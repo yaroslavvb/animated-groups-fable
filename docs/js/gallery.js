@@ -1,7 +1,7 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=9";
-import { attachControls } from "./controls.js?v=9";
+import { FilmGroupAnimation } from "./renderer.js?v=12";
+import { attachControls } from "./controls.js?v=12";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -155,7 +155,7 @@ for (const f of FEATURED) {
     `</div><p style="margin:0.4rem 0 0;">${f.text}</p>`;
   d.append(cap);
   root.append(d);
-  const anim = new FilmGroupAnimation(canvas, f.spec, { cell: 84 });
+  const anim = new FilmGroupAnimation(canvas, f.spec);
   attachControls(anim, d, cap);
   anims.push(anim);
   observer.observe(canvas);

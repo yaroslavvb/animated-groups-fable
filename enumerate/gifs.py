@@ -105,7 +105,24 @@ def _scale_of(T):
     return math.sqrt(abs(T[0][0] * T[1][1] - T[0][1] * T[1][0]))
 
 
-def render_frame(spec, t, size, cell):
+def _auto_cell(spec, size):
+    """Uniform repeat count, mirroring renderer.js: cell size chosen so every
+    GIF shows the same number of translation repeats; sparse cells (one or
+    two distinct spatial sites) get more repeats, very dense ones fewer.
+    Sites are counted by distinct spatial part (reversal partners coincide)."""
+    seen = set()
+    for op in spec["ops"]:
+        key = (tuple(tuple(r) for r in op["M"]),
+               tuple(round(x % 1.0, 6) for x in op["v"]))
+        seen.add(key)
+    n = len(seen)
+    repeats = 5 if n <= 1 else 4 if n <= 2 else 3 if n <= 6 else 2.5
+    return max(24, size / repeats)
+
+
+def render_frame(spec, t, size, cell=None):
+    if cell is None:
+        cell = _auto_cell(spec, size)
     W = size * SS
     img = Image.new("RGB", (W, W), BG)
     draw = ImageDraw.Draw(img)
@@ -181,7 +198,7 @@ def render_frame(spec, t, size, cell):
     return img.resize((size, size), Image.LANCZOS)
 
 
-def render_gif(spec, out_path, size=480, frames=40, cell=110, seconds=4.0):
+def render_gif(spec, out_path, size=480, frames=40, cell=None, seconds=4.0):
     # GIF delays are quantized to centiseconds: choose duration as a multiple
     # of 10 ms (frames=40, 4 s -> exactly 100 ms/frame) to keep the loop exact
     duration = round(1000 * seconds / frames / 10) * 10

@@ -13,7 +13,7 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=9";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=12";
 
 const TWO_PI = Math.PI * 2;
 
@@ -110,7 +110,8 @@ export class FilmGroupAnimation {
   constructor(canvas, spec, opts = {}) {
     this.canvas = canvas;
     this.spec = spec;
-    this.cell = opts.cell || 64;          // pixels per lattice unit (a1 length)
+    this.cellOverride = opts.cell || null; // explicit px-per-cell (tests only)
+    this.cell = this.cellOverride || 64;   // else derived in _setupGeometry
     this.minMotifPx = opts.minMotifPx || 9;  // upscale cell if motifs smaller
     this.period = opts.period || 4000;    // ms per time period
     this.showOverlay = opts.showOverlay || false;
@@ -138,6 +139,21 @@ export class FilmGroupAnimation {
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     this.w = w; this.h = h; this.dpr = dpr;
+    // UNIFORM REPEAT COUNT: size the cell so the pattern shows the same
+    // number of translation repeats along the canvas's short side on every
+    // diagram — enough to see the symmetry, no more. Cells with only one or
+    // two distinct sites (e.g. p1, centred p1) get extra repeats so the
+    // lattice is still evident; very dense cells slightly fewer so each
+    // clock stays legible. Reversal partners share a spatial site and are
+    // drawn superimposed, so sites are counted by distinct spatial part.
+    if (!this.cellOverride && !this._rescaled) {
+      const f1 = x => ((x % 1) + 1) % 1;
+      const key = op => op.M.flat().join(",") + "|" +
+        op.v.map(x => Math.round(f1(x) * 1e6)).join(",");
+      const nSites = new Set(this.spec.ops.map(key)).size;
+      const repeats = nSites <= 1 ? 5 : nSites <= 2 ? 4 : nSites <= 6 ? 3 : 2.5;
+      this.cell = Math.max(24, Math.min(w, h) / repeats);
+    }
     const B = this.spec.basis;
     const s = this.cell;
     // cartesian pixel basis (y flipped for screen)

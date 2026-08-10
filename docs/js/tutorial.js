@@ -2,9 +2,9 @@
  * All animation specs come from data/featured.json (single source of truth,
  * verified by enumerate/verify_animations.py and at runtime by orbit.js). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=9";
-import { StripAnimation } from "./strip.js?v=9";
-import { attachControls } from "./controls.js?v=9";
+import { FilmGroupAnimation } from "./renderer.js?v=12";
+import { StripAnimation } from "./strip.js?v=12";
+import { attachControls } from "./controls.js?v=12";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",
@@ -56,7 +56,7 @@ async function init() {
   /* hero */
   const heroCanvas = document.getElementById("hero");
   if (heroCanvas) {
-    const heroAnim = new FilmGroupAnimation(heroCanvas, data.specs.hero, { cell: 78 });
+    const heroAnim = new FilmGroupAnimation(heroCanvas, data.specs.hero);
     attachControls(heroAnim, heroCanvas.parentElement, heroCanvas.nextSibling);
     attach(heroAnim);
   }
@@ -74,7 +74,7 @@ async function init() {
       canvas.style.cssText = "width:100%;height:96px;border:1px solid var(--rule);border-radius:8px;background:#faf9f6;";
       fig.append(label, canvas);
       stripsDiv.append(fig);
-      const anim = new StripAnimation(canvas, g, { cell: 92 });
+      const anim = new StripAnimation(canvas, g);
       attachControls(anim, fig);
       attach(anim);
     }
@@ -88,13 +88,13 @@ async function init() {
       card.className = "gcard";
       const canvas = document.createElement("canvas");
       card.append(canvas);
-      const anim = new FilmGroupAnimation(canvas, data.specs[b.id], { cell: 58 });
+      bd.append(card);   // attach before constructing: geometry reads clientWidth
+      const anim = new FilmGroupAnimation(canvas, data.specs[b.id]);
       attachControls(anim, card);
       const meta = document.createElement("div");
       meta.className = "meta";
       meta.innerHTML = `<b>${b.title}</b> <span class="sym" style="margin-left:0.4em;">${b.sym}</span><div style="margin-top:0.2rem;color:var(--muted);">${b.text}</div>`;
       card.append(meta);
-      bd.append(card);
       attach(anim);
     }
   }

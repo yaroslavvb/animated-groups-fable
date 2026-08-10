@@ -5,7 +5,7 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=9";
+import { drawMotif } from "./renderer.js?v=12";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -38,7 +38,8 @@ export class StripAnimation {
   constructor(canvas, spec, opts = {}) {
     this.canvas = canvas;
     this.spec = spec;
-    this.cell = opts.cell || 88;
+    this.cellOverride = opts.cell || null;  // explicit px-per-cell (tests only)
+    this.cell = this.cellOverride || 88;    // else derived per draw from width
     this.period = opts.period || 4000;
     this.running = false;
     this.t0 = null;
@@ -106,7 +107,21 @@ export class StripAnimation {
     }
     ctx.translate(w / 2, h / 2);
 
-    const r = 0.30 * this.cell;
+    // uniform repeat count (mirrors FilmGroupAnimation): show the same
+    // number of cells on every strip; sparse cells (one site) get more
+    if (!this.cellOverride) {
+      const f1 = x => ((x % 1) + 1) % 1;
+      const sites = new Set();
+      for (const o of this.spec.ops) {
+        sites.add(o.m + "|" + Math.round(f1(o.v) * 1e6));
+        if (this.spec.cent) {
+          sites.add(o.m + "|" + Math.round(f1(o.v + this.spec.cent[0]) * 1e6));
+        }
+      }
+      const repeats = sites.size <= 1 ? 7 : sites.size <= 2 ? 5 : 4;
+      this.cell = w / repeats;
+    }
+    const r = Math.min(0.30 * this.cell, 0.34 * h);
     const base = 0.27;  // generic offset within the cell
     const copies = [];
     for (const op of this.spec.ops) {

@@ -295,3 +295,57 @@ footer.site {
 
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 @media (max-width: 720px) { .two-col { grid-template-columns: 1fr; } }
+
+/* ------- tabbed notation demos ------- */
+.tabdemo { margin: 1.5rem 0; }
+.tabbar { display: flex; gap: 0.35rem; flex-wrap: wrap; position: relative; z-index: 1; }
+.tabbtn {
+  font-family: Charter, Georgia, serif;
+  font-weight: 600;
+  font-size: 0.98rem;
+  padding: 0.28rem 0.85rem;
+  border: 1px solid var(--rule);
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  background: var(--code-bg);
+  color: var(--muted);
+  cursor: pointer;
+}
+.tabbtn.active { background: var(--panel); color: var(--ink); }
+.tabpane {
+  display: none;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  border-radius: 0 10px 10px 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.tabpane.active { display: block; }
+.tabpane canvas { width: 100%; height: 300px; display: block; background: #faf9f6; }
+.tabpane .caption { padding: 0.7rem 1rem; font-size: 0.93rem; border-top: 1px solid var(--rule); }
+.tabpane .caption .sym { font-size: 1.15rem; }
+.sym sup { font-size: 0.7em; }
+
+/* ------- wallpaper atlas ------- */
+.toc { display: flex; gap: 0.45rem; flex-wrap: wrap; margin: 1.1rem 0 1.8rem; }
+.toc .chip {
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  padding: 0.18rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 99px;
+  background: var(--panel);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+}
+.toc .chip:hover { border-color: var(--accent); }
+.toc .chip .n, section.wp h2 .n { color: var(--muted); font-weight: normal; }
+.toc .chip .n { margin-left: 0.25em; }
+section.wp { margin: 2.6rem 0; }
+section.wp h2 {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.3rem;
+}
+section.wp h2 .n { font-size: 0.95rem; margin-left: 0.4em; }
+section.wp .demo canvas { height: 280px; }

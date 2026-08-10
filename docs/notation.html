@@ -16,6 +16,7 @@
       <a href="catalog.html">Catalog</a>
       <a href="gallery.html">Gallery</a>
       <a href="notation.html" class="here">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
       <a href="history.html">History</a>
     </nav>
   </div>
@@ -64,6 +65,7 @@ time-axis space groups P4, P4<sub>1</sub>, P4<sub>2</sub>, P4<sub>3</sub>.
 (Assignments like 4<sub>1</sub>4<sub>3</sub>2 obey the relation sums but need a
 drifting lattice; they reappear on centred lattices as the
 <span class="sym">c</span>-prefixed groups.)</p>
+<div class="tabdemo" id="tabs-gyration"></div>
 
 <h3>2. Tilde marks — time glides</h3>
 <p>A mirror can only carry a time offset of 0 or ½ (it is an involution). A
@@ -84,6 +86,7 @@ half a period (a <em>mixed</em> space–time glide, Ke–Wu's
 (m<sub>x</sub> | T<sub>y</sub><sup>1/2</sup>T<sub>t</sub><sup>1/2</sup>));
 quarter offsets <span class="sym">×<sub>¼</sub></span> occur on time-centred
 lattices, the analogue of crystallographic d-glides.</p>
+<div class="tabdemo" id="tabs-glides"></div>
 
 <h3>3. Stacking prefixes — time-centred lattices</h3>
 <p>Some film groups contain a translation that moves half (or a third of) a
@@ -98,6 +101,7 @@ types; the checkerboard that swaps colours every half period);<br>
 time-axis I4: the centring forces the two kinds of 4-centres to run half a
 period out of phase, so one class is plain <span class="sym">4</span> and the
 other is a <span class="sym">4<sub>2</sub></span> screw.</p>
+<div class="tabdemo" id="tabs-centred"></div>
 
 <h3>4. The prime clause — time reversal</h3>
 <p>If the film also has time-reversing symmetries (as a spacetime pattern: the
@@ -120,21 +124,32 @@ When the reversal enriches the spatial projection beyond the forward part's
 (reversal glides add translations, reversal mirrors add directions), the
 enriched projection is appended in brackets, e.g.
 <span class="sym">o/m′[cm]</span>.</p>
+<div class="tabdemo" id="tabs-reversal"></div>
 
 <div class="aside">
 <span class="label">Resolution</span>
-<p style="margin:0.3rem 0;">For time-<em>orientation-preserving</em> groups the
-decorated symbol is a complete invariant. For reversal groups the single
-coset descriptor does not always resolve the relative positions of the
-reversing operations (the analogue of the P4₂/m-vs-P4₂/n origin distinctions
-of crystallography); where several groups share a symbol the catalog appends
-a superscript index — <span class="sym">*×/1′<sup>a</sup></span>,
-<span class="sym">*×/1′<sup>b</sup></span>, … — and the generator list, which
+<p style="margin:0.3rem 0;">For forward-time groups on a <em>primitive</em>
+lattice the decorated symbol is a complete invariant. Two kinds of collision
+survive. On time-centred lattices the prefix does not say which mirror family
+is in phase with the centring, so four forward kaleidoscopic
+<span class="sym">c</span>-groups come in same-symbol pairs
+(<span class="sym">c*222<sub>1</sub>2<sub>1</sub></span>,
+<span class="sym">c22<sub>1</sub>*</span>,
+<span class="sym">c2<sub>1</sub>*22</span>,
+<span class="sym">c*44<sub>2</sub>2<sub>1</sub></span>). And for reversal
+groups the single coset descriptor does not always resolve the relative
+positions of the reversing operations (the analogue of the
+I222-vs-I2₁2₁2₁ distinction of crystallography, where only the relative
+position of the axes separates the groups). Wherever several groups share a
+symbol the catalog appends a superscript index —
+<span class="sym">**/g′<sup>a</sup></span>,
+<span class="sym">**/g′<sup>b</sup></span>, … — and the generator list, which
 is always complete, disambiguates. A fully faithful treatment of the reversal
 layer would be a two-colour orbifold theory in the style of <i>The Symmetries
 of Things</i>, applied along the time fibre; we leave that as the natural next
 step.</p>
 </div>
+<div class="tabdemo" id="tabs-letters"></div>
 
 <h2>Reading a symbol</h2>
 <div class="thm">
@@ -149,6 +164,14 @@ in spacetime (its mirror twin is <span class="sym">6<sub>5</sub>3<sub>2</sub>2<s
 and is one of the simplest film groups that is not a product of any wallpaper
 group with any time group.</p>
 </div>
+<div class="tabdemo" id="tabs-reading"></div>
+
+<h2>The atlas: 17 wallpapers, 275 films</h2>
+<p>The base symbol organises the whole catalog: every film group projects to
+one of the 17 wallpaper groups, and the <a href="wallpaper.html">wallpaper
+atlas</a> arranges all 275 by this projection — each wallpaper group rendered
+as a film in its own right (the product with a trivial clock), followed by
+every film group whose long-exposure photograph it is.</p>
 
 <h2>Why this works: the Seifert picture</h2>
 <p>Quotient a looping film by its group G: the result is a 3-orbifold fibred in
@@ -179,5 +202,6 @@ corresponding 3D space group with distinguished axis. See the
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
+<script type="module" src="js/notation.js?v=12"></script>
 </body>
 </html>

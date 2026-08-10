@@ -1,8 +1,8 @@
 /* Catalog browser: loads data/catalog.json, filterable card grid with
  * lazily-animated canvases (only visible cards animate). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=9";
-import { attachControls } from "./controls.js?v=9";
+import { FilmGroupAnimation } from "./renderer.js?v=12";
+import { attachControls } from "./controls.js?v=12";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -13,6 +13,20 @@ async function init() {
   state.meta = data.meta;
   buildFilters(data);
   render();
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
+}
+
+/* deep links: catalog.html#g94 scrolls to the card and opens its detail
+ * modal (used by the notation examples and the wallpaper atlas) */
+function openFromHash() {
+  const id = location.hash.replace(/^#/, "");
+  if (!id) return;
+  const g = state.groups.find(x => x.id === id);
+  if (!g) return;
+  const card = document.querySelector(`[data-gid="${id}"]`);
+  if (card) card.scrollIntoView({ block: "center", behavior: "instant" });
+  showDetail(g);
 }
 
 function uniq(arr) { return [...new Set(arr)]; }
@@ -75,7 +89,8 @@ function render() {
     card.dataset.gid = g.id;
     const canvas = document.createElement("canvas");
     card.append(canvas);
-    const anim = new FilmGroupAnimation(canvas, g.render, { cell: 52 });
+    grid.append(card);   // attach before constructing: geometry reads clientWidth
+    const anim = new FilmGroupAnimation(canvas, g.render);
     state.anims.set(g.id, anim);
     attachControls(anim, card);
     const meta = document.createElement("div");
@@ -93,7 +108,6 @@ function render() {
     card.append(meta);
     meta.onclick = () => showDetail(g);
     canvas.onclick = () => showDetail(g);
-    grid.append(card);
     observer.observe(card);
   }
 }
@@ -129,7 +143,7 @@ function showDetail(g) {
   dlg.showModal();
   const canvas = document.getElementById("d-canvas");
   if (state.detailAnim) state.detailAnim.stop();
-  state.detailAnim = new FilmGroupAnimation(canvas, g.render, { cell: 80 });
+  state.detailAnim = new FilmGroupAnimation(canvas, g.render);
   const cbox = document.getElementById("d-controls");
   cbox.innerHTML = "";
   attachControls(state.detailAnim, cbox);
