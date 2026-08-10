@@ -193,6 +193,105 @@ def subgroup_coset_reps(gens_sub, gens_big, N, dim):
     return reps
 
 
+def solve_int(A, b):
+    """One integer solution of A x = b over Z, or None."""
+    n = len(A)
+    m = len(A[0]) if n else 0
+    D, U, V = smith_normal_form([row[:] for row in A])
+    Ub = [sum(U[i][k] * b[k] for k in range(n)) for i in range(n)]
+    y = [0] * m
+    r = min(n, m)
+    for i in range(n):
+        d = D[i][i] if i < r else 0
+        if d:
+            if Ub[i] % d != 0:
+                return None
+            y[i] = Ub[i] // d
+        else:
+            if Ub[i] != 0:
+                return None
+    return [sum(V[i][k] * y[k] for k in range(m)) for i in range(m)]
+
+
+def kernel_int(A):
+    """Integer nullspace basis of A x = 0 (complete lattice of solutions)."""
+    n = len(A)
+    m = len(A[0]) if n else 0
+    D, U, V = smith_normal_form([row[:] for row in A])
+    out = []
+    r = min(n, m)
+    for j in range(m):
+        d = D[j][j] if j < r else 0
+        if d == 0:
+            out.append([V[i][j] for i in range(m)])
+    return out
+
+
+def lll_reduce(basis, delta=Fraction(3, 4)):
+    """LLL lattice basis reduction (integer vectors, exact arithmetic)."""
+    b = [list(map(int, v)) for v in basis if any(v)]
+    if not b:
+        return []
+    n = len(b)
+
+    def dot(u, v):
+        return sum(x * y for x, y in zip(u, v))
+
+    def gso():
+        bstar = []
+        mu = [[Fraction(0)] * n for _ in range(n)]
+        for i in range(n):
+            bi = [Fraction(x) for x in b[i]]
+            for j in range(i):
+                denom = dot(bstar[j], bstar[j])
+                mu[i][j] = Fraction(dot([Fraction(x) for x in b[i]], bstar[j]),
+                                    1) / denom if denom else Fraction(0)
+                bi = [x - mu[i][j] * y for x, y in zip(bi, bstar[j])]
+            bstar.append(bi)
+        return bstar, mu
+
+    bstar, mu = gso()
+    k = 1
+    guard = 0
+    while k < n and guard < 10000:
+        guard += 1
+        for j in range(k - 1, -1, -1):
+            if abs(mu[k][j]) > Fraction(1, 2):
+                q = int(mu[k][j] + Fraction(1, 2)) if mu[k][j] > 0 else \
+                    -int(-mu[k][j] + Fraction(1, 2))
+                b[k] = [x - q * y for x, y in zip(b[k], b[j])]
+                bstar, mu = gso()
+        d1 = dot(bstar[k], bstar[k])
+        d0 = dot(bstar[k - 1], bstar[k - 1])
+        if d0 and Fraction(d1) >= (delta - mu[k][k - 1] ** 2) * d0:
+            k += 1
+        else:
+            b[k], b[k - 1] = b[k - 1], b[k]
+            bstar, mu = gso()
+            k = max(k - 1, 1)
+    return b
+
+
+def size_reduce_against(x, basis):
+    """Reduce vector x modulo the lattice spanned by basis (Babai rounding)."""
+    if not basis:
+        return x
+    x = list(map(int, x))
+
+    def dot(u, v):
+        return sum(a * b for a, b in zip(u, v))
+
+    for _ in range(3):
+        for bv in basis:
+            nb = dot(bv, bv)
+            if nb == 0:
+                continue
+            q = round(Fraction(dot(x, bv), nb))
+            if q:
+                x = [a - int(q) * c for a, c in zip(x, bv)]
+    return x
+
+
 # ---------------------------------------------------------------- self-tests
 if __name__ == "__main__":
     import random

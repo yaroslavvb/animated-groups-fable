@@ -473,21 +473,42 @@ def _orientation_ok(mode, detK, c_sign, has_time):
     raise ValueError(mode)
 
 
-def find_conjugations(ac_src, ac_dst, bound=2, orientation="any", max_found=None):
+def _op_conj_invariant(ac, i):
+    """Per-op data preserved by unimodular conjugation."""
+    from exact import smith_normal_form
+    A = ac.A[i]
+    n = len(A)
+    (M, s) = ac.P[i]
+
+    def snf_div(B):
+        D, _, _ = smith_normal_form([list(r) for r in B])
+        return tuple(D[k][k] for k in range(n))
+
+    Am = [[A[r][c2] - (1 if r == c2 else 0) for c2 in range(n)] for r in range(n)]
+    Ap = [[A[r][c2] + (1 if r == c2 else 0) for c2 in range(n)] for r in range(n)]
+    tr = sum(A[k][k] for k in range(n))
+    return (s, tr, snf_div(Am), snf_div(Ap))
+
+
+def find_conjugations(ac_src, ac_dst, bound=2, orientation="any",
+                      max_found=None, combo_bound=3, galilean=True):
     """Find conjugations mapping (P_src, L_src) -> (P_dst, L_dst) respecting the
     Galilean block structure, as integer unimodular matrices K in lattice
-    coordinates (the standard-coordinates map is N = B_dst K B_src^{-1}).
+    coordinates (standard-coordinates map: N = B_dst K B_src^{-1}).
     Returns list of (K, perm), perm[i] = index in dst of the conjugated op i.
 
-    The Galilean condition (bottom row of N = [0..0, c]) holds iff
-    (t-row of B_dst) . K = c * (t-row of B_src), enforced column-wise; |c| is
-    forced by the ratio of time denominators. All op checks are integer
-    arithmetic in lattice coordinates: K A_g K^{-1} must be some A_h of dst.
+    Method: the conditions  K A_g = A_h K  (for generators g with candidate
+    images h) and  (t-row of B_dst) K = c (t-row of B_src)  are LINEAR in the
+    entries of K, with |c| forced by the ratio of lattice time denominators.
+    We solve the integer solution lattice by Smith normal form and enumerate
+    small combinations, then filter by unimodularity, orientation and the full
+    op check. `bound` is kept for API compatibility (unused).
     """
     src, dst = ac_src, ac_dst
     has_time = src.lat.has_time
     n = src.n
     out = []
+    seen = set()
 
     def try_K(K, c_sign):
         detK = int(det3(K))
@@ -495,6 +516,10 @@ def find_conjugations(ac_src, ac_dst, bound=2, orientation="any", max_found=None
             return None
         if not _orientation_ok(orientation, detK, c_sign, has_time):
             return None
+        Kt = tuple(tuple(row) for row in K)
+        if (Kt, c_sign) in seen:
+            return None
+        seen.add((Kt, c_sign))
         Kinv = int_inverse_unimodular(K)
         perm = []
         for Ag in src.A:
@@ -505,49 +530,99 @@ def find_conjugations(ac_src, ac_dst, bound=2, orientation="any", max_found=None
             perm.append(j)
         if len(set(perm)) != len(perm):
             return None
-        return (tuple(tuple(row) for row in K), perm)
+        # time signs must be preserved
+        for i, j in enumerate(perm):
+            if src.P[i][1] != dst.P[j][1]:
+                return None
+        return (Kt, perm)
 
-    rng = range(-bound, bound + 1)
+    from exact import kernel_int, solve_int
 
-    if not has_time:
-        for K in gl_cached(n, bound):
-            r = try_K(K, 1)
-            if r and r not in out:
-                out.append(r)
-                if max_found and len(out) >= max_found:
-                    return out
-        return out
+    gen_idx = src._generator_indices()
+    if has_time and galilean:
+        q_src, q_dst = src.lat.time_den(), dst.lat.time_den()
+        cabs = Fraction(q_src, q_dst)
+        trow_d = [Fraction(dst.lat.B[n - 1][j]) for j in range(n)]
+        trow_s = [Fraction(src.lat.B[n - 1][j]) for j in range(n)]
+        c_branches = [cabs, -cabs]
+    else:
+        # crystallographic mode: arbitrary GL_n(Z) re-basings; the time
+        # direction is distinguished only through the s-labels of point ops
+        # (checked in try_K), not through the conjugating matrix.
+        c_branches = [None]
 
-    # --- time case: prune by column time-components
-    q_src, q_dst = src.lat.time_den(), dst.lat.time_den()
-    cabs = Fraction(q_src, q_dst)
-    trow_d = [Fraction(dst.lat.B[n - 1][j]) for j in range(n)]
-    trow_s = [Fraction(src.lat.B[n - 1][j]) for j in range(n)]
-    for c in (cabs, -cabs):
-        c_sign = 1 if c > 0 else -1
-        # entries of K must accommodate the time rescale: bound grows with |c|
-        b_here = max(bound, math.ceil(abs(c)))
-        rng_c = range(-b_here, b_here + 1)
-        all_cols = [tuple(col) for col in iproduct(rng_c, repeat=n)]
-        col_options = []
-        feasible = True
+    # candidate images per generator, filtered by conjugation invariants
+    inv_dst = [_op_conj_invariant(dst, j) for j in range(len(dst.P))]
+    img_options = []
+    for i in gen_idx:
+        inv = _op_conj_invariant(src, i)
+        opts = [j for j in range(len(dst.P)) if inv_dst[j] == inv]
+        if not opts:
+            return []
+        img_options.append(opts)
+
+    NV = n * n  # unknowns: K entries row-major
+
+    def conj_rows(Ag, Ah):
+        rows = []
         for i in range(n):
-            target = c * trow_s[i]
-            opts = [col for col in all_cols
-                    if sum(t * k for t, k in zip(trow_d, col)) == target]
-            if not opts:
-                feasible = False
-                break
-            col_options.append(opts)
-        if not feasible:
-            continue
-        for cols in iproduct(*col_options):
-            K = tuple(tuple(cols[j][i] for j in range(n)) for i in range(n))
-            r = try_K(K, c_sign)
-            if r:
-                out.append(r)
-                if max_found and len(out) >= max_found:
-                    return out
+            for j in range(n):
+                row = [0] * NV
+                for q in range(n):
+                    row[i * n + q] += Ag[q][j]      # (K Ag)_{ij}
+                    if False:
+                        pass
+                for p in range(n):
+                    row[p * n + j] -= Ah[i][p]      # (Ah K)_{ij}
+                rows.append(row)
+        return rows
+
+    for c in c_branches:
+        c_sign = 1 if (c is None or c > 0) else -1
+        for images in iproduct(*img_options) if img_options else [()]:
+            rows = []
+            rhs = []
+            for gi, hj in zip(gen_idx, images):
+                for row in conj_rows(src.A[gi], dst.A[hj]):
+                    rows.append(row)
+                    rhs.append(0)
+            if has_time and galilean:
+                # scale t-row condition to integers
+                den = 1
+                for x in trow_d + [c * t for t in trow_s]:
+                    den = den * Fraction(x).denominator // gcd(
+                        den, Fraction(x).denominator)
+                for j in range(n):
+                    row = [0] * NV
+                    for i in range(n):
+                        row[i * n + j] = int(Fraction(trow_d[i]) * den)
+                    rows.append(row)
+                    rhs.append(int(Fraction(c * trow_s[j]) * den))
+            if not rows:
+                rows = [[0] * NV]
+                rhs = [0]
+            x0 = solve_int(rows, rhs)
+            if x0 is None:
+                continue
+            from exact import lll_reduce, size_reduce_against
+            kb = lll_reduce(kernel_int(rows))
+            x0 = size_reduce_against(x0, kb)
+            dim = len(kb)
+            cb = combo_bound
+            while (2 * cb + 1) ** dim > 200000 and cb > 1:
+                cb -= 1
+            for combo in iproduct(range(-cb, cb + 1), repeat=dim):
+                x = list(x0)
+                for coeff, base in zip(combo, kb):
+                    if coeff:
+                        for k in range(NV):
+                            x[k] += coeff * base[k]
+                K = [[x[i * n + j] for j in range(n)] for i in range(n)]
+                r = try_K(K, c_sign)
+                if r:
+                    out.append(r)
+                    if max_found and len(out) >= max_found:
+                        return out
     return out
 
 

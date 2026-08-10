@@ -19,18 +19,23 @@ from stcore import (ArithClass, Lattice, find_conjugations, group_closure,
 from driver import cheap_invariant, dedupe_pairs, enumerate_groups
 
 ORIENT = "proper3"
+GALILEAN = False  # crystallographic (Ke-Wu) convention; True = strict frame-preserving
 
 
 def _dedupe_bucket(args):
     bucket, bound = args
-    reps, merged = dedupe_pairs(bucket, bound=bound, orientation=ORIENT)
+    reps, merged = dedupe_pairs(bucket, bound=bound, orientation=ORIENT,
+                                galilean=GALILEAN)
     return reps, merged
 
 
 def _enum_class(args):
     name, ac, bound_moves = args
     D2, reps = ac.h1_with_reps()
-    moves = find_conjugations(ac, ac, bound=bound_moves, orientation=ORIENT)
+    if len(reps) <= 1:
+        return (name, ac, reps, len(reps), 0)
+    moves = find_conjugations(ac, ac, bound=bound_moves, orientation=ORIENT,
+                              galilean=GALILEAN)
     orbits = reduce_classes(ac, reps, moves)
     return (name, ac, orbits, len(reps), len(moves))
 
@@ -116,7 +121,26 @@ def classify_system(ac):
         return "Trigonal"
     if 4 in spatial_orders:
         return "Tetragonal"
-    # only orders 1, 2 remain: count 2-fold "directions"
+    # only orders 1, 2 remain: count 2-fold "directions" (as actual axes)
+    def eigdir(M, val):
+        # primitive direction with M v = val*v
+        a11, a12 = M[0][0] - val, M[0][1]
+        a21, a22 = M[1][0], M[1][1] - val
+        if a11 == 0 and a12 == 0:
+            v = (1, 0)
+        elif a21 == 0 and a22 == 0:
+            v = (0, 1)
+        elif (a11, a12) != (0, 0):
+            v = (-a12, a11)
+        else:
+            v = (-a22, a21)
+        from math import gcd
+        g = gcd(abs(v[0]), abs(v[1])) or 1
+        v = (v[0] // g, v[1] // g)
+        if v[0] < 0 or (v[0] == 0 and v[1] < 0):
+            v = (-v[0], -v[1])
+        return v
+
     dirs = set()
     for (M, s) in P:
         det = M[0][0] * M[1][1] - M[0][1] * M[1][0]
@@ -129,10 +153,9 @@ def classify_system(ac):
         elif M == M_R2 and s == -1:
             pass                             # inversion: no direction
         elif det == -1:
-            # spatial mirror: s=+1 vertical mirror (normal in-plane);
-            # s=-1 in-plane 2-fold (axis in-plane)
-            dirs.add(("ax", M, 1 if s == -1 else 0) if False else ("d", M))
-    n_inplane = len([x for x in dirs if x != "t"])
+            # s=+1 vertical mirror: direction = its normal (-1 eigenvector);
+            # s=-1 in-plane 2-fold: direction = its axis (+1 eigenvector)
+            dirs.add(eigdir(M, 1) if s == -1 else eigdir(M, -1))
     total_dirs = len(dirs)
     if total_dirs == 0:
         return "Triclinic"
@@ -216,6 +239,19 @@ def main():
         got = by_system.get(k, 0)
         mark = "OK" if got == expected[k] else f"EXPECTED {expected[k]}"
         print(f"  {k:14s} {got:4d}  {mark}")
+
+    # per-(system, lattice-signature) rows for localization
+    rows = {}
+    for cname, ac, orbits in out_classes:
+        sysname = classify_system(ac)
+        sig = tuple(sorted(tuple(str(x) for x in r)
+                           for r in ac.lat.residues if any(r)))
+        key = (sysname, sig)
+        rows.setdefault(key, [0, []])
+        rows[key][0] += len(orbits)
+        rows[key][1].append(f"{cname}({len(orbits)})")
+    for (sysname, sig), (cnt, names) in sorted(rows.items()):
+        print(f"    {sysname:14s} {cnt:3d}  res={sig}  {' '.join(names)}")
 
     with open("out/enum2p1.pkl", "wb") as f:
         pickle.dump({"classes": out_classes, "merged": merged,
