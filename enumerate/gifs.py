@@ -12,14 +12,17 @@ import sys
 from PIL import Image, ImageDraw
 
 SS = 4  # supersampling factor
-# satellite revolutions per period; |1 - SAT_REVS| = 1 keeps all n screw
-# copies' satellites at n DISTINCT screen angles (mirrors renderer.js)
+# Two-handed clock, mirrors renderer.js (static colors; time = motion only):
+# outer hand c=2 (|1-c|=1: n distinct positions around n-fold screws),
+# inner hand c=1 (odd: resolves half-period offsets the outer misses).
 SAT_REVS = 2
+SAT_REVS_INNER = 1
 
 BODY = (59, 110, 165)
 BEAK = (224, 145, 60)
 ORBIT = (135, 135, 155)
 TAIL = (192, 57, 43)
+INNER = (46, 125, 79)
 BG = (250, 249, 246)
 
 
@@ -48,20 +51,14 @@ def motif_paths(r):
 def draw_motif(draw, cx, cy, T, theta, r):
     """T = 2x2 pixel transform matrix applied to motif-local coords.
 
-    As in renderer.js, the clock has two rotation-INVARIANT channels (hue and
-    pulse) besides the satellite angle, so time-screw phase offsets cannot be
-    aliased by the spatial rotation of the copy."""
-    import colorsys
+    Static colors; internal time is carried entirely by the two moving hands
+    (outer c=2, inner c=1), mirroring renderer.js."""
 
     def xf(p):
         x, y = p
         return (cx + T[0][0] * x + T[0][1] * y, cy + T[1][0] * x + T[1][1] * y)
 
-    ph = theta % 1.0
-    pulse = 1 + 0.16 * math.cos(2 * math.pi * ph)
-    hue_rgb = tuple(int(255 * c) for c in colorsys.hls_to_rgb(ph, 0.45, 0.78))
-
-    body, beak = motif_paths(r * pulse)
+    body, beak = motif_paths(r)
     draw.polygon([xf(p) for p in body], fill=BODY)
     draw.polygon([xf(p) for p in beak], fill=BEAK)
 
@@ -75,11 +72,18 @@ def draw_motif(draw, cx, cy, T, theta, r):
     tail = [xf((orbit_r * math.cos(ang - a), orbit_r * math.sin(ang - a)))
             for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
     draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
-    # satellite: hue encodes internal time
+    # outer satellite (static color)
     sx, sy = xf((orbit_r * math.cos(ang), orbit_r * math.sin(ang)))
-    sr = 0.15 * r * _scale_of(T) * (0.8 + 0.5 * pulse - 0.5)
-    draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=hue_rgb,
-                 outline=(45, 45, 65), width=max(1, int(0.02 * r)))
+    sr = 0.13 * r * _scale_of(T)
+    draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=TAIL)
+    # inner hand (c = SAT_REVS_INNER): resolves half-period offsets
+    ang2 = SAT_REVS_INNER * 2 * math.pi * theta
+    inner_r = 0.36 * r
+    ix, iy = xf((inner_r * math.cos(ang2), inner_r * math.sin(ang2)))
+    ox, oy = xf((0, 0))
+    draw.line([(ox, oy), (ix, iy)], fill=INNER, width=max(1, int(0.06 * r)))
+    ir = 0.09 * r * _scale_of(T)
+    draw.ellipse([ix - ir, iy - ir, ix + ir, iy + ir], fill=INNER)
 
 
 def _scale_of(T):
@@ -115,7 +119,7 @@ def render_frame(spec, t, size, cell):
             d = math.hypot(dx, dy)
             if d > 1e-6 and d < min_d:
                 min_d = d
-    r = min(0.30 * min(l1, l2), 0.55 * min_d) * spec.get("motifScale", 1)
+    r = min(0.30 * min(l1, l2), 0.60 * min_d) * spec.get("motifScale", 1)
     cx0, cy0 = W / 2, W / 2
 
     # lattice window

@@ -17,13 +17,17 @@ import { verifySpec, orbitPlacements } from "./orbit.js";
 
 const TWO_PI = Math.PI * 2;
 
-/* Satellite revolutions per period. MUST be an integer (loop closure) with
- * |1 - SAT_REVS| = 1 so that around an n-fold time-screw centre the n copies
- * show n DISTINCT satellite screen angles: the k-th copy's satellite sits at
- * screen angle (1 - c) * k * 2π/n + const, so c = -1 aliased n=6 to thirds
- * and n=4 to halves. c = 2 gives the advertised "spiral of phases" for every
- * n simultaneously. */
-const SAT_REVS = 2;
+/* The motif clock has TWO hands (both integer revolutions per period, so the
+ * loop closes; colors are static — time shows only as motion):
+ *  - outer hand, c = 2 revs: around an n-fold time-screw centre the k-th
+ *    copy's hand sits at screen angle (1-c)*k*2π/n + const, and |1-c| = 1
+ *    makes all n positions distinct (the "spiral of phases") for every n;
+ *  - inner hand, c = 1 rev: the outer hand's position has period T/2, so it
+ *    cannot show half-period offsets (time glides, time centring); an odd
+ *    rev count resolves them (half a period turns the inner hand by 180°).
+ * The pair of hands determines the internal time uniquely. */
+const SAT_REVS = 2;        // outer hand
+const SAT_REVS_INNER = 1;  // inner hand
 
 /* ---------------------------------------------------------------- motif */
 // The motif must have NO accidental symmetry: chiral, asymmetric, and it
@@ -33,18 +37,8 @@ export function drawMotif(ctx, theta, r, colors) {
   const c = colors || MOTIF_COLORS;
   ctx.save();
 
-  // The clock must be readable in TWO rotation-invariant channels — hue and
-  // pulse — because a spatial rotation R_k adds k·2π/n to the satellite's
-  // apparent angle, which aliases the phase of time-screw copies (for n = 4
-  // the k and k+2 copies would look identical). Hue and size cannot be
-  // rotated, so phase offsets stay visible around every screw centre.
-  const ph = ((theta % 1) + 1) % 1;
-  const pulse = 1 + 0.16 * Math.cos(TWO_PI * ph);
-  const hue = Math.round(360 * ph);
-
-  // body: asymmetric chiral flag (comma / tadpole shape), pulsing gently
-  ctx.save();
-  ctx.scale(pulse, pulse);
+  // body: asymmetric chiral flag (comma / tadpole shape); static colors —
+  // internal time is carried entirely by the two moving hands below
   ctx.beginPath();
   ctx.moveTo(-0.15 * r, -0.5 * r);
   ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
@@ -52,7 +46,6 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.closePath();
   ctx.fillStyle = c.body;
   ctx.fill();
-  ctx.restore();
 
   // beak: sharp asymmetry marker
   ctx.beginPath();
@@ -63,8 +56,7 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.fillStyle = c.beak;
   ctx.fill();
 
-  // clock: orbit ring + satellite; SAT_REVS revolutions per period keeps the
-  // n screw-copies' satellites at n distinct screen angles (see SAT_REVS)
+  // outer hand (c = SAT_REVS): ring + tail + satellite, static color
   const ang = SAT_REVS * TWO_PI * theta;
   const orbitR = 0.68 * r;
   ctx.beginPath();
@@ -79,14 +71,25 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.strokeStyle = c.tail;
   ctx.lineWidth = Math.max(1, 0.09 * r);
   ctx.stroke();
-  // satellite: hue encodes internal time (rotation-invariant clock)
   ctx.beginPath();
-  ctx.arc(sx, sy, 0.15 * r * (0.8 + 0.5 * pulse - 0.5), 0, TWO_PI);
-  ctx.fillStyle = `hsl(${hue}, 78%, 45%)`;
+  ctx.arc(sx, sy, 0.13 * r, 0, TWO_PI);
+  ctx.fillStyle = c.satellite;
   ctx.fill();
-  ctx.lineWidth = Math.max(0.6, 0.03 * r);
-  ctx.strokeStyle = "rgba(40,40,60,0.55)";
+
+  // inner hand (c = SAT_REVS_INNER): resolves half-period offsets
+  const ang2 = SAT_REVS_INNER * TWO_PI * theta;
+  const innerR = 0.36 * r;
+  const ix = innerR * Math.cos(ang2), iy = innerR * Math.sin(ang2);
+  ctx.beginPath();
+  ctx.moveTo(0, 0);
+  ctx.lineTo(ix, iy);
+  ctx.strokeStyle = c.inner;
+  ctx.lineWidth = Math.max(1, 0.06 * r);
   ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(ix, iy, 0.09 * r, 0, TWO_PI);
+  ctx.fillStyle = c.inner;
+  ctx.fill();
 
   ctx.restore();
 }
@@ -97,6 +100,7 @@ export const MOTIF_COLORS = {
   orbit: "rgba(120,120,140,0.35)",
   tail: "#c0392b",
   satellite: "#c0392b",
+  inner: "#2e7d4f",
 };
 
 /* --------------------------------------------------------- group drawing */
@@ -153,7 +157,7 @@ export class FilmGroupAnimation {
       }
     }
     // motif footprint (ring + satellite) reaches ~0.85 r: keep 2*0.85 r < minD
-    this.motifR = Math.min(0.30 * Math.min(l1, l2), 0.55 * minD) *
+    this.motifR = Math.min(0.30 * Math.min(l1, l2), 0.60 * minD) *
                   (this.spec.motifScale || 1);
     // window of lattice translations covering the canvas (+margin)
     const inv = invert2([[this.b1[0], this.b2[0]], [this.b1[1], this.b2[1]]]);
