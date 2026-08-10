@@ -85,6 +85,9 @@ export class FilmGroupAnimation {
     this.showOverlay = opts.showOverlay || false;
     this.running = false;
     this.t0 = null;
+    this.phase = 0;          // current time in periods, [0,1)
+    this.userPaused = false; // set by controls; visibility autostart respects it
+    this.onTick = null;      // callback(phase) for control widgets
     this._frame = this._frame.bind(this);
     this._setupGeometry();
   }
@@ -124,7 +127,7 @@ export class FilmGroupAnimation {
   start() {
     if (this.running) return;
     this.running = true;
-    this.t0 = null;
+    this.t0 = null;   // _frame resumes from this.phase
     this._raf = requestAnimationFrame(this._frame);
   }
   stop() {
@@ -132,12 +135,22 @@ export class FilmGroupAnimation {
     if (this._raf) cancelAnimationFrame(this._raf);
     this._raf = null;
   }
+  getPhase() { return this.phase; }
+  setPhase(t) {
+    this.phase = ((t % 1) + 1) % 1;
+    this.t0 = null;   // if running, next frame re-anchors to the new phase
+    if (!this.running) {
+      this.drawFrame(this.phase);
+      if (this.onTick) this.onTick(this.phase);
+    }
+  }
 
   _frame(ts) {
     if (!this.running) return;
-    if (this.t0 === null) this.t0 = ts;
-    const t = ((ts - this.t0) / this.period) % 1;   // global time in periods
-    this.drawFrame(t);
+    if (this.t0 === null) this.t0 = ts - this.phase * this.period;
+    this.phase = (((ts - this.t0) / this.period) % 1 + 1) % 1;
+    this.drawFrame(this.phase);
+    if (this.onTick) this.onTick(this.phase);
     this._raf = requestAnimationFrame(this._frame);
   }
 

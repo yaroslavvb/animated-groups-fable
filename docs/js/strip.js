@@ -15,13 +15,16 @@ export class StripAnimation {
     this.period = opts.period || 4000;
     this.running = false;
     this.t0 = null;
+    this.phase = 0;
+    this.userPaused = false;
+    this.onTick = null;
     this._frame = this._frame.bind(this);
   }
 
   start() {
     if (this.running) return;
     this.running = true;
-    this.t0 = null;
+    this.t0 = null;   // _frame resumes from this.phase
     this._raf = requestAnimationFrame(this._frame);
   }
   stop() {
@@ -29,11 +32,22 @@ export class StripAnimation {
     if (this._raf) cancelAnimationFrame(this._raf);
     this._raf = null;
   }
+  getPhase() { return this.phase; }
+  setPhase(t) {
+    this.phase = ((t % 1) + 1) % 1;
+    this.t0 = null;
+    if (!this.running) {
+      this.draw(this.phase);
+      if (this.onTick) this.onTick(this.phase);
+    }
+  }
 
   _frame(ts) {
     if (!this.running) return;
-    if (this.t0 === null) this.t0 = ts;
-    this.draw(((ts - this.t0) / this.period) % 1);
+    if (this.t0 === null) this.t0 = ts - this.phase * this.period;
+    this.phase = (((ts - this.t0) / this.period) % 1 + 1) % 1;
+    this.draw(this.phase);
+    if (this.onTick) this.onTick(this.phase);
     this._raf = requestAnimationFrame(this._frame);
   }
 

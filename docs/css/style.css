@@ -236,6 +236,39 @@ button.linkish {
 }
 button.linkish:hover { border-color: var(--accent); color: var(--accent); }
 
+/* ------- animation playback controls ------- */
+.anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.3rem 0.6rem;
+  border-top: 1px solid var(--rule);
+  background: var(--panel);
+  font-family: system-ui, sans-serif;
+}
+.anim-controls .ac-btn {
+  border: 1px solid var(--rule);
+  background: var(--code-bg);
+  color: var(--ink);
+  border-radius: 6px;
+  width: 2rem;
+  height: 1.5rem;
+  line-height: 1;
+  font-size: 0.7rem;
+  cursor: pointer;
+  flex: none;
+}
+.anim-controls .ac-btn:hover { border-color: var(--accent); color: var(--accent); }
+.anim-controls .ac-slider { flex: 1; min-width: 0; accent-color: var(--accent); }
+.anim-controls .ac-label {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  flex: none;
+  min-width: 4.2em;
+  text-align: right;
+}
+
 figure { margin: 1.4rem 0; }
 figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }
 

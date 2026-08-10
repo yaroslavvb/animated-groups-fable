@@ -2,6 +2,7 @@
 "use strict";
 import { FilmGroupAnimation } from "./renderer.js";
 import { StripAnimation, CHRONOFRIEZE } from "./strip.js";
+import { attachControls } from "./controls.js";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -83,7 +84,8 @@ const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const a = anims.find(x => x.canvas === e.target);
     if (!a) continue;
-    if (e.isIntersecting) a.start(); else a.stop();
+    if (e.isIntersecting) { if (!a.userPaused) a.start(); }
+    else a.stop();
   }
 }, { rootMargin: "60px" });
 
@@ -94,7 +96,11 @@ function attach(anim) {
 
 /* hero */
 const heroCanvas = document.getElementById("hero");
-if (heroCanvas) attach(new FilmGroupAnimation(heroCanvas, HERO, { cell: 78 }));
+if (heroCanvas) {
+  const heroAnim = new FilmGroupAnimation(heroCanvas, HERO, { cell: 78 });
+  attachControls(heroAnim, heroCanvas.parentElement, heroCanvas.nextSibling);
+  attach(heroAnim);
+}
 
 /* strips */
 const stripsDiv = document.getElementById("strips");
@@ -109,7 +115,9 @@ if (stripsDiv) {
     canvas.style.cssText = "width:100%;height:96px;border:1px solid var(--rule);border-radius:8px;background:#faf9f6;";
     fig.append(label, canvas);
     stripsDiv.append(fig);
-    attach(new StripAnimation(canvas, g, { cell: 92 }));
+    const anim = new StripAnimation(canvas, g, { cell: 92 });
+    attachControls(anim, fig);
+    attach(anim);
   }
 }
 
@@ -121,12 +129,14 @@ if (bd) {
     card.className = "gcard";
     const canvas = document.createElement("canvas");
     card.append(canvas);
+    const anim = new FilmGroupAnimation(canvas, b.spec, { cell: 58 });
+    attachControls(anim, card);
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML = `<b>${b.title}</b> <span class="sym" style="margin-left:0.4em;">${b.sym}</span><div style="margin-top:0.2rem;color:var(--muted);">${b.text}</div>`;
     card.append(meta);
     bd.append(card);
-    attach(new FilmGroupAnimation(canvas, b.spec, { cell: 58 }));
+    attach(anim);
   }
 }
 

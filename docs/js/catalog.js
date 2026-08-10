@@ -2,6 +2,7 @@
  * lazily-animated canvases (only visible cards animate). */
 "use strict";
 import { FilmGroupAnimation } from "./renderer.js";
+import { attachControls } from "./controls.js";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -74,6 +75,9 @@ function render() {
     card.dataset.gid = g.id;
     const canvas = document.createElement("canvas");
     card.append(canvas);
+    const anim = new FilmGroupAnimation(canvas, g.render, { cell: 52 });
+    state.anims.set(g.id, anim);
+    attachControls(anim, card);
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML =
@@ -87,7 +91,8 @@ function render() {
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);
-    card.onclick = () => showDetail(g);
+    meta.onclick = () => showDetail(g);
+    canvas.onclick = () => showDetail(g);
     grid.append(card);
     observer.observe(card);
   }
@@ -95,17 +100,13 @@ function render() {
 
 function onVisible(entries) {
   for (const e of entries) {
-    const gid = e.target.dataset.gid;
-    const canvas = e.target.querySelector("canvas");
+    const anim = state.anims.get(e.target.dataset.gid);
+    if (!anim) continue;
     if (e.isIntersecting) {
-      if (!state.anims.has(gid)) {
-        const g = state.groups.find(x => x.id === gid);
-        const anim = new FilmGroupAnimation(canvas, g.render, { cell: 52 });
-        state.anims.set(gid, anim);
-      }
-      state.anims.get(gid).start();
-    } else if (state.anims.has(gid)) {
-      state.anims.get(gid).stop();
+      if (!anim.userPaused) anim.start();
+      else anim.setPhase(anim.getPhase());  // draw the paused frame once
+    } else {
+      anim.stop();
     }
   }
 }
@@ -129,6 +130,9 @@ function showDetail(g) {
   const canvas = document.getElementById("d-canvas");
   if (state.detailAnim) state.detailAnim.stop();
   state.detailAnim = new FilmGroupAnimation(canvas, g.render, { cell: 80 });
+  const cbox = document.getElementById("d-controls");
+  cbox.innerHTML = "";
+  attachControls(state.detailAnim, cbox);
   state.detailAnim.start();
   dlg.onclose = () => { if (state.detailAnim) state.detailAnim.stop(); };
 }

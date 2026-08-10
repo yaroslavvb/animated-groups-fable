@@ -1,6 +1,7 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
 import { FilmGroupAnimation } from "./renderer.js";
+import { attachControls } from "./controls.js";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -152,7 +153,8 @@ const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const a = anims.find(x => x.canvas === e.target);
     if (!a) continue;
-    if (e.isIntersecting) a.start(); else a.stop();
+    if (e.isIntersecting) { if (!a.userPaused) a.start(); }
+    else a.stop();
   }
 }, { rootMargin: "60px" });
 
@@ -174,6 +176,7 @@ for (const f of FEATURED) {
   d.append(cap);
   root.append(d);
   const anim = new FilmGroupAnimation(canvas, f.spec, { cell: 84 });
+  attachControls(anim, d, cap);
   anims.push(anim);
   observer.observe(canvas);
 }
