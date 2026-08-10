@@ -24,7 +24,18 @@ export function drawMotif(ctx, theta, r, colors) {
   const c = colors || MOTIF_COLORS;
   ctx.save();
 
-  // body: asymmetric chiral flag (comma / tadpole shape)
+  // The clock must be readable in TWO rotation-invariant channels — hue and
+  // pulse — because a spatial rotation R_k adds k·2π/n to the satellite's
+  // apparent angle, which aliases the phase of time-screw copies (for n = 4
+  // the k and k+2 copies would look identical). Hue and size cannot be
+  // rotated, so phase offsets stay visible around every screw centre.
+  const ph = ((theta % 1) + 1) % 1;
+  const pulse = 1 + 0.16 * Math.cos(TWO_PI * ph);
+  const hue = Math.round(360 * ph);
+
+  // body: asymmetric chiral flag (comma / tadpole shape), pulsing gently
+  ctx.save();
+  ctx.scale(pulse, pulse);
   ctx.beginPath();
   ctx.moveTo(-0.15 * r, -0.5 * r);
   ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
@@ -32,6 +43,7 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.closePath();
   ctx.fillStyle = c.body;
   ctx.fill();
+  ctx.restore();
 
   // beak: sharp asymmetry marker
   ctx.beginPath();
@@ -59,10 +71,14 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.strokeStyle = c.tail;
   ctx.lineWidth = Math.max(1, 0.09 * r);
   ctx.stroke();
+  // satellite: hue encodes internal time (rotation-invariant clock)
   ctx.beginPath();
-  ctx.arc(sx, sy, 0.13 * r, 0, TWO_PI);
-  ctx.fillStyle = c.satellite;
+  ctx.arc(sx, sy, 0.15 * r * (0.8 + 0.5 * pulse - 0.5), 0, TWO_PI);
+  ctx.fillStyle = `hsl(${hue}, 78%, 45%)`;
   ctx.fill();
+  ctx.lineWidth = Math.max(0.6, 0.03 * r);
+  ctx.strokeStyle = "rgba(40,40,60,0.55)";
+  ctx.stroke();
 
   ctx.restore();
 }

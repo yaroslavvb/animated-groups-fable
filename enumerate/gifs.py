@@ -43,12 +43,22 @@ def motif_paths(r):
 
 
 def draw_motif(draw, cx, cy, T, theta, r):
-    """T = 2x2 pixel transform matrix applied to motif-local coords."""
+    """T = 2x2 pixel transform matrix applied to motif-local coords.
+
+    As in renderer.js, the clock has two rotation-INVARIANT channels (hue and
+    pulse) besides the satellite angle, so time-screw phase offsets cannot be
+    aliased by the spatial rotation of the copy."""
+    import colorsys
+
     def xf(p):
         x, y = p
         return (cx + T[0][0] * x + T[0][1] * y, cy + T[1][0] * x + T[1][1] * y)
 
-    body, beak = motif_paths(r)
+    ph = theta % 1.0
+    pulse = 1 + 0.16 * math.cos(2 * math.pi * ph)
+    hue_rgb = tuple(int(255 * c) for c in colorsys.hls_to_rgb(ph, 0.45, 0.78))
+
+    body, beak = motif_paths(r * pulse)
     draw.polygon([xf(p) for p in body], fill=BODY)
     draw.polygon([xf(p) for p in beak], fill=BEAK)
 
@@ -62,10 +72,11 @@ def draw_motif(draw, cx, cy, T, theta, r):
     tail = [xf((orbit_r * math.cos(ang + a), orbit_r * math.sin(ang + a)))
             for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
     draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
-    # satellite
+    # satellite: hue encodes internal time
     sx, sy = xf((orbit_r * math.cos(ang), orbit_r * math.sin(ang)))
-    sr = 0.13 * r * _scale_of(T)
-    draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=TAIL)
+    sr = 0.15 * r * _scale_of(T) * (0.8 + 0.5 * pulse - 0.5)
+    draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=hue_rgb,
+                 outline=(45, 45, 65), width=max(1, int(0.02 * r)))
 
 
 def _scale_of(T):

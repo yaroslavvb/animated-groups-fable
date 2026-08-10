@@ -423,6 +423,180 @@ def ccw_phase(M, tau, basis):
     return (n, k)
 
 
+def op2_mul(a, b):
+    """Compose spatial affine ops (M, w) mod nothing."""
+    (Ma, wa), (Mb, wb) = a, b
+    M = tuple(tuple(Ma[i][0] * Mb[0][j] + Ma[i][1] * Mb[1][j] for j in range(2))
+              for i in range(2))
+    w = (Ma[0][0] * wb[0] + Ma[0][1] * wb[1] + wa[0],
+         Ma[1][0] * wb[0] + Ma[1][1] * wb[1] + wa[1])
+    return (M, w)
+
+
+def mirror_axis_minus(M):
+    """Primitive integer -1-eigenvector of a det=-1 involution."""
+    rows = [(M[0][0] + 1, M[0][1]), (M[1][0], M[1][1] + 1)]
+    row = next((r for r in rows if r != (0, 0)), None)
+    assert row is not None
+    cand = (-row[1], row[0])
+    from math import gcd
+    g = gcd(abs(cand[0]), abs(cand[1])) or 1
+    c = (cand[0] // g, cand[1] // g)
+    if c[0] < 0 or (c[0] == 0 and c[1] < 0):
+        c = (-c[0], -c[1])
+    assert (M[0][0] * c[0] + M[0][1] * c[1],
+            M[1][0] * c[0] + M[1][1] * c[1]) == (-c[0], -c[1])
+    return c
+
+
+def _decompose_eigen(w, a, am):
+    """w = gl*a + off*am in the eigenbasis (a = +1, am = -1 eigenvector)."""
+    det = a[0] * am[1] - a[1] * am[0]
+    gl = Fraction(w[0] * am[1] - w[1] * am[0], det)
+    off = Fraction(-w[0] * a[1] + w[1] * a[0], det)
+    return off, gl
+
+
+def _frac_gcd(x, y):
+    from math import gcd as igcd
+    x, y = abs(Fraction(x)), abs(Fraction(y))
+    if x == 0:
+        return y
+    if y == 0:
+        return x
+    den = x.denominator * y.denominator // igcd(x.denominator, y.denominator)
+    return Fraction(igcd(int(x * den), int(y * den)), den)
+
+
+def _lat_gens(lat2):
+    gens = [(Fraction(1), Fraction(0)), (Fraction(0), Fraction(1))]
+    gens += [(Fraction(r[0]), Fraction(r[1])) for r in lat2.residues if any(r)]
+    return gens
+
+
+def _off_spacing(a, am, lat2):
+    """Generator of the projection of the lattice onto the off (am)
+    coordinate of the eigenbasis: parallel lines repeat with this spacing."""
+    g = Fraction(0)
+    for v in _lat_gens(lat2):
+        off, _ = _decompose_eigen(v, a, am)
+        g = _frac_gcd(g, off)
+    return g if g else Fraction(1)
+
+
+def _gl_spacing(a, lat2):
+    """Generator of the intersection of the lattice with the axis direction:
+    the glide component of a reflection is defined modulo this."""
+    # smallest positive gl with gl*a in lat2: search small rational multiples
+    for q in (Fraction(1, 2), Fraction(1), Fraction(3, 2), Fraction(2),
+              Fraction(3)):
+        if lat2.contains([q * a[0], q * a[1]]):
+            return q
+    raise ValueError("no axis step found")
+
+
+def _line_key(M, w, lat2):
+    """Canonical key of the mirror/glide line of (M|w): (axis dir, -1-eigdir,
+    point-offset of the line modulo the parallel-line spacing)."""
+    a = mirror_axis(M)
+    am = mirror_axis_minus(M)
+    off, gl = _decompose_eigen((Fraction(w[0]), Fraction(w[1])), a, am)
+    g = _off_spacing(a, am, lat2)
+    pos = (Fraction(off) / 2) % g
+    return (a, am, pos)
+
+
+def _line_point(M, w):
+    """A point on the reflection line of (M|w) (perp part halved)."""
+    a = mirror_axis(M)
+    off, gl = _decompose_along_axis((Fraction(w[0]), Fraction(w[1])), a)
+    b = (Fraction(-a[1]), Fraction(a[0]))
+    return (b[0] * off / 2, b[1] * off / 2)
+
+
+def mirror_classes_detailed(fwd_ops, lat2):
+    """Group-orbit classes of reflection/glide LINES with time data.
+
+    Returns list of dicts: {key: canonical line key of rep, instances:
+    set of line keys, pure_taus: set, glide: set of (glide_frac, tau),
+    rep_op: (M, w) of a concrete instance, axis_step: q}."""
+    # concrete line instances: (M, w) over small translation window
+    inst = {}
+    for (M, s, v, tau) in fwd_ops:
+        if s != 1 or det2(M) != -1:
+            continue
+        a = mirror_axis(M)
+        am = mirror_axis_minus(M)
+        q = _gl_spacing(a, lat2)
+        for r in list(lat2.residues):
+            for i in (-1, 0, 1):
+                for j in (-1, 0, 1):
+                    w = (frac1(v[0] + r[0]) + i, frac1(v[1] + r[1]) + j)
+                    key = _line_key(M, w, lat2)
+                    off, gl = _decompose_eigen(
+                        (Fraction(w[0]), Fraction(w[1])), a, am)
+                    pure = (Fraction(gl) % q) == 0
+                    e = inst.setdefault(key, {"pure_taus": set(), "glide": set(),
+                                              "rep_op": (M, w), "axis_step": q,
+                                              "pure_here": False})
+                    t = frac1(tau)
+                    if pure:
+                        e["pure_taus"].add(t)
+                        e["pure_here"] = True
+                    else:
+                        e["glide"].add((Fraction(gl) % q, t))
+    # orbit-merge line keys under the spatial action
+    keys = list(inst.keys())
+    parent = {k: k for k in keys}
+
+    def find(k):
+        while parent[k] != k:
+            parent[k] = parent[parent[k]]
+            k = parent[k]
+        return k
+
+    for (Mo, s, vo, _) in fwd_ops:
+        if s != 1:
+            continue
+        for k in keys:
+            M, w = inst[k]["rep_op"]
+            Mi = ((Mo[1][1], -Mo[0][1]), (-Mo[1][0], Mo[0][0]))
+            deto = det2(Mo)
+            Mi = tuple(tuple(x * deto for x in row) for row in Mi)  # Mo^{-1}
+            vfr = (Fraction(vo[0]), Fraction(vo[1]))
+            vi = (-(Mi[0][0] * vfr[0] + Mi[0][1] * vfr[1]),
+                  -(Mi[1][0] * vfr[0] + Mi[1][1] * vfr[1]))
+            Mw = op2_mul(op2_mul((Mo, vfr), (M, w)), (Mi, vi))
+            M2, w2 = Mw
+            # key from the RAW translation part: reducing w2 mod the lattice
+            # componentwise would land on a DIFFERENT (interleaved) line and
+            # merge distinct line families; _line_key's mod-g handles any w
+            k2 = _line_key(M2, (Fraction(w2[0]), Fraction(w2[1])), lat2)
+            if k2 in parent and find(k2) != find(k):
+                parent[find(k2)] = find(k)
+    classes = {}
+    for k in keys:
+        root = find(k)
+        c = classes.setdefault(root, {"instances": set(), "pure_instances": set(),
+                                      "pure_taus": set(), "glide": set(),
+                                      "rep_op": inst[k]["rep_op"],
+                                      "axis_step": inst[k]["axis_step"]})
+        c["instances"].add(k)
+        if inst[k]["pure_here"]:
+            c["pure_instances"].add(k)
+        c["pure_taus"] |= inst[k]["pure_taus"]
+        c["glide"] |= inst[k]["glide"]
+    return list(classes.values())
+
+
+def point_on_line(p, M, w, lat2):
+    """Is point p on the reflection line of (M|w) modulo lattice?"""
+    img = (M[0][0] * p[0] + M[0][1] * p[1] + w[0],
+           M[1][0] * p[0] + M[1][1] * p[1] + w[1])
+    d = (Fraction(img[0] - p[0]), Fraction(img[1] - p[1]))
+    return lat2.contains([d[0], d[1]])
+
+
 def rotation_orbit_classes(ops_render, lat2, basis):
     """Orbit classes of rotation centres: [(n, k)] sorted, using the full
     spatial action for orbit identification."""
@@ -462,8 +636,48 @@ def rotation_orbit_classes(ops_render, lat2, basis):
                     frontier.append(img)
         seen |= orbit
         n, k = pts[p]
-        classes.append((n, k))
-    classes.sort(key=lambda x: (-x[0], x[1]))
+        classes.append((n, k, p))
+    classes.sort(key=lambda x: (-x[0], x[1], x[2]))
+    return [(n, k) for (n, k, p) in classes]
+
+
+def rotation_orbit_classes_with_points(ops_render, lat2, basis):
+    """Like rotation_orbit_classes but returns [(n, k, rep_point)]."""
+    pts = {}
+    for (M, s, v, tau) in ops_render:
+        if s != 1 or det2(M) != 1 or M == M_ID:
+            continue
+        A = ((1 - M[0][0], -M[0][1]), (-M[1][0], 1 - M[1][1]))
+        det = A[0][0] * A[1][1] - A[0][1] * A[1][0]
+        Ainv = ((Fraction(A[1][1], det), Fraction(-A[0][1], det)),
+                (Fraction(-A[1][0], det), Fraction(A[0][0], det)))
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                t = (v[0] + i, v[1] + j)
+                p = (frac1(Ainv[0][0] * t[0] + Ainv[0][1] * t[1]),
+                     frac1(Ainv[1][0] * t[0] + Ainv[1][1] * t[1]))
+                n, k = ccw_phase(M, tau, basis)
+                cur = pts.get(p)
+                if cur is None or n > cur[0]:
+                    pts[p] = (n, k)
+    classes = []
+    seen = set()
+    for p in sorted(pts):
+        if p in seen:
+            continue
+        orbit = {p}
+        frontier = [p]
+        while frontier:
+            q = frontier.pop()
+            for (M, s, v, tau) in ops_render:
+                img = (frac1(M[0][0] * q[0] + M[0][1] * q[1] + v[0]),
+                       frac1(M[1][0] * q[0] + M[1][1] * q[1] + v[1]))
+                if img in pts and img not in orbit:
+                    orbit.add(img)
+                    frontier.append(img)
+        seen |= orbit
+        n, k = pts[p]
+        classes.append({"n": n, "k": k, "rep": p, "orbit": orbit})
     return classes
 
 
@@ -501,9 +715,285 @@ def mirror_line_classes(ops_render, lat2):
 # ------------------------------------------------------------------ symbol
 SUB = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 
+SUBFRAC = {Fraction(1, 2): "½", Fraction(1, 4): "¼", Fraction(3, 4): "¾",
+           Fraction(1, 3): "⅓", Fraction(2, 3): "⅔",
+           Fraction(1, 6): "⅙", Fraction(5, 6): "⅚"}
+
 
 def sub(k):
     return str(k).translate(SUB)
+
+
+def _point_line_pos(p, a, am, lat2):
+    """off-coordinate class of the a-direction line through p, and spacing."""
+    off, gl = _decompose_eigen((Fraction(p[0]), Fraction(p[1])), a, am)
+    g = _off_spacing(a, am, lat2)
+    return off % g, g
+
+
+def _on_class(p, mclass, lat2):
+    """Is p on a PURE mirror line of the class? (glide lines don't count:
+    a cone centre on glide lines only is an interior gyration point)."""
+    for (a, am, pos) in mclass["pure_instances"]:
+        my, q = _point_line_pos(p, a, am, lat2)
+        if (my - pos) % q == 0:
+            return True
+    return False
+
+
+def _arc_mark(m):
+    return "~" if 0 not in m["pure_taus"] else ""
+
+
+def _cone_str(c):
+    return str(c["n"]) + (sub(c["k"]) if c["k"] else "")
+
+
+def _glide_x(tau_set):
+    taus = sorted(tau_set)
+    if not taus or 0 in taus:
+        return "×"
+    return "×" + SUBFRAC.get(taus[0], f"^{taus[0]}")
+
+
+def _boundary_walk(corners, arcs, lat2):
+    """Concrete walk of the kaleidoscope boundary. corners: cone-class dicts;
+    arcs: mirror-class dicts. Returns cyclic list [(arc_i, corner_i), ...]."""
+    pt2c = {}
+    for ci, c in enumerate(corners):
+        for p in c["orbit"]:
+            pt2c[p] = ci
+    if not pt2c:
+        return []
+
+    def lines_through(p):
+        out = []
+        seen = set()
+        for ai, m in enumerate(arcs):
+            for (a, am, pos) in m["pure_instances"]:
+                my, q = _point_line_pos(p, a, am, lat2)
+                if (my - pos) % q == 0 and (ai, a) not in seen:
+                    seen.add((ai, a))
+                    out.append((ai, a, am))
+        return out
+
+    p0 = min(pt2c)
+    ls = lines_through(p0)
+    if not ls:
+        return []
+    l0 = min(ls, key=lambda x: (x[0], x[1]))
+    word = []
+    p, line = p0, l0
+    for _ in range(12):
+        ai, a, am = line
+        # candidates: corner points (with integer shifts) on this concrete line
+        best = None
+        offp, glp = _decompose_eigen((Fraction(p[0]), Fraction(p[1])), a, am)
+        for q0 in pt2c:
+            for i in (-1, 0, 1):
+                for j in (-1, 0, 1):
+                    q = (q0[0] + i, q0[1] + j)
+                    if q == p:
+                        continue
+                    offq, glq = _decompose_eigen(
+                        (Fraction(q[0]), Fraction(q[1])), a, am)
+                    if offq != offp:
+                        continue
+                    d = abs(Fraction(glq) - Fraction(glp))
+                    if d == 0:
+                        continue
+                    if best is None or d < best[0]:
+                        best = (d, q0, q)
+        if best is None:
+            break
+        nxt = best[1]
+        word.append((ai, pt2c[nxt]))
+        here = lines_through(nxt)
+        # prefer turning onto a DIFFERENT mirror class (the chamber boundary
+        # turns at corners); fall back to the same class, other direction
+        others = [L for L in here if L[0] != ai]
+        same = [L for L in here if L[0] == ai and L[1] != a]
+        nxt_lines = others or same or here
+        line = min(nxt_lines, key=lambda x: (x[0], x[1]))
+        p = nxt
+        if nxt == p0 or (pt2c[nxt] == pt2c[p0] and len(word) >= len(corners)):
+            break
+    return word
+
+
+def _connected(mclass, i1, i2, corners, lat2):
+    """Are corner classes i1, i2 adjacent along some concrete pure line of
+    mclass — i.e. consecutive on the line, with no other corner between?"""
+    for (a, am, pos) in mclass["pure_instances"]:
+        g = _off_spacing(a, am, lat2)
+        # collect all corner points (with shifts) by concrete line offset
+        by_line = {}
+        for ci, c in enumerate(corners):
+            for p0 in c["orbit"]:
+                for i in (-2, -1, 0, 1, 2):
+                    for j in (-2, -1, 0, 1, 2):
+                        p = (p0[0] + i, p0[1] + j)
+                        off, gl = _decompose_eigen(
+                            (Fraction(p[0]), Fraction(p[1])), a, am)
+                        by_line.setdefault(off, []).append((gl, ci))
+        for off, pts in by_line.items():
+            if (off - pos) % g != 0:
+                continue  # concrete line not in this class
+            pts = sorted(set(pts))
+            for (g1, ca), (g2, cb) in zip(pts, pts[1:]):
+                if {ca, cb} == {i1, i2} or (i1 == i2 and ca == cb == i1):
+                    return True
+    return False
+
+
+def _boundary_words_graph(corners, arcs, lat2, slots):
+    """All cyclic (arc, corner) boundary words of the given length, from the
+    class-level adjacency graph (arc class adjacent to a corner pair when a
+    concrete pure mirror line contains both)."""
+    nC, nA = len(corners), len(arcs)
+    conn = {}
+    for ai in range(nA):
+        for ci in range(nC):
+            for cj in range(ci, nC):
+                if _connected(arcs[ai], ci, cj, corners, lat2):
+                    conn.setdefault((ci, cj), []).append(ai)
+                    if ci != cj:
+                        conn.setdefault((cj, ci), []).append(ai)
+
+    # distinct pure-line directions of arc class ai through corner ci: the
+    # boundary may enter and leave a corner along the SAME class only if two
+    # different lines of that class pass through it
+    def ndirs(ci, ai):
+        dirs = set()
+        for (a, am, pos) in arcs[ai]["pure_instances"]:
+            my, q = _point_line_pos(corners[ci]["rep"], a, am, lat2)
+            if (my - pos) % q == 0:
+                dirs.add(a)
+        return len(dirs)
+
+    words = []
+
+    def ok_turn(corner, arc_in, arc_out):
+        return arc_in != arc_out or ndirs(corner, arc_in) >= 2
+
+    def dfs(path_corners, path_arcs):
+        if len(path_corners) == slots:
+            # close the cycle: arc before corner i = arc from corner i-1 to i
+            u, v = path_corners[-1], path_corners[0]
+            for ai in conn.get((u, v), []):
+                if path_arcs and not ok_turn(u, path_arcs[-1], ai):
+                    continue
+                if path_arcs and not ok_turn(v, ai, path_arcs[0]):
+                    continue
+                w = [(([ai] + path_arcs)[idx], path_corners[idx])
+                     for idx in range(slots)]
+                words.append(w)
+            return
+        u = path_corners[-1]
+        for v in range(nC):
+            for ai in conn.get((u, v), []):
+                if path_arcs and not ok_turn(u, path_arcs[-1], ai):
+                    continue
+                dfs(path_corners + [v], path_arcs + [ai])
+
+    for start in range(nC):
+        dfs([start], [])
+    return words
+
+
+def _kaleidoscope_string(word, corners, arcs):
+    """Canonical '*...' string from the cyclic (arc, corner) word: choose the
+    rotation/direction whose digit sequence is descending-compatible, then
+    lexicographically smallest."""
+    if not word:
+        # corner-less boundaries: one '*' per arc class, unmarked first
+        parts = sorted(_arc_mark(m) + "*" for m in arcs)
+        return "".join(parts)
+    n = len(word)
+    cands = []
+    seqs = [word[i:] + word[:i] for i in range(n)]
+    # reversed walk: arcs pair with the preceding corner
+    rword = []
+    for i in range(n - 1, -1, -1):
+        ai = word[i][0]
+        ci = word[i - 1][1]
+        rword.append((ai, ci))
+    seqs += [rword[i:] + rword[:i] for i in range(n)]
+    for s in seqs:
+        digits = [corners[ci]["n"] for (_, ci) in s]
+        if digits != sorted(digits, reverse=True):
+            continue
+        txt = "*" + "".join(_arc_mark(arcs[ai]) + _cone_str(corners[ci])
+                            for (ai, ci) in s)
+        cands.append(txt)
+    if not cands:
+        for s in seqs:
+            txt = "*" + "".join(_arc_mark(arcs[ai]) + _cone_str(corners[ci])
+                                for (ai, ci) in s)
+            cands.append(txt)
+    return min(cands)
+
+
+def decorated_body(base_fwd, fwd_ops, lat2, basis):
+    """Feature-complete forward body of the clockwork symbol."""
+    cones = rotation_orbit_classes_with_points(fwd_ops, lat2, basis)
+    mlines = mirror_classes_detailed(fwd_ops, lat2)
+    arcs = [m for m in mlines if m["pure_taus"]]
+    gclasses = [m for m in mlines if not m["pure_taus"] and m["glide"]]
+
+    def cone_on_mirror(c):
+        return any(_on_class(c["rep"], m, lat2) for m in arcs)
+
+    interior = sorted([c for c in cones if not cone_on_mirror(c)],
+                      key=lambda c: (-c["n"], c["k"], c["rep"]))
+    corner_cs = sorted([c for c in cones if cone_on_mirror(c)],
+                       key=lambda c: (-c["n"], c["k"], c["rep"]))
+
+    # ---- ×-slot decorations (crosscap count fixed by the base template)
+    def xdecos(nslots):
+        tsets = [set(t for (_, t) in m["glide"]) for m in gclasses]
+        if nslots >= len(tsets):
+            parts = sorted(_glide_x(t) for t in tsets)
+            parts += ["×"] * (nslots - len(tsets))
+            return "".join(parts)
+        allt = set().union(*tsets) if tsets else set()
+        return _glide_x(allt) * 1 if nslots == 1 else "×" * nslots
+
+    if base_fwd == "p1":
+        return "o"
+    if base_fwd in ("p2", "p3", "p4", "p6"):
+        return "".join(_cone_str(c) for c in interior + corner_cs)
+    if base_fwd == "pg":
+        return xdecos(2)
+    if base_fwd == "pgg":
+        return "".join(_cone_str(c) for c in interior) + xdecos(1)
+    if base_fwd == "cm":
+        return "".join(sorted(_arc_mark(m) + "*" for m in arcs)) + xdecos(1)
+    if base_fwd == "pm":
+        return "".join(sorted(_arc_mark(m) + "*" for m in arcs))
+    # kaleidoscope bases with corners (and pmg's corner-less boundary)
+    SLOTS = {"pmm": 4, "cmm": 2, "p4m": 3, "p4g": 1, "p3m1": 3, "p31m": 1,
+             "p6m": 3, "pmg": 0}
+    slots = SLOTS.get(base_fwd, len(corner_cs))
+    body = "".join(_cone_str(c) for c in interior)
+    if slots == 0 or not corner_cs:
+        body += _kaleidoscope_string([], [], arcs)
+    else:
+        words = _boundary_words_graph(corner_cs, arcs, lat2, slots)
+        if words:
+            def fmt(w):
+                return "*" + "".join(_arc_mark(arcs[ai]) + _cone_str(corner_cs[ci])
+                                     for (ai, ci) in w)
+            desc = sorted((corner_cs[ci]["n"] for (_, ci) in words[0]),
+                          reverse=True)
+            good = [fmt(w) for w in words
+                    if [corner_cs[ci]["n"] for (_, ci) in w] == desc]
+            body += min(good) if good else min(fmt(w) for w in words)
+        else:
+            # should not happen; degrade to sorted display
+            body += "*" + "".join(_cone_str(c) for c in corner_cs)
+            body += "".join(_arc_mark(m) for m in arcs)
+    return body
 
 
 def clockwork_symbol(base, cones, has_time_centering, third_centering,
@@ -666,6 +1156,7 @@ def build_entry(cname, ac, vec, idx):
     third = any(Fraction(r[2]).denominator == 3 for r in ac.lat.residues)
     lat2_fwd = spatial_projection(ac, vec, forward_only=True)[1]
     revkind = reversal_kind_of(ops_r, lat2_fwd)
+    body = decorated_body(base_fwd, fwd_ops, lat2_fwd, basis)
     forward = revkind is None
     product = is_product(ops_r, ac, lat2)
     # symmorphic = the cocycle class is trivial
@@ -675,11 +1166,13 @@ def build_entry(cname, ac, vec, idx):
     from enumerate_2p1 import classify_system
     system = classify_system(ac)
 
-    sym = clockwork_symbol(base_fwd, cones, has_tc, third, revkind, mirrors,
-                           n_tglide_dirs)
-    if revkind and base != base_fwd:
-        # the reversal enriches the spatial projection: record it
-        sym += f"[{base}]"
+    prefix = "r" if third else ("c" if has_tc else "")
+    sym = prefix + body
+    if revkind:
+        sym += "/" + revkind
+        if base != base_fwd:
+            # the reversal enriches the spatial projection: record it
+            sym += f"[{base}]"
     sym_html = (sym.replace("₀", "<sub>0</sub>").replace("₁", "<sub>1</sub>")
                 .replace("₂", "<sub>2</sub>").replace("₃", "<sub>3</sub>")
                 .replace("₄", "<sub>4</sub>").replace("₅", "<sub>5</sub>")

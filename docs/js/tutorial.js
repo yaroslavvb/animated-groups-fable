@@ -42,7 +42,7 @@ const BESTIARY = [
   {
     sym: "~*~*",
     title: "Time glide",
-    text: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/2</sup>): mirror symmetry that holds only after waiting half a period — mirror images run in counterphase.",
+    text: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/2</sup>): mirror symmetry that holds only after waiting half a period — mirror images run in counterphase. (Crystallographically this group is pg&nbsp;×&nbsp;ℤ in disguise — see the gallery.)",
     spec: { basis: SQ, ops: [
       { M: [[1, 0], [0, 1]], v: [0, 0], s: 1, tau: 0 },
       { M: MY, v: [0, 0], s: 1, tau: 0.5 },
