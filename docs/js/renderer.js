@@ -13,113 +13,96 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=9";
 
 const TWO_PI = Math.PI * 2;
 
-/* The motif clock has TWO hands (both integer revolutions per period, so the
- * loop closes; colors are static — time shows only as motion):
- *  - outer hand, c = SAT_REVS revs: around an n-fold time-screw centre the
- *    k-th copy's hand sits at screen angle (σ - c)·k·2π/n + const, where
- *    σ = -1 because the y-flipped pixel basis renders every lattice rotation
- *    clockwise on screen. Distinct positions for all n ∈ {2,3,4,6} need
- *    gcd(|σ - c|, n) = 1: c = -2 gives |σ - c| = 1 (the "spiral of phases").
- *    (c = +2 gave |σ - c| = 3 — aliasing exactly the trigonal screws.)
- *  - inner hand, c = 1 rev: the outer hand's position has period T/2, so it
- *    cannot show half-period offsets (time glides, time centring); an odd
- *    rev count resolves them (half a period turns the inner hand by 180°).
- * The pair of hands determines the internal time uniquely; the legibility
- * conditions are enforced by enumerate/verify_animations.py. */
-const SAT_REVS = -2;       // outer hand
-const SAT_REVS_INNER = 1;  // inner hand
+/* The motif clock is a NON-ROTATIONAL, injective phase channel: the body
+ * fills like a vessel, fill level = theta mod 1.
+ *
+ * Rationale: any rotating clock element interacts with the pattern's own
+ * rotational symmetries — the k-th copy of an n-fold screw adds k·2π/n to a
+ * hand's apparent angle, which can alias phases entirely (a long line of
+ * bugs). A fill level cannot be rotated: the map theta -> level is injective
+ * on [0,1), so two copies at different internal times ALWAYS look different
+ * in a frozen frame; and the fill line is locked to the body's local axis,
+ * so a rotated copy shows a visibly rotated fill line. Orientation and phase
+ * are fully orthogonal channels. Reversal copies drain instead of filling.
+ * Colors are static; only the fill boundary moves. */
+
+/* body spans local y in [BODY_TOP, BODY_BOT] (canvas y-down local coords) */
+const BODY_TOP = -0.85;
+const BODY_BOT = 0.5;
+
+function bodyPath(ctx, r) {
+  ctx.beginPath();
+  ctx.moveTo(-0.15 * r, -0.5 * r);
+  ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
+  ctx.bezierCurveTo(-0.28 * r, 0.5 * r, -0.42 * r, 0.12 * r, -0.15 * r, -0.5 * r);
+  ctx.closePath();
+  // beak joins the vessel so the last sixth of the fill climbs the spout
+  ctx.moveTo(-0.15 * r, -0.5 * r);
+  ctx.lineTo(0.1 * r, -0.85 * r);
+  ctx.lineTo(0.22 * r, -0.45 * r);
+  ctx.closePath();
+}
 
 /* ---------------------------------------------------------------- motif */
-// The motif must have NO accidental symmetry: chiral, asymmetric, and it
-// carries a two-handed clock encoding internal time. Rendering is LAYERED
-// ("body" | "tail" | "hands", or "all"): frames draw every placement's body
-// layer first, then tails, then hands, so painting is order-independent —
-// copies that share a site (a reversal partner of a forward op has the same
-// spatial part) show BOTH clocks superimposed instead of occluding.
+// The motif must have NO accidental symmetry: chiral, asymmetric. Rendering
+// is LAYERED ("body" | "tail" | "hands", or "all" — kept names: body =
+// vessel outline, tail = liquid fill, hands = fill-line marker): frames draw
+// every placement's layer together, so painting is order-independent and
+// copies sharing a site (reversal partners) superimpose both fill lines.
 export function drawMotif(ctx, theta, r, colors, layer = "all") {
   // theta = internal time in periods (any real); r = motif radius (px)
   const c = colors || MOTIF_COLORS;
+  const ph = ((theta % 1) + 1) % 1;       // fill level, injective in theta
+  const yLevel = (BODY_BOT - ph * (BODY_BOT - BODY_TOP)) * r;
   ctx.save();
 
   if (layer === "all" || layer === "body") {
-    // body: asymmetric chiral flag (comma / tadpole shape); static colors —
-    // internal time is carried entirely by the moving hands
-    ctx.beginPath();
-    ctx.moveTo(-0.15 * r, -0.5 * r);
-    ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
-    ctx.bezierCurveTo(-0.28 * r, 0.5 * r, -0.42 * r, 0.12 * r, -0.15 * r, -0.5 * r);
-    ctx.closePath();
+    // empty vessel: light body + outline; static
+    bodyPath(ctx, r);
     ctx.fillStyle = c.body;
     ctx.fill();
-
-    // beak: sharp asymmetry marker
-    ctx.beginPath();
-    ctx.moveTo(-0.15 * r, -0.5 * r);
-    ctx.lineTo(0.1 * r, -0.85 * r);
-    ctx.lineTo(0.22 * r, -0.45 * r);
-    ctx.closePath();
-    ctx.fillStyle = c.beak;
-    ctx.fill();
-
-    // orbit ring (static)
-    ctx.beginPath();
-    ctx.arc(0, 0, 0.68 * r, 0, TWO_PI);
-    ctx.strokeStyle = c.orbit;
-    ctx.lineWidth = Math.max(0.5, 0.03 * r);
+    ctx.lineWidth = Math.max(0.6, 0.045 * r);
+    ctx.strokeStyle = c.outline;
     ctx.stroke();
   }
 
-  const ang = SAT_REVS * TWO_PI * theta;
-  const orbitR = 0.68 * r;
-
   if (layer === "all" || layer === "tail") {
-    // trailing tail (behind the satellite w.r.t. its direction of motion)
-    const ts = Math.sign(SAT_REVS) || 1;
-    ctx.beginPath();
-    ctx.arc(0, 0, orbitR, ang - ts * 0.85, ang - ts * 0.12, ts < 0);
-    ctx.strokeStyle = c.tail;
-    ctx.lineWidth = Math.max(1, 0.09 * r);
-    ctx.stroke();
+    // the liquid: dark fill from the bottom up to yLevel, clipped to the body
+    ctx.save();
+    bodyPath(ctx, r);
+    ctx.clip();
+    ctx.fillStyle = c.fill;
+    ctx.fillRect(-1.1 * r, yLevel, 2.2 * r, (BODY_BOT + 0.1) * r - yLevel + 0.1 * r);
+    ctx.restore();
   }
 
   if (layer === "all" || layer === "hands") {
-    // outer hand (c = SAT_REVS)
-    const sx = orbitR * Math.cos(ang), sy = orbitR * Math.sin(ang);
+    // fill-line marker: a bright segment at the liquid surface (clipped),
+    // readable even at small sizes; coincident copies show several lines
+    ctx.save();
+    bodyPath(ctx, r);
+    ctx.clip();
     ctx.beginPath();
-    ctx.arc(sx, sy, 0.13 * r, 0, TWO_PI);
-    ctx.fillStyle = c.satellite;
-    ctx.fill();
-
-    // inner hand (c = SAT_REVS_INNER): resolves half-period offsets
-    const ang2 = SAT_REVS_INNER * TWO_PI * theta;
-    const innerR = 0.38 * r;
-    const ix = innerR * Math.cos(ang2), iy = innerR * Math.sin(ang2);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(ix, iy);
-    ctx.strokeStyle = c.inner;
-    ctx.lineWidth = Math.max(1.2, 0.085 * r);
+    ctx.moveTo(-1.1 * r, yLevel);
+    ctx.lineTo(1.1 * r, yLevel);
+    ctx.strokeStyle = c.line;
+    ctx.lineWidth = Math.max(1.2, 0.09 * r);
     ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(ix, iy, 0.11 * r, 0, TWO_PI);
-    ctx.fillStyle = c.inner;
-    ctx.fill();
+    ctx.restore();
   }
 
   ctx.restore();
 }
 
 export const MOTIF_COLORS = {
-  body: "#3b6ea5",
-  beak: "#e0913c",
-  orbit: "rgba(120,120,140,0.35)",
-  tail: "#c0392b",
-  satellite: "#c0392b",
-  inner: "#2e7d4f",
+  body: "#dbe6f2",
+  outline: "#7d93ab",
+  fill: "#3b6ea5",
+  line: "#c0392b",
 };
 
 /* --------------------------------------------------------- group drawing */

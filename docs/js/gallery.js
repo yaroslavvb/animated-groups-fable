@@ -1,7 +1,7 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js";
-import { attachControls } from "./controls.js";
+import { FilmGroupAnimation } from "./renderer.js?v=9";
+import { attachControls } from "./controls.js?v=9";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -45,8 +45,9 @@ pair is the film-group version of left- and right-quartz.",
     kw: "(R<sub>π/3</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/6</sup>) — sixfold time screw",
     text: "The time-axis P6<sub>1</sub>. The subscripts are forced by the \
 orbifold relation: &#8537;&nbsp;+&nbsp;&#8531;&nbsp;+&nbsp;½&nbsp;=&nbsp;1&nbsp;≡&nbsp;0. \
-Around each 6-centre the satellites form a phase spiral — a hexagonal \
-'clock carousel'. Its mirror twin is 6<sub>5</sub>3<sub>2</sub>2<sub>1</sub>; \
+Around each 6-centre the six copies are filled one sixth of a period apart — \
+a hexagonal staircase of fill levels. Its mirror twin is \
+6<sub>5</sub>3<sub>2</sub>2<sub>1</sub>; \
 6<sub>2</sub>, 6<sub>3</sub>, 6<sub>4</sub> variants exist likewise, exactly \
 matching the 3D screw groups P6<sub>1</sub>…P6<sub>5</sub>.",
     specId: "p6-timescrew",
@@ -103,7 +104,7 @@ every point operation is instantaneous. (This is the plane analogue of the \
     sym: "o/g′",
     kw: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>) — glide time-reversal",
     text: "Played backwards, the film equals itself displaced half a cell: \
-columns alternate clockwise / counterclockwise. The operation is anti-unitary \
+columns alternate filling / draining. The operation is anti-unitary \
 in quantum settings — Xu–Wu show its 1+1D version forces a Kramers-like double \
 degeneracy at the zone boundary <em>without any spin</em>. Note the \
 time-collapsed photograph has a finer translation lattice than any single \
@@ -136,7 +137,7 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: "60px" });
 
 const root = document.getElementById("demos");
-const DATA = await (await fetch("data/featured.json")).json();
+const DATA = await (await fetch("data/featured.json", {cache: "no-cache"})).json();
 for (const f of FEATURED) {
   f.spec = DATA.specs[f.specId];
   const d = document.createElement("div");

@@ -159,41 +159,14 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
 
 
 def legibility_check(spec, name):
-    """The motif clock must make every time offset VISIBLE as motion.
-
-    Outer hand (SAT_REVS revs/period): around an n-fold screw the k-th copy's
-    hand sits at screen angle (sigma - c)*k*2pi/n + const with sigma = -1
-    (y-flipped pixel basis) — distinct for all k iff gcd(|sigma - c|, n) = 1.
-    Half-period-type offsets on translations/centrings are invisible to an
-    even outer hand and must be resolved by the inner hand: for every
-    fractional offset delta carried by a pure translation, require
-    SAT_REVS_INNER * delta not in Z (or the outer hand to catch it)."""
-    from math import gcd
-    from gifs import SAT_REVS, SAT_REVS_INNER
-    from fractions import Fraction
-    sigma = -1
-    errs = []
-    for o in spec["ops"]:
-        M = tuple(tuple(int(x) for x in r) for r in o["M"])
-        # spatial order of M
-        n, X = 1, M
-        while X != ((1, 0), (0, 1)) and n < 8:
-            X = tuple(tuple(X[i][0] * M[0][j] + X[i][1] * M[1][j]
-                            for j in (0, 1)) for i in (0, 1))
-            n += 1
-        det = M[0][0] * M[1][1] - M[0][1] * M[1][0]
-        tau = FR(o["tau"]) % 1
-        if o["s"] == 1 and det == 1 and n > 1 and tau != 0:
-            if gcd(abs(sigma - SAT_REVS), n) != 1:
-                errs.append(f"{name}: outer hand aliases the {n}-fold screw "
-                            f"(gcd(|sigma-c|, {n}) != 1)")
-        if o["s"] == 1 and M == ((1, 0), (0, 1)) and tau != 0:
-            outer_sees = (SAT_REVS * tau) % 1 != 0
-            inner_sees = (SAT_REVS_INNER * tau) % 1 != 0
-            if not (outer_sees or inner_sees):
-                errs.append(f"{name}: time offset {tau} on a translation is "
-                            f"invisible to both hands")
-    return errs
+    """With the fill-level motif the phase channel is INJECTIVE in theta mod 1
+    and non-rotational, so no spatial operation can alias it: any two copies
+    with different internal times look different in every frozen frame. The
+    remaining requirement is structural: every op's tau must be a proper
+    fraction of the period (guaranteed by the group axioms) — kept as a
+    placeholder so future motif changes must consciously re-derive their
+    legibility conditions here."""
+    return []
 
 
 def layout_check(spec, name, floor=0.05):

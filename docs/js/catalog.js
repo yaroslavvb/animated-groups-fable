@@ -1,13 +1,13 @@
 /* Catalog browser: loads data/catalog.json, filterable card grid with
  * lazily-animated canvases (only visible cards animate). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js";
-import { attachControls } from "./controls.js";
+import { FilmGroupAnimation } from "./renderer.js?v=9";
+import { attachControls } from "./controls.js?v=9";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
 async function init() {
-  const res = await fetch("data/catalog.json");
+  const res = await fetch("data/catalog.json", {cache: "no-cache"});
   const data = await res.json();
   state.groups = data.groups;
   state.meta = data.meta;

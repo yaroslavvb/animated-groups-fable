@@ -2,9 +2,9 @@
  * All animation specs come from data/featured.json (single source of truth,
  * verified by enumerate/verify_animations.py and at runtime by orbit.js). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js";
-import { StripAnimation } from "./strip.js";
-import { attachControls } from "./controls.js";
+import { FilmGroupAnimation } from "./renderer.js?v=9";
+import { StripAnimation } from "./strip.js?v=9";
+import { attachControls } from "./controls.js?v=9";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",
@@ -30,9 +30,9 @@ const BESTIARY = [
   { id: "mixed-glide", sym: "&times;<sub>&frac12;</sub>&times;<sub>&frac12;</sub>", title: "Mixed space–time glide",
     text: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>y</sub><sup>1/2</sup>T<sub>t</sub><sup>1/2</sup>): reflect, slide half a cell, wait half a period." },
   { id: "p2-timecentred", sym: "c2&middot;2&middot;2<sub>1</sub>&middot;2<sub>1</sub>", title: "Time centring",
-    text: "Centred spacetime lattice: translating by half a cell diagonal = waiting half a period. Half the 2-centres spin in phase, half in counterphase." },
+    text: "Centred spacetime lattice: translating by half a cell diagonal = waiting half a period. Half the 2-centres fill in phase, half in counterphase." },
   { id: "glide-time-reversal", sym: "o/g&prime;", title: "Glide time-reversal",
-    text: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>): played backwards, the film equals itself shifted half a cell — neighbouring columns spin in opposite senses." },
+    text: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>): played backwards, the film equals itself shifted half a cell — neighbouring columns fill and drain in opposite senses." },
 ];
 
 const anims = [];
@@ -51,7 +51,7 @@ function attach(anim) {
 }
 
 async function init() {
-  const data = await (await fetch("data/featured.json")).json();
+  const data = await (await fetch("data/featured.json", {cache: "no-cache"})).json();
 
   /* hero */
   const heroCanvas = document.getElementById("hero");
@@ -100,7 +100,7 @@ async function init() {
   }
 
   /* fill counts from catalog data */
-  fetch("data/catalog.json").then(r => r.json()).then(cat => {
+  fetch("data/catalog.json", {cache: "no-cache"}).then(r => r.json()).then(cat => {
     for (const el of document.querySelectorAll("[data-count]")) {
       const key = el.dataset.count;
       if (cat.meta && cat.meta[key] !== undefined) el.textContent = cat.meta[key];

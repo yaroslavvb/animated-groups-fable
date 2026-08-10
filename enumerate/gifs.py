@@ -12,19 +12,16 @@ import sys
 from PIL import Image, ImageDraw
 
 SS = 4  # supersampling factor
-# Two-handed clock, mirrors renderer.js (static colors; time = motion only).
-# Outer hand: screen-angle step around an n-fold screw is (sigma - c)*2pi/n
-# with sigma = -1 (the y-flipped pixel basis renders lattice rotations
-# clockwise); gcd(|sigma - c|, n) = 1 for n in {2,3,4,6} requires c = -2.
-# Inner hand: odd rev count resolves half-period offsets the outer misses.
-SAT_REVS = -2
-SAT_REVS_INNER = 1
+# NON-ROTATIONAL clock, mirrors renderer.js: the body fills like a vessel,
+# fill level = theta mod 1 (injective — no rotational aliasing possible).
+# Colors static; only the fill boundary moves. Reversal copies drain.
+BODY_TOP = -0.85
+BODY_BOT = 0.5
 
-BODY = (59, 110, 165)
-BEAK = (224, 145, 60)
-ORBIT = (135, 135, 155)
-TAIL = (192, 57, 43)
-INNER = (46, 125, 79)
+BODY_L = (219, 230, 242)
+OUTLINE = (125, 147, 171)
+FILL = (59, 110, 165)
+LINE = (192, 57, 43)
 BG = (250, 249, 246)
 
 
@@ -50,48 +47,58 @@ def motif_paths(r):
     return body, beak
 
 
+def _clip_below(poly, y0):
+    """Sutherland-Hodgman clip of a polygon to the half-plane y >= y0
+    (canvas y-down local coords: the liquid below the surface line)."""
+    out = []
+    n = len(poly)
+    for i in range(n):
+        a, b = poly[i], poly[(i + 1) % n]
+        ain, bin_ = a[1] >= y0, b[1] >= y0
+        if ain:
+            out.append(a)
+        if ain != bin_:
+            t = (y0 - a[1]) / (b[1] - a[1])
+            out.append((a[0] + t * (b[0] - a[0]), y0))
+    return out
+
+
 def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
     """T = 2x2 pixel transform matrix applied to motif-local coords.
 
-    Static colors; internal time is carried entirely by the two moving hands
-    (outer c=2, inner c=1). Layered exactly as renderer.js: frames draw all
-    bodies, then all tails, then all hands, so painting is order-independent
-    and coincident copies superimpose both clocks."""
+    Non-rotational clock: the vessel (body + beak spout) fills with the dark
+    color, fill level = theta mod 1; a bright line marks the surface. Layered
+    exactly as renderer.js ("body" = vessel, "tail" = liquid, "hands" =
+    surface line) so painting is order-independent and coincident copies
+    superimpose their surface lines."""
 
     def xf(p):
         x, y = p
         return (cx + T[0][0] * x + T[0][1] * y, cy + T[1][0] * x + T[1][1] * y)
 
-    orbit_r = 0.68 * r
-    ang = SAT_REVS * 2 * math.pi * theta
+    ph = theta % 1.0
+    y_level = (BODY_BOT - ph * (BODY_BOT - BODY_TOP)) * r
+    body, beak = motif_paths(r)
+    polys = [body, beak]
 
     if layer in ("all", "body"):
-        body, beak = motif_paths(r)
-        draw.polygon([xf(p) for p in body], fill=BODY)
-        draw.polygon([xf(p) for p in beak], fill=BEAK)
-        ring = [xf((orbit_r * math.cos(2 * math.pi * i / 48),
-                    orbit_r * math.sin(2 * math.pi * i / 48))) for i in range(49)]
-        draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
+        for poly in polys:
+            draw.polygon([xf(p) for p in poly], fill=BODY_L, outline=OUTLINE,
+                         width=max(1, int(0.045 * r)))
 
     if layer in ("all", "tail"):
-        ts = 1 if SAT_REVS >= 0 else -1
-        tail = [xf((orbit_r * math.cos(ang - ts * a),
-                    orbit_r * math.sin(ang - ts * a)))
-                for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
-        draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
+        for poly in polys:
+            cp = _clip_below(poly, y_level)
+            if len(cp) >= 3:
+                draw.polygon([xf(p) for p in cp], fill=FILL)
 
     if layer in ("all", "hands"):
-        sx, sy = xf((orbit_r * math.cos(ang), orbit_r * math.sin(ang)))
-        sr = 0.13 * r * _scale_of(T)
-        draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=TAIL)
-        ang2 = SAT_REVS_INNER * 2 * math.pi * theta
-        inner_r = 0.38 * r
-        ix, iy = xf((inner_r * math.cos(ang2), inner_r * math.sin(ang2)))
-        ox, oy = xf((0, 0))
-        draw.line([(ox, oy), (ix, iy)], fill=INNER,
-                  width=max(2, int(0.085 * r)))
-        ir = 0.11 * r * _scale_of(T)
-        draw.ellipse([ix - ir, iy - ir, ix + ir, iy + ir], fill=INNER)
+        for poly in polys:
+            cp = _clip_below(poly, y_level)
+            xs = [p[0] for p in cp if abs(p[1] - y_level) < 1e-9]
+            if len(xs) >= 2:
+                draw.line([xf((min(xs), y_level)), xf((max(xs), y_level))],
+                          fill=LINE, width=max(2, int(0.09 * r)))
 
 
 def _scale_of(T):
