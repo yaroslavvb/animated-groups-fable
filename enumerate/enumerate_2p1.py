@@ -1,0 +1,172 @@
+"""2+1D space-time ("film") groups.
+
+Anchors (Ke & Wu, arXiv:2604.05619, Table 1):
+  31 magnetic point groups, 14 Bravais lattices, 72 symmorphic classes,
+  275 space-time groups total, by crystal system:
+  Triclinic 2, T-Monoclinic 13, R-Monoclinic 13, Orthorhombic 127,
+  Tetragonal 68, Trigonal 25, Hexagonal 27.
+"""
+
+import sys
+from fractions import Fraction
+from itertools import combinations
+
+from stcore import (ArithClass, Lattice, find_conjugations, group_closure,
+                    op_mul, op_identity)
+from driver import cheap_invariant, dedupe_pairs, enumerate_groups
+
+H = Fraction(1, 2)
+T3 = Fraction(1, 3)
+
+M_ID = ((1, 0), (0, 1))
+M_R2 = ((-1, 0), (0, -1))
+M_MX = ((1, 0), (0, -1))
+M_R4 = ((0, -1), (1, 0))
+M_R3 = ((0, -1), (1, -1))
+M_R6 = ((1, -1), (1, 0))
+M_SWAP = ((0, 1), (1, 0))
+
+
+def ambient(setting):
+    if setting == "sq":
+        Q = group_closure([(M_R4, 1), (M_MX, 1)], 2)
+    else:
+        Q = group_closure([(M_R6, 1), (M_SWAP, 1)], 2)
+    return [(M, s) for (M, _) in Q for s in (1, -1)]
+
+
+def all_subgroups(ops, d):
+    """All subgroups of the finite (M,s) group `ops`."""
+    subs = {tuple(sorted(group_closure([], d)))}
+    frontier = list(subs)
+    while frontier:
+        new = []
+        for sub in frontier:
+            for g in ops:
+                if g in sub:
+                    continue
+                bigger = tuple(sorted(group_closure(list(sub) + [g], d)))
+                if bigger not in subs:
+                    subs.add(bigger)
+                    new.append(bigger)
+        frontier = new
+    return sorted(subs, key=len)
+
+
+def centering_pool(setting):
+    """Candidate centering generator sets."""
+    halves = []
+    nz = [v for v in
+          [(a * H, b * H, c * H) for a in (0, 1) for b in (0, 1) for c in (0, 1)]
+          if any(v)]
+    # all subgroups of (Z_2)^3 via generator subsets, deduped by residue set
+    seen = {}
+    for r in range(0, 4):
+        for combo in combinations(nz, r):
+            lat = Lattice(2, True, combo)
+            key = tuple(sorted(lat.residues))
+            if key not in seen:
+                seen[key] = combo
+    pools = list(seen.values())
+    if setting == "hex":
+        thirds = [(2 * T3, T3, T3), (T3, 2 * T3, T3)]
+        extra = [(t,) for t in thirds]
+        for t in thirds:
+            for h in nz:
+                extra.append((t, h))
+        pools = pools + extra
+    return pools
+
+
+def classify_system(ac):
+    """Ke-Wu crystal system from the point group (3D geometry with t-axis)."""
+    P = ac.P
+    orders = set()
+    for (M, s) in P:
+        # spatial order of M
+        x, k = M, 1
+        while x != M_ID:
+            x = tuple(tuple(sum(x[i][p] * M[p][j] for p in range(2)) for j in range(2))
+                      for i in range(2))
+            k += 1
+        orders.add((k, s, M[0][0] * M[1][1] - M[0][1] * M[1][0]))
+    spatial_orders = {k for (k, s, dt) in orders}
+    if (6, 1, 1) in orders or (3, -1, 1) in orders:
+        return "Hexagonal"
+    if 6 in spatial_orders or 3 in spatial_orders:
+        return "Trigonal"
+    if 4 in spatial_orders:
+        return "Tetragonal"
+    # only orders 1, 2 remain: count 2-fold "directions"
+    dirs = set()
+    for (M, s) in P:
+        det = M[0][0] * M[1][1] - M[0][1] * M[1][0]
+        if M == M_ID and s == 1:
+            continue
+        if M == M_R2 and s == 1:
+            dirs.add("t")                    # 2-fold along t
+        elif M == M_ID and s == -1:
+            dirs.add("t")                    # sigma_h, normal t
+        elif M == M_R2 and s == -1:
+            pass                             # inversion: no direction
+        elif det == -1:
+            # spatial mirror: s=+1 vertical mirror (normal in-plane);
+            # s=-1 in-plane 2-fold (axis in-plane)
+            dirs.add(("ax", M, 1 if s == -1 else 0) if False else ("d", M))
+    n_inplane = len([x for x in dirs if x != "t"])
+    total_dirs = len(dirs)
+    if total_dirs == 0:
+        return "Triclinic"
+    if total_dirs == 1:
+        if "t" in dirs:
+            return "T-Monoclinic"
+        return "R-Monoclinic"
+    return "Orthorhombic"
+
+
+def main():
+    verbose = "-v" in sys.argv
+    named = []
+    seen_pairs = set()
+    for setting in ("sq", "hex"):
+        amb = ambient(setting)
+        subs = all_subgroups(amb, 2)
+        pools = centering_pool(setting)
+        for i, P in enumerate(subs):
+            for j, cents in enumerate(pools):
+                try:
+                    lat = Lattice(2, True, cents)
+                    ac = ArithClass(list(P), lat)
+                except AssertionError:
+                    continue
+                key = (tuple(P), tuple(sorted(lat.residues)))
+                if key in seen_pairs:
+                    continue
+                seen_pairs.add(key)
+                named.append((f"{setting}:P{i}:L{j}", ac))
+    print(f"candidate (P, L) pairs: {len(named)}")
+
+    classes, merged = dedupe_pairs(named, bound=2, orientation="proper3",
+                                   verbose=False)
+    print(f"arithmetic classes after dedupe: {len(classes)}  (expected 72)")
+
+    results = enumerate_groups(classes, bound_moves=2, orientation="proper3",
+                               verbose=verbose)
+    total = 0
+    by_system = {}
+    for cname, ac, orbits in results:
+        total += len(orbits)
+        sysname = classify_system(ac)
+        by_system[sysname] = by_system.get(sysname, 0) + len(orbits)
+    print(f"TOTAL 2+1D space-time groups: {total}  (expected 275)")
+    expected = {"Triclinic": 2, "T-Monoclinic": 13, "R-Monoclinic": 13,
+                "Orthorhombic": 127, "Tetragonal": 68, "Trigonal": 25,
+                "Hexagonal": 27}
+    for k in expected:
+        got = by_system.get(k, 0)
+        mark = "OK" if got == expected[k] else f"EXPECTED {expected[k]}"
+        print(f"  {k:14s} {got:4d}  {mark}")
+
+
+if __name__ == "__main__":
+    main()
