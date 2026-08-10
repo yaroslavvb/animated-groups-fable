@@ -10,7 +10,8 @@ import pickle
 from fractions import Fraction
 
 from stcore import (ArithClass, Lattice, cocycle_sigma, find_conjugations,
-                    group_closure, op_identity, op_mul, rmat_vec, rmat_inv)
+                    group_closure, op_identity, op_mul, rmat_mul, rmat_vec,
+                    rmat_inv)
 
 M_ID = ((1, 0), (0, 1))
 M_R2 = ((-1, 0), (0, -1))
@@ -147,8 +148,130 @@ def _decompose_along_axis(w, a):
 
 
 # ------------------------------------------------------- wallpaper naming
+class WallpaperIdentifier:
+    """Certified identification against the 17 canonical wallpaper models,
+    using the same conjugation machinery validated in validate_2d.py."""
+
+    def __init__(self):
+        from validate_2d import CASES
+        from stcore import find_conjugations, reduce_classes
+        self.models = []
+        for name, gens, cents in CASES:
+            lat = Lattice(2, False, cents)
+            P = group_closure([(M, 1) for M in gens], 2)
+            acc = ArithClass(P, lat)
+            D2, reps = acc.h1_with_reps()
+            moves = find_conjugations(acc, acc, orientation="any")
+            orbits = reduce_classes(acc, reps, moves)
+            labeled = {}
+            for v in orbits:
+                label = self._label(name, acc, v)
+                # closure: label every classify-key in the orbit
+                seen = {acc.classify_cocycle(v)}
+                frontier = [v]
+                from stcore import apply_move
+                while frontier:
+                    w = frontier.pop()
+                    for (K, perm) in moves:
+                        u = apply_move(acc, K, perm, w)
+                        c = acc.classify_cocycle(u)
+                        if c not in seen:
+                            seen.add(c)
+                            frontier.append(u)
+                for c in seen:
+                    labeled[c] = label
+            self.models.append((name, acc, labeled))
+
+    @staticmethod
+    def _label(case_name, acc, vec):
+        """Names valid in the CANONICAL settings of validate_2d.CASES."""
+        triv = acc.classify_cocycle(vec) == acc.classify_cocycle([0] * len(vec))
+        sig = cocycle_sigma(acc, vec)
+        if case_name == "1-obl":
+            return "p1"
+        if case_name == "2-obl":
+            return "p2"
+        if case_name == "m-P":
+            return "pm" if triv else "pg"
+        if case_name == "m-C":
+            return "cm"
+        if case_name == "2mm-P":
+            if triv:
+                return "pmm"
+            glided = 0
+            for (M, s), v in zip(acc.P, sig):
+                if det2(M) == -1:
+                    a = mirror_axis(M)
+                    off, gl = _decompose_along_axis((frac1(v[0]), frac1(v[1])), a)
+                    if frac1(gl) != 0:
+                        glided += 1
+            return "pgg" if glided >= 2 else "pmg"
+        if case_name == "2mm-C":
+            return "cmm"
+        if case_name == "4-sq":
+            return "p4"
+        if case_name == "4mm-sq":
+            return "p4m" if triv else "p4g"
+        if case_name == "3-hex":
+            return "p3"
+        if case_name == "3m1-hex":
+            return "p3m1"
+        if case_name == "31m-hex":
+            return "p31m"
+        if case_name == "6-hex":
+            return "p6"
+        if case_name == "6mm-hex":
+            return "p6m"
+        raise ValueError(case_name)
+
+    def identify(self, Q, lat2, sig2):
+        from stcore import find_conjugations
+        P2 = [(M, 1) for M in Q]
+        ac2 = ArithClass(P2, lat2)
+        ac2.h1_with_reps()
+        for name, acc, labeled in self.models:
+            if len(acc.P) != len(ac2.P):
+                continue
+            conjs = find_conjugations(ac2, acc, orientation="any", max_found=1)
+            if not conjs:
+                continue
+            K, perm = conjs[0]
+            # transport sigma rationally: sigma'(perm(g)) = N sigma(g),
+            # N = B_c K B_2^{-1}; coords in acc: k = D2_c * B_c^{-1} sigma'
+            N = rmat_mul(rmat_mul(acc.lat.B, [list(r) for r in K]), ac2.lat.Binv)
+            m = len(ac2.P)
+            kvec = [0] * (m * 2)
+            for i in range(m):
+                sg = [Fraction(sig2[ac2.P[i][0]][0]), Fraction(sig2[ac2.P[i][0]][1])]
+                sp = rmat_vec(N, sg)
+                coords = rmat_vec(acc.lat.Binv, sp)
+                j = perm[i]
+                for r in range(2):
+                    x = Fraction(coords[r]) * acc.D2
+                    assert x.denominator == 1, (name, x)
+                    kvec[j * 2 + r] = int(x) % acc.D2
+            c = acc.classify_cocycle(kvec)
+            if c in labeled:
+                return labeled[c]
+            # cocycle class not in table: conjugation landed outside known
+            # orbits (should not happen) — fall through to next model
+        raise ValueError("no wallpaper identification")
+
+
+_IDENT = None
+
+
 def wallpaper_name(ac, vec, forward_only=False):
     """Name of the spatial projection among the 17 wallpaper groups."""
+    global _IDENT
+    if _IDENT is None:
+        _IDENT = WallpaperIdentifier()
+    Q, lat2, sig2 = spatial_projection(ac, vec, forward_only=forward_only)
+    return _IDENT.identify(Q, lat2, sig2)
+
+
+def _wallpaper_name_naive(ac, vec, forward_only=False):
+    """Old heuristic classifier (kept for reference/tests)."""
     Q, lat2, sig2 = spatial_projection(ac, vec, forward_only=forward_only)
     n_rot = max(spatial_order(M) for M in Q if det2(M) == 1) if any(
         det2(M) == 1 for M in Q) else 1
@@ -619,17 +742,57 @@ def bravais_letter(ac):
 
 
 # --------------------------------------------------------------- main export
+def orbit_closure(ac, vec, moves):
+    """All cocycle vectors equivalent to vec under the within-class moves."""
+    from stcore import apply_move
+    seen = {ac.classify_cocycle(list(vec)): list(vec)}
+    frontier = [list(vec)]
+    while frontier:
+        v = frontier.pop()
+        for (K, perm) in moves:
+            w = apply_move(ac, K, perm, v)
+            c = ac.classify_cocycle(w)
+            if c not in seen:
+                seen[c] = w
+                frontier.append(w)
+    return list(seen.values())
+
+
+def tau_weight(ac, vec):
+    """(#ops with nonzero time offset, #ops with nonzero spatial part, lex)."""
+    ops = full_ops(ac, vec)
+    nt = sum(1 for (M, s, v, tau) in ops if tau != 0)
+    nv = sum(1 for (M, s, v, tau) in ops if v != (Fraction(0), Fraction(0)))
+    return (nt, nv, tuple(vec))
+
+
 def main():
+    from stcore import find_conjugations
     with open("out/enum2p1.pkl", "rb") as f:
         data = pickle.load(f)
     print(f"loaded {data['total']} groups in {len(data['classes'])} classes")
     entries = []
     idx = 0
     for cname, ac, orbits in data["classes"]:
+        moves = find_conjugations(ac, ac, orientation="proper3",
+                                  galilean=False) if len(orbits) else []
         for vec in orbits:
             idx += 1
+            closure = orbit_closure(ac, vec, moves)
+            # canonical representative: the most nearly static form, so that
+            # e.g. pg x Z displays as a spatial glide, not its equivalent
+            # time-glide form (crystallographic y<->t re-basing identifies them)
+            canon = min(closure, key=lambda w: tau_weight(ac, w))
             try:
-                entries.append(build_entry(cname, ac, vec, idx))
+                e = build_entry(cname, ac, canon, idx)
+                # product is a property of the group: test every equivalent form
+                if not e["product"]:
+                    lat2 = spatial_projection(ac, canon)[1]
+                    e["product"] = any(
+                        is_product(ops_render_list(ac, w), ac,
+                                   spatial_projection(ac, w)[1])
+                        for w in closure)
+                entries.append(e)
             except Exception as e:
                 print(f"ENTRY FAILED {cname} #{idx}: {e!r}")
                 raise

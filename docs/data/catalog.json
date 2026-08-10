@@ -2,7 +2,7 @@
  "meta": {
   "total": 275,
   "forward": 68,
-  "nonproduct": 242,
+  "nonproduct": 241,
   "nonsymmorphic": 203,
   "bySystem": {
    "Triclinic": 2,
@@ -67,12 +67,12 @@
   {
    "id": "g2",
    "cls": "sq:P1:L0",
-   "symbol": "o/m\u2032[pm]",
-   "symbolHtml": "o/m\u2032[pm]",
+   "symbol": "o/m\u2032[cm]",
+   "symbolHtml": "o/m\u2032[cm]",
    "hm": "",
    "system": "R-Monoclinic",
    "bravais": "P",
-   "base": "pm",
+   "base": "cm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -135,12 +135,12 @@
   {
    "id": "g3",
    "cls": "sq:P1:L6",
-   "symbol": "o/m\u2032[cm]\u1d43",
-   "symbolHtml": "o/m\u2032[cm]<sup>a</sup>",
+   "symbol": "o/m\u2032[pm]",
+   "symbolHtml": "o/m\u2032[pm]",
    "hm": "",
    "system": "R-Monoclinic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -240,12 +240,12 @@
   {
    "id": "g4",
    "cls": "sq:P1:L6",
-   "symbol": "o/m\u2032[cm]\u1d47",
-   "symbolHtml": "o/m\u2032[cm]<sup>b</sup>",
+   "symbol": "o/m\u2032[pg]",
+   "symbolHtml": "o/m\u2032[pg]",
    "hm": "",
    "system": "R-Monoclinic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -586,12 +586,12 @@
   {
    "id": "g8",
    "cls": "sq:P4:L0",
-   "symbol": "**",
-   "symbolHtml": "**",
+   "symbol": "*\u00d7",
+   "symbolHtml": "*\u00d7",
    "hm": "",
    "system": "R-Monoclinic",
    "bravais": "P",
-   "base": "pm",
+   "base": "cm",
    "forward": true,
    "product": true,
    "symmorphic": true,
@@ -654,12 +654,12 @@
   {
    "id": "g9",
    "cls": "sq:P4:L0",
-   "symbol": "~**",
-   "symbolHtml": "~**",
+   "symbol": "~*\u00d7",
+   "symbolHtml": "~*\u00d7",
    "hm": "(m|T_t^{1/2})",
    "system": "R-Monoclinic",
    "bravais": "P",
-   "base": "pm",
+   "base": "cm",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -722,12 +722,12 @@
   {
    "id": "g10",
    "cls": "sq:P4:L6",
-   "symbol": "*\u00d7",
-   "symbolHtml": "*\u00d7",
+   "symbol": "**",
+   "symbolHtml": "**",
    "hm": "",
    "system": "R-Monoclinic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": true,
    "product": true,
    "symmorphic": true,
@@ -827,19 +827,19 @@
   {
    "id": "g11",
    "cls": "sq:P4:L6",
-   "symbol": "~*\u00d7",
-   "symbolHtml": "~*\u00d7",
-   "hm": "(m|T_t^{1/2})",
+   "symbol": "\u00d7\u00d7",
+   "symbolHtml": "\u00d7\u00d7",
+   "hm": "",
    "system": "R-Monoclinic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": true,
-   "product": false,
+   "product": true,
    "symmorphic": false,
    "generators": [
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "t(1/2,1/2 | 0)      # centring",
-    "( m | 0,0 | 1/2 )   # M=((0, 1), (1, 0)), s=1"
+    "( m | 1/4,1/4 | 0 )   # M=((0, 1), (1, 0)), s=1"
    ],
    "notes": "",
    "render": {
@@ -866,11 +866,11 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.25,
+       0.25
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -884,11 +884,11 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.75,
+       0.75
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -1011,7 +1011,7 @@
    "symmorphic": false,
    "generators": [
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
-    "( mt | 1/2,0 | 0 )   # M=((1, 0), (0, 1)), s=-1"
+    "( mt | 0,1/2 | 0 )   # M=((1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -1038,8 +1038,8 @@
        ]
       ],
       "v": [
-       0.5,
-       0.0
+       0.0,
+       0.5
       ],
       "s": -1,
       "tau": 0.0
@@ -1346,12 +1346,12 @@
   {
    "id": "g17",
    "cls": "sq:P12:L0",
-   "symbol": "2222/m\u2032[pmm]",
-   "symbolHtml": "2222/m\u2032[pmm]",
+   "symbol": "2222/m\u2032[cmm]",
+   "symbolHtml": "2222/m\u2032[cmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "pmm",
+   "base": "cmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -1451,12 +1451,12 @@
   {
    "id": "g18",
    "cls": "sq:P12:L0",
-   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[pmm]",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[pmm]",
+   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[cmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "pmm",
+   "base": "cmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -1556,12 +1556,12 @@
   {
    "id": "g19",
    "cls": "sq:P12:L6",
-   "symbol": "2222/m\u2032[cmm]\u1d43",
-   "symbolHtml": "2222/m\u2032[cmm]<sup>a</sup>",
+   "symbol": "2222/m\u2032[pmm]",
+   "symbolHtml": "2222/m\u2032[pmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -1734,12 +1734,12 @@
   {
    "id": "g20",
    "cls": "sq:P12:L6",
-   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[cmm]\u1d43",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>a</sup>",
+   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[pmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -1912,12 +1912,12 @@
   {
    "id": "g21",
    "cls": "sq:P12:L6",
-   "symbol": "2222/m\u2032[cmm]\u1d47",
-   "symbolHtml": "2222/m\u2032[cmm]<sup>b</sup>",
+   "symbol": "2222/m\u2032[pgg]",
+   "symbolHtml": "2222/m\u2032[pgg]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pgg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -2090,12 +2090,12 @@
   {
    "id": "g22",
    "cls": "sq:P12:L6",
-   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[cmm]\u1d47",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>b</sup>",
+   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[pgg]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[pgg]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pgg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -2268,12 +2268,12 @@
   {
    "id": "g23",
    "cls": "sq:P12:L6",
-   "symbol": "2222/m\u2032[cmm]\u1d9c",
-   "symbolHtml": "2222/m\u2032[cmm]<sup>c</sup>",
+   "symbol": "2222/m\u2032[pmg]",
+   "symbolHtml": "2222/m\u2032[pmg]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -2446,12 +2446,12 @@
   {
    "id": "g24",
    "cls": "sq:P12:L6",
-   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[cmm]\u1d9c",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>c</sup>",
+   "symbol": "2\u20812\u20812\u20812\u2081/m\u2032[pmg]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>/m\u2032[pmg]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -2624,12 +2624,12 @@
   {
    "id": "g25",
    "cls": "sq:P12:L7",
-   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d43",
-   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>a</sup>",
+   "symbol": "c222\u20812\u2081/m\u2032[pmm]\u1d43",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[pmm]<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -2802,8 +2802,8 @@
   {
    "id": "g26",
    "cls": "sq:P12:L14",
-   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d47",
-   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>b</sup>",
+   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d43",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
@@ -3126,8 +3126,8 @@
   {
    "id": "g27",
    "cls": "sq:P12:L14",
-   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d9c",
-   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>c</sup>",
+   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d47",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
@@ -3450,12 +3450,12 @@
   {
    "id": "g28",
    "cls": "sq:P13:L0",
-   "symbol": "**/1\u2032",
-   "symbolHtml": "**/1\u2032",
+   "symbol": "*\u00d7/1\u2032",
+   "symbolHtml": "*\u00d7/1\u2032",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "pm",
+   "base": "cm",
    "forward": false,
    "product": true,
    "symmorphic": true,
@@ -3555,12 +3555,12 @@
   {
    "id": "g29",
    "cls": "sq:P13:L0",
-   "symbol": "~**/1\u2032",
-   "symbolHtml": "~**/1\u2032",
+   "symbol": "~*\u00d7/1\u2032",
+   "symbolHtml": "~*\u00d7/1\u2032",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "pm",
+   "base": "cm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -3660,12 +3660,12 @@
   {
    "id": "g30",
    "cls": "sq:P13:L0",
-   "symbol": "\u00d7\u00d7/1\u2032[cm]",
-   "symbolHtml": "\u00d7\u00d7/1\u2032[cm]",
+   "symbol": "*\u00d7/1\u2032[pm]",
+   "symbolHtml": "*\u00d7/1\u2032[pm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -3765,12 +3765,12 @@
   {
    "id": "g31",
    "cls": "sq:P13:L0",
-   "symbol": "\u00d7\u00bd\u00d7/1\u2032[cm]",
-   "symbolHtml": "\u00d7<sub>\u00bd</sub>\u00d7/1\u2032[cm]",
+   "symbol": "~*\u00d7/1\u2032[pm]",
+   "symbolHtml": "~*\u00d7/1\u2032[pm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -3870,12 +3870,12 @@
   {
    "id": "g32",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d43",
-   "symbolHtml": "*\u00d7/1\u2032<sup>a</sup>",
+   "symbol": "**/1\u2032\u1d43",
+   "symbolHtml": "**/1\u2032<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": true,
    "symmorphic": true,
@@ -4048,12 +4048,12 @@
   {
    "id": "g33",
    "cls": "sq:P13:L6",
-   "symbol": "~*\u00d7/1\u2032\u1d43",
-   "symbolHtml": "~*\u00d7/1\u2032<sup>a</sup>",
+   "symbol": "~**/1\u2032\u1d43",
+   "symbolHtml": "~**/1\u2032<sup>a</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -4226,8 +4226,8 @@
   {
    "id": "g34",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d47",
-   "symbolHtml": "*\u00d7/1\u2032<sup>b</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032[cm]\u1d43",
+   "symbolHtml": "\u00d7\u00d7/1\u2032[cm]<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -4404,8 +4404,8 @@
   {
    "id": "g35",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d9c",
-   "symbolHtml": "*\u00d7/1\u2032<sup>c</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032[cm]\u1d47",
+   "symbolHtml": "\u00d7\u00d7/1\u2032[cm]<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -4582,12 +4582,12 @@
   {
    "id": "g36",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d48",
-   "symbolHtml": "*\u00d7/1\u2032<sup>d</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032[pm]\u1d43",
+   "symbolHtml": "\u00d7\u00d7/1\u2032[pm]<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -4760,12 +4760,12 @@
   {
    "id": "g37",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d49",
-   "symbolHtml": "*\u00d7/1\u2032<sup>e</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032[pm]\u1d47",
+   "symbolHtml": "\u00d7\u00d7/1\u2032[pm]<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -4938,12 +4938,12 @@
   {
    "id": "g38",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1da0",
-   "symbolHtml": "*\u00d7/1\u2032<sup>f</sup>",
+   "symbol": "**/1\u2032\u1d47",
+   "symbolHtml": "**/1\u2032<sup>b</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -5116,12 +5116,12 @@
   {
    "id": "g39",
    "cls": "sq:P13:L6",
-   "symbol": "~*\u00d7/1\u2032\u1d47",
-   "symbolHtml": "~*\u00d7/1\u2032<sup>b</sup>",
+   "symbol": "~**/1\u2032\u1d47",
+   "symbolHtml": "~**/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -5294,12 +5294,12 @@
   {
    "id": "g40",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d4d",
-   "symbolHtml": "*\u00d7/1\u2032<sup>g</sup>",
+   "symbol": "**/1\u2032\u1d9c",
+   "symbolHtml": "**/1\u2032<sup>c</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -5472,12 +5472,12 @@
   {
    "id": "g41",
    "cls": "sq:P13:L6",
-   "symbol": "~*\u00d7/1\u2032\u1d9c",
-   "symbolHtml": "~*\u00d7/1\u2032<sup>c</sup>",
+   "symbol": "~**/1\u2032\u1d9c",
+   "symbolHtml": "~**/1\u2032<sup>c</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -5650,12 +5650,12 @@
   {
    "id": "g42",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u02b0",
-   "symbolHtml": "*\u00d7/1\u2032<sup>h</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032\u1d43",
+   "symbolHtml": "\u00d7\u00d7/1\u2032<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -5828,12 +5828,12 @@
   {
    "id": "g43",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u2071",
-   "symbolHtml": "*\u00d7/1\u2032<sup>i</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032\u1d47",
+   "symbolHtml": "\u00d7\u00d7/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -6006,12 +6006,12 @@
   {
    "id": "g44",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u02b2",
-   "symbolHtml": "*\u00d7/1\u2032<sup>j</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032\u1d9c",
+   "symbolHtml": "\u00d7\u00d7/1\u2032<sup>c</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": true,
    "symmorphic": false,
@@ -6184,12 +6184,12 @@
   {
    "id": "g45",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u1d4f",
-   "symbolHtml": "*\u00d7/1\u2032<sup>k</sup>",
+   "symbol": "\u00d7\u00d7/1\u2032\u1d48",
+   "symbolHtml": "\u00d7\u00d7/1\u2032<sup>d</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -6362,8 +6362,8 @@
   {
    "id": "g46",
    "cls": "sq:P13:L6",
-   "symbol": "*\u00d7/1\u2032\u02e1",
-   "symbolHtml": "*\u00d7/1\u2032<sup>l</sup>",
+   "symbol": "**/1\u2032[cm]",
+   "symbolHtml": "**/1\u2032[cm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -6540,8 +6540,8 @@
   {
    "id": "g47",
    "cls": "sq:P13:L6",
-   "symbol": "~*\u00d7/1\u2032\u1d48",
-   "symbolHtml": "~*\u00d7/1\u2032<sup>d</sup>",
+   "symbol": "~**/1\u2032[cm]",
+   "symbolHtml": "~**/1\u2032[cm]",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -6718,12 +6718,12 @@
   {
    "id": "g48",
    "cls": "sq:P13:L7",
-   "symbol": "c~*\u00d7/1\u2032\u1d43",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>a</sup>",
+   "symbol": "c~**/1\u2032\u1d43",
+   "symbolHtml": "c~**/1\u2032<sup>a</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -6896,8 +6896,8 @@
   {
    "id": "g49",
    "cls": "sq:P13:L7",
-   "symbol": "c*\u00d7/1\u2032\u1d43",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>a</sup>",
+   "symbol": "c\u00d7\u00d7/1\u2032[cm]",
+   "symbolHtml": "c\u00d7\u00d7/1\u2032[cm]",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
@@ -7074,8 +7074,8 @@
   {
    "id": "g50",
    "cls": "sq:P13:L14",
-   "symbol": "c*\u00d7/1\u2032\u1d47",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>b</sup>",
+   "symbol": "c*\u00d7/1\u2032",
+   "symbolHtml": "c*\u00d7/1\u2032",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
@@ -7398,8 +7398,8 @@
   {
    "id": "g51",
    "cls": "sq:P13:L14",
-   "symbol": "c~*\u00d7/1\u2032\u1d47",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>b</sup>",
+   "symbol": "c~*\u00d7/1\u2032",
+   "symbolHtml": "c~*\u00d7/1\u2032",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
@@ -7722,12 +7722,12 @@
   {
    "id": "g52",
    "cls": "sq:P13:L14",
-   "symbol": "c*\u00d7/1\u2032\u1d9c",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>c</sup>",
+   "symbol": "c*\u00d7/1\u2032[pm]",
+   "symbolHtml": "c*\u00d7/1\u2032[pm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -8046,12 +8046,12 @@
   {
    "id": "g53",
    "cls": "sq:P13:L14",
-   "symbol": "c~*\u00d7/1\u2032\u1d9c",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>c</sup>",
+   "symbol": "c~*\u00d7/1\u2032[pm]",
+   "symbolHtml": "c~*\u00d7/1\u2032[pm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -9420,12 +9420,12 @@
   {
    "id": "g64",
    "cls": "sq:P14:L3",
-   "symbol": "c2~*22\u2081\u1d43",
-   "symbolHtml": "c2~*22<sub>1</sub><sup>a</sup>",
+   "symbol": "c*~2222",
+   "symbolHtml": "c*~2222",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": true,
    "product": false,
    "symmorphic": true,
@@ -9598,12 +9598,12 @@
   {
    "id": "g65",
    "cls": "sq:P14:L3",
-   "symbol": "c2~*22\u2081\u1d47",
-   "symbolHtml": "c2~*22<sub>1</sub><sup>b</sup>",
+   "symbol": "c*~2~222\u1d43",
+   "symbolHtml": "c*~2~222<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -9776,12 +9776,12 @@
   {
    "id": "g66",
    "cls": "sq:P14:L3",
-   "symbol": "c2*2\u2081\u1d43",
-   "symbolHtml": "c2*2<sub>1</sub><sup>a</sup>",
+   "symbol": "c22\u2081*",
+   "symbolHtml": "c22<sub>1</sub>*",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -9954,12 +9954,12 @@
   {
    "id": "g67",
    "cls": "sq:P14:L3",
-   "symbol": "c2~*2\u2081",
-   "symbolHtml": "c2~*2<sub>1</sub>",
+   "symbol": "c22\u2081~*",
+   "symbolHtml": "c22<sub>1</sub>~*",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -10844,8 +10844,8 @@
   {
    "id": "g72",
    "cls": "sq:P14:L7",
-   "symbol": "c2~*22\u2081\u1d9c",
-   "symbolHtml": "c2~*22<sub>1</sub><sup>c</sup>",
+   "symbol": "c2~*22\u2081",
+   "symbolHtml": "c2~*22<sub>1</sub>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
@@ -11035,7 +11035,7 @@
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "t(1/2,1/2 | 1/2)      # centring",
     "( R180 | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=1",
-    "( m | 0,1/2 | 1/2 )   # M=((-1, 0), (0, 1)), s=1"
+    "( m | 0,1/2 | 0 )   # M=((-1, 0), (0, 1)), s=1"
    ],
    "notes": "",
    "render": {
@@ -11102,7 +11102,7 @@
        0.5
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -11120,7 +11120,7 @@
        0.0
       ],
       "s": 1,
-      "tau": 0.0
+      "tau": 0.5
      },
      {
       "M": [
@@ -11138,7 +11138,7 @@
        0.5
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -11156,7 +11156,7 @@
        0.0
       ],
       "s": 1,
-      "tau": 0.0
+      "tau": 0.5
      },
      {
       "M": [
@@ -11200,12 +11200,12 @@
   {
    "id": "g74",
    "cls": "sq:P14:L14",
-   "symbol": "c2~*22\u2081\u1d48",
-   "symbolHtml": "c2~*22<sub>1</sub><sup>d</sup>",
+   "symbol": "c*~2~222\u1d47",
+   "symbolHtml": "c*~2~222<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
-   "base": "cmm",
+   "base": "pmm",
    "forward": true,
    "product": false,
    "symmorphic": true,
@@ -11524,12 +11524,12 @@
   {
    "id": "g75",
    "cls": "sq:P14:L14",
-   "symbol": "c2*2\u2081\u1d47",
-   "symbolHtml": "c2*2<sub>1</sub><sup>b</sup>",
+   "symbol": "c22\u2081\u00d7",
+   "symbolHtml": "c22<sub>1</sub>\u00d7",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
-   "base": "cmm",
+   "base": "pgg",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -12131,12 +12131,12 @@
   {
    "id": "g78",
    "cls": "sq:P16:L3",
-   "symbol": "c~*\u00d7/1\u2032\u1d48",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>d</sup>",
+   "symbol": "c~**/1\u2032\u1d47",
+   "symbolHtml": "c~**/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -12309,12 +12309,12 @@
   {
    "id": "g79",
    "cls": "sq:P16:L3",
-   "symbol": "c~*\u00d7/1\u2032\u1d49",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>e</sup>",
+   "symbol": "c~**/1\u2032\u1d9c",
+   "symbolHtml": "c~**/1\u2032<sup>c</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -12487,12 +12487,12 @@
   {
    "id": "g80",
    "cls": "sq:P16:L3",
-   "symbol": "c*\u00d7/1\u2032\u1d48",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>d</sup>",
+   "symbol": "c\u00d7\u00d7/1\u2032",
+   "symbolHtml": "c\u00d7\u00d7/1\u2032",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -12665,12 +12665,12 @@
   {
    "id": "g81",
    "cls": "sq:P16:L3",
-   "symbol": "c*\u00d7/1\u2032\u1d49",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>e</sup>",
+   "symbol": "c\u00d7\u00d7/1\u2032[pm]",
+   "symbolHtml": "c\u00d7\u00d7/1\u2032[pm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -12843,12 +12843,12 @@
   {
    "id": "g82",
    "cls": "sq:P16:L5",
-   "symbol": "c*\u00d7/1\u2032\u1da0",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>f</sup>",
+   "symbol": "c**/1\u2032\u1d43",
+   "symbolHtml": "c**/1\u2032<sup>a</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -13021,12 +13021,12 @@
   {
    "id": "g83",
    "cls": "sq:P16:L5",
-   "symbol": "c~*\u00d7/1\u2032\u1da0",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>f</sup>",
+   "symbol": "c~**/1\u2032\u1d48",
+   "symbolHtml": "c~**/1\u2032<sup>d</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -13199,12 +13199,12 @@
   {
    "id": "g84",
    "cls": "sq:P16:L5",
-   "symbol": "c*\u00d7/1\u2032\u1d4d",
-   "symbolHtml": "c*\u00d7/1\u2032<sup>g</sup>",
+   "symbol": "c**/1\u2032\u1d47",
+   "symbolHtml": "c**/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -13377,12 +13377,12 @@
   {
    "id": "g85",
    "cls": "sq:P16:L5",
-   "symbol": "c~*\u00d7/1\u2032\u1d4d",
-   "symbolHtml": "c~*\u00d7/1\u2032<sup>g</sup>",
+   "symbol": "c~**/1\u2032\u1d49",
+   "symbolHtml": "c~**/1\u2032<sup>e</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cm",
+   "base": "pm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -13660,19 +13660,19 @@
   {
    "id": "g87",
    "cls": "sq:P18:L0",
-   "symbol": "~**/m\u2032[pmm]",
-   "symbolHtml": "~**/m\u2032[pmm]",
-   "hm": "(m|T_t^{1/2})",
+   "symbol": "\u00d7\u00d7/m\u2032[pmg]",
+   "symbolHtml": "\u00d7\u00d7/m\u2032[pmg]",
+   "hm": "",
    "system": "R-Monoclinic",
    "bravais": "P",
-   "base": "pmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
    "generators": [
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
-    "( m\u00b7mt | 0,0 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 1/2,0 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -13717,11 +13717,11 @@
        ]
       ],
       "v": [
-       0.0,
+       0.5,
        0.0
       ],
       "s": -1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -13735,11 +13735,11 @@
        ]
       ],
       "v": [
-       0.0,
+       0.5,
        0.0
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -13870,19 +13870,19 @@
   {
    "id": "g89",
    "cls": "sq:P18:L0",
-   "symbol": "~**/m\u2032[pmg]",
-   "symbolHtml": "~**/m\u2032[pmg]",
-   "hm": "(m|T_t^{1/2}T_s^{1/2})",
+   "symbol": "\u00d7\u00d7/m\u2032[pgg]",
+   "symbolHtml": "\u00d7\u00d7/m\u2032[pgg]",
+   "hm": "",
    "system": "R-Monoclinic",
    "bravais": "P",
-   "base": "pmg",
+   "base": "pgg",
    "forward": false,
    "product": false,
    "symmorphic": false,
    "generators": [
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
-    "( m\u00b7mt | 0,1/2 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 1/2,1/2 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -13927,11 +13927,11 @@
        ]
       ],
       "v": [
-       0.0,
+       0.5,
        0.5
       ],
       "s": -1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -13945,11 +13945,11 @@
        ]
       ],
       "v": [
-       0.0,
+       0.5,
        0.5
       ],
       "s": 1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -13975,12 +13975,12 @@
   {
    "id": "g90",
    "cls": "sq:P18:L3",
-   "symbol": "c~*\u00d7/m\u2032[cmm]",
-   "symbolHtml": "c~*\u00d7/m\u2032[cmm]",
+   "symbol": "c~**/m\u2032[pmm]",
+   "symbolHtml": "c~**/m\u2032[pmm]",
    "hm": "(m|T_t^{1/2})",
    "system": "R-Monoclinic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -14153,12 +14153,12 @@
   {
    "id": "g91",
    "cls": "sq:P18:L3",
-   "symbol": "c*\u00d7/m\u2032[cmm]",
-   "symbolHtml": "c*\u00d7/m\u2032[cmm]",
+   "symbol": "c\u00d7\u00d7/m\u2032[pmg]",
+   "symbolHtml": "c\u00d7\u00d7/m\u2032[pmg]",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "R-Monoclinic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -14331,12 +14331,12 @@
   {
    "id": "g92",
    "cls": "sq:P23:L3",
-   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d48",
-   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>d</sup>",
+   "symbol": "c222\u20812\u2081/m\u2032[pmm]\u1d47",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[pmm]<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -14509,12 +14509,12 @@
   {
    "id": "g93",
    "cls": "sq:P23:L3",
-   "symbol": "c222\u20812\u2081/m\u2032[cmm]\u1d49",
-   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[cmm]<sup>e</sup>",
+   "symbol": "c222\u20812\u2081/m\u2032[pmg]",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>/m\u2032[pmg]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -16239,8 +16239,8 @@
   {
    "id": "g106",
    "cls": "sq:P27:L0",
-   "symbol": "*2222/m\u2032[p4m]\u1d43",
-   "symbolHtml": "*2222/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "2*22/m\u2032[p4m]",
+   "symbolHtml": "2*22/m\u2032[p4m]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
@@ -16417,8 +16417,8 @@
   {
    "id": "g107",
    "cls": "sq:P27:L0",
-   "symbol": "*~2~222/m\u2032[p4m]\u1d43",
-   "symbolHtml": "*~2~222/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "2~*22/m\u2032[p4m]",
+   "symbolHtml": "2~*22/m\u2032[p4m]",
    "hm": "(m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -16595,12 +16595,12 @@
   {
    "id": "g108",
    "cls": "sq:P27:L0",
-   "symbol": "*2222/m\u2032[p4m]\u1d47",
-   "symbolHtml": "*2222/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "2*22/m\u2032[p4g]",
+   "symbolHtml": "2*22/m\u2032[p4g]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -16773,12 +16773,12 @@
   {
    "id": "g109",
    "cls": "sq:P27:L0",
-   "symbol": "*~2~222/m\u2032[p4m]\u1d47",
-   "symbolHtml": "*~2~222/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "2~*22/m\u2032[p4g]",
+   "symbolHtml": "2~*22/m\u2032[p4g]",
    "hm": "(m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -16951,8 +16951,8 @@
   {
    "id": "g110",
    "cls": "sq:P27:L6",
-   "symbol": "2*22/m\u2032[p4m]",
-   "symbolHtml": "2*22/m\u2032[p4m]",
+   "symbol": "*2222/m\u2032[p4m]",
+   "symbolHtml": "*2222/m\u2032[p4m]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "C-centred (spatial)",
@@ -17274,8 +17274,8 @@
   {
    "id": "g111",
    "cls": "sq:P27:L6",
-   "symbol": "2~*22/m\u2032[p4m]",
-   "symbolHtml": "2~*22/m\u2032[p4m]",
+   "symbol": "*~2~222/m\u2032[p4m]",
+   "symbolHtml": "*~2~222/m\u2032[p4m]",
    "hm": "(m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "C-centred (spatial)",
@@ -17597,12 +17597,12 @@
   {
    "id": "g112",
    "cls": "sq:P27:L6",
-   "symbol": "2*2/m\u2032[p4m]\u1d43",
-   "symbolHtml": "2*2/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "22\u00d7/m\u2032[p4g]\u1d43",
+   "symbolHtml": "22\u00d7/m\u2032[p4g]<sup>a</sup>",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "C-centred (spatial)",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -17920,12 +17920,12 @@
   {
    "id": "g113",
    "cls": "sq:P27:L6",
-   "symbol": "2*2/m\u2032[p4m]\u1d47",
-   "symbolHtml": "2*2/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "22\u00d7/m\u2032[p4g]\u1d47",
+   "symbolHtml": "22\u00d7/m\u2032[p4g]<sup>b</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "C-centred (spatial)",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -18243,8 +18243,8 @@
   {
    "id": "g114",
    "cls": "sq:P27:L7",
-   "symbol": "c2~*22\u2081/m\u2032[p4m]\u1d43",
-   "symbolHtml": "c2~*22<sub>1</sub>/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "c*~2~222/m\u2032[p4m]",
+   "symbolHtml": "c*~2~222/m\u2032[p4m]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
@@ -18566,12 +18566,12 @@
   {
    "id": "g115",
    "cls": "sq:P27:L7",
-   "symbol": "c2*2\u2081/m\u2032[p4m]",
-   "symbolHtml": "c2*2<sub>1</sub>/m\u2032[p4m]",
+   "symbol": "c22\u2081\u00d7/m\u2032[p4g]",
+   "symbolHtml": "c22<sub>1</sub>\u00d7/m\u2032[p4g]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -19502,8 +19502,8 @@
   {
    "id": "g117",
    "cls": "sq:P27:L14",
-   "symbol": "c2~*22\u2081/m\u2032[p4m]\u1d47",
-   "symbolHtml": "c2~*22<sub>1</sub>/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "c2~*22\u2081/m\u2032[p4m]",
+   "symbolHtml": "c2~*22<sub>1</sub>/m\u2032[p4m]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "F-centred",
@@ -20115,8 +20115,8 @@
   {
    "id": "g118",
    "cls": "sq:P28:L0",
-   "symbol": "442/m\u2032[p4m]\u1d43",
-   "symbolHtml": "442/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "442/m\u2032[p4m]",
+   "symbolHtml": "442/m\u2032[p4m]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
@@ -20293,8 +20293,8 @@
   {
    "id": "g119",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20824\u20822/m\u2032[p4m]\u1d43",
-   "symbolHtml": "4<sub>2</sub>4<sub>2</sub>2/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "4\u20824\u20822/m\u2032[p4m]",
+   "symbolHtml": "4<sub>2</sub>4<sub>2</sub>2/m\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -20471,8 +20471,8 @@
   {
    "id": "g120",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20834\u20832\u2081/m\u2032[p4m]\u1d43",
-   "symbolHtml": "4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "4\u20834\u20832\u2081/m\u2032[p4m]",
+   "symbolHtml": "4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>/m\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{3/4})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -20649,8 +20649,8 @@
   {
    "id": "g121",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20814\u20812\u2081/m\u2032[p4m]\u1d43",
-   "symbolHtml": "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m\u2032[p4m]<sup>a</sup>",
+   "symbol": "4\u20814\u20812\u2081/m\u2032[p4m]",
+   "symbolHtml": "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -20827,12 +20827,12 @@
   {
    "id": "g122",
    "cls": "sq:P28:L0",
-   "symbol": "442/m\u2032[p4m]\u1d47",
-   "symbolHtml": "442/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "442/m\u2032[p4g]",
+   "symbolHtml": "442/m\u2032[p4g]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -21005,12 +21005,12 @@
   {
    "id": "g123",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20824\u20822/m\u2032[p4m]\u1d47",
-   "symbolHtml": "4<sub>2</sub>4<sub>2</sub>2/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "4\u20824\u20822/m\u2032[p4g]",
+   "symbolHtml": "4<sub>2</sub>4<sub>2</sub>2/m\u2032[p4g]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -21183,12 +21183,12 @@
   {
    "id": "g124",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20834\u20832\u2081/m\u2032[p4m]\u1d47",
-   "symbolHtml": "4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "4\u20834\u20832\u2081/m\u2032[p4g]",
+   "symbolHtml": "4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>/m\u2032[p4g]",
    "hm": "(R_{2\u03c0/4}|T_t^{3/4})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -21361,12 +21361,12 @@
   {
    "id": "g125",
    "cls": "sq:P28:L0",
-   "symbol": "4\u20814\u20812\u2081/m\u2032[p4m]\u1d47",
-   "symbolHtml": "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m\u2032[p4m]<sup>b</sup>",
+   "symbol": "4\u20814\u20812\u2081/m\u2032[p4g]",
+   "symbolHtml": "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m\u2032[p4g]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -22897,12 +22897,12 @@
   {
    "id": "g132",
    "cls": "sq:P29:L0",
-   "symbol": "*42",
-   "symbolHtml": "*42",
+   "symbol": "4*2",
+   "symbolHtml": "4*2",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": true,
    "symmorphic": false,
@@ -23075,12 +23075,12 @@
   {
    "id": "g133",
    "cls": "sq:P29:L0",
-   "symbol": "~*4\u20822",
-   "symbolHtml": "~*4<sub>2</sub>2",
+   "symbol": "4\u2082~*2",
+   "symbolHtml": "4<sub>2</sub>~*2",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -23253,12 +23253,12 @@
   {
    "id": "g134",
    "cls": "sq:P29:L0",
-   "symbol": "*4\u20822",
-   "symbolHtml": "*4<sub>2</sub>2",
+   "symbol": "4\u2082*2",
+   "symbolHtml": "4<sub>2</sub>*2",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -23431,12 +23431,12 @@
   {
    "id": "g135",
    "cls": "sq:P29:L0",
-   "symbol": "~*42",
-   "symbolHtml": "~*42",
+   "symbol": "4~*2",
+   "symbolHtml": "4~*2",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -23932,12 +23932,12 @@
   {
    "id": "g137",
    "cls": "sq:P29:L7",
-   "symbol": "c*4\u20832",
-   "symbolHtml": "c*4<sub>3</sub>2",
+   "symbol": "c4\u2083*2",
+   "symbolHtml": "c4<sub>3</sub>*2",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -24578,12 +24578,12 @@
   {
    "id": "g139",
    "cls": "sq:P29:L7",
-   "symbol": "c~*4\u20812",
-   "symbolHtml": "c~*4<sub>1</sub>2",
+   "symbol": "c4\u2081~*2",
+   "symbolHtml": "c4<sub>1</sub>~*2",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
-   "base": "p4m",
+   "base": "p4g",
    "forward": true,
    "product": false,
    "symmorphic": false,
@@ -24901,8 +24901,8 @@
   {
    "id": "g140",
    "cls": "sq:P30:L0",
-   "symbol": "*2222/1\u2032",
-   "symbolHtml": "*2222/1\u2032",
+   "symbol": "*2222/1\u2032\u1d43",
+   "symbolHtml": "*2222/1\u2032<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -25079,8 +25079,8 @@
   {
    "id": "g141",
    "cls": "sq:P30:L0",
-   "symbol": "*~2~222/1\u2032",
-   "symbolHtml": "*~2~222/1\u2032",
+   "symbol": "*~2~222/1\u2032\u1d43",
+   "symbolHtml": "*~2~222/1\u2032<sup>a</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -25257,8 +25257,8 @@
   {
    "id": "g142",
    "cls": "sq:P30:L0",
-   "symbol": "22*/1\u2032",
-   "symbolHtml": "22*/1\u2032",
+   "symbol": "22*/1\u2032\u1d43",
+   "symbolHtml": "22*/1\u2032<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -25435,8 +25435,8 @@
   {
    "id": "g143",
    "cls": "sq:P30:L0",
-   "symbol": "22~*/1\u2032",
-   "symbolHtml": "22~*/1\u2032",
+   "symbol": "22~*/1\u2032\u1d43",
+   "symbolHtml": "22~*/1\u2032<sup>a</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -25969,8 +25969,8 @@
   {
    "id": "g146",
    "cls": "sq:P30:L0",
-   "symbol": "*~2222/1\u2032",
-   "symbolHtml": "*~2222/1\u2032",
+   "symbol": "*~2222/1\u2032\u1d43",
+   "symbolHtml": "*~2222/1\u2032<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -26147,8 +26147,8 @@
   {
    "id": "g147",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081*/1\u2032",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032",
+   "symbol": "2\u20812\u2081*/1\u2032\u1d43",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -26325,8 +26325,8 @@
   {
    "id": "g148",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081~*/1\u2032",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032",
+   "symbol": "2\u20812\u2081~*/1\u2032\u1d43",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -26681,12 +26681,12 @@
   {
    "id": "g150",
    "cls": "sq:P30:L0",
-   "symbol": "22*/1\u2032[cmm]\u1d43",
-   "symbolHtml": "22*/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "22*/1\u2032[pmm]",
+   "symbolHtml": "22*/1\u2032[pmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -26859,12 +26859,12 @@
   {
    "id": "g151",
    "cls": "sq:P30:L0",
-   "symbol": "22~*/1\u2032[cmm]\u1d43",
-   "symbolHtml": "22~*/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "22~*/1\u2032[pmm]",
+   "symbolHtml": "22~*/1\u2032[pmm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27037,12 +27037,12 @@
   {
    "id": "g152",
    "cls": "sq:P30:L0",
-   "symbol": "*2222/1\u2032[cmm]\u1d43",
-   "symbolHtml": "*2222/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "*2222/1\u2032\u1d47",
+   "symbolHtml": "*2222/1\u2032<sup>b</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27215,12 +27215,12 @@
   {
    "id": "g153",
    "cls": "sq:P30:L0",
-   "symbol": "*~2~222/1\u2032[cmm]\u1d43",
-   "symbolHtml": "*~2~222/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "*~2~222/1\u2032\u1d47",
+   "symbolHtml": "*~2~222/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27393,12 +27393,12 @@
   {
    "id": "g154",
    "cls": "sq:P30:L0",
-   "symbol": "22\u00d7/1\u2032[cmm]\u1d43",
-   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "22\u00d7/1\u2032[pmg]\u1d43",
+   "symbolHtml": "22\u00d7/1\u2032[pmg]<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27571,12 +27571,12 @@
   {
    "id": "g155",
    "cls": "sq:P30:L0",
-   "symbol": "22\u00d7/1\u2032[cmm]\u1d47",
-   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "22\u00d7/1\u2032[pmg]\u1d47",
+   "symbolHtml": "22\u00d7/1\u2032[pmg]<sup>b</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27749,12 +27749,12 @@
   {
    "id": "g156",
    "cls": "sq:P30:L0",
-   "symbol": "22*/1\u2032[cmm]\u1d47",
-   "symbolHtml": "22*/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "22*/1\u2032\u1d47",
+   "symbolHtml": "22*/1\u2032<sup>b</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -27927,12 +27927,12 @@
   {
    "id": "g157",
    "cls": "sq:P30:L0",
-   "symbol": "22~*/1\u2032[cmm]\u1d47",
-   "symbolHtml": "22~*/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "22~*/1\u2032\u1d47",
+   "symbolHtml": "22~*/1\u2032<sup>b</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28105,12 +28105,12 @@
   {
    "id": "g158",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081*/1\u2032[cmm]\u1d43",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "2\u20812\u2081*/1\u2032[pmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28283,12 +28283,12 @@
   {
    "id": "g159",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081~*/1\u2032[cmm]\u1d43",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "2\u20812\u2081~*/1\u2032[pmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28461,12 +28461,12 @@
   {
    "id": "g160",
    "cls": "sq:P30:L0",
-   "symbol": "*~2222/1\u2032[cmm]\u1d43",
-   "symbolHtml": "*~2222/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "*~2222/1\u2032\u1d47",
+   "symbolHtml": "*~2222/1\u2032<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28639,12 +28639,12 @@
   {
    "id": "g161",
    "cls": "sq:P30:L0",
-   "symbol": "*~2222/1\u2032[cmm]\u1d47",
-   "symbolHtml": "*~2222/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "*~2222/1\u2032\u1d9c",
+   "symbolHtml": "*~2222/1\u2032<sup>c</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28817,12 +28817,12 @@
   {
    "id": "g162",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081\u00d7/1\u2032[cmm]\u1d43",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[cmm]<sup>a</sup>",
+   "symbol": "2\u20812\u2081\u00d7/1\u2032[pmg]\u1d43",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[pmg]<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -28995,12 +28995,12 @@
   {
    "id": "g163",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081\u00d7/1\u2032[cmm]\u1d47",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "2\u20812\u2081\u00d7/1\u2032[pmg]\u1d47",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[pmg]<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -29173,12 +29173,12 @@
   {
    "id": "g164",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081~*/1\u2032[cmm]\u1d47",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "2\u20812\u2081~*/1\u2032\u1d47",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -29351,12 +29351,12 @@
   {
    "id": "g165",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081*/1\u2032[cmm]\u1d47",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "2\u20812\u2081*/1\u2032\u1d47",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -29529,8 +29529,8 @@
   {
    "id": "g166",
    "cls": "sq:P30:L0",
-   "symbol": "22\u00d7/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "22\u00d7/1\u2032[cmm]\u1d43",
+   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>a</sup>",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -29707,8 +29707,8 @@
   {
    "id": "g167",
    "cls": "sq:P30:L0",
-   "symbol": "22\u00d7/1\u2032[cmm]\u1d48",
-   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>d</sup>",
+   "symbol": "22\u00d7/1\u2032[cmm]\u1d47",
+   "symbolHtml": "22\u00d7/1\u2032[cmm]<sup>b</sup>",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -29885,8 +29885,8 @@
   {
    "id": "g168",
    "cls": "sq:P30:L0",
-   "symbol": "22*/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "22*/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "22*/1\u2032[cmm]",
+   "symbolHtml": "22*/1\u2032[cmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -29898,7 +29898,7 @@
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
     "( R180 | 1/2,1/2 | 0 )   # M=((-1, 0), (0, -1)), s=1",
-    "( m\u00b7mt | 1/2,1/2 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -29961,8 +29961,8 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": -1,
       "tau": 0.0
@@ -29979,8 +29979,8 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": 1,
       "tau": 0.0
@@ -29997,8 +29997,8 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": -1,
       "tau": 0.0
@@ -30015,8 +30015,8 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": 1,
       "tau": 0.0
@@ -30063,8 +30063,8 @@
   {
    "id": "g169",
    "cls": "sq:P30:L0",
-   "symbol": "22~*/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "22~*/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "22~*/1\u2032[cmm]",
+   "symbolHtml": "22~*/1\u2032[cmm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30076,7 +30076,7 @@
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
     "( R180 | 1/2,1/2 | 0 )   # M=((-1, 0), (0, -1)), s=1",
-    "( m\u00b7mt | 1/2,1/2 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 0,0 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -30139,8 +30139,8 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": -1,
       "tau": 0.5
@@ -30157,8 +30157,8 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": 1,
       "tau": 0.5
@@ -30175,8 +30175,8 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": -1,
       "tau": 0.5
@@ -30193,8 +30193,8 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": 1,
       "tau": 0.5
@@ -30241,8 +30241,8 @@
   {
    "id": "g170",
    "cls": "sq:P30:L0",
-   "symbol": "*2222/1\u2032[cmm]\u1d47",
-   "symbolHtml": "*2222/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "*2222/1\u2032[cmm]",
+   "symbolHtml": "*2222/1\u2032[cmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30419,8 +30419,8 @@
   {
    "id": "g171",
    "cls": "sq:P30:L0",
-   "symbol": "*~2~222/1\u2032[cmm]\u1d47",
-   "symbolHtml": "*~2~222/1\u2032[cmm]<sup>b</sup>",
+   "symbol": "*~2~222/1\u2032[cmm]",
+   "symbolHtml": "*~2~222/1\u2032[cmm]",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30597,8 +30597,8 @@
   {
    "id": "g172",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081\u00d7/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "2\u20812\u2081\u00d7/1\u2032[cmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>\u00d7/1\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30775,8 +30775,8 @@
   {
    "id": "g173",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081~*/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "2\u20812\u2081~*/1\u2032[cmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*/1\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30788,7 +30788,7 @@
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
     "( R180 | 1/2,1/2 | 1/2 )   # M=((-1, 0), (0, -1)), s=1",
-    "( m\u00b7mt | 1/2,1/2 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 0,0 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -30851,11 +30851,11 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": -1,
-      "tau": 0.0
+      "tau": 0.5
      },
      {
       "M": [
@@ -30869,29 +30869,11 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": 1,
-      "tau": 0.5
-     },
-     {
-      "M": [
-       [
-        1,
-        0
-       ],
-       [
-        0,
-        -1
-       ]
-      ],
-      "v": [
-       0.0,
-       0.0
-      ],
-      "s": -1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -30908,8 +30890,26 @@
        0.5,
        0.5
       ],
-      "s": 1,
+      "s": -1,
       "tau": 0.0
+     },
+     {
+      "M": [
+       [
+        1,
+        0
+       ],
+       [
+        0,
+        -1
+       ]
+      ],
+      "v": [
+       0.0,
+       0.0
+      ],
+      "s": 1,
+      "tau": 0.5
      },
      {
       "M": [
@@ -30953,8 +30953,8 @@
   {
    "id": "g174",
    "cls": "sq:P30:L0",
-   "symbol": "2\u20812\u2081*/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "2\u20812\u2081*/1\u2032[cmm]",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*/1\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -30966,7 +30966,7 @@
     "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)      # lattice",
     "( R180\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, -1)), s=-1",
     "( R180 | 1/2,1/2 | 1/2 )   # M=((-1, 0), (0, -1)), s=1",
-    "( m\u00b7mt | 1/2,1/2 | 1/2 )   # M=((-1, 0), (0, 1)), s=-1"
+    "( m\u00b7mt | 0,0 | 0 )   # M=((-1, 0), (0, 1)), s=-1"
    ],
    "notes": "",
    "render": {
@@ -31029,11 +31029,11 @@
        ]
       ],
       "v": [
-       0.5,
-       0.5
+       0.0,
+       0.0
       ],
       "s": -1,
-      "tau": 0.5
+      "tau": 0.0
      },
      {
       "M": [
@@ -31047,29 +31047,11 @@
        ]
       ],
       "v": [
-       0.0,
-       0.0
+       0.5,
+       0.5
       ],
       "s": 1,
-      "tau": 0.0
-     },
-     {
-      "M": [
-       [
-        1,
-        0
-       ],
-       [
-        0,
-        -1
-       ]
-      ],
-      "v": [
-       0.0,
-       0.0
-      ],
-      "s": -1,
-      "tau": 0.0
+      "tau": 0.5
      },
      {
       "M": [
@@ -31086,8 +31068,26 @@
        0.5,
        0.5
       ],
-      "s": 1,
+      "s": -1,
       "tau": 0.5
+     },
+     {
+      "M": [
+       [
+        1,
+        0
+       ],
+       [
+        0,
+        -1
+       ]
+      ],
+      "v": [
+       0.0,
+       0.0
+      ],
+      "s": 1,
+      "tau": 0.0
      },
      {
       "M": [
@@ -31131,8 +31131,8 @@
   {
    "id": "g175",
    "cls": "sq:P30:L0",
-   "symbol": "*~2222/1\u2032[cmm]\u1d9c",
-   "symbolHtml": "*~2222/1\u2032[cmm]<sup>c</sup>",
+   "symbol": "*~2222/1\u2032[cmm]",
+   "symbolHtml": "*~2222/1\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "P",
@@ -31309,12 +31309,12 @@
   {
    "id": "g176",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*22\u2081/1\u2032\u1d43",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "c*~2222/1\u2032\u1d43",
+   "symbolHtml": "c*~2222/1\u2032<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -31632,12 +31632,12 @@
   {
    "id": "g177",
    "cls": "sq:P30:L3",
-   "symbol": "c2*2\u2081/1\u2032\u1d43",
-   "symbolHtml": "c2*2<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "c22\u2081*/1\u2032[pmm]",
+   "symbolHtml": "c22<sub>1</sub>*/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -31955,12 +31955,12 @@
   {
    "id": "g178",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*22\u2081/1\u2032\u1d47",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "c*~2222/1\u2032\u1d47",
+   "symbolHtml": "c*~2222/1\u2032<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -32278,12 +32278,12 @@
   {
    "id": "g179",
    "cls": "sq:P30:L3",
-   "symbol": "c2*2\u2081/1\u2032\u1d47",
-   "symbolHtml": "c2*2<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "c22\u2081*/1\u2032",
+   "symbolHtml": "c22<sub>1</sub>*/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -32601,12 +32601,12 @@
   {
    "id": "g180",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*22\u2081/1\u2032\u1d9c",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>c</sup>",
+   "symbol": "c*~2~222/1\u2032\u1d43",
+   "symbolHtml": "c*~2~222/1\u2032<sup>a</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -32924,12 +32924,12 @@
   {
    "id": "g181",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*2\u2081/1\u2032\u1d43",
-   "symbolHtml": "c2~*2<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "c22\u2081~*/1\u2032[pmm]",
+   "symbolHtml": "c22<sub>1</sub>~*/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -33247,12 +33247,12 @@
   {
    "id": "g182",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*22\u2081/1\u2032\u1d48",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>d</sup>",
+   "symbol": "c*~2~222/1\u2032\u1d47",
+   "symbolHtml": "c*~2~222/1\u2032<sup>b</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -33570,12 +33570,12 @@
   {
    "id": "g183",
    "cls": "sq:P30:L3",
-   "symbol": "c2~*2\u2081/1\u2032\u1d47",
-   "symbolHtml": "c2~*2<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "c22\u2081~*/1\u2032",
+   "symbolHtml": "c22<sub>1</sub>~*/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmg",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -33893,8 +33893,8 @@
   {
    "id": "g184",
    "cls": "sq:P30:L6",
-   "symbol": "2*22/1\u2032\u1d43",
-   "symbolHtml": "2*22/1\u2032<sup>a</sup>",
+   "symbol": "2*22/1\u2032",
+   "symbolHtml": "2*22/1\u2032",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -34216,8 +34216,8 @@
   {
    "id": "g185",
    "cls": "sq:P30:L6",
-   "symbol": "2~*22/1\u2032\u1d43",
-   "symbolHtml": "2~*22/1\u2032<sup>a</sup>",
+   "symbol": "2~*22/1\u2032",
+   "symbolHtml": "2~*22/1\u2032",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -34539,8 +34539,8 @@
   {
    "id": "g186",
    "cls": "sq:P30:L6",
-   "symbol": "2\u2081~*2\u20812\u2081/1\u2032\u1d43",
-   "symbolHtml": "2<sub>1</sub>~*2<sub>1</sub>2<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "2\u2081~*2\u20812\u2081/1\u2032",
+   "symbolHtml": "2<sub>1</sub>~*2<sub>1</sub>2<sub>1</sub>/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
@@ -34862,12 +34862,12 @@
   {
    "id": "g187",
    "cls": "sq:P30:L6",
-   "symbol": "2*22/1\u2032\u1d47",
-   "symbolHtml": "2*22/1\u2032<sup>b</sup>",
+   "symbol": "2*22/1\u2032[pmm]",
+   "symbolHtml": "2*22/1\u2032[pmm]",
    "hm": "",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -35185,12 +35185,12 @@
   {
    "id": "g188",
    "cls": "sq:P30:L6",
-   "symbol": "2~*22/1\u2032\u1d47",
-   "symbolHtml": "2~*22/1\u2032<sup>b</sup>",
+   "symbol": "2~*22/1\u2032[pmm]",
+   "symbolHtml": "2~*22/1\u2032[pmm]",
    "hm": "(m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -35508,12 +35508,12 @@
   {
    "id": "g189",
    "cls": "sq:P30:L6",
-   "symbol": "2\u2081~*2\u20812\u2081/1\u2032\u1d47",
-   "symbolHtml": "2<sub>1</sub>~*2<sub>1</sub>2<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "2\u2081~*2\u20812\u2081/1\u2032[pmm]",
+   "symbolHtml": "2<sub>1</sub>~*2<sub>1</sub>2<sub>1</sub>/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "C-centred (spatial)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -35831,8 +35831,8 @@
   {
    "id": "g190",
    "cls": "sq:P30:L7",
-   "symbol": "c2*22\u2081/1\u2032\u1d43",
-   "symbolHtml": "c2*22<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "c2*22\u2081/1\u2032",
+   "symbolHtml": "c2*22<sub>1</sub>/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
@@ -36154,8 +36154,8 @@
   {
    "id": "g191",
    "cls": "sq:P30:L7",
-   "symbol": "c2~*22\u2081/1\u2032\u1d49",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>e</sup>",
+   "symbol": "c2~*22\u2081/1\u2032",
+   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
@@ -36477,8 +36477,8 @@
   {
    "id": "g192",
    "cls": "sq:P30:L7",
-   "symbol": "c2~*2\u20812\u2081/1\u2032\u1d43",
-   "symbolHtml": "c2~*2<sub>1</sub>2<sub>1</sub>/1\u2032<sup>a</sup>",
+   "symbol": "c2~*2\u20812\u2081/1\u2032",
+   "symbolHtml": "c2~*2<sub>1</sub>2<sub>1</sub>/1\u2032",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
@@ -36800,12 +36800,12 @@
   {
    "id": "g193",
    "cls": "sq:P30:L7",
-   "symbol": "c2~*2\u20812\u2081/1\u2032\u1d47",
-   "symbolHtml": "c2~*2<sub>1</sub>2<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "c2~*2\u20812\u2081/1\u2032[pmm]",
+   "symbolHtml": "c2~*2<sub>1</sub>2<sub>1</sub>/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -37123,12 +37123,12 @@
   {
    "id": "g194",
    "cls": "sq:P30:L7",
-   "symbol": "c2*22\u2081/1\u2032\u1d47",
-   "symbolHtml": "c2*22<sub>1</sub>/1\u2032<sup>b</sup>",
+   "symbol": "c2*22\u2081/1\u2032[pmm]",
+   "symbolHtml": "c2*22<sub>1</sub>/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -37446,12 +37446,12 @@
   {
    "id": "g195",
    "cls": "sq:P30:L7",
-   "symbol": "c2~*22\u2081/1\u2032\u1da0",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>f</sup>",
+   "symbol": "c2~*22\u2081/1\u2032[pmm]",
+   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032[pmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "centred (space-time)",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -37769,12 +37769,12 @@
   {
    "id": "g196",
    "cls": "sq:P30:L14",
-   "symbol": "c2~*22\u2081/1\u2032\u1d4d",
-   "symbolHtml": "c2~*22<sub>1</sub>/1\u2032<sup>g</sup>",
+   "symbol": "c*~2~222/1\u2032\u1d9c",
+   "symbolHtml": "c*~2~222/1\u2032<sup>c</sup>",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
-   "base": "cmm",
+   "base": "pmm",
    "forward": false,
    "product": false,
    "symmorphic": true,
@@ -38382,8 +38382,8 @@
   {
    "id": "g197",
    "cls": "sq:P30:L14",
-   "symbol": "c2*2\u2081/1\u2032\u1d9c",
-   "symbolHtml": "c2*2<sub>1</sub>/1\u2032<sup>c</sup>",
+   "symbol": "c22\u2081\u00d7/1\u2032[cmm]",
+   "symbolHtml": "c22<sub>1</sub>\u00d7/1\u2032[cmm]",
    "hm": "(R_{2\u03c0/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Orthorhombic",
    "bravais": "F-centred",
@@ -41645,12 +41645,12 @@
   {
    "id": "g208",
    "cls": "sq:P34:L0",
-   "symbol": "*42/1\u2032\u1d43",
-   "symbolHtml": "*42/1\u2032<sup>a</sup>",
+   "symbol": "4*2/1\u2032",
+   "symbolHtml": "4*2/1\u2032",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": true,
    "symmorphic": false,
@@ -41968,12 +41968,12 @@
   {
    "id": "g209",
    "cls": "sq:P34:L0",
-   "symbol": "~*4\u20822/1\u2032\u1d43",
-   "symbolHtml": "~*4<sub>2</sub>2/1\u2032<sup>a</sup>",
+   "symbol": "4\u2082~*2/1\u2032",
+   "symbolHtml": "4<sub>2</sub>~*2/1\u2032",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -42291,12 +42291,12 @@
   {
    "id": "g210",
    "cls": "sq:P34:L0",
-   "symbol": "~*42/1\u2032\u1d43",
-   "symbolHtml": "~*42/1\u2032<sup>a</sup>",
+   "symbol": "4~*2/1\u2032",
+   "symbolHtml": "4~*2/1\u2032",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -42614,12 +42614,12 @@
   {
    "id": "g211",
    "cls": "sq:P34:L0",
-   "symbol": "*4\u20822/1\u2032\u1d43",
-   "symbolHtml": "*4<sub>2</sub>2/1\u2032<sup>a</sup>",
+   "symbol": "4\u2082*2/1\u2032",
+   "symbolHtml": "4<sub>2</sub>*2/1\u2032",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
-   "base": "p4m",
+   "base": "p4g",
    "forward": false,
    "product": false,
    "symmorphic": false,
@@ -42937,8 +42937,8 @@
   {
    "id": "g212",
    "cls": "sq:P34:L0",
-   "symbol": "*42/1\u2032\u1d47",
-   "symbolHtml": "*42/1\u2032<sup>b</sup>",
+   "symbol": "4*2/1\u2032[p4m]",
+   "symbolHtml": "4*2/1\u2032[p4m]",
    "hm": "",
    "system": "Tetragonal",
    "bravais": "P",
@@ -43260,8 +43260,8 @@
   {
    "id": "g213",
    "cls": "sq:P34:L0",
-   "symbol": "~*4\u20822/1\u2032\u1d47",
-   "symbolHtml": "~*4<sub>2</sub>2/1\u2032<sup>b</sup>",
+   "symbol": "4\u2082~*2/1\u2032[p4m]",
+   "symbolHtml": "4<sub>2</sub>~*2/1\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -43583,8 +43583,8 @@
   {
    "id": "g214",
    "cls": "sq:P34:L0",
-   "symbol": "~*42/1\u2032\u1d47",
-   "symbolHtml": "~*42/1\u2032<sup>b</sup>",
+   "symbol": "4~*2/1\u2032[p4m]",
+   "symbolHtml": "4~*2/1\u2032[p4m]",
    "hm": "(m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -43906,8 +43906,8 @@
   {
    "id": "g215",
    "cls": "sq:P34:L0",
-   "symbol": "*4\u20822/1\u2032\u1d47",
-   "symbolHtml": "*4<sub>2</sub>2/1\u2032<sup>b</sup>",
+   "symbol": "4\u2082*2/1\u2032[p4m]",
+   "symbolHtml": "4<sub>2</sub>*2/1\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
    "system": "Tetragonal",
    "bravais": "P",
@@ -46745,8 +46745,8 @@
   {
    "id": "g222",
    "cls": "sq:P34:L7",
-   "symbol": "c*4\u20832/1\u2032",
-   "symbolHtml": "c*4<sub>3</sub>2/1\u2032",
+   "symbol": "c4\u2083*2/1\u2032[p4m]",
+   "symbolHtml": "c4<sub>3</sub>*2/1\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
@@ -47357,8 +47357,8 @@
   {
    "id": "g223",
    "cls": "sq:P34:L7",
-   "symbol": "c~*4\u20812/1\u2032",
-   "symbolHtml": "c~*4<sub>1</sub>2/1\u2032",
+   "symbol": "c4\u2081~*2/1\u2032[p4m]",
+   "symbolHtml": "c4<sub>1</sub>~*2/1\u2032[p4m]",
    "hm": "(R_{2\u03c0/4}|T_t^{1/4}) (m|T_t^{1/2})",
    "system": "Tetragonal",
    "bravais": "centred (space-time)",
