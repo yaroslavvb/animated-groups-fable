@@ -7,6 +7,33 @@
 "use strict";
 import { drawMotif } from "./renderer.js";
 
+/* 1+1D group verification: ops (m, s, v, tau) act as
+ * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
+ * rep set is ops ∪ ops∘cent, verified as a group modulo Z x Z. */
+export function verifyStripSpec(spec) {
+  const frac = x => ((x % 1) + 1) % 1;
+  const reps = [];
+  for (const o of spec.ops) {
+    reps.push({ m: o.m, s: o.s, v: o.v, tau: o.tau });
+    if (spec.cent) {
+      reps.push({ m: o.m, s: o.s, v: o.v + spec.cent[0], tau: o.tau + spec.cent[1] });
+    }
+  }
+  const key = g => `${g.m}|${g.s}|${frac(g.v).toFixed(6)}|${frac(g.tau).toFixed(6)}`;
+  const keys = new Set(reps.map(key));
+  const errors = [];
+  if (!keys.has(key({ m: 1, s: 1, v: 0, tau: 0 }))) errors.push("identity missing");
+  for (const g of reps) {
+    const gi = { m: g.m, s: g.s, v: -g.m * g.v, tau: -g.s * g.tau };
+    if (!keys.has(key(gi))) errors.push(`inverse missing for ${key(g)}`);
+    for (const h of reps) {
+      const gh = { m: g.m * h.m, s: g.s * h.s, v: g.m * h.v + g.v, tau: g.s * h.tau + g.tau };
+      if (!keys.has(key(gh))) errors.push(`closure fails: ${key(g)} * ${key(h)}`);
+    }
+  }
+  return { ok: errors.length === 0, errors };
+}
+
 export class StripAnimation {
   constructor(canvas, spec, opts = {}) {
     this.canvas = canvas;
@@ -19,6 +46,10 @@ export class StripAnimation {
     this.userPaused = false;
     this.onTick = null;
     this._frame = this._frame.bind(this);
+    this.specCheck = verifyStripSpec(spec);
+    if (!this.specCheck.ok) {
+      console.error("Strip spec fails group axioms:", this.specCheck.errors, spec);
+    }
   }
 
   start() {
@@ -65,6 +96,14 @@ export class StripAnimation {
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = "#faf9f6";
     ctx.fillRect(0, 0, w, h);
+    if (!this.specCheck.ok) {
+      ctx.fillStyle = "#b03030";
+      ctx.font = "13px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("spec fails group verification — see console", w / 2, h / 2);
+      ctx.restore();
+      return;
+    }
     ctx.translate(w / 2, h / 2);
 
     const r = 0.30 * this.cell;

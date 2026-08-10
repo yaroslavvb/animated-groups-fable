@@ -1,9 +1,15 @@
-"""Render the featured gallery groups to looping GIFs (docs/gifs/)."""
+"""Render the featured gallery groups to looping GIFs (docs/gifs/).
 
+Specs come from docs/data/featured.json (single source of truth shared with
+the web renderer) and are verified against the group axioms before rendering.
+"""
+
+import json
 import math
 import os
 
 from gifs import render_gif
+from verify_animations import verify_spec_2d
 
 RT3_2 = math.sqrt(3) / 2
 SQ = [[1, 0], [0, 1]]
@@ -26,44 +32,22 @@ def powmat(M, k):
     return A
 
 
-FEATURED = {
-    "p4-timescrew": {
-        "basis": SQ, "base": [0.33, 0.15],
-        "ops": [{"M": powmat(R4, k), "v": [0, 0], "s": 1, "tau": k / 4}
-                for k in range(4)]},
-    "p6-timescrew": {
-        "basis": HEX, "base": [0.36, 0.13],
-        "ops": [{"M": powmat(R6, k), "v": [0, 0], "s": 1, "tau": k / 6}
-                for k in range(6)]},
-    "p3-timescrew": {
-        "basis": HEX, "base": [0.36, 0.13],
-        "ops": [{"M": powmat(R3, k), "v": [0, 0], "s": 1, "tau": k / 3}
-                for k in range(3)]},
-    "pm-timeglide": {
-        "basis": SQ, "base": [0.27, 0.2],
-        "ops": [{"M": ID, "v": [0, 0], "s": 1, "tau": 0},
-                {"M": MY, "v": [0, 0], "s": 1, "tau": 0.5}]},
-    "p2-timecentred": {
-        "basis": SQ, "base": [0.3, 0.17],
-        "ops": [{"M": ID, "v": [0, 0], "s": 1, "tau": 0},
-                {"M": R2, "v": [0, 0], "s": 1, "tau": 0},
-                {"M": ID, "v": [0.5, 0.5], "s": 1, "tau": 0.5},
-                {"M": R2, "v": [0.5, 0.5], "s": 1, "tau": 0.5}]},
-    "glide-time-reversal": {
-        "basis": SQ, "base": [0.27, 0.2],
-        "ops": [{"M": ID, "v": [0, 0], "s": 1, "tau": 0},
-                {"M": ID, "v": [0.5, 0], "s": -1, "tau": 0}]},
-    "palindromic-windmill": {
-        "basis": SQ, "base": [0.33, 0.15],
-        "ops": [{"M": powmat(R4, k), "v": [0, 0], "s": s,
-                 "tau": 0.5 if k % 2 else 0}
-                for k in range(4) for s in (1, -1)]},
-}
+FEATURED_IDS = ["p4-timescrew", "p6-timescrew", "p3-timescrew",
+                "pm-timeglide", "p2-timecentred", "glide-time-reversal",
+                "palindromic-windmill"]
+
+_here = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(_here, "..", "docs", "data", "featured.json")) as f:
+    _FEAT = json.load(f)
+FEATURED = {k: _FEAT["specs"][k] for k in FEATURED_IDS}
 
 if __name__ == "__main__":
     outdir = os.path.join("..", "docs", "gifs")
     os.makedirs(outdir, exist_ok=True)
     for name, spec in FEATURED.items():
+        errs = verify_spec_2d(spec, name)
+        if errs:
+            raise SystemExit("spec fails group verification: " + "; ".join(errs))
         path = os.path.join(outdir, f"{name}.gif")
         render_gif(spec, path, size=420, frames=40, cell=100)
         print("wrote", path)

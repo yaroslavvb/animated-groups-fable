@@ -12,6 +12,9 @@ import sys
 from PIL import Image, ImageDraw
 
 SS = 4  # supersampling factor
+# satellite revolutions per period; |1 - SAT_REVS| = 1 keeps all n screw
+# copies' satellites at n DISTINCT screen angles (mirrors renderer.js)
+SAT_REVS = 2
 
 BODY = (59, 110, 165)
 BEAK = (224, 145, 60)
@@ -63,13 +66,13 @@ def draw_motif(draw, cx, cy, T, theta, r):
     draw.polygon([xf(p) for p in beak], fill=BEAK)
 
     orbit_r = 0.68 * r
-    ang = -2 * math.pi * theta
+    ang = SAT_REVS * 2 * math.pi * theta
     # orbit ring (thin polygon path)
     ring = [xf((orbit_r * math.cos(2 * math.pi * i / 48),
                 orbit_r * math.sin(2 * math.pi * i / 48))) for i in range(49)]
     draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
-    # trailing tail arc
-    tail = [xf((orbit_r * math.cos(ang + a), orbit_r * math.sin(ang + a)))
+    # trailing tail arc (behind the satellite w.r.t. direction of motion)
+    tail = [xf((orbit_r * math.cos(ang - a), orbit_r * math.sin(ang - a)))
             for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
     draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
     # satellite: hue encodes internal time
@@ -93,8 +96,26 @@ def render_frame(spec, t, size, cell):
     b2 = (B[1][0] * s, -B[1][1] * s)
     l1 = math.hypot(*b1)
     l2 = math.hypot(*b2)
-    r = 0.30 * min(l1, l2) * spec.get("motifScale", 1)
     base = spec.get("base", [0.31, 0.17])
+    # motif radius from the minimum orbit distance: stamps must not overlap,
+    # or paint order (not equivariant) would break frame invariance
+    pts = []
+    for op in spec["ops"]:
+        M = op["M"]
+        bx = M[0][0] * base[0] + M[0][1] * base[1] + op["v"][0]
+        by = M[1][0] * base[0] + M[1][1] * base[1] + op["v"][1]
+        for m1 in (0, 1):
+            for m2 in (0, 1):
+                pts.append((bx + m1, by + m2))
+    min_d = min(l1, l2)
+    for i in range(len(pts)):
+        for j in range(i + 1, len(pts)):
+            dx = (pts[i][0] - pts[j][0]) * b1[0] + (pts[i][1] - pts[j][1]) * b2[0]
+            dy = (pts[i][0] - pts[j][0]) * b1[1] + (pts[i][1] - pts[j][1]) * b2[1]
+            d = math.hypot(dx, dy)
+            if d > 1e-6 and d < min_d:
+                min_d = d
+    r = min(0.30 * min(l1, l2), 0.55 * min_d) * spec.get("motifScale", 1)
     cx0, cy0 = W / 2, W / 2
 
     # lattice window

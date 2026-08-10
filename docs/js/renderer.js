@@ -13,8 +13,17 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
+import { verifySpec, orbitPlacements } from "./orbit.js";
 
 const TWO_PI = Math.PI * 2;
+
+/* Satellite revolutions per period. MUST be an integer (loop closure) with
+ * |1 - SAT_REVS| = 1 so that around an n-fold time-screw centre the n copies
+ * show n DISTINCT satellite screen angles: the k-th copy's satellite sits at
+ * screen angle (1 - c) * k * 2π/n + const, so c = -1 aliased n=6 to thirds
+ * and n=4 to halves. c = 2 gives the advertised "spiral of phases" for every
+ * n simultaneously. */
+const SAT_REVS = 2;
 
 /* ---------------------------------------------------------------- motif */
 // The motif must have NO accidental symmetry: chiral, asymmetric, and it
@@ -54,10 +63,9 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.fillStyle = c.beak;
   ctx.fill();
 
-  // clock: orbit ring + satellite at angle -2*pi*theta; on screen (with the
-  // y-flipped pixel basis) forward time moves the satellite counterclockwise,
-  // matching the fixed ccw convention of the notation
-  const ang = -TWO_PI * theta;
+  // clock: orbit ring + satellite; SAT_REVS revolutions per period keeps the
+  // n screw-copies' satellites at n distinct screen angles (see SAT_REVS)
+  const ang = SAT_REVS * TWO_PI * theta;
   const orbitR = 0.68 * r;
   ctx.beginPath();
   ctx.arc(0, 0, orbitR, 0, TWO_PI);
@@ -65,9 +73,9 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.lineWidth = Math.max(0.5, 0.03 * r);
   ctx.stroke();
   const sx = orbitR * Math.cos(ang), sy = orbitR * Math.sin(ang);
-  // trailing tail shows direction of motion
+  // trailing tail (behind the satellite w.r.t. its direction of motion)
   ctx.beginPath();
-  ctx.arc(0, 0, orbitR, ang + 0.12, ang + 0.85);
+  ctx.arc(0, 0, orbitR, ang - 0.85, ang - 0.12);
   ctx.strokeStyle = c.tail;
   ctx.lineWidth = Math.max(1, 0.09 * r);
   ctx.stroke();
@@ -105,6 +113,14 @@ export class FilmGroupAnimation {
     this.userPaused = false; // set by controls; visibility autostart respects it
     this.onTick = null;      // callback(phase) for control widgets
     this._frame = this._frame.bind(this);
+    // GROUP-ACTION GATE: verify the spec is a genuine group of spacetime
+    // operations before anything is drawn; a broken spec renders an error
+    // banner, never a silently wrong pattern.
+    this.specCheck = verifySpec(spec);
+    if (!this.specCheck.ok) {
+      console.error("Film-group spec fails group axioms:",
+                    this.specCheck.errors, spec);
+    }
     this._setupGeometry();
   }
 
@@ -120,9 +136,25 @@ export class FilmGroupAnimation {
     // cartesian pixel basis (y flipped for screen)
     this.b1 = [B[0][0] * s, -B[0][1] * s];
     this.b2 = [B[1][0] * s, -B[1][1] * s];
-    // motif radius relative to shortest lattice spacing
+    // Motif radius from the MINIMUM distance between orbit points: stamps
+    // must never overlap, otherwise paint order (not equivariant!) would
+    // break exact invariance of the rendered frame.
     const l1 = Math.hypot(...this.b1), l2 = Math.hypot(...this.b2);
-    this.motifR = 0.30 * Math.min(l1, l2) * (this.spec.motifScale || 1);
+    const pls = orbitPlacements(this.spec, 0, 1, 0, 1);
+    let minD = Math.min(l1, l2);
+    for (let i = 0; i < pls.length; i++) {
+      for (let j = i + 1; j < pls.length; j++) {
+        const dx = (pls[i].pos[0] - pls[j].pos[0]) * this.b1[0] +
+                   (pls[i].pos[1] - pls[j].pos[1]) * this.b2[0];
+        const dy = (pls[i].pos[0] - pls[j].pos[0]) * this.b1[1] +
+                   (pls[i].pos[1] - pls[j].pos[1]) * this.b2[1];
+        const d = Math.hypot(dx, dy);
+        if (d > 1e-6 && d < minD) minD = d;
+      }
+    }
+    // motif footprint (ring + satellite) reaches ~0.85 r: keep 2*0.85 r < minD
+    this.motifR = Math.min(0.30 * Math.min(l1, l2), 0.55 * minD) *
+                  (this.spec.motifScale || 1);
     // window of lattice translations covering the canvas (+margin)
     const inv = invert2([[this.b1[0], this.b2[0]], [this.b1[1], this.b2[1]]]);
     const corners = [[0, 0], [w, 0], [0, h], [w, h]];
@@ -178,32 +210,37 @@ export class FilmGroupAnimation {
     ctx.clearRect(0, 0, w, h);
     ctx.fillStyle = this.spec.bg || "#faf9f6";
     ctx.fillRect(0, 0, w, h);
+
+    if (!this.specCheck.ok) {
+      // never render a pattern from a non-group spec
+      ctx.fillStyle = "#b03030";
+      ctx.font = "13px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("spec fails group verification — see console",
+                   w / 2, h / 2);
+      ctx.restore();
+      return;
+    }
+
     ctx.translate(w / 2, h / 2);
 
-    // base offset of the motif inside the cell (generic position: avoids
-    // sitting on any symmetry element, which would degenerate the picture)
-    const base = this.spec.base || [0.31, 0.17];
-
-    for (const op of this.spec.ops) {
-      // spatial part in pixel coords: x -> Mpix * x + vpix
-      const Mpx = latToPix(op.M, this.b1, this.b2);
-      for (let m1 = this.m1range[0]; m1 <= this.m1range[1]; m1++) {
-        for (let m2 = this.m2range[0]; m2 <= this.m2range[1]; m2++) {
-          // lattice-coordinate position of this copy's base point
-          const lx = op.M[0][0] * base[0] + op.M[0][1] * base[1] + op.v[0] + m1;
-          const ly = op.M[1][0] * base[0] + op.M[1][1] * base[1] + op.v[1] + m2;
-          const px = lx * this.b1[0] + ly * this.b2[0];
-          const py = lx * this.b1[1] + ly * this.b2[1];
-          if (px < -this.w / 2 - this.motifR * 3 || px > this.w / 2 + this.motifR * 3 ||
-              py < -this.h / 2 - this.motifR * 3 || py > this.h / 2 + this.motifR * 3) continue;
-          const theta = op.s * (t - op.tau);
-          ctx.save();
-          ctx.translate(px, py);
-          ctx.transform(Mpx[0][0], Mpx[1][0], Mpx[0][1], Mpx[1][1], 0, 0);
-          drawMotif(ctx, theta, this.motifR);
-          ctx.restore();
-        }
-      }
+    // THE INTERMEDIATE STEP: the frame is drawn from the explicit orbit of
+    // the base motif under the group elements — invariance by construction.
+    const placements = orbitPlacements(
+      this.spec, this.m1range[0], this.m1range[1],
+      this.m2range[0], this.m2range[1]);
+    for (const pl of placements) {
+      const px = pl.pos[0] * this.b1[0] + pl.pos[1] * this.b2[0];
+      const py = pl.pos[0] * this.b1[1] + pl.pos[1] * this.b2[1];
+      if (px < -this.w / 2 - this.motifR * 3 || px > this.w / 2 + this.motifR * 3 ||
+          py < -this.h / 2 - this.motifR * 3 || py > this.h / 2 + this.motifR * 3) continue;
+      const Mpx = latToPix(pl.A, this.b1, this.b2);
+      const theta = pl.s * (t - pl.tau);
+      ctx.save();
+      ctx.translate(px, py);
+      ctx.transform(Mpx[0][0], Mpx[1][0], Mpx[0][1], Mpx[1][1], 0, 0);
+      drawMotif(ctx, theta, this.motifR);
+      ctx.restore();
     }
     if (this.showOverlay && this.spec.overlay) drawOverlay(ctx, this);
     ctx.restore();

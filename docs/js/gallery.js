@@ -37,8 +37,7 @@ only the full 360° turn is instantaneous. This is the animated analogue of a \
 chiral screw crystal, and its spacetime mirror image, \
 4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>, is a genuinely different group — the \
 pair is the film-group version of left- and right-quartz.",
-    spec: { basis: SQ, ops: Array.from({ length: 4 }, (_, k) =>
-      ({ M: powmat(R4, k), v: [0, 0], s: 1, tau: k / 4 })), base: [0.33, 0.15] },
+    specId: "p4-timescrew",
   },
   {
     id: "p6-timescrew",
@@ -50,8 +49,7 @@ Around each 6-centre the satellites form a phase spiral — a hexagonal \
 'clock carousel'. Its mirror twin is 6<sub>5</sub>3<sub>2</sub>2<sub>1</sub>; \
 6<sub>2</sub>, 6<sub>3</sub>, 6<sub>4</sub> variants exist likewise, exactly \
 matching the 3D screw groups P6<sub>1</sub>…P6<sub>5</sub>.",
-    spec: { basis: HEX, ops: Array.from({ length: 6 }, (_, k) =>
-      ({ M: powmat(R6, k), v: [0, 0], s: 1, tau: k / 6 })), base: [0.36, 0.13] },
+    specId: "p6-timescrew",
   },
   {
     id: "p3-timescrew",
@@ -64,8 +62,7 @@ chirality-selective response rule: the heterodyne conductivities of a crystal \
 pumped with this symmetry conserve pseudo-angular momentum mod 3, so probe \
 light of one circular polarisation answers at shifted frequency with the \
 <em>opposite</em> chirality.",
-    spec: { basis: HEX, ops: Array.from({ length: 3 }, (_, k) =>
-      ({ M: powmat(R3, k), v: [0, 0], s: 1, tau: k / 3 })), base: [0.36, 0.13] },
+    specId: "p3-timescrew",
   },
   {
     id: "pm-timeglide",
@@ -85,10 +82,7 @@ film, the pattern can never be made static. It is the smallest example where \
 the strict Galilean classification (283 classes) is finer than the \
 crystallographic one (275); the catalog, following Ke–Wu, files it with \
 pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
-    spec: { basis: SQ, ops: [
-      { M: ID, v: [0, 0], s: 1, tau: 0 },
-      { M: MY, v: [0, 0], s: 1, tau: 0.5 },
-    ], base: [0.27, 0.2] },
+    specId: "pm-timeglide",
   },
   {
     id: "p2-timecentred",
@@ -102,12 +96,7 @@ Galilean boost can undo the centring — the group is not a product even though 
 every point operation is instantaneous. (This is the plane analogue of the \
 1+1D centred groups Cm<sub>x</sub>, Cm<sub>t</sub> that Fletcher discarded as \
 'rhombic'.)",
-    spec: { basis: SQ, ops: [
-      { M: ID, v: [0, 0], s: 1, tau: 0 },
-      { M: R2, v: [0, 0], s: 1, tau: 0 },
-      { M: ID, v: [0.5, 0.5], s: 1, tau: 0.5 },
-      { M: R2, v: [0.5, 0.5], s: 1, tau: 0.5 },
-    ], base: [0.3, 0.17] },
+    specId: "p2-timecentred",
   },
   {
     id: "glide-time-reversal",
@@ -119,10 +108,7 @@ in quantum settings — Xu–Wu show its 1+1D version forces a Kramers-like doub
 degeneracy at the zone boundary <em>without any spin</em>. Note the \
 time-collapsed photograph has a finer translation lattice than any single \
 frame: the half-cell shift is a symmetry only of the loop, not of a moment.",
-    spec: { basis: SQ, ops: [
-      { M: ID, v: [0, 0], s: 1, tau: 0 },
-      { M: ID, v: [0.5, 0], s: -1, tau: 0 },
-    ], base: [0.27, 0.2] },
+    specId: "glide-time-reversal",
   },
   {
     id: "palindromic-windmill",
@@ -135,16 +121,7 @@ reversal negates the phase ½&nbsp;≡&nbsp;−½. The odd screws 4<sub>1</sub>,
 handedness — they admit only reversal composed with a spatial mirror \
 (4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m′): a small parity theorem visible \
 on screen.",
-    spec: { basis: SQ, ops: [
-      { M: ID, v: [0, 0], s: 1, tau: 0 },
-      { M: R4, v: [0, 0], s: 1, tau: 0.5 },
-      { M: R2, v: [0, 0], s: 1, tau: 0 },
-      { M: powmat(R4, 3), v: [0, 0], s: 1, tau: 0.5 },
-      { M: ID, v: [0, 0], s: -1, tau: 0 },
-      { M: R4, v: [0, 0], s: -1, tau: 0.5 },
-      { M: R2, v: [0, 0], s: -1, tau: 0 },
-      { M: powmat(R4, 3), v: [0, 0], s: -1, tau: 0.5 },
-    ], base: [0.33, 0.15] },
+    specId: "palindromic-windmill",
   },
 ];
 
@@ -159,7 +136,9 @@ const observer = new IntersectionObserver((entries) => {
 }, { rootMargin: "60px" });
 
 const root = document.getElementById("demos");
+const DATA = await (await fetch("data/featured.json")).json();
 for (const f of FEATURED) {
+  f.spec = DATA.specs[f.specId];
   const d = document.createElement("div");
   d.className = "demo";
   d.id = f.id;
