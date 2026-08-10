@@ -48,42 +48,46 @@ def motif_paths(r):
     return body, beak
 
 
-def draw_motif(draw, cx, cy, T, theta, r):
+def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
     """T = 2x2 pixel transform matrix applied to motif-local coords.
 
     Static colors; internal time is carried entirely by the two moving hands
-    (outer c=2, inner c=1), mirroring renderer.js."""
+    (outer c=2, inner c=1). Layered exactly as renderer.js: frames draw all
+    bodies, then all tails, then all hands, so painting is order-independent
+    and coincident copies superimpose both clocks."""
 
     def xf(p):
         x, y = p
         return (cx + T[0][0] * x + T[0][1] * y, cy + T[1][0] * x + T[1][1] * y)
 
-    body, beak = motif_paths(r)
-    draw.polygon([xf(p) for p in body], fill=BODY)
-    draw.polygon([xf(p) for p in beak], fill=BEAK)
-
     orbit_r = 0.68 * r
     ang = SAT_REVS * 2 * math.pi * theta
-    # orbit ring (thin polygon path)
-    ring = [xf((orbit_r * math.cos(2 * math.pi * i / 48),
-                orbit_r * math.sin(2 * math.pi * i / 48))) for i in range(49)]
-    draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
-    # trailing tail arc (behind the satellite w.r.t. direction of motion)
-    tail = [xf((orbit_r * math.cos(ang - a), orbit_r * math.sin(ang - a)))
-            for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
-    draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
-    # outer satellite (static color)
-    sx, sy = xf((orbit_r * math.cos(ang), orbit_r * math.sin(ang)))
-    sr = 0.13 * r * _scale_of(T)
-    draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=TAIL)
-    # inner hand (c = SAT_REVS_INNER): resolves half-period offsets
-    ang2 = SAT_REVS_INNER * 2 * math.pi * theta
-    inner_r = 0.36 * r
-    ix, iy = xf((inner_r * math.cos(ang2), inner_r * math.sin(ang2)))
-    ox, oy = xf((0, 0))
-    draw.line([(ox, oy), (ix, iy)], fill=INNER, width=max(1, int(0.06 * r)))
-    ir = 0.09 * r * _scale_of(T)
-    draw.ellipse([ix - ir, iy - ir, ix + ir, iy + ir], fill=INNER)
+
+    if layer in ("all", "body"):
+        body, beak = motif_paths(r)
+        draw.polygon([xf(p) for p in body], fill=BODY)
+        draw.polygon([xf(p) for p in beak], fill=BEAK)
+        ring = [xf((orbit_r * math.cos(2 * math.pi * i / 48),
+                    orbit_r * math.sin(2 * math.pi * i / 48))) for i in range(49)]
+        draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
+
+    if layer in ("all", "tail"):
+        tail = [xf((orbit_r * math.cos(ang - a), orbit_r * math.sin(ang - a)))
+                for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
+        draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
+
+    if layer in ("all", "hands"):
+        sx, sy = xf((orbit_r * math.cos(ang), orbit_r * math.sin(ang)))
+        sr = 0.13 * r * _scale_of(T)
+        draw.ellipse([sx - sr, sy - sr, sx + sr, sy + sr], fill=TAIL)
+        ang2 = SAT_REVS_INNER * 2 * math.pi * theta
+        inner_r = 0.38 * r
+        ix, iy = xf((inner_r * math.cos(ang2), inner_r * math.sin(ang2)))
+        ox, oy = xf((0, 0))
+        draw.line([(ox, oy), (ix, iy)], fill=INNER,
+                  width=max(2, int(0.085 * r)))
+        ir = 0.11 * r * _scale_of(T)
+        draw.ellipse([ix - ir, iy - ir, ix + ir, iy + ir], fill=INNER)
 
 
 def _scale_of(T):
@@ -135,6 +139,7 @@ def render_frame(spec, t, size, cell):
 
     Bpix = ((b1[0], b2[0]), (b1[1], b2[1]))
     Binv = inv
+    visible = []
     for op in spec["ops"]:
         M = op["M"]
         # pixel transform of M: Bpix * M * Bpix^{-1}
@@ -155,7 +160,11 @@ def render_frame(spec, t, size, cell):
                 py = lx * b1[1] + ly * b2[1]
                 if abs(px) > W / 2 + 3 * r or abs(py) > W / 2 + 3 * r:
                     continue
-                draw_motif(draw, cx0 + px, cy0 + py, T, theta, r)
+                visible.append((px, py, T, theta))
+    # layered, order-independent painting (mirrors renderer.js)
+    for layer in ("body", "tail", "hands"):
+        for (px, py, T, theta) in visible:
+            draw_motif(draw, cx0 + px, cy0 + py, T, theta, r, layer)
     return img.resize((size, size), Image.LANCZOS)
 
 

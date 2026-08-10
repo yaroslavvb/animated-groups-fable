@@ -117,16 +117,20 @@ export class StripAnimation {
       }
     }
     const span = Math.ceil(w / 2 / this.cell) + 1;
-    for (const [m, v, s, tau] of copies) {
-      for (let k = -span; k <= span; k++) {
-        const x = (m * base + v + k) * this.cell;
-        if (x < -w / 2 - r || x > w / 2 + r) continue;
-        const theta = s * (t - tau);
-        ctx.save();
-        ctx.translate(x, 0);
-        ctx.scale(m, 1);   // spatial mirror flips the motif
-        drawMotif(ctx, theta, r);
-        ctx.restore();
+    // layered drawing: order-independent painting; coincident copies
+    // (e.g. a palindrome's forward/backward pair) superimpose both clocks
+    for (const layer of ["body", "tail", "hands"]) {
+      for (const [m, v, s, tau] of copies) {
+        for (let k = -span; k <= span; k++) {
+          const x = (m * base + v + k) * this.cell;
+          if (x < -w / 2 - r || x > w / 2 + r) continue;
+          const theta = s * (t - tau);
+          ctx.save();
+          ctx.translate(x, 0);
+          ctx.scale(m, 1);   // spatial mirror flips the motif
+          drawMotif(ctx, theta, r, null, layer);
+          ctx.restore();
+        }
       }
     }
     ctx.restore();

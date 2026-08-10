@@ -31,65 +31,79 @@ const SAT_REVS_INNER = 1;  // inner hand
 
 /* ---------------------------------------------------------------- motif */
 // The motif must have NO accidental symmetry: chiral, asymmetric, and it
-// carries a "clock": an orbiting satellite whose angle encodes internal time.
-export function drawMotif(ctx, theta, r, colors) {
+// carries a two-handed clock encoding internal time. Rendering is LAYERED
+// ("body" | "tail" | "hands", or "all"): frames draw every placement's body
+// layer first, then tails, then hands, so painting is order-independent —
+// copies that share a site (a reversal partner of a forward op has the same
+// spatial part) show BOTH clocks superimposed instead of occluding.
+export function drawMotif(ctx, theta, r, colors, layer = "all") {
   // theta = internal time in periods (any real); r = motif radius (px)
   const c = colors || MOTIF_COLORS;
   ctx.save();
 
-  // body: asymmetric chiral flag (comma / tadpole shape); static colors —
-  // internal time is carried entirely by the two moving hands below
-  ctx.beginPath();
-  ctx.moveTo(-0.15 * r, -0.5 * r);
-  ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
-  ctx.bezierCurveTo(-0.28 * r, 0.5 * r, -0.42 * r, 0.12 * r, -0.15 * r, -0.5 * r);
-  ctx.closePath();
-  ctx.fillStyle = c.body;
-  ctx.fill();
+  if (layer === "all" || layer === "body") {
+    // body: asymmetric chiral flag (comma / tadpole shape); static colors —
+    // internal time is carried entirely by the moving hands
+    ctx.beginPath();
+    ctx.moveTo(-0.15 * r, -0.5 * r);
+    ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
+    ctx.bezierCurveTo(-0.28 * r, 0.5 * r, -0.42 * r, 0.12 * r, -0.15 * r, -0.5 * r);
+    ctx.closePath();
+    ctx.fillStyle = c.body;
+    ctx.fill();
 
-  // beak: sharp asymmetry marker
-  ctx.beginPath();
-  ctx.moveTo(-0.15 * r, -0.5 * r);
-  ctx.lineTo(0.1 * r, -0.85 * r);
-  ctx.lineTo(0.22 * r, -0.45 * r);
-  ctx.closePath();
-  ctx.fillStyle = c.beak;
-  ctx.fill();
+    // beak: sharp asymmetry marker
+    ctx.beginPath();
+    ctx.moveTo(-0.15 * r, -0.5 * r);
+    ctx.lineTo(0.1 * r, -0.85 * r);
+    ctx.lineTo(0.22 * r, -0.45 * r);
+    ctx.closePath();
+    ctx.fillStyle = c.beak;
+    ctx.fill();
 
-  // outer hand (c = SAT_REVS): ring + tail + satellite, static color
+    // orbit ring (static)
+    ctx.beginPath();
+    ctx.arc(0, 0, 0.68 * r, 0, TWO_PI);
+    ctx.strokeStyle = c.orbit;
+    ctx.lineWidth = Math.max(0.5, 0.03 * r);
+    ctx.stroke();
+  }
+
   const ang = SAT_REVS * TWO_PI * theta;
   const orbitR = 0.68 * r;
-  ctx.beginPath();
-  ctx.arc(0, 0, orbitR, 0, TWO_PI);
-  ctx.strokeStyle = c.orbit;
-  ctx.lineWidth = Math.max(0.5, 0.03 * r);
-  ctx.stroke();
-  const sx = orbitR * Math.cos(ang), sy = orbitR * Math.sin(ang);
-  // trailing tail (behind the satellite w.r.t. its direction of motion)
-  ctx.beginPath();
-  ctx.arc(0, 0, orbitR, ang - 0.85, ang - 0.12);
-  ctx.strokeStyle = c.tail;
-  ctx.lineWidth = Math.max(1, 0.09 * r);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(sx, sy, 0.13 * r, 0, TWO_PI);
-  ctx.fillStyle = c.satellite;
-  ctx.fill();
 
-  // inner hand (c = SAT_REVS_INNER): resolves half-period offsets
-  const ang2 = SAT_REVS_INNER * TWO_PI * theta;
-  const innerR = 0.36 * r;
-  const ix = innerR * Math.cos(ang2), iy = innerR * Math.sin(ang2);
-  ctx.beginPath();
-  ctx.moveTo(0, 0);
-  ctx.lineTo(ix, iy);
-  ctx.strokeStyle = c.inner;
-  ctx.lineWidth = Math.max(1, 0.06 * r);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(ix, iy, 0.09 * r, 0, TWO_PI);
-  ctx.fillStyle = c.inner;
-  ctx.fill();
+  if (layer === "all" || layer === "tail") {
+    // trailing tail (behind the satellite w.r.t. its direction of motion)
+    ctx.beginPath();
+    ctx.arc(0, 0, orbitR, ang - 0.85, ang - 0.12);
+    ctx.strokeStyle = c.tail;
+    ctx.lineWidth = Math.max(1, 0.09 * r);
+    ctx.stroke();
+  }
+
+  if (layer === "all" || layer === "hands") {
+    // outer hand (c = SAT_REVS)
+    const sx = orbitR * Math.cos(ang), sy = orbitR * Math.sin(ang);
+    ctx.beginPath();
+    ctx.arc(sx, sy, 0.13 * r, 0, TWO_PI);
+    ctx.fillStyle = c.satellite;
+    ctx.fill();
+
+    // inner hand (c = SAT_REVS_INNER): resolves half-period offsets
+    const ang2 = SAT_REVS_INNER * TWO_PI * theta;
+    const innerR = 0.38 * r;
+    const ix = innerR * Math.cos(ang2), iy = innerR * Math.sin(ang2);
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(ix, iy);
+    ctx.strokeStyle = c.inner;
+    ctx.lineWidth = Math.max(1.2, 0.085 * r);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(ix, iy, 0.11 * r, 0, TWO_PI);
+    ctx.fillStyle = c.inner;
+    ctx.fill();
+  }
 
   ctx.restore();
 }
@@ -109,6 +123,7 @@ export class FilmGroupAnimation {
     this.canvas = canvas;
     this.spec = spec;
     this.cell = opts.cell || 64;          // pixels per lattice unit (a1 length)
+    this.minMotifPx = opts.minMotifPx || 9;  // upscale cell if motifs smaller
     this.period = opts.period || 4000;    // ms per time period
     this.showOverlay = opts.showOverlay || false;
     this.running = false;
@@ -159,6 +174,15 @@ export class FilmGroupAnimation {
     // motif footprint (ring + satellite) reaches ~0.85 r: keep 2*0.85 r < minD
     this.motifR = Math.min(0.30 * Math.min(l1, l2), 0.60 * minD) *
                   (this.spec.motifScale || 1);
+    // dense groups: enforce a minimum on-screen motif size by scaling the
+    // cell up (fewer repeats shown, but a legible clock)
+    const minPx = this.minMotifPx || 9;
+    if (!this._rescaled && this.motifR > 0 && this.motifR < minPx) {
+      this._rescaled = true;
+      this.cell *= minPx / this.motifR;
+      this._setupGeometry();
+      return;
+    }
     // window of lattice translations covering the canvas (+margin)
     const inv = invert2([[this.b1[0], this.b2[0]], [this.b1[1], this.b2[1]]]);
     const corners = [[0, 0], [w, 0], [0, h], [w, h]];
@@ -230,21 +254,29 @@ export class FilmGroupAnimation {
 
     // THE INTERMEDIATE STEP: the frame is drawn from the explicit orbit of
     // the base motif under the group elements — invariance by construction.
+    // Drawing is layered (bodies, tails, hands) so that painting is
+    // order-independent: coincident copies (reversal partners share a site)
+    // superimpose both clocks instead of occluding one another.
     const placements = orbitPlacements(
       this.spec, this.m1range[0], this.m1range[1],
       this.m2range[0], this.m2range[1]);
+    const visible = [];
     for (const pl of placements) {
       const px = pl.pos[0] * this.b1[0] + pl.pos[1] * this.b2[0];
       const py = pl.pos[0] * this.b1[1] + pl.pos[1] * this.b2[1];
       if (px < -this.w / 2 - this.motifR * 3 || px > this.w / 2 + this.motifR * 3 ||
           py < -this.h / 2 - this.motifR * 3 || py > this.h / 2 + this.motifR * 3) continue;
-      const Mpx = latToPix(pl.A, this.b1, this.b2);
-      const theta = pl.s * (t - pl.tau);
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.transform(Mpx[0][0], Mpx[1][0], Mpx[0][1], Mpx[1][1], 0, 0);
-      drawMotif(ctx, theta, this.motifR);
-      ctx.restore();
+      visible.push([pl, px, py, latToPix(pl.A, this.b1, this.b2)]);
+    }
+    for (const layer of ["body", "tail", "hands"]) {
+      for (const [pl, px, py, Mpx] of visible) {
+        const theta = pl.s * (t - pl.tau);
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.transform(Mpx[0][0], Mpx[1][0], Mpx[0][1], Mpx[1][1], 0, 0);
+        drawMotif(ctx, theta, this.motifR, null, layer);
+        ctx.restore();
+      }
     }
     if (this.showOverlay && this.spec.overlay) drawOverlay(ctx, this);
     ctx.restore();

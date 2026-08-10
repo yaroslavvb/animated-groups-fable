@@ -150,11 +150,17 @@ export function verifyFrames(makeAnim, spec, opts = {}) {
                   [-Bpix[1][0] / det, Bpix[0][0] / det]];
     const Mpix = matMul2(matMul2(Bpix, op.M), Binv);
     const vpix = matVec2(Bpix, op.v);
+    // Invariance is F(t0)(q) = F(t1)(op(q)); with canvas semantics
+    // dest = C(src), displaying F(t1)∘op needs C = op^{-1} (pixel form)
+    const dpx = Mpix[0][0] * Mpix[1][1] - Mpix[0][1] * Mpix[1][0];
+    const Mi = [[Mpix[1][1] / dpx, -Mpix[0][1] / dpx],
+                [-Mpix[1][0] / dpx, Mpix[0][0] / dpx]];
+    const vi = matVec2(Mi, vpix).map(x => -x);
     const cvT = document.createElement("canvas");
     cvT.width = cvT.height = size;
     const ctxT = cvT.getContext("2d");
     ctxT.translate(size / 2, size / 2);
-    ctxT.transform(Mpix[0][0], Mpix[1][0], Mpix[0][1], Mpix[1][1], vpix[0], vpix[1]);
+    ctxT.transform(Mi[0][0], Mi[1][0], Mi[0][1], Mi[1][1], vi[0], vi[1]);
     ctxT.translate(-size / 2, -size / 2);
     ctxT.drawImage(cvB, 0, 0, size, size);
     // compare central region (edges differ by window clipping)

@@ -93,20 +93,41 @@ def verify_strip(spec, name):
     return [f"strip {name}: {e}" for e in errs]
 
 
-def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=14.0):
-    """Render F(t0) and op-transformed F(s t0 + tau); compare central region."""
+def _bilinear_sample(arr, A, t):
+    """Sample arr (H x W x 3, index coords) at A @ (x, y) + t per output pixel,
+    with explicit bilinear interpolation — no library transform conventions."""
+    import numpy as np
+    H, W, _ = arr.shape
+    ys, xs = np.mgrid[0:H, 0:W]
+    sx = A[0][0] * xs + A[0][1] * ys + t[0]
+    sy = A[1][0] * xs + A[1][1] * ys + t[1]
+    x0 = np.floor(sx).astype(int)
+    y0 = np.floor(sy).astype(int)
+    fx = (sx - x0)[..., None]
+    fy = (sy - y0)[..., None]
+    x0 = np.clip(x0, 0, W - 2)
+    y0 = np.clip(y0, 0, H - 2)
+    return (arr[y0, x0] * (1 - fx) * (1 - fy) + arr[y0, x0 + 1] * fx * (1 - fy)
+            + arr[y0 + 1, x0] * (1 - fx) * fy + arr[y0 + 1, x0 + 1] * fx * fy)
+
+
+def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
+    """Render F(t0) and op-transformed F(s t0 + tau); compare central region.
+
+    The comparison map is the op's INVERSE pixel transform about the pattern
+    origin, which the renderer places at continuous coordinate size/2, i.e.
+    index size/2 - 0.5 after the supersampled downscale."""
     from gifs import render_frame
-    from PIL import Image
     import numpy as np
     errs = []
     f0 = render_frame(spec, t0, size, cell)
     B = spec["basis"]
     b1 = (B[0][0] * cell, -B[0][1] * cell)
     b2 = (B[1][0] * cell, -B[1][1] * cell)
+    A0 = np.asarray(f0, dtype=float)
     for o in spec["ops"]:
         t1 = (o["s"] * t0 + o["tau"]) % 1.0
         f1 = render_frame(spec, t1, size, cell)
-        # pixel transform of op: about centre, x -> Mpix x + vpix
         M = o["M"]
         det = b1[0] * b2[1] - b2[0] * b1[1]
         Binv = ((b2[1] / det, -b2[0] / det), (-b1[1] / det, b1[0] / det))
@@ -118,22 +139,18 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=14.0):
               MB[1][0] * Binv[0][1] + MB[1][1] * Binv[1][1]))
         vx = b1[0] * o["v"][0] + b2[0] * o["v"][1]
         vy = b1[1] * o["v"][0] + b2[1] * o["v"][1]
-        # PIL affine: output(x,y) = input(a x + b y + c, d x + e y + f); we
-        # need the INVERSE map of (p -> T p + v) about the centre
-        dt = T[0][0] * T[1][1] - T[0][1] * T[1][0]
-        Ti = ((T[1][1] / dt, -T[0][1] / dt), (-T[1][0] / dt, T[0][0] / dt))
-        cx = cy = size / 2
-        # inverse: q -> Ti (q - c - v) + c
-        a, b_, c_ = Ti[0][0], Ti[0][1], -Ti[0][0] * (cx + vx) - Ti[0][1] * (cy + vy) + cx
-        d, e, f_ = Ti[1][0], Ti[1][1], -Ti[1][0] * (cx + vx) - Ti[1][1] * (cy + vy) + cy
-        f1t = f1.transform((size, size), Image.AFFINE, (a, b_, c_, d, e, f_),
-                           resample=Image.BILINEAR)
-        A = np.asarray(f0, dtype=float)
-        Bm = np.asarray(f1t, dtype=float)
+        c0 = size / 2 - 0.5   # pattern origin in index coordinates
+        # Invariance is F(t0)(x) = F(t1)(op(x)): sample the SECOND frame at
+        # the FORWARD image op(q) = T (q - c0) + c0 + v. (Sampling at the
+        # inverse instead only agrees for involutions — a direction bug this
+        # comment commemorates.)
+        tx = -T[0][0] * c0 - T[0][1] * c0 + c0 + vx
+        ty = -T[1][0] * c0 - T[1][1] * c0 + c0 + vy
+        A1 = np.asarray(f1, dtype=float)
+        Bt = _bilinear_sample(A1, T, (tx, ty))
         R = int(size * 0.30)
-        ca = A[size // 2 - R: size // 2 + R, size // 2 - R: size // 2 + R]
-        cb = Bm[size // 2 - R: size // 2 + R, size // 2 - R: size // 2 + R]
-        mean = float(abs(ca - cb).mean())
+        lo, hi = size // 2 - R, size // 2 + R
+        mean = float(abs(A0[lo:hi, lo:hi] - Bt[lo:hi, lo:hi]).mean())
         if mean > tol:
             errs.append(f"{name}: pixel invariance fails for op "
                         f"M={o['M']} v={o['v']} s={o['s']} tau={o['tau']} "
