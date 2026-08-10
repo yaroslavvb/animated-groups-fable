@@ -5,9 +5,9 @@
  * IntersectionObserver starts/stops them with visibility, which also covers
  * tab switches (a hidden pane never intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=15";
-import { attachControls } from "./controls.js?v=15";
-import { groupCaption } from "./wallpaper-data.js?v=15";
+import { FilmGroupAnimation } from "./renderer.js?v=16";
+import { attachControls } from "./controls.js?v=16";
+import { groupCaption } from "./wallpaper-data.js?v=16";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {

@@ -1,15 +1,14 @@
 /* Wallpaper atlas, OVERVIEW level: 17 sections, one per wallpaper group.
- * Each section: what happens over this base (the issues), a notation-style
- * tab widget with the curated examples (info box below describes the time
- * aspect in plain English), and a link to the per-wallpaper page that tabs
- * over ALL its film groups at full size (wallpaper-group.html?g=<hm>). */
+ * Each section: what happens over this base (the issues), then a
+ * notation-style tab widget over ALL film groups with that projection —
+ * the info box below each animation states its time behaviour — and a
+ * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=15";
+import { buildTabs } from "./tabs.js?v=16";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=15";
+  from "./wallpaper-data.js?v=16";
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
-const bySym = new Map(data.groups.map(g => [g.symbol, g]));
 const byBase = new Map(WALLPAPERS.map(w => [w.hm, []]));
 for (const g of data.groups) {
   if (byBase.has(g.base)) byBase.get(g.base).push(g);
@@ -50,18 +49,17 @@ for (const w of WALLPAPERS) {
   pc.textContent = censusSentence(w, list);
   sec.append(pc);
 
+  // ALL film groups over this base, tabbed (product first, then forward,
+  // then reversal)
   const tabHost = document.createElement("div");
   tabHost.className = "tabdemo";
   sec.append(tabHost);
-  buildTabs(tabHost, w.examples.map(sym => {
-    const g = bySym.get(sym);
-    return { g, sym, note: g ? timeStory(g) : "" };
-  }));
+  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })));
 
   const all = document.createElement("p");
   all.className = "alllink";
   all.innerHTML = `<a href="wallpaper-group.html?g=${w.hm}">` +
-    `All ${list.length} film groups over ${w.hm}, tabbed at full size →</a>`;
+    `The same ${list.length} groups on their own page, larger →</a>`;
   sec.append(all);
 }
 

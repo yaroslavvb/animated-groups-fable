@@ -184,7 +184,7 @@ export function timeStory(g) {
   const near = (a, b) => Math.abs(a - b) < 1e-6;
   const fword = q =>
     near(q, 1 / 2) ? "half a period" :
-    near(q, 1 / 4) ? "a quarter of a period" :
+    near(q, 1 / 4) ? "a quarter period" :
     near(q, 3 / 4) ? "three quarters of a period" :
     near(q, 1 / 3) ? "a third of a period" :
     near(q, 2 / 3) ? "two thirds of a period" :
@@ -233,50 +233,42 @@ export function timeStory(g) {
 
   const s = [];
   if (g.product) {
-    s.push("Time is fully decoupled from space here: every copy ticks in \
-unison, and each frozen frame already has the complete wallpaper symmetry.");
+    s.push("Product: every copy runs in phase, and each instant has the \
+full wallpaper symmetry.");
   } else {
     if (screws.size > 0) {
-      const n = Math.max(...screws.keys());
-      s.push(`Turning the plane by ${360 / n}° about certain centres has \
-exactly the same effect as letting the film run for ${fword(screws.get(n))} \
-— freeze the film and the copies around such a centre sit at equally spaced \
-fill levels.` + (screws.size > 1 ?
-        " The other rotation centres carry their own fractional offsets." : ""));
-      if (plainRot) s.push("Some rotation centres remain instantaneous: the \
-pattern matches itself under them in every frozen frame.");
+      const parts = [...screws.keys()].sort((a, b) => b - a).map((n, i) =>
+        i === 0
+          ? `A ${360 / n}° turn about a ${n}-centre advances the film \
+${fword(screws.get(n))}`
+          : `a ${360 / n}° turn about a ${n}-centre, ${fword(screws.get(n))}`);
+      s.push(parts.join("; ") + ".");
+      if (plainRot) s.push("Other rotation centres carry no offset.");
     }
     if (tildeMirror) {
-      s.push("The pattern agrees with its mirror image only after waiting \
-half a period — reflected copies fill in counterphase, and no single frame \
-is mirror-symmetric.");
+      s.push("Mirror symmetry holds only after waiting half a period; no \
+instant is mirror-symmetric.");
     }
     if (glideTau !== null) {
-      s.push(`There is a glide that also waits: reflect, slide half a cell \
-along the axis, and wait ${fword(glideTau)} — only then does the film match \
-itself.`);
+      s.push(`The glide reflection (reflect, slide half a cell) also waits \
+${fword(glideTau)}.`);
     }
     if (cent) {
       s.push(cent.third ?
-        "Sliding the whole pattern a third of a cell is the same as waiting \
-a third of a period: the motifs stack in time like ABC layers." :
-        "Sliding the whole pattern half a cell diagonally is the same as \
-waiting half a period: nearest neighbours run half a period out of step — a \
-space-time checkerboard.");
+        "Translating a third of a cell equals waiting a third of a period \
+(ABC stacking in time)." :
+        "Translating half a cell diagonally equals waiting half a period: \
+adjacent motifs run in counterphase.");
     }
   }
   if (revs.has("pal")) {
-    s.push("Played backwards, the film is indistinguishable from itself — \
-the loop is a palindrome.");
+    s.push("Played backwards, the film equals itself: a palindrome.");
   } else if (revs.has("shift")) {
-    s.push("Played backwards, the film equals itself shifted half a cell — \
-columns alternately fill and drain.");
+    s.push("Played backwards, the film equals itself shifted half a cell.");
   } else if (revs.has("ref")) {
-    s.push("Played backwards and reflected, the film matches itself: a \
-mirror symmetry that exists only across time, never in a single frame.");
+    s.push("Played backwards and reflected, the film equals itself.");
   } else if (revs.has("rot")) {
-    s.push("Played backwards and given a turn, the film matches itself — \
-rotation symmetry that exists only across time.");
+    s.push("Played backwards and rotated, the film equals itself.");
   }
   return s.join(" ");
 }
