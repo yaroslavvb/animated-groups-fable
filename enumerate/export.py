@@ -51,13 +51,16 @@ def lattice_residues(ac):
 
 
 # ------------------------------------------------- spatial projection (base)
-def spatial_projection(ac, vec):
+def spatial_projection(ac, vec, forward_only=False):
     """The 2D crystallographic group obtained by forgetting time.
 
     Returns (Q_ops, lat2, sig2): Q_ops = spatial point ops (dedup over s),
     lat2 = 2D lattice incl. spatial parts of all spacetime translations and
-    reversal glide vectors, sig2 = dict M -> spatial translation part."""
+    (unless forward_only) reversal glide vectors, sig2 = dict M -> spatial
+    translation part."""
     ops = full_ops(ac, vec)
+    if forward_only:
+        ops = [o for o in ops if o[1] == 1]
     cents2 = set()
     for r in ac.lat.residues:
         if (r[0], r[1]) != (0, 0):
@@ -76,22 +79,17 @@ def spatial_projection(ac, vec):
 
 
 def mirror_axis(M):
-    """Primitive integer +1-eigenvector of a det=-1 involution."""
-    # solve (M - I) a = 0
-    a11, a12 = M[0][0] - 1, M[0][1]
-    a21, a22 = M[1][0], M[1][1] - 1
-    if a11 == 0 and a12 == 0:
-        cand = (1, 0)
-    elif a21 == 0 and a22 == 0:
-        cand = (0, 1)
-    elif a12 != 0 or a11 != 0:
-        cand = (-a12, a11)
-    else:
-        cand = (-a22, a21)
+    """Primitive integer +1-eigenvector of a det=-1 involution.
+
+    Any nonzero row (r1, r2) of (M - I) annihilates the eigenvector, which is
+    therefore proportional to (-r2, r1)."""
+    rows = [(M[0][0] - 1, M[0][1]), (M[1][0], M[1][1] - 1)]
+    row = next((r for r in rows if r != (0, 0)), None)
+    assert row is not None, "identity has no mirror axis"
+    cand = (-row[1], row[0])
     from math import gcd
     g = gcd(abs(cand[0]), abs(cand[1])) or 1
     c = (cand[0] // g, cand[1] // g)
-    # canonical sign
     if c[0] < 0 or (c[0] == 0 and c[1] < 0):
         c = (-c[0], -c[1])
     assert (M[0][0] * c[0] + M[0][1] * c[1], M[1][0] * c[0] + M[1][1] * c[1]) == c
@@ -149,9 +147,9 @@ def _decompose_along_axis(w, a):
 
 
 # ------------------------------------------------------- wallpaper naming
-def wallpaper_name(ac, vec):
+def wallpaper_name(ac, vec, forward_only=False):
     """Name of the spatial projection among the 17 wallpaper groups."""
-    Q, lat2, sig2 = spatial_projection(ac, vec)
+    Q, lat2, sig2 = spatial_projection(ac, vec, forward_only=forward_only)
     n_rot = max(spatial_order(M) for M in Q if det2(M) == 1) if any(
         det2(M) == 1 for M in Q) else 1
     has_refl = any(det2(M) == -1 for M in Q)
@@ -529,6 +527,7 @@ def build_entry(cname, ac, vec, idx):
     ops_r = ops_render_list(ac, vec)
     Q, lat2, sig2 = spatial_projection(ac, vec)
     base = wallpaper_name(ac, vec)
+    base_fwd = wallpaper_name(ac, vec, forward_only=True)
     fwd_ops = [(M, s, v, tau) for (M, s, v, tau) in ops_r if s == 1]
     cones = rotation_orbit_classes(fwd_ops, lat2, basis)
     mirrors = mirror_line_classes(fwd_ops, lat2)
@@ -540,8 +539,6 @@ def build_entry(cname, ac, vec, idx):
     revkind = reversal_kind_of(ops_r, lat2)
     forward = revkind is None
     product = is_product(ops_r, ac, lat2)
-    symmorphic = all(tau == 0 and lat2.contains([v[0], v[1]]) or True
-                     for _ in [0])  # replaced below
     # symmorphic = the cocycle class is trivial
     symmorphic = ac.classify_cocycle(list(vec)) == \
         ac.classify_cocycle([0] * len(vec))
@@ -549,21 +546,29 @@ def build_entry(cname, ac, vec, idx):
     from enumerate_2p1 import classify_system
     system = classify_system(ac)
 
-    sym = clockwork_symbol(base, cones, has_tc, third, revkind, mirrors,
+    sym = clockwork_symbol(base_fwd, cones, has_tc, third, revkind, mirrors,
                            n_tglide_dirs)
+    if revkind and base != base_fwd:
+        # the reversal enriches the spatial projection: record it
+        sym += f"[{base}]"
     sym_html = (sym.replace("₀", "<sub>0</sub>").replace("₁", "<sub>1</sub>")
                 .replace("₂", "<sub>2</sub>").replace("₃", "<sub>3</sub>")
                 .replace("₄", "<sub>4</sub>").replace("₅", "<sub>5</sub>")
                 .replace("½", "<sub>½</sub>"))
 
-    # Ke-Wu-style op description
+    # Ke-Wu-style op description: highest-order fractional time screw first
     kws = []
-    for (M, s, v, tau) in ops_r[:24]:
+    screws = []
+    for (M, s, v, tau) in ops_r:
         if s == 1 and tau != 0 and M != M_ID and det2(M) == 1:
             n, k = ccw_phase(M, tau, basis)
             if k:
-                kws.append(f"(R_{{2π/{n}}}|T_t^{{{k}/{n}}})")
-                break
+                screws.append((n, k))
+    if screws:
+        n, k = max(screws, key=lambda x: (x[0], -x[1]))
+        from math import gcd as _g
+        g = _g(n, k)
+        kws.append(f"(R_{{2π/{n}}}|T_t^{{{k // g}/{n // g}}})")
     for (M, s, v, tau) in ops_r:
         if s == 1 and tau != 0 and det2(M) == -1:
             kws.append("(m|T_t^{1/2}" + ("T_s^{1/2})" if not lat2.contains(
@@ -598,21 +603,19 @@ def build_entry(cname, ac, vec, idx):
 
 
 def bravais_letter(ac):
+    """Honest lattice description from the residues of the chosen setting
+    (Bravais type proper is setting-dependent; the catalog shows residues)."""
     res = [r for r in ac.lat.residues if any(r)]
     if not res:
         return "P"
     if any(Fraction(r[2]).denominator == 3 for r in res):
-        return "R"
+        return "R (1/3-stacked)"
     if len(res) == 3:
-        return "F"
+        return "F-centred"
     r = res[0]
     if r[2] == 0:
-        return "C-spatial"
-    if (r[0], r[1]) == (Fraction(1, 2), Fraction(1, 2)):
-        return "I"
-    if (r[0], r[1]) == (0, 0):
-        return "P(t/2)"
-    return "C-timemixed"
+        return "C-centred (spatial)"
+    return "centred (space-time)"
 
 
 # --------------------------------------------------------------- main export
@@ -630,6 +633,19 @@ def main():
             except Exception as e:
                 print(f"ENTRY FAILED {cname} #{idx}: {e!r}")
                 raise
+    # a few distinct groups share a symbol (reversal-coset fine structure the
+    # notation does not resolve); disambiguate with superscript letters
+    by_sym = {}
+    for e in entries:
+        by_sym.setdefault(e["symbol"], []).append(e)
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    SUPS = "ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿᵒᵖ𐞥ʳˢᵗᵘᵛʷˣʸᶻ"
+    for sym, es in by_sym.items():
+        if len(es) > 1:
+            for i, e in enumerate(es):
+                e["symbol"] = e["symbol"] + SUPS[i]
+                e["symbolHtml"] = e["symbolHtml"] + f"<sup>{letters[i]}</sup>"
+
     meta = {
         "total": len(entries),
         "forward": sum(1 for e in entries if e["forward"]),

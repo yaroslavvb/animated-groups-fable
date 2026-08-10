@@ -123,17 +123,11 @@ def classify_system(ac):
         return "Tetragonal"
     # only orders 1, 2 remain: count 2-fold "directions" (as actual axes)
     def eigdir(M, val):
-        # primitive direction with M v = val*v
-        a11, a12 = M[0][0] - val, M[0][1]
-        a21, a22 = M[1][0], M[1][1] - val
-        if a11 == 0 and a12 == 0:
-            v = (1, 0)
-        elif a21 == 0 and a22 == 0:
-            v = (0, 1)
-        elif (a11, a12) != (0, 0):
-            v = (-a12, a11)
-        else:
-            v = (-a22, a21)
+        # primitive direction with M v = val*v: any nonzero row (r1, r2) of
+        # (M - val*I) annihilates it, so v ~ (-r2, r1)
+        rows = [(M[0][0] - val, M[0][1]), (M[1][0], M[1][1] - val)]
+        row = next((r for r in rows if r != (0, 0)), (0, 1))
+        v = (-row[1], row[0])
         from math import gcd
         g = gcd(abs(v[0]), abs(v[1])) or 1
         v = (v[0] // g, v[1] // g)
