@@ -22,15 +22,19 @@ export class StripAnimation {
     if (this.running) return;
     this.running = true;
     this.t0 = null;
-    requestAnimationFrame(this._frame);
+    this._raf = requestAnimationFrame(this._frame);
   }
-  stop() { this.running = false; }
+  stop() {
+    this.running = false;
+    if (this._raf) cancelAnimationFrame(this._raf);
+    this._raf = null;
+  }
 
   _frame(ts) {
     if (!this.running) return;
     if (this.t0 === null) this.t0 = ts;
     this.draw(((ts - this.t0) / this.period) % 1);
-    requestAnimationFrame(this._frame);
+    this._raf = requestAnimationFrame(this._frame);
   }
 
   draw(t) {

@@ -76,7 +76,14 @@ operation protecting Ke–Wu's 'horizontal cone' in space-time metamaterials \
 (their driven two-site lattice satisfies u(t)&nbsp;=&nbsp;v(t&nbsp;+&nbsp;T/2), \
 i.e. exactly this symmetry), and Fletcher's trick for halving an animator's \
 work: 'the same drawing can be used again (turned if necessary) at different \
-stages in the cycle'.",
+stages in the cycle'. A delicious fine point: <em>crystallographically</em> \
+this group is isomorphic to pg&nbsp;×&nbsp;ℤ — the time glide is pg's spatial \
+glide read along the time axis instead of a space axis. The identification \
+relabels a space direction as time, so no change of frame realises it: as a \
+film, the pattern can never be made static. It is the smallest example where \
+the strict Galilean classification (283 classes) is finer than the \
+crystallographic one (275); the catalog, following Ke–Wu, files it with \
+pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
     spec: { basis: SQ, ops: [
       { M: ID, v: [0, 0], s: 1, tau: 0 },
       { M: MY, v: [0, 0], s: 1, tau: 0.5 },
@@ -118,7 +125,7 @@ frame: the half-cell shift is a symmetry only of the loop, not of a moment.",
   },
   {
     id: "palindromic-windmill",
-    sym: "4<sub>2</sub>4<sub>2</sub>2/1′",
+    sym: "4<sub>2</sub>4<sub>2</sub>2/1′<sup>a</sup>",
     kw: "time reversal + time screw — a palindromic windmill",
     text: "A half-period screw (4<sub>2</sub>) coexisting with a time mirror: \
 the loop is a palindrome, and the quarter-turn-at-half-period survives because \

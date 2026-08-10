@@ -576,15 +576,20 @@ def ops_render_list(ac, vec):
     return out
 
 
-def reversal_kind_of(ops_render, lat2):
-    """Canonical descriptor of the reversing coset, or None."""
+def reversal_kind_of(ops_render, lat2_fwd):
+    """Canonical descriptor of the reversing coset, or None.
+    lat2_fwd must be the FORWARD spatial lattice (the enriched projection
+    contains every reversal glide by construction, so testing against it
+    would never detect g')."""
     revs = [(M, s, v, tau) for (M, s, v, tau) in ops_render if s == -1]
     if not revs:
         return None
-    # prefer identity spatial part
-    for (M, s, v, tau) in revs:
-        if M == M_ID:
-            return "1′" if lat2.contains([v[0], v[1]]) else "g′"
+    # prefer identity spatial part; pure only if the glide is a forward vector
+    id_revs = [(M, s, v, tau) for (M, s, v, tau) in revs if M == M_ID]
+    if id_revs:
+        if any(lat2_fwd.contains([v[0], v[1]]) for (M, s, v, tau) in id_revs):
+            return "1′"
+        return "g′"
     # else prefer smallest order op; mirrors before rotations at order 2
     def rank(op):
         M = op[0]
@@ -659,7 +664,8 @@ def build_entry(cname, ac, vec, idx):
     has_tc = any(r[2] == Fraction(1, 2) and (r[0], r[1]) != (0, 0)
                  for r in ac.lat.residues)
     third = any(Fraction(r[2]).denominator == 3 for r in ac.lat.residues)
-    revkind = reversal_kind_of(ops_r, lat2)
+    lat2_fwd = spatial_projection(ac, vec, forward_only=True)[1]
+    revkind = reversal_kind_of(ops_r, lat2_fwd)
     forward = revkind is None
     product = is_product(ops_r, ac, lat2)
     # symmorphic = the cocycle class is trivial

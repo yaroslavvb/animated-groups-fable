@@ -65,5 +65,5 @@ if __name__ == "__main__":
     os.makedirs(outdir, exist_ok=True)
     for name, spec in FEATURED.items():
         path = os.path.join(outdir, f"{name}.gif")
-        render_gif(spec, path, size=420, frames=48, cell=100)
+        render_gif(spec, path, size=420, frames=40, cell=100)
         print("wrote", path)

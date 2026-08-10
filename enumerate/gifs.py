@@ -57,7 +57,7 @@ def draw_motif(draw, cx, cy, T, theta, r):
     # orbit ring (thin polygon path)
     ring = [xf((orbit_r * math.cos(2 * math.pi * i / 48),
                 orbit_r * math.sin(2 * math.pi * i / 48))) for i in range(49)]
-    draw.line(ring, fill=ORBIT, width=max(1, int(0.04 * r * 0)) or 1)
+    draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
     # trailing tail arc
     tail = [xf((orbit_r * math.cos(ang + a), orbit_r * math.sin(ang + a)))
             for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
@@ -123,18 +123,25 @@ def render_frame(spec, t, size, cell):
     return img.resize((size, size), Image.LANCZOS)
 
 
-def render_gif(spec, out_path, size=480, frames=48, cell=110, seconds=4.0):
+def render_gif(spec, out_path, size=480, frames=40, cell=110, seconds=4.0):
+    # GIF delays are quantized to centiseconds: choose duration as a multiple
+    # of 10 ms (frames=40, 4 s -> exactly 100 ms/frame) to keep the loop exact
+    duration = round(1000 * seconds / frames / 10) * 10
     imgs = [render_frame(spec, i / frames, size, cell) for i in range(frames)]
     imgs[0].save(out_path, save_all=True, append_images=imgs[1:],
-                 duration=int(1000 * seconds / frames), loop=0, optimize=True)
+                 duration=duration, loop=0, optimize=True)
     return out_path
 
 
 if __name__ == "__main__":
-    catalog_path, gid, out = sys.argv[1], sys.argv[2], sys.argv[3]
-    size = 480
+    args = sys.argv[1:]
+    catalog_path, gid, out = args[0], args[1], args[2]
+    opts = {"--size": 480, "--frames": 40}
+    for k in list(opts):
+        if k in args:
+            opts[k] = int(args[args.index(k) + 1])
     with open(catalog_path) as f:
         catalog = json.load(f)
     entry = next(e for e in catalog["groups"] if e["id"] == gid)
-    render_gif(entry["render"], out, size=size)
+    render_gif(entry["render"], out, size=opts["--size"], frames=opts["--frames"])
     print("wrote", out)

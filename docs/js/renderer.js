@@ -42,7 +42,9 @@ export function drawMotif(ctx, theta, r, colors) {
   ctx.fillStyle = c.beak;
   ctx.fill();
 
-  // clock: orbit ring + satellite at angle -2*pi*theta (clockwise = forward)
+  // clock: orbit ring + satellite at angle -2*pi*theta; on screen (with the
+  // y-flipped pixel basis) forward time moves the satellite counterclockwise,
+  // matching the fixed ccw convention of the notation
   const ang = -TWO_PI * theta;
   const orbitR = 0.68 * r;
   ctx.beginPath();
@@ -123,16 +125,20 @@ export class FilmGroupAnimation {
     if (this.running) return;
     this.running = true;
     this.t0 = null;
-    requestAnimationFrame(this._frame);
+    this._raf = requestAnimationFrame(this._frame);
   }
-  stop() { this.running = false; }
+  stop() {
+    this.running = false;
+    if (this._raf) cancelAnimationFrame(this._raf);
+    this._raf = null;
+  }
 
   _frame(ts) {
     if (!this.running) return;
     if (this.t0 === null) this.t0 = ts;
     const t = ((ts - this.t0) / this.period) % 1;   // global time in periods
     this.drawFrame(t);
-    requestAnimationFrame(this._frame);
+    this._raf = requestAnimationFrame(this._frame);
   }
 
   drawFrame(t) {
