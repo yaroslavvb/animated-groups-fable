@@ -116,7 +116,7 @@ def _auto_cell(spec, size):
                tuple(round(x % 1.0, 6) for x in op["v"]))
         seen.add(key)
     n = len(seen)
-    repeats = 5 if n <= 1 else 4 if n <= 2 else 3 if n <= 6 else 2.5
+    repeats = 5 if n <= 1 else 4 if n <= 2 else 3 if n <= 6 else 2.0
     return max(24, size / repeats)
 
 

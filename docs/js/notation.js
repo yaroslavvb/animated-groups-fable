@@ -3,8 +3,8 @@
  * examples cannot drift out of sync with the enumeration — a symbol that
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=12";
-import { attachControls } from "./controls.js?v=12";
+import { FilmGroupAnimation } from "./renderer.js?v=14";
+import { attachControls } from "./controls.js?v=14";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section

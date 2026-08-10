@@ -13,7 +13,7 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=12";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=14";
 
 const TWO_PI = Math.PI * 2;
 
@@ -151,7 +151,7 @@ export class FilmGroupAnimation {
       const key = op => op.M.flat().join(",") + "|" +
         op.v.map(x => Math.round(f1(x) * 1e6)).join(",");
       const nSites = new Set(this.spec.ops.map(key)).size;
-      const repeats = nSites <= 1 ? 5 : nSites <= 2 ? 4 : nSites <= 6 ? 3 : 2.5;
+      const repeats = nSites <= 1 ? 5 : nSites <= 2 ? 4 : nSites <= 6 ? 3 : 2.0;
       this.cell = Math.max(24, Math.min(w, h) / repeats);
     }
     const B = this.spec.basis;

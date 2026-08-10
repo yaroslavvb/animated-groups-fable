@@ -349,3 +349,23 @@ section.wp h2 {
 }
 section.wp h2 .n { font-size: 0.95rem; margin-left: 0.4em; }
 section.wp .demo canvas { height: 280px; }
+
+/* Pattern canvases: cap the display width at roughly twice the height and
+ * centre — a full-width canvas on a wide viewport would show a dozen cell
+ * columns however the cell size is chosen, defeating the uniform repeat
+ * count. Strips (1D) are exempt: they need the width. */
+.demo canvas, .tabpane canvas, #d-canvas {
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* atlas overview: one or two example demos side by side */
+.wp-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.1rem;
+}
+.wp-pair .demo { margin: 0.4rem 0; }
+.wp-pair .demo canvas { height: 250px; }
+.alllink { font-size: 1.02rem; font-weight: 600; }
