@@ -3,8 +3,7 @@
  * examples cannot drift out of sync with the enumeration — a symbol that
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=14";
-import { attachControls } from "./controls.js?v=14";
+import { buildTabs } from "./tabs.js?v=15";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section
@@ -125,79 +124,12 @@ of left- and right-handed quartz." },
   ],
 };
 
-const anims = new Map();
-const observer = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    const anim = anims.get(e.target);
-    if (!anim) continue;
-    if (e.isIntersecting) { if (!anim.userPaused) anim.start(); }
-    else anim.stop();
-  }
-}, { rootMargin: "60px" });
-
-function buildTabs(host, items, bySym) {
-  const bar = document.createElement("div");
-  bar.className = "tabbar";
-  const paneBox = document.createElement("div");
-  const panes = [];
-
-  items.forEach((item, i) => {
-    const g = bySym.get(item.sym);
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "tabbtn sym";
-    btn.innerHTML = g ? g.symbolHtml : item.sym;
-    const pane = document.createElement("div");
-    pane.className = "tabpane";
-    if (!g) {
-      pane.innerHTML = `<div class="caption">symbol “${item.sym}” not found \
-in catalog.json — the examples are out of sync with the enumeration</div>`;
-      console.error("notation example missing from catalog:", item.sym);
-    } else {
-      const canvas = document.createElement("canvas");
-      pane.append(canvas);
-      const cap = document.createElement("div");
-      cap.className = "caption";
-      cap.innerHTML =
-        `<div style="display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;">` +
-        `<span class="sym">${g.symbolHtml}</span>` +
-        `<span style="color:var(--muted);">${g.hm || ""}</span>` +
-        `<a class="linkish" style="margin-left:auto;text-decoration:none;" ` +
-        `href="catalog.html#${g.id}">catalog ↗</a>` +
-        `</div><p style="margin:0.4rem 0 0;">${item.note}</p>`;
-      pane.append(cap);
-      // animation created on first activation: a display:none canvas has no
-      // size, so geometry must be set up only once the pane is visible
-      pane._mk = () => {
-        const anim = new FilmGroupAnimation(canvas, g.render);
-        attachControls(anim, pane, cap);
-        anims.set(canvas, anim);
-        observer.observe(canvas);
-      };
-    }
-    btn.addEventListener("click", () => activate(i));
-    bar.append(btn);
-    paneBox.append(pane);
-    panes.push({ btn, pane });
-  });
-
-  function activate(k) {
-    panes.forEach(({ btn, pane }, i) => {
-      btn.classList.toggle("active", i === k);
-      pane.classList.toggle("active", i === k);
-    });
-    const p = panes[k].pane;
-    if (p._mk) { p._mk(); p._mk = null; }
-    // the IntersectionObserver sees the visibility change and starts/stops
-  }
-
-  host.append(bar, paneBox);
-  activate(0);
-}
-
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const bySym = new Map(data.groups.map(g => [g.symbol, g]));
 for (const [id, items] of Object.entries(SECTIONS)) {
   const host = document.getElementById(id);
-  if (host) buildTabs(host, items, bySym);
+  if (host) {
+    buildTabs(host, items.map(it =>
+      ({ g: bySym.get(it.sym), sym: it.sym, note: it.note })));
+  }
 }

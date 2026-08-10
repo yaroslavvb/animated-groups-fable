@@ -1,7 +1,7 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=14";
-import { attachControls } from "./controls.js?v=14";
+import { FilmGroupAnimation } from "./renderer.js?v=15";
+import { attachControls } from "./controls.js?v=15";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];

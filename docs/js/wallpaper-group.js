@@ -1,24 +1,11 @@
-/* Wallpaper atlas, DETAIL level: one wallpaper group (?g=<hm>), every film
- * group whose spatial projection it is, each as a full-size demo. */
+/* Wallpaper atlas, DETAIL level: one wallpaper group (?g=<hm>), a single
+ * notation-style tab widget over EVERY film group whose spatial projection
+ * it is. The box below the animation gives the group's data and a
+ * plain-English account of its time behaviour. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=14";
-import { attachControls } from "./controls.js?v=14";
-import { WALLPAPERS, sectionSort, censusSentence, groupCaption }
-  from "./wallpaper-data.js?v=14";
-
-const anims = new Map();
-const observer = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    const anim = anims.get(e.target);
-    if (!anim) continue;
-    if (e.isIntersecting) {
-      if (!anim.userPaused) anim.start();
-      else anim.setPhase(anim.getPhase());
-    } else {
-      anim.stop();
-    }
-  }
-}, { rootMargin: "120px" });
+import { buildTabs } from "./tabs.js?v=15";
+import { WALLPAPERS, sectionSort, censusSentence, timeStory }
+  from "./wallpaper-data.js?v=15";
 
 const hm = new URLSearchParams(location.search).get("g");
 const idx = WALLPAPERS.findIndex(w => w.hm === hm);
@@ -50,26 +37,16 @@ if (idx < 0) {
   head.innerHTML =
     `<h1><span class="sym">${w.orb}</span> · ${w.hm}</h1>` +
     `<p class="subtitle">All ${list.length} film groups whose spatial ` +
-    `projection is ${w.hm}, at full size.</p>` +
+    `projection is ${w.hm} — tab across them; the box below each animation ` +
+    `describes its time behaviour.</p>` +
     `<p><a href="wallpaper.html#wp-${w.hm}">← atlas overview</a> &ensp;·&ensp; ` +
     `<a href="wallpaper-group.html?g=${prev.hm}">← ${prev.hm}</a> &ensp;·&ensp; ` +
     `<a href="wallpaper-group.html?g=${next.hm}">${next.hm} →</a></p>`;
   intro.innerHTML = `<p>${w.note} ${w.issues}</p>` +
     `<p style="color:var(--muted);">${censusSentence(w, list)}</p>`;
 
-  for (const g of list) {
-    const demo = document.createElement("div");
-    demo.className = "demo";
-    const canvas = document.createElement("canvas");
-    demo.append(canvas);
-    const cap = document.createElement("div");
-    cap.className = "caption";
-    cap.innerHTML = groupCaption(g);
-    demo.append(cap);
-    listDiv.append(demo);   // attach before constructing
-    const anim = new FilmGroupAnimation(canvas, g.render);
-    anims.set(canvas, anim);
-    observer.observe(canvas);
-    attachControls(anim, demo, cap);
-  }
+  const tabHost = document.createElement("div");
+  tabHost.className = "tabdemo big";
+  listDiv.append(tabHost);   // attach before constructing animations
+  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })));
 }

@@ -175,6 +175,112 @@ export function censusSentence(w, list) {
     `space with time.`;
 }
 
+/* Plain-English account of a group's TIME behaviour, generated from its
+ * actual operations (render.ops) rather than from the symbol — the ops are
+ * the ground truth, so the text cannot drift from the mathematics. Kept to
+ * a few sentences: what a viewer should watch for in the animation. */
+export function timeStory(g) {
+  const frac = x => ((x % 1) + 1) % 1;
+  const near = (a, b) => Math.abs(a - b) < 1e-6;
+  const fword = q =>
+    near(q, 1 / 2) ? "half a period" :
+    near(q, 1 / 4) ? "a quarter of a period" :
+    near(q, 3 / 4) ? "three quarters of a period" :
+    near(q, 1 / 3) ? "a third of a period" :
+    near(q, 2 / 3) ? "two thirds of a period" :
+    near(q, 1 / 6) ? "a sixth of a period" :
+    near(q, 5 / 6) ? "five sixths of a period" : q.toFixed(2) + " of a period";
+
+  const screws = new Map();   // rotation order -> smallest nonzero offset
+  let plainRot = false, tildeMirror = false;
+  let glideTau = null;        // smallest nonzero time offset on a spatial glide
+  let cent = null;            // centring: {third: bool}
+  const revs = new Set();     // "pal" | "shift" | "ref" | "rot"
+
+  for (const op of g.render.ops) {
+    const M = op.M;
+    const det = M[0][0] * M[1][1] - M[0][1] * M[1][0];
+    const tr = M[0][0] + M[1][1];
+    const isId = det === 1 && tr === 2;
+    const v = op.v.map(frac);
+    const tau = frac(op.tau);
+    const hasV = v.some(x => !near(x, 0) && !near(x, 1));
+    if (op.s === 1) {
+      if (isId) {
+        if (hasV && tau > 1e-6) cent = { third: near(tau, 1 / 3) || near(tau, 2 / 3) };
+      } else if (det === 1) {
+        const n = tr === -2 ? 2 : tr === -1 ? 3 : tr === 0 ? 4 : 6;
+        if (tau > 1e-6) {
+          const cur = screws.get(n);
+          if (cur === undefined || tau < cur) screws.set(n, tau);
+        } else plainRot = true;
+      } else {
+        // reflection: g² = (I | Mv+v) is a lattice translation for mirrors
+        // AND standard glides — the glide vector is (Mv+v)/2, so the test
+        // must be mod 2: even components = mirror, odd = glide
+        const gx = (M[0][0] * v[0] + M[0][1] * v[1] + v[0]) % 2;
+        const gy = (M[1][0] * v[0] + M[1][1] * v[1] + v[1]) % 2;
+        const even = x => near(x, 0) || near(x, 2);
+        if (even(gx) && even(gy)) { if (tau > 1e-6) tildeMirror = true; }
+        else if (tau > 1e-6 && (glideTau === null || tau < glideTau)) glideTau = tau;
+      }
+    } else {
+      if (isId) revs.add(hasV ? "shift" : "pal");
+      else if (det === 1) revs.add("rot");
+      else revs.add("ref");
+    }
+  }
+
+  const s = [];
+  if (g.product) {
+    s.push("Time is fully decoupled from space here: every copy ticks in \
+unison, and each frozen frame already has the complete wallpaper symmetry.");
+  } else {
+    if (screws.size > 0) {
+      const n = Math.max(...screws.keys());
+      s.push(`Turning the plane by ${360 / n}° about certain centres has \
+exactly the same effect as letting the film run for ${fword(screws.get(n))} \
+— freeze the film and the copies around such a centre sit at equally spaced \
+fill levels.` + (screws.size > 1 ?
+        " The other rotation centres carry their own fractional offsets." : ""));
+      if (plainRot) s.push("Some rotation centres remain instantaneous: the \
+pattern matches itself under them in every frozen frame.");
+    }
+    if (tildeMirror) {
+      s.push("The pattern agrees with its mirror image only after waiting \
+half a period — reflected copies fill in counterphase, and no single frame \
+is mirror-symmetric.");
+    }
+    if (glideTau !== null) {
+      s.push(`There is a glide that also waits: reflect, slide half a cell \
+along the axis, and wait ${fword(glideTau)} — only then does the film match \
+itself.`);
+    }
+    if (cent) {
+      s.push(cent.third ?
+        "Sliding the whole pattern a third of a cell is the same as waiting \
+a third of a period: the motifs stack in time like ABC layers." :
+        "Sliding the whole pattern half a cell diagonally is the same as \
+waiting half a period: nearest neighbours run half a period out of step — a \
+space-time checkerboard.");
+    }
+  }
+  if (revs.has("pal")) {
+    s.push("Played backwards, the film is indistinguishable from itself — \
+the loop is a palindrome.");
+  } else if (revs.has("shift")) {
+    s.push("Played backwards, the film equals itself shifted half a cell — \
+columns alternately fill and drain.");
+  } else if (revs.has("ref")) {
+    s.push("Played backwards and reflected, the film matches itself: a \
+mirror symmetry that exists only across time, never in a single frame.");
+  } else if (revs.has("rot")) {
+    s.push("Played backwards and given a turn, the film matches itself — \
+rotation symmetry that exists only across time.");
+  }
+  return s.join(" ");
+}
+
 export function groupCaption(g) {
   return `<div style="display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;">` +
     `<span class="sym">${g.symbolHtml}</span>` +

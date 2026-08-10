@@ -1,26 +1,12 @@
 /* Wallpaper atlas, OVERVIEW level: 17 sections, one per wallpaper group.
- * Each section: what happens over this base (the issues), one or two
- * curated live examples, and a link to the per-wallpaper page that shows
- * ALL its film groups at full size (wallpaper-group.html?g=<hm>). */
+ * Each section: what happens over this base (the issues), a notation-style
+ * tab widget with the curated examples (info box below describes the time
+ * aspect in plain English), and a link to the per-wallpaper page that tabs
+ * over ALL its film groups at full size (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=14";
-import { attachControls } from "./controls.js?v=14";
-import { WALLPAPERS, sectionSort, censusSentence, groupCaption }
-  from "./wallpaper-data.js?v=14";
-
-const anims = new Map();
-const observer = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    const anim = anims.get(e.target);
-    if (!anim) continue;
-    if (e.isIntersecting) {
-      if (!anim.userPaused) anim.start();
-      else anim.setPhase(anim.getPhase());
-    } else {
-      anim.stop();
-    }
-  }
-}, { rootMargin: "80px" });
+import { buildTabs } from "./tabs.js?v=15";
+import { WALLPAPERS, sectionSort, censusSentence, timeStory }
+  from "./wallpaper-data.js?v=15";
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const bySym = new Map(data.groups.map(g => [g.symbol, g]));
@@ -48,7 +34,7 @@ for (const w of WALLPAPERS) {
   const sec = document.createElement("section");
   sec.className = "wp";
   sec.id = "wp-" + w.hm;
-  atlas.append(sec);   // attach before constructing any animation
+  atlas.append(sec);   // attach before any animation is constructed
 
   const h = document.createElement("h2");
   h.innerHTML = `<span class="sym">${w.orb}</span> · ${w.hm} ` +
@@ -64,31 +50,18 @@ for (const w of WALLPAPERS) {
   pc.textContent = censusSentence(w, list);
   sec.append(pc);
 
-  const pair = document.createElement("div");
-  pair.className = "wp-pair";
-  sec.append(pair);
-  for (const sym of w.examples) {
+  const tabHost = document.createElement("div");
+  tabHost.className = "tabdemo";
+  sec.append(tabHost);
+  buildTabs(tabHost, w.examples.map(sym => {
     const g = bySym.get(sym);
-    if (!g) { console.error("example missing from catalog:", sym); continue; }
-    const demo = document.createElement("div");
-    demo.className = "demo";
-    const canvas = document.createElement("canvas");
-    demo.append(canvas);
-    const cap = document.createElement("div");
-    cap.className = "caption";
-    cap.innerHTML = groupCaption(g);
-    demo.append(cap);
-    pair.append(demo);
-    const anim = new FilmGroupAnimation(canvas, g.render);
-    anims.set(canvas, anim);
-    observer.observe(canvas);
-    attachControls(anim, demo, cap);
-  }
+    return { g, sym, note: g ? timeStory(g) : "" };
+  }));
 
   const all = document.createElement("p");
   all.className = "alllink";
   all.innerHTML = `<a href="wallpaper-group.html?g=${w.hm}">` +
-    `All ${list.length} film groups over ${w.hm}, at full size →</a>`;
+    `All ${list.length} film groups over ${w.hm}, tabbed at full size →</a>`;
   sec.append(all);
 }
 

@@ -369,3 +369,6 @@ section.wp .demo canvas { height: 280px; }
 .wp-pair .demo { margin: 0.4rem 0; }
 .wp-pair .demo canvas { height: 250px; }
 .alllink { font-size: 1.02rem; font-weight: 600; }
+
+/* detail-level tab widget: larger animation pane */
+.tabdemo.big .tabpane canvas { height: 360px; }

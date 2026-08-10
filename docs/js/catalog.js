@@ -1,8 +1,8 @@
 /* Catalog browser: loads data/catalog.json, filterable card grid with
  * lazily-animated canvases (only visible cards animate). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=14";
-import { attachControls } from "./controls.js?v=14";
+import { FilmGroupAnimation } from "./renderer.js?v=15";
+import { attachControls } from "./controls.js?v=15";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
