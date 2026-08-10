@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>History — Film Groups</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="history.html" class="here">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+<h1>History</h1>
+<p class="subtitle">A 1956 Gazette article with zero citations anticipated
+space-time crystallography by six decades.</p>
+
+<h2>Fletcher, 1956</h2>
+<p>Trevor J. Fletcher — then a lecturer at Sir John Cass College, London, later
+one of Britain's best-known mathematics educators — made 16&thinsp;mm
+mathematical animation films by hand: <i>Plucked Strings</i> (1954),
+<i>The Cardioid</i>, <i>Four Line Conics</i> (produced at the National Film
+Board of Canada, six festival awards). Drawing frames is expensive, and
+Fletcher noticed that the symmetries of a cyclically repeating diagram let one
+drawing serve several moments of the film: "the symmetries present in a diagram
+can often be used to reduce the labour of drawing." His five-page article
+<i>Film Groups</i> (Math. Gazette <b>40</b>, 15–19, Feb. 1956) then does
+something remarkably modern: it treats a looping film as a static
+three-dimensional pattern in coordinates (t,&nbsp;y,&nbsp;z), applies the
+classification of space groups, and strikes out every group that "would
+interchange time and space axes". For animations both looping and doubly
+periodic in space he counts, from the 230 space groups minus the 36 cubic ones,
+<b>194 film groups</b>. He knew exactly what a time glide was — "reflection
+together with a shift in time&hellip; then the same drawing can be used again
+(turned if necessary) at different stages in the cycle" — and used group
+number 26 of his tables in <i>Plucked Strings</i>. He even analysed strobing:
+a rigid drawing of cos(ny&nbsp;−&nbsp;mx) pulled past a shutter produces
+apparent transverse motion, his diagnosis of the Dance–Kaufmann wave films,
+complete with a Zoetrope recipe.</p>
+
+<p>Both Crossref and Semantic Scholar list <b>zero citations</b> for the
+article. It was, as far as we can tell, never followed up.</p>
+
+<h2>What Fletcher got wrong (instructively)</h2>
+<p>Two conventions separate his counts from the modern ones.</p>
+<p><b>7 vs 13 (strips).</b> For patterns with one space and one time dimension
+Fletcher reused the frieze-group count: 7. But a frieze's two axes are
+interchangeable, while film's are not: reflection across the strip
+(m<sub>x</sub>) and reflection of time (m<sub>t</sub>) are different
+operations. Distinguishing them splits pm, pg, pmg into two groups each, and
+restores the two centred groups (cm, cmm read as time-centred) that he had
+excluded as "based on rhombic lattices" — a centred spacetime lattice is a
+perfectly realisable film in which neighbours run half a period out of phase.
+The correct count, first given by Xu–Wu (2018), is <b>13</b>.</p>
+<p><b>194 vs 275 (the plane case).</b> Subtracting the cubic groups from 230
+misses in the other direction as well: (i) a single 3D space group can sit in
+spacetime in inequivalent ways (c-axis temporal or spatial — the monoclinic
+and base-centred orthorhombic cases split), and (ii) time reversal is not a
+spatial operation, so the "magnetic" combinations (operations composed with
+playing the film backwards, including Ke–Wu's glide time-reversal) are not
+counted by the 230 at all. The correct count, via the group-cohomology
+classification of Ke–Wu (2026, and Xu–Wu's 2018 appendix), is <b>275</b>,
+verified independently by the computation in this repository.</p>
+
+<h2>The other ancestors</h2>
+<p><b>Shubnikov's antisymmetry (1945–).</b> The "prime" operation of
+black-white symmetry was originally interpreted as time reversal; Zamorzaev's
+1953 thesis derived the 1651 antisymmetry space groups, and his Chișinău
+school's P-symmetry generalised colour to arbitrary quality groups. A looping
+N-frame animation is literally a Z<sub>N</sub> colour symmetry — "time as
+colour" is the discrete shadow of the film-group circle, and our tilde-marked
+mirrors obey the same parity rules as the 46 two-colour wallpaper groups.</p>
+<p><b>Janssen–Janner–Ascher (1969).</b> "Crystallographic groups in space and
+time" set up the general theory (including the central-extension machinery)
+that the modern physics literature builds on; the 2+1D enumeration seems not
+to have been carried out then.</p>
+<p><b>Choreographic crystals and the H/K theorem.</b> For finite
+configurations, Boyle–Khoo–Smith (2016) classified "choreographic order"
+(satellite swarms whose symmetries are space ops with time offsets); in
+equivariant dynamics the Golubitsky–Stewart H/K theorem describes exactly which
+pairs (setwise, pointwise) symmetry groups a time-periodic state can have —
+the point-group shadow of a film group's clock character.</p>
+<p><b>Conway's program.</b> Orbifold notation for wallpaper groups (with
+Thurston, 1980s; Conway–Huson 2002), colour decorations in <i>The Symmetries
+of Things</i> (2008), fibrifold names for the space groups
+(Conway–Delgado&#8209;Friedrichs–Huson–Thurston 2001), and — days before this
+site — Conway-type orbifold symbols for the 80 layer groups (Mahmoudi et al.,
+Dec. 2025). Our <a href="notation.html">clockwork decorations</a> extend the
+same program along the time direction; to our knowledge no time-decorated
+orbifold notation existed before.</p>
+
+<h2>Fletcher's closing line</h2>
+<p>He ends with Klein: geometry is the study of invariants of a group, and
+"mathematical film making is both a science and an art. The symmetry groups are
+the key to both the structure of the science and the aesthetics of the art."
+This site is an attempt to build the catalog he was one abstraction away
+from writing.</p>
+
+<h2>Sources</h2>
+<p style="font-size:0.92rem;">
+Fletcher, <i>Film Groups</i>, Math. Gazette 40 (1956) 15–19,
+<a href="https://doi.org/10.2307/3610262">doi:10.2307/3610262</a> ·
+<a href="https://atm.org.uk/Trevor-Fletcher-Films">ATM's digitised Fletcher films</a> ·
+Xu–Wu, <a href="https://arxiv.org/abs/1703.03388">arXiv:1703.03388</a> ·
+Ke–Wu, <a href="https://arxiv.org/abs/2604.05619">arXiv:2604.05619</a> ·
+Janssen–Janner–Ascher, Physica 41 (1969) 541; 42 (1969) 41, 71 ·
+Boyle–Khoo–Smith, <a href="https://arxiv.org/abs/1407.5876">arXiv:1407.5876</a> ·
+Golubitsky–Stewart, <i>The Symmetry Perspective</i> (2002) ·
+CDHT, <a href="https://arxiv.org/abs/math/9911185">arXiv:math/9911185</a> ·
+Mahmoudi–Dresselhaus–Dimitriyev, <a href="https://arxiv.org/abs/2512.05149">arXiv:2512.05149</a> ·
+Litvin, <a href="https://www.iucr.org/publications/iucr/magnetic-group-tables"><i>Magnetic Group Tables</i></a>.
+</p>
+</main>
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+</body>
+</html>

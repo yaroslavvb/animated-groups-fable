@@ -41,7 +41,7 @@ def dedupe_pairs(named, bound=2, orientation="any", verbose=False):
         if found:
             merged[name] = found
             if verbose:
-                print(f"    {name} ~ {found} (merged)")
+                print(f"    {name} ~ {found} (merged)", flush=True)
         else:
             reps.append((name, ac, inv))
     return [(n, a) for (n, a, _) in reps], merged
@@ -58,6 +58,6 @@ def enumerate_groups(classes, bound_moves=1, orientation="any", verbose=False):
         orbits = reduce_classes(ac, reps, moves)
         if verbose:
             print(f"  {name:12s} |P|={len(ac.P):2d} H1={len(reps):3d} "
-                  f"moves={len(moves):3d} -> {len(orbits)} groups")
+                  f"moves={len(moves):3d} -> {len(orbits)} groups", flush=True)
         out.append((name, ac, orbits))
     return out

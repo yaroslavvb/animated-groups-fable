@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clockwork Orbifold Notation — Film Groups</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html" class="here">Notation</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+<h1>Clockwork orbifold notation</h1>
+<p class="subtitle">Conway's orbifold symbols, decorated with clocks.</p>
+
+<p>Conway's orbifold notation names a wallpaper group by the features of its
+quotient orbifold: gyration points <span class="sym">n</span>, kaleidoscopic
+boundaries <span class="sym">*n…</span>, glide "miracles"
+<span class="sym">×</span>, and the handle <span class="sym">o</span>. A film
+group adds one datum to the same picture: every symmetry operation now carries
+a <em>time offset</em> — the fraction of the animation period by which it
+advances the film — and possibly a time reversal. The notation records these
+offsets as decorations on the Conway symbol. The base symbol is the orbifold
+of the <em>spatial projection</em> of the group (the symmetry of the long-exposure
+photograph, with every frame overlaid); the decorations say how the projection
+lifts to spacetime.</p>
+
+<h2>The rules</h2>
+
+<h3>1. Gyration subscripts — time screws</h3>
+<p>A gyration point of order <i>n</i> whose counterclockwise generator advances
+the film by <i>k</i>/<i>n</i> of a period is written
+<span class="sym">n<sub>k</sub></span> (subscript omitted when
+<i>k</i> = 0). This is Ke–Wu's <em>time-screw rotation</em>
+(R<sub>2π/n</sub> | T<sub>t</sub><sup>k/n</sup>), and the subscript convention
+deliberately mirrors the crystallographic screw axis
+<span class="sym">n<sub>k</sub></span>: a film group is a 3D space group with
+the screw direction along time.</p>
+<p>Because the generator is fixed (counterclockwise, forward time),
+<span class="sym">4<sub>1</sub></span> and <span class="sym">4<sub>3</sub></span>
+are different groups — mirror twins, like left- and right-handed quartz. The
+subscripts at different gyration points of one group are not independent: in
+each relation of the orbifold group the offsets must sum to an integer. For the
+<span class="sym">442</span> family this forces exactly the four possibilities
+<span class="sym">442</span>, <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub></span>,
+<span class="sym">4<sub>2</sub>4<sub>2</sub>2</span>,
+<span class="sym">4<sub>3</sub>4<sub>3</sub>2<sub>1</sub></span> — precisely the
+time-axis space groups P4, P4<sub>1</sub>, P4<sub>2</sub>, P4<sub>3</sub>.</p>
+
+<h3>2. Tilde marks — time glides</h3>
+<p>A mirror can only carry a time offset of 0 or ½ (it is an involution). A
+mirror carrying ½ — Ke–Wu's <em>time glide</em>
+(m | T<sub>t</sub><sup>1/2</sup>) — is marked with a tilde on its arc of the
+kaleidoscopic boundary: the pattern is mirror-symmetric only after waiting half
+a period. Arcs are the segments of a <span class="sym">*</span> boundary
+between corners; a tilde is written in the position of the arc it marks, e.g.
+<span class="sym">*<span style="text-decoration:overline">2</span>2…</span> in
+print, <span class="mono">*~22~2 …</span> in ASCII. At a corner of odd order
+the two adjacent arcs must carry equal marks; at even corners they are free —
+the same parity rule as in two-colour (black–white) symmetry, with "colour
+swap" replaced by "wait half a period".</p>
+<p>Spatial glides <span class="sym">×</span> may carry any offset q with
+2q equal to the offset of the translation they square to:
+<span class="sym">×<sub>½</sub></span> is a glide-reflection that also waits
+half a period (a <em>mixed</em> space–time glide, Ke–Wu's
+(m<sub>x</sub> | T<sub>y</sub><sup>1/2</sup>T<sub>t</sub><sup>1/2</sup>));
+quarter offsets <span class="sym">×<sub>¼</sub></span> occur on time-centred
+lattices, the analogue of crystallographic d-glides.</p>
+
+<h3>3. Stacking prefixes — time-centred lattices</h3>
+<p>Some film groups contain a translation that moves half (or a third of) a
+cell <em>and</em> waits half (or a third of) a period — a centring of the
+spacetime lattice that no change of frame can remove once there is point
+symmetry to pin the frame. Prefix:</p>
+<p><span class="sym">c</span> — half-cell shift at half period (body/base-centred
+types; the checkerboard that swaps colours every half period);<br>
+<span class="sym">r</span> — third-cell shift at a third of a period
+(rhombohedral stacking, the ABC-stacked animation).</p>
+<p>Example: <span class="sym">c4 4<sub>2</sub> 2<sub>1</sub></span> is the
+time-axis I4: the centring forces the two kinds of 4-centres to run half a
+period out of phase, so one class is plain <span class="sym">4</span> and the
+other is a <span class="sym">4<sub>2</sub></span> screw.</p>
+
+<h3>4. The prime clause — time reversal</h3>
+<p>If the film also has time-reversing symmetries (as a spacetime pattern: the
+loop equals its own reverse, possibly displaced), the group G contains its
+forward part G<sup>+</sup> with index 2. Write the forward symbol, a slash,
+and one canonical representative of the reversing coset:</p>
+<p><span class="sym">/1′</span> — plain palindrome (time mirror m<sub>t</sub>);<br>
+<span class="sym">/g′</span> — <em>glide time-reversal</em>
+(m<sub>t</sub> | T<sub>x</sub><sup>1/2</sup>): the reversed film equals the
+original shifted half a cell;<br>
+<span class="sym">/m′</span>, <span class="sym">/2′</span>,
+<span class="sym">/4′</span>, … — reversal composed with a spatial mirror,
+half-turn, quarter-turn, …; subscripts for fractional shifts as above.</p>
+<p>Consistency forces the reversal to <em>negate</em> all forward offsets
+(conjugation by m<sub>t</sub> maps a k/n screw to a −k/n screw), which is why,
+for instance, <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/1′</span>
+does not exist but <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m′</span>
+does: a mirror flips the screw's handedness and the reversal flips it back.</p>
+
+<h2>Reading a symbol</h2>
+<div class="thm">
+<span class="label">Example</span>
+<p style="margin:0.3rem 0;"><span class="sym">6<sub>1</sub>3<sub>1</sub>2<sub>1</sub></span> —
+a hexagonal pattern of clocks in which turning 60° about a 6-centre is the same
+as letting the film run for one sixth of its period. Around each 6-centre the
+six neighbouring motifs form a "clock spiral"; the 3-centres lag by thirds, the
+2-centres by halves (their subscripts are forced:
+&#8537; + &#8531; + ½ = 1 ≡ 0). It is the time-axis P6<sub>1</sub>, is chiral
+in spacetime (its mirror twin is <span class="sym">6<sub>5</sub>3<sub>2</sub>2<sub>1</sub></span>),
+and is one of the simplest film groups that is not a product of any wallpaper
+group with any time group.</p>
+</div>
+
+<h2>Why this works: the Seifert picture</h2>
+<p>Quotient a looping film by its group G: the result is a 3-orbifold fibred in
+circles (the time circles) over the 2-orbifold of the spatial projection. The
+clockwork decorations are exactly the Seifert data of this fibration: gyration
+subscripts are the local Seifert invariants β/α at cone points, tildes and
+primes describe the behaviour of the fibre over mirror and reversal loci, and
+the stacking prefix is the obstruction ("Euler") class. The notation is thus a
+film-group counterpart of the Conway–Delgado&#8209;Friedrichs–Huson–Thurston
+<em>fibrifold</em> names for space groups — specialised to the fibration
+along time that every looping animation carries canonically. A film group is a
+product (wallpaper × clock) exactly when all decorations vanish: trivial
+Seifert data means a trivial circle bundle.</p>
+
+<h2>Symbol ↔ Hermann–Mauguin</h2>
+<p>Every catalog entry also lists a Hermann–Mauguin-style symbol in the spirit
+of Xu–Wu and Ke–Wu (P4<sub>1</sub>-as-time-screw, Pg<sub>x</sub>-style glides,
+primes for reversal), plus explicit generators, so the clockwork symbol can
+always be cross-checked against the conventional crystallographic name of the
+corresponding 3D space group with distinguished axis. See the
+<a href="catalog.html">catalog</a>.</p>
+
+</main>
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+</body>
+</html>

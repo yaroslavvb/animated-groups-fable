@@ -83,6 +83,19 @@ def main():
     assert sorted(names) == expected, sorted(names)
     print("matches Xu-Wu list ✓")
 
+    import os
+    import pickle
+    os.makedirs("out", exist_ok=True)
+    entries = []
+    for cname, ac, orbits in results:
+        pg_name, lat_name = cname.split("/")
+        for vec in orbits:
+            entries.append({"name": name_group(pg_name, lat_name, ac, vec),
+                            "ac": ac, "vec": vec})
+    with open("out/enum1p1.pkl", "wb") as f:
+        pickle.dump(entries, f)
+    print("saved out/enum1p1.pkl")
+
 
 if __name__ == "__main__":
     main()

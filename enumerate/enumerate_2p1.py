@@ -7,13 +7,32 @@ Anchors (Ke & Wu, arXiv:2604.05619, Table 1):
   Tetragonal 68, Trigonal 25, Hexagonal 27.
 """
 
+import pickle
 import sys
+import time
 from fractions import Fraction
 from itertools import combinations
+from multiprocessing import Pool
 
 from stcore import (ArithClass, Lattice, find_conjugations, group_closure,
-                    op_mul, op_identity)
+                    op_mul, op_identity, reduce_classes)
 from driver import cheap_invariant, dedupe_pairs, enumerate_groups
+
+ORIENT = "proper3"
+
+
+def _dedupe_bucket(args):
+    bucket, bound = args
+    reps, merged = dedupe_pairs(bucket, bound=bound, orientation=ORIENT)
+    return reps, merged
+
+
+def _enum_class(args):
+    name, ac, bound_moves = args
+    D2, reps = ac.h1_with_reps()
+    moves = find_conjugations(ac, ac, bound=bound_moves, orientation=ORIENT)
+    orbits = reduce_classes(ac, reps, moves)
+    return (name, ac, orbits, len(reps), len(moves))
 
 H = Fraction(1, 2)
 T3 = Fraction(1, 3)
@@ -125,15 +144,27 @@ def classify_system(ac):
 
 
 def main():
+    import time
     verbose = "-v" in sys.argv
+    t0 = time.time()
     named = []
     seen_pairs = set()
     for setting in ("sq", "hex"):
         amb = ambient(setting)
         subs = all_subgroups(amb, 2)
         pools = centering_pool(setting)
+        print(f"[{time.time()-t0:6.1f}s] {setting}: {len(subs)} subgroups x "
+              f"{len(pools)} centerings", flush=True)
+        boost_free = {(M_ID, 1), (M_R2, -1)}
         for i, P in enumerate(subs):
+            # For P inside {1, 2'} every boost is allowed (Mv = sv holds for
+            # all v), so every spacetime lattice is Galilean-equivalent to the
+            # primitive one: keep only primitive (avoids expensive dedupe of
+            # sixth-lattices; matches the Triclinic row of Ke-Wu Table 1).
+            all_boosts = set(P) <= boost_free
             for j, cents in enumerate(pools):
+                if all_boosts and cents:
+                    continue
                 try:
                     lat = Lattice(2, True, cents)
                     ac = ArithClass(list(P), lat)
@@ -144,21 +175,40 @@ def main():
                     continue
                 seen_pairs.add(key)
                 named.append((f"{setting}:P{i}:L{j}", ac))
-    print(f"candidate (P, L) pairs: {len(named)}")
+    print(f"[{time.time()-t0:6.1f}s] candidate (P, L) pairs: {len(named)}",
+          flush=True)
 
-    classes, merged = dedupe_pairs(named, bound=2, orientation="proper3",
-                                   verbose=False)
-    print(f"arithmetic classes after dedupe: {len(classes)}  (expected 72)")
+    # --- dedupe by invariant bucket (sequential: pool proved flaky)
+    buckets = {}
+    for name, ac in named:
+        buckets.setdefault(cheap_invariant(ac), []).append((name, ac))
+    print(f"[{time.time()-t0:6.1f}s] {len(buckets)} invariant buckets, "
+          f"largest {max(len(b) for b in buckets.values())}", flush=True)
+    classes = []
+    merged = {}
+    for bi, b in enumerate(buckets.values()):
+        reps, mg = _dedupe_bucket((b, 2))
+        classes.extend(reps)
+        merged.update(mg)
+        print(f"[{time.time()-t0:6.1f}s]   bucket {bi+1}/{len(buckets)} "
+              f"({len(b)} cands -> {len(reps)} classes)", flush=True)
+    print(f"[{time.time()-t0:6.1f}s] arithmetic classes after dedupe: "
+          f"{len(classes)}  (expected 72)", flush=True)
 
-    results = enumerate_groups(classes, bound_moves=2, orientation="proper3",
-                               verbose=verbose)
+    enum = [_enum_class((n, a, 2)) for (n, a) in classes]
     total = 0
     by_system = {}
-    for cname, ac, orbits in results:
+    out_classes = []
+    for cname, ac, orbits, nh1, nmoves in enum:
+        if verbose:
+            print(f"  {cname:14s} |P|={len(ac.P):2d} H1={nh1:3d} "
+                  f"moves={nmoves:3d} -> {len(orbits)} groups", flush=True)
         total += len(orbits)
         sysname = classify_system(ac)
         by_system[sysname] = by_system.get(sysname, 0) + len(orbits)
-    print(f"TOTAL 2+1D space-time groups: {total}  (expected 275)")
+        out_classes.append((cname, ac, orbits))
+    print(f"[{time.time()-t0:6.1f}s] TOTAL 2+1D space-time groups: {total}  "
+          f"(expected 275)", flush=True)
     expected = {"Triclinic": 2, "T-Monoclinic": 13, "R-Monoclinic": 13,
                 "Orthorhombic": 127, "Tetragonal": 68, "Trigonal": 25,
                 "Hexagonal": 27}
@@ -166,6 +216,11 @@ def main():
         got = by_system.get(k, 0)
         mark = "OK" if got == expected[k] else f"EXPECTED {expected[k]}"
         print(f"  {k:14s} {got:4d}  {mark}")
+
+    with open("out/enum2p1.pkl", "wb") as f:
+        pickle.dump({"classes": out_classes, "merged": merged,
+                     "by_system": by_system, "total": total}, f)
+    print("saved out/enum2p1.pkl", flush=True)
 
 
 if __name__ == "__main__":

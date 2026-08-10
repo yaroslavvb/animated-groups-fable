@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalog — Film Groups</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html" class="here">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main>
+  <h1>The catalog</h1>
+  <p class="subtitle">Every crystallographic symmetry type of a looping animation
+  that tiles the plane. Click a card for generators and details.</p>
+
+  <div class="filters" id="filters"></div>
+  <div class="cardgrid" id="grid"></div>
+
+  <dialog id="detail" style="max-width:720px;width:92%;border:1px solid var(--rule);border-radius:12px;background:var(--panel);color:var(--ink);padding:0;">
+    <div style="padding:1rem 1.2rem;">
+      <div style="display:flex;align-items:baseline;gap:0.8rem;flex-wrap:wrap;">
+        <span class="sym" id="d-sym" style="font-size:1.5rem;"></span>
+        <span class="hm" id="d-hm" style="color:var(--muted);"></span>
+        <form method="dialog" style="margin-left:auto;"><button class="linkish">close</button></form>
+      </div>
+      <div class="tags" id="d-tags" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.5rem 0;"></div>
+      <canvas id="d-canvas" style="width:100%;height:300px;border:1px solid var(--rule);border-radius:8px;background:#faf9f6;"></canvas>
+      <div id="d-desc" style="margin:0.7rem 0;"></div>
+      <h3 style="margin:0.8rem 0 0.3rem;">Generators <span style="color:var(--muted);font-weight:normal;font-size:0.85rem;">(x in lattice coordinates, t in periods)</span></h3>
+      <div class="genbox" id="d-gens"></div>
+    </div>
+  </dialog>
+</main>
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/catalog.js"></script>
+</body>
+</html>

@@ -23,6 +23,7 @@ Classes for fixed (P, L) = H^1(P, R^n / L) modulo the stabilizer moves;
 conjugation search.
 """
 
+import math
 from fractions import Fraction
 from itertools import product as iproduct
 from math import gcd
@@ -334,37 +335,35 @@ class ArithClass:
             Y_cols.append(e)
         Y = [[Y_cols[c][r] for c in range(len(Y_cols))] for r in range(N_unk)]
         DY, UY, _ = smith_normal_form([row[:] for row in Y])
-        diag = [DY[i][i] for i in range(N_unk)]
-
-        def classify(vec):
-            out = []
-            for i in range(N_unk):
-                s = sum(UY[i][k] * vec[k] for k in range(N_unk))
-                out.append(s % diag[i] if diag[i] else s)
-            return tuple(out)
+        self._UY = UY
+        self._diag = [DY[i][i] for i in range(N_unk)]
+        self.D2 = D2
 
         # --- enumerate image of solution group in the quotient (small closure)
-        zero = tuple([0] * N_unk)
-        rep_of = {classify([0] * N_unk): [0] * N_unk}
+        rep_of = {self.classify_cocycle([0] * N_unk): [0] * N_unk}
         frontier = [[0] * N_unk]
         while frontier:
             new = []
             for v in frontier:
                 for g in sol_gens:
                     w = [(a + b) % D2 for a, b in zip(v, g)]
-                    c = classify(w)
+                    c = self.classify_cocycle(w)
                     if c not in rep_of:
                         rep_of[c] = w
                         new.append(w)
             frontier = new
             if len(rep_of) > 20000:
                 raise RuntimeError("H^1 unexpectedly large")
-        self._classify = classify
-        self.D2 = D2
         return D2, list(rep_of.values())
 
     def classify_cocycle(self, vec):
-        return self._classify(vec)
+        UY, diag = self._UY, self._diag
+        N_unk = len(vec)
+        out = []
+        for i in range(N_unk):
+            s = sum(UY[i][k] * vec[k] for k in range(N_unk))
+            out.append(s % diag[i] if diag[i] else s)
+        return tuple(out)
 
 
 # ---------------------------------------------------------------- moves
@@ -522,11 +521,14 @@ def find_conjugations(ac_src, ac_dst, bound=2, orientation="any", max_found=None
     # --- time case: prune by column time-components
     q_src, q_dst = src.lat.time_den(), dst.lat.time_den()
     cabs = Fraction(q_src, q_dst)
-    all_cols = [tuple(col) for col in iproduct(rng, repeat=n)]
     trow_d = [Fraction(dst.lat.B[n - 1][j]) for j in range(n)]
     trow_s = [Fraction(src.lat.B[n - 1][j]) for j in range(n)]
     for c in (cabs, -cabs):
         c_sign = 1 if c > 0 else -1
+        # entries of K must accommodate the time rescale: bound grows with |c|
+        b_here = max(bound, math.ceil(abs(c)))
+        rng_c = range(-b_here, b_here + 1)
+        all_cols = [tuple(col) for col in iproduct(rng_c, repeat=n)]
         col_options = []
         feasible = True
         for i in range(n):
