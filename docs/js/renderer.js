@@ -19,14 +19,18 @@ const TWO_PI = Math.PI * 2;
 
 /* The motif clock has TWO hands (both integer revolutions per period, so the
  * loop closes; colors are static — time shows only as motion):
- *  - outer hand, c = 2 revs: around an n-fold time-screw centre the k-th
- *    copy's hand sits at screen angle (1-c)*k*2π/n + const, and |1-c| = 1
- *    makes all n positions distinct (the "spiral of phases") for every n;
+ *  - outer hand, c = SAT_REVS revs: around an n-fold time-screw centre the
+ *    k-th copy's hand sits at screen angle (σ - c)·k·2π/n + const, where
+ *    σ = -1 because the y-flipped pixel basis renders every lattice rotation
+ *    clockwise on screen. Distinct positions for all n ∈ {2,3,4,6} need
+ *    gcd(|σ - c|, n) = 1: c = -2 gives |σ - c| = 1 (the "spiral of phases").
+ *    (c = +2 gave |σ - c| = 3 — aliasing exactly the trigonal screws.)
  *  - inner hand, c = 1 rev: the outer hand's position has period T/2, so it
  *    cannot show half-period offsets (time glides, time centring); an odd
  *    rev count resolves them (half a period turns the inner hand by 180°).
- * The pair of hands determines the internal time uniquely. */
-const SAT_REVS = 2;        // outer hand
+ * The pair of hands determines the internal time uniquely; the legibility
+ * conditions are enforced by enumerate/verify_animations.py. */
+const SAT_REVS = -2;       // outer hand
 const SAT_REVS_INNER = 1;  // inner hand
 
 /* ---------------------------------------------------------------- motif */
@@ -74,8 +78,9 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
 
   if (layer === "all" || layer === "tail") {
     // trailing tail (behind the satellite w.r.t. its direction of motion)
+    const ts = Math.sign(SAT_REVS) || 1;
     ctx.beginPath();
-    ctx.arc(0, 0, orbitR, ang - 0.85, ang - 0.12);
+    ctx.arc(0, 0, orbitR, ang - ts * 0.85, ang - ts * 0.12, ts < 0);
     ctx.strokeStyle = c.tail;
     ctx.lineWidth = Math.max(1, 0.09 * r);
     ctx.stroke();
@@ -159,14 +164,25 @@ export class FilmGroupAnimation {
     // must never overlap, otherwise paint order (not equivariant!) would
     // break exact invariance of the rendered frame.
     const l1 = Math.hypot(...this.b1), l2 = Math.hypot(...this.b2);
-    const pls = orbitPlacements(this.spec, 0, 1, 0, 1);
+    // site coordinates reduced mod 1 so the {0,1} shift window covers all
+    // relative lattice offsets (M*base can land outside the unit cell)
+    const frac = x => ((x % 1) + 1) % 1;
+    const sites = [];
+    const base = this.spec.base || [0.31, 0.17];
+    for (const op of this.spec.ops) {
+      const bx = frac(op.M[0][0] * base[0] + op.M[0][1] * base[1] + op.v[0]);
+      const by = frac(op.M[1][0] * base[0] + op.M[1][1] * base[1] + op.v[1]);
+      for (const m1 of [0, 1]) for (const m2 of [0, 1]) {
+        sites.push([bx + m1, by + m2]);
+      }
+    }
     let minD = Math.min(l1, l2);
-    for (let i = 0; i < pls.length; i++) {
-      for (let j = i + 1; j < pls.length; j++) {
-        const dx = (pls[i].pos[0] - pls[j].pos[0]) * this.b1[0] +
-                   (pls[i].pos[1] - pls[j].pos[1]) * this.b2[0];
-        const dy = (pls[i].pos[0] - pls[j].pos[0]) * this.b1[1] +
-                   (pls[i].pos[1] - pls[j].pos[1]) * this.b2[1];
+    for (let i = 0; i < sites.length; i++) {
+      for (let j = i + 1; j < sites.length; j++) {
+        const dx = (sites[i][0] - sites[j][0]) * this.b1[0] +
+                   (sites[i][1] - sites[j][1]) * this.b2[0];
+        const dy = (sites[i][0] - sites[j][0]) * this.b1[1] +
+                   (sites[i][1] - sites[j][1]) * this.b2[1];
         const d = Math.hypot(dx, dy);
         if (d > 1e-6 && d < minD) minD = d;
       }

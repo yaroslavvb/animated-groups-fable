@@ -158,16 +158,73 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
     return errs
 
 
+def legibility_check(spec, name):
+    """The motif clock must make every time offset VISIBLE as motion.
+
+    Outer hand (SAT_REVS revs/period): around an n-fold screw the k-th copy's
+    hand sits at screen angle (sigma - c)*k*2pi/n + const with sigma = -1
+    (y-flipped pixel basis) — distinct for all k iff gcd(|sigma - c|, n) = 1.
+    Half-period-type offsets on translations/centrings are invisible to an
+    even outer hand and must be resolved by the inner hand: for every
+    fractional offset delta carried by a pure translation, require
+    SAT_REVS_INNER * delta not in Z (or the outer hand to catch it)."""
+    from math import gcd
+    from gifs import SAT_REVS, SAT_REVS_INNER
+    from fractions import Fraction
+    sigma = -1
+    errs = []
+    for o in spec["ops"]:
+        M = tuple(tuple(int(x) for x in r) for r in o["M"])
+        # spatial order of M
+        n, X = 1, M
+        while X != ((1, 0), (0, 1)) and n < 8:
+            X = tuple(tuple(X[i][0] * M[0][j] + X[i][1] * M[1][j]
+                            for j in (0, 1)) for i in (0, 1))
+            n += 1
+        det = M[0][0] * M[1][1] - M[0][1] * M[1][0]
+        tau = FR(o["tau"]) % 1
+        if o["s"] == 1 and det == 1 and n > 1 and tau != 0:
+            if gcd(abs(sigma - SAT_REVS), n) != 1:
+                errs.append(f"{name}: outer hand aliases the {n}-fold screw "
+                            f"(gcd(|sigma-c|, {n}) != 1)")
+        if o["s"] == 1 and M == ((1, 0), (0, 1)) and tau != 0:
+            outer_sees = (SAT_REVS * tau) % 1 != 0
+            inner_sees = (SAT_REVS_INNER * tau) % 1 != 0
+            if not (outer_sees or inner_sees):
+                errs.append(f"{name}: time offset {tau} on a translation is "
+                            f"invisible to both hands")
+    return errs
+
+
+def layout_check(spec, name, floor=0.05):
+    """The renderer sizes motifs by the min orbit distance at spec['base'];
+    a degenerate base renders (near-)blank. Fail below an absolute floor."""
+    from optimize_bases import min_orbit_dist, _sites
+    B = spec["basis"]
+    b1 = (B[0][0], -B[0][1])
+    b2 = (B[1][0], -B[1][1])
+    d = min_orbit_dist(spec, spec.get("base", [0.31, 0.17]), b1, b2,
+                       _sites(spec))
+    if d < floor:
+        return [f"{name}: degenerate motif layout — min orbit distance "
+                f"{d:.4f} at base {spec.get('base')}"]
+    return []
+
+
 def main():
     errs = []
     cat = json.load(open("../docs/data/catalog.json"))
     for g in cat["groups"]:
         errs += verify_spec_2d(g["render"], f'catalog {g["id"]} {g["symbol"]}')
+        errs += layout_check(g["render"], f'catalog {g["id"]} {g["symbol"]}')
+        errs += legibility_check(g["render"], f'catalog {g["id"]} {g["symbol"]}')
     print(f"algebraic check: 275 catalog specs -> {len(errs)} errors")
 
     feat = json.load(open("../docs/data/featured.json"))
     for name, spec in feat["specs"].items():
         errs += verify_spec_2d(spec, f"featured {name}")
+        errs += layout_check(spec, f"featured {name}")
+        errs += legibility_check(spec, f"featured {name}")
     for strip in feat["strips"]:
         errs += verify_strip(strip, strip["name"])
     print(f"+ featured/strips -> total {len(errs)} errors")

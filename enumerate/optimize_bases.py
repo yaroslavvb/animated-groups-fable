@@ -26,11 +26,19 @@ def _sites(spec):
 
 
 def min_orbit_dist(spec, base, b1, b2, sites=None):
+    # The {0,1} shift window is complete for relative lattice offsets in
+    # {-1,0,1} ONLY when base lies in [0,1)^2 — normalize first, or bases
+    # explored past the cell boundary hide their true nearest pairs and win
+    # with inflated scores.
+    base = (base[0] % 1.0, base[1] % 1.0)
     pts = []
     for op in (sites if sites is not None else _sites(spec)):
         M, v = op["M"], op["v"]
-        bx = M[0][0] * base[0] + M[0][1] * base[1] + v[0]
-        by = M[1][0] * base[0] + M[1][1] * base[1] + v[1]
+        # reduce the site coordinate mod 1 BEFORE the {0,1} shift window:
+        # the window only covers relative lattice offsets {-1,0,1} for
+        # canonical representatives (M*base can land outside [0,1))
+        bx = (M[0][0] * base[0] + M[0][1] * base[1] + v[0]) % 1.0
+        by = (M[1][0] * base[0] + M[1][1] * base[1] + v[1]) % 1.0
         for m1 in (0, 1):
             for m2 in (0, 1):
                 pts.append((bx + m1, by + m2))

@@ -12,10 +12,12 @@ import sys
 from PIL import Image, ImageDraw
 
 SS = 4  # supersampling factor
-# Two-handed clock, mirrors renderer.js (static colors; time = motion only):
-# outer hand c=2 (|1-c|=1: n distinct positions around n-fold screws),
-# inner hand c=1 (odd: resolves half-period offsets the outer misses).
-SAT_REVS = 2
+# Two-handed clock, mirrors renderer.js (static colors; time = motion only).
+# Outer hand: screen-angle step around an n-fold screw is (sigma - c)*2pi/n
+# with sigma = -1 (the y-flipped pixel basis renders lattice rotations
+# clockwise); gcd(|sigma - c|, n) = 1 for n in {2,3,4,6} requires c = -2.
+# Inner hand: odd rev count resolves half-period offsets the outer misses.
+SAT_REVS = -2
 SAT_REVS_INNER = 1
 
 BODY = (59, 110, 165)
@@ -72,7 +74,9 @@ def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
         draw.line(ring, fill=ORBIT, width=max(1, int(0.03 * r)))
 
     if layer in ("all", "tail"):
-        tail = [xf((orbit_r * math.cos(ang - a), orbit_r * math.sin(ang - a)))
+        ts = 1 if SAT_REVS >= 0 else -1
+        tail = [xf((orbit_r * math.cos(ang - ts * a),
+                    orbit_r * math.sin(ang - ts * a)))
                 for a in [0.12 + k * (0.73 / 12) for k in range(13)]]
         draw.line(tail, fill=TAIL, width=max(2, int(0.09 * r)))
 
@@ -110,8 +114,10 @@ def render_frame(spec, t, size, cell):
     pts = []
     for op in spec["ops"]:
         M = op["M"]
-        bx = M[0][0] * base[0] + M[0][1] * base[1] + op["v"][0]
-        by = M[1][0] * base[0] + M[1][1] * base[1] + op["v"][1]
+        # site coords mod 1: the {0,1} window is only complete for canonical
+        # representatives (M*base can land outside the unit cell)
+        bx = (M[0][0] * base[0] + M[0][1] * base[1] + op["v"][0]) % 1.0
+        by = (M[1][0] * base[0] + M[1][1] * base[1] + op["v"][1]) % 1.0
         for m1 in (0, 1):
             for m2 in (0, 1):
                 pts.append((bx + m1, by + m2))
