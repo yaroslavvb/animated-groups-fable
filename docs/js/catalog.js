@@ -3,13 +3,13 @@
  * visibility only decides whether an animation the viewer has started is
  * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=23";
-import { attachControls } from "./controls.js?v=23";
-import { WALLPAPERS } from "./wallpaper-data.js?v=23";
+import { FilmGroupAnimation } from "./renderer.js?v=24";
+import { attachControls } from "./controls.js?v=24";
+import { WALLPAPERS } from "./wallpaper-data.js?v=24";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=23";
+import { attachStage } from "./stage.js?v=24";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 

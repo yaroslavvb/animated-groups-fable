@@ -458,3 +458,9 @@ section.wp .demo canvas { height: 280px; }
 
 /* detail-level tab widget: larger animation pane */
 .tabdemo.big .tabpane canvas { height: 360px; }
+
+/* comparison table: scrollable on narrow screens, muted rotation-free rows */
+.tablewrap { overflow-x: auto; margin: 1rem 0; }
+.tablewrap table.counts { margin: 0; }
+table.counts tr.rotfree td { background: var(--code-bg); }
+table.counts td .sym { margin-right: 0.35em; }
