@@ -1,141 +1,113 @@
 #!/usr/bin/env wolframscript
 (* ::Package:: *)
 
-(* make-guide.wls — regenerate FilmGroupsGuide.nb, the Wolfram Community
-   guide notebook for the FilmGroups package.
-   Usage:  wolframscript -f make-guide.wls                                *)
+(* make-guide.wls — regenerate FilmGroupsGuide.nb: ONE self-contained
+   notebook. It carries the catalog and the renderer inside it, so it needs
+   no package files and no network; evaluate it and you get the atlas.
+
+   Usage:  wolframscript -f make-guide.wls                                  *)
 
 dir = DirectoryName[$InputFileName];
+catPath = FileNameJoin[{dir, "..", "docs", "data", "catalog.json"}];
+srcPath = FileNameJoin[{dir, "guide-src.wl"}];
 outPath = FileNameJoin[{dir, "FilmGroupsGuide.nb"}];
 
-text[s_] := Cell[s, "Text"];
-input[s_] := Cell[s, "Input"];
-section[s_] := Cell[s, "Section"];
-subsection[s_] := Cell[s, "Subsection"];
+cat = Import[catPath, "RawJSON"];
+groups = cat["groups"];
+
+(* --------------------------------------------------------------- data *)
+(* The group itself — the matrices M, the fractional translations v and the
+   time offsets tau — is stored EXACTLY: those are what the classification is
+   about and what any verification runs on. The basis is a display modulus
+   (enumerate/optimize_aspect.py picks it so the orbit is isotropic on
+   screen), so it stays machine-precision. *)
+ex[x_] := With[{r = Rationalize[x, 10^-6]},
+  If[Abs[N[r] - x] > 10^-6, Throw[{"inexact", x}], r]];
+
+num[x_] := If[Round[x] == x, Round[x], N[x]];
+
+opWL[o_] := {Round /@ # & /@ o["M"], ex /@ o["v"], Round[o["s"]], ex[o["tau"]]};
+
+wl[e_] := ToString[e, InputForm];
+
+entry[g_] := StringJoin[
+  "\"", g["id"], "\"-><|\"Symbol\"->", wl[g["symbol"]],
+  ",\"Base\"->", wl[g["base"]],
+  ",\"Forward\"->", wl[g["forward"]],
+  ",\"Product\"->", wl[g["product"]],
+  ",\"Basis\"->", wl[num /@ # & /@ g["render"]["basis"]],
+  ",\"Point\"->", wl[num /@ g["render"]["base"]],
+  ",\"Ops\"->", wl[opWL /@ g["render"]["ops"]], "|>"];
+
+dataCell = StringJoin["$FG=<|\n",
+  StringRiffle[entry /@ groups, ",\n"], "\n|>;"];
+
+(* the 17 wallpaper groups, orbifold name and count, in the atlas's order *)
+wps = {{"p1", "o"}, {"p2", "2222"}, {"pm", "**"}, {"pg", "\[Times]\[Times]"},
+  {"cm", "*\[Times]"}, {"pmm", "*2222"}, {"pmg", "22*"}, {"pgg", "22\[Times]"},
+  {"cmm", "2*22"}, {"p4", "442"}, {"p4m", "*442"}, {"p4g", "4*2"},
+  {"p3", "333"}, {"p3m1", "*333"}, {"p31m", "3*3"}, {"p6", "632"},
+  {"p6m", "*632"}};
+
+wpCell = "$WP=" <> wl[wps] <> ";";
+
+src = Import[srcPath, "Text"];
+(* the build-time header of the source file is not wanted in the notebook *)
+src = StringTrim@StringDrop[src, StringPosition[src, "*)"][[1, 2]]];
+
+(* ------------------------------------------------------------ viewer *)
+viewer = "\
+(* Tab order, as in the atlas: the groups that do something with time first,
+   the trivial clock (identical to its wallpaper group) last of that run and
+   greyed, then the groups with time reversal. *)
+FG$rank[g_] := Which[! g[\"Forward\"], 2, g[\"Product\"], 1, True, 0];
+FG$over[w_] := SortBy[Select[Keys[$FG], $FG[#][\"Base\"] === w &],
+  {FG$rank[$FG[#]] &, ToExpression@StringDrop[#, 1] &}];
+
+Manipulate[
+  Column[{
+    SetterBar[Dynamic[FG$pick[w]],
+      (# -> Style[$FG[#][\"Symbol\"],
+         Which[$FG[#][\"Product\"] && $FG[#][\"Forward\"], GrayLevel[0.6],
+               $FG[#][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
+               True, GrayLevel[0.3]]]) & /@ FG$over[w]],
+    Dynamic@FilmGroupFrame[FG$pick[w], t, {660, 300}]},
+   Center, 1],
+  {{w, \"p6\", \"\"}, #[[1]] -> Row[{Style[#[[2]], Bold], \" \", #[[1]]}] & /@ $WP,
+    ControlType -> SetterBar},
+  {{t, 0, \"t\"}, 0, 1, ControlType -> Animator, AnimationRate -> 1/4,
+    AppearanceElements -> {\"PlayPauseButton\"}},
+  Initialization :> (FG$pick = Association[# -> First[FG$over[#]] & /@ $WP[[All, 1]]]),
+  SaveDefinitions -> True, ControlPlacement -> Top]";
+
+(* ----------------------------------------------------------- notebook *)
+refs = "T. J. Fletcher, Film Groups, Math. Gazette 40 (1956) 15\[Dash]19, \
+doi:10.2307/3610262.\n\
+S. Xu, C. Wu, Space-Time Crystal and Space-Time Group, Phys. Rev. Lett. 120, \
+096401 (2018), arXiv:1703.03388.\n\
+C. Ke, C. Wu, Two-Dimensional Space-Time Groups: Classification and \
+Applications (2026), arXiv:2604.05619 \[LongDash] the 275.\n\
+J. H. Conway, H. Burgiel, C. Goodman-Strauss, The Symmetries of Things \
+(2008) \[LongDash] orbifold notation.\n\
+Atlas and source: https://yaroslavvb.github.io/animated-groups-fable \
+\[LongDash] https://github.com/yaroslavvb/animated-groups-fable";
 
 cells = {
-   Cell["Film Groups", "Title"],
-   Cell["The 275 space-time symmetry groups of the plane, animated", "Subtitle"],
+  Cell["Film groups", "Title"],
+  Cell["The 275 space-time groups of the plane, by wallpaper group. \
+Evaluate the notebook.", "Text"],
+  Cell[refs, "Text"],
+  Cell[CellGroupData[{
+    Cell["Catalog and renderer", "Section"],
+    Cell[dataCell, "Input"],
+    Cell[wpCell, "Input"],
+    Cell[src, "Input"]}, Closed]],
+  Cell["The 17 wallpaper groups", "Section"],
+  Cell[viewer, "Input"]};
 
-   text["A film is a map from spacetime \
-\[DoubleStruckCapitalR]\:00b2\[Times]\[DoubleStruckCapitalR] to colors. \
-A film group is a crystallographic group of symmetries of such a film: transformations \
-g : (x, t) \[RightArrow] (M.x + v, s\[ThinSpace]t + \[Tau]), with M a 2\[Times]2 point \
-operation, v a spatial translation, s = \[PlusMinus]1 a time direction, and \[Tau] a \
-time offset, containing a lattice of two independent spatial translations and one time \
-period. Up to crystallographic equivalence there are exactly 275 such groups \
-(Ke & Wu, arXiv:2604.05619) \[LongDash] the space-time analogue of the 17 wallpaper \
-groups, and a subfamily of the 230 space groups read with one axis as time \
-(Fletcher, Math. Gazette 40 (1956) 15\[Dash]19; the 1+1-dimensional count of 13 is in \
-Xu & Wu, Phys. Rev. Lett. 120, 096401 (2018))."],
-   text["This notebook accompanies the FilmGroups package, a port of the interactive \
-atlas at https://yaroslavvb.github.io/animated-groups-fable . Every group is stored as \
-exact data, machine-verified against the group axioms, and rendered as a looping \
-animation: the orbit of a single animated motif under the group."],
-
-   section["Setup"],
-   text["Place FilmGroups.wl and FilmGroupsData.wl in the same directory as this \
-notebook and load:"],
-   input["SetDirectory[NotebookDirectory[]];\nGet[\"FilmGroups.wl\"]"],
-
-   section["The motif: a clock that cannot alias"],
-   text["Each copy of the motif displays its own internal time \[Theta] = s\[ThinSpace](t \[Minus] \[Tau]): \
-a vessel that fills once per period, its surface marked in red. The fill level is an \
-injective function of \[Theta] mod 1, and it cannot be rotated \[LongDash] so two copies at \
-different internal times always look different in a frozen frame, no matter how the \
-pattern's own rotations act. Orientation and phase are independent readouts. The vessel is \
-chiral and asymmetric (no accidental symmetry), and time-reversed copies drain instead of \
-filling."],
-   input["Row[Table[FilmGroupMotif[\[Theta]], {\[Theta], 0, 5/6, 1/6}], Spacer[4]]"],
-
-   section["Animating a group"],
-   text["FilmGroupAnimation accepts an index 1\[Dash]275, an ID like \"g95\", or a \
-notation symbol from the catalog. Group #95 is 4\:20824\:20822, the film analogue of the \
-space group P4\:2082: a fourfold time screw \[LongDash] each quarter turn about a 4\:2082 \
-centre advances the film by half a period. Press play."],
-   input["FilmGroupAnimation[95]"],
-   text["A hexagonal time screw, 6\:20823\:20822 (#244): the sixfold centres advance the \
-film by a third of a period per sixth of a turn, so equal fill levels spiral around each \
-centre."],
-   input["FilmGroupAnimation[\"g244\"]"],
-   text["Time reversal. In group #2 \[LongDash] o/m\[Prime] over the wallpaper \
-group cm \[LongDash] a mirror runs the film backwards: each copy's mirror image drains \
-as the copy fills."],
-   input["FilmGroupAnimation[2]"],
-   text["In o/1\[Prime] (#12) the reversal fixes every site, so each vessel is drawn \
-superimposed with its own time-reverse and shows two surface lines \[LongDash] one \
-rising, one falling \[LongDash] meeting twice per period."],
-   input["FilmGroupAnimation[12]"],
-   text["The animations are Manipulates with SaveDefinitions \[Rule] True, so they keep \
-working \[LongDash] play button and all \[LongDash] in a notebook opened without the \
-package."],
-
-   section["Window size and other options"],
-   text["\"Cells\" sets the width of the window in lattice translations; the default \
-Automatic sizes the window so roughly 16 copies are visible. \"ShowCell\" overlays the \
-lattice. A frame at a single time t is a Graphics:"],
-   input["GraphicsRow[{FilmGroupFrame[95, 0.3, \"Cells\" -> 2],\n  FilmGroupFrame[95, 0.3, \"Cells\" -> 4, \"ShowCell\" -> True]}, ImageSize -> 600]"],
-   text["\"MotifScale\" shrinks the stamps, \"Colors\" overrides any of \"Body\", \
-\"Outline\", \"Fill\", \"Line\", \"Background\", and Background and ImageSize pass \
-through to Graphics."],
-   input["FilmGroupFrame[258, 0.25, \"Cells\" -> {6, 3}, \"MotifScale\" -> 0.9,\n  \"Colors\" -> <|\"Fill\" -> RGBColor[\"#8c4a3a\"], \"Line\" -> RGBColor[\"#1a3a5c\"]|>,\n  ImageSize -> 640]"],
-
-   section["Browsing all 275"],
-   text["The browser steps through the whole catalog (requires the package loaded in the \
-current session):"],
-   input["FilmGroupBrowser[]"],
-
-   section["The catalog"],
-   text["FilmGroupData[] is the full catalog as a Dataset. Each entry records the \
-notation Symbol (Conway orbifold notation with time decorations: gyration subscripts \
-n\:2096 for time screws, \[Tilde] for time glides, \[Prime] for time reversal, c/r \
-prefixes for space-time-centred lattices \[LongDash] see the atlas notation page), the \
-crystal System, the base wallpaper group of the spatial projection, the flags \
-ForwardTime / Product / Symmorphic, human-readable Generators, and the exact rendering \
-spec (Basis, Ops, BasePoint)."],
-   input["FilmGroupData[]"],
-   input["Normal @ FilmGroupData[][GroupBy[\"System\"], Length]"],
-   input["FilmGroupData[][Select[#ForwardTime && ! #Symmorphic &], Length]"],
-   input["Column @ FilmGroupData[95, \"Generators\"]"],
-
-   section["Verified symmetry"],
-   text["\"Ops\" lists coset representatives of the group modulo \
-\[DoubleStruckCapitalZ]\:00b2\[Times]\[DoubleStruckCapitalZ] \
-(lattice and time period), stored exactly \[LongDash] integer matrices, rational offsets, \
-Sqrt[3]/2. VerifyFilmGroup checks identity, inverses and closure in exact arithmetic. The \
-whole catalog passes:"],
-   input["AllTrue[Range[275], VerifyFilmGroup[#][\"OK\"] &]"],
-   text["Rendering then inherits the symmetry by construction: a frame is drawn as the \
-explicit orbit of the base motif under these representatives and the lattice, so applying \
-any listed operation to the picture at time t reproduces the picture at time \
-s\[ThinSpace]t + \[Tau] exactly."],
-
-   section["Exporting"],
-   text["Frames export to an animated GIF (here 40 frames, 4 seconds per period, matching \
-the atlas):"],
-   input["Export[\"film-group-95.gif\", FilmGroupFrames[95, 40, ImageSize -> 320],\n  \"DisplayDurations\" -> 0.1, \"AnimationRepetitions\" -> Infinity]"],
-
-   section["References"],
-   text["T. J. Fletcher, \"Film Groups\", Math. Gazette 40 (1956) 15\[Dash]19. \
-doi:10.2307/3610262\n\
-S. Xu, C. Wu, \"Space-Time Crystal and Space-Time Group\", Phys. Rev. Lett. 120, \
-096401 (2018). arXiv:1703.03388\n\
-C. Ke, C. Wu, \"Two-Dimensional Space-Time Groups: Classification and Applications\" \
-(2026). arXiv:2604.05619\n\
-J. H. Conway, H. Burgiel, C. Goodman-Strauss, The Symmetries of Things (2008) \
-\[LongDash] orbifold notation.\n\
-Interactive atlas: https://yaroslavvb.github.io/animated-groups-fable\n\
-Source: https://github.com/yaroslavvb/animated-groups-fable (wolfram/ directory; the \
-catalog data is generated from the atlas's own, and the two renderers agree frame by \
-frame)."]
-   };
-
-nb = Notebook[cells, StyleDefinitions -> "Default.nb",
-   WindowSize -> {900, 800}];
-
+nb = Notebook[cells, StyleDefinitions -> "Default.nb", WindowSize -> {1000, 800}];
 Export[outPath, nb, "NB"];
-Print["wrote ", outPath, " (", FileByteCount[outPath], " bytes)"];
+Print["wrote ", outPath, "  ", FileByteCount[outPath], " bytes"];
 
-(* sanity: the file must round-trip as a notebook expression *)
 back = Get[outPath];
-Print["cells: ", Length[First[back]], "  head: ", Head[back]];
+Print["round-trips: ", Head[back] === Notebook, "   cells: ", Length[First[back]]];
