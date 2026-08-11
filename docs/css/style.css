@@ -424,7 +424,6 @@ footer.site {
  * than a colour so it stays lighter in both themes and in both states, and it
  * comes up on hover so it never reads as disabled. */
 .tabbtn.trivial { opacity: 0.55; font-weight: 500; }
-.tabbtn.trivial.active { opacity: 0.8; color: var(--muted); }
 .tabbtn.trivial:hover { opacity: 0.9; }
 
 /* Two runs in the wallpaper atlas (tabs.js `split`): the film groups with NO
@@ -442,6 +441,10 @@ footer.site {
   color: var(--fwd-ink);
 }
 .tabbtn.fwd.active { background: var(--panel); color: var(--fwd-ink); }
+/* after .tabbtn.fwd.active on purpose: same specificity, so source order
+ * decides, and a selected trivial tab must stay muted rather than pick up its
+ * run's ink — greyed is the whole point of it */
+.tabbtn.trivial.active { opacity: 0.8; color: var(--muted); }
 .tabpane {
   display: none;
   background: var(--panel);

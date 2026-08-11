@@ -6,10 +6,10 @@
  * the viewer has started, which also covers tab switches (a hidden pane never
  * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=34";
-import { attachControls } from "./controls.js?v=34";
-import { attachStage } from "./stage.js?v=34";
-import { groupCaption, isTrivialClock } from "./wallpaper-data.js?v=34";
+import { FilmGroupAnimation } from "./renderer.js?v=35";
+import { attachControls } from "./controls.js?v=35";
+import { attachStage } from "./stage.js?v=35";
+import { groupCaption, isTrivialClock } from "./wallpaper-data.js?v=35";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {
@@ -113,5 +113,11 @@ in catalog.json — out of sync with the enumeration</div>`;
   }
 
   host.append(bar, paneBox);
-  activate(0);
+  // Open on the first tab that is a case to work through, which is index 0
+  // everywhere EXCEPT the three wallpapers whose only forward-time film group
+  // is the trivial clock — p1, pm, pg. There the trivial tab leads its run and
+  // so leads the row, and opening a section on the one group where "what can
+  // time do here?" answers "nothing" is exactly what ordering it last is for.
+  const first = list.findIndex(it => !isTrivial(it));
+  activate(first < 0 ? 0 : first);
 }
