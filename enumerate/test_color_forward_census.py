@@ -46,7 +46,20 @@ class ColorForwardCensusTests(unittest.TestCase):
         rows = self.payload["by_wallpaper"]
         self.assertEqual([row["wallpaper_group"] for row in rows],
                          list(census.BASE_ORDER))
+        self.assertEqual([row["orbifold"] for row in rows],
+                         [census.ORBIFOLD_BY_BASE[base]
+                          for base in census.BASE_ORDER])
+        self.assertEqual(len({row["orbifold"] for row in rows}), 17)
         self.assertEqual(sum(row["forward_total"] for row in rows), 68)
+
+    def test_downloads_keep_both_group_notations(self) -> None:
+        csv_header = census.wallpaper_csv_text(self.payload).splitlines()[0]
+        self.assertEqual(csv_header.split(",")[:2],
+                         ["orbifold", "wallpaper_group"])
+        self.assertEqual(
+            self.payload["meta"]["label_conventions"]["primary"],
+            "Conway orbifold notation",
+        )
 
     def test_noscript_fallback_matches_payload(self) -> None:
         report = (census.ROOT / "docs" / "future-directions.html").read_text()
