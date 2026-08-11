@@ -3,9 +3,13 @@
  * visibility only decides whether an animation the viewer has started is
  * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
+import { FilmGroupAnimation } from "./renderer.js?v=20";
+import { attachControls } from "./controls.js?v=20";
+import { WALLPAPERS } from "./wallpaper-data.js?v=20";
+
+const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
+const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
+import { attachStage } from "./stage.js?v=20";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -36,19 +40,20 @@ function uniq(arr) { return [...new Set(arr)]; }
 
 function buildFilters(data) {
   const bar = document.getElementById("filters");
-  const mk = (id, label, values) => {
+  const mk = (id, label, values, labelOf = null) => {
     const wrap = document.createElement("label");
     wrap.append(label + " ");
     const sel = document.createElement("select");
     sel.id = id;
     sel.append(new Option("all", ""));
-    values.forEach(v => sel.append(new Option(v, v)));
+    values.forEach(v => sel.append(new Option(labelOf ? labelOf(v) : v, v)));
     sel.onchange = render;
     wrap.append(sel);
     bar.append(wrap);
   };
   mk("f-system", "system", uniq(state.groups.map(g => g.system)));
-  mk("f-base", "spatial base", uniq(state.groups.map(g => g.base)).sort());
+  mk("f-base", "spatial base", uniq(state.groups.map(g => g.base)).sort(),
+     hm => baseLabel(hm));
   mk("f-time", "time structure", ["forward", "with reversal"]);
   mk("f-sym", "type", ["symmorphic", "nonsymmorphic"]);
   mk("f-prod", "product?", ["product", "not a product"]);
@@ -104,7 +109,7 @@ function render() {
       `<span class="hm">${g.hm || ""}</span>` +
       `<div class="tags">` +
       `<span class="tag">${g.system}</span>` +
-      `<span class="tag">base ${g.base}</span>` +
+      `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
       (g.forward ? "" : `<span class="tag rev">time reversal</span>`) +
       (g.product ? `<span class="tag product">product</span>` : "") +
@@ -140,7 +145,7 @@ function showDetail(g) {
   const tags = document.getElementById("d-tags");
   tags.innerHTML =
     `<span class="tag">${g.system}</span>` +
-    `<span class="tag">base ${g.base}</span>` +
+    `<span class="tag">base ${baseLabel(g.base)}</span>` +
     `<span class="tag">${g.bravais}</span>` +
     (g.symmorphic ? `<span class="tag">symmorphic</span>` : `<span class="tag nonsym">nonsymmorphic</span>`) +
     (g.forward ? `<span class="tag">forward-time</span>` : `<span class="tag rev">time reversal</span>`) +

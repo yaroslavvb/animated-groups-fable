@@ -116,8 +116,13 @@ def _auto_cell(spec, size):
                tuple(round(x % 1.0, 6) for x in op["v"]))
         seen.add(key)
     n = len(seen)
-    repeats = 5 if n <= 1 else 4 if n <= 2 else 3 if n <= 6 else 2.0
-    return max(24, size / repeats)
+    # target ~16 visible motifs (mirrors renderer.js); square frame, so the
+    # short/long-side clamps coincide
+    B = spec["basis"]
+    bdet = abs(B[0][0] * B[1][1] - B[0][1] * B[1][0]) or 1
+    cell = math.sqrt(n * size * size / (16.0 * bdet))
+    cell = max(cell, size / 3.0, 24)
+    return min(cell, size / 1.3)
 
 
 def render_frame(spec, t, size, cell=None):

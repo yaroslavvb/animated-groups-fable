@@ -840,7 +840,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "o"
   },
   {
    "name": "P2",
@@ -858,7 +859,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "o/m′[**]"
   },
   {
    "name": "Pm_x",
@@ -876,7 +878,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "**"
   },
   {
    "name": "Pg_x",
@@ -894,7 +897,8 @@
      "tau": 0.5
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "~*~*"
   },
   {
    "name": "Pm_t",
@@ -912,7 +916,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "o/1′"
   },
   {
    "name": "Pg_t",
@@ -930,7 +935,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "o/g′"
   },
   {
    "name": "P2m_xm_t",
@@ -960,7 +966,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "**/1′"
   },
   {
    "name": "P2g_xg_t",
@@ -990,7 +997,8 @@
      "tau": 0.5
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "~*~*/g′"
   },
   {
    "name": "P2m_xg_t",
@@ -1020,7 +1028,8 @@
      "tau": 0
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "**/g′"
   },
   {
    "name": "P2g_xm_t",
@@ -1050,7 +1059,8 @@
      "tau": 0.5
     }
    ],
-   "cent": null
+   "cent": null,
+   "orb": "~*~*/1′"
   },
   {
    "name": "Cm_x",
@@ -1071,7 +1081,8 @@
    "cent": [
     0.5,
     0.5
-   ]
+   ],
+   "orb": "c**"
   },
   {
    "name": "Cm_t",
@@ -1092,7 +1103,8 @@
    "cent": [
     0.5,
     0.5
-   ]
+   ],
+   "orb": "co/1′"
   },
   {
    "name": "C2m_xm_t",
@@ -1125,7 +1137,8 @@
    "cent": [
     0.5,
     0.5
-   ]
+   ],
+   "orb": "c**/1′"
   }
  ]
 }

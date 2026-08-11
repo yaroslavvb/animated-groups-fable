@@ -13,8 +13,8 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=18";
-import { Playback } from "./playback.js?v=18";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=20";
+import { Playback } from "./playback.js?v=20";
 
 const TWO_PI = Math.PI * 2;
 
@@ -146,8 +146,18 @@ export class FilmGroupAnimation extends Playback {
       const key = op => op.M.flat().join(",") + "|" +
         op.v.map(x => Math.round(f1(x) * 1e6)).join(",");
       const nSites = new Set(this.spec.ops.map(key)).size;
-      const repeats = nSites <= 1 ? 5 : nSites <= 2 ? 4 : nSites <= 6 ? 3 : 2.0;
-      this.cell = Math.max(24, Math.min(w, h) / repeats);
+      // TARGET MOTIF COUNT: choose the cell so roughly 16 copies are visible
+      // regardless of group order or canvas size — enough to exhibit every
+      // operation and the lattice, no more. Clamps keep 1.3-3 translation
+      // repeats on the short side and at most 6 on the long side.
+      const TARGET = 16;
+      const B0 = this.spec.basis;
+      const bdet = Math.abs(B0[0][0] * B0[1][1] - B0[0][1] * B0[1][0]) || 1;
+      const minS = Math.min(w, h), maxS = Math.max(w, h);
+      let c = Math.sqrt(nSites * w * h / (TARGET * bdet));
+      c = Math.max(c, minS / 3, maxS / 6, 24);
+      c = Math.min(c, minS / 1.3);
+      this.cell = c;
     }
     const B = this.spec.basis;
     const s = this.cell;

@@ -1,8 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
+import { FilmGroupAnimation } from "./renderer.js?v=20";
+import { attachControls } from "./controls.js?v=20";
+import { attachStage } from "./stage.js?v=20";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -88,7 +88,7 @@ pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
   },
   {
     id: "p2-timecentred",
-    sym: "c2·2·2<sub>1</sub>·2<sub>1</sub>",
+    sym: "c222<sub>1</sub>2<sub>1</sub>",
     kw: "time-centred lattice — the checkerboard flip",
     text: "No fractional point operation at all: here the <em>lattice</em> is \
 the space-time entanglement. Translating by half a cell diagonal is the same \
@@ -114,7 +114,7 @@ frame: the half-cell shift is a symmetry only of the loop, not of a moment.",
   },
   {
     id: "palindromic-windmill",
-    sym: "4<sub>2</sub>4<sub>2</sub>2/1′<sup>a</sup>",
+    sym: "4<sub>2</sub>4<sub>2</sub>2/1′",
     kw: "time reversal + time screw — a palindromic windmill",
     text: "A half-period screw (4<sub>2</sub>) coexisting with a time mirror: \
 the loop is a palindrome, and the quarter-turn-at-half-period survives because \

@@ -3,9 +3,9 @@
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=18";
+import { buildTabs } from "./tabs.js?v=20";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=18";
+  from "./wallpaper-data.js?v=20";
 
 const hm = new URLSearchParams(location.search).get("g");
 const idx = WALLPAPERS.findIndex(w => w.hm === hm);
@@ -30,7 +30,7 @@ if (idx < 0) {
   const w = WALLPAPERS[idx];
   const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
   const list = sectionSort(data.groups.filter(g => g.base === w.hm));
-  document.title = `${w.hm} — Wallpaper Atlas — Film Groups`;
+  document.title = `${w.orb} · ${w.hm} — Wallpaper Atlas — Film Groups`;
 
   const prev = WALLPAPERS[(idx + WALLPAPERS.length - 1) % WALLPAPERS.length];
   const next = WALLPAPERS[(idx + 1) % WALLPAPERS.length];
@@ -40,8 +40,8 @@ if (idx < 0) {
     `projection is ${w.hm} — tab across them; the box below each animation ` +
     `describes its time behaviour.</p>` +
     `<p><a href="wallpaper.html#wp-${w.hm}">← atlas overview</a> &ensp;·&ensp; ` +
-    `<a href="wallpaper-group.html?g=${prev.hm}">← ${prev.hm}</a> &ensp;·&ensp; ` +
-    `<a href="wallpaper-group.html?g=${next.hm}">${next.hm} →</a></p>`;
+    `<a href="wallpaper-group.html?g=${prev.hm}">← <span class="sym">${prev.orb}</span> ${prev.hm}</a> &ensp;·&ensp; ` +
+    `<a href="wallpaper-group.html?g=${next.hm}"><span class="sym">${next.orb}</span> ${next.hm} →</a></p>`;
   intro.innerHTML = `<p>${w.note} ${w.issues}</p>` +
     `<p style="color:var(--muted);">${censusSentence(w, list)}</p>`;
 

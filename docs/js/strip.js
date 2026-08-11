@@ -5,8 +5,8 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=18";
-import { Playback } from "./playback.js?v=18";
+import { drawMotif } from "./renderer.js?v=20";
+import { Playback } from "./playback.js?v=20";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -83,8 +83,11 @@ export class StripAnimation extends Playback {
           sites.add(o.m + "|" + Math.round(f1(o.v + this.spec.cent[0]) * 1e6));
         }
       }
-      const repeats = sites.size <= 1 ? 7 : sites.size <= 2 ? 5 : 4;
-      this.cell = w / repeats;
+      // target ~6 visible copies (2.2-6 cells)
+      let c = (sites.size * w) / 6;
+      c = Math.max(c, w / 6);
+      c = Math.min(c, w / 2.2);
+      this.cell = c;
     }
     const r = Math.min(0.30 * this.cell, 0.34 * h);
     const base = 0.27;  // generic offset within the cell

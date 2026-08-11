@@ -2,10 +2,10 @@
  * All animation specs come from data/featured.json (single source of truth,
  * verified by enumerate/verify_animations.py and at runtime by orbit.js). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { StripAnimation } from "./strip.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
+import { FilmGroupAnimation } from "./renderer.js?v=20";
+import { StripAnimation } from "./strip.js?v=20";
+import { attachControls } from "./controls.js?v=20";
+import { attachStage } from "./stage.js?v=20";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",
@@ -30,7 +30,7 @@ const BESTIARY = [
     text: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/2</sup>): mirror symmetry that holds only after waiting half a period — mirror images run in counterphase. (Crystallographically this group is pg&nbsp;&times;&nbsp;&#8484; in disguise — see the gallery.)" },
   { id: "mixed-glide", sym: "&times;<sub>&frac12;</sub>&times;<sub>&frac12;</sub>", title: "Mixed space–time glide",
     text: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>y</sub><sup>1/2</sup>T<sub>t</sub><sup>1/2</sup>): reflect, slide half a cell, wait half a period." },
-  { id: "p2-timecentred", sym: "c2&middot;2&middot;2<sub>1</sub>&middot;2<sub>1</sub>", title: "Time centring",
+  { id: "p2-timecentred", sym: "c222<sub>1</sub>2<sub>1</sub>", title: "Time centring",
     text: "Centred spacetime lattice: translating by half a cell diagonal = waiting half a period. Half the 2-centres fill in phase, half in counterphase." },
   { id: "glide-time-reversal", sym: "o/g&prime;", title: "Glide time-reversal",
     text: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>): played backwards, the film equals itself shifted half a cell — neighbouring columns fill and drain in opposite senses." },
@@ -72,7 +72,7 @@ async function init() {
       const fig = document.createElement("figure");
       fig.style.margin = "0.9rem 0";
       const label = document.createElement("div");
-      label.innerHTML = `<span class="sym">${g.name.replace(/_(\w)/g, "<sub>$1</sub>")}</span> <span style="color:var(--muted);font-size:0.9rem;">— ${STRIP_BLURBS[g.name] || ""}</span>`;
+      label.innerHTML = `<span class="sym">${g.orb || g.name}</span> <span style="color:var(--muted);font-size:0.9rem;">${g.name.replace(/_(\w)/g, "<sub>$1</sub>")} — ${STRIP_BLURBS[g.name] || ""}</span>`;
       label.style.marginBottom = "0.25rem";
       const canvas = document.createElement("canvas");
       canvas.style.cssText = "width:100%;height:96px;border:1px solid var(--rule);border-radius:8px;background:#faf9f6;";
