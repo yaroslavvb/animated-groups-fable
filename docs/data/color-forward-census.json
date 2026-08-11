@@ -1,6 +1,6 @@
 {
   "meta": {
-    "schema_version": 2,
+    "schema_version": 1,
     "range": {
       "minimum_colours": 1,
       "maximum_colours": 6
@@ -9,10 +9,6 @@
     "catalog_sha256": "040eebe747815557014c1dbf1d4265d204aaae35c110595f2a15b94ee7f68ca0",
     "catalog_total_groups": 275,
     "catalog_forward_groups": 68,
-    "label_conventions": {
-      "primary": "Conway orbifold notation",
-      "catalog_base": "International short (Hermann–Mauguin) notation"
-    },
     "definitions": {
       "wieting_all_transitive": "Plane-affine classes of all index-N colour stabilizers.",
       "regular_cyclic_kernels": "Plane-affine classes of normal index-N kernels with quotient C_N.",
@@ -74,7 +70,6 @@
   ],
   "by_wallpaper": [
     {
-      "orbifold": "o",
       "wallpaper_group": "p1",
       "regular_cyclic": {
         "1": 1,
@@ -95,7 +90,6 @@
       "forward_total": 1
     },
     {
-      "orbifold": "2222",
       "wallpaper_group": "p2",
       "regular_cyclic": {
         "1": 1,
@@ -116,7 +110,6 @@
       "forward_total": 3
     },
     {
-      "orbifold": "**",
       "wallpaper_group": "pm",
       "regular_cyclic": {
         "1": 1,
@@ -137,7 +130,6 @@
       "forward_total": 1
     },
     {
-      "orbifold": "××",
       "wallpaper_group": "pg",
       "regular_cyclic": {
         "1": 1,
@@ -158,7 +150,6 @@
       "forward_total": 1
     },
     {
-      "orbifold": "*×",
       "wallpaper_group": "cm",
       "regular_cyclic": {
         "1": 1,
@@ -179,7 +170,6 @@
       "forward_total": 2
     },
     {
-      "orbifold": "*2222",
       "wallpaper_group": "pmm",
       "regular_cyclic": {
         "1": 1,
@@ -200,7 +190,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "22*",
       "wallpaper_group": "pmg",
       "regular_cyclic": {
         "1": 1,
@@ -221,7 +210,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "22×",
       "wallpaper_group": "pgg",
       "regular_cyclic": {
         "1": 1,
@@ -242,7 +230,6 @@
       "forward_total": 4
     },
     {
-      "orbifold": "2*22",
       "wallpaper_group": "cmm",
       "regular_cyclic": {
         "1": 1,
@@ -263,7 +250,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "442",
       "wallpaper_group": "p4",
       "regular_cyclic": {
         "1": 1,
@@ -284,7 +270,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "*442",
       "wallpaper_group": "p4m",
       "regular_cyclic": {
         "1": 1,
@@ -305,7 +290,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "4*2",
       "wallpaper_group": "p4g",
       "regular_cyclic": {
         "1": 1,
@@ -326,7 +310,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "333",
       "wallpaper_group": "p3",
       "regular_cyclic": {
         "1": 1,
@@ -347,7 +330,6 @@
       "forward_total": 4
     },
     {
-      "orbifold": "*333",
       "wallpaper_group": "p3m1",
       "regular_cyclic": {
         "1": 1,
@@ -368,7 +350,6 @@
       "forward_total": 2
     },
     {
-      "orbifold": "3*3",
       "wallpaper_group": "p31m",
       "regular_cyclic": {
         "1": 1,
@@ -389,7 +370,6 @@
       "forward_total": 4
     },
     {
-      "orbifold": "632",
       "wallpaper_group": "p6",
       "regular_cyclic": {
         "1": 1,
@@ -410,7 +390,6 @@
       "forward_total": 6
     },
     {
-      "orbifold": "*632",
       "wallpaper_group": "p6m",
       "regular_cyclic": {
         "1": 1,
