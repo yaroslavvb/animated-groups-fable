@@ -12,8 +12,8 @@
  * Geometry (cell size, motif radius, placements) is borrowed from a
  * FilmGroupAnimation that is constructed but never started. */
 "use strict";
-import { FilmGroupAnimation, bodyPath } from "./renderer.js?v=24";
-import { orbitPlacements } from "./orbit.js?v=24";
+import { FilmGroupAnimation, bodyPath } from "./renderer.js?v=25";
+import { orbitPlacements } from "./orbit.js?v=25";
 
 const frac = x => ((x % 1) + 1) % 1;
 

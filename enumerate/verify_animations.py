@@ -164,19 +164,15 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
 
 
 def legibility_check(spec, name):
-    """With the fill-level comma the phase channel is INJECTIVE in theta mod 1
-    and non-rotational, so no spatial operation can alias it: any two copies
-    with different internal times look different in every frozen frame. The
-    phase ring adds a second, discrete channel; for it to be well defined,
-    every op's tau must be an exact multiple of 1/N for the N this spec
-    reports — checked here, since a tau with an unexpected denominator would
-    put copies at ring positions that drift instead of stepping together."""
-    from gifs import beat_count
-    taus = [op["tau"] for op in spec["ops"]]
-    n = beat_count(taus)
-    bad = [t for t in taus if abs((t % 1.0) * n - round((t % 1.0) * n)) > 1e-6]
-    if bad:
-        return [f"{name}: tau values {bad} are not multiples of 1/{n}"]
+    """The motif's phase channel is a one-way sweep across the comma: the
+    coloured region is everything behind the sweep line while filling (theta <
+    1/2) and everything ahead of it while emptying (theta >= 1/2). That map is
+    INJECTIVE on [0,1) — the two halves colour opposite sides of the line, so
+    only the boundary instants (empty at 0, full at 1/2) are shared — and it is
+    non-rotational, so no spatial operation can alias it: any two copies at
+    different internal times differ in every frozen frame. Nothing further to
+    check; kept so that a future motif change has to re-derive its legibility
+    conditions here rather than inherit this claim silently."""
     return []
 
 

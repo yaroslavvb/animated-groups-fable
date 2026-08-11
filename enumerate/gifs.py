@@ -16,14 +16,15 @@ SS = 4  # supersampling factor
 # NON-ROTATIONAL clock, mirrors renderer.js: a thick comma (chiral, so a
 # rotated or reflected copy reads as such) fills like a vessel, fill level =
 # theta mod 1 (injective — no rotational aliasing possible). Colors static;
-# only the fill boundary moves. Reversal copies drain. Around each comma the
+# only the sweep boundary moves: the comma fills, then empties, the boundary
+# travelling the same way throughout, so the loop closes without a jump.
+# Reversal copies run the sweep backwards. Around each comma the
 # phase ring shows WHICH of the group's N time intervals the copy is in,
 # drawn in screen coordinates and never rotated with the copy — see the
 # drawPhaseRing comment in renderer.js.
 BODY_L = (219, 230, 242)
 OUTLINE = (125, 147, 171)
 FILL = (59, 110, 165)
-LINE = (192, 57, 43)
 BEAT_ON = (192, 57, 43)
 BEAT_OFF = (216, 210, 196)
 BG = (250, 249, 246)
@@ -83,14 +84,16 @@ def motif_paths(r):
     return [body]
 
 
-def _clip_below(poly, y0):
-    """Sutherland-Hodgman clip of a polygon to the half-plane y >= y0
-    (canvas y-down local coords: the liquid below the surface line)."""
+def _clip_half(poly, y0, below):
+    """Sutherland-Hodgman clip of a polygon to a half-plane bounded by y = y0
+    (canvas y-down local coords): below=True keeps y >= y0, the part of the
+    comma under the sweep line; below=False keeps y <= y0, the part above."""
+    keep = (lambda y: y >= y0) if below else (lambda y: y <= y0)
     out = []
     n = len(poly)
     for i in range(n):
         a, b = poly[i], poly[(i + 1) % n]
-        ain, bin_ = a[1] >= y0, b[1] >= y0
+        ain, bin_ = keep(a[1]), keep(b[1])
         if ain:
             out.append(a)
         if ain != bin_:
@@ -102,18 +105,22 @@ def _clip_below(poly, y0):
 def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
     """T = 2x2 pixel transform matrix applied to motif-local coords.
 
-    Non-rotational clock: the comma fills with the dark color, fill level =
-    theta mod 1; a bright line marks the surface. Layered exactly as
-    renderer.js ("body" = comma outline, "tail" = liquid, "hands" = surface
-    line) so painting is order-independent and coincident copies superimpose
-    their surface lines."""
+    Continuous one-way wipe, mirroring renderer.js: a sweep line crosses the
+    comma from base to brim once per half period, always the same way; the
+    colour is behind the line while filling (first half) and ahead of it while
+    emptying (second half). Continuous at both handovers, and injective in
+    theta because the two halves colour opposite sides of the line. Layered
+    ("body" = comma outline, "fill" = coloured region) so painting is
+    order-independent: coincident copies show the union of their regions."""
 
     def xf(p):
         x, y = p
         return (cx + T[0][0] * x + T[0][1] * y, cy + T[1][0] * x + T[1][1] * y)
 
     ph = theta % 1.0
-    y_level = (BODY_BOT - ph * (BODY_BOT - BODY_TOP)) * r
+    rising = ph < 0.5
+    sweep = (ph * 2.0) % 1.0
+    y_line = (BODY_BOT - sweep * (BODY_BOT - BODY_TOP)) * r
     polys = motif_paths(r)
 
     if layer in ("all", "body"):
@@ -121,19 +128,11 @@ def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
             draw.polygon([xf(p) for p in poly], fill=BODY_L, outline=OUTLINE,
                          width=max(1, int(0.045 * r)))
 
-    if layer in ("all", "tail"):
+    if layer in ("all", "fill"):
         for poly in polys:
-            cp = _clip_below(poly, y_level)
+            cp = _clip_half(poly, y_line, rising)
             if len(cp) >= 3:
                 draw.polygon([xf(p) for p in cp], fill=FILL)
-
-    if layer in ("all", "hands"):
-        for poly in polys:
-            cp = _clip_below(poly, y_level)
-            xs = [p[0] for p in cp if abs(p[1] - y_level) < 1e-9]
-            if len(xs) >= 2:
-                draw.line([xf((min(xs), y_level)), xf((max(xs), y_level))],
-                          fill=LINE, width=max(2, int(0.09 * r)))
 
 
 def beat_count(taus):
@@ -167,7 +166,11 @@ def draw_phase_ring(draw, cx, cy, theta, r, n, direction):
     coordinates — no spatial transform is applied — so one interval is one arc
     on every copy; see the drawPhaseRing comment in renderer.js. PIL arc
     angles are degrees clockwise from 3 o'clock, matching canvas."""
-    lit = int((theta % 1.0) * n) % n if n > 1 else -1
+    # a single-interval group is always in interval 0: sector 0 is lit and
+    # carries the arrowhead like any other, held back to the unlit weight
+    # (mirrors drawPhaseRing in renderer.js)
+    solo = n == 1
+    lit = int((theta % 1.0) * n) % n if n > 1 else 0
     gap = min(0.125 / n, 0.022) * 360.0
     R = RING_MID * r
     lw = max(1, int(RING_W * r))
@@ -184,7 +187,8 @@ def draw_phase_ring(draw, cx, cy, theta, r, n, direction):
                 a1 -= head
             else:
                 a0 += head
-        draw.arc(box, a0, a1, fill=(BEAT_ON if k == lit else BEAT_OFF),
+        draw.arc(box, a0, a1,
+                 fill=(BEAT_ON if (k == lit and not solo) else BEAT_OFF),
                  width=lw)
         if head > 0:
             base, tip = (a1, a1 + head) if s > 0 else (a0, a0 - head)
@@ -193,7 +197,7 @@ def draw_phase_ring(draw, cx, cy, theta, r, n, direction):
                 return (cx + rad * math.cos(a), cy + rad * math.sin(a))
             draw.polygon([at(base, R - HEAD_HALF * lw),
                           at(base, R + HEAD_HALF * lw),
-                          at(tip, R)], fill=BEAT_ON)
+                          at(tip, R)], fill=(BEAT_OFF if solo else BEAT_ON))
 
 
 def _scale_of(T):
@@ -330,7 +334,7 @@ def render_frame(spec, t, size, cell=None, rings=True):
                     continue
                 visible.append((px, py, T, theta, op["s"]))
     # layered, order-independent painting (mirrors renderer.js)
-    for layer in ("body", "tail", "hands"):
+    for layer in ("body", "fill"):
         for (px, py, T, theta, _s) in visible:
             draw_motif(draw, cx0 + px, cy0 + py, T, theta, r, layer)
     if rings:

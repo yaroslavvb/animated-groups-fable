@@ -5,9 +5,9 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif, drawPhaseRing } from "./renderer.js?v=24";
-import { Playback } from "./playback.js?v=24";
-import { stripTimeSymmetry } from "./phases.js?v=24";
+import { drawMotif, drawPhaseRing } from "./renderer.js?v=25";
+import { Playback } from "./playback.js?v=25";
+import { stripTimeSymmetry } from "./phases.js?v=25";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -155,7 +155,7 @@ export class StripAnimation extends Playback {
     const span = Math.ceil(w / 2 / this.cell) + 1;
     // layered drawing: order-independent painting; coincident copies
     // (e.g. a palindrome's forward/backward pair) superimpose both clocks
-    for (const layer of ["body", "tail", "hands"]) {
+    for (const layer of ["body", "fill"]) {
       for (const [m, v, s, tau] of copies) {
         for (let k = -span; k <= span; k++) {
           const x = (m * base + v + k) * this.cell;
