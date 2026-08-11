@@ -13,9 +13,9 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=24";
-import { Playback } from "./playback.js?v=24";
-import { filmTimeSymmetry, beatOf } from "./phases.js?v=24";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=25";
+import { Playback } from "./playback.js?v=25";
+import { filmTimeSymmetry, beatOf } from "./phases.js?v=25";
 
 const TWO_PI = Math.PI * 2;
 
@@ -32,18 +32,19 @@ const MAX_COLUMNS = 18;
 
 /* The motif is a THICK COMMA — a shape with no symmetry of its own, so a
  * rotated copy reads as rotated and a reflected copy reads as reflected. Its
- * clock is a NON-ROTATIONAL, injective phase channel: the comma fills like a
- * vessel, fill level = theta mod 1.
+ * clock is a NON-ROTATIONAL, injective phase channel: a sweep line crosses
+ * the comma, colouring it in and then out again (see drawMotif).
  *
  * Rationale: any rotating clock element interacts with the pattern's own
  * rotational symmetries — the k-th copy of an n-fold screw adds k·2π/n to a
  * hand's apparent angle, which can alias phases entirely (a long line of
- * bugs). A fill level cannot be rotated: the map theta -> level is injective
- * on [0,1), so two copies at different internal times ALWAYS look different
- * in a frozen frame; and the fill line is locked to the comma's local axis,
- * so a rotated copy shows a visibly rotated fill line. Orientation and phase
- * are fully orthogonal channels. Reversal copies drain instead of filling.
- * Colors are static; only the fill boundary moves.
+ * bugs). A sweep cannot be rotated: the map theta -> coloured region is
+ * injective on [0,1), so two copies at different internal times ALWAYS look
+ * different in a frozen frame; and the sweep is locked to the comma's local
+ * axis, so a rotated copy shows a visibly rotated sweep. Orientation and
+ * phase are fully orthogonal channels. Reversal copies run the sweep the
+ * other way. Colors are static; only the boundary moves, and it moves
+ * continuously through t = 0, so a looping film has no visible seam.
  *
  * The comma carries the CONTINUOUS phase; the ring around it (drawPhaseRing)
  * carries the DISCRETE one — which of the group's N time intervals the copy
@@ -106,19 +107,31 @@ export function bodyPath(ctx, r) {
 
 /* ---------------------------------------------------------------- motif */
 // The motif must have NO accidental symmetry: chiral, asymmetric. Rendering
-// is LAYERED ("body" | "tail" | "hands", or "all" — kept names: body = comma
-// outline, tail = liquid fill, hands = fill-line marker): frames draw every
-// placement's layer together, so painting is order-independent and copies
-// sharing a site (reversal partners) superimpose both fill lines.
+// is LAYERED ("body" | "fill", or "all"): frames draw every placement's body
+// before any fill, so painting is order-independent — copies sharing a site
+// (a reversal partner has the same spatial part) show the union of their
+// coloured regions, which does not depend on who painted first.
 export function drawMotif(ctx, theta, r, colors, layer = "all") {
   // theta = internal time in periods (any real); r = motif radius (px)
   const c = colors || MOTIF_COLORS;
-  const ph = ((theta % 1) + 1) % 1;       // fill level, injective in theta
-  const yLevel = (BODY_BOT - ph * (BODY_BOT - BODY_TOP)) * r;
+  const ph = ((theta % 1) + 1) % 1;
+  /* CONTINUOUS ONE-WAY WIPE. A sweep line crosses the comma from base to brim
+   * once in each half of the period, always travelling the same way. In the
+   * first half the colour lies BEHIND the line (the comma fills); in the
+   * second half it lies AHEAD of it (the comma empties, the boundary still
+   * rising). The painted region is continuous across both handovers — full at
+   * t = 1/2, empty at t = 0 = 1 — so the loop never jumps. And because the two
+   * halves colour opposite sides of the line, the picture still determines the
+   * phase uniquely: the channel stays injective on [0,1), which is what keeps
+   * the copies around a screw centre distinguishable. */
+  const rising = ph < 0.5;
+  const p = (ph * 2) % 1;                                  // sweep position
+  const yLine = (BODY_BOT - p * (BODY_BOT - BODY_TOP)) * r;
+  const yTop = (BODY_TOP - 0.2) * r, yBot = (BODY_BOT + 0.2) * r;
   ctx.save();
 
   if (layer === "all" || layer === "body") {
-    // empty comma: light body + outline; static
+    // the empty comma: light body + outline; static
     bodyPath(ctx, r);
     ctx.fillStyle = c.body;
     ctx.fill();
@@ -127,28 +140,13 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
     ctx.stroke();
   }
 
-  if (layer === "all" || layer === "tail") {
-    // the liquid: dark fill from the bottom up to yLevel, clipped to the comma
+  if (layer === "all" || layer === "fill") {
     ctx.save();
     bodyPath(ctx, r);
     ctx.clip();
     ctx.fillStyle = c.fill;
-    ctx.fillRect(-1.1 * r, yLevel, 2.2 * r, (BODY_BOT + 0.1) * r - yLevel + 0.1 * r);
-    ctx.restore();
-  }
-
-  if (layer === "all" || layer === "hands") {
-    // fill-line marker: a bright segment at the liquid surface (clipped),
-    // readable even at small sizes; coincident copies show several lines
-    ctx.save();
-    bodyPath(ctx, r);
-    ctx.clip();
-    ctx.beginPath();
-    ctx.moveTo(-1.1 * r, yLevel);
-    ctx.lineTo(1.1 * r, yLevel);
-    ctx.strokeStyle = c.line;
-    ctx.lineWidth = Math.max(1.2, 0.09 * r);
-    ctx.stroke();
+    if (rising) ctx.fillRect(-1.2 * r, yLine, 2.4 * r, yBot - yLine);
+    else ctx.fillRect(-1.2 * r, yTop, 2.4 * r, yLine - yTop);
     ctx.restore();
   }
 
@@ -194,12 +192,13 @@ const HEAD_HALF = 1.15;   // half its base width, likewise
 export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
   if (r < RING_MIN_PX) return;
   const c = colors || MOTIF_COLORS;
-  // a group with a single interval has nothing to point at: the ring records
-  // the ABSENCE of a subdivision rather than shouting a constant, so nothing
-  // is lit and the loop below draws one quiet circle with a notch at t = 0.
-  // (Such a group has no time reversal either — a reversal always splits the
-  // period at its two fixed points — so no arrow is missing here.)
-  const lit = n > 1 ? beatOf(theta, n) : -1;
+  // A group with a single interval is always in interval 0, so sector 0 is
+  // lit and carries the arrowhead like any other: every diagram on the site
+  // then shows the direction the loop runs, and the absence of an arrow means
+  // "too small to draw one", never "this group is special". Such a ring is
+  // held back to the unlit weight so a constant is reported, not shouted.
+  const solo = n === 1;
+  const lit = n > 1 ? beatOf(theta, n) : 0;
   const gap = Math.min(0.125 / n, 0.022) * TWO_PI;   // ~1/8 of a sector
   const R = RING_MID * r;
   const lw = Math.max(1.1, RING_W * r);
@@ -212,8 +211,8 @@ export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
     let a1 = -Math.PI / 2 + ((k + 1) / n) * TWO_PI - gap;
     // the unlit arcs only have to show where the intervals are; they are held
     // well back so the ring reads as a readout on the pattern, not as pattern
-    ctx.globalAlpha = k === lit ? 1 : 0.4;
-    ctx.strokeStyle = k === lit ? c.beatOn : c.beatOff;
+    ctx.globalAlpha = solo ? 0.55 : (k === lit ? 1 : 0.4);
+    ctx.strokeStyle = (k === lit && !solo) ? c.beatOn : c.beatOff;
     const head = k === lit && r >= ARROW_MIN_PX
       ? Math.min((HEAD_LEN * lw) / R, 0.4 * (a1 - a0)) : 0;
     // the head is carved OUT of the lit arc, never added past it, so the arc
@@ -233,7 +232,7 @@ export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
       ctx.lineTo(bx2, by2);
       ctx.lineTo(tx, ty);
       ctx.closePath();
-      ctx.fillStyle = c.beatOn;
+      ctx.fillStyle = solo ? c.beatOff : c.beatOn;
       ctx.fill();
     }
   }
@@ -244,7 +243,6 @@ export const MOTIF_COLORS = {
   body: "#dbe6f2",
   outline: "#7d93ab",
   fill: "#3b6ea5",
-  line: "#c0392b",
   beatOn: "#c0392b",
   beatOff: "#b3aa96",
 };
@@ -454,7 +452,7 @@ export class FilmGroupAnimation extends Playback {
           py < -this.h / 2 - this.motifR * 3 || py > this.h / 2 + this.motifR * 3) continue;
       visible.push([pl, px, py, latToPix(pl.A, this.b1, this.b2)]);
     }
-    for (const layer of ["body", "tail", "hands"]) {
+    for (const layer of ["body", "fill"]) {
       for (const [pl, px, py, Mpx] of visible) {
         const theta = pl.s * (t - pl.tau);
         ctx.save();
