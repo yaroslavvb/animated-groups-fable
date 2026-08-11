@@ -13,47 +13,103 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=18";
-import { Playback } from "./playback.js?v=18";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=23";
+import { Playback } from "./playback.js?v=23";
+import { filmTimeSymmetry, beatOf } from "./phases.js?v=23";
 
 const TWO_PI = Math.PI * 2;
 
-/* The motif clock is a NON-ROTATIONAL, injective phase channel: the body
- * fills like a vessel, fill level = theta mod 1.
+/* Translation repeats shown across a diagram's short side. CELLS is the
+ * target — the range wallpaper plates conventionally use — and MIN_CELLS the
+ * floor a dense group may be relaxed to when its motifs would otherwise be
+ * too small to read (see _setupGeometry). */
+const CELLS = 4;
+const MIN_CELLS = 3;
+
+/* Hard ceiling on how many motifs may appear across a diagram, whatever its
+ * width and however many copies the group puts in a cell. */
+const MAX_COLUMNS = 18;
+
+/* The motif is a THICK COMMA — a shape with no symmetry of its own, so a
+ * rotated copy reads as rotated and a reflected copy reads as reflected. Its
+ * clock is a NON-ROTATIONAL, injective phase channel: the comma fills like a
+ * vessel, fill level = theta mod 1.
  *
  * Rationale: any rotating clock element interacts with the pattern's own
  * rotational symmetries — the k-th copy of an n-fold screw adds k·2π/n to a
  * hand's apparent angle, which can alias phases entirely (a long line of
  * bugs). A fill level cannot be rotated: the map theta -> level is injective
  * on [0,1), so two copies at different internal times ALWAYS look different
- * in a frozen frame; and the fill line is locked to the body's local axis,
+ * in a frozen frame; and the fill line is locked to the comma's local axis,
  * so a rotated copy shows a visibly rotated fill line. Orientation and phase
  * are fully orthogonal channels. Reversal copies drain instead of filling.
- * Colors are static; only the fill boundary moves. */
+ * Colors are static; only the fill boundary moves.
+ *
+ * The comma carries the CONTINUOUS phase; the ring around it (drawPhaseRing)
+ * carries the DISCRETE one — which of the group's N time intervals the copy
+ * is in. See phases.js. */
 
-/* body spans local y in [BODY_TOP, BODY_BOT] (canvas y-down local coords) */
-const BODY_TOP = -0.85;
-const BODY_BOT = 0.5;
+/* Comma outline: five cubic segments traced clockwise on screen (y down) —
+ * the outer flank of the tail from the head's right down to the tip, the
+ * inner flank back up to the head, then the head's own circle. Hand-tuned in
+ * loose coordinates and normalised below, once, to sit centred inside radius
+ * COMMA_R with the ring clear of it. */
+const COMMA_R = 0.64;      // comma circumradius, in units of the motif radius
+/* The tail is long and curls well past the head's axis on purpose: that is
+ * the whole chirality signal, and it has to survive down to a 30 px thumbnail
+ * where a stubbier comma reads the same as its mirror image. */
+const RAW = [
+  [[0.40, -0.30], [0.52, 0.18], [0.32, 0.56], [-0.52, 0.74]],
+  [[-0.52, 0.74], [-0.10, 0.52], [0.18, 0.26], [0.06, 0.02]],
+  [[0.06, 0.02], [-0.14, 0.02], [-0.40, -0.10], [-0.40, -0.30]],
+  [[-0.40, -0.30], [-0.40, -0.54], [-0.22, -0.68], [0.00, -0.68]],
+  [[0.00, -0.68], [0.24, -0.68], [0.40, -0.54], [0.40, -0.30]],
+];
 
-function bodyPath(ctx, r) {
+/* recentre on the outline's bounding box and scale to circumradius COMMA_R,
+ * so the shape's extent is a known constant the layout can budget for */
+const COMMA = (() => {
+  const pts = [];
+  for (const [p0, p1, p2, p3] of RAW) {
+    for (let i = 0; i <= 24; i++) {
+      const t = i / 24, m = 1 - t;
+      pts.push([
+        m * m * m * p0[0] + 3 * m * m * t * p1[0] + 3 * m * t * t * p2[0] + t * t * t * p3[0],
+        m * m * m * p0[1] + 3 * m * m * t * p1[1] + 3 * m * t * t * p2[1] + t * t * t * p3[1],
+      ]);
+    }
+  }
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
+  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+  const k = COMMA_R / Math.max(...pts.map(p => Math.hypot(p[0] - cx, p[1] - cy)));
+  const segs = RAW.map(seg => seg.map(p => [(p[0] - cx) * k, (p[1] - cy) * k]));
+  const yy = pts.map(p => (p[1] - cy) * k);
+  return { segs, top: Math.min(...yy), bot: Math.max(...yy) };
+})();
+
+/* the comma spans local y in [BODY_TOP, BODY_BOT] (canvas y-down local
+ * coords): fill level 0 leaves it empty, level 1 fills it to the brim */
+const BODY_TOP = COMMA.top;
+const BODY_BOT = COMMA.bot;
+
+export function bodyPath(ctx, r) {
+  const s = COMMA.segs;
   ctx.beginPath();
-  ctx.moveTo(-0.15 * r, -0.5 * r);
-  ctx.bezierCurveTo(0.65 * r, -0.55 * r, 0.55 * r, 0.28 * r, 0.05 * r, 0.42 * r);
-  ctx.bezierCurveTo(-0.28 * r, 0.5 * r, -0.42 * r, 0.12 * r, -0.15 * r, -0.5 * r);
-  ctx.closePath();
-  // beak joins the vessel so the last sixth of the fill climbs the spout
-  ctx.moveTo(-0.15 * r, -0.5 * r);
-  ctx.lineTo(0.1 * r, -0.85 * r);
-  ctx.lineTo(0.22 * r, -0.45 * r);
+  ctx.moveTo(s[0][0][0] * r, s[0][0][1] * r);
+  for (const [, p1, p2, p3] of s) {
+    ctx.bezierCurveTo(p1[0] * r, p1[1] * r, p2[0] * r, p2[1] * r,
+                      p3[0] * r, p3[1] * r);
+  }
   ctx.closePath();
 }
 
 /* ---------------------------------------------------------------- motif */
 // The motif must have NO accidental symmetry: chiral, asymmetric. Rendering
-// is LAYERED ("body" | "tail" | "hands", or "all" — kept names: body =
-// vessel outline, tail = liquid fill, hands = fill-line marker): frames draw
-// every placement's layer together, so painting is order-independent and
-// copies sharing a site (reversal partners) superimpose both fill lines.
+// is LAYERED ("body" | "tail" | "hands", or "all" — kept names: body = comma
+// outline, tail = liquid fill, hands = fill-line marker): frames draw every
+// placement's layer together, so painting is order-independent and copies
+// sharing a site (reversal partners) superimpose both fill lines.
 export function drawMotif(ctx, theta, r, colors, layer = "all") {
   // theta = internal time in periods (any real); r = motif radius (px)
   const c = colors || MOTIF_COLORS;
@@ -62,7 +118,7 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
   ctx.save();
 
   if (layer === "all" || layer === "body") {
-    // empty vessel: light body + outline; static
+    // empty comma: light body + outline; static
     bodyPath(ctx, r);
     ctx.fillStyle = c.body;
     ctx.fill();
@@ -72,7 +128,7 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
   }
 
   if (layer === "all" || layer === "tail") {
-    // the liquid: dark fill from the bottom up to yLevel, clipped to the body
+    // the liquid: dark fill from the bottom up to yLevel, clipped to the comma
     ctx.save();
     bodyPath(ctx, r);
     ctx.clip();
@@ -99,11 +155,98 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
   ctx.restore();
 }
 
+/* ----------------------------------------------------------- phase ring */
+/* The discrete phase readout: N arcs, one per interval of the period, with
+ * the copy's current interval lit. Sector k occupies turns [k/N, (k+1)/N)
+ * measured CLOCKWISE FROM 12 O'CLOCK IN SCREEN COORDINATES — the ring is
+ * never rotated or reflected with its copy. That is deliberate and is the
+ * whole point: the same interval is then the same arc on every copy, so the
+ * staircase of phases around a screw centre is legible at a glance instead of
+ * having to be mentally un-rotated. The ring is therefore an annotation, not
+ * part of the pattern: the pattern proper (comma + fill) is exactly
+ * equivariant, and the pixel-level invariance checks switch the ring off
+ * (orbit.js verifyFrames, enumerate/gifs.py render_frame).
+ *
+ * The lit arc ends in an ARROWHEAD giving the copy's DIRECTION OF TIME: its
+ * internal clock is theta = s (t - tau), so d(theta)/dt = s, and the head
+ * points the way the lit arc is about to move — clockwise where the copy is
+ * filling, anticlockwise where a time reversal has it draining. This is the
+ * one thing a frozen frame genuinely cannot show, which is why it is drawn
+ * rather than left to the motion; note it is a velocity, so it is invariant
+ * under the forward-time subgroup only. Under a time-reversing element the
+ * film must also be played backwards — and playing a film backwards reverses
+ * every arrow in it, so the symmetry still holds where it is claimed to. */
+const RING_MID = 0.76;    // ring centreline, in units of the motif radius
+const RING_W = 0.12;      // ring stroke width; the ring's outer edge at
+                          // 0.82 r is the motif's whole footprint, which
+                          // _setupGeometry keeps clear of its neighbours
+
+/* below this the ring is fewer pixels across than its own stroke and reads as
+ * a smudge, so the densest groups on the smallest thumbnails simply do not
+ * get one; the comma's fill still carries the phase there */
+const RING_MIN_PX = 6.5;
+
+/* the arrowhead needs a few pixels of its own before it stops being a blot */
+const ARROW_MIN_PX = 9;
+const HEAD_LEN = 1.7;     // arrowhead length, in ring stroke widths
+const HEAD_HALF = 1.15;   // half its base width, likewise
+
+export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
+  if (r < RING_MIN_PX) return;
+  const c = colors || MOTIF_COLORS;
+  // a group with a single interval has nothing to point at: the ring records
+  // the ABSENCE of a subdivision rather than shouting a constant, so nothing
+  // is lit and the loop below draws one quiet circle with a notch at t = 0.
+  // (Such a group has no time reversal either — a reversal always splits the
+  // period at its two fixed points — so no arrow is missing here.)
+  const lit = n > 1 ? beatOf(theta, n) : -1;
+  const gap = Math.min(0.125 / n, 0.022) * TWO_PI;   // ~1/8 of a sector
+  const R = RING_MID * r;
+  const lw = Math.max(1.1, RING_W * r);
+  const s = dir < 0 ? -1 : 1;
+  ctx.save();
+  ctx.lineWidth = lw;
+  ctx.lineCap = "butt";
+  for (let k = 0; k < n; k++) {
+    let a0 = -Math.PI / 2 + (k / n) * TWO_PI + gap;
+    let a1 = -Math.PI / 2 + ((k + 1) / n) * TWO_PI - gap;
+    // the unlit arcs only have to show where the intervals are; they are held
+    // well back so the ring reads as a readout on the pattern, not as pattern
+    ctx.globalAlpha = k === lit ? 1 : 0.4;
+    ctx.strokeStyle = k === lit ? c.beatOn : c.beatOff;
+    const head = k === lit && r >= ARROW_MIN_PX
+      ? Math.min((HEAD_LEN * lw) / R, 0.4 * (a1 - a0)) : 0;
+    // the head is carved OUT of the lit arc, never added past it, so the arc
+    // plus its point still fits inside the interval it is reporting
+    if (head > 0) { if (s > 0) a1 -= head; else a0 += head; }
+    ctx.beginPath();
+    ctx.arc(0, 0, R, a0, a1);
+    ctx.stroke();
+    if (head > 0) {
+      const base = s > 0 ? a1 : a0, tip = base + s * head;
+      const at = (ang, rad) => [rad * Math.cos(ang), rad * Math.sin(ang)];
+      const [bx1, by1] = at(base, R - HEAD_HALF * lw);
+      const [bx2, by2] = at(base, R + HEAD_HALF * lw);
+      const [tx, ty] = at(tip, R);
+      ctx.beginPath();
+      ctx.moveTo(bx1, by1);
+      ctx.lineTo(bx2, by2);
+      ctx.lineTo(tx, ty);
+      ctx.closePath();
+      ctx.fillStyle = c.beatOn;
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
 export const MOTIF_COLORS = {
   body: "#dbe6f2",
   outline: "#7d93ab",
   fill: "#3b6ea5",
   line: "#c0392b",
+  beatOn: "#c0392b",
+  beatOff: "#b3aa96",
 };
 
 /* --------------------------------------------------------- group drawing */
@@ -114,8 +257,14 @@ export class FilmGroupAnimation extends Playback {
     this.spec = spec;
     this.cellOverride = opts.cell || null; // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 64;   // else derived in _setupGeometry
-    this.minMotifPx = opts.minMotifPx || 9;  // upscale cell if motifs smaller
+    // the phase ring needs a few more pixels than the bare comma did
+    this.minMotifPx = opts.minMotifPx || 13;  // upscale cell if motifs smaller
     this.showOverlay = opts.showOverlay || false;
+    this.showPhase = opts.showPhase !== false;   // the phase-ring readout
+    // the group's time structure: N intervals, and the marks the scrub bar
+    // offers as jump targets (controls.js)
+    this.timeSym = filmTimeSymmetry(spec);
+    this.beats = this.timeSym.n;
     // GROUP-ACTION GATE: verify the spec is a genuine group of spacetime
     // operations before anything is drawn; a broken spec renders an error
     // banner, never a silently wrong pattern.
@@ -127,6 +276,18 @@ export class FilmGroupAnimation extends Playback {
     this._setupGeometry();
   }
 
+  /* copies per cell, counted by distinct SPATIAL action: a reversal partner
+   * shares its site with its forward twin and is drawn superimposed on it */
+  _nSites() {
+    if (this._nSitesCache === undefined) {
+      const f = x => ((x % 1) + 1) % 1;
+      this._nSitesCache = new Set(this.spec.ops.map(op =>
+        op.M.flat().join(",") + "|" +
+        op.v.map(x => Math.round(f(x) * 1e6)).join(","))).size;
+    }
+    return this._nSitesCache;
+  }
+
   _setupGeometry() {
     const dpr = window.devicePixelRatio || 1;
     const canvas = this.canvas;
@@ -134,20 +295,37 @@ export class FilmGroupAnimation extends Playback {
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
     this.w = w; this.h = h; this.dpr = dpr;
-    // UNIFORM REPEAT COUNT: size the cell so the pattern shows the same
-    // number of translation repeats along the canvas's short side on every
-    // diagram — enough to see the symmetry, no more. Cells with only one or
-    // two distinct sites (e.g. p1, centred p1) get extra repeats so the
-    // lattice is still evident; very dense cells slightly fewer so each
-    // clock stays legible. Reversal partners share a spatial site and are
-    // drawn superimposed, so sites are counted by distinct spatial part.
-    if (!this.cellOverride && !this._rescaled) {
-      const f1 = x => ((x % 1) + 1) % 1;
-      const key = op => op.M.flat().join(",") + "|" +
-        op.v.map(x => Math.round(f1(x) * 1e6)).join(",");
-      const nSites = new Set(this.spec.ops.map(key)).size;
-      const repeats = nSites <= 1 ? 5 : nSites <= 2 ? 4 : nSites <= 6 ? 3 : 2.0;
-      this.cell = Math.max(24, Math.min(w, h) / repeats);
+    // UNIFORM CELL SPACING: size the cell so the diagram shows a fixed number
+    // of translation repeats across the canvas's SHORT side, exactly as the
+    // standard wallpaper plates do (MathWorld's show three to five unit cells
+    // in each direction). Tying the cell to the short side keeps the spacing
+    // ISOTROPIC: a wide canvas shows more columns instead of a stretched
+    // cell, which is what previously left a couple of rows adrift in a sea of
+    // background.
+    // `_cellFor(k)` is the cell size that fits k repeats on the short side;
+    // the dense-cell rescale below is capped with it, because a diagram
+    // showing a cell and a half has stopped being a wallpaper.
+    const B0 = this.spec.basis;
+    // the cell's own extent along each axis, in units of `cell`, so a
+    // non-square basis (centred rectangular, hexagonal) still shows CELLS
+    // repeats rather than that many multiples of a stretched vector
+    const minS = Math.min(w, h);
+    const hs = minS === h ? Math.max(Math.abs(B0[0][1]), Math.abs(B0[1][1]))
+                          : Math.max(Math.abs(B0[0][0]), Math.abs(B0[1][0]));
+    this._cellFor = k => Math.max(minS / (k * (hs || 1)), 24);
+    // How many MOTIFS a given cell puts across the canvas. A cell is one
+    // repeat of the lattice but holds `nSites` copies, so on a dense group the
+    // repeat count above says nothing about how crowded the picture actually
+    // looks; this counts the copies. The array is close to isotropic by
+    // construction (optimize_aspect.py), so the mean spacing sqrt(area per
+    // copy) is the column pitch.
+    const bdet0 = Math.abs(B0[0][0] * B0[1][1] - B0[0][1] * B0[1][0]) || 1;
+    this._columnsAt = (cell) =>
+      w / Math.sqrt(bdet0 * cell * cell / this._nSites());
+    // both adjustments below re-enter this method; neither may have its work
+    // undone by the initial rule running again
+    if (!this.cellOverride && !this._rescaled && !this._capped) {
+      this.cell = this._cellFor(CELLS);
     }
     const B = this.spec.basis;
     const s = this.cell;
@@ -181,17 +359,45 @@ export class FilmGroupAnimation extends Playback {
         if (d > 1e-6 && d < minD) minD = d;
       }
     }
-    // motif footprint (ring + satellite) reaches ~0.85 r: keep 2*0.85 r < minD
-    this.motifR = Math.min(0.30 * Math.min(l1, l2), 0.60 * minD) *
+    // The phase ring is the motif's outermost part, at 0.82 r, so the copies
+    // fill 2*0.82*0.55 = 0.90 of the distance to their nearest neighbour:
+    // packed like a wallpaper plate, with a tenth of the spacing left as a
+    // gap so no two rings ever touch (touching would make paint order — which
+    // is not equivariant — visible). The first term caps a lone motif in a
+    // sparse cell, where nothing else limits its size.
+    this.motifR = Math.min(0.40 * Math.min(l1, l2), 0.52 * minD) *
                   (this.spec.motifScale || 1);
-    // dense groups: enforce a minimum on-screen motif size by scaling the
-    // cell up (fewer repeats shown, but a legible clock)
-    const minPx = this.minMotifPx || 9;
-    if (!this._rescaled && this.motifR > 0 && this.motifR < minPx) {
+    // Dense groups: a cell holding a dozen sites — and mirror-related sites
+    // sit close together by construction — gives motifs too small to read a
+    // clock on, so the cell is scaled up. But only as far as MIN_CELLS
+    // repeats: past that the diagram stops showing the lattice, which is the
+    // failure the CELLS rule above exists to prevent. Below that bound the
+    // motif simply is small; the group is dense.
+    const minPx = this.minMotifPx || 13;
+    if (!this._rescaled && !this.cellOverride &&
+        this.motifR > 0 && this.motifR < minPx) {
       this._rescaled = true;
-      this.cell *= minPx / this.motifR;
+      // never below what is already set: the column cap may have got here
+      // first, and its ceiling is the one that must survive
+      this.cell = Math.max(this.cell,
+                           Math.min(this.cell * (minPx / this.motifR),
+                                    this._cellFor(MIN_CELLS)));
       this._setupGeometry();
       return;
+    }
+    // COLUMN CAP, applied last and unconditionally so that it always holds: a
+    // wide canvas over a group with a dozen copies per cell would otherwise
+    // run to thirty motifs across, which reads as texture rather than as a
+    // pattern one can follow copy by copy. Everything above only ever raises
+    // the cell, and so does this, so the three rules do not fight.
+    if (!this._capped && !this.cellOverride) {
+      const cols = this._columnsAt(this.cell);
+      if (cols > MAX_COLUMNS) {
+        this._capped = true;
+        this.cell *= cols / MAX_COLUMNS;
+        this._setupGeometry();
+        return;
+      }
     }
     // window of lattice translations covering the canvas (+margin)
     const inv = invert2([[this.b1[0], this.b2[0]], [this.b1[1], this.b2[1]]]);
@@ -255,6 +461,16 @@ export class FilmGroupAnimation extends Playback {
         ctx.translate(px, py);
         ctx.transform(Mpx[0][0], Mpx[1][0], Mpx[0][1], Mpx[1][1], 0, 0);
         drawMotif(ctx, theta, this.motifR, null, layer);
+        ctx.restore();
+      }
+    }
+    // the phase readout, in SCREEN coordinates: translated to the copy but
+    // never rotated or reflected by it, so one interval is one arc everywhere
+    if (this.showPhase) {
+      for (const [pl, px, py] of visible) {
+        ctx.save();
+        ctx.translate(px, py);
+        drawPhaseRing(ctx, pl.s * (t - pl.tau), this.motifR, this.beats, pl.s);
         ctx.restore();
       }
     }

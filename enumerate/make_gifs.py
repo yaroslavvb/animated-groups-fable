@@ -11,27 +11,6 @@ import os
 from gifs import render_gif
 from verify_animations import verify_spec_2d
 
-RT3_2 = math.sqrt(3) / 2
-SQ = [[1, 0], [0, 1]]
-HEX = [[1, 0], [-0.5, RT3_2]]
-ID = [[1, 0], [0, 1]]
-R4 = [[0, -1], [1, 0]]
-R2 = [[-1, 0], [0, -1]]
-R6 = [[1, -1], [1, 0]]
-R3 = [[0, -1], [1, -1]]
-MY = [[-1, 0], [0, 1]]
-
-
-def powmat(M, k):
-    A = [[1, 0], [0, 1]]
-    for _ in range(k):
-        A = [[M[0][0] * A[0][0] + M[0][1] * A[1][0],
-              M[0][0] * A[0][1] + M[0][1] * A[1][1]],
-             [M[1][0] * A[0][0] + M[1][1] * A[1][0],
-              M[1][0] * A[0][1] + M[1][1] * A[1][1]]]
-    return A
-
-
 FEATURED_IDS = ["p4-timescrew", "p6-timescrew", "p3-timescrew",
                 "pm-timeglide", "p2-timecentred", "glide-time-reversal",
                 "palindromic-windmill"]
@@ -49,5 +28,6 @@ if __name__ == "__main__":
         if errs:
             raise SystemExit("spec fails group verification: " + "; ".join(errs))
         path = os.path.join(outdir, f"{name}.gif")
-        render_gif(spec, path, size=420, frames=40, cell=100)
+        # cell left to gifs._auto_cell: the same repeat count the site shows
+        render_gif(spec, path, size=420, frames=40)
         print("wrote", path)

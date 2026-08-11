@@ -1,27 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
-
-const RT3_2 = Math.sqrt(3) / 2;
-const SQ = [[1, 0], [0, 1]];
-const HEX = [[1, 0], [-0.5, RT3_2]];
-const ID = [[1, 0], [0, 1]];
-const R4 = [[0, -1], [1, 0]];
-const R2 = [[-1, 0], [0, -1]];
-const R6 = [[1, -1], [1, 0]];
-const R3 = [[0, -1], [1, -1]];
-const MY = [[-1, 0], [0, 1]];
-
-function powmat(M, k) {
-  let A = ID;
-  for (let i = 0; i < k; i++) {
-    A = [[M[0][0] * A[0][0] + M[0][1] * A[1][0], M[0][0] * A[0][1] + M[0][1] * A[1][1]],
-         [M[1][0] * A[0][0] + M[1][1] * A[1][0], M[1][0] * A[0][1] + M[1][1] * A[1][1]]];
-  }
-  return A;
-}
+import { FilmGroupAnimation } from "./renderer.js?v=23";
+import { attachControls } from "./controls.js?v=23";
+import { attachStage } from "./stage.js?v=23";
 
 const FEATURED = [
   {
@@ -88,7 +69,7 @@ pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
   },
   {
     id: "p2-timecentred",
-    sym: "c2·2·2<sub>1</sub>·2<sub>1</sub>",
+    sym: "c222<sub>1</sub>2<sub>1</sub>",
     kw: "time-centred lattice — the checkerboard flip",
     text: "No fractional point operation at all: here the <em>lattice</em> is \
 the space-time entanglement. Translating by half a cell diagonal is the same \
@@ -114,7 +95,7 @@ frame: the half-cell shift is a symmetry only of the loop, not of a moment.",
   },
   {
     id: "palindromic-windmill",
-    sym: "4<sub>2</sub>4<sub>2</sub>2/1′<sup>a</sup>",
+    sym: "4<sub>2</sub>4<sub>2</sub>2/1′",
     kw: "time reversal + time screw — a palindromic windmill",
     text: "A half-period screw (4<sub>2</sub>) coexisting with a time mirror: \
 the loop is a palindrome, and the quarter-turn-at-half-period survives because \

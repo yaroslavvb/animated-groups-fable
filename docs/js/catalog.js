@@ -3,9 +3,13 @@
  * visibility only decides whether an animation the viewer has started is
  * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
+import { FilmGroupAnimation } from "./renderer.js?v=23";
+import { attachControls } from "./controls.js?v=23";
+import { WALLPAPERS } from "./wallpaper-data.js?v=23";
+
+const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
+const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
+import { attachStage } from "./stage.js?v=23";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -15,9 +19,53 @@ async function init() {
   state.groups = data.groups;
   state.meta = data.meta;
   buildFilters(data);
+  applyUrl();
+  window.addEventListener("popstate", applyUrl);
+  window.addEventListener("hashchange", openFromHash);
+}
+
+/* ------------------------------------------------------ filters in the URL
+ * A selection is a view of the catalog, so it lives in the query string and
+ * is therefore linkable and bookmarkable: catalog.html?time=forward is the
+ * 68 forward-time groups, ?base=p4m&type=nonsymmorphic the nonsymmorphic ones
+ * over p4m. Filters left at "all" are omitted, so the bare catalog.html URL
+ * stays clean, and a value the enumeration does not offer (a hand-edited or
+ * stale link) falls back to "all" rather than showing an empty grid. */
+const URL_FILTERS = [
+  ["f-system", "system"],
+  ["f-base", "base"],
+  ["f-time", "time"],
+  ["f-sym", "type"],
+  ["f-prod", "product"],
+];
+
+function filtersToUrl() {
+  const q = new URLSearchParams();
+  for (const [id, key] of URL_FILTERS) {
+    const v = document.getElementById(id).value;
+    if (v) q.set(key, v);
+  }
+  const s = q.toString();
+  return location.pathname + (s ? "?" + s : "");
+}
+
+/* a new selection is a new page of the catalog and gets its own history entry,
+ * so Back returns to the previous one. The #gN detail anchor is dropped: it
+ * points into the list that has just been replaced. */
+function filtersChanged() {
+  history.pushState(null, "", filtersToUrl());
+  render();
+}
+
+function applyUrl() {
+  const q = new URLSearchParams(location.search);
+  for (const [id, key] of URL_FILTERS) {
+    const sel = document.getElementById(id);
+    const want = q.get(key) || "";
+    sel.value = [...sel.options].some(o => o.value === want) ? want : "";
+  }
   render();
   openFromHash();
-  window.addEventListener("hashchange", openFromHash);
 }
 
 /* deep links: catalog.html#g94 scrolls to the card and opens its detail
@@ -36,19 +84,20 @@ function uniq(arr) { return [...new Set(arr)]; }
 
 function buildFilters(data) {
   const bar = document.getElementById("filters");
-  const mk = (id, label, values) => {
+  const mk = (id, label, values, labelOf = null) => {
     const wrap = document.createElement("label");
     wrap.append(label + " ");
     const sel = document.createElement("select");
     sel.id = id;
     sel.append(new Option("all", ""));
-    values.forEach(v => sel.append(new Option(v, v)));
-    sel.onchange = render;
+    values.forEach(v => sel.append(new Option(labelOf ? labelOf(v) : v, v)));
+    sel.onchange = filtersChanged;
     wrap.append(sel);
     bar.append(wrap);
   };
   mk("f-system", "system", uniq(state.groups.map(g => g.system)));
-  mk("f-base", "spatial base", uniq(state.groups.map(g => g.base)).sort());
+  mk("f-base", "spatial base", uniq(state.groups.map(g => g.base)).sort(),
+     hm => baseLabel(hm));
   mk("f-time", "time structure", ["forward", "with reversal"]);
   mk("f-sym", "type", ["symmorphic", "nonsymmorphic"]);
   mk("f-prod", "product?", ["product", "not a product"]);
@@ -104,7 +153,7 @@ function render() {
       `<span class="hm">${g.hm || ""}</span>` +
       `<div class="tags">` +
       `<span class="tag">${g.system}</span>` +
-      `<span class="tag">base ${g.base}</span>` +
+      `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
       (g.forward ? "" : `<span class="tag rev">time reversal</span>`) +
       (g.product ? `<span class="tag product">product</span>` : "") +
@@ -140,7 +189,7 @@ function showDetail(g) {
   const tags = document.getElementById("d-tags");
   tags.innerHTML =
     `<span class="tag">${g.system}</span>` +
-    `<span class="tag">base ${g.base}</span>` +
+    `<span class="tag">base ${baseLabel(g.base)}</span>` +
     `<span class="tag">${g.bravais}</span>` +
     (g.symmorphic ? `<span class="tag">symmorphic</span>` : `<span class="tag nonsym">nonsymmorphic</span>`) +
     (g.forward ? `<span class="tag">forward-time</span>` : `<span class="tag rev">time reversal</span>`) +

@@ -5,8 +5,9 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=18";
-import { Playback } from "./playback.js?v=18";
+import { drawMotif, drawPhaseRing } from "./renderer.js?v=23";
+import { Playback } from "./playback.js?v=23";
+import { stripTimeSymmetry } from "./phases.js?v=23";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -35,6 +36,52 @@ export function verifyStripSpec(spec) {
   return { ok: errors.length === 0, errors };
 }
 
+const f1 = x => ((x % 1) + 1) % 1;
+
+/* The DISTINCT SPATIAL actions (m, v mod 1). A reversal partner — same
+ * mirror, same translation, opposite time direction — occupies the same site
+ * by construction, and the renderer superimposes the two clocks there on
+ * purpose; it must not be counted as a second copy, nor as a collision. */
+function spatialCopies(spec) {
+  const seen = new Map();
+  const put = (m, v) => {
+    const k = m + "|" + Math.round(f1(v) * 1e6);
+    if (!seen.has(k)) seen.set(k, { m, v });
+  };
+  for (const o of spec.ops) {
+    put(o.m, o.v);
+    if (spec.cent) put(o.m, o.v + spec.cent[0]);
+  }
+  return [...seen.values()];
+}
+
+/* The offset maximising the closest distance between copies; {base, gap} with
+ * gap in cells. Two DIFFERENT spatial copies landing on one point score a gap
+ * of zero and so can never win — which is the whole point: a base of ½ makes
+ * a mirror pair coincide, and an objective that merely counted distinct
+ * positions would happily choose it and draw two motifs on top of each other. */
+function bestBase(spec) {
+  const copies = spatialCopies(spec);
+  let best = { base: 0.27, gap: -1 };
+  for (let i = 1; i <= 480; i++) {
+    const base = i / 960;             // half a cell covers every distinct offset
+    const p = copies.map(c => f1(c.m * base + c.v)).sort((a, b) => a - b);
+    let gap = 1;
+    for (let k = 0; k < p.length; k++) {
+      const d = k + 1 < p.length ? p[k + 1] - p[k] : 1 - p[p.length - 1] + p[0];
+      if (d < gap) gap = d;
+    }
+    // ties (a group with a single copy per cell constrains nothing) go to a
+    // generic-looking offset rather than to whichever the scan reached first
+    if (gap > best.gap + 1e-9 ||
+        (gap > best.gap - 1e-9 &&
+         Math.abs(base - 0.27) < Math.abs(best.base - 0.27))) {
+      best = { base, gap };
+    }
+  }
+  return best;
+}
+
 export class StripAnimation extends Playback {
   constructor(canvas, spec, opts = {}) {
     super(opts);   // playback state, paused until the viewer presses play
@@ -42,6 +89,16 @@ export class StripAnimation extends Playback {
     this.spec = spec;
     this.cellOverride = opts.cell || null;  // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 88;    // else derived per draw from width
+    this.showPhase = opts.showPhase !== false;
+    this.timeSym = stripTimeSymmetry(spec);
+    this.beats = this.timeSym.n;
+    // 1-D analogue of optimize_bases.py: place the motif so its copies are as
+    // far apart as they can be. A fixed offset puts the two copies of a
+    // centred group (v and v + 1/2, mirrored) almost on top of each other,
+    // which with the phase ring is not a pattern but a smudge.
+    const layout = bestBase(spec);
+    this.base = layout.base;
+    this.minGap = layout.gap;      // closest pair, in cells — sizes the motif
     this.specCheck = verifyStripSpec(spec);
     if (!this.specCheck.ok) {
       console.error("Strip spec fails group axioms:", this.specCheck.errors, spec);
@@ -73,21 +130,20 @@ export class StripAnimation extends Playback {
     ctx.translate(w / 2, h / 2);
 
     // uniform repeat count (mirrors FilmGroupAnimation): show the same
-    // number of cells on every strip; sparse cells (one site) get more
+    // number of COPIES on every strip, so the spacing between motifs is the
+    // same whether a cell holds one of them or four
+    const nCopies = spatialCopies(this.spec).length;
     if (!this.cellOverride) {
-      const f1 = x => ((x % 1) + 1) % 1;
-      const sites = new Set();
-      for (const o of this.spec.ops) {
-        sites.add(o.m + "|" + Math.round(f1(o.v) * 1e6));
-        if (this.spec.cent) {
-          sites.add(o.m + "|" + Math.round(f1(o.v + this.spec.cent[0]) * 1e6));
-        }
-      }
-      const repeats = sites.size <= 1 ? 7 : sites.size <= 2 ? 5 : 4;
-      this.cell = w / repeats;
+      let c = (nCopies * w) / 7;         // target ~7 visible copies
+      c = Math.max(c, w / 7);
+      c = Math.min(c, w / 2.2);
+      this.cell = c;
     }
-    const r = Math.min(0.30 * this.cell, 0.34 * h);
-    const base = 0.27;  // generic offset within the cell
+    // size the motif by the CLOSEST pair, exactly as the 2+1D renderer does:
+    // the phase ring at 0.82 r is the outermost part, and 2*0.82*0.52 < 1
+    // keeps two neighbours' rings clear of one another
+    const r = Math.min(0.52 * this.minGap * this.cell, 0.34 * h);
+    const base = this.base;
     const copies = [];
     for (const op of this.spec.ops) {
       copies.push([op.m, op.v, op.s, op.tau]);
@@ -113,41 +169,20 @@ export class StripAnimation extends Playback {
         }
       }
     }
+    // the phase readout: translated to each copy but never mirrored with it,
+    // so one interval of the period is one arc everywhere (renderer.js)
+    if (this.showPhase) {
+      for (const [m, v, s, tau] of copies) {
+        for (let k = -span; k <= span; k++) {
+          const x = (m * base + v + k) * this.cell;
+          if (x < -w / 2 - r || x > w / 2 + r) continue;
+          ctx.save();
+          ctx.translate(x, 0);
+          drawPhaseRing(ctx, s * (t - tau), r, this.beats, s);
+          ctx.restore();
+        }
+      }
+    }
     ctx.restore();
   }
 }
-
-/* The 13 groups, generators in the spec format (from the enumeration). */
-export const CHRONOFRIEZE = [
-  { name: "P1", ops: [{ m: 1, s: 1, v: 0, tau: 0 }], cent: null,
-    blurb: "translations only — a marching band of identical clocks" },
-  { name: "P2", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "2-fold space-time rotation: flip space AND run time backwards" },
-  { name: "Pm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: null,
-    blurb: "spatial mirror, clocks in phase" },
-  { name: "Pg_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 }], cent: null,
-    blurb: "time glide: mirror + half-period delay" },
-  { name: "Pm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "time mirror: the loop is a palindrome" },
-  { name: "Pg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0.5, tau: 0 }], cent: null,
-    blurb: "glide time-reversal: played backwards = shifted half a cell" },
-  { name: "P2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "mirror + palindrome (and their product, the 2-fold)" },
-  { name: "P2g_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
-                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0.5 }], cent: null,
-    blurb: "both glides; only the 2-fold survives undisplaced" },
-  { name: "P2m_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0 }], cent: null,
-    blurb: "mirror + glide time-reversal" },
-  { name: "P2g_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0.5 }], cent: null,
-    blurb: "time glide + palindrome" },
-  { name: "Cm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred: neighbours run half a period out of phase; mirror survives" },
-  { name: "Cm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred palindrome" },
-  { name: "C2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred, mirror and palindrome together" },
-];

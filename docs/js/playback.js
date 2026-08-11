@@ -35,6 +35,9 @@ export class Playback {
     this._runListeners = []; // callback(anim) on any play/pause/start/stop
     this._raf = null;
     this._frame = this._frame.bind(this);
+    // the loop's time structure (phases.js); subclasses that know their group
+    // replace it, and controls.js draws its marks on the scrub bar
+    this.timeSym = { n: 1, marks: [{ t: 0, kind: "beat", label: "0" }] };
   }
 
   /* ---------------------------------------------------- viewer intent */
@@ -72,6 +75,31 @@ export class Playback {
   }
   /* step by dt periods; stepping is scrubbing, so it takes over from play */
   step(dt) { this.pause(); this.setPhase(this.phase + dt); }
+
+  /* Step to the next (dir = +1) or previous distinguished instant of the loop,
+   * wrapping around: the arrow keys' default move. A group whose only mark is
+   * t = 0 has nothing to step between, so there `fallback` periods are used
+   * instead and the arrows behave as a frame step. Like any scrub this pauses
+   * — the marks exist to be looked at, and a jump you cannot see is no use. */
+  stepMark(dir, fallback) {
+    const marks = (this.timeSym && this.timeSym.marks) || [];
+    if (marks.length < 2) return this.step(dir * fallback);
+    const eps = 1e-4;
+    const ts = marks.map(m => m.t);
+    const next = dir > 0
+      ? ts.find(t => t > this.phase + eps)
+      : [...ts].reverse().find(t => t < this.phase - eps);
+    this.pause();
+    this.setPhase(next === undefined ? (dir > 0 ? ts[0] : ts[ts.length - 1])
+                                     : next);
+  }
+
+  /* SEEKING is not scrubbing: it jumps to a named instant and leaves viewer
+   * intent alone, so a playing loop restarts from there and a paused one
+   * simply shows that frame. The reset button and the scrub bar's symmetry
+   * marks (controls.js), and Home / End on the keyboard. */
+  seek(t) { this.setPhase(t); }
+  reset() { this.seek(0); }
 
   /* paint the frozen frame once (a paused canvas must never be blank) */
   drawStatic() {

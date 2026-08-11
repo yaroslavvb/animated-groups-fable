@@ -3,7 +3,7 @@
  * examples cannot drift out of sync with the enumeration — a symbol that
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=18";
+import { buildTabs } from "./tabs.js?v=23";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section
@@ -84,12 +84,12 @@ the full product 2222. Reversal negates offsets, and every offset here is \
       note: "Glide time-reversal over the bare torus: played backwards, the \
 film equals itself shifted half a cell. Columns alternately fill and \
 drain." },
-    { sym: "4₁4₁2₁/m′[p4m]",
+    { sym: "4₁4₁2₁/m′[*442]",
       note: "Why /1′ cannot dress a 4₁: reversal alone would turn it into a \
 4₃. Composed with a mirror the handedness flips twice, so /m′ works. The \
 reversal mirrors enlarge the photograph from p4 to p4m — recorded in the \
 bracket." },
-    { sym: "o/m′[cm]",
+    { sym: "o/m′[*×]",
       note: "No forward symmetry beyond translations: the reversal mirror \
 alone is responsible for the photograph, enriching p1 to cm. The film has \
 mirror symmetry only as a palindrome, never at an instant." },

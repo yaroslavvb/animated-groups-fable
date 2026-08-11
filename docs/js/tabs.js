@@ -6,10 +6,10 @@
  * the viewer has started, which also covers tab switches (a hidden pane never
  * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=18";
-import { attachControls } from "./controls.js?v=18";
-import { attachStage } from "./stage.js?v=18";
-import { groupCaption } from "./wallpaper-data.js?v=18";
+import { FilmGroupAnimation } from "./renderer.js?v=23";
+import { attachControls } from "./controls.js?v=23";
+import { attachStage } from "./stage.js?v=23";
+import { groupCaption } from "./wallpaper-data.js?v=23";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {
@@ -53,6 +53,7 @@ in catalog.json — out of sync with the enumeration</div>`;
         attachStage(anim, canvas);
         attachControls(anim, pane, cap);
         anims.set(canvas, anim);
+        pane._anim = anim;
         observer.observe(canvas);
       };
     }
@@ -69,6 +70,10 @@ in catalog.json — out of sync with the enumeration</div>`;
     });
     const p = panes[k].pane;
     if (p._mk) { p._mk(); p._mk = null; }
+    // A tab is a fresh look at a different group, not a return to where this
+    // one was left: rewind it, so two tabs are always compared at the same
+    // instant of their loops rather than at whatever phase each was abandoned.
+    if (p._anim) p._anim.reset();
   }
 
   host.append(bar, paneBox);

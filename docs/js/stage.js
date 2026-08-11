@@ -11,10 +11,11 @@
  *
  *   click            play / pause, anywhere in the picture
  *   space / enter    play / pause, once the stage has focus
- *   ← →              step one frame back / forward
+ *   ← →              jump to the previous / next symmetry instant (or, for a
+ *                    loop with no interior marks, step one frame)
  *   ↑ ↓              same, when the stage has focus
- *   shift + arrow    fine step
- *   home / end       first / last frame
+ *   shift + arrow    fine step, for looking between the marks
+ *   home / end       first / last frame (seek: play or pause is left as it is)
  *
  * The horizontal arrows also work while the pointer merely hovers a stage, so
  * stepping through a loop needs no click. The vertical arrows and space are
@@ -36,7 +37,8 @@ export function attachStage(anim, canvas) {
 
   stage.tabIndex = 0;
   stage.setAttribute("role", "group");
-  stage.title = "click to play or pause · ← → step through the loop";
+  stage.title = "click to play or pause · ← → jump between the loop's " +
+                "symmetry instants · shift + ← → step frame by frame";
 
   // the picture is the button: a click anywhere in it toggles playback
   const onClick = () => anim.toggle();
@@ -87,15 +89,19 @@ export function attachStage(anim, canvas) {
  * `full` is false for hover, where only the horizontal arrows are claimed. */
 function handleKey(e, anim, full) {
   if (e.metaKey || e.ctrlKey || e.altKey) return;
-  const d = e.shiftKey ? FINE : STEP;
+  // Plain arrows hop between the loop's distinguished instants (the marks on
+  // the scrub bar) — those are the moments worth landing on. Shift falls back
+  // to a fine frame step, for looking at what happens between them.
+  const go = (dir) => e.shiftKey ? anim.step(dir * FINE) : anim.stepMark(dir, STEP);
   switch (e.code === "Space" ? " " : e.key) {
-    case "ArrowRight": anim.step(+d); break;
-    case "ArrowLeft": anim.step(-d); break;
-    case "ArrowUp": if (!full) return; anim.step(+d); break;
-    case "ArrowDown": if (!full) return; anim.step(-d); break;
+    case "ArrowRight": go(+1); break;
+    case "ArrowLeft": go(-1); break;
+    case "ArrowUp": if (!full) return; go(+1); break;
+    case "ArrowDown": if (!full) return; go(-1); break;
     case " ": case "Enter": if (!full) return; anim.toggle(); break;
-    case "Home": if (!full) return; anim.pause(); anim.setPhase(0); break;
-    case "End": if (!full) return; anim.pause(); anim.setPhase(1 - STEP); break;
+    // seeking, not scrubbing: play/pause intent is left alone (playback.js)
+    case "Home": if (!full) return; anim.reset(); break;
+    case "End": if (!full) return; anim.seek(1 - STEP); break;
     default: return;
   }
   e.preventDefault();

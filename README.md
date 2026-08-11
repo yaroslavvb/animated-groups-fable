@@ -47,15 +47,33 @@ The classification is recomputed from scratch in exact rational arithmetic
   match Ke–Wu Table 1).
 - `export.py` — feature extraction (rotation centres with phases, mirror/glide
   line classes, reversal cosets), clockwork symbols, catalog JSON.
-- `gifs.py` — renders the featured groups to looping GIFs (PIL).
+- `optimize_bases.py` — picks each spec's motif base point to maximise the
+  minimum distance between orbit points (the renderer sizes motifs by it).
+- `optimize_aspect.py` — picks each cell's aspect ratio, a free modulus of an
+  oblique or rectangular lattice, so the orbit is isotropic on screen; only
+  where every operation provably stays an isometry.
+- `gifs.py` — renders the featured groups to looping GIFs (PIL), mirroring
+  `docs/js/renderer.js` motif for motif.
+- `verify_animations.py` — group axioms, layout and pixel-level invariance for
+  every spec; run before every deploy.
 
 Run order:
 
 ```bash
 python3 exact.py && python3 validate_2d.py && python3 enumerate_1p1.py
 python3 enumerate_2p1.py -v
-python3 export.py
+python3 export.py && python3 optimize_bases.py && python3 optimize_aspect.py
+python3 verify_animations.py
 ```
+
+## Mathematica port (`wolfram/`)
+
+The full catalog as a Wolfram Language package: `FilmGroupAnimation[95]`
+gives an interactive `Manipulate` of any of the 275 groups,
+`FilmGroupBrowser[]` steps through the whole catalog, and the group data is
+stored exactly and re-verified against the group axioms in exact arithmetic.
+See [wolfram/README.md](wolfram/README.md) and the guide notebook
+`wolfram/FilmGroupsGuide.nb`.
 
 ## References
 
