@@ -6,11 +6,11 @@
  * mathematical count lives in data/color-forward-census.json, so the report
  * and the downloadable tables cannot drift apart. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=25";
-import { attachControls } from "./controls.js?v=25";
-import { attachStage } from "./stage.js?v=25";
-import { paintColored } from "./colored.js?v=25";
-import { groupCaption } from "./wallpaper-data.js?v=25";
+import { FilmGroupAnimation } from "./renderer.js?v=26";
+import { attachControls } from "./controls.js?v=26";
+import { attachStage } from "./stage.js?v=26";
+import { paintColored } from "./colored.js?v=26";
+import { groupCaption } from "./wallpaper-data.js?v=26";
 
 const DATA_URL = "data/color-forward-census.json";
 
@@ -165,7 +165,7 @@ function renderSummary(data) {
     summaryRow(data, "regular_cyclic_kernels",
       "regular cyclic plane colour groups"),
     summaryRow(data, "forward_catalog_canonical_clock_order",
-      "forward catalog normal forms of exact clock order"),
+      "clockwork groups of exact clock order"),
   ];
   replaceWithTable("census-table", makeTable(headers, rows, {
     caption: "Counts for exact colour or canonical clock order N",

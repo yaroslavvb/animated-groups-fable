@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="A reproducible census connecting Wieting colour groups to the 68 forward film-group normal forms, for one through six colours.">
-<title>Colour Groups → Forward Film Groups</title>
+<title>Colour Groups and Clockwork Groups</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
@@ -26,14 +26,23 @@
 
 <main>
 <div class="report-copy">
-<h1>Future directions: colour groups and film groups</h1>
-<p class="subtitle">A film group is a wallpaper group coloured by a circle
-of phases. Below: the dictionary with worked examples, then a census through
-six colours that keeps three equivalence problems visibly separate.</p>
+<h1>Future directions: colour groups and clockwork groups</h1>
+<p class="subtitle">A <b>clockwork group</b> — a film group whose every
+symmetry runs time forwards — is a wallpaper group coloured by a circle of
+phases. Below: the dictionary with worked examples, then a census through six
+colours that keeps three equivalence problems visibly separate.</p>
+
+<p class="report-copy">The name is meant literally. Drop the time-reversing
+symmetries and what is left of a film group is a wallpaper group in which
+every operation advances the film by a fixed fraction of the period: a
+wallpaper pattern with a clock, and a clock that only turns one way. These
+are the 68 groups the <a href="notation.html">clockwork orbifold symbols</a>
+name without a prime clause, and the objects this page compares with the
+classical colour groups.</p>
 
 <div class="thm">
 <span class="label">Result</span>
-<p style="margin:0.3rem 0;">The 68 forward entries in the film-group catalog
+<p style="margin:0.3rem 0;">The 68 clockwork groups (the forward entries of the film-group catalog)
 have canonical displayed clock orders
 <b id="result-clock-orders">loading…</b> for exact orders
 N&nbsp;=&nbsp;1,&thinsp;2,&thinsp;3,&thinsp;4,&thinsp;5,&thinsp;6.
@@ -125,7 +134,7 @@ explains.</p>
 
 <p>Now let the colour group be cyclic of order N. A perfect
 ℤ<sub>N</sub>-colouring of Γ is a homomorphism φ:&nbsp;Γ&nbsp;→&nbsp;ℤ<sub>N</sub>;
-a forward film group whose offsets have denominator N is <em>literally</em>
+a clockwork group whose offsets have denominator N is <em>literally</em>
 this datum, with φ(g)&nbsp;=&nbsp;N·τ(g)&nbsp;mod&nbsp;N. Sample the film at
 N equally spaced instants and paint each copy by the instant at which it is,
 say, full: a time screw <span class="sym">n<sub>k</sub></span> becomes a
@@ -142,7 +151,7 @@ six around every 6-centre of <span class="sym">6<sub>1</sub>3<sub>1</sub>2<sub>1
 <div class="report-copy">
 <p>Let Γ be a wallpaper group and H the subgroup preserving one chosen colour.
 A perfect N-colouring is a transitive coset action on Γ/H, so [Γ:H]&nbsp;=&nbsp;N.
-It extends directly to one forward film clock precisely when</p>
+It extends directly to one clockwork group precisely when</p>
 
 <p class="display-formula">H ◁ Γ &emsp;and&emsp; Γ/H ≅ C<sub>N</sub>,</p>
 
@@ -270,7 +279,7 @@ stabilizer is automatically regular cyclic.</p>
 
 <h2 id="circle">10. The circle: colouring without quantisation</h2>
 
-<p>Set aside the sampling. A forward film group simply <em>is</em> a
+<p>Set aside the sampling. A clockwork group simply <em>is</em> a
 homomorphism-like cocycle φ:&nbsp;Γ&nbsp;→&nbsp;ℝ/ℤ — a colouring of the
 wallpaper group by the circle of phases — classified, as the
 <a href="notation.html">notation page</a> describes, by
@@ -307,7 +316,7 @@ stating as theorems rather than counts.</p>
 <div class="report-copy">
 <p>This report counts how classical plane colour data is read as the clock
 displayed by a canonical forward representative. It does <em>not</em> count independent
-N-colourings <em>of each of the 68 forward film groups</em>. That would be a
+N-colourings <em>of each of the 68 clockwork groups</em>. That would be a
 new three-dimensional finite-index subgroup census and would first require a
 choice among parent-group, full affine, and Galilean equivalence. No such
 larger number is asserted here.</p>
@@ -367,6 +376,6 @@ Applications” (2026). <a href="https://arxiv.org/abs/2604.05619">arXiv</a>.</p
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/future-directions.js?v=25"></script>
+<script type="module" src="js/future-directions.js?v=26"></script>
 </body>
 </html>

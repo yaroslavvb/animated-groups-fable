@@ -3,13 +3,13 @@
  * visibility only decides whether an animation the viewer has started is
  * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=25";
-import { attachControls } from "./controls.js?v=25";
-import { WALLPAPERS } from "./wallpaper-data.js?v=25";
+import { FilmGroupAnimation } from "./renderer.js?v=26";
+import { attachControls } from "./controls.js?v=26";
+import { WALLPAPERS } from "./wallpaper-data.js?v=26";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=25";
+import { attachStage } from "./stage.js?v=26";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -98,7 +98,8 @@ function buildFilters(data) {
   mk("f-system", "system", uniq(state.groups.map(g => g.system)));
   mk("f-base", "spatial base", uniq(state.groups.map(g => g.base)).sort(),
      hm => baseLabel(hm));
-  mk("f-time", "time structure", ["forward", "with reversal"]);
+  mk("f-time", "time structure", ["forward", "with reversal"],
+     v => v === "forward" ? "clockwork (forward time)" : v);
   mk("f-sym", "type", ["symmorphic", "nonsymmorphic"]);
   mk("f-prod", "product?", ["product", "not a product"]);
   const count = document.createElement("span");
@@ -192,7 +193,7 @@ function showDetail(g) {
     `<span class="tag">base ${baseLabel(g.base)}</span>` +
     `<span class="tag">${g.bravais}</span>` +
     (g.symmorphic ? `<span class="tag">symmorphic</span>` : `<span class="tag nonsym">nonsymmorphic</span>`) +
-    (g.forward ? `<span class="tag">forward-time</span>` : `<span class="tag rev">time reversal</span>`) +
+    (g.forward ? `<span class="tag">clockwork</span>` : `<span class="tag rev">time reversal</span>`) +
     (g.product ? `<span class="tag">product type</span>` : `<span class="tag nonsym">not a product</span>`);
   dlg.showModal();
   const canvas = document.getElementById("d-canvas");
