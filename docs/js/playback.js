@@ -18,11 +18,14 @@
  */
 "use strict";
 
-/* Where a paused animation sits before anyone touches it. Not 0: at t = 0 a
- * product group's vessels are all exactly empty, so the still frame would be
- * an outline drawing. A third of the way in, fill levels are visible and the
- * phase differences that distinguish the groups are legible while stopped. */
-const START_PHASE = 0.3;
+/* Where a paused animation sits before anyone touches it: the start of the
+ * loop, so that the opening frame is the one the notation describes and the
+ * reset button returns to exactly what the reader first saw. A product group
+ * is then an outline drawing until it is played (at t = 0 every copy of an
+ * unclocked group is at phase 0, i.e. empty) — that is a fair picture of a
+ * group whose copies never differ, and any group with a clock shows its
+ * phase differences immediately. */
+const START_PHASE = 0;
 
 export class Playback {
   constructor(opts = {}) {
