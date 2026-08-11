@@ -47,25 +47,6 @@ BASE_ORDER = (
     "p1", "p2", "pm", "pg", "cm", "pmm", "pmg", "pgg", "cmm",
     "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m",
 )
-ORBIFOLD_BY_BASE = {
-    "p1": "o",
-    "p2": "2222",
-    "pm": "**",
-    "pg": "××",
-    "cm": "*×",
-    "pmm": "*2222",
-    "pmg": "22*",
-    "pgg": "22×",
-    "cmm": "2*22",
-    "p4": "442",
-    "p4m": "*442",
-    "p4g": "4*2",
-    "p3": "333",
-    "p3m1": "*333",
-    "p31m": "3*3",
-    "p6": "632",
-    "p6m": "*632",
-}
 
 # Wieting's aggregate number a(N) of colour plane groups of index N.
 WIETING_ALL = {1: 17, 2: 46, 3: 23, 4: 96, 5: 14, 6: 90}
@@ -126,10 +107,6 @@ def build_payload() -> dict[str, Any]:
         raise AssertionError((CYCLIC_TOTALS, EXPECTED_CYCLIC_TOTALS))
     if WIETING_ALL[2] != CYCLIC_TOTALS[2]:
         raise AssertionError("every index-two subgroup must be regular cyclic")
-    if tuple(ORBIFOLD_BY_BASE) != BASE_ORDER:
-        raise AssertionError("orbifold dictionary must follow the 17-base order")
-    if len(set(ORBIFOLD_BY_BASE.values())) != len(BASE_ORDER):
-        raise AssertionError("orbifold symbols must uniquely label the 17 bases")
 
     film_by_base = {
         base: {n: [] for n in range(1, MAX_COLOURS + 1)}
@@ -172,7 +149,6 @@ def build_payload() -> dict[str, Any]:
         films = {str(n): len(film_by_base[base][n])
                  for n in range(1, MAX_COLOURS + 1)}
         wallpaper_rows.append({
-            "orbifold": ORBIFOLD_BY_BASE[base],
             "wallpaper_group": base,
             "regular_cyclic": cyclic,
             "forward_catalog": films,
@@ -181,16 +157,12 @@ def build_payload() -> dict[str, Any]:
 
     return {
         "meta": {
-            "schema_version": 2,
+            "schema_version": 1,
             "range": {"minimum_colours": 1, "maximum_colours": MAX_COLOURS},
             "catalog_source": "catalog.json",
             "catalog_sha256": hashlib.sha256(raw_catalog).hexdigest(),
             "catalog_total_groups": catalog["meta"]["total"],
             "catalog_forward_groups": len(forward),
-            "label_conventions": {
-                "primary": "Conway orbifold notation",
-                "catalog_base": "International short (Hermann–Mauguin) notation",
-            },
             "definitions": {
                 "wieting_all_transitive":
                     "Plane-affine classes of all index-N colour stabilizers.",
@@ -243,15 +215,14 @@ def summary_csv_text(payload: dict[str, Any]) -> str:
 
 def wallpaper_csv_text(payload: dict[str, Any]) -> str:
     buf = io.StringIO(newline="")
-    fields = ["orbifold", "wallpaper_group"]
+    fields = ["wallpaper_group"]
     fields += [f"cyclic_n{n}" for n in range(1, MAX_COLOURS + 1)]
     fields += [f"film_n{n}" for n in range(1, MAX_COLOURS + 1)]
     fields += ["forward_total"]
     writer = csv.DictWriter(buf, fieldnames=fields, lineterminator="\n")
     writer.writeheader()
     for row in payload["by_wallpaper"]:
-        out = {"orbifold": row["orbifold"],
-               "wallpaper_group": row["wallpaper_group"],
+        out = {"wallpaper_group": row["wallpaper_group"],
                "forward_total": row["forward_total"]}
         for n in range(1, MAX_COLOURS + 1):
             out[f"cyclic_n{n}"] = row["regular_cyclic"][str(n)]
