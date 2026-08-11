@@ -4,9 +4,9 @@
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=30";
+import { buildTabs } from "./tabs.js?v=32";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=30";
+  from "./wallpaper-data.js?v=32";
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const byBase = new Map(WALLPAPERS.map(w => [w.hm, []]));

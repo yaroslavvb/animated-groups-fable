@@ -6,10 +6,10 @@
  * the viewer has started, which also covers tab switches (a hidden pane never
  * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=30";
-import { attachControls } from "./controls.js?v=30";
-import { attachStage } from "./stage.js?v=30";
-import { groupCaption } from "./wallpaper-data.js?v=30";
+import { FilmGroupAnimation } from "./renderer.js?v=32";
+import { attachControls } from "./controls.js?v=32";
+import { attachStage } from "./stage.js?v=32";
+import { groupCaption } from "./wallpaper-data.js?v=32";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {

@@ -1,12 +1,14 @@
 /* Playback controls for FilmGroupAnimation / StripAnimation.
  * attachControls(anim, host): inserts a reset + play/pause + scrub bar into
  * `host` (appended at the end unless `before` is given). Animations start
- * paused — the big overlay button on the canvas (stage.js) and this bar are
- * the two ways to start one. Dragging the slider scrubs and takes over from
- * playback; arrow keys on the focused slider step a frame at a time (shift:
- * finer), matching the stage's keyboard. The button glyph follows viewer
- * intent (anim.playRequested), not the rAF loop, so scrolling an animation
- * off screen does not make it look paused.
+ * paused — the picture itself (stage.js) and this bar are the two ways to
+ * start one. Dragging the slider scrubs and takes over from playback; the
+ * arrow keys work from ANY control in the bar, not just the slider, because
+ * clicking play focuses that button and a focused button is precisely what
+ * the stage's hover-scrub handler stands down for. They hop between the
+ * symmetry marks (shift: a fine frame step), matching the stage's keyboard.
+ * The button glyph follows viewer intent (anim.playRequested), not the rAF
+ * loop, so scrolling an animation off screen does not make it look paused.
  *
  * Under the slider sits the group's TIME-SYMMETRY RULER (phases.js): a tick
  * at every distinguished instant of the loop, each one a jump target.
@@ -19,7 +21,7 @@
  * nothing to mark but t = 0 get no ruler.
  */
 "use strict";
-import { STEP, FINE } from "./stage.js?v=30";
+import { STEP, FINE, hoveredAnim } from "./stage.js?v=32";
 
 const RES = 1000;  // slider resolution
 const THUMB = 14;  // assumed slider thumb width (px), for aligning the ruler
@@ -27,6 +29,7 @@ const THUMB = 14;  // assumed slider thumb width (px), for aligning the ruler
 export function attachControls(anim, host, before = null) {
   const bar = document.createElement("div");
   bar.className = "anim-controls";
+  bar._anim = anim;   // stage.js's hover handler asks whose bar this is
 
   const rst = document.createElement("button");
   rst.type = "button";
@@ -63,10 +66,19 @@ export function attachControls(anim, host, before = null) {
     anim.setPhase(Number(slider.value) / RES);
   });
 
-  // arrow keys on the slider hop between the symmetry marks (shift: a fine
-  // frame step), never by 1/1000 of a period — matching the stage's keyboard
-  slider.addEventListener("keydown", (e) => {
+  // The arrow keys belong to the WHOLE BAR, not just the slider. Clicking the
+  // play button focuses it, and a focused button is exactly the case
+  // stage.js's document-level hover handler stands down for — so with the
+  // listener on the slider alone, pressing space to play and then reaching for
+  // the arrows did nothing at all. Here they hop between the symmetry marks
+  // (shift: a fine frame step), matching the stage's keyboard, from whichever
+  // control happens to hold focus.
+  bar.addEventListener("keydown", (e) => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
+    // the pointer still wins: a different animation under the cursor takes the
+    // arrows, as it does when the focus is on a stage
+    const over = hoveredAnim();
+    if (over && over !== anim) return;
     const go = (dir) =>
       e.shiftKey ? anim.step(dir * FINE) : anim.stepMark(dir, STEP);
     if (e.key === "ArrowRight" || e.key === "ArrowUp") go(+1);

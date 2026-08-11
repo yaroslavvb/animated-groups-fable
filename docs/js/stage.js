@@ -32,6 +32,13 @@ export const FINE = 1 / 240;   // shift: a tenth of that
 let hot = null;
 let hotWired = false;
 
+/* The animation the pointer is over, or null. The control bar consults this
+ * to keep one rule true everywhere: whichever animation is hovered takes the
+ * arrow keys, whatever happens to hold focus. */
+export function hoveredAnim() {
+  return hot ? hot._anim || null : null;
+}
+
 /* opts.href — make the picture a LINK to that URL instead of a play/pause
  * button. Used by the catalog, where a card's picture opens the group's own
  * page; the control bar's play button is untouched and still starts the
@@ -135,9 +142,13 @@ function handleKey(e, anim, full) {
 }
 
 /* One document-level listener serves hover scrubbing for every stage. It
- * stands down for the hovered stage itself (whose own listener handles the
- * keys, so nothing steps twice) and for form controls outside any stage —
- * the scrub slider's arrow keys, the catalog's filter selects. */
+ * stands down for the hovered stage itself, and for the hovered animation's
+ * own control bar (both have listeners of their own, so nothing steps twice),
+ * and for form controls belonging to anything else — the catalog's filter
+ * selects. A control bar belonging to a DIFFERENT animation is not a blocker:
+ * the pointer wins the arrows, which is the same rule the stages follow, and
+ * without this a play button left focused on one card would silence the card
+ * the reader is actually pointing at. */
 function wireHotKeys() {
   if (hotWired) return;
   hotWired = true;
@@ -145,10 +156,15 @@ function wireHotKeys() {
     if (!hot || !hot._anim) return;
     const ae = document.activeElement;
     if (ae && ae !== document.body) {
-      const owner = ae.closest && ae.closest(".anim-stage");
-      if (owner) { if (owner === hot) return; }
-      else if (/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(ae.tagName)) return;
-      else if (ae.isContentEditable) return;
+      const bar = ae.closest && ae.closest(".anim-controls");
+      if (bar) {
+        if (bar._anim === hot._anim) return;   // its own bar has the keys
+      } else {
+        const owner = ae.closest && ae.closest(".anim-stage");
+        if (owner) { if (owner === hot) return; }
+        else if (/^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(ae.tagName)) return;
+        else if (ae.isContentEditable) return;
+      }
     }
     handleKey(e, hot._anim, false);
   });
