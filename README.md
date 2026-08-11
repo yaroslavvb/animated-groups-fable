@@ -25,6 +25,9 @@ loop with ← → (shift for finer steps).
   gyration subscripts (time screws), tilde-marked mirrors (time glides),
   stacking prefixes (time-centred lattices) and a prime clause (time
   reversal); equivalently, Seifert-fibration data of the quotient 3-orbifold.
+- **Colours** — a reproducible comparison of Wieting's perfect plane
+  colourings, their regular-cyclic subset, and the 68 forward film-group
+  normal forms by canonical clock order, for one through six colours.
 - **History** — Fletcher 1956 (zero citations; his counts 7 and 194 vs the
   modern 13 and 275, explained), Shubnikov/Zamorzaev antisymmetry,
   Janssen–Janner–Ascher, choreographic crystals, the H/K theorem.
@@ -52,6 +55,10 @@ The classification is recomputed from scratch in exact rational arithmetic
 - `optimize_aspect.py` — picks each cell's aspect ratio, a free modulus of an
   oblique or rectangular lattice, so the orbit is isotropic on screen; only
   where every operation provably stays an isometry.
+- `color_forward_census.py` — generates the colour/forward-film JSON and CSV
+  tables and checks all 68 forward entries against the published report.
+- `verify_cyclic_colors.mjs` — independently recomputes the regular-cyclic
+  colour subset using a checkout of `yaroslavvb/wieting-subgroups`.
 - `gifs.py` — renders the featured groups to looping GIFs (PIL), mirroring
   `docs/js/renderer.js` motif for motif.
 - `verify_animations.py` — group axioms, layout and pixel-level invariance for
@@ -64,7 +71,21 @@ python3 exact.py && python3 validate_2d.py && python3 enumerate_1p1.py
 python3 enumerate_2p1.py -v
 python3 export.py && python3 optimize_bases.py && python3 optimize_aspect.py
 python3 verify_animations.py
+python3 color_forward_census.py
 ```
+
+From the repository root, verify the tracked colour census and its independent
+wallpaper-subgroup calculation with:
+
+```bash
+python3 -m unittest enumerate.test_color_forward_census
+python3 enumerate/color_forward_census.py --check
+node enumerate/verify_cyclic_colors.mjs ../wieting-subgroups
+```
+
+The cyclic verifier pins `wieting-subgroups` commit
+`dc192b34f206e6fd8e0533c6a25ab89a6055b9ff` and checks its engine hash before
+running the 17-by-6 affine-normalizer census.
 
 ## Mathematica port (`wolfram/`)
 

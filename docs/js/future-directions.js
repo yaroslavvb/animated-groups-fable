@@ -1,202 +1,135 @@
-/* Future-directions page: paired demos — a STATIC coloured rendering of a
- * film-group spec (colour = clock data) beside the LIVE film — plus the
- * colour-count numbers computed from the catalog at load time, so the page
- * can never disagree with the data. */
+/* Render the generated colour-to-forward-film census.  All mathematical
+ * counts live in data/color-forward-census.json; this file only presents
+ * them, so the report and downloadable tables cannot drift apart. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=24";
-import { attachControls } from "./controls.js?v=24";
-import { paintColored } from "./colored.js?v=24";
-import { groupCaption } from "./wallpaper-data.js?v=24";
 
-const PAIRS = [
-  { host: "pair-bw", sym: "o/g′", mode: "bw",
-    left: "The dichromatic pattern: colour = time sign. Swapping black and \
-white is playing the film backwards; here the swap is carried by a \
-half-cell translation.",
-    right: "The film itself: columns alternately fill and drain." },
-  { host: "pair-checker", sym: "c222₁2₁", mode: "phase",
-    left: "The unitary two-colouring: hue = phase, and the two phases 0 and \
-½ paint the two sublattices of the checkerboard.",
-    right: "The film: translating half a cell diagonally equals waiting \
-half a period." },
-  { host: "pair-z4", sym: "4₁4₁2₁", mode: "phase",
-    left: "The perfect ℤ₄-colouring of p4: a quarter turn about any \
-4-centre advances the colour by one.",
-    right: "The film: the same quarter turn advances the phase by a \
-quarter period." },
-  { host: "pair-z6", sym: "6₁3₁2₁", mode: "phase",
-    left: "The perfect ℤ₆-colouring of p6: six colours cycling around every \
-6-centre, three around every 3-centre, two around every 2-centre.",
-    right: "The film: the hero of the tutorial, read chromatically." },
-];
+const DATA_URL = "data/color-forward-census.json";
 
-const anims = new Map();
-const observer = new IntersectionObserver((entries) => {
-  for (const e of entries) {
-    const anim = anims.get(e.target);
-    if (!anim) continue;
-    if (e.isIntersecting) { if (!anim.userPaused) anim.start(); }
-    else anim.stop();
+function makeTable(headers, rows, options = {}) {
+  const table = document.createElement("table");
+  table.className = "counts census-table";
+  if (options.caption) {
+    const caption = document.createElement("caption");
+    caption.textContent = options.caption;
+    table.append(caption);
   }
-}, { rootMargin: "80px" });
 
-const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
-const bySym = new Map(data.groups.map(g => [g.symbol, g]));
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  for (const label of headers) {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = label;
+    headerRow.append(th);
+  }
+  thead.append(headerRow);
+  table.append(thead);
 
-for (const p of PAIRS) {
-  const host = document.getElementById(p.host);
-  if (!host) continue;
-  const g = bySym.get(p.sym);
-  if (!g) { console.error("missing symbol", p.sym); continue; }
-
-  const mk = (cap) => {
-    const demo = document.createElement("div");
-    demo.className = "demo";
-    const canvas = document.createElement("canvas");
-    demo.append(canvas);
-    const c = document.createElement("div");
-    c.className = "caption";
-    c.innerHTML = cap;
-    demo.append(c);
-    host.append(demo);
-    return { demo, canvas, cap: c };
-  };
-
-  const L = mk(`<span class="sym">${g.symbolHtml}</span>, coloured — ${p.left}`);
-  paintColored(L.canvas, g.render, p.mode);
-
-  const R = mk(groupCaption(g) + `<p style="margin:0.4rem 0 0;">${p.right}</p>`);
-  const anim = new FilmGroupAnimation(R.canvas, g.render);
-  anims.set(R.canvas, anim);
-  observer.observe(R.canvas);
-  attachControls(anim, R.demo, R.cap);
+  const tbody = document.createElement("tbody");
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+    row.forEach((value, index) => {
+      const cell = document.createElement(index === 0 ? "th" : "td");
+      if (index === 0) cell.scope = "row";
+      cell.textContent = value;
+      tr.append(cell);
+    });
+    tbody.append(tr);
+  }
+  table.append(tbody);
+  return table;
 }
 
-/* ---- colour counts, computed live from the catalog ----
- * Every offset in the catalog is a multiple of 1/12, so all clock arithmetic
- * below is exact in integer twelfths. */
-const T = 12;
-function gcd(a, b) { return b ? gcd(b, a % b) : a; }
-const tw = x => ((Math.round(x * T) % T) + T) % T;   // to twelfths, mod 1
-function clockDenom(g) {
-  let d = T;
-  for (const op of g.render.ops) d = gcd(d, tw(op.tau));
-  return T / (d || T);
+function replaceWithTable(id, table) {
+  const host = document.getElementById(id);
+  if (!host) return;
+  host.replaceChildren(table);
 }
-/* clockless: no forward operation and no centring carries an offset — the
- * reversal taus are removable by a shift of the time origin */
-function clockless(g) {
-  return g.render.ops.every(op => op.s === -1 || tw(op.tau) === 0);
-}
-const fwd = data.groups.filter(g => g.forward);
-const byN = {};
-for (const g of fwd) byN[clockDenom(g)] = (byN[clockDenom(g)] || 0) + 1;
-const rev = data.groups.filter(g => !g.forward && clockless(g));
-const gray = rev.filter(g => g.product).length;
 
-/* Recolouring orbits: relabelling colours by k -> u k (u a unit mod N) sends
- * tau -> u*tau and leaves every spatial part alone, so the image lies in the
- * same arithmetic class. Two catalog entries are the same group when their op
- * sets agree after an origin shift (M|v) -> (M | v + a - M a); shifts on the
- * 1/12 grid suffice for this data. Anything left unmatched must be the unique
- * forward entry of its class with that clock denominator, hence fixed by the
- * relabelling — asserted below rather than assumed. */
-function opKey(ops, mul, ax, ay) {
-  const rows = ops.map(o => {
-    const M = o.M, v0 = tw(o.v[0]), v1 = tw(o.v[1]);
-    const mx = M[0][0] * ax + M[0][1] * ay, my = M[1][0] * ax + M[1][1] * ay;
-    const w0 = (((v0 + ax - mx) % T) + T) % T, w1 = (((v1 + ay - my) % T) + T) % T;
-    return `${M[0][0]},${M[0][1]},${M[1][0]},${M[1][1]}|${w0},${w1}|${o.s}|${(mul * tw(o.tau)) % T}`;
+function summaryRow(data, field, label) {
+  const values = data.summary.map(row => row[field]);
+  return [label, ...values, values.reduce((a, b) => a + b, 0)];
+}
+
+function renderSummary(data) {
+  const result = document.getElementById("result-clock-orders");
+  if (result) {
+    result.textContent = data.summary
+      .map(row => row.forward_catalog_canonical_clock_order).join(", ");
+  }
+  const headers = ["census", ...data.summary.map(row => `N=${row.colours}`), "Σ through 6"];
+  const rows = [
+    summaryRow(data, "wieting_all_transitive",
+      "all transitive perfect plane colourings"),
+    summaryRow(data, "regular_cyclic_kernels",
+      "regular cyclic plane colour groups"),
+    summaryRow(data, "forward_catalog_canonical_clock_order",
+      "forward catalog normal forms of exact clock order"),
+  ];
+  replaceWithTable("census-table", makeTable(headers, rows, {
+    caption: "Counts for exact colour or canonical clock order N",
+  }));
+}
+
+function wallpaperRows(data, field) {
+  const rows = data.by_wallpaper.map(row => {
+    const counts = data.summary.map(summary =>
+      row[field][String(summary.colours)]);
+    return [row.wallpaper_group, ...counts,
+      field === "forward_catalog"
+        ? row.forward_total
+        : counts.reduce((a, b) => a + b, 0)];
   });
-  rows.sort();
-  return rows.join(";");
-}
-const shifted = new Map();          // (cls, opKey) -> id
-for (const g of fwd) {
-  for (let i = 0; i < T; i++) for (let j = 0; j < T; j++) {
-    shifted.set(g.cls + "#" + opKey(g.render.ops, 1, i, j), g.id);
-  }
-}
-const parent = new Map(fwd.map(g => [g.id, g.id]));
-const find = a => { while (parent.get(a) !== a) { parent.set(a, parent.get(parent.get(a))); a = parent.get(a); } return a; };
-for (const g of fwd) {
-  const N = clockDenom(g);
-  for (let u = 2; u < N; u++) {
-    if (gcd(u, N) !== 1) continue;
-    const hit = shifted.get(g.cls + "#" + opKey(g.render.ops, u, 0, 0));
-    if (hit) { parent.set(find(g.id), find(hit)); continue; }
-    // unmatched: must be alone in its class at this denominator
-    const kin = fwd.filter(x => x.cls === g.cls && clockDenom(x) === N);
-    if (kin.length !== 1) {
-      console.error("recolouring orbit undetermined for", g.symbol, g.cls);
-    }
-  }
-}
-const orbitN = {};
-const seenRoot = new Set();
-for (const g of fwd) {
-  const r = find(g.id);
-  if (seenRoot.has(r)) continue;
-  seenRoot.add(r);
-  const N = clockDenom(g);
-  orbitN[N] = (orbitN[N] || 0) + 1;
+  const totals = data.summary.map(summary => {
+    const n = String(summary.colours);
+    return data.by_wallpaper.reduce((sum, row) => sum + row[field][n], 0);
+  });
+  rows.push(["TOTAL", ...totals, totals.reduce((a, b) => a + b, 0)]);
+  return rows;
 }
 
-const put = (key, val) => {
-  for (const el of document.querySelectorAll(`[data-cc="${key}"]`)) el.textContent = val;
-};
-put("gray", gray);
-put("proper", rev.length - gray);
-for (const N of [1, 2, 3, 4, 6]) {
-  put("n" + N, byN[N] || 0);
-  put("o" + N, orbitN[N] || 0);
+function renderWallpaperTables(data) {
+  const headers = ["wallpaper", ...data.summary.map(row => `N=${row.colours}`), "Σ"];
+  replaceWithTable("cyclic-wallpaper-table", makeTable(
+    headers, wallpaperRows(data, "regular_cyclic"), {
+      caption: "Regular cyclic plane colour groups by wallpaper type",
+    }));
+  replaceWithTable("film-wallpaper-table", makeTable(
+    headers, wallpaperRows(data, "forward_catalog"), {
+      caption: "Forward catalog normal forms by wallpaper projection and canonical clock order",
+    }));
 }
-put("n2b", byN[2] || 0);
-put("nf", fwd.length);
-put("ot", seenRoot.size);
 
-/* ---- per-wallpaper comparison table ---- */
-/* Colour plane groups per wallpaper group: Wieting (1982) Table 11 /
- * Grünbaum–Shephard (1987) ch. 8, as tabulated for N = 2, 3, 4, 6. */
-const LIT = {
-  p1: [1, 1, 2, 1], p2: [2, 1, 3, 2], pm: [5, 2, 10, 11], pg: [2, 2, 4, 5],
-  cm: [3, 2, 7, 7], pmm: [5, 1, 13, 9], pmg: [5, 2, 11, 11], pgg: [2, 1, 4, 4],
-  cmm: [5, 1, 11, 8], p4: [2, 0, 5, 2], p4m: [5, 0, 13, 2], p4g: [3, 0, 7, 2],
-  p3: [0, 2, 1, 1], p3m1: [1, 2, 1, 4], p31m: [1, 2, 1, 5], p6: [1, 2, 1, 5],
-  p6m: [3, 2, 2, 11],
-};
-const ORB = {
-  p1: "o", p2: "2222", pm: "**", pg: "××", cm: "*×", pmm: "*2222", pmg: "22*",
-  pgg: "22×", cmm: "2*22", p4: "442", p4m: "*442", p4g: "4*2", p3: "333",
-  p3m1: "*333", p31m: "3*3", p6: "632", p6m: "*632",
-};
-const ROT_FREE = new Set(["p1", "pm", "pg", "cm"]);
-const NS = [2, 3, 4, 6];
-const filmTab = {};
-for (const g of fwd) {
-  (filmTab[g.base] = filmTab[g.base] || {})[clockDenom(g)] =
-    ((filmTab[g.base] || {})[clockDenom(g)] || 0) + 1;
+function renderFingerprint(data) {
+  const host = document.getElementById("data-fingerprint");
+  if (!host) return;
+  const meta = data.meta;
+  host.textContent =
+    `Generated from ${meta.catalog_total_groups} catalog entries ` +
+    `(${meta.catalog_forward_groups} forward); catalog SHA-256 ` +
+    `${meta.catalog_sha256}.`;
 }
-const table = document.getElementById("cc-table");
-if (table) {
-  const order = ["p1", "p2", "pm", "pg", "cm", "pmm", "pmg", "pgg", "cmm",
-                 "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m"];
-  const cell = n => (n ? String(n) : "·");
-  let html = `<tr><th rowspan="2">wallpaper</th>` +
-    `<th colspan="4">forward film groups</th>` +
-    `<th colspan="4">colour plane groups</th></tr><tr>` +
-    NS.map(n => `<th>${n}</th>`).join("") +
-    NS.map(n => `<th>${n}</th>`).join("") + `</tr>`;
-  const tot = [0, 0, 0, 0], totL = [0, 0, 0, 0];
-  for (const b of order) {
-    const f = filmTab[b] || {};
-    const cls = ROT_FREE.has(b) ? ' class="rotfree"' : "";
-    html += `<tr${cls}><td><span class="sym">${ORB[b]}</span> ${b}</td>`;
-    NS.forEach((n, i) => { tot[i] += f[n] || 0; html += `<td>${cell(f[n])}</td>`; });
-    NS.forEach((n, i) => { totL[i] += LIT[b][i]; html += `<td>${cell(LIT[b][i])}</td>`; });
-    html += `</tr>`;
+
+function showError(error) {
+  console.error(error);
+  for (const id of ["census-table", "cyclic-wallpaper-table",
+                    "film-wallpaper-table"]) {
+    const host = document.getElementById(id);
+    if (!host) continue;
+    const p = document.createElement("p");
+    p.className = "aside";
+    p.textContent = "The generated census could not be loaded. Use the CSV download links below.";
+    host.replaceChildren(p);
   }
-  html += `<tr><td><b>Σ</b></td>` + tot.map(x => `<td><b>${x}</b></td>`).join("") +
-          totL.map(x => `<td><b>${x}</b></td>`).join("") + `</tr>`;
-  table.innerHTML = html;
+}
+
+try {
+  const response = await fetch(DATA_URL, { cache: "no-cache" });
+  if (!response.ok) throw new Error(`${DATA_URL}: HTTP ${response.status}`);
+  const data = await response.json();
+  renderSummary(data);
+  renderWallpaperTables(data);
+  renderFingerprint(data);
+} catch (error) {
+  showError(error);
 }
