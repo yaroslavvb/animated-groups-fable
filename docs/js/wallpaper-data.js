@@ -28,7 +28,7 @@ or ½, and the orbifold relation ties the four classes together: besides the \
 product this allows exactly 2₁2₁2₁2₁, all four classes screwed. The \
 centring c222₁2₁ mixes plain 2s and 2₁s in one group — the checkerboard \
 whose sublattices swap roles every half period. Among the reversal groups, \
-o/2′[2222] is the extreme case: the photograph's entire p2 symmetry is \
+o/2′[p2] is the extreme case: the photograph's entire p2 symmetry is \
 carried by time-reversing half-turns.",
     examples: ["2₁2₁2₁2₁", "c222₁2₁"] },
   { hm: "pm", orb: "**",
@@ -40,7 +40,7 @@ is reversal — including the catalog's largest symbol collisions: **/g′ᵃᵇ
 (the reversal glide runs on or between the mirrors) and the centred family \
 c**/1′ᵃ…ᵈ, four groups on one symbol, separated only by their generator \
 lists.",
-    examples: ["**/g′ᵃ", "o/m′[**]"] },
+    examples: ["**/g′ᵃ", "o/m′[pm]"] },
   { hm: "pg", orb: "××",
     note: "No mirrors — two families of glides, two of Conway's miracles.",
     issues: "The home of the disguises. The time glide ~*~* and the mixed \
@@ -57,9 +57,9 @@ are the same crystallographic class.",
     issues: "One forward decoration survives: ~*×½, the tilded mirror \
 forcing offset ½ onto the interleaved glide. On the time-centred lattice \
 the glide can square to the centring and carry a quarter offset — \
-c×¼×¼/g′[*×], the d-glide analogue — and the pair c*×/1′ᵃᵇ is another \
+c×¼×¼/g′[cm], the d-glide analogue — and the pair c*×/1′ᵃᵇ is another \
 relative-position collision.",
-    examples: ["~*×½", "c×¼×¼/g′[*×]"] },
+    examples: ["~*×½", "c×¼×¼/g′[cm]"] },
   { hm: "pmm", orb: "*2222",
     note: "The rectangular kaleidoscope: mirrors both ways, four corner classes.",
     issues: "Even corners leave the four mirror arcs free to tilde \
@@ -107,13 +107,13 @@ palindrome over p4 — their reversal needs a mirror, and lands over p4m.",
 tilde in the patterns *4₂~4₂2, *~4₂4₂~2, *~4~4~2 — tildes at the \
 4-corners force the 4₂ screws — the centred forward pair c*44₂2₁ᵃᵇ \
 collides, and every /m′ of the p4 screws arrives here in brackets, \
-including 4₁4₁2₁/m′[*442], the only way an odd screw meets time reversal.",
-    examples: ["*~4~4~2", "4₁4₁2₁/m′[*442]"] },
+including 4₁4₁2₁/m′[p4m], the only way an odd screw meets time reversal.",
+    examples: ["*~4~4~2", "4₁4₁2₁/m′[p4m]"] },
   { hm: "p4g", orb: "4*2",
     note: "Fourfold gyrations beside mirrors, glides between them.",
     issues: "Gyration beside mirror: the 4-centres screw while the single \
 arc tildes (4₂*~2, 4*~2, 4₂*2), and on the centred lattice the chiral \
-pair c4₁*2, c4₃*2 appears. The bracketed /m′[4*2] entries show reversal \
+pair c4₁*2, c4₃*2 appears. The bracketed /m′[p4g] entries show reversal \
 mirrors completing a p4g photograph from pmm-, pgg- and p4-type forward \
 parts.",
     examples: ["4₂*~2", "c4₁*2"] },
@@ -131,9 +131,9 @@ reversal only via a mirror (over p3m1) or a half-turn (over p6).",
     issues: "Odd corners force adjacent arcs to carry equal tilde marks, \
 so the kaleidoscope decorates all-or-nothing: *~3~3~3 is the unique \
 forward decoration. The section receives every /m′ of the p3 screws — \
-3₁3₁3₁/m′[*333] is the chiral screw's only palindromic completion on this \
-base — together with r33₁3₂/m′[*333].",
-    examples: ["*~3~3~3", "3₁3₁3₁/m′[*333]"] },
+3₁3₁3₁/m′[p3m1] is the chiral screw's only palindromic completion on this \
+base — together with r33₁3₂/m′[p3m1].",
+    examples: ["*~3~3~3", "3₁3₁3₁/m′[p3m1]"] },
   { hm: "p31m", orb: "3*3",
     note: "A threefold gyration off the mirrors and one on them.",
     issues: "With one 3-centre off the mirrors, tilde and screw decorate \
@@ -145,8 +145,8 @@ stacking in a single group.",
     note: "Sixfold, threefold and twofold gyrations.",
     issues: "The full screw family: 6₁3₁2₁ … 6₅3₂2₁ mirror the space \
 groups P6₁…P6₅, in chiral pairs 6₁/6₅ and 6₂/6₄. Only the half-period \
-screw 6₃32₁ is palindromic (again ½ ≡ −½). In 333/2′[632] and \
-r33₁3₂/2′[632] the photograph's six-fold symmetry is supplied entirely by \
+screw 6₃32₁ is palindromic (again ½ ≡ −½). In 333/2′[p6] and \
+r33₁3₂/2′[p6] the photograph's six-fold symmetry is supplied entirely by \
 time-reversing half-turns.",
     examples: ["6₁3₁2₁", "6₃32₁"] },
   { hm: "p6m", orb: "*632",
@@ -155,7 +155,7 @@ time-reversing half-turns.",
 *~6~3~2, *6₃~3~2₁, *~6₃32₁, the 6-corner screwing when its two arcs \
 disagree — and the section collects the /m′ completions of the whole \
 hexagonal tower: all five 6-screws and the trigonal groups below them.",
-    examples: ["*6₃~3~2₁", "6₁3₁2₁/m′[*632]"] },
+    examples: ["*6₃~3~2₁", "6₁3₁2₁/m′[p6m]"] },
 ];
 
 /* within a section: the pure product first, then forward-time, then reversal */

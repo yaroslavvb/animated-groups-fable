@@ -1166,26 +1166,17 @@ def build_entry(cname, ac, vec, idx):
     from enumerate_2p1 import classify_system
     system = classify_system(ac)
 
-    HM2ORB = {"p1": "o", "p2": "2222", "pm": "**", "pg": "××", "cm": "*×",
-              "pmm": "*2222", "pmg": "22*", "pgg": "22×", "cmm": "2*22",
-              "p4": "442", "p4m": "*442", "p4g": "4*2", "p3": "333",
-              "p3m1": "*333", "p31m": "3*3", "p6": "632", "p6m": "*632"}
     prefix = "r" if third else ("c" if has_tc else "")
     sym = prefix + body
     if revkind:
         sym += "/" + revkind
         if base != base_fwd:
-            # the reversal enriches the spatial projection: record it, in
-            # orbifold form (the symbol never mixes notations; the HM name
-            # lives in the catalog's base field)
-            sym += f"[{HM2ORB[base]}]"
-    # plain `symbol` mixes Unicode subscript digits with FULL-SIZE vulgar
-    # fractions (½¼) because Unicode has no subscript fractions; the HTML
-    # form subscripts both — keep these two substitution lists in sync
+            # the reversal enriches the spatial projection: record it
+            sym += f"[{base}]"
     sym_html = (sym.replace("₀", "<sub>0</sub>").replace("₁", "<sub>1</sub>")
                 .replace("₂", "<sub>2</sub>").replace("₃", "<sub>3</sub>")
                 .replace("₄", "<sub>4</sub>").replace("₅", "<sub>5</sub>")
-                .replace("½", "<sub>½</sub>").replace("¼", "<sub>¼</sub>"))
+                .replace("½", "<sub>½</sub>"))
 
     # Ke-Wu-style op description: highest-order fractional time screw first
     kws = []

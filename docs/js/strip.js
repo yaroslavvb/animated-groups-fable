@@ -5,9 +5,8 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif, drawPhaseRing } from "./renderer.js?v=22";
-import { Playback } from "./playback.js?v=22";
-import { stripTimeSymmetry } from "./phases.js?v=22";
+import { drawMotif } from "./renderer.js?v=18";
+import { Playback } from "./playback.js?v=18";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -43,9 +42,6 @@ export class StripAnimation extends Playback {
     this.spec = spec;
     this.cellOverride = opts.cell || null;  // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 88;    // else derived per draw from width
-    this.showPhase = opts.showPhase !== false;
-    this.timeSym = stripTimeSymmetry(spec);
-    this.beats = this.timeSym.n;
     this.specCheck = verifyStripSpec(spec);
     if (!this.specCheck.ok) {
       console.error("Strip spec fails group axioms:", this.specCheck.errors, spec);
@@ -87,14 +83,9 @@ export class StripAnimation extends Playback {
           sites.add(o.m + "|" + Math.round(f1(o.v + this.spec.cent[0]) * 1e6));
         }
       }
-      // target ~6 visible copies (2.2-6 cells)
-      let c = (sites.size * w) / 6;
-      c = Math.max(c, w / 6);
-      c = Math.min(c, w / 2.2);
-      this.cell = c;
+      const repeats = sites.size <= 1 ? 7 : sites.size <= 2 ? 5 : 4;
+      this.cell = w / repeats;
     }
-    // the phase ring reaches 0.85 r, so the copies stay clear of each other
-    // at the same spacing the bare motif used
     const r = Math.min(0.30 * this.cell, 0.34 * h);
     const base = 0.27;  // generic offset within the cell
     const copies = [];
@@ -122,20 +113,41 @@ export class StripAnimation extends Playback {
         }
       }
     }
-    // the phase readout: translated to each copy but never mirrored with it,
-    // so one interval of the period is one arc everywhere (renderer.js)
-    if (this.showPhase) {
-      for (const [m, v, s, tau] of copies) {
-        for (let k = -span; k <= span; k++) {
-          const x = (m * base + v + k) * this.cell;
-          if (x < -w / 2 - r || x > w / 2 + r) continue;
-          ctx.save();
-          ctx.translate(x, 0);
-          drawPhaseRing(ctx, s * (t - tau), r, this.beats);
-          ctx.restore();
-        }
-      }
-    }
     ctx.restore();
   }
 }
+
+/* The 13 groups, generators in the spec format (from the enumeration). */
+export const CHRONOFRIEZE = [
+  { name: "P1", ops: [{ m: 1, s: 1, v: 0, tau: 0 }], cent: null,
+    blurb: "translations only — a marching band of identical clocks" },
+  { name: "P2", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
+    blurb: "2-fold space-time rotation: flip space AND run time backwards" },
+  { name: "Pm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: null,
+    blurb: "spatial mirror, clocks in phase" },
+  { name: "Pg_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 }], cent: null,
+    blurb: "time glide: mirror + half-period delay" },
+  { name: "Pm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: null,
+    blurb: "time mirror: the loop is a palindrome" },
+  { name: "Pg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0.5, tau: 0 }], cent: null,
+    blurb: "glide time-reversal: played backwards = shifted half a cell" },
+  { name: "P2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
+                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
+    blurb: "mirror + palindrome (and their product, the 2-fold)" },
+  { name: "P2g_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
+                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0.5 }], cent: null,
+    blurb: "both glides; only the 2-fold survives undisplaced" },
+  { name: "P2m_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
+                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0 }], cent: null,
+    blurb: "mirror + glide time-reversal" },
+  { name: "P2g_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
+                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0.5 }], cent: null,
+    blurb: "time glide + palindrome" },
+  { name: "Cm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: [0.5, 0.5],
+    blurb: "centred: neighbours run half a period out of phase; mirror survives" },
+  { name: "Cm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
+    blurb: "centred palindrome" },
+  { name: "C2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
+                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
+    blurb: "centred, mirror and palindrome together" },
+];

@@ -8,37 +8,21 @@ Specs use the same format as the web renderer: basis (cartesian), ops list
 import json
 import math
 import sys
-from fractions import Fraction
 
 from PIL import Image, ImageDraw
 
 SS = 4  # supersampling factor
-# NON-ROTATIONAL clock, mirrors renderer.js: a thick comma (chiral, so a
-# rotated or reflected copy reads as such) fills like a vessel, fill level =
-# theta mod 1 (injective — no rotational aliasing possible). Colors static;
-# only the fill boundary moves. Reversal copies drain. Around each comma the
-# phase ring shows WHICH of the group's N time intervals the copy is in,
-# drawn in screen coordinates and never rotated with the copy — see the
-# drawPhaseRing comment in renderer.js.
+# NON-ROTATIONAL clock, mirrors renderer.js: the body fills like a vessel,
+# fill level = theta mod 1 (injective — no rotational aliasing possible).
+# Colors static; only the fill boundary moves. Reversal copies drain.
+BODY_TOP = -0.85
+BODY_BOT = 0.5
+
 BODY_L = (219, 230, 242)
 OUTLINE = (125, 147, 171)
 FILL = (59, 110, 165)
 LINE = (192, 57, 43)
-BEAT_ON = (192, 57, 43)
-BEAT_OFF = (216, 210, 196)
 BG = (250, 249, 246)
-
-COMMA_R = 0.62      # comma circumradius, in units of the motif radius
-RING_MID = 0.78     # phase-ring centreline; its outer edge stays inside 0.85 r
-RING_W = 0.13
-# the five cubic segments of the comma, verbatim from renderer.js
-RAW_COMMA = [
-    ((0.40, -0.30), (0.52, 0.18), (0.32, 0.56), (-0.52, 0.74)),
-    ((-0.52, 0.74), (-0.10, 0.52), (0.18, 0.26), (0.06, 0.02)),
-    ((0.06, 0.02), (-0.14, 0.02), (-0.40, -0.10), (-0.40, -0.30)),
-    ((-0.40, -0.30), (-0.40, -0.54), (-0.22, -0.68), (0.00, -0.68)),
-    ((0.00, -0.68), (0.24, -0.68), (0.40, -0.54), (0.40, -0.30)),
-]
 
 
 def bezier(p0, p1, p2, p3, steps=16):
@@ -52,32 +36,15 @@ def bezier(p0, p1, p2, p3, steps=16):
     return pts
 
 
-def _normalized_comma():
-    """Recentre the raw comma on its bounding box and scale it to circumradius
-    COMMA_R — the same one-off normalisation renderer.js does, sampled the
-    same way (24 steps per segment), so the GIFs and the site agree."""
-    pts = []
-    for seg in RAW_COMMA:
-        pts.append(seg[0])
-        pts += bezier(*seg, steps=24)
-    cx = (min(p[0] for p in pts) + max(p[0] for p in pts)) / 2
-    cy = (min(p[1] for p in pts) + max(p[1] for p in pts)) / 2
-    k = COMMA_R / max(math.hypot(p[0] - cx, p[1] - cy) for p in pts)
-    segs = [tuple(((p[0] - cx) * k, (p[1] - cy) * k) for p in seg)
-            for seg in RAW_COMMA]
-    ys = [(p[1] - cy) * k for p in pts]
-    return segs, min(ys), max(ys)
-
-
-COMMA_SEGS, BODY_TOP, BODY_BOT = _normalized_comma()
-
-
 def motif_paths(r):
-    """The comma outline as one closed polygon, in motif-local coords."""
-    body = [(COMMA_SEGS[0][0][0] * r, COMMA_SEGS[0][0][1] * r)]
-    for seg in COMMA_SEGS:
-        body += bezier(*[(p[0] * r, p[1] * r) for p in seg], steps=24)
-    return [body]
+    """Body polygon + beak triangle in motif-local coordinates (radius r)."""
+    body = []
+    body += bezier((-0.15 * r, -0.5 * r), (0.65 * r, -0.55 * r),
+                   (0.55 * r, 0.28 * r), (0.05 * r, 0.42 * r))
+    body += bezier((0.05 * r, 0.42 * r), (-0.28 * r, 0.5 * r),
+                   (-0.42 * r, 0.12 * r), (-0.15 * r, -0.5 * r))
+    beak = [(-0.15 * r, -0.5 * r), (0.1 * r, -0.85 * r), (0.22 * r, -0.45 * r)]
+    return body, beak
 
 
 def _clip_below(poly, y0):
@@ -99,11 +66,11 @@ def _clip_below(poly, y0):
 def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
     """T = 2x2 pixel transform matrix applied to motif-local coords.
 
-    Non-rotational clock: the comma fills with the dark color, fill level =
-    theta mod 1; a bright line marks the surface. Layered exactly as
-    renderer.js ("body" = comma outline, "tail" = liquid, "hands" = surface
-    line) so painting is order-independent and coincident copies superimpose
-    their surface lines."""
+    Non-rotational clock: the vessel (body + beak spout) fills with the dark
+    color, fill level = theta mod 1; a bright line marks the surface. Layered
+    exactly as renderer.js ("body" = vessel, "tail" = liquid, "hands" =
+    surface line) so painting is order-independent and coincident copies
+    superimpose their surface lines."""
 
     def xf(p):
         x, y = p
@@ -111,7 +78,8 @@ def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
 
     ph = theta % 1.0
     y_level = (BODY_BOT - ph * (BODY_BOT - BODY_TOP)) * r
-    polys = motif_paths(r)
+    body, beak = motif_paths(r)
+    polys = [body, beak]
 
     if layer in ("all", "body"):
         for poly in polys:
@@ -133,79 +101,26 @@ def draw_motif(draw, cx, cy, T, theta, r, layer="all"):
                           fill=LINE, width=max(2, int(0.09 * r)))
 
 
-def beat_count(taus):
-    """The order of a set of fractions in R/Z: the smallest n with every value
-    in (1/n)Z. Mirrors beatCount in phases.js."""
-    n = 1
-    for t in taus:
-        d = Fraction(t % 1.0).limit_denominator(24).denominator
-        n = n * d // math.gcd(n, d)
-    return n
-
-
-def interval_count(spec):
-    """N: the number of intervals the loop's distinguished instants cut the
-    period into — the beat k/B from the time translations, together with the
-    fixed points tau/2, tau/2 + 1/2 of every time reversal. Mirrors
-    timeMarks in phases.js; the ring is that ruler wrapped into a circle."""
-    taus = [op["tau"] for op in spec["ops"]]
-    b = beat_count(taus)
-    marks = {round((k / b) % 1.0, 6) for k in range(b)}
-    for op in spec["ops"]:
-        if op["s"] == -1:
-            marks.add(round((op["tau"] / 2) % 1.0, 6))
-            marks.add(round((op["tau"] / 2 + 0.5) % 1.0, 6))
-    return beat_count(marks)
-
-
-def draw_phase_ring(draw, cx, cy, theta, r, n):
-    """N arcs, the copy's current interval lit. Drawn in SCREEN coordinates —
-    no spatial transform is applied — so one interval is one arc on every
-    copy; see the drawPhaseRing comment in renderer.js. PIL arc angles are
-    degrees clockwise from 3 o'clock, matching canvas."""
-    lit = int((theta % 1.0) * n) % n if n > 1 else -1
-    gap = min(0.125 / n, 0.022) * 360.0
-    box = [cx - RING_MID * r, cy - RING_MID * r,
-           cx + RING_MID * r, cy + RING_MID * r]
-    for k in range(n):
-        draw.arc(box, (k / n) * 360.0 - 90.0 + gap,
-                 ((k + 1) / n) * 360.0 - 90.0 - gap,
-                 fill=(BEAT_ON if k == lit else BEAT_OFF),
-                 width=max(1, int(RING_W * r)))
-
-
 def _scale_of(T):
     return math.sqrt(abs(T[0][0] * T[1][1] - T[0][1] * T[1][0]))
 
 
-CELLS = 4          # translation repeats across the frame, as renderer.js
-MIN_CELLS = 3      # the fewest a dense group may be relaxed to
-MIN_MOTIF_PX = 13  # below this the clock stops being readable
-
-
-def _cell_for(spec, size, k):
-    """the cell size that fits k translation repeats across a square frame"""
-    B = spec["basis"]
-    hy = max(abs(B[0][1]), abs(B[1][1])) or 1
-    return max(size / (k * hy), 24)
-
-
 def _auto_cell(spec, size):
-    """Uniform cell spacing, mirroring renderer.js: CELLS repeats across the
-    frame, relaxed towards MIN_CELLS when that is the only way to keep the
-    motifs big enough to read. GIF frames are square, so both sides show the
-    same count."""
-    cell = _cell_for(spec, size, CELLS)
-    r = _motif_radius(spec, cell) / SS
-    if r > 0 and r < MIN_MOTIF_PX:
-        cell = min(cell * (MIN_MOTIF_PX / r), _cell_for(spec, size, MIN_CELLS))
-    return cell
+    """Uniform repeat count, mirroring renderer.js: cell size chosen so every
+    GIF shows the same number of translation repeats; sparse cells (one or
+    two distinct spatial sites) get more repeats, very dense ones fewer.
+    Sites are counted by distinct spatial part (reversal partners coincide)."""
+    seen = set()
+    for op in spec["ops"]:
+        key = (tuple(tuple(r) for r in op["M"]),
+               tuple(round(x % 1.0, 6) for x in op["v"]))
+        seen.add(key)
+    n = len(seen)
+    repeats = 5 if n <= 1 else 4 if n <= 2 else 3 if n <= 6 else 2.0
+    return max(24, size / repeats)
 
 
-def render_frame(spec, t, size, cell=None, rings=True):
-    """`rings=False` drops the phase-ring annotation, which is deliberately
-    NOT equivariant (it is never rotated with its copy): the pixel-invariance
-    check in verify_animations.py asserts invariance of the pattern proper."""
+def render_frame(spec, t, size, cell=None):
     if cell is None:
         cell = _auto_cell(spec, size)
     W = size * SS
@@ -238,7 +153,7 @@ def render_frame(spec, t, size, cell=None, rings=True):
             d = math.hypot(dx, dy)
             if d > 1e-6 and d < min_d:
                 min_d = d
-    r = min(0.40 * min(l1, l2), 0.55 * min_d) * spec.get("motifScale", 1)
+    r = min(0.30 * min(l1, l2), 0.60 * min_d) * spec.get("motifScale", 1)
     cx0, cy0 = W / 2, W / 2
 
     # lattice window
@@ -280,10 +195,6 @@ def render_frame(spec, t, size, cell=None, rings=True):
     for layer in ("body", "tail", "hands"):
         for (px, py, T, theta) in visible:
             draw_motif(draw, cx0 + px, cy0 + py, T, theta, r, layer)
-    if rings:
-        n = interval_count(spec)
-        for (px, py, T, theta) in visible:
-            draw_phase_ring(draw, cx0 + px, cy0 + py, theta, r, n)
     return img.resize((size, size), Image.LANCZOS)
 
 

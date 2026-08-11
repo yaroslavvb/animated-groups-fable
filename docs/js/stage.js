@@ -14,7 +14,7 @@
  *   ← →              step one frame back / forward
  *   ↑ ↓              same, when the stage has focus
  *   shift + arrow    fine step
- *   home / end       first / last frame (seek: play or pause is left as it is)
+ *   home / end       first / last frame
  *
  * The horizontal arrows also work while the pointer merely hovers a stage, so
  * stepping through a loop needs no click. The vertical arrows and space are
@@ -94,9 +94,8 @@ function handleKey(e, anim, full) {
     case "ArrowUp": if (!full) return; anim.step(+d); break;
     case "ArrowDown": if (!full) return; anim.step(-d); break;
     case " ": case "Enter": if (!full) return; anim.toggle(); break;
-    // seeking, not scrubbing: play/pause intent is left alone (playback.js)
-    case "Home": if (!full) return; anim.reset(); break;
-    case "End": if (!full) return; anim.seek(1 - STEP); break;
+    case "Home": if (!full) return; anim.pause(); anim.setPhase(0); break;
+    case "End": if (!full) return; anim.pause(); anim.setPhase(1 - STEP); break;
     default: return;
   }
   e.preventDefault();

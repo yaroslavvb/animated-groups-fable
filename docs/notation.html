@@ -86,21 +86,6 @@ half a period (a <em>mixed</em> space–time glide, Ke–Wu's
 (m<sub>x</sub> | T<sub>y</sub><sup>1/2</sup>T<sub>t</sub><sup>1/2</sup>));
 quarter offsets <span class="sym">×<sub>¼</sub></span> occur on time-centred
 lattices, the analogue of crystallographic d-glides.</p>
-<p>Three points of grammar. A boundary with no corners has a single arc, and
-its tilde is written before the star (<span class="sym">~*</span>,
-<span class="sym">~*×<sub>½</sub></span>); where the boundary word has a
-symmetry, marks are written in the first equivalent position. Note the
-convention switch between the two kinds of subscript: a subscript on a digit
-is the <em>numerator</em> of k/n (crystallographic screw style), while a
-subscript on <span class="sym">×</span> is the fraction itself — an
-involution has no order n to divide by. And on
-<span class="sym">c</span>-prefixed lattices tildes are omitted: the
-centring puts parallel mirror families half a period apart, so mirror phase
-is relative, and where the residual choice matters it is carried by the
-superscript letter and the generator list (for the chiral pair
-<span class="sym">c4<sub>1</sub>*2</span> /
-<span class="sym">c4<sub>3</sub>*2</span>, the subscript is fixed by which
-screw sense pairs with the in-phase mirror family).</p>
 <div class="tabdemo" id="tabs-glides"></div>
 
 <h3>3. Stacking prefixes — time-centred lattices</h3>
@@ -128,32 +113,17 @@ and one canonical representative of the reversing coset:</p>
 (m<sub>t</sub> | T<sub>x</sub><sup>1/2</sup>): the reversed film equals the
 original shifted half a cell;<br>
 <span class="sym">/m′</span>, <span class="sym">/2′</span>,
-<span class="sym">/4′</span>, … — reversal composed with a spatial
-reflection (a mirror, or — when the bracket shows only glides, as in
-<span class="sym">o/m′[××]</span> — a glide reflection), half-turn,
-quarter-turn, ….</p>
-<p>The descriptor names the simplest operation the reversing coset contains,
-in the order <span class="sym">1′</span>, <span class="sym">g′</span>, then
-<span class="sym">m′</span>/<span class="sym">2′</span>/…; the coset usually
-contains several kinds, and the symbol records the first realised. The slash
-clause is close kin to both colour notations: crystallographers prime the
-reversing operations (Belov–Tarkhova's p4′g′m), while <i>The Symmetries of
-Things</i> names a two-colouring by the orbifold pair full
-group&thinsp;/&thinsp;colour-preserving kernel. A bracketed clockwork symbol
-is that pair read backwards — the kernel with its clocks, then the full
-projection — and the clause names the reversing coset just once, because
-reversal negates every offset: decorations on the reversing features
-themselves would carry no invariant content.</p>
+<span class="sym">/4′</span>, … — reversal composed with a spatial mirror,
+half-turn, quarter-turn, …; subscripts for fractional shifts as above.</p>
 <p>Consistency forces the reversal to <em>negate</em> all forward offsets
 (conjugation by m<sub>t</sub> maps a k/n screw to a −k/n screw), which is why,
 for instance, <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/1′</span>
 does not exist but <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>/m′</span>
 does: a mirror flips the screw's handedness and the reversal flips it back.
-When the reversal changes the spatial projection's wallpaper type
-(reversal mirrors add directions), the enriched projection's orbifold is
-appended in brackets, e.g. <span class="sym">o/m′[*×]</span> — a film with
-no forward symmetry beyond translations whose photograph is nonetheless
-cm = <span class="sym">*×</span>, entirely by grace of the reversal.</p>
+When the reversal enriches the spatial projection beyond the forward part's
+(reversal glides add translations, reversal mirrors add directions), the
+enriched projection is appended in brackets, e.g.
+<span class="sym">o/m′[cm]</span>.</p>
 <div class="tabdemo" id="tabs-reversal"></div>
 
 <div class="aside">
@@ -173,13 +143,11 @@ I222-vs-I2₁2₁2₁ distinction of crystallography, where only the relative
 position of the axes separates the groups). Wherever several groups share a
 symbol the catalog appends a superscript index —
 <span class="sym">**/g′<sup>a</sup></span>,
-<span class="sym">**/g′<sup>b</sup></span>, … — assigned in the enumeration
-order of the generator lists, which are always complete and disambiguate. A fully faithful treatment of the reversal
+<span class="sym">**/g′<sup>b</sup></span>, … — and the generator list, which
+is always complete, disambiguates. A fully faithful treatment of the reversal
 layer would be a two-colour orbifold theory in the style of <i>The Symmetries
-of Things</i>, applied along the time fibre; the beginnings of that step —
-and the dictionary between colour symmetry and film groups generally — are
-developed in <a href="future-directions.html">Future directions: coloured
-groups + film groups</a>.</p>
+of Things</i>, applied along the time fibre; we leave that as the natural next
+step.</p>
 </div>
 <div class="tabdemo" id="tabs-letters"></div>
 
@@ -198,59 +166,12 @@ group with any time group.</p>
 </div>
 <div class="tabdemo" id="tabs-reading"></div>
 
-<h2 id="chronofrieze">One dimension down: the thirteen chronofriezes</h2>
-<p>The same rules name the 13 film groups of a looping strip
-(<a href="index.html#warmup">tutorial §2</a>), with base symbols one
-dimension lower: the spatial projection of a strip group is a line group,
-whose quotient 1-orbifold is either the circle <span class="sym">o</span>
-(translations only) or the mirrored interval <span class="sym">**</span>
-(two mirror points). Every decoration carries over verbatim — tildes for
-half-period mirrors, the <span class="sym">c</span> prefix for the centred
-spacetime lattice, the reversal clause and its bracket:</p>
-
-<table class="counts">
-<tr><th>clockwork</th><th>conventional</th><th style="text-align:left;">time behaviour</th></tr>
-<tr><td class="sym">o</td><td>P1</td><td style="text-align:left;">translations only</td></tr>
-<tr><td class="sym">**</td><td>Pm<sub>x</sub></td><td style="text-align:left;">spatial mirror</td></tr>
-<tr><td class="sym">~*~*</td><td>Pg<sub>x</sub></td><td style="text-align:left;">time glide: mirror after half a period</td></tr>
-<tr><td class="sym">c**</td><td>Cm<sub>x</sub></td><td style="text-align:left;">mirror on the centred lattice</td></tr>
-<tr><td class="sym">o/1′</td><td>Pm<sub>t</sub></td><td style="text-align:left;">palindrome</td></tr>
-<tr><td class="sym">o/g′</td><td>Pg<sub>t</sub></td><td style="text-align:left;">played backwards = shifted half a cell</td></tr>
-<tr><td class="sym">o/m′[**]</td><td>P2</td><td style="text-align:left;">flip space and reverse time</td></tr>
-<tr><td class="sym">**/1′</td><td>P2m<sub>x</sub>m<sub>t</sub></td><td style="text-align:left;">mirror + palindrome</td></tr>
-<tr><td class="sym">~*~*/1′</td><td>P2g<sub>x</sub>m<sub>t</sub></td><td style="text-align:left;">time glide + palindrome</td></tr>
-<tr><td class="sym">**/g′</td><td>P2m<sub>x</sub>g<sub>t</sub></td><td style="text-align:left;">mirror + glide time-reversal</td></tr>
-<tr><td class="sym">~*~*/g′</td><td>P2g<sub>x</sub>g<sub>t</sub></td><td style="text-align:left;">time glide + glide time-reversal</td></tr>
-<tr><td class="sym">co/1′</td><td>Cm<sub>t</sub></td><td style="text-align:left;">centred palindrome</td></tr>
-<tr><td class="sym">c**/1′</td><td>C2m<sub>x</sub>m<sub>t</sub></td><td style="text-align:left;">centred, mirror + palindrome</td></tr>
-</table>
-
-<p>Two features are instructive. The time glide
-<span class="sym">~*~*</span> survives here as its own class: in 2+1D it
-re-bases to <span class="sym">××</span> by trading the time axis for the
-spare spatial direction, but a strip has no spare direction — the smallest
-setting where the crystallographic and frame-preserving classifications
-already agree on keeping the decoration. And
-<span class="sym">o/m′[**]</span> — flip space <em>and</em> reverse time,
-the 2-fold spacetime rotation — shows the bracket at its purest: the
-photograph's entire mirror symmetry is contributed by the reversal coset.</p>
-
 <h2>The atlas: 17 wallpapers, 275 films</h2>
 <p>The base symbol organises the whole catalog: every film group projects to
 one of the 17 wallpaper groups, and the <a href="wallpaper.html">wallpaper
 atlas</a> arranges all 275 by this projection — each wallpaper group rendered
 as a film in its own right (the product with a trivial clock), followed by
 every film group whose long-exposure photograph it is.</p>
-
-<h2>Beyond: coloured groups</h2>
-<p>Film groups are wallpaper groups coloured by a circle of phases, and the
-discrete theory of colour symmetry — the 46 black–white Shubnikov types,
-perfect ℤ<sub>N</sub> colourings — runs alongside every rule above: time
-reversal is a two-colouring, time screws are cyclic colourings, centrings
-are coloured lattices. The dictionary, with static coloured renderings
-paired against the films, is developed in
-<a href="future-directions.html">Future directions: coloured groups + film
-groups</a>.</p>
 
 <h2>Why this works: the Seifert picture</h2>
 <p>Quotient a looping film by its group G: the result is a 3-orbifold fibred in
@@ -268,12 +189,12 @@ along time that every looping animation carries canonically. A film group is a
 product (wallpaper × clock) exactly when all decorations vanish: trivial
 Seifert data means a trivial circle bundle.</p>
 
-<h2>Symbol ↔ operators</h2>
-<p>Every catalog entry also lists its characteristic nonsymmorphic operations
-in Ke–Wu's Seitz-style form — (R<sub>2π/4</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/4</sup>)
-for a time screw, (m&thinsp;|&thinsp;T<sub>t</sub><sup>1/2</sup>) for a time
-glide — together with the complete generator list, so every decoration of the
-clockwork symbol can be cross-checked against explicit operations. See the
+<h2>Symbol ↔ Hermann–Mauguin</h2>
+<p>Every catalog entry also lists a Hermann–Mauguin-style symbol in the spirit
+of Xu–Wu and Ke–Wu (P4<sub>1</sub>-as-time-screw, Pg<sub>x</sub>-style glides,
+primes for reversal), plus explicit generators, so the clockwork symbol can
+always be cross-checked against the conventional crystallographic name of the
+corresponding 3D space group with distinguished axis. See the
 <a href="catalog.html">catalog</a>.</p>
 
 </main>
@@ -281,6 +202,6 @@ clockwork symbol can be cross-checked against explicit operations. See the
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/notation.js?v=22"></script>
+<script type="module" src="js/notation.js?v=18"></script>
 </body>
 </html>

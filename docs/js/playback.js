@@ -35,9 +35,6 @@ export class Playback {
     this._runListeners = []; // callback(anim) on any play/pause/start/stop
     this._raf = null;
     this._frame = this._frame.bind(this);
-    // the loop's time structure (phases.js); subclasses that know their group
-    // replace it, and controls.js draws its marks on the scrub bar
-    this.timeSym = { n: 1, marks: [{ t: 0, kind: "beat", label: "0" }] };
   }
 
   /* ---------------------------------------------------- viewer intent */
@@ -75,13 +72,6 @@ export class Playback {
   }
   /* step by dt periods; stepping is scrubbing, so it takes over from play */
   step(dt) { this.pause(); this.setPhase(this.phase + dt); }
-
-  /* SEEKING is not scrubbing: it jumps to a named instant and leaves viewer
-   * intent alone, so a playing loop restarts from there and a paused one
-   * simply shows that frame. The reset button and the scrub bar's symmetry
-   * marks (controls.js), and Home / End on the keyboard. */
-  seek(t) { this.setPhase(t); }
-  reset() { this.seek(0); }
 
   /* paint the frozen frame once (a paused canvas must never be blank) */
   drawStatic() {

@@ -116,23 +116,18 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
 
     The comparison map is the op's INVERSE pixel transform about the pattern
     origin, which the renderer places at continuous coordinate size/2, i.e.
-    index size/2 - 0.5 after the supersampled downscale.
-
-    Rendered with rings=False. The phase ring is an annotation drawn in screen
-    coordinates and deliberately never rotated with its copy (renderer.js), so
-    it would fail this check by construction; what must be invariant, and is
-    checked here, is the pattern proper — the comma bodies and their fill."""
+    index size/2 - 0.5 after the supersampled downscale."""
     from gifs import render_frame
     import numpy as np
     errs = []
-    f0 = render_frame(spec, t0, size, cell, rings=False)
+    f0 = render_frame(spec, t0, size, cell)
     B = spec["basis"]
     b1 = (B[0][0] * cell, -B[0][1] * cell)
     b2 = (B[1][0] * cell, -B[1][1] * cell)
     A0 = np.asarray(f0, dtype=float)
     for o in spec["ops"]:
         t1 = (o["s"] * t0 + o["tau"]) % 1.0
-        f1 = render_frame(spec, t1, size, cell, rings=False)
+        f1 = render_frame(spec, t1, size, cell)
         M = o["M"]
         det = b1[0] * b2[1] - b2[0] * b1[1]
         Binv = ((b2[1] / det, -b2[0] / det), (-b1[1] / det, b1[0] / det))
@@ -164,19 +159,13 @@ def pixel_invariance(spec, name, t0=0.137, size=260, cell=64, tol=8.0):
 
 
 def legibility_check(spec, name):
-    """With the fill-level comma the phase channel is INJECTIVE in theta mod 1
+    """With the fill-level motif the phase channel is INJECTIVE in theta mod 1
     and non-rotational, so no spatial operation can alias it: any two copies
     with different internal times look different in every frozen frame. The
-    phase ring adds a second, discrete channel; for it to be well defined,
-    every op's tau must be an exact multiple of 1/N for the N this spec
-    reports — checked here, since a tau with an unexpected denominator would
-    put copies at ring positions that drift instead of stepping together."""
-    from gifs import beat_count
-    taus = [op["tau"] for op in spec["ops"]]
-    n = beat_count(taus)
-    bad = [t for t in taus if abs((t % 1.0) * n - round((t % 1.0) * n)) > 1e-6]
-    if bad:
-        return [f"{name}: tau values {bad} are not multiples of 1/{n}"]
+    remaining requirement is structural: every op's tau must be a proper
+    fraction of the period (guaranteed by the group axioms) — kept as a
+    placeholder so future motif changes must consciously re-derive their
+    legibility conditions here."""
     return []
 
 
