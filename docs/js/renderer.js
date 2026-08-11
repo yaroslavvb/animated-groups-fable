@@ -13,18 +13,36 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=28";
-import { Playback } from "./playback.js?v=28";
-import { filmTimeSymmetry, beatOf } from "./phases.js?v=28";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=29";
+import { Playback } from "./playback.js?v=29";
+import { filmTimeSymmetry, beatOf } from "./phases.js?v=29";
 
 const TWO_PI = Math.PI * 2;
 
-/* Translation repeats shown across a diagram's short side. CELLS is the
- * target — the range wallpaper plates conventionally use — and MIN_CELLS the
- * floor a dense group may be relaxed to when its motifs would otherwise be
- * too small to read (see _setupGeometry). */
+/* Translation repeats shown across a diagram's short side, when the group is
+ * sparse enough for that to be the binding rule. */
 const CELLS = 4;
-const MIN_CELLS = 3;
+
+/* Fraction of the distance to its nearest neighbour that a motif occupies.
+ * The phase ring is its outermost part, at 0.82 r, so 2*0.82*PACK = 0.85
+ * leaves a seventh of the spacing as a gap: packed like a wallpaper plate,
+ * with no two rings ever touching (touching would make paint order — which is
+ * not equivariant — visible). */
+const PACK = 0.52;
+
+/* MOTIF SIZE FLOOR: no diagram may show more than this many motif rows down
+ * its short side, which is the same thing as a lower bound on the size of a
+ * copy. No group may draw a motif smaller, whatever its density — the reader
+ * compares one diagram against another, and a group whose copies are a third
+ * the size of its neighbour's reads as a different kind of object rather than
+ * as a denser one. The reference the eye calibrates on is 2_1 2_1 2_1 2_1,
+ * a sparse group whose size comes from the cap below rather than from this
+ * floor; 5.8 rows is set just above what it reaches on its own at any canvas
+ * height, so nothing is ever drawn smaller than it. (Six exactly would leave
+ * the floor a few hundredths of a pixel short of it at some heights.) */
+const MOTIF_ROWS = 5.8;
+const MOTIF_FLOOR = PACK / MOTIF_ROWS;
+const MOTIF_FLOOR_PX = 13;   // absolute floor, for canvases too small for the above
 
 /* Hard ceiling on how many motifs may appear across a diagram, whatever its
  * width and however many copies the group puts in a cell. */
@@ -300,9 +318,9 @@ export class FilmGroupAnimation extends Playback {
     // ISOTROPIC: a wide canvas shows more columns instead of a stretched
     // cell, which is what previously left a couple of rows adrift in a sea of
     // background.
-    // `_cellFor(k)` is the cell size that fits k repeats on the short side;
-    // the dense-cell rescale below is capped with it, because a diagram
-    // showing a cell and a half has stopped being a wallpaper.
+    // `_cellFor(k)` is the cell size that fits k repeats on the short side.
+    // It sets the starting point only: the motif floor and the column cap
+    // below both raise the cell past it whenever the group is dense.
     const B0 = this.spec.basis;
     // the cell's own extent along each axis, in units of `cell`, so a
     // non-square basis (centred rectangular, hexagonal) still shows CELLS
@@ -357,29 +375,26 @@ export class FilmGroupAnimation extends Playback {
         if (d > 1e-6 && d < minD) minD = d;
       }
     }
-    // The phase ring is the motif's outermost part, at 0.82 r, so the copies
-    // fill 2*0.82*0.55 = 0.90 of the distance to their nearest neighbour:
-    // packed like a wallpaper plate, with a tenth of the spacing left as a
-    // gap so no two rings ever touch (touching would make paint order — which
-    // is not equivariant — visible). The first term caps a lone motif in a
-    // sparse cell, where nothing else limits its size.
-    this.motifR = Math.min(0.40 * Math.min(l1, l2), 0.52 * minD) *
+    // PACK of the distance to the nearest neighbour; the first term caps a
+    // lone motif in a sparse cell, where nothing else limits its size.
+    this.motifR = Math.min(0.40 * Math.min(l1, l2), PACK * minD) *
                   (this.spec.motifScale || 1);
-    // Dense groups: a cell holding a dozen sites — and mirror-related sites
-    // sit close together by construction — gives motifs too small to read a
-    // clock on, so the cell is scaled up. But only as far as MIN_CELLS
-    // repeats: past that the diagram stops showing the lattice, which is the
-    // failure the CELLS rule above exists to prevent. Below that bound the
-    // motif simply is small; the group is dense.
-    const minPx = this.minMotifPx || 13;
+    // MOTIF FLOOR. A cell holding a dozen sites — and mirror-related sites sit
+    // close together by construction — gives motifs far too small to read a
+    // clock on, so the cell is scaled up until they reach the floor. This is
+    // an unconditional guarantee, not a preference: it used to be bounded by a
+    // minimum number of visible lattice repeats, and the dense groups then
+    // never reached it, coming out at a third of the size of a sparse group's
+    // on the same card. What a reader needs held constant across diagrams is
+    // the SIZE OF A COPY, not the number of unit cells; a dense group shows
+    // less than one cell and that is the honest picture of it.
+    // motifR is exactly linear in cell (both terms are), so one pass lands on
+    // the floor rather than converging towards it.
+    const minPx = Math.max(this.minMotifPx || MOTIF_FLOOR_PX, minS * MOTIF_FLOOR);
     if (!this._rescaled && !this.cellOverride &&
         this.motifR > 0 && this.motifR < minPx) {
       this._rescaled = true;
-      // never below what is already set: the column cap may have got here
-      // first, and its ceiling is the one that must survive
-      this.cell = Math.max(this.cell,
-                           Math.min(this.cell * (minPx / this.motifR),
-                                    this._cellFor(MIN_CELLS)));
+      this.cell *= minPx / this.motifR;
       this._setupGeometry();
       return;
     }

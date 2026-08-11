@@ -9,8 +9,9 @@
  * second attach to the same canvas rebinds it, which the catalog's reused
  * dialog canvas relies on), paints the frozen frame, and binds:
  *
- *   click            play / pause, anywhere in the picture
- *   space / enter    play / pause, once the stage has focus
+ *   click            play / pause, anywhere in the picture — or, when the
+ *                    stage was given a href, follow that link instead
+ *   space / enter    the same, once the stage has focus
  *   ← →              jump to the previous / next symmetry instant (or, for a
  *                    loop with no interior marks, step one frame)
  *   ↑ ↓              same, when the stage has focus
@@ -31,21 +32,41 @@ export const FINE = 1 / 240;   // shift: a tenth of that
 let hot = null;
 let hotWired = false;
 
-export function attachStage(anim, canvas) {
+/* opts.href — make the picture a LINK to that URL instead of a play/pause
+ * button. Used by the catalog, where a card's picture opens the group's own
+ * page; the control bar's play button is untouched and still starts the
+ * animation in place, and the arrow keys still scrub. */
+export function attachStage(anim, canvas, opts = {}) {
   const stage = wrap(canvas);
   if (stage._detach) stage._detach();   // re-attach: drop the previous binding
+  const href = opts.href || null;
 
   stage.tabIndex = 0;
-  stage.setAttribute("role", "group");
-  stage.title = "click to play or pause · ← → jump between the loop's " +
-                "symmetry instants · shift + ← → step frame by frame";
+  stage.setAttribute("role", href ? "link" : "group");
+  stage.title = (href
+      ? "open this group's page · "
+      : "click to play or pause · ") +
+    "← → jump between the loop's symmetry instants · " +
+    "shift + ← → step frame by frame";
 
-  // the picture is the button: a click anywhere in it toggles playback
-  const onClick = () => anim.toggle();
+  // the picture is the button — or, given a href, the link
+  const onClick = (e) => {
+    if (!href) return anim.toggle();
+    // let the usual modifiers do what they do everywhere else
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) {
+      window.open(href, "_blank");
+    } else {
+      location.href = href;
+    }
+  };
 
   const sync = () => {
     const on = anim.playRequested;
     stage.classList.toggle("playing", on);
+    if (href) {
+      stage.setAttribute("aria-label", "open this group's page");
+      return;
+    }
     stage.setAttribute("aria-label", on
       ? "animation, playing — click or press space to pause, arrow keys step"
       : "animation, paused — click or press space to play, arrow keys step");
@@ -57,6 +78,12 @@ export function attachStage(anim, canvas) {
     // scrubbed by the document handler below, not whichever holds focus
     if (hot && hot !== stage &&
         (e.key === "ArrowLeft" || e.key === "ArrowRight")) return;
+    // a linked picture follows its link on enter/space, as a link does
+    if (href && (e.key === "Enter" || e.code === "Space")) {
+      e.preventDefault();
+      location.href = href;
+      return;
+    }
     handleKey(e, anim, true);
   };
   const onEnter = () => { hot = stage; };

@@ -283,5 +283,5 @@ export function groupCaption(g) {
     (g.product ? `<span class="tag product">product</span>` : "") +
     `</span>` +
     `<a class="linkish" style="margin-left:auto;text-decoration:none;" ` +
-    `href="catalog.html#${g.id}">catalog ↗</a></div>`;
+    `href="group.html?g=${g.id}">this group ↗</a></div>`;
 }

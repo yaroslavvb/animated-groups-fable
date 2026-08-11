@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catalog — Film Groups</title>
+<title>Film group — Film Groups</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
@@ -22,22 +22,11 @@
     </nav>
   </div>
 </header>
-<main>
-  <h1>The catalog</h1>
-  <p class="subtitle">Every crystallographic symmetry type of a looping animation
-  that tiles the plane. Click a card to open that group's own page.</p>
-  <p class="hint">Cards start paused: <kbd>&#9654;</kbd> below a card plays it in
-  place, and pointing at a card lets <kbd>&larr;</kbd> <kbd>&rarr;</kbd> jump
-  between the loop's symmetry instants (shift: step frame by frame). The
-  selection is in the address bar, so a filtered catalog can be linked to.</p>
-
-  <div class="filters" id="filters"></div>
-  <div class="cardgrid" id="grid"></div>
-</main>
+<main class="narrow" id="group-page"></main>
 <footer class="site">
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/catalog.js?v=29"></script>
+<script type="module" src="js/group.js?v=29"></script>
 </body>
 </html>

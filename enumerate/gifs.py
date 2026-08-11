@@ -205,8 +205,10 @@ def _scale_of(T):
 
 
 CELLS = 4          # translation repeats across the frame, as renderer.js
-MIN_CELLS = 3      # the fewest a dense group may be relaxed to
-MIN_MOTIF_PX = 13  # below this the clock stops being readable
+PACK = 0.52        # fraction of the nearest-neighbour distance a motif takes
+MOTIF_ROWS = 5.8   # motif-size floor: at most this many motif rows per side
+MOTIF_FLOOR = PACK / MOTIF_ROWS
+MOTIF_FLOOR_PX = 13   # absolute floor, for frames too small for the above
 MAX_COLUMNS = 18   # hard ceiling on motifs across the frame
 
 
@@ -235,14 +237,16 @@ def _columns_at(spec, size, cell):
 
 def _auto_cell(spec, size):
     """Uniform cell spacing, mirroring renderer.js: CELLS repeats across the
-    frame, relaxed towards MIN_CELLS when that is the only way to keep the
-    motifs big enough to read, and finally capped so that no more than
-    MAX_COLUMNS motifs are shown across. GIF frames are square, so both sides
-    show the same count."""
+    frame, then raised without bound until the motif reaches the size floor
+    (no group's copies may come out smaller than another's), then raised again
+    if more than MAX_COLUMNS motifs would be shown across. All three rules
+    only ever raise the cell, so they cannot fight. GIF frames are square, so
+    both sides show the same count."""
     cell = _cell_for(spec, size, CELLS)
     r = _motif_radius(spec, cell) / SS
-    if r > 0 and r < MIN_MOTIF_PX:
-        cell = min(cell * (MIN_MOTIF_PX / r), _cell_for(spec, size, MIN_CELLS))
+    floor = max(MOTIF_FLOOR_PX, size * MOTIF_FLOOR)
+    if r > 0 and r < floor:
+        cell *= floor / r          # motifR is exactly linear in cell
     cols = _columns_at(spec, size, cell)
     if cols > MAX_COLUMNS:
         cell *= cols / MAX_COLUMNS
@@ -281,7 +285,7 @@ def _motif_radius(spec, cell):
             d = math.hypot(dx, dy)
             if d > 1e-6 and d < min_d:
                 min_d = d
-    return min(0.40 * min(l1, l2), 0.52 * min_d) * spec.get("motifScale", 1)
+    return min(0.40 * min(l1, l2), PACK * min_d) * spec.get("motifScale", 1)
 
 
 def render_frame(spec, t, size, cell=None, rings=True):

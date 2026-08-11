@@ -1,8 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=28";
-import { attachControls } from "./controls.js?v=28";
-import { attachStage } from "./stage.js?v=28";
+import { FilmGroupAnimation } from "./renderer.js?v=29";
+import { attachControls } from "./controls.js?v=29";
+import { attachStage } from "./stage.js?v=29";
 
 const FEATURED = [
   {

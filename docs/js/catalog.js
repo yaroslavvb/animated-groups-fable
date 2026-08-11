@@ -1,15 +1,18 @@
 /* Catalog browser: loads data/catalog.json, filterable card grid with
  * lazily-animated canvases. Cards start paused showing their first frame;
  * visibility only decides whether an animation the viewer has started is
- * actually burning frames. */
+ * actually burning frames. Each card is a link to that group's own page
+ * (group.html?g=…) — picture and caption both — and the card's control bar
+ * keeps play/pause and scrubbing in place. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=28";
-import { attachControls } from "./controls.js?v=28";
-import { WALLPAPERS } from "./wallpaper-data.js?v=28";
+import { FilmGroupAnimation } from "./renderer.js?v=29";
+import { attachControls } from "./controls.js?v=29";
+import { WALLPAPERS } from "./wallpaper-data.js?v=29";
+import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=29";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=28";
+import { attachStage } from "./stage.js?v=29";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -31,21 +34,19 @@ async function init() {
  * over p4m. Filters left at "all" are omitted, so the bare catalog.html URL
  * stays clean, and a value the enumeration does not offer (a hand-edited or
  * stale link) falls back to "all" rather than showing an empty grid. */
-const URL_FILTERS = [
-  ["f-system", "system"],
-  ["f-base", "base"],
-  ["f-time", "time"],
-  ["f-sym", "type"],
-  ["f-prod", "product"],
-];
-
-function filtersToUrl() {
+/* the selection the controls currently express, as query parameters — the one
+ * representation of it, shared with the group pages via filters.js */
+function currentQuery() {
   const q = new URLSearchParams();
-  for (const [id, key] of URL_FILTERS) {
+  for (const [id, key] of FILTER_KEYS) {
     const v = document.getElementById(id).value;
     if (v) q.set(key, v);
   }
-  const s = q.toString();
+  return q;
+}
+
+function filtersToUrl() {
+  const s = currentQuery().toString();
   return location.pathname + (s ? "?" + s : "");
 }
 
@@ -59,7 +60,7 @@ function filtersChanged() {
 
 function applyUrl() {
   const q = new URLSearchParams(location.search);
-  for (const [id, key] of URL_FILTERS) {
+  for (const [id, key] of FILTER_KEYS) {
     const sel = document.getElementById(id);
     const want = q.get(key) || "";
     sel.value = [...sel.options].some(o => o.value === want) ? want : "";
@@ -68,16 +69,14 @@ function applyUrl() {
   openFromHash();
 }
 
-/* deep links: catalog.html#g94 scrolls to the card and opens its detail
- * modal (used by the notation examples and the wallpaper atlas) */
+/* Old deep links: catalog.html#g94 used to scroll to a card and open a modal.
+ * Groups now have real pages, so the anchor forwards to one — links from the
+ * notation examples and the wallpaper atlas, and anything already bookmarked,
+ * keep working and land somewhere better. */
 function openFromHash() {
   const id = location.hash.replace(/^#/, "");
-  if (!id) return;
-  const g = state.groups.find(x => x.id === id);
-  if (!g) return;
-  const card = document.querySelector(`[data-gid="${id}"]`);
-  if (card) card.scrollIntoView({ block: "center", behavior: "instant" });
-  showDetail(g);
+  if (!id || !state.groups.some(x => x.id === id)) return;
+  location.replace(groupHref(id, location.search));
 }
 
 function uniq(arr) { return [...new Set(arr)]; }
@@ -108,19 +107,6 @@ function buildFilters(data) {
   bar.append(count);
 }
 
-function passes(g) {
-  const v = id => document.getElementById(id).value;
-  if (v("f-system") && g.system !== v("f-system")) return false;
-  if (v("f-base") && g.base !== v("f-base")) return false;
-  if (v("f-time") === "forward" && !g.forward) return false;
-  if (v("f-time") === "with reversal" && g.forward) return false;
-  if (v("f-sym") === "symmorphic" && !g.symmorphic) return false;
-  if (v("f-sym") === "nonsymmorphic" && g.symmorphic) return false;
-  if (v("f-prod") === "product" && !g.product) return false;
-  if (v("f-prod") === "not a product" && g.product) return false;
-  return true;
-}
-
 let observer = null;
 
 function render() {
@@ -130,7 +116,8 @@ function render() {
   if (observer) observer.disconnect();
   grid.innerHTML = "";
 
-  const shown = state.groups.filter(passes);
+  const q = currentQuery();
+  const shown = state.groups.filter(g => passes(g, q));
   document.getElementById("f-count").textContent =
     `${shown.length} / ${state.groups.length} groups`;
 
@@ -145,7 +132,12 @@ function render() {
     grid.append(card);   // attach before constructing: geometry reads clientWidth
     const anim = new FilmGroupAnimation(canvas, g.render);
     state.anims.set(g.id, anim);
-    attachStage(anim, canvas);   // play button + keyboard, paints the still frame
+    // On a card the picture is a LINK to the group's own page, not the play
+    // button it is everywhere else: a grid of 275 is something you browse, and
+    // the thing you want from a thumbnail is the group. Play/pause stays on
+    // the control bar below, and the arrow keys still scrub in place.
+    const href = groupHref(g.id, location.search);
+    attachStage(anim, canvas, { href });
     attachControls(anim, card);
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -160,9 +152,7 @@ function render() {
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);
-    // the picture toggles playback (stage.js), so the caption is what opens
-    // the detail modal
-    meta.onclick = () => showDetail(g);
+    meta.onclick = () => { location.href = href; };
     observer.observe(card);
   }
 }
@@ -178,33 +168,6 @@ function onVisible(entries) {
       anim.stop();              // leaves playRequested alone: it resumes
     }
   }
-}
-
-/* ------- detail modal ------- */
-function showDetail(g) {
-  const dlg = document.getElementById("detail");
-  document.getElementById("d-sym").innerHTML = g.symbolHtml;
-  document.getElementById("d-hm").textContent = g.hm || "";
-  document.getElementById("d-desc").innerHTML = g.notes || "";
-  document.getElementById("d-gens").textContent = g.generators.join("\n");
-  const tags = document.getElementById("d-tags");
-  tags.innerHTML =
-    `<span class="tag">${g.system}</span>` +
-    `<span class="tag">base ${baseLabel(g.base)}</span>` +
-    `<span class="tag">${g.bravais}</span>` +
-    (g.symmorphic ? `<span class="tag">symmorphic</span>` : `<span class="tag nonsym">nonsymmorphic</span>`) +
-    (g.forward ? `<span class="tag">clockwork</span>` : `<span class="tag rev">time reversal</span>`) +
-    (g.product ? `<span class="tag">product type</span>` : `<span class="tag nonsym">not a product</span>`);
-  dlg.showModal();
-  const canvas = document.getElementById("d-canvas");
-  if (state.detailAnim) state.detailAnim.stop();
-  state.detailAnim = new FilmGroupAnimation(canvas, g.render);
-  attachStage(state.detailAnim, canvas);   // the dialog canvas is reused;
-                                           // attachStage replaces its overlay
-  const cbox = document.getElementById("d-controls");
-  cbox.innerHTML = "";
-  attachControls(state.detailAnim, cbox);
-  dlg.onclose = () => { if (state.detailAnim) state.detailAnim.stop(); };
 }
 
 init();
