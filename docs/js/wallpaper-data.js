@@ -169,14 +169,22 @@ export function isTrivialClock(g) {
   return !!(g.forward && g.product);
 }
 
-/* Tab order: the groups that do something with time first — forward-time,
- * then reversal — and the trivial clock LAST. It used to lead, on the reading
- * that a section should open with its simplest member; but a section is read
- * to see what time can do over that wallpaper, and opening on the one group
- * where the answer is "nothing" buries the point. It stays in the list, at the
- * end and greyed (tabs.js), as the baseline to compare against. */
+/* Tab order, in two runs that tabs.js colours and separates:
+ *
+ *   1. FORWARD time — no reversal anywhere in the group. The trivial clock is
+ *      forward too and sits at the END of this run: it used to lead the whole
+ *      section, on the reading that a section should open with its simplest
+ *      member, but a section is read to see what time can do over that
+ *      wallpaper and opening on the one group where the answer is "nothing"
+ *      buries the point. It stays as the baseline, last and greyed.
+ *   2. WITH TIME REVERSAL.
+ *
+ * The trivial clock is last of the forward run rather than last of all tabs,
+ * so that the run a tab sits in always tells the truth about whether its group
+ * reverses time — a forward group parked after the reversal ones would make
+ * the colouring lie. */
 export function sectionSort(list) {
-  const rank = g => (isTrivialClock(g) ? 2 : g.forward ? 0 : 1);
+  const rank = g => (!g.forward ? 2 : isTrivialClock(g) ? 1 : 0);
   return [...list].sort((a, b) =>
     rank(a) - rank(b) || Number(a.id.slice(1)) - Number(b.id.slice(1)));
 }

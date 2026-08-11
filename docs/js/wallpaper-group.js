@@ -3,9 +3,9 @@
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=33";
+import { buildTabs } from "./tabs.js?v=34";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=33";
+  from "./wallpaper-data.js?v=34";
 
 const hm = new URLSearchParams(location.search).get("g");
 const idx = WALLPAPERS.findIndex(w => w.hm === hm);
@@ -48,5 +48,6 @@ if (idx < 0) {
   const tabHost = document.createElement("div");
   tabHost.className = "tabdemo big";
   listDiv.append(tabHost);   // attach before constructing animations
-  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })));
+  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })),
+            { split: true });   // forward run, then the reversal run
 }

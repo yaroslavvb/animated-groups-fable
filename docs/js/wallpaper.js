@@ -4,9 +4,9 @@
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=33";
+import { buildTabs } from "./tabs.js?v=34";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=33";
+  from "./wallpaper-data.js?v=34";
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const byBase = new Map(WALLPAPERS.map(w => [w.hm, []]));
@@ -54,7 +54,8 @@ for (const w of WALLPAPERS) {
   const tabHost = document.createElement("div");
   tabHost.className = "tabdemo";
   sec.append(tabHost);
-  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })));
+  buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })),
+            { split: true });   // forward run, then the reversal run
 
   const all = document.createElement("p");
   all.className = "alllink";

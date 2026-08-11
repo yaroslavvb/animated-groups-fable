@@ -9,6 +9,12 @@
   --accent2: #c0392b;
   --gold: #e0913c;
   --rule: #e3e0d8;
+  /* the forward-time run of a wallpaper section's tabs (css .tabbtn.fwd):
+     a green quiet enough to sit beside the grey run without competing with
+     the animation, and dark enough on it to pass as body-weight text */
+  --fwd-bg: #e6f0e6;
+  --fwd-rule: #c3dbc7;
+  --fwd-ink: #2f6b46;
   --code-bg: #f1efe9;
   --shadow: 0 1px 3px rgba(30, 30, 60, 0.08), 0 4px 16px rgba(30, 30, 60, 0.05);
 }
@@ -23,6 +29,9 @@
     --accent2: #e07460;
     --gold: #e0b23c;
     --rule: #2c303c;
+    --fwd-bg: #1e2a24;
+    --fwd-rule: #33473b;
+    --fwd-ink: #86c39d;
     --code-bg: #232733;
     --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
@@ -417,6 +426,22 @@ footer.site {
 .tabbtn.trivial { opacity: 0.55; font-weight: 500; }
 .tabbtn.trivial.active { opacity: 0.8; color: var(--muted); }
 .tabbtn.trivial:hover { opacity: 0.9; }
+
+/* Two runs in the wallpaper atlas (tabs.js `split`): the film groups with NO
+ * time reversal, tinted green, then the ones that reverse time, in the row's
+ * usual grey. `.tabsplit` is a zero-height full-width flex item, so the
+ * reversal run always begins on a line of its own however the row wraps —
+ * which matters most in the big sections, where 36 tabs wrap several times
+ * and colour alone would not read as a grouping. The active tab keeps its
+ * run's ink colour over the pane background, so the group being shown still
+ * says which run it came from. */
+.tabsplit { flex-basis: 100%; height: 0.3rem; }
+.tabbtn.fwd {
+  background: var(--fwd-bg);
+  border-color: var(--fwd-rule);
+  color: var(--fwd-ink);
+}
+.tabbtn.fwd.active { background: var(--panel); color: var(--fwd-ink); }
 .tabpane {
   display: none;
   background: var(--panel);
