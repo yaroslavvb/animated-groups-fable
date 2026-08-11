@@ -131,6 +131,10 @@ export function verifyFrames(makeAnim, spec, opts = {}) {
   cvB.width = cvB.height = size;
   cvB.style.width = cvB.style.height = size + "px";
   const animB = makeAnim(cvB);
+  // The phase ring is a screen-space annotation, deliberately not rotated
+  // with its copy (renderer.js), so it is switched off here: invariance is
+  // asserted of the pattern proper — the comma bodies and their fill.
+  animA.showPhase = animB.showPhase = false;
   const B = spec.basis;
   const cell = animA.cell;
 

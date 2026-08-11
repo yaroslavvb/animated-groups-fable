@@ -293,7 +293,8 @@ button.linkish:hover { border-color: var(--accent); color: var(--accent); }
   flex: none;
 }
 .anim-controls .ac-btn:hover { border-color: var(--accent); color: var(--accent); }
-.anim-controls .ac-slider { flex: 1; min-width: 0; accent-color: var(--accent); }
+.anim-controls .ac-col { flex: 1; min-width: 0; }
+.anim-controls .ac-slider { width: 100%; display: block; accent-color: var(--accent); }
 .anim-controls .ac-label {
   color: var(--muted);
   font-size: 0.72rem;
@@ -302,6 +303,67 @@ button.linkish:hover { border-color: var(--accent); color: var(--accent); }
   min-width: 4.2em;
   text-align: right;
 }
+
+/* ------- the time-symmetry ruler under the scrub bar (js/controls.js) -----
+ * One tick per distinguished instant of the loop: a labelled bar at the beats
+ * t = k/N, a lozenge at the palindrome pivots of a time reversal. Clicking a
+ * tick seeks to it. Marks are positioned along the THUMB'S TRAVEL (the inline
+ * calc() controls.js writes), so a tick lines up with the thumb that sits on
+ * it. The row keeps its own height so the ticks never overlap the track. */
+.anim-controls .ac-marks {
+  position: relative;
+  height: 0.95rem;
+  margin-top: 1px;
+}
+.anim-controls .ac-mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+/* the tick itself, drawn with ::before so the label can sit under it */
+.anim-controls .ac-mark::before {
+  content: "";
+  width: 1px;
+  height: 4px;
+  background: var(--muted);
+  opacity: 0.7;
+}
+.anim-controls .ac-mark-mirror::before {
+  /* palindrome pivot: a lozenge, in the reversal colour used by the
+     symmetry-element overlay */
+  width: 5px;
+  height: 5px;
+  background: #8e44ad;
+  opacity: 0.85;
+  transform: rotate(45deg) scale(0.8);
+}
+.anim-controls .ac-mark-both::before { background: #8e44ad; opacity: 0.9; width: 2px; }
+.anim-controls .ac-mark:hover::before,
+.anim-controls .ac-mark:focus-visible::before {
+  background: var(--accent2);
+  opacity: 1;
+  height: 6px;
+}
+.anim-controls .ac-mark-label {
+  font-size: 8.5px;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.anim-controls .ac-mark:hover .ac-mark-label { color: var(--accent2); }
 
 figure { margin: 1.4rem 0; }
 figcaption { font-size: 0.9rem; color: var(--muted); margin-top: 0.4rem; }

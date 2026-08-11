@@ -31,17 +31,30 @@ Ke&ndash;Wu (2026).</p>
 <p class="hint">Every animation on this site starts paused. Click one to play
 or pause it (<kbd>space</kbd> does the same once you have clicked), or point at
 a frame and step through the loop with <kbd>&larr;</kbd> <kbd>&rarr;</kbd> —
-hold shift for finer steps.</p>
+hold shift for finer steps. <kbd>⏮</kbd> returns the loop to t&nbsp;=&nbsp;0.</p>
+
+<p class="hint"><b>Reading a diagram.</b> The motif is a comma — an
+asymmetric, handed shape, so a rotated copy looks rotated and a reflected copy
+looks reflected. It fills like a vessel once per period: its fill level
+<em>is</em> its internal time. The ring around it is a <em>phase
+visualiser</em>: the group's time operations cut the period into a whole
+number of intervals, the ring shows one arc per interval, and the lit arc is
+the interval that copy is currently in. Rings are drawn upright on the screen
+and are never turned with their copy, so the same interval is the same arc
+everywhere and a staircase of phases can be read off at a glance. The same
+intervals are marked under the scrub bar — click a mark to jump to it
+(<span style="color:#8e44ad;">◆</span> marks an instant about which the loop
+is a palindrome).</p>
 
 <div class="demo">
   <canvas id="hero"></canvas>
   <div class="caption"><span class="sym">6<sub>1</sub>3<sub>1</sub>2<sub>1</sub></span> —
   the time-axis P6<sub>1</sub>. Rotating the plane by 60° about a six-fold
   centre has exactly the same effect as letting the animation run for one sixth
-  of its period. Watch the fill levels: each motif is a vessel that fills once
-  per period, and around each 6-centre the six copies are filled one sixth
-  apart — a staircase of phases. No change of coordinates makes this a static
-  wallpaper with an independent clock.</div>
+  of its period. Watch the fill levels: each comma fills once per period, and
+  around each 6-centre the six copies are filled one sixth apart — a staircase
+  of phases, which their rings read out as six arcs stepping round. No change
+  of coordinates makes this a static wallpaper with an independent clock.</div>
 </div>
 
 <h2 id="setup">1. Animations as spacetime crystals</h2>
@@ -84,9 +97,9 @@ mirror m<sub>x</sub>, the time mirror m<sub>t</sub> (the loop is a palindrome),
 and their product, the 2-fold spacetime rotation (flip space <em>and</em>
 reverse time). Combined with fractional translations these give exactly
 <b>13 groups</b> (Xu&ndash;Wu 2018) — the film-group analogue of the 7 frieze
-groups. All thirteen, live (each motif fills like a vessel once per period —
-its fill level <em>is</em> its internal time — so phase differences are
-visible at a glance, and time-reversed copies drain while the others fill):</p>
+groups. All thirteen, live (each comma fills once per period — its fill level
+<em>is</em> its internal time — so phase differences are visible at a glance,
+and time-reversed copies drain while the others fill):</p>
 
 <div id="strips"></div>
 
@@ -206,6 +219,6 @@ P. Scott, <i>The geometries of 3-manifolds</i>, Bull. LMS <b>15</b> (1983)
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/tutorial.js?v=21"></script>
+<script type="module" src="js/tutorial.js?v=22"></script>
 </body>
 </html>

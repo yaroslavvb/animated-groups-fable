@@ -5,8 +5,9 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=21";
-import { Playback } from "./playback.js?v=21";
+import { drawMotif, drawPhaseRing } from "./renderer.js?v=22";
+import { Playback } from "./playback.js?v=22";
+import { stripTimeSymmetry } from "./phases.js?v=22";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -42,6 +43,9 @@ export class StripAnimation extends Playback {
     this.spec = spec;
     this.cellOverride = opts.cell || null;  // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 88;    // else derived per draw from width
+    this.showPhase = opts.showPhase !== false;
+    this.timeSym = stripTimeSymmetry(spec);
+    this.beats = this.timeSym.n;
     this.specCheck = verifyStripSpec(spec);
     if (!this.specCheck.ok) {
       console.error("Strip spec fails group axioms:", this.specCheck.errors, spec);
@@ -89,6 +93,8 @@ export class StripAnimation extends Playback {
       c = Math.min(c, w / 2.2);
       this.cell = c;
     }
+    // the phase ring reaches 0.85 r, so the copies stay clear of each other
+    // at the same spacing the bare motif used
     const r = Math.min(0.30 * this.cell, 0.34 * h);
     const base = 0.27;  // generic offset within the cell
     const copies = [];
@@ -112,6 +118,20 @@ export class StripAnimation extends Playback {
           ctx.translate(x, 0);
           ctx.scale(m, 1);   // spatial mirror flips the motif
           drawMotif(ctx, theta, r, null, layer);
+          ctx.restore();
+        }
+      }
+    }
+    // the phase readout: translated to each copy but never mirrored with it,
+    // so one interval of the period is one arc everywhere (renderer.js)
+    if (this.showPhase) {
+      for (const [m, v, s, tau] of copies) {
+        for (let k = -span; k <= span; k++) {
+          const x = (m * base + v + k) * this.cell;
+          if (x < -w / 2 - r || x > w / 2 + r) continue;
+          ctx.save();
+          ctx.translate(x, 0);
+          drawPhaseRing(ctx, s * (t - tau), r, this.beats);
           ctx.restore();
         }
       }

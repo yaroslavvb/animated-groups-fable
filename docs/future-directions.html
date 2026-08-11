@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Future Directions: Coloured Groups + Film Groups</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+<h1>Future directions: coloured groups + film groups</h1>
+<p class="subtitle">A film group is a wallpaper group coloured by a circle of
+phases. The discrete theory of colour symmetry is the natural companion —
+and the natural next step — of the clockwork orbifold notation.</p>
+
+<h2 id="colour">1. Colour symmetry in one paragraph</h2>
+
+<p>A <em>perfect colouring</em> of a wallpaper pattern assigns each copy of
+the motif one of N colours so that every symmetry of the uncoloured pattern
+permutes the colours consistently: following van der Waerden and Burckhardt,
+a colouring is a homomorphism φ from the wallpaper group Γ onto a transitive
+group of colour permutations, two colourings being equivalent when the pairs
+(Γ,&nbsp;φ) are. For two colours the data is just the index-2 subgroup
+H&nbsp;=&nbsp;ker&nbsp;φ of colour-preserving operations, and the classical
+count is <b>46</b> two-coloured (black–white, <em>dichromatic</em>) plane
+types, alongside the 17 uncoloured and the 17 <em>grey</em> types in which
+the swap commutes with everything — 80 Shubnikov classes in all. The 46
+split further into 28 whose swaps are point operations and 18 whose swap is
+an <em>anti-translation</em> (Belov's p<sub>b</sub>′-type coloured
+lattices) — the exact two-colour ancestors of the <span class="sym">c</span>
+and <span class="sym">r</span> stacking prefixes. The subject is older than
+it looks: Alexander and Herrmann's eighty two-dimensional <em>layer
+groups</em> (1929) match the 80 dichromatic classes one-for-one, reflection
+through the layer plane playing colour swap — precisely the trick film
+groups play with time.</p>
+
+<p>Two notations coexist. Crystallographers, after Belov and Tarkhova, prime
+the colour-reversing operations (p4′g′m); <i>The Symmetries of Things</i>
+(Part II, chapters 11–13) instead names a colouring by the orbifold
+<em>pair</em> full group&thinsp;/&thinsp;colour-preserving kernel — Escher's
+threefold reptiles are its <span class="sym">632//333</span>. The clockwork
+notation's <a href="notation.html">reversal clause</a> is the ToS pair read
+backwards: <span class="sym">o/m′[*×]</span> lists the kernel with its
+clocks, then the full projection in the bracket — the pair
+<span class="sym">*×&thinsp;/&thinsp;o</span>.</p>
+
+<div class="aside" id="lit">
+<span class="label">Literature</span>
+<p style="margin:0.3rem 0;">H.&thinsp;J. Woods, "The geometrical basis of
+pattern design IV: counterchange symmetry in plane patterns", J. Textile
+Inst. 27 (1936) T305–T320 — first enumeration of the 46 (fifteen years
+before the Shubnikov school; see D.&thinsp;W. Crowe, Comput. Math. Appl.
+12B, 1986); H. Heesch (Z. Krist. 73, 1930) for the antisymmetry operation;
+W. Alexander &amp; K. Herrmann (Z. Krist. 70, 1929) for the 80 layer groups;
+N.&thinsp;V. Belov &amp; T.&thinsp;N. Tarkhova, "Groups of colored symmetry"
+(Kristallografiya 1, 1956) — the primed notation and polychromatic
+generalisations; B.&thinsp;L. van der Waerden &amp; J.&thinsp;J. Burckhardt,
+"Farbgruppen" (Z. Kristallogr. 115, 1961) — colourings as homomorphisms;
+T.&thinsp;W. Wieting, <i>The Mathematical Theory of Chromatic Plane
+Ornaments</i> (1982) — counts for all N&nbsp;≤&nbsp;60;
+J.&thinsp;D. Jarratt &amp; R.&thinsp;L.&thinsp;E. Schwarzenberger,
+"Coloured plane groups" (Acta Cryst. A36, 1980);
+R.&thinsp;L.&thinsp;E. Schwarzenberger, "Colour symmetry" (Bull. LMS 16,
+1984) — a survey of the competing definitions; B. Grünbaum &amp;
+G.&thinsp;C. Shephard, <i>Tilings and Patterns</i> (1987), ch. 8;
+D.&thinsp;K. Washburn &amp; D.&thinsp;W. Crowe, <i>Symmetries of Culture</i>
+(1988); M. Senechal, "Color symmetry" (Comput. Math. Appl. 16, 1988);
+J.&thinsp;H. Conway, H. Burgiel, C. Goodman-Strauss, <i>The Symmetries of
+Things</i> (2008), Part II. For the space-time lineage: T. Janssen,
+A. Janner &amp; E. Ascher, "Crystallographic groups in space and time"
+(Physica 41, 1969) already generalises Shubnikov groups by discrete time
+translations; V. Gopalan, "Relativistic spacetime crystals" (Acta Cryst.
+A77, 2021) applies colour groups to boosts rather than clocks.</p>
+</div>
+
+<h2 id="bw">2. Two colours, first way: play it backwards</h2>
+
+<p>Time reversal is a two-colouring of spacetime: the forward part
+G<sup>+</sup> sits inside a film group G with index 2, exactly as the
+colour-preserving subgroup sits inside a dichromatic group. Paint every
+copy of the motif by its time sign and the film becomes a black–white
+pattern; "swap the colours" reads "play the film backwards". The example
+below is <span class="sym">o/g′</span>, glide time-reversal: the swap is
+carried by a half-cell translation, so black and white columns alternate —
+one of the classical translation-swap ("p<sub>b</sub>′") colourings.</p>
+
+<div class="wp-pair" id="pair-bw"></div>
+
+<p>Restricted to the film groups with no clock at all — every forward
+operation instantaneous, no time-centred lattice — this correspondence is
+exact enough to count. The catalog contains <b><span data-cc="gray">…</span></b>
+grey classes (the products <span class="sym">/1′</span>) and
+<b><span data-cc="proper">…</span></b> proper clockless reversal classes.
+<span id="count-note">Against the classical 46 the proper count reads 45,
+and the missing pair is a theorem, not an accident. The one absent type is
+(cmm,&nbsp;cm) — Belov's cmm′ — and it is not missing from the catalog,
+only from the clockless census: re-base the spacetime lattice, trading the
+colour-preserving translation axis for time, and its centred spatial
+lattice becomes a time-centring. The catalog files it as the clocked class
+<span class="sym">c**/m′[*2222]</span>. This is the reversal-layer instance
+of the mechanism that files <span class="sym">~*~*</span> under
+<span class="sym">××</span>; the strict frame-preserving classification
+(283 classes) separates the two readings again.</span></p>
+
+<h2 id="checker">3. Two colours, second way: wait half a period</h2>
+
+<p>Colour symmetry does not care whether the swap is realised by an
+orientation-reversing operation of time or by time itself. A film group
+whose clock takes only the values 0 and ½ paints the same two colours
+<em>unitarily</em>: copies at phase 0 in one colour, copies at phase ½ in
+the other, and the swap is "wait half a period". Time-centred lattices are
+the purest case — <span class="sym">c222<sub>1</sub>2<sub>1</sub></span>
+is the checkerboard whose two sublattices trade colours every half
+period — and the 2₁ screws and tilded mirrors are the point-operation
+swaps. The data is once more a pair (Γ, index-2 kernel), so this is a
+second film reading of the dichromatic types; the catalog has
+<b><span data-cc="n2">…</span></b> forward classes with clock denominator 2
+rather than 46, because the film equivalence coarsens the
+translation-supported types — the same convention gap §4 quantifies.</p>
+
+<div class="wp-pair" id="pair-checker"></div>
+
+<h2 id="ncolour">4. N colours: the clock as a paint pot</h2>
+
+<p>Now let the colour group be cyclic of order N. A perfect
+ℤ<sub>N</sub>-colouring of Γ is a homomorphism φ:&nbsp;Γ&nbsp;→&nbsp;ℤ<sub>N</sub>;
+a forward film group whose offsets have denominator N is <em>literally</em>
+this datum, with φ(g)&nbsp;=&nbsp;N·τ(g)&nbsp;mod&nbsp;N. Sample the film at
+N equally spaced instants and paint each copy by the instant at which it is,
+say, full: a time screw <span class="sym">n<sub>k</sub></span> becomes a
+gyration that advances the colour by k — Escher's trick of rotating a
+pattern into its own recolouring. The static colourings below are computed
+from the film specs themselves (hue&nbsp;=&nbsp;phase): four colours cycling
+around every 4-centre of <span class="sym">4<sub>1</sub>4<sub>1</sub>2<sub>1</sub></span>,
+six around every 6-centre of <span class="sym">6<sub>1</sub>3<sub>1</sub>2<sub>1</sub></span>.</p>
+
+<div class="wp-pair" id="pair-z4"></div>
+<div class="wp-pair" id="pair-z6"></div>
+
+<p>Counting by clock denominator, the forward layer of the catalog computes
+the cyclic colour symmetries of the plane under film equivalence:</p>
+
+<table class="counts">
+<tr><th>colours N</th><th>1</th><th>2</th><th>3</th><th>4</th><th>6</th><th>Σ</th></tr>
+<tr><td>forward film groups</td>
+<td><span data-cc="n1">…</span></td><td><span data-cc="n2b">…</span></td>
+<td><span data-cc="n3">…</span></td><td><span data-cc="n4">…</span></td>
+<td><span data-cc="n6">…</span></td><td><b><span data-cc="nf">…</span></b></td></tr>
+</table>
+
+<p>One caveat keeps the comparison honest. Chromatic classification counts
+pairs (Γ,&nbsp;φ) up to plane-affine equivalence; the film classification
+additionally allows Galilean boosts and re-basings of the spacetime lattice.
+Where φ is supported on translations alone the film equivalence is strictly
+coarser — a drifting colour gradient can be panned away — which is why the
+p1, pm and pg rows of the film table are bare: their cyclic colourings are
+all translation-supported. And keeping 3D orientation, the film count
+distinguishes mirror-image colourings the chromatic tables merge. The
+published counts of <em>all</em> perfect colourings are 46, 23, 96, 14, 90
+for N&nbsp;=&nbsp;2…6 (Wieting; Jarratt–Schwarzenberger; Grünbaum–Shephard);
+of p3's two published three-colourings, the gyrational one — the colour
+symmetry of Escher's 1939 reptiles — returns above as the chiral pair
+<span class="sym">3<sub>1</sub>3<sub>1</sub>3<sub>1</sub></span>,
+<span class="sym">3<sub>2</sub>3<sub>2</sub>3<sub>2</sub></span>, and the
+sublattice one as <span class="sym">r33<sub>1</sub>3<sub>2</sub></span>.
+The disagreement between the two censuses is itself a theorem about which
+colourings survive being read as motion.</p>
+
+<h2 id="circle">5. The circle: colouring without quantisation</h2>
+
+<p>Set aside the sampling. A forward film group simply <em>is</em> a
+homomorphism-like cocycle φ:&nbsp;Γ&nbsp;→&nbsp;ℝ/ℤ — a colouring of the
+wallpaper group by the circle of phases — classified, as the
+<a href="notation.html">notation page</a> describes, by
+H¹(P,&nbsp;ℝ³/L) and its normaliser action. Every clockwork decoration is
+chromatic data read continuously: gyration subscripts are the colours of
+rotations, tildes the half-turn of colour on mirrors, the
+<span class="sym">c</span> and <span class="sym">r</span> prefixes the
+colours of translations, and the reversal clause the anti-unitary layer that
+discrete colour theory calls black–white. The clockwork orbifold symbol is,
+in this reading, a <em>chromatic orbifold symbol for the colour group
+ℝ/ℤ</em> — the discrete colour notations are its quotients, and the film is
+what a colouring looks like when the colours are moments.</p>
+
+<h2 id="directions">6. Directions</h2>
+
+<p>Four seem worth walking. <b>(i) Coloured clockwork.</b> A fully coloured
+clockwork orbifold — <i>The Symmetries of Things</i>' pair notation with
+clocks on the kernel, or equivalently Belov-style primes distributed over
+the bracketed projection's features — would unify this catalog with the
+two-colour tables and settle the residual superscript-letter collisions
+structurally. <b>(ii) Colour × time.</b>
+Films of coloured patterns: cocycles into ℤ<sub>M</sub>&nbsp;×&nbsp;ℝ/ℤ,
+whose classification would organise, e.g., animations that recolour as they
+loop. <b>(iii) Non-cyclic colour groups.</b> Perfect colourings with colour
+group S₃ or the quaternion trick of Wieting have no film analogue yet —
+they would correspond to motifs carrying non-abelian internal states, a
+step from clocks toward connections. <b>(iv) The chromatic count as
+homology.</b> The tables above suggest reading the discrepancy between
+chromatic and film equivalence as the action of the boost/re-basing group
+on H¹ — a finite computation this repository already performs, worth
+stating as theorems rather than counts.</p>
+
+</main>
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/future-directions.js?v=22"></script>
+</body>
+</html>

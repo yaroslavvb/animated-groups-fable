@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>dev check</title>
+<link rel="stylesheet" href="css/style.css?v=22">
+<style>body{margin:0;padding:10px;} .row{display:flex;gap:8px;flex-wrap:wrap;}
+.box{border:1px solid #ccc;background:#fff;} .box canvas{display:block;}
+h3{font:12px system-ui;margin:6px 0 2px;}</style>
+</head><body>
+<div id="out"></div>
+<script type="module">
+import { FilmGroupAnimation } from "./js/renderer.js?v=22";
+import { StripAnimation } from "./js/strip.js?v=22";
+import { attachControls } from "./js/controls.js?v=22";
+import { attachStage } from "./js/stage.js?v=22";
+
+const params = new URLSearchParams(location.search);
+const mode = params.get("m") || "film";
+const out = document.getElementById("out");
+const feat = await (await fetch("data/featured.json")).json();
+const cat = await (await fetch("data/catalog.json")).json();
+
+function panel(title, w, h, mk) {
+  const wrap = document.createElement("div");
+  const t = document.createElement("h3"); t.textContent = title;
+  const box = document.createElement("div"); box.className = "box";
+  const cv = document.createElement("canvas");
+  cv.style.width = w + "px"; cv.style.height = h + "px";
+  box.append(cv); wrap.append(t, box); out.append(wrap);
+  const a = mk(cv);
+  attachStage(a, cv); attachControls(a, box);
+  a.setPhase(0.3);
+  return a;
+}
+
+if (mode === "strip") {
+  const only = (params.get("s") || "").split(",").filter(Boolean);
+  const W = +(params.get("w") || 700), H = +(params.get("h") || 96);
+  const list = only.length ? feat.strips.filter(s => only.includes(s.name)) : feat.strips;
+  for (const s of list) {
+    const a = panel(s.name, W, H, cv => new StripAnimation(cv, s));
+    out.lastChild.firstChild.textContent = s.name + "  N=" + a.beats;
+  }
+} else {
+  const ids = (params.get("g") || "").split(",").filter(Boolean);
+  const picks = ids.length
+    ? ids.map(id => cat.groups.find(g => g.id === id)).filter(Boolean)
+    : cat.groups.filter(g => ["g1","g6","g225","g49","g235","g259","g258","g116"].includes(g.id));
+  for (const g of picks) {
+    panel(g.symbol + "  [" + g.id + " · " + g.base + "]", 740, 300,
+          cv => new FilmGroupAnimation(cv, g.render));
+  }
+}
+</script>
+</body></html>
