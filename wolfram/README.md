@@ -7,9 +7,24 @@ animation, grouped by wallpaper group. A port of the
 Wolfram Community.
 
 The notebook is **self-contained**: it carries the catalog and the renderer
-inside it, needs no package files and no network, and its `Manipulate` sets
-`SaveDefinitions -> True` so the output keeps working for a reader who never
-evaluates it. Open it and evaluate.
+inside it, and needs no package files and no network.
+
+It has exactly two cells you can evaluate. The first is an **initialization
+cell** holding everything — catalog, renderer, tab helpers — and the notebook
+sets `InitializationCellEvaluation -> True`, so the front end runs it when the
+notebook is opened (about 0.05 s). The second is the `Manipulate`. Running
+that one cell is all a reader has to do. If the front end ever skips the
+automatic run, the viewer fails on the undefined `$WP` with
+`Manipulate::vstype` — the notebook deliberately keeps the
+initialization-cell prompt enabled rather than failing silently, and
+*Evaluation ▸ Evaluate Initialization Cells* fixes it.
+
+The `Manipulate` sets `SaveDefinitions -> True`, so its stored output keeps
+animating for a reader on Wolfram Community who never evaluates anything.
+Everything the body touches is therefore a definition rather than something
+computed in an `Initialization` option: `SaveDefinitions` walks the body and
+does **not** look inside `Initialization`, so a symbol reached only from there
+is missing from the stored output and the viewer arrives dead.
 
 ## Files
 
@@ -21,6 +36,22 @@ evaluates it. Open it and evaluate.
   `wolframscript -f make-guide.wls`.
 
 ## Correctness
+
+Three paths are checked, in a fresh kernel each time:
+
+- **warm** — evaluate the initialization cell, then the `Manipulate` cell.
+  The init cell alone defines all 275 groups, the 17 tab rows and the
+  renderer, in 0.05 s.
+- **cold** — a kernel that has never seen the notebook, given only the
+  `Manipulate`'s stored output. The 2.1 MB of definitions `SaveDefinitions`
+  tucked inside it restore the renderer and the catalog, every tab row still
+  resolves, and frames draw. This is the Community reader.
+- **front end** — a real front end, cursor in the `Manipulate` cell.
+  *Evaluate Initialization* then evaluating that cell gives a live viewer with
+  no messages; evaluating it alone gives `Manipulate::vstype`, which is what
+  the retained prompt is there to prevent. A headless front end does no
+  open-time evaluation at all, so `InitializationCellEvaluation` itself can
+  only be confirmed in the GUI.
 
 The renderer is a port of `docs/js/renderer.js` — same constants, same
 arithmetic — with one convention change: the browser's canvas has y pointing

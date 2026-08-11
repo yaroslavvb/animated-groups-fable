@@ -56,28 +56,45 @@ src = Import[srcPath, "Text"];
 src = StringTrim@StringDrop[src, StringPosition[src, "*)"][[1, 2]]];
 
 (* ------------------------------------------------------------ viewer *)
-viewer = "\
+(* The tabs, worked out once here rather than per frame. Everything the
+   Manipulate's body touches has to be a DEFINITION, because SaveDefinitions
+   walks the body and saves what it finds: it does NOT look inside an
+   Initialization option, so anything reached only from there would be missing
+   from the stored output and the viewer would come up dead for a reader who
+   never evaluates the notebook. *)
+helpers = "\
+(* --------------------------------------------------------------- tabs *)
 (* Tab order, as in the atlas: the groups that do something with time first,
    the trivial clock (identical to its wallpaper group) last of that run and
    greyed, then the groups with time reversal. *)
 FG$rank[g_] := Which[! g[\"Forward\"], 2, g[\"Product\"], 1, True, 0];
+
 FG$over[w_] := SortBy[Select[Keys[$FG], $FG[#][\"Base\"] === w &],
   {FG$rank[$FG[#]] &, ToExpression@StringDrop[#, 1] &}];
 
+FG$tabs = Association[# -> FG$over[#] & /@ $WP[[All, 1]]];
+
+FG$label[g_] := Style[$FG[g][\"Symbol\"],
+  Which[$FG[g][\"Product\"] && $FG[g][\"Forward\"], GrayLevel[0.6],
+        $FG[g][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
+        True, GrayLevel[0.3]]];
+
+(* what a wallpaper's tab row shows until the reader picks something else.
+   A default DownValue, not an assignment made while the viewer runs: the
+   SetterBar's click writes FG$pick[w] and that specific value then wins. *)
+FG$pick[w_] := First[FG$tabs[w]];";
+
+viewer = "\
 Manipulate[
   Column[{
-    SetterBar[Dynamic[FG$pick[w]],
-      (# -> Style[$FG[#][\"Symbol\"],
-         Which[$FG[#][\"Product\"] && $FG[#][\"Forward\"], GrayLevel[0.6],
-               $FG[#][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
-               True, GrayLevel[0.3]]]) & /@ FG$over[w]],
+    SetterBar[Dynamic[FG$pick[w]], (# -> FG$label[#]) & /@ FG$tabs[w]],
     Dynamic@FilmGroupFrame[FG$pick[w], t, {660, 300}]},
    Center, 1],
   {{w, \"p6\", \"\"}, #[[1]] -> Row[{Style[#[[2]], Bold], \" \", #[[1]]}] & /@ $WP,
     ControlType -> SetterBar},
   {{t, 0, \"t\"}, 0, 1, ControlType -> Animator, AnimationRate -> 1/4,
     AppearanceElements -> {\"PlayPauseButton\"}},
-  Initialization :> (FG$pick = Association[# -> First[FG$over[#]] & /@ $WP[[All, 1]]]),
+  TrackedSymbols :> {w},   (* the clock redraws the frame, not the tab row *)
   SaveDefinitions -> True, ControlPlacement -> Top]";
 
 (* ----------------------------------------------------------- notebook *)
@@ -92,22 +109,44 @@ J. H. Conway, H. Burgiel, C. Goodman-Strauss, The Symmetries of Things \
 Atlas and source: https://yaroslavvb.github.io/animated-groups-fable \
 \[LongDash] https://github.com/yaroslavvb/animated-groups-fable";
 
+(* ONE initialization cell: the catalog, the wallpaper list, the renderer and
+   the tab helpers, so the only other cell in the notebook is the Manipulate.
+
+   InitializationCell -> True tags the cell; InitializationCellEvaluation ->
+   True is what asks for it to be run, on open. The warning is deliberately
+   left ON: a front end driven headlessly does no open-time evaluation at all
+   and goes straight to the Manipulate, which then fails with
+   Manipulate::vstype on the undefined $WP, so if the automatic run ever does
+   not happen the reader should be asked rather than shown a broken viewer.
+   Answering it costs one click and about a twentieth of a second. *)
+initCell = StringRiffle[{dataCell, wpCell, src, helpers}, "\n\n"];
+
 cells = {
   Cell["Film groups", "Title"],
   Cell["The 275 space-time groups of the plane, by wallpaper group. \
-Evaluate the notebook.", "Text"],
+Evaluate the animation below.", "Text"],
   Cell[refs, "Text"],
   Cell[CellGroupData[{
     Cell["Catalog and renderer", "Section"],
-    Cell[dataCell, "Input"],
-    Cell[wpCell, "Input"],
-    Cell[src, "Input"]}, Closed]],
+    Cell[initCell, "Input", InitializationCell -> True]}, Closed]],
   Cell["The 17 wallpaper groups", "Section"],
   Cell[viewer, "Input"]};
 
-nb = Notebook[cells, StyleDefinitions -> "Default.nb", WindowSize -> {1000, 800}];
+nb = Notebook[cells, StyleDefinitions -> "Default.nb", WindowSize -> {1000, 800},
+  InitializationCellEvaluation -> True];
 Export[outPath, nb, "NB"];
 Print["wrote ", outPath, "  ", FileByteCount[outPath], " bytes"];
 
 back = Get[outPath];
 Print["round-trips: ", Head[back] === Notebook, "   cells: ", Length[First[back]]];
+Print["init cells: ",
+  Length@Cases[back, Cell[_String, "Input", ___, InitializationCell -> True, ___], Infinity],
+  "   plain Input cells: ",
+  Length@Cases[back, c : Cell[_String, "Input", ___] /; FreeQ[c, InitializationCell], Infinity]];
+(* Options[Notebook[...]] reports the SYMBOL's options, not the expression's,
+   so check the notebook expression itself *)
+Print["evaluates on open: ", ! FreeQ[back, InitializationCellEvaluation -> True],
+  "   viewer cell is only the Manipulate: ",
+  StringStartsQ[StringTrim@Last@Cases[
+    back, c : Cell[s_String, "Input", ___] /; FreeQ[c, InitializationCell] :> s, Infinity],
+    "Manipulate["]];

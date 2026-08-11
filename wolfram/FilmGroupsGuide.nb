@@ -10,20 +10,20 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       154,          7]
-NotebookDataLength[    178484,       2573]
-NotebookOptionsPosition[    177392,       2550]
-NotebookOutlinePosition[    177736,       2565]
-CellTagsIndexPosition[    177693,       2562]
+NotebookDataLength[    178614,       2580]
+NotebookOptionsPosition[    177655,       2557]
+NotebookOutlinePosition[    178035,       2573]
+CellTagsIndexPosition[    177992,       2570]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
-Cell["Film groups", "Title",ExpressionUUID->"14f7897e-560d-4afb-8011-31c5f6e1f46b"],
+Cell["Film groups", "Title",ExpressionUUID->"6280d120-fe0f-4b7f-9402-46550c5aef81"],
 
 Cell["\<\
 The 275 space-time groups of the plane, by wallpaper group. Evaluate the \
-notebook.\
-\>", "Text",ExpressionUUID->"5c3b6d8d-5752-45c2-8948-0ab5308147c6"],
+animation below.\
+\>", "Text",ExpressionUUID->"74960691-4e48-46d4-ac2f-c7d7ccb2c8f3"],
 
 Cell["\<\
 T. J. Fletcher, Film Groups, Math. Gazette 40 (1956) 15\[Dash]19, \
@@ -36,11 +36,11 @@ J. H. Conway, H. Burgiel, C. Goodman-Strauss, The Symmetries of Things (2008) \
 \[LongDash] orbifold notation.
 Atlas and source: https://yaroslavvb.github.io/animated-groups-fable \
 \[LongDash] https://github.com/yaroslavvb/animated-groups-fable\
-\>", "Text",ExpressionUUID->"857b63c1-ca62-4486-bed6-812caa6896b2"],
+\>", "Text",ExpressionUUID->"b076e9c9-c4c9-4a42-afe1-53a653679aa1"],
 
 Cell[CellGroupData[{
 
-Cell["Catalog and renderer", "Section",ExpressionUUID->"1a7da766-6777-4c00-a2fe-2de5696654a9"],
+Cell["Catalog and renderer", "Section",ExpressionUUID->"ceb5653f-556a-4066-9b87-963e0bf39011"],
 
 Cell["\<\
 $FG=<|
@@ -2314,18 +2314,14 @@ False,\"Product\"->False,\"Basis\"->{{0.5, -0.866025403784}, {0.5, \
 {{{1, -1}, {1, 0}}, {0, 0}, 1, 0}, {{{1, 0}, {0, 1}}, {0, 0}, -1, 1/2}, {{{1, \
 0}, {0, 1}}, {0, 0}, 1, 0}, {{{1, 0}, {1, -1}}, {0, 0}, -1, 0}, {{{1, 0}, {1, \
 -1}}, {0, 0}, 1, 1/2}}|>
-|>;\
-\>", "Input",ExpressionUUID->"95254d9a-b6c6-4579-a964-0d5522908a82"],
+|>;
 
-Cell["\<\
 $WP={{\"p1\", \"o\"}, {\"p2\", \"2222\"}, {\"pm\", \"**\"}, {\"pg\", \"\
 \[Times]\[Times]\"}, {\"cm\", \"*\[Times]\"}, {\"pmm\", \"*2222\"}, {\"pmg\", \
 \"22*\"}, {\"pgg\", \"22\[Times]\"}, {\"cmm\", \"2*22\"}, {\"p4\", \"442\"}, \
 {\"p4m\", \"*442\"}, {\"p4g\", \"4*2\"}, {\"p3\", \"333\"}, {\"p3m1\", \"*333\
-\"}, {\"p31m\", \"3*3\"}, {\"p6\", \"632\"}, {\"p6m\", \"*632\"}};\
-\>", "Input",ExpressionUUID->"1e93ce7c-ae7e-42ed-9f76-c2439f6242cc"],
+\"}, {\"p31m\", \"3*3\"}, {\"p6\", \"632\"}, {\"p6m\", \"*632\"}};
 
-Cell["\<\
 (* ---------------------------------------------------------------- motif *)
 (* thick comma: five cubics, sampled, recentred on its bounding box, scaled \
 to
@@ -2515,27 +2511,39 @@ Nothing, p]],
   prim = {place[[All, 1]], place[[All, 2]], place[[All, 3]]};
   Graphics[prim, PlotRange -> {{-w, w}, {-h, h}}/2, ImageSize -> size,
     Background -> FG$col[\"Background\"], PlotRangePadding -> 0,
-    ImagePadding -> 0, AspectRatio -> Full]];\
-\>", "Input",ExpressionUUID->"fb398e97-abc9-4ef5-82d6-950d22ef1245"]
-}, Closed]],
+    ImagePadding -> 0, AspectRatio -> Full]];
 
-Cell["The 17 wallpaper groups", "Section",ExpressionUUID->"ec528f24-6d82-49f8-8984-2c53dba07405"],
-
-Cell["\<\
+(* --------------------------------------------------------------- tabs *)
 (* Tab order, as in the atlas: the groups that do something with time first,
    the trivial clock (identical to its wallpaper group) last of that run and
    greyed, then the groups with time reversal. *)
 FG$rank[g_] := Which[! g[\"Forward\"], 2, g[\"Product\"], 1, True, 0];
+
 FG$over[w_] := SortBy[Select[Keys[$FG], $FG[#][\"Base\"] === w &],
   {FG$rank[$FG[#]] &, ToExpression@StringDrop[#, 1] &}];
 
+FG$tabs = Association[# -> FG$over[#] & /@ $WP[[All, 1]]];
+
+FG$label[g_] := Style[$FG[g][\"Symbol\"],
+  Which[$FG[g][\"Product\"] && $FG[g][\"Forward\"], GrayLevel[0.6],
+        $FG[g][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
+        True, GrayLevel[0.3]]];
+
+(* what a wallpaper's tab row shows until the reader picks something else.
+   A default DownValue, not an assignment made while the viewer runs: the
+   SetterBar's click writes FG$pick[w] and that specific value then wins. *)
+FG$pick[w_] := First[FG$tabs[w]];\
+\>", "Input",
+ InitializationCell->
+  True,ExpressionUUID->"37a15f04-2506-4a15-b89b-8d86016a4d29"]
+}, Closed]],
+
+Cell["The 17 wallpaper groups", "Section",ExpressionUUID->"81b77856-c7a3-4d4a-b633-fd3cd419d60a"],
+
+Cell["\<\
 Manipulate[
   Column[{
-    SetterBar[Dynamic[FG$pick[w]],
-      (# -> Style[$FG[#][\"Symbol\"],
-         Which[$FG[#][\"Product\"] && $FG[#][\"Forward\"], GrayLevel[0.6],
-               $FG[#][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
-               True, GrayLevel[0.3]]]) & /@ FG$over[w]],
+    SetterBar[Dynamic[FG$pick[w]], (# -> FG$label[#]) & /@ FG$tabs[w]],
     Dynamic@FilmGroupFrame[FG$pick[w], t, {660, 300}]},
    Center, 1],
   {{w, \"p6\", \"\"}, #[[1]] -> Row[{Style[#[[2]], Bold], \" \", #[[1]]}] & \
@@ -2543,15 +2551,15 @@ Manipulate[
     ControlType -> SetterBar},
   {{t, 0, \"t\"}, 0, 1, ControlType -> Animator, AnimationRate -> 1/4,
     AppearanceElements -> {\"PlayPauseButton\"}},
-  Initialization :> (FG$pick = Association[# -> First[FG$over[#]] & /@ \
-$WP[[All, 1]]]),
+  TrackedSymbols :> {w},   (* the clock redraws the frame, not the tab row *)
   SaveDefinitions -> True, ControlPlacement -> Top]\
-\>", "Input",ExpressionUUID->"2d59563b-0285-4fc0-bb46-4154a7ea1018"]
+\>", "Input",ExpressionUUID->"9b895865-0bbf-4a65-80d7-7b6bdab06e11"]
 },
+InitializationCellEvaluation->True,
 WindowSize->{1000, 800},
 FrontEndVersion->"14.2 for Mac OS X x86 (64-bit) (March 16, 2025)",
 StyleDefinitions->"Default.nb",
-ExpressionUUID->"d8483f79-fcb9-4e09-92ba-7cb20dad0d05"
+ExpressionUUID->"a7275f47-1e7a-4a02-8d38-cd24a4a2cf3a"
 ]
 (* End of Notebook Content *)
 
@@ -2564,17 +2572,16 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[554, 20, 83, 0, 70, "Title",ExpressionUUID->"14f7897e-560d-4afb-8011-31c5f6e1f46b"],
-Cell[640, 22, 163, 3, 70, "Text",ExpressionUUID->"5c3b6d8d-5752-45c2-8948-0ab5308147c6"],
-Cell[806, 27, 654, 11, 70, "Text",ExpressionUUID->"857b63c1-ca62-4486-bed6-812caa6896b2"],
+Cell[554, 20, 83, 0, 70, "Title",ExpressionUUID->"6280d120-fe0f-4b7f-9402-46550c5aef81"],
+Cell[640, 22, 170, 3, 70, "Text",ExpressionUUID->"74960691-4e48-46d4-ac2f-c7d7ccb2c8f3"],
+Cell[813, 27, 654, 11, 70, "Text",ExpressionUUID->"b076e9c9-c4c9-4a42-afe1-53a653679aa1"],
 Cell[CellGroupData[{
-Cell[1485, 42, 94, 0, 70, "Section",ExpressionUUID->"1a7da766-6777-4c00-a2fe-2de5696654a9"],
-Cell[1582, 44, 164977, 2273, 70, "Input",ExpressionUUID->"95254d9a-b6c6-4579-a964-0d5522908a82"],
-Cell[166562, 2319, 457, 6, 70, "Input",ExpressionUUID->"1e93ce7c-ae7e-42ed-9f76-c2439f6242cc"],
-Cell[167022, 2327, 9029, 191, 70, "Input",ExpressionUUID->"fb398e97-abc9-4ef5-82d6-950d22ef1245"]
+Cell[1492, 42, 94, 0, 70, "Section",ExpressionUUID->"ceb5653f-556a-4066-9b87-963e0bf39011"],
+Cell[1589, 44, 175334, 2493, 70, "Input",ExpressionUUID->"37a15f04-2506-4a15-b89b-8d86016a4d29",
+ InitializationCell->True]
 }, Closed]],
-Cell[176066, 2521, 97, 0, 70, "Section",ExpressionUUID->"ec528f24-6d82-49f8-8984-2c53dba07405"],
-Cell[176166, 2523, 1222, 25, 70, "Input",ExpressionUUID->"2d59563b-0285-4fc0-bb46-4154a7ea1018"]
+Cell[176938, 2540, 97, 0, 70, "Section",ExpressionUUID->"81b77856-c7a3-4d4a-b633-fd3cd419d60a"],
+Cell[177038, 2542, 613, 13, 70, "Input",ExpressionUUID->"9b895865-0bbf-4a65-80d7-7b6bdab06e11"]
 }
 ]
 *)
