@@ -6,11 +6,11 @@
  * mathematical count lives in data/color-forward-census.json, so the report
  * and the downloadable tables cannot drift apart. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=26";
-import { attachControls } from "./controls.js?v=26";
-import { attachStage } from "./stage.js?v=26";
-import { paintColored } from "./colored.js?v=26";
-import { groupCaption } from "./wallpaper-data.js?v=26";
+import { FilmGroupAnimation } from "./renderer.js?v=27";
+import { attachControls } from "./controls.js?v=27";
+import { attachStage } from "./stage.js?v=27";
+import { paintColored } from "./colored.js?v=27";
+import { groupCaption } from "./wallpaper-data.js?v=27";
 
 const DATA_URL = "data/color-forward-census.json";
 
