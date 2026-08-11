@@ -19,7 +19,7 @@
  * nothing to mark but t = 0 get no ruler.
  */
 "use strict";
-import { STEP, FINE } from "./stage.js?v=25";
+import { STEP, FINE } from "./stage.js?v=26";
 
 const RES = 1000;  // slider resolution
 const THUMB = 14;  // assumed slider thumb width (px), for aligning the ruler

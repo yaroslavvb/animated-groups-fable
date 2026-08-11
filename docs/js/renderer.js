@@ -13,9 +13,9 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=25";
-import { Playback } from "./playback.js?v=25";
-import { filmTimeSymmetry, beatOf } from "./phases.js?v=25";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=26";
+import { Playback } from "./playback.js?v=26";
+import { filmTimeSymmetry, beatOf } from "./phases.js?v=26";
 
 const TWO_PI = Math.PI * 2;
 
