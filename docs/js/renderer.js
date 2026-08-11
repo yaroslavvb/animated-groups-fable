@@ -13,8 +13,8 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=17";
-import { Playback } from "./playback.js?v=17";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=18";
+import { Playback } from "./playback.js?v=18";
 
 const TWO_PI = Math.PI * 2;
 

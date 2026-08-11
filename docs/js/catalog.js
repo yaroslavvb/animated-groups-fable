@@ -3,9 +3,9 @@
  * visibility only decides whether an animation the viewer has started is
  * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=17";
-import { attachControls } from "./controls.js?v=17";
-import { attachStage } from "./stage.js?v=17";
+import { FilmGroupAnimation } from "./renderer.js?v=18";
+import { attachControls } from "./controls.js?v=18";
+import { attachStage } from "./stage.js?v=18";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -110,8 +110,9 @@ function render() {
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);
+    // the picture toggles playback (stage.js), so the caption is what opens
+    // the detail modal
     meta.onclick = () => showDetail(g);
-    canvas.onclick = () => showDetail(g);
     observer.observe(card);
   }
 }

@@ -189,7 +189,9 @@ table.counts td:first-child { text-align: left; }
   padding: 0.55rem 0.8rem 0.7rem;
   font-family: system-ui, sans-serif;
   font-size: 0.86rem;
+  cursor: pointer;   /* opens the detail modal; the canvas plays/pauses */
 }
+.gcard .meta:hover .sym { color: var(--accent); }
 
 .gcard .meta .sym { font-size: 1.12rem; }
 .gcard .meta .hm { color: var(--muted); margin-left: 0.5em; }
@@ -252,17 +254,14 @@ button.linkish {
 }
 button.linkish:hover { border-color: var(--accent); color: var(--accent); }
 
-/* ------- animation stage: paused by default, prominent play button -------
- * Every animation canvas is wrapped in .anim-stage (js/stage.js). The canvas
- * paints its own light background in both colour schemes, so the overlay
- * colours are fixed rather than themed. */
+/* ------- animation stage: paused by default, the picture is the button -----
+ * Every animation canvas is wrapped in .anim-stage (js/stage.js); clicking
+ * anywhere in it toggles playback, so nothing is painted over the pattern. */
 .anim-stage {
-  --stage-paper: #faf9f6;
-  --stage-ink: #1f2430;
-  --stage-accent: #3b6ea5;
   position: relative;
   display: block;
   outline: none;
+  cursor: pointer;
 }
 .anim-stage canvas { display: block; }
 /* The ring must be an outline with a NEGATIVE offset: the canvas fills the
@@ -270,85 +269,6 @@ button.linkish:hover { border-color: var(--accent); color: var(--accent); }
  * .demo / .gcard clip with overflow:hidden (so an outward ring is cut off).
  * Outlines paint on top of descendants, hence this is the one that shows. */
 .anim-stage:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-
-/* a paused frame is veiled, so "still" never reads as "broken" */
-.anim-stage::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: rgba(250, 249, 246, 0.32);
-  transition: opacity 0.18s ease;
-}
-.anim-stage.playing::after { opacity: 0; }
-
-.play-overlay {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: system-ui, -apple-system, sans-serif;
-  color: var(--stage-ink);
-  transition: opacity 0.18s ease, transform 0.12s ease;
-}
-.play-overlay .po-glyph {
-  width: 4.4rem;
-  height: 4.4rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #fff;
-  border: 2px solid var(--stage-accent);
-  color: var(--stage-accent);
-  font-size: 1.45rem;
-  padding-left: 0.18em;          /* optical centring of the ▶ glyph */
-  box-shadow: 0 2px 12px rgba(30, 30, 60, 0.28);
-  transition: background 0.12s ease, color 0.12s ease;
-}
-.play-overlay .po-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.88);
-  border-radius: 99px;
-  padding: 0.05rem 0.55rem;
-}
-.play-overlay:hover .po-glyph,
-.play-overlay:focus-visible .po-glyph {
-  background: var(--stage-accent);
-  color: #fff;
-}
-.play-overlay:focus-visible { outline: none; }
-.play-overlay:focus-visible .po-glyph { box-shadow: 0 0 0 3px var(--accent2); }
-.play-overlay:active { transform: translate(-50%, -50%) scale(0.96); }
-
-.anim-stage.playing .play-overlay {
-  opacity: 0;
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(0.9);
-}
-
-/* short canvases (the 1+1D strips) get the compact button */
-.anim-stage.small .play-overlay .po-glyph {
-  width: 2.5rem;
-  height: 2.5rem;
-  font-size: 0.95rem;
-  border-width: 1.5px;
-}
-.anim-stage.small .play-overlay .po-label { display: none; }
-
-@media (prefers-reduced-motion: reduce) {
-  .anim-stage::after, .play-overlay, .play-overlay .po-glyph { transition: none; }
-}
 
 /* ------- animation playback controls ------- */
 .anim-controls {

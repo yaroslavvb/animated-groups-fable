@@ -1,24 +1,25 @@
-/* The play affordance. Every animation canvas is wrapped in a "stage": a
- * positioned box carrying a prominent play button (animations are paused
- * until the viewer asks for them) and keyboard scrubbing.
+/* The play affordance. Every animation canvas is wrapped in a "stage": the
+ * picture itself is the control (animations are paused until the viewer asks
+ * for them), plus keyboard scrubbing. Nothing is painted over the pattern —
+ * the state is legible from the control bar below and from the motion itself.
  *
  *   attachStage(anim, canvas) -> stage element
  *
  * It wraps `canvas` in <div class="anim-stage"> in place (idempotent — a
- * second attach to the same canvas replaces the previous overlay, which the
- * catalog's reused dialog canvas relies on), paints the frozen first frame,
- * and binds:
+ * second attach to the same canvas rebinds it, which the catalog's reused
+ * dialog canvas relies on), paints the frozen frame, and binds:
  *
+ *   click            play / pause, anywhere in the picture
+ *   space / enter    play / pause, once the stage has focus
  *   ← →              step one frame back / forward
  *   ↑ ↓              same, when the stage has focus
  *   shift + arrow    fine step
- *   space / enter    play / pause
  *   home / end       first / last frame
  *
  * The horizontal arrows also work while the pointer merely hovers a stage, so
  * stepping through a loop needs no click. The vertical arrows and space are
- * claimed only once the stage has focus, so they keep scrolling the page
- * everywhere else.
+ * claimed only once the stage has focus (a click focuses it), so they keep
+ * scrolling the page everywhere else.
  */
 "use strict";
 
@@ -35,35 +36,17 @@ export function attachStage(anim, canvas) {
 
   stage.tabIndex = 0;
   stage.setAttribute("role", "group");
-  stage.setAttribute("aria-label",
-    "animation — press play, or step through the loop with the arrow keys");
-  stage.title = "← → step through the loop · space plays once focused";
-  // strips and other short canvases get the compact button
-  stage.classList.toggle("small", (canvas.clientHeight || 999) < 150);
+  stage.title = "click to play or pause · ← → step through the loop";
 
-  const btn = document.createElement("button");
-  btn.type = "button";
-  btn.className = "play-overlay";
-  btn.innerHTML = '<span class="po-glyph">▶</span><span class="po-label">Play</span>';
-  btn.addEventListener("click", (e) => {
-    e.stopPropagation();   // catalog cards open a modal on canvas click
-    // toggle, not play: while running this button is labelled "pause", and
-    // assistive technology activates it with a synthesized click
-    anim.toggle();
-    stage.focus({ preventScroll: true });
-  });
-  stage.append(btn);
+  // the picture is the button: a click anywhere in it toggles playback
+  const onClick = () => anim.toggle();
 
   const sync = () => {
     const on = anim.playRequested;
     stage.classList.toggle("playing", on);
-    btn.setAttribute("aria-label", on ? "Pause animation" : "Play animation");
-    // while playing the button is veiled to opacity 0: keep it out of the tab
-    // order, and never strand focus on something nobody can see
-    btn.tabIndex = on ? -1 : 0;
-    if (on && document.activeElement === btn) {
-      stage.focus({ preventScroll: true });
-    }
+    stage.setAttribute("aria-label", on
+      ? "animation, playing — click or press space to pause, arrow keys step"
+      : "animation, paused — click or press space to play, arrow keys step");
   };
   anim.onRunChange(sync);
 
@@ -76,7 +59,9 @@ export function attachStage(anim, canvas) {
   };
   const onEnter = () => { hot = stage; };
   const onLeave = () => { if (hot === stage) hot = null; };
+  // focus on press, so space and the vertical arrows work after a click
   const onDown = () => stage.focus({ preventScroll: true });
+  stage.addEventListener("click", onClick);
   stage.addEventListener("keydown", onKey);
   stage.addEventListener("mouseenter", onEnter);
   stage.addEventListener("mouseleave", onLeave);
@@ -84,11 +69,11 @@ export function attachStage(anim, canvas) {
 
   stage._anim = anim;
   stage._detach = () => {
+    stage.removeEventListener("click", onClick);
     stage.removeEventListener("keydown", onKey);
     stage.removeEventListener("mouseenter", onEnter);
     stage.removeEventListener("mouseleave", onLeave);
     stage.removeEventListener("mousedown", onDown);
-    btn.remove();
     if (hot === stage) hot = null;
     stage._detach = null;
   };
