@@ -35,6 +35,7 @@ RING_W = 0.12
 ARROW_MIN_PX = 9    # below this the direction-of-time head is just a blot
 HEAD_LEN = 1.7      # arrowhead length, in ring stroke widths
 HEAD_HALF = 1.15    # half its base width, likewise
+HAND_TAIL = 1.4     # arc trailing the head, in head lengths
 # the five cubic segments of the comma, verbatim from renderer.js
 RAW_COMMA = [
     ((0.40, -0.30), (0.52, 0.18), (0.32, 0.56), (-0.52, 0.74)),
@@ -161,43 +162,38 @@ def interval_count(spec):
 
 
 def draw_phase_ring(draw, cx, cy, theta, r, n, direction):
-    """N arcs, the copy's current interval lit, the lit one ending in an
-    arrowhead that gives the copy's direction of time. Drawn in SCREEN
-    coordinates — no spatial transform is applied — so one interval is one arc
-    on every copy; see the drawPhaseRing comment in renderer.js. PIL arc
-    angles are degrees clockwise from 3 o'clock, matching canvas."""
-    # a single-interval group is always in interval 0: sector 0 is lit and
-    # carries the arrowhead like any other, held back to the unlit weight
-    # (mirrors drawPhaseRing in renderer.js)
-    solo = n == 1
-    lit = int((theta % 1.0) * n) % n if n > 1 else 0
+    """A fixed ruler of N arcs with a hand riding round it: the hand's point
+    sits at turn theta, so it sweeps one turn per period at constant speed, and
+    the interval the copy is in is read off from where the point is rather than
+    by lighting that arc. Which way it sweeps is the copy's direction of time.
+    Drawn in SCREEN coordinates — no spatial transform is applied — so one
+    interval is one arc on every copy; see the drawPhaseRing comment in
+    renderer.js. PIL arc angles are degrees clockwise from 3 o'clock, matching
+    canvas."""
     gap = min(0.125 / n, 0.022) * 360.0
     R = RING_MID * r
     lw = max(1, int(RING_W * r))
     s = -1 if direction < 0 else 1
     box = [cx - R, cy - R, cx + R, cy + R]
+
     for k in range(n):
-        a0 = (k / n) * 360.0 - 90.0 + gap
-        a1 = ((k + 1) / n) * 360.0 - 90.0 - gap
-        head = 0.0
-        if k == lit and r >= ARROW_MIN_PX * SS:
-            head = min(math.degrees(HEAD_LEN * lw / R), 0.4 * (a1 - a0))
-        if head > 0:
-            if s > 0:
-                a1 -= head
-            else:
-                a0 += head
-        draw.arc(box, a0, a1,
-                 fill=(BEAT_ON if (k == lit and not solo) else BEAT_OFF),
-                 width=lw)
-        if head > 0:
-            base, tip = (a1, a1 + head) if s > 0 else (a0, a0 - head)
-            def at(ang, rad):
-                a = math.radians(ang)
-                return (cx + rad * math.cos(a), cy + rad * math.sin(a))
-            draw.polygon([at(base, R - HEAD_HALF * lw),
-                          at(base, R + HEAD_HALF * lw),
-                          at(tip, R)], fill=(BEAT_OFF if solo else BEAT_ON))
+        draw.arc(box, (k / n) * 360.0 - 90.0 + gap,
+                 ((k + 1) / n) * 360.0 - 90.0 - gap, fill=BEAT_OFF, width=lw)
+
+    if r >= ARROW_MIN_PX * SS:
+        tip = (theta % 1.0) * 360.0 - 90.0
+        head = math.degrees(HEAD_LEN * lw / R)
+        base = tip - s * head
+        tail = base - s * head * HAND_TAIL
+        draw.arc(box, min(base, tail), max(base, tail), fill=BEAT_ON, width=lw)
+
+        def at(ang, rad):
+            a = math.radians(ang)
+            return (cx + rad * math.cos(a), cy + rad * math.sin(a))
+
+        draw.polygon([at(base, R - HEAD_HALF * lw),
+                      at(base, R + HEAD_HALF * lw),
+                      at(tip, R)], fill=BEAT_ON)
 
 
 def _scale_of(T):

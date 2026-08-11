@@ -3,9 +3,9 @@
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=29";
+import { buildTabs } from "./tabs.js?v=30";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=29";
+  from "./wallpaper-data.js?v=30";
 
 const hm = new URLSearchParams(location.search).get("g");
 const idx = WALLPAPERS.findIndex(w => w.hm === hm);

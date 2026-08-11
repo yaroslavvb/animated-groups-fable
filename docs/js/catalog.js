@@ -5,14 +5,14 @@
  * (group.html?g=…) — picture and caption both — and the card's control bar
  * keeps play/pause and scrubbing in place. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=29";
-import { attachControls } from "./controls.js?v=29";
-import { WALLPAPERS } from "./wallpaper-data.js?v=29";
-import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=29";
+import { FilmGroupAnimation } from "./renderer.js?v=30";
+import { attachControls } from "./controls.js?v=30";
+import { WALLPAPERS } from "./wallpaper-data.js?v=30";
+import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=30";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=29";
+import { attachStage } from "./stage.js?v=30";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 

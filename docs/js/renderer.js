@@ -13,9 +13,9 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=29";
-import { Playback } from "./playback.js?v=29";
-import { filmTimeSymmetry, beatOf } from "./phases.js?v=29";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=30";
+import { Playback } from "./playback.js?v=30";
+import { filmTimeSymmetry } from "./phases.js?v=30";
 
 const TWO_PI = Math.PI * 2;
 
@@ -172,8 +172,8 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
 }
 
 /* ----------------------------------------------------------- phase ring */
-/* The discrete phase readout: N arcs, one per interval of the period, with
- * the copy's current interval lit. Sector k occupies turns [k/N, (k+1)/N)
+/* The phase readout: a fixed ruler of N arcs, one per interval of the period,
+ * with a HAND riding round it. Interval k occupies turns [k/N, (k+1)/N)
  * measured CLOCKWISE FROM 12 O'CLOCK IN SCREEN COORDINATES — the ring is
  * never rotated or reflected with its copy. That is deliberate and is the
  * whole point: the same interval is then the same arc on every copy, so the
@@ -183,15 +183,22 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
  * equivariant, and the pixel-level invariance checks switch the ring off
  * (orbit.js verifyFrames, enumerate/gifs.py render_frame).
  *
- * The lit arc ends in an ARROWHEAD giving the copy's DIRECTION OF TIME: its
- * internal clock is theta = s (t - tau), so d(theta)/dt = s, and the head
- * points the way the lit arc is about to move — clockwise where the copy is
- * filling, anticlockwise where a time reversal has it draining. This is the
- * one thing a frozen frame genuinely cannot show, which is why it is drawn
- * rather than left to the motion; note it is a velocity, so it is invariant
- * under the forward-time subgroup only. Under a time-reversing element the
- * film must also be played backwards — and playing a film backwards reverses
- * every arrow in it, so the symmetry still holds where it is claimed to. */
+ * The hand's POINT sits at turn theta of the ring, so it sweeps one full turn
+ * per period at constant angular speed — and which interval the copy is in is
+ * read off where the point currently is, rather than by lighting that arc.
+ * Lighting jumped from arc to arc, a blink once per interval that read as a
+ * flashing indicator; a hand moving at the speed the clock actually runs shows
+ * the same discrete fact and the continuous phase with it.
+ *
+ * Which WAY it sweeps is the copy's DIRECTION OF TIME: its internal clock is
+ * theta = s (t - tau), so d(theta)/dt = s, and the head leads — clockwise
+ * where the copy is filling, anticlockwise where a time reversal has it
+ * draining. In a frozen frame the head's orientation is the only thing that
+ * says so; note that this is a velocity, so it is invariant under the
+ * forward-time subgroup only. Under a time-reversing element the film must
+ * also be played backwards — and playing a film backwards reverses every arrow
+ * in it, so the symmetry still holds where it is claimed to. The hand's
+ * POSITION, being a function of theta alone, is invariant under everything. */
 const RING_MID = 0.76;    // ring centreline, in units of the motif radius
 const RING_W = 0.12;      // ring stroke width; the ring's outer edge at
                           // 0.82 r is the motif's whole footprint, which
@@ -206,53 +213,54 @@ const RING_MIN_PX = 6.5;
 const ARROW_MIN_PX = 9;
 const HEAD_LEN = 1.7;     // arrowhead length, in ring stroke widths
 const HEAD_HALF = 1.15;   // half its base width, likewise
+const HAND_TAIL = 1.4;    // arc trailing the head, in head lengths
 
 export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
   if (r < RING_MIN_PX) return;
   const c = colors || MOTIF_COLORS;
-  // A group with a single interval is always in interval 0, so sector 0 is
-  // lit and carries the arrowhead like any other: every diagram on the site
-  // then shows the direction the loop runs, and the absence of an arrow means
-  // "too small to draw one", never "this group is special". Such a ring is
-  // held back to the unlit weight so a constant is reported, not shouted.
-  const solo = n === 1;
-  const lit = n > 1 ? beatOf(theta, n) : 0;
   const gap = Math.min(0.125 / n, 0.022) * TWO_PI;   // ~1/8 of a sector
   const R = RING_MID * r;
   const lw = Math.max(1.1, RING_W * r);
   const s = dir < 0 ? -1 : 1;
+  const at = (ang, rad) => [rad * Math.cos(ang), rad * Math.sin(ang)];
   ctx.save();
   ctx.lineWidth = lw;
   ctx.lineCap = "butt";
+
+  // the ruler: one arc per interval, held well back so the ring reads as a
+  // readout on the pattern rather than as pattern. It does not move.
+  ctx.globalAlpha = 0.4;
+  ctx.strokeStyle = c.beatOff;
   for (let k = 0; k < n; k++) {
-    let a0 = -Math.PI / 2 + (k / n) * TWO_PI + gap;
-    let a1 = -Math.PI / 2 + ((k + 1) / n) * TWO_PI - gap;
-    // the unlit arcs only have to show where the intervals are; they are held
-    // well back so the ring reads as a readout on the pattern, not as pattern
-    ctx.globalAlpha = solo ? 0.55 : (k === lit ? 1 : 0.4);
-    ctx.strokeStyle = (k === lit && !solo) ? c.beatOn : c.beatOff;
-    const head = k === lit && r >= ARROW_MIN_PX
-      ? Math.min((HEAD_LEN * lw) / R, 0.4 * (a1 - a0)) : 0;
-    // the head is carved OUT of the lit arc, never added past it, so the arc
-    // plus its point still fits inside the interval it is reporting
-    if (head > 0) { if (s > 0) a1 -= head; else a0 += head; }
     ctx.beginPath();
-    ctx.arc(0, 0, R, a0, a1);
+    ctx.arc(0, 0, R, -Math.PI / 2 + (k / n) * TWO_PI + gap,
+                     -Math.PI / 2 + ((k + 1) / n) * TWO_PI - gap);
     ctx.stroke();
-    if (head > 0) {
-      const base = s > 0 ? a1 : a0, tip = base + s * head;
-      const at = (ang, rad) => [rad * Math.cos(ang), rad * Math.sin(ang)];
-      const [bx1, by1] = at(base, R - HEAD_HALF * lw);
-      const [bx2, by2] = at(base, R + HEAD_HALF * lw);
-      const [tx, ty] = at(tip, R);
-      ctx.beginPath();
-      ctx.moveTo(bx1, by1);
-      ctx.lineTo(bx2, by2);
-      ctx.lineTo(tx, ty);
-      ctx.closePath();
-      ctx.fillStyle = solo ? c.beatOff : c.beatOn;
-      ctx.fill();
-    }
+  }
+
+  // the hand: its point at turn theta, sweeping one turn per period the way
+  // this copy's clock runs. Angular size is fixed, so it stays the arrow it
+  // was however many intervals the ruler is divided into.
+  if (r >= ARROW_MIN_PX) {
+    ctx.globalAlpha = 1;
+    const tip = -Math.PI / 2 + (((theta % 1) + 1) % 1) * TWO_PI;
+    const head = (HEAD_LEN * lw) / R;
+    const base = tip - s * head;
+    ctx.strokeStyle = c.beatOn;
+    ctx.beginPath();
+    ctx.arc(0, 0, R, Math.min(base, base - s * head * HAND_TAIL),
+                     Math.max(base, base - s * head * HAND_TAIL));
+    ctx.stroke();
+    const [bx1, by1] = at(base, R - HEAD_HALF * lw);
+    const [bx2, by2] = at(base, R + HEAD_HALF * lw);
+    const [tx, ty] = at(tip, R);
+    ctx.beginPath();
+    ctx.moveTo(bx1, by1);
+    ctx.lineTo(bx2, by2);
+    ctx.lineTo(tx, ty);
+    ctx.closePath();
+    ctx.fillStyle = c.beatOn;
+    ctx.fill();
   }
   ctx.restore();
 }

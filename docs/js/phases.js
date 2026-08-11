@@ -58,7 +58,11 @@ export function beatCount(taus) {
   return n;
 }
 
-/* which of the N intervals an internal time falls in */
+/* Which of the N intervals an internal time falls in. The ring no longer
+ * lights that interval — its hand rides round continuously and the interval is
+ * read off from where the point is (renderer.js) — but the index is what makes
+ * the ruler well defined, and it is the statement the marks on the scrub bar
+ * and the notation both rest on, so it stays exported and documented here. */
 export function beatOf(theta, n) {
   return ((Math.floor(frac1(theta) * n) % n) + n) % n;
 }
