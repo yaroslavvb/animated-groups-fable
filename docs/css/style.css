@@ -409,6 +409,14 @@ footer.site {
   cursor: pointer;
 }
 .tabbtn.active { background: var(--panel); color: var(--ink); }
+/* The trivial clock — the film group identical to its wallpaper group, sorted
+ * last by sectionSort — is greyed back: it belongs in the row as the baseline
+ * the others depart from, not as one more case to work through. Opacity rather
+ * than a colour so it stays lighter in both themes and in both states, and it
+ * comes up on hover so it never reads as disabled. */
+.tabbtn.trivial { opacity: 0.55; font-weight: 500; }
+.tabbtn.trivial.active { opacity: 0.8; color: var(--muted); }
+.tabbtn.trivial:hover { opacity: 0.9; }
 .tabpane {
   display: none;
   background: var(--panel);

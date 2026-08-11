@@ -6,10 +6,10 @@
  * the viewer has started, which also covers tab switches (a hidden pane never
  * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=32";
-import { attachControls } from "./controls.js?v=32";
-import { attachStage } from "./stage.js?v=32";
-import { groupCaption } from "./wallpaper-data.js?v=32";
+import { FilmGroupAnimation } from "./renderer.js?v=33";
+import { attachControls } from "./controls.js?v=33";
+import { attachStage } from "./stage.js?v=33";
+import { groupCaption, isTrivialClock } from "./wallpaper-data.js?v=33";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {
@@ -32,7 +32,14 @@ export function buildTabs(host, items) {
   items.forEach((item, i) => {
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "tabbtn sym";
+    // the trivial clock is greyed: it sits at the end of the row as the
+    // baseline — the wallpaper with a clock bolted on, nothing entangled —
+    // and should not read as one more case to work through
+    const trivial = item.g && isTrivialClock(item.g);
+    btn.className = "tabbtn sym" + (trivial ? " trivial" : "");
+    if (trivial) btn.title = "the trivial case: this film group is identical " +
+      "to the wallpaper group — every copy in phase forever, so every instant " +
+      "is the wallpaper itself";
     btn.innerHTML = item.g ? item.g.symbolHtml : item.sym;
     const pane = document.createElement("div");
     pane.className = "tabpane";

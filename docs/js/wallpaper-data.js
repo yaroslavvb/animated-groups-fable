@@ -159,8 +159,24 @@ hexagonal tower: all five 6-screws and the trigonal groups below them.",
 ];
 
 /* within a section: the pure product first, then forward-time, then reversal */
+/* The film group IDENTICAL TO ITS WALLPAPER GROUP: the direct product with a
+ * bare clock, G x Z. Every copy of the motif is at the same phase forever, so
+ * each instant is the wallpaper itself and nothing is entangled with time — it
+ * is the reference the other groups over that base are departures from.
+ * Exactly one per base, all 17. (The /1' products are NOT this: a palindrome
+ * is time structure, and its instants are not all the same wallpaper.) */
+export function isTrivialClock(g) {
+  return !!(g.forward && g.product);
+}
+
+/* Tab order: the groups that do something with time first — forward-time,
+ * then reversal — and the trivial clock LAST. It used to lead, on the reading
+ * that a section should open with its simplest member; but a section is read
+ * to see what time can do over that wallpaper, and opening on the one group
+ * where the answer is "nothing" buries the point. It stays in the list, at the
+ * end and greyed (tabs.js), as the baseline to compare against. */
 export function sectionSort(list) {
-  const rank = g => (g.forward ? (g.product ? 0 : 1) : 2);
+  const rank = g => (isTrivialClock(g) ? 2 : g.forward ? 0 : 1);
   return [...list].sort((a, b) =>
     rank(a) - rank(b) || Number(a.id.slice(1)) - Number(b.id.slice(1)));
 }

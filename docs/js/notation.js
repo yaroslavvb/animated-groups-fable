@@ -3,7 +3,7 @@
  * examples cannot drift out of sync with the enumeration — a symbol that
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=32";
+import { buildTabs } from "./tabs.js?v=33";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section
