@@ -43,11 +43,14 @@ FilmGroupAnimation::usage =
   "FilmGroupAnimation[g] returns a Manipulate animating the pattern of film \
 group g over one period, with a play/pause Animator (initially paused).  \
 Options of FilmGroupFrame, plus AnimationRate (periods per second, default \
-1/4), \"Label\" (True shows the group symbol), and SaveDefinitions.";
+1/4), \"Label\" (True shows the group symbol), and SaveDefinitions (True by \
+default, so the output stays interactive in a notebook opened without the \
+package).";
 
 FilmGroupBrowser::usage =
   "FilmGroupBrowser[] returns a Manipulate for browsing all 275 film groups, \
-with a group selector and a time animator.";
+with a group selector and a time animator.  Unlike FilmGroupAnimation, the \
+browser requires the package to be loaded in the current session.";
 
 FilmGroupMotif::usage =
   "FilmGroupMotif[theta] renders the bare motif at internal time theta (in \
@@ -117,7 +120,9 @@ opKey[g_] := {g["M"], Mod[g["v"], 1], g["s"], Mod[g["Tau"], 1]};
 
 VerifyFilmGroup[g_] := Module[{e = resolveOrFail[g], ops, keys, errors = {}},
   If[e === $Failed, Return[$Failed]];
-  ops = Map[MapAt[Rationalize[#, 1*^-6] &, #, {{"v"}, {"Tau"}}] &, e["Ops"]];
+  (* canonicalize to exact values (raw specs may carry floats, cf. orbit.js) *)
+  ops = Map[<|"M" -> Round[#M], "v" -> Rationalize[#v, 1*^-6],
+      "s" -> Round[#s], "Tau" -> Rationalize[#Tau, 1*^-6]|> &, e["Ops"]];
   keys = AssociationMap[Automatic &, opKey /@ ops];
   If[Length[keys] =!= Length[ops], AppendTo[errors, "duplicate operations"]];
   If[! KeyExistsQ[keys, {{{1, 0}, {0, 1}}, {0, 0}, 1, 0}],
@@ -192,8 +197,9 @@ FilmGroupMotif[theta_?NumericQ, r : _?NumericQ : 1] := Module[
 
 (* Window size in lattice translations, chosen (as on the web site) so that
    roughly 16 motif copies are visible: sparse cells get more repeats,
-   dense ones fewer.  Sites are counted by distinct spatial part, since
-   time-reversal partners share a site and draw superimposed. *)
+   dense ones fewer.  Sites are counted by distinct spatial part: ops that
+   share one (e.g. a pure time reversal and the identity) draw superimposed
+   at a single site. *)
 autoCells[spec_] := Module[{nSites, bdet},
   nSites = Length @ DeleteDuplicates @ Map[
      {#M, Round[1*^6 Mod[N[#v], 1]]} &, spec["Ops"]];
@@ -248,26 +254,27 @@ latticeWindow[binv_, cx_, cy_] := Module[{ms, pad = 1.6},
   {Floor[Min[ms[[All, 1]]] - pad], Ceiling[Max[ms[[All, 1]]] + pad],
    Floor[Min[ms[[All, 2]]] - pad], Ceiling[Max[ms[[All, 2]]] + pad]}];
 
-geometryCache[id_, cells_, motifScale_] := geometryCache[id, cells, motifScale] =
-  staticGeometry[resolve[id], cells, motifScale];
+(* memoized on the spec itself: catalog entries are shared objects, so
+   repeated frames of one group hit the cache; custom specs cache too *)
+geometryCache[spec_, cells_, motifScale_] := geometryCache[spec, cells, motifScale] =
+  staticGeometry[spec, cells, motifScale];
 
-geometryFor[spec_, cellsOpt_, motifScale_] := Module[
-  {cells = If[cellsOpt === Automatic, autoCells[spec], cellsOpt]},
-  If[StringQ[spec["ID"]],
-   geometryCache[spec["ID"], cells, motifScale],
-   staticGeometry[spec, cells, motifScale]]];
+geometryFor[spec_, cellsOpt_, motifScale_] := geometryCache[spec,
+  If[cellsOpt === Automatic, autoCells[spec], cellsOpt], motifScale];
 
 (* ------------------------------------------------------ frame drawing *)
 
 (* One time slice from precomputed geometry.  Painting is layered — all
    vessels, then all liquid, then all surface lines — so it is
-   order-independent and coincident copies (time-reversal partners share a
-   site) superimpose both surface lines instead of occluding one another. *)
+   order-independent, and coincident copies (ops sharing a spatial part,
+   e.g. a site-fixing time reversal) superimpose both surface lines
+   instead of occluding one another. *)
 iRenderFrame[static_, t_, colors_, showCell_, background_, imageSize_, label_] :=
  Module[{r, wx, wy, fills, segs, grid, thO, thL, c},
   c = colors; r = static["R"]; {wx, wy} = static["Window"];
   thO = Max[0.045 r/wx, 0.0012]; thL = Max[0.09 r/wx, 0.0025];
-  {fills, segs} = Map[Flatten[#, 1] &] @ Transpose @ Table[
+  {fills, segs} = If[static["Classes"] === {}, {{}, {}},
+    Map[Flatten[#, 1] &] @ Transpose @ Table[
      Module[{ph, yl, cps, ss, matTs = cls["MatTs"], poss = cls["Poss"]},
       ph = Mod[cls["S"] (t - cls["Tau"]), 1.];
       yl = $bodyBot - ph ($bodyBot - $bodyTop);
@@ -277,7 +284,7 @@ iRenderFrame[static_, t_, colors_, showCell_, background_, imageSize_, label_] :
          {i, Length[matTs]}, {cp, cps}], 1],
        Flatten[Table[sg . matTs[[i]] + ConstantArray[poss[[i]], 2],
          {i, Length[matTs]}, {sg, ss}], 1]}],
-     {cls, static["Classes"]}];
+     {cls, static["Classes"]}]];
   grid = If[showCell,
     Module[{m1lo, m1hi, m2lo, m2hi, a1, a2},
      {m1lo, m1hi, m2lo, m2hi} = static["LatticeRanges"];

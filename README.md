@@ -57,6 +57,15 @@ python3 enumerate_2p1.py -v
 python3 export.py
 ```
 
+## Mathematica port (`wolfram/`)
+
+The full catalog as a Wolfram Language package: `FilmGroupAnimation[95]`
+gives an interactive `Manipulate` of any of the 275 groups,
+`FilmGroupBrowser[]` steps through the whole catalog, and the group data is
+stored exactly and re-verified against the group axioms in exact arithmetic.
+See [wolfram/README.md](wolfram/README.md) and the guide notebook
+`wolfram/FilmGroupsGuide.nb`.
+
 ## References
 
 - T. J. Fletcher, "Film Groups", *Math. Gazette* **40** (1956) 15–19.

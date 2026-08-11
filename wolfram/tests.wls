@@ -113,6 +113,26 @@ check["window honours Cells {4,2}",
   (PlotRange /. Options[g, PlotRange]) === {{-2., 2.}, {-1., 1.}}];
 check["frames list", Length[FilmGroupFrames[1, 8]] === 8 &&
    MatchQ[FilmGroupFrames[1, 8], {__Graphics}]];
+(* raw render specs in the web catalog's JSON spelling *)
+rawSpec = <|"basis" -> {{1, 0}, {0, 1}}, "base" -> {0.31, 0.17},
+   "ops" -> {
+     <|"M" -> {{1, 0}, {0, 1}}, "v" -> {0, 0}, "s" -> 1, "tau" -> 0.|>,
+     <|"M" -> {{-1, 0}, {0, -1}}, "v" -> {0, 0}, "s" -> 1, "tau" -> 0.5|>}|>;
+rawG = FilmGroupFrame[rawSpec, 0.4];
+(* every Polygon must carry an explicit list of numeric point matrices —
+   catches unevaluated junk like Polygon[fills$nnn] from a broken pipeline *)
+rawPolys = Cases[rawG, Polygon[a_] :> a, Infinity];
+check["raw spec renders", Head[rawG] === Graphics && FreeQ[rawG, $Failed] &&
+   rawPolys =!= {} && AllTrue[rawPolys, VectorQ[#, MatrixQ] &]];
+check["raw spec verifies", VerifyFilmGroup[rawSpec]["OK"]];
+(* float-valued raw spec (JSON sources may deliver reals throughout) *)
+floatSpec = MapAt[N, rawSpec, "basis"];
+floatSpec["ops"] = Map[MapAt[N, #, "M"] &, floatSpec["ops"]];
+check["float raw spec verifies", VerifyFilmGroup[floatSpec]["OK"]];
+(* degenerate window: every placement culled must yield a clean empty frame *)
+tinyG = Quiet @ FilmGroupFrame[2, 0.3, "Cells" -> 0.2, "MotifScale" -> 0.05];
+check["degenerate window renders clean",
+  Head[tinyG] === Graphics && FreeQ[tinyG, Transpose] && FreeQ[tinyG, $Failed]];
 
 Print["[7] animation constructors"];
 m = FilmGroupAnimation[samples[[3]]];

@@ -18,7 +18,7 @@ cells = {
    Cell["The 275 space-time symmetry groups of the plane, animated", "Subtitle"],
 
    text["A film is a map from spacetime \
-\!\(\*SuperscriptBox[\(\[DoubleStruckCapitalR]\), \(2\)]\)\[Times]\[DoubleStruckCapitalR] to colors. \
+\[DoubleStruckCapitalR]\:00b2\[Times]\[DoubleStruckCapitalR] to colors. \
 A film group is a crystallographic group of symmetries of such a film: transformations \
 g : (x, t) \[RightArrow] (M.x + v, s\[ThinSpace]t + \[Tau]), with M a 2\[Times]2 point \
 operation, v a spatial translation, s = \[PlusMinus]1 a time direction, and \[Tau] a \
@@ -58,10 +58,14 @@ centre advances the film by half a period. Press play."],
 film by a third of a period per sixth of a turn, so equal fill levels spiral around each \
 centre."],
    input["FilmGroupAnimation[\"g244\"]"],
-   text["Time reversal. In o/m\[Prime][cm] (#2) a mirror runs the film backwards: \
-reflected copies drain while their partners fill. Mirror pairs share a site and are drawn \
-superimposed, showing both surface lines."],
+   text["Time reversal. In group #2 \[LongDash] o/m\[Prime] over the wallpaper \
+group cm \[LongDash] a mirror runs the film backwards: each copy's mirror image drains \
+as the copy fills."],
    input["FilmGroupAnimation[2]"],
+   text["In o/1\[Prime] (#12) the reversal fixes every site, so each vessel is drawn \
+superimposed with its own time-reverse and shows two surface lines \[LongDash] one \
+rising, one falling \[LongDash] meeting twice per period."],
+   input["FilmGroupAnimation[12]"],
    text["The animations are Manipulates with SaveDefinitions \[Rule] True, so they keep \
 working \[LongDash] play button and all \[LongDash] in a notebook opened without the \
 package."],
@@ -96,7 +100,7 @@ spec (Basis, Ops, BasePoint)."],
 
    section["Verified symmetry"],
    text["\"Ops\" lists coset representatives of the group modulo \
-\!\(\*SuperscriptBox[\(\[DoubleStruckCapitalZ]\), \(2\)]\)\[Times]\[DoubleStruckCapitalZ] \
+\[DoubleStruckCapitalZ]\:00b2\[Times]\[DoubleStruckCapitalZ] \
 (lattice and time period), stored exactly \[LongDash] integer matrices, rational offsets, \
 Sqrt[3]/2. VerifyFilmGroup checks identity, inverses and closure in exact arithmetic. The \
 whole catalog passes:"],
@@ -112,14 +116,17 @@ the atlas):"],
    input["Export[\"film-group-95.gif\", FilmGroupFrames[95, 40, ImageSize -> 320],\n  \"DisplayDurations\" -> 0.1, \"AnimationRepetitions\" -> Infinity]"],
 
    section["References"],
-   text["T. J. Fletcher, Film groups, Math. Gazette 40 (1956) 15\[Dash]19.\n\
-Ke & Wu, Space-time groups in 2+1 dimensions, arXiv:2604.05619.\n\
-Xu & Wu, Space-time crystals in 1+1 dimensions, Phys. Rev. Lett. 120, 096401 (2018).\n\
+   text["T. J. Fletcher, \"Film Groups\", Math. Gazette 40 (1956) 15\[Dash]19. \
+doi:10.2307/3610262\n\
+S. Xu, C. Wu, \"Space-Time Crystal and Space-Time Group\", Phys. Rev. Lett. 120, \
+096401 (2018). arXiv:1703.03388\n\
+C. Ke, C. Wu, \"Two-Dimensional Space-Time Groups: Classification and Applications\" \
+(2026). arXiv:2604.05619\n\
 J. H. Conway, H. Burgiel, C. Goodman-Strauss, The Symmetries of Things (2008) \
 \[LongDash] orbifold notation.\n\
 Interactive atlas: https://yaroslavvb.github.io/animated-groups-fable\n\
 Source: https://github.com/yaroslavvb/animated-groups-fable (wolfram/ directory; the \
-catalog data is generated from the atlas's own, and both renderers agree frame by \
+catalog data is generated from the atlas's own, and the two renderers agree frame by \
 frame)."]
    };
 

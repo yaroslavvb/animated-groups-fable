@@ -63,23 +63,27 @@ If[! MatchQ[result, {__Association}],
 meta = json["meta"];
 
 header = "(* ::Package:: *)\n\n" <>
-  "(* FilmGroupsData.wl — catalog of the 275 film groups (2+1-dimensional\n" <>
+  "(* FilmGroupsData.wl -- catalog of the 275 film groups (2+1-dimensional\n" <>
   "   space-time symmetry groups).  AUTO-GENERATED from docs/data/catalog.json\n" <>
   "   by build-data.wls; do not edit by hand.\n\n" <>
   "   Each entry is an Association; \"Ops\" lists coset representatives\n" <>
   "   {M, v, s, Tau} of the group modulo Z^2 (lattice) x Z (time period),\n" <>
   "   acting on spacetime as (x, t) -> (M.x + v, s t + Tau) with x, v in\n" <>
   "   lattice coordinates and t, Tau in units of the time period.  All\n" <>
-  "   group data is exact (integers, rationals, Sqrt[3]/2). *)\n\n";
+  "   group data is exact (integers, rationals, Sqrt[3]/2).  The catalog's\n" <>
+  "   symbolHtml field (an HTML rendering of Symbol) is deliberately\n" <>
+  "   omitted. *)\n\n";
 
 str = header <>
   "FilmGroups`Data`$Meta = " <> ToString[meta, InputForm] <> ";\n\n" <>
   "FilmGroups`Data`$Groups = " <> ToString[result, InputForm] <> ";\n";
 
-(* emit pure ASCII: escape every non-ASCII character as \:xxxx so the data
-   file is immune to encoding settings wherever it is read *)
+(* emit pure ASCII: escape every non-ASCII character (\:xxxx below U+10000,
+   \|xxxxxx above) so the data file is immune to encoding settings *)
 str = StringJoin @ Map[
-   If[# > 126, "\\:" <> IntegerString[#, 16, 4], FromCharacterCode[#]] &,
+   Which[# <= 126, FromCharacterCode[#],
+     # <= 16^^FFFF, "\\:" <> IntegerString[#, 16, 4],
+     True, "\\|" <> IntegerString[#, 16, 6]] &,
    ToCharacterCode[str]];
 
 Export[outPath, str, "Text"];
