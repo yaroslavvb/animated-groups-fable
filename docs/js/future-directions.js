@@ -126,7 +126,12 @@ function makeTable(headers, rows, options = {}) {
     const tr = document.createElement("tr");
     row.forEach((value, index) => {
       const cell = document.createElement(index === 0 ? "th" : "td");
-      if (index === 0) cell.scope = "row";
+      if (index === 0) {
+        cell.scope = "row";
+        if (options.firstColumnClass) {
+          cell.className = options.firstColumnClass;
+        }
+      }
       cell.textContent = value;
       tr.append(cell);
     });
@@ -171,7 +176,7 @@ function wallpaperRows(data, field) {
   const rows = data.by_wallpaper.map(row => {
     const counts = data.summary.map(summary =>
       row[field][String(summary.colours)]);
-    return [row.wallpaper_group, ...counts,
+    return [row.orbifold, ...counts,
       field === "forward_catalog"
         ? row.forward_total
         : counts.reduce((a, b) => a + b, 0)];
@@ -185,14 +190,16 @@ function wallpaperRows(data, field) {
 }
 
 function renderWallpaperTables(data) {
-  const headers = ["wallpaper", ...data.summary.map(row => `N=${row.colours}`), "Σ"];
+  const headers = ["orbifold", ...data.summary.map(row => `N=${row.colours}`), "Σ"];
   replaceWithTable("cyclic-wallpaper-table", makeTable(
     headers, wallpaperRows(data, "regular_cyclic"), {
-      caption: "Regular cyclic plane colour groups by wallpaper type",
+      caption: "Regular cyclic plane colour groups by Conway orbifold",
+      firstColumnClass: "sym",
     }));
   replaceWithTable("film-wallpaper-table", makeTable(
     headers, wallpaperRows(data, "forward_catalog"), {
-      caption: "Forward catalog normal forms by wallpaper projection and canonical clock order",
+      caption: "Forward catalog normal forms by spatial orbifold projection and canonical clock order",
+      firstColumnClass: "sym",
     }));
 }
 
