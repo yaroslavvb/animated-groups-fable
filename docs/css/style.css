@@ -160,46 +160,6 @@ table.counts th, table.counts td {
 table.counts th { background: var(--code-bg); text-align: center; }
 table.counts td:first-child { text-align: left; }
 
-/* ------- colour / forward-film census report ------- */
-.report-copy { max-width: 780px; }
-.table-scroll {
-  max-width: 100%;
-  overflow-x: auto;
-  margin: 0.8rem 0 1.4rem;
-  scrollbar-gutter: stable;
-}
-.table-scroll table.counts {
-  margin: 0;
-  min-width: 650px;
-  width: 100%;
-}
-table.census-table caption {
-  text-align: left;
-  color: var(--muted);
-  font-size: 0.86rem;
-  font-weight: 600;
-  padding: 0 0 0.35rem;
-}
-table.census-table tbody th {
-  border: 1px solid var(--rule);
-  background: var(--panel);
-  padding: 0.35rem 0.7rem;
-  text-align: left;
-  font-weight: 500;
-  white-space: nowrap;
-}
-#cyclic-wallpaper-table tbody tr:last-child,
-#film-wallpaper-table tbody tr:last-child { font-weight: 700; }
-.display-formula {
-  margin: 1rem 0;
-  text-align: center;
-  font-size: 1.08rem;
-  letter-spacing: 0.01em;
-}
-.report-examples { align-items: stretch; }
-.report-examples .aside { margin: 0.5rem 0; }
-.sources { font-size: 0.92rem; }
-#data-fingerprint { overflow-wrap: anywhere; }
 
 /* ------- animation cards ------- */
 .cardgrid {
