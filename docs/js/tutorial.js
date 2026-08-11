@@ -2,10 +2,10 @@
  * All animation specs come from data/featured.json (single source of truth,
  * verified by enumerate/verify_animations.py and at runtime by orbit.js). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=20";
-import { StripAnimation } from "./strip.js?v=20";
-import { attachControls } from "./controls.js?v=20";
-import { attachStage } from "./stage.js?v=20";
+import { FilmGroupAnimation } from "./renderer.js?v=21";
+import { StripAnimation } from "./strip.js?v=21";
+import { attachControls } from "./controls.js?v=21";
+import { attachStage } from "./stage.js?v=21";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",

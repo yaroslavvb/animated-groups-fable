@@ -1,27 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=20";
-import { attachControls } from "./controls.js?v=20";
-import { attachStage } from "./stage.js?v=20";
-
-const RT3_2 = Math.sqrt(3) / 2;
-const SQ = [[1, 0], [0, 1]];
-const HEX = [[1, 0], [-0.5, RT3_2]];
-const ID = [[1, 0], [0, 1]];
-const R4 = [[0, -1], [1, 0]];
-const R2 = [[-1, 0], [0, -1]];
-const R6 = [[1, -1], [1, 0]];
-const R3 = [[0, -1], [1, -1]];
-const MY = [[-1, 0], [0, 1]];
-
-function powmat(M, k) {
-  let A = ID;
-  for (let i = 0; i < k; i++) {
-    A = [[M[0][0] * A[0][0] + M[0][1] * A[1][0], M[0][0] * A[0][1] + M[0][1] * A[1][1]],
-         [M[1][0] * A[0][0] + M[1][1] * A[1][0], M[1][0] * A[0][1] + M[1][1] * A[1][1]]];
-  }
-  return A;
-}
+import { FilmGroupAnimation } from "./renderer.js?v=21";
+import { attachControls } from "./controls.js?v=21";
+import { attachStage } from "./stage.js?v=21";
 
 const FEATURED = [
   {

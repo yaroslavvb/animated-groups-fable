@@ -5,8 +5,8 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=20";
-import { Playback } from "./playback.js?v=20";
+import { drawMotif } from "./renderer.js?v=21";
+import { Playback } from "./playback.js?v=21";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -119,38 +119,3 @@ export class StripAnimation extends Playback {
     ctx.restore();
   }
 }
-
-/* The 13 groups, generators in the spec format (from the enumeration). */
-export const CHRONOFRIEZE = [
-  { name: "P1", ops: [{ m: 1, s: 1, v: 0, tau: 0 }], cent: null,
-    blurb: "translations only — a marching band of identical clocks" },
-  { name: "P2", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "2-fold space-time rotation: flip space AND run time backwards" },
-  { name: "Pm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: null,
-    blurb: "spatial mirror, clocks in phase" },
-  { name: "Pg_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 }], cent: null,
-    blurb: "time glide: mirror + half-period delay" },
-  { name: "Pm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "time mirror: the loop is a palindrome" },
-  { name: "Pg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0.5, tau: 0 }], cent: null,
-    blurb: "glide time-reversal: played backwards = shifted half a cell" },
-  { name: "P2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: null,
-    blurb: "mirror + palindrome (and their product, the 2-fold)" },
-  { name: "P2g_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
-                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0.5 }], cent: null,
-    blurb: "both glides; only the 2-fold survives undisplaced" },
-  { name: "P2m_xg_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0.5, tau: 0 }, { m: -1, s: -1, v: 0.5, tau: 0 }], cent: null,
-    blurb: "mirror + glide time-reversal" },
-  { name: "P2g_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0.5 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0.5 }], cent: null,
-    blurb: "time glide + palindrome" },
-  { name: "Cm_x", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred: neighbours run half a period out of phase; mirror survives" },
-  { name: "Cm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: 1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred palindrome" },
-  { name: "C2m_xm_t", ops: [{ m: 1, s: 1, v: 0, tau: 0 }, { m: -1, s: 1, v: 0, tau: 0 },
-                            { m: 1, s: -1, v: 0, tau: 0 }, { m: -1, s: -1, v: 0, tau: 0 }], cent: [0.5, 0.5],
-    blurb: "centred, mirror and palindrome together" },
-];

@@ -9,7 +9,7 @@
  * screen does not make it look paused.
  */
 "use strict";
-import { STEP, FINE } from "./stage.js?v=20";
+import { STEP, FINE } from "./stage.js?v=21";
 
 const RES = 1000;  // slider resolution
 
