@@ -8,6 +8,10 @@ Groups* and the modern classification of Xu–Wu (PRL 2018) and Ke–Wu
 
 **Site**: https://yaroslavvb.github.io/animated-groups-fable/
 
+Every animation starts paused on a frozen frame: press ▶ to run one, or point at
+it and step through the loop with ← → (shift for finer steps; space plays the
+frame you have focused).
+
 - **Tutorial** — animations as spacetime crystals; the 13 strip ("chronofrieze")
   groups live; the operation bestiary (time screw, time glide, time centring,
   glide time-reversal); the classification theorem.

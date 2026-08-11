@@ -1,21 +1,24 @@
 /* Shared tabbed-demo widget (the notation-page tab structure): a bar of
  * symbol tabs, below it one live animation with a caption box (symbol, HM
  * operator, tags, catalog link, explanatory note). Animations are created
- * lazily on first activation — a display:none canvas has no size — and an
- * IntersectionObserver starts/stops them with visibility, which also covers
- * tab switches (a hidden pane never intersects). */
+ * lazily on first activation — a display:none canvas has no size — and start
+ * paused on their first frame; the IntersectionObserver resumes only the ones
+ * the viewer has started, which also covers tab switches (a hidden pane never
+ * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=16";
-import { attachControls } from "./controls.js?v=16";
-import { groupCaption } from "./wallpaper-data.js?v=16";
+import { FilmGroupAnimation } from "./renderer.js?v=17";
+import { attachControls } from "./controls.js?v=17";
+import { attachStage } from "./stage.js?v=17";
+import { groupCaption } from "./wallpaper-data.js?v=17";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const anim = anims.get(e.target);
     if (!anim) continue;
-    if (e.isIntersecting) { if (!anim.userPaused) anim.start(); }
-    else anim.stop();
+    if (e.isIntersecting) {
+      if (anim.playRequested) anim.start(); else anim.drawStatic();
+    } else anim.stop();
   }
 }, { rootMargin: "60px" });
 
@@ -47,6 +50,7 @@ in catalog.json — out of sync with the enumeration</div>`;
       pane.append(cap);
       pane._mk = () => {
         const anim = new FilmGroupAnimation(canvas, item.g.render);
+        attachStage(anim, canvas);
         attachControls(anim, pane, cap);
         anims.set(canvas, anim);
         observer.observe(canvas);

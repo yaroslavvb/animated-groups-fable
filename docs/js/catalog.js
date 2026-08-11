@@ -1,8 +1,11 @@
 /* Catalog browser: loads data/catalog.json, filterable card grid with
- * lazily-animated canvases (only visible cards animate). */
+ * lazily-animated canvases. Cards start paused showing their first frame;
+ * visibility only decides whether an animation the viewer has started is
+ * actually burning frames. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=16";
-import { attachControls } from "./controls.js?v=16";
+import { FilmGroupAnimation } from "./renderer.js?v=17";
+import { attachControls } from "./controls.js?v=17";
+import { attachStage } from "./stage.js?v=17";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -92,6 +95,7 @@ function render() {
     grid.append(card);   // attach before constructing: geometry reads clientWidth
     const anim = new FilmGroupAnimation(canvas, g.render);
     state.anims.set(g.id, anim);
+    attachStage(anim, canvas);   // play button + keyboard, paints the still frame
     attachControls(anim, card);
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -117,10 +121,10 @@ function onVisible(entries) {
     const anim = state.anims.get(e.target.dataset.gid);
     if (!anim) continue;
     if (e.isIntersecting) {
-      if (!anim.userPaused) anim.start();
-      else anim.setPhase(anim.getPhase());  // draw the paused frame once
+      if (anim.playRequested) anim.start();
+      else anim.drawStatic();   // paused: show the frozen frame
     } else {
-      anim.stop();
+      anim.stop();              // leaves playRequested alone: it resumes
     }
   }
 }
@@ -144,10 +148,11 @@ function showDetail(g) {
   const canvas = document.getElementById("d-canvas");
   if (state.detailAnim) state.detailAnim.stop();
   state.detailAnim = new FilmGroupAnimation(canvas, g.render);
+  attachStage(state.detailAnim, canvas);   // the dialog canvas is reused;
+                                           // attachStage replaces its overlay
   const cbox = document.getElementById("d-controls");
   cbox.innerHTML = "";
   attachControls(state.detailAnim, cbox);
-  state.detailAnim.start();
   dlg.onclose = () => { if (state.detailAnim) state.detailAnim.stop(); };
 }
 

@@ -1,7 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=16";
-import { attachControls } from "./controls.js?v=16";
+import { FilmGroupAnimation } from "./renderer.js?v=17";
+import { attachControls } from "./controls.js?v=17";
+import { attachStage } from "./stage.js?v=17";
 
 const RT3_2 = Math.sqrt(3) / 2;
 const SQ = [[1, 0], [0, 1]];
@@ -131,7 +132,7 @@ const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const a = anims.find(x => x.canvas === e.target);
     if (!a) continue;
-    if (e.isIntersecting) { if (!a.userPaused) a.start(); }
+    if (e.isIntersecting) { if (a.playRequested) a.start(); else a.drawStatic(); }
     else a.stop();
   }
 }, { rootMargin: "60px" });
@@ -156,6 +157,7 @@ for (const f of FEATURED) {
   d.append(cap);
   root.append(d);
   const anim = new FilmGroupAnimation(canvas, f.spec);
+  attachStage(anim, canvas);   // play button + keyboard, paints the still frame
   attachControls(anim, d, cap);
   anims.push(anim);
   observer.observe(canvas);

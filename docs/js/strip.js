@@ -5,7 +5,8 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif } from "./renderer.js?v=16";
+import { drawMotif } from "./renderer.js?v=17";
+import { Playback } from "./playback.js?v=17";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the
@@ -34,56 +35,20 @@ export function verifyStripSpec(spec) {
   return { ok: errors.length === 0, errors };
 }
 
-export class StripAnimation {
+export class StripAnimation extends Playback {
   constructor(canvas, spec, opts = {}) {
+    super(opts);   // playback state, paused until the viewer presses play
     this.canvas = canvas;
     this.spec = spec;
     this.cellOverride = opts.cell || null;  // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 88;    // else derived per draw from width
-    this.period = opts.period || 4000;
-    this.running = false;
-    this.t0 = null;
-    this.phase = 0;
-    this.userPaused = false;
-    this.onTick = null;
-    this._frame = this._frame.bind(this);
     this.specCheck = verifyStripSpec(spec);
     if (!this.specCheck.ok) {
       console.error("Strip spec fails group axioms:", this.specCheck.errors, spec);
     }
   }
 
-  start() {
-    if (this.running) return;
-    this.running = true;
-    this.t0 = null;   // _frame resumes from this.phase
-    this._raf = requestAnimationFrame(this._frame);
-  }
-  stop() {
-    this.running = false;
-    if (this._raf) cancelAnimationFrame(this._raf);
-    this._raf = null;
-  }
-  getPhase() { return this.phase; }
-  setPhase(t) {
-    this.phase = ((t % 1) + 1) % 1;
-    this.t0 = null;
-    if (!this.running) {
-      this.draw(this.phase);
-      if (this.onTick) this.onTick(this.phase);
-    }
-  }
-
-  _frame(ts) {
-    if (!this.running) return;
-    if (this.t0 === null) this.t0 = ts - this.phase * this.period;
-    this.phase = (((ts - this.t0) / this.period) % 1 + 1) % 1;
-    this.draw(this.phase);
-    if (this.onTick) this.onTick(this.phase);
-    this._raf = requestAnimationFrame(this._frame);
-  }
-
-  draw(t) {
+  drawFrame(t) {
     const canvas = this.canvas;
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.clientWidth || 600, h = canvas.clientHeight || 110;

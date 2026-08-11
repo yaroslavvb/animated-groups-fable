@@ -2,9 +2,10 @@
  * All animation specs come from data/featured.json (single source of truth,
  * verified by enumerate/verify_animations.py and at runtime by orbit.js). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=16";
-import { StripAnimation } from "./strip.js?v=16";
-import { attachControls } from "./controls.js?v=16";
+import { FilmGroupAnimation } from "./renderer.js?v=17";
+import { StripAnimation } from "./strip.js?v=17";
+import { attachControls } from "./controls.js?v=17";
+import { attachStage } from "./stage.js?v=17";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",
@@ -40,7 +41,7 @@ const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
     const a = anims.find(x => x.canvas === e.target);
     if (!a) continue;
-    if (e.isIntersecting) { if (!a.userPaused) a.start(); }
+    if (e.isIntersecting) { if (a.playRequested) a.start(); else a.drawStatic(); }
     else a.stop();
   }
 }, { rootMargin: "60px" });
@@ -56,8 +57,11 @@ async function init() {
   /* hero */
   const heroCanvas = document.getElementById("hero");
   if (heroCanvas) {
+    // note the neighbours before attachStage wraps the canvas
+    const box = heroCanvas.parentElement, cap = heroCanvas.nextElementSibling;
     const heroAnim = new FilmGroupAnimation(heroCanvas, data.specs.hero);
-    attachControls(heroAnim, heroCanvas.parentElement, heroCanvas.nextSibling);
+    attachStage(heroAnim, heroCanvas);
+    attachControls(heroAnim, box, cap);
     attach(heroAnim);
   }
 
@@ -75,6 +79,7 @@ async function init() {
       fig.append(label, canvas);
       stripsDiv.append(fig);
       const anim = new StripAnimation(canvas, g);
+      attachStage(anim, canvas);
       attachControls(anim, fig);
       attach(anim);
     }
@@ -90,6 +95,7 @@ async function init() {
       card.append(canvas);
       bd.append(card);   // attach before constructing: geometry reads clientWidth
       const anim = new FilmGroupAnimation(canvas, data.specs[b.id]);
+      attachStage(anim, canvas);
       attachControls(anim, card);
       const meta = document.createElement("div");
       meta.className = "meta";

@@ -13,7 +13,8 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=16";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=17";
+import { Playback } from "./playback.js?v=17";
 
 const TWO_PI = Math.PI * 2;
 
@@ -106,21 +107,15 @@ export const MOTIF_COLORS = {
 };
 
 /* --------------------------------------------------------- group drawing */
-export class FilmGroupAnimation {
+export class FilmGroupAnimation extends Playback {
   constructor(canvas, spec, opts = {}) {
+    super(opts);   // playback state, paused until the viewer presses play
     this.canvas = canvas;
     this.spec = spec;
     this.cellOverride = opts.cell || null; // explicit px-per-cell (tests only)
     this.cell = this.cellOverride || 64;   // else derived in _setupGeometry
     this.minMotifPx = opts.minMotifPx || 9;  // upscale cell if motifs smaller
-    this.period = opts.period || 4000;    // ms per time period
     this.showOverlay = opts.showOverlay || false;
-    this.running = false;
-    this.t0 = null;
-    this.phase = 0;          // current time in periods, [0,1)
-    this.userPaused = false; // set by controls; visibility autostart respects it
-    this.onTick = null;      // callback(phase) for control widgets
-    this._frame = this._frame.bind(this);
     // GROUP-ACTION GATE: verify the spec is a genuine group of spacetime
     // operations before anything is drawn; a broken spec renders an error
     // banner, never a silently wrong pattern.
@@ -213,36 +208,6 @@ export class FilmGroupAnimation {
     const pad = 1.6;
     this.m1range = [Math.floor(m1min - pad), Math.ceil(m1max + pad)];
     this.m2range = [Math.floor(m2min - pad), Math.ceil(m2max + pad)];
-  }
-
-  start() {
-    if (this.running) return;
-    this.running = true;
-    this.t0 = null;   // _frame resumes from this.phase
-    this._raf = requestAnimationFrame(this._frame);
-  }
-  stop() {
-    this.running = false;
-    if (this._raf) cancelAnimationFrame(this._raf);
-    this._raf = null;
-  }
-  getPhase() { return this.phase; }
-  setPhase(t) {
-    this.phase = ((t % 1) + 1) % 1;
-    this.t0 = null;   // if running, next frame re-anchors to the new phase
-    if (!this.running) {
-      this.drawFrame(this.phase);
-      if (this.onTick) this.onTick(this.phase);
-    }
-  }
-
-  _frame(ts) {
-    if (!this.running) return;
-    if (this.t0 === null) this.t0 = ts - this.phase * this.period;
-    this.phase = (((ts - this.t0) / this.period) % 1 + 1) % 1;
-    this.drawFrame(this.phase);
-    if (this.onTick) this.onTick(this.phase);
-    this._raf = requestAnimationFrame(this._frame);
   }
 
   drawFrame(t) {

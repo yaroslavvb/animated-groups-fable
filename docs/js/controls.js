@@ -1,11 +1,15 @@
 /* Playback controls for FilmGroupAnimation / StripAnimation.
  * attachControls(anim, host): inserts a play/pause + scrub bar into `host`
- * (appended at the end unless `before` is given). Dragging the slider pauses
- * and scrubs; arrow keys on the focused slider step finely; the play button
- * resumes from the scrubbed phase. Visibility-based autostart elsewhere must
- * respect anim.userPaused.
+ * (appended at the end unless `before` is given). Animations start paused —
+ * the big overlay button on the canvas (stage.js) and this bar are the two
+ * ways to start one. Dragging the slider scrubs and takes over from playback;
+ * arrow keys on the focused slider step a frame at a time (shift: finer),
+ * matching the stage's keyboard. The button glyph follows viewer intent
+ * (anim.playRequested), not the rAF loop, so scrolling an animation off
+ * screen does not make it look paused.
  */
 "use strict";
+import { STEP, FINE } from "./stage.js?v=17";
 
 const RES = 1000;  // slider resolution
 
@@ -25,43 +29,43 @@ export function attachControls(anim, host, before = null) {
   slider.step = "1";
   slider.value = "0";
   slider.className = "ac-slider";
-  slider.title = "scrub (arrow keys for fine steps)";
+  slider.title = "scrub — arrow keys step a frame, shift for fine steps";
 
   const label = document.createElement("span");
   label.className = "ac-label";
 
-  const setBtn = () => { btn.textContent = anim.running ? "❚❚" : "▶"; };
   const setLabel = (t) => { label.textContent = "t = " + t.toFixed(2) + " T"; };
 
-  btn.addEventListener("click", () => {
-    if (anim.running) {
-      anim.userPaused = true;
-      anim.stop();
-    } else {
-      anim.userPaused = false;
-      anim.start();
-    }
-    setBtn();
-  });
+  btn.addEventListener("click", () => anim.toggle());
 
   slider.addEventListener("input", () => {
-    if (anim.running) {          // scrubbing pauses playback
-      anim.userPaused = true;
-      anim.stop();
-      setBtn();
-    }
+    anim.pause();                // scrubbing takes over from playback
     anim.setPhase(Number(slider.value) / RES);
+  });
+
+  // arrow keys on the slider step by frames, not by 1/1000 of a period
+  slider.addEventListener("keydown", (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const d = e.shiftKey ? FINE : STEP;
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") anim.step(+d);
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") anim.step(-d);
+    else if (e.key === "Home") { anim.pause(); anim.setPhase(0); }
+    else if (e.key === "End") { anim.pause(); anim.setPhase(1 - STEP); }
+    else return;
+    e.preventDefault();
   });
 
   anim.onTick = (t) => {
     slider.value = String(Math.round(t * RES) % RES);
     setLabel(t);
-    // keep the button glyph honest if something else started/stopped us
-    const want = anim.running ? "❚❚" : "▶";
-    if (btn.textContent !== want) btn.textContent = want;
   };
 
-  setBtn();
+  // the glyph tracks intent; onRunChange fires once immediately
+  anim.onRunChange(() => {
+    btn.textContent = anim.playRequested ? "❚❚" : "▶";
+    btn.setAttribute("aria-label",
+      anim.playRequested ? "pause animation" : "play animation");
+  });
   setLabel(anim.getPhase ? anim.getPhase() : 0);
 
   bar.append(btn, slider, label);
