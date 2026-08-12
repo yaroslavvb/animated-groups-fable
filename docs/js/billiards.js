@@ -1,4 +1,4 @@
-/* The mystery group: a live ball film, drawn from a solved trajectory set.
+/* Billiards: a live ball film, drawn from a solved trajectory set.
  *
  * Everywhere else on the site a motif is a drawn glyph whose only internal
  * state is a phase. Here the motif is three BALLS ON SOLVED TRAJECTORIES —
@@ -24,7 +24,6 @@ import { filmTimeSymmetry } from "./phases.js?v=36";
 
 /* the GIF's palette, so the page and the exported film are the same picture */
 const GROUND = "#faf9f6";
-const GRID = "#ded9d0";
 const EDGE = "#464c58";
 const AXIS = "#8a8578";
 
@@ -53,7 +52,6 @@ export class BallFilm extends Playback {
     // to find a 3-centre and follow a single ball around it, and neither is
     // possible at eight pixels a ball.
     this.cells = opts.cells || 1.15;
-    this.showPaths = false;
     this.showAxes = false;
     this.timeSym = filmTimeSymmetry({ ops: data.ops });
 
@@ -68,7 +66,6 @@ export class BallFilm extends Playback {
     this.colours = this.balls.map((_, i) =>
       `hsl(${((i / this.balls.length + 0.05) % 1) * 360} 60% 48%)`);
 
-    this._paths = null;    // Path2D cache for the trajectory overlay
     this._w = this._h = 0;
   }
 
@@ -103,7 +100,6 @@ export class BallFilm extends Playback {
       this.canvas.height = Math.round(h * dpr);
       this._w = w;
       this._h = h;
-      this._paths = null;
     }
     this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     this.px = Math.min(w, h) / this.cells;       // pixels per unit length
@@ -130,9 +126,7 @@ export class BallFilm extends Playback {
     const ctx = this.ctx;
     ctx.fillStyle = GROUND;
     ctx.fillRect(0, 0, w, h);
-    this._grid(ctx, w, h);
     if (this.showAxes) this._axes(ctx, w, h);
-    if (this.showPaths) this._trajectories(ctx, w, h);
 
     // only six distinct time offsets, so six path evaluations per ball
     const seen = new Map();
@@ -200,59 +194,6 @@ export class BallFilm extends Playback {
     ctx.lineWidth = Math.max(1, R * 0.16);
     ctx.strokeStyle = EDGE;
     ctx.stroke();
-  }
-
-  _grid(ctx, w, h) {
-    ctx.strokeStyle = GRID;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    const n = this.span + 1;
-    for (let m = -n; m <= n; m++) {
-      for (const [a, b] of [[[m, -n], [m, n]], [[-n, m], [n, m]]]) {
-        const p = this.scr(this.cart(a), w, h);
-        const q = this.scr(this.cart(b), w, h);
-        ctx.moveTo(p[0], p[1]);
-        ctx.lineTo(q[0], q[1]);
-      }
-    }
-    ctx.stroke();
-  }
-
-  /* Every ball's closed trajectory, cached as a Path2D per (clone, ball) in
-   * the m = 0 cell and stroked once per lattice offset. */
-  _trajectories(ctx, w, h) {
-    if (!this._paths) {
-      this._paths = [];
-      const N = 240;
-      for (const op of this.ops) {
-        for (let i = 0; i < this.balls.length; i++) {
-          const path = new Path2D();
-          for (let k = 0; k <= N; k++) {
-            const u0 = this.posAt(i, -op.tau + k / N);
-            const u = apply(op.M, u0);
-            const [x, y] = this.scr(this.cart([u[0] + op.v[0], u[1] + op.v[1]]), w, h);
-            if (k) path.lineTo(x, y); else path.moveTo(x, y);
-          }
-          this._paths.push({ path, colour: this.colours[i] });
-        }
-      }
-    }
-    ctx.save();
-    ctx.globalAlpha = 0.3;
-    ctx.lineWidth = 1.2;
-    for (let m1 = -this.span; m1 <= this.span; m1++) {
-      for (let m2 = -this.span; m2 <= this.span; m2++) {
-        const d = this.cart([m1, m2]);
-        ctx.save();
-        ctx.translate(d[0] * this.px, -d[1] * this.px);
-        for (const { path, colour } of this._paths) {
-          ctx.strokeStyle = colour;
-          ctx.stroke(path);
-        }
-        ctx.restore();
-      }
-    }
-    ctx.restore();
   }
 
   /* The fixed-point sets of the group elements: 3-centres and mirror lines.
@@ -394,30 +335,22 @@ const anim = new BallFilm(canvas, data);
 attachStage(anim, canvas);
 attachControls(anim, host);
 
-// two switches that turn the picture into its own answer key
+// one switch: draw the group's own fixed-point sets over the pattern
 const opts = document.createElement("div");
 opts.className = "film-opts";
-for (const [label, key, hint] of [
-  ["trajectories", "showPaths",
-   "the closed path every ball and every copy of it follows over one period"],
-  ["symmetry axes", "showAxes",
-   "mirror lines (solid), glide lines (dashed) and 3-centres (triangles, " +
-   "filled where the rotation costs no time)"],
-]) {
-  const id = "opt-" + key;
-  const wrap = document.createElement("label");
-  wrap.htmlFor = id;
-  wrap.title = hint;
-  const box = document.createElement("input");
-  box.type = "checkbox";
-  box.id = id;
-  box.addEventListener("change", () => {
-    anim[key] = box.checked;
-    if (!anim.running) anim.drawStatic();
-  });
-  wrap.append(box, document.createTextNode(" " + label));
-  opts.append(wrap);
-}
+const wrap = document.createElement("label");
+wrap.htmlFor = "opt-axes";
+wrap.title = "mirror lines (solid), glide lines (dashed) and 3-centres " +
+             "(triangles, filled where the rotation costs no time)";
+const box = document.createElement("input");
+box.type = "checkbox";
+box.id = "opt-axes";
+box.addEventListener("change", () => {
+  anim.showAxes = box.checked;
+  if (!anim.running) anim.drawStatic();
+});
+wrap.append(box, document.createTextNode(" symmetry axes"));
+opts.append(wrap);
 host.append(opts);
 
 // the numbers behind the picture, filled from the data file
