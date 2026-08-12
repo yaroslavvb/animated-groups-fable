@@ -5,43 +5,51 @@ The motif is n balls on CLOSED POLYLINES in the lattice cell of a clockwork grou
 (here g226 = 3_1 3_1 3_1, projection p3).  Ball i starts at a pinned s_i and drifts
 by an integer lattice vector L_i per period, so p_i(t + 1) = p_i(t) + L_i and the
 whole orbit fill is exactly periodic.  A clone (M, v, tau) shows the motif at
-internal time t - tau, so a bounce between a ball and its own rotated copy is an
-event that has to be consistent with itself a third of a period earlier -- the
-trajectory cannot be integrated forward, it has to be solved as a whole.
+internal time t - tau, so a bounce between a ball and its own rotated copy has to
+be consistent with itself a third of a period earlier: the trajectory cannot be
+integrated forward, it has to be solved all at once.
 
 Unknowns
     X[i, m], m = 1 .. K-1 : the interior breakpoints of ball i's polyline.
     X[i, 0] = s_i is pinned and X[i, K] = s_i + L_i is forced, so the solver can
-    only BEND a path, never slide it out of the way.
+    only BEND a path -- it can never slide one out of the way.
 
 Objective
-    E(X) = bend * sum |X[m+1] - 2 X[m] + X[m-1]|^2                (discrete bending,
-                                                                   zero on the
-                                                                   ballistic line)
-         + w    * sum hinge(d_target - d(pair))^2                 (soft separation)
+    E(X) = bend * sum_m |X[m+1] - 2 X[m] + X[m-1]|^2         (discrete bending;
+                                                              exactly zero on the
+                                                              ballistic straight
+                                                              line)
+         + w    * sum hinge(d_target - d(pair))^2            (soft separation)
 
-    minimised by L-BFGS with an analytic gradient, under a continuation schedule
-    w = 1e2 ... 1e6.  Because the bending term vanishes exactly on the straight
-    ballistic path, every kink in the answer is one the geometry paid for.
+    minimised by L-BFGS with an analytic gradient under a continuation schedule
+    w = 1e2 ... 3e5.  Since the bending term vanishes on the straight path, every
+    kink in the answer is one the geometry paid for.
 
 Exactness in time
-    Breakpoints sit on sample indices and every tau is an exact whole number of
-    samples (S divisible by 3), so between two consecutive samples BOTH a ball and
-    every clone move linearly.  The separation of a pair on one sample interval is
-    therefore min_{u in [0,1]} |a + u b|, available in closed form; its clipped
-    minimiser makes the distance C^1 in the unknowns, so the reported clearance is
-    the true continuous-time minimum, not a sampled proxy, and the gradient is
-    exact by the envelope theorem.
+    Breakpoints sit on sample indices and every tau is a whole number of samples
+    (S divisible by 3), so between two consecutive samples BOTH a ball and every
+    clone move linearly.  The separation of a pair over one sample interval is
+    therefore  min_{u in [0,1]} |a + u b|,  available in closed form.  Its clipped
+    minimiser leaves the distance C^1 in the unknowns, so the reported clearance is
+    the true continuous-time minimum -- not a sampled proxy that can be sneaked
+    under -- and the gradient is exact by the envelope theorem.
+
+Cost
+    Only the (clone, i, j) triples that can ever come close are kept: an
+    axis-aligned bounding-box reject on the whole trajectories, then an exact
+    distance filter.  For the tiny benchmark that is ~30 triples out of 675.  The
+    final clearance is always re-measured on a WIDE, uncoiled window so the cull
+    can never flatter the answer.
 
 Sparsifying the kinks
     A plain bending minimiser spreads a little curvature over every breakpoint.
     Two extra stages fix that: iteratively reweighted bending (w_m ~ 1/|kink_m|^2)
-    drives unneeded kinks toward zero, then a linear projection snaps them to
-    EXACTLY zero (three collinear, evenly spaced breakpoints), which is what makes
-    long straight runs show up as straight to machine precision.
+    drives the unneeded kinks toward zero, then a linear projection snaps them to
+    EXACTLY zero (three collinear, evenly spaced knots), which is what makes the
+    long straight runs read as straight to machine precision.
 
 Run:  python3 solve_project.py            # tiny benchmark
-      python3 solve_project.py --full     # n=5, S=180, + 60 rendered frames
+      python3 solve_project.py --full --render     # n=5, S=180, + 60 frames
 """
 
 from __future__ import annotations
@@ -54,7 +62,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from particles_gif import Group  # noqa: E402  (read-only import, file untouched)
+from particles_gif import Group  # noqa: E402  (read-only import; that file is untouched)
 
 try:
     from scipy.optimize import minimize as _scipy_minimize
@@ -64,14 +72,12 @@ except Exception:                                    # pragma: no cover
 
 
 # --------------------------------------------------------------------------- #
-#  the solver
-# --------------------------------------------------------------------------- #
 class PolylineSolver:
     """Closed polyline trajectories for a clockwork group, by penalty least squares."""
 
     def __init__(self, gid, starts, drifts, S=72, K=6, radius=0.075, margin=1.05,
                  span_solve=3, span_check=4, bend=1.0, anchor=0.0,
-                 cull_slack=0.45, jitter=2e-3, seed=0):
+                 cull_slack=0.40, jitter=2e-3, seed=0):
         self.g = Group(gid)
         self.B = self.g.B
         self.starts = np.asarray(starts, dtype=float)
@@ -83,46 +89,46 @@ class PolylineSolver:
             raise ValueError("K must divide S so breakpoints land on sample indices")
         self.S, self.K = S, K
         self.radius, self.margin = radius, margin
-        self.d_req = 2.0 * radius                 # hard: no overlap
+        self.d_req = 2.0 * radius                 # hard requirement: no overlap
         self.d_tgt = 2.0 * radius * margin        # what the penalty aims for
         self.bend, self.anchor = bend, anchor
         self.span_solve, self.span_check = span_solve, span_check
         self.cull_slack = cull_slack
+        self.n_triples = 0
 
         self._build_interp()
         self._build_bending()
         self._build_ops()
-        self.set_clones(self.span_solve)
 
-        # ballistic start, with a whisker of jitter so a head-on approach is not a
-        # symmetric saddle of the penalty
+        # ballistic start + a whisker of jitter, so a dead head-on approach is not
+        # a symmetric saddle of the penalty
         rng = np.random.default_rng(seed)
         self.Xf0 = self._ballistic()
-        Xf = self.Xf0.copy()
-        Xf[:, 1:self.K, :] += jitter * rng.standard_normal((self.n, self.K - 1, 2))
-        self.Xf = Xf
+        self.Xf = self.Xf0.copy()
+        self.Xf[:, 1:self.K, :] += jitter * rng.standard_normal((self.n, self.K - 1, 2))
+        self.cull()
 
-    # ---------------------------------------------------------------- geometry
+    # ------------------------------------------------------------- structure
     def _ballistic(self):
-        """straight constant-velocity path: X[m] = s + (m/K) L."""
+        """the straight constant-velocity path X[m] = s + (m/K) L."""
         frac = np.arange(self.K + 1)[None, :, None] / self.K
         return self.starts[:, None, :] + frac * self.L[:, None, :]
 
     def _build_interp(self):
-        """A: (S+1, K+1) mapping breakpoints -> sample positions at s = 0 .. S."""
+        """A: (S+1, K+1), breakpoints -> sample positions at s = 0 .. S."""
         S, K = self.S, self.K
         step = S // K
         A = np.zeros((S + 1, K + 1))
         for s in range(S + 1):
             m, r = divmod(s, step)
-            if m == K:                       # the closing sample is the last knot
+            if m == K:                        # the closing sample is the last knot
                 m, r = K - 1, step
             A[s, m] = 1.0 - r / step
             A[s, m + 1] = r / step
         self.A = A
 
     def _build_bending(self):
-        """C2: (K, K+1) with  kink_m = C2 @ Xf + const,  const = -L on row 0.
+        """C2: (K, K+1) with kink_m = C2 @ Xf + const, const = -L on row 0.
 
         Row 0 needs the previous period's last knot, X[-1] = X[K-1] - L; row K-1
         uses the closing knot X[K] = X[0] + L.  The ballistic path kills every row.
@@ -135,116 +141,206 @@ class PolylineSolver:
             C2[m, m - 1 if m > 0 else K - 1] += 1.0
         self.C2 = C2
         const = np.zeros((self.n, K, 2))
-        const[:, 0, :] = -self.L                       # from X[-1] = X[K-1] - L
+        const[:, 0, :] = -self.L                      # from X[-1] = X[K-1] - L
         self.bend_const = const
 
     def _build_ops(self):
-        """Per group op: the sample shift and the index/period maps it induces."""
+        """Per group op: its whole-sample time shift and the index map it induces."""
         S = self.S
-        self.opM = np.array([M for M, _, _ in self.g.ops])          # (O, 2, 2)
-        self.opv = np.array([v for _, v, _ in self.g.ops])          # (O, 2)
+        self.O = len(self.g.ops)
+        self.opM = np.array([M for M, _, _ in self.g.ops])
+        self.opv = np.array([v for _, v, _ in self.g.ops])
         self.opsh = np.array([int(round(tau * S)) % S for _, _, tau in self.g.ops])
-        sidx = np.arange(S + 1)
-        m = sidx[None, :] - self.opsh[:, None]
-        self.opidx = m % S                                          # (O, S+1)
-        self.opk = (m - self.opidx) // S                            # (O, S+1)
-        # which op is the identity (M = I, v = 0, tau = 0)?
+        if max(abs(tau * S - round(tau * S)) for _, _, tau in self.g.ops) > 1e-9:
+            raise ValueError("S does not make every tau a whole number of samples")
+        m = np.arange(S + 1)[None, :] - self.opsh[:, None]
+        self.opidx = m % S                            # (O, S+1) which base sample
+        self.opk = (m - self.opidx) // S              # (O, S+1) which period (drift)
         self.id_op = int(np.argmin([abs(t) for _, _, t in self.g.ops]))
+        # fold "rotate then go cartesian" into one 2x2 (forward: MB, adjoint: RB)
+        self.MB = np.array([M.T @ self.B for M in self.opM])
+        self.vB = self.opv @ self.B
+        self.RB = np.array([self.B.T @ M for M in self.opM])
 
-    def set_clones(self, span, keep=None):
-        """clone list = ops x lattice translations in [-span, span]^2 (g.clones)."""
-        rows = []
-        for oi in range(len(self.g.ops)):
+    # --------------------------------------------------------------- forward
+    # The hot loop is component-major (separate x and y arrays): reducing over a
+    # trailing length-2 axis is a strided ufunc reduce and costs more than the
+    # arithmetic it performs.  MB / RB fold the op matrix and the basis into one
+    # 2x2 each, so a clone position is two multiply-adds.
+    def _pos_xy(self, Xf):
+        """(Px, Py, Pcx, Pcy), each (n, S+1): lattice and cartesian sample positions."""
+        Px = Xf[:, :, 0] @ self.A.T
+        Py = Xf[:, :, 1] @ self.A.T
+        B = self.B
+        return Px, Py, Px * B[0, 0] + Py * B[1, 0], Px * B[0, 1] + Py * B[1, 1]
+
+    def _perop_xy(self, Px, Py):
+        """cartesian motif carried by each op, before translation: 2 x (O*n, S+1)."""
+        n, S1 = self.n, self.S + 1
+        qx = np.empty((self.O * n, S1))
+        qy = np.empty((self.O * n, S1))
+        for o in range(self.O):
+            k = self.opk[o]
+            sx = Px[:, self.opidx[o]] + k[None, :] * self.L[:, 0:1]
+            sy = Py[:, self.opidx[o]] + k[None, :] * self.L[:, 1:2]
+            MB, vb = self.MB[o], self.vB[o]
+            qx[o * n:(o + 1) * n] = sx * MB[0, 0] + sy * MB[1, 0] + vb[0]
+            qy[o * n:(o + 1) * n] = sx * MB[0, 1] + sy * MB[1, 1] + vb[1]
+        return qx, qy
+
+    def positions(self, Xf):
+        """sample positions at s = 0 .. S (index S closes the loop): lattice, cartesian."""
+        Px, Py, Pcx, Pcy = self._pos_xy(Xf)
+        return np.stack([Px, Py], -1), np.stack([Pcx, Pcy], -1)
+
+    def per_op_cart(self, P_ext):
+        """the motif carried by each op, before translation: (O, n, S+1, 2) cartesian."""
+        qx, qy = self._perop_xy(P_ext[..., 0], P_ext[..., 1])
+        return np.stack([qx, qy], -1).reshape(self.O, self.n, self.S + 1, 2)
+
+    @staticmethod
+    def _seg_min_xy(Dx, Dy, S):
+        """exact min over each sample interval of |a + u b|, u in [0,1] (componentwise)."""
+        ax, ay = Dx[..., :S], Dy[..., :S]
+        bx = Dx[..., 1:] - ax
+        by = Dy[..., 1:] - ay
+        b2 = bx * bx + by * by
+        ab = ax * bx + ay * by
+        u = -ab / (b2 + 1e-18)
+        np.clip(u, 0.0, 1.0, out=u)
+        mx = ax + u * bx
+        my = ay + u * by
+        return np.sqrt(mx * mx + my * my), mx, my, u
+
+    @classmethod
+    def _seg_min(cls, D, S):
+        """(n..., S) minimum distance per sample interval, for the cold paths."""
+        d, mx, my, u = cls._seg_min_xy(D[..., 0], D[..., 1], S)
+        return d, np.stack([mx, my], -1), u
+
+    # ------------------------------------------------------------- the cull
+    def _all_triples(self, span):
+        """(clone, i, j) triples over ops x translations x ball pairs, minus self."""
+        oi, aa, bb, ii, jj = [], [], [], [], []
+        for o in range(self.O):
             for a in range(-span, span + 1):
                 for b in range(-span, span + 1):
-                    rows.append((oi, a, b))
-        rows = [r for r in rows if keep is None or r in keep]
-        self.c_op = np.array([r[0] for r in rows])
-        self.c_w = np.array([[r[1], r[2]] for r in rows], dtype=float)
-        self.c_rows = rows
-        self.c_wcart = self.c_w @ self.B
-        # self-pair mask: only the identity op with zero translation is "myself"
-        ok = np.ones((len(rows), self.n, self.n), dtype=bool)
-        for c, (oi, a, b) in enumerate(rows):
-            if oi == self.id_op and a == 0 and b == 0 and not self.opv[oi].any():
-                ok[c][np.diag_indices(self.n)] = False
-        self.pair_ok = ok
-        self.op_sel = [np.where(self.c_op == o)[0] for o in range(len(self.g.ops))]
+                    self_clone = (o == self.id_op and a == 0 and b == 0
+                                  and not self.opv[o].any())
+                    for i in range(self.n):
+                        for j in range(self.n):
+                            if self_clone and i == j:
+                                continue
+                            oi.append(o); aa.append(a); bb.append(b)
+                            ii.append(i); jj.append(j)
+        return (np.array(oi), np.array(aa, float), np.array(bb, float),
+                np.array(ii), np.array(jj))
 
-    # ---------------------------------------------------------------- forward
-    def positions(self, Xf):
-        """sample positions, lattice and cartesian, at s = 0 .. S (S closes the loop)."""
-        P_ext = np.einsum('sm,imd->isd', self.A, Xf)          # (n, S+1, 2)
-        return P_ext, P_ext @ self.B
+    def cull(self, slack=None, span=None, thresh=None):
+        """Keep only the triples that could ever come within d_tgt + slack.
 
-    def clone_cart(self, P_ext):
-        """cartesian position of every clone-ball at every sample: (C, n, S+1, 2)."""
-        P = P_ext[:, :self.S, :]
-        per_op = np.empty((len(self.g.ops), self.n, self.S + 1, 2))
-        for o in range(len(self.g.ops)):
-            Ps = P[:, self.opidx[o], :] + self.opk[o][None, :, None] * self.L[:, None, :]
-            per_op[o] = (Ps @ self.opM[o].T + self.opv[o]) @ self.B
-        return per_op[self.c_op] + self.c_wcart[:, None, None, :]
-
-    def _pair_dist(self, Xf):
-        """exact continuous-time separation on every sample interval.
-
-        Returns (d, Dm, u, Pcart, Qc) with d of shape (C, n_i, n_j, S) -- the true
-        minimum over each interval, since both endpoints move linearly on it.
+        Two stages: an axis-aligned bounding-box reject on whole trajectories
+        (cheap, no time axis), then the exact continuous-time distance.  Most of
+        the 3 (2 span + 1)^2 n^2 triples are far away for the whole period.
         """
-        S = self.S
-        P_ext, Pcart = self.positions(Xf)
-        Qc = self.clone_cart(P_ext)
-        D = Pcart[None, :, None, :, :] - Qc[:, None, :, :, :]     # (C,n,n,S+1,2)
-        a = D[..., :S, :]
-        b = D[..., 1:, :] - a
-        b2 = (b * b).sum(-1)
-        ab = (a * b).sum(-1)
-        u = np.clip(np.where(b2 > 1e-18, -ab / np.where(b2 > 1e-18, b2, 1.0), 0.0), 0.0, 1.0)
-        Dm = a + u[..., None] * b
-        d = np.sqrt((Dm * Dm).sum(-1))
-        return d, Dm, u, P_ext, Pcart, Qc
+        slack = self.cull_slack if slack is None else slack
+        span = self.span_solve if span is None else span
+        thresh = (self.d_tgt + slack) if thresh is None else thresh
+        o, a, b, ii, jj = self._all_triples(span)
+        wc = np.stack([a, b], 1) @ self.B
 
-    # ---------------------------------------------------------------- energy
+        P_ext, Pcart = self.positions(self.Xf)
+        per_op = self.per_op_cart(P_ext)
+        lo_i, hi_i = Pcart.min(1), Pcart.max(1)                    # (n, 2)
+        lo_q, hi_q = per_op.min(2), per_op.max(2)                  # (O, n, 2)
+
+        gap = np.maximum(lo_i[ii] - (hi_q[o, jj] + wc),
+                         (lo_q[o, jj] + wc) - hi_i[ii])            # (T, 2)
+        keep = np.maximum(gap, 0.0)
+        keep = np.linalg.norm(keep, axis=1) < thresh
+        o, wc, ii, jj = o[keep], wc[keep], ii[keep], jj[keep]
+
+        if o.size:                                                  # exact filter
+            Q = per_op[o, jj] + wc[:, None, :]
+            d, _, _ = self._seg_min(Pcart[ii] - Q, self.S)
+            keep2 = d.min(1) < thresh
+            o, wc, ii, jj = o[keep2], wc[keep2], ii[keep2], jj[keep2]
+
+        self.t_op, self.t_wc, self.t_i, self.t_j = o, wc, ii, jj
+        T = o.size
+        self.n_triples = T
+        self.t_gather = o * self.n + jj                  # row of the (O*n, S+1) block
+        # one-hot scatter matrices: the adjoints of the two gathers above.  T stays
+        # small, so these are trivial BLAS calls rather than np.add.at loops.
+        self.Wi = np.zeros((self.n, T)); self.Wi[ii, np.arange(T)] = 1.0
+        self.Woj = np.zeros((self.O * self.n, T))
+        self.Woj[self.t_gather, np.arange(T)] = 1.0
+        return T
+
+    # --------------------------------------------------------------- energy
     def energy(self, y, w_pen, bend_w):
         """E and dE/dy for the free interior breakpoints y = X[:, 1:K, :]."""
-        n, S, K = self.n, self.S, self.K
+        n, S, K, T = self.n, self.S, self.K, self.n_triples
         Xf = self.Xf0.copy()
         Xf[:, 0, :] = self.starts
         Xf[:, K, :] = self.starts + self.L
         Xf[:, 1:K, :] = y.reshape(n, K - 1, 2)
 
-        d, Dm, u, P_ext, Pcart, Qc = self._pair_dist(Xf)
-        ok = self.pair_ok[..., None]                     # (C,n,n,1) -> broadcast on S
-        viol = np.where(ok, self.d_tgt - d, -1.0)
-        act = viol > 0.0
-        E = 0.5 * w_pen * float((viol[act] ** 2).sum())
+        E = 0.0
+        gXf = np.zeros_like(Xf)
+        Px, Py, Pcx, Pcy = self._pos_xy(Xf)
 
-        # dE/dDm  (envelope theorem: u* held fixed)
-        coef = np.where(act, -w_pen * viol, 0.0) / np.maximum(d, 1e-12)
-        gDm = coef[..., None] * Dm
-        gD = np.zeros_like(Dm, shape=Dm.shape[:-2] + (S + 1, 2))
-        gD[..., :S, :] += (1.0 - u)[..., None] * gDm
-        gD[..., 1:, :] += u[..., None] * gDm
+        if T:
+            qx, qy = self._perop_xy(Px, Py)
+            g = self.t_gather
+            Dx = Pcx[self.t_i] - (qx[g] + self.t_wc[:, 0:1])            # (T, S+1)
+            Dy = Pcy[self.t_i] - (qy[g] + self.t_wc[:, 1:2])
+            d, mx, my, u = self._seg_min_xy(Dx, Dy, S)                  # (T, S)
 
-        gPcart = gD.sum(axis=(0, 2))                      # (n, S+1, 2)
-        gQc = -gD.sum(axis=1)                             # (C, n, S+1, 2)
+            viol = self.d_tgt - d
+            np.maximum(viol, 0.0, out=viol)        # hinge
+            E += 0.5 * w_pen * float((viol * viol).sum())
 
-        gP = np.zeros((n, S, 2))
-        for o in range(len(self.g.ops)):
-            sel = self.op_sel[o]
-            if sel.size == 0:
-                continue
-            gQ = gQc[sel].sum(axis=0)                     # (n, S+1, 2) cartesian
-            gPs = (gQ @ self.B.T) @ self.opM[o]           # -> d/d Pshift
-            gP += np.roll(gPs[:, :S, :], -self.opsh[o], axis=1)
-            gP[:, (S - self.opsh[o]) % S, :] += gPs[:, S, :]
+            # envelope theorem: the clipped minimiser u* is held fixed
+            coef = (-w_pen) * viol / np.maximum(d, 1e-12)
+            gmx = coef * mx
+            gmy = coef * my
+            gDx = np.zeros((T, S + 1))
+            gDy = np.zeros((T, S + 1))
+            um = 1.0 - u
+            gDx[:, :S] = um * gmx
+            gDy[:, :S] = um * gmy
+            gDx[:, 1:] += u * gmx
+            gDy[:, 1:] += u * gmy
 
-        gP_ext = gPcart @ self.B.T
-        gP_ext[:, :S, :] += gP
-        gXf = np.einsum('sm,isd->imd', self.A, gP_ext)
+            gPcx = self.Wi @ gDx                       # (n, S+1) cartesian
+            gPcy = self.Wi @ gDy
+            gqx = self.Woj @ gDx                       # (O*n, S+1), sign flipped below
+            gqy = self.Woj @ gDy
 
-        # bending (in cartesian, so it is isotropic on the hexagonal lattice)
+            gP = np.zeros((n, S))
+            gPy = np.zeros((n, S))
+            for o in range(self.O):
+                sl = slice(o * n, (o + 1) * n)
+                R = self.RB[o]                          # = B.T @ M_o
+                # minus sign: D = Pcart - Qcart, so dE/dQcart = -dE/dD
+                gsx = -(gqx[sl] * R[0, 0] + gqy[sl] * R[1, 0])
+                gsy = -(gqx[sl] * R[0, 1] + gqy[sl] * R[1, 1])
+                sh = self.opsh[o]
+                gP += np.roll(gsx[:, :S], -sh, axis=1)
+                gPy += np.roll(gsy[:, :S], -sh, axis=1)
+                gP[:, (S - sh) % S] += gsx[:, S]
+                gPy[:, (S - sh) % S] += gsy[:, S]
+
+            B = self.B
+            gx = gPcx * B[0, 0] + gPcy * B[0, 1]        # d/dP from the base copy
+            gy_ = gPcx * B[1, 0] + gPcy * B[1, 1]
+            gx[:, :S] += gP
+            gy_[:, :S] += gPy
+            gXf[:, :, 0] += gx @ self.A
+            gXf[:, :, 1] += gy_ @ self.A
+
+        # bending, measured in cartesian so it is isotropic on the hex lattice
         kink = np.einsum('mk,ikd->imd', self.C2, Xf) + self.bend_const
         kc = kink @ self.B
         bw = bend_w if np.ndim(bend_w) else np.full((n, K), float(bend_w))
@@ -265,45 +361,38 @@ class PolylineSolver:
             res = _scipy_minimize(self.energy, y0, args=(w_pen, bend_w), jac=True,
                                   method='L-BFGS-B',
                                   options=dict(maxiter=maxiter, maxfun=3 * maxiter,
-                                               ftol=1e-14, gtol=1e-12))
+                                               ftol=1e-15, gtol=1e-12))
             y = res.x
-        else:
+        else:                                                    # pragma: no cover
             y = _lbfgs(lambda z: self.energy(z, w_pen, bend_w), y0, maxiter)
         self.Xf[:, 1:self.K, :] = y.reshape(self.n, self.K - 1, 2)
         return self.Xf
 
-    def cull(self, slack=None):
-        """Keep only the clones that could ever come within d_tgt + slack.
-
-        Most of the 3 x (2 span + 1)^2 clones are far away forever; dropping them is
-        a big constant factor.  The final clearance is always re-measured on the
-        FULL wide window, so a mistake here cannot flatter the answer.
-        """
-        slack = self.cull_slack if slack is None else slack
-        self.set_clones(self.span_solve)
-        d, *_ = self._pair_dist(self.Xf)
-        dmin = np.where(self.pair_ok[..., None], d, np.inf).min(axis=(1, 2, 3))
-        keep = [r for r, m in zip(self.c_rows, dmin) if m < self.d_tgt + slack]
-        self.set_clones(self.span_solve, keep=set(keep))
-        return len(keep)
-
-    def solve(self, weights=(1e2, 4e2, 2e3, 1e4, 6e4, 3e5), maxiter=90,
-              irls_rounds=3, irls_eps=6e-3, snap_tol=1.5e-3):
-        # --- stage 1: penalty continuation on uniform bending -----------------
+    def solve(self, weights=(1e2, 4e2, 2e3, 1e4, 6e4, 3e5), maxiter=110,
+              irls_rounds=3, irls_eps=6e-3, snap_tol=1.5e-3, repairs=2):
+        # stage 1: penalty continuation with uniform bending
         for w in weights:
             self.cull()
             self._run(w, self.bend, maxiter)
         w_last = weights[-1]
 
-        # --- stage 2: reweighted bending -> concentrate curvature in few kinks --
+        # stage 2: reweighted bending -> concentrate the curvature in a few kinks
         for _ in range(irls_rounds):
             k = self._kinks(self.Xf)
             bw = self.bend * (irls_eps ** 2) / (k ** 2 + irls_eps ** 2)
             self.cull()
             self._run(w_last, bw, maxiter)
 
-        # --- stage 3: snap the residual hair to exactly straight ---------------
+        # stage 3: snap the residual hair to exactly straight
         self._snap(snap_tol)
+
+        # stage 4: if the wide window disagrees with the culled one, widen and redo
+        for _ in range(repairs):
+            if self.clearance() >= self.d_req:
+                break
+            self.cull(slack=self.cull_slack + 0.5, span=self.span_check)
+            self._run(w_last, self.bend, 2 * maxiter)
+            self._snap(snap_tol)
         return self.Xf
 
     def _kinks(self, Xf):
@@ -312,66 +401,79 @@ class PolylineSolver:
         return np.linalg.norm(kink @ self.B, axis=-1)
 
     def _snap(self, tol):
-        """Force the tiny kinks to exactly zero by the nearest linear projection.
+        """Force the negligible kinks to exactly zero, by the nearest linear projection.
 
         kink_m = 0 means X[m+1] - X[m] = X[m] - X[m-1]: three knots collinear AND
-        evenly spaced, i.e. the heading is bit-for-bit constant across m.  Reverted
-        per ball if it would cost clearance.
+        evenly spaced, so the heading is bit-for-bit constant across m.  Reverted
+        wholesale if it would cost clearance.
         """
-        K, n = self.K, self.n
-        before = self.clearance(self.Xf, span=self.span_solve)
-        k = self._kinks(self.Xf)
+        K = self.K
+        before = self.clearance(self.Xf)
         Xkeep = self.Xf.copy()
-        for i in range(n):
+        k = self._kinks(self.Xf)
+        for i in range(self.n):
             rows = np.where(k[i] < tol)[0]
             if rows.size == 0:
                 continue
             Xf = self.Xf[i]
-            G = self.C2[np.ix_(rows, np.arange(1, K))]                 # (r, K-1)
-            fixed = (self.C2[rows][:, [0, K]] @ Xf[[0, K]] + self.bend_const[i][rows])
-            y0 = Xf[1:K]
-            resid = G @ y0 + fixed                                     # (r, 2)
+            G = self.C2[np.ix_(rows, np.arange(1, K))]                # (r, K-1)
+            resid = (self.C2[rows][:, [0, K]] @ Xf[[0, K]]
+                     + self.bend_const[i][rows] + G @ Xf[1:K])        # (r, 2)
             corr, *_ = np.linalg.lstsq(G, resid, rcond=None)
-            self.Xf[i, 1:K] = y0 - corr
-        after = self.clearance(self.Xf, span=self.span_solve)
-        if after < min(before, self.d_req) - 1e-12:
+            self.Xf[i, 1:K] = Xf[1:K] - corr
+        if self.clearance(self.Xf) < min(before, self.d_req) - 1e-12:
             self.Xf = Xkeep                                            # not worth it
 
-    # ---------------------------------------------------------------- measure
-    def clearance(self, Xf=None, span=None):
-        """true continuous-time minimum centre distance over the whole loop.
+    # -------------------------------------------------------------- measure
+    def clearance(self, Xf=None, span=None, thresh=1.0):
+        """True continuous-time minimum centre distance, on a WIDE clone window.
 
-        Measured on a WIDE, uncounted clone window -- never the culled one.
+        Independent of the cull used while solving: the triples are rebuilt here
+        over span_check with a threshold of `thresh` cartesian units, so the value
+        is exact whenever the true minimum is below that (it always is, in
+        practice, since the balls are packed at ~0.15).
         """
         Xf = self.Xf if Xf is None else Xf
-        old = self.c_rows
-        self.set_clones(self.span_check if span is None else span)
-        d, *_ = self._pair_dist(Xf)
-        val = float(np.where(self.pair_ok[..., None], d, np.inf).min())
-        self.set_clones(self.span_solve, keep=set(old))
-        return val
+        span = self.span_check if span is None else span
+        o, a, b, ii, jj = self._all_triples(span)
+        wc = np.stack([a, b], 1) @ self.B
+        P_ext, Pcart = self.positions(Xf)
+        per_op = self.per_op_cart(P_ext)
+        lo_i, hi_i = Pcart.min(1), Pcart.max(1)
+        lo_q, hi_q = per_op.min(2), per_op.max(2)
+        gap = np.maximum(lo_i[ii] - (hi_q[o, jj] + wc), (lo_q[o, jj] + wc) - hi_i[ii])
+        keep = np.linalg.norm(np.maximum(gap, 0.0), axis=1) < thresh
+        o, wc, ii, jj = o[keep], wc[keep], ii[keep], jj[keep]
+        if o.size == 0:
+            return float(thresh)
+        best = np.inf
+        for lo in range(0, o.size, 4096):                     # chunk, keep memory flat
+            sl = slice(lo, lo + 4096)
+            Q = per_op[o[sl], jj[sl]] + wc[sl][:, None, :]
+            d, _, _ = self._seg_min(Pcart[ii[sl]] - Q, self.S)
+            best = min(best, float(d.min()))
+        return best
 
     def straightness(self, Xf=None):
         """fraction of sample steps whose heading equals the previous step's."""
         Xf = self.Xf if Xf is None else Xf
         _, Pcart = self.positions(Xf)
-        v = Pcart[:, 1:, :] - Pcart[:, :-1, :]                 # (n, S, 2)
+        v = Pcart[:, 1:, :] - Pcart[:, :-1, :]                    # (n, S, 2)
         h = v / np.maximum(np.linalg.norm(v, axis=-1, keepdims=True), 1e-300)
         changed = np.linalg.norm(h - np.roll(h, 1, axis=1), axis=-1) > 1e-6
         return float(1.0 - changed.mean()), float(changed.sum() / self.n)
 
-    # -------------------------------------------------- orbit + symmetry check
+    # ---------------------------------------------- orbit and symmetry check
     def orbit(self, sidx, span, Xf=None):
-        """every ball in the plane at integer global sample sidx: (pts_lat, ball_idx)."""
+        """every ball in the plane at integer global sample sidx: (lattice pts, index)."""
         Xf = self.Xf if Xf is None else Xf
         P_ext, _ = self.positions(Xf)
         P = P_ext[:, :self.S, :]
         pts, idx = [], []
-        for oi, (M, v, tau) in enumerate(self.g.ops):
-            m = sidx - self.opsh[oi]
+        for o, (M, v, tau) in enumerate(self.g.ops):
+            m = sidx - self.opsh[o]
             r = m % self.S
-            p = P[:, r, :] + ((m - r) // self.S) * self.L
-            q = p @ M.T + v
+            q = (P[:, r, :] + ((m - r) // self.S) * self.L) @ M.T + v
             for a in range(-span, span + 1):
                 for b in range(-span, span + 1):
                     pts.append(q + np.array([a, b], dtype=float))
@@ -379,10 +481,12 @@ class PolylineSolver:
         return np.vstack(pts), np.concatenate(idx)
 
     def symmetry_residual(self, span=5, radius_keep=1.6, times=12):
-        """turn the orbit by the tau = 1/3 generator; it must equal the orbit at t+1/3.
+        """Turn the orbit by the tau = 1/3 generator: it must equal the orbit at t + 1/3.
 
-        The rendered symmetry is automatic (it IS an orbit fill), so anything above
-        rounding here would be a bug in the clone bookkeeping, not a real asymmetry.
+        The rendered symmetry is automatic (the picture IS an orbit fill), so
+        anything above rounding here is a bug in the clone bookkeeping, never a
+        real asymmetry.  The finite window is not carried to itself by the
+        rotation, hence radius_keep against a wider target window.
         """
         gen = None
         for M, v, tau in self.g.ops:
@@ -397,8 +501,7 @@ class PolylineSolver:
             s = (a * self.S) // times
             p0, i0 = self.orbit(s, span)
             p1, i1 = self.orbit(s + sh, span)
-            turned = p0 @ M.T + v
-            tc = turned @ self.B
+            tc = (p0 @ M.T + v) @ self.B
             keep = np.linalg.norm(tc, axis=1) < radius_keep
             p1c = p1 @ self.B
             for bi in range(self.n):
@@ -422,9 +525,8 @@ class PolylineSolver:
 
 
 # --------------------------------------------------------------------------- #
-#  fallback optimiser (only used if scipy is missing)
-# --------------------------------------------------------------------------- #
 def _lbfgs(fg, x0, maxiter, m=12):                                  # pragma: no cover
+    """Plain L-BFGS with backtracking, used only if scipy is unavailable."""
     x = x0.copy()
     f, g = fg(x)
     S_, Y_, R_ = [], [], []
@@ -432,9 +534,7 @@ def _lbfgs(fg, x0, maxiter, m=12):                                  # pragma: no
         q = g.copy()
         al = []
         for s, y, r in zip(reversed(S_), reversed(Y_), reversed(R_)):
-            a = r * s.dot(q)
-            al.append(a)
-            q -= a * y
+            a = r * s.dot(q); al.append(a); q -= a * y
         if Y_:
             q *= S_[-1].dot(Y_[-1]) / max(Y_[-1].dot(Y_[-1]), 1e-300)
         for (s, y, r), a in zip(zip(S_, Y_, R_), reversed(al)):
@@ -442,14 +542,15 @@ def _lbfgs(fg, x0, maxiter, m=12):                                  # pragma: no
         d = -q
         if d.dot(g) >= 0:
             d = -g
-        step, f0 = 1.0, f
+        step, f0, ok = 1.0, f, False
         for _ in range(30):
             xn = x + step * d
             fn, gn = fg(xn)
             if fn <= f0 + 1e-4 * step * g.dot(d):
+                ok = True
                 break
             step *= 0.5
-        else:
+        if not ok:
             break
         s, y = xn - x, gn - g
         sy = s.dot(y)
@@ -472,7 +573,7 @@ TINY = dict(gid='g226',
             S=72, radius=0.075, margin=1.05)
 
 
-def solve_tiny(K=6, verbose=False):
+def solve_tiny(K=6, return_solver=False):
     """The pinned 3-ball benchmark.  Returns the required metrics dict."""
     t0 = time.perf_counter()
     sol = PolylineSolver(TINY['gid'], TINY['starts'], TINY['drifts'],
@@ -481,44 +582,45 @@ def solve_tiny(K=6, verbose=False):
     sol.solve()
     rt = time.perf_counter() - t0
     out = sol.report(rt)
-    if verbose:
-        out['_solver'] = sol
-    return out
+    return (out, sol) if return_solver else out
 
 
-def solve_full(n=5, S=180, K=6, radius=0.07, margin=1.05, seed=3, render=False,
-               out_path=None):
-    """n balls, S samples: the target problem.  Starts are Poisson-disk seeded and
-    drifts are drawn from the short lattice vectors, then both are PINNED."""
+def make_full_problem(n=5, radius=0.07, seed=3):
+    """Poisson-disk starts and short-lattice-vector drifts, then both are PINNED."""
     g = Group('g226')
     rng = np.random.default_rng(seed)
-    d_req = 2 * radius
-    starts = []
     ws = np.array([[a, b] for a in range(-2, 3) for b in range(-2, 3)], dtype=float)
-    while len(starts) < n:
+    starts, guard = [], 0
+    while len(starts) < n and guard < 20000:
+        guard += 1
         c = rng.random(2)
         trial = np.array(starts + [c])
         ok = True
         for M, v, _ in g.ops:
-            q = (trial[:, None, :] @ M.T + v + ws[None, :, :]).reshape(-1, 2) @ g.B
-            dd = np.linalg.norm(q - c @ g.B, axis=1)
+            q = (trial @ M.T + v)[:, None, :] + ws[None, :, :]
+            dd = np.linalg.norm(q.reshape(-1, 2) @ g.B - c @ g.B, axis=1)
             dd[dd < 1e-9] = np.inf
-            if dd.min() < 2.2 * d_req:
+            if dd.min() < 2.4 * 2 * radius:
                 ok = False
                 break
         if ok:
             starts.append(c)
     short = np.array([[1, 0], [-1, 1], [0, -1], [-1, 0], [1, -1], [0, 1]], dtype=float)
-    drifts = short[rng.integers(0, len(short), size=n)]
+    return np.array(starts), short[rng.integers(0, len(short), size=len(starts))]
 
+
+def solve_full(n=5, S=180, K=6, radius=0.07, margin=1.05, seed=3, render=False,
+               out_path=None):
+    """The target problem: n balls, S samples, optionally 60 rendered frames."""
+    starts, drifts = make_full_problem(n, radius, seed)
     t0 = time.perf_counter()
-    sol = PolylineSolver('g226', np.array(starts), drifts, S=S, K=K,
-                         radius=radius, margin=margin)
+    sol = PolylineSolver('g226', starts, drifts, S=S, K=K, radius=radius,
+                         margin=margin)
     sol.solve()
     rt_solve = time.perf_counter() - t0
     rep = sol.report(rt_solve)
     rep['runtime_solve_sec'] = round(rt_solve, 4)
-
+    rep['n_triples'] = sol.n_triples
     if render:
         t1 = time.perf_counter()
         path = out_path or '/tmp/g226_polyline.gif'
@@ -529,18 +631,17 @@ def solve_full(n=5, S=180, K=6, radius=0.07, margin=1.05, seed=3, render=False,
     return rep
 
 
-def render_gif(sol, path, frames=60, size=600, cell_px=210.0, span=4):
-    """60 frames of the orbit fill, for a timing that includes drawing."""
+def render_gif(sol, path, frames=60, size=600, cell_px=200.0, span=4):
+    """60 frames of the orbit fill; used to time the whole pipeline honestly."""
     import colorsys
     from PIL import Image, ImageDraw
     n = sol.n
-    cols = []
-    for i in range(n):
-        r, gg, b = colorsys.hls_to_rgb((i / n + 0.02) % 1.0, 0.52, 0.62)
-        cols.append((int(255 * r), int(255 * gg), int(255 * b)))
-    SSx = 2
-    W = size * SSx
-    rad = sol.radius * cell_px * SSx
+    cols = [tuple(int(255 * c) for c in
+                  colorsys.hls_to_rgb((i / n + 0.02) % 1.0, 0.52, 0.62))
+            for i in range(n)]
+    ss = 2
+    W = size * ss
+    rad = sol.radius * cell_px * ss
     imgs = []
     for f in range(frames):
         s = int(round(f * sol.S / frames))
@@ -548,12 +649,11 @@ def render_gif(sol, path, frames=60, size=600, cell_px=210.0, span=4):
         pc = pts @ sol.B
         img = Image.new('RGB', (W, W), (250, 249, 246))
         d = ImageDraw.Draw(img)
-        for (px, py), i in zip(pc, idx):
-            x = W / 2 + px * cell_px * SSx
-            y = W / 2 - py * cell_px * SSx
-            if not (-2 * rad <= x <= W + 2 * rad and -2 * rad <= y <= W + 2 * rad):
-                continue
-            d.ellipse([x - rad, y - rad, x + rad, y + rad], fill=cols[i],
+        x = W / 2 + pc[:, 0] * cell_px * ss
+        y = W / 2 - pc[:, 1] * cell_px * ss
+        vis = (x > -2 * rad) & (x < W + 2 * rad) & (y > -2 * rad) & (y < W + 2 * rad)
+        for xi, yi, i in zip(x[vis], y[vis], idx[vis]):
+            d.ellipse([xi - rad, yi - rad, xi + rad, yi + rad], fill=cols[i],
                       outline=(38, 42, 52), width=max(1, int(0.17 * rad)))
         imgs.append(img.resize((size, size), Image.LANCZOS))
     imgs[0].save(path, save_all=True, append_images=imgs[1:], duration=60,

@@ -18,31 +18,48 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--group", default="g226")
     ap.add_argument("--balls", type=int, default=5)
-    ap.add_argument("--radius", type=float, default=0.056)
+    ap.add_argument("--radius", type=float, default=0.085)
     ap.add_argument("--steps", type=int, default=90)
     ap.add_argument("--frames", type=int, default=60)
     ap.add_argument("--size", type=int, default=600)
     ap.add_argument("--cell-px", type=float, default=250.0)
     ap.add_argument("--margin", type=float, default=1.02)
     ap.add_argument("--gain", type=float, default=2.2)
-    ap.add_argument("--rounds", type=int, default=25)
-    ap.add_argument("--phases", type=int, default=12)
-    ap.add_argument("--seed", type=int, default=3)
+    ap.add_argument("--rounds", type=int, default=18)
+    ap.add_argument("--phases", type=int, default=26)
+    ap.add_argument("--min-sep", type=int, default=3)
+    ap.add_argument("--seed", type=int, default=11)
+    ap.add_argument("--tries", type=int, default=3,
+                    help="seeds to try before giving up on a layout")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 
     t0 = time.time()
     g = Group(a.group)
-    rng = random.Random(a.seed)
-    starts = [[rng.random(), rng.random()] for _ in range(a.balls)]
     choices = [(1, 0), (0, 1), (1, 1), (-1, 1), (1, -1), (-1, 0), (0, -1)]
-    drifts = [list(rng.choice(choices)) for _ in range(a.balls)]
+    d_min = 2 * a.radius * a.margin
 
-    B, V, L, phases, ok = SB.solve(g, starts, drifts, a.radius, S=a.steps,
-                                   margin=a.margin, phases=a.phases,
-                                   rounds=a.rounds, gain=a.gain)
+    # Not every random layout admits a collision-free loop at this size, so try
+    # a few. The starts are seeded collision-free at t = 0 first: they are
+    # pinned, and a violation at t = 0 is one no amount of bending can repair.
+    B = V = L = None
+    for attempt in range(a.tries):
+        rng = random.Random(a.seed + attempt)
+        try:
+            starts = SB.seed_starts(g, a.balls, d_min * 1.05, rng)
+        except RuntimeError:
+            continue
+        drifts = [list(rng.choice(choices)) for _ in range(a.balls)]
+        B, V, L, phases, ok = SB.solve(g, starts, drifts, a.radius, S=a.steps,
+                                       margin=a.margin, phases=a.phases,
+                                       rounds=a.rounds, gain=a.gain,
+                                       min_sep=a.min_sep)
+        rep = R.report(g, B, V, L, a.steps, a.radius)
+        if rep["min_clearance_ratio"] >= 1.0:
+            if attempt:
+                print(f"  (layout {a.seed + attempt} after {attempt} that did not close)")
+            break
     t_solve = time.time() - t0
-    rep = R.report(g, B, V, L, a.steps, a.radius)
 
     t1 = time.time()
     imgs = R.render(g, B, V, L, a.steps, a.radius, size=a.size,

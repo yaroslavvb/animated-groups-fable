@@ -146,6 +146,35 @@ def solve(g, starts, drifts, radius, S=72, margin=1.05, span=3,
             bool(dist.min() >= 2 * radius))
 
 
+def seed_starts(g, n, d_min, rng, span=2, tries=40000):
+    """start positions that are already collision-free at t = 0.
+
+    Necessary once the balls are large: the starts are pinned, so a violation
+    at t = 0 is one no amount of bending can ever repair."""
+    clones = [(np.asarray(M, float), np.asarray(v, float))
+              for M, v, _ in g.clones(span)]
+    seeds = []
+    for _ in range(tries):
+        if len(seeds) == n:
+            break
+        cand = np.array([rng.random(), rng.random()])
+        trial = np.array(seeds + [cand])
+        cc = cand @ g.B
+        ok = True
+        for M, v in clones:
+            q = (trial @ M.T + v) @ g.B
+            d = np.linalg.norm(q - cc, axis=1)
+            d[d < 1e-9] = np.inf
+            if d.min() < d_min:
+                ok = False
+                break
+        if ok:
+            seeds.append(cand)
+    if len(seeds) < n:
+        raise RuntimeError(f"could only place {len(seeds)}/{n} balls at {d_min:.3f}")
+    return [list(s) for s in seeds]
+
+
 TINY = dict(starts=[[0.15, 0.20], [0.55, 0.35], [0.30, 0.75]],
             drifts=[[1, 0], [-1, 1], [0, -1]], radius=0.075, S=72, margin=1.05)
 
