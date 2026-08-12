@@ -3,8 +3,8 @@
 A catalog and tutorial for **film groups**: the crystallographic symmetry
 groups of animations that loop in time and tile the plane (2+1-dimensional
 space-time groups), after T. J. Fletcher's forgotten 1956 article *Film
-Groups* and the modern classification of Xu–Wu (PRL 2018) and Ke–Wu
-(arXiv:2604.05619).
+Groups* and the classification of Xu–Wu (PRL 120, 096401, 2018;
+arXiv:1703.03388), whose appendix C enumerates the 275.
 
 **Site**: https://yaroslavvb.github.io/animated-groups-fable/
 
@@ -16,7 +16,7 @@ loop with ← → (shift for finer steps).
   groups live; the operation bestiary (time screw, time glide, time centring,
   glide time-reversal); the classification theorem.
 - **Catalog** — all 275 groups of 2+1D, each with a live canvas animation,
-  explicit generators, a clockwork-orbifold symbol and Ke–Wu-style operation
+  explicit generators, an orbifold symbol and Xu–Wu-style operation
   names; filterable by crystal system, spatial base, time structure,
   (non)symmorphic, product/non-product.
 - **Gallery** — featured groups that are *not* products of a plane group with
@@ -44,7 +44,7 @@ The classification is recomputed from scratch in exact rational arithmetic
 - `enumerate_1p1.py` — anchor: reproduces the 13 space-time groups of 1+1D
   with Xu–Wu's names.
 - `enumerate_2p1.py` — the 2+1D enumeration (275 groups; per-system totals
-  match Ke–Wu Table 1).
+  match Xu–Wu Table II).
 - `export.py` — feature extraction (rotation centres with phases, mirror/glide
   line classes, reversal cosets), clockwork symbols, catalog JSON.
 - `optimize_bases.py` — picks each spec's motif base point to maximise the

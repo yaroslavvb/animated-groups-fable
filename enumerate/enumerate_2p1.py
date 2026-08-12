@@ -1,6 +1,7 @@
 """2+1D space-time ("film") groups.
 
-Anchors (Ke & Wu, arXiv:2604.05619, Table 1):
+Anchors (Xu & Wu, PRL 120, 096401 (2018), arXiv:1703.03388,
+appendix C, Table II — the paper that classifies the 275):
   31 magnetic point groups, 14 Bravais lattices, 72 symmorphic classes,
   275 space-time groups total, by crystal system:
   Triclinic 2, T-Monoclinic 13, R-Monoclinic 13, Orthorhombic 127,
@@ -19,7 +20,7 @@ from stcore import (ArithClass, Lattice, find_conjugations, group_closure,
 from driver import cheap_invariant, dedupe_pairs, enumerate_groups
 
 ORIENT = "proper3"
-GALILEAN = False  # crystallographic (Ke-Wu) convention; True = strict frame-preserving
+GALILEAN = False  # crystallographic (Xu-Wu) convention; True = strict frame-preserving
 
 
 def _dedupe_bucket(args):
@@ -103,7 +104,7 @@ def centering_pool(setting):
 
 
 def classify_system(ac):
-    """Ke-Wu crystal system from the point group (3D geometry with t-axis)."""
+    """Xu-Wu crystal system from the point group (3D geometry with t-axis)."""
     P = ac.P
     orders = set()
     for (M, s) in P:
@@ -177,7 +178,7 @@ def main():
             # For P inside {1, 2'} every boost is allowed (Mv = sv holds for
             # all v), so every spacetime lattice is Galilean-equivalent to the
             # primitive one: keep only primitive (avoids expensive dedupe of
-            # sixth-lattices; matches the Triclinic row of Ke-Wu Table 1).
+            # sixth-lattices; matches the Triclinic row of Xu-Wu Table II).
             all_boosts = set(P) <= boost_free
             for j, cents in enumerate(pools):
                 if all_boosts and cents:

@@ -1,0 +1,1465 @@
+{
+ "headline": {
+  "filmGroups": 275,
+  "clockwork": 68,
+  "wallpaper": 17,
+  "spaceGroups": 230,
+  "cubic": 36,
+  "nonCubic": 194,
+  "polar": 68,
+  "clockworkNonProduct": 51
+ },
+ "colourCensus": [
+  {
+   "n": 1,
+   "wieting": 17,
+   "cyclic": 17,
+   "clockwork": 17
+  },
+  {
+   "n": 2,
+   "wieting": 46,
+   "cyclic": 46,
+   "clockwork": 36
+  },
+  {
+   "n": 3,
+   "wieting": 23,
+   "cyclic": 8,
+   "clockwork": 6
+  },
+  {
+   "n": 4,
+   "wieting": 96,
+   "cyclic": 13,
+   "clockwork": 6
+  },
+  {
+   "n": 5,
+   "wieting": 14,
+   "cyclic": 4,
+   "clockwork": 0
+  },
+  {
+   "n": 6,
+   "wieting": 90,
+   "cyclic": 13,
+   "clockwork": 3
+  }
+ ],
+ "byOrbifold": [
+  {
+   "hm": "p1",
+   "orbifold": "◦",
+   "cyclic": [
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "film": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 1
+  },
+  {
+   "hm": "p2",
+   "orbifold": "2222",
+   "cyclic": [
+    1,
+    2,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    2,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 3,
+   "filmTotal": 3
+  },
+  {
+   "hm": "pm",
+   "orbifold": "**",
+   "cyclic": [
+    1,
+    5,
+    1,
+    3,
+    1,
+    5
+   ],
+   "film": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 16,
+   "filmTotal": 1
+  },
+  {
+   "hm": "pg",
+   "orbifold": "××",
+   "cyclic": [
+    1,
+    2,
+    1,
+    2,
+    1,
+    2
+   ],
+   "film": [
+    1,
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 9,
+   "filmTotal": 1
+  },
+  {
+   "hm": "cm",
+   "orbifold": "*×",
+   "cyclic": [
+    1,
+    3,
+    1,
+    2,
+    1,
+    3
+   ],
+   "film": [
+    1,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 11,
+   "filmTotal": 2
+  },
+  {
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "cyclic": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 6
+  },
+  {
+   "hm": "pmg",
+   "orbifold": "22*",
+   "cyclic": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 6
+  },
+  {
+   "hm": "pgg",
+   "orbifold": "22×",
+   "cyclic": [
+    1,
+    2,
+    0,
+    1,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    2,
+    0,
+    1,
+    0,
+    0
+   ],
+   "cyclicTotal": 4,
+   "filmTotal": 4
+  },
+  {
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "cyclic": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 6
+  },
+  {
+   "hm": "p4",
+   "orbifold": "442",
+   "cyclic": [
+    1,
+    2,
+    0,
+    2,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    2,
+    0,
+    3,
+    0,
+    0
+   ],
+   "cyclicTotal": 5,
+   "filmTotal": 6
+  },
+  {
+   "hm": "p4m",
+   "orbifold": "*442",
+   "cyclic": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    5,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 6
+  },
+  {
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "cyclic": [
+    1,
+    3,
+    0,
+    2,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    3,
+    0,
+    2,
+    0,
+    0
+   ],
+   "cyclicTotal": 6,
+   "filmTotal": 6
+  },
+  {
+   "hm": "p3",
+   "orbifold": "333",
+   "cyclic": [
+    1,
+    0,
+    2,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    0,
+    3,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 3,
+   "filmTotal": 4
+  },
+  {
+   "hm": "p3m1",
+   "orbifold": "*333",
+   "cyclic": [
+    1,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    1,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 2,
+   "filmTotal": 2
+  },
+  {
+   "hm": "p31m",
+   "orbifold": "3*3",
+   "cyclic": [
+    1,
+    1,
+    1,
+    0,
+    0,
+    1
+   ],
+   "film": [
+    1,
+    1,
+    1,
+    0,
+    0,
+    1
+   ],
+   "cyclicTotal": 4,
+   "filmTotal": 4
+  },
+  {
+   "hm": "p6",
+   "orbifold": "632",
+   "cyclic": [
+    1,
+    1,
+    1,
+    0,
+    0,
+    1
+   ],
+   "film": [
+    1,
+    1,
+    2,
+    0,
+    0,
+    2
+   ],
+   "cyclicTotal": 4,
+   "filmTotal": 6
+  },
+  {
+   "hm": "p6m",
+   "orbifold": "*632",
+   "cyclic": [
+    1,
+    3,
+    0,
+    0,
+    0,
+    0
+   ],
+   "film": [
+    1,
+    3,
+    0,
+    0,
+    0,
+    0
+   ],
+   "cyclicTotal": 4,
+   "filmTotal": 4
+  }
+ ],
+ "rotationFree": {
+  "bases": [
+   "p1",
+   "pm",
+   "pg",
+   "cm"
+  ],
+  "cyclic": 42,
+  "film": 5
+ },
+ "phaseImage": [
+  {
+   "n": 1,
+   "cyclic": 17,
+   "dihedral": 62
+  },
+  {
+   "n": 2,
+   "cyclic": 36,
+   "dihedral": 122
+  },
+  {
+   "n": 3,
+   "cyclic": 6,
+   "dihedral": 9
+  },
+  {
+   "n": 4,
+   "cyclic": 6,
+   "dihedral": 11
+  },
+  {
+   "n": 6,
+   "cyclic": 3,
+   "dihedral": 3
+  }
+ ],
+ "fibres": {
+  "types": 194,
+  "sizeCounts": {
+   "1": 134,
+   "2": 39,
+   "3": 21
+  },
+  "bySystem": [
+   {
+    "system": "triclinic",
+    "types": 2,
+    "films": 2,
+    "sizes": {
+     "1": 2
+    }
+   },
+   {
+    "system": "monoclinic",
+    "types": 13,
+    "films": 26,
+    "sizes": {
+     "2": 13
+    }
+   },
+   {
+    "system": "orthorhombic",
+    "types": 59,
+    "films": 127,
+    "sizes": {
+     "1": 12,
+     "2": 26,
+     "3": 21
+    }
+   },
+   {
+    "system": "tetragonal",
+    "types": 68,
+    "films": 68,
+    "sizes": {
+     "1": 68
+    }
+   },
+   {
+    "system": "trigonal",
+    "types": 25,
+    "films": 25,
+    "sizes": {
+     "1": 25
+    }
+   },
+   {
+    "system": "hexagonal",
+    "types": 27,
+    "films": 27,
+    "sizes": {
+     "1": 27
+    }
+   }
+  ]
+ },
+ "polarTable": [
+  {
+   "id": "g1",
+   "symbol": "o",
+   "symbolHtml": "o",
+   "base": "p1",
+   "orbifold": "◦",
+   "clock": 1,
+   "it": 1,
+   "hm": "P1",
+   "pointGroup": "1",
+   "system": "triclinic",
+   "product": true
+  },
+  {
+   "id": "g5",
+   "symbol": "2222",
+   "symbolHtml": "2222",
+   "base": "p2",
+   "orbifold": "2222",
+   "clock": 1,
+   "it": 3,
+   "hm": "P2",
+   "pointGroup": "2",
+   "system": "monoclinic",
+   "product": true
+  },
+  {
+   "id": "g6",
+   "symbol": "2₁2₁2₁2₁",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>",
+   "base": "p2",
+   "orbifold": "2222",
+   "clock": 2,
+   "it": 4,
+   "hm": "P2_1",
+   "pointGroup": "2",
+   "system": "monoclinic",
+   "product": false
+  },
+  {
+   "id": "g7",
+   "symbol": "c222₁2₁",
+   "symbolHtml": "c222<sub>1</sub>2<sub>1</sub>",
+   "base": "p2",
+   "orbifold": "2222",
+   "clock": 2,
+   "it": 5,
+   "hm": "C2",
+   "pointGroup": "2",
+   "system": "monoclinic",
+   "product": false
+  },
+  {
+   "id": "g10",
+   "symbol": "**",
+   "symbolHtml": "**",
+   "base": "pm",
+   "orbifold": "**",
+   "clock": 1,
+   "it": 6,
+   "hm": "Pm",
+   "pointGroup": "m",
+   "system": "monoclinic",
+   "product": true
+  },
+  {
+   "id": "g11",
+   "symbol": "××",
+   "symbolHtml": "××",
+   "base": "pg",
+   "orbifold": "××",
+   "clock": 1,
+   "it": 7,
+   "hm": "Pc",
+   "pointGroup": "m",
+   "system": "monoclinic",
+   "product": true
+  },
+  {
+   "id": "g8",
+   "symbol": "*×",
+   "symbolHtml": "*×",
+   "base": "cm",
+   "orbifold": "*×",
+   "clock": 1,
+   "it": 8,
+   "hm": "Cm",
+   "pointGroup": "m",
+   "system": "monoclinic",
+   "product": true
+  },
+  {
+   "id": "g9",
+   "symbol": "~*×½",
+   "symbolHtml": "~*×<sub>½</sub>",
+   "base": "cm",
+   "orbifold": "*×",
+   "clock": 2,
+   "it": 9,
+   "hm": "Cc",
+   "pointGroup": "m",
+   "system": "monoclinic",
+   "product": false
+  },
+  {
+   "id": "g54",
+   "symbol": "*2222",
+   "symbolHtml": "*2222",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 1,
+   "it": 25,
+   "hm": "Pmm2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": true
+  },
+  {
+   "id": "g60",
+   "symbol": "*2₁~2₁2₁~2₁",
+   "symbolHtml": "*2<sub>1</sub>~2<sub>1</sub>2<sub>1</sub>~2<sub>1</sub>",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 2,
+   "it": 26,
+   "hm": "Pmc2_1",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g55",
+   "symbol": "*~2~2~2~2",
+   "symbolHtml": "*~2~2~2~2",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 2,
+   "it": 27,
+   "hm": "Pcc2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g56",
+   "symbol": "22*",
+   "symbolHtml": "22*",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 1,
+   "it": 28,
+   "hm": "Pma2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": true
+  },
+  {
+   "id": "g61",
+   "symbol": "2₁2₁~*",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>~*",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 2,
+   "it": 29,
+   "hm": "Pca2_1",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g57",
+   "symbol": "22~*",
+   "symbolHtml": "22~*",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 2,
+   "it": 30,
+   "hm": "Pnc2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g62",
+   "symbol": "2₁2₁*",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>*",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 2,
+   "it": 31,
+   "hm": "Pmn2_1",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g58",
+   "symbol": "22×",
+   "symbolHtml": "22×",
+   "base": "pgg",
+   "orbifold": "22×",
+   "clock": 1,
+   "it": 32,
+   "hm": "Pba2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": true
+  },
+  {
+   "id": "g63",
+   "symbol": "2₁2₁×",
+   "symbolHtml": "2<sub>1</sub>2<sub>1</sub>×",
+   "base": "pgg",
+   "orbifold": "22×",
+   "clock": 2,
+   "it": 33,
+   "hm": "Pna2_1",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g59",
+   "symbol": "22×½",
+   "symbolHtml": "22×<sub>½</sub>",
+   "base": "pgg",
+   "orbifold": "22×",
+   "clock": 2,
+   "it": 34,
+   "hm": "Pnn2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g68",
+   "symbol": "2*22",
+   "symbolHtml": "2*22",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 1,
+   "it": 35,
+   "hm": "Cmm2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": true
+  },
+  {
+   "id": "g70",
+   "symbol": "2₁*2₁~2₁",
+   "symbolHtml": "2<sub>1</sub>*2<sub>1</sub>~2<sub>1</sub>",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 2,
+   "it": 36,
+   "hm": "Cmc2_1",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g69",
+   "symbol": "2*~2~2",
+   "symbolHtml": "2*~2~2",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 2,
+   "it": 37,
+   "hm": "Ccc2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g64",
+   "symbol": "c*222₁2₁ᵃ",
+   "symbolHtml": "c*222<sub>1</sub>2<sub>1</sub><sup>a</sup>",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 2,
+   "it": 38,
+   "hm": "Amm2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g65",
+   "symbol": "c*222₁2₁ᵇ",
+   "symbolHtml": "c*222<sub>1</sub>2<sub>1</sub><sup>b</sup>",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 2,
+   "it": 39,
+   "hm": "Aem2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g66",
+   "symbol": "c22₁*ᵃ",
+   "symbolHtml": "c22<sub>1</sub>*<sup>a</sup>",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 2,
+   "it": 40,
+   "hm": "Ama2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g67",
+   "symbol": "c22₁*ᵇ",
+   "symbolHtml": "c22<sub>1</sub>*<sup>b</sup>",
+   "base": "pmg",
+   "orbifold": "22*",
+   "clock": 2,
+   "it": 41,
+   "hm": "Aea2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g74",
+   "symbol": "c*22₁22₁",
+   "symbolHtml": "c*22<sub>1</sub>22<sub>1</sub>",
+   "base": "pmm",
+   "orbifold": "*2222",
+   "clock": 2,
+   "it": 42,
+   "hm": "Fmm2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g75",
+   "symbol": "c22₁×¼",
+   "symbolHtml": "c22<sub>1</sub>×<sub>¼</sub>",
+   "base": "pgg",
+   "orbifold": "22×",
+   "clock": 4,
+   "it": 43,
+   "hm": "Fdd2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g71",
+   "symbol": "c2₁*22ᵃ",
+   "symbolHtml": "c2<sub>1</sub>*22<sup>a</sup>",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 2,
+   "it": 44,
+   "hm": "Imm2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g72",
+   "symbol": "c2₁*22ᵇ",
+   "symbolHtml": "c2<sub>1</sub>*22<sup>b</sup>",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 2,
+   "it": 45,
+   "hm": "Iba2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g73",
+   "symbol": "c2*2₁2₁",
+   "symbolHtml": "c2*2<sub>1</sub>2<sub>1</sub>",
+   "base": "cmm",
+   "orbifold": "2*22",
+   "clock": 2,
+   "it": 46,
+   "hm": "Ima2",
+   "pointGroup": "mm2",
+   "system": "orthorhombic",
+   "product": false
+  },
+  {
+   "id": "g94",
+   "symbol": "442",
+   "symbolHtml": "442",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 1,
+   "it": 75,
+   "hm": "P4",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": true
+  },
+  {
+   "id": "g96",
+   "symbol": "4₁4₁2₁",
+   "symbolHtml": "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 4,
+   "it": 76,
+   "hm": "P4_1",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g95",
+   "symbol": "4₂4₂2",
+   "symbolHtml": "4<sub>2</sub>4<sub>2</sub>2",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 2,
+   "it": 77,
+   "hm": "P4_2",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g97",
+   "symbol": "4₃4₃2₁",
+   "symbolHtml": "4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 4,
+   "it": 78,
+   "hm": "P4_3",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g98",
+   "symbol": "c44₂2₁",
+   "symbolHtml": "c44<sub>2</sub>2<sub>1</sub>",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 2,
+   "it": 79,
+   "hm": "I4",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g99",
+   "symbol": "c4₁4₃2",
+   "symbolHtml": "c4<sub>1</sub>4<sub>3</sub>2",
+   "base": "p4",
+   "orbifold": "442",
+   "clock": 4,
+   "it": 80,
+   "hm": "I4_1",
+   "pointGroup": "4",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g128",
+   "symbol": "*442",
+   "symbolHtml": "*442",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 1,
+   "it": 99,
+   "hm": "P4mm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": true
+  },
+  {
+   "id": "g132",
+   "symbol": "4*2",
+   "symbolHtml": "4*2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 1,
+   "it": 100,
+   "hm": "P4bm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": true
+  },
+  {
+   "id": "g130",
+   "symbol": "*~4₂4₂~2",
+   "symbolHtml": "*~4<sub>2</sub>4<sub>2</sub>~2",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 2,
+   "it": 101,
+   "hm": "P4_2cm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g134",
+   "symbol": "4₂*2",
+   "symbolHtml": "4<sub>2</sub>*2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 2,
+   "it": 102,
+   "hm": "P4_2nm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g131",
+   "symbol": "*~4~4~2",
+   "symbolHtml": "*~4~4~2",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 2,
+   "it": 103,
+   "hm": "P4cc",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g135",
+   "symbol": "4*~2",
+   "symbolHtml": "4*~2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 2,
+   "it": 104,
+   "hm": "P4nc",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g129",
+   "symbol": "*4₂~4₂2",
+   "symbolHtml": "*4<sub>2</sub>~4<sub>2</sub>2",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 2,
+   "it": 105,
+   "hm": "P4_2mc",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g133",
+   "symbol": "4₂*~2",
+   "symbolHtml": "4<sub>2</sub>*~2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 2,
+   "it": 106,
+   "hm": "P4_2bc",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g136",
+   "symbol": "c*44₂2₁ᵃ",
+   "symbolHtml": "c*44<sub>2</sub>2<sub>1</sub><sup>a</sup>",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 2,
+   "it": 107,
+   "hm": "I4mm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g138",
+   "symbol": "c*44₂2₁ᵇ",
+   "symbolHtml": "c*44<sub>2</sub>2<sub>1</sub><sup>b</sup>",
+   "base": "p4m",
+   "orbifold": "*442",
+   "clock": 2,
+   "it": 108,
+   "hm": "I4cm",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g137",
+   "symbol": "c4₃*2",
+   "symbolHtml": "c4<sub>3</sub>*2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 4,
+   "it": 109,
+   "hm": "I4_1md",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g139",
+   "symbol": "c4₁*2",
+   "symbolHtml": "c4<sub>1</sub>*2",
+   "base": "p4g",
+   "orbifold": "4*2",
+   "clock": 4,
+   "it": 110,
+   "hm": "I4_1cd",
+   "pointGroup": "4mm",
+   "system": "tetragonal",
+   "product": false
+  },
+  {
+   "id": "g224",
+   "symbol": "333",
+   "symbolHtml": "333",
+   "base": "p3",
+   "orbifold": "333",
+   "clock": 1,
+   "it": 143,
+   "hm": "P3",
+   "pointGroup": "3",
+   "system": "trigonal",
+   "product": true
+  },
+  {
+   "id": "g226",
+   "symbol": "3₁3₁3₁",
+   "symbolHtml": "3<sub>1</sub>3<sub>1</sub>3<sub>1</sub>",
+   "base": "p3",
+   "orbifold": "333",
+   "clock": 3,
+   "it": 144,
+   "hm": "P3_1",
+   "pointGroup": "3",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g225",
+   "symbol": "3₂3₂3₂",
+   "symbolHtml": "3<sub>2</sub>3<sub>2</sub>3<sub>2</sub>",
+   "base": "p3",
+   "orbifold": "333",
+   "clock": 3,
+   "it": 145,
+   "hm": "P3_2",
+   "pointGroup": "3",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g227",
+   "symbol": "r33₁3₂",
+   "symbolHtml": "r33<sub>1</sub>3<sub>2</sub>",
+   "base": "p3",
+   "orbifold": "333",
+   "clock": 3,
+   "it": 146,
+   "hm": "R3",
+   "pointGroup": "3",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g230",
+   "symbol": "*333",
+   "symbolHtml": "*333",
+   "base": "p3m1",
+   "orbifold": "*333",
+   "clock": 1,
+   "it": 156,
+   "hm": "P3m1",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": true
+  },
+  {
+   "id": "g232",
+   "symbol": "3*3",
+   "symbolHtml": "3*3",
+   "base": "p31m",
+   "orbifold": "3*3",
+   "clock": 1,
+   "it": 157,
+   "hm": "P31m",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": true
+  },
+  {
+   "id": "g231",
+   "symbol": "*~3~3~3",
+   "symbolHtml": "*~3~3~3",
+   "base": "p3m1",
+   "orbifold": "*333",
+   "clock": 2,
+   "it": 158,
+   "hm": "P3c1",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g233",
+   "symbol": "3*~3",
+   "symbolHtml": "3*~3",
+   "base": "p31m",
+   "orbifold": "3*3",
+   "clock": 2,
+   "it": 159,
+   "hm": "P31c",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g234",
+   "symbol": "r3₂*3",
+   "symbolHtml": "r3<sub>2</sub>*3",
+   "base": "p31m",
+   "orbifold": "3*3",
+   "clock": 3,
+   "it": 160,
+   "hm": "R3m",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g235",
+   "symbol": "r3₂*~3",
+   "symbolHtml": "r3<sub>2</sub>*~3",
+   "base": "p31m",
+   "orbifold": "3*3",
+   "clock": 6,
+   "it": 161,
+   "hm": "R3c",
+   "pointGroup": "3m",
+   "system": "trigonal",
+   "product": false
+  },
+  {
+   "id": "g243",
+   "symbol": "632",
+   "symbolHtml": "632",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 1,
+   "it": 168,
+   "hm": "P6",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": true
+  },
+  {
+   "id": "g248",
+   "symbol": "6₁3₁2₁",
+   "symbolHtml": "6<sub>1</sub>3<sub>1</sub>2<sub>1</sub>",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 6,
+   "it": 169,
+   "hm": "P6_1",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g247",
+   "symbol": "6₅3₂2₁",
+   "symbolHtml": "6<sub>5</sub>3<sub>2</sub>2<sub>1</sub>",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 6,
+   "it": 170,
+   "hm": "P6_5",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g244",
+   "symbol": "6₂3₂2",
+   "symbolHtml": "6<sub>2</sub>3<sub>2</sub>2",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 3,
+   "it": 171,
+   "hm": "P6_2",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g245",
+   "symbol": "6₄3₁2",
+   "symbolHtml": "6<sub>4</sub>3<sub>1</sub>2",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 3,
+   "it": 172,
+   "hm": "P6_4",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g246",
+   "symbol": "6₃32₁",
+   "symbolHtml": "6<sub>3</sub>32<sub>1</sub>",
+   "base": "p6",
+   "orbifold": "632",
+   "clock": 2,
+   "it": 173,
+   "hm": "P6_3",
+   "pointGroup": "6",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g268",
+   "symbol": "*632",
+   "symbolHtml": "*632",
+   "base": "p6m",
+   "orbifold": "*632",
+   "clock": 1,
+   "it": 183,
+   "hm": "P6mm",
+   "pointGroup": "6mm",
+   "system": "hexagonal",
+   "product": true
+  },
+  {
+   "id": "g270",
+   "symbol": "*~6~3~2",
+   "symbolHtml": "*~6~3~2",
+   "base": "p6m",
+   "orbifold": "*632",
+   "clock": 2,
+   "it": 184,
+   "hm": "P6cc",
+   "pointGroup": "6mm",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g269",
+   "symbol": "*6₃~3~2₁",
+   "symbolHtml": "*6<sub>3</sub>~3~2<sub>1</sub>",
+   "base": "p6m",
+   "orbifold": "*632",
+   "clock": 2,
+   "it": 185,
+   "hm": "P6_3cm",
+   "pointGroup": "6mm",
+   "system": "hexagonal",
+   "product": false
+  },
+  {
+   "id": "g271",
+   "symbol": "*~6₃32₁",
+   "symbolHtml": "*~6<sub>3</sub>32<sub>1</sub>",
+   "base": "p6m",
+   "orbifold": "*632",
+   "clock": 2,
+   "it": 186,
+   "hm": "P6_3mc",
+   "pointGroup": "6mm",
+   "system": "hexagonal",
+   "product": false
+  }
+ ],
+ "enantiomorphicPairs": [
+  [
+   76,
+   78
+  ],
+  [
+   144,
+   145
+  ],
+  [
+   169,
+   170
+  ],
+  [
+   171,
+   172
+  ]
+ ],
+ "fibreExample": {
+  "it": 26,
+  "hm": "Pmc2_1",
+  "members": [
+   {
+    "id": "g40",
+    "symbol": "**/g′ᵇ",
+    "symbolHtml": "**/g′<sup>b</sup>",
+    "forward": false,
+    "base": "pm"
+   },
+   {
+    "id": "g44",
+    "symbol": "××/1′",
+    "symbolHtml": "××/1′",
+    "forward": false,
+    "base": "pg"
+   },
+   {
+    "id": "g60",
+    "symbol": "*2₁~2₁2₁~2₁",
+    "symbolHtml": "*2<sub>1</sub>~2<sub>1</sub>2<sub>1</sub>~2<sub>1</sub>",
+    "forward": true,
+    "base": "pmm"
+   }
+  ]
+ },
+ "meta": {
+  "source": "docs/data/catalog.json",
+  "generator": "enumerate/hierarchy.py",
+  "maxColours": 6,
+  "literature": [
+   "T. W. Wieting, The Mathematical Theory of Chromatic Plane Ornaments (Dekker, 1982), Table 11 = OEIS A307293",
+   "M. Senechal, Color groups, Discrete Appl. Math. 1 (1979) 51-73",
+   "J. D. Jarratt, R. L. E. Schwarzenberger, Coloured plane groups, Acta Cryst. A36 (1980) 884-888"
+  ],
+  "spaceGroupTypes": "pinned spglib results; rerun with --verify"
+ }
+}

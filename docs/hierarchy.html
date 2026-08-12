@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hierarchy — Film Groups</title>
+<link rel="stylesheet" href="css/style.css?v=39">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="hierarchy.html" class="here">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>The hierarchy</h1>
+<p class="subtitle">Coloured wallpaper groups, space-time groups, clockwork
+groups, space groups, polar space groups — six classifications of the same
+kind of object, and exactly how they nest. Colours are counted up to six.</p>
+
+<p>A looping animation of a wallpaper pattern can be described in at least six
+established vocabularies, and they were built by people who were not talking
+to each other: colour crystallographers in the 1950s–80s, space-group
+crystallographers since 1891, a mathematics teacher making 16&nbsp;mm films in
+1956, and condensed-matter physicists after 2018. Each vocabulary has its own
+count. This page is an attempt to say precisely how the counts are related —
+which containments are genuine, which are near-misses, and where a
+one-to-one correspondence really does hold.</p>
+
+<p>Two of the relations turn out to be exact, and both are theorems that can
+be checked by machine rather than believed:</p>
+
+<div class="thm">
+<span class="label">Summary</span>
+<p style="margin:0.3rem 0;">Reading a film's clock phase as a third spatial
+coordinate embeds the <b>275</b> film groups in the 230 space groups. The map
+lands in the <b>194</b> non-cubic types, hits <em>every one of them</em>, and
+has fibres of size 1, 2 or 3 — which is exactly why T.&thinsp;J. Fletcher's
+1956 count of 194 was both wrong and nearly right. Restricted to the
+<b>68</b> film groups that never reverse time — the <em>clockwork</em> groups
+— it is a <em>bijection onto the 68 polar space groups</em>.</p>
+</div>
+
+<h2 id="six">1. Six classifications</h2>
+
+<p>All six describe a pattern that repeats in two spatial directions. They
+differ in what else the pattern is allowed to carry, and in what counts as
+the same.</p>
+
+<div id="six-table"></div>
+
+<p>The two entries needing a word of definition are the middle ones. A
+<b>coloured wallpaper group</b> — Wieting's <i>chromatic plane ornament</i>,
+Senechal's <i>colour group</i> — is a wallpaper group Γ together with a
+transitive action of Γ on a set of N colours, or equivalently a subgroup of
+index N (the stabiliser of one colour); two are the same when an affine map
+of the plane carries one to the other, colours permuted freely. A
+<b>polar space group</b> is one whose point group leaves some direction
+fixed <em>and</em> fixes its sense — the ten <em>pyroelectric</em> classes
+1,&nbsp;2,&nbsp;m,&nbsp;mm2,&nbsp;4,&nbsp;4mm,&nbsp;3,&nbsp;3m,&nbsp;6,&nbsp;6mm.
+A crystal in such a group can carry a spontaneous electric polarisation,
+because nothing in its symmetry can turn the polar axis around.</p>
+
+<h2 id="lift">2. One object, four readings</h2>
+
+<p>A film group element acts on the plane and on the loop at once,</p>
+
+<p style="text-align:center;">(x,&nbsp;y,&nbsp;t) ⟼ (M(x,&nbsp;y)&nbsp;+&nbsp;v,
+&nbsp;st&nbsp;+&nbsp;τ), &emsp; M&nbsp;∈&nbsp;O(2), &nbsp;s&nbsp;=&nbsp;±1,</p>
+
+<p>and the whole hierarchy is the observation that τ can be read four ways.
+As a <em>phase</em> it is a fraction of the period: the film comes back to
+itself after waiting τ. As a <em>colour</em> it is one of N labels, when the
+τ's that occur form a finite cyclic group of order N — the case
+s&nbsp;=&nbsp;+1 throughout. As a <em>height</em> it is a fractional
+translation along a third axis, turning the film into a static
+three-dimensional crystal. And as a <em>time</em> it is what makes
+s&nbsp;=&nbsp;−1 mean something different from a mirror. Under the height
+reading each planar operation becomes a familiar 3D one:</p>
+
+<div id="lift-table"></div>
+
+<p>This is why the whole subject looks like crystallography with one axis
+singled out. Three warnings, which the rest of the page is really about. The
+height reading forgets <em>which</em> axis was time, and that is a genuine
+loss of information (§5). The colour reading only exists when time never
+reverses (§4). And the three subjects do not agree on when two patterns are
+the same, which is where most of the numerical discrepancies live (§7).</p>
+
+<h2 id="colour">3. Colour, up to six</h2>
+
+<p>Fix a wallpaper group Γ. A homomorphism χ:&nbsp;Γ&nbsp;→&nbsp;ℝ/ℤ with
+image of order N assigns each symmetry a phase; the kernel is a normal
+subgroup of index N with cyclic quotient, and its cosets are the N colours.
+This is the strict sense in which <b>a clockwork group is a coloured
+wallpaper group</b>: it is one whose colour group is C<sub>N</sub> acting
+regularly on the colours, so that "which colour" and "how far round the
+clock" are the same question.</p>
+
+<p>Three columns, three notions of colouring, N&nbsp;=&nbsp;1…6:</p>
+
+<div id="colour-table"></div>
+
+<p>The first column is Wieting's, and it is famously not monotone in N: there
+are more four-colour plane groups than six-colour ones, and only fourteen
+with five colours. The middle column keeps the colourings whose colour group
+is cyclic and regular. The last column is the film groups themselves. Column
+by column the objects get more special; row by row they get scarcer for
+arithmetic reasons that are visible in the last two entries.</p>
+
+<div class="thm">
+<span class="label">Why five colours is empty</span>
+<p style="margin:0.3rem 0;">A clock of order 5 needs a symmetry whose phase
+has order 5. Point operations of the plane have order 1,&nbsp;2,&nbsp;3,&nbsp;4
+or 6 — the crystallographic restriction — so no rotation or reflection can
+carry a fifth of a period without violating its own relation. The phase map
+must therefore be trivial on the point group and live entirely on the
+translations, and a phase that grows linearly along the lattice is a
+<em>drift</em>: pan the camera at the right constant velocity and it is gone.
+Hence 0. The four five-colour cyclic colourings in the middle column are
+real colourings of p1, pm, pg and cm; they are just not new films.</p>
+</div>
+
+<p>The same argument bounds the whole table: a film's clock order is
+1,&nbsp;2,&nbsp;3,&nbsp;4 or 6 and never 5, and never more than 6 — so
+"up&nbsp;to six colours" is not a restriction we impose but the entire
+range there is. Here are the five clocks that exist, live:</p>
+
+<div id="clocks"></div>
+
+<h2 id="clock">4. What a clock can be</h2>
+
+<p>Time reversal is what separates the film groups from the colourings.
+Every element of a film group acts on the loop circle S¹&nbsp;=&nbsp;ℝ/ℤ
+either as a rotation t&nbsp;↦&nbsp;t&nbsp;+&nbsp;τ or as a reflection
+t&nbsp;↦&nbsp;−t&nbsp;+&nbsp;τ, so the image of G in Isom(S¹) is a finite
+subgroup: cyclic C<sub>N</sub> if the group never reverses time, dihedral
+D<sub>N</sub> if it does. Sorting all 275 by that image:</p>
+
+<div id="phase-table"></div>
+
+<p>The cyclic row is the 68 clockwork groups, and it <em>is</em> the third
+column of §3 — same numbers, because they are the same objects counted
+twice. The 17 with C<sub>1</sub> are the 17 wallpaper groups with a clock
+bolted on and nothing entangled. The dihedral row is the remaining 207, and
+those are not colourings in the ordinary sense: their "colour permutation"
+includes an order-reversal of the palette, which is precisely Shubnikov's
+antisymmetry with the prime read as <em>play backwards</em>. D<sub>1</sub>
+— reversal with no fractional clock at all — is the black-and-white case,
+and the 62 such film groups are the film-group shadow of the 46 non-trivial
+two-colour plane groups plus the 17 grey ones.</p>
+
+<div class="aside">
+<span class="label">A caution about that last sentence</span>
+<p style="margin:0.3rem 0;">62 is not 46, nor 63, and the mismatch is not an
+error in either count: a film group's equivalence allows changes of frame
+that a two-coloured plane pattern's does not, and a film reversal may carry a
+spatial glide that has no analogue in a static black-and-white pattern. The
+correspondence is structural, not numerical. §7 takes the discrepancies
+apart.</p>
+</div>
+
+<h2 id="forget">5. Forgetting which axis is time</h2>
+
+<p>Read every phase as a height and a film group becomes a discrete group of
+isometries of ℝ³ with a rank-3 lattice — a space group. Which ones arise?</p>
+
+<div class="thm">
+<span class="label">Theorem (checked against spglib for all 275)</span>
+<p style="margin:0.3rem 0;">The height reading maps the 275 film groups into
+the 230 space-group types. Its image is exactly the <b>194</b> non-cubic
+types: no cubic type is hit, and every non-cubic type is hit. The fibres have
+size 1, 2 or 3 — <span data-fib="1">…</span> types come from a single film
+group, <span data-fib="2">…</span> from two and
+<span data-fib="3">…</span> from three.</p>
+</div>
+
+<p>Nothing cubic can appear because a cubic point group fixes no direction,
+while time is a direction that every film-group operation must respect. And
+every non-cubic type appears because a non-cubic point group always fixes
+some axis, which can be nominated as the time axis. That much Fletcher saw in
+1956, and he subtracted the 36 cubic groups from 230 to get 194 film groups.
+The subtraction is right; the conclusion is not, because the map is
+many-to-one: one crystal can be sliced into films in several inequivalent
+ways, depending on which invariant axis is called time and whether the
+operations reversing it are read as mirrors or as reversals.</p>
+
+<div id="fibre-table"></div>
+
+<p>Read that table as the correction to Fletcher. The tetragonal, trigonal
+and hexagonal systems have a unique high-order axis, so there is nothing to
+choose and film groups and space groups agree exactly: 68,&nbsp;25,&nbsp;27.
+Monoclinic always splits in two — the 2-fold axis is either the time axis or
+a spatial one, giving the catalog's T- and R-monoclinic systems. Orthorhombic
+has three mutually perpendicular axes and splits by up to three. Summing the
+fibres gives 275; counting the types gives Fletcher's 194.</p>
+
+<p>Here is one fibre, live: <span id="fibre-name">one space group</span>,
+three films that are not equivalent as films.</p>
+
+<div id="fibre-demo"></div>
+
+<h2 id="polar">6. Clockwork groups are exactly the polar space groups</h2>
+
+<p>Now restrict the same map to the groups that never reverse time. In the
+height reading, "never reverses time" says no operation sends
+z&nbsp;↦&nbsp;−z: the point group fixes the z-axis <em>and</em> its
+direction. That is the definition of a polar space group, and the count is
+not a coincidence.</p>
+
+<div class="thm">
+<span class="label">Theorem</span>
+<p style="margin:0.3rem 0;">The height reading restricts to a
+<b>bijection</b> between the 68 clockwork groups and the 68 polar
+space-group types. Every polar type is the lift of exactly one clockwork
+group, and no non-polar type is the lift of any.</p>
+</div>
+
+<p>The point groups occurring in the table below are therefore exactly the
+ten polar classes, and they are the ten planar point groups
+C<sub>1</sub>,&nbsp;C<sub>2</sub>,&nbsp;C<sub>3</sub>,&nbsp;C<sub>4</sub>,&nbsp;C<sub>6</sub>,
+D<sub>1</sub>,&nbsp;D<sub>2</sub>,&nbsp;D<sub>3</sub>,&nbsp;D<sub>4</sub>,&nbsp;D<sub>6</sub>
+wearing their 3D names. A clockwork group's spatial part is a planar point
+group; a polar space group's point group is a planar point group standing on
+its polar axis. They are the same list.</p>
+
+<p>Physically the dictionary is worth stating in both directions. A polar
+crystal has a distinguished axis with a distinguished sense, so it can be
+pyroelectric: heat it and a voltage appears along that axis. A clockwork film
+has a distinguished direction of time, so it can have a handedness in time:
+run it backwards and you get a film with a different symmetry group. The
+same 68 objects answer both questions, because <em>polarity along the c-axis
+and irreversibility of the clock are the same condition</em>.</p>
+
+<p>All 68, with the clockwork orbifold symbol on one side and the
+Hermann–Mauguin symbol on the other:</p>
+
+<div id="polar-table"></div>
+
+<p>The screw axes and glide planes in that column are the time operations of
+§2 in their crystallographic clothes: P4<sub>1</sub> is the quarter-period
+time screw, P6<sub>1</sub> is the sixth-period one, the <i>c</i>-glides of
+P4cc and P6cc are time glides, and the rhombohedral centrings of R3 and R3c
+are time centrings — neighbouring cells running a third of a period out of
+phase. Four rows come in mirror-image pairs
+(<span id="enant">…</span>): films that are indistinguishable as coloured
+patterns, since a reflection of the plane exchanges them, but genuinely
+distinct as films, since no change of frame turns a clock that advances by
++1/3 into one that advances by −1/3.</p>
+
+<h2 id="disagree">7. Where the counts disagree, and why</h2>
+
+<p>Compare the middle and last columns of §3 group by group and the totals do
+not merely shrink — for four wallpaper groups the film count is
+<em>larger</em>. Both directions have clean explanations, and between them
+they account for every entry.</p>
+
+<div id="orb-table"></div>
+
+<p><b>Collapses.</b> Over the four wallpaper groups with no rotation at all
+— p1, pm, pg, cm — <span id="rf-cyclic">…</span> cyclic colourings become
+<span id="rf-film">…</span> film groups. Two mechanisms are at work. First,
+drift: with no rotation the point group fixes a direction, so a phase that
+increases steadily along that direction is a camera pan, and the film is the
+one you started with. This kills all five non-trivial colourings of p1 at a
+stroke. Second, migration: the height reading can turn a time offset into a
+spatial one. Give pm's mirror half a period and its lift is a glide plane —
+space-group type Pc, number 7 — which is also what pg's ordinary spatial
+glide lifts to. A time glide over pm and a plain glide over pg are the same
+crystal with the axes labelled differently, and under the crystallographic
+convention the catalog uses — where any unimodular re-basing of the
+space-time lattice is allowed — they are one film group.</p>
+
+<div class="aside">
+<span class="label">So is the spatial projection an invariant?</span>
+<p style="margin:0.3rem 0;">Not under that convention: the example above is
+two projections, pm and pg, of one film group, and the catalog's
+<a href="wallpaper.html">base</a> is a canonical representative rather than
+an invariant. Under the stricter equivalence — conjugation by literal changes
+of frame, which refuses to re-slice simultaneity — the projection <em>is</em>
+an invariant and the two are different films. This is not a second
+disagreement but the same one: rotation-free bases are exactly the
+R&#8209;monoclinic system, which is exactly where the two conventions part
+company (13&nbsp;→&nbsp;21 types, 275&nbsp;→&nbsp;283 in total; see the
+<a href="index.html#theorem">tutorial's aside on frames</a>). Everywhere
+else the two agree, and so do all the counts on this page.</p>
+</div>
+
+<p><b>Splits.</b> The opposite happens exactly four times, over p3, p4 and
+p6, and always for the same reason: <em>chirality</em>. Plane-affine
+equivalence of coloured patterns allows a reflection, so a colouring and its
+mirror image are one class. Film equivalence does not, because reflecting the
+plane while keeping the direction of time turns a clock that advances by
++1/N into one that advances by −1/N, and those are different films. So the
+one three-colour clockwork colouring of p3 with a phase on the rotation
+becomes two film groups, P3<sub>1</sub> and P3<sub>2</sub>; likewise
+P4<sub>1</sub>/P4<sub>3</sub>, P6<sub>1</sub>/P6<sub>5</sub> and
+P6<sub>2</sub>/P6<sub>4</sub>. Four colouring classes, eight film groups,
+four extra — precisely the four enantiomorphic pairs among the 68 polar
+space groups.</p>
+
+<div class="aside">
+<span class="label">The bookkeeping, in one line</span>
+<p style="margin:0.3rem 0;">101 cyclic colourings − 42 over the rotation-free
+groups + 5 films they collapse to + 4 enantiomorphic splits =
+68. It works because outside p1, pm, pg and cm the point group contains a
+rotation, no direction is fixed, drift has nowhere to go, and the two notions
+of equivalence differ only by orientation.</p>
+</div>
+
+<h2 id="neighbours">8. The neighbours</h2>
+
+<p>Four adjacent classifications that people reasonably expect to be part of
+this picture, with a word on where each actually sits.</p>
+
+<p><b>Magnetic (Shubnikov) groups.</b> The 80 magnetic plane groups — 17
+ordinary, 17 grey, 46 black-white — and the 1651 magnetic space groups —
+230 + 230 grey + 1191 black-white — are the two-colour theory where the
+colour swap was <em>originally interpreted as time reversal</em>. That makes
+them the N&nbsp;=&nbsp;2 slice of this subject, and Zamorzaev's 1953 thesis
+is its true ancestor. A film group with a D<sub>1</sub> clock is doing
+Shubnikov's job; a film group with a C<sub>N</sub> clock is doing
+Zamorzaev's P-symmetry (colour by an arbitrary quality group) with the
+quality group ℤ/N. What film groups add is that the colour is a
+<em>continuous</em> circle of which ℤ/N is a discrete shadow, and that the
+circle has an orientation.</p>
+
+<p><b>Subperiodic groups.</b> The 7 frieze, 75 rod and 80 layer groups
+classify isometry groups of ℝ³ whose translation lattice has rank 1 or 2.
+They are the right home for animations that do <em>not</em> loop, or that
+tile in only one direction; our film groups always have a rank-3
+space-time lattice, one direction of which is the loop, so they are space
+groups and not subperiodic ones. The 1+1D case is the exception worth
+knowing: 13 strip groups, which are the film-group analogue of the 7 friezes
+and are counted on the <a href="index.html#warmup">tutorial</a>.</p>
+
+<p><b>Sohncke and chiral space groups.</b> The 65 Sohncke groups (no
+orientation-reversing operation) are the ones a chiral molecule can
+crystallise in, and 22 of them — 11 enantiomorphic pairs — are chiral
+themselves. This is a different cut of the 230 from the polar one: polarity
+is about a fixed <em>direction</em>, chirality about a fixed
+<em>orientation</em>. They overlap without containing one another. In film
+terms, Sohncke means the film has no spatial mirror at any phase; polar means
+it never runs backwards.</p>
+
+<p><b>Choreographic crystals.</b> Boyle–Khoo–Smith's classification of
+"choreographic order" — finite configurations whose symmetries are spatial
+operations composed with time offsets — is the same clockwork idea for point
+configurations rather than lattices, and the Golubitsky–Stewart H/K theorem
+describes which (setwise, pointwise) symmetry pairs a time-periodic state can
+realise. Both are about the C<sub>N</sub> quotient of §4 without a spatial
+lattice underneath.</p>
+
+<h2 id="glance">9. The whole hierarchy at a glance</h2>
+
+<div id="diagram"></div>
+
+<p>Solid arrows are the maps that exist; the label on each says what it
+forgets. The only arrow that is a bijection is the bottom one.</p>
+
+<h2 id="refs">References</h2>
+<p style="font-size:0.92rem;">
+T.&thinsp;W. Wieting, <i>The Mathematical Theory of Chromatic Plane
+Ornaments</i>, Dekker, 1982 (Table&nbsp;11 = <a
+href="https://oeis.org/A307293">OEIS A307293</a>).<br>
+M. Senechal, <i>Color groups</i>, Discrete Appl. Math. <b>1</b> (1979)
+51–73.<br>
+J.&thinsp;D. Jarratt, R.&thinsp;L.&thinsp;E. Schwarzenberger, <i>Coloured
+plane groups</i>, Acta Cryst. A<b>36</b> (1980) 884–888.
+<a href="https://doi.org/10.1107/S0567739480001866">doi:10.1107/S0567739480001866</a><br>
+A.&thinsp;M. Zamorzaev, <i>Generalisation of the Fedorov groups</i>,
+Kristallografiya <b>2</b> (1957) 15–20 (the 1651 antisymmetry space
+groups).<br>
+T.&thinsp;J. Fletcher, <i>Film Groups</i>, Math. Gazette <b>40</b> (1956)
+15–19. <a href="https://doi.org/10.2307/3610262">doi:10.2307/3610262</a><br>
+S. Xu, C. Wu, <i>Space-Time Crystal and Space-Time Group</i>, PRL <b>120</b>,
+096401 (2018). <a href="https://arxiv.org/abs/1703.03388">arXiv:1703.03388</a><br>
+C. Ke, C. Wu, <i>Two-Dimensional Space-Time Groups: Classification and
+Applications</i> (2026). <a href="https://arxiv.org/abs/2604.05619">arXiv:2604.05619</a><br>
+J.&thinsp;H. Conway, H. Burgiel, C. Goodman-Strauss, <i>The Symmetries of
+Things</i>, A K Peters, 2008 (colour signatures).<br>
+<i>International Tables for Crystallography</i>, Vol.&nbsp;A (space-group
+numbering); space-group types identified with
+<a href="https://spglib.readthedocs.io/">spglib</a>.<br>
+L. Boyle, J.&thinsp;Y. Khoo, K. Smith, <i>Symmetric satellite swarms and
+choreographic crystals</i>, PRL <b>116</b>, 015503 (2016).
+<a href="https://arxiv.org/abs/1407.5876">arXiv:1407.5876</a>
+</p>
+
+<p class="hint">Every count on this page is regenerated from the catalog by
+<span class="mono">enumerate/hierarchy.py</span>, which asserts the two
+theorems of §5 and §6 and re-derives the space-group types with
+<span class="mono">--verify</span>. The companion
+<a href="https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html">clockwork/colouring
+correspondence</a> and <a href="https://yaroslavvb.github.io/animated-groups/space-group-correspondence.html">cyclic-colouring/polar-space-group
+atlas</a> give the same 68 records with static coloured plates and explicit
+cell presentations.</p>
+
+</main>
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/hierarchy.js?v=39"></script>
+</body>
+</html>

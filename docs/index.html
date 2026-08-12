@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Film Groups — the crystallography of looping animations</title>
-<link rel="stylesheet" href="css/style.css?v=38">
+<link rel="stylesheet" href="css/style.css?v=39">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
 <body>
@@ -17,6 +17,7 @@
       <a href="gallery.html">Gallery</a>
       <a href="notation.html">Notation</a>
       <a href="wallpaper.html">Wallpaper</a>
+      <a href="hierarchy.html">Hierarchy</a>
       <a href="history.html">History</a>
     </nav>
   </div>
@@ -26,7 +27,7 @@
 <h1>Film groups: the crystallography of looping animations</h1>
 <p class="subtitle">A catalog and tutorial for the symmetry groups of animations
 that loop in time and tile the plane — after T.&thinsp;J. Fletcher (1956) and
-Ke&ndash;Wu (2026).</p>
+Xu&ndash;Wu (2018).</p>
 
 <p class="hint">Every animation on this site starts paused. Click one to play
 or pause it (<kbd>space</kbd> does the same once you have clicked), or point at
@@ -54,8 +55,11 @@ is a palindrome).</p>
 
 <div class="demo">
   <canvas id="hero"></canvas>
-  <div class="caption"><span class="sym">6<sub>1</sub>3<sub>1</sub>2<sub>1</sub></span> —
-  the time-axis P6<sub>1</sub>. Rotating the plane by 60° about a six-fold
+  <div class="caption"><span class="sym"><sup>6</sup>6<sup>3</sup>3<sup>2</sup>2</span>
+  <span style="color:var(--muted);">— the orbifold <span class="sym">632</span>
+  with a clock, catalogue entry
+  <a href="group.html?g=g248">xu248</a>, the time-axis P6<sub>1</sub></span>.
+  Rotating the plane by 60° about a six-fold
   centre has exactly the same effect as letting the animation run for one sixth
   of its period. Watch the fill levels: each comma fills once per period, and
   around each 6-centre the six copies are filled one sixth apart — a staircase
@@ -81,7 +85,7 @@ discrete subgroup G of E(2)&nbsp;×&nbsp;E(1) — each element acts by</p>
 time translation (the loop) and a rank-2 spatial lattice (the tiling). The
 element with s&nbsp;=&nbsp;−1 plays the film backwards; τ is a <em>fraction of the
 period</em>. Physicists study the same objects as symmetry groups of
-space-time crystals (Xu&ndash;Wu 2018; Ke&ndash;Wu 2026); Fletcher called them film
+space-time crystals (Xu&ndash;Wu 2018); Fletcher called them film
 groups, and we keep his name.</p>
 
 <p>Two film groups are equivalent when conjugate by an affine map of spacetime
@@ -124,7 +128,7 @@ rather than 13 — see <a href="history.html">History</a> for the two
 <p>In two spatial dimensions the point operations are rotations of order
 1,&thinsp;2,&thinsp;3,&thinsp;4,&thinsp;6 and reflections, each optionally
 composed with time reversal, and each dressed with a fractional spacetime
-translation. The genuinely new operations, in Ke&ndash;Wu's terminology:</p>
+translation. The genuinely new operations, in Xu&ndash;Wu's terminology:</p>
 
 <div class="cardgrid" id="bestiary-cards"></div>
 
@@ -136,7 +140,7 @@ composed with a spatial isometry) familiar from Shubnikov theory with
 <h2 id="theorem">4. The classification</h2>
 
 <div class="thm">
-<span class="label">Theorem (Xu–Wu 2018 app. C; Ke–Wu 2026; independently recomputed here)</span>
+<span class="label">Theorem (Xu&ndash;Wu 2018, appendix C and Table II; independently recomputed here)</span>
 <p style="margin:0.3rem 0;">Up to the equivalence above there are exactly
 <b>275</b> film groups in 2+1 dimensions: 72 symmorphic and 203 nonsymmorphic,
 organised in 7 crystal systems, 14 spacetime Bravais lattices and 31 magnetic
@@ -166,7 +170,7 @@ then the centred R-monoclinic types split further (13 → 21; total 283
 classes; every other system is unchanged). The split happens exactly where
 the monoclinic cell's free plane contains the time axis, so its re-basings
 are not honest changes of frame. The catalog uses the crystallographic
-convention, matching Ke–Wu.</p>
+convention, matching Xu&ndash;Wu.</p>
 </div>
 
 <p>The proof is finite linear algebra, and the computation is in this
@@ -177,23 +181,25 @@ this arithmetic class are its orbits under the normaliser (lattice re-basings,
 boosts, and combined orientation flips). Summing orbits over the 72 arithmetic
 classes gives 275. The same machinery run in 1+1D yields the 13 strip groups
 above, and run on static 2D patterns yields the 17 wallpaper groups — two
-anchors we use as validation, along with the per-system totals of Ke–Wu's
-Table&nbsp;1 (which for the tetragonal, trigonal and hexagonal systems equal the
+anchors we use as validation, along with the per-system totals of Xu&ndash;Wu's
+Table&nbsp;II (which for the tetragonal, trigonal and hexagonal systems equal the
 3D space-group counts 68, 25, 27, since there a film group <em>is</em> a space
 group with distinguished c-axis).</p>
 
 <p>Structurally: a film group G determines a wallpaper group Γ (its spatial
 projection — the symmetry of the long-exposure photograph) and each spatial
 operation carries a clock phase; quotienting spacetime by G gives a 3-orbifold
-fibred in time-circles over Γ's orbifold. The <a href="notation.html">clockwork
-orbifold notation</a> records exactly this Seifert-fibration data and names
+fibred in time-circles over Γ's orbifold. Conway and Goodman-Strauss's
+<a href="notation.html">orbifold notation</a>, with the superscripts that
+<i>The Symmetries of Things</i> uses for colourings, records exactly this
+Seifert-fibration data and names
 every group in the <a href="catalog.html">catalog</a>; products (wallpaper ×
 clock) are precisely the entries with no decorations.</p>
 
 <h2 id="explore">5. Explore</h2>
 
 <p><a href="catalog.html"><b>Catalog</b></a> — all groups, filterable, each with
-a live animation, generators, clockwork symbol and Hermann&ndash;Mauguin-style
+a live animation, generators, orbifold symbol and Hermann&ndash;Mauguin-style
 name.<br>
 <a href="gallery.html"><b>Gallery</b></a> — the featured non-product groups
 with downloadable looping GIFs: time screws, time glides, time centrings,
@@ -210,9 +216,13 @@ equivariant dynamics.</p>
 T.&thinsp;J. Fletcher, <i>Film Groups</i>, Math. Gazette <b>40</b> (1956) 15–19.
 <a href="https://doi.org/10.2307/3610262">doi:10.2307/3610262</a><br>
 S. Xu, C. Wu, <i>Space-Time Crystal and Space-Time Group</i>, PRL <b>120</b>,
-096401 (2018). <a href="https://arxiv.org/abs/1703.03388">arXiv:1703.03388</a><br>
+096401 (2018). <a href="https://arxiv.org/abs/1703.03388">arXiv:1703.03388</a>
+&mdash; the source of this catalog: the 13 groups in 1+1D and the 275 in 2+1D
+(appendix&nbsp;C, Table&nbsp;II).<br>
 C. Ke, C. Wu, <i>Two-Dimensional Space-Time Groups: Classification and
-Applications</i> (2026). <a href="https://arxiv.org/abs/2604.05619">arXiv:2604.05619</a><br>
+Applications</i> (2026). <a href="https://arxiv.org/abs/2604.05619">arXiv:2604.05619</a>
+&mdash; a later re-derivation of the same 275, with the chirality-selective
+response rule and the horizontal cone cited in the gallery.<br>
 J.&thinsp;H. Conway, O. Delgado Friedrichs, D.&thinsp;H. Huson, W.&thinsp;P. Thurston,
 <i>On Three-dimensional Space Groups</i>, Beitr. Algebra Geom. <b>42</b> (2001)
 475–507. <a href="https://arxiv.org/abs/math/9911185">arXiv:math/9911185</a><br>
@@ -227,6 +237,6 @@ P. Scott, <i>The geometries of 3-manifolds</i>, Bull. LMS <b>15</b> (1983)
   Film groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/tutorial.js?v=38"></script>
+<script type="module" src="js/tutorial.js?v=39"></script>
 </body>
 </html>

@@ -3,9 +3,9 @@
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=38";
+import { buildTabs } from "./tabs.js?v=39";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory, setSignatures, signatureOf }
-  from "./wallpaper-data.js?v=38";
+  from "./wallpaper-data.js?v=39";
 
 /* The book's colour signatures for the forward groups, so the atlas names each
  * film group the way the correspondence tables do. Optional by construction:

@@ -1,8 +1,8 @@
 /* Gallery: featured non-product film groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=38";
-import { attachControls } from "./controls.js?v=38";
-import { attachStage } from "./stage.js?v=38";
+import { FilmGroupAnimation } from "./renderer.js?v=39";
+import { attachControls } from "./controls.js?v=39";
+import { attachStage } from "./stage.js?v=39";
 
 const FEATURED = [
   {
@@ -63,7 +63,7 @@ glide read along the time axis instead of a space axis. The identification \
 relabels a space direction as time, so no change of frame realises it: as a \
 film, the pattern can never be made static. It is the smallest example where \
 the strict Galilean classification (283 classes) is finer than the \
-crystallographic one (275); the catalog, following Ke–Wu, files it with \
+crystallographic one (275); the catalog, following Xu–Wu, files it with \
 pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
     specId: "pm-timeglide",
   },

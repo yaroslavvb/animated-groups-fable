@@ -23,7 +23,7 @@
  * is a wallpaper again.
  */
 "use strict";
-import { LIMITS } from "./urlstate.js?v=38";
+import { LIMITS } from "./urlstate.js?v=39";
 
 const TWO_PI = Math.PI * 2;
 const DEG = Math.PI / 180;

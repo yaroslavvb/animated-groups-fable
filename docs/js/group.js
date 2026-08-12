@@ -7,11 +7,11 @@
  * same list rather than the whole 275.
  */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=38";
-import { attachControls } from "./controls.js?v=38";
-import { attachStage } from "./stage.js?v=38";
-import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=38";
-import { passes, groupHref } from "./filters.js?v=38";
+import { FilmGroupAnimation } from "./renderer.js?v=39";
+import { attachControls } from "./controls.js?v=39";
+import { attachStage } from "./stage.js?v=39";
+import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=39";
+import { passes, groupHref } from "./filters.js?v=39";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;

@@ -17,12 +17,12 @@
  * the page animates a different one.
  */
 "use strict";
-import { Playback } from "./playback.js?v=38";
-import { attachStage } from "./stage.js?v=38";
-import { attachControls } from "./controls.js?v=38";
-import { filmTimeSymmetry } from "./phases.js?v=38";
-import { drawBall, GROUND } from "./ball.js?v=38";
-import { elements } from "./designer/symmetry.js?v=38";
+import { Playback } from "./playback.js?v=39";
+import { attachStage } from "./stage.js?v=39";
+import { attachControls } from "./controls.js?v=39";
+import { filmTimeSymmetry } from "./phases.js?v=39";
+import { drawBall, GROUND } from "./ball.js?v=39";
+import { elements } from "./designer/symmetry.js?v=39";
 
 /* the GIF's palette, so the page and the exported film are the same picture */
 const AXIS = "#8a8578";

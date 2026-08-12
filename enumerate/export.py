@@ -1201,7 +1201,7 @@ def build_entry(cname, ac, vec, idx):
                 .replace("₄", "<sub>4</sub>").replace("₅", "<sub>5</sub>")
                 .replace("½", "<sub>½</sub>").replace("¼", "<sub>¼</sub>"))
 
-    # Ke-Wu-style op description: highest-order fractional time screw first
+    # Xu-Wu-style op description: highest-order fractional time screw first
     kws = []
     screws = []
     for (M, s, v, tau) in ops_r:
