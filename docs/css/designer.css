@@ -1,0 +1,394 @@
+/* Designer — the one page on the site that is an instrument rather than a
+ * text. It owns the whole viewport: the 3D box on the left, the controls in a
+ * fixed column on the right, and no page scroll, because scrolling the page
+ * while dragging a breakpoint would be a bug rather than a feature.
+ *
+ * The column is in two parts. The film and the two numbers that say whether the
+ * design is legal are PINNED at the top, because they are the feedback loop and
+ * a reader dragging a breakpoint must not have to scroll to see what it did;
+ * everything below them — the paint, the settings, the group, the generators,
+ * the random search — is consulted rather than watched, and scrolls.
+ *
+ * The drawing surfaces stay on the light ground in both colour schemes: the
+ * design is a picture of a printed plate, and it is the same picture the
+ * billiards page shows. */
+
+html { scroll-behavior: auto; }
+
+body.designer-page {
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* the header is sticky everywhere else; here it is simply the top row of a
+   column layout, and sticky would make it overlap the canvas */
+body.designer-page header.site { position: static; flex: 0 0 auto; }
+body.designer-page header.site .inner { max-width: none; }
+
+main.designer {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.stage3d {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  background: #faf9f6;
+}
+
+/* absolutely placed so the canvas's own intrinsic size never drives layout —
+   it is measured from the box, not the other way round */
+#view {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.legend {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.6rem;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 1.1rem;
+  max-width: calc(100% - 2rem);
+  pointer-events: none;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.78rem;
+  color: #7c8395;
+}
+.legend b { color: #464c58; font-weight: 600; }
+
+.column {
+  flex: 0 0 306px;
+  width: 306px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--rule);
+  background: var(--panel);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.column .pinned {
+  flex: 0 0 auto;
+  padding: 0.7rem 0.9rem 0.6rem;
+  border-bottom: 1px solid var(--rule);
+}
+.column .scroller {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0.9rem 3rem;
+}
+
+.column h2 {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 1.3rem 0 0.5rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--rule);
+}
+.column .panel:first-of-type h2 { margin-top: 0.9rem; }
+
+.column button {
+  font: inherit;
+  font-size: 0.84rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+.column button:hover { border-color: var(--accent); color: var(--accent); }
+.column button.wide { width: 100%; margin-top: 0.5rem; padding: 0.35rem; }
+.column button[disabled] { opacity: 0.4; cursor: default; }
+.column button[disabled]:hover { border-color: var(--rule); color: var(--ink); }
+
+.toolbar { display: flex; gap: 0.35rem; }
+.toolbar button { flex: 1 1 auto; }
+
+.note {
+  margin: 0.6rem 0 0;
+  padding: 0.35rem 0.5rem;
+  border-left: 3px solid var(--gold);
+  background: var(--code-bg);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- preview */
+
+/* The film is pinned above the scrolling controls, so on a short screen it has
+   to give some room back rather than leave the panel below it a slot. */
+#preview {
+  display: block;
+  width: min(100%, 34vh);
+  aspect-ratio: 1 / 1;
+  margin: 0.7rem auto 0;
+  background: #faf9f6;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.playrow { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.5rem; }
+.playrow button { flex: 0 0 2.4rem; text-align: center; font-size: 0.78rem; }
+.playrow input[type="range"] { flex: 1 1 auto; min-width: 0; accent-color: var(--accent); }
+.playrow .clock {
+  flex: 0 0 2.4rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* ----------------------------------------------------------------- status */
+
+dl.status {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.1rem 0.7rem;
+  margin: 0.7rem 0 0;
+  font-size: 0.84rem;
+}
+dl.status dt { color: var(--muted); }
+dl.status dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+dl.status dd.warn { color: var(--gold); }
+dl.status dd.bad { color: var(--accent2); font-weight: 600; }
+
+/* ----------------------------------------------------------------- colour */
+
+.swatches { display: flex; gap: 5px; }
+.swatches button {
+  flex: 1 1 auto;
+  height: 26px;
+  padding: 0;
+  border-radius: 5px;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.swatches button:hover { border-color: var(--muted); }
+.swatches button[aria-pressed="true"] { border-color: var(--ink); }
+
+/* --------------------------------------------------------------- settings */
+
+.seg { display: flex; gap: 4px; }
+.seg button { flex: 1 1 auto; }
+.seg button[aria-pressed="true"] {
+  background: var(--code-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0;
+  color: var(--muted);
+}
+.row > span { flex: 0 0 5.4rem; }
+.row > .seg { flex: 1 1 auto; min-width: 0; }
+.row input[type="range"] { flex: 1 1 auto; min-width: 0; accent-color: var(--accent); }
+.row input[type="number"] {
+  flex: 0 0 4.5rem;
+  font: inherit;
+  font-size: 0.84rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  padding: 0.15rem 0.35rem;
+}
+.row output {
+  flex: 0 0 2.6rem;
+  text-align: right;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.6rem 0 0.2rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.check input { accent-color: var(--accent); }
+
+.report {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  min-height: 3.2em;
+}
+.report b { color: var(--ink); }
+
+/* ------------------------------------------------------------- generators */
+
+#gens .ops { list-style: none; margin: 0; padding: 0; }
+#gens .ops li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr auto;
+  align-items: baseline;
+  gap: 0.4rem;
+  padding: 0.12rem 0;
+  font-size: 0.82rem;
+}
+#gens .tag {
+  font-family: Charter, Georgia, serif;
+  font-style: italic;
+  color: var(--muted);
+}
+#gens .k { color: var(--ink); }
+#gens .ts { color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+#gens details { margin-top: 0.4rem; }
+#gens summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+#gens .alg { list-style: none; margin: 0.3rem 0 0; padding: 0; }
+#gens .alg li { margin: 0.2rem 0; }
+#gens .alg code {
+  display: block;
+  font-size: 0.76rem;
+  background: var(--code-bg);
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  white-space: pre;
+}
+#gens .alg span { font-size: 0.72rem; color: var(--muted); }
+
+/* --------------------------------------------------------- group selector */
+
+.grouplist { display: flex; flex-direction: column; gap: 1px; }
+
+.grouplist .head {
+  margin: 0.7rem 0 0.1rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.grouplist .head:first-child { margin-top: 0; }
+
+/* the wallpaper group each row sits under, named in orbifold notation; the
+   Hermann-Mauguin name is the small tag after it */
+.grouplist .sub {
+  margin: 0.35rem 0 0.1rem;
+  padding-left: 0.15rem;
+  font-family: Charter, Georgia, serif;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+.grouplist .sub span {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-left: 0.35rem;
+}
+
+.grow { display: flex; align-items: stretch; gap: 2px; }
+
+.grow > button.grp {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "sig par" "fab par";
+  align-items: baseline;
+  gap: 0 0.5rem;
+  text-align: left;
+  padding: 0.15rem 0.45rem;
+  background: transparent;
+  border-color: transparent;
+}
+.grow > button.grp:hover { background: var(--bg); border-color: var(--rule); }
+.grow > button.grp[aria-pressed="true"] {
+  background: var(--code-bg);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.grp .sig {
+  grid-area: sig;
+  font-family: Charter, Georgia, serif;
+  font-size: 1rem;
+}
+.grp[aria-pressed="true"] .sig { font-weight: 600; color: var(--accent); }
+.grp .fab { grid-area: fab; font-size: 0.72rem; color: var(--muted); }
+.grp .par {
+  grid-area: par;
+  justify-self: end;
+  align-self: center;
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* its own link, so clicking out to the correspondence never selects */
+.grow > a.ext {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  padding: 0 0.3rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  border-radius: 5px;
+}
+.grow > a.ext:hover { color: var(--accent); background: var(--bg); }
+
+/* ----------------------------------------------------------------- narrow */
+
+@media (max-width: 900px) {
+  body.designer-page { height: auto; overflow: visible; }
+  main.designer { flex-direction: column; }
+  .stage3d { flex: 0 0 auto; height: 62vh; min-height: 320px; }
+  .column {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 100%;
+    border-left: none;
+    border-top: 1px solid var(--rule);
+  }
+  .column .scroller { overflow: visible; }
+  .column .pinned { border-bottom: none; }
+  #preview { max-width: 320px; }
+
+  /* five lines of text over the lower half of the drawing, three of them
+     naming gestures this device does not have */
+  .legend { font-size: 0.72rem; gap: 0.1rem 0.75rem; bottom: 0.35rem; }
+  .legend .fine { display: none; }
+}

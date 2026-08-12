@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Designer — Film Groups</title>
+<link rel="stylesheet" href="css/style.css?v=37">
+<link rel="stylesheet" href="css/designer.css?v=38">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body class="designer-page">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="billiards.html">Billiards</a>
+      <a href="designer.html" class="here">Designer</a>
+      <a href="future-directions.html">Future</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="designer">
+  <div class="stage3d">
+    <canvas id="view"></canvas>
+    <!-- .fine is for gestures a touch device does not have (shift, wheel, a
+         delete key) and for the wording that is only there to teach; the
+         narrow layout drops both rather than print a legend that lies. -->
+    <p class="legend">
+      <span><b>click the floor</b> place a billiard</span>
+      <span class="fine"><b>shift-click a tube</b> add a breakpoint</span>
+      <span><b>drag a handle</b><span class="fine"> move it in its own time slice</span></span>
+      <span><b>drag the background</b> orbit</span>
+      <span class="fine"><b>wheel</b> zoom</span>
+      <span class="fine"><b>delete</b> remove what is selected</span>
+    </p>
+  </div>
+
+  <aside class="column">
+    <div class="pinned">
+      <div class="toolbar">
+        <button type="button" id="copy-link" title="the whole design is in the address">Copy link</button>
+        <button type="button" id="fit" title="bring the box back into view">Fit</button>
+        <button type="button" id="undo" title="undo (Ctrl/Cmd+Z)">Undo</button>
+        <button type="button" id="redo" title="redo (Ctrl/Cmd+Shift+Z)">Redo</button>
+      </div>
+      <p class="note" id="note" hidden></p>
+
+      <canvas id="preview" aria-label="the design, playing"></canvas>
+      <div class="playrow">
+        <button type="button" id="play" aria-label="pause">❚❚</button>
+        <input type="range" id="scrub" min="0" max="1000" step="1" value="0"
+               list="marks" aria-label="time">
+        <datalist id="marks"></datalist>
+        <span class="clock" id="clock">0.00</span>
+      </div>
+
+      <dl class="status" id="status">
+        <dt>worst gap</dt><dd id="st-gap">—</dd>
+        <dt>touches</dt><dd id="st-touch">—</dd>
+        <dt>overlaps</dt><dd id="st-over">—</dd>
+      </dl>
+    </div>
+
+    <div class="scroller">
+      <section class="panel">
+        <h2>Colour</h2>
+        <div id="swatches" class="swatches"></div>
+        <p class="hint">Paint only: it names a billiard, and every copy the
+          group makes inherits it.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Settings</h2>
+        <label class="row" for="radius">
+          <span>radius</span>
+          <input type="range" id="radius" min="0.02" max="0.14" step="0.002">
+          <output id="radius-out"></output>
+        </label>
+        <div class="row"><span>display span</span>
+          <div class="seg" id="span">
+            <button type="button" data-span="1">1 ring</button>
+            <button type="button" data-span="2">2 rings</button>
+          </div>
+        </div>
+        <label class="check" for="sym">
+          <input type="checkbox" id="sym">
+          <span>symmetry diagram</span>
+        </label>
+      </section>
+
+      <section class="panel">
+        <h2>Generators</h2>
+        <div id="gens"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Group</h2>
+        <div id="groups" class="grouplist"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Random</h2>
+        <label class="row" for="r-count"><span>billiards</span>
+          <input type="number" id="r-count" min="1" max="8" step="1" value="3"></label>
+        <label class="row" for="r-breaks"><span>breakpoints</span>
+          <input type="number" id="r-breaks" min="0" max="5" step="1" value="2"></label>
+        <label class="row" for="r-radius"><span>radius</span>
+          <input type="number" id="r-radius" min="0.02" max="0.14" step="0.005" value="0.06"></label>
+        <button type="button" id="generate" class="wide">Generate</button>
+        <p class="report" id="r-report">—</p>
+      </section>
+    </div>
+  </aside>
+</main>
+
+<script type="module" src="js/designer/app.js?v=38"></script>
+</body>
+</html>

@@ -21,10 +21,10 @@ import { Playback } from "./playback.js?v=36";
 import { attachStage } from "./stage.js?v=36";
 import { attachControls } from "./controls.js?v=36";
 import { filmTimeSymmetry } from "./phases.js?v=36";
+import { drawBall, GROUND } from "./ball.js?v=38";
+import { elements } from "./designer/symmetry.js?v=38";
 
 /* the GIF's palette, so the page and the exported film are the same picture */
-const GROUND = "#faf9f6";
-const EDGE = "#464c58";
 const AXIS = "#8a8578";
 
 const TWO_PI = Math.PI * 2;
@@ -152,118 +152,20 @@ export class BallFilm extends Playback {
             const p = this.cart([u[0] + m1, u[1] + m2]);
             const [x, y] = this.scr(p, w, h);
             if (x < -pad || x > w + pad || y < -pad || y > h + pad) continue;
-            this._ball(ctx, x, y, ph, this.colours[i]);
+            drawBall(ctx, x, y, this.R, ph, this.colours[i]);
           }
         }
       }
     }
   }
 
-  /* a ball wearing its own clock: the colour grows out of the centre over the
-   * first half of the period and is eaten away from the centre over the
-   * second, so a dot is a ball just starting and a thin ring is one nearly
-   * done. Radial rather than rotational — a turning marker inside a pattern
-   * with rotational symmetry cannot be read at all. */
-  _ball(ctx, x, y, ph, colour) {
-    const R = this.R;
-    ctx.beginPath();
-    ctx.arc(x, y, R, 0, TWO_PI);
-    ctx.fillStyle = GROUND;
-    ctx.fill();
-    if (ph < 0.5) {
-      const rr = R * 2 * ph;
-      if (rr > 0.4) {
-        ctx.beginPath();
-        ctx.arc(x, y, rr, 0, TWO_PI);
-        ctx.fillStyle = colour;
-        ctx.fill();
-      }
-    } else {
-      ctx.fillStyle = colour;
-      ctx.fill();
-      const rr = R * (2 * ph - 1);
-      if (rr > 0.4) {
-        ctx.beginPath();
-        ctx.arc(x, y, rr, 0, TWO_PI);
-        ctx.fillStyle = GROUND;
-        ctx.fill();
-      }
-    }
-    ctx.beginPath();
-    ctx.arc(x, y, R, 0, TWO_PI);
-    ctx.lineWidth = Math.max(1, R * 0.16);
-    ctx.strokeStyle = EDGE;
-    ctx.stroke();
-  }
 
-  /* The fixed-point sets of the group elements: 3-centres and mirror lines.
-   * A rotation (det +1, M != I) fixes one point, u = (I - M)^-1 v. A
-   * reflection (det -1) fixes a line: split v along the mirror direction d
-   * and the normal n; the axis sits at half the normal component, and
-   * whatever is left along d is the glide.
-   *
-   * Enumerated over ops AND lattice translations, because a fixed point is
-   * not a linear function of the translation: the centres of (M | m) as m
-   * runs over the lattice are (I - M)^-1 m, a lattice three times finer for a
-   * 3-fold. Translating one centre by the lattice would show a third of them.
-   * Computed from the ops rather than hard-coded, and cached — it depends
-   * only on how far the view reaches. */
+  /* The symmetry elements depend only on the group and how far the view
+   * reaches, so they are computed once per span rather than every frame. */
   _elements() {
-    if (this._els && this._els.span === this.span) return this._els;
-    const n = this.span + 1;
-    const seenPt = new Set(), seenLn = new Map();
-    const pts = [], lns = [];
-    for (const op of this.ops) {
-      const M = op.M;
-      const det = M[0][0] * M[1][1] - M[0][1] * M[1][0];
-      const isI = M[0][0] === 1 && M[1][1] === 1 && !M[0][1] && !M[1][0];
-      if (isI) continue;
-      // +1 eigenvector: a nonzero column of M + I; -1 eigenvector: of M - I
-      const d = det < 0 ? pick([[M[0][0] + 1, M[1][0]], [M[0][1], M[1][1] + 1]]) : null;
-      const nn = det < 0 ? pick([[M[0][0] - 1, M[1][0]], [M[0][1], M[1][1] - 1]]) : null;
-      const IM = det > 0
-        ? inv2([[1 - M[0][0], -M[0][1]], [-M[1][0], 1 - M[1][1]]]) : null;
-      for (let m1 = -3 * n; m1 <= 3 * n; m1++) {
-        for (let m2 = -3 * n; m2 <= 3 * n; m2++) {
-          const v = [op.v[0] + m1, op.v[1] + m2];
-          if (det > 0) {
-            const c = apply(IM, v);
-            if (Math.abs(c[0]) > n + 1 || Math.abs(c[1]) > n + 1) continue;
-            const key = [Math.round(c[0] * 60), Math.round(c[1] * 60)].join();
-            // Does the rotation about this centre cost any time? A centre is
-            // well defined by (M | v) alone — two elements with the same
-            // spatial part and different taus would put a pure time
-            // translation in the group, which this one does not have — so the
-            // answer is a property of the point, not of which op found it.
-            if (!seenPt.has(key)) {
-              seenPt.add(key);
-              pts.push({ c, free: Math.abs(frac(op.tau)) < 1e-9 });
-            }
-          } else {
-            const co = solve2(d, nn, v);          // v = co[0] d + co[1] n
-            const off = co[1] / 2;                // the axis's normal offset
-            const base = [nn[0] * off, nn[1] * off];
-            if (Math.abs(base[0]) > 2 * n || Math.abs(base[1]) > 2 * n) continue;
-            const key = [Math.round(d[0] * 60), Math.round(d[1] * 60),
-                         Math.round(off * 60)].join();
-            // One axis carries many elements: the same reflection composed
-            // with every translation along it, which here includes a centring
-            // a third of the way along. The line is a MIRROR as soon as one
-            // of them has no leftover slide, so this has to be an AND over
-            // everything on the axis, not whichever was reached first.
-            const glide = Math.abs(frac(co[0] + 0.5) - 0.5) > 1e-6;
-            const had = seenLn.get(key);
-            if (had === undefined) {
-              seenLn.set(key, lns.length);
-              lns.push({ base, d, glide });
-            } else if (!glide) {
-              lns[had].glide = false;
-            }
-          }
-        }
-      }
+    if (!this._els || this._els.span !== this.span) {
+      this._els = { span: this.span, ...elements(this.ops, this.span) };
     }
-    this._els = { span: this.span, pts, lns };
     return this._els;
   }
 
@@ -312,15 +214,6 @@ export class BallFilm extends Playback {
     }
     ctx.restore();
   }
-}
-
-const pick = (cols) =>
-  (Math.hypot(cols[0][0], cols[0][1]) > 1e-9 ? cols[0] : cols[1]);
-
-/* coefficients of v in the (possibly oblique) basis d, n */
-function solve2(d, n, v) {
-  const det = d[0] * n[1] - d[1] * n[0];
-  return [(v[0] * n[1] - v[1] * n[0]) / det, (d[0] * v[1] - d[1] * v[0]) / det];
 }
 
 /* ------------------------------------------------------------------ page */
