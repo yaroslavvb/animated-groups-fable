@@ -8,14 +8,15 @@
  * whole catalog.
  */
 "use strict";
+import { colouringKind } from "./colouring.js?v=40";
 
 /* select id -> query-string key. The values are the option values themselves
- * ("forward", "nonsymmorphic", …), so a URL reads as what it selects. */
+ * ("forward", "dihedral", …), so a URL reads as what it selects. */
 export const FILTER_KEYS = [
   ["f-system", "system"],
   ["f-base", "base"],
   ["f-time", "time"],
-  ["f-sym", "type"],
+  ["f-colour", "colouring"],
   ["f-prod", "product"],
 ];
 
@@ -28,8 +29,7 @@ export function passes(g, q) {
   if (v("base") && g.base !== v("base")) return false;
   if (v("time") === "forward" && !g.forward) return false;
   if (v("time") === "with reversal" && g.forward) return false;
-  if (v("type") === "symmorphic" && !g.symmorphic) return false;
-  if (v("type") === "nonsymmorphic" && g.symmorphic) return false;
+  if (v("colouring") && colouringKind(g) !== v("colouring")) return false;
   if (v("product") === "product" && !g.product) return false;
   if (v("product") === "not a product" && g.product) return false;
   return true;

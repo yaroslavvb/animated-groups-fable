@@ -10,6 +10,7 @@ import { attachControls } from "./controls.js?v=40";
 import { WALLPAPERS } from "./wallpaper-data.js?v=40";
 import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=40";
 import { nameOf } from "./catalog-names.js?v=40";
+import { colouringKind, KIND } from "./colouring.js?v=40";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
@@ -33,8 +34,8 @@ async function init() {
 /* ------------------------------------------------------ filters in the URL
  * A selection is a view of the catalog, so it lives in the query string and
  * is therefore linkable and bookmarkable: catalog.html?time=forward is the
- * 68 forward-time groups, ?base=p4m&type=nonsymmorphic the nonsymmorphic ones
- * over p4m. Filters left at "all" are omitted, so the bare catalog.html URL
+ * 68 forward-time groups, ?base=p4m&colouring=dihedral the ones over p4m
+ * whose clock colours by phase and direction together. Filters left at "all" are omitted, so the bare catalog.html URL
  * stays clean, and a value the enumeration does not offer (a hand-edited or
  * stale link) falls back to "all" rather than showing an empty grid. */
 /* the selection the controls currently express, as query parameters — the one
@@ -102,7 +103,8 @@ function buildFilters(data) {
      hm => baseLabel(hm));
   mk("f-time", "time structure", ["forward", "with reversal"],
      v => v === "forward" ? "clockwork (forward time)" : v);
-  mk("f-sym", "type", ["symmorphic", "nonsymmorphic"]);
+  mk("f-colour", "colouring", ["cyclic", "antisymmetry", "dihedral", "none"],
+     (k) => KIND[k].label);
   mk("f-prod", "product?", ["product", "not a product"]);
   const count = document.createElement("span");
   count.className = "count";
@@ -153,12 +155,15 @@ function render() {
       `<div class="tags">` +
       `<span class="tag">${g.system}</span>` +
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
-      (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      // Only the forward groups are tagged. "Clockwork" is the property worth
-      // naming — 68 of the 275 — and tagging the other 207 "time reversal"
-      // put a label on the ordinary case, which is where most cards already
-      // are: the absence of the green tag says it just as well.
-      (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
+
+      // Which colouring of its projection the group induces (hierarchy §5).
+      // Every group is in exactly one of the four classes, and "cyclic" is
+      // exactly the 68 clockwork ones, so this single tag replaces both the
+      // old clockwork tag and the symmorphic/nonsymmorphic one — the latter
+      // said something true about the cocycle but nothing about the animation.
+      (() => { const k = colouringKind(g);
+        return `<span class="tag kind-${k}" title="${KIND[k].title}">` +
+               `${KIND[k].label}</span>`; })() +
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);

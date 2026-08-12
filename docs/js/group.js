@@ -8,6 +8,7 @@
  */
 "use strict";
 import { FilmGroupAnimation } from "./renderer.js?v=40";
+import { colouringKind, KIND } from "./colouring.js?v=40";
 import { attachControls } from "./controls.js?v=40";
 import { attachStage } from "./stage.js?v=40";
 import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=40";
@@ -64,11 +65,10 @@ function render(g) {
       `<span class="tag">${g.system}</span>` +
       `<span class="tag">${g.bravais}</span>` +
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
-      (g.symmorphic ? `<span class="tag">symmorphic</span>`
-                    : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
-      (g.product ? `<span class="tag">product type</span>`
-                 : `<span class="tag nonsym">not a product</span>`) +
+      (() => { const k = colouringKind(g);
+        return `<span class="tag kind-${k}" title="${KIND[k].title}">` +
+               `${KIND[k].label}</span>`; })() +
+      (g.product ? `<span class="tag">product type</span>` : "") +
     `</div>` +
     `<div class="demo" id="gp-demo"><canvas id="gp-canvas"></canvas></div>` +
     `<p>${timeStory(g)}</p>` +

@@ -5,6 +5,7 @@
  * against catalog.json so they cannot silently drift. */
 "use strict";
 import { signatureOf } from "./catalog-names.js?v=40";
+import { colouringKind, KIND } from "./colouring.js?v=40";
 
 /* Crystallographic order; orb = Conway orbifold of the wallpaper group.
  * note: one-line description of the wallpaper itself.
@@ -306,8 +307,9 @@ export function groupCaption(g) {
            `title="the colour type G/K">${sig.tos}</span>` : "") +
     `<span style="color:var(--muted);">${g.hm || ""}</span>` +
     `<span class="tags" style="display:flex;gap:0.4rem;flex-wrap:wrap;">` +
-    (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-    (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
+    (() => { const k = colouringKind(g);
+      return `<span class="tag kind-${k}" title="${KIND[k].title}">` +
+             `${KIND[k].label}</span>`; })() +
     (g.product ? `<span class="tag product">product</span>` : "") +
     `</span>` +
     `<a class="linkish" style="margin-left:auto;text-decoration:none;" ` +

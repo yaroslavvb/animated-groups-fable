@@ -215,14 +215,19 @@ table.counts td:first-child { text-align: left; }
   color: var(--muted);
   font-family: system-ui, sans-serif;
 }
-.tag.nonsym { background: var(--accent); color: #fff; }
-/* forward time, stated positively — the same green the wallpaper atlas
-   uses for the forward run of its tabs, so one idea has one colour.
-   There is deliberately no companion tag for the time-reversing groups:
-   they are 207 of the 275, the ordinary case, and labelling the ordinary
-   case puts a badge on almost every card for no information. */
-.tag.fwd { background: var(--fwd-bg); color: var(--fwd-ink);
-           box-shadow: inset 0 0 0 1px var(--fwd-rule); }
+/* Which colouring of its projection a group induces — the partition the
+   hierarchy page draws, and the one thing about a group worth saying on a
+   card. The four are mutually exclusive and cover all 275, so every card
+   carries exactly one. Only the two ends of the range are coloured: the
+   clockwork groups in the green the wallpaper atlas already uses for its
+   forward run, so one idea keeps one colour, and the groups whose clock does
+   not descend at all in a muted red, because "there is no colouring here" is
+   the exceptional answer. The two middle classes are the ordinary case and
+   take the plain tag — a badge on almost every card carries no information. */
+.tag.kind-cyclic { background: var(--fwd-bg); color: var(--fwd-ink);
+                   box-shadow: inset 0 0 0 1px var(--fwd-rule); }
+.tag.kind-none { background: transparent; color: var(--accent2);
+                 box-shadow: inset 0 0 0 1px currentColor; }
 .tag.product { }
 
 /* featured big demo */
