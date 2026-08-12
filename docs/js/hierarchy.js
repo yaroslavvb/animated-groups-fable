@@ -55,7 +55,7 @@ table("six-table",
     ["coloured wallpaper groups, N&nbsp;≤&nbsp;6", "a plane pattern in N colours",
      b(COLOURS), "…the same, colours permuted freely"],
     ["&emsp;…with a regular cyclic colour group",
-     "a plane pattern whose N colours are a clock", b(CYCLIC), ditto],
+     "a plane pattern whose N colours form C<sub>N</sub>", b(CYCLIC), ditto],
     ["space-time (film) groups, 2+1D", "an animation that loops and tiles",
      b(H.headline.filmGroups),
      "a change of frame, up to re-basing the space-time lattice"],
@@ -101,7 +101,7 @@ table("colour-table",
     "count of normal subgroups of index N with cyclic quotient, up to " +
     "plane-affine equivalence. Column 3: this catalog. " +
     "<b>The three columns use different equivalences</b>" +
-    "; the totals are not comparable. See §7." });
+    "; the totals are not comparable. See §8." });
 
 /* §4 — the image of the clock in Isom(S¹) */
 table("phase-table",
@@ -118,7 +118,42 @@ table("phase-table",
     "N&nbsp;&gt;&nbsp;6: the crystallographic restriction applies to the " +
     "clock as much as to the rotations." });
 
-/* §5 — the fibres of "forget which axis is time" */
+/* §5 — the colouring of the projection that each film group induces, and the
+ * pure-reversal groups against the magnetic plane groups */
+{
+  const K = new Map(H.colouringKinds.map(k => [k.key, k]));
+  table("kinds-table",
+    ["image of Φ", "descends to Γ?", "colour group induced on Γ", "the colour is",
+     "film groups"],
+    H.colouringKinds.map(k => [
+      `<span class="sym">${k.image}</span>`,
+      k.descends ? "yes" : "<b>no</b>", k.colourGroup, k.colour, b(k.count)])
+      .concat([[b("Σ"), "", "", "", b(H.headline.filmGroups)]]),
+    { total: true, left: [0, 1, 2, 3],
+      note: "Row 4 is the case Φ does not descend: G contains a pure time " +
+        "reversal, so an element acting trivially on space acts non-trivially " +
+        "on the loop. Rows 1 and 2 both give a regular cyclic colour group, " +
+        `${K.get("cyclic").count} + ${K.get("antisymmetry").count} = ` +
+        `${H.regularCyclicTotal} groups in all.` });
+  for (const el of document.querySelectorAll("[data-kind]"))
+    el.textContent = el.dataset.kind === "regular"
+      ? H.regularCyclicTotal : K.get(el.dataset.kind).count;
+
+  const p = H.pureReversal;
+  table("pure-table",
+    ["orbifold", "HM", "N&nbsp;=&nbsp;1", "N&nbsp;=&nbsp;2", "Σ"],
+    p.byBase.map(r => [sym(r.orbifold), r.hm, r.film[0], r.film[1] ||
+        "<span style='color:var(--rule);'>·</span>", r.film[0] + r.film[1]])
+      .concat([[b("Σ"), "", b(p.byClock["1"]), b(p.byClock["2"]), b(p.count)]]),
+    { total: true, left: [0, 1],
+      note: "Film groups with a pure time reversal, by spatial projection. " +
+        "Each entry equals the Senechal–Wieting count of cyclic subgroups of " +
+        "that index — column 2 of §3 restricted to N&nbsp;≤&nbsp;2 — so the " +
+        "table is simultaneously the census of the 17 grey and 46 " +
+        "black-white plane groups." });
+}
+
+/* §6 — the fibres of "forget which axis is time" */
 {
   const sizes = Object.keys(H.fibres.sizeCounts).sort();
   table("fibre-table",
@@ -135,7 +170,7 @@ table("phase-table",
     el.textContent = H.fibres.sizeCounts[el.dataset.fib];
 }
 
-/* §6 — the 68 clockwork groups against the 68 polar space groups */
+/* §7 — the 68 clockwork groups against the 68 polar space groups */
 {
   const rows = H.polarTable.map(r => [
     `<a href="group.html?g=${r.id}">${sym(leadHtml(r))}</a>`,
@@ -160,7 +195,7 @@ table("phase-table",
   document.getElementById("enant").innerHTML = pairs.join(", ");
 }
 
-/* §7 — cyclic colourings against film groups, one wallpaper group per row */
+/* §8 — cyclic colourings against film groups, one wallpaper group per row */
 {
   const N = H.meta.maxColours;
   const dot = "<span style='color:var(--rule);'>·</span>";
@@ -302,12 +337,12 @@ function venn() {
       fill="var(--muted)">of 3 dimensions · ${h.spaceGroups} in all</text>
 
     ${/* each dashed ring is named inside itself, clear of the lens between them */""}
-    ${ring(275, 175, "--gold", `${CYCLIC} cyclic clocks`)}
+    ${ring(275, 175, "--gold", `${CYCLIC} regular cyclic`)}
     ${ring(505, 168, "--accent", `${h.nonCubic} non-cubic`)}
     ${ring(505, 183, "--accent", `all ${h.filmGroups} films land here`)}
 
     ${n(144, 205, COLOURS - CYCLIC, ["colour group", "is not a clock"])}
-    ${n(256, 252, CYCLIC - h.clockwork, ["not a new film", "(§7)"])}
+    ${n(256, 252, CYCLIC - h.clockwork, ["same film as", "another (§8)"])}
     ${n(381, 236, h.clockwork, ["clockwork", "= polar"], "--accent2")}
     ${n(513, 252, h.nonCubic - h.polar, ["non-polar types",
         `— ${h.filmGroups - h.clockwork} reversing films`])}
@@ -329,7 +364,7 @@ function venn() {
   The circles use different equivalences — colourings up to affine maps of the
   plane, crystals up to space-group type — and the ${CYCLIC - h.clockwork} is
   the gap: ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct films
-  (<a href="#disagree">§7</a>).</p></div>`;
+  (<a href="#disagree">§8</a>).</p></div>`;
 }
 
 /* ---------- the summary diagram at the foot ---------- */
@@ -337,8 +372,8 @@ function venn() {
 document.getElementById("diagram").innerHTML = diagram();
 
 /* Three lanes — the plane, space-time, space — three rows each. Every lane
- * reads downwards as a containment; the arrows across are the two maps of §5
- * and §6 plus the colour reading of §3. The middle row of the outer lanes is
+ * reads downwards as a containment; the arrows across are the two maps of §6
+ * and §7 plus the colour reading of §3. The middle row of the outer lanes is
  * deliberately empty so that the bijection lands on one horizontal line. */
 function diagram() {
   const L = [95, 380, 665];              // lane centres

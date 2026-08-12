@@ -89,8 +89,8 @@ spatial coordinate. Under the height reading:</p>
 <div id="lift-table"></div>
 
 <p>Three caveats, developed below: the height reading forgets which axis was
-time (§5); the colour reading requires s&nbsp;≡&nbsp;+1 (§4); and the three
-subjects use different equivalences (§7).</p>
+time (§6); the colour reading requires s&nbsp;≡&nbsp;+1 (§5); and the three
+subjects use different equivalences (§8).</p>
 
 <h2 id="colour">3. Colour, up to six</h2>
 
@@ -132,21 +132,51 @@ that image:</p>
 <div id="phase-table"></div>
 
 <p>The cyclic row is column 3 of §3. The 17 with C<sub>1</sub> are the
-wallpaper groups with an independent loop. The dihedral row is the remaining
-207; these are not colourings, since their colour permutation includes an
-order reversal of the palette — Shubnikov antisymmetry with the prime read as
-time reversal. D<sub>1</sub> is the black-and-white case.</p>
+wallpaper groups with an independent loop.</p>
 
-<div class="aside">
-<span class="label">62 against 46 and 63</span>
-<p style="margin:0.3rem 0;">The 62 groups with a D<sub>1</sub> clock match
-neither the 46 non-trivial two-colour plane groups nor the 63 including the
-grey ones. Film equivalence admits changes of frame that two-coloured plane
-patterns do not, and a film reversal may carry a spatial glide with no static
-analogue. The correspondence is structural, not numerical; see §7.</p>
+<h2 id="induced">5. Which film groups colour their projection</h2>
+
+<p>Write Φ:&nbsp;G&nbsp;→&nbsp;Isom(S¹) for the action on the loop, and Γ for
+the spatial projection. A colouring of Γ is what Φ induces when it descends
+along G&nbsp;↠&nbsp;Γ, and it descends exactly when ker&nbsp;π&nbsp;⊆&nbsp;ker&nbsp;Φ
+— that is, when no element of G acts trivially on space and non-trivially on
+time. The colours are then the cosets of ker&nbsp;Φ and the colour group is
+the image. Four cases:</p>
+
+<div id="kinds-table"></div>
+
+<p>The second row answers the obvious question about the first. D<sub>1</sub>
+is cyclic of order 2, so those <span data-kind="antisymmetry">…</span> groups
+have a regular cyclic colour group and yet reverse time: the colour is the
+<em>direction</em> of time, not a phase, and the colouring is a black-and-white
+one in Shubnikov's sense. In total
+<span data-kind="regular">…</span> of the 275 induce a regular cyclic
+colouring, of which only the 68 clockwork groups colour by phase. A clock is a
+regular cyclic colouring whose colour group acts on the loop by rotations; an
+antisymmetry is one whose generator acts by a reflection.</p>
+
+<p>The last row is the case with no induced colouring at all: G contains a
+<em>pure time reversal</em>, an element (x,&nbsp;t)&nbsp;↦&nbsp;(x,&nbsp;−t&nbsp;+&nbsp;τ₀)
+that plays the film backwards without moving anything. Φ is then non-trivial
+on ker&nbsp;π and does not descend.</p>
+
+<div class="thm">
+<span class="label">The pure-reversal groups</span>
+<p style="margin:0.3rem 0;">If ρ&nbsp;=&nbsp;(x,&nbsp;t)&nbsp;↦&nbsp;(x,&nbsp;−t&nbsp;+&nbsp;τ₀)
+lies in G and g&nbsp;=&nbsp;(M,&nbsp;v,&nbsp;+1,&nbsp;τ) is forward, then
+ρgρ<sup>−1</sup>&nbsp;=&nbsp;(M,&nbsp;v,&nbsp;+1,&nbsp;−τ), so
+g(ρgρ<sup>−1</sup>)<sup>−1</sup> is the pure time translation by 2τ. The loop
+being minimal, 2τ&nbsp;∈&nbsp;ℤ and the clock has order 1 or 2. There are
+<b>63</b> such film groups, <b>17</b> with N&nbsp;=&nbsp;1 and <b>46</b> with
+N&nbsp;=&nbsp;2, and the counts agree with the Senechal–Wieting numbers of
+cyclic subgroups of index 1 and 2 <em>wallpaper group by wallpaper group</em>
+— that is, with the 17 grey and 46 black-white plane groups. The
+correspondence sends (Γ,&nbsp;χ) to graph(χ)&nbsp;⋊&nbsp;⟨ρ⟩.</p>
 </div>
 
-<h2 id="forget">5. Forgetting which axis is time</h2>
+<div id="pure-table"></div>
+
+<h2 id="forget">6. Forgetting which axis is time</h2>
 
 <p>Reading each phase as a height makes a film group a discrete group of
 isometries of ℝ³ with a rank-3 lattice, that is, a space group.</p>
@@ -182,7 +212,7 @@ three. The fibres sum to 275; the types number 194.</p>
 
 <div id="fibre-demo"></div>
 
-<h2 id="polar">6. Clockwork groups are the polar space groups</h2>
+<h2 id="polar">7. Clockwork groups are the polar space groups</h2>
 
 <p>Restrict the map to groups without time reversal. In the height reading
 this says that no operation sends z&nbsp;↦&nbsp;−z: the point group fixes the
@@ -219,7 +249,7 @@ patterns, since a reflection of the plane exchanges them, but inequivalent as
 films, since no change of frame sends a clock advancing by +1/N to one
 advancing by −1/N.</p>
 
-<h2 id="disagree">7. Where the counts differ</h2>
+<h2 id="disagree">8. Where the counts differ</h2>
 
 <p>Comparing columns 2 and 3 of §3 group by group: the totals shrink over four
 wallpaper groups and grow over three. Both directions are accounted for.</p>
@@ -269,7 +299,7 @@ fixed, drift has nowhere to go, and the two equivalences differ only in
 orientation.</p>
 </div>
 
-<h2 id="neighbours">8. Adjacent classifications</h2>
+<h2 id="neighbours">9. Adjacent classifications</h2>
 
 <p><b>Magnetic (Shubnikov) groups.</b> The 80 magnetic plane groups
 (17&nbsp;+&nbsp;17 grey&nbsp;+&nbsp;46 black-white) and the 1651 magnetic
@@ -299,9 +329,9 @@ order — finite configurations whose symmetries are spatial operations composed
 with time offsets — which is the clockwork construction without a spatial
 lattice. The Golubitsky–Stewart H/K theorem describes which (setwise,
 pointwise) pairs a time-periodic state realises. Both concern the
-C<sub>N</sub> quotient of §4.</p>
+C<sub>N</sub> quotient of §5.</p>
 
-<h2 id="glance">9. Summary</h2>
+<h2 id="glance">10. Summary</h2>
 
 <div id="diagram"></div>
 
@@ -339,7 +369,7 @@ choreographic crystals</i>, PRL <b>116</b>, 015503 (2016).
 
 <p class="hint">All counts here are regenerated from the catalog by
 <span class="mono">enumerate/hierarchy.py</span>, which asserts the theorems
-of §5 and §6 and re-derives the space-group types under
+of §6 and §7 and re-derives the space-group types under
 <span class="mono">--verify</span>. The companion
 <a href="https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html">clockwork/colouring
 correspondence</a> and <a href="https://yaroslavvb.github.io/animated-groups/space-group-correspondence.html">cyclic-colouring/polar-space-group

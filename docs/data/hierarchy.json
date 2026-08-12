@@ -460,6 +460,255 @@
    "dihedral": 3
   }
  ],
+ "colouringKinds": [
+  {
+   "key": "cyclic",
+   "image": "C<sub>N</sub>",
+   "descends": true,
+   "colourGroup": "C<sub>N</sub>, regular",
+   "colour": "phase",
+   "count": 68
+  },
+  {
+   "key": "antisymmetry",
+   "image": "D<sub>1</sub>",
+   "descends": true,
+   "colourGroup": "C<sub>2</sub>, regular",
+   "colour": "direction of time",
+   "count": 45
+  },
+  {
+   "key": "dihedral",
+   "image": "D<sub>N</sub>, N&nbsp;≥&nbsp;2",
+   "descends": true,
+   "colourGroup": "D<sub>N</sub> on 2N colours",
+   "colour": "phase and direction",
+   "count": 99
+  },
+  {
+   "key": "none",
+   "image": "C<sub>N</sub> or D<sub>N</sub>",
+   "descends": false,
+   "colourGroup": "—",
+   "colour": "—",
+   "count": 63
+  }
+ ],
+ "regularCyclicTotal": 113,
+ "pureReversal": {
+  "count": 63,
+  "byClock": {
+   "1": 17,
+   "2": 46
+  },
+  "byBase": [
+   {
+    "hm": "p1",
+    "orbifold": "◦",
+    "film": [
+     1,
+     1
+    ],
+    "colourings": [
+     1,
+     1
+    ]
+   },
+   {
+    "hm": "p2",
+    "orbifold": "2222",
+    "film": [
+     1,
+     2
+    ],
+    "colourings": [
+     1,
+     2
+    ]
+   },
+   {
+    "hm": "pm",
+    "orbifold": "**",
+    "film": [
+     1,
+     5
+    ],
+    "colourings": [
+     1,
+     5
+    ]
+   },
+   {
+    "hm": "pg",
+    "orbifold": "××",
+    "film": [
+     1,
+     2
+    ],
+    "colourings": [
+     1,
+     2
+    ]
+   },
+   {
+    "hm": "cm",
+    "orbifold": "*×",
+    "film": [
+     1,
+     3
+    ],
+    "colourings": [
+     1,
+     3
+    ]
+   },
+   {
+    "hm": "pmm",
+    "orbifold": "*2222",
+    "film": [
+     1,
+     5
+    ],
+    "colourings": [
+     1,
+     5
+    ]
+   },
+   {
+    "hm": "pmg",
+    "orbifold": "22*",
+    "film": [
+     1,
+     5
+    ],
+    "colourings": [
+     1,
+     5
+    ]
+   },
+   {
+    "hm": "pgg",
+    "orbifold": "22×",
+    "film": [
+     1,
+     2
+    ],
+    "colourings": [
+     1,
+     2
+    ]
+   },
+   {
+    "hm": "cmm",
+    "orbifold": "2*22",
+    "film": [
+     1,
+     5
+    ],
+    "colourings": [
+     1,
+     5
+    ]
+   },
+   {
+    "hm": "p4",
+    "orbifold": "442",
+    "film": [
+     1,
+     2
+    ],
+    "colourings": [
+     1,
+     2
+    ]
+   },
+   {
+    "hm": "p4m",
+    "orbifold": "*442",
+    "film": [
+     1,
+     5
+    ],
+    "colourings": [
+     1,
+     5
+    ]
+   },
+   {
+    "hm": "p4g",
+    "orbifold": "4*2",
+    "film": [
+     1,
+     3
+    ],
+    "colourings": [
+     1,
+     3
+    ]
+   },
+   {
+    "hm": "p3",
+    "orbifold": "333",
+    "film": [
+     1,
+     0
+    ],
+    "colourings": [
+     1,
+     0
+    ]
+   },
+   {
+    "hm": "p3m1",
+    "orbifold": "*333",
+    "film": [
+     1,
+     1
+    ],
+    "colourings": [
+     1,
+     1
+    ]
+   },
+   {
+    "hm": "p31m",
+    "orbifold": "3*3",
+    "film": [
+     1,
+     1
+    ],
+    "colourings": [
+     1,
+     1
+    ]
+   },
+   {
+    "hm": "p6",
+    "orbifold": "632",
+    "film": [
+     1,
+     1
+    ],
+    "colourings": [
+     1,
+     1
+    ]
+   },
+   {
+    "hm": "p6m",
+    "orbifold": "*632",
+    "film": [
+     1,
+     3
+    ],
+    "colourings": [
+     1,
+     3
+    ]
+   }
+  ],
+  "matchesMagneticPlaneGroups": true
+ },
  "fibres": {
   "types": 194,
   "sizeCounts": {

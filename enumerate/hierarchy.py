@@ -199,6 +199,19 @@ def phase(value) -> Fraction:
     return exact % 1
 
 
+def has_pure_reversal(group) -> bool:
+    """Does G contain a reversal that acts trivially on space?
+
+    Such an element is (x, t) -> (x, -t + tau0): the film played backwards is
+    itself, with nothing moved. Its presence is what stops the clock from
+    colouring the projection, because then the map G -> Isom(S^1) is not
+    trivial on the kernel of the spatial projection and so does not descend.
+    """
+    return any(o["M"] == [[1, 0], [0, 1]] and phase(o["v"][0]) == 0
+               and phase(o["v"][1]) == 0 and o["s"] == -1
+               for o in group["render"]["ops"])
+
+
 def clock_image(group) -> tuple[int, bool]:
     """The image of a film group in Isom(S^1), as (N, contains a reversal).
 
@@ -227,7 +240,8 @@ def build(groups):
         it = PINNED_IT[int(g["id"][1:])]
         rows.append(dict(id=g["id"], symbol=g["symbol"], symbolHtml=g["symbolHtml"],
                          base=g["base"], system=g["system"], product=g["product"],
-                         forward=g["forward"], clock=n, reversing=reversing, it=it))
+                         forward=g["forward"], clock=n, reversing=reversing, it=it,
+                         pureReversal=has_pure_reversal(g)))
         if reversing == g["forward"]:
             raise AssertionError(f"{g['id']}: forward flag disagrees with its operations")
     return rows
@@ -274,6 +288,60 @@ def report(rows):
              dihedral=sum(1 for r in rows if r["reversing"] and r["clock"] == n))
         for n in (1, 2, 3, 4, 6)
     ]
+
+    # --- which colouring of the projection a film group induces ------------
+    #
+    # Write Phi: G -> Isom(S^1) for the action on the loop. Phi descends to the
+    # projected wallpaper group exactly when no element acts trivially on space
+    # and non-trivially on time, i.e. when G has no pure time reversal; the
+    # colours are then the cosets of ker Phi and the colour group is the image.
+    # D_1 is cyclic of order 2, so it colours as well as C_N does — the colour
+    # is the direction of time rather than a phase. That row is the answer to
+    # "regular cyclic colour group, yet the film runs backwards".
+    def kind(r):
+        if not r["reversing"]:
+            return "cyclic"
+        if r["pureReversal"]:
+            return "none"
+        return "antisymmetry" if r["clock"] == 1 else "dihedral"
+
+    kinds = collections.Counter(kind(r) for r in rows)
+    data["colouringKinds"] = [
+        dict(key="cyclic", image="C<sub>N</sub>", descends=True,
+             colourGroup="C<sub>N</sub>, regular", colour="phase",
+             count=kinds["cyclic"]),
+        dict(key="antisymmetry", image="D<sub>1</sub>", descends=True,
+             colourGroup="C<sub>2</sub>, regular", colour="direction of time",
+             count=kinds["antisymmetry"]),
+        dict(key="dihedral", image="D<sub>N</sub>, N&nbsp;≥&nbsp;2", descends=True,
+             colourGroup="D<sub>N</sub> on 2N colours", colour="phase and direction",
+             count=kinds["dihedral"]),
+        dict(key="none", image="C<sub>N</sub> or D<sub>N</sub>", descends=False,
+             colourGroup="—", colour="—", count=kinds["none"]),
+    ]
+    data["regularCyclicTotal"] = kinds["cyclic"] + kinds["antisymmetry"]
+
+    # The groups with a pure time reversal. Conjugating a forward element by
+    # one negates its phase, so 2*tau lies in the loop lattice and the clock
+    # has order 1 or 2 — and per wallpaper group the counts are exactly the
+    # Senechal--Wieting numbers of cyclic subgroups of index 1 and 2, i.e. the
+    # 17 grey and 46 black-white plane groups.
+    pure = [r for r in rows if r["pureReversal"]]
+    pure_by_base = {b: [sum(1 for r in pure if r["base"] == b and r["clock"] == n)
+                        for n in (1, 2)] for b in BASE_ORDER}
+    data["pureReversal"] = dict(
+        count=len(pure),
+        byClock={str(n): sum(1 for r in pure if r["clock"] == n) for n in (1, 2)},
+        byBase=[dict(hm=b, orbifold=ORBIFOLD[b], film=pure_by_base[b],
+                     colourings=list(CYCLIC_BY_BASE[b][:2])) for b in BASE_ORDER],
+        matchesMagneticPlaneGroups=all(
+            pure_by_base[b] == list(CYCLIC_BY_BASE[b][:2]) for b in BASE_ORDER),
+    )
+    assert {r["clock"] for r in pure} <= {1, 2}, \
+        "a pure time reversal forces a clock of order 1 or 2"
+    assert data["pureReversal"]["matchesMagneticPlaneGroups"], \
+        "the pure-reversal groups do not match the magnetic plane groups base by base"
+    assert sum(k["count"] for k in data["colouringKinds"]) == len(rows)
 
     # --- forgetting which axis is time -------------------------------------
     fibre = collections.defaultdict(list)
@@ -370,6 +438,13 @@ def print_report(data):
     print("\nclock image      " + "".join(f"{n:>6}" for n in (1, 2, 3, 4, 6)))
     print("  C_N (forward)  " + "".join(f"{r['cyclic']:>6}" for r in data["phaseImage"]))
     print("  D_N (reversal) " + "".join(f"{r['dihedral']:>6}" for r in data["phaseImage"]))
+    print("\ncolouring induced on the projection")
+    for k in data["colouringKinds"]:
+        print(f"  {k['key']:<13} {k['count']:>4}")
+    print(f"  regular cyclic in total: {data['regularCyclicTotal']}")
+    p = data["pureReversal"]
+    print(f"  pure time reversal: {p['count']} = {p['byClock']['1']} + "
+          f"{p['byClock']['2']}, matching the grey and black-white plane groups")
     print("\nfibres of 'forget which axis is time'")
     for row in data["fibres"]["bySystem"]:
         print(f"  {row['system']:<13} {row['types']:>4} types  {row['films']:>4} films  "
