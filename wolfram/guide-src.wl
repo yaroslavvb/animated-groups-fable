@@ -1,5 +1,6 @@
 (* guide-src.wl — the renderer embedded verbatim into FilmGroupsGuide.nb by
-   make-guide.wls. It assumes $FG (the catalog) is already defined.
+   make-guide.wls. It is self-contained: a frame is drawn from one group's
+   Association, and nothing here reaches the catalog.
 
    A port of docs/js/renderer.js. Canvas convention there is y-DOWN; here the
    pixel basis keeps y up, the motif outline is reflected once at build time,
@@ -138,14 +139,12 @@ FG$col = <|"Body" -> RGBColor[219/255, 230/255, 242/255],
   "BeatOff" -> RGBColor[179/255, 170/255, 150/255],
   "Background" -> RGBColor[250/255, 249/255, 246/255]|>;
 
-(* g: a catalog id ("g248"), a notation symbol, or a spec Association *)
-FG$spec[g_String] := FG$spec[g] =
-  Lookup[$FG, g, SelectFirst[Values[$FG], #["Symbol"] === g &, $Failed]];
-FG$spec[a_Association] := a;
-
-FilmGroupFrame[g_, t_, size : {w_, h_} : {680, 300}] := Module[
-  {spec = FG$spec[g], cell, b1, b2, r, n, binv, ms, m1r, m2r, place, prim},
-  If[! AssociationQ[spec], Return[$Failed]];
+(* spec: one group's Association, straight from the catalog. Deliberately NOT
+   a lookup by name: a name would have to reach the whole catalog, and
+   SaveDefinitions saves whole symbols, so every stored output in the notebook
+   would then carry all 275 groups. FilmGroup["g248"] does the lookup. *)
+FilmGroupFrame[spec_Association, t_, size : {w_, h_} : {680, 300}] := Module[
+  {cell, b1, b2, r, n, binv, ms, m1r, m2r, place, prim},
   cell = FG$cell[spec, size];
   {b1, b2} = cell spec["Basis"];
   r = FG$radius[spec, cell];

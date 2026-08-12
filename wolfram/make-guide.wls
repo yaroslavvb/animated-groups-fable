@@ -39,17 +39,30 @@ entry[g_] := StringJoin[
   ",\"Point\"->", wl[num /@ g["render"]["base"]],
   ",\"Ops\"->", wl[opWL /@ g["render"]["ops"]], "|>"];
 
-dataCell = StringJoin["$FG=<|\n",
-  StringRiffle[entry /@ groups, ",\n"], "\n|>;"];
-
-(* the 17 wallpaper groups, orbifold name and count, in the atlas's order *)
+(* the 17 wallpaper groups, orbifold and IT name, in the atlas's order *)
 wps = {{"p1", "o"}, {"p2", "2222"}, {"pm", "**"}, {"pg", "\[Times]\[Times]"},
   {"cm", "*\[Times]"}, {"pmm", "*2222"}, {"pmg", "22*"}, {"pgg", "22\[Times]"},
   {"cmm", "2*22"}, {"p4", "442"}, {"p4m", "*442"}, {"p4g", "4*2"},
   {"p3", "333"}, {"p3m1", "*333"}, {"p31m", "3*3"}, {"p6", "632"},
   {"p6m", "*632"}};
 
+hms = wps[[All, 1]];
+
 wpCell = "$WP=" <> wl[wps] <> ";";
+
+(* The catalog goes in as SEVENTEEN associations, one per wallpaper, and $FG
+   is their join. That split is what keeps the evaluated notebook small: each
+   section's Manipulate mentions only its own FG$<name>, and SaveDefinitions
+   saves whole symbols, so a single shared $FG would put all 275 groups into
+   all 17 stored outputs — a 4 MB notebook to say what fits in well under
+   one. Nothing the viewers touch may reach $FG for the same reason; it is
+   here for reading the catalog by hand. *)
+wpData[hm_] := StringJoin["FG$", hm, "=<|\n",
+  StringRiffle[entry /@ Select[groups, #["base"] === hm &], ",\n"], "\n|>;"];
+
+dataCell = StringJoin[
+  StringRiffle[wpData /@ hms, "\n\n"],
+  "\n\n$FG=Join[", StringRiffle["FG$" <> # & /@ hms, ","], "];"];
 
 src = Import[srcPath, "Text"];
 (* the build-time header of the source file is not wanted in the notebook *)
@@ -64,38 +77,57 @@ src = StringTrim@StringDrop[src, StringPosition[src, "*)"][[1, 2]]];
    never evaluates the notebook. *)
 helpers = "\
 (* --------------------------------------------------------------- tabs *)
-(* Tab order, as in the atlas: the groups that do something with time first,
-   the trivial clock (identical to its wallpaper group) last of that run and
-   greyed, then the groups with time reversal. *)
-FG$rank[g_] := Which[! g[\"Forward\"], 2, g[\"Product\"], 1, True, 0];
-
-FG$over[w_] := SortBy[Select[Keys[$FG], $FG[#][\"Base\"] === w &],
-  {FG$rank[$FG[#]] &, ToExpression@StringDrop[#, 1] &}];
+(* Every film group over a wallpaper EXCEPT its trivial clock: the one whose
+   symbol is just the wallpaper's own orbifold name, a spatial group carrying
+   a time coordinate it does nothing with. There is exactly one per wallpaper,
+   so this leaves 258 of the 275. Forward groups first, then time reversal. *)
+FG$over[w_] := SortBy[
+  Select[Keys[$FG],
+    $FG[#][\"Base\"] === w && ! ($FG[#][\"Forward\"] && $FG[#][\"Product\"]) &],
+  {If[$FG[#][\"Forward\"], 0, 1] &, ToExpression@StringDrop[#, 1] &}];
 
 FG$tabs = Association[# -> FG$over[#] & /@ $WP[[All, 1]]];
 
-FG$label[g_] := Style[$FG[g][\"Symbol\"],
-  Which[$FG[g][\"Product\"] && $FG[g][\"Forward\"], GrayLevel[0.6],
-        $FG[g][\"Forward\"], RGBColor[0.18, 0.42, 0.27],
-        True, GrayLevel[0.3]]];
+(* The tab captions, worked out now: green for a group that only moves
+   forward in time, grey for one with a time reversal. Finished Style
+   expressions rather than a function of $FG, so that reading a caption does
+   not drag the whole catalog into every stored output. *)
+FG$labels = Association[# -> Style[$FG[#][\"Symbol\"],
+    If[$FG[#][\"Forward\"], RGBColor[0.18, 0.42, 0.27], GrayLevel[0.3]]] & /@
+  Flatten[Values[FG$tabs]]];
 
-(* what a wallpaper's tab row shows until the reader picks something else.
-   A default DownValue, not an assignment made while the viewer runs: the
-   SetterBar's click writes FG$pick[w] and that specific value then wins. *)
-FG$pick[w_] := First[FG$tabs[w]];";
+(* for reading the catalog by hand: FilmGroupFrame[FilmGroup[\"g248\"], 0.3] *)
+FilmGroup[g_String] := Lookup[$FG, g,
+  SelectFirst[Values[$FG], #[\"Symbol\"] === g &, $Failed]];
 
-viewer = "\
+(* what a section shows until the reader picks something else. A default
+   DownValue, not an assignment made while the viewer runs: the SetterBar's
+   click writes FG$pick[w] and that specific value then wins. *)
+FG$pick[w_] := First[FG$tabs[w]];
+
+(* The tab rows, eight setters to a row at most. They all write the same
+   value, so whichever row holds the current group is the one that shows a
+   selection and the others show none — one exclusive choice across the
+   block, which a single SetterBar could not wrap onto several lines. *)
+FG$bar[w_] := Column[
+  SetterBar[Dynamic[FG$pick[w]], (# -> FG$labels[#]) & /@ #] & /@
+    Partition[FG$tabs[w], UpTo[8]],
+  Center, 0.3];";
+
+(* One of these per wallpaper. The clock starts stopped -- AnimationRunning ->
+   False -- with a progress slider to scrub by hand, and TrackedSymbols :> {}
+   keeps the body from being rebuilt on every tick: the tab rows are static
+   and the frame is already inside its own Dynamic. *)
+viewerFor[hm_] := StringReplace["\
 Manipulate[
-  Column[{
-    SetterBar[Dynamic[FG$pick[w]], (# -> FG$label[#]) & /@ FG$tabs[w]],
-    Dynamic@FilmGroupFrame[FG$pick[w], t, {660, 300}]},
+  Column[{FG$bar[\"WP\"],
+          Dynamic@FilmGroupFrame[FG$WP[FG$pick[\"WP\"]], t, {660, 300}]},
    Center, 1],
-  {{w, \"p6\", \"\"}, #[[1]] -> Row[{Style[#[[2]], Bold], \" \", #[[1]]}] & /@ $WP,
-    ControlType -> SetterBar},
   {{t, 0, \"t\"}, 0, 1, ControlType -> Animator, AnimationRate -> 1/4,
-    AppearanceElements -> {\"PlayPauseButton\"}},
-  TrackedSymbols :> {w},   (* the clock redraws the frame, not the tab row *)
-  SaveDefinitions -> True, ControlPlacement -> Top]";
+    AnimationRunning -> False,
+    AppearanceElements -> {\"ProgressSlider\", \"PlayPauseButton\"}},
+  TrackedSymbols :> {}, SaveDefinitions -> True, ControlPlacement -> Top]",
+  "WP" -> hm];
 
 (* ----------------------------------------------------------- notebook *)
 refs = "T. J. Fletcher, Film Groups, Math. Gazette 40 (1956) 15\[Dash]19, \
@@ -121,32 +153,46 @@ Atlas and source: https://yaroslavvb.github.io/animated-groups-fable \
    Answering it costs one click and about a twentieth of a second. *)
 initCell = StringRiffle[{dataCell, wpCell, src, helpers}, "\n\n"];
 
+(* one section per wallpaper group, headed by its orbifold and IT names *)
+sectionFor[{hm_, orb_}] := Cell[CellGroupData[{
+  Cell[orb <> " \[CenterDot] " <> hm, "Subsection"],
+  Cell[viewerFor[hm], "Input"]}, Open]];
+
 cells = {
   Cell["Film groups", "Title"],
-  Cell["The 275 space-time groups of the plane, by wallpaper group. \
-Evaluate the animation below.", "Text"],
+  Cell["258 space-time groups of the plane, by wallpaper group \[LongDash] \
+the 17 that do nothing with time are left out. Evaluate the notebook.", "Text"],
   Cell[refs, "Text"],
   Cell[CellGroupData[{
     Cell["Catalog and renderer", "Section"],
     Cell[initCell, "Input", InitializationCell -> True]}, Closed]],
-  Cell["The 17 wallpaper groups", "Section"],
-  Cell[viewer, "Input"]};
+  Cell[CellGroupData[
+    Prepend[sectionFor /@ wps, Cell["The 17 wallpaper groups", "Section"]],
+    Open]]};
 
-nb = Notebook[cells, StyleDefinitions -> "Default.nb", WindowSize -> {1000, 800},
+(* wide enough for a full row of eight tabs: the longest of them, p6m's, comes
+   to about 1260 pixels *)
+nb = Notebook[cells, StyleDefinitions -> "Default.nb", WindowSize -> {1320, 850},
   InitializationCellEvaluation -> True];
 Export[outPath, nb, "NB"];
 Print["wrote ", outPath, "  ", FileByteCount[outPath], " bytes"];
 
 back = Get[outPath];
 Print["round-trips: ", Head[back] === Notebook, "   cells: ", Length[First[back]]];
+views = Cases[back, c : Cell[s_String, "Input", ___] /; FreeQ[c, InitializationCell] :> s,
+  Infinity];
 Print["init cells: ",
   Length@Cases[back, Cell[_String, "Input", ___, InitializationCell -> True, ___], Infinity],
-  "   plain Input cells: ",
-  Length@Cases[back, c : Cell[_String, "Input", ___] /; FreeQ[c, InitializationCell], Infinity]];
+  "   section cells: ", Length[views],
+  "   subsections: ", Length@Cases[back, Cell[_, "Subsection", ___], Infinity]];
 (* Options[Notebook[...]] reports the SYMBOL's options, not the expression's,
    so check the notebook expression itself *)
 Print["evaluates on open: ", ! FreeQ[back, InitializationCellEvaluation -> True],
-  "   viewer cell is only the Manipulate: ",
-  StringStartsQ[StringTrim@Last@Cases[
-    back, c : Cell[s_String, "Input", ___] /; FreeQ[c, InitializationCell] :> s, Infinity],
-    "Manipulate["]];
+  "   every section cell is only a Manipulate: ",
+  AllTrue[views, StringStartsQ[StringTrim[#], "Manipulate["] &],
+  "   none animate on arrival: ",
+  AllTrue[views, StringContainsQ[#, "AnimationRunning -> False"] &],
+  "   all save definitions: ",
+  AllTrue[views, StringContainsQ[#, "SaveDefinitions -> True"] &]];
+Print["wallpapers covered: ",
+  Union@Flatten@StringCases[views, "FG$bar[\"" ~~ w : WordCharacter .. ~~ "\"]" :> w]];
