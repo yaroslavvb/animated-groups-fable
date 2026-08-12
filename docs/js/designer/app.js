@@ -21,6 +21,7 @@
  * always agree about which instant is on screen.
  */
 "use strict";
+import { xuLabel } from "../labels.js?v=38";
 import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=38";
 import { scan } from "./collide.js?v=38";
 import { encode, decode, LIMITS } from "./urlstate.js?v=38";
@@ -788,7 +789,11 @@ window.addEventListener("hashchange", () => {
 function buildGroups() {
   const host = el("groups");
   const parts = [];
-  for (const n of [3, 4, 6]) {
+  // The orders come from the data, not from a literal. This list read
+  // [3, 4, 6] and so hid every clock-order-2 group — thirty-six of the
+  // fifty-one, g6 among them — which made the menu look like a claim that
+  // they are not clockwork groups at all.
+  for (const n of groups.orders) {
     parts.push(`<p class="head">${n} colours</p>`);
     const list = groups.byColors.get(n);
     const seen = [];
@@ -803,7 +808,7 @@ function buildGroups() {
           `<div class="grow"><button type="button" class="grp" data-g="${g.id}">` +
           `<span class="sig">${g.signatureHtml}</span>` +
           `<span class="fab">${g.fableHtml}</span>` +
-          `<span class="par">${g.id}</span></button>` +
+          `<span class="par">${xuLabel(g.id)}</span></button>` +
           `<a class="ext" href="${esc(g.correspondenceUrl)}" target="_blank" ` +
           `rel="noopener" title="this group in the correspondence table">↗</a></div>`);
       }

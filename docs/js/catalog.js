@@ -5,14 +5,14 @@
  * (group.html?g=…) — picture and caption both — and the card's control bar
  * keeps play/pause and scrubbing in place. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=36";
-import { attachControls } from "./controls.js?v=36";
-import { WALLPAPERS } from "./wallpaper-data.js?v=36";
-import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=36";
+import { FilmGroupAnimation } from "./renderer.js?v=38";
+import { attachControls } from "./controls.js?v=38";
+import { WALLPAPERS } from "./wallpaper-data.js?v=38";
+import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=38";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=36";
+import { attachStage } from "./stage.js?v=38";
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -148,7 +148,12 @@ function render() {
       `<span class="tag">${g.system}</span>` +
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      (g.forward ? "" : `<span class="tag rev">time reversal</span>`) +
+      // Time direction is stated BOTH ways. Marking only the reversal groups
+      // left the 68 forward ones with nothing to say they run one way, on a
+      // page whose own filter offers "clockwork (forward time)" — so a
+      // clockwork group's card looked like a card that had failed to be one.
+      (g.forward ? `<span class="tag fwd">clockwork</span>`
+                 : `<span class="tag rev">time reversal</span>`) +
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);

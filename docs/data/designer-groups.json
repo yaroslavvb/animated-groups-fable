@@ -1,10 +1,15 @@
 {
  "meta": {
-  "count": 15,
-  "selection": "forward film groups with clock order >= 3",
+  "count": 51,
+  "selection": "forward film groups with clock order >= 2",
+  "colorOrders": [
+   2,
+   3,
+   4,
+   6
+  ],
   "notation": "book_color_signature from The Symmetries of Things (Conway, Burgiel, Goodman-Strauss 2008)",
-  "source": "https://github.com/yaroslavvb/animated-groups data/clockwork-coloring-correspondence.json",
-  "sourceSchemaVersion": 5,
+  "source": "data/xu-correspondence.json",
   "palette": [
    "#0072B2",
    "#E69F00",
@@ -14,6 +19,44 @@
    "#56B4E9"
   ],
   "byColors": {
+   "2": [
+    "g55",
+    "g60",
+    "g64",
+    "g65",
+    "g74",
+    "g231",
+    "g129",
+    "g130",
+    "g131",
+    "g136",
+    "g138",
+    "g269",
+    "g270",
+    "g271",
+    "g9",
+    "g69",
+    "g70",
+    "g71",
+    "g72",
+    "g73",
+    "g57",
+    "g61",
+    "g62",
+    "g66",
+    "g67",
+    "g6",
+    "g7",
+    "g59",
+    "g63",
+    "g233",
+    "g133",
+    "g134",
+    "g135",
+    "g95",
+    "g98",
+    "g246"
+   ],
    "3": [
     "g225",
     "g226",
@@ -131,7 +174,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -254,7 +297,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -485,7 +528,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -904,7 +947,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -1102,7 +1145,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -1310,7 +1353,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -1484,7 +1527,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -1640,7 +1683,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -1868,7 +1911,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -2253,7 +2296,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -2642,7 +2685,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -3031,7 +3074,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -3464,7 +3507,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -3668,7 +3711,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -3882,7 +3925,7 @@
    ],
    "generators": [
     {
-     "expr": "t(1,0 | 0) t(0,1 | 0) t(0,0 | 1)",
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
      "note": "lattice"
     },
     {
@@ -3940,6 +3983,7995 @@
      "operation": "5/6-turn rotation (300°)",
      "phase": "1/6",
      "timeShift": "+1/6 period"
+    }
+   ]
+  },
+  {
+   "id": "g55",
+   "n": 2,
+   "signature": "*²2²2²2²2",
+   "signatureHtml": "*<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*~2~2~2~2",
+   "fableHtml": "*~2~2~2~2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g55",
+   "catalogUrl": "group.html?g=g55",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g60",
+   "n": 2,
+   "signature": "*¹2²2¹2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>2</sup>2<sup>1</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*2₁~2₁2₁~2₁",
+   "fableHtml": "*2<sub>1</sub>~2<sub>1</sub>2<sub>1</sub>~2<sub>1</sub>",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "**",
+   "kernelHm": "pm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g60",
+   "catalogUrl": "group.html?g=g60",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g64",
+   "n": 2,
+   "signature": "*¹2¹2¹2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c*222₁2₁ᵃ",
+   "fableHtml": "c*222<sub>1</sub>2<sub>1</sub><sup>a</sup>",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g64",
+   "catalogUrl": "group.html?g=g64",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.204541
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g65",
+   "n": 2,
+   "signature": "*¹2²2²2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c*222₁2₁ᵇ",
+   "fableHtml": "c*222<sub>1</sub>2<sub>1</sub><sup>b</sup>",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g65",
+   "catalogUrl": "group.html?g=g65",
+   "basis": [
+    [
+     0.0,
+     -1.0
+    ],
+    [
+     2.204541,
+     -0.0
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g74",
+   "n": 2,
+   "signature": "*¹2¹2²2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c*22₁22₁",
+   "fableHtml": "c*22<sub>1</sub>22<sub>1</sub>",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g74",
+   "catalogUrl": "group.html?g=g74",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "t(1/2,0 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "t(1/2,1/2 | 0)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "D",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g231",
+   "n": 2,
+   "signature": "*²3²3²3",
+   "signatureHtml": "*<sup>2</sup>3<sup>2</sup>3<sup>2</sup>3",
+   "cyclic": "C_2",
+   "fable": "*~3~3~3",
+   "fableHtml": "*~3~3~3",
+   "parentOrbifold": "*333",
+   "parentHm": "p3m1",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "system": "Trigonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g231",
+   "catalogUrl": "group.html?g=g231",
+   "basis": [
+    [
+     0.5,
+     -0.866025403784
+    ],
+    [
+     0.5,
+     0.866025403784
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 1), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g129",
+   "n": 2,
+   "signature": "*¹4²4¹2",
+   "signatureHtml": "*<sup>1</sup>4<sup>2</sup>4<sup>1</sup>2",
+   "cyclic": "C_2",
+   "fable": "*4₂~4₂2",
+   "fableHtml": "*4<sub>2</sub>~4<sub>2</sub>2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g129",
+   "catalogUrl": "group.html?g=g129",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g130",
+   "n": 2,
+   "signature": "*²4¹4²2",
+   "signatureHtml": "*<sup>2</sup>4<sup>1</sup>4<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*~4₂4₂~2",
+   "fableHtml": "*~4<sub>2</sub>4<sub>2</sub>~2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g130",
+   "catalogUrl": "group.html?g=g130",
+   "basis": [
+    [
+     1.000000000001,
+     -0.0
+    ],
+    [
+     0.0,
+     1.000000000001
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g131",
+   "n": 2,
+   "signature": "*²4²4²2",
+   "signatureHtml": "*<sup>2</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*~4~4~2",
+   "fableHtml": "*~4~4~2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g131",
+   "catalogUrl": "group.html?g=g131",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g136",
+   "n": 2,
+   "signature": "*¹4¹4²2",
+   "signatureHtml": "*<sup>1</sup>4<sup>1</sup>4<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c*44₂2₁ᵃ",
+   "fableHtml": "c*44<sub>2</sub>2<sub>1</sub><sup>a</sup>",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "*442",
+   "kernelHm": "p4m",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g136",
+   "catalogUrl": "group.html?g=g136",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g138",
+   "n": 2,
+   "signature": "*¹4²4²2",
+   "signatureHtml": "*<sup>1</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c*44₂2₁ᵇ",
+   "fableHtml": "c*44<sub>2</sub>2<sub>1</sub><sup>b</sup>",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "4*2",
+   "kernelHm": "p4g",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g138",
+   "catalogUrl": "group.html?g=g138",
+   "basis": [
+    [
+     1.000000000001,
+     -0.0
+    ],
+    [
+     0.0,
+     1.000000000001
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g269",
+   "n": 2,
+   "signature": "*¹6²3²2",
+   "signatureHtml": "*<sup>1</sup>6<sup>2</sup>3<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*6₃~3~2₁",
+   "fableHtml": "*6<sub>3</sub>~3~2<sub>1</sub>",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "3*3",
+   "kernelHm": "p31m",
+   "system": "Hexagonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g269",
+   "catalogUrl": "group.html?g=g269",
+   "basis": [
+    [
+     0.866025403784,
+     0.499999999999
+    ],
+    [
+     -0.866025403784,
+     0.5
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (-1, 1)), s=1"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/6}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/6-turn rotation (60°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "4",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "5",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "5/6-turn rotation (300°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g270",
+   "n": 2,
+   "signature": "*²6²3²2",
+   "signatureHtml": "*<sup>2</sup>6<sup>2</sup>3<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "*~6~3~2",
+   "fableHtml": "*~6~3~2",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "632",
+   "kernelHm": "p6",
+   "system": "Hexagonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g270",
+   "catalogUrl": "group.html?g=g270",
+   "basis": [
+    [
+     0.5,
+     -0.866025403784
+    ],
+    [
+     0.5,
+     0.866025403785
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (-1, 1)), s=1"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/6-turn rotation (60°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "4",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "5",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "5/6-turn rotation (300°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g271",
+   "n": 2,
+   "signature": "*²6¹3¹2",
+   "signatureHtml": "*<sup>2</sup>6<sup>1</sup>3<sup>1</sup>2",
+   "cyclic": "C_2",
+   "fable": "*~6₃32₁",
+   "fableHtml": "*~6<sub>3</sub>32<sub>1</sub>",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "*333",
+   "kernelHm": "p3m1",
+   "system": "Hexagonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g271",
+   "catalogUrl": "group.html?g=g271",
+   "basis": [
+    [
+     0.5,
+     -0.866025403784
+    ],
+    [
+     0.5,
+     0.866025403784
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (-1, 1)), s=1"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/6}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/6-turn rotation (60°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "4",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "5",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "5/6-turn rotation (300°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g9",
+   "n": 2,
+   "signature": "*²×²",
+   "signatureHtml": "*<sup>2</sup>×<sup>2</sup>",
+   "cyclic": "C_2",
+   "fable": "~*×½",
+   "fableHtml": "~*×<sub>½</sub>",
+   "parentOrbifold": "*×",
+   "parentHm": "cm",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "system": "R-Monoclinic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g9",
+   "catalogUrl": "group.html?g=g9",
+   "basis": [
+    [
+     0.707106781187,
+     0.707106781187
+    ],
+    [
+     -0.707106781187,
+     0.707106781187
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((0, 1), (1, 0)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g69",
+   "n": 2,
+   "signature": "¹2*²2²2",
+   "signatureHtml": "<sup>1</sup>2*<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "2*~2~2",
+   "fableHtml": "2*~2~2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g69",
+   "catalogUrl": "group.html?g=g69",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.204541
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 0)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g70",
+   "n": 2,
+   "signature": "²2*¹2²2",
+   "signatureHtml": "<sup>2</sup>2*<sup>1</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "2₁*2₁~2₁",
+   "fableHtml": "2<sub>1</sub>*2<sub>1</sub>~2<sub>1</sub>",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "*×",
+   "kernelHm": "cm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g70",
+   "catalogUrl": "group.html?g=g70",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.204541
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 0)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g71",
+   "n": 2,
+   "signature": "²2*¹2¹2",
+   "signatureHtml": "<sup>2</sup>2*<sup>1</sup>2<sup>1</sup>2",
+   "cyclic": "C_2",
+   "fable": "c2₁*22ᵃ",
+   "fableHtml": "c2<sub>1</sub>*22<sup>a</sup>",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g71",
+   "catalogUrl": "group.html?g=g71",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.204541
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g72",
+   "n": 2,
+   "signature": "²2*²2²2",
+   "signatureHtml": "<sup>2</sup>2*<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c2₁*22ᵇ",
+   "fableHtml": "c2<sub>1</sub>*22<sup>b</sup>",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g72",
+   "catalogUrl": "group.html?g=g72",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     2.204541
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g73",
+   "n": 2,
+   "signature": "¹2*¹2²2",
+   "signatureHtml": "<sup>1</sup>2*<sup>1</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c2*2₁2₁",
+   "fableHtml": "c2*2<sub>1</sub>2<sub>1</sub>",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g73",
+   "catalogUrl": "group.html?g=g73",
+   "basis": [
+    [
+     -0.0,
+     -1.0
+    ],
+    [
+     0.498063,
+     0.0
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g57",
+   "n": 2,
+   "signature": "¹2¹2*²",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2*<sup>2</sup>",
+   "cyclic": "C_2",
+   "fable": "22~*",
+   "fableHtml": "22~*",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g57",
+   "catalogUrl": "group.html?g=g57",
+   "basis": [
+    [
+     0.0,
+     -1.0
+    ],
+    [
+     1.0,
+     0.0
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g61",
+   "n": 2,
+   "signature": "²2²2*²",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2*<sup>2</sup>",
+   "cyclic": "C_2",
+   "fable": "2₁2₁~*",
+   "fableHtml": "2<sub>1</sub>2<sub>1</sub>~*",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "××",
+   "kernelHm": "pg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g61",
+   "catalogUrl": "group.html?g=g61",
+   "basis": [
+    [
+     0.0,
+     -1.0
+    ],
+    [
+     1.0,
+     0.0
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g62",
+   "n": 2,
+   "signature": "²2²2*¹",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2*<sup>1</sup>",
+   "cyclic": "C_2",
+   "fable": "2₁2₁*",
+   "fableHtml": "2<sub>1</sub>2<sub>1</sub>*",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "**",
+   "kernelHm": "pm",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g62",
+   "catalogUrl": "group.html?g=g62",
+   "basis": [
+    [
+     0.0,
+     -1.0
+    ],
+    [
+     1.0,
+     0.0
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g66",
+   "n": 2,
+   "signature": "¹2²2*¹",
+   "signatureHtml": "<sup>1</sup>2<sup>2</sup>2*<sup>1</sup>",
+   "cyclic": "C_2",
+   "fable": "c22₁*ᵃ",
+   "fableHtml": "c22<sub>1</sub>*<sup>a</sup>",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g66",
+   "catalogUrl": "group.html?g=g66",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.498063
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 1/2,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g67",
+   "n": 2,
+   "signature": "¹2²2*²",
+   "signatureHtml": "<sup>1</sup>2<sup>2</sup>2*<sup>2</sup>",
+   "cyclic": "C_2",
+   "fable": "c22₁*ᵇ",
+   "fableHtml": "c22<sub>1</sub>*<sup>b</sup>",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g67",
+   "catalogUrl": "group.html?g=g67",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.498063
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 1/2,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "C",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g6",
+   "n": 2,
+   "signature": "²2²2²2²2",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "2₁2₁2₁2₁",
+   "fableHtml": "2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>2<sub>1</sub>",
+   "parentOrbifold": "2222",
+   "parentHm": "p2",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "system": "T-Monoclinic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g6",
+   "catalogUrl": "group.html?g=g6",
+   "basis": [
+    [
+     2.416829,
+     -1.416829
+    ],
+    [
+     -1.416829,
+     2.416829
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g7",
+   "n": 2,
+   "signature": "¹2¹2²2²2",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c222₁2₁",
+   "fableHtml": "c222<sub>1</sub>2<sub>1</sub>",
+   "parentOrbifold": "2222",
+   "parentHm": "p2",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "T-Monoclinic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g7",
+   "catalogUrl": "group.html?g=g7",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(0,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g59",
+   "n": 2,
+   "signature": "¹2¹2×²",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2×<sup>2</sup>",
+   "cyclic": "C_2",
+   "fable": "22×½",
+   "fableHtml": "22×<sub>½</sub>",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g59",
+   "catalogUrl": "group.html?g=g59",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 1/2,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g63",
+   "n": 2,
+   "signature": "²2²2×¹",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2×<sup>1</sup>",
+   "cyclic": "C_2",
+   "fable": "2₁2₁×",
+   "fableHtml": "2<sub>1</sub>2<sub>1</sub>×",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "××",
+   "kernelHm": "pg",
+   "system": "Orthorhombic",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g63",
+   "catalogUrl": "group.html?g=g63",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 1/2,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/2}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g233",
+   "n": 2,
+   "signature": "¹3*²3",
+   "signatureHtml": "<sup>1</sup>3*<sup>2</sup>3",
+   "cyclic": "C_2",
+   "fable": "3*~3",
+   "fableHtml": "3*~3",
+   "parentOrbifold": "3*3",
+   "parentHm": "p31m",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "system": "Trigonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g233",
+   "catalogUrl": "group.html?g=g233",
+   "basis": [
+    [
+     0.866025403784,
+     0.499999999999
+    ],
+    [
+     -0.866025403784,
+     0.5
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (-1, 1)), s=1"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "reflection",
+     "operation": "Mirror reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g133",
+   "n": 2,
+   "signature": "²4*²2",
+   "signatureHtml": "<sup>2</sup>4*<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "4₂*~2",
+   "fableHtml": "4<sub>2</sub>*~2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g133",
+   "catalogUrl": "group.html?g=g133",
+   "basis": [
+    [
+     1.000000000001,
+     -0.0
+    ],
+    [
+     0.0,
+     1.000000000001
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 1/2,1/2 | 0 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "0",
+     "timeShift": "none"
+    }
+   ]
+  },
+  {
+   "id": "g134",
+   "n": 2,
+   "signature": "²4*¹2",
+   "signatureHtml": "<sup>2</sup>4*<sup>1</sup>2",
+   "cyclic": "C_2",
+   "fable": "4₂*2",
+   "fableHtml": "4<sub>2</sub>*2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g134",
+   "catalogUrl": "group.html?g=g134",
+   "basis": [
+    [
+     1.000000000001,
+     -0.0
+    ],
+    [
+     0.0,
+     1.000000000001
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 1/2,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 0 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2}) (m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g135",
+   "n": 2,
+   "signature": "¹4*²2",
+   "signatureHtml": "<sup>1</sup>4*<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "4*~2",
+   "fableHtml": "4*~2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g135",
+   "catalogUrl": "group.html?g=g135",
+   "basis": [
+    [
+     1.000000000001,
+     -0.0
+    ],
+    [
+     0.0,
+     1.000000000001
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( m | 1/2,1/2 | 1/2 )",
+     "note": "M=((-1, 0), (0, 1)), s=1"
+    },
+    {
+     "expr": "( m | 0,0 | 1/2 )",
+     "note": "M=((0, -1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(m|T_t^{1/2}T_s^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "glide",
+     "operation": "Glide reflection",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g95",
+   "n": 2,
+   "signature": "²4²4¹2",
+   "signatureHtml": "<sup>2</sup>4<sup>2</sup>4<sup>1</sup>2",
+   "cyclic": "C_2",
+   "fable": "4₂4₂2",
+   "fableHtml": "4<sub>2</sub>4<sub>2</sub>2",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g95",
+   "catalogUrl": "group.html?g=g95",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R90 | 0,0 | 1/2 )",
+     "note": "M=((0, -1), (1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g98",
+   "n": 2,
+   "signature": "¹4²4²2",
+   "signatureHtml": "<sup>1</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "c44₂2₁",
+   "fableHtml": "c44<sub>2</sub>2<sub>1</sub>",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "system": "Tetragonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g98",
+   "catalogUrl": "group.html?g=g98",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     0,
+     1
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.5,
+      0.5
+     ],
+     "s": 1,
+     "tau": 0.5
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "t(1/2,1/2 | 1/2)",
+     "note": "centring"
+    },
+    {
+     "expr": "( R180 | 0,0 | 0 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R90 | 0,0 | 0 )",
+     "note": "M=((0, -1), (1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/4}|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/4-turn rotation (90°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "B",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "B",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "3/4-turn rotation (270°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    }
+   ]
+  },
+  {
+   "id": "g246",
+   "n": 2,
+   "signature": "²6¹3²2",
+   "signatureHtml": "<sup>2</sup>6<sup>1</sup>3<sup>2</sup>2",
+   "cyclic": "C_2",
+   "fable": "6₃32₁",
+   "fableHtml": "6<sub>3</sub>32<sub>1</sub>",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "system": "Hexagonal",
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g246",
+   "catalogUrl": "group.html?g=g246",
+   "basis": [
+    [
+     1,
+     0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "ops": [
+    {
+     "M": [
+      [
+       -1,
+       0
+      ],
+      [
+       0,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       -1,
+       1
+      ],
+      [
+       -1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       -1
+      ],
+      [
+       1,
+       -1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    },
+    {
+     "M": [
+      [
+       0,
+       1
+      ],
+      [
+       -1,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       -1
+      ],
+      [
+       1,
+       0
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.5
+    },
+    {
+     "M": [
+      [
+       1,
+       0
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "v": [
+      0.0,
+      0.0
+     ],
+     "s": 1,
+     "tau": 0.0
+    }
+   ],
+   "generators": [
+    {
+     "expr": "t(1,0 | 0)   t(0,1 | 0)   t(0,0 | 1)",
+     "note": "lattice"
+    },
+    {
+     "expr": "( R180 | 0,0 | 1/2 )",
+     "note": "M=((-1, 0), (0, -1)), s=1"
+    },
+    {
+     "expr": "( R120 | 0,0 | 0 )",
+     "note": "M=((-1, 1), (-1, 0)), s=1"
+    }
+   ],
+   "hm": "(R_{2π/6}|T_t^{1/2})",
+   "geometricOps": [
+    {
+     "generator": "A",
+     "power": "1",
+     "role": "generator",
+     "kind": "rotation",
+     "operation": "1/6-turn rotation (60°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "2",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "1/3-turn rotation (120°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "3",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "Half-turn rotation (180°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
+    },
+    {
+     "generator": "A",
+     "power": "4",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "2/3-turn rotation (240°)",
+     "phase": "0",
+     "timeShift": "none"
+    },
+    {
+     "generator": "A",
+     "power": "5",
+     "role": "power",
+     "kind": "rotation",
+     "operation": "5/6-turn rotation (300°)",
+     "phase": "1/2",
+     "timeShift": "+1/2 period"
     }
    ]
   }

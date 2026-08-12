@@ -486,10 +486,24 @@ def _off_spacing(a, am, lat2):
 
 def _gl_spacing(a, lat2):
     """Generator of the intersection of the lattice with the axis direction:
-    the glide component of a reflection is defined modulo this."""
-    # smallest positive gl with gl*a in lat2: search small rational multiples
-    for q in (Fraction(1, 2), Fraction(1), Fraction(3, 2), Fraction(2),
-              Fraction(3)):
+    the glide component of a reflection is defined modulo this.
+
+    The step has to be the SMALLEST q with q*a in the lattice, and it is not
+    always a half-integer: a centred lattice puts thirds and quarters on the
+    axis too. The earlier version searched a fixed ladder starting at 1/2 and
+    returned the first hit, so for the 1/3-centred trigonal groups it answered
+    1 where the truth is 1/3 — a wrong modulus, which would book a pure mirror
+    with glide component 1/3 as a glide. It happens to change no entry in the
+    current catalogue (checked: all 275 identical either way), but the modulus
+    is wrong on its own terms, so it is computed rather than guessed: the
+    candidate denominators are those the lattice's own coordinates carry."""
+    dens = {Fraction(c).denominator for v in _lat_gens(lat2) for c in v}
+    dens |= {Fraction(c).denominator for c in a}
+    step = 1
+    for d in dens:
+        step = step * d // math.gcd(step, d)
+    for k in range(1, 6 * step + 1):
+        q = Fraction(k, step)
         if lat2.contains([q * a[0], q * a[1]]):
             return q
     raise ValueError("no axis step found")

@@ -6,10 +6,10 @@
  * the viewer has started, which also covers tab switches (a hidden pane never
  * intersects). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=36";
-import { attachControls } from "./controls.js?v=36";
-import { attachStage } from "./stage.js?v=36";
-import { groupCaption, isTrivialClock } from "./wallpaper-data.js?v=36";
+import { FilmGroupAnimation } from "./renderer.js?v=38";
+import { attachControls } from "./controls.js?v=38";
+import { attachStage } from "./stage.js?v=38";
+import { groupCaption, isTrivialClock } from "./wallpaper-data.js?v=38";
 
 const anims = new Map();
 const observer = new IntersectionObserver((entries) => {
@@ -69,7 +69,9 @@ export function buildTabs(host, items, opts = {}) {
       brk.setAttribute("aria-hidden", "true");
       bar.append(brk);
     }
-    btn.innerHTML = item.g ? item.g.symbolHtml : item.sym;
+    btn.innerHTML = item.g
+      ? (opts.label ? opts.label(item.g) : item.g.symbolHtml)
+      : item.sym;
     const pane = document.createElement("div");
     pane.className = "tabpane";
     if (!item.g) {

@@ -162,8 +162,10 @@ export async function loadGroups(url = "data/designer-groups.json") {
   const data = await res.json();
   const groups = data.groups;
   const byId = new Map(groups.map((g) => [g.id, g]));
-  const byColors = new Map();
-  for (const n of [3, 4, 6]) byColors.set(n, groups.filter((g) => g.n === n));
+  // Which clock orders exist is the data's business. Hard-coding [3, 4, 6]
+  // here was one of the two places that hid the clock-order-2 groups.
+  const orders = [...new Set(groups.map((g) => g.n))].sort((a, b) => a - b);
+  const byColors = new Map(orders.map((n) => [n, groups.filter((g) => g.n === n)]));
 
   // The palette is baked in above; if the data file ever moves, say so loudly
   // rather than drawing a design in colours nobody chose.
@@ -171,7 +173,7 @@ export async function loadGroups(url = "data/designer-groups.json") {
   if (meta.length !== PALETTE.length || meta.some((c, i) => c !== PALETTE[i])) {
     throw new Error("designer groups: meta.palette no longer matches PALETTE");
   }
-  return { groups, byId, byColors, meta: data.meta };
+  return { groups, byId, byColors, orders, meta: data.meta };
 }
 
 export class Design {

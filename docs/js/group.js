@@ -7,11 +7,11 @@
  * same list rather than the whole 275.
  */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=36";
-import { attachControls } from "./controls.js?v=36";
-import { attachStage } from "./stage.js?v=36";
-import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=36";
-import { passes, groupHref } from "./filters.js?v=36";
+import { FilmGroupAnimation } from "./renderer.js?v=38";
+import { attachControls } from "./controls.js?v=38";
+import { attachStage } from "./stage.js?v=38";
+import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=38";
+import { passes, groupHref } from "./filters.js?v=38";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
@@ -63,7 +63,7 @@ function render(g) {
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? `<span class="tag">symmorphic</span>`
                     : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      (g.forward ? `<span class="tag">clockwork</span>`
+      (g.forward ? `<span class="tag fwd">clockwork</span>`
                  : `<span class="tag rev">time reversal</span>`) +
       (g.product ? `<span class="tag">product type</span>`
                  : `<span class="tag nonsym">not a product</span>`) +

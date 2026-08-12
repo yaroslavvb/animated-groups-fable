@@ -4,9 +4,25 @@
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=36";
-import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=36";
+import { buildTabs } from "./tabs.js?v=38";
+import { WALLPAPERS, sectionSort, censusSentence, timeStory, setSignatures, signatureOf }
+  from "./wallpaper-data.js?v=38";
+
+/* The book's colour signatures for the forward groups, so the atlas names each
+ * film group the way the correspondence tables do. Optional by construction:
+ * if the file is missing the captions fall back to the catalogue symbol. */
+async function loadSignatures() {
+  try {
+    const r = await fetch("data/xu-correspondence.json", { cache: "no-cache" });
+    if (!r.ok) return;
+    const d = await r.json();
+    setSignatures(new Map(Object.entries(d.groups)));
+  } catch (e) {
+    console.warn("wallpaper: no colour signatures —", e.message);
+  }
+}
+
+await loadSignatures();
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const byBase = new Map(WALLPAPERS.map(w => [w.hm, []]));
@@ -55,7 +71,7 @@ for (const w of WALLPAPERS) {
   tabHost.className = "tabdemo";
   sec.append(tabHost);
   buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })),
-            { split: true });   // forward run, then the reversal run
+            { split: true, label: labelOf });   // forward run, then the reversal run
 
   const all = document.createElement("p");
   all.className = "alllink";
@@ -73,3 +89,9 @@ function openFromHash() {
 }
 openFromHash();
 window.addEventListener("hashchange", openFromHash);
+
+/* a tab is named by its book signature where it has one */
+function labelOf(g) {
+  const sig = signatureOf(g.id);
+  return sig ? sig.signatureHtml : g.symbolHtml;
+}

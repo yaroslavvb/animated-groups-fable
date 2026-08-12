@@ -17,10 +17,10 @@
  * the page animates a different one.
  */
 "use strict";
-import { Playback } from "./playback.js?v=36";
-import { attachStage } from "./stage.js?v=36";
-import { attachControls } from "./controls.js?v=36";
-import { filmTimeSymmetry } from "./phases.js?v=36";
+import { Playback } from "./playback.js?v=38";
+import { attachStage } from "./stage.js?v=38";
+import { attachControls } from "./controls.js?v=38";
+import { filmTimeSymmetry } from "./phases.js?v=38";
 import { drawBall, GROUND } from "./ball.js?v=38";
 import { elements } from "./designer/symmetry.js?v=38";
 

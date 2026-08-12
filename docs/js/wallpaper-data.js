@@ -297,13 +297,28 @@ adjacent motifs run in counterphase.");
   return s.join(" ");
 }
 
+/* The Conway / Goodman-Strauss reading of the forward groups, as published in
+ * the correspondence tables: id -> { signatureHtml, tos, clockOrder }. Loaded
+ * once by the page (data/xu-correspondence.json) and handed here, because the
+ * caption is built synchronously while the tabs are laid out. Absent — for a
+ * time-reversing group, which is not a colouring — the caption simply falls
+ * back to the catalogue symbol. */
+let SIGNATURES = new Map();
+
+export function setSignatures(map) { SIGNATURES = map || new Map(); }
+export function signatureOf(id) { return SIGNATURES.get(id) || null; }
+
 export function groupCaption(g) {
+  const sig = SIGNATURES.get(g.id);
   return `<div style="display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;">` +
-    `<span class="sym">${g.symbolHtml}</span>` +
+    `<span class="sym">${sig ? sig.signatureHtml : g.symbolHtml}</span>` +
+    (sig ? `<span class="sym" style="color:var(--muted);font-size:0.95rem;" ` +
+           `title="the colour type G/K">${sig.tos}</span>` : "") +
     `<span style="color:var(--muted);">${g.hm || ""}</span>` +
     `<span class="tags" style="display:flex;gap:0.4rem;flex-wrap:wrap;">` +
     (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-    (g.forward ? "" : `<span class="tag rev">time reversal</span>`) +
+    (g.forward ? `<span class="tag fwd">clockwork</span>`
+               : `<span class="tag rev">time reversal</span>`) +
     (g.product ? `<span class="tag product">product</span>` : "") +
     `</span>` +
     `<a class="linkish" style="margin-left:auto;text-decoration:none;" ` +

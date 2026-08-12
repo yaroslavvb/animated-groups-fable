@@ -36,12 +36,26 @@
  * Position in this list is the wire value, so entries may be APPENDED but
  * never reordered or removed. */
 const GROUP_IDS = [
+  /* indices 0-14 — the fifteen the designer opened with; a link's meaning is
+     its POSITION here, so these three lines must never change */
   "g225", "g226", "g227", "g234", "g244", "g245",
   "g96", "g97", "g99", "g137", "g139", "g75",
   "g235", "g247", "g248",
+  /* appended: the clock-order-2 groups, which the first menu left out */
+  "g55", "g60", "g64", "g65", "g74", "g231",
+  "g129", "g130", "g131", "g136", "g138", "g269",
+  "g270", "g271", "g9", "g69", "g70", "g71",
+  "g72", "g73", "g57", "g61", "g62", "g66",
+  "g67", "g6", "g7", "g59", "g63", "g233",
+  "g133", "g134", "g135", "g95", "g98", "g246",
 ];
 
-const VERSION = 1;
+/* 2 — the group field widened from 4 bits to 6 when the thirty-six
+ * clock-order-2 groups joined the menu. Indices 0-14 are unchanged, so every
+ * v1 link still names the group it always named; decode reads those with the
+ * old field width and everything after it lines up. */
+const VERSION = 2;
+const V1_B_GROUP = 4;
 const TAU = Math.PI * 2;
 
 /* Field widths, in bits. Their sum times the design size is the hash length,
@@ -53,7 +67,7 @@ const TAU = Math.PI * 2;
  *   yaw   1/1024 of a turn is a third of a degree, below what a drag resolves
  */
 const B_VERSION = 4;
-const B_GROUP = 4;
+const B_GROUP = 6;   /* 51 groups; see VERSION above */
 const B_R = 12;
 /* One spare bit, written zero and ignored on the way back. Room for the next
  * one-bit mode to appear without a version bump, which is the only kind of
@@ -281,9 +295,9 @@ export function decode(str) {
 
   const r = new BitReader(payload);
   const version = r.get(B_VERSION);
-  if (version !== VERSION) return null;
+  if (version !== VERSION && version !== 1) return null;
 
-  const gi = r.get(B_GROUP);
+  const gi = r.get(version === 1 ? V1_B_GROUP : B_GROUP);
   const rq = r.get(B_R);
   const reserved = r.get(B_RESERVED);
   const span = r.get(B_SPAN);
@@ -319,7 +333,7 @@ export function decode(str) {
   const half = 1 << (B_ANGLE - 1);
 
   return {
-    v: VERSION,
+    v: version,
     g: GROUP_IDS[gi],
     r: rq * STEP_R,
     span: span ? 2 : 1,

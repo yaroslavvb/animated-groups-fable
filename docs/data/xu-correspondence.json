@@ -1,0 +1,1534 @@
+{
+ "meta": {
+  "source": "https://yaroslavvb.github.io/animated-groups/data/clockwork-coloring-correspondence.json",
+  "sourceSchemaVersion": 6,
+  "catalogSha256": "040eebe747815557014c1dbf1d4265d204aaae35c110595f2a15b94ee7f68ca0",
+  "selection": "group.forward == true",
+  "count": 68,
+  "notation": "book colour signature and G/K colour type from The Symmetries of Things (Conway, Burgiel, Goodman-Strauss 2008)"
+ },
+ "groups": {
+  "g1": {
+   "id": "g1",
+   "ordinal": 1,
+   "signature": "◦",
+   "signatureHtml": "◦",
+   "tos": "◦",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "◦",
+   "parentHm": "p1",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g1"
+  },
+  "g5": {
+   "id": "g5",
+   "ordinal": 2,
+   "signature": "2222",
+   "signatureHtml": "2222",
+   "tos": "2222",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "2222",
+   "parentHm": "p2",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g5"
+  },
+  "g6": {
+   "id": "g6",
+   "ordinal": 3,
+   "signature": "²2²2²2²2",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "tos": "2222/◦",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2222",
+   "parentHm": "p2",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g6"
+  },
+  "g7": {
+   "id": "g7",
+   "ordinal": 4,
+   "signature": "¹2¹2²2²2",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "tos": "2222/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2222",
+   "parentHm": "p2",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g7"
+  },
+  "g8": {
+   "id": "g8",
+   "ordinal": 5,
+   "signature": "*×",
+   "signatureHtml": "*×",
+   "tos": "*×",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "*×",
+   "parentHm": "cm",
+   "kernelOrbifold": "*×",
+   "kernelHm": "cm",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g8"
+  },
+  "g9": {
+   "id": "g9",
+   "ordinal": 6,
+   "signature": "*²×²",
+   "signatureHtml": "*<sup>2</sup>×<sup>2</sup>",
+   "tos": "*×/◦",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*×",
+   "parentHm": "cm",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g9"
+  },
+  "g10": {
+   "id": "g10",
+   "ordinal": 7,
+   "signature": "**",
+   "signatureHtml": "**",
+   "tos": "**",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "**",
+   "parentHm": "pm",
+   "kernelOrbifold": "**",
+   "kernelHm": "pm",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g10"
+  },
+  "g11": {
+   "id": "g11",
+   "ordinal": 8,
+   "signature": "××",
+   "signatureHtml": "××",
+   "tos": "××",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "××",
+   "parentHm": "pg",
+   "kernelOrbifold": "××",
+   "kernelHm": "pg",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g11"
+  },
+  "g54": {
+   "id": "g54",
+   "ordinal": 9,
+   "signature": "*2222",
+   "signatureHtml": "*2222",
+   "tos": "*2222",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g54"
+  },
+  "g55": {
+   "id": "g55",
+   "ordinal": 10,
+   "signature": "*²2²2²2²2",
+   "signatureHtml": "*<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "tos": "*2222/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g55"
+  },
+  "g56": {
+   "id": "g56",
+   "ordinal": 11,
+   "signature": "22*",
+   "signatureHtml": "22*",
+   "tos": "22*",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g56"
+  },
+  "g57": {
+   "id": "g57",
+   "ordinal": 12,
+   "signature": "¹2¹2*²",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2*<sup>2</sup>",
+   "tos": "22*/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g57"
+  },
+  "g58": {
+   "id": "g58",
+   "ordinal": 13,
+   "signature": "22×",
+   "signatureHtml": "22×",
+   "tos": "22×",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g58"
+  },
+  "g59": {
+   "id": "g59",
+   "ordinal": 14,
+   "signature": "¹2¹2×²",
+   "signatureHtml": "<sup>1</sup>2<sup>1</sup>2×<sup>2</sup>",
+   "tos": "22×/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g59"
+  },
+  "g60": {
+   "id": "g60",
+   "ordinal": 15,
+   "signature": "*¹2²2¹2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>2</sup>2<sup>1</sup>2<sup>2</sup>2",
+   "tos": "*2222/**",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "**",
+   "kernelHm": "pm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g60"
+  },
+  "g61": {
+   "id": "g61",
+   "ordinal": 16,
+   "signature": "²2²2*²",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2*<sup>2</sup>",
+   "tos": "22*/××",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "××",
+   "kernelHm": "pg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g61"
+  },
+  "g62": {
+   "id": "g62",
+   "ordinal": 17,
+   "signature": "²2²2*¹",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2*<sup>1</sup>",
+   "tos": "22*/**",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "**",
+   "kernelHm": "pm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g62"
+  },
+  "g63": {
+   "id": "g63",
+   "ordinal": 18,
+   "signature": "²2²2×¹",
+   "signatureHtml": "<sup>2</sup>2<sup>2</sup>2×<sup>1</sup>",
+   "tos": "22×/××",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "××",
+   "kernelHm": "pg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g63"
+  },
+  "g64": {
+   "id": "g64",
+   "ordinal": 19,
+   "signature": "*¹2¹2¹2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2",
+   "tos": "*2222/*2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g64"
+  },
+  "g65": {
+   "id": "g65",
+   "ordinal": 20,
+   "signature": "*¹2²2²2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "tos": "*2222/22*",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g65"
+  },
+  "g66": {
+   "id": "g66",
+   "ordinal": 21,
+   "signature": "¹2²2*¹",
+   "signatureHtml": "<sup>1</sup>2<sup>2</sup>2*<sup>1</sup>",
+   "tos": "22*/22*",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g66"
+  },
+  "g67": {
+   "id": "g67",
+   "ordinal": 22,
+   "signature": "¹2²2*²",
+   "signatureHtml": "<sup>1</sup>2<sup>2</sup>2*<sup>2</sup>",
+   "tos": "22*/22×",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "22*",
+   "parentHm": "pmg",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g67"
+  },
+  "g68": {
+   "id": "g68",
+   "ordinal": 23,
+   "signature": "2*22",
+   "signatureHtml": "2*22",
+   "tos": "2*22",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g68"
+  },
+  "g69": {
+   "id": "g69",
+   "ordinal": 24,
+   "signature": "¹2*²2²2",
+   "signatureHtml": "<sup>1</sup>2*<sup>2</sup>2<sup>2</sup>2",
+   "tos": "2*22/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g69"
+  },
+  "g70": {
+   "id": "g70",
+   "ordinal": 25,
+   "signature": "²2*¹2²2",
+   "signatureHtml": "<sup>2</sup>2*<sup>1</sup>2<sup>2</sup>2",
+   "tos": "2*22/*×",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "*×",
+   "kernelHm": "cm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g70"
+  },
+  "g71": {
+   "id": "g71",
+   "ordinal": 26,
+   "signature": "²2*¹2¹2",
+   "signatureHtml": "<sup>2</sup>2*<sup>1</sup>2<sup>1</sup>2",
+   "tos": "2*22/*2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g71"
+  },
+  "g72": {
+   "id": "g72",
+   "ordinal": 27,
+   "signature": "²2*²2²2",
+   "signatureHtml": "<sup>2</sup>2*<sup>2</sup>2<sup>2</sup>2",
+   "tos": "2*22/22×",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g72"
+  },
+  "g73": {
+   "id": "g73",
+   "ordinal": 28,
+   "signature": "¹2*¹2²2",
+   "signatureHtml": "<sup>1</sup>2*<sup>1</sup>2<sup>2</sup>2",
+   "tos": "2*22/22*",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "2*22",
+   "parentHm": "cmm",
+   "kernelOrbifold": "22*",
+   "kernelHm": "pmg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g73"
+  },
+  "g74": {
+   "id": "g74",
+   "ordinal": 29,
+   "signature": "*¹2¹2²2²2",
+   "signatureHtml": "*<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2<sup>2</sup>2",
+   "tos": "*2222/2*22",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*2222",
+   "parentHm": "pmm",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g74"
+  },
+  "g75": {
+   "id": "g75",
+   "ordinal": 30,
+   "signature": "¹2²2×⁴",
+   "signatureHtml": "<sup>1</sup>2<sup>2</sup>2×<sup>4</sup>",
+   "tos": "22×⁴/2222",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "22×",
+   "parentHm": "pgg",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g75"
+  },
+  "g94": {
+   "id": "g94",
+   "ordinal": 31,
+   "signature": "442",
+   "signatureHtml": "442",
+   "tos": "442",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g94"
+  },
+  "g95": {
+   "id": "g95",
+   "ordinal": 32,
+   "signature": "²4²4¹2",
+   "signatureHtml": "<sup>2</sup>4<sup>2</sup>4<sup>1</sup>2",
+   "tos": "442/2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g95"
+  },
+  "g96": {
+   "id": "g96",
+   "ordinal": 33,
+   "signature": "⁴4⁴4²2",
+   "signatureHtml": "<sup>4</sup>4<sup>4</sup>4<sup>2</sup>2",
+   "tos": "442⁴/◦",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g96"
+  },
+  "g97": {
+   "id": "g97",
+   "ordinal": 34,
+   "signature": "⁴4⁴4²2",
+   "signatureHtml": "<sup>4</sup>4<sup>4</sup>4<sup>2</sup>2",
+   "tos": "442⁴/◦",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g97"
+  },
+  "g98": {
+   "id": "g98",
+   "ordinal": 35,
+   "signature": "¹4²4²2",
+   "signatureHtml": "<sup>1</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "tos": "442/442",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g98"
+  },
+  "g99": {
+   "id": "g99",
+   "ordinal": 36,
+   "signature": "⁴4⁴4¹2",
+   "signatureHtml": "<sup>4</sup>4<sup>4</sup>4<sup>1</sup>2",
+   "tos": "442⁴/2222",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "442",
+   "parentHm": "p4",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g99"
+  },
+  "g128": {
+   "id": "g128",
+   "ordinal": 37,
+   "signature": "*442",
+   "signatureHtml": "*442",
+   "tos": "*442",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "*442",
+   "kernelHm": "p4m",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g128"
+  },
+  "g129": {
+   "id": "g129",
+   "ordinal": 38,
+   "signature": "*¹4²4¹2",
+   "signatureHtml": "*<sup>1</sup>4<sup>2</sup>4<sup>1</sup>2",
+   "tos": "*442/*2222",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g129"
+  },
+  "g130": {
+   "id": "g130",
+   "ordinal": 39,
+   "signature": "*²4¹4²2",
+   "signatureHtml": "*<sup>2</sup>4<sup>1</sup>4<sup>2</sup>2",
+   "tos": "*442/2*22",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g130"
+  },
+  "g131": {
+   "id": "g131",
+   "ordinal": 40,
+   "signature": "*²4²4²2",
+   "signatureHtml": "*<sup>2</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "tos": "*442/442",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g131"
+  },
+  "g132": {
+   "id": "g132",
+   "ordinal": 41,
+   "signature": "4*2",
+   "signatureHtml": "4*2",
+   "tos": "4*2",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "4*2",
+   "kernelHm": "p4g",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g132"
+  },
+  "g133": {
+   "id": "g133",
+   "ordinal": 42,
+   "signature": "²4*²2",
+   "signatureHtml": "<sup>2</sup>4*<sup>2</sup>2",
+   "tos": "4*2/22×",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g133"
+  },
+  "g134": {
+   "id": "g134",
+   "ordinal": 43,
+   "signature": "²4*¹2",
+   "signatureHtml": "<sup>2</sup>4*<sup>1</sup>2",
+   "tos": "4*2/2*22",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "2*22",
+   "kernelHm": "cmm",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g134"
+  },
+  "g135": {
+   "id": "g135",
+   "ordinal": 44,
+   "signature": "¹4*²2",
+   "signatureHtml": "<sup>1</sup>4*<sup>2</sup>2",
+   "tos": "4*2/442",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "442",
+   "kernelHm": "p4",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g135"
+  },
+  "g136": {
+   "id": "g136",
+   "ordinal": 45,
+   "signature": "*¹4¹4²2",
+   "signatureHtml": "*<sup>1</sup>4<sup>1</sup>4<sup>2</sup>2",
+   "tos": "*442/*442",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "*442",
+   "kernelHm": "p4m",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g136"
+  },
+  "g137": {
+   "id": "g137",
+   "ordinal": 46,
+   "signature": "⁴4*¹2",
+   "signatureHtml": "<sup>4</sup>4*<sup>1</sup>2",
+   "tos": "4*2⁴/*2222",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "*2222",
+   "kernelHm": "pmm",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g137"
+  },
+  "g138": {
+   "id": "g138",
+   "ordinal": 47,
+   "signature": "*¹4²4²2",
+   "signatureHtml": "*<sup>1</sup>4<sup>2</sup>4<sup>2</sup>2",
+   "tos": "*442/4*2",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*442",
+   "parentHm": "p4m",
+   "kernelOrbifold": "4*2",
+   "kernelHm": "p4g",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g138"
+  },
+  "g139": {
+   "id": "g139",
+   "ordinal": 48,
+   "signature": "⁴4*²2",
+   "signatureHtml": "<sup>4</sup>4*<sup>2</sup>2",
+   "tos": "4*2⁴/22×",
+   "clockOrder": 4,
+   "cyclic": "C_4",
+   "parentOrbifold": "4*2",
+   "parentHm": "p4g",
+   "kernelOrbifold": "22×",
+   "kernelHm": "pgg",
+   "phaseLabels": [
+    "0",
+    "1/4",
+    "1/2",
+    "3/4"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g139"
+  },
+  "g224": {
+   "id": "g224",
+   "ordinal": 49,
+   "signature": "333",
+   "signatureHtml": "333",
+   "tos": "333",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "333",
+   "parentHm": "p3",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g224"
+  },
+  "g225": {
+   "id": "g225",
+   "ordinal": 50,
+   "signature": "³3³3³3",
+   "signatureHtml": "<sup>3</sup>3<sup>3</sup>3<sup>3</sup>3",
+   "tos": "333³/◦",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "333",
+   "parentHm": "p3",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g225"
+  },
+  "g226": {
+   "id": "g226",
+   "ordinal": 51,
+   "signature": "³3³3³3",
+   "signatureHtml": "<sup>3</sup>3<sup>3</sup>3<sup>3</sup>3",
+   "tos": "333³/◦",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "333",
+   "parentHm": "p3",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g226"
+  },
+  "g227": {
+   "id": "g227",
+   "ordinal": 52,
+   "signature": "³3³3¹3",
+   "signatureHtml": "<sup>3</sup>3<sup>3</sup>3<sup>1</sup>3",
+   "tos": "333³/333",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "333",
+   "parentHm": "p3",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g227"
+  },
+  "g230": {
+   "id": "g230",
+   "ordinal": 53,
+   "signature": "*333",
+   "signatureHtml": "*333",
+   "tos": "*333",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "*333",
+   "parentHm": "p3m1",
+   "kernelOrbifold": "*333",
+   "kernelHm": "p3m1",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g230"
+  },
+  "g231": {
+   "id": "g231",
+   "ordinal": 54,
+   "signature": "*²3²3²3",
+   "signatureHtml": "*<sup>2</sup>3<sup>2</sup>3<sup>2</sup>3",
+   "tos": "*333/333",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*333",
+   "parentHm": "p3m1",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g231"
+  },
+  "g232": {
+   "id": "g232",
+   "ordinal": 55,
+   "signature": "3*3",
+   "signatureHtml": "3*3",
+   "tos": "3*3",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "3*3",
+   "parentHm": "p31m",
+   "kernelOrbifold": "3*3",
+   "kernelHm": "p31m",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g232"
+  },
+  "g233": {
+   "id": "g233",
+   "ordinal": 56,
+   "signature": "¹3*²3",
+   "signatureHtml": "<sup>1</sup>3*<sup>2</sup>3",
+   "tos": "3*3/333",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "3*3",
+   "parentHm": "p31m",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g233"
+  },
+  "g234": {
+   "id": "g234",
+   "ordinal": 57,
+   "signature": "³3*¹3",
+   "signatureHtml": "<sup>3</sup>3*<sup>1</sup>3",
+   "tos": "3*3³/*333",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "3*3",
+   "parentHm": "p31m",
+   "kernelOrbifold": "*333",
+   "kernelHm": "p3m1",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g234"
+  },
+  "g235": {
+   "id": "g235",
+   "ordinal": 58,
+   "signature": "³3*²3",
+   "signatureHtml": "<sup>3</sup>3*<sup>2</sup>3",
+   "tos": "3*3⁶/333",
+   "clockOrder": 6,
+   "cyclic": "C_6",
+   "parentOrbifold": "3*3",
+   "parentHm": "p31m",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0",
+    "1/6",
+    "1/3",
+    "1/2",
+    "2/3",
+    "5/6"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7",
+    "#D55E00",
+    "#56B4E9"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g235"
+  },
+  "g243": {
+   "id": "g243",
+   "ordinal": 59,
+   "signature": "632",
+   "signatureHtml": "632",
+   "tos": "632",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "632",
+   "kernelHm": "p6",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g243"
+  },
+  "g244": {
+   "id": "g244",
+   "ordinal": 60,
+   "signature": "³6³3¹2",
+   "signatureHtml": "<sup>3</sup>6<sup>3</sup>3<sup>1</sup>2",
+   "tos": "632³/2222",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g244"
+  },
+  "g245": {
+   "id": "g245",
+   "ordinal": 61,
+   "signature": "³6³3¹2",
+   "signatureHtml": "<sup>3</sup>6<sup>3</sup>3<sup>1</sup>2",
+   "tos": "632³/2222",
+   "clockOrder": 3,
+   "cyclic": "C_3",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "2222",
+   "kernelHm": "p2",
+   "phaseLabels": [
+    "0",
+    "1/3",
+    "2/3"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g245"
+  },
+  "g246": {
+   "id": "g246",
+   "ordinal": 62,
+   "signature": "²6¹3²2",
+   "signatureHtml": "<sup>2</sup>6<sup>1</sup>3<sup>2</sup>2",
+   "tos": "632/333",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "333",
+   "kernelHm": "p3",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g246"
+  },
+  "g247": {
+   "id": "g247",
+   "ordinal": 63,
+   "signature": "⁶6³3²2",
+   "signatureHtml": "<sup>6</sup>6<sup>3</sup>3<sup>2</sup>2",
+   "tos": "632⁶/◦",
+   "clockOrder": 6,
+   "cyclic": "C_6",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/6",
+    "1/3",
+    "1/2",
+    "2/3",
+    "5/6"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7",
+    "#D55E00",
+    "#56B4E9"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g247"
+  },
+  "g248": {
+   "id": "g248",
+   "ordinal": 64,
+   "signature": "⁶6³3²2",
+   "signatureHtml": "<sup>6</sup>6<sup>3</sup>3<sup>2</sup>2",
+   "tos": "632⁶/◦",
+   "clockOrder": 6,
+   "cyclic": "C_6",
+   "parentOrbifold": "632",
+   "parentHm": "p6",
+   "kernelOrbifold": "◦",
+   "kernelHm": "p1",
+   "phaseLabels": [
+    "0",
+    "1/6",
+    "1/3",
+    "1/2",
+    "2/3",
+    "5/6"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00",
+    "#009E73",
+    "#CC79A7",
+    "#D55E00",
+    "#56B4E9"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g248"
+  },
+  "g268": {
+   "id": "g268",
+   "ordinal": 65,
+   "signature": "*632",
+   "signatureHtml": "*632",
+   "tos": "*632",
+   "clockOrder": 1,
+   "cyclic": "C_1",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "*632",
+   "kernelHm": "p6m",
+   "phaseLabels": [
+    "0"
+   ],
+   "phaseColors": [
+    "#0072B2"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g268"
+  },
+  "g269": {
+   "id": "g269",
+   "ordinal": 66,
+   "signature": "*¹6²3²2",
+   "signatureHtml": "*<sup>1</sup>6<sup>2</sup>3<sup>2</sup>2",
+   "tos": "*632/3*3",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "3*3",
+   "kernelHm": "p31m",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g269"
+  },
+  "g270": {
+   "id": "g270",
+   "ordinal": 67,
+   "signature": "*²6²3²2",
+   "signatureHtml": "*<sup>2</sup>6<sup>2</sup>3<sup>2</sup>2",
+   "tos": "*632/632",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "632",
+   "kernelHm": "p6",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g270"
+  },
+  "g271": {
+   "id": "g271",
+   "ordinal": 68,
+   "signature": "*²6¹3¹2",
+   "signatureHtml": "*<sup>2</sup>6<sup>1</sup>3<sup>1</sup>2",
+   "tos": "*632/*333",
+   "clockOrder": 2,
+   "cyclic": "C_2",
+   "parentOrbifold": "*632",
+   "parentHm": "p6m",
+   "kernelOrbifold": "*333",
+   "kernelHm": "p3m1",
+   "phaseLabels": [
+    "0",
+    "1/2"
+   ],
+   "phaseColors": [
+    "#0072B2",
+    "#E69F00"
+   ],
+   "correspondenceUrl": "https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g271"
+  }
+ }
+}
