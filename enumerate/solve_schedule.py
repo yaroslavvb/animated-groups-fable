@@ -47,21 +47,30 @@ tiny benchmark closes in 13 passes and ~35 ms of construction.  So: constructive
 placement, monotone, a handful of passes -- not a relaxation with a step size,
 but not the single analytic shot the strategy hoped for either.
 
-Then a RETRACTION sweep pulls every vertex back toward its straight line as far
-as the exact detector permits.  Vertices that make it all the way back are
-exactly collinear again and stop being kinks, so what survives is only the bends
-that are load-bearing -- genuine bounces.
+Then the construction is straightened back out, in two sweeps that do different
+jobs.  RETRACTION returns vertices to their original straight line wherever the
+detector allows; FLATTENING handles the rest, by asking a vertex only to become
+collinear with its two NEIGHBOURS -- a far smaller request once the neighbours
+have themselves moved, and enough to delete the kink.  Both sweeps are exact:
+a move is accepted only if the closed-form detector still clears the target.
+What survives is only the bends that are load-bearing -- genuine bounces.  On the
+tiny benchmark the two sweeps take 27 kinked vertices per period down to 23, and
+flattening alone accounts for most of that (10.0 -> 7.7 kinks per ball).
 
 If a grid will not close, the vertices are re-seeded and then the grid is
 refined; the two n=5 failures seen in a 100-instance sweep were both grids too
 coarse for where an encounter happened to land, and both closed at 2K.
 
 Measured (this machine, numpy only)
-    tiny  n=3 S=72  K=12 : 0.09 s, clearance 1.085 diameters, 8.3 kinks/ball,
-                           straight_fraction 0.884, symmetry residual 5.9e-16
-    full  n=5 S=180 K=18 : 0.76 s solve + 4.25 s to render 60 frames at 600x600
-                           through particles_gif.render  ->  5.0 s all in
-    141 random feasible instances at tiny scale, 51 at full scale: all solved.
+    tiny  n=3 S=72  K=12 : 0.135 s, clearance 1.092 diameters, 7.7 kinks/ball,
+                           straight_fraction 0.894, symmetry residual 5.6e-16
+    full  n=5 S=180 K=12 : 0.80 s solve, + 4.07 s to render 60 frames at 600x600
+                           through particles_gif.render  ->  4.9 s all in
+    on 261 random instances (141 tiny-scale, 51 full-scale, plus grids at
+    K = 9/12/18) every one that was not infeasible outright was solved, worst
+    clearance 1.050 diameters.  `pinned_clearance` names the infeasible ones:
+    when the given starts already overlap at t = 0 no bending can help, since
+    those points are pinned -- about a quarter of uniformly random starts.
 
 Requirements honoured
     * starts and integer drifts are PINNED; only interior vertices move, so no
@@ -156,14 +165,18 @@ class Clones:
     """Every clone track, on the vertex grid, in cartesian coordinates."""
 
     def __init__(self, g, K, R_window):
-        if K % 3:
-            raise ValueError("K must be divisible by 3 so tau is a whole step")
         self.g, self.K = g, K
-        self.ops = sorted(g.ops, key=lambda o: o[2])      # tau = 0, 1/3, 2/3
-        # precompute the seam-aware re-index for each op once
+        self.ops = sorted(g.ops, key=lambda o: o[2])      # by time offset
+        # precompute the seam-aware re-index for each op once. The whole method
+        # rests on every clone track living on the SAME vertex grid, which is
+        # exactly the condition that each tau is a whole number of steps -- for
+        # a clock of order N that means N | K, whatever N is.
         self.gather, self.wrap = [], []
-        for a in range(len(self.ops)):
-            sh = a * K // 3
+        for _, _, tau in self.ops:
+            steps = tau * K
+            if abs(steps - round(steps)) > 1e-9:
+                raise ValueError(f"K = {K} does not divide the clock: tau = {tau}")
+            sh = int(round(steps)) % K
             self.gather.append((np.arange(K) - sh) % K)
             self.wrap.append(((np.arange(K) - sh) < 0).astype(float))
 
@@ -173,6 +186,15 @@ class Clones:
         ms = [np.array([m1, m2], float)
               for m1 in range(-span, span + 1) for m2 in range(-span, span + 1)]
         ms = [m for m in ms if np.linalg.norm(m @ g.B) <= R_window + 1e-9]
+        # Which op IS the identity? Not necessarily index 0: the ops are sorted
+        # by tau, and a group with several tau = 0 elements (any base group
+        # bigger than a bare rotation) leaves that tie in catalogue order. Take
+        # it from the op itself, or a ball is skipped against its own rotated
+        # copy and compared against ITSELF instead -- which puts a zero
+        # distance in the pair table and a negative number under a sqrt.
+        self.ident = next(a for a, (M, v, tau) in enumerate(self.ops)
+                          if np.allclose(M, np.eye(2)) and np.allclose(v, 0.0)
+                          and abs(tau) < 1e-12)
         self.op_of = np.array([a for a in range(len(self.ops)) for _ in ms])
         self.m_of = np.array([m for _ in range(len(self.ops)) for m in ms])
         self.total = len(self.op_of)
@@ -183,14 +205,11 @@ class Clones:
         self.a_k = self.op_of[self.keep]
         self.m_k = self.m_of[self.keep]
         self.C = len(self.a_k)
-        self.is_self = (self.a_k == 0) & (np.abs(self.m_k).sum(1) < 1e-9)
+        self.is_self = (self.a_k == self.ident) & (np.abs(self.m_k).sum(1) < 1e-9)
 
     def cull(self, mask):
         self.keep[self.keep] = mask
         self._refresh()
-
-    def tags(self):
-        return list(zip(self.a_k.tolist(), self.m_k))
 
     def tracks(self, P):
         """(C, n, K+1, 2) cartesian clone tracks -- one vectorised shot."""
@@ -469,19 +488,23 @@ def orbit(g, P, t, span):
 
 
 def symmetry_residual(g, P, span=5, keep_r=1.2, samples=16):
-    """Turn the orbit at t by the tau = 1/3 generator; it must BE the orbit at
-    t + 1/3, ball index by ball index.  Scored only well inside the window."""
+    """Turn the orbit at t by the generator with the SMALLEST positive time
+    offset; it must BE the orbit at t + tau, ball index by ball index.  Scored
+    only well inside the window.  The smallest offset is the sharpest test
+    available: it is the generator of the clock, so every other offset is a
+    power of it."""
     Mg = vg = None
-    for M, v, tau in g.ops:
-        if abs(tau - 1.0 / 3.0) < 1e-9:
-            Mg, vg = M, v
-    if Mg is None:
+    shift = min((tau for _, _, tau in g.ops if tau > 1e-9), default=None)
+    if shift is None:
         return float("nan")
+    for M, v, tau in g.ops:
+        if abs(tau - shift) < 1e-9:
+            Mg, vg = M, v
     worst = 0.0
     for s in range(samples):
         t = s / samples
         p0, i0 = orbit(g, P, t, span)
-        p1, i1 = orbit(g, P, t + 1.0 / 3.0, span)
+        p1, i1 = orbit(g, P, t + shift, span)
         turned = ((p0 @ g.Binv) @ Mg.T + vg) @ g.B
         inside = np.linalg.norm(turned, axis=1) < keep_r
         for b in range(P.n):
@@ -628,7 +651,10 @@ def solve_tiny(K=12, verbose=False, **kw):
     return _report(TINY, K, verbose, **kw)[0]
 
 
-def solve_full(K=18, verbose=False, **kw):
+def solve_full(K=12, verbose=False, **kw):
+    """The target scale: n = 5, S = 180.  K = 12 rather than 18 -- a coarser grid
+    solves the same instances, with fewer kinks and in half the time, which
+    leaves the 10 s budget almost entirely to the renderer."""
     return _report(FULL, K, verbose, **kw)[0]
 
 

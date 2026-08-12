@@ -57,18 +57,41 @@ which is the one piece proved impossible above:
     momentum-conserving and consistent in both frames, which is what makes an
     event at time t in one ball's frame the same event at t - tau in the
     other's;
-  * the impulse is held close to the contact normal by a penalty, so contacts
-    stay frictionless-looking; the residual tangential part is reported;
-  * the velocity closes exactly around the period (sum of impulses = 0), so
-    there is no phantom kink at the seam;
+  * the velocity closes exactly around the period (the impulses on each ball
+    sum to zero), so there is no phantom kink at the seam;
   * start and drift are pinned by construction -- the solver can only bend.
 
-The impulse magnitudes are then found by damped Gauss-Newton on the exact
-analytic gap functions (minimum separation of each encounter, a quadratic
-minimisation per segment pair, differentiated with the envelope theorem) rather
-than by the elastic rule.  The restitution each contact ends up with is
-measured and reported, so the distance from a true billiard is a number, not a
-hand-wave.
+What is given up is the elastic RULE, and with it the requirement that a
+contact impulse point along the contact normal.  Instead the impulses are
+chosen so that every encounter clears the ball diameter, and the restitution
+each contact ends up with is then MEASURED: about two thirds of contacts do
+reflect (eps > 0), with a median eps near +0.5 rather than the +1 of a true
+bounce.  Steering the impulses back towards the normal (w_tan > 0) is possible
+and costs about a fifth of the clearance -- main() prints that number.  So the
+gap between this and a true billiard is quantified, not waved away.
+
+The solve is two phases, because the direct one does not work:
+
+  1. Corridor.  Descend the exact clearance objective -- total squared
+     shortfall over every instant and every pair, differentiated through each
+     closest approach -- with every sample a free breakpoint.  A group-L1
+     pressure on the kinks is what makes this phase produce a POLYLINE rather
+     than a curve: bending is gathered into a few breakpoints instead of being
+     smeared over all S samples, so there is something for phase 2 to keep.
+  2. Sparsify.  Detect the contacts of those paths, build the linear space of
+     paths that bend only there (one paired impulse per contact, restricted to
+     the closed-velocity null space), and continue the SAME descent projected
+     onto it.  Projecting each step, rather than fitting once at the end, is
+     the difference between clearing the diameter and losing a third of it.
+
+Two details cost real time to find and are load-bearing:
+  * the descent must step in PATH space, not in impulse space.  The tent
+    operator has entries of order S/4, so an impulse-space gradient is
+    hopelessly scaled and the descent stalls at ~0.7 of the required clearance.
+  * without a barrier keeping each path near its own straight drift, the solver
+    walks a ball out of the finite clone window it is being tested against and
+    reports a clearance that is not real.  The symmetry residual is what
+    catches it: it jumps from 1e-16 to O(1) the moment a path escapes.
 
 Run:  python3 solve_events.py           # tiny benchmark + Strategy-B probe
 """
@@ -165,7 +188,7 @@ def build_clones(g, S, span):
     return out, self_c
 
 
-def clone_stack(g, tr, clones):
+def clone_stack(g, tr, clones, want_vel=True):
     """cartesian positions (C, n, S+1, 2) and velocities (C, n, S, 2).
 
     All clones sharing an op share the roll and the rotation -- they differ
@@ -176,7 +199,7 @@ def clone_stack(g, tr, clones):
     X = tr.X[:, :S, :]
     idx = np.arange(S)
     Q = np.empty((len(clones), n, S + 1, 2))
-    Qv = np.empty((len(clones), n, S, 2))
+    Qv = np.empty((len(clones), n, S, 2)) if want_vel else None
     byop = {}
     for c, cd in enumerate(clones):
         byop.setdefault(cd['op'], []).append(c)
@@ -192,11 +215,12 @@ def clone_stack(g, tr, clones):
         cs = np.array(cs)
         Q[cs, :, :S, :] = base[None] + mc[:, None, None, :]
         Q[cs, :, S, :] = Q[cs, :, 0, :] + drift[None]
-        Qv[cs] = ((tr.U[:, sh, :] @ M.T) @ g.B)[None]
+        if want_vel:
+            Qv[cs] = ((tr.U[:, sh, :] @ M.T) @ g.B)[None]
     return Q, Qv
 
 
-def pair_geometry(g, tr, clones, self_c):
+def pair_geometry(g, tr, clones, self_c, want_vel=True):
     """exact per-interval closest approach of every base ball to every clone.
 
     Both members of a pair are straight on a sample interval (the clones' kinks
@@ -205,14 +229,16 @@ def pair_geometry(g, tr, clones, self_c):
     """
     S, n = tr.S, tr.n
     P = tr.X @ g.B
-    Vb = tr.U @ g.B
-    Q, Qv = clone_stack(g, tr, clones)
+    Vb = tr.U @ g.B if want_vel else None
+    Q, Qv = clone_stack(g, tr, clones, want_vel)
     D = P[:, None, None, :, :] - Q[None, :, :, :, :]          # (i, C, j, S+1, 2)
     A = D[:, :, :, :S, :]
     B = D[:, :, :, 1:, :] - A
-    aa = np.einsum('...d,...d->...', A, A)
-    ab = np.einsum('...d,...d->...', A, B)
-    bb = np.einsum('...d,...d->...', B, B)
+    a0, a1 = A[..., 0], A[..., 1]
+    b0, b1 = B[..., 0], B[..., 1]
+    aa = a0 * a0 + a1 * a1
+    ab = a0 * b0 + a1 * b1
+    bb = b0 * b0 + b1 * b1
     ss = np.clip(-ab / np.maximum(bb, 1e-300), 0.0, 1.0)
     dm2 = np.maximum(aa + (2 * ab + ss * bb) * ss, 0.0)
     if self_c is not None:
@@ -315,218 +341,346 @@ def find_contacts(g, tr, clones, gm, d_thresh):
     return out
 
 
-def merit(gm, target):
-    """total squared shortfall against `target`, over every instant and pair."""
-    d = np.sqrt(np.minimum(gm['dm2'], target ** 2))
-    v = target - d
-    return float((v * v).sum())
+def psi_matrix(S):
+    """Psi[k, t]: displacement at sample t from a unit kink at interval k.
 
-
-def match_carry(new, old, D_old, S, window=5):
-    """inherit impulses when the contact set is re-detected between rounds."""
-    D = np.zeros((len(new), 2))
-    taken = set()
-    for p, e in enumerate(new):
-        for q, f in enumerate(old):
-            if q in taken or (e['i'], e['j'], e['c']) != (f['i'], f['j'], f['c']):
-                continue
-            d = abs(e['ki'] - f['ki']) % S
-            if min(d, S - d) <= window:
-                D[p] = D_old[q]
-                taken.add(q)
-                break
-    return D
-
-
-# --------------------------------------------------------------------------
-#  influence of an impulse on the path (the tent, and its integral)
-# --------------------------------------------------------------------------
-
-def phi(kp, k, S):
-    """velocity response at interval k to a unit kink at interval kp."""
-    return (1.0 if kp <= k else 0.0) - 1.0 + kp / S
-
-
-def psi(kp, t, S):
-    """position response at time t (in samples) to a unit kink at kp.
-
-    Integral of phi, i.e. the tent  max(0, k - kp) - k (1 - kp/S)  extended
-    affinely inside the interval.  It is <= 0 everywhere: see the module
-    docstring.
+    Psi[k, 0] = Psi[k, S] = 0 identically, so the pinning of the start and of
+    the drift is built into the parametrisation, not imposed afterwards.
     """
-    k = int(math.floor(t))
-    f = t - k
-    return max(0.0, k - kp) - k * (1.0 - kp / S) + f * phi(kp, k, S)
+    k = np.arange(S)[:, None]
+    t = np.arange(S + 1)[None, :]
+    return np.maximum(0, t - k) - t * (1.0 - k / S)
 
 
-def contributions(contacts, n):
-    """which impulses act on which ball, with what 2x2 transport matrix.
+def slot_ops(g, contacts):
+    """one impulse per physical contact, acting on BOTH participants.
 
-    Contact p pushes ball i by +D_p at sample ki and its partner ball j by
-    -(D_p transported by the clone's inverse rotation) at sample kj: equal and
-    opposite in the plane, hence a genuine momentum exchange even though the
-    partner is a rotated, time-shifted copy.
+    Contact p adds D_p (lattice, row convention) to ball i at sample ki and
+    D_p @ T_p to ball j at sample kj, where T_p transports the equal and
+    opposite reaction back through the clone's rotation into the partner's own
+    frame.  For the identity clone T = -I, i.e. plain Newton's third law; for a
+    120-degree clone the reaction is the rotated one, which is exactly what
+    makes an event at t in one ball's frame the same event at t - tau in the
+    other's.
     """
-    out = [[] for _ in range(n)]
-    I2 = np.eye(2)
-    for p, e in enumerate(contacts):
-        out[e['i']].append((e['ki'], I2, p))
-        out[e['j']].append((e['kj'], -e['Ri'].T, p))
+    out = []
+    for e in contacts:
+        T = -(g.B @ e['Ri'] @ g.Binv)
+        out.append(dict(i=e['i'], ki=e['ki'], j=e['j'], kj=e['kj'], T=T,
+                        R=e['R'], nh=e['nh'], gap=e['gap']))
     return out
 
 
-def path_jac(contrib_i, t, S, P):
-    """d P_i(t) / d D  as a (2, 2P) matrix."""
-    Jm = np.zeros((2, 2 * P))
-    for (kp, A, p) in contrib_i:
-        w = psi(kp, t, S)
-        if w:
-            Jm[:, 2 * p:2 * p + 2] += w * A
-    return Jm
+def slots_to_jumps(slots, D, n, S):
+    J = np.zeros((n, S, 2))
+    for p, sl in enumerate(slots):
+        J[sl['i'], sl['ki']] += D[p]
+        J[sl['j'], sl['kj']] += D[p] @ sl['T']
+    return J
 
 
-def vel_at(contrib_i, k, S, P, D, base):
-    """cartesian velocity of ball i on interval k, given impulses D."""
-    v = base.copy()
-    for (kp, A, p) in contrib_i:
-        v = v + phi(kp, k, S) * (A @ D[p])
-    return v
+def closure_matrix(slots, n):
+    """total impulse on each ball, as a linear map on the flattened D.
+
+    Forcing it to zero is what makes the velocity return after a period, so
+    there is no unexplained kink at the seam.
+    """
+    C = np.zeros((2 * n, 2 * len(slots)))
+    for p, sl in enumerate(slots):
+        C[2 * sl['i']:2 * sl['i'] + 2, 2 * p:2 * p + 2] += np.eye(2)
+        C[2 * sl['j']:2 * sl['j'] + 2, 2 * p:2 * p + 2] += sl['T'].T
+    return C
+
+
+def closure_defect(g, tr):
+    """|velocity after one period - velocity before|, per ball, cartesian.
+
+    Zero means the polyline really closes: the ball leaves the seam on exactly
+    the heading it arrived with, so t = 0 is not a disguised extra kink.
+    """
+    V = tr.U @ g.B
+    return float(np.linalg.norm(V[:, 0, :] - V[:, -1, :], axis=1).max())
 
 
 # --------------------------------------------------------------------------
 #  the solver
 # --------------------------------------------------------------------------
 
-def rebuild(g, tr, contacts, D):
-    """impulses -> jump field -> trajectory (start and drift still pinned)."""
-    J = np.zeros((tr.n, tr.S, 2))
-    for p, e in enumerate(contacts):
-        J[e['i'], e['ki']] += (D[p]) @ g.Binv
-        J[e['j'], e['kj']] += (-(e['Ri'].T @ D[p])) @ g.Binv
-    tr.set_jumps(J)
+def merit_grad(g, tr, clones, self_c, target, Mall, aall, Psi,
+               X0=None, raw=False, roam=0.7, w_roam=40.0):
+    """merit, its gradient w.r.t. the jump field, and the true clearance.
+
+    Every contribution enters through a closest approach, whose location inside
+    a segment is a stationary point, so differentiating the distance only needs
+    the explicit dependence: the unit normal, split between the two samples
+    bracketing the contact.  The partner's share is carried back through the
+    clone's matrix, which is what couples a ball to its own time-shifted copy.
+
+    A one-sided barrier keeps each path within `roam` of its straight drift.
+    Without it the solver walks a ball clean out of the finite clone window it
+    is being tested against and reports a clearance that is not real -- the
+    symmetry residual jumps from 1e-16 to O(1) when that happens, which is how
+    it gets caught.
+    """
+    S = tr.S
+    gm = pair_geometry(g, tr, clones, self_c, want_vel=False)
+    dm2 = gm['dm2']
+    # only the entries that actually violate need a square root, and they are
+    # a small minority of every pair at every instant
+    hit = dm2 < target * target
+    viol = np.zeros_like(dm2)
+    viol[hit] = target - np.sqrt(dm2[hit])
+    m = float(viol[hit] @ viol[hit]) if hit.any() else 0.0
+    GX = np.zeros_like(tr.X)
+    if X0 is not None:
+        dev = tr.X - X0
+        r = np.linalg.norm(dev, axis=2)
+        over = np.maximum(r - roam, 0.0)
+        m += w_roam * float((over * over).sum())
+        GX += (2 * w_roam * over / np.maximum(r, 1e-300))[:, :, None] * dev
+    idx = np.argwhere(hit)
+    if len(idx) == 0:
+        out = GX if raw else np.tensordot(Psi, GX,
+                                          axes=([1], [1])).transpose(1, 0, 2)
+        return m, out, math.sqrt(dm2.min()), gm
+    I, C, J, K = idx.T
+    s = gm['ss'][I, C, J, K]
+    rel = gm['A'][I, C, J, K] + s[:, None] * gm['B'][I, C, J, K]
+    nh = rel / np.maximum(np.linalg.norm(rel, axis=1), 1e-300)[:, None]
+    w = -2.0 * viol[I, C, J, K]
+    gi = (w[:, None] * nh) @ g.B.T                    # lattice gradient
+    np.add.at(GX, (I, K), (1 - s)[:, None] * gi)
+    np.add.at(GX, (I, K + 1), s[:, None] * gi)
+    gj = -np.einsum('eb,ebc->ec', gi, Mall[C])
+    np.add.at(GX, (J, (K - aall[C]) % S), (1 - s)[:, None] * gj)
+    np.add.at(GX, (J, (K + 1 - aall[C]) % S), s[:, None] * gj)
+    out = GX if raw else np.tensordot(Psi, GX,
+                                      axes=([1], [1])).transpose(1, 0, 2)
+    return m, out, math.sqrt(dm2.min()), gm
+
+
+def l1_kink_grad(J):
+    """gradient of sum_k |J[i,k]| with respect to the path samples.
+
+    A group-L1 pressure on the kinks: it costs the same to bend a lot once as a
+    little often, so the descent gathers its bending into a few breakpoints
+    instead of smearing it over every sample.  That is what makes the free
+    phase produce something a contact-only subspace can actually represent --
+    without it phase 1 finds a curve, not a polyline, and the projection in
+    phase 2 throws most of it away.
+    """
+    nrm = np.linalg.norm(J, axis=2, keepdims=True)
+    H = np.where(nrm > 1e-12, J / np.maximum(nrm, 1e-30), 0.0)
+    n, S, _ = J.shape
+    W = np.zeros((n, S + 3, 2))
+    W[:, 1:S + 1, :] = H                              # J[k] lives at offset k+1
+    return (W[:, 0:S + 1, :] - 2 * W[:, 1:S + 2, :] + W[:, 2:S + 3, :])
+
+
+def descend_free(g, tr, clones, self_c, target, Mall, aall, Psi, X0,
+                 iters, lr=0.02, beta=0.9, w_l1=0.0):
+    """phase 1 -- find a corridor using every sample as a free breakpoint.
+
+    This is deliberately unrestricted: it answers "is there room at all", and
+    its answer is the initial guess phase 2 sparsifies.  The mean of the jump
+    field is removed every step, which is the exact projection onto closed
+    velocity, so even here there is no kink at the seam.
+    """
+    S = tr.S
+    X = tr.X.copy()
+    mom = np.zeros_like(X)
+    best = (-1.0, tr.J.copy())
+    for _ in range(iters):
+        m, GX, clear, _ = merit_grad(g, tr, clones, self_c, target,
+                                     Mall, aall, Psi, X0, raw=True)
+        if clear > best[0]:
+            best = (clear, tr.J.copy())
+        if m == 0.0 and w_l1 == 0.0:
+            break
+        if w_l1:
+            GX = GX + w_l1 * l1_kink_grad(tr.J)
+        gn = float(np.linalg.norm(GX))
+        if gn < 1e-14:
+            break
+        mom = beta * mom - lr * GX / gn
+        X = X + mom
+        X[:, 0, :] = tr.s
+        X[:, S, :] = tr.s + tr.L                      # start and drift pinned
+        # closed velocity: X[1] - X[0] must equal X[S] - X[S-1]
+        r = 0.5 * (X[:, 1, :] + X[:, S - 1, :] - X[:, 0, :] - X[:, S, :])
+        X[:, 1, :] -= r
+        X[:, S - 1, :] -= r
+        tr.set_jumps(x_to_jumps(X, tr))
+    tr.set_jumps(best[1])
+    return best[0]
+
+
+def x_to_jumps(X, tr):
+    """second difference of a pinned path -> the jump field it comes from."""
+    U = np.diff(X, axis=1)
+    J = np.zeros_like(U)
+    J[:, 1:, :] = np.diff(U, axis=1)
     return J
 
 
-def newton_step(g, tr, contacts, D, target, mu, w_close, w_tan):
-    """one Levenberg-Marquardt step on the exact gap functions.
+def slot_subspace(g, tr, slots, Psi, w_tan=0.0):
+    """the linear space of paths that bend ONLY at the given contacts.
 
-    Rows: (a) gap_p >= target, linearised -- the contact time is a stationary
-    point of the separation, so by the envelope theorem only the explicit
-    dependence on the impulses survives; (b) the total impulse on each ball
-    vanishes, so the velocity closes around the period exactly; (c) a penalty
-    on the tangential part of each impulse, keeping contacts frictionless;
-    (d) LM damping.
+    One column pair per contact: the tent it raises on ball i at sample ki plus
+    the tent its equal-and-opposite reaction raises on ball j at kj.  The
+    columns are then restricted to the null space of the closure map, so every
+    path in the space already has a velocity that returns after a period.
 
-    Every gap row has entries of size ~S/4 with the same sign (all of psi is
-    negative), so the block is nearly rank deficient and the weights have to be
-    scaled to it -- an absolute ridge is either a no-op or a straitjacket.
+    Restricting by PROJECTION rather than by re-parametrising is what makes
+    phase 2 work: the descent step is taken in path space, where the geometry
+    is well scaled, and only then dropped onto this subspace.
     """
-    S, n, P = tr.S, tr.n, len(contacts)
-    contrib = contributions(contacts, n)
-    rows, rhs = [], []
+    n, S, P = tr.n, tr.S, len(slots)
+    if P == 0:
+        return None
+    A = np.zeros((n * (S + 1) * 2, 2 * P))
+    for p, sl in enumerate(slots):
+        for d in range(2):
+            e = np.zeros(2)
+            e[d] = 1.0
+            col = np.zeros((n, S + 1, 2))
+            col[sl['i']] += np.outer(Psi[sl['ki']], e)
+            col[sl['j']] += np.outer(Psi[sl['kj']], e @ sl['T'])
+            A[:, 2 * p + d] = col.ravel()
+    C = closure_matrix(slots, n)
+    _, sv, vt = np.linalg.svd(C)
+    rank = int((sv > 1e-9 * max(sv.max(), 1e-30)).sum())
+    Nb = vt[rank:].T                                  # (2P, q)
+    Aeff = A @ Nb
+    # w_tan biases impulses towards the contact normal -- among the paths in
+    # the subspace fitting the descent step equally well, prefer the one whose
+    # kinks lean least sideways.  It DEFAULTS TO ZERO, and main() shows why:
+    # asking for frictionless contacts costs about a fifth of the clearance and
+    # loses feasibility outright.  That is the tent obstruction again, measured
+    # rather than argued.
+    Tn = np.zeros((P, 2 * P))
+    for p, sl in enumerate(slots):
+        Tn[p, 2 * p:2 * p + 2] = [-sl['nh'][1], sl['nh'][0]]
+    TN = Tn @ Nb
+    scale = float((Aeff * Aeff).sum()) / max(float((TN * TN).sum()), 1e-30)
+    G = Aeff.T @ Aeff + (w_tan * scale) * (TN.T @ TN)
+    G += 1e-10 * np.trace(G) / max(len(G), 1) * np.eye(len(G))
+    return dict(Nb=Nb, Aeff=Aeff, G=G, At=Aeff.T)
 
-    for p, e in enumerate(contacts):
-        Ji = path_jac(contrib[e['i']], e['ti'], S, P)
-        Jj = path_jac(contrib[e['j']], e['tj'], S, P)
-        rows.append(e['nh'] @ (Ji - e['R'].T @ Jj))
-        rhs.append(max(0.0, target - e['gap']))
-    Jg = np.array(rows)
-    scale = max(float(np.abs(Jg).max()), 1e-12)
 
-    clo = np.zeros((2 * n, 2 * P))
-    for i in range(n):
-        for (kp, A, p) in contrib[i]:
-            clo[2 * i:2 * i + 2, 2 * p:2 * p + 2] += A
-    tan = np.zeros((P, 2 * P))
-    for p, e in enumerate(contacts):
-        tan[p, 2 * p:2 * p + 2] = [-e['nh'][1], e['nh'][0]]
+def descend_slots(g, tr, clones, self_c, slots, sub, target, Mall, aall, Psi,
+                  X0, iters, lr=0.02, beta=0.85):
+    """phase 2 -- projected gradient descent onto the contact subspace.
 
-    flat = D.ravel()
-    wc, wt, wr = w_close * scale, w_tan * scale, mu * scale
-    A_ = np.vstack([Jg, wc * clo, wt * tan, wr * np.eye(2 * P)])
-    b_ = np.concatenate([np.array(rhs), -wc * (clo @ flat),
-                         -wt * (tan @ flat), -wr * flat])
-    return np.linalg.lstsq(A_, b_, rcond=None)[0].reshape(P, 2)
+    Each unknown is one physical collision; the impulse it applies to the two
+    participants is equal and opposite after transport through the clone.  The
+    step is taken in path space and then projected, so a path that bends
+    everywhere is pulled onto the nearest path that bends only at contacts,
+    repeatedly, rather than being fitted once and abandoned.
+    """
+    n, S = tr.n, tr.S
+    Nb, Aeff, G, At = sub['Nb'], sub['Aeff'], sub['G'], sub['At']
+
+    def land(X):
+        y = np.linalg.solve(G, At @ (X - X0).ravel())
+        Xp = X0 + (Aeff @ y).reshape(n, S + 1, 2)
+        D = (Nb @ y).reshape(-1, 2)
+        return Xp, D
+
+    X, D = land(tr.X.copy())
+    tr.set_jumps(slots_to_jumps(slots, D, n, S))
+    mom = np.zeros_like(X)
+    best = (-1.0, D.copy())
+    for _ in range(iters):
+        m, GX, clear, _ = merit_grad(g, tr, clones, self_c, target,
+                                     Mall, aall, Psi, X0, raw=True)
+        if clear > best[0]:
+            best = (clear, D.copy())
+        if m == 0.0:
+            break
+        gn = float(np.linalg.norm(GX))
+        if gn < 1e-14:
+            break
+        mom = beta * mom - lr * GX / gn
+        X, D = land(X + mom)
+        tr.set_jumps(slots_to_jumps(slots, D, n, S))
+    D = best[1]
+    tr.set_jumps(slots_to_jumps(slots, D, n, S))
+    return best[0], D
 
 
-def solve(g, starts, drifts, S, radius, margin=1.05, span=2, rounds=40,
-          det=1.45, w_close=8.0, w_tan=0.25, mu0=0.35, verbose=False):
-    """damped Gauss-Newton with a homotopy on the required clearance.
+def solve(g, starts, drifts, S, radius, margin=1.05, span=2,
+          free_iters=80, slot_iters=140, sweeps=3, det=1.35, w_l1=0.10,
+          w_tan=0.0, verbose=False):
+    """corridor first, then sparsify onto the contacts.
 
-    Jumping straight at the full target makes the contact set churn and the
-    linearisation is only good locally, so the required clearance is raised
-    gradually and every step is line-searched on the true merit (total squared
-    shortfall over every instant and every pair, not just the sampled ones).
+    Phase 1 asks whether there is room at all, using every sample as a free
+    breakpoint.  Phase 2 then asks for the same clearance from paths that bend
+    ONLY where they meet something: the contacts of the phase-1 paths become
+    the breakpoints, one paired impulse each, and the impulses are re-optimised
+    against the same objective.  Repeating the pair a few times lets the
+    contact set settle -- moving the paths moves which encounters exist, which
+    is the self-consistency the problem is really about.
     """
     d_goal = 2 * radius * margin
     tr = Traj(starts, drifts, S)
+    X0 = tr.X.copy()                                  # the straight drifts
     clones_full, self_full = build_clones(g, S, span)
-    clones, self_c = cull_clones(g, tr, clones_full, self_full, d_goal + 0.8)
-    contacts, D = [], np.zeros((0, 2))
-    gm = pair_geometry(g, tr, clones, self_c)
-    clear = math.sqrt(gm['dm2'].min())
-    best = (clear, tr.J.copy(), [], D)
-    target = min(d_goal, max(2.5 * clear, 0.4 * d_goal))
-    mu, stall = mu0, 0
+    clones, self_c = cull_clones(g, tr, clones_full, self_full, d_goal + 0.6)
+    Mall = np.array([c['M'] for c in clones])
+    aall = np.array([c['a'] for c in clones])
+    Psi = psi_matrix(S)
 
-    for it in range(rounds):
-        new = find_contacts(g, tr, clones, gm, target * det)
-        if not new:
+    descend_free(g, tr, clones, self_c, d_goal, Mall, aall, Psi, X0,
+                 free_iters, w_l1=w_l1)
+    if verbose:
+        print(f"  phase 1 (free breakpoints): clearance "
+              f"{min_clearance(g, tr, span=span + 1):.4f}")
+
+    best = (-1.0, tr.J.copy(), [], np.zeros((0, 2)))
+    slots, D = [], np.zeros((0, 2))
+    for sw in range(sweeps):
+        clones, self_c = cull_clones(g, tr, clones_full, self_full,
+                                     d_goal + 0.6)
+        Mall = np.array([c['M'] for c in clones])
+        aall = np.array([c['a'] for c in clones])
+        gm = pair_geometry(g, tr, clones, self_c)
+        contacts = find_contacts(g, tr, clones, gm, d_goal * det)
+        if not contacts:
             break
-        D = match_carry(new, contacts, D, S)
-        contacts = new
-        step = newton_step(g, tr, contacts, D, target, mu, w_close, w_tan)
-
-        base = merit(gm, target)
-        acc = None
-        for a in (1.0, 0.55, 0.3, 0.15, 0.07):
-            Dt = D + a * step
-            rebuild(g, tr, contacts, Dt)
-            gt = pair_geometry(g, tr, clones, self_c)
-            m = merit(gt, target)
-            if m < base:
-                acc, gm, base = Dt, gt, m
-                break
-        if acc is None:
-            mu *= 4.0
-            stall += 1
-            rebuild(g, tr, contacts, D)
-            if stall > 3:
-                if target >= d_goal - 1e-12:
-                    break
-                target = min(d_goal, target * 1.12)           # push on anyway
-                mu, stall = mu0, 0
-                gm = pair_geometry(g, tr, clones, self_c)
-            continue
-        D, mu, stall = acc, max(mu * 0.6, 0.04), 0
-        clear = math.sqrt(gm['dm2'].min())
-        if clear > best[0]:
-            best = (clear, tr.J.copy(), contacts, D.copy())
+        slots = slot_ops(g, contacts)
+        sub = slot_subspace(g, tr, slots, Psi, w_tan)
+        _, D = descend_slots(g, tr, clones, self_c, slots, sub, d_goal,
+                             Mall, aall, Psi, X0, slot_iters)
+        clear = min_clearance(g, tr, span=span + 1)    # honest, unculled window
         if verbose:
-            print(f"  round {it:3d}  clearance {clear:.4f}  target {target:.4f}"
-                  f"  contacts {len(contacts):3d}  merit {base:.3e}  mu {mu:.3f}")
-        if clear >= target - 1e-9:
-            if target >= d_goal - 1e-12:
-                break
-            target = min(d_goal, target * 1.35)
-            mu = mu0
-        if it % 7 == 6:
-            clones, self_c = cull_clones(g, tr, clones_full, self_full,
-                                         d_goal + 0.8)
-            gm = pair_geometry(g, tr, clones, self_c)
+            print(f"  phase 2 sweep {sw}: contacts {len(slots):3d}  "
+                  f"clearance {clear:.4f}")
+        if clear > best[0]:
+            best = (clear, tr.J.copy(), slots, D.copy())
+        if clear >= d_goal * (1 - 1e-6):
+            break
+        # not there yet: re-open the corridor from where we are and try again
+        descend_free(g, tr, clones, self_c, d_goal, Mall, aall, Psi, X0,
+                     free_iters // 2, w_l1=w_l1)
 
     tr.set_jumps(best[1])
-    contacts = best[2]
-    # drop impulses too small to bend the path visibly, so the kink count is
+    slots, D = best[2], best[3]
+    # drop impulses too small to bend a path visibly, so the kink count is
     # honest; keep the pruning only if it costs no clearance
-    keep = tr.J.copy()
-    speed = float(np.linalg.norm(tr.U @ g.B, axis=2).mean())
-    J = tr.J.copy()
-    J[np.linalg.norm(J, axis=2) < 3e-4 * speed] = 0.0
-    tr.set_jumps(J)
-    if min_clearance(g, tr, span=span) < best[0] - 1e-12:
-        tr.set_jumps(keep)
-    return tr, contacts, clones_full, self_full, d_goal
+    if len(slots):
+        keep = tr.J.copy()
+        speed = float(np.linalg.norm(tr.U @ g.B, axis=2).mean())
+        alive = np.linalg.norm(D, axis=1) > 3e-4 * speed
+        if not alive.all():
+            slots2 = [s for s, a in zip(slots, alive) if a]
+            D2 = D[alive]
+            tr.set_jumps(slots_to_jumps(slots2, D2, tr.n, S))
+            if min_clearance(g, tr, span=span) >= best[0] - 1e-12:
+                slots, D = slots2, D2
+            else:
+                tr.set_jumps(keep)
+    return tr, slots, clones_full, self_full, d_goal
 
 
 # --------------------------------------------------------------------------
@@ -605,14 +759,22 @@ def min_clearance(g, tr, span=3):
 
 
 def orbit_cart(g, tr, clones, t):
-    """every ball in the plane at global time t (clones share tau, so cache)."""
-    pts, idx, cache = [], [], {}
+    """every ball in the plane at global time t, cartesian, with ball index.
+
+    Clones sharing an op share both the time offset and the rotation, so the
+    motif is evaluated once per op and the lattice translations are a broadcast
+    add.
+    """
+    byop = {}
     for cd in clones:
-        a = cd['a']
-        if a not in cache:
-            cache[a] = tr.at(t - a / tr.S)
-        pts.append((cache[a] @ cd['M'].T + cd['m']) @ g.B)
-        idx.append(np.arange(tr.n))
+        byop.setdefault(cd['op'], []).append(cd)
+    pts, idx = [], []
+    for cds in byop.values():
+        p = tr.at(t - cds[0]['a'] / tr.S)
+        base = (p @ cds[0]['M'].T) @ g.B                  # (n, 2)
+        mc = np.array([cd['m'] for cd in cds]) @ g.B      # (C, 2)
+        pts.append((base[None, :, :] + mc[:, None, :]).reshape(-1, 2))
+        idx.append(np.tile(np.arange(tr.n), len(cds)))
     return np.vstack(pts), np.concatenate(idx)
 
 
@@ -654,29 +816,34 @@ def kink_stats(g, tr, tol=1e-6):
     return float(kinks.sum()) / tr.n, 1.0 - float(kinks.mean())
 
 
-def restitution(g, tr, contacts):
+def restitution(g, tr, slots):
     """how elastic each surviving contact actually is.
 
-    eps = -(normal relative velocity after) / (before).  eps = 1 is a true
-    elastic bounce, eps < 0 means the path bent around its partner instead of
-    reflecting off it -- which the tent argument says must happen sometimes.
+    eps = -(normal relative velocity after) / (before).  eps = +1 is a true
+    elastic bounce; eps < 0 means the path bowed AROUND its partner instead of
+    reflecting off it, which the tent argument in the module docstring says has
+    to happen once the start and the drift are both pinned.
     """
-    S, n, P = tr.S, tr.n, len(contacts)
-    if P == 0:
-        return []
-    contrib = contributions(contacts, n)
-    D = np.zeros((P, 2))
-    for p, e in enumerate(contacts):
-        D[p] = (tr.J[e['i'], e['ki']] @ g.B)                  # recovered impulse
-    base = (tr.L @ g.B) / S
+    S = tr.S
     out = []
-    for p, e in enumerate(contacts):
-        i, j, ki, kj, R = e['i'], e['j'], e['ki'], e['kj'], e['R']
+    for sl in slots:
+        i, j, ki, kj, R = sl['i'], sl['j'], sl['ki'], sl['kj'], sl['R']
         ub = (tr.U[i, (ki - 1) % S] @ g.B) - (tr.U[j, (kj - 1) % S] @ g.B) @ R
         ua = (tr.U[i, ki] @ g.B) - (tr.U[j, kj] @ g.B) @ R
-        gb, ga = float(ub @ e['nh']), float(ua @ e['nh'])
-        if abs(gb) > 1e-12:
+        gb, ga = float(ub @ sl['nh']), float(ua @ sl['nh'])
+        if abs(gb) > 1e-10:
             out.append(-ga / gb)
+    return out
+
+
+def tangential_fraction(g, tr, slots):
+    """how far each contact impulse leans off the contact normal."""
+    out = []
+    for sl in slots:
+        d = tr.J[sl['i'], sl['ki']] @ g.B
+        nn = float(np.linalg.norm(d))
+        if nn > 1e-12:
+            out.append(abs(float(np.cross(d / nn, sl['nh']))))
     return out
 
 
@@ -688,53 +855,124 @@ TINY = dict(group='g226', n=3, S=72, radius=0.075, margin=1.05,
             starts=[[0.15, 0.20], [0.55, 0.35], [0.30, 0.75]],
             drifts=[[1, 0], [-1, 1], [0, -1]])
 
+FULL = dict(group='g226', n=5, S=180, radius=0.070, margin=1.05,
+            starts=[[0.15, 0.20], [0.55, 0.35], [0.30, 0.75],
+                    [0.80, 0.70], [0.05, 0.55]],
+            drifts=[[1, 0], [-1, 1], [0, -1], [1, -1], [0, 1]])
 
-def solve_tiny(verbose=False):
-    t0 = time.time()
-    g = Group(TINY['group'])
-    tr, contacts, _, _, d_goal = solve(
-        g, TINY['starts'], TINY['drifts'], TINY['S'], TINY['radius'],
-        margin=TINY['margin'], verbose=verbose)
-    runtime = time.time() - t0
 
+def _measure(g, tr, slots, spec, runtime):
     clear = min_clearance(g, tr, span=3)
     shift = min((tau for _, _, tau in g.ops if tau > 1e-9), default=0.0)
-    sym = check_symmetry(g, tr, shift)
     kpb, straight = kink_stats(g, tr)
     return dict(
         runtime_sec=round(runtime, 3),
-        min_clearance_ratio=round(clear / (2 * TINY['radius']), 4),
-        symmetry_residual=sym,
+        min_clearance_ratio=round(clear / (2 * spec['radius']), 4),
+        symmetry_residual=check_symmetry(g, tr, shift),
         kinks_per_ball=round(kpb, 3),
         straight_fraction=round(straight, 4),
-        converged=bool(clear >= 2 * TINY['radius']),
+        converged=bool(clear >= 2 * spec['radius']),
     )
+
+
+def solve_spec(spec, verbose=False):
+    t0 = time.time()
+    g = Group(spec['group'])
+    tr, slots, _, _, _ = solve(g, spec['starts'], spec['drifts'], spec['S'],
+                               spec['radius'], margin=spec['margin'],
+                               verbose=verbose)
+    runtime = time.time() - t0
+    return g, tr, slots, _measure(g, tr, slots, spec, runtime)
+
+
+def solve_tiny(verbose=False):
+    return solve_spec(TINY, verbose)[3]
+
+
+def render(g, tr, radius, size=600, frames=60, cell_px=210.0, span=3):
+    """the animation itself, so the full-problem estimate includes drawing."""
+    from PIL import Image, ImageDraw                  # local: solving needs no PIL
+    import colorsys
+    n = tr.n
+    cols = [tuple(int(255 * c) for c in
+                  colorsys.hls_to_rgb((i / n + 0.05) % 1.0, 0.5, 0.62))
+            for i in range(n)]
+    clones, _ = build_clones(g, tr.S, span)
+    r = radius * cell_px
+    imgs = []
+    for f in range(frames):
+        img = Image.new("RGB", (size, size), (250, 249, 246))
+        d = ImageDraw.Draw(img)
+        pts, idx = orbit_cart(g, tr, clones, f / frames)
+        for (px, py), i in zip(pts, idx):
+            x, y = size / 2 + px * cell_px, size / 2 - py * cell_px
+            if -2 * r <= x <= size + 2 * r and -2 * r <= y <= size + 2 * r:
+                d.ellipse([x - r, y - r, x + r, y + r], fill=cols[i],
+                          outline=(40, 44, 54), width=max(1, int(0.16 * r)))
+        imgs.append(img)
+    return imgs
 
 
 def main():
     print("tent check (kink +y at k=20, S=72):")
     hi, lo, pred = tent_check()
     print(f"  path deviation range [{lo:.4f}, {hi:.2e}]   predicted min {pred:.4f}")
-    print("  -> a kink bows the path AGAINST itself; a repulsive contact"
+    print("  -> a kink bows the path AGAINST itself, so a repulsive contact"
           " impulse closes its own gap.\n")
 
     g = Group(TINY['group'])
-    print("Strategy B, literal elastic exchange:")
+    print("Strategy B, literal elastic exchange (60 iterations):")
     rep = strategy_b_probe(g, TINY['starts'], TINY['drifts'], TINY['S'],
                            TINY['radius'])
     for k, v in rep.items():
-        print(f"  [{k:6s}] start {v['first']:.4f} best {v['best']:.4f} "
-              f"last {v['last']:.4f}  (need {2*TINY['radius']:.4f})")
+        print(f"  [{k:6s}] clearance start {v['first']:.4f} best {v['best']:.4f}"
+              f" last {v['last']:.4f}   (need {2*TINY['radius']:.4f})")
         print(f"           tail {v['tail']}")
-        print(f"           closure defect {v['closure_defect']:.3e}  "
-              f"mean speed {v['speed']:.4f}  "
+        print(f"           closure defect {v['closure_defect']:.3e}   "
+              f"mean speed {v['speed']:.4f}   "
               f"impulse surviving projection {v['impulse_kept']*100:.0f}%")
-    print("  -> neither variant converges; see module docstring.\n")
+    print("  -> neither variant converges: 'closed' cannot keep any impulse,"
+          " 'open' diverges.\n")
 
-    print("delivered solver:")
-    out = solve_tiny(verbose=True)
-    print()
-    print(out)
+    print("delivered solver, TINY:")
+    g, tr, slots, out = solve_spec(TINY, verbose=True)
+    eps = restitution(g, tr, slots)
+    tan = tangential_fraction(g, tr, slots)
+    print(f"  contacts {len(slots)}   closure defect {closure_defect(g, tr):.2e}"
+          f"   (mean speed {np.linalg.norm(tr.U @ g.B, axis=2).mean():.4f})")
+    if eps:
+        print(f"  restitution: median {np.median(eps):+.2f}, "
+              f"{100*np.mean(np.array(eps) > 0):.0f}% of contacts reflect"
+              f" (eps>0), range [{min(eps):+.2f}, {max(eps):+.2f}]")
+        print(f"  impulse tangential component: median "
+              f"{np.median(tan):.2f} of unit")
+    gaps = np.array([sl['gap'] for sl in slots]) / (2 * TINY['radius'])
+    print(f"  contact gaps at detection / diameter: min {gaps.min():.2f} median "
+          f"{np.median(gaps):.2f} max {gaps.max():.2f}"
+          f"  ({int((gaps < 1.25).sum())} of {len(gaps)} genuinely tight)")
+    print("  solve_tiny() ->")
+    print(f"  {solve_tiny()}\n")
+
+    print("cost of insisting the impulses be frictionless (along the normal):")
+    for wt in (0.0, 0.2):
+        tr2, sl2, _, _, _ = solve(g, TINY['starts'], TINY['drifts'],
+                                  TINY['S'], TINY['radius'],
+                                  margin=TINY['margin'], w_tan=wt)
+        r2 = min_clearance(g, tr2, span=3) / (2 * TINY['radius'])
+        t2 = tangential_fraction(g, tr2, sl2)
+        print(f"  w_tan={wt:.2f}: clearance ratio {r2:.3f}"
+              f"   median tangential component {np.median(t2):.2f}")
+    print("  -> pulling contacts towards the normal loses feasibility;"
+          " the tent obstruction again.\n")
+
+    print("delivered solver, FULL (n=5, S=180, r=0.07) + 60 frames of 600x600:")
+    g, tr, slots, outf = solve_spec(FULL)
+    t0 = time.time()
+    imgs = render(g, tr, FULL['radius'])
+    draw = time.time() - t0
+    print(f"  {outf}")
+    print(f"  contacts {len(slots)}   render {draw:.2f}s for {len(imgs)} frames"
+          f"   TOTAL {outf['runtime_sec'] + draw:.2f}s")
 
 
 if __name__ == "__main__":

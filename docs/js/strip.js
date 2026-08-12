@@ -5,9 +5,9 @@
  * centering (vx, tau).
  */
 "use strict";
-import { drawMotif, drawPhaseRing } from "./renderer.js?v=35";
-import { Playback } from "./playback.js?v=35";
-import { stripTimeSymmetry } from "./phases.js?v=35";
+import { drawMotif, drawPhaseRing } from "./renderer.js?v=36";
+import { Playback } from "./playback.js?v=36";
+import { stripTimeSymmetry } from "./phases.js?v=36";
 
 /* 1+1D group verification: ops (m, s, v, tau) act as
  * (x,t) -> (m x + v, s t + tau); with an optional centring translation the

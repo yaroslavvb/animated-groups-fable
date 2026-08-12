@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Billiards — Film Groups</title>
+<link rel="stylesheet" href="css/style.css?v=36">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="billiards.html" class="here">Billiards</a>
+      <a href="future-directions.html">Future</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="narrow">
+  <h1>Billiards</h1>
+  <p class="subtitle">Three balls, eighteen copies of each, and never an
+    overlap.</p>
+
+  <p>Every ball on the screen is a copy of one of three, put there by a
+    symmetry of the film. Some of those symmetries shift time as well as
+    space, so each ball shares the plane with copies of itself running ⅙, ⅓,
+    ½, ⅔ and ⅚ of a period behind.</p>
+
+  <p>Each ball carries its own clock. The colour grows out of the centre over
+    the first half of the period and is eaten away from the centre over the
+    second: a dot is a ball just starting, a full disk with a pinhole is one
+    just past halfway, a thin ring is one nearly done.</p>
+
+  <div class="demo" id="film"></div>
+
+  <p class="hint">Click the picture to play or pause; the arrow keys jump
+    between the six marked instants of the loop, shift for a fine step.
+    <b>Symmetry axes</b> draws mirror lines solid and glide lines dashed, and
+    puts a triangle on every 3-centre — filled where the rotation costs no
+    time, hollow where it also runs the film a third of a period on.</p>
+
+  <h2>Why it cannot be simulated</h2>
+  <p>The trajectories are straight between breakpoints, and each ball drifts a
+    whole lattice vector per period, so the film loops although no ball ends
+    where it began. The constraint is that no ball may overlap any other ball
+    anywhere in the plane at any instant — including the copies of itself at
+    the five other phases. The solution sits exactly on that constraint: over
+    the whole loop the closest any two balls come is one diameter, so they do
+    make contact, and never more than contact.</p>
+  <p>That cannot be run forward in time. An impact at time <i>t</i> has to
+    deflect the partner too, and the partner is a copy of the same ball at
+    <i>t</i> − ⅓, already in the past; changing it changes the collision that
+    caused it. The whole periodic trajectory is solved at once instead — a
+    self-consistent loop, found by relaxing the closed polylines against every
+    clone of every ball until nothing overlaps. Because no two balls ever
+    overlap, paint order cannot matter, so the drawn frame is exactly
+    symmetric and not merely the point set behind it.</p>
+
+  <dl class="facts">
+    <dt>group</dt><dd><a href="https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html#g235"><span class="sym"><sup>3</sup>3∗<sup>2</sup>3</span> — g235</a>,
+      over orbifold 3∗3 with colour group C<sub>6</sub></dd>
+    <dt>balls</dt><dd id="d-balls">—</dd>
+    <dt>clock</dt><dd id="d-clock">—</dd>
+    <dt>closest approach</dt><dd id="d-clear">—</dd>
+    <dt>symmetry residual</dt><dd id="d-sym">—</dd>
+    <dt>solver</dt><dd><a href="https://github.com/yaroslavvb/animated-groups-fable/blob/main/enumerate/solve_baseline.py">solve_baseline.py</a>
+      · <a href="https://github.com/yaroslavvb/animated-groups-fable/blob/main/enumerate/physicality.py">physicality.py</a></dd>
+  </dl>
+</main>
+
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/billiards.js?v=36"></script>
+</body>
+</html>

@@ -245,3 +245,58 @@ def prune_free_kinks(g, B, V, L, S, radius, margin=1.02, span=3, passes=1):
         if not removed:
             break
     return B, V
+
+
+def straighten(g, B, V, L, S, radius, span=3, passes=6, steps=12):
+    """Pull each breakpoint toward the straight line through its neighbours,
+    as far as the no-overlap constraint allows.
+
+    prune_free_kinks can only delete a bend, and at high clone counts almost
+    every bend is load-bearing -- removing it reintroduces an overlap, so it
+    stays at whatever angle the relaxation left it, which is what reads as a
+    jerk. This instead keeps the bend and makes it shallower: bisect along the
+    segment from the breakpoint to the chord midpoint and take the furthest
+    point that is still clear. Clearance never decreases, so a solved
+    trajectory set stays solved.
+    """
+    groups = clone_groups(g, R.integer_clones(g, span, S))
+    d_min = 2 * radius
+
+    def clear_of(Bx, Vx):
+        X = R.rasterize(Bx, Vx, L, S)
+        allp = stack(g, X, L, groups)
+        base = X @ g.B
+        d = np.linalg.norm(base[None, :, None, :, :] - allp[:, None, :, :, :], axis=4)
+        d[d < 1e-9] = np.inf
+        return float(d.min())
+
+    B = [list(b) for b in B]
+    V = [[np.asarray(p, dtype=float) for p in v] for v in V]
+    for _ in range(passes):
+        moved = 0.0
+        for i in range(len(B)):
+            m = len(B[i])
+            for k in range(m):
+                # neighbours on the closed path; wrapping costs a drift vector
+                prev = V[i][k - 1] + (0 if k else -np.asarray(L[i], dtype=float))
+                nxt = (V[i][(k + 1) % m] +
+                       (np.asarray(L[i], dtype=float) if k + 1 == m else 0))
+                target = 0.5 * (prev + nxt)
+                here = V[i][k]
+                lo, hi = 0.0, 1.0
+                best = 0.0
+                for _ in range(steps):
+                    mid = 0.5 * (lo + hi)
+                    trial = [list(v) for v in V]
+                    trial[i][k] = here + mid * (target - here)
+                    if clear_of(B, trial) >= d_min:
+                        best, lo = mid, mid
+                    else:
+                        hi = mid
+                if best > 1e-3:
+                    step = best * (target - here)
+                    moved += float(np.linalg.norm(step))
+                    V[i][k] = here + step
+        if moved < 1e-4:
+            break
+    return B, [[list(p) for p in v] for v in V]

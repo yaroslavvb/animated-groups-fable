@@ -501,3 +501,69 @@ section.wp .demo canvas { height: 280px; }
 .tablewrap table.counts { margin: 0; }
 table.counts tr.rotfree td { background: var(--code-bg); }
 table.counts td .sym { margin-right: 0.35em; }
+
+/* ---------------------------------------------------------------- mystery
+ * The ball film is a canvas of its own: taller than the pattern diagrams and
+ * sized by the viewport, because what has to be legible here is a ball's fill
+ * level, not the outline of a glyph. */
+.demo canvas.ballfilm {
+  height: clamp(340px, 62vh, 560px);
+  cursor: pointer;
+}
+
+.film-opts {
+  display: flex;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+  padding: 0.55rem 0.9rem 0.75rem;
+  border-top: 1px solid var(--rule);
+  font: 0.88rem/1.4 system-ui, -apple-system, sans-serif;
+  color: var(--muted);
+}
+.film-opts label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+.film-opts label:hover { color: var(--accent); }
+.film-opts input { accent-color: var(--accent); cursor: pointer; }
+
+/* Progressive hints. Closed by default and quiet enough to skip past — the
+ * page is a puzzle, so a hint has to be something you choose to open. */
+details {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--panel);
+  padding: 0.15rem 1rem;
+  margin: 0.7rem 0;
+  box-shadow: var(--shadow);
+}
+details[open] { padding-bottom: 0.7rem; }
+summary {
+  cursor: pointer;
+  padding: 0.6rem 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.94rem;
+  color: var(--accent);
+  list-style-position: outside;
+}
+summary:hover { color: var(--accent2); }
+details[open] summary { border-bottom: 1px solid var(--rule); margin-bottom: 0.4rem; }
+details > p:last-child { margin-bottom: 0; }
+
+dl.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.2rem;
+  margin: 1.2rem 0;
+  font: 0.9rem/1.5 system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+dl.facts dt { color: var(--muted); }
+dl.facts dd { margin: 0; }
+
+@media (max-width: 520px) {
+  dl.facts { grid-template-columns: 1fr; gap: 0 0; }
+  dl.facts dd { margin-bottom: 0.5rem; }
+}

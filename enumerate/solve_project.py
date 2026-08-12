@@ -95,6 +95,7 @@ class PolylineSolver:
         self.span_solve, self.span_check = span_solve, span_check
         self.cull_slack = cull_slack
         self.n_triples = 0
+        self._triple_cache = {}
 
         self._build_interp()
         self._build_bending()
@@ -220,7 +221,15 @@ class PolylineSolver:
 
     # ------------------------------------------------------------- the cull
     def _all_triples(self, span):
-        """(clone, i, j) triples over ops x translations x ball pairs, minus self."""
+        """(clone, i, j) triples over ops x translations x ball pairs, minus self.
+
+        Depends only on the group and the ball count, so it is cached: the wide
+        window is 3 (2 span + 1)^2 n^2 entries and gets rebuilt on every clearance
+        measurement.
+        """
+        hit = self._triple_cache.get(span)
+        if hit is not None:
+            return hit
         oi, aa, bb, ii, jj = [], [], [], [], []
         for o in range(self.O):
             for a in range(-span, span + 1):
@@ -233,8 +242,10 @@ class PolylineSolver:
                                 continue
                             oi.append(o); aa.append(a); bb.append(b)
                             ii.append(i); jj.append(j)
-        return (np.array(oi), np.array(aa, float), np.array(bb, float),
-                np.array(ii), np.array(jj))
+        out = (np.array(oi), np.array(aa, float), np.array(bb, float),
+               np.array(ii), np.array(jj))
+        self._triple_cache[span] = out
+        return out
 
     def cull(self, slack=None, span=None, thresh=None):
         """Keep only the triples that could ever come within d_tgt + slack.
@@ -479,9 +490,11 @@ class PolylineSolver:
         """True continuous-time minimum centre distance, on a WIDE clone window.
 
         Independent of the cull used while solving: the triples are rebuilt here
-        over span_check with a threshold of `thresh` cartesian units, so the value
-        is exact whenever the true minimum is below that (it always is, in
-        practice, since the balls are packed at ~0.15).
+        over span_check.  A pair whose bounding boxes are `thresh` apart cannot
+        get closer than `thresh`, so the result is EXACT whenever the true minimum
+        is below thresh and is otherwise clamped to thresh -- always a valid lower
+        bound, never an optimistic one.  In practice the balls are packed at ~0.15
+        and thresh is 1.0, so the exact branch is the one that fires.
         """
         Xf = self.Xf if Xf is None else Xf
         span = self.span_check if span is None else span
@@ -502,7 +515,7 @@ class PolylineSolver:
             Q = per_op[o[sl], jj[sl]] + wc[sl][:, None, :]
             d, _, _ = self._seg_min(Pcart[ii[sl]] - Q, self.S)
             best = min(best, float(d.min()))
-        return best
+        return min(best, float(thresh))      # box-rejected pairs bound it below
 
     def straightness(self, Xf=None):
         """fraction of sample steps whose heading equals the previous step's."""
@@ -519,15 +532,15 @@ class PolylineSolver:
         Xf = self.Xf if Xf is None else Xf
         P_ext, _ = self.positions(Xf)
         P = P_ext[:, :self.S, :]
+        rng = np.arange(-span, span + 1, dtype=float)
+        ab = np.stack(np.meshgrid(rng, rng, indexing='ij'), -1).reshape(-1, 2)
         pts, idx = [], []
         for o, (M, v, tau) in enumerate(self.g.ops):
             m = sidx - self.opsh[o]
             r = m % self.S
-            q = (P[:, r, :] + ((m - r) // self.S) * self.L) @ M.T + v
-            for a in range(-span, span + 1):
-                for b in range(-span, span + 1):
-                    pts.append(q + np.array([a, b], dtype=float))
-                    idx.append(np.arange(self.n))
+            q = (P[:, r, :] + ((m - r) // self.S) * self.L) @ M.T + v      # (n, 2)
+            pts.append((q[None, :, :] + ab[:, None, :]).reshape(-1, 2))
+            idx.append(np.tile(np.arange(self.n), len(ab)))
         return np.vstack(pts), np.concatenate(idx)
 
     def symmetry_residual(self, span=5, radius_keep=1.6, times=12):
@@ -669,7 +682,7 @@ def solve_tiny(K=6, return_solver=False):
                          margin=TINY['margin'])
     sol.solve()
     t_solve = time.perf_counter() - t0
-    out = sol.report(time.perf_counter() - t0)
+    out = sol.report(0.0)                          # runtime filled in below
     out['runtime_sec'] = round(time.perf_counter() - t0, 4)
     out['runtime_solve_sec'] = round(t_solve, 4)
     return (out, sol) if return_solver else out
@@ -790,8 +803,15 @@ def render_gif(sol, path, frames=60, size=600, cell_px=200.0, span=None, ss=2):
             d.ellipse([xi - rad, yi - rad, xi + rad, yi + rad], fill=cols[i],
                       outline=(38, 42, 52), width=max(1, int(0.17 * rad)))
         imgs.append(img.resize((size, size), Image.BOX))
-    imgs[0].save(path, save_all=True, append_images=imgs[1:], duration=60,
-                 loop=0, optimize=False)
+    # One shared palette for the whole loop.  Saving RGB frames straight to GIF
+    # makes PIL derive a palette per frame -- ten times slower here, no smaller a
+    # file, and it lets the colours shimmer from frame to frame.  Every frame has
+    # the same gamut (n ball colours, one outline, one background), so a palette
+    # taken from frame 0 is exact for all of them.
+    pal = imgs[0].convert('P', palette=Image.ADAPTIVE, colors=64)
+    frames_p = [im.quantize(palette=pal, dither=Image.NONE) for im in imgs]
+    frames_p[0].save(path, save_all=True, append_images=frames_p[1:], duration=60,
+                     loop=0, optimize=False)
     return path
 
 
