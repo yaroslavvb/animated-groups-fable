@@ -4,24 +4,10 @@
  * plain-English account of its time behaviour. */
 "use strict";
 import { buildTabs } from "./tabs.js?v=40";
-import { WALLPAPERS, sectionSort, censusSentence, timeStory, setSignatures, signatureOf }
+import { leadHtml } from "./catalog-names.js?v=40";
+import { WALLPAPERS, sectionSort, censusSentence, timeStory }
   from "./wallpaper-data.js?v=40";
 
-/* The book's colour signatures for the forward groups, so the atlas names each
- * film group the way the correspondence tables do. Optional by construction:
- * if the file is missing the captions fall back to the catalogue symbol. */
-async function loadSignatures() {
-  try {
-    const r = await fetch("data/xu-correspondence.json", { cache: "no-cache" });
-    if (!r.ok) return;
-    const d = await r.json();
-    setSignatures(new Map(Object.entries(d.groups)));
-  } catch (e) {
-    console.warn("wallpaper: no colour signatures —", e.message);
-  }
-}
-
-await loadSignatures();
 
 const hm = new URLSearchParams(location.search).get("g");
 const idx = WALLPAPERS.findIndex(w => w.hm === hm);
@@ -65,11 +51,6 @@ if (idx < 0) {
   tabHost.className = "tabdemo big";
   listDiv.append(tabHost);   // attach before constructing animations
   buildTabs(tabHost, list.map(g => ({ g, sym: g.symbol, note: timeStory(g) })),
-            { split: true, label: labelOf });   // forward run, then the reversal run
+            { split: true, label: leadHtml });   // forward run, then the reversal run
 }
 
-/* a tab is named by its book signature where it has one */
-function labelOf(g) {
-  const sig = signatureOf(g.id);
-  return sig ? sig.signatureHtml : g.symbolHtml;
-}

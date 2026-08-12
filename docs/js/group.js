@@ -12,7 +12,7 @@ import { attachControls } from "./controls.js?v=40";
 import { attachStage } from "./stage.js?v=40";
 import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=40";
 import { passes, groupHref } from "./filters.js?v=40";
-import { nameOf } from "./catalog-names.js?v=40";
+import { nameOf, leadHtml } from "./catalog-names.js?v=40";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
@@ -45,10 +45,10 @@ function render(g) {
   const prev = i > 0 ? list[i - 1] : list[list.length - 1];
   const next = i >= 0 && i < list.length - 1 ? list[i + 1] : list[0];
   const nav = list.length > 1 && i >= 0
-    ? `<a href="${groupHref(prev.id, from)}">← <span class="sym">${prev.symbolHtml}</span></a>` +
+    ? `<a href="${groupHref(prev.id, from)}">← <span class="sym">${leadHtml(prev)}</span></a>` +
       ` &ensp;<span style="color:var(--muted);">${i + 1} of ${list.length}` +
       `${from ? " in this selection" : ""}</span>&ensp; ` +
-      `<a href="${groupHref(next.id, from)}"><span class="sym">${next.symbolHtml}</span> →</a>`
+      `<a href="${groupHref(next.id, from)}"><span class="sym">${leadHtml(next)}</span> →</a>`
     : "";
 
   document.title = `${g.symbol} — Film Groups`;

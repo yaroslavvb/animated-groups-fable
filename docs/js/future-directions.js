@@ -8,6 +8,7 @@ import { attachControls } from "./controls.js?v=40";
 import { paintColored } from "./colored.js?v=40";
 import { attachStage } from "./stage.js?v=40";
 import { groupCaption } from "./wallpaper-data.js?v=40";
+import { leadHtml } from "./catalog-names.js?v=40";
 
 const PAIRS = [
   { host: "pair-bw", sym: "o/g′", mode: "bw",
@@ -63,7 +64,7 @@ for (const p of PAIRS) {
     return { demo, canvas, cap: c };
   };
 
-  const L = mk(`<span class="sym">${g.symbolHtml}</span>, coloured — ${p.left}`);
+  const L = mk(`<span class="sym">${leadHtml(g)}</span>, coloured — ${p.left}`);
   paintColored(L.canvas, g.render, p.mode);
 
   const R = mk(groupCaption(g) + `<p style="margin:0.4rem 0 0;">${p.right}</p>`);

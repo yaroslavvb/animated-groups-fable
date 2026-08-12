@@ -47,3 +47,10 @@ export function nameOf(g) {
   }
   return { lead, tail };
 }
+
+/* The lead name alone, for the many places that show one symbol and no room
+ * for a second: tab buttons, prev/next links, table cells. */
+export function leadHtml(g) {
+  const s = SIGS.get(g.id);
+  return s ? s.signatureHtml : g.symbolHtml;
+}

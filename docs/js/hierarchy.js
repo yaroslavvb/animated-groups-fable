@@ -9,20 +9,11 @@
  */
 "use strict";
 import { buildTabs } from "./tabs.js?v=40";
-import { setSignatures } from "./wallpaper-data.js?v=40";
+import { leadHtml } from "./catalog-names.js?v=40";
 
 const H = await (await fetch("data/hierarchy.json", { cache: "no-cache" })).json();
 const CATALOG = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
 const BY_ID = new Map(CATALOG.groups.map(g => [g.id, g]));
-
-// the colour signatures, so a clockwork tab is captioned the way the
-// correspondence tables name it; absent, captions fall back to the symbol
-try {
-  const r = await fetch("data/xu-correspondence.json", { cache: "no-cache" });
-  if (r.ok) setSignatures(new Map(Object.entries((await r.json()).groups)));
-} catch (e) {
-  console.warn("hierarchy: no colour signatures —", e.message);
-}
 
 const sum = xs => xs.reduce((a, b) => a + b, 0);
 const COLOURS = sum(H.colourCensus.map(r => r.wieting));
@@ -76,7 +67,7 @@ table("six-table",
      b(H.headline.polar), ditto],
   ],
   { left: [0, 1, 3],
-    note: `The indented rows are subsets of the row above. ` +
+    note: `Indented rows are subsets of the row above. ` +
     `${COLOURS} = ${H.colourCensus.map(r => r.wieting).join(" + ")} over ` +
     `N&nbsp;=&nbsp;1…6; ${CYCLIC} = ` +
     `${H.colourCensus.map(r => r.cyclic).join(" + ")}.` });
@@ -109,8 +100,8 @@ table("colour-table",
     note: "Column 1: Wieting 1982, Table 11. Column 2: the Senechal–Wieting " +
     "count of normal subgroups of index N with cyclic quotient, up to " +
     "plane-affine equivalence. Column 3: this catalog. " +
-    "<b>The three columns use different notions of equivalence</b> " +
-    "— §7 is about exactly that, and the totals are not meant to agree." });
+    "<b>The three columns use different equivalences</b>" +
+    "; the totals are not comparable. See §7." });
 
 /* §4 — the image of the clock in Isom(S¹) */
 table("phase-table",
@@ -139,8 +130,7 @@ table("phase-table",
       .concat([[b("Σ"), b(H.fibres.types), b(H.headline.filmGroups),
                 ...sizes.map(s => b(H.fibres.sizeCounts[s]))]]),
     { total: true, left: [0],
-      note: "A fibre of size k is one space-group type that can be sliced " +
-      "into k inequivalent films." });
+      note: "A fibre of size k is one space-group type sliced by k inequivalent films." });
   for (const el of document.querySelectorAll("[data-fib]"))
     el.textContent = H.fibres.sizeCounts[el.dataset.fib];
 }
@@ -148,7 +138,7 @@ table("phase-table",
 /* §6 — the 68 clockwork groups against the 68 polar space groups */
 {
   const rows = H.polarTable.map(r => [
-    `<a href="group.html?g=${r.id}">${sym(r.symbolHtml)}</a>`,
+    `<a href="group.html?g=${r.id}">${sym(leadHtml(r))}</a>`,
     sym(H.byOrbifold.find(o => o.hm === r.base).orbifold) +
       ` <span style="color:var(--muted);">${r.base}</span>`,
     r.clock === 1 ? "<span style='color:var(--muted);'>1</span>" : r.clock,
@@ -193,8 +183,8 @@ table("phase-table",
       b(H.headline.clockwork - CYCLIC)]]),
     { total: true, left: [0, 1],
       note: "Each cell is <i>cyclic colourings → film groups</i> for that " +
-      "wallpaper group and that clock order, red where they differ. The four " +
-      "rotation-free rows lose almost everything; p3, p4 and p6 gain." });
+      "wallpaper group and clock order, marked where they differ. The four " +
+      "rotation-free rows collapse; p3, p4 and p6 split." });
 
   document.getElementById("rf-cyclic").textContent = H.rotationFree.cyclic;
   document.getElementById("rf-film").textContent = H.rotationFree.film;
@@ -205,18 +195,18 @@ table("phase-table",
 /* the five clocks that exist, in order, the trivial one last */
 {
   const picks = [
-    ["g6", "C<sub>2</sub> — the half-period time screw: every 2-centre " +
-      "advances the film by half a period, so around it the two copies are " +
-      "opposite phases. Lifts to P2<sub>1</sub>."],
-    ["g226", "C<sub>3</sub> — a third of a period per 120° turn. Lifts to " +
-      "P3<sub>1</sub>; turning the clock the other way gives P3<sub>2</sub>, " +
-      "its mirror image and a different film."],
-    ["g96", "C<sub>4</sub> — a quarter per 90° turn, the canonical time " +
-      "screw. Lifts to P4<sub>1</sub>."],
-    ["g235", "C<sub>6</sub> — the richest clock there is: a time glide and a " +
-      "time centring together generate six phases. Lifts to R3c."],
-    ["g1", "C<sub>1</sub> — no clock at all. The 17 films of this kind are " +
-      "the 17 wallpaper groups, each with an independent loop bolted on."],
+    ["g6", "C<sub>2</sub>: every 2-centre advances the film by half a " +
+      "period, so its two copies are opposite in phase. Lifts to " +
+      "P2<sub>1</sub>."],
+    ["g226", "C<sub>3</sub>: a third of a period per 120° turn. Lifts to " +
+      "P3<sub>1</sub>; the opposite sense gives P3<sub>2</sub>, its mirror " +
+      "image and a distinct film."],
+    ["g96", "C<sub>4</sub>: a quarter of a period per 90° turn. Lifts to " +
+      "P4<sub>1</sub>."],
+    ["g235", "C<sub>6</sub>: a time glide and a time centring together " +
+      "generate six phases. Lifts to R3c."],
+    ["g1", "C<sub>1</sub>: no clock. The 17 such films are the 17 wallpaper " +
+      "groups with an independent loop."],
   ];
   const host = document.createElement("div");
   host.className = "tabdemo big";
@@ -239,10 +229,10 @@ table("phase-table",
   buildTabs(host, members.map(m => ({
     g: BY_ID.get(m.id), sym: m.symbol,
     note: `Projects to ${m.base}; ${m.forward
-      ? "runs one way only, so this is the clockwork member of the fibre"
-      : "reverses time, so what is a mirror perpendicular to c in the crystal " +
-        "is a palindrome in the film"}. As a crystal it is ` +
-      `<span class="mono">${hm}</span>, the same as the other tabs.`,
+      ? "no time reversal, so this is the clockwork member of the fibre"
+      : "reverses time — the mirror perpendicular to c in the crystal is a " +
+        "palindrome in the film"}. As a crystal it is ` +
+      `<span class="mono">${hm}</span>, as in the other tabs.`,
   })), { split: true });
 }
 
@@ -252,11 +242,11 @@ table("phase-table",
  * ring deep each, and drawn so that the ring inside the left circle meets the
  * ring inside the right one in exactly the clockwork groups.
  *
- * The regions are honest set differences, with one seam: the left circle
- * counts colourings up to plane-affine equivalence and the right one counts
+ * The regions are set differences, with one seam: the left circle counts
+ * colourings up to plane-affine equivalence and the right one counts
  * space-group types, so the 101 cyclic colourings and the 68 polar types are
- * the same region measured two ways. That seam IS §7, and the caption says
- * so rather than hiding it behind a single number.
+ * the same region measured two ways. The caption names that seam rather than
+ * reporting a single number for the region.
  */
 document.getElementById("venn").innerHTML = venn();
 
@@ -328,20 +318,18 @@ function venn() {
     <text x="381" y="464" text-anchor="middle" font-size="11.5"
       fill="var(--accent2)" font-weight="600">the ${h.clockwork} clockwork groups</text>
     <text x="381" y="480" text-anchor="middle" font-size="11"
-      fill="var(--muted)">a colouring, a film and a polar crystal at once</text>
+      fill="var(--muted)">a colouring, a film and a polar crystal</text>
   </svg>
-  <p class="hint" style="margin-top:0;">Every region is a set difference and
-  the numbers add up around each circle:
+  <p class="hint" style="margin-top:0;">Regions are set differences:
   ${COLOURS - CYCLIC}&nbsp;+&nbsp;${CYCLIC - h.clockwork}&nbsp;+&nbsp;${h.clockwork}&nbsp;=&nbsp;${COLOURS}
-  on the left, and
+  on the left,
   ${h.cubic}&nbsp;+&nbsp;${h.nonCubic - h.polar}&nbsp;+&nbsp;${h.polar}&nbsp;=&nbsp;${h.spaceGroups}
-  on the right. The ${h.cubic} cubic types are outside everything because a
-  cubic point group fixes no direction, so nothing in such a crystal can be
-  called time. The two circles are read with two different equivalences —
-  colourings up to affine maps of the plane, crystals up to space-group type —
-  and the ${CYCLIC - h.clockwork} is exactly the gap between them:
-  ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct films.
-  <a href="#disagree">§7</a> takes that number apart.</p></div>`;
+  on the right. The ${h.cubic} cubic types lie outside both circles: a cubic
+  point group fixes no direction, so no axis of such a crystal can be time.
+  The circles use different equivalences — colourings up to affine maps of the
+  plane, crystals up to space-group type — and the ${CYCLIC - h.clockwork} is
+  the gap: ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct films
+  (<a href="#disagree">§7</a>).</p></div>`;
 }
 
 /* ---------- the summary diagram at the foot ---------- */

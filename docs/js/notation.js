@@ -4,6 +4,7 @@
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
 import { buildTabs } from "./tabs.js?v=40";
+import { leadHtml } from "./catalog-names.js?v=40";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section
@@ -129,7 +130,10 @@ const bySym = new Map(data.groups.map(g => [g.symbol, g]));
 for (const [id, items] of Object.entries(SECTIONS)) {
   const host = document.getElementById(id);
   if (host) {
+    // the tab is named the way the rest of the site names a group: by its
+    // book colour signature where it has one
     buildTabs(host, items.map(it =>
-      ({ g: bySym.get(it.sym), sym: it.sym, note: it.note })));
+      ({ g: bySym.get(it.sym), sym: it.sym, note: it.note })),
+      { label: leadHtml });
   }
 }

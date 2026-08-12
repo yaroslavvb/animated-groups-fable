@@ -4,6 +4,7 @@
  * film groups at full size) import this. Examples are resolved by SYMBOL
  * against catalog.json so they cannot silently drift. */
 "use strict";
+import { signatureOf } from "./catalog-names.js?v=40";
 
 /* Crystallographic order; orb = Conway orbifold of the wallpaper group.
  * note: one-line description of the wallpaper itself.
@@ -297,19 +298,8 @@ adjacent motifs run in counterphase.");
   return s.join(" ");
 }
 
-/* The Conway / Goodman-Strauss reading of the forward groups, as published in
- * the correspondence tables: id -> { signatureHtml, tos, clockOrder }. Loaded
- * once by the page (data/xu-correspondence.json) and handed here, because the
- * caption is built synchronously while the tabs are laid out. Absent — for a
- * time-reversing group, which is not a colouring — the caption simply falls
- * back to the catalogue symbol. */
-let SIGNATURES = new Map();
-
-export function setSignatures(map) { SIGNATURES = map || new Map(); }
-export function signatureOf(id) { return SIGNATURES.get(id) || null; }
-
 export function groupCaption(g) {
-  const sig = SIGNATURES.get(g.id);
+  const sig = signatureOf(g.id);
   return `<div style="display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;">` +
     `<span class="sym">${sig ? sig.signatureHtml : g.symbolHtml}</span>` +
     (sig ? `<span class="sym" style="color:var(--muted);font-size:0.95rem;" ` +

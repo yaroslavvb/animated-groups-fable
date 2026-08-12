@@ -33,6 +33,7 @@ import { attachStage } from "./stage.js?v=40";
 import { attachControls } from "./controls.js?v=40";
 import { filmTimeSymmetry } from "./phases.js?v=40";
 import { orbitPlacements } from "./orbit.js?v=40";
+import { leadHtml } from "./catalog-names.js?v=40";
 
 const INK = "#1f2430";
 const GROUND = "#faf9f6";
@@ -521,7 +522,7 @@ for (const t of TESTS) {
   const b = document.createElement("button");
   b.type = "button";
   b.className = "gpick";
-  b.innerHTML = `<span class="sym">${g.symbolHtml}</span>` +
+  b.innerHTML = `<span class="sym">${leadHtml(g)}</span>` +
                 `<span class="why">${t.why}</span>`;
   b.addEventListener("click", () => {
     for (const o of sel.children) o.classList.toggle("on", o === b);

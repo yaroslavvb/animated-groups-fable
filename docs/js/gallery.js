@@ -3,6 +3,7 @@
 import { FilmGroupAnimation } from "./renderer.js?v=40";
 import { attachControls } from "./controls.js?v=40";
 import { attachStage } from "./stage.js?v=40";
+import { leadHtml, signatureOf } from "./catalog-names.js?v=40";
 
 const FEATURED = [
   {
@@ -108,6 +109,23 @@ on screen.",
   },
 ];
 
+
+/* The featured list names its groups by symbol, not by id, so the catalogue
+ * has to be consulted to find the signature. Subscript markup is stripped and
+ * the digits folded to the catalogue's Unicode subscripts before comparing. */
+const SUBS = "\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089";
+const CATALOG = await (async () => {
+  try {
+    const r = await fetch("data/catalog.json", { cache: "no-cache" });
+    return r.ok ? (await r.json()).groups : [];
+  } catch { return []; }
+})();
+const canon = h => String(h)
+  .replace(/<sub>(\d)<\/sub>/g, (_, d) => SUBS[+d])
+  .replace(/<[^>]*>/g, "");
+const BY_SYMBOL = new Map(CATALOG.map(g => [g.symbol, g.id]));
+function idBySymbol(sym) { return BY_SYMBOL.get(canon(sym)) || null; }
+
 const anims = [];
 const observer = new IntersectionObserver((entries) => {
   for (const e of entries) {
@@ -122,6 +140,7 @@ const root = document.getElementById("demos");
 const DATA = await (await fetch("data/featured.json", {cache: "no-cache"})).json();
 for (const f of FEATURED) {
   f.spec = DATA.specs[f.specId];
+  f.gid = idBySymbol(f.sym);
   const d = document.createElement("div");
   d.className = "demo";
   d.id = f.id;
@@ -131,7 +150,8 @@ for (const f of FEATURED) {
   cap.className = "caption";
   cap.innerHTML =
     `<div style="display:flex;align-items:baseline;gap:0.7rem;flex-wrap:wrap;">` +
-    `<span class="sym">${f.sym}</span>` +
+    `<span class="sym">${f.gid && signatureOf(f.gid) ? signatureOf(f.gid).signatureHtml : f.sym}</span>` +
+    (f.gid && signatureOf(f.gid) ? `<span class="sym" style="color:var(--muted);font-size:0.85em;">${f.sym}</span>` : "") +
     `<span style="color:var(--muted);">${f.kw}</span>` +
     `<a class="linkish" style="margin-left:auto;text-decoration:none;" href="gifs/${f.id}.gif" download>⬇ GIF</a>` +
     `</div><p style="margin:0.4rem 0 0;">${f.text}</p>`;
