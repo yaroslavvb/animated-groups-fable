@@ -1,4 +1,4 @@
-/* One film group, on its own page: group.html?g=g94
+/* One spacetime group, on its own page: group.html?g=g94
  *
  * Every catalog entry has a URL, so a single group can be linked to,
  * bookmarked and opened in a new tab. The page carries the catalog selection
@@ -29,7 +29,7 @@ const g = data.groups.find(x => x.id === id);
 if (!g) {
   root.innerHTML =
     `<h1>No such group</h1>` +
-    `<p class="subtitle">There is no film group with id “${escapeHtml(id || "")}”. ` +
+    `<p class="subtitle">There is no spacetime group with id “${escapeHtml(id || "")}”. ` +
     `The catalog has ${data.groups.length}.</p>` +
     `<p><a href="${backHref}">← back to the catalog</a></p>`;
 } else {
@@ -51,7 +51,7 @@ function render(g) {
       `<a href="${groupHref(next.id, from)}"><span class="sym">${leadHtml(next)}</span> →</a>`
     : "";
 
-  document.title = `${g.symbol} — Film Groups`;
+  document.title = `${g.symbol} — Spacetime Groups`;
   root.innerHTML =
     (() => { const n = nameOf(g);
       return `<h1><span class="sym">${n.lead}</span>` +
@@ -77,7 +77,7 @@ function render(g) {
       `font-size:0.7em;">(x in lattice coordinates, t in periods)</span></h2>` +
     `<div class="genbox">${escapeHtml(g.generators.join("\n"))}</div>` +
     `<p><a href="wallpaper-group.html?g=${g.base}">` +
-      `All film groups over <span class="sym">${ORB.get(g.base) || ""}</span> ` +
+      `All spacetime groups over <span class="sym">${ORB.get(g.base) || ""}</span> ` +
       `${g.base} →</a></p>`;
 
   // the animation last, once its box is in the document and has a width

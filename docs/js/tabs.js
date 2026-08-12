@@ -27,7 +27,7 @@ const observer = new IntersectionObserver((entries) => {
  * opts.split — draw the row as TWO runs: the groups with no time reversal
  * first, tinted green, then the groups that reverse time, in the usual grey,
  * starting on a line of their own. The wallpaper atlas passes it, where the
- * list is every film group over one wallpaper and that distinction is the
+ * list is every spacetime group over one wallpaper and that distinction is the
  * first thing worth seeing. The notation page does not: its tabs are chosen
  * examples in a deliberate teaching order, and a split down the middle of a
  * worked argument would be noise. Callers that pass it are expected to have
@@ -59,7 +59,7 @@ export function buildTabs(host, items, opts = {}) {
     const rev = opts.split && item.g && !item.g.forward;
     btn.className = "tabbtn sym" + (trivial ? " trivial" : "") +
       (opts.split ? (rev ? " rev" : " fwd") : "");
-    if (trivial) btn.title = "the trivial case: this film group is identical " +
+    if (trivial) btn.title = "the trivial case: this spacetime group is identical " +
       "to the wallpaper group — every copy in phase forever, so every instant " +
       "is the wallpaper itself";
     // the reversal run starts on a line of its own
@@ -116,7 +116,7 @@ in catalog.json — out of sync with the enumeration</div>`;
 
   host.append(bar, paneBox);
   // Open on the first tab that is a case to work through, which is index 0
-  // everywhere EXCEPT the three wallpapers whose only forward-time film group
+  // everywhere EXCEPT the three wallpapers whose only forward-time spacetime group
   // is the trivial clock — p1, pm, pg. There the trivial tab leads its run and
   // so leads the row, and opening a section on the one group where "what can
   // time do here?" answers "nothing" is exactly what ordering it last is for.

@@ -1260,7 +1260,7 @@ def bravais_letter(ac):
     r = res[0]
     if r[2] == 0:
         return "C-centred (spatial)"
-    return "centred (space-time)"
+    return "centred (spacetime)"
 
 
 # --------------------------------------------------------------- main export

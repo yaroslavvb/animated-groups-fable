@@ -1,6 +1,6 @@
 /* The ball glyph, and the ground it is drawn on.
  *
- * Two pages draw the same object — the Billiards film and the Designer's live
+ * Two pages draw the same object — the Billiards animation and the Designer's live
  * preview — and it is the same object in both: a ball wearing its own clock.
  * The colour grows out of the centre over the first half of the period and is
  * eaten away from the centre over the second, so a dot is a ball just

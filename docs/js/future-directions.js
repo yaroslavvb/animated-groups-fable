@@ -1,5 +1,5 @@
 /* Future-directions page: paired demos — a STATIC coloured rendering of a
- * film-group spec (colour = clock data) beside the LIVE film — plus the
+ * spacetime-group spec (colour = clock data) beside the LIVE animation — plus the
  * colour-count numbers computed from the catalog at load time, so the page
  * can never disagree with the data. */
 "use strict";
@@ -13,23 +13,23 @@ import { leadHtml } from "./catalog-names.js?v=40";
 const PAIRS = [
   { host: "pair-bw", sym: "o/g′", mode: "bw",
     left: "The dichromatic pattern: colour = time sign. Swapping black and \
-white is playing the film backwards; here the swap is carried by a \
+white is playing the animation backwards; here the swap is carried by a \
 half-cell translation.",
-    right: "The film itself: columns alternately fill and drain." },
+    right: "The animation itself: columns alternately fill and drain." },
   { host: "pair-checker", sym: "c222₁2₁", mode: "phase",
     left: "The unitary two-colouring: hue = phase, and the two phases 0 and \
 ½ paint the two sublattices of the checkerboard.",
-    right: "The film: translating half a cell diagonally equals waiting \
+    right: "The animation: translating half a cell diagonally equals waiting \
 half a period." },
   { host: "pair-z4", sym: "4₁4₁2₁", mode: "phase",
     left: "The perfect ℤ₄-colouring of p4: a quarter turn about any \
 4-centre advances the colour by one.",
-    right: "The film: the same quarter turn advances the phase by a \
+    right: "The animation: the same quarter turn advances the phase by a \
 quarter period." },
   { host: "pair-z6", sym: "6₁3₁2₁", mode: "phase",
     left: "The perfect ℤ₆-colouring of p6: six colours cycling around every \
 6-centre, three around every 3-centre, two around every 2-centre.",
-    right: "The film: the hero of the tutorial, read chromatically." },
+    right: "The animation: the hero of the tutorial, read chromatically." },
 ];
 
 const anims = new Map();
@@ -186,7 +186,7 @@ if (table) {
                  "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m"];
   const cell = n => (n ? String(n) : "·");
   let html = `<tr><th rowspan="2">wallpaper</th>` +
-    `<th colspan="4">forward film groups</th>` +
+    `<th colspan="4">forward spacetime groups</th>` +
     `<th colspan="4">colour plane groups</th></tr><tr>` +
     NS.map(n => `<th>${n}</th>`).join("") +
     NS.map(n => `<th>${n}</th>`).join("") + `</tr>`;

@@ -2,11 +2,11 @@
 """Rebuild docs/data/xu-correspondence.json and docs/data/designer-groups.json.
 
 WHY THIS EXISTS.  The designer's group menu was built once, by hand, with the
-selection "forward film groups with clock order >= 3".  That quietly dropped
+selection "forward spacetime groups with clock order >= 3".  That quietly dropped
 the 36 groups whose clock is a single half-period flip -- among them g6,
 2_1 2_1 2_1 2_1, which is entry 01/51 of the correspondence table.  A clock of
 order 2 is no less a clock than one of order 6: the 180 degree turn about
-every 2-centre advances the film by half a period, and no instant of the film
+every 2-centre advances the animation by half a period, and no instant of the animation
 has the full p2 symmetry.  So the menu, not the classification, was wrong.
 Selection here is `clock order >= 2`, computed from the ops rather than
 copied, and the list is generated rather than typed.
@@ -320,7 +320,7 @@ def main():
     out = {
         "meta": {
             "count": len(picked),
-            "selection": "forward film groups with clock order >= 2",
+            "selection": "forward spacetime groups with clock order >= 2",
             "colorOrders": orders,
             "notation": "book_color_signature from The Symmetries of Things "
                         "(Conway, Burgiel, Goodman-Strauss 2008)",

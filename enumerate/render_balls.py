@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Rendering and verification for ball trajectories in a clockwork group.
 
-Solver-independent: hand it closed polylines and it draws the film and checks it.
+Solver-independent: hand it closed polylines and it draws the animation and checks it.
 A trajectory set is (B, V, L, S):
     B[i]  sorted sample indices of ball i's breakpoints, starting with 0
     V[i]  the positions at those breakpoints, lattice coordinates
@@ -182,7 +182,7 @@ def draw_cells(g, size, cell_px, span):
 
 
 def render(g, B, V, L, S, radius, size=600, frames=60, cell_px=250.0, span=2):
-    """frames of the film, assembled by pasting pre-shrunk sprites"""
+    """frames of the animation, assembled by pasting pre-shrunk sprites"""
     n = len(B)
     cols = palette(n)
     R = radius * cell_px

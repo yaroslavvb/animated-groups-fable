@@ -16,8 +16,8 @@ const SECTIONS = {
 in unison — every instant is a p4 wallpaper with the full fourfold symmetry." },
     { sym: "4₁4₁2₁",
       note: "The time-axis P4₁: a quarter turn about any 4-centre advances \
-the film a quarter period, so the four copies around a centre form a \
-staircase of quarter phases. Freeze the film — no instant has fourfold \
+the animation a quarter period, so the four copies around a centre form a \
+staircase of quarter phases. Freeze the animation — no instant has fourfold \
 symmetry, yet the loop does." },
     { sym: "4₂4₂2",
       note: "The half-period screw P4₂: 90° equals half a period, so \
@@ -28,7 +28,7 @@ forces the 2-centres to carry no offset: ½ + ½ + 0 ≡ 0." },
 long-exposure photograph, the opposite screw handedness. No \
 orientation-preserving motion of the plane combined with any forward \
 re-timing of the clock identifies the two — only a spatial reflection, or \
-playing the film backwards, does (rule 4)." },
+playing the animation backwards, does (rule 4)." },
   ],
   "tabs-glides": [
     { sym: "*2222",
@@ -54,7 +54,7 @@ with q = ½." },
     { sym: "c22₁×¼",
       note: "On a time-centred lattice a glide can square to the centring \
 translation (half cell, half period) and so carry a quarter offset — the \
-film analogue of a crystallographic d-glide. The prefix c is the subject of \
+animation analogue of a crystallographic d-glide. The prefix c is the subject of \
 the next rule." },
   ],
   "tabs-centred": [
@@ -83,7 +83,7 @@ the full product 2222. Reversal negates offsets, and every offset here is \
 0 ≡ −0, so nothing else is decorated." },
     { sym: "o/g′",
       note: "Glide time-reversal over the bare torus: played backwards, the \
-film equals itself shifted half a cell. Columns alternately fill and \
+animation equals itself shifted half a cell. Columns alternately fill and \
 drain." },
     { sym: "4₁4₁2₁/m′[*442]",
       note: "Why /1′ cannot dress a 4₁: reversal alone would turn it into a \
@@ -92,7 +92,7 @@ reversal mirrors enlarge the photograph from p4 to p4m — recorded in the \
 bracket." },
     { sym: "o/m′[*×]",
       note: "No forward symmetry beyond translations: the reversal mirror \
-alone is responsible for the photograph, enriching p1 to cm. The film has \
+alone is responsible for the photograph, enriching p1 to cm. The animation has \
 mirror symmetry only as a palindrome, never at an instant." },
   ],
   "tabs-letters": [
@@ -119,8 +119,8 @@ symmorphic, the other is not)." },
 six copies around it are filled a sixth apart. The subscripts obey \
 ⅙ + ⅓ + ½ ≡ 0, so the 3- and 2-centre offsets are forced." },
     { sym: "6₅3₂2₁",
-      note: "The mirror twin: the film that is 6₁3₁2₁'s reflection. \
-Handedness of a time screw is real — the pair is the film-group analogue \
+      note: "The mirror twin: the animation that is 6₁3₁2₁'s reflection. \
+Handedness of a time screw is real — the pair is the spacetime-group analogue \
 of left- and right-handed quartz." },
   ],
 };

@@ -1,9 +1,9 @@
-/* Static COLOURED renderings of film-group specs: paint every copy of the
+/* Static COLOURED renderings of spacetime-group specs: paint every copy of the
  * motif by its clock data instead of animating it. This is the dictionary
  * the future-directions tutorial draws: colour = phase.
  *
  *   mode "phase": body hue = tau * 360deg (the copy's time offset), so a
- *     film group with clock denominator N paints a perfect Z_N colouring
+ *     spacetime group with clock denominator N paints a perfect Z_N colouring
  *     of its wallpaper projection; time-reversed copies (s = -1), whose
  *     phase is only defined up to sign, are drawn hollow with a hue ring.
  *   mode "bw": black / white by the time sign s — the Shubnikov picture,

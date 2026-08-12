@@ -56,9 +56,9 @@ table("six-table",
      b(COLOURS), "…the same, colours permuted freely"],
     ["&emsp;…with a regular cyclic colour group",
      "a plane pattern whose N colours form C<sub>N</sub>", b(CYCLIC), ditto],
-    ["space-time (film) groups, 2+1D", "an animation that loops and tiles",
-     b(H.headline.filmGroups),
-     "a change of frame, up to re-basing the space-time lattice"],
+    ["spacetime groups, 2+1D", "an animation that loops and tiles",
+     b(H.headline.spacetimeGroups),
+     "a change of frame, up to re-basing the spacetime lattice"],
     ["&emsp;…clockwork groups", "one that never runs backwards",
      b(H.headline.clockwork), ditto],
     ["space groups", "a 3D crystal", b(H.headline.spaceGroups),
@@ -111,24 +111,24 @@ table("phase-table",
      ...H.phaseImage.map(r => r.cyclic), b(H.headline.clockwork)],
     ["D<sub>N</sub> — reverses time",
      ...H.phaseImage.map(r => r.dihedral),
-     b(H.headline.filmGroups - H.headline.clockwork)],
+     b(H.headline.spacetimeGroups - H.headline.clockwork)],
   ],
   { left: [0],
     note: "N&nbsp;=&nbsp;5 is absent from both rows, and so is every " +
     "N&nbsp;&gt;&nbsp;6: the crystallographic restriction applies to the " +
     "clock as much as to the rotations." });
 
-/* §5 — the colouring of the projection that each film group induces, and the
+/* §5 — the colouring of the projection that each spacetime group induces, and the
  * pure-reversal groups against the magnetic plane groups */
 {
   const K = new Map(H.colouringKinds.map(k => [k.key, k]));
   table("kinds-table",
     ["image of Φ", "descends to Γ?", "colour group induced on Γ", "the colour is",
-     "film groups"],
+     "spacetime groups"],
     H.colouringKinds.map(k => [
       `<span class="sym">${k.image}</span>`,
       k.descends ? "yes" : "<b>no</b>", k.colourGroup, k.colour, b(k.count)])
-      .concat([[b("Σ"), "", "", "", b(H.headline.filmGroups)]]),
+      .concat([[b("Σ"), "", "", "", b(H.headline.spacetimeGroups)]]),
     { total: true, left: [0, 1, 2, 3],
       note: "Row 4 is the case Φ does not descend: G contains a pure time " +
         "reversal, so an element acting trivially on space acts non-trivially " +
@@ -142,11 +142,11 @@ table("phase-table",
   const p = H.pureReversal;
   table("pure-table",
     ["orbifold", "HM", "N&nbsp;=&nbsp;1", "N&nbsp;=&nbsp;2", "Σ"],
-    p.byBase.map(r => [sym(r.orbifold), r.hm, r.film[0], r.film[1] ||
-        "<span style='color:var(--rule);'>·</span>", r.film[0] + r.film[1]])
+    p.byBase.map(r => [sym(r.orbifold), r.hm, r.spacetime[0], r.spacetime[1] ||
+        "<span style='color:var(--rule);'>·</span>", r.spacetime[0] + r.spacetime[1]])
       .concat([[b("Σ"), "", b(p.byClock["1"]), b(p.byClock["2"]), b(p.count)]]),
     { total: true, left: [0, 1],
-      note: "Film groups with a pure time reversal, by spatial projection. " +
+      note: "Spacetime groups with a pure time reversal, by spatial projection. " +
         "Each entry equals the Senechal–Wieting count of cyclic subgroups of " +
         "that index — column 2 of §3 restricted to N&nbsp;≤&nbsp;2 — so the " +
         "table is simultaneously the census of the 17 grey and 46 " +
@@ -157,15 +157,15 @@ table("phase-table",
 {
   const sizes = Object.keys(H.fibres.sizeCounts).sort();
   table("fibre-table",
-    ["3D crystal system", "space-group types", "film groups",
+    ["3D crystal system", "space-group types", "spacetime groups",
      ...sizes.map(s => `fibres of ${s}`)],
     H.fibres.bySystem.map(r =>
-      [r.system, r.types, r.films,
+      [r.system, r.types, r.spacetimeGroups,
        ...sizes.map(s => r.sizes[s] || "<span style='color:var(--rule);'>·</span>")])
-      .concat([[b("Σ"), b(H.fibres.types), b(H.headline.filmGroups),
+      .concat([[b("Σ"), b(H.fibres.types), b(H.headline.spacetimeGroups),
                 ...sizes.map(s => b(H.fibres.sizeCounts[s]))]]),
     { total: true, left: [0],
-      note: "A fibre of size k is one space-group type sliced by k inequivalent films." });
+      note: "A fibre of size k is one space-group type sliced by k inequivalent animations." });
   for (const el of document.querySelectorAll("[data-fib]"))
     el.textContent = H.fibres.sizeCounts[el.dataset.fib];
 }
@@ -195,7 +195,7 @@ table("phase-table",
   document.getElementById("enant").innerHTML = pairs.join(", ");
 }
 
-/* §8 — cyclic colourings against film groups, one wallpaper group per row */
+/* §8 — cyclic colourings against spacetime groups, one wallpaper group per row */
 {
   const N = H.meta.maxColours;
   const dot = "<span style='color:var(--rule);'>·</span>";
@@ -203,26 +203,26 @@ table("phase-table",
     : c === f ? `${c}` : `<span style="color:var(--accent2);">${c}→${f}</span>`;
   table("orb-table",
     ["orbifold", "HM", ...Array.from({ length: N }, (_, i) => `C<sub>${i + 1}</sub>`),
-     "Σ colourings", "Σ films", "Δ"],
+     "Σ colourings", "Σ animations", "Δ"],
     H.byOrbifold.map(r => {
-      const d = r.filmTotal - r.cyclicTotal;
+      const d = r.spacetimeTotal - r.cyclicTotal;
       return [sym(r.orbifold), r.hm,
-        ...r.cyclic.map((c, i) => cell(c, r.film[i])),
-        r.cyclicTotal, r.filmTotal,
+        ...r.cyclic.map((c, i) => cell(c, r.spacetime[i])),
+        r.cyclicTotal, r.spacetimeTotal,
         d === 0 ? "" : `<b style="color:var(--accent2);">${d > 0 ? "+" : ""}${d}</b>`];
     }).concat([[b("Σ"), "",
       ...Array.from({ length: N }, (_, i) => b(cell(
         sum(H.byOrbifold.map(r => r.cyclic[i])),
-        sum(H.byOrbifold.map(r => r.film[i]))))),
+        sum(H.byOrbifold.map(r => r.spacetime[i]))))),
       b(CYCLIC), b(H.headline.clockwork),
       b(H.headline.clockwork - CYCLIC)]]),
     { total: true, left: [0, 1],
-      note: "Each cell is <i>cyclic colourings → film groups</i> for that " +
+      note: "Each cell is <i>cyclic colourings → spacetime groups</i> for that " +
       "wallpaper group and clock order, marked where they differ. The four " +
       "rotation-free rows collapse; p3, p4 and p6 split." });
 
   document.getElementById("rf-cyclic").textContent = H.rotationFree.cyclic;
-  document.getElementById("rf-film").textContent = H.rotationFree.film;
+  document.getElementById("rf-spacetime").textContent = H.rotationFree.spacetime;
 }
 
 /* ---------- live widgets ---------- */
@@ -230,17 +230,17 @@ table("phase-table",
 /* the five clocks that exist, in order, the trivial one last */
 {
   const picks = [
-    ["g6", "C<sub>2</sub>: every 2-centre advances the film by half a " +
+    ["g6", "C<sub>2</sub>: every 2-centre advances the animation by half a " +
       "period, so its two copies are opposite in phase. Lifts to " +
       "P2<sub>1</sub>."],
     ["g226", "C<sub>3</sub>: a third of a period per 120° turn. Lifts to " +
       "P3<sub>1</sub>; the opposite sense gives P3<sub>2</sub>, its mirror " +
-      "image and a distinct film."],
+      "image and a distinct animation."],
     ["g96", "C<sub>4</sub>: a quarter of a period per 90° turn. Lifts to " +
       "P4<sub>1</sub>."],
     ["g235", "C<sub>6</sub>: a time glide and a time centring together " +
       "generate six phases. Lifts to R3c."],
-    ["g1", "C<sub>1</sub>: no clock. The 17 such films are the 17 wallpaper " +
+    ["g1", "C<sub>1</sub>: no clock. The 17 such animations are the 17 wallpaper " +
       "groups with an independent loop."],
   ];
   const host = document.createElement("div");
@@ -249,7 +249,7 @@ table("phase-table",
   buildTabs(host, picks.map(([id, note]) => ({ g: BY_ID.get(id), sym: id, note })));
 }
 
-/* one space-group type, several inequivalent films */
+/* one space-group type, several inequivalent animations */
 {
   const ex = H.fibreExample;
   const hm = ex.hm.replace(/_(\d)/g, "<sub>$1</sub>");
@@ -266,7 +266,7 @@ table("phase-table",
     note: `Projects to ${m.base}; ${m.forward
       ? "no time reversal, so this is the clockwork member of the fibre"
       : "reverses time — the mirror perpendicular to c in the crystal is a " +
-        "palindrome in the film"}. As a crystal it is ` +
+        "palindrome in the animation"}. As a crystal it is ` +
       `<span class="mono">${hm}</span>, as in the other tabs.`,
   })), { split: true });
 }
@@ -319,7 +319,7 @@ function venn() {
       wallpaper groups with up to six colours, containing the ${CYCLIC} whose
       colour group is a regular cyclic clock. The right is the
       ${h.spaceGroups} space-group types, containing the ${h.nonCubic}
-      non-cubic ones that the ${h.filmGroups} film groups realise. The two
+      non-cubic ones that the ${h.spacetimeGroups} spacetime groups realise. The two
       inner circles meet in the ${h.clockwork} clockwork groups, which are
       also the ${h.polar} polar space groups.">
     ${circle(A, "--gold")}${circle(C, "--accent")}
@@ -339,13 +339,13 @@ function venn() {
     ${/* each dashed ring is named inside itself, clear of the lens between them */""}
     ${ring(275, 175, "--gold", `${CYCLIC} regular cyclic`)}
     ${ring(505, 168, "--accent", `${h.nonCubic} non-cubic`)}
-    ${ring(505, 183, "--accent", `all ${h.filmGroups} films land here`)}
+    ${ring(505, 183, "--accent", `all ${h.spacetimeGroups} animations land here`)}
 
     ${n(144, 205, COLOURS - CYCLIC, ["colour group", "is not a clock"])}
-    ${n(256, 252, CYCLIC - h.clockwork, ["same film as", "another (§8)"])}
+    ${n(256, 252, CYCLIC - h.clockwork, ["same animation as", "another (§8)"])}
     ${n(381, 236, h.clockwork, ["clockwork", "= polar"], "--accent2")}
     ${n(513, 252, h.nonCubic - h.polar, ["non-polar types",
-        `— ${h.filmGroups - h.clockwork} reversing films`])}
+        `— ${h.spacetimeGroups - h.clockwork} reversing animations`])}
     ${n(631, 205, h.cubic, ["cubic types"])}
 
     <line x1="381" y1="352" x2="381" y2="446" stroke="var(--accent2)"
@@ -353,7 +353,7 @@ function venn() {
     <text x="381" y="464" text-anchor="middle" font-size="11.5"
       fill="var(--accent2)" font-weight="600">the ${h.clockwork} clockwork groups</text>
     <text x="381" y="480" text-anchor="middle" font-size="11"
-      fill="var(--muted)">a colouring, a film and a polar crystal</text>
+      fill="var(--muted)">a colouring, an animation and a polar crystal</text>
   </svg>
   <p class="hint" style="margin-top:0;">Regions are set differences:
   ${COLOURS - CYCLIC}&nbsp;+&nbsp;${CYCLIC - h.clockwork}&nbsp;+&nbsp;${h.clockwork}&nbsp;=&nbsp;${COLOURS}
@@ -363,7 +363,7 @@ function venn() {
   point group fixes no direction, so no axis of such a crystal can be time.
   The circles use different equivalences — colourings up to affine maps of the
   plane, crystals up to space-group type — and the ${CYCLIC - h.clockwork} is
-  the gap: ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct films
+  the gap: ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct animations
   (<a href="#disagree">§8</a>).</p></div>`;
 }
 
@@ -371,7 +371,7 @@ function venn() {
 
 document.getElementById("diagram").innerHTML = diagram();
 
-/* Three lanes — the plane, space-time, space — three rows each. Every lane
+/* Three lanes — the plane, spacetime, space — three rows each. Every lane
  * reads downwards as a containment; the arrows across are the two maps of §6
  * and §7 plus the colour reading of §3. The middle row of the outer lanes is
  * deliberately empty so that the bijection lands on one horizontal line. */
@@ -409,8 +409,8 @@ function diagram() {
   const h = H.headline, mid = (a, c) => (a + c) / 2;
   return `<div class="tablewrap"><svg viewBox="0 0 760 350" width="100%"
     style="max-width:760px;display:block;margin:1rem auto;font-family:system-ui,sans-serif;"
-    role="img" aria-label="The three lanes — plane, space-time, space — and the
-    maps between them: phase read as height maps the 275 film groups onto the
+    role="img" aria-label="The three lanes — plane, spacetime, space — and the
+    maps between them: phase read as height maps the 275 spacetime groups onto the
     194 non-cubic space-group types, and restricts to a bijection between the
     68 clockwork groups and the 68 polar space groups.">
     <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6"
@@ -420,7 +420,7 @@ function diagram() {
     ${box(L[0], ROW[0], COLOURS, ["coloured wallpaper groups",
         `N&#160;≤&#160;${H.meta.maxColours} colours`])}
     ${box(L[0], ROW[2], CYCLIC, ["…whose colour group is", "a regular cyclic clock"])}
-    ${box(L[1], ROW[0], h.filmGroups, ["film (space-time) groups", "of 2+1 dimensions"])}
+    ${box(L[1], ROW[0], h.spacetimeGroups, ["spacetime groups", "of 2+1 dimensions"])}
     ${box(L[1], ROW[2], h.clockwork, ["clockwork groups", "— they never run backwards"], true)}
     ${box(L[2], ROW[0], h.spaceGroups, ["space-group types", "of 3 dimensions"])}
     ${box(L[2], ROW[1], h.nonCubic, ["non-cubic", "— Fletcher's count"])}

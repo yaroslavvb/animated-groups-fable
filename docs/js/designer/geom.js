@@ -19,7 +19,7 @@
  *
  * Screen y runs DOWN, so the -z term is what puts later time higher up the
  * page. Pitch is clamped away from both ends: at 0 the horizontal plane is a
- * line and every disk is a needle, at 90 the time axis vanishes and the film
+ * line and every disk is a needle, at 90 the time axis vanishes and the animation
  * is a wallpaper again.
  */
 "use strict";

@@ -1,6 +1,6 @@
-/* The little film: the design as it will actually be seen.
+/* The little animation: the design as it will actually be seen.
  *
- * The 3D box is a way of EDITING a film; this is the film. Seen from above with
+ * The 3D box is a way of EDITING an animation; this is the animation. Seen from above with
  * time running, it is the same picture the billiards page shows, drawn the same
  * way — a ball wearing its own clock, the colour growing out of the centre over
  * the first half of the period and eaten away from the centre over the second,
@@ -10,7 +10,7 @@
  *
  * It holds no copy of the design. Every frame samples Design.clones() afresh,
  * which is cached in the model and dropped by every edit, so dragging a
- * breakpoint changes the film under the reader's hand with nothing to rebuild
+ * breakpoint changes the animation under the reader's hand with nothing to rebuild
  * and no notification to forget to send.
  *
  * This is the one animation on the site that plays without being asked. The
@@ -101,7 +101,7 @@ export class Preview extends Playback {
      * DESIGN, not a constant: a billiard whose loop leaves the base cell is put
      * back into view by a translation the size of its own excursion, and a
      * window fixed at two rings of cells simply omits those balls from the
-     * film. So the model is asked for what is near the view, not for a block. */
+     * animation. So the model is asked for what is near the view, not for a block. */
     const seen = this.design.viewClones(
       Math.hypot(w, h) / 2 / this.px + this.design.radius, this.o);
     for (const c of seen) {

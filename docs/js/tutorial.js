@@ -9,7 +9,7 @@ import { attachStage } from "./stage.js?v=40";
 
 const STRIP_BLURBS = {
   "P1": "translations only — a marching band of identical clocks",
-  "P2": "2-fold space-time rotation: flip space AND run time backwards",
+  "P2": "2-fold spacetime rotation: flip space AND run time backwards",
   "Pm_x": "spatial mirror, clocks in phase",
   "Pg_x": "time glide: mirror + half-period delay",
   "Pm_t": "time mirror: the loop is a palindrome",
@@ -33,7 +33,7 @@ const BESTIARY = [
   { id: "p2-timecentred", sym: "c222<sub>1</sub>2<sub>1</sub>", title: "Time centring",
     text: "Centred spacetime lattice: translating by half a cell diagonal = waiting half a period. Half the 2-centres fill in phase, half in counterphase." },
   { id: "glide-time-reversal", sym: "o/g&prime;", title: "Glide time-reversal",
-    text: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>): played backwards, the film equals itself shifted half a cell — neighbouring columns fill and drain in opposite senses." },
+    text: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>): played backwards, the animation equals itself shifted half a cell — neighbouring columns fill and drain in opposite senses." },
 ];
 
 const anims = [];

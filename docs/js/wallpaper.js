@@ -1,6 +1,6 @@
 /* Wallpaper atlas, OVERVIEW level: 17 sections, one per wallpaper group.
  * Each section: what happens over this base (the issues), then a
- * notation-style tab widget over ALL film groups with that projection —
+ * notation-style tab widget over ALL spacetime groups with that projection —
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
@@ -39,7 +39,7 @@ for (const w of WALLPAPERS) {
 
   const h = document.createElement("h2");
   h.innerHTML = `<span class="sym">${w.orb}</span> · ${w.hm} ` +
-    `<span class="n">${list.length} film groups</span>`;
+    `<span class="n">${list.length} spacetime groups</span>`;
   sec.append(h);
 
   const p = document.createElement("p");
@@ -51,7 +51,7 @@ for (const w of WALLPAPERS) {
   pc.textContent = censusSentence(w, list);
   sec.append(pc);
 
-  // ALL film groups over this base, tabbed (product first, then forward,
+  // ALL spacetime groups over this base, tabbed (product first, then forward,
   // then reversal)
   const tabHost = document.createElement("div");
   tabHost.className = "tabdemo";

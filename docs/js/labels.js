@@ -1,7 +1,7 @@
 /* How a group is NAMED to the reader.
  *
  * The catalogue's ids are g1…g275, and the numbering is not ours: it is the
- * one in Xu & Wu's classification of the 275 space-time groups, which the
+ * one in Xu & Wu's classification of the 275 spacetime groups, which the
  * correspondence tables at yaroslavvb.github.io/animated-groups also follow.
  * Written "g6" that provenance is invisible and the id reads like an internal
  * key; written "xu6" it says where the number comes from and that the same

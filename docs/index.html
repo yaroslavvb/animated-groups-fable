@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Film Groups — the crystallography of looping animations</title>
+<title>Spacetime Groups — the crystallography of looping animations</title>
 <link rel="stylesheet" href="css/style.css?v=40">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
 <body>
 <header class="site">
   <div class="inner">
-    <a class="title" href="index.html">Film Groups</a>
+    <a class="title" href="index.html">Spacetime Groups</a>
     <nav>
       <a href="index.html" class="here">Tutorial</a>
       <a href="catalog.html">Catalog</a>
@@ -25,7 +25,7 @@
 </header>
 <main class="narrow">
 
-<h1>Film groups: the crystallography of looping animations</h1>
+<h1>Spacetime groups: the crystallography of looping animations</h1>
 <p class="subtitle">A catalog and tutorial for the symmetry groups of animations
 that loop in time and tile the plane — after T.&thinsp;J. Fletcher (1956) and
 Xu&ndash;Wu (2018).</p>
@@ -73,10 +73,10 @@ is a palindrome).</p>
 <p>An animation is a function on ℝ²&nbsp;×&nbsp;ℝ — the plane times time. If it
 loops with period T and tiles the plane with a lattice of translations, its
 symmetry group is a crystallographic group of 2+1-dimensional spacetime.
-Fletcher's 1956 observation, made for mathematical films, is that one can
+Fletcher's 1956 observation, made for mathematical animations, is that one can
 treat t as a third spatial coordinate and reuse the theory of space groups.
 One constraint distinguishes spacetime from ℝ³: no symmetry may rotate a space
-direction into the time direction. Formally, a <em>film group</em> is a
+direction into the time direction. Formally, a <em>spacetime group</em> is a
 discrete subgroup G of E(2)&nbsp;×&nbsp;E(1) — each element acts by</p>
 
 <p style="text-align:center;">(x,&nbsp;t) ⟼ (Rx&nbsp;+&nbsp;v,&nbsp;st&nbsp;+&nbsp;τ),
@@ -84,12 +84,13 @@ discrete subgroup G of E(2)&nbsp;×&nbsp;E(1) — each element acts by</p>
 
 <p>— such that the translations in G span a rank-3 lattice containing a pure
 time translation (the loop) and a rank-2 spatial lattice (the tiling). The
-element with s&nbsp;=&nbsp;−1 plays the film backwards; τ is a <em>fraction of the
-period</em>. Physicists study the same objects as symmetry groups of
-space-time crystals (Xu&ndash;Wu 2018); Fletcher called them film
-groups, and we keep his name.</p>
+element with s&nbsp;=&nbsp;−1 plays the animation backwards; τ is a <em>fraction of the
+period</em>. These are the <em>spacetime groups</em> of Xu and Wu (2018),
+the symmetry groups of a spacetime crystal; Fletcher, who got here first and
+was not read, called them <i>film groups</i> — see
+<a href="history.html">History</a>.</p>
 
-<p>Two film groups are equivalent when conjugate by an affine map of spacetime
+<p>Two spacetime groups are equivalent when conjugate by an affine map of spacetime
 that preserves absolute time — x&nbsp;↦&nbsp;Ax&nbsp;+&nbsp;ut&nbsp;+&nbsp;b,
 t&nbsp;↦&nbsp;ct&nbsp;+&nbsp;d — with 3D orientation preserved
 (det&nbsp;A&nbsp;·&nbsp;c&nbsp;&gt;&nbsp;0, the convention under which the
@@ -107,7 +108,7 @@ possible point-like operations form at most a Klein four-group: the spatial
 mirror m<sub>x</sub>, the time mirror m<sub>t</sub> (the loop is a palindrome),
 and their product, the 2-fold spacetime rotation (flip space <em>and</em>
 reverse time). Combined with fractional translations these give exactly
-<b>13 groups</b> (Xu&ndash;Wu 2018) — the film-group analogue of the 7 frieze
+<b>13 groups</b> (Xu&ndash;Wu 2018) — the spacetime-group analogue of the 7 frieze
 groups. All thirteen, live (each comma fills once per period — its fill level
 <em>is</em> its internal time — so phase differences are visible at a glance,
 and time-reversed copies drain while the others fill):</p>
@@ -117,7 +118,7 @@ and time-reversed copies drain while the others fill):</p>
 <p>Three phenomena appear here that persist in 2+1D. The <em>time glide</em>
 (the tilded mirrors of <span class="sym">~*~*</span>): mirror symmetry holds
 only after waiting half a period. The <em>glide time-reversal</em> (the
-clause of <span class="sym">o/g′</span>): the film played backwards equals
+clause of <span class="sym">o/g′</span>): the animation played backwards equals
 itself shifted half a cell. And <em>time centring</em> (the
 <span class="sym">c</span>-prefixed groups): the spacetime lattice is
 centred, so each motif's nearest neighbours run half a period out of phase. Fletcher's 1956 paper counted 7 groups at this stage
@@ -143,11 +144,11 @@ composed with a spatial isometry) familiar from Shubnikov theory with
 <div class="thm">
 <span class="label">Theorem (Xu&ndash;Wu 2018, appendix C and Table II; independently recomputed here)</span>
 <p style="margin:0.3rem 0;">Up to the equivalence above there are exactly
-<b>275</b> film groups in 2+1 dimensions: 72 symmorphic and 203 nonsymmorphic,
+<b>275</b> spacetime groups in 2+1 dimensions: 72 symmorphic and 203 nonsymmorphic,
 organised in 7 crystal systems, 14 spacetime Bravais lattices and 31 magnetic
 point groups. Of these, <b><span data-count="forward">…</span></b> preserve the
 direction of time — call these the <em>clockwork groups</em>: a wallpaper
-group in which every symmetry advances the film by a fixed fraction of the
+group in which every symmetry advances the animation by a fixed fraction of the
 period, a pattern with a clock that only turns one way — and
 <b><span data-count="nonproduct">…</span></b> are <em>not</em> a product of a
 plane group with a group of time translations/reversals — their symmetry
@@ -156,7 +157,7 @@ genuinely entangles space with time.</p>
 
 <table class="counts">
 <tr><th>system</th><th>Triclinic</th><th>T&#8209;Mono</th><th>R&#8209;Mono</th><th>Ortho</th><th>Tetragonal</th><th>Trigonal</th><th>Hexagonal</th><th>Σ</th></tr>
-<tr><td>film groups</td><td>2</td><td>13</td><td>13</td><td>127</td><td>68</td><td>25</td><td>27</td><td><b>275</b></td></tr>
+<tr><td>spacetime groups</td><td>2</td><td>13</td><td>13</td><td>127</td><td>68</td><td>25</td><td>27</td><td><b>275</b></td></tr>
 </table>
 
 <div class="aside">
@@ -177,17 +178,17 @@ convention, matching Xu&ndash;Wu.</p>
 <p>The proof is finite linear algebra, and the computation is in this
 repository. Fix the <em>magnetic point group</em> P (spatial op, time sign)
 and a compatible spacetime lattice L; the possible systems of fractional
-translations form the cohomology group H¹(P,&nbsp;ℝ³/L), and the film groups in
+translations form the cohomology group H¹(P,&nbsp;ℝ³/L), and the spacetime groups in
 this arithmetic class are its orbits under the normaliser (lattice re-basings,
 boosts, and combined orientation flips). Summing orbits over the 72 arithmetic
 classes gives 275. The same machinery run in 1+1D yields the 13 strip groups
 above, and run on static 2D patterns yields the 17 wallpaper groups — two
 anchors we use as validation, along with the per-system totals of Xu&ndash;Wu's
 Table&nbsp;II (which for the tetragonal, trigonal and hexagonal systems equal the
-3D space-group counts 68, 25, 27, since there a film group <em>is</em> a space
+3D space-group counts 68, 25, 27, since there a spacetime group <em>is</em> a space
 group with distinguished c-axis).</p>
 
-<p>Structurally: a film group G determines a wallpaper group Γ (its spatial
+<p>Structurally: a spacetime group G determines a wallpaper group Γ (its spatial
 projection — the symmetry of the long-exposure photograph) and each spatial
 operation carries a clock phase; quotienting spacetime by G gives a 3-orbifold
 fibred in time-circles over Γ's orbifold. Conway and Goodman-Strauss's
@@ -235,7 +236,7 @@ P. Scott, <i>The geometries of 3-manifolds</i>, Bull. LMS <b>15</b> (1983)
 
 </main>
 <footer class="site">
-  Film groups: the crystallography of looping animations ·
+  Spacetime groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
 <script type="module" src="js/tutorial.js?v=40"></script>

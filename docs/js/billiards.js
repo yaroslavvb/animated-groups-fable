@@ -1,4 +1,4 @@
-/* Billiards: a live ball film, drawn from a solved trajectory set.
+/* Billiards: a live ball animation, drawn from a solved trajectory set.
  *
  * Everywhere else on the site a motif is a drawn glyph whose only internal
  * state is a phase. Here the motif is three BALLS ON SOLVED TRAJECTORIES —
@@ -6,7 +6,7 @@
  *
  *      p_i(t + 1) = p_i(t) + L_i        L_i a lattice vector
  *
- * so the film loops although no ball ends where it began. The orbit fill is
+ * so the animation loops although no ball ends where it began. The orbit fill is
  * the usual one with a time offset: clone (M | v | tau) draws the motif at
  * internal time t - tau, which is why a ball can meet a copy of itself
  * running a third of a period behind. The trajectories were solved as one
@@ -24,7 +24,7 @@ import { filmTimeSymmetry } from "./phases.js?v=40";
 import { drawBall, GROUND } from "./ball.js?v=40";
 import { elements } from "./designer/symmetry.js?v=40";
 
-/* the GIF's palette, so the page and the exported film are the same picture */
+/* the GIF's palette, so the page and the exported animation are the same picture */
 const AXIS = "#8a8578";
 
 const TWO_PI = Math.PI * 2;
@@ -208,7 +208,7 @@ export class BallFilm extends Playback {
       }
       ctx.closePath();
       // filled: a symmetry of every single frame. hollow: a symmetry only of
-      // the film, because turning about it also runs the clock on.
+      // the animation, because turning about it also runs the clock on.
       if (free) ctx.fill();
       else { ctx.fillStyle = GROUND; ctx.fill(); ctx.fillStyle = AXIS; ctx.stroke(); }
     }
@@ -220,7 +220,7 @@ export class BallFilm extends Playback {
 const data = await (await fetch("data/billiards-g235.json", { cache: "no-cache" }))
   .json();
 
-const host = document.getElementById("film");
+const host = document.getElementById("animation");
 const canvas = document.createElement("canvas");
 canvas.className = "ballfilm";
 host.append(canvas);                       // attach BEFORE measuring

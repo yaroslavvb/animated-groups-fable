@@ -1,7 +1,7 @@
 /* Shared data for the two-level wallpaper atlas: per-wallpaper blurbs,
  * discussion paragraphs, and curated example symbols. Both wallpaper.js
  * (overview, 17 sections) and wallpaper-group.js (one wallpaper, all its
- * film groups at full size) import this. Examples are resolved by SYMBOL
+ * spacetime groups at full size) import this. Examples are resolved by SYMBOL
  * against catalog.json so they cannot silently drift. */
 "use strict";
 import { signatureOf } from "./catalog-names.js?v=40";
@@ -15,10 +15,10 @@ export const WALLPAPERS = [
   { hm: "p1", orb: "o",
     note: "Translations only — the quotient is the torus, Conway's o.",
     issues: "With no point operations a Galilean boost removes any drift, \
-so the only forward film over p1 is the product o itself — even the \
+so the only forward animation over p1 is the product o itself — even the \
 time-centred stacking can be boosted away. Time structure survives only \
 when reversal pins the frame: the palindrome o/1′, the glide time-reversal \
-o/g′ (played backwards, the film is itself shifted half a cell), and the \
+o/g′ (played backwards, the animation is itself shifted half a cell), and the \
 centred palindromes co/1′, co/g′, where the centring becomes irremovable \
 precisely because reversal fixes a time origin.",
     examples: ["o/g′"] },
@@ -46,7 +46,7 @@ lists.",
     note: "No mirrors — two families of glides, two of Conway's miracles.",
     issues: "The home of the disguises. The time glide ~*~* and the mixed \
 space–time glide ×½×½ are crystallographically the class ×× = pg × ℤ — \
-pg's glide read along a different axis of spacetime — yet as films they \
+pg's glide read along a different axis of spacetime — yet as animations they \
 can never be made static; this is exactly where the strict Galilean \
 classification (283 classes) is finer than the crystallographic one used \
 here (275). The decoration becomes essential once reversal pins the frame: \
@@ -160,7 +160,7 @@ hexagonal tower: all five 6-screws and the trigonal groups below them.",
 ];
 
 /* within a section: the pure product first, then forward-time, then reversal */
-/* The film group IDENTICAL TO ITS WALLPAPER GROUP: the direct product with a
+/* The spacetime group IDENTICAL TO ITS WALLPAPER GROUP: the direct product with a
  * bare clock, G x Z. Every copy of the motif is at the same phase forever, so
  * each instant is the wallpaper itself and nothing is entangled with time — it
  * is the reference the other groups over that base are departures from.
@@ -193,7 +193,7 @@ export function sectionSort(list) {
 export function censusSentence(w, list) {
   const nf = list.filter(g => g.forward).length;
   const npr = list.filter(g => g.product).length;
-  return `Of the ${list.length} film groups over ${w.hm}: ` +
+  return `Of the ${list.length} spacetime groups over ${w.hm}: ` +
     `${nf} forward-time and ${list.length - nf} with time reversal; ` +
     `${npr} ${npr === 1 ? "is a" : "are"} product${npr === 1 ? "" : "s"} of ` +
     `${w.hm} with a time group, ${list.length - npr} genuinely entangle ` +
@@ -264,7 +264,7 @@ full wallpaper symmetry.");
     if (screws.size > 0) {
       const parts = [...screws.keys()].sort((a, b) => b - a).map((n, i) =>
         i === 0
-          ? `A ${360 / n}° turn about a ${n}-centre advances the film \
+          ? `A ${360 / n}° turn about a ${n}-centre advances the animation \
 ${fword(screws.get(n))}`
           : `a ${360 / n}° turn about a ${n}-centre, ${fword(screws.get(n))}`);
       s.push(parts.join("; ") + ".");
@@ -287,13 +287,13 @@ adjacent motifs run in counterphase.");
     }
   }
   if (revs.has("pal")) {
-    s.push("Played backwards, the film equals itself: a palindrome.");
+    s.push("Played backwards, the animation equals itself: a palindrome.");
   } else if (revs.has("shift")) {
-    s.push("Played backwards, the film equals itself shifted half a cell.");
+    s.push("Played backwards, the animation equals itself shifted half a cell.");
   } else if (revs.has("ref")) {
-    s.push("Played backwards and reflected, the film equals itself.");
+    s.push("Played backwards and reflected, the animation equals itself.");
   } else if (revs.has("rot")) {
-    s.push("Played backwards and rotated, the film equals itself.");
+    s.push("Played backwards and rotated, the animation equals itself.");
   }
   return s.join(" ");
 }

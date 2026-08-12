@@ -1,5 +1,5 @@
 /* Wallpaper atlas, DETAIL level: one wallpaper group (?g=<hm>), a single
- * notation-style tab widget over EVERY film group whose spatial projection
+ * notation-style tab widget over EVERY spacetime group whose spatial projection
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
@@ -32,13 +32,13 @@ if (idx < 0) {
   const w = WALLPAPERS[idx];
   const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
   const list = sectionSort(data.groups.filter(g => g.base === w.hm));
-  document.title = `${w.orb} · ${w.hm} — Wallpaper Atlas — Film Groups`;
+  document.title = `${w.orb} · ${w.hm} — Wallpaper Atlas — Spacetime Groups`;
 
   const prev = WALLPAPERS[(idx + WALLPAPERS.length - 1) % WALLPAPERS.length];
   const next = WALLPAPERS[(idx + 1) % WALLPAPERS.length];
   head.innerHTML =
     `<h1><span class="sym">${w.orb}</span> · ${w.hm}</h1>` +
-    `<p class="subtitle">All ${list.length} film groups whose spatial ` +
+    `<p class="subtitle">All ${list.length} spacetime groups whose spatial ` +
     `projection is ${w.hm} — tab across them; the box below each animation ` +
     `describes its time behaviour.</p>` +
     `<p><a href="wallpaper.html#wp-${w.hm}">← atlas overview</a> &ensp;·&ensp; ` +

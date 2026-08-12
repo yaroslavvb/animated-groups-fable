@@ -1,9 +1,9 @@
-"""2+1D space-time ("film") groups.
+"""2+1D spacetime ("animation") groups.
 
 Anchors (Xu & Wu, PRL 120, 096401 (2018), arXiv:1703.03388,
 appendix C, Table II — the paper that classifies the 275):
   31 magnetic point groups, 14 Bravais lattices, 72 symmorphic classes,
-  275 space-time groups total, by crystal system:
+  275 spacetime groups total, by crystal system:
   Triclinic 2, T-Monoclinic 13, R-Monoclinic 13, Orthorhombic 127,
   Tetragonal 68, Trigonal 25, Hexagonal 27.
 """
@@ -225,7 +225,7 @@ def main():
         sysname = classify_system(ac)
         by_system[sysname] = by_system.get(sysname, 0) + len(orbits)
         out_classes.append((cname, ac, orbits))
-    print(f"[{time.time()-t0:6.1f}s] TOTAL 2+1D space-time groups: {total}  "
+    print(f"[{time.time()-t0:6.1f}s] TOTAL 2+1D spacetime groups: {total}  "
           f"(expected 275)", flush=True)
     expected = {"Triclinic": 2, "T-Monoclinic": 13, "R-Monoclinic": 13,
                 "Orthorhombic": 127, "Tetragonal": 68, "Trigonal": 25,

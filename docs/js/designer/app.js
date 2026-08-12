@@ -359,7 +359,7 @@ function symElements() {
 /* The group's own fixed-point sets, drawn into the box rather than onto the
  * floor: a rotation centre is an AXIS in spacetime, and a rotation that costs
  * time is a screw about it. Filled marker: the turn costs nothing, so it is a
- * symmetry of every frozen frame. Hollow: only of the film.
+ * symmetry of every frozen frame. Hollow: only of the animation.
  *
  * Two passes. `over` is false for what belongs on the ground — the mirror and
  * glide lines, and a marker at every centre in the block — and true for what
@@ -369,7 +369,7 @@ function symElements() {
  * The markers are drawn in BOTH passes. On a 16- or 18-op group a marker left
  * on the floor is behind a hundred tubes and the diagram is a diagram of
  * nothing; drawn again over the top, slightly transparent, it reads as what it
- * is — a place in the plane, seen through the film standing above it. */
+ * is — a place in the plane, seen through the animation standing above it. */
 function drawSymmetry(g, over) {
   const B = design.group.basis;
   const N = design.group.n;
@@ -406,7 +406,7 @@ function drawSymmetry(g, over) {
     const foot = cam.project([q[0], q[1], 0]);
     const home = p.c[0] > -0.02 && p.c[0] < 1.02 && p.c[1] > -0.02 && p.c[1] < 1.02;
     if (over) {
-      // the second pass is dimmer: it is being read through the film
+      // the second pass is dimmer: it is being read through the animation
       g.globalAlpha = 0.72;
       marker(g, foot, p);
       if (!home) { g.globalAlpha = 1; continue; }
@@ -431,7 +431,7 @@ function drawSymmetry(g, over) {
 }
 
 /* A rotation centre, on the floor. Filled: the turn costs no time, so it is a
- * symmetry of every frozen frame as well as of the film. */
+ * symmetry of every frozen frame as well as of the animation. */
 function marker(g, foot, p) {
   const r = 6;
   g.beginPath();
@@ -705,7 +705,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { sel = null; dirty = true; return; }
   /* The group's beats are the instants worth stopping on — a design on an
    * N-colour clock is read at k/N — so the arrows step between them rather
-   * than by some frame count the film does not have. */
+   * than by some frame count the animation does not have. */
   if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
     e.preventDefault();
     preview.stepMark(e.key === "ArrowRight" ? 1 : -1, 1 / 24);

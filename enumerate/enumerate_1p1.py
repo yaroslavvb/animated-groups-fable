@@ -1,4 +1,4 @@
-"""1+1D space-time groups. Anchor: Xu & Wu (PRL 2018) count = 13:
+"""1+1D spacetime groups. Anchor: Xu & Wu (PRL 2018) count = 13:
 P1, P2, Pm_x, Pg_x, Pm_t, Pg_t, Cm_x, Cm_t, P2m_xm_t, P2g_xg_t, P2m_xg_t,
 P2g_xm_t, C2m_xm_t.
 """
@@ -74,7 +74,7 @@ def main():
         for vec in orbits:
             names.append(name_group(pg_name, lat_name, ac, vec))
             total += 1
-    print(f"TOTAL 1+1D space-time groups: {total} (expected 13)")
+    print(f"TOTAL 1+1D spacetime groups: {total} (expected 13)")
     print("names:", sorted(names))
     expected = sorted(["P1", "P2", "Pm_x", "Pg_x", "Pm_t", "Pg_t", "Cm_x",
                        "Cm_t", "P2m_xm_t", "P2g_xg_t", "P2m_xg_t", "P2g_xm_t",

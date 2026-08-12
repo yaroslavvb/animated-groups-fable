@@ -1,4 +1,4 @@
-/* Gallery: featured non-product film groups, big demos + GIF downloads. */
+/* Gallery: featured non-product spacetime groups, big demos + GIF downloads. */
 "use strict";
 import { FilmGroupAnimation } from "./renderer.js?v=40";
 import { attachControls } from "./controls.js?v=40";
@@ -11,7 +11,7 @@ const FEATURED = [
     sym: "4<sub>1</sub>4<sub>1</sub>2<sub>1</sub>",
     kw: "(R<sub>π/2</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/4</sup>) — time-screw rotation",
     text: "The time-axis P4<sub>1</sub>. A quarter turn about any 4-centre \
-equals a quarter period of the film; the two families of 4-centres both carry \
+equals a quarter period of the animation; the two families of 4-centres both carry \
 the screw, the 2-centres carry its square (half period). Why no product \
 decomposition exists: any isomorphism with (wallpaper)&nbsp;×&nbsp;(clock) \
 would make the 90° rotation an honest symmetry at each instant — but at a \
@@ -19,7 +19,7 @@ fixed time the four motifs around a centre are at four different phases, and \
 only the full 360° turn is instantaneous. This is the animated analogue of a \
 chiral screw crystal, and its spacetime mirror image, \
 4<sub>3</sub>4<sub>3</sub>2<sub>1</sub>, is a genuinely different group — the \
-pair is the film-group version of left- and right-quartz.",
+pair is the spacetime-group version of left- and right-quartz.",
     specId: "p4-timescrew",
   },
   {
@@ -40,7 +40,7 @@ matching the 3D screw groups P6<sub>1</sub>…P6<sub>5</sub>.",
     sym: "3<sub>1</sub>3<sub>1</sub>3<sub>1</sub>",
     kw: "(R<sub>2π/3</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/3</sup>) — the chirality-selection screw",
     text: "The time-axis P3<sub>1</sub>: all three families of 3-centres \
-advance the film by a third of a period. This is precisely the symmetry \
+advance the animation by a third of a period. This is precisely the symmetry \
 (R<sub>2π/3</sub>|T<sub>t</sub><sup>1/3</sup>) for which Ke–Wu derive their \
 chirality-selective response rule: the heterodyne conductivities of a crystal \
 pumped with this symmetry conserve pseudo-angular momentum mod 3, so probe \
@@ -54,7 +54,7 @@ light of one circular polarisation answers at shifted frequency with the \
     kw: "(m<sub>x</sub>&thinsp;|&thinsp;T<sub>t</sub><sup>1/2</sup>) — time-glide reflection",
     text: "Mirror symmetry that is nowhere instantaneous: reflect, then wait \
 half a period. Left- and right-handed copies run in counterphase. This is the \
-operation protecting Ke–Wu's 'horizontal cone' in space-time metamaterials \
+operation protecting Ke–Wu's 'horizontal cone' in spacetime metamaterials \
 (their driven two-site lattice satisfies u(t)&nbsp;=&nbsp;v(t&nbsp;+&nbsp;T/2), \
 i.e. exactly this symmetry), and Fletcher's trick for halving an animator's \
 work: 'the same drawing can be used again (turned if necessary) at different \
@@ -62,7 +62,7 @@ stages in the cycle'. A delicious fine point: <em>crystallographically</em> \
 this group is isomorphic to pg&nbsp;×&nbsp;ℤ — the time glide is pg's spatial \
 glide read along the time axis instead of a space axis. The identification \
 relabels a space direction as time, so no change of frame realises it: as a \
-film, the pattern can never be made static. It is the smallest example where \
+animation, the pattern can never be made static. It is the smallest example where \
 the strict Galilean classification (283 classes) is finer than the \
 crystallographic one (275); the catalog, following Xu–Wu, files it with \
 pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
@@ -73,7 +73,7 @@ pg&nbsp;×&nbsp;ℤ under <span class=\"sym\">××</span>.",
     sym: "c222<sub>1</sub>2<sub>1</sub>",
     kw: "time-centred lattice — the checkerboard flip",
     text: "No fractional point operation at all: here the <em>lattice</em> is \
-the space-time entanglement. Translating by half a cell diagonal is the same \
+the spacetime entanglement. Translating by half a cell diagonal is the same \
 as waiting half a period, so the pattern is a checkerboard whose two sublattices \
 swap roles every half period. With the 2-fold centres pinning the frame, no \
 Galilean boost can undo the centring — the group is not a product even though \
@@ -86,7 +86,7 @@ every point operation is instantaneous. (This is the plane analogue of the \
     id: "glide-time-reversal",
     sym: "o/g′",
     kw: "(m<sub>t</sub>&thinsp;|&thinsp;T<sub>x</sub><sup>1/2</sup>) — glide time-reversal",
-    text: "Played backwards, the film equals itself displaced half a cell: \
+    text: "Played backwards, the animation equals itself displaced half a cell: \
 columns alternate filling / draining. The operation is anti-unitary \
 in quantum settings — Xu–Wu show its 1+1D version forces a Kramers-like double \
 degeneracy at the zone boundary <em>without any spin</em>. Note the \

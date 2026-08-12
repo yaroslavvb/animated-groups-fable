@@ -8,7 +8,7 @@
  *
  * What the user designs is a BILLIARD: a ball whose centre runs round a closed
  * piecewise-linear loop p(t), p(0) = p(1). No drift — it comes back exactly
- * where it started, which is what makes the film loop and what makes the time
+ * where it started, which is what makes the animation loop and what makes the time
  * shift below a clean wrap rather than a seam.
  *
  * The orbit fill puts a clone of that loop everywhere the group says:
@@ -203,7 +203,7 @@ export class Design {
 
   /* The orbit fill runs every frame, so it is cached; every mutator drops the
    * cache rather than trying to patch it. Blocks are cached by span because the
-   * film and the box ask for different ones and neither should evict the other
+   * animation and the box ask for different ones and neither should evict the other
    * every frame. */
   _invalidate() {
     this._clones = new Map();
@@ -447,7 +447,7 @@ export class Design {
   }
 
   /* The clones a round view of the plane can see. Cached on the view, because
-   * the film asks for the same one sixty times a second. */
+   * the animation asks for the same one sixty times a second. */
   viewClones(radius, centre = [0, 0]) {
     const key = `${radius}|${centre[0]}|${centre[1]}`;
     if (this._view && this._view.key === key) return this._view.out;

@@ -14,7 +14,7 @@
  * at every distinguished instant of the loop, each one a jump target.
  *   beat marks (│, labelled)  t = k/N — the pattern here is the pattern at
  *                             t = 0 moved by a spatial operation
- *   mirror marks (◆)          fixed points of a time reversal: the film is
+ *   mirror marks (◆)          fixed points of a time reversal: the animation is
  *                             palindromic about this instant
  * Seeking a mark leaves play/pause alone (Playback.seek), so a mark can be
  * clicked mid-play to restart the loop from a symmetric instant. Groups with

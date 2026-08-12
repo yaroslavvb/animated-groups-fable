@@ -4,7 +4,7 @@
  * The lead name is the book colour signature — ²2²2²2²2, ³3*²3 — in the
  * notation of Conway, Burgiel and Goodman-Strauss: a superscript on an
  * orbifold feature is the order of the colour permutation that feature
- * induces. It is the right lead here because a clock of order N on a film
+ * induces. It is the right lead here because a clock of order N on an animation
  * group IS a perfect N-colouring of the group's spatial projection, so the
  * signature says the same thing the animation shows.
  *

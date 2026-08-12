@@ -1,6 +1,6 @@
-/* Orbit construction and symmetry verification for film-group animations.
+/* Orbit construction and symmetry verification for spacetime-group animations.
  *
- * A render spec lists coset representatives ops = {M, v, s, tau} of a film
+ * A render spec lists coset representatives ops = {M, v, s, tau} of an animation
  * group modulo integer lattice translations and integer time translations.
  * The animation is DEFINED as the orbit of one motif worldtube under these
  * elements: this module builds that orbit explicitly and verifies, before
@@ -12,7 +12,7 @@
  *
  * verifyFrames() additionally checks invariance at the pixel level: it
  * renders F(t0), applies a group element to the canvas, and compares with
- * F(s t0 + tau) — "apply the indicated symmetry and see the same film".
+ * F(s t0 + tau) — "apply the indicated symmetry and see the same animation".
  */
 "use strict";
 
@@ -33,7 +33,7 @@ function matVec2(A, v) {
   return [A[0][0] * v[0] + A[0][1] * v[1], A[1][0] * v[0] + A[1][1] * v[1]];
 }
 
-/* Compose film-group elements g1∘g2 acting as
+/* Compose spacetime-group elements g1∘g2 acting as
  * (x,t) -> (M x + v, s t + tau). */
 export function compose(g1, g2) {
   return {

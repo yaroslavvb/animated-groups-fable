@@ -1,9 +1,9 @@
-# Film Groups — the crystallography of looping animations
+# Spacetime Groups — the crystallography of looping animations
 
-A catalog and tutorial for **film groups**: the crystallographic symmetry
-groups of animations that loop in time and tile the plane (2+1-dimensional
-space-time groups), after T. J. Fletcher's forgotten 1956 article *Film
-Groups* and the classification of Xu–Wu (PRL 120, 096401, 2018;
+A catalog and tutorial for the **spacetime groups** of 2+1 dimensions: the
+crystallographic symmetry groups of animations that loop in time and tile the
+plane, after T. J. Fletcher's forgotten 1956 article *Film Groups* and the
+classification of Xu–Wu (PRL 120, 096401, 2018;
 arXiv:1703.03388), whose appendix C enumerates the 275.
 
 **Site**: https://yaroslavvb.github.io/animated-groups-fable/
@@ -41,7 +41,7 @@ The classification is recomputed from scratch in exact rational arithmetic
   (lattice re-basings, Galilean boosts, combined orientation flips) as a
   pruned integer conjugation search.
 - `validate_2d.py` — anchor: reproduces the 17 wallpaper groups.
-- `enumerate_1p1.py` — anchor: reproduces the 13 space-time groups of 1+1D
+- `enumerate_1p1.py` — anchor: reproduces the 13 spacetime groups of 1+1D
   with Xu–Wu's names.
 - `enumerate_2p1.py` — the 2+1D enumeration (275 groups; per-system totals
   match Xu–Wu Table II).

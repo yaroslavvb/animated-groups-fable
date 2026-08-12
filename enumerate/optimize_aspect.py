@@ -9,7 +9,7 @@ two glide images) all share one y coordinate: with a square cell they land in
 a tight row, and the rows sit a whole cell apart. The result is a diagram of
 a few crowded rows separated by bands of empty background — the failure this
 script removes. Squashing the cell to a quarter of its height puts the same
-points on a square grid, and the film is the same film: the aspect ratio of
+points on a square grid, and the animation is the same animation: the aspect ratio of
 a rectangular (or oblique) cell is a continuous parameter that no symmetry
 fixes.
 

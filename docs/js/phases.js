@@ -1,4 +1,4 @@
-/* Time symmetry of a film group: which instants of the loop matter.
+/* Time symmetry of a spacetime group: which instants of the loop matter.
  *
  * Every element acts on time as  t -> s t + tau  with s = +-1 and tau a
  * fraction of the period. Two structures follow, and both are used on screen.
@@ -9,7 +9,7 @@
  *                exactly the coset (1/B)Z. The frame here is the frame at
  *                t = 0 moved by the spatial part of an element with tau = k/B.
  *   mirror marks fixed points of a time reversal t -> -t + tau, i.e.
- *                t = tau/2 and tau/2 + 1/2. At those instants the film is
+ *                t = tau/2 and tau/2 + 1/2. At those instants the animation is
  *                momentarily palindromic and the reversal's spatial part is
  *                an honest symmetry of the single frame.
  * With reversals present the two sets always merge into k/(2B) — a reversal
@@ -33,7 +33,7 @@
  */
 "use strict";
 
-const MAXD = 24;      // no film-group tau has a larger denominator
+const MAXD = 24;      // no spacetime-group tau has a larger denominator
 const EPS = 1e-6;
 
 const frac1 = x => ((x % 1) + 1) % 1;

@@ -1,5 +1,5 @@
 /* The fixed-point sets of a clockwork group: where its rotation axes stand and
- * where its mirrors run. Two pages draw them — the billiards film, over the
+ * where its mirrors run. Two pages draw them — the billiards animation, over the
  * pattern, and the designer, into the spacetime box — so the computation lives
  * here rather than twice.
  *
@@ -24,7 +24,7 @@
  * In spacetime a rotation centre is an AXIS, and a rotation that costs time is
  * a SCREW about it: `order` and `tau` are what the designer labels it with.
  * `free` says the rotation costs no time, i.e. it is a symmetry of every frozen
- * frame and not only of the film — the site draws those filled and the rest
+ * frame and not only of the animation — the site draws those filled and the rest
  * hollow.
  */
 "use strict";

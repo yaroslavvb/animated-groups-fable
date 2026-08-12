@@ -1,5 +1,5 @@
 /* Motif prototypes: candidate shapes and candidate phase channels, side by
- * side, each one running inside a real film group and each one measured.
+ * side, each one running inside a real spacetime group and each one measured.
  *
  * A motif on this site has to do two jobs at once, and they pull apart:
  *
@@ -438,7 +438,7 @@ export function measure(motif) {
   return { phase, hand, rot, seam };
 }
 
-/* --------------------------------------------------------------- the film */
+/* --------------------------------------------------------------- the animation */
 function latToPix(A, b1, b2) {
   const B = [[b1[0], b2[0]], [b1[1], b2[1]]];
   const d = B[0][0] * B[1][1] - B[0][1] * B[1][0];
@@ -515,7 +515,7 @@ const TESTS = [
 
 const sel = document.getElementById("group-pick");
 const grid = document.getElementById("grid");
-const films = [];
+const animations = [];
 
 for (const t of TESTS) {
   const g = byId.get(t.id);
@@ -526,7 +526,7 @@ for (const t of TESTS) {
                 `<span class="why">${t.why}</span>`;
   b.addEventListener("click", () => {
     for (const o of sel.children) o.classList.toggle("on", o === b);
-    for (const f of films) { f.spec = g.render; f.drawStatic(); }
+    for (const f of animations) { f.spec = g.render; f.drawStatic(); }
   });
   sel.append(b);
 }
@@ -547,7 +547,7 @@ for (const m of MOTIFS) {
   grid.append(card);                      // attach before measuring/constructing
 
   const anim = new MotifFilm(canvas, byId.get(TESTS[0].id).render, m);
-  films.push(anim);
+  animations.push(anim);
   attachStage(anim, canvas);
   attachControls(anim, body);
 

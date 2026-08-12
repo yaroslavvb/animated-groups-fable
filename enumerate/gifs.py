@@ -1,4 +1,4 @@
-"""Render looping GIFs of film groups, mirroring docs/js/renderer.js.
+"""Render looping GIFs of spacetime groups, mirroring docs/js/renderer.js.
 
 Usage: gifs.py <catalog.json> <group-id> <out.gif> [--size 480] [--frames 48]
 Specs use the same format as the web renderer: basis (cartesian), ops list

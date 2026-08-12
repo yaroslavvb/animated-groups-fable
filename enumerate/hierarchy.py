@@ -3,7 +3,7 @@
 
 The hierarchy page is an essay about how six classifications fit together:
 the 17 wallpaper groups, the coloured wallpaper groups up to six colours, the
-275 film (space-time) groups, the 68 forward-time ones we call clockwork
+275 spacetime groups, the 68 forward-time ones we call clockwork
 groups, the 230 space groups, and the 68 polar space groups among them.  Every
 count printed on that page is produced here, from `docs/data/catalog.json`, so
 that none of them is a number typed in by hand and left to rot.
@@ -11,7 +11,7 @@ that none of them is a number typed in by hand and left to rot.
 Three kinds of input meet in this script.
 
 1. *Recomputed.*  Anything that is a property of our own 275-group catalog:
-   the image of each film group's clock in Isom(S^1), the totals by clock
+   the image of each spacetime group's clock in Isom(S^1), the totals by clock
    order, by spatial projection, by crystal system.  Pure Python.
 
 2. *Pinned.*  The 3D space-group type of each of the 275, as an International
@@ -168,8 +168,8 @@ PINNED_POLAR = {
     186: ("P6_3mc", "6mm"),
 }
 
-# The four enantiomorphic pairs among the polar types: mirror-image films that
-# are one coloured pattern but two film groups.
+# The four enantiomorphic pairs among the polar types: mirror-image animations that
+# are one coloured pattern but two spacetime groups.
 ENANTIOMORPHIC_PAIRS = ((76, 78), (144, 145), (169, 170), (171, 172))
 
 SYSTEM_RANGES = (
@@ -202,7 +202,7 @@ def phase(value) -> Fraction:
 def has_pure_reversal(group) -> bool:
     """Does G contain a reversal that acts trivially on space?
 
-    Such an element is (x, t) -> (x, -t + tau0): the film played backwards is
+    Such an element is (x, t) -> (x, -t + tau0): the animation played backwards is
     itself, with nothing moved. Its presence is what stops the clock from
     colouring the projection, because then the map G -> Isom(S^1) is not
     trivial on the kernel of the spatial projection and so does not descend.
@@ -213,7 +213,7 @@ def has_pure_reversal(group) -> bool:
 
 
 def clock_image(group) -> tuple[int, bool]:
-    """The image of a film group in Isom(S^1), as (N, contains a reversal).
+    """The image of a spacetime group in Isom(S^1), as (N, contains a reversal).
 
     Every element acts on the loop as t -> t + tau or t -> -t + tau.  The
     forward ones give rotations of the phase circle directly; a pair of
@@ -252,7 +252,7 @@ def report(rows):
 
     forward = [r for r in rows if not r["reversing"]]
     data["headline"] = dict(
-        filmGroups=len(rows), clockwork=len(forward), wallpaper=17,
+        spacetimeGroups=len(rows), clockwork=len(forward), wallpaper=17,
         spaceGroups=230, cubic=36, nonCubic=194, polar=68,
         clockworkNonProduct=sum(1 for r in forward if not r["product"]),
     )
@@ -266,19 +266,19 @@ def report(rows):
         for n in range(1, MAX_COLOURS + 1)
     ]
 
-    film_by_base = collections.defaultdict(lambda: [0] * MAX_COLOURS)
+    spacetime_by_base = collections.defaultdict(lambda: [0] * MAX_COLOURS)
     for r in forward:
-        film_by_base[r["base"]][r["clock"] - 1] += 1
+        spacetime_by_base[r["base"]][r["clock"] - 1] += 1
     data["byOrbifold"] = [
         dict(hm=b, orbifold=ORBIFOLD[b], cyclic=list(CYCLIC_BY_BASE[b]),
-             film=list(film_by_base[b]),
-             cyclicTotal=sum(CYCLIC_BY_BASE[b]), filmTotal=sum(film_by_base[b]))
+             spacetime=list(spacetime_by_base[b]),
+             cyclicTotal=sum(CYCLIC_BY_BASE[b]), spacetimeTotal=sum(spacetime_by_base[b]))
         for b in BASE_ORDER
     ]
     data["rotationFree"] = dict(
         bases=list(ROTATION_FREE),
         cyclic=sum(sum(CYCLIC_BY_BASE[b]) for b in ROTATION_FREE),
-        film=sum(sum(film_by_base[b]) for b in ROTATION_FREE),
+        spacetime=sum(sum(spacetime_by_base[b]) for b in ROTATION_FREE),
     )
 
     # --- the clock's image -------------------------------------------------
@@ -289,7 +289,7 @@ def report(rows):
         for n in (1, 2, 3, 4, 6)
     ]
 
-    # --- which colouring of the projection a film group induces ------------
+    # --- which colouring of the projection a spacetime group induces ------------
     #
     # Write Phi: G -> Isom(S^1) for the action on the loop. Phi descends to the
     # projected wallpaper group exactly when no element acts trivially on space
@@ -297,7 +297,7 @@ def report(rows):
     # colours are then the cosets of ker Phi and the colour group is the image.
     # D_1 is cyclic of order 2, so it colours as well as C_N does — the colour
     # is the direction of time rather than a phase. That row is the answer to
-    # "regular cyclic colour group, yet the film runs backwards".
+    # "regular cyclic colour group, yet the animation runs backwards".
     def kind(r):
         if not r["reversing"]:
             return "cyclic"
@@ -332,7 +332,7 @@ def report(rows):
     data["pureReversal"] = dict(
         count=len(pure),
         byClock={str(n): sum(1 for r in pure if r["clock"] == n) for n in (1, 2)},
-        byBase=[dict(hm=b, orbifold=ORBIFOLD[b], film=pure_by_base[b],
+        byBase=[dict(hm=b, orbifold=ORBIFOLD[b], spacetime=pure_by_base[b],
                      colourings=list(CYCLIC_BY_BASE[b][:2])) for b in BASE_ORDER],
         matchesMagneticPlaneGroups=all(
             pure_by_base[b] == list(CYCLIC_BY_BASE[b][:2]) for b in BASE_ORDER),
@@ -357,7 +357,7 @@ def report(rows):
         bySystem=[
             dict(system=name,
                  types=sum(by_system[name].values()),
-                 films=sum(k * v for k, v in by_system[name].items()),
+                 spacetimeGroups=sum(k * v for k, v in by_system[name].items()),
                  sizes={str(k): v for k, v in sorted(by_system[name].items())})
             for _, _, name in SYSTEM_RANGES if by_system[name]
         ],
@@ -374,7 +374,7 @@ def report(rows):
     data["polarTable"] = polar_rows
     data["enantiomorphicPairs"] = [list(p) for p in ENANTIOMORPHIC_PAIRS]
 
-    # a fibre worth showing: one 3D crystal, three different films
+    # a fibre worth showing: one 3D crystal, three different animations
     biggest = max(fibre.items(), key=lambda kv: (len(kv[1]), -kv[0]))
     data["fibreExample"] = dict(
         it=biggest[0], hm=PINNED_POLAR.get(biggest[0], ("", ""))[0],
@@ -386,7 +386,7 @@ def report(rows):
     assert len(rows) == 275
     assert len(forward) == 68
     assert data["fibres"]["types"] == 194
-    assert max(fibre) <= 194, "a film group landed in a cubic type"
+    assert max(fibre) <= 194, "a spacetime group landed in a cubic type"
     assert sorted(fibre) == list(range(1, 195)), "the 194 non-cubic types are not all hit"
     assert sorted({r["it"] for r in forward}) == sorted(PINNED_POLAR), \
         "the forward groups are not in bijection with the polar types"
@@ -430,7 +430,7 @@ def verify_pins(groups):
 
 def print_report(data):
     h = data["headline"]
-    print(f"film groups {h['filmGroups']}   clockwork {h['clockwork']}   "
+    print(f"spacetime groups {h['spacetimeGroups']}   clockwork {h['clockwork']}   "
           f"3D types hit {data['fibres']['types']} of the {h['nonCubic']} non-cubic")
     print("\ncolours  Wieting  cyclic  clockwork")
     for row in data["colourCensus"]:
@@ -447,11 +447,11 @@ def print_report(data):
           f"{p['byClock']['2']}, matching the grey and black-white plane groups")
     print("\nfibres of 'forget which axis is time'")
     for row in data["fibres"]["bySystem"]:
-        print(f"  {row['system']:<13} {row['types']:>4} types  {row['films']:>4} films  "
+        print(f"  {row['system']:<13} {row['types']:>4} types  {row['animations']:>4} animations  "
               f"sizes {row['sizes']}")
     rf = data["rotationFree"]
     print(f"\nover {', '.join(rf['bases'])}: {rf['cyclic']} cyclic colourings "
-          f"collapse to {rf['film']} film groups")
+          f"collapse to {rf['animation']} spacetime groups")
 
 
 def main() -> None:

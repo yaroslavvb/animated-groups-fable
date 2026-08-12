@@ -1,6 +1,6 @@
-/* Film-group renderer.
+/* Spacetime-group renderer.
  *
- * A film group acts on spacetime by  g:(x,t) -> (Rx + v, s t + tau)  with R a
+ * A spacetime group acts on spacetime by  g:(x,t) -> (Rx + v, s t + tau)  with R a
  * 2x2 spatial matrix (in lattice coordinates), s = +-1, tau a fraction of the
  * time period. The pattern is the orbit of one animated motif ("worldtube").
  * The spatial slice of copy g at global time t is the motif rendered at
@@ -62,7 +62,7 @@ const MAX_COLUMNS = 18;
  * axis, so a rotated copy shows a visibly rotated sweep. Orientation and
  * phase are fully orthogonal channels. Reversal copies run the sweep the
  * other way. Colors are static; only the boundary moves, and it moves
- * continuously through t = 0, so a looping film has no visible seam.
+ * continuously through t = 0, so a looping animation has no visible seam.
  *
  * The comma carries the CONTINUOUS phase; the ring around it (drawPhaseRing)
  * carries the DISCRETE one — which of the group's N time intervals the copy
@@ -195,8 +195,8 @@ export function drawMotif(ctx, theta, r, colors, layer = "all") {
  * where the copy is filling, anticlockwise where a time reversal has it
  * draining. In a frozen frame the head's orientation is the only thing that
  * says so; note that this is a velocity, so it is invariant under the
- * forward-time subgroup only. Under a time-reversing element the film must
- * also be played backwards — and playing a film backwards reverses every arrow
+ * forward-time subgroup only. Under a time-reversing element the animation must
+ * also be played backwards — and playing an animation backwards reverses every arrow
  * in it, so the symmetry still holds where it is claimed to. The hand's
  * POSITION, being a function of theta alone, is invariant under everything. */
 const RING_MID = 0.76;    // ring centreline, in units of the motif radius
@@ -294,7 +294,7 @@ export class FilmGroupAnimation extends Playback {
     // banner, never a silently wrong pattern.
     this.specCheck = verifySpec(spec);
     if (!this.specCheck.ok) {
-      console.error("Film-group spec fails group axioms:",
+      console.error("Spacetime-group spec fails group axioms:",
                     this.specCheck.errors, spec);
     }
     this._setupGeometry();
