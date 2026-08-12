@@ -148,12 +148,11 @@ function render() {
       `<span class="tag">${g.system}</span>` +
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      // Time direction is stated BOTH ways. Marking only the reversal groups
-      // left the 68 forward ones with nothing to say they run one way, on a
-      // page whose own filter offers "clockwork (forward time)" — so a
-      // clockwork group's card looked like a card that had failed to be one.
-      (g.forward ? `<span class="tag fwd">clockwork</span>`
-                 : `<span class="tag rev">time reversal</span>`) +
+      // Only the forward groups are tagged. "Clockwork" is the property worth
+      // naming — 68 of the 275 — and tagging the other 207 "time reversal"
+      // put a label on the ordinary case, which is where most cards already
+      // are: the absence of the green tag says it just as well.
+      (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
       (g.product ? `<span class="tag product">product</span>` : "") +
       `</div>`;
     card.append(meta);

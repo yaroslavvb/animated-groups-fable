@@ -30,23 +30,30 @@ const CYCLIC = sum(H.colourCensus.map(r => r.cyclic));
 
 /* ---------- tables ---------- */
 
+/* opts.left — column indices holding prose rather than counts, which the
+ * shared .counts rule would otherwise right-align. opts.total — the last row
+ * is a sum and gets a rule above it. */
 function table(id, head, rows, opts = {}) {
   const host = document.getElementById(id);
   if (!host) return;
+  const left = new Set(opts.left || []);
+  const cls = i => left.has(i) ? ' class="txt"' : "";
+  const last = rows.length - 1;
   const wrap = document.createElement("div");
   wrap.className = "tablewrap";
   wrap.innerHTML =
     `<table class="counts">` +
-    `<thead><tr>${head.map(h => `<th>${h}</th>`).join("")}</tr></thead>` +
-    `<tbody>${rows.map(r =>
-      `<tr${r.cls ? ` class="${r.cls}"` : ""}>` +
-      (r.cells || r).map(c => `<td>${c}</td>`).join("") + `</tr>`).join("")}</tbody>` +
+    `<thead><tr>${head.map((h, i) => `<th${cls(i)}>${h}</th>`).join("")}</tr></thead>` +
+    `<tbody>${rows.map((r, j) =>
+      `<tr${opts.total && j === last ? ' class="total"' : ""}>` +
+      r.map((c, i) => `<td${cls(i)}>${c}</td>`).join("") + `</tr>`).join("")}</tbody>` +
     `</table>` + (opts.note ? `<p class="hint">${opts.note}</p>` : "");
   host.append(wrap);
 }
 
 const b = s => `<b>${s}</b>`;
 const sym = s => `<span class="sym">${s}</span>`;
+const ditto = `<span style="color:var(--muted);">as above</span>`;
 
 /* §1 — the six classifications, with the two refinements marked as such */
 table("six-table",
@@ -57,18 +64,19 @@ table("six-table",
     ["coloured wallpaper groups, N&nbsp;≤&nbsp;6", "a plane pattern in N colours",
      b(COLOURS), "…the same, colours permuted freely"],
     ["&emsp;…with a regular cyclic colour group",
-     "a plane pattern whose N colours are a clock", b(CYCLIC), "”"],
+     "a plane pattern whose N colours are a clock", b(CYCLIC), ditto],
     ["space-time (film) groups, 2+1D", "an animation that loops and tiles",
      b(H.headline.filmGroups),
      "a change of frame, up to re-basing the space-time lattice"],
     ["&emsp;…clockwork groups", "one that never runs backwards",
-     b(H.headline.clockwork), "”"],
+     b(H.headline.clockwork), ditto],
     ["space groups", "a 3D crystal", b(H.headline.spaceGroups),
      "an orientation-preserving affine map of space"],
     ["&emsp;…polar space groups", "a crystal with a polar axis",
-     b(H.headline.polar), "”"],
+     b(H.headline.polar), ditto],
   ],
-  { note: `The indented rows are subsets of the row above. ` +
+  { left: [0, 1, 3],
+    note: `The indented rows are subsets of the row above. ` +
     `${COLOURS} = ${H.colourCensus.map(r => r.wieting).join(" + ")} over ` +
     `N&nbsp;=&nbsp;1…6; ${CYCLIC} = ` +
     `${H.colourCensus.map(r => r.cyclic).join(" + ")}.` });
@@ -87,7 +95,8 @@ table("lift-table",
     ["half-turn", "reverses time", "inversion centre"],
     ["rotation by 2π/n", "reverses time", "rotoinversion about c"],
   ],
-  { note: "The first five rows keep the direction of the c-axis and are the " +
+  { left: [0, 1, 2],
+    note: "The first five rows keep the direction of the c-axis and are the " +
     "clockwork case; the last four turn it round." });
 
 /* §3 — the colour census */
@@ -95,10 +104,12 @@ table("colour-table",
   ["colours N", "all N-colour plane groups", "colour group C<sub>N</sub>, regular",
    "clockwork groups"],
   H.colourCensus.map(r => [b(r.n), r.wieting, r.cyclic, r.clockwork])
-    .concat([{ cells: [b("Σ"), b(COLOURS), b(CYCLIC), b(H.headline.clockwork)] }]),
-  { note: "Column 1: Wieting 1982, Table 11. Column 2: normal subgroups of " +
-    "index N with cyclic quotient, up to plane-affine equivalence. Column 3: " +
-    "this catalog. <b>The three columns use different notions of equivalence</b> " +
+    .concat([[b("Σ"), b(COLOURS), b(CYCLIC), b(H.headline.clockwork)]]),
+  { total: true,
+    note: "Column 1: Wieting 1982, Table 11. Column 2: the Senechal–Wieting " +
+    "count of normal subgroups of index N with cyclic quotient, up to " +
+    "plane-affine equivalence. Column 3: this catalog. " +
+    "<b>The three columns use different notions of equivalence</b> " +
     "— §7 is about exactly that, and the totals are not meant to agree." });
 
 /* §4 — the image of the clock in Isom(S¹) */
@@ -111,7 +122,8 @@ table("phase-table",
      ...H.phaseImage.map(r => r.dihedral),
      b(H.headline.filmGroups - H.headline.clockwork)],
   ],
-  { note: "N&nbsp;=&nbsp;5 is absent from both rows, and so is every " +
+  { left: [0],
+    note: "N&nbsp;=&nbsp;5 is absent from both rows, and so is every " +
     "N&nbsp;&gt;&nbsp;6: the crystallographic restriction applies to the " +
     "clock as much as to the rotations." });
 
@@ -122,10 +134,12 @@ table("phase-table",
     ["3D crystal system", "space-group types", "film groups",
      ...sizes.map(s => `fibres of ${s}`)],
     H.fibres.bySystem.map(r =>
-      [r.system, r.types, r.films, ...sizes.map(s => r.sizes[s] || "·")])
-      .concat([{ cells: [b("Σ"), b(H.fibres.types), b(H.headline.filmGroups),
-                         ...sizes.map(s => b(H.fibres.sizeCounts[s]))] }]),
-    { note: "A fibre of size k is one space-group type that can be sliced " +
+      [r.system, r.types, r.films,
+       ...sizes.map(s => r.sizes[s] || "<span style='color:var(--rule);'>·</span>")])
+      .concat([[b("Σ"), b(H.fibres.types), b(H.headline.filmGroups),
+                ...sizes.map(s => b(H.fibres.sizeCounts[s]))]]),
+    { total: true, left: [0],
+      note: "A fibre of size k is one space-group type that can be sliced " +
       "into k inequivalent films." });
   for (const el of document.querySelectorAll("[data-fib]"))
     el.textContent = H.fibres.sizeCounts[el.dataset.fib];
@@ -144,7 +158,8 @@ table("phase-table",
   table("polar-table",
     ["clockwork symbol", "projects to", "colours", "IT&nbsp;no.",
      "Hermann–Mauguin", "class", "system"], rows,
-    { note: `All ${H.polarTable.length} rows, ordered by International Tables ` +
+    { left: [0, 1, 6],
+      note: `All ${H.polarTable.length} rows, ordered by International Tables ` +
       `number; the “colours” column is the order of the clock. ` +
       `Every polar type occurs exactly once.` });
 
@@ -176,7 +191,8 @@ table("phase-table",
         sum(H.byOrbifold.map(r => r.film[i]))))),
       b(CYCLIC), b(H.headline.clockwork),
       b(H.headline.clockwork - CYCLIC)]]),
-    { note: "Each cell is <i>cyclic colourings → film groups</i> for that " +
+    { total: true, left: [0, 1],
+      note: "Each cell is <i>cyclic colourings → film groups</i> for that " +
       "wallpaper group and that clock order, red where they differ. The four " +
       "rotation-free rows lose almost everything; p3, p4 and p6 gain." });
 
@@ -217,7 +233,10 @@ table("phase-table",
   const host = document.createElement("div");
   host.className = "tabdemo big";
   document.getElementById("fibre-demo").append(host);
-  buildTabs(host, ex.members.map(m => ({
+  // split:true draws two runs, and expects the forward one first — the fibre
+  // arrives in catalog order, which is not that
+  const members = [...ex.members].sort((a, c) => Number(c.forward) - Number(a.forward));
+  buildTabs(host, members.map(m => ({
     g: BY_ID.get(m.id), sym: m.symbol,
     note: `Projects to ${m.base}; ${m.forward
       ? "runs one way only, so this is the clockwork member of the fibre"
@@ -227,7 +246,105 @@ table("phase-table",
   })), { split: true });
 }
 
-/* ---------- the diagram ---------- */
+/* ---------- the Euler diagram at the top ---------- */
+
+/* Two circles that genuinely are sets of the same kind of thing, nested one
+ * ring deep each, and drawn so that the ring inside the left circle meets the
+ * ring inside the right one in exactly the clockwork groups.
+ *
+ * The regions are honest set differences, with one seam: the left circle
+ * counts colourings up to plane-affine equivalence and the right one counts
+ * space-group types, so the 101 cyclic colourings and the 68 polar types are
+ * the same region measured two ways. That seam IS §7, and the caption says
+ * so rather than hiding it behind a single number.
+ */
+document.getElementById("venn").innerHTML = venn();
+
+function venn() {
+  const h = H.headline;
+  const A = { x: 265, y: 245, r: 175 };          // coloured wallpaper groups
+  const Ai = { x: 310, y: 245, r: 125 };         // …with a regular cyclic clock
+  const C = { x: 495, y: 245, r: 175 };          // space-group types
+  const Ci = { x: 460, y: 245, r: 132 };         // …non-cubic
+
+  // the lens where the two inner circles meet: the clockwork groups
+  const d = Ci.x - Ai.x;
+  const a = (d * d + Ai.r * Ai.r - Ci.r * Ci.r) / (2 * d);
+  const k = Math.sqrt(Ai.r * Ai.r - a * a);
+  const px = (Ai.x + a).toFixed(2), top = (Ai.y - k).toFixed(2), bot = (Ai.y + k).toFixed(2);
+  const lens = `M ${px} ${top} A ${Ai.r} ${Ai.r} 0 0 1 ${px} ${bot} ` +
+               `A ${Ci.r} ${Ci.r} 0 0 1 ${px} ${top} Z`;
+
+  const circle = (c, colour, dash) => `<circle cx="${c.x}" cy="${c.y}" r="${c.r}"
+    fill="var(${colour})" fill-opacity="0.09" stroke="var(${colour})"
+    stroke-width="1.6" ${dash ? 'stroke-dasharray="5 4"' : ""}/>`;
+  const n = (x, y, v, label, colour) => `
+    <text x="${x}" y="${y}" text-anchor="middle" font-size="26" font-weight="700"
+      fill="var(${colour || "--ink"})">${v}</text>
+    ${label.map((t, i) => `<text x="${x}" y="${y + 20 + i * 14}" text-anchor="middle"
+      font-size="11.5" fill="var(--muted)">${t}</text>`).join("")}`;
+
+  const ring = (x, y, colour, text) => `<text x="${x}" y="${y}"
+    text-anchor="middle" font-size="11.5" fill="var(${colour})">${text}</text>`;
+
+  return `<div class="tablewrap"><svg viewBox="0 0 760 505" width="100%"
+    style="max-width:760px;display:block;margin:1.2rem auto 0.4rem;
+           font-family:system-ui,sans-serif;" role="img"
+    aria-label="Two overlapping circles. The left is the ${COLOURS} coloured
+      wallpaper groups with up to six colours, containing the ${CYCLIC} whose
+      colour group is a regular cyclic clock. The right is the
+      ${h.spaceGroups} space-group types, containing the ${h.nonCubic}
+      non-cubic ones that the ${h.filmGroups} film groups realise. The two
+      inner circles meet in the ${h.clockwork} clockwork groups, which are
+      also the ${h.polar} polar space groups.">
+    ${circle(A, "--gold")}${circle(C, "--accent")}
+    ${circle(Ai, "--gold", true)}${circle(Ci, "--accent", true)}
+    <path d="${lens}" fill="var(--accent2)" fill-opacity="0.17"
+      stroke="var(--accent2)" stroke-width="2"/>
+
+    <text x="${A.x}" y="40" text-anchor="middle" font-size="11.5" font-weight="600"
+      letter-spacing="0.07em" fill="var(--gold)">COLOURED WALLPAPER GROUPS</text>
+    <text x="${A.x}" y="55" text-anchor="middle" font-size="10.5"
+      fill="var(--muted)">N&#160;≤&#160;${H.meta.maxColours} colours · ${COLOURS} in all</text>
+    <text x="${C.x}" y="40" text-anchor="middle" font-size="11.5" font-weight="600"
+      letter-spacing="0.07em" fill="var(--accent)">SPACE-GROUP TYPES</text>
+    <text x="${C.x}" y="55" text-anchor="middle" font-size="10.5"
+      fill="var(--muted)">of 3 dimensions · ${h.spaceGroups} in all</text>
+
+    ${/* each dashed ring is named inside itself, clear of the lens between them */""}
+    ${ring(275, 175, "--gold", `${CYCLIC} cyclic clocks`)}
+    ${ring(505, 168, "--accent", `${h.nonCubic} non-cubic`)}
+    ${ring(505, 183, "--accent", `all ${h.filmGroups} films land here`)}
+
+    ${n(144, 205, COLOURS - CYCLIC, ["colour group", "is not a clock"])}
+    ${n(256, 252, CYCLIC - h.clockwork, ["not a new film", "(§7)"])}
+    ${n(381, 236, h.clockwork, ["clockwork", "= polar"], "--accent2")}
+    ${n(513, 252, h.nonCubic - h.polar, ["non-polar types",
+        `— ${h.filmGroups - h.clockwork} reversing films`])}
+    ${n(631, 205, h.cubic, ["cubic types"])}
+
+    <line x1="381" y1="352" x2="381" y2="446" stroke="var(--accent2)"
+      stroke-width="1.2"/>
+    <text x="381" y="464" text-anchor="middle" font-size="11.5"
+      fill="var(--accent2)" font-weight="600">the ${h.clockwork} clockwork groups</text>
+    <text x="381" y="480" text-anchor="middle" font-size="11"
+      fill="var(--muted)">a colouring, a film and a polar crystal at once</text>
+  </svg>
+  <p class="hint" style="margin-top:0;">Every region is a set difference and
+  the numbers add up around each circle:
+  ${COLOURS - CYCLIC}&nbsp;+&nbsp;${CYCLIC - h.clockwork}&nbsp;+&nbsp;${h.clockwork}&nbsp;=&nbsp;${COLOURS}
+  on the left, and
+  ${h.cubic}&nbsp;+&nbsp;${h.nonCubic - h.polar}&nbsp;+&nbsp;${h.polar}&nbsp;=&nbsp;${h.spaceGroups}
+  on the right. The ${h.cubic} cubic types are outside everything because a
+  cubic point group fixes no direction, so nothing in such a crystal can be
+  called time. The two circles are read with two different equivalences —
+  colourings up to affine maps of the plane, crystals up to space-group type —
+  and the ${CYCLIC - h.clockwork} is exactly the gap between them:
+  ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct films.
+  <a href="#disagree">§7</a> takes that number apart.</p></div>`;
+}
+
+/* ---------- the summary diagram at the foot ---------- */
 
 document.getElementById("diagram").innerHTML = diagram();
 

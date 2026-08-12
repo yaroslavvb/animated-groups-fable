@@ -317,8 +317,7 @@ export function groupCaption(g) {
     `<span style="color:var(--muted);">${g.hm || ""}</span>` +
     `<span class="tags" style="display:flex;gap:0.4rem;flex-wrap:wrap;">` +
     (g.symmorphic ? "" : `<span class="tag nonsym">nonsymmorphic</span>`) +
-    (g.forward ? `<span class="tag fwd">clockwork</span>`
-               : `<span class="tag rev">time reversal</span>`) +
+    (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
     (g.product ? `<span class="tag product">product</span>` : "") +
     `</span>` +
     `<a class="linkish" style="margin-left:auto;text-decoration:none;" ` +

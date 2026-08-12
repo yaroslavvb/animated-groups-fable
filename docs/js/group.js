@@ -63,8 +63,7 @@ function render(g) {
       `<span class="tag">base ${baseLabel(g.base)}</span>` +
       (g.symmorphic ? `<span class="tag">symmorphic</span>`
                     : `<span class="tag nonsym">nonsymmorphic</span>`) +
-      (g.forward ? `<span class="tag fwd">clockwork</span>`
-                 : `<span class="tag rev">time reversal</span>`) +
+      (g.forward ? `<span class="tag fwd">clockwork</span>` : "") +
       (g.product ? `<span class="tag">product type</span>`
                  : `<span class="tag nonsym">not a product</span>`) +
     `</div>` +

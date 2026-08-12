@@ -216,9 +216,11 @@ table.counts td:first-child { text-align: left; }
   font-family: system-ui, sans-serif;
 }
 .tag.nonsym { background: var(--accent); color: #fff; }
-.tag.rev { background: #8e44ad; color: #fff; }
 /* forward time, stated positively — the same green the wallpaper atlas
-   uses for the forward run of its tabs, so one idea has one colour */
+   uses for the forward run of its tabs, so one idea has one colour.
+   There is deliberately no companion tag for the time-reversing groups:
+   they are 207 of the 275, the ordinary case, and labelling the ordinary
+   case puts a badge on almost every card for no information. */
 .tag.fwd { background: var(--fwd-bg); color: var(--fwd-ink);
            box-shadow: inset 0 0 0 1px var(--fwd-rule); }
 .tag.product { }
@@ -591,3 +593,15 @@ dl.facts dd { margin: 0; }
   dl.facts { grid-template-columns: 1fr; gap: 0 0; }
   dl.facts dd { margin-bottom: 0.5rem; }
 }
+
+/* ------- hierarchy page -------
+ * The shared .counts rule right-aligns every column but the first, which is
+ * right for a table of numbers and wrong for the hierarchy page's prose
+ * columns ("an object is", "same when", the crystal-system names). Those
+ * columns are marked .txt by js/hierarchy.js. A .total row is a column sum
+ * and is ruled off from the rows it adds up.
+ */
+table.counts th.txt, table.counts td.txt { text-align: left; }
+table.counts tr.total td { border-top-width: 2px; }
+table.counts tbody tr:hover { background: var(--code-bg); }
+
