@@ -502,14 +502,34 @@ section.wp .demo canvas { height: 280px; }
 table.counts tr.rotfree td { background: var(--code-bg); }
 table.counts td .sym { margin-right: 0.35em; }
 
-/* ---------------------------------------------------------------- mystery
- * The ball film is a canvas of its own: taller than the pattern diagrams and
- * sized by the viewport, because what has to be legible here is a ball's fill
- * level, not the outline of a glyph. */
+/* --------------------------------------------------------------- billiards
+ * The page is the animation: no prose, so the film takes the height the text
+ * would have had, and the canvas is sized by the viewport rather than by the
+ * measure. What has to be legible here is a ball's fill level, not the
+ * outline of a glyph, so it wants the room. */
+main.billiards {
+  max-width: 1080px;
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 .demo canvas.ballfilm {
-  height: clamp(340px, 62vh, 560px);
+  height: clamp(360px, 76vh, 760px);
   cursor: pointer;
 }
+
+/* one muted line under the picture: what the film is, and where it came from */
+.credit {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 1.1rem;
+  font: 0.85rem/1.5 system-ui, -apple-system, sans-serif;
+  color: var(--muted);
+}
+.credit .sym { font-size: 0.95rem; }
 
 .film-opts {
   display: flex;

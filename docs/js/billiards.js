@@ -51,7 +51,7 @@ export class BallFilm extends Playback {
     // rich pattern and anything wider is a texture: the reader is being asked
     // to find a 3-centre and follow a single ball around it, and neither is
     // possible at eight pixels a ball.
-    this.cells = opts.cells || 1.15;
+    this.cells = opts.cells || 1.45;
     this.showAxes = false;
     this.timeSym = filmTimeSymmetry({ ops: data.ops });
 
@@ -353,14 +353,12 @@ wrap.append(box, document.createTextNode(" symmetry axes"));
 opts.append(wrap);
 host.append(opts);
 
-// the numbers behind the picture, filled from the data file
-const put = (id, text) => {
-  const el = document.getElementById(id);
-  if (el) el.textContent = text;
-};
-put("d-balls", `${data.balls.length} per cell, ` +
-               `${data.balls.length * data.ops.length} counting every copy`);
-put("d-clear", `${data.clearanceRatio.toFixed(3)} × the ball diameter — ` +
-               `contact, never overlap`);
-put("d-sym", `${data.symmetryResidual.toExponential(1)} (exact, to rounding)`);
-put("d-clock", `order ${data.clockOrder} — offsets are sixths of a period`);
+// the one caption line, filled from the data file
+const count = document.getElementById("d-balls");
+if (count) {
+  count.textContent = `${data.balls.length} balls, ` +
+                      `${data.ops.length} copies of each`;
+  count.title = `clock of order ${data.clockOrder}; closest approach ` +
+                `${data.clearanceRatio.toFixed(3)} ball diameters; symmetry ` +
+                `residual ${data.symmetryResidual.toExponential(1)}`;
+}
