@@ -46,16 +46,14 @@ groups — the map is a bijection onto the <b>68</b> polar space-group
 types.</p>
 </div>
 
-<p>The two circles below are colourings of the plane and crystals in space;
-the spacetime groups relate them.</p>
+<div id="diagram"></div>
 
-<div id="venn"></div>
-
-<p>Two consequences. Spacetime groups are not a subset of the coloured wallpaper
-groups: only the clockwork ones are colourings, since a
-colour permutation cannot reverse the palette. And they are not merely
-comparable with the space groups: every spacetime group <em>is</em> a space group,
-necessarily non-cubic, and what fails is injectivity.</p>
+<p>Each arrow is labelled with what it forgets; only the bottom one is a
+bijection. Two things the diagram settles. Spacetime groups are not a subset
+of the coloured wallpaper groups — only the clockwork ones are colourings,
+since a colour permutation cannot reverse the palette (§5). And they are not
+merely comparable with the space groups: every spacetime group <em>is</em> a
+space group, necessarily non-cubic, and what fails is injectivity (§6).</p>
 
 <h2 id="six">1. The classifications</h2>
 
@@ -114,7 +112,7 @@ order 5. Plane point operations have order 1,&nbsp;2,&nbsp;3,&nbsp;4,&nbsp;6,
 so χ is trivial on the point group and supported on the translations. A phase
 linear along the lattice is a drift, removed by a Galilean boost. The four
 five-colour cyclic colourings in column 2 are colourings of p1, pm, pg, cm,
-and are not new animations.</p>
+and are not new spacetime groups.</p>
 </div>
 
 <p>The same argument bounds N: a clock has order 1,&nbsp;2,&nbsp;3,&nbsp;4 or
@@ -202,8 +200,8 @@ as mirrors or as time reversals.</p>
 
 <div id="fibre-table"></div>
 
-<p>Tetragonal, trigonal and hexagonal have a unique high-order axis, so animations
-and types agree: 68,&nbsp;25,&nbsp;27. Monoclinic splits in two, according to
+<p>Tetragonal, trigonal and hexagonal have a unique high-order axis, so
+spacetime groups and types agree: 68,&nbsp;25,&nbsp;27. Monoclinic splits in two, according to
 whether the 2-fold axis is temporal or spatial (the catalog's T- and
 R-monoclinic). Orthorhombic has three perpendicular axes and splits by up to
 three. The fibres sum to 275; the types number 194.</p>
@@ -256,16 +254,75 @@ wallpaper groups and grow over three. Both directions are accounted for.</p>
 
 <div id="orb-table"></div>
 
-<p><b>Collapses.</b> Over the four wallpaper groups with trivial rotation part
-— p1, pm, pg, cm — <span id="rf-cyclic">…</span> cyclic colourings give
-<span id="rf-spacetime">…</span> spacetime groups, by two mechanisms.
-<i>Drift</i>: with no rotation the point group fixes a direction, and a phase
-increasing along it is removed by a Galilean boost; this accounts for all five
-non-trivial colourings of p1. <i>Migration</i>: the height reading can
-exchange a time offset for a spatial one. Giving pm's mirror half a period
-lifts it to a glide plane, type Pc (7), which is also the lift of pg's spatial
-glide; under the crystallographic convention used here, in which any unimodular
-re-basing of the spacetime lattice is allowed, these are one spacetime group.</p>
+<h3>Losses: the phase a change of frame removes</h3>
+
+<p>A phase carried by the translations is a homomorphism
+χ|<sub>L</sub>:&nbsp;L&nbsp;→&nbsp;ℝ/ℤ, and it is P-invariant, so it factors
+through the coinvariants L<sub>P</sub>&nbsp;=&nbsp;ℤ²/⟨(1&nbsp;−&nbsp;g)ℤ²&nbsp;:&nbsp;g&nbsp;∈&nbsp;P⟩.
+A change of frame subtracts from χ the character ℓ&nbsp;↦&nbsp;w·ℓ — a
+Galilean boost x&nbsp;↦&nbsp;x&nbsp;+&nbsp;wt, or a re-slicing of simultaneity
+t&nbsp;↦&nbsp;t&nbsp;+&nbsp;w·x — and such a shear keeps the group inside
+E(2)&nbsp;×&nbsp;E(1) only when w is fixed by P.</p>
+
+<div class="thm">
+<span class="label">What is removable</span>
+<p style="margin:0.3rem 0;">The removable phase is exactly the part of χ
+factoring through the <em>free</em> quotient of L<sub>P</sub>, since
+(ℝ²)<sup>P</sup>&nbsp;≠&nbsp;0 precisely when L<sub>P</sub> has free rank. A
+rotation of order ≥&nbsp;2 fixes no non-zero vector, so this happens for
+exactly the four wallpaper groups whose point group has no rotation.</p>
+</div>
+
+<div id="coinv-table"></div>
+
+<p>Over the thirteen groups with L<sub>P</sub> finite nothing is removable,
+and there the colouring count is never larger than the spacetime-group count.
+Over p1, pm, pg and cm the free part absorbs phase, and
+<span id="rf-cyclic">…</span> colourings realise
+<span id="rf-spacetime">…</span> spacetime groups:</p>
+
+<div id="lost-table"></div>
+
+<p><b>Examples of colourings that are not spacetime groups.</b></p>
+
+<p><b>p1, every N&nbsp;≥&nbsp;2.</b> L<sub>P</sub>&nbsp;=&nbsp;ℤ², so every
+character is removable. Colour the cell in column k by k mod N: a striped
+N-colouring of p1, and a perfectly good one. As an animation it is the
+wallpaper sliding one cell every N-th of a period, and a camera panning at
+that speed sees it standing still. Five colourings, no new group.</p>
+
+<p><b>pm, pg and cm at N&nbsp;=&nbsp;3.</b> Their coinvariants are
+ℤ&nbsp;×&nbsp;ℤ/2, ℤ&nbsp;×&nbsp;ℤ/2 and ℤ, the free factor being the
+translation <em>along</em> the mirrors. An order-3 character has nowhere else
+to live — the point group has order 2 and the torsion has exponent 2 — so the
+unique 3-colouring of each is striped along the mirror direction, and drifts.
+Three more colourings, no new group.</p>
+
+<p><b>Every five-colouring there is.</b> Five-colourings exist only over those
+same four groups, one each. Elsewhere an order-5 character would have to
+restrict to L<sub>P</sub> as either trivial or onto C<sub>5</sub>; the first
+makes it a character of P, and no point group has order divisible by 5, while
+the second needs an element of order 5 in L<sub>P</sub>, whose exponent is 2,
+3 or 4 in the table above. All four that exist are drifts. That is the whole
+of the empty N&nbsp;=&nbsp;5 row of §3, and N&nbsp;=&nbsp;5 is the only order
+whose row is empty.</p>
+
+<p><b>pm at N&nbsp;=&nbsp;4.</b> Three colourings. Order 4 again needs the
+free ℤ; subtract that drift and what remains has order at most 2 — a colouring
+already counted higher up the same column. This is the general shape of the
+remaining losses: not that the colouring fails to be an animation, but that
+the animation it gives is one already listed with fewer colours.</p>
+
+<h3>Relabelling</h3>
+
+<p>A second, smaller effect: the height reading can exchange a time offset for
+a spatial one. Giving pm's mirror half a period lifts it to a glide plane,
+type Pc (7), which is also the lift of pg's ordinary spatial glide; under the
+crystallographic convention used here, in which any unimodular re-basing of
+the spacetime lattice is allowed, these are one spacetime group. So the 42
+colourings of the four rotation-free groups realise five spacetime groups in
+all — P1, Pm, Pc, Cm and Cc — but not with the base assignment the colour
+census would predict.</p>
 
 <div class="aside">
 <span class="label">Is the spatial projection an invariant?</span>
@@ -273,7 +330,7 @@ re-basing of the spacetime lattice is allowed, these are one spacetime group.</p
 projections of one spacetime group, and the catalog's
 <a href="wallpaper.html">base</a> is a canonical representative. Under the
 stricter equivalence — conjugation by literal changes of frame, which does not
-re-slice simultaneity — the projection is an invariant and the two animations
+re-slice simultaneity — the projection is an invariant and the two groups
 differ. This is the same disagreement rather than a second one: the
 rotation-free bases are the R&#8209;monoclinic system, which is where the two
 conventions part (13&nbsp;→&nbsp;21 types, 275&nbsp;→&nbsp;283 in total; see
@@ -281,9 +338,11 @@ the <a href="index.html#theorem">tutorial</a>). No other count on this page is
 affected.</p>
 </div>
 
-<p><b>Splits.</b> Four times, over p3, p4 and p6, by chirality. Plane-affine
+<h3>Splits: chirality</h3>
+
+<p>Four times, over p3, p4 and p6. Plane-affine
 equivalence admits reflections, so a colouring and its mirror image coincide;
-animation equivalence does not, since reflecting the plane while preserving the
+spacetime equivalence does not, since reflecting the plane while preserving the
 direction of time sends a clock advancing by +1/N to one advancing by −1/N.
 The three-colour clockwork colouring of p3 gives P3<sub>1</sub> and
 P3<sub>2</sub>; likewise P4<sub>1</sub>/P4<sub>3</sub>,
@@ -321,7 +380,7 @@ on the <a href="index.html#warmup">tutorial</a>.</p>
 orientation-reversing operation, and 22 of them, in 11 enantiomorphic pairs,
 are chiral. This cuts the 230 differently from polarity: polarity fixes a
 direction, chirality an orientation, and neither class contains the other. In
-animation terms Sohncke means no spatial mirror at any phase, polar means no time
+spacetime terms Sohncke means no spatial mirror at any phase, polar means no time
 reversal.</p>
 
 <p><b>Choreographic crystals.</b> Boyle–Khoo–Smith classify choreographic
@@ -330,13 +389,6 @@ with time offsets — which is the clockwork construction without a spatial
 lattice. The Golubitsky–Stewart H/K theorem describes which (setwise,
 pointwise) pairs a time-periodic state realises. Both concern the
 C<sub>N</sub> quotient of §5.</p>
-
-<h2 id="glance">10. Summary</h2>
-
-<div id="diagram"></div>
-
-<p>Each arrow is labelled with what it forgets; only the bottom one is a
-bijection.</p>
 
 <h2 id="refs">References</h2>
 <p style="font-size:0.92rem;">

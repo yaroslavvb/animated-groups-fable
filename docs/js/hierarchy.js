@@ -203,7 +203,7 @@ table("phase-table",
     : c === f ? `${c}` : `<span style="color:var(--accent2);">${c}→${f}</span>`;
   table("orb-table",
     ["orbifold", "HM", ...Array.from({ length: N }, (_, i) => `C<sub>${i + 1}</sub>`),
-     "Σ colourings", "Σ animations", "Δ"],
+     "Σ colourings", "Σ groups", "Δ"],
     H.byOrbifold.map(r => {
       const d = r.spacetimeTotal - r.cyclicTotal;
       return [sym(r.orbifold), r.hm,
@@ -271,103 +271,37 @@ table("phase-table",
   })), { split: true });
 }
 
-/* ---------- the Euler diagram at the top ---------- */
+/* §8 — what a change of frame can remove, and the losses it accounts for */
+{
+  const c = H.coinvariants;
+  table("coinv-table",
+    ["orbifold", "HM", "|P|", "L<sub>P</sub>", "free rank",
+     "colourings", "spacetime groups"],
+    c.map(r => [sym(r.orbifold), r.hm, r.order,
+      `<span class="sym">${r.module}</span>`,
+      r.freeRank ? b(r.freeRank) : "<span style='color:var(--rule);'>0</span>",
+      r.cyclic, r.spacetime]),
+    { left: [0, 1, 3],
+      note: "The coinvariants L<sub>P</sub> of the translation lattice under " +
+        "the point group. Free rank is the whole obstruction: it is non-zero " +
+        "for exactly the four groups whose point group has no rotation, and " +
+        "those are exactly the rows where the colouring count exceeds the " +
+        "spacetime-group count." });
 
-/* Two circles that genuinely are sets of the same kind of thing, nested one
- * ring deep each, and drawn so that the ring inside the left circle meets the
- * ring inside the right one in exactly the clockwork groups.
- *
- * The regions are set differences, with one seam: the left circle counts
- * colourings up to plane-affine equivalence and the right one counts
- * space-group types, so the 101 cyclic colourings and the 68 polar types are
- * the same region measured two ways. The caption names that seam rather than
- * reporting a single number for the region.
- */
-document.getElementById("venn").innerHTML = venn();
-
-function venn() {
-  const h = H.headline;
-  const A = { x: 265, y: 245, r: 175 };          // coloured wallpaper groups
-  const Ai = { x: 310, y: 245, r: 125 };         // …with a regular cyclic clock
-  const C = { x: 495, y: 245, r: 175 };          // space-group types
-  const Ci = { x: 460, y: 245, r: 132 };         // …non-cubic
-
-  // the lens where the two inner circles meet: the clockwork groups
-  const d = Ci.x - Ai.x;
-  const a = (d * d + Ai.r * Ai.r - Ci.r * Ci.r) / (2 * d);
-  const k = Math.sqrt(Ai.r * Ai.r - a * a);
-  const px = (Ai.x + a).toFixed(2), top = (Ai.y - k).toFixed(2), bot = (Ai.y + k).toFixed(2);
-  const lens = `M ${px} ${top} A ${Ai.r} ${Ai.r} 0 0 1 ${px} ${bot} ` +
-               `A ${Ci.r} ${Ci.r} 0 0 1 ${px} ${top} Z`;
-
-  const circle = (c, colour, dash) => `<circle cx="${c.x}" cy="${c.y}" r="${c.r}"
-    fill="var(${colour})" fill-opacity="0.09" stroke="var(${colour})"
-    stroke-width="1.6" ${dash ? 'stroke-dasharray="5 4"' : ""}/>`;
-  const n = (x, y, v, label, colour) => `
-    <text x="${x}" y="${y}" text-anchor="middle" font-size="26" font-weight="700"
-      fill="var(${colour || "--ink"})">${v}</text>
-    ${label.map((t, i) => `<text x="${x}" y="${y + 20 + i * 14}" text-anchor="middle"
-      font-size="11.5" fill="var(--muted)">${t}</text>`).join("")}`;
-
-  const ring = (x, y, colour, text) => `<text x="${x}" y="${y}"
-    text-anchor="middle" font-size="11.5" fill="var(${colour})">${text}</text>`;
-
-  return `<div class="tablewrap"><svg viewBox="0 0 760 505" width="100%"
-    style="max-width:760px;display:block;margin:1.2rem auto 0.4rem;
-           font-family:system-ui,sans-serif;" role="img"
-    aria-label="Two overlapping circles. The left is the ${COLOURS} coloured
-      wallpaper groups with up to six colours, containing the ${CYCLIC} whose
-      colour group is a regular cyclic clock. The right is the
-      ${h.spaceGroups} space-group types, containing the ${h.nonCubic}
-      non-cubic ones that the ${h.spacetimeGroups} spacetime groups realise. The two
-      inner circles meet in the ${h.clockwork} clockwork groups, which are
-      also the ${h.polar} polar space groups.">
-    ${circle(A, "--gold")}${circle(C, "--accent")}
-    ${circle(Ai, "--gold", true)}${circle(Ci, "--accent", true)}
-    <path d="${lens}" fill="var(--accent2)" fill-opacity="0.17"
-      stroke="var(--accent2)" stroke-width="2"/>
-
-    <text x="${A.x}" y="40" text-anchor="middle" font-size="11.5" font-weight="600"
-      letter-spacing="0.07em" fill="var(--gold)">COLOURED WALLPAPER GROUPS</text>
-    <text x="${A.x}" y="55" text-anchor="middle" font-size="10.5"
-      fill="var(--muted)">N&#160;≤&#160;${H.meta.maxColours} colours · ${COLOURS} in all</text>
-    <text x="${C.x}" y="40" text-anchor="middle" font-size="11.5" font-weight="600"
-      letter-spacing="0.07em" fill="var(--accent)">SPACE-GROUP TYPES</text>
-    <text x="${C.x}" y="55" text-anchor="middle" font-size="10.5"
-      fill="var(--muted)">of 3 dimensions · ${h.spaceGroups} in all</text>
-
-    ${/* each dashed ring is named inside itself, clear of the lens between them */""}
-    ${ring(275, 175, "--gold", `${CYCLIC} regular cyclic`)}
-    ${ring(505, 168, "--accent", `${h.nonCubic} non-cubic`)}
-    ${ring(505, 183, "--accent", `all ${h.spacetimeGroups} animations land here`)}
-
-    ${n(144, 205, COLOURS - CYCLIC, ["colour group", "is not a clock"])}
-    ${n(256, 252, CYCLIC - h.clockwork, ["same animation as", "another (§8)"])}
-    ${n(381, 236, h.clockwork, ["clockwork", "= polar"], "--accent2")}
-    ${n(513, 252, h.nonCubic - h.polar, ["non-polar types",
-        `— ${h.spacetimeGroups - h.clockwork} reversing animations`])}
-    ${n(631, 205, h.cubic, ["cubic types"])}
-
-    <line x1="381" y1="352" x2="381" y2="446" stroke="var(--accent2)"
-      stroke-width="1.2"/>
-    <text x="381" y="464" text-anchor="middle" font-size="11.5"
-      fill="var(--accent2)" font-weight="600">the ${h.clockwork} clockwork groups</text>
-    <text x="381" y="480" text-anchor="middle" font-size="11"
-      fill="var(--muted)">a colouring, an animation and a polar crystal</text>
-  </svg>
-  <p class="hint" style="margin-top:0;">Regions are set differences:
-  ${COLOURS - CYCLIC}&nbsp;+&nbsp;${CYCLIC - h.clockwork}&nbsp;+&nbsp;${h.clockwork}&nbsp;=&nbsp;${COLOURS}
-  on the left,
-  ${h.cubic}&nbsp;+&nbsp;${h.nonCubic - h.polar}&nbsp;+&nbsp;${h.polar}&nbsp;=&nbsp;${h.spaceGroups}
-  on the right. The ${h.cubic} cubic types lie outside both circles: a cubic
-  point group fixes no direction, so no axis of such a crystal can be time.
-  The circles use different equivalences — colourings up to affine maps of the
-  plane, crystals up to space-group type — and the ${CYCLIC - h.clockwork} is
-  the gap: ${CYCLIC} regular cyclic colourings, ${h.clockwork} distinct animations
-  (<a href="#disagree">§8</a>).</p></div>`;
+  const lost = H.lostByColour;
+  table("lost-table",
+    ["colours N", ...lost.map(r => b(r.n)), "Σ"],
+    [["cyclic colourings of p1, pm, pg, cm", ...lost.map(r => r.cyclic),
+      b(sum(lost.map(r => r.cyclic)))],
+     ["spacetime groups they realise", ...lost.map(r => r.spacetime),
+      b(sum(lost.map(r => r.spacetime)))]],
+    { left: [0],
+      note: "Every loss in the whole census sits in this table. The five " +
+        "survivors are P1, Pm, Pc, Cm and Cc — the triclinic and " +
+        "R-monoclinic clockwork groups." });
 }
 
-/* ---------- the summary diagram at the foot ---------- */
+/* ---------- the summary diagram, which opens the page ---------- */
 
 document.getElementById("diagram").innerHTML = diagram();
 
@@ -378,7 +312,7 @@ document.getElementById("diagram").innerHTML = diagram();
 function diagram() {
   const L = [95, 380, 665];              // lane centres
   const ROW = [50, 146, 242];            // box tops
-  const W = 90, HGT = 56;                // half-width, height
+  const W = 80, HGT = 56;                // half-width, height
   const box = (x, y, n, lines, accent) => `
     <rect x="${x - W}" y="${y}" width="${2 * W}" height="${HGT}" rx="6"
       fill="var(--panel)" stroke="${accent ? "var(--accent)" : "var(--rule)"}"
@@ -421,17 +355,17 @@ function diagram() {
         `N&#160;≤&#160;${H.meta.maxColours} colours`])}
     ${box(L[0], ROW[2], CYCLIC, ["…whose colour group is", "a regular cyclic clock"])}
     ${box(L[1], ROW[0], h.spacetimeGroups, ["spacetime groups", "of 2+1 dimensions"])}
-    ${box(L[1], ROW[2], h.clockwork, ["clockwork groups", "— they never run backwards"], true)}
+    ${box(L[1], ROW[2], h.clockwork, ["clockwork groups"], true)}
     ${box(L[2], ROW[0], h.spaceGroups, ["space-group types", "of 3 dimensions"])}
     ${box(L[2], ROW[1], h.nonCubic, ["non-cubic", "— Fletcher's count"])}
-    ${box(L[2], ROW[2], h.polar, ["polar space groups", "— the pyroelectric ten"], true)}
+    ${box(L[2], ROW[2], h.polar, ["polar space groups"], true)}
     ${contain(L[0], ROW[0] + HGT, ROW[2], "cyclic")}
     ${contain(L[1], ROW[0] + HGT, ROW[2], "forward")}
     ${contain(L[2], ROW[0] + HGT, ROW[1], "no cubic")}
     ${contain(L[2], ROW[1] + HGT, ROW[2], "polar")}
     ${arrow(L[1] + W, L[2] - W, ROW[0] + 28, "phase = height",
-        `onto all ${h.nonCubic} · fibres 1–3`)}
-    ${arrow(L[1] - W, L[0] + W, ROW[2] + 28, "phase = colour", "−42 drift · +4 chiral")}
+        `onto all ${h.nonCubic}`)}
+    ${arrow(L[1] - W, L[0] + W, ROW[2] + 28, "phase = colour", "−42, +4 (§8)")}
     ${arrow(L[1] + W, L[2] - W, ROW[2] + 28, "bijection", "", true)}
     <text x="${mid(L[0], L[2])}" y="336" text-anchor="middle" font-size="10.5"
       fill="var(--muted)">the ${h.wallpaper} wallpaper groups are the

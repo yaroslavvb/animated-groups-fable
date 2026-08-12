@@ -433,6 +433,193 @@
   "cyclic": 42,
   "spacetime": 5
  },
+ "coinvariants": [
+  {
+   "hm": "p1",
+   "orbifold": "◦",
+   "order": 1,
+   "module": "ℤ × ℤ",
+   "freeRank": 2,
+   "cyclic": 6,
+   "spacetime": 1
+  },
+  {
+   "hm": "p2",
+   "orbifold": "2222",
+   "order": 2,
+   "module": "ℤ/2 × ℤ/2",
+   "freeRank": 0,
+   "cyclic": 3,
+   "spacetime": 3
+  },
+  {
+   "hm": "pm",
+   "orbifold": "**",
+   "order": 2,
+   "module": "ℤ × ℤ/2",
+   "freeRank": 1,
+   "cyclic": 16,
+   "spacetime": 1
+  },
+  {
+   "hm": "pg",
+   "orbifold": "××",
+   "order": 2,
+   "module": "ℤ × ℤ/2",
+   "freeRank": 1,
+   "cyclic": 9,
+   "spacetime": 1
+  },
+  {
+   "hm": "cm",
+   "orbifold": "*×",
+   "order": 2,
+   "module": "ℤ",
+   "freeRank": 1,
+   "cyclic": 11,
+   "spacetime": 2
+  },
+  {
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "order": 4,
+   "module": "ℤ/2 × ℤ/2",
+   "freeRank": 0,
+   "cyclic": 6,
+   "spacetime": 6
+  },
+  {
+   "hm": "pmg",
+   "orbifold": "22*",
+   "order": 4,
+   "module": "ℤ/2 × ℤ/2",
+   "freeRank": 0,
+   "cyclic": 6,
+   "spacetime": 6
+  },
+  {
+   "hm": "pgg",
+   "orbifold": "22×",
+   "order": 4,
+   "module": "ℤ/2 × ℤ/2",
+   "freeRank": 0,
+   "cyclic": 4,
+   "spacetime": 4
+  },
+  {
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "order": 4,
+   "module": "ℤ/2",
+   "freeRank": 0,
+   "cyclic": 6,
+   "spacetime": 6
+  },
+  {
+   "hm": "p4",
+   "orbifold": "442",
+   "order": 4,
+   "module": "ℤ/2",
+   "freeRank": 0,
+   "cyclic": 5,
+   "spacetime": 6
+  },
+  {
+   "hm": "p4m",
+   "orbifold": "*442",
+   "order": 8,
+   "module": "ℤ/2",
+   "freeRank": 0,
+   "cyclic": 6,
+   "spacetime": 6
+  },
+  {
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "order": 8,
+   "module": "ℤ/2",
+   "freeRank": 0,
+   "cyclic": 6,
+   "spacetime": 6
+  },
+  {
+   "hm": "p3",
+   "orbifold": "333",
+   "order": 3,
+   "module": "ℤ/3",
+   "freeRank": 0,
+   "cyclic": 3,
+   "spacetime": 4
+  },
+  {
+   "hm": "p3m1",
+   "orbifold": "*333",
+   "order": 6,
+   "module": "0",
+   "freeRank": 0,
+   "cyclic": 2,
+   "spacetime": 2
+  },
+  {
+   "hm": "p31m",
+   "orbifold": "3*3",
+   "order": 6,
+   "module": "0",
+   "freeRank": 0,
+   "cyclic": 4,
+   "spacetime": 4
+  },
+  {
+   "hm": "p6",
+   "orbifold": "632",
+   "order": 6,
+   "module": "0",
+   "freeRank": 0,
+   "cyclic": 4,
+   "spacetime": 6
+  },
+  {
+   "hm": "p6m",
+   "orbifold": "*632",
+   "order": 12,
+   "module": "0",
+   "freeRank": 0,
+   "cyclic": 4,
+   "spacetime": 4
+  }
+ ],
+ "lostByColour": [
+  {
+   "n": 1,
+   "cyclic": 4,
+   "spacetime": 4
+  },
+  {
+   "n": 2,
+   "cyclic": 11,
+   "spacetime": 1
+  },
+  {
+   "n": 3,
+   "cyclic": 4,
+   "spacetime": 0
+  },
+  {
+   "n": 4,
+   "cyclic": 8,
+   "spacetime": 0
+  },
+  {
+   "n": 5,
+   "cyclic": 4,
+   "spacetime": 0
+  },
+  {
+   "n": 6,
+   "cyclic": 11,
+   "spacetime": 0
+  }
+ ],
  "phaseImage": [
   {
    "n": 1,

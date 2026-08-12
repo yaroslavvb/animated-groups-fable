@@ -95,6 +95,29 @@ BASE_ORDER = list(ORBIFOLD)
 # with an invariant direction along which a phase gradient is a pure drift.
 ROTATION_FREE = ("p1", "pm", "pg", "cm")
 
+# Point group of each wallpaper group, as generators in a standard lattice
+# basis. Used to compute the coinvariants L_P = Z^2 / <(1 - g)Z^2>, whose free
+# part is exactly the phase a change of frame can remove.
+_I = ((1, 0), (0, 1))
+_NEG = ((-1, 0), (0, -1))          # half-turn
+_MX = ((-1, 0), (0, 1))            # mirror, rectangular basis
+_S = ((0, 1), (1, 0))              # mirror swapping a rhombic/hexagonal basis
+_R4 = ((0, -1), (1, 0))
+_R3 = ((0, -1), (1, -1))
+_R6 = ((1, -1), (1, 0))
+POINT_GROUP_GENS = {
+    "p1": (), "p2": (_NEG,), "pm": (_MX,), "pg": (_MX,), "cm": (_S,),
+    "pmm": (_NEG, _MX), "pmg": (_NEG, _MX), "pgg": (_NEG, _MX),
+    "cmm": (_NEG, _S), "p4": (_R4,), "p4m": (_R4, _MX), "p4g": (_R4, _MX),
+    "p3": (_R3,), "p3m1": (_R3, _S), "p31m": (_R3, _S),
+    "p6": (_R6,), "p6m": (_R6, _S),
+}
+POINT_GROUP_ORDER = {
+    "p1": 1, "p2": 2, "pm": 2, "pg": 2, "cm": 2, "pmm": 4, "pmg": 4,
+    "pgg": 4, "cmm": 4, "p4": 4, "p4m": 8, "p4g": 8, "p3": 3, "p3m1": 6,
+    "p31m": 6, "p6": 6, "p6m": 12,
+}
+
 # --------------------------------------------------------------------------
 # pinned 3D space-group types
 # --------------------------------------------------------------------------
@@ -199,6 +222,50 @@ def phase(value) -> Fraction:
     return exact % 1
 
 
+def point_group(base):
+    """Close the stored generators into the full point group."""
+    def mul(a, b):
+        return tuple(tuple(sum(a[i][k] * b[k][j] for k in range(2)) for j in range(2))
+                     for i in range(2))
+    seen, frontier = {_I}, [_I]
+    while frontier:
+        nxt = []
+        for g in frontier:
+            for h in POINT_GROUP_GENS[base]:
+                p = mul(g, h)
+                if p not in seen:
+                    seen.add(p)
+                    nxt.append(p)
+        frontier = nxt
+    return seen
+
+
+def coinvariants(base):
+    """L_P = Z^2 / <(1 - g) Z^2>, as (description, free rank, torsion).
+
+    A phase carried by the translations is a homomorphism L -> R/Z that is
+    P-invariant, so it factors through L_P.  The part a Galilean boost or a
+    re-slicing of simultaneity can remove is exactly the part factoring
+    through the FREE quotient of L_P — equivalently the part of the form
+    l -> w.l for a P-invariant w, and (R^2)^P is nonzero precisely when L_P
+    has free rank.  So the free rank is the whole obstruction, computed here
+    rather than argued.
+    """
+    from exact import smith_normal_form
+    rows = []
+    for m in point_group(base):
+        rows.append([1 - m[0][0], -m[0][1]])
+        rows.append([-m[1][0], 1 - m[1][1]])
+    d = smith_normal_form(rows)
+    d = d[0] if isinstance(d, tuple) else d
+    diag = [abs(d[i][i]) for i in range(min(len(d), len(d[0])))]
+    diag = (diag + [0, 0])[:2]
+    free = sum(1 for x in diag if x == 0)
+    torsion = [x for x in diag if x not in (0, 1)]
+    desc = " × ".join(["ℤ"] * free + [f"ℤ/{x}" for x in torsion]) or "0"
+    return desc, free, torsion
+
+
 def has_pure_reversal(group) -> bool:
     """Does G contain a reversal that acts trivially on space?
 
@@ -280,6 +347,30 @@ def report(rows):
         cyclic=sum(sum(CYCLIC_BY_BASE[b]) for b in ROTATION_FREE),
         spacetime=sum(sum(spacetime_by_base[b]) for b in ROTATION_FREE),
     )
+
+    # --- what a change of frame can remove -------------------------------
+    coinv = {b: coinvariants(b) for b in BASE_ORDER}
+    data["coinvariants"] = [
+        dict(hm=b, orbifold=ORBIFOLD[b], order=POINT_GROUP_ORDER[b],
+             module=coinv[b][0], freeRank=coinv[b][1],
+             cyclic=sum(CYCLIC_BY_BASE[b]), spacetime=sum(spacetime_by_base[b]))
+        for b in BASE_ORDER
+    ]
+    # the whole of the loss, resolved by clock order, over those four bases
+    data["lostByColour"] = [
+        dict(n=n,
+             cyclic=sum(CYCLIC_BY_BASE[b][n - 1] for b in ROTATION_FREE),
+             spacetime=sum(spacetime_by_base[b][n - 1] for b in ROTATION_FREE))
+        for n in range(1, MAX_COLOURS + 1)
+    ]
+    for b in BASE_ORDER:
+        assert len(point_group(b)) == POINT_GROUP_ORDER[b], f"{b}: wrong point group"
+    assert {b for b in BASE_ORDER if coinv[b][1]} == set(ROTATION_FREE), \
+        "free coinvariants do not coincide with the rotation-free bases"
+    for b in BASE_ORDER:
+        if b not in ROTATION_FREE:
+            assert sum(spacetime_by_base[b]) >= sum(CYCLIC_BY_BASE[b]), \
+                f"{b}: a colouring was lost where nothing is removable"
 
     # --- the clock's image -------------------------------------------------
     data["phaseImage"] = [
