@@ -35,9 +35,14 @@ function table(id, head, rows, opts = {}) {
   wrap.innerHTML =
     `<table class="counts">` +
     `<thead><tr>${head.map((h, i) => `<th${cls(i)}>${h}</th>`).join("")}</tr></thead>` +
-    `<tbody>${rows.map((r, j) =>
-      `<tr${opts.total && j === last ? ' class="total"' : ""}>` +
-      r.map((c, i) => `<td${cls(i)}>${c}</td>`).join("") + `</tr>`).join("")}</tbody>` +
+    `<tbody>${rows.map((r, j) => {
+      // a row is either a plain array of cells or {cells, cls}
+      const cells = Array.isArray(r) ? r : r.cells;
+      const rowCls = [opts.total && j === last ? "total" : "",
+                      Array.isArray(r) ? "" : (r.cls || "")].filter(Boolean).join(" ");
+      return `<tr${rowCls ? ` class="${rowCls}"` : ""}>` +
+        cells.map((c, i) => `<td${cls(i)}>${c}</td>`).join("") + `</tr>`;
+    }).join("")}</tbody>` +
     `</table>` + (opts.note ? `<p class="hint">${opts.note}</p>` : "");
   host.append(wrap);
 }
@@ -172,27 +177,51 @@ table("phase-table",
 
 /* §7 — the 68 clockwork groups against the 68 polar space groups */
 {
-  const rows = H.polarTable.map(r => [
-    `<a href="group.html?g=${r.id}">${sym(leadHtml(r))}</a>`,
-    sym(H.byOrbifold.find(o => o.hm === r.base).orbifold) +
-      ` <span style="color:var(--muted);">${r.base}</span>`,
-    r.clock === 1 ? "<span style='color:var(--muted);'>1</span>" : r.clock,
-    r.it, `<span class="mono">${r.hm.replace(/_(\d)/g, "<sub>$1</sub>")}</span>`,
-    r.pointGroup, r.system,
-  ]);
+  /* The lead name here is the book colour signature, and four of them occur
+   * twice: the enantiomorphic pairs, which are one colouring and two groups.
+   * Those eight rows are marked so the table shows §8's splits directly, and
+   * the clockwork symbol travels alongside as the thing that separates them. */
+  const lead = r => sym(leadHtml(r));
+  const seen = new Map();
+  for (const r of H.polarTable) {
+    const k = lead(r);
+    seen.set(k, (seen.get(k) || 0) + 1);
+  }
+  const rows = H.polarTable.map(r => {
+    const alt = r.symbolHtml && sym(r.symbolHtml) !== lead(r)
+      ? ` <span class="sym" style="color:var(--muted);font-size:0.9em;">${r.symbolHtml}</span>`
+      : "";
+    return {
+      cls: seen.get(lead(r)) > 1 ? "pair" : "",
+      cells: [
+        `<a href="group.html?g=${r.id}">${lead(r)}</a>${alt}`,
+        sym(H.byOrbifold.find(o => o.hm === r.base).orbifold) +
+          ` <span style="color:var(--muted);">${r.base}</span>`,
+        r.clock === 1 ? "<span style='color:var(--muted);'>1</span>" : r.clock,
+        r.it, `<span class="mono">${r.hm.replace(/_(\d)/g, "<sub>$1</sub>")}</span>`,
+        r.pointGroup, r.system,
+      ],
+    };
+  });
+  const paired = rows.filter(r => r.cls).length;
   table("polar-table",
-    ["clockwork symbol", "projects to", "colours", "IT&nbsp;no.",
+    ["colour signature <span style='font-weight:normal;color:var(--muted);'>· " +
+       "clockwork symbol</span>", "projects to", "colours", "IT&nbsp;no.",
      "Hermann–Mauguin", "class", "system"], rows,
     { left: [0, 1, 6],
       note: `All ${H.polarTable.length} rows, ordered by International Tables ` +
-      `number; the “colours” column is the order of the clock. ` +
-      `Every polar type occurs exactly once.` });
+      `number; the “colours” column is the order of the clock. Every polar ` +
+      `type occurs exactly once. The ${paired} shaded rows are the ` +
+      `${paired / 2} pairs whose colour signature occurs twice — one ` +
+      `colouring, two spacetime groups, separated only by the clockwork ` +
+      `symbol beside it (<a href="#splits">§8</a>).` });
 
-  const pairs = H.enantiomorphicPairs.map(([a, c]) => {
+  // the pair names §7 quotes inline
+  const pairNames = H.enantiomorphicPairs.map(([x, y]) => {
     const f = n => H.polarTable.find(r => r.it === n).hm.replace(/_(\d)/g, "<sub>$1</sub>");
-    return `${f(a)}/${f(c)}`;
+    return `${f(x)}/${f(y)}`;
   });
-  document.getElementById("enant").innerHTML = pairs.join(", ");
+  document.getElementById("enant").innerHTML = pairNames.join(", ");
 }
 
 /* §8 — cyclic colourings against spacetime groups, one wallpaper group per row */
@@ -454,4 +483,16 @@ if (location.hash) {
     // the plates land last and change the height under us, so do it again
     window.addEventListener("load", go, { once: true });
   }
+}
+
+/* ---------- hotlinkable headings ----------
+ * Every h2/h3 carries an id; this hangs a "#" on each so the link can be
+ * copied without reading the source. */
+for (const h of document.querySelectorAll("main h2[id], main h3[id]")) {
+  const a = document.createElement("a");
+  a.className = "anchor";
+  a.href = `#${h.id}`;
+  a.textContent = "#";
+  a.setAttribute("aria-label", `link to “${h.textContent.trim()}”`);
+  h.append(a);
 }

@@ -684,3 +684,32 @@ table.counts tbody tr:hover { background: var(--code-bg); }
 .gpick .why { color: var(--muted); font-size: 0.74rem; }
 .gpick:hover { border-color: var(--accent); }
 .gpick.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+
+/* rows the reader is asked to compare — on the hierarchy page, the four pairs
+   of clockwork groups that share one colour signature. Marked rather than
+   merely adjacent, because the pair is the point being made. */
+table.counts tr.pair td {
+  background: var(--code-bg);
+  background: color-mix(in srgb, var(--gold) 13%, transparent);
+}
+table.counts tr.pair td:first-child { box-shadow: inset 3px 0 0 var(--gold); }
+table.counts tr.pair:hover td {
+  background: color-mix(in srgb, var(--gold) 20%, transparent);
+}
+
+/* a hotlinkable heading: the "#" appears on hover or keyboard focus, and is
+   always reachable, never a layout shift */
+h2 > a.anchor, h3 > a.anchor {
+  margin-left: 0.4em;
+  font-size: 0.72em;
+  font-weight: normal;
+  color: var(--rule);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+h2:hover > a.anchor, h3:hover > a.anchor,
+h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
+  opacity: 1;
+  color: var(--accent);
+}
