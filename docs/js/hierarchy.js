@@ -9,7 +9,7 @@
  */
 "use strict";
 import { buildTabs } from "./tabs.js?v=40";
-import { leadHtml } from "./catalog-names.js?v=40";
+import { leadHtml, signatureOf } from "./catalog-names.js?v=40";
 
 const H = await (await fetch("data/hierarchy.json", { cache: "no-cache" })).json();
 const CATALOG = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
@@ -299,6 +299,53 @@ table("phase-table",
       note: "Every loss in the whole census sits in this table. The five " +
         "survivors are P1, Pm, Pc, Cm and Cc — the triclinic and " +
         "R-monoclinic clockwork groups." });
+}
+
+/* §8 splits — one base worked through: every colouring of p3 against every
+ * clockwork group over it. The colour type comes from the correspondence
+ * tables, which is the point: two of the four rows carry the same one. */
+{
+  const e = H.splitExample;
+  const type = id => {
+    const s = signatureOf(id);
+    return s ? `<span class="sym">${s.tos}</span>` : "—";
+  };
+  // group the clockwork groups by the colouring they realise
+  const byType = new Map();
+  for (const g of e.groups) {
+    const key = (signatureOf(g.id) || {}).tos || g.id;
+    if (!byType.has(key)) byType.set(key, []);
+    byType.get(key).push(g);
+  }
+  const rows = [...byType.entries()].map(([, gs]) => [
+    gs[0].clock === 1 ? "<span style='color:var(--muted);'>1</span>" : gs[0].clock,
+    type(gs[0].id),
+    gs.map(g => `<a href="group.html?g=${g.id}">${sym(g.symbolHtml)}</a>` +
+      ` <span class="mono">${g.hm.replace(/_(\d)/g, "<sub>$1</sub>")}</span>`)
+      .join(gs.length > 1 ? " <b style='color:var(--accent2);'>and</b> " : ""),
+    gs.length > 1 ? b(gs.length) : gs.length,
+  ]);
+  table("split-table",
+    ["colours", "the colouring", "clockwork groups realising it", "how many"],
+    rows.concat([[b("Σ"), b(`${e.cyclicTotal} colourings`), "",
+                  b(`${e.spacetimeTotal} groups`)]]),
+    { total: true, left: [1, 2],
+      note: `Every cyclic colouring of <span class="sym">${e.orbifold}</span> ` +
+        `= ${e.hm}, and every clockwork group whose spatial projection it is. ` +
+        `Three colourings, four groups: one row is realised twice.` });
+
+  const host = document.createElement("div");
+  host.className = "tabdemo big";
+  document.getElementById("split-demo").append(host);
+  const note = g => g.clock === 1
+    ? "The uncoloured case: every copy in phase, the wallpaper with an independent loop."
+    : g.it === 146
+      ? "One colouring, one group. This one carries a 3<sub>1</sub> and a " +
+        "3<sub>2</sub> axis at once, so reflecting it gives back itself."
+      : `Every 3-centre advances the loop by ${g.symbol.includes("3\u2081")
+          ? "a third" : "two thirds"} of a period. Reflect the plane and you ` +
+        "get the other tab — which is why the two share a colouring and not a group.";
+  buildTabs(host, e.groups.map(g => ({ g: BY_ID.get(g.id), sym: g.symbol, note: note(g) })));
 }
 
 /* ---------- the summary diagram, which opens the page ---------- */

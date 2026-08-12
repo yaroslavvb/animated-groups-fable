@@ -338,17 +338,54 @@ the <a href="index.html#theorem">tutorial</a>). No other count on this page is
 affected.</p>
 </div>
 
-<h3>Splits: chirality</h3>
+<h3 id="splits">Splits: chirality</h3>
 
-<p>Four times, over p3, p4 and p6. Plane-affine
-equivalence admits reflections, so a colouring and its mirror image coincide;
-spacetime equivalence does not, since reflecting the plane while preserving the
-direction of time sends a clock advancing by +1/N to one advancing by −1/N.
-The three-colour clockwork colouring of p3 gives P3<sub>1</sub> and
-P3<sub>2</sub>; likewise P4<sub>1</sub>/P4<sub>3</sub>,
-P6<sub>1</sub>/P6<sub>5</sub> and P6<sub>2</sub>/P6<sub>4</sub>. Four
-colouring classes, eight spacetime groups: the four enantiomorphic pairs among the
-68 polar types.</p>
+<p>Four times, over p3, p4 and p6, the spacetime count is the <em>larger</em>
+one. Plane-affine equivalence admits reflections, so a colouring and its
+mirror image are one class; spacetime equivalence does not, since a change of
+frame that reverses the plane's orientation must also reverse time
+(det&nbsp;A&nbsp;·&nbsp;c&nbsp;&gt;&nbsp;0). Four colouring classes, eight
+spacetime groups: exactly the four enantiomorphic pairs among the 68 polar
+types.</p>
+
+<p>Here is the whole of the smallest case,
+<span class="sym">333</span>&nbsp;=&nbsp;p3, colouring by colouring:</p>
+
+<div id="split-table"></div>
+
+<p>Two of those four have the <em>same</em> Conway colour signature and the
+same colour type — <span class="sym"><sup>3</sup>3<sup>3</sup>3<sup>3</sup>3</span>,
+type <span class="sym">333³/◦</span> — because as coloured patterns they are
+the same object. Only the spacetime symbol tells them apart: in
+<span class="sym">3₁3₁3₁</span> every 3-centre advances the loop by a third of
+a period, in <span class="sym">3₂3₂3₂</span> by two thirds, and no relabelling
+of the three colours turns one staircase into the other while the clock keeps
+running the same way.</p>
+
+<p>The reflection is what merges them on the colour side. Conjugating
+<span class="sym">3₁3₁3₁</span> by a reflection of the plane alone sends
+χ(R)&nbsp;=&nbsp;+1/3 to −1/3, i.e. P3<sub>1</sub>&nbsp;↦&nbsp;P3<sub>2</sub>.
+For a coloured pattern that map is an equivalence and the colours come along
+as labels. For a spacetime group it is not admissible on its own; the
+admissible version reflects the plane <em>and</em> reverses time, and that
+composite sends χ(R)&nbsp;=&nbsp;+1/3 to +1/3 again — back to
+P3<sub>1</sub>. So there is no allowed frame in which the two agree, and the
+pair survives.</p>
+
+<div id="split-demo"></div>
+
+<p>The same argument, verbatim, over p4 (P4<sub>1</sub>/P4<sub>3</sub>) and p6
+(P6<sub>1</sub>/P6<sub>5</sub> and P6<sub>2</sub>/P6<sub>4</sub>). Two
+conditions are needed, and between them they pick out those three bases. The
+point group must contain no reflection, or the reflection is already inside
+the group and conjugates χ to χ<sup>−1</sup> for free — which rules out the
+twelve bases with a mirror. And the clock must have order N&nbsp;≥&nbsp;3,
+since for N&nbsp;≤&nbsp;2 the two senses ±1/N coincide — which rules out p1
+(everything drifts) and p2 (no clock beyond order 2). Inside p3, p4 and p6 the
+pairs are the groups that do not already contain both senses: R3 and
+I4<sub>1</sub> carry a 3<sub>1</sub> and a 3<sub>2</sub>, a 4<sub>1</sub> and
+a 4<sub>3</sub>, so they are their own mirror images and stay single. That is
+why p3 and p4 gain one apiece and p6 gains two.</p>
 
 <div class="aside">
 <span class="label">Bookkeeping</span>

@@ -195,6 +195,11 @@ PINNED_POLAR = {
 # are one coloured pattern but two spacetime groups.
 ENANTIOMORPHIC_PAIRS = ((76, 78), (144, 145), (169, 170), (171, 172))
 
+# The smallest base on which a split happens, worked through in full on the
+# page: p3 has three cyclic colourings and four clockwork groups, the excess
+# being P3_1 and P3_2 sharing one colouring.
+SPLIT_EXAMPLE = "p3"
+
 SYSTEM_RANGES = (
     (1, 2, "triclinic"), (3, 15, "monoclinic"), (16, 74, "orthorhombic"),
     (75, 142, "tetragonal"), (143, 167, "trigonal"), (168, 194, "hexagonal"),
@@ -464,6 +469,22 @@ def report(rows):
                                system=system_of(r["it"]), product=r["product"]))
     data["polarTable"] = polar_rows
     data["enantiomorphicPairs"] = [list(p) for p in ENANTIOMORPHIC_PAIRS]
+
+    # --- one split, in full ------------------------------------------------
+    e = SPLIT_EXAMPLE
+    members = [r for r in polar_rows if r["base"] == e]
+    data["splitExample"] = dict(
+        hm=e, orbifold=ORBIFOLD[e],
+        cyclic=list(CYCLIC_BY_BASE[e]), spacetime=list(spacetime_by_base[e]),
+        cyclicTotal=sum(CYCLIC_BY_BASE[e]),
+        spacetimeTotal=sum(spacetime_by_base[e]),
+        groups=sorted(members, key=lambda r: (r["clock"], r["it"])),
+    )
+    assert sum(spacetime_by_base[e]) == sum(CYCLIC_BY_BASE[e]) + 1, \
+        f"{e} is no longer a single-split example"
+    assert len(members) == sum(spacetime_by_base[e])
+    assert sorted(r["it"] for r in members if r["clock"] == 3) == [144, 145, 146], \
+        f"the {e} three-clock groups are not P3_1, P3_2, R3"
 
     # a fibre worth showing: one 3D crystal, three different animations
     biggest = max(fibre.items(), key=lambda kv: (len(kv[1]), -kv[0]))

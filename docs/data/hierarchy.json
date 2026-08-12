@@ -1860,6 +1860,82 @@
    172
   ]
  ],
+ "splitExample": {
+  "hm": "p3",
+  "orbifold": "333",
+  "cyclic": [
+   1,
+   0,
+   2,
+   0,
+   0,
+   0
+  ],
+  "spacetime": [
+   1,
+   0,
+   3,
+   0,
+   0,
+   0
+  ],
+  "cyclicTotal": 3,
+  "spacetimeTotal": 4,
+  "groups": [
+   {
+    "id": "g224",
+    "symbol": "333",
+    "symbolHtml": "333",
+    "base": "p3",
+    "orbifold": "333",
+    "clock": 1,
+    "it": 143,
+    "hm": "P3",
+    "pointGroup": "3",
+    "system": "trigonal",
+    "product": true
+   },
+   {
+    "id": "g226",
+    "symbol": "3₁3₁3₁",
+    "symbolHtml": "3<sub>1</sub>3<sub>1</sub>3<sub>1</sub>",
+    "base": "p3",
+    "orbifold": "333",
+    "clock": 3,
+    "it": 144,
+    "hm": "P3_1",
+    "pointGroup": "3",
+    "system": "trigonal",
+    "product": false
+   },
+   {
+    "id": "g225",
+    "symbol": "3₂3₂3₂",
+    "symbolHtml": "3<sub>2</sub>3<sub>2</sub>3<sub>2</sub>",
+    "base": "p3",
+    "orbifold": "333",
+    "clock": 3,
+    "it": 145,
+    "hm": "P3_2",
+    "pointGroup": "3",
+    "system": "trigonal",
+    "product": false
+   },
+   {
+    "id": "g227",
+    "symbol": "r33₁3₂",
+    "symbolHtml": "r33<sub>1</sub>3<sub>2</sub>",
+    "base": "p3",
+    "orbifold": "333",
+    "clock": 3,
+    "it": 146,
+    "hm": "R3",
+    "pointGroup": "3",
+    "system": "trigonal",
+    "product": false
+   }
+  ]
+ },
  "fibreExample": {
   "it": 26,
   "hm": "Pmc2_1",
