@@ -4,9 +4,9 @@
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=39";
+import { buildTabs } from "./tabs.js?v=40";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory, setSignatures, signatureOf }
-  from "./wallpaper-data.js?v=39";
+  from "./wallpaper-data.js?v=40";
 
 /* The book's colour signatures for the forward groups, so the atlas names each
  * film group the way the correspondence tables do. Optional by construction:

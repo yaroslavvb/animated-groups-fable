@@ -5,14 +5,17 @@
  * (group.html?g=…) — picture and caption both — and the card's control bar
  * keeps play/pause and scrubbing in place. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=39";
-import { attachControls } from "./controls.js?v=39";
-import { WALLPAPERS } from "./wallpaper-data.js?v=39";
-import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=39";
+import { FilmGroupAnimation } from "./renderer.js?v=40";
+import { attachControls } from "./controls.js?v=40";
+import { WALLPAPERS } from "./wallpaper-data.js?v=40";
+import { FILTER_KEYS, passes, groupHref } from "./filters.js?v=40";
+import { nameOf } from "./catalog-names.js?v=40";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
-import { attachStage } from "./stage.js?v=39";
+import { attachStage } from "./stage.js?v=40";
+
+
 
 const state = { groups: [], anims: new Map(), filters: {} };
 
@@ -142,8 +145,11 @@ function render() {
     const meta = document.createElement("div");
     meta.className = "meta";
     meta.innerHTML =
-      `<span class="sym">${g.symbolHtml}</span>` +
-      `<span class="hm">${g.hm || ""}</span>` +
+      (() => { const n = nameOf(g);
+        // the card carries ONE alternative name; the rest are on the group's
+        // own page, where there is room to read them
+        return `<span class="sym">${n.lead}</span>` +
+          (n.tail.length ? `<span class="hm"><span class="sym">${n.tail[0]}</span></span>` : ""); })() +
       `<div class="tags">` +
       `<span class="tag">${g.system}</span>` +
       `<span class="tag">base ${baseLabel(g.base)}</span>` +

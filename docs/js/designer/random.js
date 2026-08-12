@@ -23,8 +23,8 @@
  * the good frame, not the final one.
  */
 "use strict";
-import { scan, minGap } from "./collide.js?v=39";
-import { PALETTE, nearSkip, latticeOf } from "./model.js?v=39";
+import { scan, minGap } from "./collide.js?v=40";
+import { PALETTE, nearSkip, latticeOf } from "./model.js?v=40";
 
 /* Two rings, and not one, for the ANCHOR search. A ball cannot reach a
  * TRANSLATE of itself two cells away, which is what tempts one to use a single

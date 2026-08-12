@@ -7,11 +7,12 @@
  * same list rather than the whole 275.
  */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=39";
-import { attachControls } from "./controls.js?v=39";
-import { attachStage } from "./stage.js?v=39";
-import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=39";
-import { passes, groupHref } from "./filters.js?v=39";
+import { FilmGroupAnimation } from "./renderer.js?v=40";
+import { attachControls } from "./controls.js?v=40";
+import { attachStage } from "./stage.js?v=40";
+import { WALLPAPERS, timeStory } from "./wallpaper-data.js?v=40";
+import { passes, groupHref } from "./filters.js?v=40";
+import { nameOf } from "./catalog-names.js?v=40";
 
 const ORB = new Map(WALLPAPERS.map(w => [w.hm, w.orb]));
 const baseLabel = hm => `${ORB.get(hm) || ""} · ${hm}`;
@@ -52,9 +53,11 @@ function render(g) {
 
   document.title = `${g.symbol} — Film Groups`;
   root.innerHTML =
-    `<h1><span class="sym">${g.symbolHtml}</span>` +
-    (g.hm ? ` <span style="color:var(--muted);font-size:0.6em;">${g.hm}</span>` : "") +
-    `</h1>` +
+    (() => { const n = nameOf(g);
+      return `<h1><span class="sym">${n.lead}</span>` +
+        n.tail.map((t, i) => ` <span class="sym" style="color:var(--muted);` +
+          `font-size:${i ? 0.5 : 0.6}em;">${t}</span>`).join("") +
+        `</h1>`; })() +
     `<p><a href="${backHref}">← catalog</a>` +
     (nav ? ` &ensp;·&ensp; ${nav}` : "") + `</p>` +
     `<div class="tags" style="display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.6rem 0 1rem;">` +

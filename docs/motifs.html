@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motifs — Film Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Film Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html" class="here">Motifs</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <h1>Motifs</h1>
+  <p class="subtitle">Candidate shapes and candidate clocks for the thing the
+  group makes copies of — prototyped side by side, and measured.</p>
+
+  <p>A motif has to do two jobs at once, and they pull against each other.
+  It must carry <b>orientation</b>: a rotated copy has to look rotated and a
+  reflected copy has to look reflected, so the shape can have no symmetry of
+  its own, and its handedness has to survive down to a thumbnail. And it must
+  carry <b>phase</b>: a copy's place in the loop has to be readable from a
+  frozen frame, which asks the clock to be one-to-one over the period,
+  continuous through <i>t</i>&nbsp;=&nbsp;0 so the loop has no seam, and — the
+  rule that cost the site its first motif — <em>not a rotation</em>, because a
+  turning marker inside a pattern with turning symmetry aliases against the
+  pattern and stops being readable at all.</p>
+
+  <p>So a candidate is a <b>shape</b> paired with a <b>channel</b>, and the two
+  are separable: any shape below can carry any channel. The four numbers under
+  each card are measured from the pixels, not asserted — each motif is
+  rasterised at sixteen instants and compared against its own mirror, its own
+  rotations, and its other instants.</p>
+
+  <div class="thm">
+    <span class="label">reading the scores</span>
+    <p style="margin:0.3rem 0;"><b>handedness</b> — how far the motif is from
+    its mirror image; higher is better, and anything near zero cannot show a
+    reflection. <b>phase</b> — the smallest difference between any two instants
+    of the loop; higher is better, and zero means a frozen frame cannot tell
+    those two instants apart. <b>rotation</b> — the worst similarity to itself
+    turned by 60°, 90°, 120° or 180°; <em>lower</em> is better, since a high
+    score is exactly the aliasing that makes a motif unreadable inside a
+    gyration. <b>seam</b> — the jump across <i>t</i>&nbsp;=&nbsp;0;
+    <em>lower</em> is better.</p>
+  </div>
+
+  <h2>Test it against a group</h2>
+  <p>Every card runs the same film group, so the candidates are compared under
+  identical strain. Pick a harder one and watch which motifs stop being
+  readable.</p>
+  <div class="gpicks" id="group-pick"></div>
+
+  <div class="mgrid" id="grid"></div>
+
+  <h2>Notes on the sources</h2>
+  <p>The <b>comma</b> is the site's incumbent and the baseline every other
+  candidate is measured against. The <b>letter R</b> is the classic asymmetric
+  test glyph: unlike an abstract shape, a mirrored R is one a reader already
+  knows is wrong, which is what makes it a good handedness marker — and the
+  growing-and-shrinking R is here in two forms, alone and paired with a wipe,
+  because size on its own is a there-and-back and cannot distinguish the two
+  halves of the period.</p>
+  <p>The <b>flag</b>, the <b>scalene triangle</b> and the <b>bevelled
+  L</b> are in the spirit of the devices Conway, Burgiel and Goodman-Strauss
+  use in <i>The Symmetries of Things</i> to make a pattern's symmetry visible:
+  a shape with a distinguished spine to read a reflection against, a triangle
+  no rotation fixes, and the polyomino pair that is the textbook example of two
+  shapes no turn can identify. They are adaptations for this purpose rather
+  than reproductions of any plate.</p>
+</main>
+
+<footer class="site">
+  Film groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/motifs.js?v=40"></script>
+</body>
+</html>
