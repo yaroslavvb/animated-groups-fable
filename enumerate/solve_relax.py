@@ -22,21 +22,29 @@ converge:
   * the push accumulated on a breakpoint is a weighted MEAN over its hat
     function, not a sum.  (Summing is the true gradient, but its scale grows
     with the length of the segment, so long segments took enormous steps and
-    short ones none; the mean is the Jacobi-preconditioned gradient and one
-    step of it very nearly resolves the encounter that caused it.)
-  * clones are culled to those that ever come near a base path, recomputed
-    whenever a breakpoint is added.  ~150 clones drop to ~20.
+    short ones none; the mean is the Jacobi-preconditioned gradient, and one
+    step of it very nearly resolves the encounter that caused it.  This alone
+    is the difference between diverging and converging.)
+  * the working set is culled to the (clone, ball, ball) TRIPLES that come
+    anywhere near each other, not merely to the nearby clones: at n = 5 that
+    is ~150 clones x 25 ball pairs = 3675 candidate encounters cut to ~150.
+    It is rebuilt whenever a breakpoint is added.
   * the closest approach is computed in CONTINUOUS time -- exactly, per pair of
     segments, since both endpoints move linearly between samples -- so a fast
     pair cannot slip through between two samples.  The push is applied at the
     instant of closest approach and split over the two flanking samples.
   * the step is scaled by an adaptive gain with monotone-energy backtracking,
-    so a round never has to be tuned by hand.
+    so no round has to be tuned by hand.
+  * the push aims a few percent WIDER than the clearance required and stops as
+    soon as the requirement itself is met.  The penalty's fixed point is exact
+    contact approached from below, so demanding it exactly costs an unbounded
+    number of rounds; this was most of the old runtime.
   * kinks are earned: a new breakpoint is added only at a local minimum of the
     clearance that is still violated, and at the end every breakpoint whose
     removal does NOT re-open a collision is deleted again.
 
-Public entry point: solve_tiny().
+Public entry point: solve_tiny().  run() takes any (group, starts, drifts, S,
+radius) and is what the full-size problem should call.
 """
 
 import math
@@ -229,18 +237,61 @@ class Pairs:
     order of magnitude smaller.  The set is closed under inversion, because
     dist(i, c(j)) = dist(c^-1(i), j), which keeps the push field equal and
     opposite on the two partners of every encounter.
+
+    Two bits of bookkeeping earn their keep in the inner loop:
+      * the triples are ordered by their base ball, so the per-ball clearance
+        profile is a reduction over contiguous blocks rather than a scatter;
+      * only the distinct (clone, ball) SLOTS that some triple refers to are
+        ever transformed, grouped by time shift so each group is one batched
+        2x2 matmul.
     """
 
-    def __init__(self, g, clones, ci, ii, ji):
-        self.clones = clones
-        self.groups, self.unsort = group_by_shift(g, clones)
-        self.ci = np.asarray(ci, dtype=np.intp)
-        self.ii = np.asarray(ii, dtype=np.intp)
-        self.ji = np.asarray(ji, dtype=np.intp)
+    def __init__(self, g, paths, clones, ci, ii, ji):
+        n = paths.n
+        ci = np.asarray(ci, dtype=np.intp)
+        ii = np.asarray(ii, dtype=np.intp)
+        ji = np.asarray(ji, dtype=np.intp)
+        order = np.argsort(ii, kind="stable")
+        self.ci, self.ii, self.ji = ci[order], ii[order], ji[order]
         self.T = self.ci.size
+        self.clones = clones
+        self.block = np.searchsorted(self.ii, np.arange(n + 1))   # per-ball runs
+
+        key = self.ci * n + self.ji                      # the distinct slots
+        uniq, inv = np.unique(key, return_inverse=True)
+        shifts = np.array([clones[c][2] for c in (uniq // n)])
+        srt = np.argsort(shifts, kind="stable")          # slots grouped by shift
+        rank = np.empty_like(srt)
+        rank[srt] = np.arange(srt.size)
+        self.slot = rank[inv]
+        uc, uj = (uniq // n)[srt], (uniq % n)[srt]
+        self.nslot = uniq.size
+        # how much a clone can stretch a cartesian displacement: exactly 1 for
+        # a point-group rotation, but measured rather than assumed, because the
+        # collision filter's validity rests on it.
+        self.stretch = max(np.linalg.svd(g.Binv @ c[0].T @ g.B, compute_uv=False)[0]
+                           for c in clones) if clones else 1.0
+        self.groups = []
+        a = 0
+        for k in sorted(set(shifts.tolist())):
+            b = a + int((shifts[srt] == k).sum())
+            self.groups.append((k, slice(a, b), uj[a:b].copy(),
+                                np.array([clones[c][0].T @ g.B for c in uc[a:b]]),
+                                np.array([clones[c][1] @ g.B for c in uc[a:b]])))
+            a = b
 
     def __len__(self):
         return self.T
+
+    def slots(self, paths, cache):
+        """(nslot, S+1, 2) cartesian: ball j inside clone c, at every sample."""
+        S, X, L = paths.S, paths.X, paths.L
+        out = np.empty((self.nslot, S + 1, 2))
+        for k, sl, js, A, t in self.groups:
+            im, sh = _shift_index(S, k, cache)
+            Y = X[:, im, :] + sh[None, :, None] * L[:, None, :]   # (n,S+1,2)
+            out[sl] = np.matmul(Y[js], A) + t[:, None, :]
+        return out
 
 
 def triple_minima(g, paths, clones, cache, chunk=48):
@@ -267,7 +318,7 @@ def select(g, paths, clones, thresh, cache):
     ci, ii, ji = np.nonzero(tm < thresh)
     used = sorted(set(ci.tolist()))
     remap = {c: k for k, c in enumerate(used)}
-    return Pairs(g, [clones[c] for c in used],
+    return Pairs(g, paths, [clones[c] for c in used],
                  [remap[c] for c in ci.tolist()], ii, ji)
 
 
@@ -284,7 +335,7 @@ def all_pairs(g, paths, clones):
                 ci.append(c)
                 ii.append(i)
                 ji.append(j)
-    return Pairs(g, clones, ci, ii, ji)
+    return Pairs(g, paths, clones, ci, ii, ji)
 
 
 class Field:
@@ -309,15 +360,18 @@ def encounters(g, paths, ps, d_min, cache, want_push=True, full=False):
     base = paths.extended() @ g.B                       # (n, S+1, 2)
     if ps.T == 0:
         return Field(np.inf, 0.0, np.zeros((n, S, 2)), np.full((n, S), np.inf))
-    allp = clone_stack(g, paths, ps.groups, ps.unsort, cache)   # (C,n,S+1,2)
-    diff = base[ps.ii] - allp[ps.ci, ps.ji]             # (T, S+1, 2)
+    diff = base[ps.ii] - ps.slots(paths, cache)[ps.slot]        # (T, S+1, 2)
     d2 = (diff * diff).sum(axis=2)                      # (T, S+1) at samples
 
-    # A segment can only dip below d_min if one of its ends is already within
-    # d_min + |D|, and |D| is at most twice the largest step taken in a sample
-    # interval.  Everything else is far away and is never looked at again.
-    step = np.linalg.norm(base[:, 1:, :] - base[:, :-1, :], axis=2).max()
-    lim = (d_min + 2.0 * step) ** 2
+    # A segment [s, s+1] can only dip below d_min if one of its ends is already
+    # within d_min + |D|/2 of it, where D is the change in separation across
+    # the interval, and |D| is at most the largest step the ball takes plus the
+    # largest step its clone takes -- the latter bounded by the clone's stretch
+    # factor, so the filter stays valid even for a group whose matrices are not
+    # cartesian isometries.  Everything colder is far away and is dropped.
+    d = base[:, 1:, :] - base[:, :-1, :]
+    step = math.sqrt(float((d * d).sum(axis=2).max()))
+    lim = (d_min + 0.5 * (1.0 + ps.stretch) * step) ** 2
     ends = np.minimum(d2[:, :S], d2[:, 1:])
     hot = np.ones_like(ends, dtype=bool) if full else (ends < lim)
     ti, si = np.nonzero(hot)
@@ -332,18 +386,25 @@ def encounters(g, paths, ps, d_min, cache, want_push=True, full=False):
     seg = np.sqrt(ends)                                 # endpoint lower bound
     seg[hot] = dist                                     # exact where it matters
     worst = float(seg.min())
-    near = np.full((n, S), np.inf)
-    np.minimum.at(near, ps.ii, seg)                     # (n, S) per segment
+    near = np.empty((n, S))                             # per ball, per segment
+    for i in range(n):
+        a, b = ps.block[i], ps.block[i + 1]
+        near[i] = seg[a:b].min(axis=0) if b > a else np.inf
 
     over = np.maximum(d_min - dist, 0.0)
     energy = 0.5 * float((over * over).sum())
     push = None
     if want_push:
         f = (over / np.maximum(dist, TINY))[:, None] * w
-        pf = np.zeros((n, S + 1, 2))
-        bi = ps.ii[ti]
-        np.add.at(pf, (bi, si), (1.0 - u)[:, None] * f)
-        np.add.at(pf, (bi, si + 1), u[:, None] * f)
+        # scatter the two endpoint shares of every push in one pass; bincount
+        # is an order of magnitude faster than the unbuffered ufunc.at
+        base_i = ps.ii[ti] * (S + 1) + si
+        idx = np.concatenate([base_i, base_i + 1])
+        wgt = np.concatenate([1.0 - u, u])[:, None] * np.concatenate([f, f])
+        size = n * (S + 1)
+        pf = np.stack([np.bincount(idx, wgt[:, 0], size),
+                       np.bincount(idx, wgt[:, 1], size)], axis=1)
+        pf = pf.reshape(n, S + 1, 2)
         pc = pf[:, :S, :]
         pc[:, 0, :] += pf[:, S, :]                      # sample S is sample 0
         push = pc @ g.Binv
@@ -380,31 +441,34 @@ def worst_spots(prof, d_min, existing, S, min_sep, limit):
     return out
 
 
-def solve(g, paths, clones_all, d_min, phases=14, rounds=90, gain0=1.0,
-          min_sep=None, add_per_phase=2, slack=0.55, verbose=False):
-    """relax to d_min, alternating pushes with earning a new breakpoint.
+def solve(g, paths, clones_all, need, aim=1.03, phases=16, rounds=90,
+          gain0=1.0, min_sep=None, add_per_phase=2, slack=0.55, verbose=False):
+    """relax, alternating pushes with earning a new breakpoint.
 
     The push vanishes exactly at contact, so the fixed point of the descent is
-    dist = d_min approached from below; the caller therefore hands in a target
-    a hair wider than the clearance it actually wants.
+    dist = target approached from BELOW, and insisting on reaching it exactly
+    costs an unbounded number of rounds.  Instead the push aims a few percent
+    wider than the clearance that is actually required and the relaxation stops
+    the moment the requirement itself is met -- which happens after a couple of
+    rounds of the linear convergence rather than dozens.
     """
     S = paths.S
+    target = need * aim
     if min_sep is None:
         min_sep = max(3, S // 20)
     cache = {}
-    cap = 0.40 * d_min
-    tol = 1e-6 * d_min                            # contact is only approached
-    ps = select(g, paths, clones_all, d_min + slack, cache)
-    f = encounters(g, paths, ps, d_min, cache)
+    cap = 0.40 * target
+    ps = select(g, paths, clones_all, target + slack, cache)
+    f = encounters(g, paths, ps, target, cache)
     gain = gain0
     for phase in range(phases):
         stall = 0
         for _ in range(rounds):
-            if f.worst >= d_min - tol:
+            if f.worst >= need:
                 break
             V = paths.V
             paths.set_V(paths.trial(f.push, gain, cap))
-            f2 = encounters(g, paths, ps, d_min, cache)
+            f2 = encounters(g, paths, ps, target, cache)
             if f2.energy <= f.energy:
                 gained = (f.energy - f2.energy) / max(f.energy, TINY)
                 f = f2
@@ -416,7 +480,7 @@ def solve(g, paths, clones_all, d_min, phases=14, rounds=90, gain0=1.0,
                 stall += 1
             if stall >= 10 or gain < 1e-3:
                 break
-        if f.worst >= d_min - tol:
+        if f.worst >= need:
             if verbose:
                 print(f"  phase {phase}: cleared, worst {f.worst:.5f}, "
                       f"{sum(paths.m)} breakpoints")
@@ -424,7 +488,7 @@ def solve(g, paths, clones_all, d_min, phases=14, rounds=90, gain0=1.0,
         prof = sample_clearance(f.near)
         added = 0
         for i in range(paths.n):
-            for s in worst_spots(prof[i], d_min, paths.B[i], S, min_sep,
+            for s in worst_spots(prof[i], target, paths.B[i], S, min_sep,
                                  add_per_phase):
                 added += paths.insert(i, s, min_sep)
         if verbose:
@@ -435,12 +499,12 @@ def solve(g, paths, clones_all, d_min, phases=14, rounds=90, gain0=1.0,
                 min_sep -= 1
                 continue
             break
-        ps = select(g, paths, clones_all, d_min + slack, cache)
+        ps = select(g, paths, clones_all, target + slack, cache)
         gain = gain0
-        f = encounters(g, paths, ps, d_min, cache)
-    f = encounters(g, paths, all_pairs(g, paths, clones_all), d_min, cache,
+        f = encounters(g, paths, ps, target, cache)
+    f = encounters(g, paths, all_pairs(g, paths, clones_all), need, cache,
                    want_push=False, full=True)
-    return f, f.worst >= d_min - tol, phases
+    return f, f.worst >= need, phases
 
 
 def prune(g, paths, clones_all, d_min, tol=0.0, cache=None):
@@ -529,6 +593,25 @@ def verify(g, paths, clones_all, radius):
     return f.worst, f.worst / (2 * radius)
 
 
+def frozen_clearance(g, starts, clones):
+    """the part of the problem the solver cannot touch.
+
+    At t = 0 every ball sits on its pinned start, and so does every clone whose
+    time shift is zero.  Those separations are fixed by the caller's choice of
+    starts: if one of them is below d_min the instance is infeasible however
+    the paths are bent, and no solver should be blamed for it."""
+    s = np.array(starts, dtype=float)
+    worst = np.inf
+    for M, v, k in clones:
+        if k:
+            continue
+        q = (s @ M.T + v) @ g.B
+        d = np.linalg.norm((s @ g.B)[:, None, :] - q[None, :, :], axis=2)
+        d[d < 1e-9] = np.inf
+        worst = min(worst, float(d.min()))
+    return worst
+
+
 # --------------------------------------------------------------------------
 # the benchmark
 # --------------------------------------------------------------------------
@@ -538,15 +621,36 @@ TINY_DRIFTS = [[1, 0], [-1, 1], [0, -1]]
 
 def run(gid="g226", starts=TINY_STARTS, drifts=TINY_DRIFTS, S=72, radius=0.075,
         margin=1.05, span=3, verbose=False, **kw):
+    """solve one instance and measure it.
+
+    min_clearance_ratio is the smallest centre-to-centre distance anywhere in
+    the plane at any instant, in ball diameters, measured in continuous time
+    against every clone in the window -- so >= 1 means the balls never touch.
+    """
     t0 = time.time()
     g = Group(gid)
     clones = clone_list(g, S, span)
     paths = Paths(starts, drifts, S)
     d_min = 2 * radius * margin
-    d_solve = d_min * (1 + 1e-3)
-    f, ok, phase = solve(g, paths, clones, d_solve, verbose=verbose, **kw)
-    prune(g, paths, clones, d_solve, tol=1e-6 * d_solve)
-    worst, ratio = verify(g, paths, clones, radius)
+    frozen = frozen_clearance(g, starts, clones)
+    if frozen < d_min and verbose:
+        print(f"  WARNING: the pinned starts are only {frozen:.4f} apart at "
+              f"t = 0, below d_min = {d_min:.4f}; no bending can fix that")
+    # The relaxation and the pruning both work against a culled working set, so
+    # their verdict is only as good as the culling.  The verification is against
+    # every clone and every pair; if it ever disagrees, the working set missed
+    # something and the solver is restarted from the current paths with a fresh
+    # one.  (In practice this never fires -- the selection slack is wide -- but
+    # it is what makes the reported clearance an honest number.)
+    phase = 0
+    for attempt in range(3):
+        _, ok, phase = solve(g, paths, clones, d_min, verbose=verbose, **kw)
+        prune(g, paths, clones, d_min)
+        worst, ratio = verify(g, paths, clones, radius)
+        if worst >= d_min or not ok:
+            break
+        if verbose:
+            print(f"  culling artifact ({worst:.5f} < {d_min:.5f}), restarting")
     ok = worst >= d_min
     runtime = time.time() - t0
 
@@ -565,12 +669,39 @@ def run(gid="g226", starts=TINY_STARTS, drifts=TINY_DRIFTS, S=72, radius=0.075,
         out["_d_min"] = d_min
         out["_worst"] = worst
         out["_phase"] = phase
+        out["_frozen"] = frozen
     return out
 
 
 def solve_tiny(verbose=False):
     """the tiny benchmark: g226, 3 balls, S = 72, radius 0.075, margin 1.05."""
     return run(verbose=verbose)
+
+
+def solve_full(seed=0, n=5, S=180, radius=0.07, margin=1.05, verbose=False):
+    """the full-size problem, on random pinned starts and drifts.
+
+    The starts are only DRAWN here; the solver never moves them.  They are
+    rejection-sampled so that the frozen t = 0 configuration is feasible --
+    otherwise the instance is impossible however the paths are bent.
+    """
+    import random
+    g = Group("g226")
+    rng = random.Random(seed)
+    gap = 2 * radius * margin * 1.15
+    starts = []
+    for _ in range(20000):
+        if len(starts) == n:
+            break
+        c = np.array([rng.random(), rng.random()])
+        m = np.array([[a, b] for a in (-1, 0, 1) for b in (-1, 0, 1)], float)
+        if all(np.linalg.norm((c - np.array(s) - m) @ g.B, axis=1).min() >= gap
+               for s in starts):
+            starts.append(list(c))
+    pick = [(1, 0), (0, 1), (1, 1), (-1, 1), (1, -1), (-1, 0), (0, -1)]
+    drifts = [list(rng.choice(pick)) for _ in range(n)]
+    return run(starts=starts, drifts=drifts, S=S, radius=radius,
+               margin=margin, verbose=verbose)
 
 
 if __name__ == "__main__":

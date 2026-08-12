@@ -292,9 +292,9 @@ class PolylineSolver:
 
         if T:
             qx, qy = self._perop_xy(Px, Py)
-            g = self.t_gather
-            Dx = Pcx[self.t_i] - (qx[g] + self.t_wc[:, 0:1])            # (T, S+1)
-            Dy = Pcy[self.t_i] - (qy[g] + self.t_wc[:, 1:2])
+            gth = self.t_gather
+            Dx = Pcx[self.t_i] - (qx[gth] + self.t_wc[:, 0:1])          # (T, S+1)
+            Dy = Pcy[self.t_i] - (qy[gth] + self.t_wc[:, 1:2])
             d, mx, my, u = self._seg_min_xy(Dx, Dy, S)                  # (T, S)
 
             viol = self.d_tgt - d
@@ -318,7 +318,10 @@ class PolylineSolver:
             gqx = self.Woj @ gDx                       # (O*n, S+1), sign flipped below
             gqy = self.Woj @ gDy
 
-            gP = np.zeros((n, S))
+            # unshift each op's contribution back onto the base path.  Index S is
+            # the closing sample, which is base sample (S - sh) one period later:
+            # its gradient lands on that same slot.
+            gPx = np.zeros((n, S))
             gPy = np.zeros((n, S))
             for o in range(self.O):
                 sl = slice(o * n, (o + 1) * n)
@@ -327,18 +330,18 @@ class PolylineSolver:
                 gsx = -(gqx[sl] * R[0, 0] + gqy[sl] * R[1, 0])
                 gsy = -(gqx[sl] * R[0, 1] + gqy[sl] * R[1, 1])
                 sh = self.opsh[o]
-                gP += np.roll(gsx[:, :S], -sh, axis=1)
+                gPx += np.roll(gsx[:, :S], -sh, axis=1)
                 gPy += np.roll(gsy[:, :S], -sh, axis=1)
-                gP[:, (S - sh) % S] += gsx[:, S]
+                gPx[:, (S - sh) % S] += gsx[:, S]
                 gPy[:, (S - sh) % S] += gsy[:, S]
 
             B = self.B
             gx = gPcx * B[0, 0] + gPcy * B[0, 1]        # d/dP from the base copy
-            gy_ = gPcx * B[1, 0] + gPcy * B[1, 1]
-            gx[:, :S] += gP
-            gy_[:, :S] += gPy
+            gy = gPcx * B[1, 0] + gPcy * B[1, 1]
+            gx[:, :S] += gPx
+            gy[:, :S] += gPy
             gXf[:, :, 0] += gx @ self.A
-            gXf[:, :, 1] += gy_ @ self.A
+            gXf[:, :, 1] += gy @ self.A
 
         # bending, measured in cartesian so it is isotropic on the hex lattice
         kink = np.einsum('mk,ikd->imd', self.C2, Xf) + self.bend_const
@@ -368,8 +371,17 @@ class PolylineSolver:
         self.Xf[:, 1:self.K, :] = y.reshape(self.n, self.K - 1, 2)
         return self.Xf
 
-    def solve(self, weights=(1e2, 4e2, 2e3, 1e4, 6e4, 3e5), maxiter=110,
-              irls_rounds=3, irls_eps=6e-3, snap_tol=1.5e-3, repairs=2):
+    def solve(self, weights=(3e2, 3e3, 3e4, 3e5), maxiter=110,
+              irls_rounds=0, irls_eps=6e-3, snap_tol=1.5e-3, repairs=2):
+        """Continuation on the penalty weight, then tidy up.
+
+        irls_rounds is off by default: at K = 6 every knot already lands on an
+        active constraint (measured: the clearance in the window around each knot
+        is exactly the target), so there is no spare curvature to squeeze out and
+        the extra L-BFGS runs would be pure cost.  It earns its keep only at large
+        K, where the optimiser sprinkles hair over knots the geometry never asked
+        for.
+        """
         # stage 1: penalty continuation with uniform bending
         for w in weights:
             self.cull()
@@ -386,14 +398,52 @@ class PolylineSolver:
         # stage 3: snap the residual hair to exactly straight
         self._snap(snap_tol)
 
-        # stage 4: if the wide window disagrees with the culled one, widen and redo
+        # stage 4: repair ONLY a cull mistake.  If the wide window is no worse than
+        # the set the solver actually optimised, then nothing was missed -- the
+        # solve simply could not reach the target with this many knots, and
+        # re-running it on a wider window would burn seconds to land in the same
+        # place.  That case is for solve_auto to fix by adding knots.
         for _ in range(repairs):
-            if self.clearance() >= self.d_req:
+            wide = self.clearance()
+            if wide >= self.d_req or wide >= self._culled_clearance() - 1e-9:
                 break
             self.cull(slack=self.cull_slack + 0.5, span=self.span_check)
             self._run(w_last, self.bend, 2 * maxiter)
             self._snap(snap_tol)
         return self.Xf
+
+    def _culled_clearance(self):
+        """min separation over just the triples the optimiser was looking at."""
+        if not self.n_triples:
+            return np.inf
+        Px, Py, Pcx, Pcy = self._pos_xy(self.Xf)
+        qx, qy = self._perop_xy(Px, Py)
+        g = self.t_gather
+        d, _, _, _ = self._seg_min_xy(Pcx[self.t_i] - (qx[g] + self.t_wc[:, 0:1]),
+                                      Pcy[self.t_i] - (qy[g] + self.t_wc[:, 1:2]),
+                                      self.S)
+        return float(d.min())
+
+    def reknot(self, K_new, **kw):
+        """A fresh solver with K_new knots, warm-started on this path.
+
+        When K_new is a multiple of K the resampled polyline is the SAME curve
+        (the new knots land on the old segments), so the escalation starts from
+        wherever the coarse solve got to instead of from the ballistic line.
+        """
+        t = np.arange(K_new + 1) / K_new * self.K
+        m = np.minimum(np.floor(t).astype(int), self.K - 1)
+        f = (t - m)[None, :, None]
+        Xnew = (1 - f) * self.Xf[:, m, :] + f * self.Xf[:, m + 1, :]
+        opts = dict(S=self.S, K=K_new, radius=self.radius, margin=self.margin,
+                    span_solve=self.span_solve, span_check=self.span_check,
+                    bend=self.bend, anchor=self.anchor, cull_slack=self.cull_slack,
+                    jitter=0.0)
+        opts.update(kw)
+        new = PolylineSolver(self.g.id, self.starts, self.L, **opts)
+        new.Xf = Xnew
+        new.cull()
+        return new
 
     def _kinks(self, Xf):
         """cartesian magnitude of the heading change at each breakpoint: (n, K)."""
@@ -573,53 +623,115 @@ TINY = dict(gid='g226',
             S=72, radius=0.075, margin=1.05)
 
 
+def solve_auto(gid, starts, drifts, S, radius, margin=1.05, knots=(6, 12, 18), **kw):
+    """Solve with the fewest knots that actually clears; escalate only on failure.
+
+    Few knots are strictly better when they work -- fewer kinks, straighter paths,
+    less work -- but a tight packing can need finer articulation than K = 6 can
+    express.  Measured on n = 5, S = 180: radius 0.07 clears at K = 6, radius 0.08
+    does not (ratio 0.94) and needs K = 12, where it clears comfortably AND runs
+    faster, because better-separated paths leave far fewer active clone pairs.
+
+    Returns the first solver that clears, else the best attempt, so the caller can
+    report an honest failure rather than a silent near-miss.
+    """
+    best, prev = None, None
+    for K in knots:
+        if S % K:                              # knots must land on sample indices
+            continue
+        if prev is None:
+            sol = PolylineSolver(gid, starts, drifts, S=S, K=K, radius=radius,
+                                 margin=margin, **kw)
+        else:
+            sol = prev.reknot(K)               # warm start on the coarse path
+        sol.solve()
+        clr = sol.clearance()
+        if clr >= sol.d_req:
+            return sol
+        if best is None or clr > best[1]:
+            best = (sol, clr)
+        prev = sol
+    if best is None:
+        raise ValueError(f"no knot count in {knots} divides S = {S}")
+    return best[0]
+
+
 def solve_tiny(K=6, return_solver=False):
-    """The pinned 3-ball benchmark.  Returns the required metrics dict."""
+    """The pinned 3-ball benchmark.  Returns the required metrics dict.
+
+    runtime_sec covers everything: setup, the solve, AND the verification passes
+    (wide-window clearance and the symmetry residual), so nothing is hidden
+    outside the clock.
+    """
     t0 = time.perf_counter()
     sol = PolylineSolver(TINY['gid'], TINY['starts'], TINY['drifts'],
                          S=TINY['S'], K=K, radius=TINY['radius'],
                          margin=TINY['margin'])
     sol.solve()
-    rt = time.perf_counter() - t0
-    out = sol.report(rt)
+    t_solve = time.perf_counter() - t0
+    out = sol.report(time.perf_counter() - t0)
+    out['runtime_sec'] = round(time.perf_counter() - t0, 4)
+    out['runtime_solve_sec'] = round(t_solve, 4)
     return (out, sol) if return_solver else out
 
 
-def make_full_problem(n=5, radius=0.07, seed=3):
-    """Poisson-disk starts and short-lattice-vector drifts, then both are PINNED."""
+def make_full_problem(n=5, radius=0.07, seed=3, spacing=1.30, tries=40000):
+    """Poisson-disk starts and short-lattice-vector drifts, then both are PINNED.
+
+    `spacing` is in ball diameters and applies against the whole orbit, so the
+    real areal demand is n * |ops| disks per cell -- ask for too much and nothing
+    fits.  Raises rather than quietly returning fewer balls than requested: a
+    benchmark that silently shrinks is a benchmark that lies.
+    """
     g = Group('g226')
     rng = np.random.default_rng(seed)
     ws = np.array([[a, b] for a in range(-2, 3) for b in range(-2, 3)], dtype=float)
-    starts, guard = [], 0
-    while len(starts) < n and guard < 20000:
-        guard += 1
+    need = spacing * 2 * radius
+    starts = []
+    for _ in range(tries):
+        if len(starts) == n:
+            break
         c = rng.random(2)
+        cc = c @ g.B
         trial = np.array(starts + [c])
         ok = True
         for M, v, _ in g.ops:
             q = (trial @ M.T + v)[:, None, :] + ws[None, :, :]
-            dd = np.linalg.norm(q.reshape(-1, 2) @ g.B - c @ g.B, axis=1)
-            dd[dd < 1e-9] = np.inf
-            if dd.min() < 2.4 * 2 * radius:
+            dd = np.linalg.norm(q.reshape(-1, 2) @ g.B - cc, axis=1)
+            dd[dd < 1e-9] = np.inf                     # the candidate itself
+            if dd.min() < need:
                 ok = False
                 break
         if ok:
             starts.append(c)
+    if len(starts) < n:
+        if spacing > 1.02:                    # thin out and try again
+            return make_full_problem(n, radius, seed, max(1.02, spacing - 0.1), tries)
+        raise RuntimeError(f"seeded only {len(starts)}/{n} balls at spacing "
+                           f"{spacing:.2f} diameters (radius {radius}); the orbit "
+                           f"has {n * len(g.ops)} balls per cell, so ask for less")
     short = np.array([[1, 0], [-1, 1], [0, -1], [-1, 0], [1, -1], [0, 1]], dtype=float)
-    return np.array(starts), short[rng.integers(0, len(short), size=len(starts))]
+    return np.array(starts), short[rng.integers(0, len(short), size=n)]
 
 
-def solve_full(n=5, S=180, K=6, radius=0.07, margin=1.05, seed=3, render=False,
+def solve_full(n=5, S=180, K=None, radius=0.07, margin=1.05, seed=3, render=False,
                out_path=None):
-    """The target problem: n balls, S samples, optionally 60 rendered frames."""
+    """The target problem: n balls, S samples, optionally 60 rendered frames.
+
+    K = None escalates the knot count on failure; pass an int to pin it.
+    """
     starts, drifts = make_full_problem(n, radius, seed)
     t0 = time.perf_counter()
-    sol = PolylineSolver('g226', starts, drifts, S=S, K=K, radius=radius,
-                         margin=margin)
-    sol.solve()
+    if K is None:
+        sol = solve_auto('g226', starts, drifts, S, radius, margin)
+    else:
+        sol = PolylineSolver('g226', starts, drifts, S=S, K=K, radius=radius,
+                             margin=margin)
+        sol.solve()
     rt_solve = time.perf_counter() - t0
     rep = sol.report(rt_solve)
     rep['runtime_solve_sec'] = round(rt_solve, 4)
+    rep['knots'] = sol.K
     rep['n_triples'] = sol.n_triples
     if render:
         t1 = time.perf_counter()
@@ -631,15 +743,37 @@ def solve_full(n=5, S=180, K=6, radius=0.07, margin=1.05, seed=3, render=False,
     return rep
 
 
-def render_gif(sol, path, frames=60, size=600, cell_px=200.0, span=4):
-    """60 frames of the orbit fill; used to time the whole pipeline honestly."""
+def render_span(sol, size, cell_px):
+    """Smallest clone window that certainly covers the visible square.
+
+    A drawn ball sits at M p + v + w, so w must reach every visible point minus
+    the box that M p + v can occupy over the whole loop.  Computed rather than
+    guessed: too small a span silently leaves holes at the corners of the frame.
+    """
+    half = (size / 2 + sol.radius * cell_px) / cell_px          # cartesian half-width
+    corners = np.array([[half, half], [half, -half], [-half, half], [-half, -half]])
+    lat_corner = float(np.abs(corners @ sol.g.Binv).max())      # in lattice units
+    P_ext, _ = sol.positions(sol.Xf)
+    reach = 0.0
+    for M, v, _ in sol.g.ops:
+        reach = max(reach, float(np.abs(P_ext.reshape(-1, 2) @ M.T + v).max()))
+    return int(np.ceil(lat_corner + reach)) + 1
+
+
+def render_gif(sol, path, frames=60, size=600, cell_px=200.0, span=None, ss=2):
+    """`frames` frames of the orbit fill; used to time the whole pipeline honestly.
+
+    ss-times supersampling with a BOX downsample: at an exact integer ratio that
+    is precisely the right box filter, and it is both faster and kinder to the GIF
+    palette than LANCZOS (which smears edge pixels into hundreds of near-colours).
+    """
     import colorsys
     from PIL import Image, ImageDraw
     n = sol.n
+    span = render_span(sol, size, cell_px) if span is None else span
     cols = [tuple(int(255 * c) for c in
                   colorsys.hls_to_rgb((i / n + 0.02) % 1.0, 0.52, 0.62))
             for i in range(n)]
-    ss = 2
     W = size * ss
     rad = sol.radius * cell_px * ss
     imgs = []
@@ -655,9 +789,9 @@ def render_gif(sol, path, frames=60, size=600, cell_px=200.0, span=4):
         for xi, yi, i in zip(x[vis], y[vis], idx[vis]):
             d.ellipse([xi - rad, yi - rad, xi + rad, yi + rad], fill=cols[i],
                       outline=(38, 42, 52), width=max(1, int(0.17 * rad)))
-        imgs.append(img.resize((size, size), Image.LANCZOS))
+        imgs.append(img.resize((size, size), Image.BOX))
     imgs[0].save(path, save_all=True, append_images=imgs[1:], duration=60,
-                 loop=0, optimize=True)
+                 loop=0, optimize=False)
     return path
 
 
@@ -667,7 +801,9 @@ def main():
     ap.add_argument('--render', action='store_true')
     ap.add_argument('--balls', type=int, default=5)
     ap.add_argument('--samples', type=int, default=180)
-    ap.add_argument('--knots', type=int, default=6)
+    ap.add_argument('--knots', type=int, default=None,
+                    help="breakpoints per period; default escalates 6 -> 12 -> 18 "
+                         "only if the previous count fails to clear")
     ap.add_argument('--radius', type=float, default=0.07)
     ap.add_argument('--out', default=None)
     a = ap.parse_args()
@@ -675,7 +811,7 @@ def main():
         print(solve_full(n=a.balls, S=a.samples, K=a.knots, radius=a.radius,
                          render=a.render, out_path=a.out))
     else:
-        print(solve_tiny(K=a.knots))
+        print(solve_tiny(K=a.knots or 6))
 
 
 if __name__ == '__main__':

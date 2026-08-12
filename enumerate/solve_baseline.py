@@ -194,3 +194,54 @@ if __name__ == "__main__":
     r = solve_tiny()
     for k, v in r.items():
         print(f"  {k:22s} {v:.6g}" if isinstance(v, float) else f"  {k:22s} {v}")
+
+
+def prune_free_kinks(g, B, V, L, S, radius, margin=1.02, span=3, passes=1):
+    """Delete direction changes that happen with nothing in contact.
+
+    A relaxation is free to bend a path anywhere, and a bend in open space is
+    exactly what reads as a jerk. Removing one straightens the path through it;
+    if that reintroduces an overlap the kink is put back, so no-overlap is
+    never traded away for smoothness."""
+    import physicality as P
+    d_min = 2 * radius * margin
+    groups = clone_groups(g, R.integer_clones(g, span, S))
+
+    def clear_of(Bx, Vx):
+        X = R.rasterize(Bx, Vx, L, S)
+        allp = stack(g, X, L, groups)
+        base = X @ g.B
+        d = np.linalg.norm(base[None, :, None, :, :] - allp[:, None, :, :, :], axis=4)
+        d[d < 1e-9] = np.inf
+        return float(d.min())
+
+    B = [list(b) for b in B]
+    V = [list(np.asarray(v, dtype=float)) for v in V]
+    for _ in range(passes):
+        removed = 0
+        for i in range(len(B)):
+            k = 1
+            X = R.rasterize(B, V, L, S)
+            allp = stack(g, X, L, groups)
+            base = X @ g.B
+            d = np.linalg.norm(base[None, :, None, :, :] -
+                               allp[:, None, :, :, :], axis=4)
+            d[d < 1e-9] = np.inf
+            while k < len(B[i]):
+                s = B[i][k]
+                gap = (d[:, i, :, s].min() - 2 * radius) / (2 * radius)
+                if gap <= 0.06:                       # a real contact: keep it
+                    k += 1
+                    continue
+                trial_B = [list(b) for b in B]
+                trial_V = [list(v) for v in V]
+                del trial_B[i][k]
+                del trial_V[i][k]
+                if clear_of(trial_B, trial_V) >= 2 * radius:
+                    B, V = trial_B, trial_V
+                    removed += 1
+                else:
+                    k += 1
+        if not removed:
+            break
+    return B, V

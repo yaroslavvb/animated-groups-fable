@@ -10,6 +10,7 @@ import random
 import time
 
 from particles_gif import Group
+import physicality as P
 import render_balls as R
 import solve_baseline as SB
 
@@ -18,16 +19,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--group", default="g226")
     ap.add_argument("--balls", type=int, default=5)
-    ap.add_argument("--radius", type=float, default=0.085)
+    ap.add_argument("--radius", type=float, default=0.045)
     ap.add_argument("--steps", type=int, default=90)
     ap.add_argument("--frames", type=int, default=60)
     ap.add_argument("--size", type=int, default=600)
-    ap.add_argument("--cell-px", type=float, default=250.0)
+    ap.add_argument("--cell-px", type=float, default=280.0)
     ap.add_argument("--margin", type=float, default=1.02)
     ap.add_argument("--gain", type=float, default=2.2)
     ap.add_argument("--rounds", type=int, default=18)
-    ap.add_argument("--phases", type=int, default=26)
-    ap.add_argument("--min-sep", type=int, default=3)
+    ap.add_argument("--phases", type=int, default=20)
+    ap.add_argument("--min-sep", type=int, default=6)
+    ap.add_argument("--no-prune", action="store_true",
+                    help="keep direction changes that happen in open space")
     ap.add_argument("--seed", type=int, default=11)
     ap.add_argument("--tries", type=int, default=3,
                     help="seeds to try before giving up on a layout")
@@ -54,6 +57,9 @@ def main():
                                        margin=a.margin, phases=a.phases,
                                        rounds=a.rounds, gain=a.gain,
                                        min_sep=a.min_sep)
+        if not a.no_prune:
+            B, V = SB.prune_free_kinks(g, B, V, L, a.steps, a.radius,
+                                       margin=a.margin)
         rep = R.report(g, B, V, L, a.steps, a.radius)
         if rep["min_clearance_ratio"] >= 1.0:
             if attempt:
@@ -79,6 +85,12 @@ def main():
           f"{2 * a.radius:.4f}  -> "
           f"{'NO OVERLAP' if rep['min_clearance_ratio'] >= 1 else 'OVERLAP'}")
     print(f"  symmetry residual {rep['symmetry_residual']:.1e}")
+    m = P.metrics(g, B, V, L, a.steps, a.radius)
+    print(f"  physicality: worst turn {m['turn_p95']:.0f}deg (95th pct), "
+          f"speed variation {m['speed_cv']:.2f}, energy drift {m['energy_drift']:.2f},")
+    print(f"               {100 * m['free_kink_frac']:.0f}% of {m['kinks']} kinks "
+          f"are not at contact, impulse off-axis {m['impulse_misalign']:.2f}"
+          f"   [score {P.score(m):.2f}, lower is better]")
     print(f"  solve {t_solve:.2f}s  render {t_render:.2f}s  save {t_save:.2f}s"
           f"  TOTAL {time.time() - t0:.2f}s")
     print(f"  wrote {out}")
