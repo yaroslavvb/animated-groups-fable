@@ -337,15 +337,29 @@ table("phase-table",
   const host = document.createElement("div");
   host.className = "tabdemo big";
   document.getElementById("split-demo").append(host);
-  const note = g => g.clock === 1
+  const text = g => g.clock === 1
     ? "The uncoloured case: every copy in phase, the wallpaper with an independent loop."
     : g.it === 146
       ? "One colouring, one group. This one carries a 3<sub>1</sub> and a " +
-        "3<sub>2</sub> axis at once, so reflecting it gives back itself."
+        "3<sub>2</sub> axis at once, so its mirror image is itself."
       : `Every 3-centre advances the loop by ${g.symbol.includes("3\u2081")
           ? "a third" : "two thirds"} of a period. Reflect the plane and you ` +
         "get the other tab — which is why the two share a colouring and not a group.";
-  buildTabs(host, e.groups.map(g => ({ g: BY_ID.get(g.id), sym: g.symbol, note: note(g) })));
+  /* the static plate beside the animation: the same pattern with the phases
+   * frozen as colours, so "one colouring, two groups" can be seen rather than
+   * asserted. Plates are from the companion correspondence atlas. */
+  const plate = g =>
+    // no loading="lazy": an inactive tab pane is display:none, so a lazy image
+    // inside one never intersects the viewport and is never fetched at all
+    `<img src="img/colourings/${g.id}.webp" width="720" height="420"` +
+    ` alt="Static perfect ${g.clock}-colouring of the plane for ${g.symbol}"` +
+    ` style="width:min(100%,290px);height:auto;border:1px solid var(--rule);` +
+    `border-radius:4px;display:block;">`;
+  buildTabs(host, e.groups.map(g => ({
+    g: BY_ID.get(g.id), sym: g.symbol,
+    note: `<span style="display:flex;gap:0.9rem;align-items:flex-start;flex-wrap:wrap;">` +
+      plate(g) + `<span style="flex:1;min-width:13rem;">${text(g)}</span></span>`,
+  })));
 }
 
 /* ---------- the summary diagram, which opens the page ---------- */
@@ -419,4 +433,25 @@ function diagram() {
       N&#160;=&#160;1 case of every column: one colour, a C₁ clock, no time
       structure at all</text>
   </svg></div>`;
+}
+
+/* ---------- deep links ----------
+ * Every table, both diagrams and both widgets are injected by this module,
+ * so the browser's own jump to #splits (or any other anchor) happens while
+ * the page is still a few paragraphs long and lands nowhere near the target.
+ * Re-apply it once the document has its real height. */
+if (location.hash) {
+  const target = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+  if (target) {
+    // an explicit instant scrollTo rather than scrollIntoView: the sheet sets
+    // scroll-behavior:smooth, and a smooth scroll issued during load is easy
+    // for the browser to drop on the floor
+    const go = () => window.scrollTo({
+      top: target.getBoundingClientRect().top + window.scrollY - 12,
+      behavior: "instant",
+    });
+    go();
+    // the plates land last and change the height under us, so do it again
+    window.addEventListener("load", go, { once: true });
+  }
 }

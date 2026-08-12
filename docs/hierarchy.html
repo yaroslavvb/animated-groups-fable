@@ -340,39 +340,49 @@ affected.</p>
 
 <h3 id="splits">Splits: chirality</h3>
 
-<p>Four times, over p3, p4 and p6, the spacetime count is the <em>larger</em>
-one. Plane-affine equivalence admits reflections, so a colouring and its
-mirror image are one class; spacetime equivalence does not, since a change of
-frame that reverses the plane's orientation must also reverse time
-(det&nbsp;A&nbsp;·&nbsp;c&nbsp;&gt;&nbsp;0). Four colouring classes, eight
-spacetime groups: exactly the four enantiomorphic pairs among the 68 polar
-types.</p>
+<p>The smallest case is <span class="sym">333</span>&nbsp;=&nbsp;p3: three
+cyclic colourings, four clockwork groups. All four, each with the static
+colouring it induces on the plane —</p>
 
-<p>Here is the whole of the smallest case,
-<span class="sym">333</span>&nbsp;=&nbsp;p3, colouring by colouring:</p>
+<div id="split-demo"></div>
+
+<p class="hint">The animation is this catalog; the static plate beside it is
+the same group's perfect colouring, from the companion
+<a href="https://yaroslavvb.github.io/animated-groups/clockwork-coloring-correspondence.html">clockwork/colouring
+correspondence</a>, where all 68 are plotted.</p>
 
 <div id="split-table"></div>
 
-<p>Two of those four have the <em>same</em> Conway colour signature and the
-same colour type — <span class="sym"><sup>3</sup>3<sup>3</sup>3<sup>3</sup>3</span>,
-type <span class="sym">333³/◦</span> — because as coloured patterns they are
-the same object. Only the spacetime symbol tells them apart: in
-<span class="sym">3₁3₁3₁</span> every 3-centre advances the loop by a third of
-a period, in <span class="sym">3₂3₂3₂</span> by two thirds, and no relabelling
-of the three colours turns one staircase into the other while the clock keeps
-running the same way.</p>
+<p><span class="sym">3₁3₁3₁</span> and <span class="sym">3₂3₂3₂</span> are one
+colouring and two spacetime groups. Compare their plates: the same motifs in
+the same places, with two of the three colours exchanged. That is not a
+coincidence but the definition. A cyclic colouring is a normal subgroup
+K&nbsp;⊴&nbsp;Γ of index N with cyclic quotient, the colours being its cosets,
+and χ and χ<sup>−1</sup> have the <em>same</em> kernel. A colouring therefore
+records the partition into colour classes and not which way round the cycle
+runs — which is why the correspondence tables give the two the same signature
+<span class="sym"><sup>3</sup>3<sup>3</sup>3<sup>3</sup>3</span> and the same
+colour type <span class="sym">333³/◦</span>.</p>
 
-<p>The reflection is what merges them on the colour side. Conjugating
-<span class="sym">3₁3₁3₁</span> by a reflection of the plane alone sends
-χ(R)&nbsp;=&nbsp;+1/3 to −1/3, i.e. P3<sub>1</sub>&nbsp;↦&nbsp;P3<sub>2</sub>.
-For a coloured pattern that map is an equivalence and the colours come along
-as labels. For a spacetime group it is not admissible on its own; the
-admissible version reflects the plane <em>and</em> reverses time, and that
-composite sends χ(R)&nbsp;=&nbsp;+1/3 to +1/3 again — back to
-P3<sub>1</sub>. So there is no allowed frame in which the two agree, and the
-pair survives.</p>
+<p>A spacetime group does record it, because the phase circle is oriented:
+around a 3-centre the copies come at 0,&nbsp;⅓,&nbsp;⅔ in one and
+0,&nbsp;⅔,&nbsp;⅓ in the other, and that is the difference between a film and
+the same film run backwards. The change of frame that would undo it is a
+reflection of the plane, which sends χ(R)&nbsp;=&nbsp;+1/3 to −1/3 and
+P3<sub>1</sub> to P3<sub>2</sub>. As a map of coloured patterns that is an
+equivalence, and the colours come along as labels. As a change of frame it is
+inadmissible on its own: det&nbsp;A&nbsp;·&nbsp;c&nbsp;&gt;&nbsp;0 forces it to
+reverse time as well, and the composite sends
+χ(R)&nbsp;=&nbsp;+1/3 back to +1/3 — to P3<sub>1</sub> again. No allowed frame
+identifies the two, so the pair survives.</p>
 
-<div id="split-demo"></div>
+<p>The third colouring, <span class="sym">333³/333</span>, is the one whose
+phase sits on the translations: a tripled cell, realised by the single group
+<span class="sym">r33₁3₂</span>&nbsp;=&nbsp;R3. It carries a 3<sub>1</sub> and
+a 3<sub>2</sub> axis at once, so its own mirror image is itself and it does
+not split. Four colouring classes across p3, p4 and p6, eight spacetime
+groups: exactly the four enantiomorphic pairs among the 68 polar types.</p>
+
 
 <p>The same argument, verbatim, over p4 (P4<sub>1</sub>/P4<sub>3</sub>) and p6
 (P6<sub>1</sub>/P6<sub>5</sub> and P6<sub>2</sub>/P6<sub>4</sub>). Two
