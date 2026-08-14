@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2D Crystals — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>Catalogue A — the 2D crystals</h1>
+<p class="subtitle">The seventeen types of periodic symmetry in the plane —
+the ground floor of the suite: every spacetime group, clockwork crystal and
+colouring in the catalogues below is built over one of these.</p>
+
+<div class="toc">
+  <a class="chip" href="index.html#crystals">Crystals overview</a>
+  <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+  <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+  <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+  <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+</div>
+
+<h2 id="definition">1. The definition</h2>
+
+<p>A <em>2D crystal</em> is a discrete subgroup Γ&thinsp;≤&thinsp;E(2) of
+the isometries of the plane whose translations form a lattice of full
+rank&nbsp;two. In the ambient-group recipe that organises this whole suite —
+Eq.&nbsp;(4) of the <a href="index.html#crystals">tutorial</a>,
+Γ(<b>r</b>,&thinsp;t)&nbsp;=&nbsp;(R<b>r</b>&thinsp;+&thinsp;<b>u</b>,&nbsp;st&thinsp;+&thinsp;τ) —
+this is the degenerate instance: delete the internal coordinate altogether,
+leaving bare isometries</p>
+
+<p style="text-align:center;"><b>r</b> ⟼ R<b>r</b>&thinsp;+&thinsp;<b>u</b>,
+&emsp; R&thinsp;∈&thinsp;O(2),</p>
+
+<p>with no clock to advance and no colour to permute. A <em>crystal
+type</em> is a class of such subgroups under <em>proper</em> affine
+conjugacy: two crystals are the same when an orientation-preserving affine
+map of the plane carries one group onto the other. There are exactly
+seventeen types — the wallpaper groups (Fedorov 1891, rediscovered by
+Pólya 1924) — and this page is their catalogue.</p>
+
+<p>Proper conjugacy is the suite's convention — a motion of space should
+never be a mirror — but in the plane the restriction costs nothing:
+allowing improper conjugation merges no classes, and the count is 17 either
+way. Every wallpaper group is carried onto its mirror image by a proper
+affine map. For the twelve groups containing a reflection or a glide this
+is immediate — the group's own improper elements do the mirroring — and for
+the five rotation-only groups p1, p2, p3, p4, p6, conjugating by a
+reflection sends each rotation to its inverse, which the group already
+contains, and sends the lattice to a mirrored lattice that a proper change
+of basis restores. The plane is the one floor of the suite on which
+chirality cannot occur. Not so upstairs: in E(3) the same relaxation merges
+the eleven enantiomorphic pairs of <a href="crystals-3d.html">catalogue
+B</a> (P4₁22 against P4₃22, and their kin), collapsing 230 proper types to
+219 improper ones, and among the coloured crystals of
+<a href="crystals-colored.html">catalogue D</a> exactly one of the 269 —
+a five-colouring of p4 — splits into a chiral pair when the equivalence is
+tightened to proper maps.</p>
+
+<p>Each entry below is drawn the way this site prefers to draw a wallpaper
+group: as its <em>trivial clock</em> — the spacetime product
+Γ&thinsp;×&thinsp;ℤ of <a href="crystals-clockwork.html">catalogue C</a>,
+the film in which every copy of the motif runs in phase — frozen at a
+single instant, which is the wallpaper pattern itself (click a plate to let
+it run). This is a recall page: around each plate sit the standard facts
+and every crosslink the suite makes to that base — its spacetime groups,
+its clockwork crystals, its colourings and the places it appears
+<em>inside</em> a colouring as colour-preserving subgroup or colour-fixing
+kernel, and its vertical stack in 3D.</p>
+
+<h2 id="catalogue">2. The catalogue</h2>
+
+<p>Grouped by crystal system — the metric constraint the point group puts
+on the lattice. Headings give the Conway orbifold symbol first and the
+Hermann&ndash;Mauguin name second; the anchors are the HM names
+(<span class="mono">#p4g</span>), which is how every other catalogue links
+here.</p>
+
+<div class="toc">
+  <a class="chip" href="#p1"><span class="sym">◦</span> p1</a>
+  <a class="chip" href="#p2"><span class="sym">2222</span> p2</a>
+  <a class="chip" href="#pm"><span class="sym">**</span> pm</a>
+  <a class="chip" href="#pg"><span class="sym">××</span> pg</a>
+  <a class="chip" href="#pmm"><span class="sym">*2222</span> pmm</a>
+  <a class="chip" href="#pmg"><span class="sym">22*</span> pmg</a>
+  <a class="chip" href="#pgg"><span class="sym">22×</span> pgg</a>
+  <a class="chip" href="#cm"><span class="sym">*×</span> cm</a>
+  <a class="chip" href="#cmm"><span class="sym">2*22</span> cmm</a>
+  <a class="chip" href="#p4"><span class="sym">442</span> p4</a>
+  <a class="chip" href="#p4m"><span class="sym">*442</span> p4m</a>
+  <a class="chip" href="#p4g"><span class="sym">4*2</span> p4g</a>
+  <a class="chip" href="#p3"><span class="sym">333</span> p3</a>
+  <a class="chip" href="#p3m1"><span class="sym">*333</span> p3m1</a>
+  <a class="chip" href="#p31m"><span class="sym">3*3</span> p31m</a>
+  <a class="chip" href="#p6"><span class="sym">632</span> p6</a>
+  <a class="chip" href="#p6m"><span class="sym">*632</span> p6m</a>
+</div>
+
+<h2 id="oblique">Oblique — p1, p2</h2>
+<p style="color:var(--muted);">No constraint on the cell: a general
+parallelogram lattice, point group of order at most 2, nothing improper.</p>
+
+<section class="wp" id="p1">
+<h3><span class="sym">◦</span> · p1</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p1 (<a href="group.html?g=g1">xu1</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 1 (order 1) · oblique lattice · no reflections, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="p2">
+<h3><span class="sym">2222</span> · p2</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p2 (<a href="group.html?g=g5">xu5</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 2 (order 2) · oblique lattice · no reflections, no glides</dd>
+</dl>
+</section>
+
+<h2 id="rectangular">Rectangular — pm, pg, pmm, pmg, pgg</h2>
+<p style="color:var(--muted);">A primitive rectangular cell, forced by
+mirrors or glides along the axes.</p>
+
+<section class="wp" id="pm">
+<h3><span class="sym">**</span> · pm</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over pm (<a href="group.html?g=g10">xu10</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group m (order 2) · rectangular lattice · mirrors in one direction, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="pg">
+<h3><span class="sym">××</span> · pg</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over pg (<a href="group.html?g=g11">xu11</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group m (order 2) · rectangular lattice · no mirrors, glides in one direction</dd>
+</dl>
+</section>
+
+<section class="wp" id="pmm">
+<h3><span class="sym">*2222</span> · pmm</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over pmm (<a href="group.html?g=g54">xu54</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 2mm (order 4) · rectangular lattice · mirrors in two directions, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="pmg">
+<h3><span class="sym">22*</span> · pmg</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over pmg (<a href="group.html?g=g56">xu56</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 2mm (order 4) · rectangular lattice · mirrors one way, glides the other</dd>
+</dl>
+</section>
+
+<section class="wp" id="pgg">
+<h3><span class="sym">22×</span> · pgg</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over pgg (<a href="group.html?g=g58">xu58</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 2mm (order 4) · rectangular lattice · no mirrors, glides in two directions</dd>
+</dl>
+</section>
+
+<h2 id="rhombic">Rhombic (centred) — cm, cmm</h2>
+<p style="color:var(--muted);">The centred rectangle: mirrors with glides
+interleaved between them, primitive cell a rhombus.</p>
+
+<section class="wp" id="cm">
+<h3><span class="sym">*×</span> · cm</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over cm (<a href="group.html?g=g8">xu8</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group m (order 2) · centred rectangular (rhombic) lattice · mirrors with glides between them</dd>
+</dl>
+</section>
+
+<section class="wp" id="cmm">
+<h3><span class="sym">2*22</span> · cmm</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over cmm (<a href="group.html?g=g68">xu68</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 2mm (order 4) · centred rectangular (rhombic) lattice · mirrors in two directions, glides between them</dd>
+</dl>
+</section>
+
+<h2 id="square">Square — p4, p4m, p4g</h2>
+<p style="color:var(--muted);">A square cell, forced by fourfold
+rotation.</p>
+
+<section class="wp" id="p4">
+<h3><span class="sym">442</span> · p4</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p4 (<a href="group.html?g=g94">xu94</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 4 (order 4) · square lattice · no reflections, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="p4m">
+<h3><span class="sym">*442</span> · p4m</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p4m (<a href="group.html?g=g128">xu128</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 4mm (order 8) · square lattice · mirrors in four directions, glides between the diagonal mirrors</dd>
+</dl>
+</section>
+
+<section class="wp" id="p4g">
+<h3><span class="sym">4*2</span> · p4g</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p4g (<a href="group.html?g=g132">xu132</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 4mm (order 8) · square lattice · mirrors in the diagonal directions only, glides along the axes</dd>
+</dl>
+</section>
+
+<h2 id="hexagonal">Hexagonal — p3, p3m1, p31m, p6, p6m</h2>
+<p style="color:var(--muted);">The triangular lattice, forced by threefold
+or sixfold rotation.</p>
+
+<section class="wp" id="p3">
+<h3><span class="sym">333</span> · p3</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p3 (<a href="group.html?g=g224">xu224</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 3 (order 3) · hexagonal lattice · no reflections, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="p3m1">
+<h3><span class="sym">*333</span> · p3m1</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p3m1 (<a href="group.html?g=g230">xu230</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 3m (order 6) · hexagonal lattice · mirrors through every 3-centre, glides between them</dd>
+</dl>
+</section>
+
+<section class="wp" id="p31m">
+<h3><span class="sym">3*3</span> · p31m</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p31m (<a href="group.html?g=g232">xu232</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 3m (order 6) · hexagonal lattice · mirrors missing one family of 3-centres, glides between them</dd>
+</dl>
+</section>
+
+<section class="wp" id="p6">
+<h3><span class="sym">632</span> · p6</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p6 (<a href="group.html?g=g243">xu243</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 6 (order 6) · hexagonal lattice · no reflections, no glides</dd>
+</dl>
+</section>
+
+<section class="wp" id="p6m">
+<h3><span class="sym">*632</span> · p6m</h3>
+<div class="demo"><canvas></canvas>
+<div class="caption"><span style="color:var(--muted);">The trivial clock
+over p6m (<a href="group.html?g=g268">xu268</a>), frozen — every copy of the
+comma in phase; click the plate to let it run.</span></div></div>
+<dl class="facts">
+<dt>Symmetry</dt><dd>point group 6mm (order 12) · hexagonal lattice · mirrors in six directions, glides between them</dd>
+</dl>
+</section>
+
+<h2 id="refs">References</h2>
+<p style="font-size:0.92rem;">
+E.&thinsp;S. Fedorov, <i>Симметрія на плоскости</i> (Symmetry in the plane), Zap. Imp. S.-Peterb. Mineral. Obshchestva <b>28</b> (1891) 345–390 — the first enumeration of the seventeen.<br>
+G. Pólya, <i>Über die Analogie der Kristallsymmetrie in der Ebene</i>, Z. Kristallogr. <b>60</b> (1924) 278–282.<br>
+J.&thinsp;H. Conway, D.&thinsp;H. Huson, <i>The orbifold notation for two-dimensional groups</i>, Structural Chemistry <b>13</b> (2002) 247–257.<br>
+J.&thinsp;H. Conway, H. Burgiel, C. Goodman-Strauss, <i>The Symmetries of Things</i>, A&thinsp;K Peters, 2008 — Chapters 2–3: the orbifold signatures used throughout this suite, and the Magic Theorem proof that seventeen is the count.<br>
+<i>International Tables for Crystallography</i>, Vol.&nbsp;A: <i>Space-group symmetry</i>, IUCr — the plane-group tables (Nos. 1–17) and the space-group tables cited in the Vertical stack rows.
+</p>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/crystals-2d.js?v=40"></script>
+</body>
+</html>

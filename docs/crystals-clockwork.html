@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clockwork Crystals — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>Catalogue C — the clockwork crystals</h1>
+<p class="subtitle">The 68 spacetime groups in which time never runs backwards:
+17 trivial clocks and 51 groups that genuinely entangle space with time —
+each one a cyclic colouring of a wallpaper pattern, each one the shadow of a
+3D space group.</p>
+
+<div class="toc">
+  <a class="chip" href="index.html#crystals">Crystals overview</a>
+  <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+  <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+  <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+  <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+</div>
+
+<p>Fix the ambient group E(2)&thinsp;×&thinsp;E(1) of Xu&ndash;Wu's
+<a href="index.html#setup">Eq.&nbsp;(4)</a> — operations
+Γ(<b>r</b>,&thinsp;t) = (R<b>r</b>&thinsp;+&thinsp;<b>u</b>,&nbsp;st&thinsp;+&thinsp;τ)
+— and keep only the discrete subgroups all of whose elements have
+s&thinsp;=&thinsp;+1: no symmetry plays the film backwards. Counted up to
+time-preserving affine equivalence, which includes the Galilean boosts
+(<b>r</b>,&thinsp;t) ⟼ (<b>r</b>&thinsp;+&thinsp;t<b>w</b>,&thinsp;t),
+exactly 68 of the 275 spacetime groups are <em>forward</em>. Each is a
+wallpaper group wearing a clock that only turns one way. Seventeen wear it
+trivially — direct products wallpaper&thinsp;×&thinsp;clock, one per
+wallpaper group, in which no spatial symmetry touches the clock — and the
+remaining 51 genuinely entangle space with time: some rotation, glide or
+lattice translation cannot be performed without also advancing the clock.</p>
+
+<p>Because the group is forward, the map "how far does this symmetry advance
+the clock" is a homomorphism onto a finite cyclic group ℤ/k, with
+k&thinsp;∈&thinsp;{1,&thinsp;2,&thinsp;3,&thinsp;4,&thinsp;6}. So a clockwork
+crystal <em>is</em> a cyclic colouring of its wallpaper projection: paint
+each copy of the motif by its phase, one colour per k-th of the period, and
+every symmetry shifts the k colours cyclically. The plates below are exactly
+this picture — colour&nbsp;=&nbsp;phase.
+<a href="crystals-colored.html#clockwork">Catalogue&nbsp;D works the
+correspondence out in full</a>, including which cyclic colourings are
+<em>not</em> realised by any clock — the boostable ones, whose colour
+advance rides on a translation that a Galilean boost absorbs — and the four
+enantiomorphic clock pairs that drive the same colouring: a clock and its
+reversal stack the same colours in opposite order.</p>
+
+<p>There is a second reading of the same data. Read the clock phase as a
+<em>height</em> — lift each motif copy to the altitude given by its phase,
+periodically continued — and a clockwork crystal becomes a crystal in
+ordinary 3D space. This is Belov and Tarkhova's 1956 construction run in
+reverse: they projected stacked layers down to coloured mosaics, colour as a
+code for height. Under this lift the 51 nontrivial clockwork groups land on
+51 distinct space groups among the
+<a href="crystals-3d.html">230 of catalogue&nbsp;B</a> — the order-2 clock
+on p4 becomes the 4₂ screw of P4₂, the order-6 clock on p6 the 6₁ screw of
+P6₁ — while the 17 trivial clocks land on the 17 vertical stacks
+wallpaper&thinsp;×&thinsp;ℤ, from P1 up to P6mm. The four enantiomorphic
+clock pairs lift to four of the eleven enantiomorphic space-group pairs:
+running the clock backwards mirrors the screw.</p>
+
+<p>How to read an entry: the lead symbol is the colour-superscript orbifold
+signature of <i>The Symmetries of Things</i> (decoding rules in the
+<a href="notation.html">notation guide</a>) — a superscript on an orbifold
+feature is the order of the clock advance that feature induces. The line
+beneath gives the colour type G/K: the wallpaper group G of the projection
+and the kernel K, the subgroup of symmetries that leave the clock alone,
+both linked into <a href="crystals-2d.html">catalogue&nbsp;A</a>. The plate
+draws one comma motif per group element, coloured by phase; the remaining
+links lead to the live animation, the colouring in
+<a href="crystals-colored.html">catalogue&nbsp;D</a>, the space-group lift
+in catalogue&nbsp;B, the reverse-clock mate where the clock has a
+handedness, and the companion-site atlas entry.</p>
+
+<div class="toc" id="toc"></div>
+<div id="cat"></div>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/crystals-clockwork.js?v=40"></script>
+</body>
+</html>
