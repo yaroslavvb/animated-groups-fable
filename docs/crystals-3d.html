@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3D Crystals — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>Catalogue B — the 3D crystals</h1>
+<p class="subtitle">The <span data-count="total">230</span> space groups of
+ordinary three-dimensional space, each with a worked crystal structure — and
+with the <span data-count="stacks">17</span> wallpaper stacks and the
+<span data-count="lifts">51</span> clockwork lifts that tie them to the rest
+of this site marked.</p>
+
+<div class="toc">
+  <a class="chip" href="index.html#crystals">Crystals overview</a>
+  <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+  <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+  <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+  <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+</div>
+
+<h2 id="definition">1. The definition</h2>
+
+<p>This catalogue runs the suite's one recipe in the ambient group E(3). A
+<em>3D crystal</em> — a <em>space group</em>, in the standard vocabulary — is
+a discrete subgroup G&thinsp;≤&thinsp;E(3) whose translations form a rank-3
+lattice, and two space groups are of the same type when they are conjugate by
+a <em>proper</em> affine map of ℝ³. There are exactly 230 types. The count
+was reached independently by Fedorov and by Schoenflies in 1891&ndash;92 —
+each correcting the other's list by letter until the two agreed — and it is
+the ancestral classification of this whole subject: every other catalogue on
+this site borrows its vocabulary, and its licence to call discrete subgroups
+"crystals", from these 230.</p>
+
+<h2 id="chirality">2. 230, or 219</h2>
+
+<p>The word <em>proper</em> in the definition is load-bearing. A screw axis
+climbs as it turns: in P4₁ a quarter-turn lifts the structure a quarter of
+the cell. Viewed in a mirror it turns the other way — the reflected crystal
+is of type P4₃, and while an <em>improper</em> affine map carries P4₁ onto
+P4₃, no proper one does. Proper equivalence therefore keeps such left- and
+right-handed partners apart; allowing improper conjugacy merges exactly
+eleven <em>enantiomorphic pairs</em>,</p>
+
+<p style="text-align:center; line-height:2.1;">
+<span class="sym">P4₁</span>&thinsp;⇄&thinsp;<span class="sym">P4₃</span> <span style="color:var(--muted);">(76&thinsp;·&thinsp;78)</span> &emsp;
+<span class="sym">P4₁22</span>&thinsp;⇄&thinsp;<span class="sym">P4₃22</span> <span style="color:var(--muted);">(91&thinsp;·&thinsp;95)</span> &emsp;
+<span class="sym">P4₁2₁2</span>&thinsp;⇄&thinsp;<span class="sym">P4₃2₁2</span> <span style="color:var(--muted);">(92&thinsp;·&thinsp;96)</span> &emsp;
+<span class="sym">P3₁</span>&thinsp;⇄&thinsp;<span class="sym">P3₂</span> <span style="color:var(--muted);">(144&thinsp;·&thinsp;145)</span> &emsp;
+<span class="sym">P3₁12</span>&thinsp;⇄&thinsp;<span class="sym">P3₂12</span> <span style="color:var(--muted);">(151&thinsp;·&thinsp;153)</span> &emsp;
+<span class="sym">P3₁21</span>&thinsp;⇄&thinsp;<span class="sym">P3₂21</span> <span style="color:var(--muted);">(152&thinsp;·&thinsp;154)</span> &emsp;
+<span class="sym">P6₁</span>&thinsp;⇄&thinsp;<span class="sym">P6₅</span> <span style="color:var(--muted);">(169&thinsp;·&thinsp;170)</span> &emsp;
+<span class="sym">P6₂</span>&thinsp;⇄&thinsp;<span class="sym">P6₄</span> <span style="color:var(--muted);">(171&thinsp;·&thinsp;172)</span> &emsp;
+<span class="sym">P6₁22</span>&thinsp;⇄&thinsp;<span class="sym">P6₅22</span> <span style="color:var(--muted);">(178&thinsp;·&thinsp;179)</span> &emsp;
+<span class="sym">P6₂22</span>&thinsp;⇄&thinsp;<span class="sym">P6₄22</span> <span style="color:var(--muted);">(180&thinsp;·&thinsp;181)</span> &emsp;
+<span class="sym">P4₃32</span>&thinsp;⇄&thinsp;<span class="sym">P4₁32</span> <span style="color:var(--muted);">(212&thinsp;·&thinsp;213)</span>
+</p>
+
+<p>and the count drops to 219. This site counts properly throughout: the
+spacetime census of 275 uses the equivalence with
+det&thinsp;A&thinsp;·&thinsp;c&thinsp;&gt;&thinsp;0 — introduced in the
+<a href="index.html#setup">tutorial</a> precisely as "the convention under
+which the crystallographic screw pairs 4₁/4₃ count as two groups" — and the
+one chiral coloured crystal of <a href="crystals-colored.html#chirality">catalogue
+D</a>, the five-colouring of p4, is the two-dimensional shadow of the same
+phenomenon. Each entry below links its partner with a ⇄ badge.</p>
+
+<h2 id="organisation">3. Crystal systems and crystal classes</h2>
+
+<p>Every catalogue in the suite sorts its entries under the symmetry a reader
+can see at a glance — catalogue D groups its colourings by the wallpaper
+group being coloured. Here the visible thing is the <em>crystal class</em>:
+quotient a space group by its translation lattice and a finite subgroup of
+O(3) remains, the point group, which is the macroscopic symmetry of the
+crystal — the symmetry of its faces, its optics, its response tensors.
+Exactly 32 classes arise (Hessel, 1830 — six decades before the space groups,
+because crystal habit was measurable long before X-rays saw the lattice), and
+they gather into seven <em>crystal systems</em> according to the constraint
+the class forces on the lattice, from triclinic (none) to cubic (three equal
+axes). The catalogue below is therefore grouped by system, then by class,
+with each class's groups in the standard numbering — the 3D analogue of
+sorting colourings by wallpaper group, and the same two-tier scheme as the
+printed <i>International Tables</i>.</p>
+
+<h2 id="bridges">4. Two bridges from the plane</h2>
+
+<p>Seventeen of the 230 already live on this site in lower dimension. Take a
+wallpaper group Γ and extrude it: stack copies of the plane at all integer
+heights, allowing no symmetry that mixes height into the plane. The result is
+the vertical stack Γ&thinsp;×&thinsp;ℤ, a symmorphic space group — p1 gives
+P1, p2 gives P2, and so on through p4g&thinsp;→&thinsp;P4bm and
+p6m&thinsp;→&thinsp;P6mm. In this site's terms the stack is the
+<em>phase-as-height lift</em> of the trivial clock over Γ: film a motionless
+wallpaper pattern, reread the loop of time as a vertical coordinate, and the
+stacked film frames are the crystal. These seventeen carry a
+"stack&nbsp;of&nbsp;Γ" badge below, linking to
+<a href="crystals-2d.html">catalogue A</a>.</p>
+
+<p>The second bridge is the same lift applied to a clock that actually runs.
+A nontrivial <a href="crystals-clockwork.html">clockwork crystal</a> pairs
+each wallpaper symmetry with an advance of a k-hour clock; reading phase as
+height stacks the plane at k levels per period and turns a
+rotation-that-advances-the-clock into a genuine screw axis, a
+glide-that-advances into a diagonal glide or a centring — Belov's 1956
+stacking construction, the one his school used to draw coloured mosaics, run
+forwards. All <span data-count="lifts">51</span> nontrivial clockwork
+crystals lift this way, and they land on 51 <em>distinct</em> space groups —
+each carries a ⏱ badge below, linking back to catalogue C. Together with the
+seventeen stacks, 68 of the 230 point back into the plane. Two subtleties are
+visible in the badges: an enantiomorphic pair of clocks (a clock and the same
+clock run backwards) lifts to an enantiomorphic pair of space groups — the
+four ⏱-marked ⇄ pairs 76·78, 144·145, 169·170, 171·172 — and a nontrivial
+lift is never itself a stack, so the two badges never share a card.</p>
+
+<h2 id="catalogue">5. The catalogue</h2>
+
+<p>Grouped by crystal system, then crystal class. Each entry shows one worked
+structure — a mineral where a mineral exists, a synthetic or molecular
+crystal otherwise — hot-linked from the source collection described under
+<a href="#refs">Sources</a>; the picture links to the full-size original.
+Symbols are printed in the plain-text convention of that source: subscripts
+flattened (P21/c for P2₁/c) and a minus sign where the <i>International
+Tables</i> print an overbar (Fm-3m). Badges: ⇄ the enantiomorphic partner,
+"stack&nbsp;of&nbsp;Γ" the wallpaper stack of
+<a href="crystals-2d.html">catalogue A</a>, ⏱ the clockwork crystal of
+<a href="crystals-clockwork.html">catalogue C</a> lifting there.</p>
+
+<div id="cat"></div>
+
+<h2 id="refs">Sources</h2>
+
+<p style="font-size:0.92rem;">The structure images and worked examples are
+hot-linked from Frank Hoffmann's space-group list project at
+<a href="https://crystalsymmetry.wordpress.com/230-2/">crystalsymmetry.wordpress.com/230-2</a>
+(companion site of the MOOC <i>The Fascination of Crystals and Symmetry</i>,
+University of Hamburg; with contributions by Barbara Mayer, Lois Johnson,
+Daniel Wyllie Lacerda Rodrigues and Vladimir Vasiliev) — a growing collection
+of worked examples offering, in its own words, "at least one crystal
+structure for all of the 230 space groups". Each image above links to its
+original there; the drawings are made with VESTA or Mercury and remain the
+property of that site's author. Two errata are handled: No.&thinsp;67 is
+printed there as Cccm (the symbol of No.&thinsp;66) and is corrected to Cmma
+here, and No.&thinsp;221's plate on the source page repeats No.&thinsp;220's.</p>
+
+<p style="font-size:0.92rem;">
+E.&thinsp;S. Fedorov, <i>Симметрія правильныхъ системъ фигуръ</i> (The symmetry of regular systems of figures), Zap. Mineral. Obshch. <b>28</b> (1891) 1–146.<br>
+A. Schoenflies, <i>Krystallsysteme und Krystallstructur</i>, Teubner, Leipzig, 1891.<br>
+<i>International Tables for Crystallography</i>, Vol. A: Space-group symmetry, IUCr/Wiley — the standard reference for symbols, numbering and the 230/219 distinction.<br>
+N.&thinsp;V. Belov, T.&thinsp;N. Tarkhova, <i>Colour symmetry groups</i>, Kristallografiya <b>1</b> (1956) 4–13 — the stacking construction of §4.</p>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/crystals-3d.js?v=40"></script>
+</body>
+</html>

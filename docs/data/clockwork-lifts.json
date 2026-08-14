@@ -1,0 +1,417 @@
+{
+ "meta": {
+  "count": 68,
+  "source": "https://yaroslavvb.github.io/animated-groups/data/clockwork-coloring-correspondence.json",
+  "note": "Phase-as-height lift of each forward (clockwork) group to a 3D space group: 51 nontrivial lifts from the companion-site data, 17 trivial clocks lifted to the wallpaper-times-Z vertical stacks."
+ },
+ "groups": {
+  "g1": {
+   "sg": 1,
+   "sgName": "P1",
+   "sot": null,
+   "mate": null
+  },
+  "g5": {
+   "sg": 3,
+   "sgName": "P2",
+   "sot": null,
+   "mate": null
+  },
+  "g6": {
+   "sg": 4,
+   "sgName": "P2₁",
+   "sot": "The Symmetries of Things · p. 141",
+   "mate": null
+  },
+  "g7": {
+   "sg": 5,
+   "sgName": "C2",
+   "sot": "The Symmetries of Things · p. 141",
+   "mate": null
+  },
+  "g8": {
+   "sg": 8,
+   "sgName": "Cm",
+   "sot": null,
+   "mate": null
+  },
+  "g9": {
+   "sg": 9,
+   "sgName": "Cc",
+   "sot": "The Symmetries of Things · p. 141",
+   "mate": null
+  },
+  "g10": {
+   "sg": 6,
+   "sgName": "Pm",
+   "sot": null,
+   "mate": null
+  },
+  "g11": {
+   "sg": 7,
+   "sgName": "Pc",
+   "sot": null,
+   "mate": null
+  },
+  "g54": {
+   "sg": 25,
+   "sgName": "Pmm2",
+   "sot": null,
+   "mate": null
+  },
+  "g55": {
+   "sg": 27,
+   "sgName": "Pcc2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g56": {
+   "sg": 28,
+   "sgName": "Pma2",
+   "sot": null,
+   "mate": null
+  },
+  "g57": {
+   "sg": 30,
+   "sgName": "Pnc2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g58": {
+   "sg": 32,
+   "sgName": "Pba2",
+   "sot": null,
+   "mate": null
+  },
+  "g59": {
+   "sg": 34,
+   "sgName": "Pnn2",
+   "sot": "The Symmetries of Things · p. 141",
+   "mate": null
+  },
+  "g60": {
+   "sg": 26,
+   "sgName": "Pmc2₁",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g61": {
+   "sg": 29,
+   "sgName": "Pca2₁",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g62": {
+   "sg": 31,
+   "sgName": "Pmn2₁",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g63": {
+   "sg": 33,
+   "sgName": "Pna2₁",
+   "sot": "The Symmetries of Things · p. 141",
+   "mate": null
+  },
+  "g64": {
+   "sg": 38,
+   "sgName": "Amm2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g65": {
+   "sg": 39,
+   "sgName": "Aem2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g66": {
+   "sg": 40,
+   "sgName": "Ama2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g67": {
+   "sg": 41,
+   "sgName": "Aea2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g68": {
+   "sg": 35,
+   "sgName": "Cmm2",
+   "sot": null,
+   "mate": null
+  },
+  "g69": {
+   "sg": 37,
+   "sgName": "Ccc2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g70": {
+   "sg": 36,
+   "sgName": "Cmc2₁",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g71": {
+   "sg": 44,
+   "sgName": "Imm2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g72": {
+   "sg": 45,
+   "sgName": "Iba2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g73": {
+   "sg": 46,
+   "sgName": "Ima2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g74": {
+   "sg": 42,
+   "sgName": "Fmm2",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g75": {
+   "sg": 43,
+   "sgName": "Fdd2",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": null
+  },
+  "g94": {
+   "sg": 75,
+   "sgName": "P4",
+   "sot": null,
+   "mate": null
+  },
+  "g95": {
+   "sg": 77,
+   "sgName": "P4₂",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g96": {
+   "sg": 76,
+   "sgName": "P4₁",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": "g97"
+  },
+  "g97": {
+   "sg": 78,
+   "sgName": "P4₃",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": "g96"
+  },
+  "g98": {
+   "sg": 79,
+   "sgName": "I4",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g99": {
+   "sg": 80,
+   "sgName": "I4₁",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": null
+  },
+  "g128": {
+   "sg": 99,
+   "sgName": "P4mm",
+   "sot": null,
+   "mate": null
+  },
+  "g129": {
+   "sg": 105,
+   "sgName": "P4₂mc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g130": {
+   "sg": 101,
+   "sgName": "P4₂cm",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g131": {
+   "sg": 103,
+   "sgName": "P4cc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g132": {
+   "sg": 100,
+   "sgName": "P4bm",
+   "sot": null,
+   "mate": null
+  },
+  "g133": {
+   "sg": 106,
+   "sgName": "P4₂bc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g134": {
+   "sg": 102,
+   "sgName": "P4₂nm",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g135": {
+   "sg": 104,
+   "sgName": "P4nc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g136": {
+   "sg": 107,
+   "sgName": "I4mm",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g137": {
+   "sg": 109,
+   "sgName": "I4₁md",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": null
+  },
+  "g138": {
+   "sg": 108,
+   "sgName": "I4cm",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g139": {
+   "sg": 110,
+   "sgName": "I4₁cd",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": null
+  },
+  "g224": {
+   "sg": 143,
+   "sgName": "P3",
+   "sot": null,
+   "mate": null
+  },
+  "g225": {
+   "sg": 145,
+   "sgName": "P3₂",
+   "sot": "The Symmetries of Things · p. 156",
+   "mate": "g226"
+  },
+  "g226": {
+   "sg": 144,
+   "sgName": "P3₁",
+   "sot": "The Symmetries of Things · p. 156",
+   "mate": "g225"
+  },
+  "g227": {
+   "sg": 146,
+   "sgName": "R3",
+   "sot": "The Symmetries of Things · p. 156",
+   "mate": null
+  },
+  "g230": {
+   "sg": 156,
+   "sgName": "P3m1",
+   "sot": null,
+   "mate": null
+  },
+  "g231": {
+   "sg": 158,
+   "sgName": "P3c1",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g232": {
+   "sg": 157,
+   "sgName": "P31m",
+   "sot": null,
+   "mate": null
+  },
+  "g233": {
+   "sg": 159,
+   "sgName": "P31c",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g234": {
+   "sg": 160,
+   "sgName": "R3m",
+   "sot": "The Symmetries of Things · p. 164",
+   "mate": null
+  },
+  "g235": {
+   "sg": 161,
+   "sgName": "R3c",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": null
+  },
+  "g243": {
+   "sg": 168,
+   "sgName": "P6",
+   "sot": null,
+   "mate": null
+  },
+  "g244": {
+   "sg": 171,
+   "sgName": "P6₂",
+   "sot": "The Symmetries of Things · p. 164",
+   "mate": "g245"
+  },
+  "g245": {
+   "sg": 172,
+   "sgName": "P6₄",
+   "sot": "The Symmetries of Things · p. 164",
+   "mate": "g244"
+  },
+  "g246": {
+   "sg": 173,
+   "sgName": "P6₃",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g247": {
+   "sg": 170,
+   "sgName": "P6₅",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": "g248"
+  },
+  "g248": {
+   "sg": 169,
+   "sgName": "P6₁",
+   "sot": "The Symmetries of Things · p. 155",
+   "mate": "g247"
+  },
+  "g268": {
+   "sg": 183,
+   "sgName": "P6mm",
+   "sot": null,
+   "mate": null
+  },
+  "g269": {
+   "sg": 185,
+   "sgName": "P6₃cm",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g270": {
+   "sg": 184,
+   "sgName": "P6cc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  },
+  "g271": {
+   "sg": 186,
+   "sgName": "P6₃mc",
+   "sot": "The Symmetries of Things · p. 140",
+   "mate": null
+  }
+ }
+}
