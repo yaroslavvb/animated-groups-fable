@@ -90,15 +90,8 @@ function pairHtml(g) {
 
 /* lazy painter */
 const painted = new WeakSet();
-const io = new IntersectionObserver(entries => {
-  for (const e of entries) {
-    if (!e.isIntersecting || painted.has(e.target)) continue;
-    painted.add(e.target);
-    const g = data.groups.find(x => x.id === e.target.dataset.gid);
-    try { paintColoredCrystal(e.target, g.render); }
-    catch (err) { console.error("paint failed for", g.id, err); }
-  }
-}, { rootMargin: "300px" });
+/* Panes paint when they are first opened (buildPlateTabs), so nothing is
+ * drawn for a colouring nobody has looked at. */
 
 /* filters */
 const filterState = { action: "", flag: "" };
@@ -129,16 +122,21 @@ function passes(g) {
 
 function applyFilters() {
   let shown = 0;
-  for (const card of document.querySelectorAll(".gcard[data-gid]")) {
-    const g = data.groups.find(x => x.id === card.dataset.gid);
+  // a filtered-out colouring loses its TAB; the section goes when none is left,
+  // and a section whose open tab was just hidden re-opens on its first survivor
+  for (const btn of document.querySelectorAll(".tabbtn[data-gid]")) {
+    const g = data.groups.find(x => x.id === btn.dataset.gid);
     const ok = passes(g);
-    card.style.display = ok ? "" : "none";
+    btn.style.display = ok ? "" : "none";
     if (ok) shown++;
   }
   for (const sec of document.querySelectorAll("[data-block]")) {
-    const any = [...sec.querySelectorAll(".gcard[data-gid]")]
-      .some(c => c.style.display !== "none");
-    sec.style.display = any ? "" : "none";
+    const live = [...sec.querySelectorAll(".tabbtn[data-gid]")]
+      .filter(b => b.style.display !== "none");
+    sec.style.display = live.length ? "" : "none";
+    if (live.length && !live.some(b => b.classList.contains("active"))) {
+      sec._openFirst && sec._openFirst();
+    }
   }
   document.getElementById("f-n").textContent =
     shown === data.groups.length ? "" : `${shown} of ${data.groups.length}`;
@@ -156,8 +154,77 @@ toc.innerHTML = [2, 3, 4, 5, 6].map(k =>
   `<a class="chip" href="#k${k}">${k} colours · ${data.meta.totals[k]}</a>`
 ).join("");
 
-/* the catalogue */
+/* THE CATALOGUE, as tabbed panes.
+ *
+ * Same widget the wallpaper atlas uses: over each wallpaper group the
+ * colourings are a row of tabs and one large plate, rather than a grid of
+ * thumbnails. A colouring is a picture you read — which cells took which
+ * colour, and where the colour-fixing subgroup's cell sits — and that does not
+ * survive being shrunk to a card. One at a time, big, with the row above
+ * saying what else is there.
+ *
+ * Plates paint on first activation rather than on scroll: a pane that has
+ * never been opened has never cost anything, which matters when the page
+ * holds 269 of them. */
 const host = document.getElementById("catalogue");
+
+function buildPlateTabs(section, list) {
+  const bar = document.createElement("div");
+  bar.className = "tabbar";
+  const box = document.createElement("div");
+  const panes = [];
+
+  list.forEach((g, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tabbtn sym";
+    btn.dataset.gid = g.id;
+    btn.innerHTML = labelHtml(g);
+
+    const pane = document.createElement("div");
+    pane.className = "tabpane";
+    pane.id = g.id;
+    pane.dataset.gid = g.id;
+    const cv = document.createElement("canvas");
+    cv.dataset.gid = g.id;
+    const cap = document.createElement("div");
+    cap.className = "caption";
+    cap.innerHTML =
+      `<div>${labelHtml(g)} <span class="tags">${tagsHtml(g)}</span></div>` +
+      `<div style="font-size:0.88rem;">${pairHtml(g)}</div>` +
+      `<div style="font-size:0.85rem; color:var(--muted);">${linksHtml(g)}</div>`;
+    pane.append(cv, cap);
+    pane._paint = () => {
+      if (painted.has(cv)) return;
+      painted.add(cv);
+      try { paintColoredCrystal(cv, g.render); }
+      catch (err) { console.error("paint failed for", g.id, err); }
+    };
+
+    btn.addEventListener("click", () => activate(i));
+    bar.append(btn);
+    box.append(pane);
+    panes.push({ btn, pane, g });
+  });
+
+  function activate(k) {
+    panes.forEach(({ btn, pane }, i) => {
+      btn.classList.toggle("active", i === k);
+      pane.classList.toggle("active", i === k);
+    });
+    panes[k].pane._paint();
+  }
+  section._activate = activate;
+  section._panes = panes;
+  // open on the first colouring the filters admit
+  section._openFirst = () => {
+    const i = panes.findIndex(({ btn }) => btn.style.display !== "none");
+    if (i >= 0) activate(i);
+  };
+  section.append(bar, box);
+  activate(0);
+}
+
 for (const k of [2, 3, 4, 5, 6]) {
   const h2 = document.createElement("h2");
   h2.id = `k${k}`;
@@ -168,34 +235,31 @@ for (const k of [2, 3, 4, 5, 6]) {
     if (!list.length) continue;
     const block = document.createElement("section");
     block.dataset.block = `${k}-${hm}`;
+    block.className = "tabdemo";
     const orb = list[0].base.orb;
-    block.innerHTML =
-      `<h3 id="k${k}-${hm}">over <span class="sym">${orb}</span> · ` +
+    const head = document.createElement("h3");
+    head.id = `k${k}-${hm}`;
+    head.innerHTML =
+      `over <span class="sym">${orb}</span> · ` +
       `<a href="crystals-2d.html#${hm}">${hm}</a>` +
       `<span style="color:var(--muted); font-weight:normal;"> — ` +
-      `${list.length} colouring${list.length > 1 ? "s" : ""}</span></h3>`;
-    const grid = document.createElement("div");
-    grid.className = "cardgrid";
-    for (const g of list) {
-      const card = document.createElement("div");
-      card.className = "gcard";
-      card.id = g.id;
-      card.dataset.gid = g.id;
-      const cv = document.createElement("canvas");
-      cv.dataset.gid = g.id;
-      card.appendChild(cv);
-      const meta = document.createElement("div");
-      meta.className = "meta";
-      meta.innerHTML =
-        `<div>${labelHtml(g)} <span class="tags">${tagsHtml(g)}</span></div>` +
-        `<div style="font-size:0.88rem;">${pairHtml(g)}</div>` +
-        `<div style="font-size:0.85rem; color:var(--muted);">${linksHtml(g)}</div>`;
-      card.appendChild(meta);
-      grid.appendChild(card);
-      io.observe(cv);
-    }
-    block.appendChild(grid);
-    host.appendChild(block);
+      `${list.length} colouring${list.length > 1 ? "s" : ""}</span>`;
+    block.appendChild(head);
+    host.appendChild(block);          // attach before measuring the canvas
+    buildPlateTabs(block, list);
   }
 }
 applyFilters();
+
+/* a colouring linked to directly (#gid) opens its own tab */
+function openHash() {
+  const id = location.hash.slice(1);
+  if (!id) return;
+  const pane = document.getElementById(id);
+  if (!pane || !pane.dataset.gid) return;
+  const section = pane.closest("[data-block]");
+  const i = section._panes.findIndex(x => x.g.id === id);
+  if (i >= 0) { section._activate(i); section.scrollIntoView({ block: "start" }); }
+}
+window.addEventListener("hashchange", openHash);
+openHash();

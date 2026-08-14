@@ -81,8 +81,14 @@ const R_LETTER = normalise([
   [[-0.46, -0.70], [0.14, -0.70], [0.34, -0.60], [0.42, -0.40], [0.42, -0.22],
    [0.34, -0.04], [0.18, 0.04], [0.48, 0.70], [0.14, 0.70], [-0.10, 0.10],
    [-0.16, 0.10], [-0.16, 0.70], [-0.46, 0.70]],
-  [[-0.16, -0.44], [0.08, -0.44], [0.16, -0.38], [0.16, -0.28],
-   [0.08, -0.22], [-0.16, -0.22]],
+  /* The counter, wound the OTHER WAY round from the outline. Even-odd filling
+   * would cut it either way, but not every caller passes even-odd — the
+   * coloured plates fill bodyPath with the default nonzero rule — and under
+   * nonzero two sub-paths with the same winding simply add, so the bowl
+   * filled in solid. Opposite winding cuts the hole under both rules, which
+   * makes the shape correct rather than the callers careful. */
+  [[-0.16, -0.22], [0.08, -0.22], [0.16, -0.28], [0.16, -0.38],
+   [0.08, -0.44], [-0.16, -0.44]],
 ]);
 
 /* the comma the site shipped before, kept so it can be switched back to */
