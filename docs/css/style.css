@@ -743,3 +743,7 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
 .dfacts dt { color: var(--muted); }
 .dfacts dd { margin: 0; }
 .dfacts .mono { background: none; padding: 0; font-size: 0.95em; }
+
+#colourings h3 { margin: 1.6rem 0 0.2rem; font-size: 1.05rem;
+                 font-family: system-ui, -apple-system, sans-serif; }
+#colourings h3:first-child { margin-top: 0.4rem; }

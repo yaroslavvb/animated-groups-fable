@@ -8,8 +8,8 @@
  * this page behaves exactly like one anywhere else on the site.
  */
 "use strict";
-import { buildTabs } from "./tabs.js?v=45";
-import { leadHtml, signatureOf } from "./catalog-names.js?v=45";
+import { buildTabs } from "./tabs.js?v=46";
+import { leadHtml, signatureOf } from "./catalog-names.js?v=46";
 
 const H = await (await fetch("data/hierarchy.json", { cache: "no-cache" })).json();
 const CATALOG = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();

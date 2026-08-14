@@ -21,7 +21,7 @@
  * matches its clockwork twin's plates), paper background in both themes.
  */
 "use strict";
-import { bodyPath } from "./renderer.js?v=45";
+import { bodyPath } from "./renderer.js?v=46";
 
 export const OKABE = ["#0072B2", "#E69F00", "#009E73",
                       "#CC79A7", "#56B4E9", "#D55E00"];

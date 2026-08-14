@@ -17,7 +17,7 @@
  * cannot drift from the mathematics: 16 subgroups in 10 conjugacy classes.
  */
 "use strict";
-import { bodyPath } from "./motif.js?v=45";
+import { bodyPath } from "./motif.js?v=46";
 
 const N = 6;
 const ELS = [];
