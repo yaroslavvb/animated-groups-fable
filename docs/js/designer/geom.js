@@ -47,7 +47,7 @@
  * wallpaper again.
  */
 "use strict";
-import { LIMITS } from "./urlstate.js?v=44";
+import { LIMITS } from "./urlstate.js?v=45";
 
 const TWO_PI = Math.PI * 2;
 const DEG = Math.PI / 180;

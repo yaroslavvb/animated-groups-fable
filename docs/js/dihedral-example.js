@@ -17,7 +17,7 @@
  * cannot drift from the mathematics: 16 subgroups in 10 conjugacy classes.
  */
 "use strict";
-import { bodyPath } from "./motif.js?v=44";
+import { bodyPath } from "./motif.js?v=45";
 
 const N = 6;
 const ELS = [];
@@ -176,10 +176,31 @@ export function drawColouring(canvas, H) {
 }
 
 /* ------------------------------------------------------------------ page */
-const grid = document.getElementById("colourings");
-if (grid) {
-  for (const c of CLASSES.slice().sort((a, b) => a.colours - b.colours ||
-                                                 b.H.length - a.H.length)) {
+const WORDS = { 1: "One", 2: "Two", 3: "Three", 4: "Four", 6: "Six",
+                12: "Twelve" };
+
+const host = document.getElementById("colourings");
+if (host) {
+  // grouped by palette size, the way catalogue D is: how many colours is the
+  // first thing a reader sorts by, and it is the index of the subgroup
+  const byColours = new Map();
+  for (const c of CLASSES) {
+    if (!byColours.has(c.colours)) byColours.set(c.colours, []);
+    byColours.get(c.colours).push(c);
+  }
+  for (const n of [...byColours.keys()].sort((a, b) => a - b)) {
+    const list = byColours.get(n).sort((a, b) => b.H.length - a.H.length);
+    const h = document.createElement("h3");
+    h.id = "n" + n;
+    h.innerHTML = `${WORDS[n] || n} colour${n > 1 ? "s" : ""}` +
+      `<span style="color:var(--muted);font-weight:normal;"> — ` +
+      `${list.length} colouring${list.length > 1 ? "s" : ""}, ` +
+      `H of index ${n}</span>`;
+    host.append(h);
+    const grid = document.createElement("div");
+    grid.className = "dgrid";
+    host.append(grid);
+    for (const c of list) {
     const card = document.createElement("section");
     card.className = "dcard";
     const cv = document.createElement("canvas");
@@ -201,8 +222,9 @@ if (grid) {
         : `, order ${c.colourOrder} on ${c.colours} colours`) + `</dd></dl>`;
     card.append(cv, meta);
     grid.append(card);                       // attach before measuring
-    const n = drawColouring(cv, c.H);
-    if (n !== c.colours) console.error("coset count disagrees", c, n);
+    const got = drawColouring(cv, c.H);
+    if (got !== c.colours) console.error("coset count disagrees", c, got);
+    }
   }
 }
 

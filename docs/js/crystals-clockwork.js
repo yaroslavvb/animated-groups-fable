@@ -3,7 +3,7 @@
  * crosslinks into catalogues A (parent and kernel), B (space-group lift),
  * D (the colouring) and the companion-site atlas. */
 "use strict";
-import { paintColored } from "./colored.js?v=44";
+import { paintColored } from "./colored.js?v=45";
 
 const ORDER17 = [
   ["p1", "◦"], ["p2", "2222"], ["pm", "**"], ["pg", "××"], ["cm", "*×"],
