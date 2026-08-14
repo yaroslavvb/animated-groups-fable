@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coloured 2D Crystals — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>Catalogue D — the coloured 2D crystals</h1>
+<p class="subtitle">The <span data-count="total">269</span> ways of colouring a
+wallpaper pattern in at most six colours so that every symmetry respects the
+colouring — classified, rendered, and tied to the clockwork crystals.</p>
+
+<div class="toc">
+  <a class="chip" href="index.html#crystals">Crystals overview</a>
+  <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+  <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+  <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+  <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+</div>
+
+<h2 id="definition">1. The definition</h2>
+
+<p>Every catalogue in this suite instantiates one recipe — fix an ambient
+group of allowed symmetries and an equivalence relation, then count the
+discrete subgroups whose translations form a full-rank lattice. Xu&ndash;Wu's
+Eq.&nbsp;(4) writes the spacetime instance of the recipe: operations</p>
+
+<p style="text-align:center;">Γ(<b>r</b>,&thinsp;t) = (R<b>r</b>&thinsp;+&thinsp;<b>u</b>,&nbsp;st&thinsp;+&thinsp;τ),</p>
+
+<p>a spatial isometry paired with an action on an <em>internal</em>
+coordinate — there, the clock. A coloured crystal replaces the clock by the
+simplest internal state imaginable: a label from a finite set of k colours,
+acted on by permutations. The ambient group becomes
+E(2)&thinsp;×&thinsp;S<sub>k</sub>, with elements</p>
+
+<p style="text-align:center;">(<b>x</b>,&thinsp;c) ⟼ (R<b>x</b>&thinsp;+&thinsp;<b>u</b>,&nbsp;σ(c)),
+&emsp; R&thinsp;∈&thinsp;O(2), &nbsp;σ&thinsp;∈&thinsp;S<sub>k</sub>,</p>
+
+<p>and a <em>coloured 2D crystal</em> is a discrete subgroup
+G&thinsp;≤&thinsp;E(2)&thinsp;×&thinsp;S<sub>k</sub> such that (i) the
+projection to E(2) is injective — each isometry appears with exactly one
+colour permutation — and its image Γ is a wallpaper group, and (ii) the
+action on the k colours is transitive — otherwise fewer colours would do.
+Two coloured crystals are the same when conjugate by an affine map of the
+plane combined with a relabelling of the colours. This is precisely the
+classical notion of a <em>k-colour group</em>: van der Waerden and Burckhardt
+(1961) first phrased colour symmetry this way, and the enumerations of
+Jarratt&ndash;Schwarzenberger (1980) and Wieting (1982) count exactly these
+objects.</p>
+
+<div class="thm">
+<span class="label">Equivalent formulation (the pair picture)</span>
+<p style="margin:0.3rem 0;">A coloured crystal is a pair
+Γ&thinsp;&gt;&thinsp;H: a wallpaper group Γ together with a subgroup H of
+index k — the stabiliser of one colour. The colours are the k cosets of H;
+the symmetry g sends the colour&nbsp;gʹH to the colour&nbsp;g·gʹH. Two pairs
+are equivalent when a single affine transformation carries one group onto the
+other <em>and</em> one subgroup onto the other. Every subgroup of finite
+index in a wallpaper group is itself a wallpaper group, so H has one of the
+17 types — the catalogue names each entry
+"Γ&thinsp;/&thinsp;H" accordingly.</p>
+</div>
+
+<p>In the language of Chapter 8 of Grünbaum and Shephard's <i>Tilings and
+Patterns</i>: colour the copies of a motif with χ, call a pair
+(s,&thinsp;θ) of a symmetry and a colour permutation a <em>colour
+symmetry</em> when θ(χ(M<sub>i</sub>)) = χ(s(M<sub>i</sub>)) for every copy
+M<sub>i</sub>, and call the colouring <em>perfect</em> when every symmetry of
+the uncoloured pattern is associated with some colour symmetry. For a
+primitive pattern (trivial motif stabiliser — the comma motifs drawn here),
+transitive colourings are automatically perfect, and the colour symmetry
+group C(𝒫̂) is exactly a coloured crystal in the sense above: the compatible
+permutation θ is determined by s, so C(𝒫̂) is the graph of a homomorphism
+Γ&thinsp;→&thinsp;S<sub>k</sub> with transitive image, H its point
+stabiliser. G&amp;S's classification of colour symmetry groups "up to affine
+transformation and permutation of colours" (their §8.2) is the same
+equivalence again.</p>
+
+<h2 id="counts">2. The census</h2>
+
+<p>The counts below — Wieting's, reproduced as Table 8.2.1 of Grünbaum &amp;
+Shephard and as Jarratt&ndash;Schwarzenberger's Table 5, and confirmed to
+k&nbsp;≤&nbsp;60 by OEIS <a href="https://oeis.org/A307293">A307293</a> —
+were recomputed from scratch for this catalogue
+(<span class="mono">enumerate/enumerate_colored.py</span>: subgroups of index
+k&nbsp;≤&nbsp;6 of each of the 17 groups in exact rational arithmetic, then
+orbits under the affine normaliser; all 85 cells agree). One colour is no
+colouring, so the row k&nbsp;=&nbsp;1 is <a href="crystals-2d.html">catalogue
+A</a> itself.</p>
+
+<div class="tablewrap"><table class="counts">
+<tr><th class="txt">k</th><th>p1</th><th>p2</th><th>pm</th><th>pg</th><th>cm</th><th>pmm</th><th>pmg</th><th>pgg</th><th>cmm</th><th>p4</th><th>p4m</th><th>p4g</th><th>p3</th><th>p3m1</th><th>p31m</th><th>p6</th><th>p6m</th><th>Σ</th></tr>
+<tr><td class="txt">2</td><td>1</td><td>2</td><td>5</td><td>2</td><td>3</td><td>5</td><td>5</td><td>2</td><td>5</td><td>2</td><td>5</td><td>3</td><td>—</td><td>1</td><td>1</td><td>1</td><td>3</td><td><b>46</b></td></tr>
+<tr><td class="txt">3</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>1</td><td>1</td><td>—</td><td>—</td><td>—</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td><td><b>23</b></td></tr>
+<tr><td class="txt">4</td><td>2</td><td>3</td><td>10</td><td>4</td><td>7</td><td>13</td><td>11</td><td>4</td><td>11</td><td>5</td><td>13</td><td>7</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td><b>96</b></td></tr>
+<tr><td class="txt">5</td><td>1</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>1</td><td>1</td><td>1</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td><b>14</b></td></tr>
+<tr><td class="txt">6</td><td>1</td><td>2</td><td>11</td><td>5</td><td>7</td><td>9</td><td>11</td><td>4</td><td>8</td><td>2</td><td>2</td><td>2</td><td>1</td><td>4</td><td>5</td><td>5</td><td>11</td><td><b>90</b></td></tr>
+<tr class="total"><td class="txt">2–6</td><td>6</td><td>9</td><td>30</td><td>15</td><td>21</td><td>29</td><td>31</td><td>12</td><td>26</td><td>10</td><td>20</td><td>12</td><td>4</td><td>8</td><td>9</td><td>9</td><td>18</td><td><b>269</b></td></tr>
+</table></div>
+
+<p>Why stop at six? Six colours already exhaust every order a
+crystallographic clock can have (1,&thinsp;2,&thinsp;3,&thinsp;4,&thinsp;6 —
+see §4) together with the first order a clock <em>cannot</em> have
+(five), and six is where Grünbaum &amp; Shephard's chapter and the classical
+Russian-school tables stop drawing. Nothing else is special about it: the
+counts continue 15, 166, 40, 75, 13, 219,&thinsp;… for
+k&nbsp;=&nbsp;7,&thinsp;…,&thinsp;12, and the enumeration script runs to any
+k. The frieze analogue for completeness: 17, 7, 19, 7, 17 strip colour
+groups for k&nbsp;=&nbsp;2,&thinsp;…,&thinsp;6 (G&amp;S Table 8.2.1; the
+pattern 7/17/19 depends only on k mod 4).</p>
+
+<h2 id="orbifold">3. The orbifold view</h2>
+
+<p>Conway's orbifold notation is the right bookkeeping here, for one
+structural reason: a subgroup H of index k in Γ is the same thing as a
+degree-k <em>orbifold covering</em> of Γ's orbifold by H's orbifold. Every
+wallpaper orbifold has orbifold Euler characteristic zero — that is
+<em>why</em> finite-index subgroups of wallpaper groups are again wallpaper
+groups — so the covering constraint χ(O<sub>H</sub>) = k·χ(O<sub>Γ</sub>)
+is vacuous, and which coverings exist is a genuinely combinatorial
+question, the one this catalogue answers. An entry such as
+<span class="sym">*632&thinsp;/&thinsp;333</span> (k&nbsp;=&nbsp;6) says: the
+orbifold <span class="sym">333</span> covers <span class="sym">*632</span>
+six-fold; equivalently, colour the p6m pattern in six colours so that the
+colour-preserving symmetries form a p3.</p>
+
+<p>Around any feature of Γ's orbifold, the colouring behaves in one of a few
+readable ways: a rotation centre of order n permutes the k colours in cycles
+whose common length divides n; a mirror either preserves each colour on its
+line or transposes colours across it; and <i>The Symmetries of Things</i>
+decorates the orbifold symbol with superscripts recording exactly these
+local permutation orders — the same superscripts this site already uses for
+clockwork groups, where the "permutation" is the advance of a clock. The
+catalogue tags every entry with its global colour-permutation action too:
+the image of Γ in S<sub>k</sub>, which for k&nbsp;≤&nbsp;6 ranges over
+C<sub>k</sub>, dihedral groups, S<sub>3</sub>, A<sub>4</sub>, S<sub>4</sub>,
+the Frobenius group F<sub>20</sub>, S<sub>3</sub>≀C<sub>2</sub> and a few
+others — see the filter bar.</p>
+
+<h2 id="patterns">4. Colour groups are not coloured patterns</h2>
+
+<p>A colour group is an abstract object — a group of (isometry, permutation)
+pairs. A coloured pattern is a picture. The passage from picture to group
+forgets information, and Grünbaum &amp; Shephard's Figure 8.3.2 is the
+canonical witness:</p>
+
+<figure style="margin:1rem 0; text-align:center;">
+<img src="img/gs/fig-8-3-2.png" alt="Two 2-chromatic colourings of a pattern of type PP15 with the same colour symmetry group pmm[2]4 but different 2-colour pattern types" style="max-width:100%; border:1px solid var(--rule); border-radius:8px;">
+<figcaption style="font-size:0.88rem; color:var(--muted); margin-top:0.4rem;">
+Two 2-chromatic colourings of a pattern of type PP15 (Grünbaum &amp;
+Shephard, <i>Tilings and Patterns</i>, Figure 8.3.2, p.&thinsp;423;
+reproduced for scholarly commentary). Both have colour symmetry group
+pmm[2]₄ and the same induced group, yet they are different colourings: the
+left pattern admits <em>one</em> motif-transitive colour subgroup of type
+pmg[2]₁, the right admits <em>two</em>.</figcaption>
+</figure>
+
+<p>Both colourings of that figure have the same colour symmetry group
+(pmm[2]₄ in G&amp;S's symbols, the pair
+<span class="sym">*2222&thinsp;/&thinsp;22*</span> here) and even the same
+induced group on a motif; they are distinguished only by the <em>set of
+motif-transitive subgroups</em> of the colour symmetry group. G&amp;S
+therefore refine colour groups to <em>colour pattern types</em>, and that
+finer classification is a different, larger catalogue: 88 periodic 2-colour
+pattern types against our 46 two-colour groups, 59 against our 23 for three
+colours — and for k&nbsp;≥&nbsp;4 <em>the number of colour pattern types is
+unknown</em>. The refinement gets its own page:
+<a href="crystals-patterns.html">catalogue E</a>. The present catalogue is
+the coarser, group-level classification — exactly the level at which the
+crystallographic definition of §1 speaks.</p>
+
+<h2 id="clockwork">5. Colourings with a clock: the correspondence with catalogue C</h2>
+
+<p>Read Eq.&nbsp;(4) next to the definition of §1 once more. A
+<a href="crystals-clockwork.html">clockwork crystal</a> is a wallpaper group
+in which every symmetry advances a clock by a fixed fraction of the period:
+the internal state is a phase in ℤ/k, and each symmetry adds a constant to
+it. That is precisely a coloured crystal whose colour permutations are
+<em>cyclic shifts</em>: colour&nbsp;=&nbsp;phase, one colour per k-th of the
+period. Formally, the clockwork groups over Γ with clock order k correspond
+to homomorphisms Γ&thinsp;→&thinsp;ℤ/k — colourings in which H is normal
+with cyclic quotient. The catalogue tags these entries
+<span class="tag kind-cyclic" style="display:inline-block;">cyclic</span>;
+of the 269, <span data-count="cyclic">84</span> are cyclic
+(46&thinsp;+&thinsp;8&thinsp;+&thinsp;13&thinsp;+&thinsp;4&thinsp;+&thinsp;13
+for k&nbsp;=&nbsp;2,&thinsp;…,&thinsp;6).</p>
+
+<p>But the two equivalence relations differ, and the difference is a
+theorem-sized subtlety. Spacetime equivalence allows Galilean boosts and
+re-basings of the spacetime lattice; colour equivalence allows neither — a
+colour is not a coordinate that can be sheared into space. The effect runs
+in one direction only: distinct cyclic colourings can lift to <em>the same</em>
+spacetime group. A colouring in which the colour advances along a
+<em>translation</em> (say, p1 coloured in k stripes) lifts to a spacetime
+lattice that a boost straightens back into wallpaper&thinsp;×&thinsp;clock:
+as a spacetime crystal it is trivial — "drift is never new symmetry" — and
+the colouring leaves no clockwork trace. Concretely: of the 80 cyclic
+colourings with k&nbsp;∈&nbsp;{2,&thinsp;3,&thinsp;4,&thinsp;6}, exactly 47
+are realised by the <span data-count="fwdnontrivial">51</span> nontrivial
+clockwork groups (four pairs of enantiomorphic clocks, such as
+<span class="sym">3₁3₁3₁</span>&thinsp;/&thinsp;<span class="sym">3₂3₂3₂</span>,
+share a colouring — running the clock backwards recolours nothing), and the
+remaining 33 are <em>boostable</em>: their colour rides on a translation.
+The four cyclic 5-colourings have no clockwork twin for a different reason —
+no crystallographic clock has order five. Every entry below links to its
+clockwork realisations, or says which of the two obstructions applies.</p>
+
+<div class="aside">
+<span class="label">Belov's fifteen and Lockwood–Macmillan's eleven, reconciled</span>
+<p style="margin:0.3rem 0;">The Russian school reached this correspondence
+from the other side. Belov and Tarkhova (1956) drew coloured mosaics by
+stacking copies of a plane pattern at k equal heights and projecting —
+colour as a code for height, height as our clock phase — and found
+<em>fifteen</em> multicolour (k&nbsp;≥&nbsp;3) mosaics. Grünbaum &amp;
+Shephard note that four pairs among the fifteen differ by "mere reversal of
+the colour sequence", and Lockwood &amp; Macmillan (1978) insist "in fact
+there are only eleven polychromatic types that allow rotations". The
+computation adjudicates all of this at once: the multicolour clockwork
+groups of <a href="crystals-clockwork.html">catalogue C</a> number exactly
+15, they carry exactly 11 distinct colour groups, and the four coincidences
+are exactly the four enantiomorphic clock pairs
+(<span class="sym">3₁3₁3₁</span>/<span class="sym">3₂3₂3₂</span>,
+<span class="sym">6₁3₂2₀</span>-type pairs, …) — a clock and its reversal
+stack the same colours in opposite order. Belov counted mosaics-with-sequence
+(clockwork groups); Lockwood &amp; Macmillan counted colourings (our
+entries); both were right. What limits the stacking construction as a census
+of colour groups is the cyclic-only definition: for k&nbsp;=&nbsp;3 already,
+15 of the 23 colour groups have symmetric rather than cyclic action
+(S<sub>3</sub>: some mirror transposes two colours) and cannot be drawn by
+stacking at all.</p>
+</div>
+
+<h2 id="chirality">6. Chirality, and the analogue of 230 versus 219</h2>
+
+<p>Catalogues A and B use <em>proper</em> affine equivalence: in 3D this is
+what splits the 11 enantiomorphic pairs (P4₁22&thinsp;≠&thinsp;P4₃22) and
+raises 219 classes to the familiar 230. The classical colour-group census
+counts with reflections allowed. Re-running our enumeration with only
+orientation-preserving equivalences finds that exactly <em>one</em> of the
+269 is chiral: the five-colouring of p4
+(<a href="#c5-p4-1"><span class="sym">442&thinsp;/&thinsp;442</span>,
+k&nbsp;=&nbsp;5</a>), whose colour-period lattice is the ideal
+(2&thinsp;+&thinsp;i) of the Gaussian integers; its mirror image is the
+(2&thinsp;−&thinsp;i)-colouring, and no proper affine map carries one to the
+other. Under proper equivalence the catalogue would have 270 entries. (A
+colouring of a group that contains any reflection or glide is automatically
+achiral: the group's own improper elements mirror the pattern onto itself,
+recoloured.) The count of five: p4 is the one wallpaper group with an
+index-5 subgroup census driven by ℤ[i], where 5 splits; five colours are
+impossible over the hexagonal groups since 5 is inert in ℤ[ω].</p>
+
+<h2 id="history">7. Notes on the literature</h2>
+
+<p>Two-colour ("counterchange") symmetry was enumerated first by the textile
+physicist H.&thinsp;J. Woods (1936): all 46 two-colour wallpaper types,
+drawn as patterns, two decades before crystallography caught up — see Crowe
+(1986) for the history. The Shubnikov school reached the same 46 through
+antisymmetry (Shubnikov 1951; Belov, Neronova &amp; Smirnova 1957), read
+black/white as a two-sided plane, and counted 80&nbsp;=&nbsp;46&thinsp;+&thinsp;2·17
+periodic groups of the two-sided plane (Weber, Heesch, Alexander &amp;
+Herrmann, 1929–30) — on this site the two-sided plane reappears with
+"colour swap" read as "play the film backwards", the magnetic operations of
+the <a href="catalog.html">main catalog</a>. The modern pair definition is
+van der Waerden &amp; Burckhardt (1961); Senechal (1979) settled the prime
+orders (for p&nbsp;&gt;&nbsp;3 there are 16, 15, 14, 13 colour groups as
+p&nbsp;≡&nbsp;1, 7, 5, 11 mod 12 — check the table: 14 at k&nbsp;=&nbsp;5);
+Jarratt &amp; Schwarzenberger (1980) published the first full table to
+k&nbsp;=&nbsp;15 (with three later-corrected slips at k&nbsp;=&nbsp;8, 12,
+14, none below 7); Wieting (1982) enumerated to k&nbsp;=&nbsp;60 twice over
+by independent methods, and his numbers are the accepted census. Grünbaum
+&amp; Shephard's Chapter 8 (1987) reprints the table, draws every 2- and
+3-colour group (Figures 8.2.2–8.2.3 — <a href="crystals-patterns.html">catalogue
+E</a> indexes those plates), and then argues, with Figure 8.3.2 as star
+witness, that groups undercount pictures. Schwarzenberger's survey
+<i>Colour symmetry</i> (1984) reconciles all of the above.</p>
+
+<h2 id="catalogue">8. The catalogue</h2>
+
+<p>Grouped by number of colours, then by wallpaper group in the site's
+standard order. Each plate is a static rendering: one comma motif per group
+element, coloured by coset — the same construction as the
+<a href="wallpaper.html">wallpaper atlas</a>, with colour standing where the
+clock stood. Labels: for k&nbsp;=&nbsp;2, 3 each entry carries its Grünbaum&ndash;Shephard
+symbol (pm[2]₃,&thinsp;…) and, for two colours, the Shubnikov-style primed
+symbol; for k&nbsp;≥&nbsp;4 no published symbol scheme exists and entries
+carry this catalogue's systematic ids (<span class="mono">c4-pm-7</span> =
+7th four-colouring over pm). Every entry names its pair
+<span class="sym">orb(Γ)&thinsp;/&thinsp;orb(H)</span>, its colour-fixing
+kernel, its permutation action, and links: the base and subgroup in
+<a href="crystals-2d.html">catalogue A</a>, clockwork realisations in
+<a href="crystals-clockwork.html">catalogue C</a>, pattern-type refinements
+in <a href="crystals-patterns.html">catalogue E</a>. Colours are the site's
+phase palette and mean nothing individually — a relabelling is the same
+crystal.</p>
+
+<div class="filters" id="filters"></div>
+<div class="toc" id="toc"></div>
+<div id="catalogue"></div>
+
+<h2 id="refs">References</h2>
+<p style="font-size:0.92rem;">
+B. Grünbaum, G.&thinsp;C. Shephard, <i>Tilings and Patterns</i>, Freeman, 1987 — Chapter 8, Colored patterns and tilings; Table 8.2.1, Figures 8.2.2, 8.2.3, 8.3.2.<br>
+T.&thinsp;W. Wieting, <i>The Mathematical Theory of Chromatic Plane Ornaments</i>, Marcel Dekker, 1982.<br>
+J.&thinsp;D. Jarratt, R.&thinsp;L.&thinsp;E. Schwarzenberger, <i>Coloured plane groups</i>, Acta Cryst. A<b>36</b> (1980) 884–888.<br>
+R.&thinsp;L.&thinsp;E. Schwarzenberger, <i>Colour symmetry</i>, Bull. London Math. Soc. <b>16</b> (1984) 209–240.<br>
+M. Senechal, <i>Color groups</i>, Discrete Appl. Math. <b>1</b> (1979) 51–73.<br>
+B.&thinsp;L. van der Waerden, J.&thinsp;J. Burckhardt, <i>Farbgruppen</i>, Z. Kristallogr. <b>115</b> (1961) 231–234.<br>
+H.&thinsp;J. Woods, <i>The geometrical basis of pattern design IV: counterchange symmetry in plane patterns</i>, J. Textile Inst. <b>27</b> (1936) T305–T320.<br>
+D.&thinsp;W. Crowe, <i>The mosaic patterns of H.&thinsp;J. Woods</i>, Comput. Math. Applic. <b>12B</b> (1986) 407–411.<br>
+N.&thinsp;V. Belov, T.&thinsp;N. Tarkhova, <i>Colour symmetry groups</i>, Kristallografiya <b>1</b> (1956) 4–13.<br>
+S. Xu, C. Wu, <i>Space-Time Crystal and Space-Time Group</i>, PRL <b>120</b>, 096401 (2018). <a href="https://arxiv.org/abs/1703.03388">arXiv:1703.03388</a><br>
+OEIS <a href="https://oeis.org/A307293">A307293</a>, number of colour plane groups of index n.
+</p>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/crystals-colored.js?v=40"></script>
+</body>
+</html>
