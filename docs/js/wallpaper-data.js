@@ -4,8 +4,8 @@
  * spacetime groups at full size) import this. Examples are resolved by SYMBOL
  * against catalog.json so they cannot silently drift. */
 "use strict";
-import { signatureOf } from "./catalog-names.js?v=40";
-import { colouringKind, KIND } from "./colouring.js?v=40";
+import { signatureOf } from "./catalog-names.js?v=41";
+import { colouringKind, KIND } from "./colouring.js?v=41";
 
 /* Crystallographic order; orb = Conway orbifold of the wallpaper group.
  * note: one-line description of the wallpaper itself.
