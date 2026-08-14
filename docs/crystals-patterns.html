@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour Pattern Types — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=40">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Wallpaper</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+
+<h1>Catalogue E — the colour pattern types</h1>
+<p class="subtitle">Grünbaum &amp; Shephard's picture-level refinement of the
+colour groups: the 88 periodic two-colour and 59 periodic three-colour
+pattern types, indexed plate by plate — and the edge of knowledge: for
+k&nbsp;≥&nbsp;4 the number of k-colour pattern types is an open problem.</p>
+
+<div class="toc">
+  <a class="chip" href="index.html#crystals">Crystals overview</a>
+  <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+  <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+  <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+  <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+</div>
+
+<h2 id="definition">1. The definition</h2>
+
+<p>The <a href="crystals-colored.html">coloured crystals of
+catalogue&nbsp;D</a> classify colourings by an abstract invariant — the
+colour symmetry group C(𝒫̂), the group of pairs (s,&thinsp;θ) of a symmetry
+of the underlying pattern and a compatible permutation of the colours.
+Section&nbsp;8.3 of Grünbaum and Shephard's <i>Tilings and Patterns</i>
+classifies the coloured pictures themselves. Their definition, shortened but
+faithful: two k-chromatic patterns 𝒫̂₁ and 𝒫̂₂ are of the same
+<em>k-colour pattern type</em> if — possibly after an appropriate renaming
+(permutation) of the colours in one of the patterns — they have the same
+colour symmetry groups, the same stabilisers of their coloured motifs (the
+<em>induced</em> colour groups), and the same set of
+coloured-motif-transitive subgroups of their colour symmetry groups.
+Equivalently, in the compatible-bijection form that runs through their
+Chapter&nbsp;7: 𝒫̂₁ and 𝒫̂₂ are of the same type if, after renaming
+colours, there is a one-to-one colour-preserving mapping Ψ from the coloured
+copies of the motif of 𝒫̂₁ onto those of 𝒫̂₂ such that Ψ is compatible
+with the underlying group S<sub>C</sub>(𝒫̂₁) and Ψ<sup>−1</sup> is
+compatible with S<sub>C</sub>(𝒫̂₂).</p>
+
+<p>This is strictly finer than the group-level classification of
+catalogue&nbsp;D, and none of the three clauses is redundant. The colour
+group cannot see how it sits on the picture; adding the induced group does
+not help either; Grünbaum &amp; Shephard's Figure&nbsp;8.3.2 is the
+canonical witness that the two together are still not enough:</p>
+
+<figure style="margin:1rem 0; text-align:center;">
+<img src="img/gs/fig-8-3-2.png?v=40" alt="Two 2-chromatic colourings of a pattern of type PP15 with the same colour symmetry group pmm[2]4 and the same induced group but different 2-colour pattern types" style="max-width:100%; border:1px solid var(--rule); border-radius:8px;">
+<figcaption style="font-size:0.88rem; color:var(--muted); margin-top:0.4rem;">
+Two 2-chromatic colourings of a pattern of type PP15 (Grünbaum &amp;
+Shephard, <i>Tilings and Patterns</i>, Figure 8.3.2, p.&thinsp;423;
+reproduced for scholarly commentary). Both have colour symmetry group
+pmm[2]₄ and the same induced group — d1, with no colour change — yet they
+are of different 2-colour pattern types: the colouring in (a) admits exactly
+<em>one</em> motif-transitive subgroup of type pmg[2]₁, the colouring in (b)
+admits <em>two</em>.</figcaption>
+</figure>
+
+<p>Where do the types beyond the colour groups come from? From underlying
+patterns that are <em>non-primitive</em> — those whose motif has a
+non-trivial stabiliser. Over a primitive pattern the induced group is
+trivial and the colour group determines the type, so the plates of
+Figures&nbsp;8.2.2 and&nbsp;8.2.3 — one perfectly coloured primitive
+pattern per colour group — both define the 46&nbsp;+&nbsp;23 colour groups
+of catalogue&nbsp;D and exhaust the primitive pattern types. Every further
+type lives over a non-primitive pattern, where the induced colour group is
+non-trivial and one colour group can organise several inequivalent
+pictures: the underlying pattern PP15 of the figure above alone carries five
+2-colour pattern types (PP15[2]₁, PP15[2]₁*, PP15[2]₂, PP15[2]₃, PP15[2]₄)
+over only four colour groups. Grünbaum &amp; Shephard enumerate the
+non-primitive types by a merging procedure — move the coloured copies of
+the motif, keeping the colour symmetry group, until same-coloured copies
+merge — and record the result as two displayed statements:</p>
+
+<div class="thm">
+<span class="label">Statements 8.3.1 and 8.3.2</span>
+<p style="margin:0.3rem 0;"><b>8.3.1</b>&emsp;There exist 28 strip and 88
+periodic 2-colour pattern types.<br>
+<b>8.3.2</b>&emsp;There exist 15 strip and 59 periodic 3-colour pattern
+types.</p>
+<p style="margin:0.3rem 0;">Split by underlying pattern:
+88&nbsp;=&nbsp;46&nbsp;primitive&nbsp;+&nbsp;42&nbsp;non-primitive and
+59&nbsp;=&nbsp;23&nbsp;+&nbsp;36; for the strip types,
+28&nbsp;=&nbsp;17&nbsp;+&nbsp;11 and 15&nbsp;=&nbsp;7&nbsp;+&nbsp;8. This
+catalogue lists the periodic types; the strip counts are quoted for
+completeness.</p>
+</div>
+
+<div class="aside">
+<span class="label">Open problems</span>
+<p style="margin:0.3rem 0;">The census stops at three colours. Immediately
+after the two statements above, Grünbaum &amp; Shephard write: "It seems
+that the number of k-color pattern types with k&nbsp;≥&nbsp;4 is unknown" —
+and it still is. And their §8.4 defines a finer invariant again, the
+<em>equicolor type</em> (the bijection Ψ required to be compatible with
+every symmetry of the underlying pattern, not only with those in the
+underlying group); that enumeration, which they describe as completely
+straightforward, has never been carried out even for k&nbsp;=&nbsp;2.</p>
+</div>
+
+<h2 id="k2">2. Two colours — 88 periodic types</h2>
+
+<p>Rows follow the printed reading order of the plates; each row carries a
+stable anchor, and the entries of <a href="crystals-colored.html">catalogue
+D</a> deep-link into them. The pattern-type symbol is Grünbaum &amp;
+Shephard's: the underlying pattern type (PPn in the numbering of their
+Chapter&nbsp;5), the number of colours in brackets, and where needed a
+subscript matching the subscript of the colour group. The colour-group
+column links to the corresponding coloured crystal of catalogue&nbsp;D; the
+plate column gives figure and book page.</p>
+
+<h3 id="k2-primitive">Primitive types — the colour groups drawn</h3>
+
+<p>One type per colour group: the Figure&nbsp;8.2.2 panel that draws the
+group is the type's canonical picture.</p>
+
+<div class="tablewrap"><table class="counts">
+<tr><th class="txt">Pattern type</th><th class="txt">Colour group</th><th class="txt">Plate</th></tr>
+<tr id="pp1-2"><td class="txt"><span class="sym">PP1[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p1-1">p1[2]</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;408</td></tr>
+<tr id="pp2-2-1"><td class="txt"><span class="sym">PP2[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pg-1">pg[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;408</td></tr>
+<tr id="pp2-2-2"><td class="txt"><span class="sym">PP2[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pg-2">pg[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;408</td></tr>
+<tr id="pp3-2-1"><td class="txt"><span class="sym">PP3[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-4">pm[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp3-2-2"><td class="txt"><span class="sym">PP3[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-5">pm[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp3-2-3"><td class="txt"><span class="sym">PP3[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-3">pm[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp3-2-4"><td class="txt"><span class="sym">PP3[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-1">pm[2]₄</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp3-2-5"><td class="txt"><span class="sym">PP3[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-2">pm[2]₅</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp5-2-1"><td class="txt"><span class="sym">PP5[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-cm-1">cm[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp5-2-2"><td class="txt"><span class="sym">PP5[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-cm-3">cm[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp5-2-3"><td class="txt"><span class="sym">PP5[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-cm-2">cm[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp7-2-1"><td class="txt"><span class="sym">PP7[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p2-1">p2[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;409</td></tr>
+<tr id="pp7-2-2"><td class="txt"><span class="sym">PP7[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p2-2">p2[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp9-2-1"><td class="txt"><span class="sym">PP9[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pgg-2">pgg[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp9-2-2"><td class="txt"><span class="sym">PP9[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pgg-1">pgg[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp11-2-1"><td class="txt"><span class="sym">PP11[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-4">pmg[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp11-2-2"><td class="txt"><span class="sym">PP11[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-3">pmg[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp11-2-3"><td class="txt"><span class="sym">PP11[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-5">pmg[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp11-2-4"><td class="txt"><span class="sym">PP11[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-2">pmg[2]₄</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp11-2-5"><td class="txt"><span class="sym">PP11[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-1">pmg[2]₅</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp14-2-1"><td class="txt"><span class="sym">PP14[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-3">pmm[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;410</td></tr>
+<tr id="pp14-2-2"><td class="txt"><span class="sym">PP14[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-2">pmm[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp14-2-3"><td class="txt"><span class="sym">PP14[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-5">pmm[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp14-2-4"><td class="txt"><span class="sym">PP14[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-4">pmm[2]₄</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp14-2-5"><td class="txt"><span class="sym">PP14[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-1">pmm[2]₅</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp17-2-1"><td class="txt"><span class="sym">PP17[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-5">cmm[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp17-2-2"><td class="txt"><span class="sym">PP17[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-2">cmm[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp17-2-3"><td class="txt"><span class="sym">PP17[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-4">cmm[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp17-2-4"><td class="txt"><span class="sym">PP17[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-1">cmm[2]₄</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp17-2-5"><td class="txt"><span class="sym">PP17[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-3">cmm[2]₅</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;411</td></tr>
+<tr id="pp23-2"><td class="txt"><span class="sym">PP23[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p31m-1">p31m[2]</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp27-2"><td class="txt"><span class="sym">PP27[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p3m1-1">p3m1[2]</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp30-2-1"><td class="txt"><span class="sym">PP30[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4-2">p4[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp30-2-2"><td class="txt"><span class="sym">PP30[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4-1">p4[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp33-2-1"><td class="txt"><span class="sym">PP33[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-3">p4g[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp33-2-2"><td class="txt"><span class="sym">PP33[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-2">p4g[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp33-2-3"><td class="txt"><span class="sym">PP33[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-1">p4g[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp37-2-1"><td class="txt"><span class="sym">PP37[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-5">p4m[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp37-2-2"><td class="txt"><span class="sym">PP37[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-3">p4m[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;412</td></tr>
+<tr id="pp37-2-3"><td class="txt"><span class="sym">PP37[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-2">p4m[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp37-2-4"><td class="txt"><span class="sym">PP37[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-1">p4m[2]₄</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp37-2-5"><td class="txt"><span class="sym">PP37[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-4">p4m[2]₅</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp42-2"><td class="txt"><span class="sym">PP42[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p6-1">p6[2]</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp46-2-1"><td class="txt"><span class="sym">PP46[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-2">p6m[2]₁</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp46-2-2"><td class="txt"><span class="sym">PP46[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-1">p6m[2]₂</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+<tr id="pp46-2-3"><td class="txt"><span class="sym">PP46[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-3">p6m[2]₃</a></td><td class="txt">Fig.&thinsp;8.2.2, p.&thinsp;413</td></tr>
+</table></div>
+
+<h3 id="k2-nonprimitive">Non-primitive types</h3>
+
+<p>The 42 types of Figure&nbsp;8.3.5. The star on PP15[2]₁* is Grünbaum
+&amp; Shephard's mark for a second, inequivalent type over the same
+underlying pattern with the same colour group as PP15[2]₁ — the two differ
+in how the induced group sits over the motifs, exactly the phenomenon of
+their Figure&nbsp;8.3.1(c).</p>
+
+<div class="tablewrap"><table class="counts">
+<tr><th class="txt">Pattern type</th><th class="txt">Colour group</th><th class="txt">Underlying pattern</th><th class="txt">Plate</th></tr>
+<tr id="pp4-2-2"><td class="txt"><span class="sym">PP4[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-5">pm[2]₂</a></td><td class="txt">PP4</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp4-2-3"><td class="txt"><span class="sym">PP4[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-3">pm[2]₃</a></td><td class="txt">PP4</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp4-2-5"><td class="txt"><span class="sym">PP4[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-pm-2">pm[2]₅</a></td><td class="txt">PP4</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp6-2-3"><td class="txt"><span class="sym">PP6[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-cm-2">cm[2]₃</a></td><td class="txt">PP6</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp8-2-2"><td class="txt"><span class="sym">PP8[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p2-2">p2[2]₂</a></td><td class="txt">PP8</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp10-2-2"><td class="txt"><span class="sym">PP10[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pgg-1">pgg[2]₂</a></td><td class="txt">PP10</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;426</td></tr>
+<tr id="pp12-2-1"><td class="txt"><span class="sym">PP12[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-4">pmg[2]₁</a></td><td class="txt">PP12</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp12-2-3"><td class="txt"><span class="sym">PP12[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-5">pmg[2]₃</a></td><td class="txt">PP12</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp12-2-5"><td class="txt"><span class="sym">PP12[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-1">pmg[2]₅</a></td><td class="txt">PP12</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp13-2-1"><td class="txt"><span class="sym">PP13[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-4">pmg[2]₁</a></td><td class="txt">PP13</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp13-2-4"><td class="txt"><span class="sym">PP13[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-pmg-2">pmg[2]₄</a></td><td class="txt">PP13</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp15-2-1"><td class="txt"><span class="sym">PP15[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-3">pmm[2]₁</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp15-2-1s"><td class="txt"><span class="sym">PP15[2]₁*</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-3">pmm[2]₁</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp15-2-2"><td class="txt"><span class="sym">PP15[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-2">pmm[2]₂</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp15-2-3"><td class="txt"><span class="sym">PP15[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-5">pmm[2]₃</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;427</td></tr>
+<tr id="pp15-2-4"><td class="txt"><span class="sym">PP15[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-4">pmm[2]₄</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp16-2-1"><td class="txt"><span class="sym">PP16[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-3">pmm[2]₁</a></td><td class="txt">PP16</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp16-2-3"><td class="txt"><span class="sym">PP16[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-pmm-5">pmm[2]₃</a></td><td class="txt">PP16</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp18-2-3"><td class="txt"><span class="sym">PP18[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-4">cmm[2]₃</a></td><td class="txt">PP18</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp18-2-4"><td class="txt"><span class="sym">PP18[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-1">cmm[2]₄</a></td><td class="txt">PP18</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp19-2-2"><td class="txt"><span class="sym">PP19[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-2">cmm[2]₂</a></td><td class="txt">PP19</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp19-2-3"><td class="txt"><span class="sym">PP19[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-4">cmm[2]₃</a></td><td class="txt">PP19</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp19-2-5"><td class="txt"><span class="sym">PP19[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-3">cmm[2]₅</a></td><td class="txt">PP19</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp20-2-5"><td class="txt"><span class="sym">PP20[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-cmm-3">cmm[2]₅</a></td><td class="txt">PP20</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;428</td></tr>
+<tr id="pp24-2"><td class="txt"><span class="sym">PP24[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p31m-1">p31m[2]</a></td><td class="txt">PP24</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp31-2-2"><td class="txt"><span class="sym">PP31[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4-1">p4[2]₂</a></td><td class="txt">PP31</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp32-2-1"><td class="txt"><span class="sym">PP32[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4-2">p4[2]₁</a></td><td class="txt">PP32</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp34-2-1"><td class="txt"><span class="sym">PP34[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-3">p4g[2]₁</a></td><td class="txt">PP34</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp35-2-2"><td class="txt"><span class="sym">PP35[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-2">p4g[2]₂</a></td><td class="txt">PP35</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp36-2-2"><td class="txt"><span class="sym">PP36[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p4g-2">p4g[2]₂</a></td><td class="txt">PP36</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp38-2-1"><td class="txt"><span class="sym">PP38[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-5">p4m[2]₁</a></td><td class="txt">PP38</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp38-2-4"><td class="txt"><span class="sym">PP38[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-1">p4m[2]₄</a></td><td class="txt">PP38</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp38-2-5"><td class="txt"><span class="sym">PP38[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-4">p4m[2]₅</a></td><td class="txt">PP38</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;429</td></tr>
+<tr id="pp39-2-3"><td class="txt"><span class="sym">PP39[2]₃</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-2">p4m[2]₃</a></td><td class="txt">PP39</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp39-2-5"><td class="txt"><span class="sym">PP39[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-4">p4m[2]₅</a></td><td class="txt">PP39</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp40-2-4"><td class="txt"><span class="sym">PP40[2]₄</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-1">p4m[2]₄</a></td><td class="txt">PP40</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp41-2-5"><td class="txt"><span class="sym">PP41[2]₅</span></td><td class="txt"><a href="crystals-colored.html#c2-p4m-4">p4m[2]₅</a></td><td class="txt">PP41</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp44-2"><td class="txt"><span class="sym">PP44[2]</span></td><td class="txt"><a href="crystals-colored.html#c2-p6-1">p6[2]</a></td><td class="txt">PP44</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp47-2-1"><td class="txt"><span class="sym">PP47[2]₁</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-2">p6m[2]₁</a></td><td class="txt">PP47</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp48a-2-2"><td class="txt"><span class="sym">PP48A[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-1">p6m[2]₂</a></td><td class="txt">PP48A</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp48b-2-2"><td class="txt"><span class="sym">PP48B[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-1">p6m[2]₂</a></td><td class="txt">PP48B</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+<tr id="pp50-2-2"><td class="txt"><span class="sym">PP50[2]₂</span></td><td class="txt"><a href="crystals-colored.html#c2-p6m-1">p6m[2]₂</a></td><td class="txt">PP50</td><td class="txt">Fig.&thinsp;8.3.5, p.&thinsp;430</td></tr>
+</table></div>
+
+<h2 id="k3">3. Three colours — 59 periodic types</h2>
+
+<p>The three-colour plates — first published, the book notes, in Grünbaum
+&amp; Shephard [1983b] — occupy Figure&nbsp;8.2.3 (the 23 primitive types)
+and Figure&nbsp;8.3.6 (the 36 non-primitive ones). Two printing slips are
+corrected silently below: Table&nbsp;8.2.3 prints the symbol of p2[3] as
+"p2[2]", and the Figure&nbsp;8.2.3 panel of PP23[3]₂ is labelled p31m[3]₃
+for p31m[3]₂.</p>
+
+<h3 id="k3-primitive">Primitive types — the colour groups drawn</h3>
+
+<div class="tablewrap"><table class="counts">
+<tr><th class="txt">Pattern type</th><th class="txt">Colour group</th><th class="txt">Plate</th></tr>
+<tr id="pp1-3"><td class="txt"><span class="sym">PP1[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-p1-1">p1[3]</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp2-3-1"><td class="txt"><span class="sym">PP2[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pg-2">pg[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp2-3-2"><td class="txt"><span class="sym">PP2[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pg-1">pg[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp3-3-1"><td class="txt"><span class="sym">PP3[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pm-1">pm[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp3-3-2"><td class="txt"><span class="sym">PP3[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pm-2">pm[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp5-3-1"><td class="txt"><span class="sym">PP5[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-cm-2">cm[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;414</td></tr>
+<tr id="pp5-3-2"><td class="txt"><span class="sym">PP5[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-cm-1">cm[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp7-3"><td class="txt"><span class="sym">PP7[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-p2-1">p2[3]</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp9-3"><td class="txt"><span class="sym">PP9[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-pgg-1">pgg[3]</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp11-3-1"><td class="txt"><span class="sym">PP11[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-2">pmg[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp11-3-2"><td class="txt"><span class="sym">PP11[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-1">pmg[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp14-3"><td class="txt"><span class="sym">PP14[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-pmm-1">pmm[3]</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp17-3"><td class="txt"><span class="sym">PP17[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-cmm-1">cmm[3]</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp21-3-1"><td class="txt"><span class="sym">PP21[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p3-1">p3[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp21-3-2"><td class="txt"><span class="sym">PP21[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p3-2">p3[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;415</td></tr>
+<tr id="pp23-3-1"><td class="txt"><span class="sym">PP23[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p31m-1">p31m[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp23-3-2"><td class="txt"><span class="sym">PP23[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p31m-2">p31m[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp27-3-1"><td class="txt"><span class="sym">PP27[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p3m1-1">p3m1[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp27-3-2"><td class="txt"><span class="sym">PP27[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p3m1-2">p3m1[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp42-3-1"><td class="txt"><span class="sym">PP42[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6-1">p6[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp42-3-2"><td class="txt"><span class="sym">PP42[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6-2">p6[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp46-3-1"><td class="txt"><span class="sym">PP46[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-1">p6m[3]₁</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+<tr id="pp46-3-2"><td class="txt"><span class="sym">PP46[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">Fig.&thinsp;8.2.3, p.&thinsp;416</td></tr>
+</table></div>
+
+<h3 id="k3-nonprimitive">Non-primitive types</h3>
+
+<p>The 36 types of Figure&nbsp;8.3.6, including the two starred types
+PP15[3]* and PP19[3]* — second inequivalent colourings of PP15 and PP19
+with the colour groups pmm[3] and cmm[3] already used by PP15[3] and
+PP19[3]. Without them the count would be 34, not the 36 of the figure's
+caption.</p>
+
+<div class="tablewrap"><table class="counts">
+<tr><th class="txt">Pattern type</th><th class="txt">Colour group</th><th class="txt">Underlying pattern</th><th class="txt">Plate</th></tr>
+<tr id="pp4-3-1"><td class="txt"><span class="sym">PP4[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pm-1">pm[3]₁</a></td><td class="txt">PP4</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp4-3-2"><td class="txt"><span class="sym">PP4[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pm-2">pm[3]₂</a></td><td class="txt">PP4</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp6-3-1"><td class="txt"><span class="sym">PP6[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-cm-2">cm[3]₁</a></td><td class="txt">PP6</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp6-3-2"><td class="txt"><span class="sym">PP6[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-cm-1">cm[3]₂</a></td><td class="txt">PP6</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp8-3"><td class="txt"><span class="sym">PP8[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-p2-1">p2[3]</a></td><td class="txt">PP8</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp10-3"><td class="txt"><span class="sym">PP10[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-pgg-1">pgg[3]</a></td><td class="txt">PP10</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;431</td></tr>
+<tr id="pp12-3-1"><td class="txt"><span class="sym">PP12[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-2">pmg[3]₁</a></td><td class="txt">PP12</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp12-3-2"><td class="txt"><span class="sym">PP12[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-1">pmg[3]₂</a></td><td class="txt">PP12</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp13-3-1"><td class="txt"><span class="sym">PP13[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-2">pmg[3]₁</a></td><td class="txt">PP13</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp13-3-2"><td class="txt"><span class="sym">PP13[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-pmg-1">pmg[3]₂</a></td><td class="txt">PP13</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp15-3"><td class="txt"><span class="sym">PP15[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-pmm-1">pmm[3]</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp18-3"><td class="txt"><span class="sym">PP18[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-cmm-1">cmm[3]</a></td><td class="txt">PP18</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp16-3"><td class="txt"><span class="sym">PP16[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-pmm-1">pmm[3]</a></td><td class="txt">PP16</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp15-3-s"><td class="txt"><span class="sym">PP15[3]*</span></td><td class="txt"><a href="crystals-colored.html#c3-pmm-1">pmm[3]</a></td><td class="txt">PP15</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp19-3"><td class="txt"><span class="sym">PP19[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-cmm-1">cmm[3]</a></td><td class="txt">PP19</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;432</td></tr>
+<tr id="pp19-3-s"><td class="txt"><span class="sym">PP19[3]*</span></td><td class="txt"><a href="crystals-colored.html#c3-cmm-1">cmm[3]</a></td><td class="txt">PP19</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp20-3"><td class="txt"><span class="sym">PP20[3]</span></td><td class="txt"><a href="crystals-colored.html#c3-cmm-1">cmm[3]</a></td><td class="txt">PP20</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp22-3-2"><td class="txt"><span class="sym">PP22[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p3-2">p3[3]₂</a></td><td class="txt">PP22</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp25-3-1"><td class="txt"><span class="sym">PP25[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p31m-1">p31m[3]₁</a></td><td class="txt">PP25</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp25-3-2"><td class="txt"><span class="sym">PP25[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p31m-2">p31m[3]₂</a></td><td class="txt">PP25</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp26-3-2"><td class="txt"><span class="sym">PP26[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p31m-2">p31m[3]₂</a></td><td class="txt">PP26</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp28-3-1"><td class="txt"><span class="sym">PP28[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p3m1-1">p3m1[3]₁</a></td><td class="txt">PP28</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp28-3-2"><td class="txt"><span class="sym">PP28[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p3m1-2">p3m1[3]₂</a></td><td class="txt">PP28</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp29-3-2"><td class="txt"><span class="sym">PP29[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p3m1-2">p3m1[3]₂</a></td><td class="txt">PP29</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;433</td></tr>
+<tr id="pp43-3-1"><td class="txt"><span class="sym">PP43[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6-1">p6[3]₁</a></td><td class="txt">PP43</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp43-3-2"><td class="txt"><span class="sym">PP43[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6-2">p6[3]₂</a></td><td class="txt">PP43</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp45-3-2"><td class="txt"><span class="sym">PP45[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6-2">p6[3]₂</a></td><td class="txt">PP45</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp47-3-1"><td class="txt"><span class="sym">PP47[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-1">p6m[3]₁</a></td><td class="txt">PP47</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp47-3-2"><td class="txt"><span class="sym">PP47[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">PP47</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp48a-3-1"><td class="txt"><span class="sym">PP48A[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-1">p6m[3]₁</a></td><td class="txt">PP48A</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp48a-3-2"><td class="txt"><span class="sym">PP48A[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">PP48A</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp48b-3-1"><td class="txt"><span class="sym">PP48B[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-1">p6m[3]₁</a></td><td class="txt">PP48B</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp48b-3-2"><td class="txt"><span class="sym">PP48B[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">PP48B</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;434</td></tr>
+<tr id="pp49-3-1"><td class="txt"><span class="sym">PP49[3]₁</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-1">p6m[3]₁</a></td><td class="txt">PP49</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;435</td></tr>
+<tr id="pp49-3-2"><td class="txt"><span class="sym">PP49[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">PP49</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;435</td></tr>
+<tr id="pp51-3-2"><td class="txt"><span class="sym">PP51[3]₂</span></td><td class="txt"><a href="crystals-colored.html#c3-p6m-2">p6m[3]₂</a></td><td class="txt">PP51</td><td class="txt">Fig.&thinsp;8.3.6, p.&thinsp;435</td></tr>
+</table></div>
+
+<h2 id="beyond">4. Beyond three colours</h2>
+
+<p>For k&nbsp;≥&nbsp;4 the primitive half of the classification continues
+without incident: primitive k-colour pattern types are exactly k-colour
+groups, and <a href="crystals-colored.html">catalogue&nbsp;D</a> counts and
+draws them — 96 four-colour, 14 five-colour and 90 six-colour groups. It is
+the non-primitive half that is missing. Nothing plays the role of
+Figures&nbsp;8.3.5 and&nbsp;8.3.6 for four colours, and the total number of
+k-colour pattern types is unknown for every k&nbsp;≥&nbsp;4. Whoever repeats
+Grünbaum &amp; Shephard's merging procedure over the 96 four-colour groups
+settles the first open case.</p>
+
+<h2 id="refs">References</h2>
+<p style="font-size:0.92rem;">
+B. Grünbaum, G.&thinsp;C. Shephard, <i>Tilings and Patterns</i>, Freeman, 1987 — Chapter 8, §8.3; Figures 8.2.2, 8.2.3, 8.3.5, 8.3.6; Statements 8.3.1–8.3.2.<br>
+B. Grünbaum, G.&thinsp;C. Shephard [1983b in the book's bibliography] — cited at Table 8.2.3 for the 3-colour symbols; the paper in which the 3-colour pattern types were first illustrated.<br>
+B. Grünbaum, G.&thinsp;C. Shephard, <i>Incidence symbols and their applications</i>, in <i>Relations Between Combinatorics and Other Parts of Mathematics</i>, Proc. Sympos. Pure Math. XXXIV, AMS, 1979, 199–244 — [1979a]; the incidence-symbol machinery behind the colour-adjacency symbols of §8.6.
+</p>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+</body>
+</html>
