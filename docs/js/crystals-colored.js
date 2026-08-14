@@ -6,7 +6,7 @@
  * crosslinks into catalogues A (bases and subgroups), C (clockwork
  * realisations) and E (pattern types). */
 "use strict";
-import { paintColoredCrystal } from "./colored-crystal.js?v=46";
+import { paintColoredCrystal } from "./colored-crystal.js?v=47";
 
 const ORDER17 = ["p1", "p2", "pm", "pg", "cm", "pmm", "pmg", "pgg", "cmm",
                  "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m"];

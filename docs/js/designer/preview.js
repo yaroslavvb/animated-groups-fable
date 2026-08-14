@@ -18,10 +18,10 @@
  * and opening a design tool IS the asking.
  */
 "use strict";
-import { Playback } from "../playback.js?v=46";
-import { filmTimeSymmetry } from "../phases.js?v=46";
-import { pathAt } from "./model.js?v=46";
-import { drawBall, GROUND } from "../ball.js?v=46";
+import { Playback } from "../playback.js?v=47";
+import { filmTimeSymmetry } from "../phases.js?v=47";
+import { pathAt } from "./model.js?v=47";
+import { drawBall, GROUND } from "../ball.js?v=47";
 
 const CELL = "#d9d5c8";
 const TWO_PI = Math.PI * 2;

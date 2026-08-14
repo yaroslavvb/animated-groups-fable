@@ -747,3 +747,15 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
 #colourings h3 { margin: 1.6rem 0 0.2rem; font-size: 1.05rem;
                  font-family: system-ui, -apple-system, sans-serif; }
 #colourings h3:first-child { margin-top: 0.4rem; }
+
+/* the two conventions, side by side */
+.dpair { display: grid; grid-template-columns: 1fr 1fr; }
+.dpair figure { margin: 0; position: relative; }
+.dpair figure + figure { border-left: 1px solid var(--rule); }
+.dpair canvas { width: 100%; aspect-ratio: 1; display: block; background: #faf9f6; }
+.dpair span {
+  position: absolute; left: 0.35rem; top: 0.25rem;
+  font: 0.72rem/1 "SF Mono", Menlo, monospace; color: var(--muted);
+  background: rgba(250,249,246,0.85); padding: 0.1rem 0.25rem; border-radius: 3px;
+}
+.dside { margin: 0.45rem 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--muted); }

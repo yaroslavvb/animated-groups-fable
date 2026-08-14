@@ -17,7 +17,7 @@
  * cannot drift from the mathematics: 16 subgroups in 10 conjugacy classes.
  */
 "use strict";
-import { bodyPath } from "./motif.js?v=46";
+import { bodyPath } from "./motif.js?v=47";
 
 const N = 6;
 const ELS = [];
@@ -75,6 +75,29 @@ const CLASSES = [];
   }
 }
 
+
+/* Do gH and Hg cut the group the same way, and if not, how much survives?
+ * A left multiplication by a sends the right coset Hg to aHg, which is again
+ * a right coset only when aH = Ha — so the symmetries that still permute the
+ * right-coset blocks are exactly the normaliser of H. */
+function sides(H) {
+  const part = side => new Set(ELS.map(g =>
+    H.map(hh => key(side === "L" ? mul(g, hh) : mul(hh, g))).sort().join("|")));
+  const L = [...part("L")].sort().join("//");
+  const R = [...part("R")].sort().join("//");
+  const rblocks = new Set(ELS.map(g => H.map(hh => key(mul(hh, g))).sort().join("|")));
+  const keeps = ELS.filter(a => {
+    const moved = new Set([...rblocks].map(b =>
+      b.split("|").map(t => t.split(",").map(Number))
+        .map(x => key(mul(a, x))).sort().join("|")));
+    return [...moved].every(x => rblocks.has(x));
+  });
+  return { agree: L === R, keeps: keeps.length,
+           norm: ELS.filter(a => H.every(h =>
+             H.some(x => key(x) === key(mul(mul(a, h), INV.get(key(a)))))))
+             .length };
+}
+
 /* names, from the structure rather than from a lookup table */
 function isoName(H) {
   const n = H.length;
@@ -111,7 +134,7 @@ const applyM = (M, p) => [M[0][0] * p[0] + M[0][1] * p[1],
  * vertex at 0 degrees and the edge midpoint at 30 degrees */
 const BASE = [0.60 * Math.cos(Math.PI / 12), 0.60 * Math.sin(Math.PI / 12)];
 
-export function drawColouring(canvas, H) {
+export function drawColouring(canvas, H, side = "L") {
   const dpr = window.devicePixelRatio || 1;
   const w = canvas.clientWidth || 240, h = canvas.clientHeight || 240;
   canvas.width = Math.round(w * dpr);
@@ -149,15 +172,19 @@ export function drawColouring(canvas, H) {
   ctx.stroke();
 
   // one motif per group element, coloured by its coset
+  // LEFT cosets gH, or RIGHT cosets Hg. Only the left ones are invariant
+  // under the action that put the copies where they are — see cosetSide().
+  const blockOf = g => H.map(hh => key(side === "L" ? mul(g, hh) : mul(hh, g)))
+    .sort().join("|");
   const cosets = [];
   const indexOf = new Map();
   for (const g of ELS) {
-    const c = H.map(hh => key(mul(g, hh))).sort().join("|");
+    const c = blockOf(g);
     if (!indexOf.has(c)) { indexOf.set(c, cosets.length); cosets.push(c); }
   }
   const R = S * 0.20;
   for (const g of ELS) {
-    const c = H.map(hh => key(mul(g, hh))).sort().join("|");
+    const c = blockOf(g);
     const M = matOf(g);
     const p = scr(applyM(M, BASE));
     ctx.save();
@@ -203,7 +230,15 @@ if (host) {
     for (const c of list) {
     const card = document.createElement("section");
     card.className = "dcard";
-    const cv = document.createElement("canvas");
+    const pair = document.createElement("div");
+    pair.className = "dpair";
+    const cvL = document.createElement("canvas");
+    const cvR = document.createElement("canvas");
+    const labL = document.createElement("span"), labR = document.createElement("span");
+    labL.textContent = "gH"; labR.textContent = "Hg";
+    const boxL = document.createElement("figure"), boxR = document.createElement("figure");
+    boxL.append(cvL, labL); boxR.append(cvR, labR);
+    pair.append(boxL, boxR);
     const meta = document.createElement("div");
     meta.className = "dmeta";
     const conj = c.nconj > 1
@@ -220,10 +255,21 @@ if (host) {
       (c.colourOrder === c.colours
         ? ` &mdash; regular`
         : `, order ${c.colourOrder} on ${c.colours} colours`) + `</dd></dl>`;
-    card.append(cv, meta);
+    const sd = sides(c.H);
+    meta.insertAdjacentHTML("beforeend",
+      `<p class="dside">${sd.agree
+        ? "gH = Hg elementwise, so the two pictures are the same colouring."
+        : `gH \u2260 Hg: the right-coset blocks are a different partition, and ` +
+          `only <b>${sd.keeps} of 12</b> symmetries permute them \u2014 the ` +
+          `normaliser of H. The right-hand picture is not a colouring of this ` +
+          `figure.`}</p>`);
+    card.append(pair, meta);
     grid.append(card);                       // attach before measuring
-    const got = drawColouring(cv, c.H);
+    const got = drawColouring(cvL, c.H, "L");
+    drawColouring(cvR, c.H, "R");
     if (got !== c.colours) console.error("coset count disagrees", c, got);
+    if (sd.agree !== c.normal) console.error("agree/normal mismatch", c, sd);
+    if (!sd.agree && sd.keeps !== sd.norm) console.error("keeps != normaliser", c, sd);
     }
   }
 }

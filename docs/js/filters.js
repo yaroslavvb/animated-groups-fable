@@ -8,7 +8,7 @@
  * whole catalog.
  */
 "use strict";
-import { colouringKind } from "./colouring.js?v=46";
+import { colouringKind } from "./colouring.js?v=47";
 
 /* select id -> query-string key. The values are the option values themselves
  * ("forward", "dihedral", …), so a URL reads as what it selects. */

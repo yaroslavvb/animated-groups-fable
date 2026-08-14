@@ -6,8 +6,8 @@
  * computed from data/catalog.json (spacetime and clockwork censuses) and
  * data/colored.json (colouring census, subgroup/kernel appearances). */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=46";
-import { attachStage } from "./stage.js?v=46";
+import { FilmGroupAnimation } from "./renderer.js?v=47";
+import { attachStage } from "./stage.js?v=47";
 
 const ORDER17 = ["p1", "p2", "pm", "pg", "cm", "pmm", "pmg", "pgg", "cmm",
                  "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m"];

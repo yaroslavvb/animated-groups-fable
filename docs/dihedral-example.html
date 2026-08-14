@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Hexagon — Spacetime Groups</title>
-<link rel="stylesheet" href="css/style.css?v=46">
+<link rel="stylesheet" href="css/style.css?v=47">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
 <body>
@@ -112,7 +112,49 @@ group has exactly as many elements as there are colours (the action is
 plate.</p>
 </div>
 
-<h2 id="all">4. Every colouring of the hexagon</h2>
+<h2 id="sides">4. Left cosets or right cosets?</h2>
+
+<p>Both are used in the literature, and the choice is not free once the picture
+is drawn. Copies were labelled by sending the base copy to
+<span class="mono">g·x₀</span>, so the symmetry acts on copies by <b>left</b>
+multiplication. Ask which partitions of <span class="mono">G</span> that action
+preserves: if the block containing <span class="mono">1</span> is
+<span class="mono">B</span>, then <span class="mono">aB</span> is a block for
+every <span class="mono">a</span>, which forces <span class="mono">B</span> to
+be a subgroup and the blocks to be its <b>left</b> cosets. So</p>
+
+<p style="text-align:center;">colours = orbits of <em>right</em> multiplication
+by <span class="mono">H</span>; &emsp; symmetry = <em>left</em> multiplication
+by <span class="mono">G</span>.</p>
+
+<p>The construction works precisely because those two actions commute. That is
+the whole content of "the colouring respects the symmetry", and it is what
+makes the stabiliser come out as <span class="mono">H</span> rather than
+something else.</p>
+
+<p>Take the other convention literally and colour the copy at
+<span class="mono">g</span> by the right coset <span class="mono">Hg</span>.
+For <span class="mono">H = {1, s}</span> the two partitions are</p>
+
+<p class="mono" style="font-size:0.86rem;">
+gH: &ensp;{1,s} {r,rs} {r²,r²s} {r³,r³s} {r⁴,r⁴s} {r⁵,r⁵s}<br>
+Hg: &ensp;{1,s} {r,r⁵s} {rs,r⁵} {r²,r⁴s} {r²s,r⁴} {r³,r³s}</p>
+
+<p>— genuinely different, and only four of the twelve symmetries permute the
+right-hand blocks at all. Those four are the <em>normaliser</em> of
+<span class="mono">H</span>, since <span class="mono">a·Hg = aHg</span> is
+again a right coset exactly when <span class="mono">aH = Ha</span>. So mixing
+the conventions does not give a worse colouring; it gives something that is not
+a colouring.</p>
+
+<p>None of this changes the count. The map
+<span class="mono">gH ↦ Hg⁻¹</span> is a bijection between the two coset
+spaces, subgroups and their conjugacy classes are left–right symmetric, and
+normality is too — so a catalogue built the other way round has the same 16
+subgroups, the same 10 classes and the same palette sizes. Every card below
+shows both, and they coincide exactly on the normal rows.</p>
+
+<h2 id="all">5. Every colouring of the hexagon</h2>
 
 <p>There are <b><span id="n-subs">…</span></b> subgroups in
 <b><span id="n-classes">…</span></b> conjugacy classes, so there are that many
@@ -127,7 +169,7 @@ index 12 — the free orbit, one colour per symmetry — at the bottom.</p>
 
 <div id="colourings"></div>
 
-<h2 id="read">5. What to read off them</h2>
+<h2 id="read">6. What to read off them</h2>
 
 <p><b>Two colourings can have the same number of colours and be structurally
 different.</b> Both six-colour entries above have six colours and twelve
@@ -168,6 +210,6 @@ picture on an infinite figure.</p>
   Spacetime groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script type="module" src="js/dihedral-example.js?v=46"></script>
+<script type="module" src="js/dihedral-example.js?v=47"></script>
 </body>
 </html>

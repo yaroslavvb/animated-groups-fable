@@ -4,10 +4,10 @@
  * the info box below each animation states its time behaviour — and a
  * link to the same list larger (wallpaper-group.html?g=<hm>). */
 "use strict";
-import { buildTabs } from "./tabs.js?v=46";
-import { leadHtml } from "./catalog-names.js?v=46";
+import { buildTabs } from "./tabs.js?v=47";
+import { leadHtml } from "./catalog-names.js?v=47";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=46";
+  from "./wallpaper-data.js?v=47";
 
 
 const data = await (await fetch("data/catalog.json", { cache: "no-cache" })).json();
