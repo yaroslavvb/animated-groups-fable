@@ -3,10 +3,10 @@
  * it is. The box below the animation gives the group's data and a
  * plain-English account of its time behaviour. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=41";
-import { leadHtml } from "./catalog-names.js?v=41";
+import { buildTabs } from "./tabs.js?v=42";
+import { leadHtml } from "./catalog-names.js?v=42";
 import { WALLPAPERS, sectionSort, censusSentence, timeStory }
-  from "./wallpaper-data.js?v=41";
+  from "./wallpaper-data.js?v=42";
 
 
 const hm = new URLSearchParams(location.search).get("g");

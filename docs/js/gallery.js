@@ -1,9 +1,9 @@
 /* Gallery: featured non-product spacetime groups, big demos + GIF downloads. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=41";
-import { attachControls } from "./controls.js?v=41";
-import { attachStage } from "./stage.js?v=41";
-import { leadHtml, signatureOf } from "./catalog-names.js?v=41";
+import { FilmGroupAnimation } from "./renderer.js?v=42";
+import { attachControls } from "./controls.js?v=42";
+import { attachStage } from "./stage.js?v=42";
+import { leadHtml, signatureOf } from "./catalog-names.js?v=42";
 
 const FEATURED = [
   {

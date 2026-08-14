@@ -21,14 +21,14 @@
  * always agree about which instant is on screen.
  */
 "use strict";
-import { xuLabel } from "../labels.js?v=41";
-import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=41";
-import { scan } from "./collide.js?v=41";
-import { encode, decode, LIMITS } from "./urlstate.js?v=41";
-import { loadGroups, Design, PALETTE, nearSkip, cart, latticeOf } from "./model.js?v=41";
-import { elements } from "./symmetry.js?v=41";
-import { generate } from "./random.js?v=41";
-import { Preview } from "./preview.js?v=41";
+import { xuLabel } from "../labels.js?v=42";
+import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=42";
+import { scan } from "./collide.js?v=42";
+import { encode, decode, LIMITS } from "./urlstate.js?v=42";
+import { loadGroups, Design, PALETTE, nearSkip, cart, latticeOf } from "./model.js?v=42";
+import { elements } from "./symmetry.js?v=42";
+import { generate } from "./random.js?v=42";
+import { Preview } from "./preview.js?v=42";
 
 /* The drawing surface is the site's printed-plate ground in both colour
  * schemes: the design is a picture of the same thing the billiards page shows,

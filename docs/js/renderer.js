@@ -13,10 +13,10 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=41";
-import { Playback } from "./playback.js?v=41";
-import { filmTimeSymmetry } from "./phases.js?v=41";
-import { drawMotif, MOTIF_COLORS } from "./motif.js?v=41";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=42";
+import { Playback } from "./playback.js?v=42";
+import { filmTimeSymmetry } from "./phases.js?v=42";
+import { drawMotif, MOTIF_COLORS } from "./motif.js?v=42";
 
 const TWO_PI = Math.PI * 2;
 
@@ -72,7 +72,7 @@ const MAX_COLUMNS = 18;
 /* THE MOTIF lives in motif.js — shape, phase channel and colours together, so
  * that swapping it is one line there rather than an edit in four files. These
  * re-exports keep every existing caller (strip.js, colored.js) working. */
-export { bodyPath, drawMotif, MOTIF_COLORS } from "./motif.js?v=41";
+export { bodyPath, drawMotif, MOTIF_COLORS } from "./motif.js?v=42";
 
 /* ----------------------------------------------------------- phase ring */
 /* The phase readout: a fixed ruler of N arcs, one per interval of the period,
