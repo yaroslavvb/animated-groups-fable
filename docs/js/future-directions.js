@@ -3,12 +3,12 @@
  * colour-count numbers computed from the catalog at load time, so the page
  * can never disagree with the data. */
 "use strict";
-import { FilmGroupAnimation } from "./renderer.js?v=42";
-import { attachControls } from "./controls.js?v=42";
-import { paintColored } from "./colored.js?v=42";
-import { attachStage } from "./stage.js?v=42";
-import { groupCaption } from "./wallpaper-data.js?v=42";
-import { leadHtml } from "./catalog-names.js?v=42";
+import { FilmGroupAnimation } from "./renderer.js?v=43";
+import { attachControls } from "./controls.js?v=43";
+import { paintColored } from "./colored.js?v=43";
+import { attachStage } from "./stage.js?v=43";
+import { groupCaption } from "./wallpaper-data.js?v=43";
+import { leadHtml } from "./catalog-names.js?v=43";
 
 const PAIRS = [
   { host: "pair-bw", sym: "o/g′", mode: "bw",

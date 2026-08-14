@@ -3,8 +3,8 @@
  * examples cannot drift out of sync with the enumeration — a symbol that
  * disappears from the catalog renders an explicit error, never a stale demo. */
 "use strict";
-import { buildTabs } from "./tabs.js?v=42";
-import { leadHtml } from "./catalog-names.js?v=42";
+import { buildTabs } from "./tabs.js?v=43";
+import { leadHtml } from "./catalog-names.js?v=43";
 
 /* One entry per notation rule; `note` explains what the named group
  * exemplifies. Keep notes to the point being illustrated — the section

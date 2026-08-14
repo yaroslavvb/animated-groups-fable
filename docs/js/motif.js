@@ -123,12 +123,35 @@ const SHRINK = 0.29;
  * continuous through t = 0, so the loop has no seam */
 const swell = ph => (ph < 0.5 ? ph * 2 : 2 - ph * 2);
 
+/* ------------------------------------------------------------ the colour */
+/* The letter also cycles blue to green and back. The point of the second
+ * channel is not decoration: SIZE ALONE IS A THERE-AND-BACK, the same at t and
+ * at 1 - t, so it cannot say which half of the period a copy is in. Running the
+ * colour a QUARTER PERIOD AHEAD of the size makes the two orthogonal — size
+ * says how far from the half period, colour says which side of it — and the
+ * pair is then injective on the whole loop. Set LEAD to 0 to have colour and
+ * size swell together instead, which is prettier and says less.
+ *
+ * The ramp is a raised cosine rather than a triangle: its derivative vanishes
+ * at the turning points, so the colour eases in and out instead of reversing
+ * with a visible kink, and it is smooth through t = 0 as well as continuous. */
+const BLUE_RGB = [59, 110, 165];      // the site's fill blue, #3b6ea5
+const GREEN_RGB = [47, 107, 70];      // the forward-run green, #2f6b46
+const LEAD = 0.25;
+const TWO_PI = Math.PI * 2;
+
+function cycleColour(ph) {
+  const u = (1 - Math.cos(TWO_PI * (ph + LEAD))) / 2;   // 0 = blue, 1 = green
+  const c = BLUE_RGB.map((b, i) => Math.round(b + (GREEN_RGB[i] - b) * u));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+
 /* ---------------------------------------------------------- the motifs */
 export const MOTIFS = {
-  /* The growing and shrinking R. Size is the most legible channel there is at
-   * thumbnail scale. It is not injective on its own — the letter is the same
-   * size at t and at 1 - t — so the phase RING (renderer.js) carries which
-   * half of the period a copy is in, and the two together determine it. */
+  /* The growing and shrinking R, cycling blue to green. Size is the most
+   * legible channel at thumbnail scale but is a there-and-back; the colour
+   * runs a quarter period ahead of it, so between them they fix the phase
+   * outright rather than only up to t <-> 1 - t. */
   "r-scale": {
     name: "R, growing and shrinking",
     shape: R_LETTER,
@@ -144,7 +167,7 @@ export const MOTIFS = {
       if (layer === "all" || layer === "fill") {
         const k = (1 - SHRINK) + SHRINK * swell(ph);
         trace(ctx, R_LETTER, r, k);
-        ctx.fillStyle = c.fill;
+        ctx.fillStyle = cycleColour(ph);
         ctx.fill("evenodd");
         ctx.lineWidth = Math.max(0.6, 0.05 * r);
         ctx.strokeStyle = c.outline;
