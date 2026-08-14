@@ -713,3 +713,33 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
   opacity: 1;
   color: var(--accent);
 }
+
+/* ------------------------------------------------------- dihedral example
+ * Twelve motifs on a hexagon, once per subgroup. Cards are uniform: the page
+ * is a comparison, so no colouring may look more important by being bigger. */
+.dfig { margin: 1.1rem 0; display: flex; justify-content: center; }
+.dfig canvas {
+  width: min(320px, 70vw); height: min(320px, 70vw);
+  background: #faf9f6; border: 1px solid var(--rule); border-radius: 8px;
+}
+.dgrid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem; margin: 1.3rem 0 2rem;
+}
+.dcard {
+  background: var(--panel); border: 1px solid var(--rule); border-radius: 8px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+.dcard canvas { width: 100%; aspect-ratio: 1; display: block; background: #faf9f6; }
+.dmeta { padding: 0.55rem 0.8rem 0.75rem; border-top: 1px solid var(--rule); }
+.dhead {
+  display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;
+  font: 0.9rem/1.4 system-ui, -apple-system, sans-serif; margin-bottom: 0.4rem;
+}
+.dfacts {
+  display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 0.6rem;
+  margin: 0; font: 0.76rem/1.45 system-ui, -apple-system, sans-serif;
+}
+.dfacts dt { color: var(--muted); }
+.dfacts dd { margin: 0; }
+.dfacts .mono { background: none; padding: 0; font-size: 0.95em; }

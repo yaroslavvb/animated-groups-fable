@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Hexagon — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=44">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="narrow">
+
+<h1>A worked example: the hexagon</h1>
+<p class="subtitle">Cosets, stabilisers and kernels on the smallest group where
+they all differ — every colouring of a <span class="sym">D<sub>6</sub></span>
+figure, drawn.</p>
+
+<p>The <a href="crystals-colored.html">coloured crystals</a> are built from one
+recipe: a colouring is not something you invent, it is something you choose a
+<em>subgroup</em> for. That recipe is easier to see on a finite group than on a
+wallpaper group, and the hexagon is the smallest case where every distinction
+the catalogue makes is already visible. Everything on this page is computed
+from the group rather than tabulated — the subgroup lattice, the cosets, the
+pictures.</p>
+
+<p><span class="sym">D<sub>6</sub></span> here means the hexagon's <b>twelve</b>
+symmetries — six rotations <span class="mono">1, r, r², r³, r⁴, r⁵</span> by
+multiples of 60°, and six reflections <span class="mono">s, rs, …, r⁵s</span>.
+(This is the crystallographer's <span class="sym">D<sub>6</sub></span>, the one
+behind the site's <span class="sym">632</span> and <span class="sym">*632</span>,
+not the algebraist's group of order 6.) The one relation you need is that
+reflecting reverses a turn, <span class="mono">s r s = r⁻¹</span>.</p>
+
+<h2 id="copies">1. Copies are labelled by group elements</h2>
+
+<p>Draw one asymmetric motif in one of the twelve slivers of the hexagon. The
+group produces eleven more, and — because the motif has no symmetry of its own
+— exactly one copy per group element. So a copy <em>is</em> a group element.
+Here each of the twelve has its own colour:</p>
+
+<div class="dfig"><canvas id="fig-orbit"></canvas></div>
+
+<p>Note that six copies read as left-handed and six as right-handed. That is
+the reflections doing their work, and it is why the motif has to be chiral: a
+symmetric blob would make the picture unreadable.</p>
+
+<h2 id="cosets">2. Cosets</h2>
+
+<p>Fix a subgroup <span class="mono">H ≤ G</span>. The <b>left coset</b> of an
+element <span class="mono">g</span> is</p>
+<p style="text-align:center;" class="mono">gH = { gh : h ∈ H }.</p>
+<p>Three facts do all the work. Every element lies in exactly one coset, so the
+cosets partition the group. Every coset has <span class="mono">|H|</span>
+elements, so there are <span class="mono">|G|/|H|</span> of them. And
+<span class="mono">gH = g′H</span> exactly when
+<span class="mono">g⁻¹g′ ∈ H</span>.</p>
+
+<p>Take <span class="mono">H = {1, s}</span>, a single reflection. Then
+<span class="mono">|H| = 2</span>, so there are six cosets:</p>
+<p style="text-align:center;" class="mono">{1, s} &emsp; {r, rs} &emsp; {r², r²s}
+&emsp; {r³, r³s} &emsp; {r⁴, r⁴s} &emsp; {r⁵, r⁵s}</p>
+
+<div class="dfig"><canvas id="fig-coset"></canvas></div>
+
+<p>Six cosets, six colours, and the two copies sharing a colour are the two
+halves of a hexagon vertex's neighbourhood — a left-handed one and its mirror
+image. That is not a coincidence: it is the whole idea.</p>
+
+<h2 id="recipe">3. The colouring</h2>
+
+<p>Paint the copy at <span class="mono">g</span> with the colour
+<span class="mono">gH</span>. It is well defined by the third fact above — two
+elements share a colour precisely when they differ by something in
+<span class="mono">H</span> — and it automatically respects the symmetry, since
+acting by <span class="mono">x</span> sends the colour
+<span class="mono">gH</span> to the colour <span class="mono">xgH</span>, the
+same way for every copy at once. That is the definition the catalogue uses,
+with <span class="mono">E(2) × S<sub>k</sub></span> in place of
+<span class="mono">D<sub>6</sub> × S<sub>k</sub></span>.</p>
+
+<div class="thm">
+<span class="label">stabiliser and kernel</span>
+<p style="margin:0.3rem 0;">The subgroup <span class="mono">H</span> is the
+<b>stabiliser</b> of one colour: the elements that leave that colour where it
+is. Other colours have <em>conjugate</em> stabilisers — the colour
+<span class="mono">gH</span> is stabilised by
+<span class="mono">gHg⁻¹</span>.<br>
+The <b>kernel</b> is what all of those have in common,
+<span class="mono">core(H) = ⋂<sub>g</sub> gHg⁻¹</span>: the elements that fix
+<em>every</em> colour at once. The colour group — the permutations of the
+palette the symmetry actually produces — is
+<span class="mono">G / core(H)</span>.<br>
+So <span class="mono">H</span> normal ⟺ stabiliser = kernel ⟺ the colour
+group has exactly as many elements as there are colours (the action is
+<em>regular</em>). Those are the two numbers the catalogue prints under every
+plate.</p>
+</div>
+
+<h2 id="all">4. Every colouring of the hexagon</h2>
+
+<p>There are <b><span id="n-subs">…</span></b> subgroups in
+<b><span id="n-classes">…</span></b> conjugacy classes, so there are that many
+colourings up to a turn of the hexagon. Conjugate subgroups give the same
+picture rotated, which is why the classes are what get counted — the same
+reason the coloured crystals are counted up to an affine map of the plane.</p>
+
+<div class="dgrid" id="colourings"></div>
+
+<h2 id="read">5. What to read off them</h2>
+
+<p><b>Two colourings can have the same number of colours and be structurally
+different.</b> Both six-colour entries above have six colours and twelve
+copies. But <span class="mono">H = {1, s}</span> is not normal: its kernel is
+trivial, the colour group is all of <span class="sym">D<sub>6</sub></span>, and
+twelve symmetries act on six colours — each colour keeping a two-element
+stabiliser. Whereas <span class="mono">H = {1, r³}</span> is normal: stabiliser
+and kernel coincide, the colour group is <span class="sym">S₃</span>, and six
+act on six. The first is <em>not</em> regular, the second is. That distinction
+is exactly why the pair notation <span class="sym">Γ/K</span> cannot be a
+complete name for a coloured crystal, and why the catalogue prints
+<span class="mono">H</span> as well as the kernel.</p>
+
+<p><b>Some colourings could be clocks and some could not.</b> A colour group
+that is cyclic can be read as "advance the phase by 1/N", which is what turns a
+colouring into an animation — and into a crystal one dimension up. Of the
+classes above only those with cyclic colour group qualify; the ones with colour
+group <span class="sym">S₃</span> or <span class="sym">D₆</span> cannot be run
+as a clock at all, because phases form a circle and the group of phase-advances
+is cyclic. That is the same obstruction that leaves 185 of the 269 coloured
+crystals with no film to their name.</p>
+
+<p><b>The three two-colourings are the magnetic case.</b> Colour-preserving
+against colour-swapping is Shubnikov's prime, spin up against spin down. On the
+hexagon there are three of them, one for each subgroup of index 2:
+<span class="mono">C₆</span> — rotations one colour, reflections the other,
+which with a chiral motif is left-handed against right-handed — and the two
+<span class="sym">S₃</span>s, which alternate around the hexagon in the two
+inequivalent ways.</p>
+
+<p>Now read <a href="crystals-colored.html">catalogue D</a> again: every entry
+there is this construction with <span class="sym">D<sub>6</sub></span> replaced
+by one of the 17 wallpaper groups, and the plate below each label is the same
+picture on an infinite figure.</p>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script type="module" src="js/dihedral-example.js?v=44"></script>
+</body>
+</html>
