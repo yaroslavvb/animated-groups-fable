@@ -50,11 +50,22 @@ const GROUP_IDS = [
   "g133", "g134", "g135", "g95", "g98", "g246",
 ];
 
-/* 2 — the group field widened from 4 bits to 6 when the thirty-six
- * clock-order-2 groups joined the menu. Indices 0-14 are unchanged, so every
- * v1 link still names the group it always named; decode reads those with the
- * old field width and everything after it lines up. */
-const VERSION = 2;
+/* 3 — the view field became the camera's DISTANCE when the box stopped being
+ *     drawn in parallel projection; there is no zoom under a perspective
+ *     camera, there is only how far away the eye is.
+ * 2 — the group field widened from 4 bits to 6 when the thirty-six
+ *     clock-order-2 groups joined the menu. Indices 0-14 are unchanged, so
+ *     every v1 link still names the group it always named; decode reads those
+ *     with the old field width and everything after it lines up.
+ *
+ * Both older versions still decode. What they carry is a zoom — pixels per
+ * world unit — and the same apparent size under perspective is dist = f/zoom,
+ * so an old link opens on the framing it always had. That conversion is NOT
+ * done here: f is (viewport height / 2) / tan(fov / 2), which this module has
+ * no business knowing and which a saved link cannot know either. decode()
+ * hands back `view.zoom` for those versions and `view.dist` for this one, and
+ * the page converts as soon as it has measured its canvas. */
+const VERSION = 3;
 const V1_B_GROUP = 4;
 const TAU = Math.PI * 2;
 
@@ -63,7 +74,10 @@ const TAU = Math.PI * 2;
  *   t     a period is 4096 steps, ~170x finer than a 24-frame scrub
  *   u     +-16 cells at 1/1024 — the editor never leaves the +-8 the spec asks
  *         for, and the extra ring costs one bit
- *   zoom  0.5 px per lattice unit, up to 4095.5
+ *   dist  1/128 of a world unit, up to 1024. A fitted view of one cell sits at
+ *         four or five, where a step is a fortieth of a percent of the framing;
+ *         a thousand units away the box is a dot, so the top is generous
+ *   zoom  0.5 px per lattice unit, up to 4095.5 — v1 and v2 only
  *   yaw   1/1024 of a turn is a third of a degree, below what a drag resolves
  */
 const B_VERSION = 4;
@@ -75,7 +89,8 @@ const B_R = 12;
 const B_RESERVED = 1;
 const B_SPAN = 1;
 const B_ANGLE = 10;
-const B_ZOOM = 13;
+const B_ZOOM = 13;   /* v1 and v2 only */
+const B_DIST = 17;
 const B_NSEEDS = 6;
 const B_SEED_COLOR = 3;
 const B_NPTS = 6;
@@ -86,6 +101,7 @@ const STEP_T = 1 / 4096;
 const STEP_U = 1 / 1024;
 const STEP_R = 1 / 4096;
 const STEP_ZOOM = 0.5;
+const STEP_DIST = 1 / 128;
 const STEP_ANGLE = TAU / 1024;
 
 const MAX_SEEDS = (1 << B_NSEEDS) - 1;
@@ -101,6 +117,8 @@ export const LIMITS = Object.freeze({
   r: { step: STEP_R, min: 0, max: 1 - STEP_R, bits: B_R },
   yaw: { step: STEP_ANGLE, min: 0, max: TAU - STEP_ANGLE, bits: B_ANGLE, wraps: true },
   pitch: { step: STEP_ANGLE, min: -Math.PI, max: Math.PI - STEP_ANGLE, bits: B_ANGLE, wraps: true },
+  dist: { step: STEP_DIST, min: 0, max: STEP_DIST * ((1 << B_DIST) - 1), bits: B_DIST },
+  /* legacy: what v1 and v2 links carry in place of dist */
   zoom: { step: STEP_ZOOM, min: 0, max: STEP_ZOOM * ((1 << B_ZOOM) - 1), bits: B_ZOOM },
   span: { values: [1, 2] },
   seedColor: { min: 0, max: PALETTE_SIZE - 1 },
@@ -240,7 +258,7 @@ export function encode(state) {
   w.put(s.span === 2 ? 1 : 0, B_SPAN);
   w.put(wrapInt(Math.round(num(view.yaw, 0) / STEP_ANGLE), 1 << B_ANGLE), B_ANGLE);
   w.put(wrapInt(Math.round(num(view.pitch, 0) / STEP_ANGLE), 1 << B_ANGLE), B_ANGLE);
-  w.put(clampInt(Math.round(num(view.zoom, 0) / STEP_ZOOM), 0, (1 << B_ZOOM) - 1), B_ZOOM);
+  w.put(clampInt(Math.round(num(view.dist, 0) / STEP_DIST), 0, (1 << B_DIST) - 1), B_DIST);
 
   /* A seed with no breakpoints is not a billiard, and decode() rejects one —
    * so drop it here rather than mint a hash this module cannot read back, which
@@ -295,7 +313,7 @@ export function decode(str) {
 
   const r = new BitReader(payload);
   const version = r.get(B_VERSION);
-  if (version !== VERSION && version !== 1) return null;
+  if (version !== VERSION && version !== 1 && version !== 2) return null;
 
   const gi = r.get(version === 1 ? V1_B_GROUP : B_GROUP);
   const rq = r.get(B_R);
@@ -303,12 +321,12 @@ export function decode(str) {
   const span = r.get(B_SPAN);
   const yaw = r.get(B_ANGLE);
   const pitch = r.get(B_ANGLE);
-  const zoom = r.get(B_ZOOM);
+  const view = r.get(version === VERSION ? B_DIST : B_ZOOM);
   const nSeeds = r.get(B_NSEEDS);
   // a failed read leaves the cursor put, so a NARROWER field after a wide one
   // can still succeed on a truncated payload — check them all, not just the last
   if (gi === null || rq === null || reserved === null || span === null ||
-      yaw === null || pitch === null || zoom === null || nSeeds === null) return null;
+      yaw === null || pitch === null || view === null || nSeeds === null) return null;
   if (gi >= GROUP_IDS.length) return null;
 
   const seeds = [];
@@ -337,10 +355,14 @@ export function decode(str) {
     g: GROUP_IDS[gi],
     r: rq * STEP_R,
     span: span ? 2 : 1,
+    /* dist on a current link, zoom on an old one, never both: a caller that
+     * finds `zoom` has to turn it into a distance with its own focal length,
+     * and one that finds neither has no view to restore. */
     view: {
       yaw: yaw * STEP_ANGLE,
       pitch: (pitch >= half ? pitch - (1 << B_ANGLE) : pitch) * STEP_ANGLE,
-      zoom: zoom * STEP_ZOOM,
+      ...(version === VERSION ? { dist: view * STEP_DIST }
+                              : { zoom: view * STEP_ZOOM }),
     },
     seeds,
   };

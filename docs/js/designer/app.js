@@ -92,16 +92,11 @@ if (unlisted.length) {
                 unlisted.map((g) => g.id).join(", "));
 }
 
-/* Never an empty box: two billiards on a 333 group, each with one interior
- * breakpoint, clearing the whole orbit by 1.81 diameters — so the page opens on
- * a legal design and the reader's first act can be to break it. */
-const DEFAULT = {
-  g: "g226", r: 0.06, span: 1,
-  seeds: [
-    { c: 0, pts: [{ t: 0, u: [0.35, 0.20] }, { t: 0.5, u: [0.60, 0.45] }] },
-    { c: 2, pts: [{ t: 0, u: [0.70, 0.75] }, { t: 0.5, u: [0.45, 0.85] }] },
-  ],
-};
+/* An empty box on a 333 group. The page used to open on two billiards already
+ * placed, which meant the reader's first act was to work out what somebody else
+ * had done rather than to put something down; a blank canvas is the tool
+ * offering itself. A group still has to be chosen for there to be a box at all. */
+const DEFAULT = { g: "g226", r: 0.06, span: 1, seeds: [] };
 
 const el = (id) => document.getElementById(id);
 const canvas = el("view");
@@ -124,16 +119,21 @@ if (location.hash.length > 1 && !restored) {
 const cam = new Camera({
   yaw: restored ? restored.view.yaw : 0.62,
   pitch: restored ? restored.view.pitch : 0.62,
-  zoom: restored && restored.view.zoom > 1 ? restored.view.zoom : 100,
+  dist: restored && restored.view.dist > 0 ? restored.view.dist : undefined,
   height: BOX_H,
 });
+/* A link written before the box had a perspective camera carries a ZOOM in
+ * pixels per world unit. The same apparent size is dist = f/zoom, and f is not
+ * known until the canvas has been measured, so the conversion waits for the
+ * first frame. */
+let pendingZoom = restored && restored.view.zoom > 1 ? restored.view.zoom : 0;
 /* Whether the camera is still the one the page chose. A fitted view belongs to
  * the canvas it was fitted to, so while the reader has not touched it a resize
- * re-fits rather than leaving an absolute pixel zoom against a different box —
- * the failure that puts a phone-width viewport inside a single tube. Once the
- * reader has orbited or zoomed, the view is theirs and the resize leaves it
+ * re-fits rather than leaving a framing chosen for a different box — the
+ * failure that puts a phone-width viewport inside a single tube. Once the
+ * reader has orbited or dollied, the view is theirs and the resize leaves it
  * alone; the Fit button is how it comes back. */
-let camTouched = !!(restored && restored.view.zoom > 1);
+let camTouched = !!(restored && (restored.view.dist > 0 || pendingZoom));
 let fitPending = !camTouched;
 
 let paint = 0;                 // the colour the next billiard is placed in
@@ -165,6 +165,9 @@ preview.onRunChange((p) => {
  * downstream of the design and none of them is worth updating twice. */
 function afterChange() {
   drawn = design.clones({ span: design.span });
+  // the group's cell and the display span are what the camera aims at and keeps
+  // clear of, so they are settled here rather than rediscovered every redraw
+  frameBox();
 
   const seeds = design.seedPaths();
   const diameter = 2 * design.radius;
@@ -226,23 +229,51 @@ function syncUndo() {
 
 /* ------------------------------------------------------------- the camera */
 
+/* What the camera turns about, and how close it may come. The target is the
+ * centre of the base cell half a period up — the middle of the box — so that an
+ * orbit turns around what the reader is looking at rather than around the world
+ * origin, which is a corner of it. The bound is the radius of a sphere holding
+ * the whole drawn block; geom keeps the eye outside it, and that is what lets it
+ * project without clipping. Both depend on the group and the span and on nothing
+ * the reader does with the mouse. */
+function frameBox() {
+  const B = design.group.basis;
+  const span = design.span;
+  const c = cart(B, [0.5, 0.5]);
+  cam.lookAt([c[0], c[1], 0.5]);
+  let rr = 0;
+  for (const u of [[-span, -span], [span + 1, -span],
+                   [span + 1, span + 1], [-span, span + 1]]) {
+    const p = cart(B, u);
+    rr = Math.max(rr, Math.hypot(p[0] - c[0], p[1] - c[1]));
+  }
+  cam.setBound(Math.hypot(rr, 0.5 * BOX_H));
+}
+
 /* Fit the BASE cell and a margin, not the whole display span: at two rings the
- * outer cells are context and the cell being designed in is the subject. */
+ * outer cells are context and the cell being designed in is the subject.
+ *
+ * Under perspective there is no closed form — apparent size goes as f/dist only
+ * for a point at the target's depth, and the box has depth. So it is solved as
+ * a fixed point instead: measure how much too big the box is on screen, push
+ * the eye back by that factor, repeat. The error in the ratio is second order,
+ * so it converges geometrically and three passes are past the pixel. */
 function fitView() {
   if (!W || !H) return;
-  cam.zoom = 1;
-  cam.centre = [0, 0];
-  const b = boxBox();
-  cam.zoom = Math.max(1, 0.92 * Math.min(W / b.w, H / b.h));
-  recentre();
+  frameBox();
+  cam.dist = cam.minDist * 6;          // far enough out that every corner is in front
+  for (let i = 0; i < 4; i++) {
+    const b = boxBox();
+    if (!b) break;
+    const k = Math.max(b.w / (0.92 * W), b.h / (0.92 * H));
+    if (!(k > 0)) break;
+    cam.dist = cam.dist * k;
+  }
 }
 
-function recentre() {
-  cam.centre = [0, 0];
-  const b = boxBox();
-  cam.centre = [W / 2 - (b.x0 + b.w / 2), H / 2 - (b.y0 + b.h / 2)];
-}
-
+/* The screen bounding box of the cell and its margin, or null if any corner of
+ * it has fallen behind the eye — which the dist clamp prevents, and which would
+ * make the measurement meaningless if it ever did not. */
 function boxBox() {
   const B = design.group.basis;
   let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
@@ -250,6 +281,7 @@ function boxBox() {
     const p = cart(B, u);
     for (const t of [0, 1]) {
       const s = cam.project([p[0], p[1], t]);
+      if (!s) return null;
       x0 = Math.min(x0, s[0]); x1 = Math.max(x1, s[0]);
       y0 = Math.min(y0, s[1]); y1 = Math.max(y1, s[1]);
     }
@@ -281,7 +313,6 @@ function drawLayer() {
   lctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   lctx.fillStyle = GROUND;
   lctx.fillRect(0, 0, W, H);
-  recentre();
   drawBox(lctx, false);
   if (showSym) drawSymmetry(lctx, false);
   drawTubes(lctx);
@@ -303,14 +334,19 @@ function drawBox(g, over) {
   const B = design.group.basis;
   const corners = design.cellCorners();
   const span = design.span;
+  // false when a corner is behind the eye and the outline would be nonsense
   const cellPath = (m1, m2, t) => {
     const d = cart(B, [m1, m2]);
+    const s = [];
+    for (const c of corners) {
+      const q = cam.project([c[0] + d[0], c[1] + d[1], t]);
+      if (!q) return false;
+      s.push(q);
+    }
     g.beginPath();
-    corners.forEach((c, i) => {
-      const s = cam.project([c[0] + d[0], c[1] + d[1], t]);
-      g[i ? "lineTo" : "moveTo"](s[0], s[1]);
-    });
+    s.forEach((q, i) => g[i ? "lineTo" : "moveTo"](q[0], q[1]));
     g.closePath();
+    return true;
   };
   g.lineWidth = 1;
   g.strokeStyle = CELL_FAR;
@@ -318,22 +354,20 @@ function drawBox(g, over) {
     for (let m1 = -span; m1 <= span; m1++) {
       for (let m2 = -span; m2 <= span; m2++) {
         if (!m1 && !m2) continue;
-        cellPath(m1, m2, 0);
-        g.stroke();
+        if (cellPath(m1, m2, 0)) g.stroke();
       }
     }
   }
   // the box itself: floor, four uprights, and the lid, which is the floor again
   g.strokeStyle = CELL;
   g.lineWidth = 1.4;
-  cellPath(0, 0, 0);
-  g.stroke();
-  cellPath(0, 0, 1);
-  g.stroke();
+  if (cellPath(0, 0, 0)) g.stroke();
+  if (cellPath(0, 0, 1)) g.stroke();
   g.beginPath();
   for (const c of corners) {
     const a = cam.project([c[0], c[1], 0]);
     const b = cam.project([c[0], c[1], 1]);
+    if (!a || !b) continue;
     g.moveTo(a[0], a[1]);
     g.lineTo(b[0], b[1]);
   }
@@ -389,6 +423,9 @@ function drawSymmetry(g, over) {
                                        ln.base[1] - reach * ln.d[1]]), 0]);
     const b = cam.project([...cart(B, [ln.base[0] + reach * ln.d[0],
                                        ln.base[1] + reach * ln.d[1]]), 0]);
+    // a mirror runs a cell past the block the camera is kept clear of, so an
+    // end of one can be behind the eye when the reader dollies right in
+    if (!a || !b) continue;
     g.beginPath();
     g.moveTo(a[0], a[1]);
     g.lineTo(b[0], b[1]);
@@ -404,13 +441,14 @@ function drawSymmetry(g, over) {
     if (p.c[0] < -span || p.c[0] > span + 1 || p.c[1] < -span || p.c[1] > span + 1) continue;
     const q = cart(B, p.c);
     const foot = cam.project([q[0], q[1], 0]);
+    if (!foot) continue;
     const home = p.c[0] > -0.02 && p.c[0] < 1.02 && p.c[1] > -0.02 && p.c[1] < 1.02;
     if (over) {
       // the second pass is dimmer: it is being read through the animation
       g.globalAlpha = 0.72;
       marker(g, foot, p);
-      if (!home) { g.globalAlpha = 1; continue; }
-      const top = cam.project([q[0], q[1], 1]);
+      const top = home ? cam.project([q[0], q[1], 1]) : null;
+      if (!top) { g.globalAlpha = 1; continue; }
       g.strokeStyle = AXIS;
       g.globalAlpha = 0.35;
       g.lineWidth = p.free ? 1.4 : 1;
@@ -468,8 +506,6 @@ function drawTubes(g) {
   // the orbit fills the plane, so most of what the display span holds is off
   // the edge of the canvas; the silhouette is the expensive part, so decide
   // before building it
-  const ax = cam.diskAxes(r);
-  const pad = Math.max(ax.rx, ax.ry) + 2;
   const ring = drag && lastSegs > FAST_SEGMENTS ? 0 : design.span;
   for (const c of drawn) {
     if (Math.abs(c.m[0]) > ring || Math.abs(c.m[1]) > ring) continue;
@@ -478,11 +514,17 @@ function drawTubes(g) {
                           (hover && hover.seed === c.seedIndex));
     for (const [a, b] of loopSegments(c.path.pts)) {
       const sa = cam.project(a), sb = cam.project(b);
+      if (!sa || !sb) continue;           // reaches past the eye; see geom.js
+      // how big the ball is on screen is now a property of WHERE it is, so the
+      // margin the cull has to leave is measured per segment
+      const pad = r * Math.max(cam.scaleAt(a), cam.scaleAt(b)) + 2;
       if (Math.max(sa[0], sb[0]) < -pad || Math.min(sa[0], sb[0]) > W + pad ||
           Math.max(sa[1], sb[1]) < -pad || Math.min(sa[1], sb[1]) > H + pad) continue;
       /* Built here, painted below, and the two must not interleave: a Path2D
        * raised between two paints costs fifteen times one raised before them. */
-      items.push({ path: tubeSegmentPath(cam, a, b, r), c, isSeed, hi,
+      const path = tubeSegmentPath(cam, a, b, r);
+      if (!path) continue;
+      items.push({ path, c, isSeed, hi,
                    d: cam.depth([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2,
                                  (a[2] + b[2]) / 2]) });
     }
@@ -512,6 +554,7 @@ function drawMarkers(g) {
   for (const e of contacts.events) {
     if (e.kind === "clear") continue;
     const p = cam.project([e.x, e.y, e.t]);
+    if (!p) continue;
     const over = e.kind === "overlap";
     g.strokeStyle = over ? OVER : TOUCH;
     g.globalAlpha = over ? Math.min(1, 0.55 + e.depth) : 0.85;
@@ -529,6 +572,7 @@ function drawHandles(g) {
     s.pts.forEach((p, k) => {
       const q = cart(B, p.u);
       const c = cam.project([q[0], q[1], p.t]);
+      if (!c) return;
       const on = sel && sel.seed === i && sel.k === k;
       const hot = hover && hover.kind === "point" && hover.seed === i && hover.k === k;
       const h = HANDLE + (on || hot ? 1.5 : 0);
@@ -548,12 +592,14 @@ function drawHandles(g) {
 /* The instant the preview is showing, as a slice through the box. Drawn every
  * frame, over the cached layer — it is the only thing that moves. */
 function drawPlane(t) {
-  const corners = design.cellCorners();
+  const s = [];
+  for (const c of design.cellCorners()) {
+    const q = cam.project([c[0], c[1], t]);
+    if (!q) return;
+    s.push(q);
+  }
   ctx.beginPath();
-  corners.forEach((c, i) => {
-    const s = cam.project([c[0], c[1], t]);
-    ctx[i ? "lineTo" : "moveTo"](s[0], s[1]);
-  });
+  s.forEach((q, i) => ctx[i ? "lineTo" : "moveTo"](q[0], q[1]));
   ctx.closePath();
   ctx.fillStyle = "rgba(59,110,165,0.09)";
   ctx.fill();
@@ -563,12 +609,18 @@ function drawPlane(t) {
 }
 
 function frame() {
+  window.__frames = (window.__frames || 0) + 1;
+  try {
   const w = canvas.clientWidth, h = canvas.clientHeight;
   const d = window.devicePixelRatio || 1;
   if (w !== W || h !== H || d !== dpr) {
     W = w; H = h; dpr = d;
     canvas.width = layer.width = Math.round(W * dpr);
     canvas.height = layer.height = Math.round(H * dpr);
+    // the focal length is half the canvas height over tan(fov/2), so the camera
+    // has to be told before anything asks it to project or to convert a zoom
+    cam.viewport(W, H);
+    if (pendingZoom) { cam.dist = cam.f / pendingZoom; pendingZoom = 0; }
     // the fit is part of the view, and the view is part of the link
     if (fitPending || !camTouched) { fitView(); fitPending = false; writeHash(); }
     dirty = true;
@@ -579,6 +631,7 @@ function frame() {
   ctx.drawImage(layer, 0, 0);
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   drawPlane(preview.getPhase());
+  } catch (err) { window.__frameErr = String(err && err.stack || err); }
   requestAnimationFrame(frame);
 }
 
@@ -664,8 +717,14 @@ canvas.addEventListener("pointermove", (e) => {
   }
   // the core gesture: the breakpoint moves in ITS OWN time slice. Time is what
   // it is; only the position in the plane is being dragged.
-  const B = design.group.basis;
-  const u = latticeOf(B, cam.unproject(sx, sy, drag.t));
+  const w = cam.unproject(sx, sy, drag.t);
+  /* The pixel need not meet that slice at all: along the horizon the ray runs
+   * parallel to it, and below the horizon a slice above the eye is met only
+   * behind the camera. The handle then stays where it was — a drag that gives
+   * up for a moment is a drag; one that jumps to the far side of the plane and
+   * back is a bug. */
+  if (!w) return;
+  const u = latticeOf(design.group.basis, w);
   design.movePoint(drag.seed, drag.k, [clamp(u[0], -8, 8), clamp(u[1], -8, 8)]);
   afterChange();
 });
@@ -673,21 +732,27 @@ canvas.addEventListener("pointermove", (e) => {
 canvas.addEventListener("pointerup", (e) => {
   const [sx, sy] = at(e);
   if (drag && drag.kind === "orbit" && drag.empty && drag.moved < DRAG_SLOP) {
-    push();
-    const B = design.group.basis;
-    const u = latticeOf(B, cam.unproject(sx, sy, 0));
-    const i = design.addSeed([clamp(u[0], -8, 8), clamp(u[1], -8, 8)], paint);
-    sel = { seed: i, k: 0 };
-    afterChange();
+    // a click whose ray misses the floor entirely places nothing; there is no
+    // point of the floor it could mean
+    const w = cam.unproject(sx, sy, 0);
+    if (w) {
+      push();
+      const u = latticeOf(design.group.basis, w);
+      const i = design.addSeed([clamp(u[0], -8, 8), clamp(u[1], -8, 8)], paint);
+      sel = { seed: i, k: 0 };
+      afterChange();
+    }
   }
   drag = null;
   dirty = true;         // the drag may have been drawing a reduced picture
   canvas.releasePointerCapture(e.pointerId);
 });
 
+/* The wheel moves the eye in and out. Wheel down is away, which is the sign
+ * every 3D view uses and the same direction the old zoom went. */
 canvas.addEventListener("wheel", (e) => {
   e.preventDefault();
-  cam.zoomBy(Math.exp(-e.deltaY * 0.0015));
+  cam.dolly(Math.exp(e.deltaY * 0.0015));
   camTouched = true;
   writeHash();
   dirty = true;
@@ -739,7 +804,9 @@ function showStatus() {
   const diameter = 2 * design.radius;
   const w = contacts.worst;
   const gap = el("st-gap");
-  gap.textContent = w ? `${(w.d / diameter).toFixed(2)}×` : "clear (> 2×)";
+  // an empty box is not "clear" — there is nothing yet for anything to clear
+  gap.textContent = !design.seeds.length ? "—"
+    : w ? `${(w.d / diameter).toFixed(2)}×` : "clear (> 2×)";
   gap.className = !w ? "" : w.kind === "overlap" ? "bad" : w.kind === "touch" ? "warn" : "";
   const touch = contacts.events.filter((e) => e.kind === "touch").length;
   const over = contacts.events.filter((e) => e.kind === "overlap").length;
@@ -754,7 +821,7 @@ function writeHash(now) {
   clearTimeout(hashTimer);
   const run = () => {
     const s = design.toState();
-    s.view = { yaw: cam.yaw, pitch: cam.pitch, zoom: cam.zoom };
+    s.view = { yaw: cam.yaw, pitch: cam.pitch, dist: cam.dist };
     const h = "#" + encode(s);
     if (h === lastHash && location.hash === h) return;
     lastHash = h;
@@ -779,7 +846,10 @@ window.addEventListener("hashchange", () => {
   } catch (err) { return; }
   cam.yaw = st.view.yaw;
   cam.pitch = st.view.pitch;
-  if (st.view.zoom > 1) cam.zoom = st.view.zoom;
+  // an old link's zoom, in pixels per world unit, is this distance — the canvas
+  // has been measured by now, so it can be converted on the spot
+  if (st.view.dist > 0) cam.dist = st.view.dist;
+  else if (st.view.zoom > 1) cam.dist = cam.f / st.view.zoom;
   syncControls();
   afterChange();
 });
@@ -979,6 +1049,22 @@ el("undo").addEventListener("click", undo);
 el("redo").addEventListener("click", redo);
 
 /* ---------------------------------------------------------------- go */
+
+window.__probe = () => {
+  const lp = lctx.getImageData(100, 100, 1, 1).data;
+  const cp = ctx.getImageData(100, 100, 1, 1).data;
+  return { W, H, dist: cam.dist, minDist: cam.minDist, f: cam.f, yaw: cam.yaw,
+           pitch: cam.pitch, target: cam.target, segs: lastSegs,
+           layerPx: [...lp], canvasPx: [...cp], frames: window.__frames };
+};
+window.__perf = (n) => {
+  n = n || 20;
+  drawLayer();
+  const t0 = performance.now();
+  for (let i = 0; i < n; i++) drawLayer();
+  return (performance.now() - t0) / n;
+};
+window.__segs = () => lastSegs;
 
 buildGroups();
 buildSwatches();

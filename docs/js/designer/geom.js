@@ -2,25 +2,49 @@
  *
  * The designer shows one period of the spacetime box: the plane spread out
  * below, time running up the page. World coordinates are (x, y, z) with x, y
- * cartesian in the plane and z = t * height, t measured in periods. The view
- * is ORTHOGRAPHIC — parallel, no perspective — for two reasons that matter to
- * what the page is for. Non-overlap is an equal-time condition on horizontal
- * distances, so a projection that shrinks the far side of the box would make
- * two balls at the same separation look different; and an affine projection
- * turns "the silhouette of a swept ball" from a hard surface-of-revolution
- * problem into the convex hull of two ellipses, exactly — and the hull of two
- * translated copies of one polygon is a stitch, not a sort (see `stitch`).
+ * cartesian in the plane and z = t * height, t measured in periods.
  *
- *   xv =  x*cos(yaw) + y*sin(yaw)
- *   yv = -x*sin(yaw) + y*cos(yaw)
- *   screenX = centre[0] +  xv*zoom
- *   screenY = centre[1] + (yv*sin(pitch) - z*cos(pitch)) * zoom
- *   depth   = yv*cos(pitch) + z*sin(pitch)          // larger = nearer viewer
+ * The camera is a PERSPECTIVE one — an eye at a finite distance from a target
+ * it orbits about. The view used to be orthographic, on the argument that
+ * non-overlap is an equal-time condition on horizontal distances and that a
+ * projection which shrinks the far side of the box makes two balls at the same
+ * separation look different. That trade has gone the other way. Nothing on this
+ * page is ever measured off the picture: legality is decided in world
+ * coordinates by collide.js and reported by the contact markers and the status
+ * lines, which is where a reader who wants a number goes. What the picture has
+ * to do is read as a SOLID BOX, and under a parallel projection it does not —
+ * the near wall and the far wall are the same size, so the reader supplies the
+ * depth by guessing, and guesses wrong about which of two tubes is in front.
+ * Converging edges settle that at a glance.
  *
- * Screen y runs DOWN, so the -z term is what puts later time higher up the
- * page. Pitch is clamped away from both ends: at 0 the horizontal plane is a
- * line and every disk is a needle, at 90 the time axis vanishes and the animation
- * is a wallpaper again.
+ * Orbit angles are yaw and pitch, and the three screen axes are orthonormal:
+ *
+ *   R (screen right)   = ( cos yaw,       sin yaw,      0  )
+ *   U (screen up)      = ( sin yaw sp,   -cos yaw sp,   cp )
+ *   D (target -> eye)  = (-sin yaw cp,    cos yaw cp,   sp )
+ *
+ * with sp = sin(pitch), cp = cos(pitch). The eye and the focal length are
+ *
+ *   eye = target + dist * D          f = (viewport height / 2) / tan(fov / 2)
+ *
+ * and a world point P projects by
+ *
+ *   v  = P - eye,   Xc = v.R,   Yc = v.U,   Zc = -(v.D)      // depth in front
+ *   screenX = centre[0] + f * Xc / Zc
+ *   screenY = centre[1] - f * Yc / Zc                        // screen y is down
+ *   depth   = -Zc = v.D                                      // larger = NEARER
+ *
+ * There is no near-plane clipping in this file and none is needed: `dist` is
+ * clamped so that the eye stays outside a sphere holding everything the page
+ * draws (see setBound), which makes Zc > 0 for every point of it. project()
+ * still returns null at or behind the eye rather than the ghost the formula
+ * would give, because a caller can always reach past that sphere — a symmetry
+ * line runs a cell beyond the block, and a billiard can be dragged eight cells
+ * out — and every caller skips what it cannot place.
+ *
+ * Pitch is clamped away from both ends: at 0 the horizontal plane is a line and
+ * every disk is a needle, at 90 the time axis vanishes and the animation is a
+ * wallpaper again.
  */
 "use strict";
 import { LIMITS } from "./urlstate.js?v=40";
@@ -29,296 +53,436 @@ const TWO_PI = Math.PI * 2;
 const DEG = Math.PI / 180;
 const MIN_PITCH = 8 * DEG;
 const MAX_PITCH = 85 * DEG;
+const DEFAULT_FOV = 40 * DEG;
 
-/* Samples per end-ellipse in a tube silhouette. The hull of an n-gon
- * inscribed in an ellipse falls short of the curve by 1 - cos(pi/n) of the
- * semi-axis, so 64 samples is 1.2e-3 — under a pixel for any ball drawn
- * smaller than about 800 px across, which no view of a whole cell ever is.
- * Going finer costs hull time on every segment of every seed, every frame. */
-const ELLIPSE_SAMPLES = 64;
+/* How much further from the target than the bounding radius the eye is held.
+ * Six percent is enough to keep Zc off zero without stopping the reader getting
+ * close enough for the perspective to be worth having. */
+const EYE_MARGIN = 1.06;
+
+/* Below this the point is the eye itself, and f/Zc is not a number. */
+const MIN_Z = 1e-9;
 
 const clampPitch = (p) => Math.min(MAX_PITCH, Math.max(MIN_PITCH, p));
 
 export class Camera {
   constructor(opts) {
     const o = opts || {};
-    this.yaw = o.yaw === undefined ? 0.6 : o.yaw;
-    this.pitch = clampPitch(o.pitch === undefined ? 0.5 : o.pitch);
-    this.zoom = o.zoom === undefined ? 100 : o.zoom;
+    this._yaw = o.yaw === undefined ? 0.6 : o.yaw;
+    this._pitch = clampPitch(o.pitch === undefined ? 0.5 : o.pitch);
     this.height = o.height === undefined ? 1 : o.height;
+    /* Set once, at construction: a field of view that changed under the reader
+     * would move everything on screen for no reason they could name. */
+    this.fov = o.fov === undefined ? DEFAULT_FOV : o.fov;
+    this.target = o.target ? [o.target[0], o.target[1], o.target[2]] : [0, 0, 0.5];
     this.centre = o.centre ? [o.centre[0], o.centre[1]] : [0, 0];
+    this.vh = o.vh === undefined ? 600 : o.vh;
+    this._bound = o.bound === undefined ? 1 : o.bound;
+    this._F = null;
+    this._dist = 0;
+    this.dist = o.dist === undefined ? this.minDist * 6 : o.dist;
   }
 
+  /* The orbit angles, the distance and the target are accessors because the
+   * basis and the eye are cached: assigning to any of them has to drop that
+   * cache, and callers assign to them by name. */
+  get yaw() { return this._yaw; }
+  set yaw(v) { this._yaw = v % TWO_PI; this._F = null; }
+
+  get pitch() { return this._pitch; }
+  set pitch(v) { this._pitch = clampPitch(v); this._F = null; }
+
+  get dist() { return this._dist; }
+  set dist(v) {
+    const lo = this.minDist;
+    // !(v > lo) rather than v < lo, so a NaN out of some ratio lands on the
+    // floor instead of poisoning every projection that follows
+    this._dist = !(v > lo) ? lo : Math.min(LIMITS.dist.max, v);
+    this._F = null;
+  }
+
+  /* The eye is never allowed inside the sphere of radius `bound` about the
+   * target. That is the whole of this file's answer to near-plane clipping. */
+  get minDist() { return this._bound * EYE_MARGIN; }
+  setBound(r) {
+    this._bound = r > 1e-3 ? r : 1e-3;
+    this.dist = this._dist;              // the floor may have risen under it
+  }
+
+  lookAt(p) {
+    this.target = [p[0], p[1], p[2]];
+    this._F = null;
+  }
+
+  /* The canvas, in CSS pixels: the principal point is its centre, and the
+   * height is what fov turns into a focal length. Panning the principal point
+   * to frame the box instead would be an off-axis projection — still correct,
+   * but it shears the cell in a way that reads as a mistake. The box is framed
+   * by AIMING at it, which is what lookAt is for. */
+  viewport(w, h) {
+    this.centre = [w / 2, h / 2];
+    this.vh = h;
+    this._F = null;
+  }
+
+  get f() { return this._frame().f; }
+
+  /* The camera basis, the eye and the focal length, recomputed only when one of
+   * them has been invalidated. A redraw projects tens of thousands of points and
+   * four trig calls apiece was the single largest cost in this file. */
+  _frame() {
+    let F = this._F;
+    if (F) return F;
+    const cy = Math.cos(this._yaw), sy = Math.sin(this._yaw);
+    const cp = Math.cos(this._pitch), sp = Math.sin(this._pitch);
+    const dx = -sy * cp, dy = cy * cp, dz = sp;
+    F = this._F = {
+      rx: cy, ry: sy,                              // R has no z component
+      ux: sy * sp, uy: -cy * sp, uz: cp,
+      dx, dy, dz,
+      ex: this.target[0] + this._dist * dx,
+      ey: this.target[1] + this._dist * dy,
+      ez: this.target[2] * this.height + this._dist * dz,
+      f: (this.vh / 2) / Math.tan(this.fov / 2),
+    };
+    return F;
+  }
+
+  /* Screen pixels for a spacetime point, or null if it is at or behind the eye
+   * — never the mirrored ghost that f * Xc / Zc gives for negative Zc. */
   project(p) {
-    const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw);
-    const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
-    const xv = p[0] * cy + p[1] * sy;
-    const yv = -p[0] * sy + p[1] * cy;
-    const z = p[2] * this.height;
-    return [this.centre[0] + xv * this.zoom,
-            this.centre[1] + (yv * sp - z * cp) * this.zoom];
+    const F = this._frame();
+    const vx = p[0] - F.ex, vy = p[1] - F.ey, vz = p[2] * this.height - F.ez;
+    const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
+    if (!(zc > MIN_Z)) return null;
+    const k = F.f / zc;
+    return [this.centre[0] + k * (vx * F.rx + vy * F.ry),
+            this.centre[1] - k * (vx * F.ux + vy * F.uy + vz * F.uz)];
   }
 
+  /* project() without the array, into out[k], out[k + 1]; false if it is not in
+   * front. Every rim of every ball goes through here — thousands of points a
+   * redraw — and the pair of little arrays the tidy form allocates is the most
+   * expensive thing about one of them. */
+  projectInto(x, y, t, out, k) {
+    const F = this._frame();
+    const vx = x - F.ex, vy = y - F.ey, vz = t * this.height - F.ez;
+    const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
+    if (!(zc > MIN_Z)) return false;
+    const s = F.f / zc;
+    out[k] = this.centre[0] + s * (vx * F.rx + vy * F.ry);
+    out[k + 1] = this.centre[1] - s * (vx * F.ux + vy * F.uy + vz * F.uz);
+    return true;
+  }
+
+  /* Painter's order: larger is NEARER the viewer, which is the convention every
+   * sort in app.js is written against. */
   depth(p) {
-    const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw);
-    const yv = -p[0] * sy + p[1] * cy;
-    return yv * Math.cos(this.pitch) + p[2] * this.height * Math.sin(this.pitch);
+    const F = this._frame();
+    return (p[0] - F.ex) * F.dx + (p[1] - F.ey) * F.dy +
+           (p[2] * this.height - F.ez) * F.dz;
   }
 
-  /* The point of the t-slice that lands on this pixel. Solvable in closed
-   * form because fixing t fixes z, and what is left is a rotation followed by
-   * a scaling of the second axis — invertible exactly while sin(pitch) != 0,
-   * which the pitch clamp guarantees. */
+  /* Pixels per world unit AT p. Under perspective this is a property of the
+   * point and not of the camera alone, which is why there is no longer a
+   * once-a-frame ellipse for the balls. Zero at or behind the eye. */
+  scaleAt(p) {
+    const F = this._frame();
+    const zc = -((p[0] - F.ex) * F.dx + (p[1] - F.ey) * F.dy +
+                 (p[2] * this.height - F.ez) * F.dz);
+    return zc > MIN_Z ? F.f / zc : 0;
+  }
+
+  /* The line of sight through a pixel, as eye + s * dir. dir is scaled so that
+   * s is exactly the negated depth: depth(eye + s * dir) = -s. That makes "the
+   * first thing this ray meets" and "the nearest thing the painter drew" the
+   * same comparison, which is what picking needs. */
+  ray(sx, sy) {
+    const F = this._frame();
+    const a = (sx - this.centre[0]) / F.f;
+    const b = (this.centre[1] - sy) / F.f;
+    return {
+      ox: F.ex, oy: F.ey, oz: F.ez,
+      dx: a * F.rx + b * F.ux - F.dx,
+      dy: a * F.ry + b * F.uy - F.dy,
+      dz: b * F.uz - F.dz,
+    };
+  }
+
+  /* The point of the t-slice that lands on this pixel — the eye ray met with
+   * the plane z = t * height.
+   *
+   * It can FAIL, which the orthographic closed form could not. The ray is
+   * parallel to the slice along one row of pixels (the horizon), and it meets
+   * slices above the eye only behind the eye, for pixels below that row. Both
+   * return null: the answer the algebra offers in the second case is the real
+   * point reflected through the camera, and handing that to a drag would throw
+   * the billiard to the far side of the plane. */
   unproject(sx, sy, t) {
-    const cy = Math.cos(this.yaw), sry = Math.sin(this.yaw);
-    const cp = Math.cos(this.pitch), sp = Math.sin(this.pitch);
-    const z = t * this.height;
-    const xv = (sx - this.centre[0]) / this.zoom;
-    const yv = ((sy - this.centre[1]) / this.zoom + z * cp) / sp;
-    return [xv * cy - yv * sry, xv * sry + yv * cy];
-  }
-
-  /* A HORIZONTAL disk of cartesian radius r projects to an ellipse — the
-   * image of a circle under the affine map A below, whose singular values are
-   * the semi-axes and whose left singular vectors give the axis directions.
-   * Depends only on the camera, so a frame computes it once and translates it
-   * to each ball. */
-  diskAxes(r) {
-    const cy = Math.cos(this.yaw), sy = Math.sin(this.yaw);
-    const sp = Math.sin(this.pitch), k = this.zoom;
-    const e = svd2(cy * k, sy * k, -sy * sp * k, cy * sp * k);
-    return { rx: e.s1 * r, ry: e.s2 * r, rot: e.rot };
+    const R = this.ray(sx, sy);
+    if (Math.abs(R.dz) < 1e-12) return null;
+    const s = (t * this.height - R.oz) / R.dz;
+    if (!(s > 0)) return null;
+    return [R.ox + s * R.dx, R.oy + s * R.dy];
   }
 
   orbit(dyaw, dpitch) {
-    this.yaw = (this.yaw + dyaw) % TWO_PI;
-    this.pitch = clampPitch(this.pitch + dpitch);
+    this._yaw = (this._yaw + dyaw) % TWO_PI;
+    this._pitch = clampPitch(this._pitch + dpitch);
+    this._F = null;
   }
 
-  /* The ceiling is the URL's, not the renderer's: a view the hash cannot hold
-   * is a view the reader cannot share, and a Copy link that quietly hands over
-   * a different zoom is worse than a wheel that stops turning. */
-  zoomBy(f) {
-    this.zoom = Math.min(LIMITS.zoom.max, Math.max(1e-6, this.zoom * f));
+  /* The wheel moves the EYE, which is what a reader expects of a 3D view. The
+   * floor is the eye-outside-the-box clamp; the ceiling is the URL's, because a
+   * view the hash cannot hold is a view the reader cannot share, and a Copy
+   * link that quietly hands over a different framing is worse than a wheel that
+   * stops turning. */
+  dolly(f) {
+    this.dist = this._dist * f;
   }
 }
 
-/* Semi-axes and orientation of the image of the unit circle under
- * [[a,b],[c,d]] — the 2x2 SVD in closed form (Blinn's construction). The
- * smaller singular value comes out signed when the map flips orientation;
- * only its magnitude is an axis length. */
-function svd2(a, b, c, d) {
-  const e = (a + d) / 2, f = (a - d) / 2;
-  const g = (c + b) / 2, h = (c - b) / 2;
-  const q = Math.hypot(e, h), r = Math.hypot(f, g);
-  return {
-    s1: q + r,
-    s2: Math.abs(q - r),
-    rot: (Math.atan2(h, e) + Math.atan2(g, f)) / 2,
-  };
+/* ---- silhouettes --------------------------------------------------------- */
+
+/* Samples per projected rim. The inscribed n-gon falls short of the circle by
+ * 1 - cos(pi/n) of the radius, so the count that keeps that under a third of a
+ * pixel depends on how big the ball IS on screen — under the old orthographic
+ * camera one ellipse served every ball at once and 64 samples was free, and now
+ * every disk has its own image. Almost every clone is a few pixels across, and
+ * a design on an 18-op group is a few thousand of these a redraw, so following
+ * the size is the whole of the performance story. */
+const MIN_RIM = 8;
+const MAX_RIM = 64;
+const RIM_SAG = 0.4;
+
+/* Scratch for one segment's two rims, their sort and their hull. A redraw asks
+ * for thousands of silhouettes and each of them wants a few small arrays; on
+ * this path the allocation costs more than the arithmetic, so there is one of
+ * each and they are reused. The consequence is that the buffer a call hands
+ * back is only good until the NEXT call — every caller here copies or draws it
+ * before asking for another. */
+const RIM = new Float64Array(4 * MAX_RIM);
+const ORD = new Int32Array(4 * MAX_RIM);
+const TMP = new Int32Array(4 * MAX_RIM);
+const HULL = new Int32Array(4 * MAX_RIM);
+
+function rimCount(rPx) {
+  /* acos(1 - x) ~ sqrt(2x) from below, so pi / sqrt(2 SAG / rPx) errs upward —
+   * the safe direction, and two square roots cheaper than an arc cosine. */
+  const n = rPx > RIM_SAG ? Math.ceil(Math.PI / Math.sqrt(2 * RIM_SAG / rPx)) : 0;
+  return n < MIN_RIM ? MIN_RIM : n > MAX_RIM ? MAX_RIM : n;
 }
 
-/* The unit circle's image, as offsets from the ellipse centre, CCW.
- *
- * Memoised on the axes: a frame draws thousands of segments and every one of
- * them has the same camera and the same ball radius, so this is computed once
- * per frame rather than once per segment. */
-let offsetCache = null;
-
-function ellipseOffsets(ax) {
-  if (offsetCache && offsetCache.rx === ax.rx && offsetCache.ry === ax.ry &&
-      offsetCache.rot === ax.rot) return offsetCache.off;
-  const c = Math.cos(ax.rot), s = Math.sin(ax.rot);
-  const out = [];
-  for (let i = 0; i < ELLIPSE_SAMPLES; i++) {
-    const a = (i / ELLIPSE_SAMPLES) * TWO_PI;
-    const u = ax.rx * Math.cos(a), v = ax.ry * Math.sin(a);
-    out.push([u * c - v * s, u * s + v * c]);
-  }
-  offsetCache = { rx: ax.rx, ry: ax.ry, rot: ax.rot, off: out };
-  return out;
-}
-
-/* The silhouette of the ball swept from spacetime point a to b, as screen
- * points. The swept solid is the union of the horizontal disks along the
- * segment; the projection is affine, so that union's image is the convex hull
- * of the images of the two end disks — no near-silhouette to solve for, no
- * tessellation of a curved surface. The only approximation left is the
- * sampling of each end ellipse (ELLIPSE_SAMPLES). */
-export function tubeSegmentHull(cam, a, b, r) {
-  const off = ellipseOffsets(cam.diskAxes(r));
-  const pa = cam.project(a), pb = cam.project(b);
-  const out = [];
-  if (walkHull(off, pa, pb, (x, y) => out.push([x, y]))) return out;
-  const pts = [];
-  for (let i = 0; i < off.length; i++) {
-    pts.push([pa[0] + off[i][0], pa[1] + off[i][1]]);
-    pts.push([pb[0] + off[i][0], pb[1] + off[i][1]]);
-  }
-  return convexHull(pts);
-}
-
-/* The hull of two TRANSLATED COPIES of one convex polygon, without sorting —
- * emitted point by point, so a caller that wants a Path2D need not build an
- * array of points first. False means it declined; the caller sorts instead.
- *
- * Support functions add under translation: in direction n the further copy wins,
- * and which copy that is depends only on the sign of <d, n> for d the offset
- * between them. A vertex's supporting directions are the cone between its two
- * edge normals, and for a CCW polygon <d, n_i> is cross(d, e_i) — so the copies
- * split at the two edges where that cross product changes sign, and the two
- * straddling vertices belong to both. The answer is one pass over the edges and
- * one pass over the output.
- *
- * That leaves the hull the sorted construction would give (verified: relative
- * area agreement 9e-15 over 2000 random cameras) at a fourteenth of the cost,
- * which matters because a design on an 18-op group is a few thousand of these
- * per redraw. It declines when the ellipse has degenerated far enough that its
- * edges no longer turn monotonely, which the pitch clamp should prevent but
- * which is not worth assuming. */
-function walkHull(off, pa, pb, emit) {
-  const n = off.length;
-  const dx = pb[0] - pa[0], dy = pb[1] - pa[1];
-  if (Math.abs(dx) < 1e-12 && Math.abs(dy) < 1e-12) {
-    for (let i = 0; i < n; i++) emit(pa[0] + off[i][0], pa[1] + off[i][1]);
-    return true;
-  }
-  const side = (i) => {
-    const j = i + 1 === n ? 0 : i + 1;
-    return dx * (off[j][1] - off[i][1]) - dy * (off[j][0] - off[i][0]) > 0;
-  };
-  let s0 = -1, s1 = -1, prev = side(n - 1), changes = 0;
+/* cos and sin of the sample angles, per count. A redraw uses two or three
+ * counts and would otherwise pay for tens of thousands of trig calls. */
+const circles = new Map();
+function unitCircle(n) {
+  let c = circles.get(n);
+  if (c) return c;
+  c = new Float64Array(2 * n);
   for (let i = 0; i < n; i++) {
-    const s = side(i);
-    if (s === prev) continue;
-    prev = s;
-    if (++changes > 2) return false;
-    if (s0 < 0) s0 = i; else s1 = i;
+    const a = (i / n) * TWO_PI;
+    c[2 * i] = Math.cos(a);
+    c[2 * i + 1] = Math.sin(a);
   }
-  if (s1 < 0) return false;
-  const near = side(s0) ? pb : pa, far = near === pb ? pa : pb;
-  for (let i = s0; ; i = i + 1 === n ? 0 : i + 1) {
-    emit(near[0] + off[i][0], near[1] + off[i][1]);
-    if (i === s1) break;
-  }
-  for (let i = s1; ; i = i + 1 === n ? 0 : i + 1) {
-    emit(far[0] + off[i][0], far[1] + off[i][1]);
-    if (i === s0) break;
+  circles.set(n, c);
+  return c;
+}
+
+/* The rim of the horizontal disk of radius r about p, projected into out at
+ * offset k. False if any of it is not in front of the eye. */
+function rimInto(cam, p, r, n, out, k) {
+  const c = unitCircle(n);
+  for (let i = 0; i < n; i++) {
+    if (!cam.projectInto(p[0] + r * c[2 * i], p[1] + r * c[2 * i + 1], p[2],
+                         out, k + 2 * i)) return false;
   }
   return true;
 }
 
-/* The same silhouette as a Path2D. It walks the hull straight into the path
- * rather than by way of tubeSegmentHull, because a redraw builds thousands of
- * these and the intermediate array of points is the most expensive thing about
- * one of them. */
+/* The silhouette of the ball swept from spacetime point a to b, as a flat
+ * buffer of the two rims and the indices of their convex hull.
+ *
+ * The swept solid is the union of the horizontal disks along the segment, and
+ * for two disks of EQUAL radius that union is exactly the convex hull of the
+ * two of them — the cross-section at any height is one disk, translated. A
+ * projective map is injective and convexity-preserving on the half-space in
+ * front of the eye, so the image of that hull is the hull of the image, and the
+ * silhouette is still the convex hull of the two projected rims. Perspective
+ * costs only the SHORTCUT the orthographic camera allowed: the two ellipses
+ * were translated copies of one polygon, so their hull could be stitched from
+ * the two of them without a sort. They are not translated copies now, so this
+ * is a real hull — paid for by sampling the small rims coarsely. */
+function tubeHull(cam, a, b, r) {
+  const n = rimCount(r * Math.max(cam.scaleAt(a), cam.scaleAt(b)));
+  if (!rimInto(cam, a, r, n, RIM, 0)) return 0;
+  if (!rimInto(cam, b, r, n, RIM, 2 * n)) return 0;
+  return hullInto(RIM, 2 * n);          // vertices of HULL, into RIM
+}
+
+/* The silhouette as screen points, or null when the segment reaches past the
+ * eye and there is nothing honest to draw. */
+export function tubeSegmentHull(cam, a, b, r) {
+  const m = tubeHull(cam, a, b, r);
+  if (!m) return null;
+  const out = [];
+  for (let i = 0; i < m; i++) {
+    const k = 2 * HULL[i];
+    out.push([RIM[k], RIM[k + 1]]);
+  }
+  return out;
+}
+
+/* The same silhouette as a Path2D — what a redraw actually wants, thousands of
+ * times over, and the array of points is the most expensive thing about one. */
 export function tubeSegmentPath(cam, a, b, r) {
-  const off = ellipseOffsets(cam.diskAxes(r));
-  const pa = cam.project(a), pb = cam.project(b);
+  const m = tubeHull(cam, a, b, r);
+  if (!m) return null;
   const path = new Path2D();
-  let first = true;
-  const ok = walkHull(off, pa, pb, (x, y) => {
-    if (first) { path.moveTo(x, y); first = false; } else path.lineTo(x, y);
-  });
-  if (!ok) {
-    const hull = tubeSegmentHull(cam, a, b, r);
-    for (let i = 0; i < hull.length; i++) {
-      if (i) path.lineTo(hull[i][0], hull[i][1]);
-      else path.moveTo(hull[i][0], hull[i][1]);
-    }
+  for (let i = 0; i < m; i++) {
+    const k = 2 * HULL[i];
+    if (i) path.lineTo(RIM[k], RIM[k + 1]);
+    else path.moveTo(RIM[k], RIM[k + 1]);
   }
   path.closePath();
   return path;
 }
 
-/* Andrew's monotone chain, counter-clockwise in a y-up reading of the plane.
- * Collinear points are dropped, so a degenerate tube (a segment that projects
- * to nothing, or two coincident ends) still yields a sane polygon. */
-function convexHull(pts) {
-  const p = pts.slice().sort((u, v) => u[0] - v[0] || u[1] - v[1]);
-  if (p.length < 3) return p;
-  const cross = (o, a, b) =>
-    (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
-  const half = (src) => {
-    const out = [];
-    for (const q of src) {
-      while (out.length >= 2 &&
-             cross(out[out.length - 2], out[out.length - 1], q) <= 0) out.pop();
-      out.push(q);
+const before = (p, u, v) =>
+  p[2 * u] < p[2 * v] || (p[2 * u] === p[2 * v] && p[2 * u + 1] < p[2 * v + 1]);
+
+const cross = (p, o, a, b) =>
+  (p[2 * a] - p[2 * o]) * (p[2 * b + 1] - p[2 * o + 1]) -
+  (p[2 * a + 1] - p[2 * o + 1]) * (p[2 * b] - p[2 * o]);
+
+/* Andrew's monotone chain over a flat [x, y, ...] buffer of n points, leaving
+ * the hull in HULL as indices into it and returning how many — counter-
+ * clockwise in a y-up reading of the plane. Collinear points are dropped, so a
+ * degenerate tube — a segment that projects to nothing, two coincident ends —
+ * still yields a sane polygon. */
+function hullInto(p, n) {
+  for (let i = 0; i < n; i++) ORD[i] = i;
+  sortInto(p, n);
+  if (n < 3) {
+    for (let i = 0; i < n; i++) HULL[i] = ORD[i];
+    return n;
+  }
+  let m = 0;
+  for (let pass = 0; pass < 2; pass++) {
+    const start = m;
+    for (let i = 0; i < n; i++) {
+      const j = ORD[pass ? n - 1 - i : i];
+      while (m - start >= 2 && cross(p, HULL[m - 2], HULL[m - 1], j) <= 0) m--;
+      HULL[m++] = j;
     }
-    out.pop();
-    return out;
-  };
-  const lower = half(p);
-  const upper = half(p.slice().reverse());
-  return lower.concat(upper);
+    m--;                          // the last of each chain opens the other one
+  }
+  return m;
 }
+
+/* ORD, sorted by (x, y). A bottom-up merge sort rather than Array#sort: the
+ * built-in wants an array to sort and a closure to compare with, and both of
+ * those are allocations on a path that runs thousands of times a redraw. */
+function sortInto(p, n) {
+  let src = ORD, dst = TMP;
+  for (let w = 1; w < n; w *= 2) {
+    for (let i = 0; i < n; i += 2 * w) {
+      let a = i, b = Math.min(i + w, n), k = i;
+      const aEnd = b, bEnd = Math.min(i + 2 * w, n);
+      while (a < aEnd && b < bEnd) dst[k++] = before(p, src[b], src[a]) ? src[b++] : src[a++];
+      while (a < aEnd) dst[k++] = src[a++];
+      while (b < bEnd) dst[k++] = src[b++];
+    }
+    const t = src; src = dst; dst = t;
+  }
+  if (src !== ORD) for (let i = 0; i < n; i++) ORD[i] = src[i];
+}
+
+/* ---- picking ------------------------------------------------------------- */
 
 /* Picking a world-tube.
  *
  * `pts` is the loop as [{t, x, y}] in CARTESIAN coordinates, sorted by t and
- * closed: the last segment runs back to pts[0] at t = 1. Under an orthographic
- * camera the pixel (sx, sy) is a whole ray, and the tube is a stack of
- * horizontal disks, so the ray meets the tube exactly when the mouse's
- * position ON SOME TIME SLICE is within r of the path's centre on that slice.
+ * closed: the last segment runs back to pts[0] at t = 1. The pixel is an eye
+ * RAY, and the tube is a stack of horizontal disks, so the ray meets the tube
+ * exactly when its position ON SOME TIME SLICE is within r of the path's centre
+ * on that slice.
  *
- * That test is a QUADRATIC, not a search: unproject is affine in t, t is
- * affine along a segment, and so is the centre — so the mouse-to-centre offset
- * is affine in the segment parameter and its squared length is a quadratic.
- * The hit set on a segment is therefore one interval, found by the quadratic
- * formula.
+ * That test is still a QUADRATIC, not a search. Along the ray z is affine in
+ * the parameter s, so s is affine in t; t is affine along a segment, and so is
+ * the centre — so the ray-to-centre offset is affine in the segment parameter
+ * and its squared length is a quadratic in it. The hit set on a segment is one
+ * interval, found by the quadratic formula, intersected with the half-line that
+ * lies in FRONT of the eye (s > 0). That last clause is new: under orthographic
+ * every slice met the ray once and always ahead of it, and under perspective a
+ * slice above the eye is met behind it.
  *
- * Which hit is nearest the viewer is settled by t alone: along the ray,
- * d(depth)/dt = height/sin(pitch) > 0, so later time is always nearer. So the
- * answer is the hit with the LARGEST t, and no depth sorting is needed to find
- * it. (`height` must be the same box height the camera was given; it is a
- * parameter because the box, not the camera, owns it.)
+ * Which hit wins is settled by s, and no depth sort is needed to find it: the
+ * ray's own parameter IS the depth order, negated, so the answer is the hit
+ * with the SMALLEST s over all segments. (Under the old camera that was the
+ * largest t, which is the same thing seen from a camera that always looked
+ * down.) `height` must be the box height the camera was given; it is a
+ * parameter because the box, not the camera, owns it.
  *
  * The returned `depth` is where the RAY ENTERS the tube — the quantity that
- * decides which of two tubes under the cursor is in front. It is deliberately
- * not the depth of the returned (x, y, t), which is the path's CENTRE at the
- * hit time and so sits up to r behind the surface the viewer clicked on.
+ * decides which of two tubes under the cursor is in front — on the same scale
+ * as cam.depth(), so the two can be compared. It is deliberately not the depth
+ * of the returned (x, y, t), which is the path's CENTRE at the hit time and so
+ * sits up to r behind the surface the viewer clicked on.
  */
 export function pickTube(cam, sx, sy, pts, r, height) {
   const n = pts.length;
   if (!n) return null;
   const h = height === undefined ? cam.height : height;
-  const forward = h > 0;              // else time is not a depth order
+  const R = cam.ray(sx, sy);
+  // one row of pixels looks along the slices and meets none of them; a second
+  // method for a line of measure zero is not worth having
+  if (Math.abs(R.dz) < 1e-12 || !(h > 0)) return null;
   let best = null;
   for (let k = 0; k < n; k++) {
     const p0 = pts[k];
     const p1 = k + 1 < n ? pts[k + 1] : { t: 1, x: pts[0].x, y: pts[0].y };
     const dt = p1.t - p0.t;
     if (!(dt > 0)) continue;
-    const m0 = cam.unproject(sx, sy, p0.t), m1 = cam.unproject(sx, sy, p1.t);
-    const ax = m0[0] - p0.x, ay = m0[1] - p0.y;      // offset at s = 0
-    const bx = m1[0] - p1.x, by = m1[1] - p1.y;      // offset at s = 1
+    // where the ray crosses each end's slice, and how far the tube's centre is
+    // from it there
+    const sa = (p0.t * h - R.oz) / R.dz;
+    const sb = (p1.t * h - R.oz) / R.dz;
+    const ax = R.ox + sa * R.dx - p0.x, ay = R.oy + sa * R.dy - p0.y;
+    const bx = R.ox + sb * R.dx - p1.x, by = R.oy + sb * R.dy - p1.y;
     const ux = bx - ax, uy = by - ay;
-    // |(a) + s(u)|^2 = r^2
+    // |(a) + m(u)|^2 = r^2
     const A = ux * ux + uy * uy;
     const B = 2 * (ax * ux + ay * uy);
     const C = ax * ax + ay * ay - r * r;
-    let s0, s1;
+    let m0, m1;
     if (A < 1e-18) {
       if (C > 0) continue;                            // parallel and outside
-      s0 = 0; s1 = 1;
+      m0 = 0; m1 = 1;
     } else {
       const disc = B * B - 4 * A * C;
       if (disc < 0) continue;
       const sq = Math.sqrt(disc);
-      s0 = (-B - sq) / (2 * A);
-      s1 = (-B + sq) / (2 * A);
+      m0 = (-B - sq) / (2 * A);
+      m1 = (-B + sq) / (2 * A);
     }
-    s0 = Math.max(0, s0);
-    s1 = Math.min(1, s1);
-    if (s0 > s1) continue;
-    const s = forward ? s1 : s0;
-    const t = p0.t + s * dt;
-    if (best === null || (forward ? t > best.t : t < best.t)) {
-      const x = p0.x + s * (p1.x - p0.x);
-      const y = p0.y + s * (p1.y - p0.y);
-      const m = cam.unproject(sx, sy, t);
-      best = { t, x, y, segIndex: k, depth: cam.depth([m[0], m[1], t]) };
+    m0 = Math.max(0, m0);
+    m1 = Math.min(1, m1);
+    // and only the part in front of the eye is looked at; s is affine in m
+    const ds = sb - sa;
+    if (ds > 0) m0 = Math.max(m0, -sa / ds);
+    else m1 = Math.min(m1, -sa / ds);
+    if (m0 > m1) continue;
+    const m = ds > 0 ? m0 : m1;                       // the ray enters here
+    const depth = -(sa + m * ds);
+    if (best === null || depth > best.depth) {
+      best = {
+        t: p0.t + m * dt,
+        x: p0.x + m * (p1.x - p0.x),
+        y: p0.y + m * (p1.y - p0.y),
+        segIndex: k,
+        depth,
+      };
     }
   }
   return best;
@@ -326,8 +490,9 @@ export function pickTube(cam, sx, sy, pts, r, height) {
 
 /* Is the pixel within `px` of the projection of spacetime point p? Used for
  * the breakpoint handles, which are drawn at a fixed pixel size and so are
- * picked at one too. */
+ * picked at one too. A point behind the eye is not drawn and is not picked. */
 export function pickPoint(cam, sx, sy, p, px) {
   const q = cam.project(p);
+  if (!q) return false;
   return Math.hypot(q[0] - sx, q[1] - sy) <= px;
 }
