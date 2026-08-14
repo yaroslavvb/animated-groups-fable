@@ -28,12 +28,12 @@
  * All four are normalised so 0 is "identical" and 1 is "no overlap at all".
  */
 "use strict";
-import { Playback } from "./playback.js?v=40";
-import { attachStage } from "./stage.js?v=40";
-import { attachControls } from "./controls.js?v=40";
-import { filmTimeSymmetry } from "./phases.js?v=40";
-import { orbitPlacements } from "./orbit.js?v=40";
-import { leadHtml } from "./catalog-names.js?v=40";
+import { Playback } from "./playback.js?v=41";
+import { attachStage } from "./stage.js?v=41";
+import { attachControls } from "./controls.js?v=41";
+import { filmTimeSymmetry } from "./phases.js?v=41";
+import { orbitPlacements } from "./orbit.js?v=41";
+import { leadHtml } from "./catalog-names.js?v=41";
 
 const INK = "#1f2430";
 const GROUND = "#faf9f6";
