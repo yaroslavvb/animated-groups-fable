@@ -13,9 +13,10 @@
  * All fractions are plain floats mod 1.
  */
 "use strict";
-import { verifySpec, orbitPlacements } from "./orbit.js?v=40";
-import { Playback } from "./playback.js?v=40";
-import { filmTimeSymmetry } from "./phases.js?v=40";
+import { verifySpec, orbitPlacements } from "./orbit.js?v=41";
+import { Playback } from "./playback.js?v=41";
+import { filmTimeSymmetry } from "./phases.js?v=41";
+import { drawMotif, MOTIF_COLORS } from "./motif.js?v=41";
 
 const TWO_PI = Math.PI * 2;
 
@@ -68,108 +69,10 @@ const MAX_COLUMNS = 18;
  * carries the DISCRETE one — which of the group's N time intervals the copy
  * is in. See phases.js. */
 
-/* Comma outline: five cubic segments traced clockwise on screen (y down) —
- * the outer flank of the tail from the head's right down to the tip, the
- * inner flank back up to the head, then the head's own circle. Hand-tuned in
- * loose coordinates and normalised below, once, to sit centred inside radius
- * COMMA_R with the ring clear of it. */
-const COMMA_R = 0.64;      // comma circumradius, in units of the motif radius
-/* The tail is long and curls well past the head's axis on purpose: that is
- * the whole chirality signal, and it has to survive down to a 30 px thumbnail
- * where a stubbier comma reads the same as its mirror image. */
-const RAW = [
-  [[0.40, -0.30], [0.52, 0.18], [0.32, 0.56], [-0.52, 0.74]],
-  [[-0.52, 0.74], [-0.10, 0.52], [0.18, 0.26], [0.06, 0.02]],
-  [[0.06, 0.02], [-0.14, 0.02], [-0.40, -0.10], [-0.40, -0.30]],
-  [[-0.40, -0.30], [-0.40, -0.54], [-0.22, -0.68], [0.00, -0.68]],
-  [[0.00, -0.68], [0.24, -0.68], [0.40, -0.54], [0.40, -0.30]],
-];
-
-/* recentre on the outline's bounding box and scale to circumradius COMMA_R,
- * so the shape's extent is a known constant the layout can budget for */
-const COMMA = (() => {
-  const pts = [];
-  for (const [p0, p1, p2, p3] of RAW) {
-    for (let i = 0; i <= 24; i++) {
-      const t = i / 24, m = 1 - t;
-      pts.push([
-        m * m * m * p0[0] + 3 * m * m * t * p1[0] + 3 * m * t * t * p2[0] + t * t * t * p3[0],
-        m * m * m * p0[1] + 3 * m * m * t * p1[1] + 3 * m * t * t * p2[1] + t * t * t * p3[1],
-      ]);
-    }
-  }
-  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
-  const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
-  const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
-  const k = COMMA_R / Math.max(...pts.map(p => Math.hypot(p[0] - cx, p[1] - cy)));
-  const segs = RAW.map(seg => seg.map(p => [(p[0] - cx) * k, (p[1] - cy) * k]));
-  const yy = pts.map(p => (p[1] - cy) * k);
-  return { segs, top: Math.min(...yy), bot: Math.max(...yy) };
-})();
-
-/* the comma spans local y in [BODY_TOP, BODY_BOT] (canvas y-down local
- * coords): fill level 0 leaves it empty, level 1 fills it to the brim */
-const BODY_TOP = COMMA.top;
-const BODY_BOT = COMMA.bot;
-
-export function bodyPath(ctx, r) {
-  const s = COMMA.segs;
-  ctx.beginPath();
-  ctx.moveTo(s[0][0][0] * r, s[0][0][1] * r);
-  for (const [, p1, p2, p3] of s) {
-    ctx.bezierCurveTo(p1[0] * r, p1[1] * r, p2[0] * r, p2[1] * r,
-                      p3[0] * r, p3[1] * r);
-  }
-  ctx.closePath();
-}
-
-/* ---------------------------------------------------------------- motif */
-// The motif must have NO accidental symmetry: chiral, asymmetric. Rendering
-// is LAYERED ("body" | "fill", or "all"): frames draw every placement's body
-// before any fill, so painting is order-independent — copies sharing a site
-// (a reversal partner has the same spatial part) show the union of their
-// coloured regions, which does not depend on who painted first.
-export function drawMotif(ctx, theta, r, colors, layer = "all") {
-  // theta = internal time in periods (any real); r = motif radius (px)
-  const c = colors || MOTIF_COLORS;
-  const ph = ((theta % 1) + 1) % 1;
-  /* CONTINUOUS ONE-WAY WIPE. A sweep line crosses the comma from base to brim
-   * once in each half of the period, always travelling the same way. In the
-   * first half the colour lies BEHIND the line (the comma fills); in the
-   * second half it lies AHEAD of it (the comma empties, the boundary still
-   * rising). The painted region is continuous across both handovers — full at
-   * t = 1/2, empty at t = 0 = 1 — so the loop never jumps. And because the two
-   * halves colour opposite sides of the line, the picture still determines the
-   * phase uniquely: the channel stays injective on [0,1), which is what keeps
-   * the copies around a screw centre distinguishable. */
-  const rising = ph < 0.5;
-  const p = (ph * 2) % 1;                                  // sweep position
-  const yLine = (BODY_BOT - p * (BODY_BOT - BODY_TOP)) * r;
-  const yTop = (BODY_TOP - 0.2) * r, yBot = (BODY_BOT + 0.2) * r;
-  ctx.save();
-
-  if (layer === "all" || layer === "body") {
-    // the empty comma: light body + outline; static
-    bodyPath(ctx, r);
-    ctx.fillStyle = c.body;
-    ctx.fill();
-    ctx.lineWidth = Math.max(0.6, 0.045 * r);
-    ctx.strokeStyle = c.outline;
-    ctx.stroke();
-  }
-
-  if (layer === "all" || layer === "fill") {
-    ctx.save();
-    bodyPath(ctx, r);
-    ctx.clip();
-    ctx.fillStyle = c.fill;
-    if (rising) ctx.fillRect(-1.2 * r, yLine, 2.4 * r, yBot - yLine);
-    else ctx.fillRect(-1.2 * r, yTop, 2.4 * r, yLine - yTop);
-    ctx.restore();
-  }
-
-  ctx.restore();
-}
+/* THE MOTIF lives in motif.js — shape, phase channel and colours together, so
+ * that swapping it is one line there rather than an edit in four files. These
+ * re-exports keep every existing caller (strip.js, colored.js) working. */
+export { bodyPath, drawMotif, MOTIF_COLORS } from "./motif.js?v=41";
 
 /* ----------------------------------------------------------- phase ring */
 /* The phase readout: a fixed ruler of N arcs, one per interval of the period,
@@ -265,13 +168,6 @@ export function drawPhaseRing(ctx, theta, r, n, dir, colors) {
   ctx.restore();
 }
 
-export const MOTIF_COLORS = {
-  body: "#dbe6f2",
-  outline: "#7d93ab",
-  fill: "#3b6ea5",
-  beatOn: "#c0392b",
-  beatOff: "#b3aa96",
-};
 
 /* --------------------------------------------------------- group drawing */
 export class FilmGroupAnimation extends Playback {
