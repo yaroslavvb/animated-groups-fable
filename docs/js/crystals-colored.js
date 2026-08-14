@@ -40,10 +40,26 @@ const sub = n => String(n).split("").map(c => SUBS[+c] || c).join("");
 const groupsOf = (k, hm) =>
   data.groups.filter(g => g.k === k && g.base.hm === hm);
 
-function labelHtml(g) {
+const SUPS = { 2: "\u00b2", 3: "\u00b3", 4: "\u2074", 5: "\u2075", 6: "\u2076" };
+
+/* THE BOOK'S COLOUR TYPE. Conway, Burgiel and Goodman-Strauss name a colouring
+ * by the orbifold of the whole group, the index as a superscript, and the
+ * orbifold of the colour-fixing kernel: 3*3⁶/333, 2222/◦. Twofold is
+ * understood, so k = 2 prints no exponent.
+ *
+ * This is the notation the clockwork/colouring correspondence tables use, and
+ * the rule is checked against them: over the 51 coloured crystals that have a
+ * clockwork twin it reproduces the published colour type in every case. */
+function tosHtml(g) {
+  const sup = g.k > 2 ? SUPS[g.k] : "";
+  return `<span class="sym">${g.base.orb}${sup}/${g.kernel.orb}</span>`;
+}
+
+/* The Grünbaum-Shephard symbol, kept as the secondary name: it distinguishes
+ * colourings that share a colour type, which the pair notation does not. */
+function gsHtml(g) {
   const m = gsMap[g.id];
   if (m && m.gs) {
-    // e.g. "pm[2]3" -> pm[2]₃ in the site's symbol style
     const t = m.gs.replace(/\[(\d)\](\d+)(\*?)/,
       (_, kk, i, star) => `[${kk}]${sub(+i)}${star}`);
     return `<span class="sym">${t}</span>`;
@@ -51,6 +67,8 @@ function labelHtml(g) {
   const n = +g.id.split("-")[2];
   return `<span class="sym">${g.base.hm}[${g.k}]${sub(n)}</span>`;
 }
+
+function labelHtml(g) { return tosHtml(g); }
 
 function tagsHtml(g) {
   const t = [];
@@ -80,12 +98,15 @@ function linksHtml(g) {
 }
 
 function pairHtml(g) {
+  // the colour type is now the lead label, so this line carries what it does
+  // NOT say: the stabiliser H, the kernel when it differs from H, the
+  // Grünbaum-Shephard symbol, and Shubnikov's where there is one
   const kern = g.kernel.hm === g.sub.hm && g.normal
     ? "" : ` · kernel <span class="sym">${g.kernel.orb}</span> (${g.kernel.hm})`;
   const shub = (gsMap[g.id] && gsMap[g.id].shubnikov)
     ? ` · <span class="sym">${gsMap[g.id].shubnikov}</span>` : "";
-  return `<span class="sym">${g.base.orb}</span> / ` +
-         `<span class="sym">${g.sub.orb}</span> (${g.sub.hm})${kern}${shub}`;
+  return `${gsHtml(g)} · H <span class="sym">${g.sub.orb}</span> ` +
+         `(${g.sub.hm})${kern}${shub}`;
 }
 
 /* lazy painter */
