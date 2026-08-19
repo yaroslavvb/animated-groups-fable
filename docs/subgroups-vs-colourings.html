@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subgroups versus Colour Groups — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=47">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<style>
+.figrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.9rem;margin:.6rem 0}
+.figrow .cell{background:var(--panel);border-radius:6px;padding:.5rem;box-shadow:var(--shadow)}
+.figrow .lab{font-family:system-ui,sans-serif;font-size:.78rem;color:var(--muted);margin:.35rem 0 0}
+.figrow svg{display:block;width:100%;height:auto}
+.hyp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:.6rem 0}
+.hyp .cell{background:var(--panel);border-radius:6px;padding:.5rem;box-shadow:var(--shadow)}
+.hyp .lab{font-family:system-ui,sans-serif;font-size:.78rem;color:var(--muted);margin:.35rem 0 0}
+.hyp img,.hyp svg{display:block;width:100%;height:auto}
+.tblwrap{overflow-x:auto}
+table.counts.tight{font-size:.86rem;font-variant-numeric:tabular-nums}
+table.counts.tight th,table.counts.tight td{padding:.25rem .5rem;white-space:nowrap}
+table.counts tr.total td{border-top:2px solid var(--accent);font-weight:600}
+.sw{display:inline-block;width:.75em;height:.75em;border-radius:50%;vertical-align:-.05em;margin-right:.15em}
+.part{font-family:system-ui,sans-serif;font-size:.8rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:3rem 0 -1.4rem}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="two-color-patterns.html">Two-color patterns</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="narrow">
+
+<h1>Are the subgroups of a group the same thing as its colourings?</h1>
+<p class="subtitle">A note for Vladimir. Part I: wallpaper groups. Part II: hyperbolic groups. Short version — yes for transitive colourings, once subgroups are identified under automorphisms rather than conjugacy; the concept has to be kept separate only for colourings in which the group does not carry every colour to every other.</p>
+
+<div class="part">Part I · Wallpaper groups</div>
+
+<h2 id="dictionary">1. The dictionary</h2>
+<div class="thm"><span class="label">Theorem (van der Waerden–Burckhardt 1961)</span>
+Let Γ be a wallpaper group. Colourings with <i>k</i> colours in which every element of Γ permutes the colours, <em>transitively</em>, taken up to affine equivalence and relabelling of the colours, correspond bijectively to subgroups <i>H</i> ≤ Γ of index <i>k</i> taken up to Aut(Γ).</div>
+<p><i>H</i> is the stabiliser of one colour; the colours are the cosets of <i>H</i> — right cosets <i>Hg</i> in the convention "<i>AB</i> = <i>A</i> then <i>B</i>" (Γ acting on the right), and <i>g</i> sends the colour <i>Hx</i> to <i>Hxg</i>. The colour-<em>preserving</em> symmetries form the core <i>K</i> = ⋂ <i>g</i><sup>−1</sup><i>Hg</i>, the largest normal subgroup inside <i>H</i> (<em>The Symmetries of Things</em> calls it the kernel; the symmetry group of the coloured pattern in the modern sense is all of Γ, acting with colour permutations), and Γ/<i>K</i> is the group of colour permutations. Two facts make this clean for wallpaper groups: a subgroup of finite index in a wallpaper group is again a wallpaper group, and by Bieberbach every automorphism of Γ is conjugation by an affine map, so "up to Aut(Γ)" is "up to affine equivalence of the pair (Γ, <i>H</i>)".</p>
+<p>This is not a reinterpretation. Van der Waerden and Burckhardt <em>define</em> a Farbgruppe as a group with a distinguished subgroup of finite index. Grünbaum and Shephard (§8.2, p. 405) prove finiteness of the <i>k</i>-colour groups by exactly the algorithm you use — choose generators, associate with each generator in every possible way a permutation of {1,…,<i>k</i>}, subject to the relators — call two results isomorphic when an affine transformation combined with a permutation of colours carries one diagram to the other, and add: "The only difficulty is to discover and eliminate isomorphic groups." Conway, Burgiel and Goodman-Strauss call the same equivalence isotopic reshaping. So: <em>the low-index enumeration of Γ is an enumeration of the <i>k</i>-colour groups, up to Aut(Γ)</em>.</p>
+
+<h2 id="differ">2. Where the two lists differ</h2>
+<h3>(a) The equivalence — this is what a program notices first</h3>
+<p>A subgroup enumerator returns subgroups as sets (all transitive coset tables: (<i>k</i>−1)! transitive homomorphisms Γ → S<sub><i>k</i></sub> per subgroup) or, with the conjugacy test switched on, up to conjugacy in Γ. The classical tables — Woods' 46, Wieting's census, Grünbaum–Shephard Table 8.2.1, <em>The Symmetries of Things</em> — count up to Aut(Γ). The simplest instance is Γ = p1 = ℤ² with two colours: three subgroups of index 2, none conjugate to another (Γ is abelian), one two-colour group.</p>
+<figure id="fig1"><div class="figrow" id="fig1row"></div>
+<figcaption><b>Three subgroups, one colour group.</b> 2ℤ×ℤ, ℤ×2ℤ and {(<i>a,b</i>) : <i>a</i>+<i>b</i> even} are the three index-2 subgroups of p1. The swap (<i>x,y</i>) ↦ (<i>y,x</i>) exchanges the two stripe subgroups and the shear (<i>x,y</i>) ↦ (<i>x, x+y</i>) carries ℤ×2ℤ onto the checkerboard, so all three pictures are the single two-colour group <span class="sym">◦/◦</span> (Belov p<sub>b</sub>′1) drawn in three coordinate systems.</figcaption></figure>
+<p>In general p1 has σ(<i>k</i>) subgroups of index <i>k</i> but only #{<i>d</i> : <i>d</i>² | <i>k</i>} colour groups (Smith normal form of the sublattice). Subgroups of index 2 are always normal, so for two colours the conjugacy test removes nothing: the seventeen groups have 74 subgroups of index 2 between them (|Hom(Γ, ℤ<sub>2</sub>)| − 1 each) against 46 two-colour groups. Recomputed with the enumerator behind <a href="crystals-colored.html">catalogue D</a>:</p>
+<div class="tblwrap"><table class="counts tight" id="tbl"></table></div>
+<p class="hint">Each cell: subgroups as sets / conjugacy classes / classes under Aut(Γ). The last number is Wieting's; a low-index enumeration that de-duplicates by conjugacy reproduces the middle one.</p>
+<p>The mechanism of the collapse is worth stating correctly. Out(Γ) is infinite only for p1 and p2, where it contains GL<sub>2</sub>(ℤ) — that is why p1's conjugacy column grows like σ(<i>k</i>) while its colour groups stay bounded. For the other fifteen groups Out(Γ) is a small finite group (Out(pm) ≅ ℤ<sub>2</sub>², Out(pmm) ≅ D<sub>4</sub>, Out(p4m) ≅ ℤ<sub>2</sub>, Out(p6m) trivial), generated by half-lattice translations that move mirrors and rotation centres and by the symmetries of the lattice that normalise the point group; those finite outer automorphisms already take pm from 7 to 5, pmm from 15 to 5 and p4m from 7 to 5 at <i>k</i> = 2. Note also that Aut(Γ) contains orientation-reversing maps: the classical counts identify enantiomorphic colourings (p4 with five colours: the ideals (2 ± <i>i</i>) of ℤ[<i>i</i>] count once; under proper equivalence they would count twice, 270 in place of 269 for <i>k</i> ≤ 6).</p>
+
+<h3>(b) Infinite index</h3>
+<p>A subgroup of infinite index — a site-symmetry group (the stabiliser of a point), a single mirror, a frieze subgroup, one translation — is not a colouring with finitely many colours. So "for some number of colours" holds precisely for the finite-index subgroups, which are the subgroups that are themselves wallpaper groups.</p>
+
+<h3>(c) Intransitive colourings — the genuine gap</h3>
+<p>Perfect only means that every symmetry permutes the colours; nothing forces the permutation group to be transitive. If your enumerator really assigns permutations to the generators and checks the relators over all of S<sub><i>k</i></sub>, it produces every homomorphism Γ → S<sub><i>k</i></sub>, transitive or not; the low-index coset-table method produces only the transitive ones. An intransitive perfect colouring is a coloured wallpaper group that corresponds to <em>no single subgroup</em>: as a Γ-set the colours split into orbits Γ/<i>H</i><sub>1</sub> ⊔ … ⊔ Γ/<i>H<sub>m</sub></i>, so the object is a multiset of conjugacy classes of subgroups with Σ [Γ:<i>H<sub>i</sub></i>] = <i>k</i>, taken up to Out(Γ) acting on all of them at once — and not even the multiset of colour-group types determines it, because the relative position of the <i>H<sub>i</sub></i> matters (the kernel is ⋂ core(<i>H<sub>i</sub></i>)). Transitivity is automatic when Γ has a single orbit on the motifs (a coset colouring, a colouring of the tiling by fundamental domains), so a counterexample needs at least two orbits of motifs or tiles under Γ. Grünbaum and Shephard keep these out of the <i>k</i>-colour groups and file them separately as (<i>k</i><sub>1</sub>,<i>k</i><sub>2</sub>)-chromatic patterns (§8.8; their Figure 8.8.5 colours the triangle and kagome tilings this way).</p>
+<figure id="fig2"><div class="figrow" id="fig2row"></div>
+<figcaption><b>Simplest counterexample.</b> Γ = p1; each cell carries a dot and a dash in general position, so the uncoloured pattern has symmetry group exactly p1. <em>Left:</em> dots coloured by <i>x</i>-parity, dashes by <i>y</i>-parity. Every translation permutes the four colours, so this is a perfect 4-colouring; its permutation group is ℤ<sub>2</sub>×ℤ<sub>2</sub> with two orbits {<span class="sw" style="background:#c9343d"></span>,<span class="sw" style="background:#2f8a4c"></span>} and {<span class="sw" style="background:#2f5dbc"></span>,<span class="sw" style="background:#d59a1c"></span>}, and its colour-preserving kernel 2ℤ×2ℤ has index 4 = <i>k</i>. It is the Γ-set Γ/⟨2e<sub>1</sub>,e<sub>2</sub>⟩ ⊔ Γ/⟨e<sub>1</sub>,2e<sub>2</sub>⟩. <em>Middle and right:</em> the only two 4-colour <em>groups</em> of p1 — the coset colourings of 2ℤ×2ℤ (Klein four-group, regular) and of 4ℤ×ℤ (cyclic) — both transitive, so neither is the left picture. The left and middle pictures have the same Γ, the same kernel 2ℤ×2ℤ and the same abstract permutation group ℤ<sub>2</sub>×ℤ<sub>2</sub>: kernel and image cannot even detect transitivity. Colouring the dashes by <i>x</i>-parity as well, in two further colours, gives Γ/<i>H</i><sub>1</sub> ⊔ Γ/<i>H</i><sub>1</sub>: the same constituent 2-colour groups, a different coloured group (kernel of index 2).</figcaption></figure>
+<p>A three-colour version is shorter but degenerate: dots by <i>x</i>-parity, every dash blue — Γ/<i>H</i><sub>1</sub> ⊔ Γ/Γ, kernel of index 2 ≠ 3, one colour fixed by everything.</p>
+
+<h2 id="program">3. What this means for the program</h2>
+<ul>
+<li>Coset-table (low-index) enumeration gives the first or second column of the table: transitivity and finiteness of <i>k</i> are automatic, so every output is a colour group and every colour group appears — several times.</li>
+<li>To reach the classical numbers, act on the coset tables by generators of Out(Γ) and keep one representative per orbit. The affine normalisers of the plane groups are tabulated (International Tables Vol. A, Part 15, Koch–Fischer–Müller); on this site they are generated as: linear parts in the GL<sub>2</sub>(ℤ)-normaliser of the point group, translation parts solving (<i>I</i> − <i>M</i>)<i>t</i> ≡ <i>v</i><sub><i>AMA</i>⁻¹</sub> − <i>Av<sub>M</sub></i> (mod ℤ²), plus the discrete half-lattice translations. Decide whether orientation-reversing maps are allowed (the classical tables allow them).</li>
+<li>Colour the fundamental domain <em>marked</em>: the unmarked tiling by fundamental domains has more symmetry than Γ, and "perfect" is relative to Γ.</li>
+</ul>
+
+<h2 id="kernel">4. Remark: which subgroup is "the coloured subgroup"</h2>
+<p>If one means the colour-preserving group <i>K</i> rather than the stabiliser <i>H</i>, the correspondence breaks in the other direction: <i>K</i> = core(<i>H</i>) is normal and does not determine the colouring — the dot/dash example already shows it. A transitive instance: in p4m take <i>K</i> = the translation lattice ℤ² (Γ/<i>K</i> ≅ D<sub>4</sub>). <i>H</i><sub>1</sub> = ℤ² ⋊ ⟨axis mirror⟩ (type pm, <span class="sym">**</span>) and <i>H</i><sub>2</sub> = ℤ² ⋊ ⟨diagonal mirror⟩ (type cm, <span class="sym">*×</span>) are index-4 subgroups with the same core <i>K</i> and the same permutation image D<sub>4</sub> — the two faithful transitive actions of D<sub>4</sub> on four points, vertices versus edges of a square — and they are two different 4-colour groups of p4m (<a href="crystals-colored.html#c4-p4m-2">c4-p4m-2</a>, <a href="crystals-colored.html#c4-p4m-3">c4-p4m-3</a>): pm ≇ cm, so no automorphism can identify them. In the notation of <em>The Symmetries of Things</em>, which puts the kernel in the denominator, both are written <span class="sym">*442⁴/◦</span> — which is exactly the point: (Γ, <i>K</i>), even with the abstract permutation group attached, is coarser than the colouring, and <i>H</i> is the datum. In the finer direction, a coloured <em>pattern</em> (motif with nontrivial stabiliser <i>S</i>) is the chain <i>S</i> ≤ <i>H</i> ≤ Γ up to simultaneous conjugacy — the <a href="two-color-patterns.html">88 two-colour pattern types</a> against the 46 two-colour groups.</p>
+
+<h2 id="verdict">5. Verdict, wallpaper case</h2>
+<p>Coloured groups in the standard, transitive sense <em>are</em> the finite-index subgroups; the list matches the classical one exactly when subgroups are identified under Aut(Γ) rather than under conjugacy. Keep "coloured group" as a separate idea only for the intransitive perfect colourings, which are finite Γ-sets — several subgroups plus their relative position. Simplest counterexamples: p1 with two colours (three subgroups, one colour group) for the equivalence, and p1 with two motif orbits and four colours for a coloured group that is no subgroup. For the Russian-school vocabulary: Belov's colour groups (cyclic colour permutation) are the normal <i>H</i> with cyclic Γ/<i>H</i>; the 80 Shubnikov plane groups are 17 + 17 grey + the 46 here — the grey groups Γ × ℤ<sub>2</sub> are not colourings in this sense.</p>
+
+<div class="part">Part II · Hyperbolic groups</div>
+
+<h2 id="hyp-same">6. What does not change</h2>
+<p>Now let Γ be a cocompact discrete group of isometries of the hyperbolic plane — a hyperbolic orbifold group, <span class="sym">*237</span>, <span class="sym">237</span>, <span class="sym">*2223</span>, <span class="sym">◦◦</span> and so on (an NEC group when reflections are allowed, a Fuchsian group otherwise). The dictionary of §1 is pure algebra and carries over word for word: transitive perfect <i>k</i>-colourings ↔ subgroups <i>H</i> of index <i>k</i>, colours = cosets, colour-preserving group = core, permutation group = Γ/<i>K</i>; the low-index enumeration is an enumeration of the colour groups; every finite-index subgroup is again a cocompact hyperbolic orbifold group, so every colour group of Γ is a hyperbolic tiling group in its own right. Sections 2(b), 2(c) and 4 also carry over verbatim: infinite-index subgroups (a point stabiliser, a single mirror) are not colourings; intransitive perfect colourings are Γ-sets, i.e. several subgroups with their relative position; the kernel does not determine <i>H</i>.</p>
+<p>One thing becomes <em>more</em> constrained. In the plane every finite-index subgroup of a wallpaper group is one of the 17 types with no restriction from the index; in ℍ² the covering relation χ(O<sub><i>H</i></sub>) = <i>k</i>·χ(O<sub>Γ</sub>) (Riemann–Hurwitz) fixes the orbifold Euler characteristic of <i>H</i>, so at index <i>k</i> only the finitely many orbifolds with that χ can occur, and they can be read off the coset table: each cycle of length <i>d</i> < <i>n</i> of an order-<i>n</i> generator on the cosets is a cone point of order <i>n</i>/<i>d</i> of <i>H</i>. For <span class="sym">237</span> (χ = −1/42) the first subgroups are at index 7 (signature <span class="sym">2223</span>), 8 (<span class="sym">337</span>), 9 (<span class="sym">277</span>) — the classical inclusions of Singerman — and index 24 contains <span class="sym">777</span>.</p>
+
+<h2 id="hyp-equiv">7. What changes: the equivalence</h2>
+<p>There is no Bieberbach theorem in ℍ². For a wallpaper group, "the same colouring up to a change of coordinates" and "the same colouring up to an abstract automorphism of Γ" coincide, and that is what makes Wieting's numbers canonical. For a hyperbolic group there are two candidates, and they differ:</p>
+<ul>
+<li><b>Geometric equivalence</b> — conjugation by the isometric normaliser <i>N</i> = N<sub>Isom(ℍ²)</sub>(Γ). Because Γ is cocompact and non-elementary, <i>N</i> is discrete and contains Γ with finite index, so <i>N</i>/Γ is a finite group: "up to conjugacy" and "up to geometric equivalence" differ by at most that finite factor. This is what a fixed picture supports.</li>
+<li><b>Abstract equivalence</b> — Aut(Γ). Out(Γ) is the (extended) mapping class group of the orbifold (Dehn–Nielsen–Baer; Macbeath and Zieschang for orbifold groups). It is infinite as soon as the orbifold has a handle or a sphere with four or more cone points (Dehn twists, braids), and even when it is finite its elements are in general not realised by isometries of a given realisation. Abstract equivalence is coarser than geometric, and there is no canonical hyperbolic analogue of "affine equivalence".</li>
+</ul>
+<p>For <em>rigid</em> orbifolds — Teichmüller dimension 0: the triangle groups <span class="sym">pqr</span>, <span class="sym">*pqr</span> and <span class="sym">p*q</span> — the two agree: every automorphism is an isometry and Out(Γ) is finite. It is trivial for <span class="sym">*pqr</span> with <i>p, q, r</i> distinct, so <em>for a maximal reflection triangle group the conjugacy classes of subgroups already are the colour groups — nothing to identify</em>. For the rotation group <span class="sym">pqr</span> (<i>p, q, r</i> distinct) Out is ℤ<sub>2</sub>, the reflection of <span class="sym">*pqr</span>: it pairs each colouring with its mirror image, so a colour group and its enantiomorph count once up to isometry, twice up to proper isometry — the hyperbolic version of the (2 ± <i>i</i>) five-colouring of p4. When labels repeat the symmetries of the triangle appear (Singerman: <span class="sym">*ppr</span> ⊂ <span class="sym">*2p2r</span> of index 2, <span class="sym">*ppp</span> ⊂ <span class="sym">*23(2p)</span> of index 6, and similarly for the rotation groups), and the isometric normaliser is the larger triangle group.</p>
+
+<h2 id="hyp-table">8. The numbers for <span class="sym">237</span> and <span class="sym">*237</span></h2>
+<p>Computed with a Sims low-index enumerator written for this note (standardised coset tables; the totals were checked independently against Frobenius' formula |Hom(Γ, S<sub><i>n</i></sub>)| = (1/<i>n</i>!) Σ<sub>χ</sub> A<sub>2</sub>(χ)A<sub>3</sub>(χ)A<sub>7</sub>(χ)/χ(1) with Hall's transitive recursion for every <i>n</i> ≤ 40, and the <span class="sym">*237</span> counts against brute force for <i>k</i> ≤ 9). Only the indices with subgroups are listed; the smallest proper subgroup of <span class="sym">237</span> has index 7, of <span class="sym">*237</span> index 2. Signatures are read off the coset tables and satisfy χ = −<i>k</i>/42, resp. −<i>k</i>/84.</p>
+<div class="tblwrap"><table class="counts tight">
+<thead><tr><th>k</th><th>classes</th><th>subgroups</th><th>up to <span class="sym">*237</span></th><th style="text-align:left">orbifolds of H</th></tr></thead><tbody><tr><td>7</td><td>2</td><td>14</td><td><b>1</b></td><td style="text-align:left"><span class="sym">2223</span> ×2 — a mirror pair (Fano points / lines), same core</td></tr><tr><td>8</td><td>1</td><td>8</td><td><b>1</b></td><td style="text-align:left"><span class="sym">337</span></td></tr><tr><td>9</td><td>1</td><td>9</td><td><b>1</b></td><td style="text-align:left"><span class="sym">277</span></td></tr><tr><td>14</td><td>9</td><td>84</td><td><b>6</b></td><td style="text-align:left"><span class="sym">2233</span> ×9: two PSL(2,7) (a mirror pair), three PSL(2,13), four AGL(3,2) (two mirror pairs)</td></tr><tr><td>15</td><td>3</td><td>45</td><td><b>2</b></td><td style="text-align:left"><span class="sym">2227</span> ×3</td></tr><tr><td>21</td><td>9</td><td>189</td><td><b>5</b></td><td style="text-align:left"><span class="sym">22222</span> ×5, <span class="sym">2333</span> ×4</td></tr><tr><td>22</td><td>13</td><td>286</td><td><b>7</b></td><td style="text-align:left"><span class="sym">2237</span> ×13</td></tr><tr><td>24</td><td>1</td><td>8</td><td><b>1</b></td><td style="text-align:left"><span class="sym">777</span> — the Klein quartic</td></tr><tr><td>28</td><td>42</td><td>1092</td><td><b>25</b></td><td style="text-align:left"><span class="sym">22223</span> ×36, <span class="sym">3333</span> ×5, <span class="sym">◦3</span> ×1</td></tr><tr><td>29</td><td>14</td><td>406</td><td><b>7</b></td><td style="text-align:left"></td></tr><tr><td>30</td><td>12</td><td>225</td><td><b>8</b></td><td style="text-align:left"></td></tr><tr><td>35</td><td>92</td><td>3220</td><td><b>47</b></td><td style="text-align:left"></td></tr><tr><td>36</td><td>42</td><td>1512</td><td><b>22</b></td><td style="text-align:left"></td></tr><tr><td>37</td><td>15</td><td>555</td><td><b>8</b></td><td style="text-align:left"></td></tr><tr><td>42</td><td>251</td><td>8799</td><td><b>137</b></td><td style="text-align:left"></td></tr><tr><td>43</td><td>192</td><td>8256</td><td><b>96</b></td><td style="text-align:left"></td></tr><tr><td>44</td><td>16</td><td>418</td><td><b>10</b></td><td style="text-align:left"></td></tr><tr><td>45</td><td>2</td><td>90</td><td><b>1</b></td><td style="text-align:left"></td></tr></tbody></table></div>
+<p class="hint"><span class="sym">237</span>: conjugacy classes of subgroups of index <i>k</i> / subgroups as sets / classes under the isometric normaliser <span class="sym">*237</span> (the reflection swaps mirror-image subgroups; this is the count of colour groups up to isometry, and also up to Aut(<span class="sym">237</span>) ≅ Out = ℤ<sub>2</sub>). Every image is inside A<sub><i>k</i></sub>.</p>
+<div class="tblwrap"><table class="counts tight">
+<thead><tr><th>k</th><th>classes = colour groups</th><th>subgroups</th><th style="text-align:left">orbifolds of H</th></tr></thead><tbody><tr><td>2</td><td><b>1</b></td><td>1</td><td style="text-align:left"><span class="sym">237</span></td></tr><tr><td>8</td><td><b>1</b></td><td>8</td><td style="text-align:left"><span class="sym">3*7</span></td></tr><tr><td>9</td><td><b>1</b></td><td>9</td><td style="text-align:left"><span class="sym">7*2</span></td></tr><tr><td>14</td><td><b>4</b></td><td>56</td><td style="text-align:left"><span class="sym">2223</span>, <span class="sym">23*</span>, <span class="sym">23×</span> ×2</td></tr><tr><td>15</td><td><b>1</b></td><td>15</td><td style="text-align:left"><span class="sym">2*27</span></td></tr><tr><td>16</td><td><b>1</b></td><td>8</td><td style="text-align:left"><span class="sym">337</span></td></tr><tr><td>18</td><td><b>1</b></td><td>9</td><td style="text-align:left"><span class="sym">277</span></td></tr><tr><td>21</td><td><b>1</b></td><td>21</td><td style="text-align:left"><span class="sym">22*2</span></td></tr><tr><td>22</td><td><b>1</b></td><td>22</td><td style="text-align:left"><span class="sym">2*37</span></td></tr><tr><td>24</td><td><b>1</b></td><td>8</td><td style="text-align:left"><span class="sym">*777</span></td></tr><tr><td>28</td><td><b>13</b></td><td>252</td><td style="text-align:left"><span class="sym">*3×</span>, <span class="sym">2*223</span>, <span class="sym">22*3</span>, <span class="sym">33*</span>, <span class="sym">33×</span>, <span class="sym">2233</span> ×6, …</td></tr><tr><td>30</td><td><b>7</b></td><td>165</td><td style="text-align:left"><span class="sym">*2727</span>, <span class="sym">27*</span>, <span class="sym">27×</span> ×3, <span class="sym">2227</span> ×2</td></tr><tr><td>35</td><td><b>2</b></td><td>70</td><td style="text-align:left"></td></tr><tr><td>36</td><td><b>2</b></td><td>72</td><td style="text-align:left"></td></tr><tr><td>37</td><td><b>1</b></td><td>37</td><td style="text-align:left"></td></tr><tr><td>42</td><td><b>31</b></td><td>1071</td><td style="text-align:left"></td></tr><tr><td>44</td><td><b>12</b></td><td>462</td><td style="text-align:left"></td></tr><tr><td>48</td><td><b>1</b></td><td>8</td><td style="text-align:left"><span class="sym">777</span></td></tr></tbody></table></div>
+<p class="hint"><span class="sym">*237</span>: here N(Γ) = Γ and Out(Γ) is trivial, so the conjugacy classes <em>are</em> the colour groups — no further identification. Subgroups with mirrors, glides or both occur (<span class="sym">3*7</span>, <span class="sym">23×</span>, <span class="sym">*777</span>); the orientation-preserving classes at index 2<i>k</i> are exactly the <span class="sym">237</span> classes at index <i>k</i> counted up to the reflection.</p>
+<p>Two things to read off. First, at every index the "subgroups" column is far larger than the "classes" column — the low-index output must be de-duplicated by conjugacy, exactly as in the plane. Second, the further collapse that Wieting's tables perform in the plane is here at most a factor of two (<span class="sym">237</span>: pairs of mirror-image colourings) or absent (<span class="sym">*237</span>): for a rigid hyperbolic group the conjugacy classes are essentially the final answer, because Out(Γ) is small — the opposite of p1, where σ(<i>k</i>) subgroups collapse to a bounded number of colour groups. Kernels behave as in §4: the Klein-quartic kernel Λ (index 168) is the core of both index-7 classes, of the index-8, index-24 and one index-21 class, and of two index-14 classes — seven different colour groups with the same colour-preserving group and the same permutation group PSL(2,7).</p>
+
+<h2 id="hyp-klein">9. The Klein quartic as a colouring</h2>
+<p>The best-known hyperbolic colouring is a subgroup in disguise. The rotation group <span class="sym">237</span> maps onto PSL(2,7), of order 168, with kernel <i>K</i> = the fundamental group of the Klein quartic (index 168, a surface of genus 3). Every subgroup of PSL(2,7) pulls back to a subgroup of <span class="sym">237</span> containing <i>K</i>, i.e. to a perfect colouring of the {7,3} tiling whose colour-preserving group is <i>K</i> and whose colour permutations are PSL(2,7):</p>
+<ul>
+<li>the stabiliser of a point of the projective line P¹(F<sub>7</sub>) (order 21) pulls back to <i>H</i><sub>8</sub> of index 8, signature <span class="sym">337</span>: an <b>8-colouring</b> of the heptagons;</li>
+<li>a Sylow 7-subgroup (order 7) pulls back to <i>H</i><sub>24</sub> of index 24, signature <span class="sym">777</span> — Singerman's chain <span class="sym">777</span> ⊂ <span class="sym">337</span> ⊂ <span class="sym">237</span>: the <b>24-colouring</b> whose colours are the 24 heptagons of the Klein quartic (Klein's 1878 figure; the heptagons of <em>The Eightfold Way</em>);</li>
+<li>the two conjugacy classes of S<sub>4</sub> in PSL(2,7) — PSL(2,7) ≅ GL(3,2) acting on the seven points and on the seven lines of the Fano plane — pull back to two non-conjugate subgroups <i>H</i><sub>7</sub>, <i>H</i><sub>7</sub>′ of index 7 and signature <span class="sym">2223</span>. Since 7 ∤ 24 they contain no rotation of order 7, so they do not colour heptagons; they colour the <em>edges</em> (stabiliser <span class="sym">2</span>). They are swapped by the reflection of <span class="sym">*237</span> (the outer automorphism PGL(2,7)/PSL(2,7)): two 7-colourings that are mirror images of each other — one colour group up to isometry, two up to proper isometry.</li>
+</ul>
+<p>All four have the same kernel <i>K</i> and the same permutation group PSL(2,7): a hyperbolic instance of §4 — the kernel, even with the abstract permutation group attached, does not determine the colouring. And the intransitive case of §2(c) is one line away: colour the heptagons with the 24 Klein-quartic colours and the vertices (stabiliser <span class="sym">3</span>, 56 of them on the quartic) with 56 further colours — a perfect 80-colouring with permutation group PSL(2,7) and kernel <i>K</i> that is the Γ-set Γ/<i>H</i><sub>24</sub> ⊔ Γ/<i>H</i><sub>56</sub>, no single subgroup.</p>
+<figure>
+<div class="hyp">
+<div class="cell"><img src="img/subgroups/fig73_8.svg" alt="{7,3} tiling, 8-colouring by PSL(2,7) on the projective line over F7" loading="lazy"><div class="lab">8 colours: H₈ = 337, index 8. x ↦ (0 ∞)(1 6)(2 3)(4 5), y ↦ (0 6 ∞)(1 3 5), xy ↦ (0 1 2 3 4 5 6)</div></div>
+<div class="cell"><img src="img/subgroups/fig73_24.svg" alt="{7,3} tiling, 24-colouring by the heptagons of the Klein quartic" loading="lazy"><div class="lab">24 colours: H₂₄ = 777, index 24 — the Klein quartic. x acts as 12 transpositions, y as 8 three-cycles, xy fixes 3 colours and has three 7-cycles</div></div>
+<div class="cell"><img src="img/subgroups/fig73_7a.svg" alt="{7,3} tiling, edges 7-coloured via the points of the Fano plane" loading="lazy"><div class="lab">7 colours on the edges: H₇ = 2223 (Fano points). x ↦ (1 3)(2 4), y ↦ (0 1 2)(4 5 6)</div></div>
+<div class="cell"><img src="img/subgroups/fig73_7b.svg" alt="{7,3} tiling, edges 7-coloured via the lines of the Fano plane — the mirror image" loading="lazy"><div class="lab">7 colours: H₇′ = 2223 (Fano lines) — the mirror image of the previous picture, not conjugate to it in 237</div></div>
+</div>
+<figcaption><b>Four colourings of {7,3} with the same kernel and the same permutation group.</b> Γ = <span class="sym">237</span>, φ: <i>x</i> ↦ (<i>z</i> ↦ −1/<i>z</i>), <i>y</i> ↦ (<i>z</i> ↦ −1/(<i>z</i>+1)), so <i>xy</i> ↦ (<i>z</i> ↦ <i>z</i>+1) on P¹(F<sub>7</sub>). Each picture colours the orbit of one object by cosets: heptagons by φ(<i>g</i>)(∞) (8), by the coset φ(<i>g</i>)⟨<i>T</i>⟩ (24), and edges by the coset φ(<i>g</i>)S<sub>4</sub> for the two classes of S<sub>4</sub> (7 and 7′). Perfectness — every generator maps colour classes to colour classes — was checked on every drawn tile; the induced permutations are given under each picture. The 8- and 24-colourings are achiral (the mirror is a relabelling); the two 7-colourings are each other's mirror images.</figcaption>
+</figure>
+
+<h2 id="hyp-verdict">10. Verdict, hyperbolic case</h2>
+<p>Everything algebraic survives the passage to ℍ²: transitive colour groups are the finite-index subgroups, intransitive ones are unions of subgroups, and the low-index enumeration lists them — now with Riemann–Hurwitz telling you in advance which orbifolds can appear at which index. What has no hyperbolic analogue is the <em>canonical equivalence</em>: in the plane Bieberbach makes "same up to coordinates" and "same up to an automorphism" agree, and that is what turns a subgroup list into Wieting's table; in ℍ² one must choose. For a picture with a fixed fundamental polygon the honest choice is the isometric normaliser <i>N</i>/Γ, a finite group — trivial for the maximal reflection triangle groups <span class="sym">*pqr</span>, where the conjugacy classes of subgroups <em>are</em> the colour groups with no further identification at all, and ℤ<sub>2</sub> for <span class="sym">pqr</span>, where the reflection pairs enantiomorphic colourings. Only for orbifolds with moduli — where Out(Γ) is a mapping class group — do "up to conjugacy", "up to isometry" and "up to automorphism" give three genuinely different lists, and then the answer to "are subgroups the same as colourings?" is: yes, but you have to say which equivalence you mean, and no table in the literature has said it for you.</p>
+
+</main>
+<script>
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const C={red:'#c9343d',green:'#2f8a4c',blue:'#2f5dbc',gold:'#d59a1c'};
+  function svg(w,h){const s=document.createElementNS(NS,'svg');s.setAttribute('viewBox',`0 0 ${w} ${h}`);s.setAttribute('role','img');return s;}
+  function el(s,tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);s.appendChild(e);return e;}
+  const nx=8,ny=5,cs=24;
+  function grid2(fn,label){
+    const s=svg(nx*cs,ny*cs);
+    for(let i=0;i<nx;i++)for(let j=0;j<ny;j++){
+      const y=ny-1-j;
+      el(s,'rect',{x:i*cs,y:y*cs,width:cs,height:cs,fill:fn(i,j)?C.red:C.blue,stroke:'var(--panel)','stroke-width':1});
+    }
+    const d=document.createElement('div');d.className='cell';d.appendChild(s);
+    const l=document.createElement('div');l.className='lab';l.textContent=label;d.appendChild(l);
+    return d;
+  }
+  const f1=document.getElementById('fig1row');
+  f1.appendChild(grid2((i,j)=>i%2===0,'H = 2ℤ×ℤ'));
+  f1.appendChild(grid2((i,j)=>j%2===0,'H = ℤ×2ℤ'));
+  f1.appendChild(grid2((i,j)=>(i+j)%2===0,'H = {a+b even}'));
+  function grid4(dotc,dashc,label){
+    const mx=6,my=4,c=32;
+    const s=svg(mx*c,my*c);
+    for(let i=0;i<mx;i++)for(let j=0;j<my;j++){
+      const y=my-1-j;
+      el(s,'rect',{x:i*c,y:y*c,width:c,height:c,fill:'none',stroke:'var(--rule)','stroke-width':.6});
+      el(s,'circle',{cx:i*c+c*0.32,cy:y*c+c*0.40,r:c*0.17,fill:dotc(i,j)});
+      el(s,'rect',{x:i*c+c*0.50,y:y*c+c*0.64,width:c*0.40,height:c*0.14,rx:2,fill:dashc(i,j)});
+    }
+    const d=document.createElement('div');d.className='cell';d.appendChild(s);
+    const l=document.createElement('div');l.className='lab';l.textContent=label;d.appendChild(l);
+    return d;
+  }
+  const f2=document.getElementById('fig2row');
+  f2.appendChild(grid4((i,j)=>i%2?C.green:C.red,(i,j)=>j%2?C.gold:C.blue,'intransitive: Γ/H₁ ⊔ Γ/H₂'));
+  const klein=(i,j)=>[C.red,C.green,C.blue,C.gold][(i%2)+2*(j%2)];
+  f2.appendChild(grid4(klein,klein,'transitive: H = 2ℤ×2ℤ'));
+  const cyc=(i,j)=>[C.red,C.green,C.blue,C.gold][((i%4)+4)%4];
+  f2.appendChild(grid4(cyc,cyc,'transitive: H = 4ℤ×ℤ'));
+  const rows=[
+   ['p1','◦',[[3,3,1],[4,4,1],[7,7,2],[6,6,1],[12,12,1]]],
+   ['p2','2222',[[7,7,2],[12,4,1],[31,19,3],[30,6,1],[76,28,2]]],
+   ['pm','**',[[7,7,5],[4,2,2],[19,15,10],[6,2,2],[28,15,11]]],
+   ['pg','××',[[3,3,2],[4,2,2],[7,5,4],[6,2,2],[12,7,5]]],
+   ['cm','*×',[[3,3,3],[4,2,2],[11,7,7],[6,2,2],[12,7,7]]],
+   ['pmm','*2222',[[15,15,5],[6,2,1],[67,51,13],[10,2,1],[92,31,9]]],
+   ['pmg','22*',[[7,7,5],[6,2,2],[23,15,11],[10,2,2],[44,15,11]]],
+   ['pgg','22×',[[3,3,2],[6,2,1],[11,7,4],[10,2,1],[20,7,4]]],
+   ['cmm','2*22',[[7,7,5],[6,2,1],[31,19,11],[10,2,1],[44,15,8]]],
+   ['p4','442',[[3,3,2],[0,0,0],[11,7,5],[10,2,1],[12,2,2]]],
+   ['p4m','*442',[[7,7,5],[0,0,0],[31,19,13],[0,0,0],[12,2,2]]],
+   ['p4g','4*2',[[3,3,3],[0,0,0],[11,7,7],[0,0,0],[12,2,2]]],
+   ['p3','333',[[0,0,0],[4,4,2],[4,1,1],[0,0,0],[3,1,1]]],
+   ['p3m1','*333',[[1,1,1],[12,4,2],[4,1,1],[0,0,0],[10,6,4]]],
+   ['p31m','3*3',[[1,1,1],[4,2,2],[4,1,1],[0,0,0],[10,5,5]]],
+   ['p6','632',[[1,1,1],[4,2,2],[4,1,1],[0,0,0],[10,5,5]]],
+   ['p6m','*632',[[3,3,3],[6,2,2],[5,2,2],[0,0,0],[32,11,11]]],
+  ];
+  const t=document.getElementById('tbl');
+  let h='<thead><tr><th>Γ</th><th>orbifold</th>'+[2,3,4,5,6].map(k=>`<th>k = ${k}</th>`).join('')+'</tr></thead><tbody>';
+  const tot=[0,1,2,3,4].map(()=>[0,0,0]);
+  for(const [hm,orb,cells] of rows){
+    h+=`<tr><td>${hm}</td><td class="sym">${orb}</td>`+cells.map((c,ix)=>{tot[ix][0]+=c[0];tot[ix][1]+=c[1];tot[ix][2]+=c[2];return `<td>${c[0]} / ${c[1]} / <b>${c[2]}</b></td>`;}).join('')+'</tr>';
+  }
+  h+='<tr class="total"><td>Σ</td><td></td>'+tot.map(c=>`<td>${c[0]} / ${c[1]} / <b>${c[2]}</b></td>`).join('')+'</tr></tbody>';
+  t.innerHTML=h;
+})();
+</script>
+</body>
+</html>
