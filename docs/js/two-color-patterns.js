@@ -6,7 +6,7 @@
 (() => {
   "use strict";
 
-  const V = "9";
+  const V = "11";
   const DATA_URL = "data/two-color-patterns.json?v=" + V;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const PALETTE = ["#0072B2", "#E69F00"];
@@ -56,9 +56,10 @@
 
   // ---- the G / H / S(M) notation --------------------------------------
   // G = the wallpaper group Γ (all symmetries of the coloured pattern),
-  // H = the subgroup preserving each colour (index 2, hence normal: H = the
-  //     kernel K, so G/H is exactly Chaim's G/K), S(M) = the stabiliser of one
-  // copy of the motif — the datum that turns 46 colour groups into 88 types.
+  // H = the stabiliser of one colour (CBGS, Symmetries of Things §12 p. 155);
+  //     at two colours index 2 forces H = K, so their G^p/H/K prints as G/K,
+  // S(M) = the stabiliser of one copy of the motif (Grünbaum–Shephard's induced
+  //     group) — the datum that turns 46 colour groups into 88 pattern types.
   const smShort = (t) => {
     const s = t.seat;
     if (s.kind === "interior") return "1";
@@ -67,14 +68,18 @@
   const smLong = (t) => t.seat.kind === "interior" ? "1" : `${smShort(t)} ≅ ${t.seat.stype}`;
   const GHK_TITLE = {
     G: "G — the wallpaper group Γ: every symmetry of the coloured pattern",
-    H: "H — the subgroup preserving each colour; of index 2, hence normal, so it is also the kernel K (Chaim writes G/K)",
+    H: "H — the stabiliser of one colour (Symmetries of Things §12, p. 155); at two colours it has index 2, hence is normal and equals the kernel K, so the book prints the single-slash G/K",
     S: "S(M) — the stabiliser of one copy of the motif: the seat, and the datum the colour group does not carry",
   };
+  // The book's own tag for the one colour type its symbol does not determine:
+  // Table 11.1 splits ∗∗/∗∗ into (1) and (2) (SoT p. 139, p. 141). Carrying it
+  // makes the printed string separate all 88 types.
+  const ghkTag = (t) => { const i = t.chaim_type.indexOf("("); return i < 0 ? "" : t.chaim_type.slice(i); };
   function ghkNode(t, opts = {}) {
     const e = el("span", "ghk-expression" + (opts.cls ? " " + opts.cls : ""));
     const term = (text, key) => { const n = el("span", "ghk-term", text); n.title = GHK_TITLE[key]; return n; };
     e.append(term(star(t.orbifold), "G"), el("span", "ghk-separator", "/"),
-             term(star(t.H.orb), "H"), el("span", "ghk-separator", "/"),
+             term(star(t.H.orb) + ghkTag(t), "H"), el("span", "ghk-separator", "/"),
              term(opts.long ? smLong(t) : smShort(t), "S"));
     return e;
   }
@@ -416,8 +421,8 @@
     const ghkCell = el("span");
     ghkCell.append(ghkNode(t, {long: true, cls: "source-math-symbol"}));
     const leg = el("span", "ghk-legend");
-    leg.append(document.createTextNode(`the group Γ = ${fam.hm} · the colour-preserving subgroup H = ${t.H.hm} · the seat S(M) = ${smLong(t)}. `),
-      document.createTextNode(`H has index 2, hence is normal and equals the kernel K, so G/H is Chaim's ${star(t.chaim_type.split(" (")[0])}${t.chaim_type.includes("(") ? " " + t.chaim_type.slice(t.chaim_type.indexOf("(")) : ""}.`));
+    leg.append(document.createTextNode(`the group Γ = ${fam.hm} · the stabiliser of a colour H = ${t.H.hm}, here also the kernel K · the seat S(M) = ${smLong(t)}. `),
+      document.createTextNode(`Index 2 makes H normal, so H = K and the book's single-slash form applies: ${star(t.chaim_type.split(" (")[0])}${ghkTag(t) ? ghkTag(t) + " — Table 11.1's tag for the one type its symbol does not determine" : ""}.`));
     ghkCell.append(leg);
     row("G / H / S(M)", ghkCell);
     // seat / marked signature
