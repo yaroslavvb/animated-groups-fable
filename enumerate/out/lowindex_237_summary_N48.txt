@@ -1,0 +1,119 @@
+237: N=48 nodes=41602 enum=7.78s analysis=14.3s
+*237: N=48 nodes=6616 enum=1.43s analysis=1.4s
+
+== 237 per-index counts (k: #conjugacy classes, #subgroups, #classes under N(237)=*237, #classes fixed by reflection)
+ k= 1  classes=  1  subgroups=    1  classesUnderN=  1  fixed=  1
+ k= 7  classes=  2  subgroups=   14  classesUnderN=  1  fixed=  0
+ k= 8  classes=  1  subgroups=    8  classesUnderN=  1  fixed=  1
+ k= 9  classes=  1  subgroups=    9  classesUnderN=  1  fixed=  1
+ k=14  classes=  9  subgroups=   84  classesUnderN=  6  fixed=  3
+ k=15  classes=  3  subgroups=   45  classesUnderN=  2  fixed=  1
+ k=21  classes=  9  subgroups=  189  classesUnderN=  5  fixed=  1
+ k=22  classes= 13  subgroups=  286  classesUnderN=  7  fixed=  1
+ k=24  classes=  1  subgroups=    8  classesUnderN=  1  fixed=  1
+ k=28  classes= 42  subgroups= 1092  classesUnderN= 25  fixed=  8
+ k=29  classes= 14  subgroups=  406  classesUnderN=  7  fixed=  0
+ k=30  classes= 12  subgroups=  225  classesUnderN=  8  fixed=  4
+ k=35  classes= 92  subgroups= 3220  classesUnderN= 47  fixed=  2
+ k=36  classes= 42  subgroups= 1512  classesUnderN= 22  fixed=  2
+ k=37  classes= 15  subgroups=  555  classesUnderN=  8  fixed=  1
+ k=42  classes=251  subgroups= 8799  classesUnderN=137  fixed= 23
+ k=43  classes=192  subgroups= 8256  classesUnderN= 96  fixed=  0
+ k=44  classes= 16  subgroups=  418  classesUnderN= 10  fixed=  4
+ k=45  classes=  2  subgroups=   90  classesUnderN=  1  fixed=  0
+ classes: [1, 0, 0, 0, 0, 0, 2, 1, 1, 0, 0, 0, 0, 9, 3, 0, 0, 0, 0, 0, 9, 13, 0, 1, 0, 0, 0, 42, 14, 12, 0, 0, 0, 0, 92, 42, 15, 0, 0, 0, 0, 251, 192, 16, 2, 0, 0, 0]
+ subgroups: [1, 0, 0, 0, 0, 0, 14, 8, 9, 0, 0, 0, 0, 84, 45, 0, 0, 0, 0, 0, 189, 286, 0, 8, 0, 0, 0, 1092, 406, 225, 0, 0, 0, 0, 3220, 1512, 555, 0, 0, 0, 0, 8799, 8256, 418, 90, 0, 0, 0]
+ classes under N: [1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 6, 2, 0, 0, 0, 0, 0, 5, 7, 0, 1, 0, 0, 0, 25, 7, 8, 0, 0, 0, 0, 47, 22, 8, 0, 0, 0, 0, 137, 96, 10, 1, 0, 0, 0]
+
+== 237 classes, k <= 24  (id: index, signature (g;m1..), Conway, class size |G:N(H)|, |N(H):H|, core index, image, primitive, outer partner id, core id, cycle types of x,y,xy)
+ #0 k=1 sig=(0;2,3,7) 237 classSize=1 N/H=1 core=1 image=S1 prim=True outer->#0 (fixed) coreid=None x:[1] y:[1] xy:[1]
+ #1 k=7 sig=(0;2,2,2,3) 2223 classSize=7 N/H=1 core=168 image=PSL(2,7) prim=True outer->#2 coreid=None x:[1, 1, 1, 2, 2] y:[1, 3, 3] xy:[7]
+ #2 k=7 sig=(0;2,2,2,3) 2223 classSize=7 N/H=1 core=168 image=PSL(2,7) prim=True outer->#1 coreid=None x:[1, 1, 1, 2, 2] y:[1, 3, 3] xy:[7]
+ #690 k=8 sig=(0;3,3,7) 337 classSize=8 N/H=1 core=168 image=PSL(2,7) prim=True outer->#690 (fixed) coreid=None x:[2, 2, 2, 2] y:[1, 1, 3, 3] xy:[1, 7]
+ #297 k=9 sig=(0;2,7,7) 277 classSize=9 N/H=1 core=504 image=PSL(2,8) prim=True outer->#297 (fixed) coreid=None x:[1, 2, 2, 2, 2] y:[3, 3, 3] xy:[1, 1, 7]
+ #319 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=168 image=PSL(2,7) prim=False outer->#381 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #381 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=168 image=PSL(2,7) prim=False outer->#319 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #5 k=14 sig=(0;2,2,3,3) 2233 classSize=14 N/H=1 core=1092 image=PSL(2,13) prim=True outer->#5 (fixed) coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #121 k=14 sig=(0;2,2,3,3) 2233 classSize=14 N/H=1 core=1092 image=PSL(2,13) prim=True outer->#121 (fixed) coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #422 k=14 sig=(0;2,2,3,3) 2233 classSize=14 N/H=1 core=1092 image=PSL(2,13) prim=True outer->#422 (fixed) coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #120 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=1344 image=2^3:PSL(2,7)=AGL(3,2) prim=False outer->#163 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #163 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=1344 image=2^3:PSL(2,7)=AGL(3,2) prim=False outer->#120 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #320 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=1344 image=2^3:PSL(2,7)=AGL(3,2) prim=False outer->#382 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #382 k=14 sig=(0;2,2,3,3) 2233 classSize=7 N/H=2 core=1344 image=2^3:PSL(2,7)=AGL(3,2) prim=False outer->#320 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2] y:[1, 1, 3, 3, 3, 3] xy:[7, 7]
+ #3 k=15 sig=(0;2,2,2,7) 2227 classSize=15 N/H=1 core=653837184000 image=A15 prim=True outer->#4 coreid=None x:[1, 1, 1, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3] xy:[1, 7, 7]
+ #4 k=15 sig=(0;2,2,2,7) 2227 classSize=15 N/H=1 core=653837184000 image=A15 prim=True outer->#3 coreid=None x:[1, 1, 1, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3] xy:[1, 7, 7]
+ #211 k=15 sig=(0;2,2,2,7) 2227 classSize=15 N/H=1 core=653837184000 image=A15 prim=True outer->#211 (fixed) coreid=None x:[1, 1, 1, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3] xy:[1, 7, 7]
+ #7 k=21 sig=(0;2,2,2,2,2) 22222 classSize=21 N/H=1 core=168 image=PSL(2,7) prim=False outer->#7 (fixed) coreid=None x:[1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #6 k=21 sig=(0;2,2,2,2,2) 22222 classSize=21 N/H=1 core=2939328 image=order 2939328 prim=False outer->#19 coreid=None x:[1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #19 k=21 sig=(0;2,2,2,2,2) 22222 classSize=21 N/H=1 core=2939328 image=order 2939328 prim=False outer->#6 coreid=None x:[1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #220 k=21 sig=(0;2,2,2,2,2) 22222 classSize=21 N/H=1 core=2939328 image=order 2939328 prim=False outer->#228 coreid=None x:[1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #228 k=21 sig=(0;2,2,2,2,2) 22222 classSize=21 N/H=1 core=2939328 image=order 2939328 prim=False outer->#220 coreid=None x:[1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #124 k=21 sig=(0;2,3,3,3) 2333 classSize=21 N/H=1 core=25545471085854720000 image=A21 prim=True outer->#166 coreid=None x:[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 1, 1, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #166 k=21 sig=(0;2,3,3,3) 2333 classSize=21 N/H=1 core=25545471085854720000 image=A21 prim=True outer->#124 coreid=None x:[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 1, 1, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #494 k=21 sig=(0;2,3,3,3) 2333 classSize=21 N/H=1 core=25545471085854720000 image=A21 prim=True outer->#496 coreid=None x:[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 1, 1, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #496 k=21 sig=(0;2,3,3,3) 2333 classSize=21 N/H=1 core=25545471085854720000 image=A21 prim=True outer->#494 coreid=None x:[1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 1, 1, 3, 3, 3, 3, 3, 3] xy:[7, 7, 7]
+ #18 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#29 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #29 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#18 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #122 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#165 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #123 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#164 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #164 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#123 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #165 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#122 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #219 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#219 (fixed) coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #423 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#453 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #425 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#454 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #453 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#423 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #454 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#425 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #523 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#540 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #540 k=22 sig=(0;2,2,3,7) 2237 classSize=22 N/H=1 core=562000363888803840000 image=A22 prim=True outer->#523 coreid=None x:[1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[1, 3, 3, 3, 3, 3, 3, 3] xy:[1, 7, 7, 7]
+ #717 k=24 sig=(0;7,7,7) 777 classSize=8 N/H=3 core=168 image=PSL(2,7) prim=False outer->#717 (fixed) coreid=None x:[2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2] y:[3, 3, 3, 3, 3, 3, 3, 3] xy:[1, 1, 1, 7, 7, 7]
+
+== *237 per-index counts (k: #conjugacy classes = #colour groups, #subgroups, of which orientation-preserving classes/subgroups)
+ k= 1  classes=  1  subgroups=    1  op-classes=  0 op-subgroups=   0
+ k= 2  classes=  1  subgroups=    1  op-classes=  1 op-subgroups=   1
+ k= 8  classes=  1  subgroups=    8  op-classes=  0 op-subgroups=   0
+ k= 9  classes=  1  subgroups=    9  op-classes=  0 op-subgroups=   0
+ k=14  classes=  4  subgroups=   56  op-classes=  1 op-subgroups=  14
+ k=15  classes=  1  subgroups=   15  op-classes=  0 op-subgroups=   0
+ k=16  classes=  1  subgroups=    8  op-classes=  1 op-subgroups=   8
+ k=18  classes=  1  subgroups=    9  op-classes=  1 op-subgroups=   9
+ k=21  classes=  1  subgroups=   21  op-classes=  0 op-subgroups=   0
+ k=22  classes=  1  subgroups=   22  op-classes=  0 op-subgroups=   0
+ k=24  classes=  1  subgroups=    8  op-classes=  0 op-subgroups=   0
+ k=28  classes= 13  subgroups=  252  op-classes=  6 op-subgroups=  84
+ k=30  classes=  7  subgroups=  165  op-classes=  2 op-subgroups=  45
+ k=35  classes=  2  subgroups=   70  op-classes=  0 op-subgroups=   0
+ k=36  classes=  2  subgroups=   72  op-classes=  0 op-subgroups=   0
+ k=37  classes=  1  subgroups=   37  op-classes=  0 op-subgroups=   0
+ k=42  classes= 31  subgroups= 1071  op-classes=  5 op-subgroups= 189
+ k=44  classes= 12  subgroups=  462  op-classes=  7 op-subgroups= 286
+ k=48  classes=  1  subgroups=    8  op-classes=  1 op-subgroups=   8
+ classes: [1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 4, 1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 0, 13, 0, 7, 0, 0, 0, 0, 2, 2, 1, 0, 0, 0, 0, 31, 0, 12, 0, 0, 0, 1]
+ subgroups: [1, 1, 0, 0, 0, 0, 0, 8, 9, 0, 0, 0, 0, 56, 15, 8, 0, 9, 0, 0, 21, 22, 0, 8, 0, 0, 0, 252, 0, 165, 0, 0, 0, 0, 70, 72, 37, 0, 0, 0, 0, 1071, 0, 462, 0, 0, 0, 8]
+
+== *237 classes, k <= 24 (id: index, Conway, orientation-preserving?, orientable underlying surface?, chi_orb, class size, |N(H):H|, core index, image, image<=A_k?, primitive, core id, cycles a,b,c)
+ #0 k=1 *237 op=False orientableSurf=True chi=-1/84 classSize=1 N/H=1 core=1 image=S1 even=True prim=True coreid=None a:[1] b:[1] c:[1]
+ #38 k=2 237 op=True orientableSurf=True chi=-1/42 classSize=1 N/H=2 core=2 image=S2 even=False prim=True coreid=None a:[2] b:[2] c:[2]
+ #16 k=8 3*7 op=False orientableSurf=True chi=-2/21 classSize=8 N/H=1 core=336 image=PGL(2,7) even=False prim=True coreid=None a:[1, 1, 2, 2, 2] b:[1, 1, 2, 2, 2] c:[1, 1, 2, 2, 2]
+ #1 k=9 7*2 op=False orientableSurf=True chi=-3/28 classSize=9 N/H=1 core=504 image=PSL(2,8) even=True prim=True coreid=None a:[1, 2, 2, 2, 2] b:[1, 2, 2, 2, 2] c:[1, 2, 2, 2, 2]
+ #39 k=14 2223 op=True orientableSurf=True chi=-1/6 classSize=14 N/H=1 core=336 image=PGL(2,7) even=False prim=False coreid=None a:[2, 2, 2, 2, 2, 2, 2] b:[2, 2, 2, 2, 2, 2, 2] c:[2, 2, 2, 2, 2, 2, 2]
+ #24 k=14 23* op=False orientableSurf=True chi=-1/6 classSize=14 N/H=1 core=1092 image=PSL(2,13) even=True prim=True coreid=None a:[1, 1, 2, 2, 2, 2, 2, 2] b:[1, 1, 2, 2, 2, 2, 2, 2] c:[1, 1, 2, 2, 2, 2, 2, 2]
+ #47 k=14 23x op=False orientableSurf=False chi=-1/6 classSize=14 N/H=1 core=2184 image=PGL(2,13) even=False prim=True coreid=None a:[2, 2, 2, 2, 2, 2, 2] b:[2, 2, 2, 2, 2, 2, 2] c:[2, 2, 2, 2, 2, 2, 2]
+ #53 k=14 23x op=False orientableSurf=False chi=-1/6 classSize=14 N/H=1 core=2184 image=PGL(2,13) even=False prim=True coreid=None a:[2, 2, 2, 2, 2, 2, 2] b:[2, 2, 2, 2, 2, 2, 2] c:[2, 2, 2, 2, 2, 2, 2]
+ #2 k=15 2*27 op=False orientableSurf=True chi=-5/28 classSize=15 N/H=1 core=653837184000 image=A15 even=True prim=True coreid=None a:[1, 1, 1, 2, 2, 2, 2, 2, 2] b:[1, 1, 1, 2, 2, 2, 2, 2, 2] c:[1, 1, 1, 2, 2, 2, 2, 2, 2]
+ #77 k=16 337 op=True orientableSurf=True chi=-4/21 classSize=8 N/H=2 core=336 image=PGL(2,7) even=True prim=False coreid=None a:[2, 2, 2, 2, 2, 2, 2, 2] b:[2, 2, 2, 2, 2, 2, 2, 2] c:[2, 2, 2, 2, 2, 2, 2, 2]
+ #54 k=18 277 op=True orientableSurf=True chi=-3/14 classSize=9 N/H=2 core=1008 image=PGL(2,8)=PSL(2,8):3 even=False prim=False coreid=None a:[2, 2, 2, 2, 2, 2, 2, 2, 2] b:[2, 2, 2, 2, 2, 2, 2, 2, 2] c:[2, 2, 2, 2, 2, 2, 2, 2, 2]
+ #3 k=21 22*2 op=False orientableSurf=True chi=-1/4 classSize=21 N/H=1 core=336 image=PGL(2,7) even=False prim=True coreid=None a:[1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] b:[1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] c:[1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+ #18 k=22 2*37 op=False orientableSurf=True chi=-11/42 classSize=22 N/H=1 core=1124000727777607680000 image=S22 even=False prim=True coreid=None a:[1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] b:[1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] c:[1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+ #17 k=24 *777 op=False orientableSurf=True chi=-2/7 classSize=8 N/H=3 core=336 image=PGL(2,7) even=False prim=False coreid=None a:[1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] b:[1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2] c:[1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+
+== consistency: 237 classes under N at index k  vs  *237 orientation-preserving classes at 2k
+ k=1: classesUnderN=1 op-classes(2k)=1 | subgroups 1 vs 1 | conway multisets equal=True OK
+ k=7: classesUnderN=1 op-classes(2k)=1 | subgroups 14 vs 14 | conway multisets equal=True OK
+ k=8: classesUnderN=1 op-classes(2k)=1 | subgroups 8 vs 8 | conway multisets equal=True OK
+ k=9: classesUnderN=1 op-classes(2k)=1 | subgroups 9 vs 9 | conway multisets equal=True OK
+ k=14: classesUnderN=6 op-classes(2k)=6 | subgroups 84 vs 84 | conway multisets equal=True OK
+ k=15: classesUnderN=2 op-classes(2k)=2 | subgroups 45 vs 45 | conway multisets equal=True OK
+ k=21: classesUnderN=5 op-classes(2k)=5 | subgroups 189 vs 189 | conway multisets equal=True OK
+ k=22: classesUnderN=7 op-classes(2k)=7 | subgroups 286 vs 286 | conway multisets equal=True OK
+ k=24: classesUnderN=1 op-classes(2k)=1 | subgroups 8 vs 8 | conway multisets equal=True OK
+ all consistent: True
