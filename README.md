@@ -25,6 +25,10 @@ loop with ← → (shift for finer steps).
   gyration subscripts (time screws), tilde-marked mirrors (time glides),
   stacking prefixes (time-centred lattices) and a prime clause (time
   reversal); equivalently, Seifert-fibration data of the quotient 3-orbifold.
+- **Two-Color Patterns** — the 88 Grünbaum–Shephard two-colour pattern
+  types, recomputed from scratch: colour group + the seat of the motif (a
+  Chaim colour signature with one symbol marked), one plate each with
+  presentation and colour permutations, crops of both books.
 - **History** — Fletcher 1956 (zero citations; his counts 7 and 194 vs the
   modern 13 and 275, explained), Shubnikov/Zamorzaev antisymmetry,
   Janssen–Janner–Ascher, choreographic crystals, the H/K theorem.
@@ -45,6 +49,12 @@ The classification is recomputed from scratch in exact rational arithmetic
   with Xu–Wu's names.
 - `enumerate_2p1.py` — the 2+1D enumeration (275 groups; per-system totals
   match Xu–Wu Table II).
+- `enumerate_colored.py` — the coloured 2D crystals (269 colour groups,
+  k ≤ 6; Table 8.2.1 of Grünbaum & Shephard).
+- `enumerate_patterns.py` — the 88 two-colour pattern types as orbits of
+  (orbifold stratum, index-2 subgroup) pairs under the affine normaliser;
+  Chaim's generators and presentations verified exactly; emits
+  `docs/data/two-color-patterns.json`.
 - `export.py` — feature extraction (rotation centres with phases, mirror/glide
   line classes, reversal cosets), clockwork symbols, catalog JSON.
 - `optimize_bases.py` — picks each spec's motif base point to maximise the
@@ -86,5 +96,6 @@ See [wolfram/README.md](wolfram/README.md) and the guide notebook
 - Conway, Delgado Friedrichs, Huson, Thurston, "On Three-dimensional Space
   Groups". [arXiv:math/9911185](https://arxiv.org/abs/math/9911185)
 - Conway, Burgiel, Goodman-Strauss, *The Symmetries of Things* (2008).
+- Grünbaum, Shephard, *Tilings and Patterns* (1987), Chapters 5 and 8.
 
 Built with Claude Code (Fable 5).

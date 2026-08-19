@@ -1,0 +1,12862 @@
+{
+ "meta": {
+  "title": "Two-Color Patterns",
+  "count": 88,
+  "primitive": 46,
+  "nonprimitive": 42,
+  "note": "88 periodic two-colour pattern types (Grünbaum & Shephard 8.3.1) as marked coloured orbifolds: colour group (catalogue D id) + seat stratum of the motif; 87 classes as (S,H) pairs (PP48A/B merge)."
+ },
+ "wallpaper": {
+  "p1": {
+   "hm": "p1",
+   "orbifold": "◦",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.32,
+     1.06
+    ]
+   ],
+   "annotated": "◦^{X,Y}",
+   "template": "◦{X,Y}",
+   "relations": "XY = YX",
+   "generators": [
+    {
+     "name": "X",
+     "geometry": "translation",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "translation",
+     "vector": [
+      1.0,
+      0.0
+     ]
+    },
+    {
+     "name": "Y",
+     "geometry": "translation",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      0.32,
+      1.06
+     ],
+     "kind": "translation",
+     "vector": [
+      0.32,
+      1.06
+     ]
+    }
+   ]
+  },
+  "p2": {
+   "hm": "p2",
+   "orbifold": "2222",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.32,
+     1.06
+    ]
+   ],
+   "annotated": "α2β2γ2δ2",
+   "template": "{α}2{β}2{γ}2{δ}2",
+   "relations": "α² = β² = γ² = δ² = αβγδ = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "β",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.32,
+      1.06
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.16,
+      0.53
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "γ",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      1.32,
+      1.06
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.66,
+      0.53
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "δ",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.0
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    }
+   ]
+  },
+  "pm": {
+   "hm": "pm",
+   "orbifold": "**",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.36
+    ]
+   ],
+   "annotated": "α∗P∗Q",
+   "template": "{α}*{P}*{Q}",
+   "relations": "P² = Q² = 1; αP = Pα; αQ = Qα",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "translation",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "translation",
+     "vector": [
+      1.0,
+      0.0
+     ]
+    },
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "parallel mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      1.36
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.68
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "pg": {
+   "hm": "pg",
+   "orbifold": "××",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.36
+    ]
+   ],
+   "annotated": "×Y×Z",
+   "template": "×{Y}×{Z}",
+   "relations": "Y²Z² = 1",
+   "generators": [
+    {
+     "name": "Y",
+     "geometry": "glide reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.0
+     ],
+     "kind": "glide",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      -1.0,
+      0.0
+     ],
+     "glide": -0.5
+    },
+    {
+     "name": "Z",
+     "geometry": "glide reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      -0.5,
+      1.36
+     ],
+     "kind": "glide",
+     "axis_point": [
+      0.0,
+      0.68
+     ],
+     "axis_direction": [
+      -1.0,
+      0.0
+     ],
+     "glide": 0.5
+    }
+   ]
+  },
+  "cm": {
+   "hm": "cm",
+   "orbifold": "*×",
+   "basis": [
+    [
+     0.5,
+     -0.68
+    ],
+    [
+     0.5,
+     0.68
+    ]
+   ],
+   "annotated": "∗P×Z",
+   "template": "*{P}×{Z}",
+   "relations": "P² = PZ²PZ⁻² = 1",
+   "generators": [
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Z",
+     "geometry": "glide reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.68
+     ],
+     "kind": "glide",
+     "axis_point": [
+      0.0,
+      0.34
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.5
+    }
+   ]
+  },
+  "pmm": {
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.36
+    ]
+   ],
+   "annotated": "∗P2Q2R2S2",
+   "template": "*{P}2{Q}2{R}2{S}2",
+   "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+   "generators": [
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "R",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.5,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "S",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      1.36
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.68
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "pmg": {
+   "hm": "pmg",
+   "orbifold": "22*",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.36
+    ]
+   ],
+   "annotated": "α2β2∗P",
+   "template": "{α}2{β}2*{P}",
+   "relations": "α² = β² = P² = 1; αβP = Pαβ",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "β",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      1.36
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.68
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.25,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "pgg": {
+   "hm": "pgg",
+   "orbifold": "22×",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.36
+    ]
+   ],
+   "annotated": "α2β2×Z",
+   "template": "{α}2{β}2×{Z}",
+   "relations": "α² = β² = αβZ² = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "β",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.0
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "Z",
+     "geometry": "glide reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.68
+     ],
+     "kind": "glide",
+     "axis_point": [
+      0.0,
+      0.34
+     ],
+     "axis_direction": [
+      -1.0,
+      0.0
+     ],
+     "glide": -0.5
+    }
+   ]
+  },
+  "cmm": {
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "basis": [
+    [
+     0.5,
+     -0.68
+    ],
+    [
+     0.5,
+     0.68
+    ]
+   ],
+   "annotated": "α2∗P2Q2",
+   "template": "{α}2*{P}2{Q}2",
+   "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      -0.68
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.25,
+      -0.34
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    },
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      -1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "p4": {
+   "hm": "p4",
+   "orbifold": "442",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0
+    ]
+   ],
+   "annotated": "α4β4γ2",
+   "template": "{α}4{β}4{γ}2",
+   "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "quarter-turn",
+     "matrix": [
+      [
+       0.0,
+       -1.0
+      ],
+      [
+       1.0,
+       0.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 4,
+     "angle_degrees": 90.0
+    },
+    {
+     "name": "β",
+     "geometry": "quarter-turn",
+     "matrix": [
+      [
+       0.0,
+       -1.0
+      ],
+      [
+       1.0,
+       0.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.5
+     ],
+     "order": 4,
+     "angle_degrees": 90.0
+    },
+    {
+     "name": "γ",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      1.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.5
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    }
+   ]
+  },
+  "p4m": {
+   "hm": "p4m",
+   "orbifold": "*442",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0
+    ]
+   ],
+   "annotated": "∗P4Q4R2",
+   "template": "*{P}4{Q}4{R}2",
+   "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+   "generators": [
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       0.0,
+       1.0
+      ],
+      [
+       1.0,
+       0.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.7071067811865475,
+      0.7071067811865475
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "R",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.5,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "p4g": {
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "basis": [
+    [
+     0.7071067811865476,
+     0.7071067811865475
+    ],
+    [
+     -0.7071067811865475,
+     0.7071067811865476
+    ]
+   ],
+   "annotated": "α4∗P2",
+   "template": "{α}4*{P}2",
+   "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "quarter-turn",
+     "matrix": [
+      [
+       0.0,
+       -1.0
+      ],
+      [
+       1.0,
+       0.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 4,
+     "angle_degrees": 90.0
+    },
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       2.220446049250313e-16
+      ],
+      [
+       2.220446049250313e-16,
+       1.0
+      ]
+     ],
+     "translation": [
+      -0.7071067811865475,
+      5.551115123125783e-17
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      -0.35355339059327373,
+      2.7755575615628914e-17
+     ],
+     "axis_direction": [
+      7.850462293418876e-17,
+      1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "p3": {
+   "hm": "p3",
+   "orbifold": "333",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "annotated": "α3β3γ3",
+   "template": "{α}3{β}3{γ}3",
+   "relations": "α³ = β³ = γ³ = αβγ = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "one-third turn",
+     "matrix": [
+      [
+       -0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 3,
+     "angle_degrees": 120.0
+    },
+    {
+     "name": "β",
+     "geometry": "one-third turn",
+     "matrix": [
+      [
+       -0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.28867513459481287
+     ],
+     "order": 3,
+     "angle_degrees": 120.0
+    },
+    {
+     "name": "γ",
+     "geometry": "one-third turn",
+     "matrix": [
+      [
+       -0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.8660254037844386
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.5773502691896257
+     ],
+     "order": 3,
+     "angle_degrees": 120.0
+    }
+   ]
+  },
+  "p3m1": {
+   "hm": "p3m1",
+   "orbifold": "*333",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "annotated": "∗P3Q3R3",
+   "template": "*{P}3{Q}3{R}3",
+   "relations": "P² = Q² = R² = (PQ)³ = (QR)³ = (RP)³ = 1",
+   "generators": [
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       0.5,
+       0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.8660254037844387,
+      0.5
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       0.5,
+       -0.8660254037844388
+      ],
+      [
+       -0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.8660254037844386
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.25,
+      0.4330127018922193
+     ],
+     "axis_direction": [
+      0.8660254037844387,
+      -0.5
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "R",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "p31m": {
+   "hm": "p31m",
+   "orbifold": "3*3",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "annotated": "α3∗P3",
+   "template": "{α}3*{P}3",
+   "relations": "α³ = P² = (PαPα⁻¹)³ = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "one-third turn",
+     "matrix": [
+      [
+       -0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.28867513459481287
+     ],
+     "order": 3,
+     "angle_degrees": 120.0
+    },
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -0.5,
+       0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       0.5
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.5000000000000001,
+      0.8660254037844387
+     ],
+     "glide": 0.0
+    }
+   ]
+  },
+  "p6": {
+   "hm": "p6",
+   "orbifold": "632",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "annotated": "α6β3γ2",
+   "template": "{α}6{β}3{γ}2",
+   "relations": "α⁶ = β³ = γ² = αβγ = 1",
+   "generators": [
+    {
+     "name": "α",
+     "geometry": "one-sixth turn",
+     "matrix": [
+      [
+       0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       0.5
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.0,
+      0.0
+     ],
+     "order": 6,
+     "angle_degrees": 60.0
+    },
+    {
+     "name": "β",
+     "geometry": "one-third turn",
+     "matrix": [
+      [
+       -0.5,
+       -0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.5,
+      0.28867513459481287
+     ],
+     "order": 3,
+     "angle_degrees": 120.0
+    },
+    {
+     "name": "γ",
+     "geometry": "half-turn",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.5,
+      0.8660254037844386
+     ],
+     "kind": "rotation",
+     "centre": [
+      0.25,
+      0.4330127018922193
+     ],
+     "order": 2,
+     "angle_degrees": 180.0
+    }
+   ]
+  },
+  "p6m": {
+   "hm": "p6m",
+   "orbifold": "*632",
+   "basis": [
+    [
+     1.0,
+     0.0
+    ],
+    [
+     -0.5,
+     0.8660254037844386
+    ]
+   ],
+   "annotated": "∗P6Q3R2",
+   "template": "*{P}6{Q}3{R}2",
+   "relations": "P² = Q² = R² = (PQ)⁶ = (QR)³ = (RP)² = 1",
+   "generators": [
+    {
+     "name": "P",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       1.0,
+       0.0
+      ],
+      [
+       0.0,
+       -1.0
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      1.0,
+      0.0
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "Q",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       0.5,
+       0.8660254037844388
+      ],
+      [
+       0.8660254037844386,
+       -0.5
+      ]
+     ],
+     "translation": [
+      0.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.0,
+      0.0
+     ],
+     "axis_direction": [
+      0.8660254037844387,
+      0.5
+     ],
+     "glide": 0.0
+    },
+    {
+     "name": "R",
+     "geometry": "mirror reflection",
+     "matrix": [
+      [
+       -1.0,
+       0.0
+      ],
+      [
+       0.0,
+       1.0
+      ]
+     ],
+     "translation": [
+      1.0,
+      0.0
+     ],
+     "kind": "mirror",
+     "axis_point": [
+      0.5,
+      0.0
+     ],
+     "axis_direction": [
+      0.0,
+      1.0
+     ],
+     "glide": 0.0
+    }
+   ]
+  }
+ },
+ "types": [
+  {
+   "id": "pp1-2",
+   "gs": "PP1[2]",
+   "pp": 1,
+   "variety": "",
+   "star": false,
+   "hm": "p1",
+   "orbifold": "◦",
+   "colour_group": "c2-p1-1",
+   "gs_group": "p1[2]",
+   "shubnikov": "p′b1",
+   "H": {
+    "hm": "p1",
+    "orb": "◦"
+   },
+   "chaim_type": "◦/◦",
+   "signature": "◦¹,²",
+   "perms": {
+    "X": 1,
+    "Y": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.143065,
+     0.108333
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.143065,
+     0.108333
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp7-2-1",
+   "gs": "PP7[2]₁",
+   "pp": 7,
+   "variety": "",
+   "star": false,
+   "hm": "p2",
+   "orbifold": "2222",
+   "colour_group": "c2-p2-1",
+   "gs_group": "p2[2]1",
+   "shubnikov": "p2′",
+   "H": {
+    "hm": "p1",
+    "orb": "◦"
+   },
+   "chaim_type": "2222/◦",
+   "signature": "²2²2²2²2",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "γ": 2,
+    "δ": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.363065,
+     0.285
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.363065,
+     0.285
+    ],
+    "min_dist": 0.63238,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp7-2-2",
+   "gs": "PP7[2]₂",
+   "pp": 7,
+   "variety": "",
+   "star": false,
+   "hm": "p2",
+   "orbifold": "2222",
+   "colour_group": "c2-p2-2",
+   "gs_group": "p2[2]2",
+   "shubnikov": "p′b2",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "2222/2222",
+   "signature": "¹2¹2²2²2",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "γ": 2,
+    "δ": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.363065,
+     0.285
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.363065,
+     0.285
+    ],
+    "min_dist": 0.63238,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp8-2-2",
+   "gs": "PP8[2]₂",
+   "pp": 8,
+   "variety": "",
+   "star": false,
+   "hm": "p2",
+   "orbifold": "2222",
+   "colour_group": "c2-p2-2",
+   "gs_group": "p2[2]2",
+   "shubnikov": "p′b2",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "2222/2222",
+   "signature": "¹2¹2²2²2",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "γ": 2,
+    "δ": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     },
+     {
+      "kind": "gyration",
+      "letters": [
+       "β"
+      ],
+      "label": "at the 2-fold centre of β"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp3-2-4",
+   "gs": "PP3[2]₄",
+   "pp": 3,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-1",
+   "gs_group": "pm[2]4",
+   "shubnikov": "pm′",
+   "H": {
+    "hm": "p1",
+    "orb": "◦"
+   },
+   "chaim_type": "**/◦",
+   "signature": "¹*²*²",
+   "perms": {
+    "α": 1,
+    "P": 2,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.628679,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp3-2-5",
+   "gs": "PP3[2]₅",
+   "pp": 3,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-2",
+   "gs_group": "pm[2]5",
+   "shubnikov": "p′b1m",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "**/** (2)",
+   "signature": "¹*¹*²",
+   "perms": {
+    "α": 1,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.628679,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp4-2-5",
+   "gs": "PP4[2]₅",
+   "pp": 4,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-2",
+   "gs_group": "pm[2]5",
+   "shubnikov": "p′b1m",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "**/** (2)",
+   "signature": "¹*¹*²",
+   "perms": {
+    "α": 1,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp3-2-3",
+   "gs": "PP3[2]₃",
+   "pp": 3,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-3",
+   "gs_group": "pm[2]3",
+   "shubnikov": "p′bm",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "**/** (1)",
+   "signature": "²*¹*¹",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.628679,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp4-2-3",
+   "gs": "PP4[2]₃",
+   "pp": 4,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-3",
+   "gs_group": "pm[2]3",
+   "shubnikov": "p′bm",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "**/** (1)",
+   "signature": "²*¹*¹",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp3-2-1",
+   "gs": "PP3[2]₁",
+   "pp": 3,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-4",
+   "gs_group": "pm[2]1",
+   "shubnikov": "p′bg",
+   "H": {
+    "hm": "pg",
+    "orb": "××"
+   },
+   "chaim_type": "**/××",
+   "signature": "²*²*²",
+   "perms": {
+    "α": 2,
+    "P": 2,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.628679,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp3-2-2",
+   "gs": "PP3[2]₂",
+   "pp": 3,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-5",
+   "gs_group": "pm[2]2",
+   "shubnikov": "c′m",
+   "H": {
+    "hm": "cm",
+    "orb": "*×"
+   },
+   "chaim_type": "**/*×",
+   "signature": "²*¹*²",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.628679,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp4-2-2",
+   "gs": "PP4[2]₂",
+   "pp": 4,
+   "variety": "",
+   "star": false,
+   "hm": "pm",
+   "orbifold": "**",
+   "colour_group": "c2-pm-5",
+   "gs_group": "pm[2]2",
+   "shubnikov": "c′m",
+   "H": {
+    "hm": "cm",
+    "orb": "*×"
+   },
+   "chaim_type": "**/*×",
+   "signature": "²*¹*²",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp2-2-1",
+   "gs": "PP2[2]₁",
+   "pp": 2,
+   "variety": "",
+   "star": false,
+   "hm": "pg",
+   "orbifold": "××",
+   "colour_group": "c2-pg-1",
+   "gs_group": "pg[2]1",
+   "shubnikov": "pg′",
+   "H": {
+    "hm": "p1",
+    "orb": "◦"
+   },
+   "chaim_type": "××/◦",
+   "signature": "×²×²",
+   "perms": {
+    "Y": 2,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.803267,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp2-2-2",
+   "gs": "PP2[2]₂",
+   "pp": 2,
+   "variety": "",
+   "star": false,
+   "hm": "pg",
+   "orbifold": "××",
+   "colour_group": "c2-pg-2",
+   "gs_group": "pg[2]2",
+   "shubnikov": "p′b1g",
+   "H": {
+    "hm": "pg",
+    "orb": "××"
+   },
+   "chaim_type": "××/××",
+   "signature": "×¹×²",
+   "perms": {
+    "Y": 1,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.11036,
+     0.36566
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.11036,
+     0.36566
+    ],
+    "min_dist": 0.803267,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp5-2-1",
+   "gs": "PP5[2]₁",
+   "pp": 5,
+   "variety": "",
+   "star": false,
+   "hm": "cm",
+   "orbifold": "*×",
+   "colour_group": "c2-cm-1",
+   "gs_group": "cm[2]1",
+   "shubnikov": "cm′",
+   "H": {
+    "hm": "p1",
+    "orb": "◦"
+   },
+   "chaim_type": "*×/◦",
+   "signature": "*²×²",
+   "perms": {
+    "P": 2,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     0.277785
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     0.277785
+    ],
+    "min_dist": 0.51525,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp5-2-3",
+   "gs": "PP5[2]₃",
+   "pp": 5,
+   "variety": "",
+   "star": false,
+   "hm": "cm",
+   "orbifold": "*×",
+   "colour_group": "c2-cm-2",
+   "gs_group": "cm[2]3",
+   "shubnikov": "p′cm",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "*×/**",
+   "signature": "*¹×²",
+   "perms": {
+    "P": 1,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     0.277785
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.314614,
+     0.277785
+    ],
+    "min_dist": 0.51525,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp6-2-3",
+   "gs": "PP6[2]₃",
+   "pp": 6,
+   "variety": "",
+   "star": false,
+   "hm": "cm",
+   "orbifold": "*×",
+   "colour_group": "c2-cm-2",
+   "gs_group": "cm[2]3",
+   "shubnikov": "p′cm",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "*×/**",
+   "signature": "*¹×²",
+   "perms": {
+    "P": 1,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.844038,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp5-2-2",
+   "gs": "PP5[2]₂",
+   "pp": 5,
+   "variety": "",
+   "star": false,
+   "hm": "cm",
+   "orbifold": "*×",
+   "colour_group": "c2-cm-3",
+   "gs_group": "cm[2]2",
+   "shubnikov": "p′cg",
+   "H": {
+    "hm": "pg",
+    "orb": "××"
+   },
+   "chaim_type": "*×/××",
+   "signature": "*²×¹",
+   "perms": {
+    "P": 2,
+    "Z": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     0.277785
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     0.277785
+    ],
+    "min_dist": 0.51525,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp14-2-5",
+   "gs": "PP14[2]₅",
+   "pp": 14,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-1",
+   "gs_group": "pmm[2]5",
+   "shubnikov": "pm′m′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "*2222/2222",
+   "signature": "*²2²2²2²2",
+   "perms": {
+    "P": 2,
+    "Q": 2,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp14-2-2",
+   "gs": "PP14[2]₂",
+   "pp": 14,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-2",
+   "gs_group": "pmm[2]2",
+   "shubnikov": "pmm′",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "*2222/**",
+   "signature": "*¹2²2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp15-2-2",
+   "gs": "PP15[2]₂",
+   "pp": 15,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-2",
+   "gs_group": "pmm[2]2",
+   "shubnikov": "pmm′",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "*2222/**",
+   "signature": "*¹2²2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "R"
+      ],
+      "label": "on the mirror R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.34
+    ],
+    "min_dist": 0.68,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp14-2-1",
+   "gs": "PP14[2]₁",
+   "pp": 14,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-3",
+   "gs_group": "pmm[2]1",
+   "shubnikov": "p′bmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*2222/*2222",
+   "signature": "*¹2¹2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp15-2-1",
+   "gs": "PP15[2]₁",
+   "pp": 15,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-3",
+   "gs_group": "pmm[2]1",
+   "shubnikov": "p′bmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*2222/*2222",
+   "signature": "*¹2¹2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "R"
+      ],
+      "label": "on the mirror R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.34
+    ],
+    "min_dist": 0.68,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp15-2-1s",
+   "gs": "PP15[2]₁*",
+   "pp": 15,
+   "variety": "",
+   "star": true,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-3",
+   "gs_group": "pmm[2]1",
+   "shubnikov": "p′bmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*2222/*2222",
+   "signature": "*¹2¹2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "Q"
+    ],
+    "label": "on the mirror Q",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp16-2-1",
+   "gs": "PP16[2]₁",
+   "pp": 16,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-3",
+   "gs_group": "pmm[2]1",
+   "shubnikov": "p′bmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*2222/*2222",
+   "signature": "*¹2¹2¹2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 1,
+    "S": 2
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "P",
+     "Q"
+    ],
+    "label": "at the corner 2 between P and Q",
+    "stype": "d2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P",
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "P",
+       "Q"
+      ],
+      "label": "at the corner 2 between P and Q"
+     },
+     {
+      "kind": "corner",
+      "letters": [
+       "Q",
+       "R"
+      ],
+      "label": "at the corner 2 between Q and R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp14-2-4",
+   "gs": "PP14[2]₄",
+   "pp": 14,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-4",
+   "gs_group": "pmm[2]4",
+   "shubnikov": "p′bgm",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "*2222/22*",
+   "signature": "*¹2²2²2²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp15-2-4",
+   "gs": "PP15[2]₄",
+   "pp": 15,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-4",
+   "gs_group": "pmm[2]4",
+   "shubnikov": "p′bgm",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "*2222/22*",
+   "signature": "*¹2²2²2²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.34
+    ],
+    "min_dist": 0.68,
+    "lattice_colour": [
+     1,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp14-2-3",
+   "gs": "PP14[2]₃",
+   "pp": 14,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-5",
+   "gs_group": "pmm[2]3",
+   "shubnikov": "c′mm",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "*2222/2*22",
+   "signature": "*¹2¹2²2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp15-2-3",
+   "gs": "PP15[2]₃",
+   "pp": 15,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-5",
+   "gs_group": "pmm[2]3",
+   "shubnikov": "c′mm",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "*2222/2*22",
+   "signature": "*¹2¹2²2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.0,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.34
+    ],
+    "min_dist": 0.68,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp16-2-3",
+   "gs": "PP16[2]₃",
+   "pp": 16,
+   "variety": "",
+   "star": false,
+   "hm": "pmm",
+   "orbifold": "*2222",
+   "colour_group": "c2-pmm-5",
+   "gs_group": "pmm[2]3",
+   "shubnikov": "c′mm",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "*2222/2*22",
+   "signature": "*¹2¹2²2²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2,
+    "S": 2
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "P",
+     "Q"
+    ],
+    "label": "at the corner 2 between P and Q",
+    "stype": "d2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P",
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "P",
+       "Q"
+      ],
+      "label": "at the corner 2 between P and Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp11-2-5",
+   "gs": "PP11[2]₅",
+   "pp": 11,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-1",
+   "gs_group": "pmg[2]5",
+   "shubnikov": "pm′g′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "22*/2222",
+   "signature": "¹2¹2*²",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.527027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.527027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp12-2-5",
+   "gs": "PP12[2]₅",
+   "pp": 12,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-1",
+   "gs_group": "pmg[2]5",
+   "shubnikov": "pm′g′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "22*/2222",
+   "signature": "¹2¹2*²",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     },
+     {
+      "kind": "gyration",
+      "letters": [
+       "β"
+      ],
+      "label": "at the 2-fold centre of β"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp11-2-4",
+   "gs": "PP11[2]₄",
+   "pp": 11,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-2",
+   "gs_group": "pmg[2]4",
+   "shubnikov": "pmg′",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "22*/**",
+   "signature": "²2²2*¹",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.527027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.527027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp13-2-4",
+   "gs": "PP13[2]₄",
+   "pp": 13,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-2",
+   "gs_group": "pmg[2]4",
+   "shubnikov": "pmg′",
+   "H": {
+    "hm": "pm",
+    "orb": "**"
+   },
+   "chaim_type": "22*/**",
+   "signature": "²2²2*¹",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.34
+    ],
+    "min_dist": 0.844038,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp11-2-2",
+   "gs": "PP11[2]₂",
+   "pp": 11,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-3",
+   "gs_group": "pmg[2]2",
+   "shubnikov": "pm′g",
+   "H": {
+    "hm": "pg",
+    "orb": "××"
+   },
+   "chaim_type": "22*/××",
+   "signature": "²2²2*²",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.527027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.527027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp11-2-1",
+   "gs": "PP11[2]₁",
+   "pp": 11,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-4",
+   "gs_group": "pmg[2]1",
+   "shubnikov": "p′bmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "22*/22*",
+   "signature": "¹2²2*¹",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.527027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.527027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp13-2-1",
+   "gs": "PP13[2]₁",
+   "pp": 13,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-4",
+   "gs_group": "pmg[2]1",
+   "shubnikov": "p′bmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "22*/22*",
+   "signature": "¹2²2*¹",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.34
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.34
+    ],
+    "min_dist": 0.844038,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp12-2-1",
+   "gs": "PP12[2]₁",
+   "pp": 12,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-4",
+   "gs_group": "pmg[2]1",
+   "shubnikov": "p′bmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "22*/22*",
+   "signature": "¹2²2*¹",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp11-2-3",
+   "gs": "PP11[2]₃",
+   "pp": 11,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-5",
+   "gs_group": "pmg[2]3",
+   "shubnikov": "p′bgg",
+   "H": {
+    "hm": "pgg",
+    "orb": "22×"
+   },
+   "chaim_type": "22*/22×",
+   "signature": "¹2²2*²",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.527027,
+     0.252327
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.527027,
+     0.252327
+    ],
+    "min_dist": 0.445946,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp12-2-3",
+   "gs": "PP12[2]₃",
+   "pp": 12,
+   "variety": "",
+   "star": false,
+   "hm": "pmg",
+   "orbifold": "22*",
+   "colour_group": "c2-pmg-5",
+   "gs_group": "pmg[2]3",
+   "shubnikov": "p′bgg",
+   "H": {
+    "hm": "pgg",
+    "orb": "22×"
+   },
+   "chaim_type": "22*/22×",
+   "signature": "¹2²2*²",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "P": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp9-2-2",
+   "gs": "PP9[2]₂",
+   "pp": 9,
+   "variety": "",
+   "star": false,
+   "hm": "pgg",
+   "orbifold": "22×",
+   "colour_group": "c2-pgg-1",
+   "gs_group": "pgg[2]2",
+   "shubnikov": "pg′g′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "22×/2222",
+   "signature": "¹2¹2×²",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.478994
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.478994
+    ],
+    "min_dist": 0.572081,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp10-2-2",
+   "gs": "PP10[2]₂",
+   "pp": 10,
+   "variety": "",
+   "star": false,
+   "hm": "pgg",
+   "orbifold": "22×",
+   "colour_group": "c2-pgg-1",
+   "gs_group": "pgg[2]2",
+   "shubnikov": "pg′g′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "22×/2222",
+   "signature": "¹2¹2×²",
+   "perms": {
+    "α": 1,
+    "β": 1,
+    "Z": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     },
+     {
+      "kind": "gyration",
+      "letters": [
+       "β"
+      ],
+      "label": "at the 2-fold centre of β"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.844038,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp9-2-1",
+   "gs": "PP9[2]₁",
+   "pp": 9,
+   "variety": "",
+   "star": false,
+   "hm": "pgg",
+   "orbifold": "22×",
+   "colour_group": "c2-pgg-2",
+   "gs_group": "pgg[2]1",
+   "shubnikov": "pgg′",
+   "H": {
+    "hm": "pg",
+    "orb": "××"
+   },
+   "chaim_type": "22×/××",
+   "signature": "²2²2×¹",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "Z": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.277027,
+     0.478994
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.5,
+       0.68
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.277027,
+     0.478994
+    ],
+    "min_dist": 0.572081,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp17-2-4",
+   "gs": "PP17[2]₄",
+   "pp": 17,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-1",
+   "gs_group": "cmm[2]4",
+   "shubnikov": "cm′m′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "2*22/2222",
+   "signature": "¹2*²2²2",
+   "perms": {
+    "α": 1,
+    "P": 2,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     -0.175548
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     -0.175548
+    ],
+    "min_dist": 0.351096,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp18-2-4",
+   "gs": "PP18[2]₄",
+   "pp": 18,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-1",
+   "gs_group": "cmm[2]4",
+   "shubnikov": "cm′m′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "2*22/2222",
+   "signature": "¹2*²2²2",
+   "perms": {
+    "α": 1,
+    "P": 2,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.25,
+     -0.34
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     -0.34
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp17-2-2",
+   "gs": "PP17[2]₂",
+   "pp": 17,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-2",
+   "gs_group": "cmm[2]2",
+   "shubnikov": "cmm′",
+   "H": {
+    "hm": "cm",
+    "orb": "*×"
+   },
+   "chaim_type": "2*22/*×",
+   "signature": "²2*¹2²2",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     -0.175548
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     -0.175548
+    ],
+    "min_dist": 0.351096,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp19-2-2",
+   "gs": "PP19[2]₂",
+   "pp": 19,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-2",
+   "gs_group": "cmm[2]2",
+   "shubnikov": "cmm′",
+   "H": {
+    "hm": "cm",
+    "orb": "*×"
+   },
+   "chaim_type": "2*22/*×",
+   "signature": "²2*¹2²2",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp17-2-5",
+   "gs": "PP17[2]₅",
+   "pp": 17,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-3",
+   "gs_group": "cmm[2]5",
+   "shubnikov": "p′cmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "2*22/*2222",
+   "signature": "²2*¹2¹2",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     -0.175548
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.314614,
+     -0.175548
+    ],
+    "min_dist": 0.351096,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp19-2-5",
+   "gs": "PP19[2]₅",
+   "pp": 19,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-3",
+   "gs_group": "cmm[2]5",
+   "shubnikov": "p′cmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "2*22/*2222",
+   "signature": "²2*¹2¹2",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp20-2-5",
+   "gs": "PP20[2]₅",
+   "pp": 20,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-3",
+   "gs_group": "cmm[2]5",
+   "shubnikov": "p′cmm",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "2*22/*2222",
+   "signature": "²2*¹2¹2",
+   "perms": {
+    "α": 2,
+    "P": 1,
+    "Q": 1
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "P",
+     "Q"
+    ],
+    "label": "at the corner 2 between P and Q",
+    "stype": "d2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P",
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "P",
+       "Q"
+      ],
+      "label": "at the corner 2 between P and Q"
+     },
+     {
+      "kind": "corner",
+      "letters": [
+       "Q",
+       "αPα⁻¹"
+      ],
+      "label": "at the corner 2 between Q and αPα⁻¹"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.844038,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp17-2-3",
+   "gs": "PP17[2]₃",
+   "pp": 17,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-4",
+   "gs_group": "cmm[2]3",
+   "shubnikov": "p′cmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "2*22/22*",
+   "signature": "¹2*¹2²2",
+   "perms": {
+    "α": 1,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     -0.175548
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     -0.175548
+    ],
+    "min_dist": 0.351096,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp19-2-3",
+   "gs": "PP19[2]₃",
+   "pp": 19,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-4",
+   "gs_group": "cmm[2]3",
+   "shubnikov": "p′cmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "2*22/22*",
+   "signature": "¹2*¹2²2",
+   "perms": {
+    "α": 1,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp18-2-3",
+   "gs": "PP18[2]₃",
+   "pp": 18,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-4",
+   "gs_group": "cmm[2]3",
+   "shubnikov": "p′cmg",
+   "H": {
+    "hm": "pmg",
+    "orb": "22*"
+   },
+   "chaim_type": "2*22/22*",
+   "signature": "¹2*¹2²2",
+   "perms": {
+    "α": 1,
+    "P": 1,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 2-fold centre of α",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.25,
+     -0.34
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 2-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     -0.34
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp17-2-1",
+   "gs": "PP17[2]₁",
+   "pp": 17,
+   "variety": "",
+   "star": false,
+   "hm": "cmm",
+   "orbifold": "2*22",
+   "colour_group": "c2-cmm-5",
+   "gs_group": "cmm[2]1",
+   "shubnikov": "p′cgg",
+   "H": {
+    "hm": "pgg",
+    "orb": "22×"
+   },
+   "chaim_type": "2*22/22×",
+   "signature": "²2*²2²2",
+   "perms": {
+    "α": 2,
+    "P": 2,
+    "Q": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.314614,
+     -0.175548
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.314614,
+     -0.175548
+    ],
+    "min_dist": 0.351096,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp30-2-2",
+   "gs": "PP30[2]₂",
+   "pp": 30,
+   "variety": "",
+   "star": false,
+   "hm": "p4",
+   "orbifold": "442",
+   "colour_group": "c2-p4-1",
+   "gs_group": "p4[2]2",
+   "shubnikov": "p4′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "442/2222",
+   "signature": "²4²4¹2",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "γ": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.193694,
+     0.685535
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.193694,
+     0.685535
+    ],
+    "min_dist": 0.506452,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp31-2-2",
+   "gs": "PP31[2]₂",
+   "pp": 31,
+   "variety": "",
+   "star": false,
+   "hm": "p4",
+   "orbifold": "442",
+   "colour_group": "c2-p4-1",
+   "gs_group": "p4[2]2",
+   "shubnikov": "p4′",
+   "H": {
+    "hm": "p2",
+    "orb": "2222"
+   },
+   "chaim_type": "442/2222",
+   "signature": "²4²4¹2",
+   "perms": {
+    "α": 2,
+    "β": 2,
+    "γ": 1
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "γ"
+    ],
+    "label": "at the 2-fold centre of γ",
+    "stype": "c2",
+    "order": 2,
+    "point": [
+     0.0,
+     0.5
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "γ"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "γ"
+      ],
+      "label": "at the 2-fold centre of γ"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.0,
+     0.5
+    ],
+    "min_dist": 0.707107,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp30-2-1",
+   "gs": "PP30[2]₁",
+   "pp": 30,
+   "variety": "",
+   "star": false,
+   "hm": "p4",
+   "orbifold": "442",
+   "colour_group": "c2-p4-2",
+   "gs_group": "p4[2]1",
+   "shubnikov": "p′c4",
+   "H": {
+    "hm": "p4",
+    "orb": "442"
+   },
+   "chaim_type": "442/442",
+   "signature": "¹4²4²2",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "γ": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.193694,
+     0.685535
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.193694,
+     0.685535
+    ],
+    "min_dist": 0.506452,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp32-2-1",
+   "gs": "PP32[2]₁",
+   "pp": 32,
+   "variety": "",
+   "star": false,
+   "hm": "p4",
+   "orbifold": "442",
+   "colour_group": "c2-p4-2",
+   "gs_group": "p4[2]1",
+   "shubnikov": "p′c4",
+   "H": {
+    "hm": "p4",
+    "orb": "442"
+   },
+   "chaim_type": "442/442",
+   "signature": "¹4²4²2",
+   "perms": {
+    "α": 1,
+    "β": 2,
+    "γ": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 4-fold centre of α",
+    "stype": "c4",
+    "order": 4,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 4-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp37-2-4",
+   "gs": "PP37[2]₄",
+   "pp": 37,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-1",
+   "gs_group": "p4m[2]4",
+   "shubnikov": "p4′mm′",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*442/*2222",
+   "signature": "*¹4²4¹2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.36036,
+     0.852201
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.36036,
+     0.852201
+    ],
+    "min_dist": 0.279279,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp38-2-4",
+   "gs": "PP38[2]₄",
+   "pp": 38,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-1",
+   "gs_group": "p4m[2]4",
+   "shubnikov": "p4′mm′",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*442/*2222",
+   "signature": "*¹4²4¹2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     },
+     {
+      "kind": "edge",
+      "letters": [
+       "R"
+      ],
+      "label": "on the mirror R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.353553,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp40-2-4",
+   "gs": "PP40[2]₄",
+   "pp": 40,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-1",
+   "gs_group": "p4m[2]4",
+   "shubnikov": "p4′mm′",
+   "H": {
+    "hm": "pmm",
+    "orb": "*2222"
+   },
+   "chaim_type": "*442/*2222",
+   "signature": "*¹4²4¹2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 1
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "R",
+     "P"
+    ],
+    "label": "at the corner 2 between R and P",
+    "stype": "d2",
+    "order": 2,
+    "point": [
+     0.5,
+     0.0
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "R",
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "R",
+       "P"
+      ],
+      "label": "at the corner 2 between R and P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.5,
+     0.0
+    ],
+    "min_dist": 0.707107,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp37-2-3",
+   "gs": "PP37[2]₃",
+   "pp": 37,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-2",
+   "gs_group": "p4m[2]3",
+   "shubnikov": "p4′m′m",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "*442/2*22",
+   "signature": "*²4¹4²2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.36036,
+     0.852201
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.36036,
+     0.852201
+    ],
+    "min_dist": 0.279279,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp39-2-3",
+   "gs": "PP39[2]₃",
+   "pp": 39,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-2",
+   "gs_group": "p4m[2]3",
+   "shubnikov": "p4′m′m",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "*442/2*22",
+   "signature": "*²4¹4²2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "Q"
+    ],
+    "label": "on the mirror Q",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.25
+    ],
+    "angle": 45.0,
+    "stab_words": [
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.25
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp37-2-2",
+   "gs": "PP37[2]₂",
+   "pp": 37,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-3",
+   "gs_group": "p4m[2]2",
+   "shubnikov": "p4m′m′",
+   "H": {
+    "hm": "p4",
+    "orb": "442"
+   },
+   "chaim_type": "*442/442",
+   "signature": "*²4²4²2",
+   "perms": {
+    "P": 2,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.36036,
+     0.852201
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.36036,
+     0.852201
+    ],
+    "min_dist": 0.279279,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp37-2-5",
+   "gs": "PP37[2]₅",
+   "pp": 37,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-4",
+   "gs_group": "p4m[2]5",
+   "shubnikov": "p′c4mm",
+   "H": {
+    "hm": "p4m",
+    "orb": "*442"
+   },
+   "chaim_type": "*442/*442",
+   "signature": "*¹4¹4²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.36036,
+     0.852201
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.36036,
+     0.852201
+    ],
+    "min_dist": 0.279279,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp38-2-5",
+   "gs": "PP38[2]₅",
+   "pp": 38,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-4",
+   "gs_group": "p4m[2]5",
+   "shubnikov": "p′c4mm",
+   "H": {
+    "hm": "p4m",
+    "orb": "*442"
+   },
+   "chaim_type": "*442/*442",
+   "signature": "*¹4¹4²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.353553,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp39-2-5",
+   "gs": "PP39[2]₅",
+   "pp": 39,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-4",
+   "gs_group": "p4m[2]5",
+   "shubnikov": "p′c4mm",
+   "H": {
+    "hm": "p4m",
+    "orb": "*442"
+   },
+   "chaim_type": "*442/*442",
+   "signature": "*¹4¹4²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "Q"
+    ],
+    "label": "on the mirror Q",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.25
+    ],
+    "angle": 45.0,
+    "stab_words": [
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.25
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp41-2-5",
+   "gs": "PP41[2]₅",
+   "pp": 41,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-4",
+   "gs_group": "p4m[2]5",
+   "shubnikov": "p′c4mm",
+   "H": {
+    "hm": "p4m",
+    "orb": "*442"
+   },
+   "chaim_type": "*442/*442",
+   "signature": "*¹4¹4²2",
+   "perms": {
+    "P": 1,
+    "Q": 1,
+    "R": 2
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "P",
+     "Q"
+    ],
+    "label": "at the corner 4 between P and Q",
+    "stype": "d4",
+    "order": 4,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P",
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "P",
+       "Q"
+      ],
+      "label": "at the corner 4 between P and Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 1.0,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp37-2-1",
+   "gs": "PP37[2]₁",
+   "pp": 37,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-5",
+   "gs_group": "p4m[2]1",
+   "shubnikov": "p′c4gm",
+   "H": {
+    "hm": "p4g",
+    "orb": "4*2"
+   },
+   "chaim_type": "*442/4*2",
+   "signature": "*¹4²4²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.36036,
+     0.852201
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.36036,
+     0.852201
+    ],
+    "min_dist": 0.279279,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp38-2-1",
+   "gs": "PP38[2]₁",
+   "pp": 38,
+   "variety": "",
+   "star": false,
+   "hm": "p4m",
+   "orbifold": "*442",
+   "colour_group": "c2-p4m-5",
+   "gs_group": "p4m[2]1",
+   "shubnikov": "p′c4gm",
+   "H": {
+    "hm": "p4g",
+    "orb": "4*2"
+   },
+   "chaim_type": "*442/4*2",
+   "signature": "*¹4²4²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.353553,
+    "lattice_colour": [
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": "pp33-2-3",
+   "gs": "PP33[2]₃",
+   "pp": 33,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-1",
+   "gs_group": "p4g[2]3",
+   "shubnikov": "p4′gm′",
+   "H": {
+    "hm": "pgg",
+    "orb": "22×"
+   },
+   "chaim_type": "4*2/22×",
+   "signature": "²4*²2",
+   "perms": {
+    "α": 2,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.182546,
+     0.562783
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.182546,
+     0.562783
+    ],
+    "min_dist": 0.329097,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp33-2-2",
+   "gs": "PP33[2]₂",
+   "pp": 33,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-2",
+   "gs_group": "p4g[2]2",
+   "shubnikov": "p4′g′m",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "4*2/2*22",
+   "signature": "²4*¹2",
+   "perms": {
+    "α": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.182546,
+     0.562783
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.182546,
+     0.562783
+    ],
+    "min_dist": 0.329097,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp35-2-2",
+   "gs": "PP35[2]₂",
+   "pp": 35,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-2",
+   "gs_group": "p4g[2]2",
+   "shubnikov": "p4′g′m",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "4*2/2*22",
+   "signature": "²4*¹2",
+   "perms": {
+    "α": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     -0.353553,
+     0.707107
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.353553,
+     0.707107
+    ],
+    "min_dist": 0.5,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp36-2-2",
+   "gs": "PP36[2]₂",
+   "pp": 36,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-2",
+   "gs_group": "p4g[2]2",
+   "shubnikov": "p4′g′m",
+   "H": {
+    "hm": "cmm",
+    "orb": "2*22"
+   },
+   "chaim_type": "4*2/2*22",
+   "signature": "²4*¹2",
+   "perms": {
+    "α": 2,
+    "P": 1
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "P",
+     "αPα⁻¹"
+    ],
+    "label": "at the corner 2 between P and αPα⁻¹",
+    "stype": "d2",
+    "order": 2,
+    "point": [
+     -0.353553,
+     -0.353553
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "P",
+     "αPα⁻¹"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "P",
+       "αPα⁻¹"
+      ],
+      "label": "at the corner 2 between P and αPα⁻¹"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.353553,
+     -0.353553
+    ],
+    "min_dist": 0.707107,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp33-2-1",
+   "gs": "PP33[2]₁",
+   "pp": 33,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-3",
+   "gs_group": "p4g[2]1",
+   "shubnikov": "p4g′m′",
+   "H": {
+    "hm": "p4",
+    "orb": "442"
+   },
+   "chaim_type": "4*2/442",
+   "signature": "¹4*²2",
+   "perms": {
+    "α": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.182546,
+     0.562783
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.182546,
+     0.562783
+    ],
+    "min_dist": 0.329097,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp34-2-1",
+   "gs": "PP34[2]₁",
+   "pp": 34,
+   "variety": "",
+   "star": false,
+   "hm": "p4g",
+   "orbifold": "4*2",
+   "colour_group": "c2-p4g-3",
+   "gs_group": "p4g[2]1",
+   "shubnikov": "p4g′m′",
+   "H": {
+    "hm": "p4",
+    "orb": "442"
+   },
+   "chaim_type": "4*2/442",
+   "signature": "¹4*²2",
+   "perms": {
+    "α": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 4-fold centre of α",
+    "stype": "c4",
+    "order": 4,
+    "point": [
+     0.0,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 4-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       -1.0,
+       1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       1.0,
+       -0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       -0.0,
+       -0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.0,
+       1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.0,
+       -1.0,
+       -1.0,
+       0.0
+      ],
+      "t": [
+       0.0,
+       0.707107
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.0,
+     0.0
+    ],
+    "min_dist": 0.707107,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp27-2",
+   "gs": "PP27[2]",
+   "pp": 27,
+   "variety": "",
+   "star": false,
+   "hm": "p3m1",
+   "orbifold": "*333",
+   "colour_group": "c2-p3m1-1",
+   "gs_group": "p3m1[2]",
+   "shubnikov": "p3m′",
+   "H": {
+    "hm": "p3",
+    "orb": "333"
+   },
+   "chaim_type": "*333/333",
+   "signature": "*²3²3²3",
+   "perms": {
+    "P": 2,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     0.350926,
+     0.59369
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.350926,
+     0.59369
+    ],
+    "min_dist": 0.298147,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp23-2",
+   "gs": "PP23[2]",
+   "pp": 23,
+   "variety": "",
+   "star": false,
+   "hm": "p31m",
+   "orbifold": "3*3",
+   "colour_group": "c2-p31m-1",
+   "gs_group": "p31m[2]",
+   "shubnikov": "p31m′",
+   "H": {
+    "hm": "p3",
+    "orb": "333"
+   },
+   "chaim_type": "3*3/333",
+   "signature": "¹3*²3",
+   "perms": {
+    "α": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     -0.024074,
+     0.377184
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.024074,
+     0.377184
+    ],
+    "min_dist": 0.335487,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp24-2",
+   "gs": "PP24[2]",
+   "pp": 24,
+   "variety": "",
+   "star": false,
+   "hm": "p31m",
+   "orbifold": "3*3",
+   "colour_group": "c2-p31m-1",
+   "gs_group": "p31m[2]",
+   "shubnikov": "p31m′",
+   "H": {
+    "hm": "p3",
+    "orb": "333"
+   },
+   "chaim_type": "3*3/333",
+   "signature": "¹3*²3",
+   "perms": {
+    "α": 1,
+    "P": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "α"
+    ],
+    "label": "at the 3-fold centre of α",
+    "stype": "c3",
+    "order": 3,
+    "point": [
+     0.5,
+     0.288675
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "α"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "α"
+      ],
+      "label": "at the 3-fold centre of α"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.5,
+     0.288675
+    ],
+    "min_dist": 0.57735,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp42-2",
+   "gs": "PP42[2]",
+   "pp": 42,
+   "variety": "",
+   "star": false,
+   "hm": "p6",
+   "orbifold": "632",
+   "colour_group": "c2-p6-1",
+   "gs_group": "p6[2]",
+   "shubnikov": "p6′",
+   "H": {
+    "hm": "p3",
+    "orb": "333"
+   },
+   "chaim_type": "632/333",
+   "signature": "²6¹3²2",
+   "perms": {
+    "α": 2,
+    "β": 1,
+    "γ": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     -0.149074,
+     0.738028
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.149074,
+     0.738028
+    ],
+    "min_dist": 0.373541,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp44-2",
+   "gs": "PP44[2]",
+   "pp": 44,
+   "variety": "",
+   "star": false,
+   "hm": "p6",
+   "orbifold": "632",
+   "colour_group": "c2-p6-1",
+   "gs_group": "p6[2]",
+   "shubnikov": "p6′",
+   "H": {
+    "hm": "p3",
+    "orb": "333"
+   },
+   "chaim_type": "632/333",
+   "signature": "²6¹3²2",
+   "perms": {
+    "α": 2,
+    "β": 1,
+    "γ": 2
+   },
+   "seat": {
+    "kind": "gyration",
+    "letters": [
+     "β"
+    ],
+    "label": "at the 3-fold centre of β",
+    "stype": "c3",
+    "order": 3,
+    "point": [
+     0.5,
+     0.288675
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "β"
+    ],
+    "equivalent": [
+     {
+      "kind": "gyration",
+      "letters": [
+       "β"
+      ],
+      "label": "at the 3-fold centre of β"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.5,
+     0.288675
+    ],
+    "min_dist": 0.57735,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp46-2-2",
+   "gs": "PP46[2]₂",
+   "pp": 46,
+   "variety": "",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-1",
+   "gs_group": "p6m[2]2",
+   "shubnikov": "p6′mm′",
+   "H": {
+    "hm": "p3m1",
+    "orb": "*333"
+   },
+   "chaim_type": "*632/*333",
+   "signature": "*²6¹3¹2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 1
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     -0.107407,
+     0.377184
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     -0.107407,
+     0.377184
+    ],
+    "min_dist": 0.19115,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp48a-2-2",
+   "gs": "PP48A[2]₂",
+   "pp": 48,
+   "variety": "A",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-1",
+   "gs_group": "p6m[2]2",
+   "shubnikov": "p6′mm′",
+   "H": {
+    "hm": "p3m1",
+    "orb": "*333"
+   },
+   "chaim_type": "*632/*333",
+   "signature": "*²6¹3¹2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "Q"
+    ],
+    "label": "on the mirror Q",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.144338
+    ],
+    "angle": 30.0,
+    "stab_words": [
+     "Q"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "Q"
+      ],
+      "label": "on the mirror Q"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.25,
+     0.144338
+    ],
+    "min_dist": 0.288675,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp48b-2-2",
+   "gs": "PP48B[2]₂",
+   "pp": 48,
+   "variety": "B",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-1",
+   "gs_group": "p6m[2]2",
+   "shubnikov": "p6′mm′",
+   "H": {
+    "hm": "p3m1",
+    "orb": "*333"
+   },
+   "chaim_type": "*632/*333",
+   "signature": "*²6¹3¹2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 1
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "R"
+    ],
+    "label": "on the mirror R",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.5,
+     0.144338
+    ],
+    "angle": 90.0,
+    "stab_words": [
+     "R"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "R"
+      ],
+      "label": "on the mirror R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.5,
+     0.144338
+    ],
+    "min_dist": 0.25,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp50-2-2",
+   "gs": "PP50[2]₂",
+   "pp": 50,
+   "variety": "",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-1",
+   "gs_group": "p6m[2]2",
+   "shubnikov": "p6′mm′",
+   "H": {
+    "hm": "p3m1",
+    "orb": "*333"
+   },
+   "chaim_type": "*632/*333",
+   "signature": "*²6¹3¹2",
+   "perms": {
+    "P": 2,
+    "Q": 1,
+    "R": 1
+   },
+   "seat": {
+    "kind": "corner",
+    "letters": [
+     "Q",
+     "R"
+    ],
+    "label": "at the corner 3 between Q and R",
+    "stype": "d3",
+    "order": 3,
+    "point": [
+     0.5,
+     0.288675
+    ],
+    "angle": 30.0,
+    "stab_words": [
+     "Q",
+     "R"
+    ],
+    "equivalent": [
+     {
+      "kind": "corner",
+      "letters": [
+       "Q",
+       "R"
+      ],
+      "label": "at the corner 3 between Q and R"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     }
+    ],
+    "seed": [
+     0.5,
+     0.288675
+    ],
+    "min_dist": 0.57735,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp46-2-1",
+   "gs": "PP46[2]₁",
+   "pp": 46,
+   "variety": "",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-2",
+   "gs_group": "p6m[2]1",
+   "shubnikov": "p6′m′m",
+   "H": {
+    "hm": "p31m",
+    "orb": "3*3"
+   },
+   "chaim_type": "*632/3*3",
+   "signature": "*¹6²3²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     -0.107407,
+     0.377184
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.107407,
+     0.377184
+    ],
+    "min_dist": 0.19115,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp47-2-1",
+   "gs": "PP47[2]₁",
+   "pp": 47,
+   "variety": "",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-2",
+   "gs_group": "p6m[2]1",
+   "shubnikov": "p6′m′m",
+   "H": {
+    "hm": "p31m",
+    "orb": "3*3"
+   },
+   "chaim_type": "*632/3*3",
+   "signature": "*¹6²3²2",
+   "perms": {
+    "P": 1,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "edge",
+    "letters": [
+     "P"
+    ],
+    "label": "on the mirror P",
+    "stype": "d1",
+    "order": null,
+    "point": [
+     0.25,
+     0.0
+    ],
+    "angle": 0.0,
+    "stab_words": [
+     "P"
+    ],
+    "equivalent": [
+     {
+      "kind": "edge",
+      "letters": [
+       "P"
+      ],
+      "label": "on the mirror P"
+     }
+    ]
+   },
+   "primitive": false,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     0.25,
+     0.0
+    ],
+    "min_dist": 0.25,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": "pp46-2-3",
+   "gs": "PP46[2]₃",
+   "pp": 46,
+   "variety": "",
+   "star": false,
+   "hm": "p6m",
+   "orbifold": "*632",
+   "colour_group": "c2-p6m-3",
+   "gs_group": "p6m[2]3",
+   "shubnikov": "p6m′m′",
+   "H": {
+    "hm": "p6",
+    "orb": "632"
+   },
+   "chaim_type": "*632/632",
+   "signature": "*²6²3²2",
+   "perms": {
+    "P": 2,
+    "Q": 2,
+    "R": 2
+   },
+   "seat": {
+    "kind": "interior",
+    "letters": [],
+    "label": "general position",
+    "stype": "c1",
+    "order": null,
+    "point": [
+     -0.107407,
+     0.377184
+    ],
+    "angle": 0.0,
+    "stab_words": [],
+    "equivalent": [
+     {
+      "kind": "interior",
+      "letters": [],
+      "label": "general position"
+     }
+    ]
+   },
+   "primitive": true,
+   "render": {
+    "ops": [
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       -1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       -0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       1.0,
+       0.0,
+       0.0,
+       -1.0
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     },
+     {
+      "m": [
+       0.5,
+       0.866025,
+       -0.866025,
+       0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       -0.5,
+       0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 0
+     },
+     {
+      "m": [
+       0.5,
+       -0.866025,
+       -0.866025,
+       -0.5
+      ],
+      "t": [
+       0.0,
+       0.0
+      ],
+      "c": 1
+     }
+    ],
+    "seed": [
+     -0.107407,
+     0.377184
+    ],
+    "min_dist": 0.19115,
+    "lattice_colour": [
+     0,
+     0
+    ]
+   }
+  }
+ ]
+}

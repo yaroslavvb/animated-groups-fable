@@ -1,0 +1,618 @@
+{
+ "pp1-2": {
+  "page": 408,
+  "figure": "8.2.2",
+  "file": "pp1-2.webp",
+  "ocr": "pli2   PP1[2]",
+  "verified": true
+ },
+ "pp2-2-1": {
+  "page": 408,
+  "figure": "8.2.2",
+  "file": "pp2-2-1.webp",
+  "ocr": "pal 2],   PP2[2],",
+  "verified": true
+ },
+ "pp2-2-2": {
+  "page": 408,
+  "figure": "8.2.2",
+  "file": "pp2-2-2.webp",
+  "ocr": "pg| 2],   PP2|2 |,",
+  "verified": true
+ },
+ "pp3-2-1": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp3-2-1.webp",
+  "ocr": "pm| 2],   PP3| 2 j,",
+  "verified": true
+ },
+ "pp3-2-2": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp3-2-2.webp",
+  "ocr": "pm| 2],   PP3| 2]",
+  "verified": true
+ },
+ "pp3-2-3": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp3-2-3.webp",
+  "ocr": "pm| 2 |;   PP3|2 |;",
+  "verified": true
+ },
+ "pp3-2-4": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp3-2-4.webp",
+  "ocr": "pm|2|4   PP3[2 |,",
+  "verified": true
+ },
+ "pp3-2-5": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp3-2-5.webp",
+  "ocr": "pm| 2 |.   PP3[2].",
+  "verified": true
+ },
+ "pp5-2-1": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp5-2-1.webp",
+  "ocr": "cm|2],   PP5[2],",
+  "verified": true
+ },
+ "pp5-2-2": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp5-2-2.webp",
+  "ocr": "cm 2 |,   PP§| 2 |,",
+  "verified": true
+ },
+ "pp5-2-3": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp5-2-3.webp",
+  "ocr": "cm] 2]. \\   PP5[2 |,",
+  "verified": true
+ },
+ "pp7-2-1": {
+  "page": 409,
+  "figure": "8.2.2",
+  "file": "pp7-2-1.webp",
+  "ocr": "pé [2 | 1   PP7[2]|,",
+  "verified": true
+ },
+ "pp7-2-2": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp7-2-2.webp",
+  "ocr": "p2| 2],   PP7| 2],",
+  "verified": true
+ },
+ "pp9-2-1": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp9-2-1.webp",
+  "ocr": "pgg(2],   PP9|2 |,",
+  "verified": true
+ },
+ "pp9-2-2": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp9-2-2.webp",
+  "ocr": "pgg|2 |.   PP9| 2],",
+  "verified": true
+ },
+ "pp11-2-1": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp11-2-1.webp",
+  "ocr": "pmg[2],   PP11[2]|,",
+  "verified": true
+ },
+ "pp11-2-2": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp11-2-2.webp",
+  "ocr": "pmg|2|>   PP11] 2],",
+  "verified": true
+ },
+ "pp11-2-3": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp11-2-3.webp",
+  "ocr": "ping|2 |;   PP11[2],",
+  "verified": true
+ },
+ "pp11-2-4": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp11-2-4.webp",
+  "ocr": "pmg| 2 | 4   PP11[2]4",
+  "verified": true
+ },
+ "pp11-2-5": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp11-2-5.webp",
+  "ocr": "pmg{ 2 |<   PP11] 2];",
+  "verified": true
+ },
+ "pp14-2-1": {
+  "page": 410,
+  "figure": "8.2.2",
+  "file": "pp14-2-1.webp",
+  "ocr": "pram| 2 |,   PP14[2],",
+  "verified": true
+ },
+ "pp14-2-2": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp14-2-2.webp",
+  "ocr": "pnm| 2],   PP14j 2 |,",
+  "verified": true
+ },
+ "pp14-2-3": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp14-2-3.webp",
+  "ocr": "pmim| 2 | 3   PP14[ 2],",
+  "verified": true
+ },
+ "pp14-2-4": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp14-2-4.webp",
+  "ocr": "pmm[ 2] 4   PP14| 2],",
+  "verified": true
+ },
+ "pp14-2-5": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp14-2-5.webp",
+  "ocr": "— prun| 2 |   PP14[2].",
+  "verified": true
+ },
+ "pp17-2-1": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp17-2-1.webp",
+  "ocr": "emm| 2 |,   PP17[2],",
+  "verified": true
+ },
+ "pp17-2-2": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp17-2-2.webp",
+  "ocr": "cmm| 2 |,   PP17[2],",
+  "verified": true
+ },
+ "pp17-2-3": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp17-2-3.webp",
+  "ocr": "cmm| 2 |;   PP17/2],",
+  "verified": true
+ },
+ "pp17-2-4": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp17-2-4.webp",
+  "ocr": "cmn[ 24 \\.   PP17|2 |,",
+  "verified": true
+ },
+ "pp17-2-5": {
+  "page": 411,
+  "figure": "8.2.2",
+  "file": "pp17-2-5.webp",
+  "ocr": "cmm| 2 | ;   PP17[ 21.",
+  "verified": true
+ },
+ "pp23-2": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp23-2.webp",
+  "ocr": "p3im| 2 |   PP23[2 |",
+  "verified": true
+ },
+ "pp27-2": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp27-2.webp",
+  "ocr": "psmil| 2]   PP27 [2 |",
+  "verified": true
+ },
+ "pp30-2-1": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp30-2-1.webp",
+  "ocr": "p42],   ~PP30[2],",
+  "verified": true
+ },
+ "pp30-2-2": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp30-2-2.webp",
+  "ocr": "p4[2|,   PP30| 2],",
+  "verified": true
+ },
+ "pp33-2-1": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp33-2-1.webp",
+  "ocr": "pg [2] 1   PP33[2],",
+  "verified": true
+ },
+ "pp33-2-2": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp33-2-2.webp",
+  "ocr": "p4g| 2},   PP33] 2 |.",
+  "verified": true
+ },
+ "pp33-2-3": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp33-2-3.webp",
+  "ocr": "p4g\\2],   PP33{ 2 |;",
+  "verified": true
+ },
+ "pp37-2-1": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp37-2-1.webp",
+  "ocr": "p4m[2 |,   PP37|2]|,",
+  "verified": true
+ },
+ "pp37-2-2": {
+  "page": 412,
+  "figure": "8.2.2",
+  "file": "pp37-2-2.webp",
+  "ocr": "p4m| 2],   PP37|2 |;",
+  "verified": true
+ },
+ "pp37-2-3": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp37-2-3.webp",
+  "ocr": "p4m| 2 |;   PP37]2],",
+  "verified": true
+ },
+ "pp37-2-4": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp37-2-4.webp",
+  "ocr": "pém|2|4   PP37[2 |],",
+  "verified": true
+ },
+ "pp37-2-5": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp37-2-5.webp",
+  "ocr": "p4im| 2 | .   PP37| 2 |.",
+  "verified": true
+ },
+ "pp42-2": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp42-2.webp",
+  "ocr": "p6| 2 |   pp42[2)",
+  "verified": true
+ },
+ "pp46-2-1": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp46-2-1.webp",
+  "ocr": "porn| 2 |;   PP46| 2],",
+  "verified": true
+ },
+ "pp46-2-2": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp46-2-2.webp",
+  "ocr": "pom 2],   PP46; 2 |,",
+  "verified": true
+ },
+ "pp46-2-3": {
+  "page": 413,
+  "figure": "8.2.2",
+  "file": "pp46-2-3.webp",
+  "ocr": "pom[ 2], >   PP46| 2 |,",
+  "verified": true
+ },
+ "pp4-2-2": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp4-2-2.webp",
+  "ocr": "pr 2 |>   PP4| 2],",
+  "verified": true
+ },
+ "pp4-2-3": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp4-2-3.webp",
+  "ocr": "pm[ 2];   pp4[2];",
+  "verified": true
+ },
+ "pp4-2-5": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp4-2-5.webp",
+  "ocr": "pm| 2].   PP4| 2].",
+  "verified": true
+ },
+ "pp6-2-3": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp6-2-3.webp",
+  "ocr": "cm 2 |;   PP6] 2],",
+  "verified": true
+ },
+ "pp8-2-2": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp8-2-2.webp",
+  "ocr": "p2|2].   PP8[2];",
+  "verified": true
+ },
+ "pp10-2-2": {
+  "page": 426,
+  "figure": "8.3.5",
+  "file": "pp10-2-2.webp",
+  "ocr": "pggl2 |.   PP10[2]2.",
+  "verified": true
+ },
+ "pp12-2-1": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp12-2-1.webp",
+  "ocr": "ping[ 2],   PP 12] 2],",
+  "verified": true
+ },
+ "pp12-2-3": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp12-2-3.webp",
+  "ocr": "pmg| 2 |;   PP12|2],",
+  "verified": true
+ },
+ "pp12-2-5": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp12-2-5.webp",
+  "ocr": "pmg{ 2 |.   Pp12[ 2].",
+  "verified": true
+ },
+ "pp13-2-1": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp13-2-1.webp",
+  "ocr": "pmg[ 2,   PP13[2],",
+  "verified": true
+ },
+ "pp13-2-4": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp13-2-4.webp",
+  "ocr": "pmg| 2 |4   PP13f2],",
+  "verified": true
+ },
+ "pp15-2-1": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp15-2-1.webp",
+  "ocr": "pm 2 |,   PP15/2],",
+  "verified": true
+ },
+ "pp15-2-1s": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp15-2-1s.webp",
+  "ocr": "pimm| 2 |,   PP15[2]¥",
+  "verified": true
+ },
+ "pp15-2-2": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp15-2-2.webp",
+  "ocr": "prim 2 |, \\   PP15] 2 |,",
+  "verified": true
+ },
+ "pp15-2-3": {
+  "page": 427,
+  "figure": "8.3.5",
+  "file": "pp15-2-3.webp",
+  "ocr": "pimnm| 2],   PP15| 2],",
+  "verified": true
+ },
+ "pp15-2-4": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp15-2-4.webp",
+  "ocr": "prum| 2 |,   PP15[2]4",
+  "verified": true
+ },
+ "pp16-2-1": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp16-2-1.webp",
+  "ocr": "pmmn|2 |,   PP16[2],",
+  "verified": true
+ },
+ "pp16-2-3": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp16-2-3.webp",
+  "ocr": "pmm| 2 |.   — PP16/ 2],",
+  "verified": true
+ },
+ "pp18-2-3": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp18-2-3.webp",
+  "ocr": "cminf 2 |.   PP18] 2];",
+  "verified": true
+ },
+ "pp18-2-4": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp18-2-4.webp",
+  "ocr": "cmm 2 | 4   PP18| 2,",
+  "verified": true
+ },
+ "pp19-2-2": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp19-2-2.webp",
+  "ocr": "cmm| 2 |,   PP19[ 2],",
+  "verified": true
+ },
+ "pp19-2-3": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp19-2-3.webp",
+  "ocr": "cmin| 2 |,   PP19| 2],",
+  "verified": true
+ },
+ "pp19-2-5": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp19-2-5.webp",
+  "ocr": "cmm| 2}.   PP19[ 2];",
+  "verified": true
+ },
+ "pp20-2-5": {
+  "page": 428,
+  "figure": "8.3.5",
+  "file": "pp20-2-5.webp",
+  "ocr": "cmm| 2 |s   PP20/2]5",
+  "verified": true
+ },
+ "pp24-2": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp24-2.webp",
+  "ocr": "p3im| 2]   PP24] 2 |",
+  "verified": true
+ },
+ "pp31-2-2": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp31-2-2.webp",
+  "ocr": "p42],   PP31| 2],",
+  "verified": true
+ },
+ "pp32-2-1": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp32-2-1.webp",
+  "ocr": "p4{2|,   PP32] 2],",
+  "verified": true
+ },
+ "pp34-2-1": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp34-2-1.webp",
+  "ocr": "pag] 2},   PP34| 2],",
+  "verified": true
+ },
+ "pp35-2-2": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp35-2-2.webp",
+  "ocr": "p4g[2|,   PP35[21,",
+  "verified": true
+ },
+ "pp36-2-2": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp36-2-2.webp",
+  "ocr": "p4g[2}>   PP36| 2 |,",
+  "verified": true
+ },
+ "pp38-2-1": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp38-2-1.webp",
+  "ocr": "p4m| 2],   PP38[ 2],",
+  "verified": true
+ },
+ "pp38-2-4": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp38-2-4.webp",
+  "ocr": "p4éml2 | a   PP38[ 2].",
+  "verified": true
+ },
+ "pp38-2-5": {
+  "page": 429,
+  "figure": "8.3.5",
+  "file": "pp38-2-5.webp",
+  "ocr": "p4m| 2 |.   PP38] 2].",
+  "verified": true
+ },
+ "pp39-2-3": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp39-2-3.webp",
+  "ocr": "p4m| 2],   PP39f 2],",
+  "verified": true
+ },
+ "pp39-2-5": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp39-2-5.webp",
+  "ocr": "p4m| 2].   PP39[2].",
+  "verified": true
+ },
+ "pp40-2-4": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp40-2-4.webp",
+  "ocr": "p4m[ 214   PP40[2 1,",
+  "verified": true
+ },
+ "pp41-2-5": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp41-2-5.webp",
+  "ocr": "p4m| 2 |.   PP41[ 2].",
+  "verified": true
+ },
+ "pp44-2": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp44-2.webp",
+  "ocr": "po[ 2]   PP44[ 2]",
+  "verified": true
+ },
+ "pp47-2-1": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp47-2-1.webp",
+  "ocr": "pom| 2 |,   PP47[2], —",
+  "verified": true
+ },
+ "pp48a-2-2": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp48a-2-2.webp",
+  "ocr": "pom 2] 2   PP48A| 2],",
+  "verified": true
+ },
+ "pp48b-2-2": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp48b-2-2.webp",
+  "ocr": "pom 2],   PP48BI 2],",
+  "verified": true
+ },
+ "pp50-2-2": {
+  "page": 430,
+  "figure": "8.3.5",
+  "file": "pp50-2-2.webp",
+  "ocr": "pom| 2},   PP50[2]>",
+  "verified": true
+ }
+}

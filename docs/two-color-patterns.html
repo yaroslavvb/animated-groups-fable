@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Two-Color Patterns — Spacetime Groups</title>
+<meta name="description" content="The 88 periodic two-color pattern types of Grünbaum and Shephard, computed from scratch and explained: what a pattern type records beyond its color group.">
+<link rel="stylesheet" href="css/style.css?v=48">
+<link rel="stylesheet" href="css/two-color-patterns.css?v=3">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body class="tcp">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="two-color-patterns.html" class="here">Two-color patterns</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="tcp-page">
+
+<section class="catalog-directory" aria-labelledby="page-title">
+  <h1 id="page-title">Two-Color Patterns</h1>
+  <p class="catalog-subtitle"><span>1. Wallpaper group</span><span>2. Chaim Goodman-Strauss colour group</span><span>3. Grünbaum–Shephard pattern type</span><strong><span data-count="total">88</span> periodic two-color pattern types</strong></p>
+  <div class="toc chips">
+    <a class="chip" href="index.html#crystals">Crystals overview</a>
+    <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+    <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+    <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+    <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+    <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+  </div>
+  <nav class="directory-grid" id="directory-grid" aria-label="Wallpaper group sections"></nav>
+  <p class="directory-credit">One thumbnail per wallpaper group (p3 has no two-colour type); the badge counts its pattern types. Every plate on this page is generated from the exact data in <code>data/two-color-patterns.json</code>, computed by <code>enumerate/enumerate_patterns.py</code>; the book crops are from Grünbaum &amp; Shephard, <i>Tilings and Patterns</i> (Figs. 8.2.2, 8.3.5) and Conway, Burgiel &amp; Goodman-Strauss, <i>The Symmetries of Things</i> (Table 11.1), reproduced for scholarly commentary.</p>
+</section>
+
+<section class="tcp-intro">
+
+<p class="lead">Grünbaum and Shephard count 46 two-colour symmetry groups of the plane and 88 two-colour <em>pattern types</em>. Both numbers are correct, and the second is not a finer classification of groups: a pattern type is a colour group together with one further datum — <em>where the motif sits</em>. This page defines that datum, gives it a one-glance notation, recomputes the 88 from scratch, and lists them all with plates, presentations and crops of the two books.</p>
+
+<h2 id="setting">1. Patterns, colourings, groups</h2>
+
+<p>A (discrete, periodic, monomotif) <em>pattern</em> 𝒫 in the sense of <i>Tilings and Patterns</i>, Chapter 5, is a family of pairwise disjoint congruent copies M<sub>i</sub> of a compact connected <em>motif</em> M, on which the symmetry group Γ = S(𝒫) — a wallpaper group — acts transitively. The copies are therefore the coset space Γ/S, where S = S(𝒫, M) is the stabiliser of one copy, the <em>induced group</em>. Because copies are disjoint and connected, S is the full stabiliser of a point of the plane — the site symmetry of the point where the motif "sits" (a connected set invariant under a rotation about p separates p from infinity, so two of its images under the stabiliser of p would meet; hence that whole stabiliser fixes the copy): trivial in general position, d1 on a mirror, c<sub>n</sub> at an n-fold gyration point, d<sub>n</sub> at a kaleidoscopic corner. Grünbaum and Shephard call the pattern <em>primitive</em> when S is trivial.</p>
+
+<p>A <em>k-colouring</em> is a map χ from the copies to k colours; a <em>colour symmetry</em> is a pair (s, θ) of a symmetry s ∈ Γ and a permutation θ of the colours with χ(sM<sub>i</sub>) = θ(χ(M<sub>i</sub>)) for every copy; the colouring is <em>perfect</em> when every s ∈ Γ admits such a θ (which is then unique), and <em>k-chromatic</em> when the θ's act transitively on the colours. For a perfect 2-chromatic two-colouring the colour-preserving symmetries form an index-2 subgroup H ≤ Γ, and the <em>colour group</em> is the pair Γ ⊃ H — the object of <a href="crystals-colored.html">catalogue D</a>: 46 of them for k = 2, denoted p4m[2]<sub>3</sub> by Grünbaum–Shephard and ∗442/2∗22 by Conway–Burgiel–Goodman-Strauss (full group / colour-preserving subgroup; for two colours the kernel K equals H).</p>
+
+<div class="thm">
+<span class="label">Definition (Grünbaum &amp; Shephard, §8.3)</span>
+<p style="margin:0.3rem 0;">Two perfectly k-coloured patterns are of the same <em>k-colour pattern type</em> if — after renaming the colours in one of them — they have the same colour symmetry group, the same induced colour groups (stabilisers of a coloured copy, with the colour permutations they induce), and the same set of coloured-motif-transitive subgroups; Grünbaum and Shephard state (p. 420) as an equivalent definition: there is a colour-preserving bijection between the coloured copies that is compatible with the underlying groups in both directions. Statement 8.3.1: <b>there are 88 periodic two-colour pattern types</b> (and 28 strip types); statement 8.3.2: 59 periodic three-colour types. The tallies keep apart the two <em>varieties</em> PP48A and PP48B of the underlying pattern PP48 that Chapter 5 distinguishes (§3 below).</p>
+</div>
+
+<h2 id="why">2. Why the group is not enough</h2>
+
+<p>Take Grünbaum and Shephard's own witness, Figure 8.3.2 (below): two colourings of the same pattern of type PP15 — pmm with the motif seated on a mirror — with the same colour group pmm[2]<sub>1</sub> = ∗2222/∗2222 and the same induced group d1, which are nevertheless of different pattern types (PP15[2]<sub>1</sub> and PP15[2]<sub>1</sub>*). Looking at the two pictures, the natural first reaction of a group theorist — it was Chaim Goodman-Strauss's, in conversation, August 2026 — is: <em>that is the same group, just a different choice of generators; the mirrors are oriented differently; if an automorphism preserves the colours we would call the two colourings the same.</em> That is exactly right, and it is exactly the point.</p>
+
+<div class="intro-figure" id="intro-example"></div>
+
+<figure class="gsfig">
+<img src="img/gs/fig-8-3-2.png?v=48" alt="Grünbaum and Shephard, Figure 8.3.2: two 2-chromatic colourings of a pattern of type PP15 with the same colour group and induced group but different pattern types">
+<figcaption>Grünbaum &amp; Shephard, <i>Tilings and Patterns</i>, Figure 8.3.2 (p. 422): the two colourings of PP15 whose colour groups and induced groups coincide and whose pattern types differ. In (a) the colour-interchanging mirrors are perpendicular to the mirror carrying the motif; in (b) they are parallel to it.</figcaption>
+</figure>
+
+<p>Both pictures have the identical group Γ = ∗2222 and, after choosing coordinates, the identical colour-preserving subgroup H — three of the four mirror generators P, Q, R, S preserve the colours and one, say S, interchanges them; the short colour signature is ∗<sup>1</sup>2<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2 in both. Nothing about the pair (Γ, H) distinguishes them. What distinguishes them is a third subgroup: the stabiliser S(M) of a copy of the motif, ⟨P⟩ in one picture (the seat mirror is adjacent to the swap-mirror S, hence perpendicular to it) and ⟨Q⟩ in the other (opposite to S, hence parallel). The automorphism of ∗2222 that turns the rectangle by a quarter turn (every automorphism of a wallpaper group is affine, §3) carries ⟨P⟩ to ⟨Q⟩ — but it carries H to a different index-2 subgroup: the swap-mirror moves from S to P. And no automorphism does better: any automorphism taking ⟨P⟩ to ⟨Q⟩ interchanges the two families of parallel mirrors, so it moves the colour-interchanging mirror S into the family of P and R and cannot preserve H. So the two pictures are related by an automorphism of Γ that is <em>not</em> an automorphism of the coloured group (Γ, H): the same group up to automorphism, the same colouring up to automorphism, but not the same <em>pair</em> (colouring, seat) up to any automorphism. Group theory does distinguish the two pictures; one only has to ask it about the right object.</p>
+
+<h2 id="invariant">3. The invariant</h2>
+
+<p>The right object is a chain of three groups. Fix a perfectly two-coloured pattern and a copy M of its motif; write</p>
+
+<p style="text-align:center; font-size:1.2rem;"><span class="sym">S(M) ≤ H ≤ Γ</span></p>
+
+<p>for the stabiliser of the copy, the colour-preserving subgroup, and the full symmetry group. The inclusion S(M) ≤ H is forced: a symmetry that fixes a copy fixes its colour. Every isomorphism between wallpaper groups is conjugation by an affine map (Bieberbach), so:</p>
+
+<div class="thm">
+<span class="label">The pattern type, algebraically</span>
+<p style="margin:0.3rem 0;">Two perfectly two-coloured patterns are of the same type, in the sense of the Definition, iff their chains S(M) ≤ H ≤ Γ are simultaneously conjugate under an affine map of the plane — equivalently, iff the pairs (S(M), H) lie in one orbit of the affine normaliser N(Γ) acting by conjugation. The colour group is the pair (Γ, H); the pattern type adds the finite subgroup S(M), read up to that same conjugation. Two types over the same colour group have the same Γ, the same H, and — as in the example above — often even affinely conjugate S(M) (⟨P⟩ and ⟨Q⟩ are conjugate under N(Γ), not in Γ); they differ in how S(M) sits <em>relative to H</em>. Grünbaum and Shephard's tally of 88 keeps one further pair apart, PP48A[2]₂ and PP48B[2]₂, whose chains coincide — see the aside below.</p>
+</div>
+
+<p>This is the bijection form of the Definition rewritten: the coloured copies with the Γ-action are the Γ-set Γ/S(M) → Γ/H (copies over colours), a "compatible colour-preserving bijection" is an isomorphism of such Γ-sets, and isomorphism classes of such data are precisely conjugacy classes of chains. The three clauses — colour group, induced group, motif-transitive subgroups — are what the chain determines: (Γ, H); S(M) with its action on Γ/H; and the family of subgroups Γ′ with Γ′S(M) = Γ.</p>
+
+<h3 id="geometric">The invariant as a picture: a marked signature</h3>
+
+<p>Because S(M) is a point stabiliser, it can be read off Conway's orbifold of Γ: S(M) is the local group of the point where the motif sits — the interior (trivial), a mirror edge (d1), a corner (d<sub>n</sub>), a cone point (c<sub>n</sub>). Conway, Burgiel and Goodman-Strauss's <em>annotated signature</em> names every one of these strata: in ∗<sup>P</sup>6<sup>Q</sup>3<sup>R</sup>2 the letters P, Q, R are the three mirror edges of the kaleidoscopic triangle, the digits 6, 3, 2 its corners (each between the two letters around it), and in <sup>α</sup>2<sup>β</sup>2∗<sup>P</sup> the letters α, β are gyration points. Their <em>colour signature</em> ∗<sup>2</sup>6<sup>1</sup>3<sup>1</sup>2 records the colour group by writing above each generator the order of its colour permutation (1 preserves, 2 interchanges). Hence:</p>
+
+<div class="thm">
+<span class="label">The pattern type, as a picture</span>
+<p style="margin:0.3rem 0;">A two-colour pattern type is a colour signature with <b>one symbol marked as the seat of the motif</b>: a mirror letter, a corner digit, a gyration letter, or nothing (general position). The mark must sit on colour-preserving symmetries — on a mirror or gyration carrying superscript 1, or on a corner both of whose mirrors carry 1. Two marked signatures give the same chain exactly when a symmetry of the coloured signature (an isotopic reshaping of the orbifold that preserves the superscripts) carries one mark to the other, or when the two marks lie on Γ-conjugate features (in p6m the edges Q and R lie on one mirror line, so ⟨Q⟩ and ⟨R⟩ are conjugate — the PP48A/PP48B pair; in p3m1 the edges P, Q, R do too, but there a signature symmetry already identifies them). Counting marks up to signature symmetries alone gives exactly Grünbaum and Shephard's 88. On this page the mark is printed as a <span class="sig"><span class="seat-mark">red box</span></span>: <span class="sig sig-big"><span class="sig-sym">∗</span><sup class="seat-mark">¹</sup><span class="sig-sym">2</span><sup>¹</sup><span class="sig-sym">2</span><sup>¹</sup><span class="sig-sym">2</span><sup>²</sup><span class="sig-sym">2</span></span> is PP15[2]<sub>1</sub>, <span class="sig sig-big"><span class="sig-sym">∗</span><sup>¹</sup><span class="sig-sym">2</span><sup class="seat-mark">¹</sup><span class="sig-sym">2</span><sup>¹</sup><span class="sig-sym">2</span><sup>²</sup><span class="sig-sym">2</span></span> is PP15[2]<sub>1</sub>*, and <span class="sig sig-big"><span class="sig-sym">∗</span><sup>¹</sup><span class="sig-sym seat-mark">2</span><sup>¹</sup><span class="sig-sym">2</span><sup>¹</sup><span class="sig-sym">2</span><sup>²</sup><span class="sig-sym">2</span></span> is PP16[2]<sub>1</sub>, the motif at the corner where P and Q meet.</p>
+</div>
+
+<p>In crystallographic language the strata refine the <em>Wyckoff positions</em> of Γ: a Wyckoff position is a Γ-class of site-symmetry groups, a stratum a Γ-class of edges, corners or centres, and the two differ only where one mirror line carries several edge types (p3m1: P, Q, R; p6m class b: Q, R) — 75 strata against the 72 Wyckoff positions of the 17 plane groups. Up to the affine normaliser: 52 strata classes, 51 <em>Wyckoff sets</em>, and the latter are Grünbaum and Shephard's PP1–PP51 with PP48A and PP48B as one set. Up to the same PP48A/B split, a two-colour pattern type is a Wyckoff set of the two-colour group whose site symmetry is entirely colour-preserving.</p>
+
+<div class="aside thm">
+<span class="label">88 or 87: PP48A and PP48B</span>
+<p style="margin:0.3rem 0;">Marked signatures up to signature symmetries count <b>88</b>, Grünbaum and Shephard's number; chains count <b>87</b>. The single discrepancy is p6m: its class-b mirror lines run 6–3–2–3–6, so they carry two kinds of edge, Q (6–3) and R (3–2), with the <em>same</em> reflection subgroup; the motif on Q gives PP48A, on R gives PP48B, and the two chains (⟨Q⟩ or ⟨R⟩, ∗333, ∗632) are conjugate — every group-theoretic invariant, including the three clauses of the Definition, agrees on them. The split is inherited from Chapter 5, where the uncoloured pattern PP48 is kept in two varieties A and B (the seat cannot be slid from one edge to the other without passing through the d3 corner), and Grünbaum and Shephard carry the underlying pattern type into the coloured tally: 88 = 87 + 1 for two colours, and the same split recurs among their 59 three-colour types (PP48A[3]<sub>1</sub>, PP48A[3]<sub>2</sub>, PP48B[3]<sub>1</sub>, PP48B[3]<sub>2</sub> are all listed in Figure 8.3.6). On this page PP48A[2]<sub>2</sub> and PP48B[2]<sub>2</sub> are listed separately, marked on Q and on R, and flagged.</p>
+</div>
+
+<h2 id="recipe">4. Ambient group, objects, equivalence: where the 88 fit</h2>
+
+<p>Every catalogue on this site follows one recipe: choose an ambient group of allowed symmetries and an equivalence relation, then count the discrete subgroups with a full-rank translation lattice up to that relation. Colour groups are subgroups of E(2) × S<sub>2</sub> (spatial isometry paired with a colour permutation) up to conjugacy by Aff(2) × S<sub>2</sub>. Pattern types are <em>not</em> subgroups of any ambient group up to a coarser or finer conjugacy: PP15[2]<sub>1</sub> and PP15[2]<sub>1</sub>* can be realised with the literally identical subgroup of E(2) × S<sub>2</sub>. The objects have to carry the seat. Two ways to say it — the second is the chain, and gives 87; the first reproduces Grünbaum and Shephard's 88 for two colours:</p>
+
+<div class="tablewrap"><table class="recipe">
+<tr><th>Catalogue</th><th>Ambient group</th><th>Objects</th><th>Equivalence</th><th>Count</th></tr>
+<tr><td><a href="crystals-2d.html">A · wallpaper</a></td><td>E(2)</td><td>discrete subgroups, full-rank translations</td><td>conjugacy in Aff(2)</td><td>17</td></tr>
+<tr><td><a href="crystals-3d.html">B · space groups</a></td><td>E(3)</td><td>as above</td><td>conjugacy in Aff<sup>+</sup>(3) (proper)</td><td>230</td></tr>
+<tr><td><a href="crystals-clockwork.html">C · clockwork</a></td><td>E(2) × ℝ/ℤ (a clock)</td><td>as above</td><td>affine + boosts</td><td>68</td></tr>
+<tr><td><a href="crystals-colored.html">D · colour groups</a></td><td>E(2) × S<sub>k</sub></td><td>as above, transitive on colours</td><td>conjugacy in Aff(2) × S<sub>k</sub></td><td>46 (k = 2)</td></tr>
+<tr><td><a href="crystals-patterns.html">E · colour pattern types</a></td><td colspan="3">index of Grünbaum–Shephard's plates for k = 2, 3 (88 + 59)</td><td>147</td></tr>
+<tr class="this"><td><b>F · two-colour pattern types</b> (this page)</td><td>E(2) × S<sub>2</sub> acting on the plane</td><td><b>pointed</b> colour groups (G, x): a point x whose stabiliser in G is colour-preserving</td><td>conjugacy in Aff(2) × S<sub>2</sub>, and moving x within its stratum (isotopy that never changes Stab(x)) — for two colours this is the marked signature</td><td>88</td></tr>
+<tr class="this"><td>F′ · the same, algebraically</td><td>E(2) × S<sub>2</sub></td><td>chains S(M) ≤ H ≤ Γ, i.e. a colour group with a colour-preserving site-symmetry subgroup</td><td>simultaneous conjugacy</td><td>87 (PP48A = PP48B)</td></tr>
+<tr><td>Wyckoff sets (uncoloured pattern types)</td><td>E(2) acting on the plane</td><td>pointed wallpaper groups (Γ, x)</td><td>conjugacy in Aff(2) + isotopy within the stratum</td><td>52 strata classes (51 Wyckoff sets when PP48A/B merge)</td></tr>
+</table></div>
+
+<p>So the honest answer to "is it a different way of grouping groups?" is: almost. It is a way of grouping <em>pairs</em> of groups — a group and a finite subgroup, or a group and one of its orbits — under the same affine equivalence as before. That is why the counts jump (46 → 88) without any group being subdivided: the group ∗2222/∗2222 is one class, and it carries four seats (general position, on P, on Q, at the corner PQ), each a type. The uniform notation on this page is therefore <em>colour type · marked colour signature</em>: ∗2222/∗2222 with ∗<sup>1</sup>2<sup>1</sup>2<sup>1</sup>2<sup>2</sup>2 marked at P. (Chapter 5's varieties are a positional refinement of the same kind, and they are what separates 88 from 87.)</p>
+
+<h2 id="counts">5. The count, recomputed</h2>
+
+<p>The enumeration (<code>enumerate/enumerate_patterns.py</code>, exact rational arithmetic, no dependencies) starts from the models of the 17 wallpaper groups used by catalogue D, defines Conway–Burgiel–Goodman-Strauss's generators for each group in those coordinates and verifies their presentations exactly, computes the strata of each orbifold from the annotated signature (edges as mirror segments between consecutive corners, corners as fixed points of products of adjacent mirrors, gyration centres), enumerates the index-2 subgroups H, keeps the pairs (stratum, H) whose local group lies in H, and takes orbits under the affine normaliser. Result: 52 strata classes (51 Wyckoff sets), and for two colours 88 marked types over the 46 colour groups — 46 primitive (general position: one per colour group, exactly Figure 8.2.2) and 42 non-primitive (exactly the 42 panels of Figure 8.3.5) — and 87 chains, PP48A and PP48B merging. The G&amp;S labels are assigned by the stabiliser type read off the plates (PP12 = pmg with c2, PP13 = pmg with d1, PP24 = p31m with c3, PP38/PP39 = p4m with d1 on an axis/diagonal mirror, PP47/48A/48B = p6m with d1 on P/Q/R, and PP15[2]<sub>1</sub> versus PP15[2]<sub>1</sub>* by the seat mirror being perpendicular or parallel to the colour-interchanging mirrors) and cross-checked against the list of <a href="crystals-patterns.html">catalogue E</a> plate by plate.</p>
+
+<h2 id="reading">6. Reading an entry</h2>
+
+<p>The catalogue is grouped by wallpaper group, then by colour group (a band with the colour type and signature, linking to catalogue D and to the Table 11.1 row in <i>The Symmetries of Things</i>), then by seat. Each pane shows: the plate — one motif copy per coset of S(M), drawn with the symmetry of S(M) (an asymmetric R-diamond in general position, an arrowhead on a mirror, a parallelogram at a half-turn, a rectangle at a d2 corner, pinwheels and regular polygons for higher orders), coloured by H, with the generators of Γ overlaid (solid: preserves colours; dashed: interchanges them) and the seat ringed; the data table with links to the Grünbaum–Shephard plate crop (↗) and to the Chaim row (↗); and the <b>Presentation</b>, Chaim's generators with their colour permutations, augmented with the pattern-type invariant: which generators fix the motif (●), the chain S(M) ≤ H ≤ Γ, and the sibling types over the same colour group. Notation: ∗ is typeset for the book's kaleidoscope star; subscripts follow Grünbaum–Shephard's Table 8.2.2 (pmm[2]<sub>4</sub>) and the Shubnikov symbol is given for orientation.</p>
+
+<p class="refs">B. Grünbaum, G. C. Shephard, <i>Tilings and Patterns</i>, Freeman 1987 — Chapter 5 (patterns, PP1–PP51), Chapter 8 (§8.2 colour groups, Figure 8.2.2; §8.3 colour pattern types, Figures 8.3.2, 8.3.5, statements 8.3.1–2). J. H. Conway, H. Burgiel, C. Goodman-Strauss, <i>The Symmetries of Things</i>, A K Peters 2008 — Chapter 10 (presentations from signatures), Chapter 11 (twofold colourations, Table 11.1). International Tables for Crystallography A, §8.3 (Wyckoff positions and Wyckoff sets). The clockwork/colouring correspondence and the presentations of the 46 colour groups follow the companion <a href="https://yaroslavvb.github.io/animated-groups/color-pattern-catalog.html">Catalog of colorings</a>.</p>
+
+</section>
+
+<div class="pattern-atlas" id="pattern-atlas"></div>
+
+</main>
+<footer class="site">
+  Spacetime groups: the crystallography of looping animations ·
+  <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+</footer>
+<script src="js/two-color-patterns.js?v=8" defer></script>
+</body>
+</html>
