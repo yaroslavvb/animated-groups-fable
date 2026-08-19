@@ -6,7 +6,7 @@
 (() => {
   "use strict";
 
-  const V = "8";
+  const V = "9";
   const DATA_URL = "data/two-color-patterns.json?v=" + V;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const PALETTE = ["#0072B2", "#E69F00"];
@@ -53,6 +53,31 @@
     const m = /^(.*\])(\d?)$/.exec(s);
     return m ? m[1] + (m[2] ? SUB[m[2]] : "") : s;
   };
+
+  // ---- the G / H / S(M) notation --------------------------------------
+  // G = the wallpaper group Γ (all symmetries of the coloured pattern),
+  // H = the subgroup preserving each colour (index 2, hence normal: H = the
+  //     kernel K, so G/H is exactly Chaim's G/K), S(M) = the stabiliser of one
+  // copy of the motif — the datum that turns 46 colour groups into 88 types.
+  const smShort = (t) => {
+    const s = t.seat;
+    if (s.kind === "interior") return "1";
+    return "⟨" + s.letters.join(", ") + "⟩";
+  };
+  const smLong = (t) => t.seat.kind === "interior" ? "1" : `${smShort(t)} ≅ ${t.seat.stype}`;
+  const GHK_TITLE = {
+    G: "G — the wallpaper group Γ: every symmetry of the coloured pattern",
+    H: "H — the subgroup preserving each colour; of index 2, hence normal, so it is also the kernel K (Chaim writes G/K)",
+    S: "S(M) — the stabiliser of one copy of the motif: the seat, and the datum the colour group does not carry",
+  };
+  function ghkNode(t, opts = {}) {
+    const e = el("span", "ghk-expression" + (opts.cls ? " " + opts.cls : ""));
+    const term = (text, key) => { const n = el("span", "ghk-term", text); n.title = GHK_TITLE[key]; return n; };
+    e.append(term(star(t.orbifold), "G"), el("span", "ghk-separator", "/"),
+             term(star(t.H.orb), "H"), el("span", "ghk-separator", "/"),
+             term(opts.long ? smLong(t) : smShort(t), "S"));
+    return e;
+  }
 
   // typeset a Chaim signature template with superscripts and optional marks.
   // template: "*{P}2{Q}2{R}2{S}2", perms {P:1,...}, seat {kind, letters}
@@ -387,11 +412,14 @@
     ch.append(document.createTextNode("  ·  "));
     ch.append(signatureNode(fam, t.perms, null));
     row("Chaim colour type", ch);
-    // G/H/K
-    const ghk = el("span", "ghk-expression source-math-symbol");
-    ghk.append(el("span", "ghk-term", star(t.orbifold)), el("span", "ghk-separator", "/"),
-      el("span", "ghk-term", star(t.H.orb)), el("span", "ghk-separator", "/"), el("span", "ghk-term", star(t.H.orb)));
-    row("Chaim G/H/K", ghk);
+    // G / H / S(M) — the three groups of the pattern type
+    const ghkCell = el("span");
+    ghkCell.append(ghkNode(t, {long: true, cls: "source-math-symbol"}));
+    const leg = el("span", "ghk-legend");
+    leg.append(document.createTextNode(`the group Γ = ${fam.hm} · the colour-preserving subgroup H = ${t.H.hm} · the seat S(M) = ${smLong(t)}. `),
+      document.createTextNode(`H has index 2, hence is normal and equals the kernel K, so G/H is Chaim's ${star(t.chaim_type.split(" (")[0])}${t.chaim_type.includes("(") ? " " + t.chaim_type.slice(t.chaim_type.indexOf("(")) : ""}.`));
+    ghkCell.append(leg);
+    row("G / H / S(M)", ghkCell);
     // seat / marked signature
     const seat = el("span");
     seat.append(signatureNode(fam, t.perms, t.seat, {big: true}));
@@ -473,7 +501,9 @@
     pane.id = t.id;
     const head = el("header", "pane-head");
     const h4 = el("h4", "pane-title");
-    h4.append(el("span", "pane-gs", t.gs), el("span", "pane-sub", ` · ${t.seat.kind === "interior" ? "general position" : t.seat.label} · ${star(t.chaim_type)}`));
+    h4.append(el("span", "pane-gs", t.gs),
+      el("span", "pane-sub", ` · ${t.seat.kind === "interior" ? "general position" : t.seat.label} · `),
+      ghkNode(t, {cls: "pane-ghk"}));
     head.append(h4);
     const perm = el("a", "pane-permalink", "#");
     perm.href = `#${t.id}`; perm.title = "permalink";
@@ -532,7 +562,7 @@
       cgl.href = `crystals-colored.html#${g.id}`;
       meta.append(document.createTextNode("Grünbaum–Shephard "), cgl,
         document.createTextNode(g.types[0].shubnikov ? ` · Shubnikov ${g.types[0].shubnikov}` : ""),
-        document.createTextNode(` · H = ${star(g.types[0].H.orb)} · `),
+        document.createTextNode(` · G/H = ${star(g.types[0].orbifold)}/${star(g.types[0].H.orb)} · `),
         lightboxLink(`img/sot/${g.id}.webp`, `${star(g.types[0].chaim_type)} — The Symmetries of Things, Table 11.1`, el("span", "", "Table 11.1 row")),
         document.createTextNode(` · ${g.types.length === 1 ? "one pattern type" : g.types.length + " pattern types"}: `));
       g.types.forEach((t, i) => {

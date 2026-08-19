@@ -6,7 +6,7 @@
 <title>Two-Color Patterns — Spacetime Groups</title>
 <meta name="description" content="The 88 periodic two-color pattern types of Grünbaum and Shephard, computed from scratch and explained: what a pattern type records beyond its color group.">
 <link rel="stylesheet" href="css/style.css?v=48">
-<link rel="stylesheet" href="css/two-color-patterns.css?v=3">
+<link rel="stylesheet" href="css/two-color-patterns.css?v=4">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 </head>
 <body class="tcp">
@@ -128,6 +128,10 @@
 
 <h2 id="reading">6. Reading an entry</h2>
 
+<p><b>The notation.</b> Every pane carries the three groups of its type as <span class="sym">G / H / S(M)</span>: the wallpaper group Γ; the subgroup H preserving each colour; and the stabiliser S(M) of one copy of the motif, written by its generators — <span class="sym">⟨P⟩ ≅ d1</span> on a mirror, <span class="sym">⟨P, Q⟩ ≅ d2</span> at a corner, <span class="sym">⟨α⟩ ≅ c3</span> at a gyration point, <span class="sym">1</span> in general position. The first two terms are the colour group and nothing more: with two colours H has index 2, hence is normal, so H is also the kernel K, and <span class="sym">G/H</span> is exactly Conway, Burgiel and Goodman-Strauss's <span class="sym">G/K</span> — their notation has two terms, the full group over the kernel — the value printed in the “Chaim colour type” row of the same pane, and checked against Table 11.1 for all 88. The third term is what Chapter 8 of Grünbaum and Shephard adds, and it is the only one of the three that varies between the types over one colour group.</p>
+
+<p>Two warnings about reading the string. It names <em>isomorphism types</em>, not subgroups: pm has two different index-2 subgroups that are both of type pm, so PP3[2]<sub>5</sub> and PP3[2]<sub>3</sub> (and likewise PP4[2]<sub>5</sub> and PP4[2]<sub>3</sub>) print the same <span class="sym">∗∗/∗∗</span> and are separated only by <em>which</em> generator interchanges the colours — <i>The Symmetries of Things</i> has to split exactly those two rows of Table 11.1 (p. 141) as <span class="sym">∗∗/∗∗</span>(1) and <span class="sym">∗∗/∗∗</span>(2), which is how they are labelled here. And S(M) up to isomorphism is coarser than the seat: <span class="sym">⟨P⟩</span> and <span class="sym">⟨Q⟩</span> are both d1 but sit differently against the colour-interchanging symmetries, which is the whole content of §2. The marked colour signature printed below the string, not the string itself, is the pattern type. (One more caution for readers of the colour-symmetry literature: several authors write G ⊇ H ⊇ K with G the symmetry group of the <em>uncoloured</em> figure and H the subgroup of symmetries that permute the colours at all. Here every symmetry permutes the colours — the colourings are perfect by construction — so that H would be all of G; our H is the colour-<em>preserving</em> subgroup, their K.)</p>
+
 <p>The catalogue is grouped by wallpaper group, then by colour group (a band with the colour type and signature, linking to catalogue D and to the Table 11.1 row in <i>The Symmetries of Things</i>), then by seat. Each pane shows: the plate — one motif copy per coset of S(M), drawn with the symmetry of S(M) (an asymmetric R-diamond in general position, an arrowhead on a mirror, a parallelogram at a half-turn, a rectangle at a d2 corner, pinwheels and regular polygons for higher orders), coloured by H, with the generators of Γ overlaid (solid: preserves colours; dashed: interchanges them) and the seat ringed; the data table with links to the Grünbaum–Shephard plate crop (↗) and to the Chaim row (↗); and the <b>Presentation</b>, Chaim's generators with their colour permutations, augmented with the pattern-type invariant: which generators fix the motif (●), the chain S(M) ≤ H ≤ Γ, and the sibling types over the same colour group. Notation: ∗ is typeset for the book's kaleidoscope star; subscripts follow Grünbaum–Shephard's Table 8.2.2 (pmm[2]<sub>4</sub>) and the Shubnikov symbol is given for orientation.</p>
 
 <p class="refs">B. Grünbaum, G. C. Shephard, <i>Tilings and Patterns</i>, Freeman 1987 — Chapter 5 (patterns, PP1–PP51), Chapter 8 (§8.2 colour groups, Figure 8.2.2; §8.3 colour pattern types, Figures 8.3.2, 8.3.5, statements 8.3.1–2). J. H. Conway, H. Burgiel, C. Goodman-Strauss, <i>The Symmetries of Things</i>, A K Peters 2008 — Chapter 10 (presentations from signatures), Chapter 11 (twofold colourations, Table 11.1). International Tables for Crystallography A, §8.3 (Wyckoff positions and Wyckoff sets). The clockwork/colouring correspondence and the presentations of the 46 colour groups follow the companion <a href="https://yaroslavvb.github.io/animated-groups/color-pattern-catalog.html">Catalog of colorings</a>.</p>
@@ -141,6 +145,6 @@
   Spacetime groups: the crystallography of looping animations ·
   <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
 </footer>
-<script src="js/two-color-patterns.js?v=8" defer></script>
+<script src="js/two-color-patterns.js?v=9" defer></script>
 </body>
 </html>

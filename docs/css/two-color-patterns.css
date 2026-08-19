@@ -188,8 +188,12 @@ main.tcp-page {
 .source-value-link:hover, .source-value-link:focus-visible { color: var(--pattern-accent); }
 .source-math-symbol { font: 650 1.05rem/1.15 Georgia, "Times New Roman", serif; }
 .source-link-mark { color: var(--pattern-accent); font: 650 0.72rem/1 Arial, Helvetica, sans-serif; }
-.ghk-expression { display: inline-flex; align-items: baseline; white-space: nowrap; }
+.ghk-expression { display: inline-flex; align-items: baseline; gap: 0.28rem; white-space: nowrap; }
+.ghk-term { cursor: help; }
 .ghk-separator { color: #809089; font-weight: 400; }
+.ghk-legend { display: block; margin-top: 0.3rem; font: 400 0.76rem/1.45 Arial, Helvetica, sans-serif; color: var(--pattern-muted); white-space: normal; }
+.pane-ghk { font: 650 0.95rem/1.2 Georgia, "Times New Roman", serif; color: var(--pattern-ink); }
+.pane-ghk .ghk-separator { color: #9aa8a2; }
 
 .group-presentation { margin: 1.1rem 0 0; }
 .presentation-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 0 0.28rem; }
