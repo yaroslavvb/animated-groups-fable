@@ -10,11 +10,13 @@ exists.
                                       group (k=2 rows are already present)
 
 The k=3 plate mapping goes through AUDIT_3: the labels actually printed in
-the highlight box of each crop, transcribed by visual audit (several of the
-sibling repo's crop files are misnamed — e.g. the file named pp153s shows
-PP18[3], and the p6m block gs-cp-3-052..057 is shifted by one panel).  Our
-type labels are matched against the audited labels; the five types beyond
-the book's figures get no crop.  Run:  python3 sync_crops.py
+the highlight box of each crop, transcribed by visual audit.  The sibling
+repo's crop misnames this table originally worked around (031/032 and
+035/037 swapped, the p6m block 052..057 shifted by one panel) were fixed at
+the source on 2026-08-25, so the audited labels now agree with the file
+names; mapping still goes by audited content, never by filename.  Our type
+labels are matched against the audited labels; the five types beyond the
+book's figures get no crop.  Run:  python3 sync_crops.py
 """
 
 import glob
@@ -39,13 +41,13 @@ AUDIT_3 = {
     19: "PP27[3]2", 20: "PP42[3]1", 21: "PP42[3]2", 22: "PP46[3]1",
     23: "PP46[3]2", 24: "PP4[3]1", 25: "PP4[3]2", 26: "PP6[3]1",
     27: "PP6[3]2", 28: "PP8[3]", 29: "PP10[3]", 30: "PP12[3]1",
-    31: "PP12[3]2", 32: "PP13[3]1", 33: "PP13[3]2", 34: "PP15[3]",
-    35: "PP18[3]", 36: "PP16[3]", 37: "PP15[3]*", 38: "PP19[3]",
+    31: "PP13[3]1", 32: "PP12[3]2", 33: "PP13[3]2", 34: "PP15[3]",
+    35: "PP15[3]*", 36: "PP16[3]", 37: "PP18[3]", 38: "PP19[3]",
     39: "PP19[3]*", 40: "PP20[3]", 41: "PP22[3]2", 42: "PP25[3]1",
     43: "PP25[3]2", 44: "PP26[3]2", 45: "PP28[3]1", 46: "PP28[3]2",
     47: "PP29[3]2", 48: "PP43[3]1", 49: "PP43[3]2", 50: "PP45[3]2",
-    51: "PP47[3]1", 52: "PP47[3]2", 53: "PP48A[3]1", 54: "PP48A[3]2",
-    55: "PP48B[3]1", 56: "PP48B[3]2", 57: "PP49[3]1", 58: "PP49[3]2",
+    51: "PP47[3]1", 52: "PP48A[3]1", 53: "PP48B[3]1", 54: "PP49[3]1",
+    55: "PP47[3]2", 56: "PP48A[3]2", 57: "PP48B[3]2", 58: "PP49[3]2",
     59: "PP51[3]2",
 }
 
