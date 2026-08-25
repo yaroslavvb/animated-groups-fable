@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patterns — Spacetime Groups</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=48">
+<link rel="stylesheet" href="css/patterns.css?v=2">
+</head>
+<body class="tcp">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="patterns.html" class="here">Patterns</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="tcp-page">
+  <header class="tcp-head">
+    <h1>Patterns</h1>
+    <p class="catalog-subtitle">
+      <span>1.&thinsp;Wallpaper group</span>
+      <span>2.&thinsp;Chaim colour group</span>
+      <span>3.&thinsp;Pattern type</span>
+      <strong class="subtitle-count">up to 6 colours — <span data-count="total">…</span> pattern types</strong>
+    </p>
+    <nav class="toc catalog-chips">
+      <a class="chip" href="index.html#crystals">Crystals overview</a>
+      <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+      <a class="chip" href="crystals-3d.html">B · 3D (230)</a>
+      <a class="chip" href="crystals-clockwork.html">C · Clockwork (68)</a>
+      <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+      <a class="chip" href="crystals-patterns.html">E · Pattern types (147)</a>
+    </nav>
+  </header>
+
+  <section class="catalog-directory" aria-label="The 17 wallpaper groups">
+    <nav class="directory-grid" id="directory-grid"></nav>
+    <p class="directory-credit">Pattern thumbnails: Eric&nbsp;W. Weisstein,
+      <a href="https://mathworld.wolfram.com/WallpaperGroups.html" rel="noopener" target="_blank">“Wallpaper Groups,” MathWorld</a>;
+      created with Artlandia SymmetryWorks. © Wolfram Research. Labels use Conway orbifold notation.</p>
+  </section>
+
+  <section class="tcp-intro">
+    <p>A <em>perfectly k-coloured pattern type</em> is a chain of three groups
+      <span class="sym">S(M)&nbsp;≤&nbsp;H&nbsp;≤&nbsp;Γ</span>, up to affine equivalence:
+      <span class="sym">Γ</span> the wallpaper group of the pattern,
+      <span class="sym">H</span> the stabiliser of one colour (the pair <span class="sym">Γ&nbsp;&gt;&nbsp;H</span>, of index k,
+      is the <a href="crystals-colored.html">colour group</a>), and
+      <span class="sym">S(M)</span> the site symmetry of the seat where the motif sits.
+      Every pane below is one such chain: the plate is computed from the exact data in
+      <code>data/patterns.json</code> (by <code>enumerate/enumerate_patterns_k.py</code>),
+      the red ring marks the seat, and the red index in the Chaim short form marks the
+      symbol whose symmetry fixes the marked motif — and therefore preserves its colour.</p>
+    <div class="census-wrap"><table class="counts census">
+      <thead><tr><th>colours&nbsp;k</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>total</th></tr></thead>
+      <tbody>
+        <tr><th class="txt">colour groups</th><td>17</td><td>46</td><td>23</td><td>96</td><td>14</td><td>90</td><td>286</td></tr>
+        <tr><th class="txt">pattern types</th><td data-cc="1">·</td><td data-cc="2">·</td><td data-cc="3">·</td><td data-cc="4">·</td><td data-cc="5">·</td><td data-cc="6">·</td><td data-cc="t">·</td></tr>
+      </tbody>
+    </table></div>
+    <p class="tcp-note">Anchors: the colour-group counts are Grünbaum&nbsp;&amp;&nbsp;Shephard’s Table&nbsp;8.2.1 (= Wieting);
+      the 88 two-colour types are Figs.&nbsp;8.2.2/8.3.5 and the three-colour types Figs.&nbsp;8.2.3/8.3.6 of
+      <em>Tilings and Patterns</em>; colour groups follow Table&nbsp;11.1/12.1 of Conway, Burgiel&nbsp;&amp;
+      Goodman-Strauss, <em>The Symmetries of Things</em>. Book crops are reproduced for scholarly commentary.
+      <strong>Beyond the book:</strong> the exact enumeration gives <strong>64</strong> three-colour types where the
+      book’s figures show 59 — five types (all with mirror-edge seats in non-regular colourings, marked on their
+      panes) are missing from Figs.&nbsp;8.2.3/8.3.6; the five panes are
+      <a href="#pp15-3ss">pmm</a>, <a href="#pp19-3ss">cmm</a>, <a href="#pp28-3-2s">p3m1</a>,
+      <a href="#pp47-3-2s">p6m</a>, <a href="#pp47-3-2ss">p6m′</a>.
+      No published tables exist beyond three colours, so the labels for k&nbsp;≥&nbsp;4 (and the
+      group symbols <span class="sym">hm[k]ₙ</span>) are systematic extensions in catalogue-D order.
+      The earlier <a href="two-color-patterns.html">two-colour study</a> remains as the detailed treatment of k&nbsp;=&nbsp;2.</p>
+  </section>
+
+  <div class="pattern-atlas" id="pattern-atlas"><p class="noscript-note">Loading the catalogue…</p></div>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <span>Spacetime Groups</span>
+    <a href="https://github.com/yaroslavvb/animated-groups-fable">Source</a>
+  </div>
+</footer>
+<script src="js/patterns.js?v=2"></script>
+</body>
+</html>

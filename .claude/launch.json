@@ -2,16 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "site",
+      "name": "docs",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8931", "-d", "docs"],
-      "port": 8931
-    },
-    {
-      "name": "site-alt",
-      "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8941", "-d", "docs"],
-      "port": 8941
+      "runtimeArgs": ["-m", "http.server", "8934", "--directory", "docs"],
+      "port": 8934
     }
   ]
 }

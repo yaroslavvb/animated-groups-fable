@@ -25,10 +25,14 @@ loop with ← → (shift for finer steps).
   gyration subscripts (time screws), tilde-marked mirrors (time glides),
   stacking prefixes (time-centred lattices) and a prime clause (time
   reversal); equivalently, Seifert-fibration data of the quotient 3-orbifold.
-- **Two-Color Patterns** — the 88 Grünbaum–Shephard two-colour pattern
-  types, recomputed from scratch: colour group + the seat of the motif (a
+- **Patterns** — all 609 perfect k-colour pattern types for k ≤ 6,
+  recomputed from scratch: colour group + the based seat of the motif (a
   Chaim colour signature with one symbol marked), one plate each with
-  presentation and colour permutations, crops of both books.
+  presentation and colour permutations, crops of both books where they
+  exist. Beyond the book: the exact enumeration gives 64 three-colour
+  types where G&S's Figs 8.2.3/8.3.6 show 59, and the previously
+  untabulated 186 + 37 + 182 for four, five and six colours. (The earlier
+  **Two-Color Patterns** page remains as the detailed k = 2 study.)
 - **History** — Fletcher 1956 (zero citations; his counts 7 and 194 vs the
   modern 13 and 275, explained), Shubnikov/Zamorzaev antisymmetry,
   Janssen–Janner–Ascher, choreographic crystals, the H/K theorem.
@@ -55,6 +59,17 @@ The classification is recomputed from scratch in exact rational arithmetic
   (orbifold stratum, index-2 subgroup) pairs under the affine normaliser;
   Chaim's generators and presentations verified exactly; emits
   `docs/data/two-color-patterns.json`.
+- `enumerate_patterns_k.py` — the 609 k-colour pattern types (k ≤ 6) as
+  orbits of *based* chains S(M) ≤ H ≤ Γ: for non-normal H the admissibility
+  of a seat depends on the point of the stratum, so seats are enumerated
+  modulo the translations normalising H and orbits taken under Schreier
+  generators of the stabiliser of H in the affine normaliser; anchored to
+  the 52/88 counts and G&S's three-colour figures (which the computation
+  exceeds by five types); emits `docs/data/patterns.json`.
+- `sync_crops.py` — copies the MathWorld thumbnails and the book crops for
+  the three-colour types from the sibling repo, matching crops by the
+  audited labels printed in their highlight boxes (several source files are
+  misnamed); emits `docs/data/crops.json`.
 - `export.py` — feature extraction (rotation centres with phases, mirror/glide
   line classes, reversal cosets), clockwork symbols, catalog JSON.
 - `optimize_bases.py` — picks each spec's motif base point to maximise the
