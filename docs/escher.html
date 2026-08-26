@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escher — Spacetime Groups</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=48">
+<link rel="stylesheet" href="css/patterns.css?v=2">
+<link rel="stylesheet" href="css/escher.css?v=1">
+</head>
+<body class="tcp">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="patterns.html">Patterns</a>
+      <a href="escher.html" class="here">Escher</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="hierarchy.html">Hierarchy</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="tcp-page">
+  <header class="tcp-head">
+    <h1>Escher</h1>
+    <p class="catalog-subtitle">
+      <span>1.&thinsp;Wallpaper group</span>
+      <span>2.&thinsp;Chaim colour group</span>
+      <strong class="subtitle-count"><span data-count="total">…</span> regular divisions of the plane</strong>
+    </p>
+    <nav class="toc catalog-chips">
+      <a class="chip" href="index.html#crystals">Crystals overview</a>
+      <a class="chip" href="crystals-2d.html">A · 2D (17)</a>
+      <a class="chip" href="crystals-colored.html">D · Coloured (269)</a>
+      <a class="chip" href="patterns.html">F · Patterns (609)</a>
+    </nav>
+  </header>
+
+  <section class="catalog-directory" aria-label="The 17 wallpaper groups">
+    <nav class="directory-grid" id="directory-grid"></nav>
+    <p class="directory-credit">Thumbnails on this index: Eric&nbsp;W. Weisstein,
+      <a href="https://mathworld.wolfram.com/WallpaperGroups.html" rel="noopener" target="_blank">“Wallpaper Groups,” MathWorld</a>;
+      created with Artlandia SymmetryWorks. © Wolfram Research. Labels use Conway orbifold notation.
+      The badge counts Escher’s drawings in that group.</p>
+  </section>
+
+  <section class="tcp-intro">
+    <p>Between 1936 and 1971 M.&thinsp;C. Escher made some 137 numbered
+      <em>regular divisions of the plane</em> — interlocking figures tiling the plane
+      periodically, most of them coloured so that the colouring itself is symmetric.
+      Each drawing is therefore an instance of exactly the two classifications this site
+      catalogues: the <a href="crystals-2d.html">wallpaper group</a> of the uncoloured
+      tiling, and the <a href="crystals-colored.html">colour group</a>
+      <span class="sym">Γ&nbsp;&gt;&nbsp;H</span> of the coloured one. This page files the
+      drawings under both — wallpaper group, then colour group — with the same tabs as
+      <a href="patterns.html">Patterns</a>, and with the seat/pattern-type layer removed:
+      a drawing is a picture, not a pattern type.</p>
+
+    <p class="escher-note"><strong>About the images.</strong> Escher’s work is in
+      copyright, and <a href="https://mcescher.com/gallery/symmetry/" rel="noopener" target="_blank">mcescher.com</a>
+      — the site of the rights holder, The M.C. Escher Company&nbsp;B.V. — reserves all rights
+      and asks that nothing be reproduced without written permission. This page therefore
+      reproduces no artwork: every drawing below is a <em>link</em> to the official gallery,
+      and the plate beside each colour group is generated from this site’s own data
+      (<code>data/patterns.json</code>), not from Escher. What is catalogued here are facts —
+      which drawing realises which group — after Doris Schattschneider’s
+      <em>Visions of Symmetry</em> and Caroline MacGillavry’s
+      <em>Symmetry Aspects of M.C. Escher’s Periodic Drawings</em>.</p>
+
+    <div class="census-wrap"><table class="counts census">
+      <thead><tr><th>colours&nbsp;k</th><th>1</th><th>2</th><th>3</th><th>4</th><th>6</th><th>total</th></tr></thead>
+      <tbody>
+        <tr><th class="txt">drawings</th><td data-kc="1">·</td><td data-kc="2">·</td><td data-kc="3">·</td><td data-kc="4">·</td><td data-kc="6">·</td><td data-kc="t">·</td></tr>
+      </tbody>
+    </table></div>
+
+    <p class="tcp-note" id="coverage-note">…</p>
+  </section>
+
+  <div class="pattern-atlas" id="escher-atlas"><p class="noscript-note">Loading the catalogue…</p></div>
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <span>Spacetime Groups</span>
+    <a href="https://github.com/yaroslavvb/animated-groups-fable">Source</a>
+  </div>
+</footer>
+<script src="js/escher.js?v=1"></script>
+</body>
+</html>

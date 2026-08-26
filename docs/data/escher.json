@@ -1,0 +1,2008 @@
+{
+ "meta": {
+  "title": "Escher",
+  "count": 107,
+  "with_wallpaper_group": 36,
+  "with_colour_group": 5,
+  "by_wallpaper_group": {
+   "p2": 3,
+   "pgg": 4,
+   "p4g": 3,
+   "p31m": 1,
+   "pg": 8,
+   "p4": 3,
+   "p3": 1,
+   "p6": 5,
+   "p1": 4,
+   "p3m1": 2,
+   "pmm": 1,
+   "cm": 1
+  },
+  "coverage_note": "Coverage is the honest limit of this page. Of the 107 works listed in the gallery, 36 have a wallpaper group in a freely readable source (EscherMath's, computed ignoring colour), and only 5 have a colour group stated anywhere I could reach. The complete classification, colour groups included, is Schattschneider's Concordance in Visions of Symmetry, Tables 1–3, pp. 328–334, which is not freely readable; nothing here is guessed to fill that gap, so the remaining drawings sit in the “not documented” buckets rather than under an invented group.",
+  "rights": "Escher's works are in copyright. The M.C. Escher Company B.V. reserves all rights and requires written permission for reproduction; no artwork is reproduced on this page — every entry links to the official gallery instead.",
+  "sources": [
+   "mcescher.com/gallery/symmetry/ — the list of works",
+   "EscherMath (Saint Louis University) — wallpaper groups (37 drawings)",
+   "David Bailey, essays on the 137 periodic drawings (Internet Archive) — motif, year, colour count",
+   "Schattschneider, Bridges 2008 — verbal colour symmetries",
+   "Schattschneider, Visions of Symmetry (1990), Concordance Tables 1–3, pp. 328–334 — the complete table, not consulted (not freely readable)"
+  ]
+ },
+ "drawings": [
+  {
+   "n": 1,
+   "title": "Dog-like Lion",
+   "year": "1926 or 1927",
+   "colours": 3,
+   "hm": "p2",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e1.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 2,
+   "title": "Lion",
+   "year": "1926",
+   "colours": 3,
+   "hm": "pgg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e2.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 3,
+   "title": "Weightlifter",
+   "year": "1936",
+   "colours": 3,
+   "hm": "p4g",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e3.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 4,
+   "title": "Chinese Boy",
+   "year": "1936",
+   "colours": 3,
+   "hm": "p31m",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e4.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 7,
+   "title": "Squirrel",
+   "year": "1936",
+   "colours": 3,
+   "hm": "p2",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e7.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 8,
+   "title": "Horse",
+   "year": "1937-1938",
+   "colours": 3,
+   "hm": "p2",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e8.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 10,
+   "title": "Fish",
+   "year": "1937-1938",
+   "colours": 3,
+   "hm": "pgg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e10.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 11,
+   "title": "Seahorse",
+   "year": "1937-1938",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e11.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 12,
+   "title": "Butterfly",
+   "year": "1937-1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e12.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 13,
+   "title": "Dragonfly",
+   "year": "1937-1938",
+   "colours": 2,
+   "hm": "p4g",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e13.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 14,
+   "title": "Lizard",
+   "year": "1937",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e14.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 15,
+   "title": "Lizard",
+   "year": "1937 (revised 1963)",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e15.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 16,
+   "title": "Greyhound",
+   "year": "1938",
+   "colours": 3,
+   "hm": "pgg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e16.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Greyhound' vs EscherMath 'Dogs'"
+  },
+  {
+   "n": 17,
+   "title": "Eagle",
+   "year": "1938",
+   "colours": 3,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e17.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Eagle' vs EscherMath 'Parrots'"
+  },
+  {
+   "n": 18,
+   "title": "Two Birds",
+   "year": "1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "Every symmetry preserves colour (a two-motif tiling with translation symmetry only) — Schattschneider, Bridges 2008.",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e18.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 19,
+   "title": "Bird",
+   "year": "1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e19.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 20,
+   "title": "Fish",
+   "year": "1938",
+   "colours": 4,
+   "hm": "p4",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e20.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 21,
+   "title": "Imp",
+   "year": "1938",
+   "colours": 3,
+   "hm": "p3",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e21.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 22,
+   "title": "Bird And Fish",
+   "year": "1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e22.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 23,
+   "title": "Bird",
+   "year": "1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e23.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 24,
+   "title": "Fish/bird",
+   "year": "1938",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e24.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 25,
+   "title": "Lizard",
+   "year": "1939",
+   "colours": 3,
+   "hm": "p6",
+   "hm_source": "the colour-group citation (its colour-blind group)",
+   "hm_check": null,
+   "colour_group": "c3-p6-1",
+   "colour_group_note": "Belov pair p6|p2: colour-blind group p6, colour-preserving subgroup p2 of index 3",
+   "confidence": "medium",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e25.jpg",
+   "sources": [
+    "P. Plachinda, on the colour symmetry of drawing 25 (Reptiles)",
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "Escher in Het Paleis"
+   ]
+  },
+  {
+   "n": 27,
+   "title": "Insect/fish",
+   "year": "1939",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e27.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Insect/fish' vs EscherMath 'Butterflies and fish'"
+  },
+  {
+   "n": 28,
+   "title": "Three Birds",
+   "year": "1938",
+   "colours": 3,
+   "hm": "p1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e28.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 30,
+   "title": "Fish/boat",
+   "year": "1940",
+   "colours": 2,
+   "hm": "p1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e30.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 31,
+   "title": "Fish",
+   "year": "1940",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e31.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 32,
+   "title": "Fish",
+   "year": "1940",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e32.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 34,
+   "title": "Bird/fish",
+   "year": "1941",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "Perfectly coloured counterchange: all glide reflections interchange the colours, all translations preserve them — Schattschneider, Bridges 2008.",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e34.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 35,
+   "title": "Lizard",
+   "year": "1941 (revised 1963)",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e35.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 38,
+   "title": "Dragonfly",
+   "year": "1941",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e38.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Dragonfly' vs EscherMath 'Moths'"
+  },
+  {
+   "n": 41,
+   "title": "Two Fish",
+   "year": "1941 (revised 1963)",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "Half-turns and horizontal glide reflections interchange the colours; vertical glide reflections and translations preserve them — Schattschneider, Bridges 2008.",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e41.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 42,
+   "title": "Shells And Starfish",
+   "year": "1941",
+   "colours": 4,
+   "hm": "p4",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e42.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 44,
+   "title": "Bird",
+   "year": "1941",
+   "colours": 2,
+   "hm": "p6",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e44.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 45,
+   "title": "Angel-devil",
+   "year": "1941",
+   "colours": 2,
+   "hm": "p4g",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": "confirmed independently by the colour-group citation",
+   "colour_group": "c1-p4g-1",
+   "colour_group_note": "a two-motif “Heaven and Hell” tiling in which each motif carries one colour, so every symmetry preserves colour: the colour group is trivial, H = Γ = p4g",
+   "confidence": "medium",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e45.jpg",
+   "sources": [
+    "Schattschneider, Bridges 2008",
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 46,
+   "title": "Two Fish",
+   "year": "1942",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e46.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 51,
+   "title": "Frog",
+   "year": "1942",
+   "colours": 1,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e51.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 52,
+   "title": "Frog/bird",
+   "year": "1942",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e52.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 55,
+   "title": "Fish",
+   "year": "1942",
+   "colours": 3,
+   "hm": "p6",
+   "hm_source": "the colour-group citation (its colour-blind group)",
+   "hm_check": null,
+   "colour_group": "c3-p6-1",
+   "colour_group_note": "632 with colour-preserving kernel 2222 (p6 > p2, index 3)",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e55.jpg",
+   "sources": [
+    "A. P. Goucher, “Analysing Escher”",
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 56,
+   "title": "Lizard",
+   "year": "1942",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e56.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 57,
+   "title": "Two Fish",
+   "year": "1942",
+   "colours": 2,
+   "hm": "p6",
+   "hm_source": "the colour-group citation (its colour-blind group)",
+   "hm_check": null,
+   "colour_group": "c2-p6-1",
+   "colour_group_note": "colour-blind p6, colour-preserving subgroup p3 of index 2: 60° and 180° rotations interchange the two colours, 120° rotations and translations preserve them",
+   "confidence": "medium",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e57.jpg",
+   "sources": [
+    "Schattschneider, Bridges 2008",
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 58,
+   "title": "Two Fish",
+   "year": "1942",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "Half-turns and horizontal glide reflections interchange the colours; vertical glide reflections and translations preserve them — Schattschneider, Bridges 2008.",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e58.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 59,
+   "title": "Two Fish",
+   "year": "1942",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e59.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 60,
+   "title": "Two Lizards",
+   "year": "1942",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e60.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 61,
+   "title": "Two Creatures",
+   "year": "1944",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e61.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Two Creatures' vs EscherMath '\"Weird\"'"
+  },
+  {
+   "n": 62,
+   "title": "Devil",
+   "year": "1944",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e62.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Devil' vs EscherMath 'Sniffers'"
+  },
+  {
+   "n": 64,
+   "title": "Leaf",
+   "year": "1944",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e64.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 65,
+   "title": "Moth",
+   "year": "1944",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e65.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ]
+  },
+  {
+   "n": 66,
+   "title": "Winged Lion",
+   "year": "1945",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e66.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 67,
+   "title": "Horseman",
+   "year": "1946",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e67.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 68,
+   "title": "Two Reptiles",
+   "year": "1948",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e68.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 69,
+   "title": "Fish/duck/lizard",
+   "year": "1948",
+   "colours": 3,
+   "hm": "p3m1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e69.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 70,
+   "title": "Butterfly",
+   "year": "1948",
+   "colours": 3,
+   "hm": "p6",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e70.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 71,
+   "title": "Twelve Birds",
+   "year": "1948",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e71.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 72,
+   "title": "Fish/boat",
+   "year": "1948",
+   "colours": null,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e72.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 73,
+   "title": "Flying Fish",
+   "year": "1949",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e73.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 74,
+   "title": "Bird",
+   "year": "1949",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e74.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 75,
+   "title": "Lizard",
+   "year": "1949",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e75.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 76,
+   "title": "Horse/bird",
+   "year": "1949",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e76.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 78,
+   "title": "Unicorn",
+   "year": "1950",
+   "colours": 3,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e78.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Unicorn' vs EscherMath 'Pegasus'"
+  },
+  {
+   "n": 79,
+   "title": "Three-colour Butterfly",
+   "year": "1950",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e79.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 80,
+   "title": "Flying Fish/bird",
+   "year": "1950",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e80.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 81,
+   "title": "Bat/bee/bird/butterfly",
+   "year": "1950",
+   "colours": 4,
+   "hm": "pmm",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e81.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 83,
+   "title": "Thirty-six Different Motifs",
+   "year": "1951",
+   "colours": null,
+   "hm": "p1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e83.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Thirty-six Different Motifs' vs EscherMath '\"Odd stuff\"'"
+  },
+  {
+   "n": 84,
+   "title": "Bird/fish",
+   "year": "1951",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e84.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 85,
+   "title": "Lizard/fish/bat",
+   "year": "1952",
+   "colours": 3,
+   "hm": "p3m1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e85.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 87,
+   "title": "Two Birds",
+   "year": "1952",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e87.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 88,
+   "title": "Seahorse",
+   "year": "1952",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e88.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 89,
+   "title": "Fish",
+   "year": "1953",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/E89.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 90,
+   "title": "Fish",
+   "year": "1953",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e90.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 91,
+   "title": "Beetle",
+   "year": "1953",
+   "colours": 2,
+   "hm": "cm",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e91.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 93,
+   "title": "Fish",
+   "year": "1954",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e93.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 94,
+   "title": "Fish",
+   "year": "1955",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e94.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 95,
+   "title": "Bird",
+   "year": "1955",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e95.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 96,
+   "title": "Swan",
+   "year": "1955",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e96.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 97,
+   "title": "Bulldog",
+   "year": "1955",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e97.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 98,
+   "title": "Reptile",
+   "year": "1955",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e98.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 99,
+   "title": "Flying Fish",
+   "year": "1954",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e99.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 101,
+   "title": "Lizards",
+   "year": "1956",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e101.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 102,
+   "title": "Ray Fish",
+   "year": "1958",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e102.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 103,
+   "title": "Fish",
+   "year": "1959",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e103.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 104,
+   "title": "Lizard",
+   "year": "1959",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e104.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 105,
+   "title": "Pegasus",
+   "year": "1959",
+   "colours": 2,
+   "hm": "p1",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e105.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 106,
+   "title": "Bird",
+   "year": "1959",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e106.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 107,
+   "title": "Fish",
+   "year": "1960",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e107.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 108,
+   "title": "Bird",
+   "year": "1961",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e108.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 109,
+   "title": "Creeping Creature",
+   "year": "1961",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e109.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Creeping Creature' vs EscherMath 'Frogs'"
+  },
+  {
+   "n": 110,
+   "title": "Bird/fish",
+   "year": "1961",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e110.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 111,
+   "title": "Flying Fish/bird",
+   "year": "1962",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e111-112.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 115,
+   "title": "Flying Fish/bird",
+   "year": "1963",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e115.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 116,
+   "title": "Fish",
+   "year": "1963",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e116.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 117,
+   "title": "Crab",
+   "year": "1963",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e117.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 118,
+   "title": "Lizard",
+   "year": "1963",
+   "colours": 4,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e118.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 119,
+   "title": "Fish",
+   "year": "1964",
+   "colours": 2,
+   "hm": "p4",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e119.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 120,
+   "title": "Fish/bird",
+   "year": "1964",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e120-121.jpg",
+   "sources": [
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 122,
+   "title": "Fish",
+   "year": "1964",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e122-123.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 124,
+   "title": "Lizard",
+   "year": "1965",
+   "colours": 2,
+   "hm": "pgg",
+   "hm_source": "the colour-group citation (its colour-blind group)",
+   "hm_check": null,
+   "colour_group": "c2-pgg-2",
+   "colour_group_note": "p2′g′g (Shubnikov black–white symbol): colour-blind group pgg, colour-preserving subgroup pg of index 2",
+   "confidence": "medium",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e124.jpg",
+   "sources": [
+    "MacGillavry's symbol as reproduced in the crystallographic literature on Escher's drawing 124",
+    "Bailey",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 126,
+   "title": "Fish/bird",
+   "year": "1967",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "Perfectly coloured counterchange: some vertical glide reflections interchange the colours and others preserve them; horizontal translations interchange, vertical translations preserve — Schattschneider, Bridges 2008.",
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e126.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 127,
+   "title": "Bird",
+   "year": "1967",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e127.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 128,
+   "title": "Bird",
+   "year": "1967",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e128.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 130,
+   "title": "Fish/horse",
+   "year": "1967",
+   "colours": 2,
+   "hm": "pg",
+   "hm_source": "EscherMath (Saint Louis University)",
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": "The same colour symmetries as drawing 126 — Schattschneider, Bridges 2008.",
+   "confidence": "high",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e130.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 132,
+   "title": "Flower",
+   "year": "1967",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e132.jpg",
+   "sources": [
+    "Bailey"
+   ]
+  },
+  {
+   "n": 133,
+   "title": "Interlaced Hexagon",
+   "year": "1967",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e133.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Interlaced Hexagon' vs EscherMath 'Mesh'"
+  },
+  {
+   "n": 134,
+   "title": "Flower",
+   "year": "1967",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e134.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": 136,
+   "title": "Two Tile Pairs",
+   "year": "1968",
+   "colours": 2,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e136.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ],
+   "conflict": "motif/subject name differs: Bailey 'Two Tile Pairs' vs EscherMath 'Design drawing of tiles'"
+  },
+  {
+   "n": 137,
+   "title": "Ghosts",
+   "year": "1971",
+   "colours": 3,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/e137.jpg",
+   "sources": [
+    "Bailey",
+    "EscherMath (Saint Louis University)",
+    "mcescher.com"
+   ]
+  },
+  {
+   "n": null,
+   "title": null,
+   "year": null,
+   "colours": null,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/AlhambraSketch1.jpg",
+   "sources": []
+  },
+  {
+   "n": null,
+   "title": null,
+   "year": null,
+   "colours": null,
+   "hm": null,
+   "hm_source": null,
+   "hm_check": null,
+   "colour_group": null,
+   "colour_group_note": null,
+   "confidence": "low",
+   "page_url": "https://mcescher.com/gallery/symmetry/",
+   "image_url": "https://mcescher.com/wp-content/uploads/2019/06/AlhambraSketch2.jpg",
+   "sources": []
+  }
+ ]
+}
