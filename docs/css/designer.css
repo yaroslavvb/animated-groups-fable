@@ -275,6 +275,22 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
 }
 #gens .k { color: var(--ink); }
 #gens .ts { color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* The same generator's colour cycle, on its own line under the geometry: in a
+ * 306px column it does not fit beside the time shift, and it is the ECHO of
+ * that shift rather than a fourth fact about the generator. */
+#gens .cyc {
+  grid-column: 2 / -1;
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+#gens .rel, #gens .corr {
+  margin: 0.45rem 0 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+#gens .rel { font-family: Charter, Georgia, serif; }
+#gens .corr a { color: var(--accent); }
 
 #gens details { margin-top: 0.4rem; }
 #gens summary {

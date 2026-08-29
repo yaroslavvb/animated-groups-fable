@@ -1,7 +1,7 @@
 {
  "meta": {
   "count": 51,
-  "selection": "forward film groups with clock order >= 2",
+  "selection": "forward spacetime groups with clock order >= 2",
   "colorOrders": [
    2,
    3,
@@ -202,7 +202,40 @@
      "phase": "2/3",
      "timeShift": "+2/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p3-1",
+    "gs": "p3[3]₁",
+    "symbol": "p3[3]₁",
+    "patternsUrl": "patterns.html#group-c3-p3-1",
+    "relations": "α³ = β³ = γ³ = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     }
+    ]
+   }
   },
   {
    "id": "g226",
@@ -325,7 +358,40 @@
      "phase": "1/3",
      "timeShift": "+1/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p3-1",
+    "gs": "p3[3]₁",
+    "symbol": "p3[3]₁",
+    "patternsUrl": "patterns.html#group-c3-p3-1",
+    "relations": "α³ = β³ = γ³ = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     }
+    ]
+   }
   },
   {
    "id": "g227",
@@ -582,7 +648,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p3-2",
+    "gs": "p3[3]₂",
+    "symbol": "p3[3]₂",
+    "patternsUrl": "patterns.html#group-c3-p3-2",
+    "relations": "α³ = β³ = γ³ = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "2/3",
+      "timeShift": "+2/3 period",
+      "cycle": "(ACB)"
+     }
+    ]
+   }
   },
   {
    "id": "g234",
@@ -996,7 +1095,32 @@
      "phase": "1/3",
      "timeShift": "+1/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p31m-2",
+    "gs": "p31m[3]₂",
+    "symbol": "p31m[3]₂",
+    "patternsUrl": "patterns.html#group-c3-p31m-2",
+    "relations": "α³ = P² = (PαPα⁻¹)³ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g244",
@@ -1204,7 +1328,40 @@
      "phase": "1/3",
      "timeShift": "+1/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p6-1",
+    "gs": "p6[3]₁",
+    "symbol": "p6[3]₁",
+    "patternsUrl": "patterns.html#group-c3-p6-1",
+    "relations": "α⁶ = β³ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-sixth turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "2/3",
+      "timeShift": "+2/3 period",
+      "cycle": "(ACB)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g245",
@@ -1412,7 +1569,40 @@
      "phase": "2/3",
      "timeShift": "+2/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c3-p6-1",
+    "gs": "p6[3]₁",
+    "symbol": "p6[3]₁",
+    "patternsUrl": "patterns.html#group-c3-p6-1",
+    "relations": "α⁶ = β³ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-sixth turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ABC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "2/3",
+      "timeShift": "+2/3 period",
+      "cycle": "(ACB)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g96",
@@ -1568,7 +1758,40 @@
      "phase": "3/4",
      "timeShift": "+3/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-p4-1",
+    "gs": null,
+    "symbol": "p4[4]₁",
+    "patternsUrl": "patterns.html#group-c4-p4-1",
+    "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ABDC)"
+     },
+     {
+      "name": "β",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ABDC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AD)(BC)"
+     }
+    ]
+   }
   },
   {
    "id": "g97",
@@ -1724,7 +1947,40 @@
      "phase": "1/4",
      "timeShift": "+1/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-p4-1",
+    "gs": null,
+    "symbol": "p4[4]₁",
+    "patternsUrl": "patterns.html#group-c4-p4-1",
+    "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ABDC)"
+     },
+     {
+      "name": "β",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ABDC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AD)(BC)"
+     }
+    ]
+   }
   },
   {
    "id": "g99",
@@ -1965,7 +2221,40 @@
      "phase": "1/4",
      "timeShift": "+1/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-p4-4",
+    "gs": null,
+    "symbol": "p4[4]₄",
+    "patternsUrl": "patterns.html#group-c4-p4-4",
+    "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ACBD)"
+     },
+     {
+      "name": "β",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "3/4",
+      "timeShift": "+3/4 period",
+      "cycle": "(ADBC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g137",
@@ -2354,7 +2643,32 @@
      "phase": "1/4",
      "timeShift": "+1/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-p4g-4",
+    "gs": null,
+    "symbol": "p4g[4]₄",
+    "patternsUrl": "patterns.html#group-c4-p4g-4",
+    "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ACBD)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g139",
@@ -2743,7 +3057,32 @@
      "phase": "3/4",
      "timeShift": "+3/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-p4g-6",
+    "gs": null,
+    "symbol": "p4g[4]₆",
+    "patternsUrl": "patterns.html#group-c4-p4g-6",
+    "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ACBD)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)(CD)"
+     }
+    ]
+   }
   },
   {
    "id": "g75",
@@ -3136,7 +3475,40 @@
      "phase": "1/4",
      "timeShift": "+1/4 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c4-pgg-3",
+    "gs": null,
+    "symbol": "pgg[4]₃",
+    "patternsUrl": "patterns.html#group-c4-pgg-3",
+    "relations": "α² = β² = αβZ² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)(CD)"
+     },
+     {
+      "name": "Z",
+      "geometry": "glide reflection",
+      "kind": "glide",
+      "phase": "1/4",
+      "timeShift": "+1/4 period",
+      "cycle": "(ACBD)"
+     }
+    ]
+   }
   },
   {
    "id": "g235",
@@ -3556,7 +3928,32 @@
      "phase": "1/3",
      "timeShift": "+1/3 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c6-p31m-4",
+    "gs": null,
+    "symbol": "p31m[6]₄",
+    "patternsUrl": "patterns.html#group-c6-p31m-4",
+    "relations": "α³ = P² = (PαPα⁻¹)³ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "2/3",
+      "timeShift": "+2/3 period",
+      "cycle": "(ABD)(CEF)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AC)(BE)(DF)"
+     }
+    ]
+   }
   },
   {
    "id": "g247",
@@ -3770,7 +4167,40 @@
      "phase": "5/6",
      "timeShift": "+5/6 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c6-p6-1",
+    "gs": null,
+    "symbol": "p6[6]₁",
+    "patternsUrl": "patterns.html#group-c6-p6-1",
+    "relations": "α⁶ = β³ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-sixth turn",
+      "kind": "rotation",
+      "phase": "1/6",
+      "timeShift": "+1/6 period",
+      "cycle": "(ABDFEC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ADE)(BFC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AF)(BE)(CD)"
+     }
+    ]
+   }
   },
   {
    "id": "g248",
@@ -3984,7 +4414,40 @@
      "phase": "1/6",
      "timeShift": "+1/6 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c6-p6-1",
+    "gs": null,
+    "symbol": "p6[6]₁",
+    "patternsUrl": "patterns.html#group-c6-p6-1",
+    "relations": "α⁶ = β³ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-sixth turn",
+      "kind": "rotation",
+      "phase": "1/6",
+      "timeShift": "+1/6 period",
+      "cycle": "(ABDFEC)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "1/3",
+      "timeShift": "+1/3 period",
+      "cycle": "(ADE)(BFC)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AF)(BE)(CD)"
+     }
+    ]
+   }
   },
   {
    "id": "g55",
@@ -4127,7 +4590,48 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmm-1",
+    "gs": "pmm[2]₅",
+    "symbol": "pmm[2]₅",
+    "patternsUrl": "patterns.html#group-c2-pmm-1",
+    "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "S",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g60",
@@ -4270,7 +4774,48 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmm-2",
+    "gs": "pmm[2]₂",
+    "symbol": "pmm[2]₂",
+    "patternsUrl": "patterns.html#group-c2-pmm-2",
+    "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "S",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g64",
@@ -4498,7 +5043,48 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmm-3",
+    "gs": "pmm[2]₁",
+    "symbol": "pmm[2]₁",
+    "patternsUrl": "patterns.html#group-c2-pmm-3",
+    "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "S",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g65",
@@ -4726,7 +5312,48 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmm-4",
+    "gs": "pmm[2]₄",
+    "symbol": "pmm[2]₄",
+    "patternsUrl": "patterns.html#group-c2-pmm-4",
+    "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "S",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g74",
@@ -5115,7 +5742,48 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmm-5",
+    "gs": "pmm[2]₃",
+    "symbol": "pmm[2]₃",
+    "patternsUrl": "patterns.html#group-c2-pmm-5",
+    "relations": "P² = Q² = R² = S² = (PQ)² = (QR)² = (RS)² = (SP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "S",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g231",
@@ -5303,7 +5971,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p3m1-1",
+    "gs": "p3m1[2]",
+    "symbol": "p3m1[2]",
+    "patternsUrl": "patterns.html#group-c2-p3m1-1",
+    "relations": "P² = Q² = R² = (PQ)³ = (QR)³ = (RP)³ = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g129",
@@ -5540,7 +6241,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4m-1",
+    "gs": "p4m[2]₄",
+    "symbol": "p4m[2]₄",
+    "patternsUrl": "patterns.html#group-c2-p4m-1",
+    "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g130",
@@ -5777,7 +6511,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4m-2",
+    "gs": "p4m[2]₃",
+    "symbol": "p4m[2]₃",
+    "patternsUrl": "patterns.html#group-c2-p4m-2",
+    "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g131",
@@ -6014,7 +6781,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4m-3",
+    "gs": "p4m[2]₂",
+    "symbol": "p4m[2]₂",
+    "patternsUrl": "patterns.html#group-c2-p4m-3",
+    "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g136",
@@ -6426,7 +7226,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4m-4",
+    "gs": "p4m[2]₅",
+    "symbol": "p4m[2]₅",
+    "patternsUrl": "patterns.html#group-c2-p4m-4",
+    "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g138",
@@ -6838,7 +7671,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4m-5",
+    "gs": "p4m[2]₁",
+    "symbol": "p4m[2]₁",
+    "patternsUrl": "patterns.html#group-c2-p4m-5",
+    "relations": "P² = Q² = R² = (PQ)⁴ = (QR)⁴ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g269",
@@ -7165,7 +8031,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p6m-2",
+    "gs": "p6m[2]₁",
+    "symbol": "p6m[2]₁",
+    "patternsUrl": "patterns.html#group-c2-p6m-2",
+    "relations": "P² = Q² = R² = (PQ)⁶ = (QR)³ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g270",
@@ -7492,7 +8391,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p6m-3",
+    "gs": "p6m[2]₃",
+    "symbol": "p6m[2]₃",
+    "patternsUrl": "patterns.html#group-c2-p6m-3",
+    "relations": "P² = Q² = R² = (PQ)⁶ = (QR)³ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g271",
@@ -7819,7 +8751,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p6m-1",
+    "gs": "p6m[2]₂",
+    "symbol": "p6m[2]₂",
+    "patternsUrl": "patterns.html#group-c2-p6m-1",
+    "relations": "P² = Q² = R² = (PQ)⁶ = (QR)³ = (RP)² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "R",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g9",
@@ -7913,7 +8878,32 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cm-1",
+    "gs": "cm[2]₁",
+    "symbol": "cm[2]₁",
+    "patternsUrl": "patterns.html#group-c2-cm-1",
+    "relations": "P² = PZ²PZ⁻² = 1",
+    "generators": [
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Z",
+      "geometry": "glide reflection",
+      "kind": "glide",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g69",
@@ -8141,7 +9131,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cmm-1",
+    "gs": "cmm[2]₄",
+    "symbol": "cmm[2]₄",
+    "patternsUrl": "patterns.html#group-c2-cmm-1",
+    "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g70",
@@ -8369,7 +9392,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cmm-2",
+    "gs": "cmm[2]₂",
+    "symbol": "cmm[2]₂",
+    "patternsUrl": "patterns.html#group-c2-cmm-2",
+    "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g71",
@@ -8597,7 +9653,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cmm-3",
+    "gs": "cmm[2]₅",
+    "symbol": "cmm[2]₅",
+    "patternsUrl": "patterns.html#group-c2-cmm-3",
+    "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g72",
@@ -8825,7 +9914,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cmm-5",
+    "gs": "cmm[2]₁",
+    "symbol": "cmm[2]₁",
+    "patternsUrl": "patterns.html#group-c2-cmm-5",
+    "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g73",
@@ -9053,7 +10175,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-cmm-4",
+    "gs": "cmm[2]₃",
+    "symbol": "cmm[2]₃",
+    "patternsUrl": "patterns.html#group-c2-cmm-4",
+    "relations": "α² = P² = Q² = (PQ)² = (QαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Q",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g57",
@@ -9196,7 +10351,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmg-1",
+    "gs": "pmg[2]₅",
+    "symbol": "pmg[2]₅",
+    "patternsUrl": "patterns.html#group-c2-pmg-1",
+    "relations": "α² = β² = P² = 1; αβP = Pαβ",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g61",
@@ -9339,7 +10527,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmg-3",
+    "gs": "pmg[2]₂",
+    "symbol": "pmg[2]₂",
+    "patternsUrl": "patterns.html#group-c2-pmg-3",
+    "relations": "α² = β² = P² = 1; αβP = Pαβ",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g62",
@@ -9482,7 +10703,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmg-2",
+    "gs": "pmg[2]₄",
+    "symbol": "pmg[2]₄",
+    "patternsUrl": "patterns.html#group-c2-pmg-2",
+    "relations": "α² = β² = P² = 1; αβP = Pαβ",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g66",
@@ -9710,7 +10964,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmg-4",
+    "gs": "pmg[2]₁",
+    "symbol": "pmg[2]₁",
+    "patternsUrl": "patterns.html#group-c2-pmg-4",
+    "relations": "α² = β² = P² = 1; αβP = Pαβ",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g67",
@@ -9938,7 +11225,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pmg-5",
+    "gs": "pmg[2]₃",
+    "symbol": "pmg[2]₃",
+    "patternsUrl": "patterns.html#group-c2-pmg-5",
+    "relations": "α² = β² = P² = 1; αβP = Pαβ",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g6",
@@ -10032,7 +11352,48 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p2-1",
+    "gs": "p2[2]₁",
+    "symbol": "p2[2]₁",
+    "patternsUrl": "patterns.html#group-c2-p2-1",
+    "relations": "α² = β² = γ² = δ² = αβγδ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "δ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g7",
@@ -10175,7 +11536,48 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p2-2",
+    "gs": "p2[2]₂",
+    "symbol": "p2[2]₂",
+    "patternsUrl": "patterns.html#group-c2-p2-2",
+    "relations": "α² = β² = γ² = δ² = αβγδ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "δ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g59",
@@ -10318,7 +11720,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pgg-1",
+    "gs": "pgg[2]₂",
+    "symbol": "pgg[2]₂",
+    "patternsUrl": "patterns.html#group-c2-pgg-1",
+    "relations": "α² = β² = αβZ² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "Z",
+      "geometry": "glide reflection",
+      "kind": "glide",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g63",
@@ -10461,7 +11896,40 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-pgg-2",
+    "gs": "pgg[2]₁",
+    "symbol": "pgg[2]₁",
+    "patternsUrl": "patterns.html#group-c2-pgg-2",
+    "relations": "α² = β² = αβZ² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "Z",
+      "geometry": "glide reflection",
+      "kind": "glide",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g233",
@@ -10649,7 +12117,32 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p31m-1",
+    "gs": "p31m[2]",
+    "symbol": "p31m[2]",
+    "patternsUrl": "patterns.html#group-c2-p31m-1",
+    "relations": "α³ = P² = (PαPα⁻¹)³ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g133",
@@ -10886,7 +12379,32 @@
      "phase": "0",
      "timeShift": "none"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4g-1",
+    "gs": "p4g[2]₃",
+    "symbol": "p4g[2]₃",
+    "patternsUrl": "patterns.html#group-c2-p4g-1",
+    "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g134",
@@ -11123,7 +12641,32 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4g-2",
+    "gs": "p4g[2]₂",
+    "symbol": "p4g[2]₂",
+    "patternsUrl": "patterns.html#group-c2-p4g-2",
+    "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g135",
@@ -11360,7 +12903,32 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4g-3",
+    "gs": "p4g[2]₁",
+    "symbol": "p4g[2]₁",
+    "patternsUrl": "patterns.html#group-c2-p4g-3",
+    "relations": "α⁴ = P² = (PαPα⁻¹)² = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "P",
+      "geometry": "mirror reflection",
+      "kind": "mirror",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g95",
@@ -11512,7 +13080,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4-1",
+    "gs": "p4[2]₂",
+    "symbol": "p4[2]₂",
+    "patternsUrl": "patterns.html#group-c2-p4-1",
+    "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     }
+    ]
+   }
   },
   {
    "id": "g98",
@@ -11767,7 +13368,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p4-2",
+    "gs": "p4[2]₁",
+    "symbol": "p4[2]₁",
+    "patternsUrl": "patterns.html#group-c2-p4-2",
+    "relations": "α⁴ = β⁴ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "β",
+      "geometry": "quarter-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   },
   {
    "id": "g246",
@@ -11973,7 +13607,40 @@
      "phase": "1/2",
      "timeShift": "+1/2 period"
     }
-   ]
+   ],
+   "canonical": {
+    "colourGroup": "c2-p6-1",
+    "gs": "p6[2]",
+    "symbol": "p6[2]",
+    "patternsUrl": "patterns.html#group-c2-p6-1",
+    "relations": "α⁶ = β³ = γ² = αβγ = 1",
+    "generators": [
+     {
+      "name": "α",
+      "geometry": "one-sixth turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     },
+     {
+      "name": "β",
+      "geometry": "one-third turn",
+      "kind": "rotation",
+      "phase": "0",
+      "timeShift": "none",
+      "cycle": "1"
+     },
+     {
+      "name": "γ",
+      "geometry": "half-turn",
+      "kind": "rotation",
+      "phase": "1/2",
+      "timeShift": "+1/2 period",
+      "cycle": "(AB)"
+     }
+    ]
+   }
   }
  ]
 }

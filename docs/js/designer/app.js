@@ -22,13 +22,13 @@
  */
 "use strict";
 import { xuLabel } from "../labels.js?v=47";
-import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=48";
+import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=49";
 import { scan } from "./collide.js?v=47";
 import { encode, decode, LIMITS } from "./urlstate.js?v=48";
-import { loadGroups, Design, PALETTE, nearSkip, cart, latticeOf } from "./model.js?v=47";
+import { loadGroups, Design, PALETTE, nearSkip, cart, latticeOf } from "./model.js?v=49";
 import { elements, planeDiagram } from "./symmetry.js?v=48";
-import { generate } from "./random.js?v=47";
-import { Preview } from "./preview.js?v=48";
+import { generate } from "./random.js?v=49";
+import { Preview } from "./preview.js?v=49";
 
 /* The drawing surface is the site's printed-plate ground in both colour
  * schemes: the design is a picture of the same thing the billiards page shows,
@@ -835,6 +835,27 @@ window.addEventListener("hashchange", () => {
 
 /* ---- group selector ---- */
 
+/* The seventeen in crystallographic order — the order the directory at the top
+ * of patterns.html is built in, and the order wallpaper-data.js keeps. This
+ * menu used to list its parents in whatever order the data file held, which is
+ * sorted by ORBIFOLD symbol: it opened *2222 before 2222 and buried 22× after
+ * p4's family, so a reader arriving from the patterns directory had to find
+ * each family again by reading. The two pages file the wallpapers the same way
+ * now.
+ *
+ * A literal and not an import: wallpaper-data.js has this order too, but it
+ * carries prose for every group and pulls the catalog in behind it, and a menu
+ * that only needs to know p4 comes before p3 should not fetch all that. */
+const WALLPAPER_ORDER = ["p1", "p2", "pm", "pg", "cm", "pmm", "pmg", "pgg",
+  "cmm", "p4", "p4m", "p4g", "p3", "p3m1", "p31m", "p6", "p6m"];
+
+/* A parent this list has never heard of sorts to the end and keeps its data
+ * order there, rather than silently sorting itself to the front. */
+function wallpaperRank(hm) {
+  const i = WALLPAPER_ORDER.indexOf(hm);
+  return i < 0 ? WALLPAPER_ORDER.length : i;
+}
+
 function buildGroups() {
   const host = el("groups");
   const parts = [];
@@ -846,10 +867,15 @@ function buildGroups() {
     parts.push(`<p class="head">${n} colours</p>`);
     const list = groups.byColors.get(n);
     const seen = [];
-    for (const g of list) if (!seen.includes(g.parentOrbifold)) seen.push(g.parentOrbifold);
-    for (const orb of seen) {
-      parts.push(`<p class="sub">${esc(orb)} <span>${esc(list.find((g) =>
-        g.parentOrbifold === orb).parentHm)}</span></p>`);
+    for (const g of list) {
+      if (!seen.some((s) => s.orb === g.parentOrbifold)) {
+        seen.push({ orb: g.parentOrbifold, hm: g.parentHm });
+      }
+    }
+    // Array#sort is stable, so families the order does not name keep theirs
+    seen.sort((a, b) => wallpaperRank(a.hm) - wallpaperRank(b.hm));
+    for (const { orb, hm } of seen) {
+      parts.push(`<p class="sub">${esc(orb)} <span>${esc(hm)}</span></p>`);
       for (const g of list.filter((x) => x.parentOrbifold === orb)) {
         // the signature is the name; two groups in a chiral pair share it, so
         // the id has to be on the row as well or the choice is ambiguous
@@ -902,21 +928,53 @@ const unlettered = (s) => String(s)
   .replace(/ about centre [A-Z]\b/, "")
   .replace(/ \(axis direction [A-Z]\)/, "");
 
+/* The generators, named as patterns.html names them.
+ *
+ * The group is presented by its ORBIFOLD generators — one per cone point, one
+ * per mirror — because that is the presentation the rest of the site uses, and
+ * because it is what makes the two pages comparable: over there each generator
+ * carries a CYCLE OF COLOURS, here the same generator carries a TIME SHIFT,
+ * and they are the same statement. The build pins the labelling by requiring
+ * exactly that agreement (see designer_groups.py), so α here is α there.
+ *
+ * A group the build could not pin falls back to the derived A, B listing
+ * rather than print a name nothing stands behind. */
 function renderGens() {
   const g = design.group;
-  const ops = (g.geometricOps || []).map((o) => {
-    const tag = o.power === "1" ? o.generator : `${o.generator}<sup>${esc(o.power)}</sup>`;
-    return `<li><span class="tag">${tag}</span>` +
-           `<span class="k">${esc(unlettered(o.operation))}</span>` +
-           `<span class="ts">${esc(o.timeShift)}</span></li>`;
-  }).join("");
+  const c = g.canonical;
+  const ops = c
+    ? c.generators.map((x) =>
+        `<li><span class="tag">${esc(x.name)}</span>` +
+        `<span class="k">${esc(x.geometry)}</span>` +
+        `<span class="ts">${esc(x.timeShift)}</span>` +
+        // the trivial cycle is already said by "none" in the column above it
+        (x.cycle && x.cycle !== "1"
+          ? `<span class="cyc">colours ${esc(spacedCycle(x.cycle))}</span>` : "")
+        + `</li>`).join("")
+    : (g.geometricOps || []).map((o) => {
+        const tag = o.power === "1" ? o.generator : `${o.generator}<sup>${esc(o.power)}</sup>`;
+        return `<li><span class="tag">${tag}</span>` +
+               `<span class="k">${esc(unlettered(o.operation))}</span>` +
+               `<span class="ts">${esc(o.timeShift)}</span></li>`;
+      }).join("");
+  const rel = c
+    ? `<p class="rel">Γ = ⟨${c.generators.map((x) => esc(x.name)).join(", ")} | ` +
+      `${esc(c.relations)}⟩</p>` +
+      `<p class="corr">the colouring patterns.html files as ` +
+      `<a href="${esc(c.patternsUrl)}">${esc(c.symbol)}</a></p>`
+    : "";
   const alg = (g.generators || []).map((x) =>
     `<li><code>${esc(x.expr)}</code>${x.note ? `<span>${esc(x.note)}</span>` : ""}</li>`
   ).join("");
   el("gens").innerHTML =
-    `<ul class="ops">${ops}</ul>` +
+    `<ul class="ops">${ops}</ul>` + rel +
     `<details><summary>the algebra</summary><ul class="alg">${alg}</ul></details>`;
 }
+
+/* "(ABDC)" -> "(A B D C)", exactly as patterns.html spaces its own cycles,
+ * and for the same reason: ABDC reads as a word. */
+const spacedCycle = (c) =>
+  c.replace(/\(([A-F]+)\)/g, (m, letters) => "(" + letters.split("").join(" ") + ")");
 
 /* Whatever the design says, the controls say. Called after anything that can
  * change the design out from under them: undo, a pasted link, Generate. */

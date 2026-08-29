@@ -157,7 +157,11 @@ function samePath(a, b) {
 }
 
 export async function loadGroups(url = "data/designer-groups.json") {
-  const res = await fetch(url);
+  /* no-cache, as every other data fetch on the site does: the file is
+   * REGENERATED — it gained the canonical generators without changing its
+   * name — and a reader holding yesterday's copy would be shown yesterday's
+   * group list by a page whose code had moved on. Revalidating costs a 304. */
+  const res = await fetch(url, { cache: "no-cache" });
   if (!res.ok) throw new Error(`designer groups: HTTP ${res.status} for ${url}`);
   const data = await res.json();
   const groups = data.groups;

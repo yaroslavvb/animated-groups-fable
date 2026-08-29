@@ -28,11 +28,17 @@ Usage:  python3 designer_groups.py [--offline]
 
 import argparse
 import hashlib
+import itertools
 import json
 import urllib.request
 from fractions import Fraction
 from math import gcd
 from pathlib import Path
+
+# The canonical generators come from the patterns build, which is where the
+# orbifold generating set of each wallpaper group is defined exactly. Python
+# puts this script's own directory on the path, so a plain import finds it.
+import enumerate_patterns
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "docs" / "data"
@@ -199,6 +205,238 @@ def geometric_ops(group):
     return out
 
 
+# ------------------------------------------ the canonical generators --
+
+# WHY THIS IS NOT A LOOKUP.
+#
+# patterns.html presents every wallpaper group by its ORBIFOLD generators --
+# one per cone point, one per mirror boundary -- named α β γ δ / P Q Z and
+# tied by relations like αβγ = 1. The designer derived its own generating set
+# by search and named it A, B, C. Both are correct and they are not the same
+# set, so a statement carried from one page to the other was not checkable:
+# there was no α in the designer to compare patterns' α with.
+#
+# The two cannot simply share a table, because they do not share a CELL.
+# patterns works in the wallpaper group's own primitive cell; the designer
+# works in the COLOUR cell -- the period cell of the animation, which is the
+# parent cell only when the clock is carried entirely by point operations and
+# is n times larger when translations carry part of it. The origins and the
+# axes were chosen independently on top of that: the designer's pmg sits in a
+# cell turned a quarter turn from patterns', and its pgg origin is an eighth
+# of a cell away from patterns'.
+#
+# So the generators are TRANSPORTED. Find the change of cell
+#
+#     y = M0 x + t0        x in patterns' cell, y in the designer's
+#
+# whose M0 carries the parent's translation lattice onto the parent
+# translations as the designer sees them, and which lands every canonical
+# generator on an element the designer's op table actually holds. Then each
+# generator's time shift is simply read off that table.
+#
+# WHICH TRANSPORT. There is more than one -- the group's own normaliser
+# permutes the cone points, and 27 of the 51 groups admit transports that
+# disagree about which 3-centre is α. The labelling is pinned by the COLOUR
+# GROUP, which is the whole point of the exercise: a cyclic colour
+# permutation IS a time shift, so the vector of shifts, read as exponents of
+# the clock, must be the vector of exponents patterns.html publishes for one
+# of its colour groups over the same wallpaper. Every one of the 51 lands on
+# exactly one colour group, and on it exactly -- not merely up to a
+# relabelling of the colours. So the designer's α is patterns' α, and what
+# patterns prints as a cycle this page prints as a time shift.
+
+
+def _mmul(A, B):
+    return tuple(tuple(sum(A[i][k] * B[k][j] for k in range(2))
+                       for j in range(2)) for i in range(2))
+
+
+def _minv(A):
+    d = A[0][0] * A[1][1] - A[0][1] * A[1][0]
+    return ((A[1][1] / d, -A[0][1] / d), (-A[1][0] / d, A[0][0] / d))
+
+
+def _mvec(A, v):
+    return (A[0][0] * v[0] + A[0][1] * v[1], A[1][0] * v[0] + A[1][1] * v[1])
+
+
+def _exact(M):
+    return tuple(tuple(Fraction(x) for x in row) for row in M)
+
+
+def _integral(M):
+    return all(x.denominator == 1 for row in M for x in row)
+
+
+def _int_mat(M):
+    return tuple(tuple(int(x) for x in row) for row in M)
+
+
+def cell_bases(lattice):
+    """Every small basis of Z² + `lattice` — the candidate linear parts.
+
+    The parent's translations, seen in the designer's cell, are Z² together
+    with the translation parts of its identity ops: one entry when the clock
+    is carried by point operations alone, n of them when the animation's cell
+    is n parent cells. M0 has to carry patterns' Z² onto exactly that, so its
+    columns are a basis of it."""
+    den = 1
+    for v in lattice:
+        for c in v:
+            den = den * c.denominator // gcd(den, c.denominator)
+    pts = [p for p in (( Fraction(a, den), Fraction(b, den))
+                       for a in range(-den, den + 1)
+                       for b in range(-den, den + 1))
+           if any((p[0] - w[0]).denominator == 1 and (p[1] - w[1]).denominator == 1
+                  for w in [(Fraction(0), Fraction(0))] + lattice)]
+    want = Fraction(1, len(lattice))
+    return [((w1[0], w2[0]), (w1[1], w2[1]))
+            for w1, w2 in itertools.product(pts, repeat=2)
+            if abs(w1[0] * w2[1] - w1[1] * w2[0]) == want]
+
+
+# Origins are searched on a grid rather than solved for: a mirror generator
+# leaves I - M singular and the solve has cases, while the grid has none. The
+# denominator has to admit an eighth (pgg's origin) and a twelfth (the
+# hexagonal ones), so it is their lcm.
+ORIGIN_STEPS = 24
+
+
+def transport_shifts(group, gens):
+    """{generator name: time shift} for every change of cell that works."""
+    ops = {(M, v): tau for M, v, tau in
+           (as_op(o) for o in group["render"]["ops"])}
+    lattice = [v for (M, v) in ops if M == IDENT]
+    out = []
+    for M0 in cell_bases(lattice):
+        M0inv = _minv(M0)
+        moved = []
+        for name, (M, v) in gens:
+            Mp = _mmul(_mmul(M0, _exact(M)), M0inv)
+            if not _integral(Mp):
+                break                      # this cell does not carry the group
+            moved.append((name, _int_mat(Mp), _mvec(M0, (Fraction(v[0]),
+                                                        Fraction(v[1])))))
+        else:
+            for a in range(ORIGIN_STEPS):
+                for b in range(ORIGIN_STEPS):
+                    t0 = (Fraction(a, ORIGIN_STEPS), Fraction(b, ORIGIN_STEPS))
+                    shifts = {}
+                    for name, Mp, M0v in moved:
+                        Mt = _mvec(_exact(Mp), t0)
+                        key = (Mp, ((M0v[0] - Mt[0] + t0[0]) % 1,
+                                    (M0v[1] - Mt[1] + t0[1]) % 1))
+                        if key not in ops:
+                            break
+                        shifts[name] = ops[key]
+                    else:
+                        out.append(shifts)
+    return out
+
+
+def perm_of(cycle, k):
+    """a cycle string as written in patterns.json, as a permutation tuple"""
+    p = list(range(k))
+    if cycle.strip() == "1":
+        return tuple(p)
+    for part in cycle.replace(")(", ")|(").split("|"):
+        letters = [ord(c) - 65 for c in part if c.isalpha()]
+        for i, c in enumerate(letters):
+            p[c] = letters[(i + 1) % len(letters)]
+    return tuple(p)
+
+
+def perm_compose(p, q):
+    return tuple(p[q[i]] for i in range(len(q)))
+
+
+def cyclic_exponents(cycles, k):
+    """{generator: exponent of a clock generator}, or None if the colour
+    group is not a cyclic group of order k acting regularly.
+
+    The clock generator is looked for in the whole GENERATED group and not
+    among the listed permutations: over p31m the six-colour cyclic group is
+    generated by a three-cycle and an involution, and neither of them alone
+    generates it."""
+    perms = {n: perm_of(c, k) for n, c in cycles.items()}
+    ident = tuple(range(k))
+    grp, frontier = {ident}, [ident]
+    while frontier:
+        x = frontier.pop()
+        for gp in perms.values():
+            y = perm_compose(x, gp)
+            if y not in grp:
+                grp.add(y)
+                frontier.append(y)
+    for rho in sorted(grp):
+        powers, cur = {}, ident
+        while cur not in powers:
+            powers[cur] = len(powers)
+            cur = perm_compose(cur, rho)
+        if len(powers) == k and all(p in powers for p in perms.values()):
+            return {n: powers[p] for n, p in perms.items()}
+    return None
+
+
+def canonical_generators(group, entry, patterns, chaim):
+    """patterns.html's generators for this group, with their time shifts, and
+    the colour group the reading identifies. None when nothing matches."""
+    hm = entry["parentHm"]
+    fam = patterns["wallpaper"].get(hm)
+    if not fam or hm not in chaim:
+        return None
+    names = [n for n, _ in chaim[hm]["gens"]]
+    if names != [g["name"] for g in fam["generators"]]:
+        raise SystemExit(f"{hm}: patterns.json and the CHAIM table disagree "
+                         f"about the generators ({names} vs "
+                         f"{[g['name'] for g in fam['generators']]})")
+    n = entry["clockOrder"]
+    shifts = transport_shifts(group, chaim[hm]["gens"])
+    if not shifts:
+        return None
+    vectors = {tuple(int(s[name] * n) % n for name in names): s for s in shifts}
+    for cg in patterns["groups"]:
+        if cg["hm"] != hm or cg["k"] != n:
+            continue
+        exps = cyclic_exponents(cg["cycles"], n)
+        if not exps:
+            continue
+        want = tuple(exps[name] % n for name in names)
+        if want not in vectors:
+            continue
+        chosen = vectors[want]
+        # An independent check on the whole identification: the colour-fixing
+        # kernel is read here from the Xu correspondence and there from the
+        # pattern enumeration, by two calculations that share nothing. If the
+        # transport had landed on the wrong colour group they would part.
+        if cg["kernel_orb"] != entry["kernelOrbifold"]:
+            raise SystemExit(
+                f"{group['id']}: matched {cg['id']}, but its kernel is "
+                f"{cg['kernel_orb']} and the correspondence says "
+                f"{entry['kernelOrbifold']}")
+        return {
+            "colourGroup": cg["id"],
+            "gs": cg["gs"],
+            # what patterns.html prints for it: the published G&S symbol where
+            # the books name the group, and its own systematic symbol where
+            # they do not. Built the same way here so the two pages call the
+            # colouring by the same name.
+            "symbol": cg["gs"] or (f"{cg['hm']}[{cg['k']}]" + "".join(
+                "₀₁₂₃₄₅₆₇₈₉"[int(d)] for d in cg["id"].rsplit("-", 1)[-1])),
+            "patternsUrl": f"patterns.html#group-{cg['id']}",
+            "relations": fam["relations"],
+            "generators": [
+                {"name": g["name"],
+                 "geometry": g["geometry"],
+                 "kind": g["kind"],
+                 "phase": str(chosen[g["name"]]),
+                 "timeShift": time_shift(chosen[g["name"]]),
+                 "cycle": cg["cycles"][g["name"]]}
+                for g in fam["generators"]],
+        }
+    return None
+
+
 # ------------------------------------------------------------------ main --
 def main():
     ap = argparse.ArgumentParser()
@@ -270,6 +508,12 @@ def main():
     if prior_path.exists():
         prior = {g["id"]: g for g in json.loads(prior_path.read_text())["groups"]}
 
+    # the canonical generators, and the exact table they are defined in
+    patterns = json.loads((DATA / "patterns.json").read_text())
+    enumerate_patterns.build_chaim()
+    chaim = enumerate_patterns.CHAIM
+    uncanonical = []
+
     # --- the designer's menu: every clockwork group with a real clock ---
     picked = []
     for gid, e in entries.items():
@@ -306,7 +550,13 @@ def main():
             "hm": g.get("hm", ""),
             "geometricOps": (prior[gid]["geometricOps"] if gid in prior
                              else geometric_ops(g)),
+            # patterns.html's own generators, if this group's clock can be read
+            # as one of its colour groups; null leaves the page on the derived
+            # A, B listing rather than on a labelling nothing pinned
+            "canonical": canonical_generators(g, e, patterns, chaim),
         })
+        if picked[-1]["canonical"] is None:
+            uncanonical.append(gid)
     # Order in this file is the WIRE order urlstate.js freezes: position is the
     # value a shared link carries, so old entries keep their index and new ones
     # are appended. Sorting the whole list would silently repoint every link
@@ -339,6 +589,12 @@ def main():
           ", ".join(f"{n}→{sum(1 for p in picked if p['n'] == n)}" for n in orders))
     print("  ids in wire order (append-only!):")
     print("   ", " ".join(p["id"] for p in picked))
+    named = len(picked) - len(uncanonical)
+    print(f"  canonical generators: {named}/{len(picked)} groups carry "
+          f"patterns.html's own labelling")
+    if uncanonical:
+        print("    no colour group matched, left on the derived listing:",
+              " ".join(uncanonical))
 
 
 if __name__ == "__main__":
