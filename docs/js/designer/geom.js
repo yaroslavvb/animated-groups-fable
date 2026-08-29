@@ -42,9 +42,21 @@
  * line runs a cell beyond the block, and a billiard can be dragged eight cells
  * out — and every caller skips what it cannot place.
  *
- * Pitch is clamped away from both ends: at 0 the horizontal plane is a line and
- * every disk is a needle, at 90 the time axis vanishes and the animation is a
- * wallpaper again.
+ * Pitch is clamped at the BOTTOM only. At 0 the horizontal plane is edge-on: it
+ * is a line, every disk is a needle, and there is nothing to place a billiard
+ * on, so the view stops short of it.
+ *
+ * 90 used to be shut out on the matching argument — that the time axis vanishes
+ * and the animation is a wallpaper again — and that argument was wrong. Straight
+ * down is not a degenerate view, it is the view the animation is SEEN in: the
+ * plane is shown whole and undistorted, and the reader who wants to know where
+ * the balls are in the cell wants exactly it. Nothing in this file minds. The
+ * basis stays orthonormal (R and U span the plane, D is straight up), no
+ * quantity here is divided by cos(pitch), and the one thing that can fail —
+ * unproject meeting a slice along the horizon — cannot happen at the top, where
+ * every pixel's ray runs dead against the slices. What vanishes is the time
+ * axis, which is the reader's business and not this file's; the top of the drag
+ * is now exactly 90, so pulling past it lands there rather than near it.
  *
  * ORTHOGRAPHIC is an option and not a second camera. `ortho` keeps the basis,
  * the eye and the orbit and replaces only the divide by the depth with a single
@@ -75,7 +87,10 @@ import { LIMITS } from "./urlstate.js?v=48";
 const TWO_PI = Math.PI * 2;
 const DEG = Math.PI / 180;
 const MIN_PITCH = 8 * DEG;
-const MAX_PITCH = 85 * DEG;
+/* Math.PI / 2 and not 90 * DEG: the clamp is what a drag lands on when it is
+ * pulled past the top, so it had better be the vertical itself and not an ulp
+ * short of it. */
+const MAX_PITCH = Math.PI / 2;
 const DEFAULT_FOV = 40 * DEG;
 
 /* How much further from the target than the bounding radius the eye is held.
