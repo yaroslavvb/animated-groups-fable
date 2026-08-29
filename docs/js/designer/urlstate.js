@@ -50,23 +50,37 @@ const GROUP_IDS = [
   "g133", "g134", "g135", "g95", "g98", "g246",
 ];
 
-/* 3 — the view field became the camera's DISTANCE when the box stopped being
+/* 4 — the display span gained a 0-ring setting, which a one-bit field cannot
+ *     hold, so it widened to two. Every field before it is unmoved, and a
+ *     v1, v2 or v3 link is read with the narrow one: there 0 is one ring and
+ *     1 is two, which is what those two values meant when it was written.
+ * 3 — the view field became the camera's DISTANCE when the box stopped being
  *     drawn in parallel projection; there is no zoom under a perspective
- *     camera, there is only how far away the eye is.
+ *     camera, there is only how far away the eye is. The spare bit later
+ *     became the PROJECTION flag when the parallel view came back as an
+ *     option — a use the bit was reserved for, and the only kind of change
+ *     that costs old links nothing, so the version did not move.
  * 2 — the group field widened from 4 bits to 6 when the thirty-six
  *     clock-order-2 groups joined the menu. Indices 0-14 are unchanged, so
  *     every v1 link still names the group it always named; decode reads those
  *     with the old field width and everything after it lines up.
  *
  * Both older versions still decode. What they carry is a zoom — pixels per
- * world unit — and the same apparent size under perspective is dist = f/zoom,
- * so an old link opens on the framing it always had. That conversion is NOT
- * done here: f is (viewport height / 2) / tan(fov / 2), which this module has
- * no business knowing and which a saved link cannot know either. decode()
- * hands back `view.zoom` for those versions and `view.dist` for this one, and
- * the page converts as soon as it has measured its canvas. */
-const VERSION = 3;
+ * world unit — and the same apparent size is dist = f/zoom, so an old link
+ * opens on the framing it always had. That conversion is NOT done here: f is
+ * (viewport height / 2) / tan(fov / 2), which this module has no business
+ * knowing and which a saved link cannot know either. decode() hands back
+ * `view.zoom` for those versions and `view.dist` for this one, and the page
+ * converts as soon as it has measured its canvas.
+ *
+ * A v1 or v2 link is also handed `view.ortho: true`. Those links were written
+ * when the box was drawn in parallel projection, so that is the picture their
+ * author was looking at, and now that the projection is a mode again there is
+ * no reason to open them in the other one — under it the zoom converts exactly
+ * rather than only at the target's depth. */
+const VERSION = 4;
 const V1_B_GROUP = 4;
+const V3_B_SPAN = 1;         /* v1, v2 and v3: 0 is one ring, 1 is two */
 const TAU = Math.PI * 2;
 
 /* Field widths, in bits. Their sum times the design size is the hash length,
@@ -83,11 +97,12 @@ const TAU = Math.PI * 2;
 const B_VERSION = 4;
 const B_GROUP = 6;   /* 51 groups; see VERSION above */
 const B_R = 12;
-/* One spare bit, written zero and ignored on the way back. Room for the next
- * one-bit mode to appear without a version bump, which is the only kind of
- * change that costs old links nothing. */
-const B_RESERVED = 1;
-const B_SPAN = 1;
+/* The projection: 1 is parallel, 0 the perspective the page opens in. This was
+ * the spare bit, written zero by every link made before the parallel view came
+ * back — which is exactly the value that means "as the page opens", so those
+ * links still say what they always said. */
+const B_ORTHO = 1;
+const B_SPAN = 2;    /* 0, 1 or 2 rings; see VERSION above */
 const B_ANGLE = 10;
 const B_ZOOM = 13;   /* v1 and v2 only */
 const B_DIST = 17;
@@ -120,7 +135,7 @@ export const LIMITS = Object.freeze({
   dist: { step: STEP_DIST, min: 0, max: STEP_DIST * ((1 << B_DIST) - 1), bits: B_DIST },
   /* legacy: what v1 and v2 links carry in place of dist */
   zoom: { step: STEP_ZOOM, min: 0, max: STEP_ZOOM * ((1 << B_ZOOM) - 1), bits: B_ZOOM },
-  span: { values: [1, 2] },
+  span: { values: [0, 1, 2] },
   seedColor: { min: 0, max: PALETTE_SIZE - 1 },
   seeds: { min: 0, max: MAX_SEEDS },
   points: { min: 1, max: MAX_PTS },
@@ -254,8 +269,8 @@ export function encode(state) {
   w.put(VERSION, B_VERSION);
   w.put(gi < 0 ? 0 : gi, B_GROUP);
   w.put(clampInt(Math.round(num(s.r, 0) / STEP_R), 0, (1 << B_R) - 1), B_R);
-  w.put(0, B_RESERVED);
-  w.put(s.span === 2 ? 1 : 0, B_SPAN);
+  w.put(view.ortho ? 1 : 0, B_ORTHO);
+  w.put(clampInt(Math.round(num(s.span, 1)), 0, 2), B_SPAN);
   w.put(wrapInt(Math.round(num(view.yaw, 0) / STEP_ANGLE), 1 << B_ANGLE), B_ANGLE);
   w.put(wrapInt(Math.round(num(view.pitch, 0) / STEP_ANGLE), 1 << B_ANGLE), B_ANGLE);
   w.put(clampInt(Math.round(num(view.dist, 0) / STEP_DIST), 0, (1 << B_DIST) - 1), B_DIST);
@@ -313,21 +328,25 @@ export function decode(str) {
 
   const r = new BitReader(payload);
   const version = r.get(B_VERSION);
-  if (version !== VERSION && version !== 1 && version !== 2) return null;
+  if (version !== VERSION && version !== 1 && version !== 2 && version !== 3) return null;
 
   const gi = r.get(version === 1 ? V1_B_GROUP : B_GROUP);
   const rq = r.get(B_R);
-  const reserved = r.get(B_RESERVED);
-  const span = r.get(B_SPAN);
+  const ortho = r.get(B_ORTHO);
+  const span = r.get(version === VERSION ? B_SPAN : V3_B_SPAN);
   const yaw = r.get(B_ANGLE);
   const pitch = r.get(B_ANGLE);
-  const view = r.get(version === VERSION ? B_DIST : B_ZOOM);
+  const view = r.get(version >= 3 ? B_DIST : B_ZOOM);
   const nSeeds = r.get(B_NSEEDS);
   // a failed read leaves the cursor put, so a NARROWER field after a wide one
   // can still succeed on a truncated payload — check them all, not just the last
-  if (gi === null || rq === null || reserved === null || span === null ||
+  if (gi === null || rq === null || ortho === null || span === null ||
       yaw === null || pitch === null || view === null || nSeeds === null) return null;
   if (gi >= GROUP_IDS.length) return null;
+  // the two-bit field has a fourth value and no fourth span; a hash carrying it
+  // is not one this page wrote, and guessing which ring the author meant is
+  // worse than falling back to the default design
+  if (version === VERSION && span > 2) return null;
 
   const seeds = [];
   for (let i = 0; i < nSeeds; i++) {
@@ -354,15 +373,18 @@ export function decode(str) {
     v: version,
     g: GROUP_IDS[gi],
     r: rq * STEP_R,
-    span: span ? 2 : 1,
+    span: version === VERSION ? span : (span ? 2 : 1),
     /* dist on a current link, zoom on an old one, never both: a caller that
      * finds `zoom` has to turn it into a distance with its own focal length,
      * and one that finds neither has no view to restore. */
     view: {
       yaw: yaw * STEP_ANGLE,
       pitch: (pitch >= half ? pitch - (1 << B_ANGLE) : pitch) * STEP_ANGLE,
-      ...(version === VERSION ? { dist: view * STEP_DIST }
-                              : { zoom: view * STEP_ZOOM }),
+      /* a v1 or v2 link predates the flag and was drawn in parallel; see the
+       * version note at the top */
+      ortho: version >= 3 ? !!ortho : true,
+      ...(version >= 3 ? { dist: view * STEP_DIST }
+                       : { zoom: view * STEP_ZOOM }),
     },
     seeds,
   };

@@ -22,13 +22,13 @@
  */
 "use strict";
 import { xuLabel } from "../labels.js?v=47";
-import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=47";
+import { Camera, tubeSegmentPath, pickTube, pickPoint } from "./geom.js?v=48";
 import { scan } from "./collide.js?v=47";
-import { encode, decode, LIMITS } from "./urlstate.js?v=47";
+import { encode, decode, LIMITS } from "./urlstate.js?v=48";
 import { loadGroups, Design, PALETTE, nearSkip, cart, latticeOf } from "./model.js?v=47";
-import { elements } from "./symmetry.js?v=47";
+import { elements, planeDiagram } from "./symmetry.js?v=48";
 import { generate } from "./random.js?v=47";
-import { Preview } from "./preview.js?v=47";
+import { Preview } from "./preview.js?v=48";
 
 /* The drawing surface is the site's printed-plate ground in both colour
  * schemes: the design is a picture of the same thing the billiards page shows,
@@ -95,8 +95,14 @@ if (unlisted.length) {
 /* An empty box on a 333 group. The page used to open on two billiards already
  * placed, which meant the reader's first act was to work out what somebody else
  * had done rather than to put something down; a blank canvas is the tool
- * offering itself. A group still has to be chosen for there to be a box at all. */
-const DEFAULT = { g: "g226", r: 0.06, span: 1, seeds: [] };
+ * offering itself. A group still has to be chosen for there to be a box at all.
+ *
+ * And on the base cell alone. The neighbouring rings are what the pattern LOOKS
+ * like; the cell is what the reader EDITS, and it is the one thing on screen
+ * every gesture on this page acts on. Opening surrounded by copies of an empty
+ * cell teaches neither, and costs the smallest box the largest picture. The
+ * rings are one click away, and what is LEGAL never depended on them. */
+const DEFAULT = { g: "g226", r: 0.06, span: 0, seeds: [] };
 
 const el = (id) => document.getElementById(id);
 const canvas = el("view");
@@ -120,6 +126,7 @@ const cam = new Camera({
   yaw: restored ? restored.view.yaw : 0.62,
   pitch: restored ? restored.view.pitch : 0.62,
   dist: restored && restored.view.dist > 0 ? restored.view.dist : undefined,
+  ortho: !!(restored && restored.view.ortho),
   height: BOX_H,
 });
 /* A link written before the box had a perspective camera carries a ZOOM in
@@ -375,19 +382,26 @@ function drawBox(g, over) {
   g.restore();
 }
 
-const EMPTY = [];
-
 /* The fixed-point sets depend on the group and the span and on nothing else, so
  * they survive every edit and every orbit of the camera; recomputing them is
- * several milliseconds on the 18-op groups and a redraw asks for them twice. */
-let symCache = null;
-function symElements() {
-  const span = design.span;
-  if (symCache && symCache.g === design.group.id && symCache.span === span) {
-    return symCache.el;
+ * several milliseconds on the 18-op groups and a redraw asks for them twice.
+ *
+ * Keyed by SPAN as well as group because the box and the animation beside it
+ * ask for different ones — the animation's window is a fixed cell and a half,
+ * whatever the box is showing — and a one-slot cache between two callers that
+ * disagree is not a cache, it is those several milliseconds every frame. */
+const symCache = new Map();
+function symElements(span) {
+  const key = design.group.id + "|" + span;
+  let el = symCache.get(key);
+  if (!el) {
+    // a group change makes every entry dead at once, and there are never more
+    // than the few spans the two views ask for
+    if (symCache.size > 4) symCache.clear();
+    el = elements(design.group.ops, span);
+    symCache.set(key, el);
   }
-  symCache = { g: design.group.id, span, el: elements(design.group.ops, span) };
-  return symCache.el;
+  return el;
 }
 
 /* The group's own fixed-point sets, drawn into the box rather than onto the
@@ -408,91 +422,55 @@ function drawSymmetry(g, over) {
   const B = design.group.basis;
   const N = design.group.n;
   const span = design.span;
-  const { pts, lns } = symElements();
+  const el = symElements(span);
+  // the diagram lies on the floor of the box, so the projection handed to it is
+  // the one that puts a lattice point on the ground plane
+  const floor = (u) => {
+    const q = cart(B, u);
+    return cam.project([q[0], q[1], 0]);
+  };
 
-  g.save();
-  g.strokeStyle = AXIS;
-  // long enough to cross the block they belong to and no longer: a mirror is an
-  // infinite line, and eighteen of them drawn to the canvas edge are a hatching
-  const reach = span + 1.2;
-  g.globalAlpha = 0.6;
-  for (const ln of over ? EMPTY : lns) {
-    g.lineWidth = ln.glide ? 1.1 : 1.7;
-    g.setLineDash(ln.glide ? [6, 4] : []);
-    const a = cam.project([...cart(B, [ln.base[0] - reach * ln.d[0],
-                                       ln.base[1] - reach * ln.d[1]]), 0]);
-    const b = cam.project([...cart(B, [ln.base[0] + reach * ln.d[0],
-                                       ln.base[1] + reach * ln.d[1]]), 0]);
-    // a mirror runs a cell past the block the camera is kept clear of, so an
-    // end of one can be behind the eye when the reader dollies right in
-    if (!a || !b) continue;
-    g.beginPath();
-    g.moveTo(a[0], a[1]);
-    g.lineTo(b[0], b[1]);
-    g.stroke();
+  if (!over) {
+    /* long enough to cross the block they belong to and no longer: a mirror is
+     * an infinite line, and eighteen of them drawn to the canvas edge are a
+     * hatching */
+    planeDiagram(g, el, floor, { reach: span + 1.2, min: -span, max: span + 1,
+                                 axis: AXIS, ground: GROUND });
+    return;
   }
-  g.setLineDash([]);
-  g.globalAlpha = 1;
 
+  // the second pass is dimmer: it is being read through the animation
+  planeDiagram(g, el, floor, { lines: false, alpha: 0.72,
+                               min: -span, max: span + 1,
+                               axis: AXIS, ground: GROUND });
+
+  /* and above each mark in the BASE cell, the axis it is the foot of, labelled
+   * with what the turn about it costs. Every cell repeats the same axes, so
+   * labelling them all is a thicket. */
+  g.save();
   g.font = "10px system-ui, sans-serif";
   g.textAlign = "left";
   g.textBaseline = "middle";
-  for (const p of pts) {
-    if (p.c[0] < -span || p.c[0] > span + 1 || p.c[1] < -span || p.c[1] > span + 1) continue;
+  for (const p of el.pts) {
+    if (!(p.c[0] > -0.02 && p.c[0] < 1.02 && p.c[1] > -0.02 && p.c[1] < 1.02)) continue;
     const q = cart(B, p.c);
     const foot = cam.project([q[0], q[1], 0]);
-    if (!foot) continue;
-    const home = p.c[0] > -0.02 && p.c[0] < 1.02 && p.c[1] > -0.02 && p.c[1] < 1.02;
-    if (over) {
-      // the second pass is dimmer: it is being read through the animation
-      g.globalAlpha = 0.72;
-      marker(g, foot, p);
-      const top = home ? cam.project([q[0], q[1], 1]) : null;
-      if (!top) { g.globalAlpha = 1; continue; }
-      g.strokeStyle = AXIS;
-      g.globalAlpha = 0.35;
-      g.lineWidth = p.free ? 1.4 : 1;
-      g.setLineDash(p.free ? [] : [3, 3]);
-      g.beginPath();
-      g.moveTo(foot[0], foot[1]);
-      g.lineTo(top[0], top[1]);
-      g.stroke();
-      g.setLineDash([]);
-      g.globalAlpha = 1;
-      g.fillStyle = AXIS;
-      g.fillText(fracLabel(p.tau, N), top[0] + 5, top[1] - 1);
-      continue;
-    }
-    marker(g, foot, p);
+    const top = foot && cam.project([q[0], q[1], 1]);
+    if (!top) continue;
+    g.strokeStyle = AXIS;
+    g.globalAlpha = 0.35;
+    g.lineWidth = p.free ? 1.4 : 1;
+    g.setLineDash(p.free ? [] : [3, 3]);
+    g.beginPath();
+    g.moveTo(foot[0], foot[1]);
+    g.lineTo(top[0], top[1]);
+    g.stroke();
+    g.setLineDash([]);
+    g.globalAlpha = 1;
+    g.fillStyle = AXIS;
+    g.fillText(fracLabel(p.tau, N), top[0] + 5, top[1] - 1);
   }
   g.restore();
-}
-
-/* A rotation centre, on the floor. Filled: the turn costs no time, so it is a
- * symmetry of every frozen frame as well as of the animation. */
-function marker(g, foot, p) {
-  const r = 6;
-  g.beginPath();
-  g.arc(foot[0], foot[1], r + 2.5, 0, TWO_PI);
-  g.fillStyle = GROUND;
-  g.fill();
-  g.beginPath();
-  if (p.order === 2) {
-    // a 2-fold has no polygon: the book draws it as a lens, and a two-sided
-    // one would be a line segment
-    g.ellipse(foot[0], foot[1], r, r * 0.5, 0, 0, TWO_PI);
-  } else {
-    for (let k = 0; k < p.order; k++) {
-      const a = -Math.PI / 2 + k * TWO_PI / p.order;
-      g[k ? "lineTo" : "moveTo"](foot[0] + r * Math.cos(a), foot[1] + r * Math.sin(a));
-    }
-    g.closePath();
-  }
-  g.lineWidth = 1.5;
-  g.strokeStyle = AXIS;
-  g.fillStyle = p.free ? AXIS : GROUND;
-  g.fill();
-  if (!p.free) g.stroke();
 }
 
 /* Above this many silhouettes a redraw is slow enough to feel, so a drag drops
@@ -821,7 +799,7 @@ function writeHash(now) {
   clearTimeout(hashTimer);
   const run = () => {
     const s = design.toState();
-    s.view = { yaw: cam.yaw, pitch: cam.pitch, dist: cam.dist };
+    s.view = { yaw: cam.yaw, pitch: cam.pitch, dist: cam.dist, ortho: cam.ortho };
     const h = "#" + encode(s);
     if (h === lastHash && location.hash === h) return;
     lastHash = h;
@@ -846,6 +824,7 @@ window.addEventListener("hashchange", () => {
   } catch (err) { return; }
   cam.yaw = st.view.yaw;
   cam.pitch = st.view.pitch;
+  cam.ortho = !!st.view.ortho;
   // an old link's zoom, in pixels per world unit, is this distance — the canvas
   // has been measured by now, so it can be converted on the spot
   if (st.view.dist > 0) cam.dist = st.view.dist;
@@ -953,6 +932,8 @@ function syncControls() {
   }
   el("radius").value = String(design.radius);
   el("radius-out").textContent = design.radius.toFixed(3);
+  // the projection rides in the link, so a pasted one can move this box
+  el("ortho").checked = cam.ortho;
   // the scrub bar's ticks are the group's beats, so they change with the group
   el("marks").innerHTML = preview.syncGroup().marks
     .map((m) => `<option value="${Math.round(m.t * 1000)}" label="${esc(m.label)}">`)
@@ -979,9 +960,25 @@ el("span").addEventListener("click", (e) => {
   afterChange();
 });
 
+/* One tick box, both pictures: the diagram is a statement about the group, and
+ * a box that showed it in the view being EDITED but not in the view being made
+ * would read as a claim that the two differ. */
 el("sym").addEventListener("change", (e) => {
   showSym = e.target.checked;
+  preview.showSym = showSym;
   dirty = true;
+  if (!preview.running) preview.drawStatic();
+});
+
+/* The projection. The two agree on the middle of the box and disagree about
+ * its halves, so a view the reader has framed themselves survives the flip and
+ * is left alone; one the page framed is re-fitted, because the box the fit was
+ * measured against is no longer the box on screen. */
+el("ortho").addEventListener("change", (e) => {
+  cam.ortho = e.target.checked;
+  if (!camTouched) fitView();
+  dirty = true;
+  writeHash();
 });
 
 /* ---- preview transport ---- */
@@ -1053,7 +1050,8 @@ el("redo").addEventListener("click", redo);
 window.__probe = () => {
   const lp = lctx.getImageData(100, 100, 1, 1).data;
   const cp = ctx.getImageData(100, 100, 1, 1).data;
-  return { W, H, dist: cam.dist, minDist: cam.minDist, f: cam.f, yaw: cam.yaw,
+  return { W, H, dist: cam.dist, minDist: cam.minDist, f: cam.f, ortho: cam.ortho,
+           yaw: cam.yaw,
            pitch: cam.pitch, target: cam.target, segs: lastSegs,
            layerPx: [...lp], canvasPx: [...cp], frames: window.__frames };
 };

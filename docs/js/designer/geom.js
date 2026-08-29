@@ -45,9 +45,32 @@
  * Pitch is clamped away from both ends: at 0 the horizontal plane is a line and
  * every disk is a needle, at 90 the time axis vanishes and the animation is a
  * wallpaper again.
+ *
+ * ORTHOGRAPHIC is an option and not a second camera. `ortho` keeps the basis,
+ * the eye and the orbit and replaces only the divide by the depth with a single
+ * scale,
+ *
+ *   s = f / dist                                     // pixels per world unit
+ *   screenX = centre[0] + s * Xc,  screenY = centre[1] - s * Yc
+ *
+ * chosen so that a point at the TARGET's depth does not move when the reader
+ * ticks the box: the two projections agree on the middle of the block and
+ * differ only in what they do to its near and far halves. Everything else — the
+ * dolly, the distance the link carries, the depth used for the painter's order
+ * — means the same thing in both, and `dist` keeps its floor even though a
+ * parallel projection has no near plane to be pushed through, so that the wheel
+ * has the same range either way.
+ *
+ * The reason to want it back is the one the switch to perspective gave up: an
+ * equal-time non-overlap condition is about horizontal DISTANCES, and only a
+ * parallel projection draws two equal separations equally wherever they sit in
+ * the box. A reader comparing gaps by eye should tick it; a reader trying to
+ * see which tube is in front should not. Under it there is no eye to be in
+ * front of, so project() never refuses a point and the symmetry lines that run
+ * a cell past the block are drawn whole.
  */
 "use strict";
-import { LIMITS } from "./urlstate.js?v=47";
+import { LIMITS } from "./urlstate.js?v=48";
 
 const TWO_PI = Math.PI * 2;
 const DEG = Math.PI / 180;
@@ -74,6 +97,10 @@ export class Camera {
     /* Set once, at construction: a field of view that changed under the reader
      * would move everything on screen for no reason they could name. */
     this.fov = o.fov === undefined ? DEFAULT_FOV : o.fov;
+    /* Parallel projection. A plain field and not an accessor: both the focal
+     * length and the parallel scale are in the cached frame, so flipping it
+     * changes which one is read and invalidates nothing. */
+    this.ortho = !!o.ortho;
     this.target = o.target ? [o.target[0], o.target[1], o.target[2]] : [0, 0, 0.5];
     this.centre = o.centre ? [o.centre[0], o.centre[1]] : [0, 0];
     this.vh = o.vh === undefined ? 600 : o.vh;
@@ -136,6 +163,7 @@ export class Camera {
     const cy = Math.cos(this._yaw), sy = Math.sin(this._yaw);
     const cp = Math.cos(this._pitch), sp = Math.sin(this._pitch);
     const dx = -sy * cp, dy = cy * cp, dz = sp;
+    const f = (this.vh / 2) / Math.tan(this.fov / 2);
     F = this._F = {
       rx: cy, ry: sy,                              // R has no z component
       ux: sy * sp, uy: -cy * sp, uz: cp,
@@ -143,19 +171,24 @@ export class Camera {
       ex: this.target[0] + this._dist * dx,
       ey: this.target[1] + this._dist * dy,
       ez: this.target[2] * this.height + this._dist * dz,
-      f: (this.vh / 2) / Math.tan(this.fov / 2),
+      f,
+      s: f / this._dist,               // ortho: pixels per world unit, everywhere
     };
     return F;
   }
 
   /* Screen pixels for a spacetime point, or null if it is at or behind the eye
-   * — never the mirrored ghost that f * Xc / Zc gives for negative Zc. */
+   * — never the mirrored ghost that f * Xc / Zc gives for negative Zc. Under
+   * ortho there is no such point and the answer is never null. */
   project(p) {
     const F = this._frame();
     const vx = p[0] - F.ex, vy = p[1] - F.ey, vz = p[2] * this.height - F.ez;
-    const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
-    if (!(zc > MIN_Z)) return null;
-    const k = F.f / zc;
+    let k = F.s;
+    if (!this.ortho) {
+      const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
+      if (!(zc > MIN_Z)) return null;
+      k = F.f / zc;
+    }
     return [this.centre[0] + k * (vx * F.rx + vy * F.ry),
             this.centre[1] - k * (vx * F.ux + vy * F.uy + vz * F.uz)];
   }
@@ -167,9 +200,12 @@ export class Camera {
   projectInto(x, y, t, out, k) {
     const F = this._frame();
     const vx = x - F.ex, vy = y - F.ey, vz = t * this.height - F.ez;
-    const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
-    if (!(zc > MIN_Z)) return false;
-    const s = F.f / zc;
+    let s = F.s;
+    if (!this.ortho) {
+      const zc = -(vx * F.dx + vy * F.dy + vz * F.dz);
+      if (!(zc > MIN_Z)) return false;
+      s = F.f / zc;
+    }
     out[k] = this.centre[0] + s * (vx * F.rx + vy * F.ry);
     out[k + 1] = this.centre[1] - s * (vx * F.ux + vy * F.uy + vz * F.uz);
     return true;
@@ -188,6 +224,7 @@ export class Camera {
    * once-a-frame ellipse for the balls. Zero at or behind the eye. */
   scaleAt(p) {
     const F = this._frame();
+    if (this.ortho) return F.s;
     const zc = -((p[0] - F.ex) * F.dx + (p[1] - F.ey) * F.dy +
                  (p[2] * this.height - F.ez) * F.dz);
     return zc > MIN_Z ? F.f / zc : 0;
@@ -199,6 +236,19 @@ export class Camera {
    * same comparison, which is what picking needs. */
   ray(sx, sy) {
     const F = this._frame();
+    /* Under ortho every ray runs along -D and it is the ORIGIN that the pixel
+     * moves, across the plane through the eye; the scaling of dir is the same
+     * promise, since R and U are perpendicular to D. */
+    if (this.ortho) {
+      const a = (sx - this.centre[0]) / F.s;
+      const b = (this.centre[1] - sy) / F.s;
+      return {
+        ox: F.ex + a * F.rx + b * F.ux,
+        oy: F.ey + a * F.ry + b * F.uy,
+        oz: F.ez + b * F.uz,                       // R has no z component
+        dx: -F.dx, dy: -F.dy, dz: -F.dz,
+      };
+    }
     const a = (sx - this.centre[0]) / F.f;
     const b = (this.centre[1] - sy) / F.f;
     return {
@@ -212,17 +262,23 @@ export class Camera {
   /* The point of the t-slice that lands on this pixel — the eye ray met with
    * the plane z = t * height.
    *
-   * It can FAIL, which the orthographic closed form could not. The ray is
-   * parallel to the slice along one row of pixels (the horizon), and it meets
-   * slices above the eye only behind the eye, for pixels below that row. Both
-   * return null: the answer the algebra offers in the second case is the real
-   * point reflected through the camera, and handing that to a drag would throw
-   * the billiard to the far side of the plane. */
+   * Under perspective it can FAIL, which the orthographic closed form could
+   * not. The ray is parallel to the slice along one row of pixels (the
+   * horizon), and it meets slices above the eye only behind the eye, for pixels
+   * below that row. Both return null: the answer the algebra offers in the
+   * second case is the real point reflected through the camera, and handing
+   * that to a drag would throw the billiard to the far side of the plane.
+   *
+   * Under ortho neither case exists. The rays are all parallel to -D, which the
+   * pitch clamp keeps off the horizontal, so every one of them meets every
+   * slice exactly once; the meeting may be behind the plane through the eye and
+   * that is of no consequence to a projection with no eye in it, so the sign of
+   * s is not looked at. */
   unproject(sx, sy, t) {
     const R = this.ray(sx, sy);
     if (Math.abs(R.dz) < 1e-12) return null;
     const s = (t * this.height - R.oz) / R.dz;
-    if (!(s > 0)) return null;
+    if (!this.ortho && !(s > 0)) return null;
     return [R.ox + s * R.dx, R.oy + s * R.dy];
   }
 
@@ -309,10 +365,13 @@ function rimInto(cam, p, r, n, out, k) {
  * projective map is injective and convexity-preserving on the half-space in
  * front of the eye, so the image of that hull is the hull of the image, and the
  * silhouette is still the convex hull of the two projected rims. Perspective
- * costs only the SHORTCUT the orthographic camera allowed: the two ellipses
- * were translated copies of one polygon, so their hull could be stitched from
- * the two of them without a sort. They are not translated copies now, so this
- * is a real hull — paid for by sampling the small rims coarsely. */
+ * costs only the SHORTCUT a parallel projection allows: there the two ellipses
+ * are translated copies of one polygon, so their hull could be stitched from
+ * the two of them without a sort. Under perspective they are not, so this is a
+ * real hull — paid for by sampling the small rims coarsely. It is used in both
+ * modes rather than kept as a special case for one: the sort is a few hundred
+ * nanoseconds on eight to sixty-four points, and a second silhouette routine
+ * that only the ticked box exercised would be the one with the bug in it. */
 function tubeHull(cam, a, b, r) {
   const n = rimCount(r * Math.max(cam.scaleAt(a), cam.scaleAt(b)));
   if (!rimInto(cam, a, r, n, RIM, 0)) return 0;
@@ -412,10 +471,10 @@ function sortInto(p, n) {
  * the parameter s, so s is affine in t; t is affine along a segment, and so is
  * the centre — so the ray-to-centre offset is affine in the segment parameter
  * and its squared length is a quadratic in it. The hit set on a segment is one
- * interval, found by the quadratic formula, intersected with the half-line that
- * lies in FRONT of the eye (s > 0). That last clause is new: under orthographic
- * every slice met the ray once and always ahead of it, and under perspective a
- * slice above the eye is met behind it.
+ * interval, found by the quadratic formula, intersected — under perspective —
+ * with the half-line that lies in FRONT of the eye (s > 0), since a slice above
+ * the eye is met behind it. A parallel projection has no such half-line: the
+ * whole line is looked along, and the intersection is skipped.
  *
  * Which hit wins is settled by s, and no depth sort is needed to find it: the
  * ray's own parameter IS the depth order, negated, so the answer is the hit
@@ -468,10 +527,12 @@ export function pickTube(cam, sx, sy, pts, r, height) {
     }
     m0 = Math.max(0, m0);
     m1 = Math.min(1, m1);
-    // and only the part in front of the eye is looked at; s is affine in m
+    // and under perspective only the part in front of the eye; s is affine in m
     const ds = sb - sa;
-    if (ds > 0) m0 = Math.max(m0, -sa / ds);
-    else m1 = Math.min(m1, -sa / ds);
+    if (!cam.ortho) {
+      if (ds > 0) m0 = Math.max(m0, -sa / ds);
+      else m1 = Math.min(m1, -sa / ds);
+    }
     if (m0 > m1) continue;
     const m = ds > 0 ? m0 : m1;                       // the ray enters here
     const depth = -(sa + m * ds);

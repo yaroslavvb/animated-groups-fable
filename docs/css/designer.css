@@ -200,7 +200,11 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
 /* --------------------------------------------------------------- settings */
 
 .seg { display: flex; gap: 4px; }
-.seg button { flex: 1 1 auto; }
+/* Three of them share the 306px column since the span gained a 0, so the
+ * padding gives way rather than the label: "2 rings" broken over two lines
+ * reads as two rings of something. */
+.seg button { flex: 1 1 auto; padding-left: 0.25rem; padding-right: 0.25rem;
+              white-space: nowrap; }
 .seg button[aria-pressed="true"] {
   background: var(--code-bg);
   border-color: var(--accent);

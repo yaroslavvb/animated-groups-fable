@@ -16,11 +16,18 @@
  * This is the one animation on the site that plays without being asked. The
  * rule elsewhere is that the reader has to ask; here the reader is the author,
  * and opening a design tool IS the asking.
+ *
+ * `showSym` puts the group's own fixed-point sets under the pattern, the same
+ * diagram the box draws on its floor and drawn by the same code. The tick box
+ * is one control and it governs both, because they are one claim about the
+ * group seen twice: the box says where the mirrors are, and here is where they
+ * are IN THE ANIMATION they are symmetries of.
  */
 "use strict";
 import { Playback } from "../playback.js?v=47";
 import { filmTimeSymmetry } from "../phases.js?v=47";
-import { pathAt } from "./model.js?v=47";
+import { pathAt, cart } from "./model.js?v=47";
+import { elements, planeDiagram } from "./symmetry.js?v=48";
 import { drawBall, GROUND } from "../ball.js?v=47";
 
 const CELL = "#d9d5c8";
@@ -39,7 +46,22 @@ export class Preview extends Playback {
     this.ctx = canvas.getContext("2d");
     this.design = design;
     this._w = this._h = 0;
+    /* Set by the page from the same tick box the box's diagram answers to. */
+    this.showSym = !!opts.showSym;
+    this._sym = null;
     this.syncGroup();
+  }
+
+  /* The symmetry elements for THIS window, which is a cell and a half whatever
+   * the box is showing — so the span asked for is a constant, and one ring of
+   * cells more than reaches its corners. Recomputed only when the group
+   * changes, which is several milliseconds the animation must not spend twice. */
+  _elements() {
+    if (!this._sym || this._sym.g !== this.design.group.id) {
+      this._sym = { g: this.design.group.id,
+                    el: elements(this.design.group.ops, 1) };
+    }
+    return this._sym.el;
   }
 
   /* The instants the group itself distinguishes — k/N for a clock of order N.
@@ -95,6 +117,15 @@ export class Preview extends Playback {
     }
     ctx.stroke();
 
+    /* Under the balls, because that is where it is: the diagram is on the
+     * ground and the animation stands on it. The marks are repeated over the
+     * top afterwards, without which a mirror under a dense pattern is a diagram
+     * of nothing. */
+    const lattice = (u) => this.scr(cart(B, u), w, h);
+    if (this.showSym) {
+      planeDiagram(ctx, this._elements(), lattice, { reach: 3, min: -1, max: 2 });
+    }
+
     const R = this.design.radius * this.px;
     const pad = R + 2;
     /* Which of the group's copies reach this window is a question about the
@@ -109,6 +140,11 @@ export class Preview extends Playback {
       const [x, y] = this.scr(p, w, h);
       if (x < -pad || x > w + pad || y < -pad || y > h + pad) continue;
       drawBall(ctx, x, y, R, t - c.tau, c.color);
+    }
+
+    if (this.showSym) {
+      planeDiagram(ctx, this._elements(), lattice,
+                   { lines: false, alpha: 0.72, min: -1, max: 2 });
     }
   }
 
