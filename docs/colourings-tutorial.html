@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A tutorial note on the correspondence between subgroups, cosets, orbits and colourings, and on where a colouring stops determining a pattern.">
+<title>Groups, subgroups, colourings — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=47">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<style>
+.figrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.9rem;margin:.9rem 0}
+.figrow .cell{background:var(--panel);border-radius:6px;padding:.5rem;box-shadow:var(--shadow)}
+.figrow .lab{font-family:system-ui,sans-serif;font-size:.76rem;color:var(--muted);margin:.4rem 0 0;line-height:1.35}
+.figrow svg{display:block;width:100%;height:auto}
+.dict{width:100%;border-collapse:collapse;font-size:.9rem;margin:.8rem 0}
+.dict th,.dict td{text-align:left;padding:.35rem .6rem;border-bottom:1px solid var(--rule);vertical-align:top}
+.dict th{font-family:system-ui,sans-serif;font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.08em;color:var(--muted);font-weight:600}
+.sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem;margin:.9rem 0}
+.sides .side{background:var(--panel);border-radius:6px;padding:.7rem .9rem;box-shadow:var(--shadow)}
+.sides h3{margin:.1rem 0 .4rem;font-size:.95rem}
+.claim{border-left:3px solid var(--accent);padding:.15rem 0 .15rem .8rem;margin:1rem 0;
+  font-size:.97rem}
+.tblwrap{overflow-x:auto}
+table.counts{border-collapse:collapse;font-size:.88rem;font-variant-numeric:tabular-nums}
+table.counts th,table.counts td{padding:.28rem .7rem;border-bottom:1px solid var(--rule);text-align:left}
+table.counts th{font-family:system-ui,sans-serif;font-size:.74rem;text-transform:uppercase;
+  letter-spacing:.07em;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <a href="index.html">Tutorial</a>
+      <a href="catalog.html">Catalog</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="notation.html">Notation</a>
+      <a href="wallpaper.html">Clockwork</a>
+      <a href="crystals-colored.html">Coloured crystals</a>
+      <a href="patterns.html">Patterns</a>
+      <a href="escher.html">Escher</a>
+      <a href="motifs.html">Motifs</a>
+      <a href="history.html">History</a>
+    </nav>
+  </div>
+</header>
+
+<main class="narrow">
+
+<h1>Groups, subgroups, colourings</h1>
+
+<p class="subtitle">Four things get called “the colouring”: a subgroup, a partition of the
+group into cosets, a set of orbits, and a picture. Three of them are the same object
+read three ways. The fourth — the picture — is <em>not</em>, and almost every argument
+about colour symmetry that goes in circles is circling that gap. This note fixes the
+dictionary, then walks the two smallest examples where every claim can be checked by
+hand, and ends with the lattice case.</p>
+
+<p>The companion note, <a href="subgroups-vs-colourings.html">Are the subgroups of a
+group the same thing as its colourings?</a>, proves the classification statement and
+counts the wallpaper cases. This one is the tutorial underneath it.</p>
+
+<h2>1. The dictionary</h2>
+
+<p>Let Γ be the symmetry group of an uncoloured figure — a wallpaper group, the
+symmetries of a torus grid, a finite rosette group. Colour the figure. The colouring is
+<b>perfect</b> when every symmetry in Γ permutes the colours: each g ∈ Γ takes all the
+blue to one single colour, all the red to one single colour, and so on. That gives a
+homomorphism ρ : Γ → Sym(colours).</p>
+
+<p>Now fix one colour and follow four objects.</p>
+
+<table class="dict">
+<tr><th>Object</th><th>Definition</th><th>What it is in the picture</th></tr>
+<tr><td><b>H</b></td><td>{g ∈ Γ : ρ(g) fixes the chosen colour}</td>
+    <td>the symmetries that leave <em>that one colour</em> where it is — they may move
+        the others</td></tr>
+<tr><td><b>k = [Γ : H]</b></td><td>the index</td>
+    <td>the number of colours, when Γ carries every colour to every other</td></tr>
+<tr><td><b>the colours</b></td><td>the cosets of H</td>
+    <td>the colour of the motif you reach by applying g is the coset of g</td></tr>
+<tr><td><b>K = core(H)</b></td><td>⋂<sub>g</sub> gHg<sup>−1</sup> = ker ρ</td>
+    <td>the symmetries that fix <em>every</em> colour — the colour-preserving group</td></tr>
+<tr><td><b>Γ/K</b></td><td>the image of ρ</td>
+    <td>the group of colour permutations, the <b>colour group</b></td></tr>
+</table>
+
+<p class="claim">A transitive perfect colouring with k colours <em>is</em> a subgroup of
+index k, and conversely. Not an analogy — the same data written twice.</p>
+
+<p>Everything else in this note is about the three places where that sentence is easy
+to misapply: which cosets, orbits versus cosets, and the difference between a colouring
+and a pattern.</p>
+
+<h2>2. Which side? Left cosets, right cosets</h2>
+
+<p>Both answers are correct and they are not the same partition. What settles it is
+which side the group acts on, and that in turn is settled by how you compose two
+symmetries — a bookkeeping choice made before any mathematics happens.</p>
+
+<div class="sides">
+<div class="side">
+<h3>Γ acting on the left</h3>
+<p>Write g·x for “apply the symmetry g to the point x”, so that (gh)·x = g·(h·x): the
+right-hand symmetry goes first. Then</p>
+<ul>
+<li>colours are the <b>left cosets</b> gH;</li>
+<li>the motif reached from the base motif by g has colour gH;</li>
+<li>g sends the colour xH to gxH.</li>
+</ul>
+</div>
+<div class="side">
+<h3>Γ acting on the right</h3>
+<p>Write x·g, and read a product AB as “A then B” — the crystallographic habit, and the
+one this repository’s composition routines use. Then</p>
+<ul>
+<li>colours are the <b>right cosets</b> Hx;</li>
+<li>the motif reached from the base motif by g has colour Hg;</li>
+<li>g sends the colour Hx to Hxg.</li>
+</ul>
+</div>
+</div>
+
+<p>They differ. In the symmetry group of a triangle, with H the two-element subgroup
+generated by one reflection s:</p>
+
+<table class="dict">
+<tr><th>Left cosets gH</th><td style="font-family:var(--mono,ui-monospace,monospace)">{1, s} &nbsp; {r, rs} &nbsp; {r², r²s}</td></tr>
+<tr><th>Right cosets Hg</th><td style="font-family:var(--mono,ui-monospace,monospace)">{1, s} &nbsp; {r, r²s} &nbsp; {r², rs}</td></tr>
+</table>
+
+<p>Two of the three blocks are different sets. Pick one convention and hold it: mixing
+them gives a map that reverses products — ρ(gh) = ρ(h)ρ(g) — and then every relation you
+check comes out backwards. It is worth saying plainly that <em>this site is not uniform
+about it</em>: the interactive pages colour by left cosets under a left action, while the
+companion note works on the right. Neither is wrong; they are mirror translations of one
+statement.</p>
+
+<p>The trap worth naming: <b>the orbits of H acting on Γ by left multiplication are the
+right cosets</b>, and vice versa. So “orbit” and “coset” sound interchangeable in
+conversation while pointing at opposite conventions.</p>
+
+<h2>3. The smallest complete example: the 3×3 torus</h2>
+
+<p>Take a 3×3 grid that wraps both ways, and let it act on itself by translation:
+A = ⟨X, Y | X³ = Y³ = 1, XY = YX⟩ = (ℤ/3)², of order 9. It has exactly six subgroups.
+Colour each cell by its coset; the ringed cell in each picture is the identity, and its
+block is H itself.</p>
+
+<div class="figrow"><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="49" width="24" height="24" fill="#CC79A7" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="25" width="24" height="24" fill="#D55E00" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="1" width="24" height="24" fill="#56B4E9" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="49" width="24" height="24" fill="#7B3294" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="25" width="24" height="24" fill="#8a8578" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="1" width="24" height="24" fill="#4D4D4D" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨1⟩</b> · index 9 · 9 colours</p></div><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="49" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="1" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="49" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="25" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨Y⟩</b> · index 3 · 3 colours</p></div><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨X⟩</b> · index 3 · 3 colours</p></div><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="49" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="1" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="49" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="25" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/></svg><p class="lab"><b>⟨XY⟩</b> · index 3 · 3 colours</p></div><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="49" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="25" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="25" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="49" width="24" height="24" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="49" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="1" width="24" height="24" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨XY²⟩</b> · index 3 · 3 colours</p></div><div class="cell"><svg viewBox="0 0 74 74" role="img" aria-label="coset colouring"><rect x="1" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="1" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="13.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="25" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="37.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="49" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="61.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="25" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="37.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/><rect x="49" y="1" width="24" height="24" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><circle cx="61.0" cy="13.0" r="4" fill="none" stroke="#faf9f6" stroke-width="1.8"/></svg><p class="lab"><b>⟨X, Y⟩</b> · index 1 · 1 colour</p></div></div>
+
+<p>Read off the dictionary. The number of colours is the index. The four subgroups of
+order 3 are four genuinely different colourings — <b>⟨X⟩</b> and <b>⟨Y⟩</b> stripe the
+torus two ways and <b>⟨XY⟩</b>, <b>⟨XY²⟩</b> stripe it diagonally — even though all four
+are abstractly the same group ℤ/3. What distinguishes them is not what H <em>is</em> but
+how it <em>sits</em> in A.</p>
+
+<p class="claim">The classification is of pairs (Γ, H), never of H alone. Two subgroups
+can be isomorphic as abstract groups, and even conjugate in some larger group, and still
+be different colourings.</p>
+
+<p>A is abelian, so every subgroup is normal, H = K in every case, and every colour group
+is regular: the number of colours equals the order of the colour group. Nothing can go
+wrong here, which is exactly why it is the place to start. The
+<a href="https://yaroslavvb.github.io/animated-groups/torus-tutorial.html">3×3 torus
+tutorial</a> works the same six subgroups through three notations.</p>
+
+<h2>4. Cosets are not orbits</h2>
+
+<p>Now the smallest example where something does go wrong. Wrap a 2×2 grid and add the
+diagonal flip s. Mod 2 the quarter turn <em>is</em> the flip, so this group is
+Γ = (ℤ/2)² ⋊ ⟨s⟩ of order 8 — the dihedral group of the square, acting on four cells. It
+has ten subgroups, four of them not normal.</p>
+
+<p>Here is the natural thing to do with a subgroup you want to <em>draw</em>: colour each
+<b>orbit</b> of H on the four cells. Ten subgroups, and only seven pictures come out:</p>
+
+<div class="figrow"><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨Y, X, XY⟩ = ⟨Ys, Xs, XY⟩ = Γ</b><br>one picture, 3 subgroups</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨XY⟩ = ⟨s, XY, XYs⟩</b><br>one picture, 2 subgroups</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#CC79A7" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨1⟩</b><br>order 1</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨s⟩</b><br>order 2</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#009E73" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨XYs⟩</b><br>order 2</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨Y⟩</b><br>order 2</p></div><div class="cell"><svg viewBox="0 0 58 58" role="img" aria-label="orbit colouring"><rect x="1" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="1" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="29" width="28" height="28" fill="#0072B2" stroke="#faf9f6" stroke-width="1.5"/><rect x="29" y="1" width="28" height="28" fill="#E69F00" stroke="#faf9f6" stroke-width="1.5"/></svg><p class="lab"><b>⟨X⟩</b><br>order 2</p></div></div>
+
+<p>Three different subgroups — two of order 4 and the whole group — leave the picture
+blank, and two more share a picture. Colouring by orbits cannot name the subgroup that
+produced it, because a subgroup can be transitive on the cells without being everything.</p>
+
+<p class="claim">Colouring by <em>cosets</em> always recovers H: H is the block containing
+the identity. Colouring by <em>orbits</em> of H on some other set need not — and the four
+cells are “some other set”, because each cell has its own symmetry.</p>
+
+<p>That last clause is the whole of section 6, arriving early.</p>
+
+<h2>5. Regular, non-regular, and why H has to be named</h2>
+
+<p>A colouring is <b>regular</b> when H = K, which happens exactly when H is normal.
+Then the number of colours equals the order of the colour group Γ/K, and naming the
+colour group names the colouring.</p>
+
+<p>When H is not normal the two part company. On the 2×2 torus take H = ⟨s⟩, of order 2:
+its core is trivial, so K = 1 and the colour group is all of Γ, order 8 — against four
+colours. Eight ≠ four, so “the colour group is Γ” does not say which colouring this is,
+and a symbol built from Γ and K alone cannot either. This is what the double slash in
+<em>The Symmetries of Things</em> is for, and why the subgroup has to be carried in the
+symbol next to the quotient.</p>
+
+<p><a href="https://yaroslavvb.github.io/animated-groups/torus-nonregular.html">Non-regular
+colourings, and why H must be named</a> works this case out in full, including the two
+distinct subgroups that produce the same Conway symbol.</p>
+
+<h2>6. A colouring is not a pattern: where the motif sits</h2>
+
+<p>Everything so far colours the group, or a set the group permutes freely. A real
+pattern also has a <b>motif</b>, and the motif has symmetries of its own. Call
+S = {g ∈ Γ : g fixes the motif} — its stabiliser, the <b>seat</b>. The motifs of the
+pattern are then the cosets Γ/S, and the colouring is a map</p>
+
+<p style="text-align:center;font-size:1.05rem">Γ/S ⟶ Γ/H, &nbsp; gS ↦ gH,</p>
+
+<p>which is well defined <b>if and only if S ≤ H</b>. The condition is not a technicality:
+it says that a symmetry which fixes the motif must fix the motif’s colour. Put a motif
+where a mirror runs through it and that mirror is forced into H — it cannot be one of the
+symmetries that swaps colours.</p>
+
+<p class="claim">A colour group is a pair (Γ, H). A coloured <em>pattern</em> is a triple
+(Γ, H, S). The extra datum is where you put the motif, and it is the reason two pictures
+can have the same group and refuse to look alike.</p>
+
+<p>This site’s own catalogue counts both. Over the seventeen wallpaper groups there are
+<b>46</b> two-colour groups and <b>88</b> two-colour pattern types; across all
+palette sizes up to six, <b>186</b> of the <b>286</b> colour groups carry more
+than one pattern, out of <b>609</b> types in all. Same group, different seat, different
+pattern — that is the ordinary case, not the exception.</p>
+
+<p>The smallest instance needs no colour at all. The uncoloured group p2 carries two
+pattern types: <a href="patterns.html#pp7">pp7</a>, with the motif in
+general position (S = 1), and <a href="patterns.html#pp8">pp8</a>, with the
+motif seated on a 2-fold centre (S ≅ c2). One group, one colour, two patterns.</p>
+
+<p>And the count that section 4 was really about: the colour classes of the motifs are the
+orbits of H on Γ/S, which are the <b>double cosets</b> H\Γ/S. When S = 1 those are just
+the cosets of H and the picture names H; when S ≠ 1 they need not, which is precisely why
+the orbit pictures collapsed.</p>
+
+<h2>7. Translations: sublattices, and what “horizontal and vertical” survives</h2>
+
+<p>Take Γ = p1 = ℤ², nothing but translations, and pick the two obvious generators — one
+horizontal, one vertical. Every element decomposes into those two. Does every
+<em>subgroup</em>?</p>
+
+<p>No. In the given basis, the subgroups of index k are the lattices with a basis
+(a, 0), (c, d) where ad = k and 0 ≤ c &lt; a, and only the ones with c = 0 are products
+aℤ × dℤ. At index 2 there are three subgroups and one of them is not a product:</p>
+
+<div class="figrow"><div class="cell"><svg viewBox="0 0 137 137" role="img" aria-label="sublattice"><rect x="1" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/></svg><p class="lab"><b>ℤ × 2ℤ</b><br>a product of subgroups</p></div><div class="cell"><svg viewBox="0 0 137 137" role="img" aria-label="sublattice"><rect x="1" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/></svg><p class="lab"><b>2ℤ × ℤ</b><br>a product of subgroups</p></div><div class="cell"><svg viewBox="0 0 137 137" role="img" aria-label="sublattice"><rect x="1" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="1" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="16" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="31" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="46" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="61" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="76" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="91" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="121" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="106" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="91" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="76" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="61" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="46" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="31" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="16" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="106" y="1" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="121" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="106" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="91" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="76" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="61" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="46" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="31" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="16" width="15" height="15" fill="#d9d5c8" stroke="#faf9f6" stroke-width="1"/><rect x="121" y="1" width="15" height="15" fill="#0072B2" stroke="#faf9f6" stroke-width="1"/></svg><p class="lab"><b>{(x, y) : x − y even}</b><br>the checkerboard — <em>not</em> a product</p></div></div>
+
+<p>But now change basis. <b>Smith normal form</b>: for every sublattice Λ ≤ ℤ² there is
+<em>some</em> basis f₁, f₂ of ℤ² and integers d₁ | d₂ with Λ = d₁ℤf₁ ⊕ d₂ℤf₂. So the
+decomposition into two independent directions always exists — it just need not be the
+pair of directions you started with. The checkerboard is a product too, along its own
+diagonals.</p>
+
+<p>That is the whole relation between the two questions, and it is why the counts differ:</p>
+
+<div class="tblwrap">
+<table class="counts">
+<tr><th>index k</th><th>sublattices of ℤ²</th><th>colour groups of p1</th></tr>
+<tr><td>1</td><td>1</td><td>1</td></tr> <tr><td>2</td><td>3</td><td>1</td></tr> <tr><td>3</td><td>4</td><td>1</td></tr> <tr><td>4</td><td>7</td><td>2</td></tr> <tr><td>5</td><td>6</td><td>1</td></tr> <tr><td>6</td><td>12</td><td>1</td></tr> <tr><td>7</td><td>8</td><td>1</td></tr> <tr><td>8</td><td>15</td><td>2</td></tr>
+</table>
+</div>
+
+<p>The middle column is σ(k), the sum of the divisors — subgroups counted as sets. The
+right column is #{d : d² | k} — subgroups counted up to a change of basis, that is up to
+Aut(p1) = GL₂(ℤ). The three index-2 lattices above are one colour group drawn in three
+coordinate systems; the invariants that survive are exactly the Smith divisors (d₁, d₂),
+and ℤ²/Λ ≅ ℤ/d₁ × ℤ/d₂ is the colour group.</p>
+
+<p>The picture behind the arithmetic is the torus. ℝ²/ℤ² is a torus; a sublattice Λ of
+index k gives a second torus ℝ²/Λ covering it k times over, and the k colours are the k
+sheets. The 3×3 grid of section 3 is this with Λ = 3ℤ²: nine cells, nine sheets, colour
+group (ℤ/3)². Sublattice, colouring, covering and finite quotient are four names for one
+object — which is why the torus is the right place to look when the wallpaper case gets
+confusing.</p>
+
+<h2>8. The short version</h2>
+
+<table class="dict">
+<tr><th>Question</th><th>Answer</th></tr>
+<tr><td>What is a colouring?</td><td>a subgroup H ≤ Γ, up to Aut(Γ)</td></tr>
+<tr><td>What are the colours?</td><td>the cosets of H — left or right according to which
+    side Γ acts on</td></tr>
+<tr><td>Which symmetries keep the colours?</td><td>K = core(H); the colour group is Γ/K</td></tr>
+<tr><td>When does the symbol determine the colouring?</td><td>when H = K (H normal,
+    the regular case); otherwise H must be named too</td></tr>
+<tr><td>Are orbits the same as cosets?</td><td>on Γ itself yes, on anything else no</td></tr>
+<tr><td>Is a colouring a pattern?</td><td>no — a pattern also fixes the seat S ≤ H</td></tr>
+<tr><td>Do sublattices decompose into two directions?</td><td>yes, but in their own basis,
+    not necessarily yours</td></tr>
+</table>
+
+<p>Where to look next on this site: the <a href="patterns.html">pattern catalogue</a> for
+the (Γ, H, S) triples with their seats drawn; the
+<a href="subgroups-vs-colourings.html">companion note</a> for the classification theorem
+and the wallpaper counts; the <a href="designer.html">designer</a> for the same groups as
+animations, where a cyclic colour permutation is a shift in time.</p>
+
+</main>
+</body>
+</html>
