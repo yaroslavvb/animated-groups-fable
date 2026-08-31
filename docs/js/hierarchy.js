@@ -432,7 +432,7 @@ function diagram() {
 
   const h = H.headline, mid = (a, c) => (a + c) / 2;
   return `<div class="tablewrap"><svg viewBox="0 0 760 350" width="100%"
-    style="max-width:760px;display:block;margin:1rem auto;font-family:system-ui,sans-serif;"
+    style="max-width:760px;display:block;margin:1rem auto;font-family:ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;"
     role="img" aria-label="The three lanes — plane, spacetime, space — and the
     maps between them: phase read as height maps the 275 spacetime groups onto the
     194 non-cubic space-group types, and restricts to a bijection between the

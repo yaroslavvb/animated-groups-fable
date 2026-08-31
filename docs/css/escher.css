@@ -1,5 +1,5 @@
 /* Escher — the periodic drawings arranged by wallpaper group and colour
-   group.  Shares the visual language of patterns.css (light, big serif family
+   group.  Shares the visual language of patterns.css (light, big sans family
    headings, teal accent, colour-group tabs); the leaf content is drawing
    cards rather than pattern-type panes. */
 
@@ -59,13 +59,13 @@
 .drawing-head { display: flex; align-items: baseline; gap: 0.45rem; flex-wrap: wrap; }
 .drawing-number {
   flex: 0 0 auto;
-  font: 700 0.72rem/1 Arial, Helvetica, sans-serif;
+  font: 700 0.72rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   letter-spacing: 0.02em;
   color: #fff; background: var(--pattern-accent);
   border-radius: 999px; padding: 0.2rem 0.45rem;
 }
 .drawing-title {
-  font: 700 1rem/1.2 Georgia, "Times New Roman", serif;
+  font: 700 1rem/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--pattern-ink);
   overflow-wrap: anywhere;
 }
@@ -89,7 +89,7 @@
   color: #8c9a95; font-size: 0.74rem; text-align: center; padding: 0.5rem;
 }
 .confidence-flag {
-  font: 650 0.68rem/1 Arial, Helvetica, sans-serif;
+  font: 650 0.68rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--pattern-seat); background: #fde8e2;
   border-radius: 0.2rem; padding: 0.12rem 0.3rem;
   box-shadow: 0 0 0 1px #f2c3b7;
@@ -97,7 +97,7 @@
 
 /* colour-group tabs get a drawing count badge */
 .tab-count {
-  font: 650 0.68rem/1 Arial, Helvetica, sans-serif;
+  font: 650 0.68rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--pattern-accent);
 }
 .colour-group-tab.is-empty { opacity: 0.4; }

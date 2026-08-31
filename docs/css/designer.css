@@ -67,7 +67,7 @@ main.designer {
   gap: 0.2rem 1.1rem;
   max-width: calc(100% - 2rem);
   pointer-events: none;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.78rem;
   color: #7c8395;
 }
@@ -81,7 +81,7 @@ main.designer {
   flex-direction: column;
   border-left: 1px solid var(--rule);
   background: var(--panel);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.88rem;
   line-height: 1.45;
 }
@@ -100,7 +100,7 @@ main.designer {
 }
 
 .column h2 {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.75rem;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -269,7 +269,7 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
   font-size: 0.82rem;
 }
 #gens .tag {
-  font-family: Charter, Georgia, serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-style: italic;
   color: var(--muted);
 }
@@ -289,7 +289,7 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
   font-size: 0.76rem;
   color: var(--muted);
 }
-#gens .rel { font-family: Charter, Georgia, serif; }
+#gens .rel { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
 #gens .corr a { color: var(--accent); }
 
 #gens details { margin-top: 0.4rem; }
@@ -329,12 +329,12 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
 .grouplist .sub {
   margin: 0.35rem 0 0.1rem;
   padding-left: 0.15rem;
-  font-family: Charter, Georgia, serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.92rem;
   color: var(--ink);
 }
 .grouplist .sub span {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.7rem;
   color: var(--muted);
   margin-left: 0.35rem;
@@ -363,7 +363,7 @@ dl.status dd.bad { color: var(--accent2); font-weight: 600; }
 
 .grp .sig {
   grid-area: sig;
-  font-family: Charter, Georgia, serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 1rem;
 }
 .grp[aria-pressed="true"] .sig { font-weight: 600; color: var(--accent); }

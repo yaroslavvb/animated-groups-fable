@@ -1,9 +1,10 @@
-/* Patterns — page styles: the "Catalog of colorings" layout (light, big serif
+/* Patterns — page styles: the "Catalog of colorings" layout (light, big sans
    family headings, teal accent) with colour-group tabs, pattern subtabs and
    lazily rendered plate + details panes.  Shares the visual language of
    two-color-patterns.css. */
 
 :root {
+  color-scheme: light;
   --pattern-ink: #171b19;
   --pattern-muted: #5d6864;
   --pattern-rule: #d4ded9;
@@ -76,10 +77,10 @@ main.tcp-page {
   display: flex; align-items: baseline; justify-content: space-between; gap: 0.4rem;
   padding: 0.42rem 0.6rem 0.48rem;
 }
-.directory-caption strong { font: 700 clamp(1rem, 1.5vw, 1.3rem)/1 Georgia, "Times New Roman", serif; letter-spacing: -0.02em; }
+.directory-caption strong { font: 700 clamp(1rem, 1.5vw, 1.3rem)/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; letter-spacing: -0.02em; }
 .directory-hm { color: var(--pattern-muted); font-size: 0.78rem; font-weight: 650; }
 .directory-count {
-  position: absolute; right: 0.5rem; top: 0.5rem; font: 650 0.7rem/1 Arial, Helvetica, sans-serif;
+  position: absolute; right: 0.5rem; top: 0.5rem; font: 650 0.7rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: #fff; background: var(--pattern-accent); border-radius: 999px; padding: 0.2rem 0.45rem;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
 }
@@ -89,8 +90,8 @@ main.tcp-page {
 .tcp-intro { max-width: 62rem; margin: 0 auto 3.4rem; }
 .tcp-intro p { font-size: 1.02rem; line-height: 1.6; color: #232926; }
 .tcp-intro .tcp-note { font-size: 0.9rem; color: #44504c; }
-.tcp-intro code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.9em; }
-.sym { font-family: "STIX Two Math", "Cambria Math", Georgia, "Times New Roman", serif; }
+.tcp-intro code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 0.9em; }
+.sym { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif; }
 .census-wrap { overflow-x: auto; margin: 0.9rem 0; }
 table.census { border-collapse: collapse; font-size: 0.9rem; }
 table.census th, table.census td { padding: 0.42rem 0.85rem; border: 1px solid var(--pattern-rule); text-align: right; }
@@ -98,11 +99,11 @@ table.census th { background: var(--pattern-soft); color: var(--pattern-muted); 
 table.census th.txt { text-align: left; }
 
 /* signature typography */
-.sig { font: 650 1.02rem/1.15 Georgia, "Times New Roman", serif; white-space: nowrap; }
+.sig { font: 650 1.02rem/1.15 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; white-space: nowrap; }
 .sig-big { font-size: 1.22rem; }
 .sig sup { font-size: 0.6em; line-height: 0; vertical-align: 0.66em; }
 .sig sup.sig-cyc { font-size: 0.52em; letter-spacing: 0.02em; }
-.sig .sig-sym { font-family: "STIX Two Math", "Cambria Math", "Times New Roman", serif; }
+.sig .sig-sym { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif; }
 .sig .seat-mark, .sig-annot .seat-mark {
   color: var(--pattern-seat);
   background: #fde8e2;
@@ -121,7 +122,7 @@ table.census th.txt { text-align: left; }
   align-items: baseline; gap: 2rem; padding: 0 0 1.1rem; border-bottom: 1px solid var(--pattern-rule);
 }
 .family-header h2 { display: flex; align-items: baseline; gap: 0.75rem; margin: 0; border: 0; padding: 0; }
-.family-orbifold { font: 700 clamp(2.6rem, 5vw, 5rem)/0.9 Georgia, "Times New Roman", serif; letter-spacing: -0.055em; }
+.family-orbifold { font: 700 clamp(2.6rem, 5vw, 5rem)/0.9 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; letter-spacing: -0.055em; }
 .family-hm { color: var(--pattern-muted); font-size: 0.92rem; font-weight: 650; }
 .family-header p { margin: 0; color: #3f4a46; font-size: 1.02rem; }
 
@@ -130,7 +131,7 @@ table.census th.txt { text-align: left; }
 .tab-k-divider {
   align-self: center; flex: 0 0 auto; margin-right: 0.15rem; padding: 0.2rem 0.5rem;
   color: var(--pattern-accent); background: #e7f3ef; border-radius: 999px;
-  font: 700 0.68rem/1.2 Arial, Helvetica, sans-serif; letter-spacing: 0.03em; text-transform: uppercase;
+  font: 700 0.68rem/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; letter-spacing: 0.03em; text-transform: uppercase;
 }
 .tab-k-divider:not(:first-child) { margin-left: 0.6rem; }
 .colour-group-tab {
@@ -154,8 +155,8 @@ table.census th.txt { text-align: left; }
 /* colour-group panel (lazy) */
 .colour-group-panel { margin-top: 1.1rem; border: 1px solid var(--pattern-rule); border-radius: 0.6rem; background: #fff; scroll-margin-top: 4.5rem; }
 .band-header { padding: 0.85rem clamp(1rem, 2vw, 1.6rem) 0.65rem; border-bottom: 1px solid var(--pattern-rule); background: var(--pattern-soft); border-radius: 0.6rem 0.6rem 0 0; }
-.band-header h3 { margin: 0; font: 700 1.3rem/1.2 Georgia, "Times New Roman", serif; display: flex; gap: 0.9rem; align-items: baseline; flex-wrap: wrap; }
-.band-type { font-family: "STIX Two Math", "Cambria Math", Georgia, serif; }
+.band-header h3 { margin: 0; font: 700 1.3rem/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; display: flex; gap: 0.9rem; align-items: baseline; flex-wrap: wrap; }
+.band-type { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif; }
 .band-meta { margin: 0.25rem 0 0; font-size: 0.86rem; color: #3f4a46; }
 
 /* pattern subtabs */
@@ -170,7 +171,7 @@ table.census th.txt { text-align: left; }
 }
 .pattern-tab:hover, .pattern-tab:focus-visible { border-color: #83978e; color: var(--pattern-ink); background: #fff; outline: none; }
 .pattern-tab[aria-selected="true"] { background: #fff; color: var(--pattern-ink); border-color: #5d8479; box-shadow: inset 0 2px 0 var(--pattern-accent); }
-.ptab-label { font: 700 0.9rem/1.15 Georgia, "Times New Roman", serif; }
+.ptab-label { font: 700 0.9rem/1.15 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
 .ptab-seat { font-size: 0.66rem; color: var(--pattern-muted); max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* pane */
@@ -189,7 +190,7 @@ table.census th.txt { text-align: left; }
 
 .plate-bg { fill: #f8f7f1; }
 .motif-fill { stroke: #26322e; stroke-width: 1.2px; vector-effect: non-scaling-stroke; }
-.motif-letter { fill: #fffaf1; stroke: #26322e; stroke-width: 0.6; paint-order: stroke fill; font-family: Arial, Helvetica, sans-serif; font-weight: 800; }
+.motif-letter { fill: #fffaf1; stroke: #26322e; stroke-width: 0.6; paint-order: stroke fill; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-weight: 800; }
 .generator-overlay { pointer-events: none; }
 .gen-halo { fill: none; stroke: rgba(255, 253, 247, 0.9); stroke-width: 6px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .gen-mirror { fill: none; stroke: var(--pattern-wine); stroke-width: 2.1px; vector-effect: non-scaling-stroke; }
@@ -202,7 +203,7 @@ table.census th.txt { text-align: left; }
 .gen-arrow { fill: var(--pattern-wine); stroke: rgba(255, 253, 247, 0.9); stroke-width: 1.2px; paint-order: stroke fill; }
 .gen-centre { fill: var(--pattern-wine); stroke: #fffdf7; stroke-width: 2.3px; }
 .gen.moves .gen-centre { fill: #fff; stroke: var(--pattern-wine); stroke-width: 2.4px; }
-.gen-label { fill: #5f1731; stroke: rgba(255, 253, 247, 0.96); stroke-width: 5px; paint-order: stroke fill; font-family: "STIX Two Math", "Cambria Math", Georgia, serif; font-size: 22px; font-weight: 800; }
+.gen-label { fill: #5f1731; stroke: rgba(255, 253, 247, 0.96); stroke-width: 5px; paint-order: stroke fill; font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif; font-size: 22px; font-weight: 800; }
 /* the generator that fixes the marked motif: seat red */
 .gen.fixes .gen-mirror, .gen.fixes .gen-glide, .gen.fixes .gen-arc { stroke: var(--pattern-seat); }
 .gen.fixes .gen-glide-vec { stroke: var(--pattern-seat); }
@@ -217,31 +218,31 @@ table.census th.txt { text-align: left; }
 .pattern-data th, .pattern-data td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--pattern-rule); text-align: left; vertical-align: top; }
 .pattern-data th { width: 34%; color: var(--pattern-muted); font-weight: 650; }
 .pattern-data tr:last-child th, .pattern-data tr:last-child td { border-bottom: 0; }
-.source-value-link { display: inline-flex; align-items: baseline; gap: 0.32rem; color: var(--pattern-ink); font: 650 1.05rem/1.15 Georgia, "Times New Roman", serif; text-decoration-color: #7f9c92; }
+.source-value-link { display: inline-flex; align-items: baseline; gap: 0.32rem; color: var(--pattern-ink); font: 650 1.05rem/1.15 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; text-decoration-color: #7f9c92; }
 .source-value-link:hover, .source-value-link:focus-visible { color: var(--pattern-accent); }
-.source-math-symbol { font: 650 1.05rem/1.15 Georgia, "Times New Roman", serif; }
-.source-link-mark { color: var(--pattern-accent); font: 650 0.72rem/1 Arial, Helvetica, sans-serif; }
+.source-math-symbol { font: 650 1.05rem/1.15 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+.source-link-mark { color: var(--pattern-accent); font: 650 0.72rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
 .syn-note { color: var(--pattern-muted); font-size: 0.76rem; }
 .beyond-note { color: var(--pattern-seat); font-weight: 650; font-size: 0.78rem; }
 
 .group-presentation { margin: 1.1rem 0 0; }
 .presentation-heading { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin: 0 0 0.28rem; }
 .group-presentation h4 { margin: 0; color: var(--pattern-ink); font-size: 0.82rem; font-weight: 700; }
-.action-palette { display: flex; align-items: center; gap: 0.3rem; color: var(--pattern-muted); font: 650 0.72rem/1 Arial, Helvetica, sans-serif; white-space: nowrap; }
-.action-colour { display: inline-grid; width: 1.45rem; height: 1.45rem; place-items: center; border: 1px solid #53625c; border-radius: 0.2rem; color: #fff; background: var(--swatch); font: 700 0.72rem/1 Arial, Helvetica, sans-serif; }
+.action-palette { display: flex; align-items: center; gap: 0.3rem; color: var(--pattern-muted); font: 650 0.72rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; white-space: nowrap; }
+.action-colour { display: inline-grid; width: 1.45rem; height: 1.45rem; place-items: center; border: 1px solid #53625c; border-radius: 0.2rem; color: #fff; background: var(--swatch); font: 700 0.72rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
 .action-colour:nth-child(2), .action-colour:nth-child(6) { color: #17201d; }
 .group-presentation table { width: 100%; border-collapse: collapse; border-block: 1px solid var(--pattern-rule); font-size: 0.8rem; }
 .group-presentation th, .group-presentation td { padding: 0.38rem 0.45rem; border-bottom: 1px solid var(--pattern-rule); text-align: left; vertical-align: top; }
 .group-presentation th { color: var(--pattern-ink); font-weight: 500; }
 .group-presentation tbody tr:last-child th, .group-presentation tbody tr:last-child td { border-bottom: 0; }
-.generator-key { display: inline-block; min-width: 1.45rem; margin-right: 0.36rem; color: var(--pattern-accent); font-family: Georgia, "Times New Roman", serif; font-weight: 700; line-height: 1; }
+.generator-key { display: inline-block; min-width: 1.45rem; margin-right: 0.36rem; color: var(--pattern-accent); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-weight: 700; line-height: 1; }
 .generator-geometry { color: var(--pattern-muted); line-height: 1.25; }
-.presentation-permutation { color: var(--pattern-ink); font-family: Georgia, "Times New Roman", serif; font-weight: 700; white-space: nowrap; }
+.presentation-permutation { color: var(--pattern-ink); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-weight: 700; white-space: nowrap; }
 .presentation-identity { color: #9aa8a2; }
 .seat-cell { width: 8rem; white-space: nowrap; }
 .seat-flag { color: var(--pattern-seat); font-weight: 650; }
-.presentation-relations { display: flex; gap: 0.6rem; margin: 0.5rem 0 0; color: var(--pattern-ink); font: 0.82rem/1.45 Georgia, "Times New Roman", serif; }
-.presentation-relations strong { flex: 0 0 auto; color: var(--pattern-muted); font-family: Arial, Helvetica, sans-serif; font-size: 0.7rem; letter-spacing: 0.025em; }
+.presentation-relations { display: flex; gap: 0.6rem; margin: 0.5rem 0 0; color: var(--pattern-ink); font: 0.82rem/1.45 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+.presentation-relations strong { flex: 0 0 auto; color: var(--pattern-muted); font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; font-size: 0.7rem; letter-spacing: 0.025em; }
 .presentation-relations span { min-width: 0; overflow-wrap: anywhere; }
 .invariant-text { margin: 0.55rem 0 0; font-size: 0.82rem; line-height: 1.5; color: #3a2f2c; }
 
@@ -251,7 +252,7 @@ table.census th.txt { text-align: left; }
 .lightbox-inner { background: #fff; border-radius: 0.6rem; padding: 0.8rem 0.9rem 0.6rem; max-width: min(96vw, 1100px); max-height: 92vh; overflow: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
 .lightbox-inner img { display: block; max-width: 100%; max-height: 78vh; margin: 0 auto; }
 .lightbox-caption { margin: 0.5rem 0 0; font-size: 0.86rem; color: var(--pattern-muted); }
-.lightbox-close { float: right; margin-top: 0.3rem; border: 1px solid var(--pattern-rule); background: var(--pattern-soft); border-radius: 0.35rem; padding: 0.25rem 0.6rem; font: 650 0.8rem/1 Arial, Helvetica, sans-serif; cursor: pointer; }
+.lightbox-close { float: right; margin-top: 0.3rem; border: 1px solid var(--pattern-rule); background: var(--pattern-soft); border-radius: 0.35rem; padding: 0.25rem 0.6rem; font: 650 0.8rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; cursor: pointer; }
 .noscript-note { padding: 1rem; border: 1px solid var(--pattern-rule); }
 
 @media (max-width: 1050px) { .pane-body { grid-template-columns: 1fr; } }
@@ -265,9 +266,6 @@ table.census th.txt { text-align: left; }
 }
 @media (max-width: 420px) {
   .directory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (prefers-color-scheme: dark) {
-  body.tcp { background: #fff; color: var(--pattern-ink); }
 }
 body.tcp header.site .title { color: var(--pattern-ink); }
 body.tcp header.site nav a { color: var(--pattern-muted); }

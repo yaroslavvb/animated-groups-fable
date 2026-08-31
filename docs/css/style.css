@@ -1,6 +1,7 @@
 /* Film Groups — site styles. Math-paper aesthetic, light-first. */
 
 :root {
+  color-scheme: light;
   --bg: #faf9f6;
   --panel: #ffffff;
   --ink: #1f2430;
@@ -19,23 +20,6 @@
   --shadow: 0 1px 3px rgba(30, 30, 60, 0.08), 0 4px 16px rgba(30, 30, 60, 0.05);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #14161c;
-    --panel: #1c1f28;
-    --ink: #e8e6e1;
-    --muted: #9aa0ab;
-    --accent: #7ba7d7;
-    --accent2: #e07460;
-    --gold: #e0b23c;
-    --rule: #2c303c;
-    --fwd-bg: #1e2a24;
-    --fwd-rule: #33473b;
-    --fwd-ink: #86c39d;
-    --code-bg: #232733;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
-  }
-}
 
 * { box-sizing: border-box; }
 
@@ -45,7 +29,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 17px/1.65 Charter, "Bitstream Charter", Georgia, "Times New Roman", serif;
+  font: 17px/1.65 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 
 header.site {
@@ -81,7 +65,7 @@ header.site nav a {
   color: var(--muted);
   text-decoration: none;
   font-size: 0.95rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 header.site nav a:hover { color: var(--accent); }
 header.site nav a.here { color: var(--accent); font-weight: 600; }
@@ -101,11 +85,11 @@ h1 + .subtitle { color: var(--muted); margin-top: 0; font-size: 1.05rem; }
 
 .hint {
   color: var(--muted);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.88rem;
 }
 kbd {
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.85em;
   border: 1px solid var(--rule);
   border-bottom-width: 2px;
@@ -131,7 +115,7 @@ p { margin: 0.7rem 0; }
 }
 .aside { border-left-color: var(--gold); }
 .aside .label, .thm .label {
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -141,7 +125,7 @@ p { margin: 0.7rem 0; }
 }
 
 code, .mono {
-  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.86em;
   background: var(--code-bg);
   padding: 0.08em 0.35em;
@@ -149,7 +133,7 @@ code, .mono {
 }
 
 .sym {
-  font-family: Charter, Georgia, serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 600;
   white-space: nowrap;
 }
@@ -159,7 +143,7 @@ table.counts {
   border-collapse: collapse;
   margin: 1rem 0;
   font-size: 0.94rem;
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 table.counts th, table.counts td {
   border: 1px solid var(--rule);
@@ -197,7 +181,7 @@ table.counts td:first-child { text-align: left; }
 
 .gcard .meta {
   padding: 0.55rem 0.8rem 0.7rem;
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.86rem;
   cursor: pointer;   /* opens the detail modal; the canvas plays/pauses */
 }
@@ -213,7 +197,7 @@ table.counts td:first-child { text-align: left; }
   border-radius: 99px;
   background: var(--code-bg);
   color: var(--muted);
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 /* Which colouring of its projection a group induces — the partition the
    hierarchy page draws, and the one thing about a group worth saying on a
@@ -253,7 +237,7 @@ table.counts td:first-child { text-align: left; }
   gap: 0.7rem;
   flex-wrap: wrap;
   align-items: center;
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.9rem;
   background: var(--panel);
   padding: 0.7rem 0.9rem;
@@ -299,7 +283,7 @@ button.linkish:hover { border-color: var(--accent); color: var(--accent); }
   padding: 0.3rem 0.6rem;
   border-top: 1px solid var(--rule);
   background: var(--panel);
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 .anim-controls .ac-btn {
   border: 1px solid var(--rule);
@@ -378,7 +362,7 @@ button.linkish:hover { border-color: var(--accent); color: var(--accent); }
 .anim-controls .ac-mark-label {
   font-size: 8.5px;
   color: var(--muted);
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-variant-numeric: tabular-nums;
   margin-top: 1px;
   white-space: nowrap;
@@ -393,14 +377,14 @@ footer.site {
   border-top: 1px solid var(--rule);
   color: var(--muted);
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   padding: 1.2rem;
   text-align: center;
 }
 
 /* generator display */
 .genbox {
-  font-family: "SF Mono", Menlo, monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 0.8rem;
   background: var(--code-bg);
   border-radius: 8px;
@@ -417,7 +401,7 @@ footer.site {
 .tabdemo { margin: 1.5rem 0; }
 .tabbar { display: flex; gap: 0.35rem; flex-wrap: wrap; position: relative; z-index: 1; }
 .tabbtn {
-  font-family: Charter, Georgia, serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 600;
   font-size: 0.98rem;
   padding: 0.28rem 0.85rem;
@@ -473,7 +457,7 @@ footer.site {
 /* ------- wallpaper atlas ------- */
 .toc { display: flex; gap: 0.45rem; flex-wrap: wrap; margin: 1.1rem 0 1.8rem; }
 .toc .chip {
-  font-family: system-ui, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.85rem;
   padding: 0.18rem 0.7rem;
   border: 1px solid var(--rule);
@@ -537,7 +521,7 @@ main.billiards {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem 1.1rem;
-  font: 0.85rem/1.5 system-ui, -apple-system, sans-serif;
+  font: 0.85rem/1.5 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--muted);
 }
 .credit .sym { font-size: 0.95rem; }
@@ -548,7 +532,7 @@ main.billiards {
   flex-wrap: wrap;
   padding: 0.55rem 0.9rem 0.75rem;
   border-top: 1px solid var(--rule);
-  font: 0.88rem/1.4 system-ui, -apple-system, sans-serif;
+  font: 0.88rem/1.4 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   color: var(--muted);
 }
 .film-opts label {
@@ -574,7 +558,7 @@ details[open] { padding-bottom: 0.7rem; }
 summary {
   cursor: pointer;
   padding: 0.6rem 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-size: 0.94rem;
   color: var(--accent);
   list-style-position: outside;
@@ -588,7 +572,7 @@ dl.facts {
   grid-template-columns: max-content 1fr;
   gap: 0.4rem 1.2rem;
   margin: 1.2rem 0;
-  font: 0.9rem/1.5 system-ui, -apple-system, sans-serif;
+  font: 0.9rem/1.5 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 dl.facts dt { color: var(--muted); }
@@ -633,7 +617,7 @@ table.counts tbody tr:hover { background: var(--code-bg); }
   margin: 0;
   padding: 0.6rem 0.85rem 0.5rem;
   font-size: 0.95rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-weight: 600;
   border-bottom: 1px solid var(--rule);
 }
@@ -658,7 +642,7 @@ table.counts tbody tr:hover { background: var(--code-bg); }
   padding: 0.55rem 0.85rem 0.3rem;
   display: grid;
   gap: 0.28rem;
-  font: 0.74rem/1.2 system-ui, -apple-system, sans-serif;
+  font: 0.74rem/1.2 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   font-variant-numeric: tabular-nums;
 }
 .score { display: grid; grid-template-columns: 5.6em 1fr 2.4em; align-items: center;
@@ -677,7 +661,7 @@ table.counts tbody tr:hover { background: var(--code-bg); }
   padding: 0.45rem 0.7rem; cursor: pointer;
   background: var(--panel); color: var(--ink);
   border: 1px solid var(--rule); border-radius: 6px;
-  font: 0.8rem/1.3 system-ui, -apple-system, sans-serif;
+  font: 0.8rem/1.3 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   max-width: 15rem;
 }
 .gpick .sym { font-size: 1.05rem; }
@@ -734,18 +718,18 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
 .dmeta { padding: 0.55rem 0.8rem 0.75rem; border-top: 1px solid var(--rule); }
 .dhead {
   display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap;
-  font: 0.9rem/1.4 system-ui, -apple-system, sans-serif; margin-bottom: 0.4rem;
+  font: 0.9rem/1.4 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; margin-bottom: 0.4rem;
 }
 .dfacts {
   display: grid; grid-template-columns: max-content 1fr; gap: 0.2rem 0.6rem;
-  margin: 0; font: 0.76rem/1.45 system-ui, -apple-system, sans-serif;
+  margin: 0; font: 0.76rem/1.45 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 }
 .dfacts dt { color: var(--muted); }
 .dfacts dd { margin: 0; }
 .dfacts .mono { background: none; padding: 0; font-size: 0.95em; }
 
 #colourings h3 { margin: 1.6rem 0 0.2rem; font-size: 1.05rem;
-                 font-family: system-ui, -apple-system, sans-serif; }
+                 font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
 #colourings h3:first-child { margin-top: 0.4rem; }
 
 /* the two conventions, side by side */
@@ -755,7 +739,7 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
 .dpair canvas { width: 100%; aspect-ratio: 1; display: block; background: #faf9f6; }
 .dpair span {
   position: absolute; left: 0.35rem; top: 0.25rem;
-  font: 0.72rem/1 "SF Mono", Menlo, monospace; color: var(--muted);
+  font: 0.72rem/1 ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; color: var(--muted);
   background: rgba(250,249,246,0.85); padding: 0.1rem 0.25rem; border-radius: 3px;
 }
 .dside { margin: 0.45rem 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--muted); }
