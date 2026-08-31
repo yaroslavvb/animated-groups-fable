@@ -2137,18 +2137,7 @@ a.short-signature-link[data-book-excerpt]::after {
 }
 
 /* The legend documents every symbol on the plate, not only the one that steps
-   the palette: those that advance the colour order first, then, behind a small
-   label, those that leave it fixed. The colour-fixed run is muted so the strip
-   still reads colour-first at a glance. */
-.colour-order-fixed-label {
-  margin-left: 0.55rem;
-  font-size: 0.68rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.62;
-  white-space: nowrap;
-}
-.colour-order-fixed-label::after { content: ":"; }
-.colour-order-action--fixed { opacity: 0.72; }
+   the palette. No extra marking distinguishes the two: the names already do it,
+   "colour reflection" against "reflection", "1/2 colour rotation" against
+   "1/2 rotation". Colour-advancing entries simply come first. */
 .colour-order-action-glyph--translation { color: var(--generator-ink); }
