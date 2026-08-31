@@ -194,12 +194,13 @@ table.census th.txt { text-align: left; }
 .generator-overlay { pointer-events: none; }
 .gen-halo { fill: none; stroke: rgba(255, 253, 247, 0.9); stroke-width: 6px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
 .gen-mirror { fill: none; stroke: var(--pattern-wine); stroke-width: 2.1px; vector-effect: non-scaling-stroke; }
-.gen-glide { fill: none; stroke: var(--pattern-wine); stroke-width: 1.8px; vector-effect: non-scaling-stroke; }
-.gen.moves .gen-mirror { stroke-dasharray: 11 8; }
-.gen.moves .gen-glide { stroke-dasharray: 8 6; }
-.gen-glide-vec { stroke: var(--pattern-wine); stroke-width: 2.6px; vector-effect: non-scaling-stroke; }
+.gen-glide { fill: none; stroke: var(--pattern-wine); stroke-width: 1.8px;
+  stroke-dasharray: 9 6; vector-effect: non-scaling-stroke; }
+.gen-glide-vec { fill: none; stroke: var(--pattern-wine); stroke-width: 2.6px;
+  stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.gen-glide-halo { fill: none; stroke: rgba(255, 253, 247, 0.92); stroke-width: 5.4px;
+  stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .gen-arc { fill: none; stroke: var(--pattern-wine); stroke-width: 2.1px; stroke-linecap: round; vector-effect: non-scaling-stroke; }
-.gen.moves .gen-arc { stroke-dasharray: 5 4; }
 .gen-arrow { fill: var(--pattern-wine); stroke: rgba(255, 253, 247, 0.9); stroke-width: 1.2px; paint-order: stroke fill; }
 .gen-centre { fill: var(--pattern-wine); stroke: #fffdf7; stroke-width: 2.3px; }
 .gen.moves .gen-centre { fill: #fff; stroke: var(--pattern-wine); stroke-width: 2.4px; }
@@ -271,3 +272,10 @@ body.tcp header.site .title { color: var(--pattern-ink); }
 body.tcp header.site nav a { color: var(--pattern-muted); }
 body.tcp header.site nav a.here, body.tcp header.site nav a:hover { color: var(--pattern-accent); }
 body.tcp footer.site { color: var(--pattern-muted); }
+
+/* Line style is the geometry — solid mirror, dashed glide, as in International
+   Tables. The glide's half arrow gives its direction and its half-cell length.
+   Colour cycling used to be shown by dashing, which made a colour-swapping
+   mirror look like a glide; it now has its own channel, these chips. */
+.gen-cycle-chip { stroke: rgba(255, 253, 247, 0.95); stroke-width: 1px; paint-order: stroke fill; }
+.gen-cycle-loop { fill: none; stroke: var(--pattern-wine); stroke-width: 1.1px; opacity: 0.75; }

@@ -773,3 +773,18 @@ header.site nav { min-width: 0; }
 }
 .navgroup-label::after { content: ":"; }
 .navgroup-superseded a { opacity: 0.62; }
+
+/* Key for the plate symbols on the notation page. */
+.plate-symbol-key { margin: 1.4rem 0 1.8rem; }
+.plate-symbol-key svg { width: 100%; max-width: 700px; height: auto; }
+.plate-symbol-key .k-mirror { stroke: #7d2140; stroke-width: 2.4px; }
+.plate-symbol-key .k-glide { stroke: #7d2140; stroke-width: 2px; stroke-dasharray: 9 6; }
+.plate-symbol-key .k-arrow {
+  fill: none; stroke: #7d2140; stroke-width: 2.6px;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.plate-symbol-key .k-chip { stroke: #fffdf7; stroke-width: 1.1px; paint-order: stroke fill; }
+.plate-symbol-key .k-loop { fill: none; stroke: #7d2140; stroke-width: 1.2px; opacity: 0.75; }
+.plate-symbol-key .k-lbl { font-size: 14px; fill: var(--ink); }
+.plate-symbol-key .k-sub { font-size: 12px; fill: var(--muted); }
+.plate-symbol-key figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }

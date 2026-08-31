@@ -272,6 +272,41 @@
     return s;
   }
 
+  // --- glide mark -----------------------------------------------------------
+  // International Tables draws a glide's direction with a HALF arrow: a shaft
+  // along the axis, as long as the glide translation, barbed on one side only.
+  // A full head stays reserved for a whole translation, so half vs full head
+  // now reads as half-period vs full-period at a glance.
+  function halfArrowPath(ax, ay, tx, ty, len, barb) {
+    const bx = ax + tx * len, by = ay + ty * len;
+    const nx = -ty, ny = tx;                     // left normal of travel
+    const hx = bx - tx * barb + nx * barb * 0.66;
+    const hy = by - ty * barb + ny * barb * 0.66;
+    const f = (v) => v.toFixed(2);
+    return `M${f(ax)},${f(ay)} L${f(bx)},${f(by)} M${f(bx)},${f(by)} L${f(hx)},${f(hy)}`;
+  }
+
+  // Colour cycling is its own channel now. It used to be shown by dashing the
+  // line, which collided with the crystallographic meaning of a dashed line
+  // (glide) and made a colour-swapping mirror look like a glide.
+  function cycleChips(grp, cyc, pal, x, y) {
+    const letters = String(cyc || "").match(/[A-Z]/g);
+    if (!letters || letters.length < 2) return;
+    const r = 3.1, gap = 2.2;
+    letters.forEach((ch, i) => {
+      const idx = ch.charCodeAt(0) - 65;
+      grp.append(svg("circle", {
+        cx: (x + i * (2 * r + gap)).toFixed(2), cy: y.toFixed(2), r,
+        fill: pal[idx % pal.length] || "#888", class: "gen-cycle-chip",
+      }));
+    });
+    grp.append(svg("path", {
+      class: "gen-cycle-loop",
+      d: `M${(x - r - 1.4).toFixed(2)},${(y + r + 1.7).toFixed(2)} `
+       + `L${(x + (letters.length - 1) * (2 * r + gap) + r + 1.4).toFixed(2)},${(y + r + 1.7).toFixed(2)}`,
+    }));
+  }
+
   function overlay(fam, t, toS, scale, w, h) {
     const g = svg("g", {class: "generator-overlay", "aria-hidden": "true"});
     fam.generators.forEach((gen, idx) => {
@@ -298,6 +333,7 @@
         grp.append(svg("polygon", {class: "gen-arrow", points: [B, [base[0] + nrm[0] * 3.5, base[1] + nrm[1] * 3.5], [base[0] - nrm[0] * 3.5, base[1] - nrm[1] * 3.5]].map(q => q.map(v => v.toFixed(2)).join(",")).join(" ")}));
         grp.append(svg("circle", {cx, cy, r: 4.2, class: "gen-centre"}));
         label(grp, gen.name, cx + rad + 8, cy - rad - 2);
+        cycleChips(grp, t.cycles[gen.name], PALETTE, cx + rad + 8, cy - rad + 9);
         g.append(grp);
         return;
       }
@@ -317,18 +353,18 @@
       grp.append(svg("line", {x1: A[0], y1: A[1], x2: B[0], y2: B[1], class: "gen-halo"}));
       grp.append(svg("line", {x1: A[0], y1: A[1], x2: B[0], y2: B[1], class: gen.kind === "mirror" ? "gen-mirror" : "gen-glide"}));
       if (gen.kind === "glide") {
-        // glide vector arrow at the axis point
         const gl = gen.glide * scale;
-        const ax = sx, ay = sy;
-        const bx = ax + sdx * gl, by = ay + sdy * gl;
-        grp.append(svg("line", {x1: ax, y1: ay, x2: bx, y2: by, class: "gen-glide-vec"}));
-        const tan = [sdx * Math.sign(gl), sdy * Math.sign(gl)];
-        const nrm = [-tan[1], tan[0]];
-        grp.append(svg("polygon", {class: "gen-arrow", points: [[bx, by], [bx - tan[0] * 7 + nrm[0] * 3.5, by - tan[1] * 7 + nrm[1] * 3.5], [bx - tan[0] * 7 - nrm[0] * 3.5, by - tan[1] * 7 - nrm[1] * 3.5]].map(q => q.map(v => v.toFixed(2)).join(",")).join(" ")}));
+        const sgn = Math.sign(gl) || 1;
+        const tx = sdx * sgn, ty = sdy * sgn;
+        const d = halfArrowPath(sx, sy, tx, ty, Math.abs(gl), 8);
+        grp.append(svg("path", {d, class: "gen-glide-halo"}));
+        grp.append(svg("path", {d, class: "gen-glide-vec"}));
       }
       // label near the plate edge where the line enters, offset inward
       const lx = A[0] + (B[0] - A[0]) * 0.06 + 10 * (-sdy), ly = A[1] + (B[1] - A[1]) * 0.06 + 10 * sdx - 4;
-      label(grp, gen.name, Math.min(Math.max(lx, 12), w - 16), Math.min(Math.max(ly, 18), h - 8));
+      const clx = Math.min(Math.max(lx, 12), w - 16), cly = Math.min(Math.max(ly, 18), h - 8);
+      label(grp, gen.name, clx, cly);
+      cycleChips(grp, t.cycles[gen.name], PALETTE, clx, cly + 11);
       g.append(grp);
     });
     // seat marker
@@ -519,8 +555,8 @@
     fig.append(buildPlate(t, fam));
     const cap = el("figcaption");
     cap.append(document.createTextNode("Overlay: generators of Γ — "),
-      el("span", "cap-keep", "solid = preserves colours"), document.createTextNode(", "),
-      el("span", "cap-swap", "dashed = interchanges them"), document.createTextNode("; translation generators are not drawn; the ring marks the seat of the motif."));
+      el("span", "cap-keep", "solid = mirror"), document.createTextNode(", "),
+      el("span", "cap-swap", "dashed = glide, half arrow = its direction and half-cell length"), document.createTextNode("; colour chips give the colour cycle; translation generators are not drawn; the ring marks the seat of the motif."));
     fig.append(cap);
     const details = el("div", "pattern-details");
     details.append(dataTable(t, fam), presentation(t, fam, siblings));
