@@ -912,13 +912,12 @@ nav a[aria-current="page"] {
   height: 1.05rem;
 }
 
-/* A glide glyph carries two rows -- the axis and, below it, the half arrow for
-   the direction -- so it needs more room than a plain mirror rule. */
+/* Glide glyphs still want a little more width than a plain mirror rule. */
 .colour-order-action-glyph--reflection[data-plane-symbol="n"],
 .colour-order-action-glyph--reflection[data-plane-symbol="d"],
 .colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
-  width: 2rem;
-  height: 1.4rem;
+  width: 1.85rem;
+  height: 1.05rem;
 }
 
 .colour-order-action-description {
@@ -1180,7 +1179,7 @@ nav a[aria-current="page"] {
   padding: 0.42rem 0.58rem;
   border: 1px solid var(--line);
   border-radius: 4px;
-  background: #faf8f1;
+  background: transparent;
   color: var(--text);
   font-size: 0.82rem;
   font-weight: 700;
@@ -1997,8 +1996,8 @@ a.short-signature-link[data-book-excerpt]::after {
   .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="n"],
   .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="d"],
   .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
-    width: 1.75rem;
-    height: 1.25rem;
+    width: 1.6rem;
+    height: 0.92rem;
   }
 
   .colour-order--plate .colour-order-action-glyph--reflection {
@@ -2159,4 +2158,25 @@ a.short-signature-link[data-book-excerpt]::after {
    the palette. No extra marking distinguishes the two: the names already do it,
    "colour reflection" against "reflection", "1/2 colour rotation" against
    "1/2 rotation". Colour-advancing entries simply come first. */
-.colour-order-action-glyph--translation { color: var(--generator-ink); }
+/* Needs an explicit box like the other two: an SVG with no intrinsic size
+   collapses in this flex row and the labels print on top of each other. */
+.colour-order-action-glyph--translation {
+  width: 1.9rem;
+  height: 1.05rem;
+  color: var(--generator-ink);
+}
+
+/* style.css joined this page today and styles every <details> as a raised card.
+   This page's disclosures carry their own summary chrome, so the generic box
+   only added an outer white panel with padding round them. */
+.extra-links,
+.diagram-symbol-dialog,
+details.presentation-source-audit,
+details.book-audit {
+  border: 0;
+  border-radius: 0;
+  background: none;
+  padding: 0;
+  margin: 0.9rem 0 0;
+  box-shadow: none;
+}
