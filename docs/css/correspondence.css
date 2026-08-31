@@ -1,0 +1,2117 @@
+/* Keep the atlas reflowable when Android display/page zoom reduces the
+   effective layout viewport below the shared site's historical 320px floor. */
+body {
+  min-width: 0;
+}
+
+/* Chrome can keep a mobile page's layout viewport wide while page zoom makes
+   its visual viewport narrower.  The head bootstrap exposes that visible width
+   so the header and atlas reflow instead of disappearing beyond the right
+   edge.  Left alignment keeps the page anchored when the visible viewport is
+   only a slice of the layout viewport. */
+:root[data-visual-viewport-constrained] .header-inner,
+:root[data-visual-viewport-constrained] .correspondence-page {
+  width: min(
+    calc(var(--clockwork-visual-viewport-width) - 1.25rem),
+    var(--content)
+  );
+  margin-right: auto;
+  margin-left: 0.625rem;
+}
+
+:root[data-visual-viewport-constrained] .directory h1 {
+  overflow-wrap: anywhere;
+}
+
+.correspondence-page {
+  --generator-ink: #74213f;
+  max-width: 1080px;
+  padding-bottom: 4rem;
+}
+
+nav a[aria-current="page"] {
+  color: var(--accent);
+  font-weight: 650;
+}
+
+.directory {
+  /* Reset the shared header-nav flex treatment: this semantic navigation is
+     the page's full-width visual directory, not a row of header links. */
+  display: block;
+  color: var(--text);
+  font-size: 1rem;
+  padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2.4rem, 5vw, 4rem);
+}
+
+.directory h1 {
+  max-width: 900px;
+  margin-bottom: 0.6rem;
+}
+
+.directory-viewer-note {
+  max-width: 760px;
+  margin: 0 0 0.8rem;
+  color: #37413d;
+  font-size: 0.78rem;
+}
+
+.diagram-symbol-teaser {
+  display: flex;
+  align-items: center;
+  max-width: 760px;
+  gap: 0.9rem;
+  margin: 0 0 0.8rem;
+  padding: 0.64rem 0.78rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--generator-ink);
+  background: var(--surface);
+}
+
+.diagram-symbol-teaser-icons {
+  display: flex;
+  flex: none;
+  gap: 0.3rem;
+}
+
+.diagram-symbol-teaser-icon {
+  display: grid;
+  justify-items: center;
+  width: 4.35rem;
+  color: var(--generator-ink);
+}
+
+.diagram-symbol-teaser-icon .diagram-symbol-icon {
+  width: 3.8rem;
+}
+
+.diagram-symbol-teaser-icon small {
+  color: var(--muted);
+  font-size: 0.58rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.diagram-symbol-teaser-copy {
+  min-width: 0;
+}
+
+.diagram-symbol-teaser h2 {
+  margin: 0 0 0.12rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.diagram-symbol-teaser p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.4;
+}
+
+.diagram-symbol-open {
+  margin-top: 0.38rem;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px dotted currentColor;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 680;
+  cursor: pointer;
+}
+
+.diagram-symbol-open:hover,
+.diagram-symbol-open:focus-visible {
+  border-bottom-style: solid;
+}
+
+.diagram-symbol-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: min(52rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: min(90dvh, 60rem);
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #706d65;
+  border-radius: 7px;
+  background: #faf8f2;
+  color: var(--text);
+  box-shadow: 0 22px 70px rgb(20 24 22 / 0.34);
+}
+
+.diagram-symbol-dialog:not([open]) {
+  display: none;
+}
+
+.diagram-symbol-dialog.is-fallback-open {
+  display: block;
+  box-shadow:
+    0 0 0 100vmax rgb(19 25 23 / 0.72),
+    0 22px 70px rgb(20 24 22 / 0.34);
+}
+
+.diagram-symbol-dialog::backdrop {
+  background: rgb(19 25 23 / 0.72);
+  backdrop-filter: blur(2px);
+}
+
+.diagram-symbol-dialog-open {
+  overflow: hidden;
+}
+
+.diagram-symbol-dialog-panel {
+  display: flex;
+  max-height: min(90dvh, 60rem);
+  margin: 0;
+  flex-direction: column;
+}
+
+.diagram-symbol-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0.85rem 1.15rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--background);
+}
+
+.diagram-symbol-dialog-header .overline {
+  margin: 0 0 0.16rem;
+  color: var(--generator-ink);
+  font-size: 0.62rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.diagram-symbol-dialog-header h2 {
+  margin: 0;
+  font-size: clamp(1rem, 2.6vw, 1.35rem);
+  line-height: 1.2;
+}
+
+.diagram-symbol-close {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.diagram-symbol-close:hover,
+.diagram-symbol-close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.diagram-symbol-dialog-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 0.9rem 1.15rem 1.1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.diagram-symbol-dialog-scroll > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.diagram-symbol-group {
+  margin-top: 0.75rem;
+}
+
+.diagram-symbol-group h3 {
+  margin: 0 0 0.15rem;
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.diagram-symbol-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.diagram-symbol-item {
+  display: grid;
+  grid-template-columns: 4.75rem minmax(0, 1fr);
+  align-items: center;
+  min-height: 2.7rem;
+  gap: 0.65rem;
+  padding: 0.28rem 0;
+}
+
+.diagram-symbol-item + .diagram-symbol-item {
+  border-top: 1px solid color-mix(in srgb, var(--line) 72%, transparent);
+}
+
+.diagram-symbol-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4.25rem;
+  min-height: 2rem;
+  color: var(--generator-ink);
+}
+
+.diagram-symbol-icon {
+  display: block;
+  width: 4.25rem;
+  height: 2rem;
+  overflow: visible;
+}
+
+.diagram-symbol-explanation {
+  display: grid;
+  grid-template-columns: minmax(10.5rem, 12.5rem) minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.7rem;
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.diagram-symbol-explanation strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.diagram-symbol-explanation > span:last-child {
+  color: var(--muted);
+}
+
+.diagram-symbol-note {
+  margin-top: 0.7rem !important;
+}
+
+.diagram-symbol-dialog .diagram-symbol-sources {
+  margin-top: 0.42rem;
+  font-size: 0.78rem;
+}
+
+.notation-caveat {
+  max-width: 760px;
+  margin: 0 0 0.8rem;
+  padding: 0.72rem 0.82rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+}
+
+.notation-caveat h2 {
+  margin: 0 0 0.22rem;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.notation-caveat p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+
+.provenance {
+  padding: clamp(2.5rem, 5vw, 4.5rem) 0;
+  border-top: 1px solid var(--line);
+}
+
+.provenance h2 {
+  max-width: 800px;
+  margin-bottom: 1.4rem;
+  font-size: clamp(1.65rem, 3vw, 2.45rem);
+  font-weight: 570;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+}
+
+.directory-families {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border-block: 1px solid var(--line);
+  background: var(--line);
+}
+
+.directory-family {
+  display: grid;
+  grid-template-columns: minmax(6.4rem, 0.18fr) minmax(0, 0.82fr);
+  gap: 1.25rem;
+  padding: 0.72rem 0.8rem;
+  background: var(--surface);
+}
+
+.directory-family h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.1;
+}
+
+.directory-family h2 a {
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  text-decoration: none;
+}
+
+.directory-family h2 a:hover,
+.directory-family h2 a:focus-visible {
+  color: var(--accent);
+}
+
+.directory-family h2 > span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.directory-groups {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.48rem;
+  min-width: 0;
+  padding-bottom: 0.12rem;
+}
+
+.directory-group {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 0.28rem;
+  min-width: 5.6rem;
+  padding: 0.34rem 0.4rem 0.42rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.directory-group:hover,
+.directory-group:focus-visible {
+  border-color: var(--accent);
+  background: var(--background);
+  color: var(--accent);
+}
+
+.directory-signature {
+  justify-self: center;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.clockwork-disambiguator {
+  color: var(--accent);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-weight: 650;
+}
+
+.clockwork-disambiguator sub,
+.clockwork-disambiguator sup {
+  font-size: 0.66em;
+  line-height: 0;
+}
+
+.clockwork-disambiguator--directory {
+  justify-self: center;
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+.directory-palette {
+  display: flex;
+  width: 100%;
+  min-width: 4rem;
+  height: 1.15rem;
+  overflow: hidden;
+  border: 1px solid rgb(35 45 41 / 0.42);
+  border-radius: 2px;
+}
+
+.directory-palette span {
+  flex: 1 1 0;
+  background: var(--directory-colour);
+}
+
+.directory-group-id {
+  justify-self: center;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.58rem;
+  line-height: 1;
+}
+
+.correspondence-atlas {
+  border-top: 1px solid var(--line);
+}
+
+.wallpaper-family {
+  padding: clamp(3rem, 7vw, 6rem) 0;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 1rem;
+}
+
+.family-header {
+  max-width: 900px;
+  margin-bottom: 1.6rem;
+}
+
+.family-header h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.65rem;
+  margin: 0 0 0.8rem;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 570;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.family-count {
+  color: var(--muted);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.28em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.family-summary {
+  max-width: 760px;
+  margin-bottom: 0.45rem;
+  color: #37413d;
+  font-size: 1.05rem;
+}
+
+.clockwork-tabs {
+  min-width: 0;
+}
+
+.clockwork-tabbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.35rem;
+  padding: 0 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.clockwork-tab {
+  display: inline-flex;
+  min-width: max-content;
+  padding: 0.4rem 0.72rem 0.36rem;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  border-radius: 8px 8px 0 0;
+  background: var(--surface);
+  color: var(--muted);
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.clockwork-tab:hover,
+.clockwork-tab:focus-visible {
+  color: var(--accent);
+}
+
+.clockwork-tab[aria-selected="true"] {
+  background: var(--background);
+  color: var(--text);
+  box-shadow: 0 2px 0 var(--background);
+}
+
+.tab-signature {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.15;
+}
+
+.clockwork-disambiguator--tab {
+  margin-top: 0.12rem;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.tab-meta {
+  margin-top: 0.16rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.correspondence-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.correspondence-item[hidden],
+.correspondence-entry[hidden] {
+  display: none;
+}
+
+.correspondence-entry {
+  padding: clamp(1.4rem, 4vw, 2.5rem);
+  border: 1px solid var(--line);
+  border-radius: 0 8px 8px 8px;
+  background: var(--background);
+  box-shadow: 0 12px 28px rgb(35 45 41 / 0.05);
+  scroll-margin-top: 1rem;
+}
+
+.entry-header {
+  margin-bottom: 1.5rem;
+}
+
+.entry-header h3 {
+  margin: 0;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  font-weight: 570;
+  line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.clockwork-disambiguator--heading {
+  display: block;
+  margin-top: 0.42rem;
+  font-size: 1rem;
+  line-height: 1.15;
+}
+
+.clockwork-disambiguator--heading::before {
+  content: "clockwork ";
+  color: var(--muted);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 550;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.orbifold-star {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif;
+  font-size: 1em;
+  font-style: normal;
+  font-weight: inherit;
+  letter-spacing: 0;
+  vertical-align: baseline;
+}
+
+.book-color-signature sup,
+.tab-signature sup {
+  font-size: 0.56em;
+  line-height: 0;
+  vertical-align: 0.68em;
+}
+
+.entry-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  gap: clamp(1.5rem, 4vw, 3.5rem);
+  align-items: start;
+}
+
+.entry-visuals {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+}
+
+.colour-plate,
+.clockwork-film,
+.crystal-viewer {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: #f7f4ec;
+}
+
+.clockwork-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 12 / 7;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(0, 111, 99, 0.035), transparent 45%),
+    #faf8f1;
+}
+
+.clockwork-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.film-status {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(80%, 22rem);
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
+.film-status[hidden] {
+  display: none;
+}
+
+.clockwork-stage[data-state="error"] .film-status {
+  color: #8c382e;
+}
+
+.clockwork-film .animation-controls {
+  margin: 0;
+  padding: 0.62rem 0.72rem;
+  border-top: 1px solid var(--line);
+  background: var(--background);
+}
+
+.colour-plate figcaption {
+  margin: 0;
+}
+
+.colour-plate-graphic {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 12 / 7;
+  overflow: hidden;
+}
+
+.colour-plate img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 12 / 7;
+  object-fit: cover;
+}
+
+.plate-generator-overlay {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--generator-ink);
+  pointer-events: none;
+}
+
+.plate-generator-axis-halo,
+.plate-generator-axis,
+.diagram-symbol-plane,
+.plate-generator-translation-halo,
+.plate-generator-translation,
+.diagram-symbol-translation,
+.plate-generator-quarter-arrow-halo,
+.plate-generator-quarter-arrow,
+.diagram-symbol-quarter-arrow,
+.plate-generator-glyph-halo,
+.plate-generator-glyph {
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.plate-generator-axis-halo,
+.plate-generator-translation-halo,
+.plate-generator-quarter-arrow-halo,
+.plate-generator-glyph-halo {
+  fill: none;
+  stroke: rgba(255, 253, 247, 0.94);
+  stroke-width: 6px;
+}
+
+.plate-generator-glyph-halo {
+  color: rgba(255, 253, 247, 0.94);
+}
+
+.plate-generator-axis,
+.diagram-symbol-plane,
+.plate-generator-translation,
+.diagram-symbol-translation {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2px;
+}
+
+.plate-generator-axis--plane-m {
+  stroke-dasharray: none;
+}
+
+.plate-generator-axis--plane-axial {
+  stroke-dasharray: 9 7;
+}
+
+.plate-generator-axis--plane-c {
+  stroke-dasharray: 1 7;
+}
+
+.plate-generator-axis--plane-n,
+.plate-generator-axis--plane-d {
+  stroke-dasharray: 10 5 1 5;
+}
+
+.plate-generator-quarter-arrow,
+.diagram-symbol-quarter-arrow {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.35px;
+}
+
+.plate-generator-glyph {
+  color: var(--generator-ink);
+}
+
+.plate-generator-label {
+  fill: currentColor;
+  stroke: rgba(255, 253, 247, 0.98);
+  stroke-width: 4px;
+  paint-order: stroke fill;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+@media (forced-colors: active) {
+  .diagram-symbol-image {
+    color: CanvasText;
+  }
+
+  .plate-generator-axis-halo,
+  .plate-generator-translation-halo,
+  .plate-generator-quarter-arrow-halo,
+  .plate-generator-glyph-halo,
+  .plate-generator-label {
+    stroke: Canvas;
+  }
+
+  .plate-generator-axis,
+  .diagram-symbol-plane,
+  .plate-generator-translation,
+  .diagram-symbol-translation,
+  .plate-generator-quarter-arrow,
+  .diagram-symbol-quarter-arrow,
+  .plate-generator-glyph {
+    color: CanvasText;
+    stroke: CanvasText;
+  }
+
+  .plate-generator-label {
+    fill: CanvasText;
+  }
+}
+
+.colour-plate figcaption {
+  padding: 0.8rem 0.9rem 0.85rem;
+  border-top: 1px solid var(--line);
+  background: var(--background);
+  color: var(--muted);
+  font-size: 0.72rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.colour-order {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  color: #37413d;
+  line-height: 1;
+}
+
+.colour-order--plate {
+  flex-wrap: nowrap;
+  font-size: 0.68rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.colour-order-palette {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.colour-order-label {
+  margin-right: 0.08rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+}
+
+.colour-order-swatch {
+  display: block;
+  width: 0.76rem;
+  height: 0.76rem;
+  flex: none;
+  border: 1px solid #26332f;
+  border-radius: 2px;
+  background: var(--colour-order-swatch);
+}
+
+.colour-order-action {
+  display: inline-flex;
+  min-width: 0;
+  flex: none;
+  align-items: center;
+  gap: 0.14rem;
+  white-space: nowrap;
+}
+
+.colour-order-action-glyph {
+  display: block;
+  flex: none;
+  overflow: visible;
+  color: var(--generator-ink);
+}
+
+.colour-order-action-glyph--rotation {
+  width: 1.22rem;
+  height: 1.22rem;
+}
+
+.colour-order-action-glyph--reflection {
+  width: 1.55rem;
+  height: 1.05rem;
+}
+
+.colour-order-action-description {
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.crystal-viewer-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: #edf0ee;
+}
+
+.crystal-viewer-preview {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.crystal-viewer-prompt {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  padding: 2.8rem 1rem 1rem;
+  background: linear-gradient(transparent, rgb(16 24 21 / 0.82));
+  color: #fff;
+  text-align: center;
+}
+
+.crystal-viewer-prompt[hidden] {
+  display: none;
+}
+
+.crystal-viewer-load,
+.crystal-viewer-close {
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: var(--background);
+  color: var(--accent);
+  font: 650 0.76rem/1.15 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.crystal-viewer-load {
+  padding: 0.62rem 0.82rem;
+}
+
+.crystal-viewer-load:hover,
+.crystal-viewer-load:focus-visible,
+.crystal-viewer-close:hover,
+.crystal-viewer-close:focus-visible {
+  background: var(--accent);
+  color: #fff;
+}
+
+.crystal-viewer-prompt small {
+  max-width: 28rem;
+  font-size: 0.66rem;
+  line-height: 1.35;
+}
+
+.crystal-viewer-frame,
+.crystal-viewer-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.crystal-viewer-frame {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.crystal-viewer-stage[data-state="loading"] .crystal-viewer-frame,
+.crystal-viewer-stage[data-state="ready"] .crystal-viewer-frame {
+  pointer-events: auto;
+}
+
+.crystal-viewer-iframe {
+  border: 0;
+  background: #fff;
+}
+
+.crystal-viewer-close {
+  position: absolute;
+  z-index: 5;
+  inset: 0.6rem 0.6rem auto auto;
+  padding: 0.48rem 0.62rem;
+  box-shadow: 0 1px 6px rgb(16 24 21 / 0.24);
+}
+
+.crystal-viewer-close[hidden] {
+  display: none;
+}
+
+.crystal-viewer figcaption {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.78rem 0.9rem 0.88rem;
+  border-top: 1px solid var(--line);
+  background: var(--background);
+  color: var(--muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.crystal-viewer-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.crystal-viewer-title > span {
+  color: var(--muted);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  white-space: nowrap;
+}
+
+.crystal-viewer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 0.28rem;
+}
+
+.crystal-viewer-exception,
+.crystal-viewer-source-note {
+  margin: 0.1rem 0 0;
+  padding: 0.48rem 0.56rem;
+  border-left: 3px solid #a56f00;
+  background: #fff5d9;
+  color: #5f4816;
+  font-size: 0.68rem;
+}
+
+.entry-copy {
+  min-width: 0;
+  color: #37413d;
+}
+
+.other-names {
+  margin: 0;
+}
+
+.other-names h4 {
+  margin: 0 0 0.22rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.other-names ul {
+  margin: 0;
+  padding: 0;
+  border-block: 1px solid var(--line);
+  list-style: none;
+}
+
+.other-names li {
+  display: grid;
+  grid-template-columns: minmax(9.5rem, 0.82fr) minmax(0, 1.18fr);
+  gap: 0.65rem;
+  padding: 0.42rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.76rem;
+}
+
+.other-names li:last-child {
+  border-bottom: 0;
+}
+
+.term-help {
+  position: relative;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 550;
+}
+
+.term-help-label {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  padding-right: 0.72rem;
+  border-bottom: 1px dotted currentColor;
+  cursor: help;
+}
+
+.term-help-label::after {
+  position: absolute;
+  right: 0.12rem;
+  bottom: 0;
+  content: "?";
+  color: var(--accent);
+  font-size: 0.82em;
+  font-weight: 750;
+}
+
+.term-help-copy {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  display: none;
+  width: min(22rem, calc(100vw - 3rem));
+  padding: 0.62rem 0.7rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--surface-raised, #fff);
+  box-shadow: 0 0.55rem 1.35rem rgb(26 39 34 / 0.16);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 450;
+  line-height: 1.42;
+  pointer-events: none;
+}
+
+.term-help:hover .term-help-copy,
+.term-help:focus-within .term-help-copy {
+  display: block;
+}
+
+.term-help-copy strong,
+.term-help-copy > span {
+  display: block;
+}
+
+.term-help-copy strong {
+  margin-bottom: 0.18rem;
+  font-size: 0.68rem;
+}
+
+.other-names a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 620;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.16em;
+}
+
+.extra-links {
+  margin-top: 0.9rem;
+}
+
+.extra-links > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  padding: 0.42rem 0.58rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #faf8f1;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+
+.extra-links > summary::-webkit-details-marker {
+  display: none;
+}
+
+.extra-links > summary::after {
+  content: "+";
+  flex: 0 0 auto;
+  margin-left: 0.75rem;
+  color: var(--accent);
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.extra-links[open] > summary {
+  margin-bottom: 0.42rem;
+}
+
+.extra-links[open] > summary::after {
+  content: "−";
+}
+
+.extra-links > summary:hover,
+.extra-links > summary:focus-visible {
+  border-color: var(--accent);
+  background: #fffdf7;
+}
+
+.extra-links-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: 0.34rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.extra-links-list li {
+  min-width: 0;
+}
+
+.extra-link {
+  display: grid;
+  align-content: start;
+  min-height: 4.25rem;
+  gap: 0.12rem;
+  padding: 0.48rem 0.52rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #faf8f1;
+  color: inherit;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.extra-link:hover,
+.extra-link:focus-visible {
+  border-color: var(--accent);
+  background: #fffdf7;
+}
+
+.extra-link-catalog {
+  color: var(--text);
+  font-size: 0.7rem;
+  font-weight: 690;
+}
+
+.extra-link-target {
+  overflow-wrap: anywhere;
+  color: #37413d;
+  font-size: 0.65rem;
+}
+
+.extra-link-scope {
+  align-self: end;
+  color: var(--muted);
+  font-size: 0.54rem;
+  font-weight: 680;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.book-audit-value {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.22rem 0.62rem;
+}
+
+.book-audit-limit {
+  width: fit-content;
+  padding: 0.08rem 0.3rem;
+  border-radius: 999px;
+  background: #eef3f0;
+  color: #59665f;
+  font-size: 0.68rem;
+  font-weight: 620;
+}
+
+.fibrifold-name {
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif;
+  font-size: 0.96rem;
+  font-weight: 650;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+.hermann-mauguin-name,
+.international-tables-number,
+.schoenflies-name,
+.hall-symbol-name {
+  color: var(--text);
+  font-weight: 620;
+}
+
+.schoenflies-name {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif;
+  font-size: 0.98rem;
+}
+
+.hall-symbol-name {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.82rem;
+}
+
+.other-name-list {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.5rem;
+}
+
+.identified-name {
+  position: static;
+  display: inline-flex;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.identified-name + .identified-name::before {
+  margin-right: 0.5rem;
+  content: "·";
+  color: var(--muted);
+}
+
+.identified-name .term-help-label {
+  padding-right: 0;
+}
+
+.identified-name .term-help-label::after {
+  content: none;
+}
+
+.identified-name .term-help-copy {
+  right: 0;
+  left: auto;
+  width: min(19rem, calc(100vw - 3rem));
+  white-space: normal;
+}
+
+.book-page-link {
+  font-weight: 620;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.16em;
+}
+
+.short-signature-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.short-signature-link:hover,
+.short-signature-link:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 0.05em;
+  text-underline-offset: 0.14em;
+}
+
+.signature-evidence-note {
+  width: fit-content;
+  margin: 0.2rem 0 0;
+  padding: 0.15rem 0.38rem;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.signature-evidence-note--derived {
+  background: #eef3f0;
+  color: #53615b;
+}
+
+.signature-evidence-note--discrepancy {
+  border: 1px solid #d6a75d;
+  background: #fff8e8;
+  color: #6c4a15;
+}
+
+.other-name-category {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 550;
+}
+
+.short-form-support {
+  display: inline-flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.18rem 0.42rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
+.short-form-support-label {
+  font-weight: 620;
+}
+
+.short-form-support-links {
+  min-width: 0;
+}
+
+.short-form-support-link--conflict {
+  color: #8a4a1d;
+}
+
+a[data-book-excerpt] {
+  display: inline-block;
+  cursor: zoom-in;
+}
+
+a[data-book-excerpt]::after {
+  content: "  ◫";
+  color: var(--accent);
+  font-size: 0.86em;
+}
+
+a.short-signature-link[data-book-excerpt]::after {
+  content: none;
+}
+
+.group-presentation {
+  margin: 0 0 1.25rem;
+}
+
+.presentation-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin: 0 0 0.28rem;
+}
+
+.group-presentation h4 {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.colour-order--presentation {
+  justify-content: flex-end;
+  font-size: 0.66rem;
+}
+
+.colour-order--presentation .colour-order-swatch {
+  width: 0.62rem;
+  height: 0.62rem;
+}
+
+.group-presentation table {
+  width: 100%;
+  border-collapse: collapse;
+  border-block: 1px solid var(--line);
+  font-size: 0.76rem;
+}
+
+.group-presentation th,
+.group-presentation td {
+  padding: 0.32rem 0.42rem;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.group-presentation thead th {
+  padding-block: 0.25rem;
+  color: var(--muted);
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.group-presentation tbody th {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.presentation-colour-action {
+  width: 6rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.clock-power {
+  display: inline-block;
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.clock-power var {
+  font-style: italic;
+}
+
+.clock-power sub,
+.clock-power sup {
+  font-size: 0.62em;
+  line-height: 0;
+}
+
+.clock-power sub {
+  margin-left: 0.04em;
+}
+
+.presentation-time-action {
+  width: 6.2rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.presentation-generator-identity {
+  display: grid;
+  grid-template-columns: 1.3rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.generator-symbol-core {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+.generator-symbol-body .generator-symbol-arms {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: butt;
+  stroke-linejoin: miter;
+  vector-effect: non-scaling-stroke;
+}
+
+.plate-generator-glyph-halo .generator-symbol-core,
+.plate-generator-glyph-halo .generator-symbol-arms {
+  stroke-width: 6px;
+}
+
+
+.generator-key {
+  color: var(--generator-ink);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.generator-geometry {
+  min-width: 0;
+  color: var(--text);
+}
+
+.turn-direction {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted var(--muted);
+  text-underline-offset: 0.16em;
+}
+
+.turn-direction-tooltip {
+  position: absolute;
+  z-index: 12;
+  bottom: calc(100% + 0.35rem);
+  left: -0.4rem;
+  display: none;
+  width: max-content;
+  max-width: min(18rem, calc(100vw - 2rem));
+  padding: 0.42rem 0.52rem;
+  border: 1px solid #59635f;
+  border-radius: 4px;
+  background: #17201d;
+  box-shadow: 0 5px 16px rgb(15 21 19 / 0.2);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.turn-direction:hover .turn-direction-tooltip,
+.turn-direction:focus .turn-direction-tooltip {
+  display: block;
+}
+
+.group-presentation tbody tr:last-child th,
+.group-presentation tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.presentation-relations {
+  display: flex;
+  gap: 0.6rem;
+  margin: 0.5rem 0 0;
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.presentation-relations strong {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.025em;
+}
+
+.presentation-relations span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.presentation-source-note {
+  margin: 0.4rem 0 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.presentation-source-audit {
+  margin-top: 0.42rem;
+  color: var(--muted);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.presentation-source-audit summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 650;
+}
+
+.presentation-source-audit ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem 0.75rem;
+  margin: 0.38rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.presentation-source-audit li {
+  display: inline-flex;
+  gap: 0.28rem;
+  align-items: baseline;
+}
+
+.presentation-source-audit li span {
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-weight: 700;
+}
+
+.presentation-source-audit code {
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, "STIX Two Math", "Cambria Math", sans-serif;
+}
+
+.presentation-source-audit p {
+  margin: 0.3rem 0 0;
+}
+
+.provenance {
+  max-width: 880px;
+}
+
+.provenance p {
+  max-width: 800px;
+  color: #37413d;
+}
+
+.provenance code {
+  overflow-wrap: anywhere;
+}
+
+.correspondence-page footer {
+  padding-top: 2rem;
+  border-top: 1px solid var(--line);
+}
+
+.book-excerpt-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  width: min(90rem, calc(100vw - 1rem));
+  max-width: none;
+  max-height: 94dvh;
+  margin: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #706d65;
+  border-radius: 6px;
+  background: #faf8f2;
+  color: var(--text);
+  box-shadow: 0 22px 70px rgb(20 24 22 / 0.34);
+}
+
+.book-excerpt-dialog:not([open]) {
+  display: none;
+}
+
+.book-excerpt-dialog.is-fallback-open {
+  display: block;
+  box-shadow:
+    0 0 0 100vmax rgb(19 25 23 / 0.76),
+    0 22px 70px rgb(20 24 22 / 0.34);
+}
+
+.book-dialog-open {
+  overflow: hidden;
+}
+
+.book-excerpt-dialog::backdrop {
+  background: rgb(19 25 23 / 0.76);
+  backdrop-filter: blur(2px);
+}
+
+.book-excerpt-panel {
+  display: flex;
+  max-height: 94dvh;
+  margin: 0;
+  flex-direction: column;
+}
+
+.book-excerpt-header {
+  position: relative;
+  padding: 1.25rem 4.5rem 1rem 1.35rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--background);
+}
+
+.book-excerpt-header .overline {
+  margin: 0 0 0.28rem;
+}
+
+.book-excerpt-header h2 {
+  margin: 0;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  line-height: 1.15;
+}
+
+.book-excerpt-header p:last-child {
+  max-width: 48rem;
+  margin: 0.45rem 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.book-excerpt-close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.9rem;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid var(--control-line);
+  border-radius: 50%;
+  background: var(--surface-raised);
+  color: var(--text);
+  font: 400 1.65rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.book-excerpt-close:hover,
+.book-excerpt-close:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.book-excerpt-media {
+  position: relative;
+  display: grid;
+  min-height: 8rem;
+  min-width: 0;
+  max-height: min(70dvh, 60rem);
+  flex: 0 1 auto;
+  overflow: auto;
+  place-items: center;
+  background: #e8e4da;
+}
+
+.book-excerpt-media img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(70dvh, 60rem);
+  height: auto;
+  margin: auto;
+  object-fit: contain;
+}
+
+.book-excerpt-media[data-zoom="actual"] {
+  place-items: start;
+}
+
+.book-excerpt-media[data-zoom="actual"] img {
+  max-width: none;
+  max-height: none;
+  margin: 0;
+}
+
+.book-excerpt-media:not([data-state="ready"]) img {
+  opacity: 0;
+}
+
+.book-excerpt-status {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  margin: 0;
+  padding: 1.5rem;
+  place-items: center;
+  color: #454c48;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+.book-excerpt-status[hidden] {
+  display: none;
+}
+
+.book-excerpt-media[data-state="error"] .book-excerpt-status {
+  color: #8b3626;
+}
+
+.book-excerpt-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.85rem 1.35rem 1rem;
+  border-top: 1px solid var(--line);
+  background: var(--background);
+}
+
+.book-excerpt-footer p {
+  max-width: 43rem;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.book-excerpt-source {
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.book-excerpt-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.book-excerpt-zoom {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--control-line);
+  border-radius: 3px;
+  background: var(--surface-raised);
+  color: var(--text);
+  font: 650 0.75rem/1 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  cursor: pointer;
+}
+
+.book-excerpt-zoom:hover,
+.book-excerpt-zoom:focus-visible,
+.book-excerpt-zoom[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .entry-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-copy {
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 700px) {
+  .diagram-symbol-teaser {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .diagram-symbol-dialog {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .diagram-symbol-dialog-panel {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .diagram-symbol-explanation {
+    display: block;
+  }
+
+  .diagram-symbol-explanation > span:last-child {
+    display: block;
+    margin-top: 0.12rem;
+  }
+
+  .book-excerpt-dialog {
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .book-excerpt-panel {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .book-excerpt-media {
+    max-height: none;
+    flex: 1 1 auto;
+  }
+
+  .book-excerpt-footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .book-excerpt-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 620px) {
+  .colour-plate figcaption {
+    padding-inline: 0.5rem;
+  }
+
+  .colour-order--plate {
+    gap: 0.16rem;
+    font-size: 0.6rem;
+  }
+
+  .colour-order--plate .colour-order-palette {
+    gap: 0.14rem;
+  }
+
+  .colour-order--plate .colour-order-swatch {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+
+  .colour-order--plate .colour-order-action {
+    gap: 0.1rem;
+  }
+
+  .colour-order--plate .colour-order-action-glyph--rotation {
+    width: 1.05rem;
+    height: 1.05rem;
+  }
+
+  .colour-order--plate .colour-order-action-glyph--reflection {
+    width: 1.35rem;
+    height: 0.92rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .directory h1 {
+    overflow-wrap: anywhere;
+    font-size: clamp(2rem, 11.5vw, 2.35rem);
+  }
+
+  .directory-family {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .directory-family h2 > span {
+    display: inline;
+    margin-left: 0.38rem;
+  }
+
+  .directory-groups {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .other-names li {
+    grid-template-columns: 1fr;
+    gap: 0.14rem;
+  }
+
+  .identified-name .term-help-copy {
+    right: auto;
+    left: 0;
+  }
+
+  .extra-links-list {
+    grid-template-columns: 1fr;
+  }
+
+  .extra-links > summary {
+    width: 100%;
+    min-height: 2.9rem;
+    padding-inline: 0.68rem;
+  }
+
+  .group-presentation th,
+  .group-presentation td {
+    padding-inline: 0.28rem;
+  }
+
+  .presentation-colour-action {
+    width: 4.9rem;
+  }
+
+  .presentation-time-action {
+    width: 5.6rem;
+  }
+
+  .presentation-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.32rem;
+  }
+
+  .colour-order--presentation {
+    justify-content: flex-start;
+  }
+
+  .colour-order--plate {
+    gap: 0.16rem;
+    font-size: 0.6rem;
+  }
+
+  .colour-order--plate .colour-order-palette {
+    gap: 0.14rem;
+  }
+
+  .presentation-generator-identity {
+    grid-template-columns: 1.1rem minmax(0, 1fr);
+    gap: 0.22rem;
+  }
+
+  .crystal-viewer-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.08rem;
+  }
+
+  .crystal-viewer-prompt {
+    gap: 0.22rem;
+    padding: 1.2rem 0.55rem 0.48rem;
+  }
+
+  .crystal-viewer-prompt small {
+    max-width: 19rem;
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+
+}
+
+@media (max-width: 410px) {
+  .colour-order--plate {
+    flex-wrap: wrap;
+    row-gap: 0.28rem;
+  }
+}
+
+@media print {
+  .site-header,
+  .directory,
+  .clockwork-film,
+  .crystal-viewer-prompt,
+  .crystal-viewer-frame,
+  .crystal-viewer-close,
+  .book-excerpt-dialog,
+  .diagram-symbol-dialog,
+  footer {
+    display: none;
+  }
+
+  .correspondence-entry {
+    break-before: page;
+  }
+
+  .term-help-copy,
+  .term-help-label::after {
+    display: none !important;
+  }
+}
