@@ -17,8 +17,12 @@ import {
 
 "use strict";
 
+// Port note: this module sits in js/ here, one level below the page, while in
+// animated-groups it sits beside data/ at the site root. import.meta.url is the
+// module's own URL, so the path needs the extra hop or every film falls back to
+// "Film unavailable; use the static plate."
 const DATA_URL = new URL(
-  "data/clockwork-coloring-correspondence.json?v=reflection-centering-v1",
+  "../data/clockwork-coloring-correspondence.json?v=reflection-centering-v1",
   import.meta.url,
 );
 const BOOK_EXCERPT_TARGET = "clockwork-book-excerpt";
