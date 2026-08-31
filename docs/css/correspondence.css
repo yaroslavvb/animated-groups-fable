@@ -2135,3 +2135,20 @@ a.short-signature-link[data-book-excerpt]::after {
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+
+/* The legend documents every symbol on the plate, not only the one that steps
+   the palette: those that advance the colour order first, then, behind a small
+   label, those that leave it fixed. The colour-fixed run is muted so the strip
+   still reads colour-first at a glance. */
+.colour-order-fixed-label {
+  margin-left: 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  white-space: nowrap;
+}
+.colour-order-fixed-label::after { content: ":"; }
+.colour-order-action--fixed { opacity: 0.72; }
+.colour-order-action-glyph--translation { color: var(--generator-ink); }
