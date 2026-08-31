@@ -27,7 +27,7 @@ body.tcp {
 main.tcp-page {
   width: min(100% - 2rem, 1060px);
   margin: 0 auto;
-  padding: clamp(1.8rem, 3.5vw, 3.6rem) 0 8rem;
+  padding: clamp(1.8rem, 3.5vw, 3.6rem) 1.2rem 8rem;
 }
 
 /* ---------------------------------------------------------- directory */

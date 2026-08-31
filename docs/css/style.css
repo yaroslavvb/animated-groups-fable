@@ -189,7 +189,12 @@ table.counts td:first-child { text-align: left; }
 .gcard .meta:hover .sym { color: var(--accent); }
 
 .gcard .meta .sym { font-size: 1.12rem; }
-.gcard .meta .hm { color: var(--muted); margin-left: 0.5em; }
+.gcard .meta .hm {
+  color: var(--muted);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .gcard .meta .tags { margin-top: 0.25rem; display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
 .tag {

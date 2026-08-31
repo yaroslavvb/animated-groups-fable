@@ -35,11 +35,23 @@ const plain = h => String(h || "").replace(/<[^>]*>/g, "");
  * earlier tail entry, is dropped: for a group with a trivial clock the
  * signature, the orbifold and the symbol are all the same string, and
  * printing it three times says nothing three times. */
+/* g.hm arrives as LaTeX source -- "(R_{2π/2}|T_t^{1/2})" -- and was being
+ * printed verbatim on 143 of the 275 catalogue cards. Render the subscripts and
+ * superscripts as markup. The [A-Za-z0-9] class on the bare forms is
+ * load-bearing: a looser pattern eats the tags the braced replaces just
+ * inserted. */
+export const hmHtml = h => String(h || "")
+  .replace(/_\{([^}]*)\}/g, "<sub>$1</sub>")
+  .replace(/\^\{([^}]*)\}/g, "<sup>$1</sup>")
+  .replace(/_([A-Za-z0-9])/g, "<sub>$1</sub>")
+  .replace(/\^([A-Za-z0-9])/g, "<sup>$1</sup>")
+  .replace(/\|/g, "&thinsp;|&thinsp;");
+
 export function nameOf(g) {
   const s = SIGS.get(g.id);
   const lead = s ? s.signatureHtml : g.symbolHtml;
   const tail = [];
-  for (const cand of [s ? s.tos : "", s ? g.symbolHtml : "", g.hm || ""]) {
+  for (const cand of [s ? s.tos : "", s ? g.symbolHtml : "", hmHtml(g.hm)]) {
     const t = plain(cand);
     if (!t) continue;
     if (t === plain(lead) || tail.some(x => plain(x) === t)) continue;

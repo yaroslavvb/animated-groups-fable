@@ -9,7 +9,7 @@ body {
    so the header and atlas reflow instead of disappearing beyond the right
    edge.  Left alignment keeps the page anchored when the visible viewport is
    only a slice of the layout viewport. */
-:root[data-visual-viewport-constrained] .header-inner,
+:root[data-visual-viewport-constrained] header.site .inner,
 :root[data-visual-viewport-constrained] .correspondence-page {
   width: min(
     calc(var(--clockwork-visual-viewport-width) - 1.25rem),
@@ -856,7 +856,8 @@ nav a[aria-current="page"] {
 }
 
 .colour-order--plate {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  row-gap: 0.28rem;
   font-size: 0.68rem;
   letter-spacing: 0;
   text-transform: none;
