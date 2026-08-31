@@ -25,6 +25,8 @@ body {
 
 .correspondence-page {
   --generator-ink: #74213f;
+  /* the ground colour of the rendered plate images, sampled from them */
+  --plate-surface: #f7f4ec;
   max-width: 1080px;
   padding-bottom: 4rem;
 }
@@ -747,12 +749,12 @@ nav a[aria-current="page"] {
 .plate-generator-quarter-arrow-halo,
 .plate-generator-glyph-halo {
   fill: none;
-  stroke: rgba(255, 253, 247, 0.94);
+  stroke: var(--plate-surface);
   stroke-width: 6px;
 }
 
 .plate-generator-glyph-halo {
-  color: rgba(255, 253, 247, 0.94);
+  color: var(--plate-surface);
 }
 
 .plate-generator-axis,
@@ -794,7 +796,7 @@ nav a[aria-current="page"] {
 
 .plate-generator-label {
   fill: currentColor;
-  stroke: rgba(255, 253, 247, 0.98);
+  stroke: var(--plate-surface);
   stroke-width: 4px;
   paint-order: stroke fill;
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -907,6 +909,15 @@ nav a[aria-current="page"] {
 .colour-order-action-glyph--reflection {
   width: 1.55rem;
   height: 1.05rem;
+}
+
+/* A glide glyph carries two rows -- the axis and, below it, the half arrow for
+   the direction -- so it needs more room than a plain mirror rule. */
+.colour-order-action-glyph--reflection[data-plane-symbol="n"],
+.colour-order-action-glyph--reflection[data-plane-symbol="d"],
+.colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
+  width: 2rem;
+  height: 1.4rem;
 }
 
 .colour-order-action-description {
@@ -1982,6 +1993,13 @@ a.short-signature-link[data-book-excerpt]::after {
     height: 1.05rem;
   }
 
+  .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="n"],
+  .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="d"],
+  .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
+    width: 1.75rem;
+    height: 1.25rem;
+  }
+
   .colour-order--plate .colour-order-action-glyph--reflection {
     width: 1.35rem;
     height: 0.92rem;
@@ -2124,13 +2142,13 @@ a.short-signature-link[data-book-excerpt]::after {
 .diagram-symbol-glide-arrow {
   fill: none;
   stroke: currentColor;
-  stroke-width: 2.35px;
+  stroke-width: 2.1px;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 .plate-generator-glide-arrow-halo {
   fill: none;
-  stroke: var(--background, #fffdf7);
+  stroke: var(--plate-surface);
   stroke-width: 5.2px;
   stroke-linecap: round;
   stroke-linejoin: round;

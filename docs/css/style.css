@@ -788,3 +788,20 @@ header.site nav { min-width: 0; }
 .plate-symbol-key .k-lbl { font-size: 14px; fill: var(--ink); }
 .plate-symbol-key .k-sub { font-size: 12px; fill: var(--muted); }
 .plate-symbol-key figcaption { color: var(--muted); font-size: 0.9rem; margin-top: 0.4rem; }
+
+/* Skip link: hidden until keyboard-focused. Pages ported from the sibling repo
+   carry one, and without this rule it renders as stray text at the top left. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  padding: 0.5rem 0.9rem;
+  background: var(--panel);
+  color: var(--accent);
+  border: 1px solid var(--rule);
+  border-radius: 0 0 6px 0;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 0;
+}
