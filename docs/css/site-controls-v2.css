@@ -481,3 +481,32 @@ footer p { margin-bottom: 0.45rem; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+/* Grouped header: each area of the site is one labelled cluster, so the bar
+   reads as four short lists rather than fourteen equal links. */
+.navgroup {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.navgroup-label {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+.navgroup-label::after { content: ":"; }
+.navgroup-superseded a { opacity: 0.62; }
+
+/* This header right-aligns its nav, so let each area own a full row instead of
+   letting four groups pack onto two lines and read as one run of links. */
+.site-header nav .navgroup {
+  flex: 0 0 100%;
+  justify-content: flex-end;
+}
+@media (max-width: 900px) {
+  .site-header nav .navgroup { justify-content: flex-start; }
+}

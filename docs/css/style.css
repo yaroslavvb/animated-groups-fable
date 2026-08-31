@@ -743,3 +743,33 @@ h2 > a.anchor:focus-visible, h3 > a.anchor:focus-visible {
   background: rgba(250,249,246,0.85); padding: 0.1rem 0.25rem; border-radius: 3px;
 }
 .dside { margin: 0.45rem 0 0; font-size: 0.76rem; line-height: 1.45; color: var(--muted); }
+
+/* Grouped header: each area of the site is one labelled cluster, so the bar
+   reads as four short lists rather than fourteen equal links. */
+.navgroup {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+/* Measured at a real 390px viewport: the header does not overflow, grouped or
+   flat. min-width:0 is defensive only. The stacking is a presentation choice —
+   on a phone the four areas read better as four labelled blocks than as one
+   reflowed run of links. */
+header.site nav { min-width: 0; }
+@media (max-width: 700px) {
+  header.site .inner { flex-direction: column; align-items: stretch; gap: 0.5rem; }
+  header.site nav { flex-direction: column; align-items: flex-start; gap: 0.55rem; width: 100%; }
+  .navgroup { flex: 0 0 auto; width: 100%; }
+}
+.navgroup-label {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  white-space: nowrap;
+}
+.navgroup-label::after { content: ":"; }
+.navgroup-superseded a { opacity: 0.62; }
