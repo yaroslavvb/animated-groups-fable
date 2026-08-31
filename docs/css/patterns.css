@@ -5,31 +5,28 @@
 
 :root {
   color-scheme: light;
-  --pattern-ink: #171b19;
-  --pattern-muted: #5d6864;
-  --pattern-rule: #d4ded9;
-  --pattern-soft: #f5f8f6;
-  --pattern-accent: #00766b;
+  /* Chrome tokens defer to style.css so these pages carry the same ink, rules
+     and accent as catalog.html and gallery.html. Only the data colours below
+     -- motif blue and orange, generator wine, seat -- are page-specific. */
+  --pattern-ink: var(--ink);
+  --pattern-muted: var(--muted);
+  --pattern-rule: var(--rule);
+  --pattern-soft: var(--code-bg);
+  --pattern-accent: var(--accent);
   --pattern-blue: #0072b2;
   --pattern-orange: #e69f00;
   --pattern-wine: #7d2140;
   --pattern-seat: #c8452c;
 }
 
+/* Background, type scale and link colour all come from style.css now, so
+   clicking in from catalog.html does not change the page under you. */
 body.tcp {
-  background: #fff;
   color: var(--pattern-ink);
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.55;
 }
-body.tcp header.site { background: #fff; }
-body.tcp a { color: inherit; text-decoration-color: #b8c8c2; text-underline-offset: 0.2em; }
-body.tcp a:hover { text-decoration-color: var(--pattern-accent); color: var(--pattern-accent); }
 
 main.tcp-page {
-  width: min(100% - 2rem, 1560px);
-  max-width: none;
+  width: min(100% - 2rem, 1060px);
   margin: 0 auto;
   padding: clamp(1.8rem, 3.5vw, 3.6rem) 0 8rem;
 }
@@ -38,10 +35,6 @@ main.tcp-page {
 .tcp-head h1 {
   max-width: 1050px;
   margin: 0;
-  font-size: clamp(2.75rem, 6vw, 5.4rem);
-  font-weight: 670;
-  letter-spacing: -0.075em;
-  line-height: 0.92;
   border: 0;
 }
 .catalog-subtitle {
@@ -258,7 +251,7 @@ table.census th.txt { text-align: left; }
 
 @media (max-width: 1050px) { .pane-body { grid-template-columns: 1fr; } }
 @media (max-width: 760px) {
-  main.tcp-page { width: min(100% - 1rem, 1560px); }
+  main.tcp-page { width: min(100% - 1rem, 1060px); }
   .directory-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .family-header { grid-template-columns: 1fr; gap: 0.75rem; }
   .colour-group-tab { flex: 1 1 8rem; max-width: 100%; min-width: 0; }
@@ -268,9 +261,7 @@ table.census th.txt { text-align: left; }
 @media (max-width: 420px) {
   .directory-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-body.tcp header.site .title { color: var(--pattern-ink); }
 body.tcp header.site nav a { color: var(--pattern-muted); }
-body.tcp header.site nav a.here, body.tcp header.site nav a:hover { color: var(--pattern-accent); }
 body.tcp footer.site { color: var(--pattern-muted); }
 
 /* Line style is the geometry — solid mirror, dashed glide, as in International
