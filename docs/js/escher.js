@@ -65,9 +65,9 @@
     const P = (pts) => pts.map(p => p.map(v => (v * r / 13).toFixed(2)).join(",")).join(" ");
     switch (stype) {
       case "c1": {
-        g.append(svg("polygon", {points: P([[0, -13], [13, 0], [0, 13], [-13, 0]]), class: "motif-fill"}));
-        const t = svg("text", {x: 0, y: 0.75 * r / 13, class: "motif-letter",
-          "font-size": (13 * r / 13).toFixed(1), "text-anchor": "middle", "dominant-baseline": "middle"});
+        g.append(svg("polygon", {points: P([[0, -13], [8, -2], [0, 11], [-8, -2]]), class: "motif-fill"}));
+        const t = svg("text", {x: 0, y: -2 * r / 13, class: "motif-letter",
+          "font-size": (11 * r / 13).toFixed(1), "text-anchor": "middle", "dominant-baseline": "middle"});
         t.textContent = "R";
         g.append(t);
         break;
