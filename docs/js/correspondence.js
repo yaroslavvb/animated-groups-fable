@@ -699,87 +699,44 @@ function initializeBookExcerptDialog() {
   dialog.addEventListener("close", resetExcerpt);
 }
 
-function initializeDiagramSymbolDialog() {
-  const dialog = document.querySelector("#diagram-symbol-dialog");
+function initializeDiagramSymbolIndex() {
+  const index = document.querySelector("#diagram-symbol-index");
   const openButton = document.querySelector("[data-diagram-symbol-open]");
-  if (!dialog || !openButton) return;
+  const teaser = openButton?.closest(".diagram-symbol-teaser");
+  if (!index || !openButton || !teaser) return;
 
-  const closeButton = dialog.querySelector("[data-diagram-symbol-close]");
-  const supportsNativeDialog = typeof dialog.showModal === "function";
-  let opener = null;
+  const closeButton = index.querySelector("[data-diagram-symbol-close]");
 
-  dialog.dataset.mode = supportsNativeDialog ? "native" : "fallback";
+  // Keep the expanded key directly below its introduction. In the source it
+  // lives after the generated directory so that regenerating the 68 links does
+  // not need to duplicate or splice the long symbol list.
+  teaser.after(index);
 
-  function restorePage() {
-    document.documentElement.classList.remove("diagram-symbol-dialog-open");
-    if (opener && opener.isConnected) opener.focus();
-    opener = null;
+  function setExpanded(expanded, { restoreFocus = false } = {}) {
+    index.hidden = !expanded;
+    openButton.setAttribute("aria-expanded", String(expanded));
+    openButton.textContent = expanded ? "Hide visual index" : "Show visual index";
+    if (!expanded && restoreFocus) openButton.focus();
   }
 
-  function closeIndex() {
-    if (!dialog.hasAttribute("open")) return;
-    if (supportsNativeDialog) {
-      dialog.close();
-      return;
-    }
-    dialog.removeAttribute("open");
-    dialog.classList.remove("is-fallback-open");
-    restorePage();
-  }
-
-  function openIndex() {
-    if (dialog.hasAttribute("open")) return;
-    opener = openButton;
-    if (supportsNativeDialog) {
-      dialog.showModal();
-    } else {
-      dialog.setAttribute("open", "");
-      dialog.classList.add("is-fallback-open");
-    }
-    document.documentElement.classList.add("diagram-symbol-dialog-open");
-    closeButton?.focus();
-  }
-
-  openButton.addEventListener("click", openIndex);
-  closeButton?.addEventListener("click", closeIndex);
-  dialog.addEventListener("click", (event) => {
-    if (event.target === dialog) closeIndex();
+  openButton.addEventListener("click", () => {
+    setExpanded(index.hidden);
   });
-  dialog.addEventListener("close", restorePage);
-
-  document.addEventListener("click", (event) => {
-    if (
-      !supportsNativeDialog
-      && dialog.hasAttribute("open")
-      && event.target !== openButton
-      && !dialog.contains(event.target)
-    ) {
-      event.preventDefault();
-      closeIndex();
-    }
-  }, true);
+  closeButton?.addEventListener("click", () => {
+    setExpanded(false, { restoreFocus: true });
+  });
 
   document.addEventListener("keydown", (event) => {
-    if (supportsNativeDialog || !dialog.hasAttribute("open")) return;
-    if (event.key === "Escape") {
-      event.preventDefault();
-      closeIndex();
-      return;
-    }
-    if (event.key !== "Tab") return;
-    const focusable = [
-      ...dialog.querySelectorAll('button, a[href]'),
-    ].filter((element) => !element.hidden);
-    if (focusable.length === 0) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
-    }
+    if (
+      event.key !== "Escape"
+      || index.hidden
+      || (
+        document.activeElement !== openButton
+        && !index.contains(document.activeElement)
+      )
+    ) return;
+    event.preventDefault();
+    setExpanded(false, { restoreFocus: true });
   });
 }
 
@@ -892,6 +849,6 @@ async function initialize() {
 }
 
 initializeClockworkTabs();
-initializeDiagramSymbolDialog();
+initializeDiagramSymbolIndex();
 initializeBookExcerptLinks();
 void initialize();
