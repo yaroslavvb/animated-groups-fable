@@ -776,6 +776,98 @@ function initializeBookExcerptLinks() {
   }
 }
 
+const CHAIM_CONWAY_NAME_SYSTEM = "Chaim/Conway G/H/K notation";
+
+function createOrbifoldNotation(symbol) {
+  const node = document.createElement("span");
+  node.textContent = String(symbol).replace(/\*/g, "∗");
+  return node;
+}
+
+function createExplicitGhkExpression(record) {
+  const expression = document.createElement("span");
+  expression.className = "chaim-ghk-name fibrifold-name book-color-signature";
+
+  const group = record.parent.orbifold;
+  // These 68 correspondences use a transitive cyclic action on exactly
+  // `clock_order` colours. The action is therefore regular, so the stabiliser
+  // H of one chosen colour is the same subgroup as the all-colour kernel K.
+  const singleColourStabiliser = record.kernel.orbifold;
+  const allColourStabiliser = record.kernel.orbifold;
+  expression.append(createOrbifoldNotation(group));
+  if (record.clock_order > 2) {
+    const exponent = document.createElement("sup");
+    exponent.textContent = String(record.clock_order);
+    expression.append(exponent);
+  }
+  expression.append(
+    document.createTextNode(" / "),
+    createOrbifoldNotation(singleColourStabiliser),
+    document.createTextNode(" / "),
+    createOrbifoldNotation(allColourStabiliser),
+  );
+  expression.setAttribute(
+    "aria-label",
+    `G ${group}${record.clock_order > 2 ? ` with colour-count superscript ${record.clock_order}` : ""}; H ${singleColourStabiliser}; K ${allColourStabiliser}`,
+  );
+  return expression;
+}
+
+function initializeChaimConwayNames(records) {
+  let present = 0;
+  for (const record of records) {
+    const list = document.getElementById(record.id)?.querySelector(".other-name-list");
+    if (!list || !record.parent?.orbifold || !record.kernel?.orbifold) continue;
+    if (list.querySelector(`[data-name-system="${CHAIM_CONWAY_NAME_SYSTEM}"]`)) {
+      present += 1;
+      continue;
+    }
+
+    const oneColour = record.clock_order === 1;
+    const explanation = [
+      "G is the full wallpaper group.",
+      "H is the single-colour stabiliser: the symmetries fixing one chosen colour.",
+      "K is the all-colour stabiliser: the symmetries fixing every colour.",
+      oneColour
+        ? "For this one-colour group, H = K = G."
+        : `For this regular cyclic ${record.clock_order}-colour action, H = K.`,
+      "All three terms stay visible: the name is not shortened to G/K, and G//K is not used here.",
+    ].join(" ");
+
+    const name = document.createElement("span");
+    name.className = "identified-name term-help";
+    name.dataset.nameSystem = CHAIM_CONWAY_NAME_SYSTEM;
+    name.tabIndex = 0;
+    name.title = `${CHAIM_CONWAY_NAME_SYSTEM}: ${explanation}`;
+    name.setAttribute(
+      "aria-label",
+      `${CHAIM_CONWAY_NAME_SYSTEM}: G ${record.parent.orbifold}${record.clock_order > 2 ? ` with colour-count superscript ${record.clock_order}` : ""}; H ${record.kernel.orbifold}; K ${record.kernel.orbifold}. ${explanation}`,
+    );
+
+    const label = document.createElement("span");
+    label.className = "term-help-label";
+    label.setAttribute("aria-hidden", "true");
+    label.append(createExplicitGhkExpression(record));
+
+    const help = document.createElement("span");
+    help.className = "term-help-copy";
+    help.setAttribute("aria-hidden", "true");
+    const heading = document.createElement("strong");
+    heading.textContent = CHAIM_CONWAY_NAME_SYSTEM;
+    const copy = document.createElement("span");
+    copy.textContent = explanation;
+    help.append(heading, copy);
+
+    name.append(label, help);
+    list.prepend(name);
+    present += 1;
+  }
+
+  if (present !== records.length) {
+    console.error(`Added ${present} of ${records.length} Chaim/Conway G/H/K names.`);
+  }
+}
+
 async function initialize() {
   const roots = [...document.querySelectorAll("[data-clockwork-player]")];
   if (roots.length === 0) return;
@@ -798,6 +890,7 @@ async function initialize() {
   }
 
   const records = new Map(payload.groups.map((record) => [record.id, record]));
+  initializeChaimConwayNames(payload.groups);
   const players = [];
   const playersById = new Map();
   for (const root of roots) {
