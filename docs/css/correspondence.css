@@ -913,8 +913,12 @@ nav a[aria-current="page"] {
   height: 1.05rem;
 }
 
-/* Glide glyphs still want a little more width than a plain mirror rule. */
-.colour-order-action-glyph--reflection[data-plane-symbol="n"],
+/* The dash-dot glide rule needs enough runway to remain legible at legend size. */
+.colour-order-action-glyph--reflection[data-plane-symbol="n"] {
+  width: 3rem;
+  height: 0.95rem;
+}
+
 .colour-order-action-glyph--reflection[data-plane-symbol="d"],
 .colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
   width: 1.85rem;
@@ -2021,7 +2025,11 @@ a.short-signature-link[data-book-excerpt]::after {
     height: 1.05rem;
   }
 
-  .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="n"],
+  .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="n"] {
+    width: 3rem;
+    height: 0.95rem;
+  }
+
   .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="d"],
   .colour-order--plate .colour-order-action-glyph--reflection[data-plane-symbol="axial"] {
     width: 1.6rem;
