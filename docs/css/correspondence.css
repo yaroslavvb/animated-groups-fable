@@ -405,9 +405,9 @@ nav a[aria-current="page"] {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-  background: var(--plate-surface);
+  background: #f8f7f1;
   border-bottom: 1px solid var(--line);
 }
 
@@ -525,11 +525,15 @@ nav a[aria-current="page"] {
   border-bottom: 0;
 }
 
-/* On a group page the notation note follows the entries: it is reference
-   material, and the index carries it in full. */
+/* On a group page the symbol key and the notation note follow the entries:
+   they are reference material, and the index carries them in full. */
 .family-notes {
   padding: clamp(1.5rem, 4vw, 2.5rem) 0 0;
   border-top: 1px solid var(--line);
+}
+
+.family-notes .diagram-symbol-teaser {
+  margin-bottom: 0.8rem;
 }
 
 .correspondence-atlas {

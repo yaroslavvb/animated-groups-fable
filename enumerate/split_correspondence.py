@@ -109,10 +109,6 @@ class Family:
             self.tabs.append((tab.group(1), signature.group(1), meta.group(1)))
         if len(self.tabs) != len(self.entries):
             raise ValueError("%s: %d tabs for %d entries" % (self.hm, len(self.tabs), len(self.entries)))
-        # The thumbnail is the one-colour plate: the plain wallpaper pattern.
-        plain = [gid for gid, order in self.entries if order == "1"] or [self.entries[0][0]]
-        entry = cut(section, '<section class="correspondence-entry" id="%s"' % plain[0], "section")
-        self.thumb = re.search(r'<img src="(output/clockwork-colorings/[^"]+)"', entry).group(1)
 
     @property
     def page(self):
@@ -190,15 +186,16 @@ def index_page(parts):
     for family in parts.families:
         label = "%s, %s: %s (%s)" % (
             family.orbifold_text, family.hm, family.count_text, family.space_groups_text)
+        # The same MathWorld wallpaper thumbnails as patterns.html.
         cards.append(
             '        <a class="family-card" href="%s" aria-label="%s">\n'
-            '          <img src="%s" width="720" height="420" loading="lazy" decoding="async" alt="">\n'
+            '          <img src="img/mathworld/%s.webp" width="320" height="240" loading="lazy" decoding="async" alt="">\n'
             '          <span class="family-card-caption"><strong class="family-card-orbifold">%s</strong>'
             '<span class="family-card-hm">%s</span></span>\n'
             '          <span class="family-card-count" aria-hidden="true" title="%s">%d</span>\n'
             '          <span class="family-card-groups" aria-hidden="true">%s</span>\n'
             '        </a>' % (
-                family.page, attr(label), family.thumb, family.orbifold_html, family.hm,
+                family.page, attr(label), family.hm, family.orbifold_html, family.hm,
                 attr(family.count_text), family.count, family.space_groups_html))
     total = sum(family.count for family in parts.families)
     head = parts.head.replace("</head>", redirect_script(parts) + "</head>", 1)
@@ -214,8 +211,8 @@ def index_page(parts):
         '    <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">\n'
         '      <h2 id="family-directory-title">The 17 wallpaper groups</h2>\n'
         '      <p class="family-directory-note">One page per wallpaper group, in the order of the '
-        '<em>International Tables</em>. Each card shows the group\'s own pattern; the badge counts the '
-        'forward clockwork groups over it, %d in all, and the small line names their polar space groups.</p>\n'
+        '<em>International Tables</em>. The badge counts the forward clockwork groups over the group, '
+        '%d in all, and the small line names their polar space groups.</p>\n'
         '      <nav class="family-grid" aria-label="Wallpaper groups">\n'
         '%s\n'
         '      </nav>\n'
@@ -252,6 +249,9 @@ def family_page(parts, index):
           '<span class="family-hm">%s</span> '
           '<span class="family-count">%s</span></h1>' % (
               family.orbifold_html, family.hm, family.count_text))
+    # The page opens on the entries.  The symbol key (with its visual index,
+    # which the script moves to follow the teaser) and the notation note are
+    # reference material and come after them.
     body = (
         '<main class="correspondence-page correspondence-family-page">\n'
         '    <section class="directory family-page-header" aria-labelledby="page-title">\n'
@@ -260,20 +260,19 @@ def family_page(parts, index):
         '      %s\n'
         '      <p class="family-summary">%s</p>\n'
         '%s\n'
-        '      %s\n'
-        '      %s\n'
         '    </section>\n\n'
-        '    %s\n\n'
         '    <div class="correspondence-atlas" id="correspondences">\n'
         '    <section class="wallpaper-family" id="wallpaper-%s" aria-labelledby="page-title" data-wallpaper-family>\n'
         '      %s\n'
         '    </section>\n'
         '    </div>\n\n'
-        '    <section class="family-notes" aria-label="Notation">\n'
+        '    <section class="family-notes" aria-label="Diagram symbols and notation">\n'
+        '      %s\n'
         '      %s\n'
         '    </section>\n\n'
-        '    %s' % (index + 1, h1, family.summary, "\n".join(pager), parts.note, parts.teaser,
-                    parts.dialog, family.hm, family.tabs_html, parts.notation, parts.tail))
+        '    %s\n\n'
+        '    %s' % (index + 1, h1, family.summary, "\n".join(pager), family.hm, family.tabs_html,
+                    parts.teaser, parts.notation, parts.dialog, parts.tail))
     return head + body
 
 
