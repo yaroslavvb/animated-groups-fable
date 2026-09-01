@@ -10,8 +10,8 @@ text"; this script cuts the snapshot into
     docs/correspondence.html            the index: introduction, symbol key,
                                         notation, and a visual table of
                                         contents with one card per wallpaper
-                                        group (thumbnail = that group's
-                                        one-colour plate)
+                                        group (the MathWorld thumbnails of
+                                        patterns.html)
     docs/correspondence-<hm>.html       one page per wallpaper group, in the
                                         order of the International Tables:
                                         p1, p2, pm, pg, cm, pmm, pmg, pgg,
@@ -30,6 +30,10 @@ derives from his manifests together with a "rendered" flag for the current
 snapshot of his catalog.  Entries he has not rendered yet get no line.  The
 source snapshot stays untouched; the rows are added while the pages are
 written.
+
+Every entry also shows its clockwork orbifold symbol (docs/data/catalog.json,
+the same symbol the catalogue prints) under its heading and in its tab; the
+snapshot printed it only where the book signature needed disambiguating.
 
 Order of operations after editing the source:
     python3 correspondence_symbols.py       redraw the symbols in the source
@@ -153,8 +157,61 @@ def add_vladimir_provenance(tail, meta):
     return tail.replace(anchor, anchor + addition, 1)
 
 
+CATALOG = DOCS / "data" / "catalog.json"
+
+
+def load_clockwork_symbols():
+    """The clockwork orbifold symbol of every catalogue group, as text and as
+    HTML: {id: (text, html)}.  Stars are shown as the page shows every
+    orbifold star, with the same glyph and class as the book signatures."""
+    star = '<span class="orbifold-star">∗</span>'
+    symbols = {}
+    for group in json.loads(CATALOG.read_text(encoding="utf-8"))["groups"]:
+        symbols[group["id"]] = (group["symbol"].replace("*", "∗"),
+                                group["symbolHtml"].replace("*", star))
+    return symbols
+
+
+def add_clockwork_symbols(fragment, gids, symbols):
+    """Give every entry its clockwork symbol, under the heading and in the tab.
+
+    The snapshot prints the symbol only where the book signature needs
+    disambiguating (3₁3₁3₁ against 3₂3₂3₂ and the like); the catalogue has one
+    for every group, so every entry now carries it, and the eight original
+    labels lose their "project-specific" wording."""
+    fragment = fragment.replace("Project-specific clockwork symbol", "Clockwork symbol")
+    fragment = fragment.replace("project-specific clockwork symbol", "clockwork symbol")
+    for gid in gids:
+        if gid not in symbols:
+            raise ValueError("%s is not in docs/data/catalog.json" % gid)
+        text, html = symbols[gid]
+        # The heading, after the signature (and any evidence note).
+        title = fragment.index('id="%s-title"' % gid)
+        header_end = fragment.index("</header>", title)
+        if "clockwork-disambiguator--heading" not in fragment[title:header_end]:
+            span = ('<span class="clockwork-disambiguator clockwork-disambiguator--heading" '
+                    'aria-label="Clockwork symbol %s">%s</span>\n          ' % (attr(text), html))
+            fragment = fragment[:header_end] + span + fragment[header_end:]
+        # The tab, between the signature and the Hermann-Mauguin name.
+        tab_start = fragment.index('<a class="clockwork-tab" id="tab-%s"' % gid)
+        tab_end = fragment.index("</a>", tab_start)
+        tab = fragment[tab_start:tab_end]
+        if "clockwork-disambiguator--tab" not in tab:
+            tab = re.sub(r'(aria-label="[^"]*colour action %s)"' % gid,
+                         r'\1; clockwork symbol %s"' % attr(text).replace("\\", "\\\\"), tab, count=1)
+            # The signature nests <span class="orbifold-star">, so find its
+            # balanced end rather than the first closing tag.
+            _start, signature_end = balanced(tab, '<span class="tab-signature">', "span")
+            tab = (tab[:signature_end]
+                   + '<span class="clockwork-disambiguator clockwork-disambiguator--tab" '
+                     'aria-label="Clockwork symbol %s">%s</span>' % (attr(text), html)
+                   + tab[signature_end:])
+            fragment = fragment[:tab_start] + tab + fragment[tab_end:]
+    return fragment
+
+
 class Family:
-    def __init__(self, section, links):
+    def __init__(self, section, links, symbols):
         self.section = section
         self.hm = re.search(r'id="wallpaper-([^"]+)"', section).group(1)
         # The signature nests <span class="orbifold-star">, so cut it balanced.
@@ -168,9 +225,10 @@ class Family:
         self.entries = re.findall(
             r'<section class="correspondence-entry" id="(g\d+)"[^>]*data-clock-order="(\d+)"',
             section)
-        self.tabs_html = add_vladimir_rows(
-            cut(section, '<div class="clockwork-tabs"', "div"),
-            [gid for gid, _order in self.entries], links)
+        gids = [gid for gid, _order in self.entries]
+        self.tabs_html = add_clockwork_symbols(
+            add_vladimir_rows(cut(section, '<div class="clockwork-tabs"', "div"), gids, links),
+            gids, symbols)
         self.tabs = []
         for tab in re.finditer(
                 r'<a class="clockwork-tab" id="tab-(g\d+)"[^>]*>(.*?)</a>', section, re.S):
@@ -208,6 +266,7 @@ class Parts:
         self.notation = cut(directory, '<aside class="notation-caveat"', "aside")
         self.dialog = cut(source, '<section class="diagram-symbol-dialog"', "section")
         self.links_meta, self.links = load_links()
+        self.symbols = load_clockwork_symbols()
         atlas = cut(source, '<div class="correspondence-atlas"', "div")
         self.families = []
         i = 0
@@ -216,7 +275,7 @@ class Parts:
                 start, end = balanced(atlas, '<section class="wallpaper-family"', "section", i)
             except ValueError:
                 break
-            self.families.append(Family(atlas[start:end], self.links))
+            self.families.append(Family(atlas[start:end], self.links, self.symbols))
             i = end
         if len(self.families) != 17:
             raise ValueError("expected 17 wallpaper families, found %d" % len(self.families))
