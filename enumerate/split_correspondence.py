@@ -22,8 +22,16 @@ Every entry keeps its id, so a link that used to read
 correspondence.html#g244 still works: the index redirects it to
 correspondence-p6.html#g244.
 
+Each entry's Identifications list also gets a "Vladimir catalog" line: the
+page of Vladimir Bulatov's catalog of colour groups (the G/K[N] entry whose
+subgroup is the colouring's kernel) from docs/data/vladimir-catalog-links.json,
+which vladimir_catalog_links.py derives from his manifests.  The source
+snapshot stays untouched; the rows are added while the pages are written.
+
 Order of operations after editing the source:
     python3 correspondence_symbols.py       redraw the symbols in the source
+    python3 vladimir_catalog_links.py       refresh the catalog links (needs a
+                                            checkout of vbulatov2011/colorsym-catalog)
     python3 split_correspondence.py         write the 18 pages
     python3 split_correspondence.py --check exit 1 unless the pages are current
 """
@@ -41,6 +49,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "enumerate" / "correspondence-source.html"
 DOCS = ROOT / "docs"
 INDEX = DOCS / "correspondence.html"
+LINKS = DOCS / "data" / "vladimir-catalog-links.json"
 
 SUBSCRIPTS = str.maketrans("0123456789", "₀₁₂₃₄₅₆₇₈₉")
 SUPERSCRIPTS = str.maketrans("0123456789", "⁰¹²³⁴⁵⁶⁷⁸⁹")
@@ -85,8 +94,64 @@ def cut(source, open_prefix, tag, from_idx=0):
     return source[start:end]
 
 
+def load_links():
+    """Vladimir Bulatov's colour-group catalog page for each of the 68 records,
+    as written by vladimir_catalog_links.py: (meta, {record id: link})."""
+    data = json.loads(LINKS.read_text(encoding="utf-8"))
+    return data["meta"], data["links"]
+
+
+def vladimir_row(link):
+    """The "Vladimir catalog" line of an entry's Identifications list."""
+    notes = []
+    variants = link["entries"]
+    if len(variants) > 1:
+        notes.append(
+            '<span class="vladimir-catalog-note" title="%s">%d subgroups up to conjugacy '
+            'in his manifest share this page</span>' % (attr(", ".join(variants)), len(variants)))
+    if not link["rendered"]:
+        notes.append('<span class="vladimir-catalog-note vladimir-catalog-note--pending">'
+                     'not yet rendered in the catalog snapshot</span>')
+    return (
+        '<li class="other-names-row vladimir-catalog-row">'
+        '<span class="other-name-category">Vladimir catalog</span>'
+        '<span class="vladimir-catalog-list">'
+        '<a class="vladimir-catalog-link" href="%s" target="_blank" rel="noopener" '
+        'title="Vladimir Bulatov\u2019s catalog of colour groups of the wallpaper groups, entry %s">%s</a>'
+        '%s</span></li>' % (
+            attr(link["url"]), attr(link["entry"]), html_lib.escape(link["entry"]), "".join(notes)))
+
+
+def add_vladimir_rows(fragment, gids, links):
+    """Append the Vladimir catalog row to the Identifications list of each entry."""
+    for gid in gids:
+        if gid not in links:
+            raise ValueError("%s has no Vladimir catalog link; run vladimir_catalog_links.py" % gid)
+        start = fragment.index('aria-labelledby="%s-other-names-title"' % gid)
+        end = fragment.index("</ul>", start)
+        if 'vladimir-catalog-row' in fragment[start:end]:
+            continue
+        line_start = fragment.rfind("\n", 0, end) + 1
+        row = "                  %s\n" % vladimir_row(links[gid])
+        fragment = fragment[:line_start] + row + fragment[line_start:]
+    return fragment
+
+
+def add_vladimir_provenance(tail, meta):
+    """Link the catalog itself and the link map from the Data section."""
+    if "vladimir-catalog-links.json" in tail:
+        return tail
+    anchor = "68-record crystal-example map</a>"
+    if anchor not in tail:
+        raise ValueError("provenance paragraph changed; cannot place the Vladimir catalog links")
+    addition = (
+        ' · <a href="%s">Vladimir Bulatov\u2019s catalog of colour groups</a>'
+        ' · <a href="data/vladimir-catalog-links.json">68-record catalog link map</a>' % attr(meta["base_url"]))
+    return tail.replace(anchor, anchor + addition, 1)
+
+
 class Family:
-    def __init__(self, section):
+    def __init__(self, section, links):
         self.section = section
         self.hm = re.search(r'id="wallpaper-([^"]+)"', section).group(1)
         # The signature nests <span class="orbifold-star">, so cut it balanced.
@@ -97,10 +162,12 @@ class Family:
             r'<span class="family-count">(.*?)</span>', section, re.S).group(1))
         self.summary = re.search(
             r'<p class="family-summary">(.*?)</p>', section, re.S).group(1).strip()
-        self.tabs_html = cut(section, '<div class="clockwork-tabs"', "div")
         self.entries = re.findall(
             r'<section class="correspondence-entry" id="(g\d+)"[^>]*data-clock-order="(\d+)"',
             section)
+        self.tabs_html = add_vladimir_rows(
+            cut(section, '<div class="clockwork-tabs"', "div"),
+            [gid for gid, _order in self.entries], links)
         self.tabs = []
         for tab in re.finditer(
                 r'<a class="clockwork-tab" id="tab-(g\d+)"[^>]*>(.*?)</a>', section, re.S):
@@ -137,6 +204,7 @@ class Parts:
         self.teaser = cut(directory, '<aside class="diagram-symbol-teaser"', "aside")
         self.notation = cut(directory, '<aside class="notation-caveat"', "aside")
         self.dialog = cut(source, '<section class="diagram-symbol-dialog"', "section")
+        self.links_meta, self.links = load_links()
         atlas = cut(source, '<div class="correspondence-atlas"', "div")
         self.families = []
         i = 0
@@ -145,11 +213,12 @@ class Parts:
                 start, end = balanced(atlas, '<section class="wallpaper-family"', "section", i)
             except ValueError:
                 break
-            self.families.append(Family(atlas[start:end]))
+            self.families.append(Family(atlas[start:end], self.links))
             i = end
         if len(self.families) != 17:
             raise ValueError("expected 17 wallpaper families, found %d" % len(self.families))
-        self.tail = source[source.index('<section class="provenance"'):]
+        self.tail = add_vladimir_provenance(
+            source[source.index('<section class="provenance"'):], self.links_meta)
         self.title = re.search(r"<title>(.*?)</title>", self.head).group(1)
 
 

@@ -1,0 +1,883 @@
+{
+ "meta": {
+  "title": "Vladimir Bulatov colour-group catalog links for the forward clockwork groups",
+  "catalog_repo": "https://github.com/vbulatov2011/colorsym-catalog",
+  "catalog_commit": "c3dfcfffa6dbc2c9969aa5ee49223088a82c1a60",
+  "base_url": "https://colorsym-catalog.mathornament.workers.dev/",
+  "source": "docs/data/clockwork-coloring-correspondence.json",
+  "source_schema_version": 10,
+  "rule": "entry G/K[N]: K normal in G, G/K cyclic of order N; several manifest subgroups (#k) of one type share the page path",
+  "records": 68,
+  "rendered": 2
+ },
+ "links": {
+  "g1": {
+   "entry": "o/o[1]",
+   "entries": [
+    "o/o[1]"
+   ],
+   "manifest_ids": [
+    "o.1.1"
+   ],
+   "path": "o/1/o-o-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/o/1/o-o-1/",
+   "rendered": false
+  },
+  "g5": {
+   "entry": "2222/2222[1]",
+   "entries": [
+    "2222/2222[1]"
+   ],
+   "manifest_ids": [
+    "2222.1.1"
+   ],
+   "path": "2222/1/2222-2222-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2222/1/2222-2222-1/",
+   "rendered": false
+  },
+  "g6": {
+   "entry": "2222/o[2]",
+   "entries": [
+    "2222/o[2]"
+   ],
+   "manifest_ids": [
+    "2222.2.6"
+   ],
+   "path": "2222/2/2222-o-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2222/2/2222-o-2/",
+   "rendered": false
+  },
+  "g7": {
+   "entry": "2222/2222[2]",
+   "entries": [
+    "2222/2222[2]#1",
+    "2222/2222[2]#2",
+    "2222/2222[2]#3",
+    "2222/2222[2]#4",
+    "2222/2222[2]#5",
+    "2222/2222[2]#6"
+   ],
+   "manifest_ids": [
+    "2222.2.4",
+    "2222.2.2",
+    "2222.2.5",
+    "2222.2.3",
+    "2222.2.1",
+    "2222.2.7"
+   ],
+   "path": "2222/2/2222-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2222/2/2222-2222-2/",
+   "rendered": false
+  },
+  "g8": {
+   "entry": "*x/*x[1]",
+   "entries": [
+    "*x/*x[1]"
+   ],
+   "manifest_ids": [
+    "*x.1.1"
+   ],
+   "path": "sx/1/sx-sx-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/sx/1/sx-sx-1/",
+   "rendered": false
+  },
+  "g9": {
+   "entry": "*x/o[2]",
+   "entries": [
+    "*x/o[2]"
+   ],
+   "manifest_ids": [
+    "*x.2.3"
+   ],
+   "path": "sx/2/sx-o-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/sx/2/sx-o-2/",
+   "rendered": false
+  },
+  "g10": {
+   "entry": "**/**[1]",
+   "entries": [
+    "**/**[1]"
+   ],
+   "manifest_ids": [
+    "**.1.1"
+   ],
+   "path": "ss/1/ss-ss-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/ss/1/ss-ss-1/",
+   "rendered": false
+  },
+  "g11": {
+   "entry": "xx/xx[1]",
+   "entries": [
+    "xx/xx[1]"
+   ],
+   "manifest_ids": [
+    "xx.1.1"
+   ],
+   "path": "xx/1/xx-xx-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/xx/1/xx-xx-1/",
+   "rendered": false
+  },
+  "g54": {
+   "entry": "*2222/*2222[1]",
+   "entries": [
+    "*2222/*2222[1]"
+   ],
+   "manifest_ids": [
+    "*2222.1.1"
+   ],
+   "path": "s2222/1/s2222-s2222-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/1/s2222-s2222-1/",
+   "rendered": false
+  },
+  "g55": {
+   "entry": "*2222/2222[2]",
+   "entries": [
+    "*2222/2222[2]"
+   ],
+   "manifest_ids": [
+    "*2222.2.15"
+   ],
+   "path": "s2222/2/s2222-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/2/s2222-2222-2/",
+   "rendered": false
+  },
+  "g56": {
+   "entry": "22*/22*[1]",
+   "entries": [
+    "22*/22*[1]"
+   ],
+   "manifest_ids": [
+    "22*.1.1"
+   ],
+   "path": "22s/1/22s-22s-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/1/22s-22s-1/",
+   "rendered": false
+  },
+  "g57": {
+   "entry": "22*/2222[2]",
+   "entries": [
+    "22*/2222[2]"
+   ],
+   "manifest_ids": [
+    "22*.2.1"
+   ],
+   "path": "22s/2/22s-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/2/22s-2222-2/",
+   "rendered": false
+  },
+  "g58": {
+   "entry": "22x/22x[1]",
+   "entries": [
+    "22x/22x[1]"
+   ],
+   "manifest_ids": [
+    "22x.1.1"
+   ],
+   "path": "22x/1/22x-22x-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22x/1/22x-22x-1/",
+   "rendered": false
+  },
+  "g59": {
+   "entry": "22x/2222[2]",
+   "entries": [
+    "22x/2222[2]"
+   ],
+   "manifest_ids": [
+    "22x.2.3"
+   ],
+   "path": "22x/2/22x-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22x/2/22x-2222-2/",
+   "rendered": false
+  },
+  "g60": {
+   "entry": "*2222/**[2]",
+   "entries": [
+    "*2222/**[2]#1",
+    "*2222/**[2]#2"
+   ],
+   "manifest_ids": [
+    "*2222.2.3",
+    "*2222.2.12"
+   ],
+   "path": "s2222/2/s2222-ss-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/2/s2222-ss-2/",
+   "rendered": false
+  },
+  "g61": {
+   "entry": "22*/xx[2]",
+   "entries": [
+    "22*/xx[2]"
+   ],
+   "manifest_ids": [
+    "22*.2.7"
+   ],
+   "path": "22s/2/22s-xx-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/2/22s-xx-2/",
+   "rendered": false
+  },
+  "g62": {
+   "entry": "22*/**[2]",
+   "entries": [
+    "22*/**[2]"
+   ],
+   "manifest_ids": [
+    "22*.2.6"
+   ],
+   "path": "22s/2/22s-ss-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/2/22s-ss-2/",
+   "rendered": false
+  },
+  "g63": {
+   "entry": "22x/xx[2]",
+   "entries": [
+    "22x/xx[2]#1",
+    "22x/xx[2]#2"
+   ],
+   "manifest_ids": [
+    "22x.2.2",
+    "22x.2.1"
+   ],
+   "path": "22x/2/22x-xx-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22x/2/22x-xx-2/",
+   "rendered": false
+  },
+  "g64": {
+   "entry": "*2222/*2222[2]",
+   "entries": [
+    "*2222/*2222[2]#1",
+    "*2222/*2222[2]#2",
+    "*2222/*2222[2]#3",
+    "*2222/*2222[2]#4"
+   ],
+   "manifest_ids": [
+    "*2222.2.2",
+    "*2222.2.1",
+    "*2222.2.8",
+    "*2222.2.4"
+   ],
+   "path": "s2222/2/s2222-s2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/2/s2222-s2222-2/",
+   "rendered": false
+  },
+  "g65": {
+   "entry": "*2222/22*[2]",
+   "entries": [
+    "*2222/22*[2]#1",
+    "*2222/22*[2]#2",
+    "*2222/22*[2]#3",
+    "*2222/22*[2]#4"
+   ],
+   "manifest_ids": [
+    "*2222.2.13",
+    "*2222.2.14",
+    "*2222.2.7",
+    "*2222.2.11"
+   ],
+   "path": "s2222/2/s2222-22s-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/2/s2222-22s-2/",
+   "rendered": false
+  },
+  "g66": {
+   "entry": "22*/22*[2]",
+   "entries": [
+    "22*/22*[2]#1",
+    "22*/22*[2]#2"
+   ],
+   "manifest_ids": [
+    "22*.2.4",
+    "22*.2.2"
+   ],
+   "path": "22s/2/22s-22s-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/2/22s-22s-2/",
+   "rendered": false
+  },
+  "g67": {
+   "entry": "22*/22x[2]",
+   "entries": [
+    "22*/22x[2]#1",
+    "22*/22x[2]#2"
+   ],
+   "manifest_ids": [
+    "22*.2.5",
+    "22*.2.3"
+   ],
+   "path": "22s/2/22s-22x-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22s/2/22s-22x-2/",
+   "rendered": false
+  },
+  "g68": {
+   "entry": "2*22/2*22[1]",
+   "entries": [
+    "2*22/2*22[1]"
+   ],
+   "manifest_ids": [
+    "2*22.1.1"
+   ],
+   "path": "2s22/1/2s22-2s22-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/1/2s22-2s22-1/",
+   "rendered": false
+  },
+  "g69": {
+   "entry": "2*22/2222[2]",
+   "entries": [
+    "2*22/2222[2]"
+   ],
+   "manifest_ids": [
+    "2*22.2.5"
+   ],
+   "path": "2s22/2/2s22-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/2/2s22-2222-2/",
+   "rendered": false
+  },
+  "g70": {
+   "entry": "2*22/*x[2]",
+   "entries": [
+    "2*22/*x[2]#1",
+    "2*22/*x[2]#2"
+   ],
+   "manifest_ids": [
+    "2*22.2.6",
+    "2*22.2.3"
+   ],
+   "path": "2s22/2/2s22-sx-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/2/2s22-sx-2/",
+   "rendered": false
+  },
+  "g71": {
+   "entry": "2*22/*2222[2]",
+   "entries": [
+    "2*22/*2222[2]"
+   ],
+   "manifest_ids": [
+    "2*22.2.2"
+   ],
+   "path": "2s22/2/2s22-s2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/2/2s22-s2222-2/",
+   "rendered": false
+  },
+  "g72": {
+   "entry": "2*22/22x[2]",
+   "entries": [
+    "2*22/22x[2]"
+   ],
+   "manifest_ids": [
+    "2*22.2.7"
+   ],
+   "path": "2s22/2/2s22-22x-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/2/2s22-22x-2/",
+   "rendered": false
+  },
+  "g73": {
+   "entry": "2*22/22*[2]",
+   "entries": [
+    "2*22/22*[2]#1",
+    "2*22/22*[2]#2"
+   ],
+   "manifest_ids": [
+    "2*22.2.4",
+    "2*22.2.1"
+   ],
+   "path": "2s22/2/2s22-22s-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/2s22/2/2s22-22s-2/",
+   "rendered": false
+  },
+  "g74": {
+   "entry": "*2222/2*22[2]",
+   "entries": [
+    "*2222/2*22[2]#1",
+    "*2222/2*22[2]#2",
+    "*2222/2*22[2]#3",
+    "*2222/2*22[2]#4"
+   ],
+   "manifest_ids": [
+    "*2222.2.10",
+    "*2222.2.5",
+    "*2222.2.9",
+    "*2222.2.6"
+   ],
+   "path": "s2222/2/s2222-2s22-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s2222/2/s2222-2s22-2/",
+   "rendered": false
+  },
+  "g75": {
+   "entry": "22x/2222[4]",
+   "entries": [
+    "22x/2222[4]#2",
+    "22x/2222[4]#3"
+   ],
+   "manifest_ids": [
+    "22x.4.6",
+    "22x.4.7"
+   ],
+   "path": "22x/4/22x-2222-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/22x/4/22x-2222-4/",
+   "rendered": false
+  },
+  "g94": {
+   "entry": "442/442[1]",
+   "entries": [
+    "442/442[1]"
+   ],
+   "manifest_ids": [
+    "442.1.1"
+   ],
+   "path": "442/1/442-442-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/1/442-442-1/",
+   "rendered": false
+  },
+  "g95": {
+   "entry": "442/2222[2]",
+   "entries": [
+    "442/2222[2]"
+   ],
+   "manifest_ids": [
+    "442.2.1"
+   ],
+   "path": "442/2/442-2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/2/442-2222-2/",
+   "rendered": false
+  },
+  "g96": {
+   "entry": "442/o[4]",
+   "entries": [
+    "442/o[4]"
+   ],
+   "manifest_ids": [
+    "442.4.7"
+   ],
+   "path": "442/4/442-o-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/4/442-o-4/",
+   "rendered": false
+  },
+  "g97": {
+   "entry": "442/o[4]",
+   "entries": [
+    "442/o[4]"
+   ],
+   "manifest_ids": [
+    "442.4.7"
+   ],
+   "path": "442/4/442-o-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/4/442-o-4/",
+   "rendered": false
+  },
+  "g98": {
+   "entry": "442/442[2]",
+   "entries": [
+    "442/442[2]#1",
+    "442/442[2]#2"
+   ],
+   "manifest_ids": [
+    "442.2.2",
+    "442.2.3"
+   ],
+   "path": "442/2/442-442-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/2/442-442-2/",
+   "rendered": false
+  },
+  "g99": {
+   "entry": "442/2222[4]",
+   "entries": [
+    "442/2222[4]#3"
+   ],
+   "manifest_ids": [
+    "442.4.2"
+   ],
+   "path": "442/4/442-2222-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/442/4/442-2222-4/",
+   "rendered": false
+  },
+  "g128": {
+   "entry": "*442/*442[1]",
+   "entries": [
+    "*442/*442[1]"
+   ],
+   "manifest_ids": [
+    "*442.1.1"
+   ],
+   "path": "s442/1/s442-s442-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/1/s442-s442-1/",
+   "rendered": false
+  },
+  "g129": {
+   "entry": "*442/*2222[2]",
+   "entries": [
+    "*442/*2222[2]"
+   ],
+   "manifest_ids": [
+    "*442.2.1"
+   ],
+   "path": "s442/2/s442-s2222-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/2/s442-s2222-2/",
+   "rendered": false
+  },
+  "g130": {
+   "entry": "*442/2*22[2]",
+   "entries": [
+    "*442/2*22[2]"
+   ],
+   "manifest_ids": [
+    "*442.2.6"
+   ],
+   "path": "s442/2/s442-2s22-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/2/s442-2s22-2/",
+   "rendered": false
+  },
+  "g131": {
+   "entry": "*442/442[2]",
+   "entries": [
+    "*442/442[2]"
+   ],
+   "manifest_ids": [
+    "*442.2.7"
+   ],
+   "path": "s442/2/s442-442-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/2/s442-442-2/",
+   "rendered": false
+  },
+  "g132": {
+   "entry": "4*2/4*2[1]",
+   "entries": [
+    "4*2/4*2[1]"
+   ],
+   "manifest_ids": [
+    "4*2.1.1"
+   ],
+   "path": "4s2/1/4s2-4s2-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/1/4s2-4s2-1/",
+   "rendered": false
+  },
+  "g133": {
+   "entry": "4*2/22x[2]",
+   "entries": [
+    "4*2/22x[2]"
+   ],
+   "manifest_ids": [
+    "4*2.2.3"
+   ],
+   "path": "4s2/2/4s2-22x-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/2/4s2-22x-2/",
+   "rendered": false
+  },
+  "g134": {
+   "entry": "4*2/2*22[2]",
+   "entries": [
+    "4*2/2*22[2]"
+   ],
+   "manifest_ids": [
+    "4*2.2.1"
+   ],
+   "path": "4s2/2/4s2-2s22-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/2/4s2-2s22-2/",
+   "rendered": false
+  },
+  "g135": {
+   "entry": "4*2/442[2]",
+   "entries": [
+    "4*2/442[2]"
+   ],
+   "manifest_ids": [
+    "4*2.2.2"
+   ],
+   "path": "4s2/2/4s2-442-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/2/4s2-442-2/",
+   "rendered": false
+  },
+  "g136": {
+   "entry": "*442/*442[2]",
+   "entries": [
+    "*442/*442[2]#1",
+    "*442/*442[2]#2"
+   ],
+   "manifest_ids": [
+    "*442.2.4",
+    "*442.2.2"
+   ],
+   "path": "s442/2/s442-s442-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/2/s442-s442-2/",
+   "rendered": false
+  },
+  "g137": {
+   "entry": "4*2/*2222[4]",
+   "entries": [
+    "4*2/*2222[4]"
+   ],
+   "manifest_ids": [
+    "4*2.4.2"
+   ],
+   "path": "4s2/4/4s2-s2222-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/4/4s2-s2222-4/",
+   "rendered": false
+  },
+  "g138": {
+   "entry": "*442/4*2[2]",
+   "entries": [
+    "*442/4*2[2]#1",
+    "*442/4*2[2]#2"
+   ],
+   "manifest_ids": [
+    "*442.2.5",
+    "*442.2.3"
+   ],
+   "path": "s442/2/s442-4s2-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s442/2/s442-4s2-2/",
+   "rendered": false
+  },
+  "g139": {
+   "entry": "4*2/22x[4]",
+   "entries": [
+    "4*2/22x[4]"
+   ],
+   "manifest_ids": [
+    "4*2.4.7"
+   ],
+   "path": "4s2/4/4s2-22x-4/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/4s2/4/4s2-22x-4/",
+   "rendered": false
+  },
+  "g224": {
+   "entry": "333/333[1]",
+   "entries": [
+    "333/333[1]"
+   ],
+   "manifest_ids": [
+    "333.1.1"
+   ],
+   "path": "333/1/333-333-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/333/1/333-333-1/",
+   "rendered": false
+  },
+  "g225": {
+   "entry": "333/o[3]",
+   "entries": [
+    "333/o[3]"
+   ],
+   "manifest_ids": [
+    "333.3.4"
+   ],
+   "path": "333/3/333-o-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/333/3/333-o-3/",
+   "rendered": false
+  },
+  "g226": {
+   "entry": "333/o[3]",
+   "entries": [
+    "333/o[3]"
+   ],
+   "manifest_ids": [
+    "333.3.4"
+   ],
+   "path": "333/3/333-o-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/333/3/333-o-3/",
+   "rendered": false
+  },
+  "g227": {
+   "entry": "333/333[3]",
+   "entries": [
+    "333/333[3]#1",
+    "333/333[3]#2",
+    "333/333[3]#3"
+   ],
+   "manifest_ids": [
+    "333.3.2",
+    "333.3.1",
+    "333.3.3"
+   ],
+   "path": "333/3/333-333-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/333/3/333-333-3/",
+   "rendered": false
+  },
+  "g230": {
+   "entry": "*333/*333[1]",
+   "entries": [
+    "*333/*333[1]"
+   ],
+   "manifest_ids": [
+    "*333.1.1"
+   ],
+   "path": "s333/1/s333-s333-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s333/1/s333-s333-1/",
+   "rendered": false
+  },
+  "g231": {
+   "entry": "*333/333[2]",
+   "entries": [
+    "*333/333[2]"
+   ],
+   "manifest_ids": [
+    "*333.2.1"
+   ],
+   "path": "s333/2/s333-333-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s333/2/s333-333-2/",
+   "rendered": false
+  },
+  "g232": {
+   "entry": "3*3/3*3[1]",
+   "entries": [
+    "3*3/3*3[1]"
+   ],
+   "manifest_ids": [
+    "3*3.1.1"
+   ],
+   "path": "3s3/1/3s3-3s3-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/3s3/1/3s3-3s3-1/",
+   "rendered": false
+  },
+  "g233": {
+   "entry": "3*3/333[2]",
+   "entries": [
+    "3*3/333[2]"
+   ],
+   "manifest_ids": [
+    "3*3.2.1"
+   ],
+   "path": "3s3/2/3s3-333-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/3s3/2/3s3-333-2/",
+   "rendered": false
+  },
+  "g234": {
+   "entry": "3*3/*333[3]",
+   "entries": [
+    "3*3/*333[3]"
+   ],
+   "manifest_ids": [
+    "3*3.3.1"
+   ],
+   "path": "3s3/3/3s3-s333-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/3s3/3/3s3-s333-3/",
+   "rendered": false
+  },
+  "g235": {
+   "entry": "3*3/333[6]",
+   "entries": [
+    "3*3/333[6]#2"
+   ],
+   "manifest_ids": [
+    "3*3.6.4"
+   ],
+   "path": "3s3/6/3s3-333-6/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/3s3/6/3s3-333-6/",
+   "rendered": false
+  },
+  "g243": {
+   "entry": "632/632[1]",
+   "entries": [
+    "632/632[1]"
+   ],
+   "manifest_ids": [
+    "632.1.1"
+   ],
+   "path": "632/1/632-632-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/1/632-632-1/",
+   "rendered": false
+  },
+  "g244": {
+   "entry": "632/2222[3]",
+   "entries": [
+    "632/2222[3]"
+   ],
+   "manifest_ids": [
+    "632.3.1"
+   ],
+   "path": "632/3/632-2222-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/3/632-2222-3/",
+   "rendered": true
+  },
+  "g245": {
+   "entry": "632/2222[3]",
+   "entries": [
+    "632/2222[3]"
+   ],
+   "manifest_ids": [
+    "632.3.1"
+   ],
+   "path": "632/3/632-2222-3/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/3/632-2222-3/",
+   "rendered": true
+  },
+  "g246": {
+   "entry": "632/333[2]",
+   "entries": [
+    "632/333[2]"
+   ],
+   "manifest_ids": [
+    "632.2.1"
+   ],
+   "path": "632/2/632-333-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/2/632-333-2/",
+   "rendered": false
+  },
+  "g247": {
+   "entry": "632/o[6]",
+   "entries": [
+    "632/o[6]"
+   ],
+   "manifest_ids": [
+    "632.6.4"
+   ],
+   "path": "632/6/632-o-6/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/6/632-o-6/",
+   "rendered": false
+  },
+  "g248": {
+   "entry": "632/o[6]",
+   "entries": [
+    "632/o[6]"
+   ],
+   "manifest_ids": [
+    "632.6.4"
+   ],
+   "path": "632/6/632-o-6/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/632/6/632-o-6/",
+   "rendered": false
+  },
+  "g268": {
+   "entry": "*632/*632[1]",
+   "entries": [
+    "*632/*632[1]"
+   ],
+   "manifest_ids": [
+    "*632.1.1"
+   ],
+   "path": "s632/1/s632-s632-1/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s632/1/s632-s632-1/",
+   "rendered": false
+  },
+  "g269": {
+   "entry": "*632/3*3[2]",
+   "entries": [
+    "*632/3*3[2]"
+   ],
+   "manifest_ids": [
+    "*632.2.1"
+   ],
+   "path": "s632/2/s632-3s3-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s632/2/s632-3s3-2/",
+   "rendered": false
+  },
+  "g270": {
+   "entry": "*632/632[2]",
+   "entries": [
+    "*632/632[2]"
+   ],
+   "manifest_ids": [
+    "*632.2.3"
+   ],
+   "path": "s632/2/s632-632-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s632/2/s632-632-2/",
+   "rendered": false
+  },
+  "g271": {
+   "entry": "*632/*333[2]",
+   "entries": [
+    "*632/*333[2]"
+   ],
+   "manifest_ids": [
+    "*632.2.2"
+   ],
+   "path": "s632/2/s632-s333-2/",
+   "url": "https://colorsym-catalog.mathornament.workers.dev/s632/2/s632-s333-2/",
+   "rendered": false
+  }
+ }
+}
