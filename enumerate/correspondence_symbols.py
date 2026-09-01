@@ -28,9 +28,10 @@ single path, all wound the same way), so it scales as a shape and anti-aliases
 like type; the plate overlay adds a halo with `paint-order: stroke fill`.
 
 Usage:
-    python3 correspondence_symbols.py            rewrite docs/correspondence.html
-    python3 correspondence_symbols.py --check    exit 1 unless the page is current
+    python3 correspondence_symbols.py            rewrite enumerate/correspondence-source.html
+    python3 correspondence_symbols.py --check    exit 1 unless the source is current
     python3 correspondence_symbols.py --svg      print a sample sheet (SVG) to stdout
+    then python3 split_correspondence.py         to regenerate the served pages
 """
 
 import math
@@ -39,7 +40,9 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-PAGE = ROOT / "docs" / "correspondence.html"
+# The monolithic 68-row snapshot; split_correspondence.py cuts it into the
+# served index and the 17 per-wallpaper-group pages under docs/.
+PAGE = ROOT / "enumerate" / "correspondence-source.html"
 
 # --- geometry -----------------------------------------------------------------
 # All lengths in plate units (the overlay viewBox is 720 x 420).  R is the

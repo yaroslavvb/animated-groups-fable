@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An audited atlas of 68 forward clockwork groups, cyclic plane colourings, and interactive real-crystal examples, organized by Euclidean orbifold signature.">
+  <meta name="description" content="Wallpaper group p1 (◦): 1 forward group over it, each with its cyclic colouring, clockwork film and polar space group (P1).">
   <meta name="theme-color" content="#ffffff">
-  <title>Clockwork/colouring correspondence — Spacetime Groups</title>
+  <title>◦ p1 — Clockwork/colouring correspondence — Spacetime Groups</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127902;&#65039;</text></svg>">
   <script data-mobile-viewport-bootstrap>
     (() => {
@@ -46,17 +46,6 @@
   <script defer src="js/site-header.js?v=collapsible-header-v1"></script>
   <link rel="stylesheet" href="css/site-controls-v2.css">
   <link rel="stylesheet" href="css/correspondence.css?v=collapsible-header-v1">
-  <script>
-    // The correspondence used to be one page; #g244 and #wallpaper-p6 now
-    // live on correspondence-p6.html.
-    (() => {
-      const entries = {"g1":"p1","g6":"p2","g7":"p2","g5":"p2","g10":"pm","g11":"pg","g9":"cm","g8":"cm","g55":"pmm","g60":"pmm","g64":"pmm","g65":"pmm","g74":"pmm","g54":"pmm","g57":"pmg","g61":"pmg","g62":"pmg","g66":"pmg","g67":"pmg","g56":"pmg","g59":"pgg","g63":"pgg","g75":"pgg","g58":"pgg","g69":"cmm","g70":"cmm","g71":"cmm","g72":"cmm","g73":"cmm","g68":"cmm","g95":"p4","g96":"p4","g97":"p4","g98":"p4","g99":"p4","g94":"p4","g129":"p4m","g130":"p4m","g131":"p4m","g136":"p4m","g138":"p4m","g128":"p4m","g133":"p4g","g134":"p4g","g135":"p4g","g137":"p4g","g139":"p4g","g132":"p4g","g225":"p3","g226":"p3","g227":"p3","g224":"p3","g231":"p3m1","g230":"p3m1","g233":"p31m","g234":"p31m","g235":"p31m","g232":"p31m","g244":"p6","g245":"p6","g246":"p6","g247":"p6","g248":"p6","g243":"p6","g269":"p6m","g270":"p6m","g271":"p6m","g268":"p6m"};
-      const families = ["p1","p2","pm","pg","cm","pmm","pmg","pgg","cmm","p4","p4m","p4g","p3","p3m1","p31m","p6","p6m"];
-      const hash = decodeURIComponent(location.hash.slice(1));
-      if (entries[hash]) location.replace(`correspondence-${entries[hash]}.html#${hash}`);
-      else if (hash.startsWith("wallpaper-") && families.includes(hash.slice(10))) location.replace(`correspondence-${hash.slice(10)}.html`);
-    })();
-  </script>
 </head>
 <body>
   <a class="skip-link" href="#correspondences">Skip to correspondences</a>
@@ -98,30 +87,17 @@
   </div>
 </header>
 
-  <main class="correspondence-page">
-    <section class="directory" aria-labelledby="page-title">
-      <h1 id="page-title">Clockwork/<wbr>colouring correspondence</h1>
+  <main class="correspondence-page correspondence-family-page">
+    <section class="directory family-page-header" aria-labelledby="page-title">
+      <p class="family-breadcrumb"><a href="correspondence.html">Clockwork/colouring correspondence</a> <span aria-hidden="true">·</span> wallpaper group 1 of 17</p>
+      <h1 id="page-title"><span class="family-orbifold">◦</span> <span class="family-hm">p1</span> <span class="family-count">1 forward group</span></h1>
+      <p class="family-summary">A torus; translations only.</p>
+      <nav class="family-pager" aria-label="Neighbouring wallpaper groups">
+        <a class="family-pager-link family-pager-index" href="correspondence.html">All 17 wallpaper groups</a>
+        <a class="family-pager-link family-pager-next" href="correspondence-p2.html" rel="next">2222 p2 <span aria-hidden="true">→</span></a>
+      </nav>
       <p class="directory-viewer-note">Each group has three corresponding visualizations: a static 2D colouring, a clockwork animation, and an interactive crystal model in the associated polar space group.</p>
       <aside class="diagram-symbol-teaser" aria-labelledby="diagram-symbol-teaser-title"><div class="diagram-symbol-teaser-icons" aria-hidden="true"><span class="diagram-symbol-teaser-icon"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z M0.88,-11.89 L-4.33,-20.91 L-5.93,-19.98 L-0.72,-10.96 Z M-10.74,5.18 L-15.95,14.2 L-14.34,15.13 L-9.13,6.11 Z M9.86,6.71 L20.28,6.71 L20.28,4.86 L9.86,4.86 Z"/></svg><small>3<sub>1</sub> screw</small></span><span class="diagram-symbol-teaser-icon"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-d" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-d" x1="6" y1="16" x2="62" y2="16"></line><path class="diagram-symbol-quarter-arrow" d="M 25.58 20.2 L 35.58 16 L 25.58 11.8"></path><path class="diagram-symbol-quarter-arrow" d="M 33.42 20.2 L 43.42 16 L 33.42 11.8"></path></svg><small>d glide</small></span></div><div class="diagram-symbol-teaser-copy"><h2 id="diagram-symbol-teaser-title">Diagram symbols</h2><p>Translation, rotation, screw-axis, mirror, and glide marks on the colouring plates follow crystallographic projection notation.</p><button class="diagram-symbol-open" type="button" data-diagram-symbol-open aria-expanded="false" aria-controls="diagram-symbol-index">Show visual index</button></div></aside>
-      <aside class="notation-caveat" aria-labelledby="notation-caveat-title">
-        <h2 id="notation-caveat-title">Notation</h2>
-        <p>Only <strong>cyclic</strong> colour permutations are considered here.
-        That restriction is what makes the correspondence exact: a colouring
-        whose permutations form a cyclic group is the same object as a
-        <strong>polar</strong> crystal, the colour cycle being the height along
-        the polar axis. Each row is therefore one colouring and one polar space
-        group, named both ways.</p>
-        <p>Names on the left are the coloured-orbifold signatures of
-        <a href="https://www.mit.edu/~hlb/Symmetries_of_Things/" target="_blank" rel="noopener"><em>The Symmetries of Things</em> ↗</a>
-        (Conway, Burgiel and Goodman-Strauss); each row links to the book page
-        its short form is read from. Names on the right are the standard
-        crystallographic ones &mdash; the Hermann&ndash;Mauguin symbol and its
-        number in the
-        <a href="https://it.iucr.org/A/" target="_blank" rel="noopener">International Tables for Crystallography, Volume A ↗</a>,
-        with each row also linking to its entry in the
-        <a href="https://www.cryst.ehu.es/cgi-bin/cryst/programs/nph-wp-list" target="_blank" rel="noopener">Bilbao Crystallographic Server ↗</a>
-        and to a real mineral bearing the group.</p>
-      </aside>
     </section>
 
     <section class="diagram-symbol-dialog" id="diagram-symbol-index" aria-labelledby="diagram-symbol-dialog-title" hidden>
@@ -142,113 +118,143 @@
       </article>
     </section>
 
-    <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">
-      <h2 id="family-directory-title">The 17 wallpaper groups</h2>
-      <p class="family-directory-note">One page per wallpaper group, in the order of the <em>International Tables</em>. Each card shows the group's own pattern; the badge counts the forward clockwork groups over it, 68 in all, and the small line names their polar space groups.</p>
-      <nav class="family-grid" aria-label="Wallpaper groups">
-        <a class="family-card" href="correspondence-p1.html" aria-label="◦, p1: 1 forward group (P1)">
-          <img src="output/clockwork-colorings/g1.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">◦</strong><span class="family-card-hm">p1</span></span>
-          <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">P1</span>
-        </a>
-        <a class="family-card" href="correspondence-p2.html" aria-label="2222, p2: 3 forward groups (P2₁, C2, P2)">
-          <img src="output/clockwork-colorings/g5.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">2222</strong><span class="family-card-hm">p2</span></span>
-          <span class="family-card-count" aria-hidden="true" title="3 forward groups">3</span>
-          <span class="family-card-groups" aria-hidden="true">P2<sub>1</sub> · C2 · P2</span>
-        </a>
-        <a class="family-card" href="correspondence-pm.html" aria-label="∗∗, pm: 1 forward group (Pm)">
-          <img src="output/clockwork-colorings/g10.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span><span class="orbifold-star">∗</span></strong><span class="family-card-hm">pm</span></span>
-          <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">Pm</span>
-        </a>
-        <a class="family-card" href="correspondence-pg.html" aria-label="××, pg: 1 forward group (Pc)">
-          <img src="output/clockwork-colorings/g11.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">××</strong><span class="family-card-hm">pg</span></span>
-          <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">Pc</span>
-        </a>
-        <a class="family-card" href="correspondence-cm.html" aria-label="∗×, cm: 2 forward groups (Cc, Cm)">
-          <img src="output/clockwork-colorings/g8.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>×</strong><span class="family-card-hm">cm</span></span>
-          <span class="family-card-count" aria-hidden="true" title="2 forward groups">2</span>
-          <span class="family-card-groups" aria-hidden="true">Cc · Cm</span>
-        </a>
-        <a class="family-card" href="correspondence-pmm.html" aria-label="∗2222, pmm: 6 forward groups (Pcc2, Aem2, Pmc2₁, Fmm2, Amm2, Pmm2)">
-          <img src="output/clockwork-colorings/g54.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>2222</strong><span class="family-card-hm">pmm</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Pcc2 · Aem2 · Pmc2<sub>1</sub> · Fmm2 · Amm2 · Pmm2</span>
-        </a>
-        <a class="family-card" href="correspondence-pmg.html" aria-label="22∗, pmg: 6 forward groups (Pca2₁, Pmn2₁, Aea2, Pnc2, Ama2, Pma2)">
-          <img src="output/clockwork-colorings/g56.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">22<span class="orbifold-star">∗</span></strong><span class="family-card-hm">pmg</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Pca2<sub>1</sub> · Pmn2<sub>1</sub> · Aea2 · Pnc2 · Ama2 · Pma2</span>
-        </a>
-        <a class="family-card" href="correspondence-pgg.html" aria-label="22×, pgg: 4 forward groups (Fdd2, Pna2₁, Pnn2, Pba2)">
-          <img src="output/clockwork-colorings/g58.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">22×</strong><span class="family-card-hm">pgg</span></span>
-          <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">Fdd2 · Pna2<sub>1</sub> · Pnn2 · Pba2</span>
-        </a>
-        <a class="family-card" href="correspondence-cmm.html" aria-label="2∗22, cmm: 6 forward groups (Iba2, Ccc2, Cmc2₁, Imm2, Ima2, Cmm2)">
-          <img src="output/clockwork-colorings/g68.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">2<span class="orbifold-star">∗</span>22</strong><span class="family-card-hm">cmm</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Iba2 · Ccc2 · Cmc2<sub>1</sub> · Imm2 · Ima2 · Cmm2</span>
-        </a>
-        <a class="family-card" href="correspondence-p4.html" aria-label="442, p4: 6 forward groups (P4₁, P4₃, I4₁, P4₂, I4, P4)">
-          <img src="output/clockwork-colorings/g94.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">442</strong><span class="family-card-hm">p4</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P4<sub>1</sub> · P4<sub>3</sub> · I4<sub>1</sub> · P4<sub>2</sub> · I4 · P4</span>
-        </a>
-        <a class="family-card" href="correspondence-p4m.html" aria-label="∗442, p4m: 6 forward groups (P4cc, P4₂cm, I4cm, P4₂mc, I4mm, P4mm)">
-          <img src="output/clockwork-colorings/g128.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>442</strong><span class="family-card-hm">p4m</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P4cc · P4<sub>2</sub>cm · I4cm · P4<sub>2</sub>mc · I4mm · P4mm</span>
-        </a>
-        <a class="family-card" href="correspondence-p4g.html" aria-label="4∗2, p4g: 6 forward groups (I4₁cd, P4₂bc, I4₁md, P4₂nm, P4nc, P4bm)">
-          <img src="output/clockwork-colorings/g132.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">4<span class="orbifold-star">∗</span>2</strong><span class="family-card-hm">p4g</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">I4<sub>1</sub>cd · P4<sub>2</sub>bc · I4<sub>1</sub>md · P4<sub>2</sub>nm · P4nc · P4bm</span>
-        </a>
-        <a class="family-card" href="correspondence-p3.html" aria-label="333, p3: 4 forward groups (P3₂, P3₁, R3, P3)">
-          <img src="output/clockwork-colorings/g224.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">333</strong><span class="family-card-hm">p3</span></span>
-          <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">P3<sub>2</sub> · P3<sub>1</sub> · R3 · P3</span>
-        </a>
-        <a class="family-card" href="correspondence-p3m1.html" aria-label="∗333, p3m1: 2 forward groups (P3c1, P3m1)">
-          <img src="output/clockwork-colorings/g230.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>333</strong><span class="family-card-hm">p3m1</span></span>
-          <span class="family-card-count" aria-hidden="true" title="2 forward groups">2</span>
-          <span class="family-card-groups" aria-hidden="true">P3c1 · P3m1</span>
-        </a>
-        <a class="family-card" href="correspondence-p31m.html" aria-label="3∗3, p31m: 4 forward groups (R3c, R3m, P31c, P31m)">
-          <img src="output/clockwork-colorings/g232.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">3<span class="orbifold-star">∗</span>3</strong><span class="family-card-hm">p31m</span></span>
-          <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">R3c · R3m · P31c · P31m</span>
-        </a>
-        <a class="family-card" href="correspondence-p6.html" aria-label="632, p6: 6 forward groups (P6₅, P6₁, P6₂, P6₄, P6₃, P6)">
-          <img src="output/clockwork-colorings/g243.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold">632</strong><span class="family-card-hm">p6</span></span>
-          <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P6<sub>5</sub> · P6<sub>1</sub> · P6<sub>2</sub> · P6<sub>4</sub> · P6<sub>3</sub> · P6</span>
-        </a>
-        <a class="family-card" href="correspondence-p6m.html" aria-label="∗632, p6m: 4 forward groups (P6cc, P6₃cm, P6₃mc, P6mm)">
-          <img src="output/clockwork-colorings/g268.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="">
-          <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>632</strong><span class="family-card-hm">p6m</span></span>
-          <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">P6cc · P6<sub>3</sub>cm · P6<sub>3</sub>mc · P6mm</span>
-        </a>
-      </nav>
+    <div class="correspondence-atlas" id="correspondences">
+    <section class="wallpaper-family" id="wallpaper-p1" aria-labelledby="page-title" data-wallpaper-family>
+      <div class="clockwork-tabs" data-clockwork-tabs>
+        <nav class="clockwork-tabbar" data-clockwork-tablist aria-label="Forward clockwork groups over orbifold ◦">
+          <a class="clockwork-tab" id="tab-g1" href="#g1" data-clockwork-tab data-panel-id="g1" aria-label="◦, colour action g1"><span class="tab-signature">◦</span><span class="tab-meta">P1</span></a>
+        </nav>
+        <ol class="correspondence-list">
+
+      <li class="correspondence-item">
+        <section class="correspondence-entry" id="g1" aria-labelledby="g1-title" data-clockwork-tabpanel data-clock-order="1">
+          <header class="entry-header">
+            <h3 id="g1-title"><span class="book-color-signature" aria-label="Chaim notation ◦">◦</span></h3>
+
+
+          </header>
+
+          <div class="entry-grid">
+            <div class="entry-visuals">
+
+              <figure class="colour-plate">
+                <div class="colour-plate-graphic">
+                  <img src="output/clockwork-colorings/g1.webp?v=reflection-centering-v1" width="720" height="420" loading="lazy" decoding="async" alt="Static perfect 1-colouring for group g1: asymmetric motifs carry phase colours for Conway type ◦.">
+                  <svg class="plate-generator-overlay" data-generator-overlay="g1" viewBox="0 0 720 420" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><g class="plate-generator plate-generator--translation plate-generator--translation-vector" data-generator="X" data-generator-kind="translation" data-generator-symbol="translation" data-lift-kind="translation-vector" data-time-shift="0" data-translation-vector="0.79,0.21"><path class="plate-generator-translation-halo" d="M 58 382 L 163 353.67 M 153.81 361.85 L 163 353.67 L 150.95 351.23"></path><path class="plate-generator-translation" d="M 58 382 L 163 353.67 M 153.81 361.85 L 163 353.67 L 150.95 351.23"></path></g><g class="plate-generator plate-generator--translation plate-generator--translation-vector" data-generator="Y" data-generator-kind="translation" data-generator-symbol="translation" data-lift-kind="translation-vector" data-time-shift="0" data-translation-vector="0.21,0.79"><path class="plate-generator-translation-halo" d="M 58 382 L 86.33 277 M 88.77 289.05 L 86.33 277 L 78.15 286.19"></path><path class="plate-generator-translation" d="M 58 382 L 86.33 277 M 88.77 289.05 L 86.33 277 L 78.15 286.19"></path></g><g class="plate-generator-labels"><text class="plate-generator-label" x="178.45" y="349.50" text-anchor="middle" dominant-baseline="central">X</text><text class="plate-generator-label" x="97.66" y="265.71" text-anchor="middle" dominant-baseline="central">Y</text></g></svg>
+                </div>
+                <figcaption>
+                  <p class="colour-order colour-order--plate" role="img" aria-label="Colour order: blue"><span class="colour-order-palette" aria-hidden="true"><span class="colour-order-label">order</span><span class="colour-order-swatch" style="--colour-order-swatch: #0072B2" aria-hidden="true"></span></span><span class="colour-order-action colour-order-action--translation colour-order-action--fixed" data-forward-symbol="translation" data-action-kind="translation" data-colour-effect="fixed"><svg class="colour-order-action-glyph colour-order-action-glyph--translation" viewBox="0 0 48 32" aria-hidden="true" focusable="false"><path class="diagram-symbol-translation" d="M6,16 L42,16 M42,16 L34,11 M42,16 L34,21"></path></svg><span class="colour-order-action-description" aria-hidden="true">translation</span></span></p>
+                </figcaption>
+              </figure>
+              <figure class="crystal-viewer" data-crystal-viewer="g1" data-group-id="g1" data-provider="sketchfab" data-reference-match="exact" data-crystal-name="Gilmarite" data-crystal-embed="https://sketchfab.com/models/f750647d7e0643be96bb0a02499aa33a/embed?autostart=1&amp;ui_controls=1&amp;ui_infos=1&amp;ui_watermark=1&amp;ui_watermark_link=1">
+                <div class="crystal-viewer-stage" id="g1-crystal-stage" data-crystal-stage data-state="idle" aria-describedby="g1-crystal-status">
+                  <img class="crystal-viewer-preview" src="output/space-groups/g1.webp?v=stacked-clock-period" width="720" height="480" loading="lazy" decoding="async" alt="Space–time lift diagram for g1 and polar space group No. 1 P1; exact clock phases form stacked sheets in vertical time through one clock period. Activate the interactive viewer to examine Gilmarite.">
+                  <div class="crystal-viewer-prompt" data-crystal-prompt>
+                    <button class="crystal-viewer-load" type="button" data-crystal-load aria-controls="g1-crystal-stage">Explore Gilmarite in 3D</button>
+                    <small>Opens the public Sketchfab WebGL viewer externally. Only one crystal viewer stays live at a time.</small>
+                  </div>
+                  <div class="crystal-viewer-frame" data-crystal-frame></div>
+                  <button class="crystal-viewer-close" type="button" data-crystal-close aria-controls="g1-crystal-stage" hidden>Close 3D viewer</button>
+                </div>
+                <figcaption>
+                  <span class="crystal-viewer-title"><strong>3D crystal · Gilmarite</strong><span>No. 1 P1</span></span>
+                  <span class="crystal-viewer-links"><a href="https://crystalsymmetry.wordpress.com/2014/06/03/1/" target="_blank" rel="noopener">CrystalSymmetry example</a><span aria-hidden="true"> · </span><a href="https://sketchfab.com/3d-models/p1-1-gilmarite-f750647d7e0643be96bb0a02499aa33a" target="_blank" rel="noopener">Open model on Sketchfab</a></span>
+
+
+                </figcaption>
+                <p class="visually-hidden" id="g1-crystal-status" data-crystal-status aria-live="polite">Interactive 3D viewer not loaded.</p>
+              </figure>
+
+              <figure class="clockwork-film" data-clockwork-player data-group-id="g1">
+                <div class="clockwork-stage" data-film-stage data-state="loading">
+                  <canvas class="clockwork-canvas" id="g1-film" width="1" height="1" role="img" aria-label="Animated clockwork action for g1">JavaScript is needed for this film; the static coloured plate remains available below.</canvas>
+                  <p class="film-status" data-film-status>Loading local film data…</p>
+                </div>
+                <div class="animation-controls" data-film-controls data-state="loading">
+                  <button class="animation-toggle" type="button" data-film-toggle aria-controls="g1-film" aria-pressed="false" disabled>
+                    <span class="animation-icon" aria-hidden="true">▶</span>
+                    <span data-film-toggle-label>Play</span>
+                  </button>
+                  <label class="visually-hidden" for="g1-phase">Phase for colour action g1</label>
+                  <input class="phase-slider" id="g1-phase" data-film-slider type="range" min="0" max="1" step="0.001" value="0" aria-valuetext="phase 0.000 of one period" disabled>
+                  <output class="phase-output" data-film-output for="g1-phase">0.000</output>
+                </div>
+              </figure>
+            </div>
+
+            <div class="entry-copy">
+
+              <section class="group-presentation" aria-labelledby="g1-presentation-title">
+                <div class="presentation-heading">
+                  <h4 id="g1-presentation-title">Presentation</h4>
+                  <p class="colour-order colour-order--presentation" role="img" aria-label="Colour order: blue"><span class="colour-order-palette" aria-hidden="true"><span class="colour-order-label">order</span><span class="colour-order-swatch" style="--colour-order-swatch: #0072B2" aria-hidden="true"></span></span></p>
+                </div>
+                <table data-presentation="g1">
+                  <caption class="visually-hidden">Chaim’s named geometric generators with fixed-clock powers and directed time shifts for g1</caption>
+                  <thead><tr><th scope="col">Generator</th><th scope="col">Color</th><th scope="col">Time</th></tr></thead>
+                  <tbody><tr class="presentation-generator-row"><th scope="row"><span class="presentation-generator-identity"><span class="generator-key">X</span><span class="generator-geometry">translation</span></span></th><td class="presentation-colour-action" data-clock-power="0" data-fixed-cycle="1" data-source-cycle="1">none</td><td class="presentation-time-action" data-time-shift="0">none</td></tr>
+<tr class="presentation-generator-row"><th scope="row"><span class="presentation-generator-identity"><span class="generator-key">Y</span><span class="generator-geometry">translation</span></span></th><td class="presentation-colour-action" data-clock-power="0" data-fixed-cycle="1" data-source-cycle="1">none</td><td class="presentation-time-action" data-time-shift="0">none</td></tr></tbody>
+                </table>
+                <p class="presentation-relations"><strong>Relations</strong> <span>Γ = ⟨X, Y | XY = YX⟩</span></p>
+
+
+              </section>
+
+              <section class="other-names" aria-labelledby="g1-other-names-title">
+                <h4 id="g1-other-names-title">Identifications</h4>
+                <ul>
+                  <li class="book-audit-row"><span class="term-help" aria-label="Book type audit: The book crop supporting the displayed short form. For a composite cyclic extension with no literal book row, this uses the nearest available rule or type audit and marks that limitation."><span class="term-help-label" aria-hidden="true">Book type audit</span><span class="term-help-copy" aria-hidden="true">The book crop supporting the displayed short form. For a composite cyclic extension with no literal book row, this uses the nearest available rule or type audit and marks that limitation.</span></span><span class="book-audit-value"><a class="book-page-link" href="https://yaroslavvb.github.io/animated-groups/book-excerpt.html?v=short-signature-audit-v2&amp;image=output%2Fbook-excerpts%2Fp40-ring.webp&amp;title=Plane-group+signature+%E2%97%A6&amp;context=Table+3.2+on+printed+p.+40%3B+the+outline+marks+%E2%97%A6+among+the+17+plane+groups.&amp;alt=Annotated+excerpt+of+Table+3.2+with+the+plane-group+signature+%E2%97%A6+outlined.&amp;source=https%3A%2F%2Fbooks.google.com%2Fbooks%3Fid%3DEtQCk0TNafsC%26pg%3DPA40" data-printed-page="40" data-pdf-page="59" data-book-excerpt="p40::◦" data-book-image="output/book-excerpts/p40-ring.webp" data-book-title="Plane-group signature ◦" data-book-context="Table 3.2 on printed p. 40; the outline marks ◦ among the 17 plane groups." data-book-alt="Annotated excerpt of Table 3.2 with the plane-group signature ◦ outlined." data-book-source="https://books.google.com/books?id=EtQCk0TNafsC&amp;pg=PA40" data-short-signature-excerpt target="clockwork-book-excerpt">The Symmetries of Things · p. 40</a></span></li>
+                  <li class="other-names-row"><span class="other-name-category">Other names</span><span class="other-name-list"><span class="identified-name term-help" data-name-system="Conway fibrifold notation" title="Conway fibrifold notation: Conway&#x27;s decorated orbifold name for this lift. It records the horizontal base orbifold and the fractional height translations coupled to its generators; this page uses the alias for the chosen height direction."><span class="term-help-label"><span class="fibrifold-name" aria-label="(◦)">(◦)</span></span><span class="term-help-copy" aria-hidden="true"><strong>Conway fibrifold notation</strong><span>Conway&#x27;s decorated orbifold name for this lift. It records the horizontal base orbifold and the fractional height translations coupled to its generators; this page uses the alias for the chosen height direction.</span></span></span><span class="identified-name term-help" data-name-system="Hermann–Mauguin space-group symbol" title="Hermann–Mauguin space-group symbol: The short international Hermann–Mauguin symbol for this three-dimensional space-group type. Full form: P 1."><span class="term-help-label"><span class="hermann-mauguin-name">P1</span></span><span class="term-help-copy" aria-hidden="true"><strong>Hermann–Mauguin space-group symbol</strong><span>The short international Hermann–Mauguin symbol for this three-dimensional space-group type. Full form: P 1.</span></span></span><span class="identified-name term-help" data-name-system="International Tables number" title="International Tables number: The standard International Tables number identifying this three-dimensional space-group type."><span class="term-help-label"><span class="international-tables-number">No. 1</span></span><span class="term-help-copy" aria-hidden="true"><strong>International Tables number</strong><span>The standard International Tables number identifying this three-dimensional space-group type.</span></span></span><span class="identified-name term-help" data-name-system="Schoenflies space-group symbol" title="Schoenflies space-group symbol: The Schoenflies symbol for the full three-dimensional space-group type; its superscript distinguishes types with the same point group."><span class="term-help-label"><span class="schoenflies-name" aria-label="C1^1">C<sub>1</sub><sup>1</sup></span></span><span class="term-help-copy" aria-hidden="true"><strong>Schoenflies space-group symbol</strong><span>The Schoenflies symbol for the full three-dimensional space-group type; its superscript distinguishes types with the same point group.</span></span></span><span class="identified-name term-help" data-name-system="Hall setting symbol" title="Hall setting symbol: The Hall symbol for the selected coordinate setting; unlike a bare Hermann–Mauguin type symbol, it fixes the setting unambiguously."><span class="term-help-label"><span class="hall-symbol-name">P 1</span></span><span class="term-help-copy" aria-hidden="true"><strong>Hall setting symbol</strong><span>The Hall symbol for the selected coordinate setting; unlike a bare Hermann–Mauguin type symbol, it fixes the setting unambiguously.</span></span></span><span class="identified-name term-help" data-name-system="Catalog instance" title="Catalog instance: The matching animated example in the forward-time catalog; gN is this project&#x27;s record identifier."><span class="term-help-label"><a href="https://yaroslavvb.github.io/animated-groups-fable/catalog.html?time=forward#g1">g1</a></span><span class="term-help-copy" aria-hidden="true"><strong>Catalog instance</strong><span>The matching animated example in the forward-time catalog; gN is this project&#x27;s record identifier.</span></span></span></span></li>
+                </ul>
+              </section>
+
+              <details class="extra-links" data-extra-links="g1">
+                <summary id="g1-extra-links-title">Extra links</summary>
+                <ul class="extra-links-list">
+                  <li><a class="extra-link" data-catalog-id="crystal-symmetry-example" data-link-scope="exact_space_group" data-group-id="g1" href="https://crystalsymmetry.wordpress.com/2014/06/03/1/" target="_blank" rel="noopener"><span class="extra-link-catalog">CrystalSymmetry worked example</span><span class="extra-link-target">No. 1 P1</span><span class="extra-link-scope">exact space group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="crystal-symmetry-diagram" data-link-scope="exact_space_group" data-group-id="g1" href="https://crystalsymmetry.wordpress.com/space-group-diagrams/001-p1-2/" target="_blank" rel="noopener"><span class="extra-link-catalog">CrystalSymmetry diagram</span><span class="extra-link-target">No. 1 P1</span><span class="extra-link-scope">exact space group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="iucr-space-group" data-link-scope="exact_space_group" data-group-id="g1" href="https://onlinelibrary.wiley.com/iucr/itc/Ac/ch2o3v0001/sgtable2o3o001/" target="_blank" rel="noopener"><span class="extra-link-catalog">IUCr Volume A space-group table</span><span class="extra-link-target">No. 1 P1</span><span class="extra-link-scope">exact space group</span></a></li>
+                  <li><a class="extra-link ucl-reference" data-catalog-id="ucl-space-group" data-link-scope="exact_space_group" data-group-id="g1" href="http://img.chem.ucl.ac.uk/sgp/large/001az1.htm" target="_blank" rel="noopener"><span class="extra-link-catalog">UCL space-group diagrams</span><span class="extra-link-target">No. 1 P1</span><span class="extra-link-scope">exact space group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="bilbao-point-group" data-link-scope="polar_point_group" data-group-id="g1" href="https://cryst.ehu.es/cgi-bin/rep/programs/sam/point.py?sg=1&amp;num=1" target="_blank" rel="noopener"><span class="extra-link-catalog">Bilbao Point Group Tables</span><span class="extra-link-target">Point group 1</span><span class="extra-link-scope">shared polar point group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="aflow-prototypes" data-link-scope="exact_space_group" data-group-id="g1" href="https://aflow.org/p/triclinic_spacegroup.html#sg1" target="_blank" rel="noopener"><span class="extra-link-catalog">AFLOW crystal prototypes</span><span class="extra-link-target">No. 1 P1</span><span class="extra-link-scope">exact space group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="gsp-point-group" data-link-scope="polar_point_group" data-group-id="g1" href="https://github.com/LluisCasas/GSP/blob/main/1.pdf" target="_blank" rel="noopener"><span class="extra-link-catalog">GSP crystal morphology</span><span class="extra-link-target">Point group 1</span><span class="extra-link-scope">shared polar point group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="webmineral-crystal-class" data-link-scope="polar_point_group" data-group-id="g1" href="https://webmineral.com/crystal/Triclinic-Pedial.shtml" target="_blank" rel="noopener"><span class="extra-link-catalog">Webmineral crystal class</span><span class="extra-link-target">Point group 1</span><span class="extra-link-scope">shared polar point group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="smorf-crystal-form" data-link-scope="polar_point_group" data-group-id="g1" href="https://smorf.nl/crystals_triclinic.php?crystal=pv/triclinicpedion1" target="_blank" rel="noopener"><span class="extra-link-catalog">Smorf crystal form</span><span class="extra-link-target">Point group 1</span><span class="extra-link-scope">shared polar point group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="gemmology-cdl" data-link-scope="point_group_reference" data-group-id="g1" href="https://gemmology.dev/docs/cdl/#crystal-systems" target="_blank" rel="noopener"><span class="extra-link-catalog">gemmology.dev CDL</span><span class="extra-link-target">CDL point-group table · 1</span><span class="extra-link-scope">point-group reference</span></a></li>
+                  <li><a class="extra-link international-tables-reference" data-catalog-id="iucr-plane-group" data-link-scope="parent_plane_group" data-group-id="g1" href="https://it.iucr.org/Ac/ch2o2v0001/sgtable2o2o001/" target="_blank" rel="noopener"><span class="extra-link-catalog">IUCr plane-group table</span><span class="extra-link-target">No. 1 p1</span><span class="extra-link-scope">parent plane group</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="jmol-sgsv" data-link-scope="manual_space_group_selection" data-group-id="g1" href="https://spacegroups.symotter.org/" target="_blank" rel="noopener"><span class="extra-link-catalog">Jmol Space Group Visualizer</span><span class="extra-link-target">Select No. 1 P1 manually</span><span class="extra-link-scope">manual space-group selection</span></a></li>
+                  <li><a class="extra-link" data-catalog-id="crystallify" data-link-scope="manual_space_group_selection" data-group-id="g1" href="https://www.crystallify.com/" target="_blank" rel="noopener"><span class="extra-link-catalog">Crystallify</span><span class="extra-link-target">Select No. 1 P1 manually</span><span class="extra-link-scope">manual space-group selection</span></a></li>
+                </ul>
+              </details>
+            </div>
+          </div>
+        </section>
+      </li>
+        </ol>
+      </div>
+    </section>
+    </div>
+
+    <section class="family-notes" aria-label="Notation">
+      <aside class="notation-caveat" aria-labelledby="notation-caveat-title">
+        <h2 id="notation-caveat-title">Notation</h2>
+        <p>Only <strong>cyclic</strong> colour permutations are considered here.
+        That restriction is what makes the correspondence exact: a colouring
+        whose permutations form a cyclic group is the same object as a
+        <strong>polar</strong> crystal, the colour cycle being the height along
+        the polar axis. Each row is therefore one colouring and one polar space
+        group, named both ways.</p>
+        <p>Names on the left are the coloured-orbifold signatures of
+        <a href="https://www.mit.edu/~hlb/Symmetries_of_Things/" target="_blank" rel="noopener"><em>The Symmetries of Things</em> ↗</a>
+        (Conway, Burgiel and Goodman-Strauss); each row links to the book page
+        its short form is read from. Names on the right are the standard
+        crystallographic ones &mdash; the Hermann&ndash;Mauguin symbol and its
+        number in the
+        <a href="https://it.iucr.org/A/" target="_blank" rel="noopener">International Tables for Crystallography, Volume A ↗</a>,
+        with each row also linking to its entry in the
+        <a href="https://www.cryst.ehu.es/cgi-bin/cryst/programs/nph-wp-list" target="_blank" rel="noopener">Bilbao Crystallographic Server ↗</a>
+        and to a real mineral bearing the group.</p>
+      </aside>
     </section>
 
     <section class="provenance" aria-labelledby="provenance-title">

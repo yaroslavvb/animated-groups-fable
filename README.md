@@ -67,10 +67,14 @@ The classification is recomputed from scratch in exact rational arithmetic
   the 52/88 counts and G&S's three-colour figures (which the computation
   exceeds by five types); emits `docs/data/patterns.json`.
 - `correspondence_symbols.py` — the crystallographic generator symbols on
-  the correspondence page (International Tables projection symbols: lens,
+  the correspondence pages (International Tables projection symbols: lens,
   triangle, diamond, hexagon and edge-prolonging screw tails, each one
-  filled outline); rewrites `docs/correspondence.html` in place, `--check`
-  verifies it is current.
+  filled outline); rewrites the snapshot `correspondence-source.html` in
+  place, `--check` verifies it is current.
+- `split_correspondence.py` — cuts that snapshot into the served pages:
+  `docs/correspondence.html` (the index with one card per wallpaper group)
+  and `docs/correspondence-<hm>.html`, one page per wallpaper group (17);
+  old `correspondence.html#g244` links are redirected by the index.
 - `sync_crops.py` — copies the MathWorld thumbnails and the book crops for
   the three-colour types from the sibling repo, matching crops by the
   audited labels printed in their highlight boxes (several source files are

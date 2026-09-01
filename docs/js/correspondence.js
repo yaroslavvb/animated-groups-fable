@@ -814,8 +814,11 @@ function createExplicitGhkExpression(record) {
 }
 
 function initializeChaimConwayNames(records) {
+  // Each wallpaper group has its own page, so only the records with an entry
+  // on this page are expected to receive a name.
+  const onPage = records.filter((record) => document.getElementById(record.id));
   let present = 0;
-  for (const record of records) {
+  for (const record of onPage) {
     const list = document.getElementById(record.id)?.querySelector(".other-name-list");
     if (!list || !record.parent?.orbifold || !record.kernel?.orbifold) continue;
     if (list.querySelector(`[data-name-system="${CHAIM_CONWAY_NAME_SYSTEM}"]`)) {
@@ -863,8 +866,8 @@ function initializeChaimConwayNames(records) {
     present += 1;
   }
 
-  if (present !== records.length) {
-    console.error(`Added ${present} of ${records.length} Chaim/Conway G/H/K names.`);
+  if (present !== onPage.length) {
+    console.error(`Added ${present} of ${onPage.length} Chaim/Conway G/H/K names.`);
   }
 }
 

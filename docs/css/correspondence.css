@@ -348,125 +348,188 @@ nav a[aria-current="page"] {
   letter-spacing: -0.035em;
 }
 
-.directory-families {
-  display: grid;
-  gap: 1px;
-  overflow: hidden;
-  border-block: 1px solid var(--line);
-  background: var(--line);
+/* Visual table of contents on the index: one card per wallpaper group, its
+   own one-colour plate as the picture, the number of forward clockwork groups
+   over it as a badge, and their polar space groups on the last line. */
+.family-directory {
+  padding: 0 0 clamp(2rem, 5vw, 3.5rem);
 }
 
-.directory-family {
-  display: grid;
-  grid-template-columns: minmax(6.4rem, 0.18fr) minmax(0, 0.82fr);
-  gap: 1.25rem;
-  padding: 0.72rem 0.8rem;
-  background: var(--surface);
-}
-
-.directory-family h2 {
-  margin: 0;
-  font-size: 1rem;
+.family-directory h2 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
   font-weight: 650;
-  line-height: 1.1;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
 }
 
-.directory-family h2 a {
-  color: var(--text);
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  text-decoration: none;
-}
-
-.directory-family h2 a:hover,
-.directory-family h2 a:focus-visible {
-  color: var(--accent);
-}
-
-.directory-family h2 > span {
-  display: block;
-  margin-top: 0.2rem;
+.family-directory-note {
+  max-width: 760px;
+  margin: 0 0 1.1rem;
   color: var(--muted);
-  font-size: 0.62rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
-.directory-groups {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0.48rem;
-  min-width: 0;
-  padding-bottom: 0.12rem;
-}
-
-.directory-group {
+.family-grid {
   display: grid;
-  flex: 0 0 auto;
-  gap: 0.28rem;
-  min-width: 5.6rem;
-  padding: 0.34rem 0.4rem 0.42rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.9rem;
+}
+
+.family-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
   color: var(--text);
   text-decoration: none;
+  box-shadow: 0 1px 2px rgb(35 45 41 / 0.05);
+  transition: box-shadow 120ms ease, transform 120ms ease, border-color 120ms ease;
 }
 
-.directory-group:hover,
-.directory-group:focus-visible {
+.family-card:hover,
+.family-card:focus-visible {
   border-color: var(--accent);
-  background: var(--background);
-  color: var(--accent);
+  color: var(--text);
+  box-shadow: 0 8px 22px rgb(35 45 41 / 0.14);
+  transform: translateY(-2px);
+  outline: none;
 }
 
-.directory-signature {
-  justify-self: center;
+.family-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
+  background: var(--plate-surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.family-card-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.5rem 0.65rem 0.1rem;
+}
+
+.family-card-orbifold {
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 0.82rem;
-  font-weight: 650;
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  font-weight: 700;
   line-height: 1.1;
-  white-space: nowrap;
+  letter-spacing: -0.02em;
 }
 
-.clockwork-disambiguator {
-  color: var(--accent);
-  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+.family-card-hm {
+  color: var(--muted);
+  font-size: 0.8rem;
   font-weight: 650;
 }
 
-.clockwork-disambiguator sub,
-.clockwork-disambiguator sup {
-  font-size: 0.66em;
+.family-card-count {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.22rem 0.5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 650;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.25);
+}
+
+.family-card-groups {
+  padding: 0.1rem 0.65rem 0.6rem;
+  color: var(--muted);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.family-card-groups sub,
+.family-card-groups sup {
+  font-size: 0.75em;
   line-height: 0;
 }
 
-.clockwork-disambiguator--directory {
-  justify-self: center;
-  font-size: 0.72rem;
-  line-height: 1;
-}
-
-.directory-palette {
-  display: flex;
-  width: 100%;
-  min-width: 4rem;
-  height: 1.15rem;
-  overflow: hidden;
-  border: 1px solid rgb(35 45 41 / 0.42);
-  border-radius: 2px;
-}
-
-.directory-palette span {
-  flex: 1 1 0;
-  background: var(--directory-colour);
-}
-
-.directory-group-id {
-  justify-self: center;
+/* The group pages: breadcrumb, the family's name as the page title, and a
+   pager to the neighbouring groups in International Tables order. */
+.family-breadcrumb {
+  margin: 0 0 0.7rem;
   color: var(--muted);
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 0.58rem;
+  font-size: 0.78rem;
+}
+
+.family-breadcrumb a {
+  color: inherit;
+}
+
+.family-page-header h1 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.65rem;
+  max-width: none;
+  margin: 0 0 0.6rem;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 570;
   line-height: 1;
+  letter-spacing: -0.025em;
+}
+
+.family-page-header .family-hm {
+  color: var(--muted);
+  font-size: 0.5em;
+  font-weight: 500;
+}
+
+.family-page-header .family-summary {
+  margin-bottom: 0.5rem;
+}
+
+.family-pager {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.4rem;
+  margin: 0 0 1.3rem;
+  font-size: 0.82rem;
+}
+
+.family-pager-link {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.family-pager-link:hover,
+.family-pager-link:focus-visible {
+  text-decoration: underline;
+}
+
+.family-pager-index {
+  color: var(--muted);
+}
+
+.correspondence-family-page .wallpaper-family {
+  padding-top: clamp(1.2rem, 3vw, 2rem);
+  border-bottom: 0;
+}
+
+/* On a group page the notation note follows the entries: it is reference
+   material, and the index carries it in full. */
+.family-notes {
+  padding: clamp(1.5rem, 4vw, 2.5rem) 0 0;
+  border-top: 1px solid var(--line);
 }
 
 .correspondence-atlas {
@@ -2052,20 +2115,13 @@ a.short-signature-link[data-book-excerpt]::after {
     font-size: clamp(1.45rem, 7vw, 1.75rem);
   }
 
-  .directory-family {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+  .family-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
   }
 
-  .directory-family h2 > span {
-    display: inline;
-    margin-left: 0.38rem;
-  }
-
-  .directory-groups {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: thin;
+  .family-page-header h1 {
+    font-size: clamp(1.7rem, 9vw, 2.4rem);
   }
 
   .other-names li {
