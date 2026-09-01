@@ -17,10 +17,14 @@
         pendingFrame = 0;
         const layoutWidth = window.innerWidth;
         const candidateWidth = viewport?.width;
+        // A pinch zoom also narrows the visual viewport, but the layout must
+        // not follow it: the viewer is magnifying a slice of the page, not
+        // asking for a narrower page.  Only an unscaled narrowing counts.
+        const pinchZoomed = Number.isFinite(viewport?.scale) && viewport.scale > 1.001;
         const visibleWidth = Number.isFinite(candidateWidth) && candidateWidth > 0
           ? Math.min(layoutWidth, candidateWidth)
           : layoutWidth;
-        const constrained = layoutWidth <= 620 && visibleWidth + 1 < layoutWidth;
+        const constrained = !pinchZoomed && layoutWidth <= 620 && visibleWidth + 1 < layoutWidth;
         root.toggleAttribute("data-visual-viewport-constrained", constrained);
         if (constrained) {
           root.style.setProperty(
