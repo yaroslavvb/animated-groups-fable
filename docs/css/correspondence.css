@@ -1499,11 +1499,6 @@ nav a[aria-current="page"] {
   font-size: 0.68rem;
 }
 
-.vladimir-catalog-note--pending::before {
-  margin-right: 0.3rem;
-  content: "·";
-}
-
 .short-form-support {
   display: inline-flex;
   min-width: 0;

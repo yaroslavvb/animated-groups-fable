@@ -26,7 +26,9 @@ Writes docs/data/vladimir-catalog-links.json:
       "url": "https://.../632/2/632-333-2/", "rendered": false}, ...}}
 
 ``rendered`` says whether the snapshot of the catalog given by --catalog
-already contains that page (Vladimir's catalog is a growing prototype).
+already contains that page (Vladimir's catalog is a growing prototype);
+split_correspondence.py shows the "Vladimir catalog" line only for those.
+Re-run this script after pulling a newer snapshot, then regenerate the pages.
 
 Usage:
     python3 enumerate/vladimir_catalog_links.py \

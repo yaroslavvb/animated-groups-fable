@@ -22,11 +22,14 @@ Every entry keeps its id, so a link that used to read
 correspondence.html#g244 still works: the index redirects it to
 correspondence-p6.html#g244.
 
-Each entry's Identifications list also gets a "Vladimir catalog" line: the
-page of Vladimir Bulatov's catalog of colour groups (the G/K[N] entry whose
-subgroup is the colouring's kernel) from docs/data/vladimir-catalog-links.json,
-which vladimir_catalog_links.py derives from his manifests.  The source
-snapshot stays untouched; the rows are added while the pages are written.
+An entry whose colouring Vladimir Bulatov has rendered in his catalog of
+colour groups (the G/K[N] entry whose subgroup is the colouring's kernel)
+also gets a "Vladimir catalog" line in its Identifications list, from
+docs/data/vladimir-catalog-links.json, which vladimir_catalog_links.py
+derives from his manifests together with a "rendered" flag for the current
+snapshot of his catalog.  Entries he has not rendered yet get no line.  The
+source snapshot stays untouched; the rows are added while the pages are
+written.
 
 Order of operations after editing the source:
     python3 correspondence_symbols.py       redraw the symbols in the source
@@ -109,9 +112,6 @@ def vladimir_row(link):
         notes.append(
             '<span class="vladimir-catalog-note" title="%s">%d subgroups up to conjugacy '
             'in his manifest share this page</span>' % (attr(", ".join(variants)), len(variants)))
-    if not link["rendered"]:
-        notes.append('<span class="vladimir-catalog-note vladimir-catalog-note--pending">'
-                     'not yet rendered in the catalog snapshot</span>')
     return (
         '<li class="other-names-row vladimir-catalog-row">'
         '<span class="other-name-category">Vladimir catalog</span>'
@@ -123,10 +123,13 @@ def vladimir_row(link):
 
 
 def add_vladimir_rows(fragment, gids, links):
-    """Append the Vladimir catalog row to the Identifications list of each entry."""
+    """Append the Vladimir catalog row to the Identifications list of each
+    entry whose page exists in the current snapshot of his catalog."""
     for gid in gids:
         if gid not in links:
             raise ValueError("%s has no Vladimir catalog link; run vladimir_catalog_links.py" % gid)
+        if not links[gid]["rendered"]:
+            continue
         start = fragment.index('aria-labelledby="%s-other-names-title"' % gid)
         end = fragment.index("</ul>", start)
         if 'vladimir-catalog-row' in fragment[start:end]:
