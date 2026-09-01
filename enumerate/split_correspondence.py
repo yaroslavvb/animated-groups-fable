@@ -199,15 +199,15 @@ def index_page(parts):
                 attr(family.count_text), family.count, family.space_groups_html))
     total = sum(family.count for family in parts.families)
     head = parts.head.replace("</head>", redirect_script(parts) + "</head>", 1)
+    # The index opens on the wallpaper groups; the symbol key (with its visual
+    # index, which the script keeps next to its teaser) and the notation note
+    # follow them as reference material, as on the group pages.
     body = (
         '<main class="correspondence-page">\n'
         '    <section class="directory" aria-labelledby="page-title">\n'
         '      %s\n'
         '      %s\n'
-        '      %s\n'
-        '      %s\n'
         '    </section>\n\n'
-        '    %s\n\n'
         '    <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">\n'
         '      <h2 id="family-directory-title">The 17 wallpaper groups</h2>\n'
         '      <p class="family-directory-note">One page per wallpaper group, in the order of the '
@@ -217,8 +217,13 @@ def index_page(parts):
         '%s\n'
         '      </nav>\n'
         '    </section>\n\n'
-        '    %s' % (parts.h1, parts.note, parts.teaser, parts.notation, parts.dialog, total,
-                    "\n".join(cards), parts.tail))
+        '    <section class="family-notes" aria-label="Diagram symbols and notation">\n'
+        '      %s\n'
+        '      %s\n'
+        '    </section>\n\n'
+        '    %s\n\n'
+        '    %s' % (parts.h1, parts.note, total, "\n".join(cards), parts.teaser, parts.notation,
+                    parts.dialog, parts.tail))
     return head + body
 
 
