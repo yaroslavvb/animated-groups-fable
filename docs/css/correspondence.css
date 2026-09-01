@@ -740,7 +740,6 @@ nav a[aria-current="page"] {
 .plate-generator-quarter-arrow-halo,
 .plate-generator-quarter-arrow,
 .diagram-symbol-quarter-arrow,
-.plate-generator-glyph-halo,
 .plate-generator-glyph {
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -749,15 +748,10 @@ nav a[aria-current="page"] {
 
 .plate-generator-axis-halo,
 .plate-generator-translation-halo,
-.plate-generator-quarter-arrow-halo,
-.plate-generator-glyph-halo {
+.plate-generator-quarter-arrow-halo {
   fill: none;
   stroke: var(--plate-surface);
   stroke-width: 6px;
-}
-
-.plate-generator-glyph-halo {
-  color: var(--plate-surface);
 }
 
 .plate-generator-axis,
@@ -773,17 +767,23 @@ nav a[aria-current="page"] {
   stroke-dasharray: none;
 }
 
+/* Line styles after the International Tables (planes seen edge-on): solid
+   for m, long dashes for an in-plane (axial) glide, a row of round dots for a
+   c-glide, dash-dot for n and d. Widths and dashes are screen pixels (the
+   strokes do not scale) and the caps are round, which lengthens every dash by
+   one stroke width, so the gaps below are set for the visible result. */
 .plate-generator-axis--plane-axial {
-  stroke-dasharray: 9 7;
+  stroke-dasharray: 12 8;
 }
 
 .plate-generator-axis--plane-c {
-  stroke-dasharray: 1 7;
+  stroke-width: 3.4px;
+  stroke-dasharray: 0 8;
 }
 
 .plate-generator-axis--plane-n,
 .plate-generator-axis--plane-d {
-  stroke-dasharray: 10 5 1 5;
+  stroke-dasharray: 12 6.5 0 6.5;
 }
 
 .plate-generator-quarter-arrow,
@@ -793,8 +793,17 @@ nav a[aria-current="page"] {
   stroke-width: 2.35px;
 }
 
+/* A rotation or screw symbol is one filled outline (see
+   enumerate/correspondence_symbols.py). The halo is the same path stroked in
+   the plate colour and painted beneath the fill, so it hugs the tails as well
+   as the core and stays a constant 2.5px on screen at every plate width. */
 .plate-generator-glyph {
   color: var(--generator-ink);
+  fill: currentColor;
+  fill-rule: nonzero;
+  stroke: var(--plate-surface);
+  stroke-width: 5px;
+  paint-order: stroke fill;
 }
 
 .plate-generator-label {
@@ -816,8 +825,12 @@ nav a[aria-current="page"] {
   .plate-generator-axis-halo,
   .plate-generator-translation-halo,
   .plate-generator-quarter-arrow-halo,
-  .plate-generator-glyph-halo,
   .plate-generator-label {
+    stroke: Canvas;
+  }
+
+  .plate-generator-glyph {
+    color: CanvasText;
     stroke: Canvas;
   }
 
@@ -826,8 +839,7 @@ nav a[aria-current="page"] {
   .plate-generator-translation,
   .diagram-symbol-translation,
   .plate-generator-quarter-arrow,
-  .diagram-symbol-quarter-arrow,
-  .plate-generator-glyph {
+  .diagram-symbol-quarter-arrow {
     color: CanvasText;
     stroke: CanvasText;
   }
@@ -906,8 +918,8 @@ nav a[aria-current="page"] {
 }
 
 .colour-order-action-glyph--rotation {
-  width: 1.22rem;
-  height: 1.22rem;
+  width: 1.32rem;
+  height: 1.32rem;
 }
 
 .colour-order-action-glyph--reflection {
@@ -1542,25 +1554,15 @@ a.short-signature-link[data-book-excerpt]::after {
   gap: 0.3rem;
 }
 
+/* Rotation and screw symbols are single filled outlines: the crystallographic
+   core (lens, triangle, diamond, hexagon) and the tails that prolong its edges
+   are subpaths of one path, so the glyph scales as a shape and anti-aliases
+   like type instead of a fill plus non-scaling strokes. The geometry lives in
+   enumerate/correspondence_symbols.py, which regenerates every instance. */
 .generator-symbol-core {
   fill: currentColor;
-  stroke: currentColor;
-  stroke-width: 1.25;
-  vector-effect: non-scaling-stroke;
-}
-
-.generator-symbol-body .generator-symbol-arms {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: butt;
-  stroke-linejoin: miter;
-  vector-effect: non-scaling-stroke;
-}
-
-.plate-generator-glyph-halo .generator-symbol-core,
-.plate-generator-glyph-halo .generator-symbol-arms {
-  stroke-width: 6px;
+  fill-rule: nonzero;
+  stroke: none;
 }
 
 
@@ -2214,6 +2216,30 @@ a.short-signature-link[data-book-excerpt]::after {
   stroke-width: 5.2px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+/* The head of that half arrow is a filled half arrowhead on one side of the
+   line: a stroked barb of the same size disappeared among the dashes. */
+.plate-generator-glide-head,
+.diagram-symbol-glide-head {
+  fill: currentColor;
+  stroke: none;
+}
+.plate-generator-glide-head {
+  stroke: var(--plate-surface);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+  vector-effect: non-scaling-stroke;
+}
+@media (forced-colors: active) {
+  .plate-generator-glide-head,
+  .diagram-symbol-glide-head {
+    fill: CanvasText;
+  }
+  .plate-generator-glide-head {
+    stroke: Canvas;
+  }
 }
 
 /* The legend documents every symbol on the plate, not only the one that steps
