@@ -51,14 +51,14 @@ function updateScale(){if(!record)return;const key=palette()==='concentration'?'
 function svgElement(tag,attributes){const element=document.createElementNS(svgNS,tag);for(const [name,value] of Object.entries(attributes))element.setAttribute(name,value);return element;}
 function overlay(){
   if(!group)return;
-  const overlay=$('generator-overlay');overlay.toggleAttribute('hidden',!$('show-generators').checked);overlay.replaceChildren();
+  const layer=$('generator-overlay');layer.toggleAttribute('hidden',!$('show-generators').checked);layer.replaceChildren();
   const width=tiles(),extent=Math.ceil(2*width)+1;
   for(const named of group.namedGenerators)for(let j=-extent;j<=extent;j++)for(let i=-extent;i<=extent;i++){
     const [x,y]=latticeToScreen([named.centre[0]+i,named.centre[1]+j],width);if(x<.025||x>.975||y<.045||y>.96)continue;
     const marker=svgElement('g',{transform:`translate(${768*x},${768*y})`,class:'generator-marker'+(named.name===generatorName?' selected':''),role:'button',tabindex:'0','aria-label':`${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift`});
     marker.append(svgElement('circle',{r:23,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:'scale(.8)'}));
     const label=svgElement('text',{x:26,y:5});label.textContent=named.name;marker.append(label);
-    const select=()=>{generatorName=named.name;$('operation').value=generatorName;overlay();drawComparison();};marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};overlay.append(marker);
+    const select=()=>{generatorName=named.name;$('operation').value=generatorName;overlay();drawComparison();};marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
   }
   const g=generator();$('generator-description').textContent=`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`;$('compare-label').textContent=`q(x, t + ${g.timeShift} T)`;
   const count=6,shift=Math.round(g.tau*count),row=document.createElement('div');row.className='phase-row';
