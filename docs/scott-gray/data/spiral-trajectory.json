@@ -1,0 +1,66 @@
+{
+  "title": "P4 spiral-wave reference trajectory",
+  "file": "spiral-trajectory.f32",
+  "n": 128,
+  "frames": 32,
+  "channels": [
+    "u",
+    "v"
+  ],
+  "dtype": "float32 little-endian",
+  "layout": "[frame][channel][y][x]; u plane then v plane for each frame",
+  "bytes": 4194304,
+  "params": {
+    "F": 0.007457,
+    "k": 0.033896,
+    "Du": 0.16,
+    "Dv": 0.08,
+    "L": 234.75127446880322,
+    "dx": 1.8339943317875251,
+    "dt": 0.8,
+    "stencil": "5-point",
+    "integrator": "forward Euler"
+  },
+  "frameTime": 20,
+  "timeSpan": 620,
+  "warmupTime": 1600,
+  "source": "https://github.com/vbulatov2011/symhub/blob/main/apps/symsim/gray_scott/presets/wp/par-24-06-12-18-05-25-452.json",
+  "sourceLicense": "MIT; Copyright (c) 2025 Vladimir Bulatov",
+  "sourceProcessing": "Bilinear source cell resampling to128; C4 projection; 5-point PDE warmup 2,000 Euler steps. L rescaled to match leading diffusion of source9-point stencil. Spatial C4 average every100steps during warmup and every25steps during capture to suppress roundoff. No temporal closure projection, no interpolation between phases.",
+  "symmetryRotation": "(x,y)->(-y mod N,x); lattice point at index(0,0), equivalent to(N/2,N/2)",
+  "checks": {
+    "c4Rms": 8.925415073690601e-09,
+    "adjacentFrameRms": 0.06921696662902832,
+    "firstLastRmsAt620": 0.16255469620227814,
+    "recurrenceMinima": [
+      {
+        "lag": 566.4,
+        "rms": 0.06412000954151154
+      },
+      {
+        "lag": 1137.6,
+        "rms": 0.1006036177277565
+      },
+      {
+        "lag": 1711.2,
+        "rms": 0.12694059312343597
+      },
+      {
+        "lag": 2284.7999999999997,
+        "rms": 0.14911650121212006
+      }
+    ],
+    "oneFrameReplayRms": 0.0,
+    "oneFrameDtHalfRms": 0.0003899470902979374,
+    "minUV": [
+      0.07271155714988708,
+      6.178325975270127e-07
+    ],
+    "maxUV": [
+      0.9625574350357056,
+      0.47635534405708313
+    ],
+    "returnRmsAt640": 0.20009005069732666
+  },
+  "status": "finite genuine forward PDE trajectory, not a verified periodic orbit"
+}

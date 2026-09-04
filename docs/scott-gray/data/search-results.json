@@ -1,0 +1,90 @@
+{
+  "method": "200 projected L-BFGS iterations from the deterministic skate seed; N32 M32 dx3 F=.062 k=.0609; initial T1200; independent RK4 validation",
+  "interpretation": "All six bounded local searches failed the numerical validation gates. This is not evidence that the requested orbits do not exist.",
+  "results": [
+    {
+      "group": "g94",
+      "initialPdeRms": 0.0018342633050815026,
+      "finalPdeRms": 9.77607170081072e-05,
+      "relativePde": 0.27142837337440223,
+      "closureRms": 0.047360590262990984,
+      "relativeClosure": 1.4017515401109415,
+      "trajectoryRms": 0.06790530177122149,
+      "temporalRms": 0.03378672247382916,
+      "spatialRms": 0.04000564049580552,
+      "symmetryMax": 0,
+      "period": 1202.2187152496404,
+      "validated": false
+    },
+    {
+      "group": "g95",
+      "initialPdeRms": 0.0018342633050815098,
+      "finalPdeRms": 9.67551025095737e-05,
+      "relativePde": 0.26863988282385687,
+      "closureRms": 0.0488793627734579,
+      "relativeClosure": 1.4485409330694372,
+      "trajectoryRms": 0.06993339857519854,
+      "temporalRms": 0.033743860223461715,
+      "spatialRms": 0.0399993290739787,
+      "symmetryMax": 0,
+      "period": 1202.3374527245662,
+      "validated": false
+    },
+    {
+      "group": "g96",
+      "initialPdeRms": 0.001834263305081508,
+      "finalPdeRms": 9.751436182909383e-05,
+      "relativePde": 0.27137887236112057,
+      "closureRms": 0.047700556202335605,
+      "relativeClosure": 1.4116525902379773,
+      "trajectoryRms": 0.06646647204517626,
+      "temporalRms": 0.03379057746374709,
+      "spatialRms": 0.040040167264027766,
+      "symmetryMax": 0,
+      "period": 1202.243508967665,
+      "validated": false
+    },
+    {
+      "group": "g97",
+      "initialPdeRms": 0.0018342633050815091,
+      "finalPdeRms": 9.94175179284181e-05,
+      "relativePde": 0.2778518816192228,
+      "closureRms": 0.05196753207617271,
+      "relativeClosure": 1.5355715715743006,
+      "trajectoryRms": 0.07266215348510104,
+      "temporalRms": 0.03384246819762005,
+      "spatialRms": 0.040001940743877376,
+      "symmetryMax": 0,
+      "period": 1202.0374214117646,
+      "validated": false
+    },
+    {
+      "group": "g98",
+      "initialPdeRms": 0.002218142861982424,
+      "finalPdeRms": 0.00017228880035308224,
+      "relativePde": 0.2758469694095967,
+      "closureRms": 0.05403896710906003,
+      "relativeClosure": 1.0994857518759502,
+      "trajectoryRms": 0.08315454417460152,
+      "temporalRms": 0.04914931095456069,
+      "spatialRms": 0.05828123289965197,
+      "symmetryMax": 0,
+      "period": 1205.4659410897193,
+      "validated": false
+    },
+    {
+      "group": "g99",
+      "initialPdeRms": 0.002601989020362038,
+      "finalPdeRms": 0.00012817418022613664,
+      "relativePde": 0.27016330399523075,
+      "closureRms": 0.04338909315201261,
+      "relativeClosure": 1.0359389580808291,
+      "trajectoryRms": 0.056720011707253146,
+      "temporalRms": 0.04188383187402744,
+      "spatialRms": 0.04779912879591626,
+      "symmetryMax": 0,
+      "period": 1204.6282782716385,
+      "validated": false
+    }
+  ]
+}
