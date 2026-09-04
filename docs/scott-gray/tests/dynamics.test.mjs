@@ -9,8 +9,23 @@ test('glider previews satisfy every catalog operation, including g99 affine offs
   for(const group of groups){const options={N:16,M:16,ops:group.render.ops};const field=makePreview(options),s=movieStats(field,16,16,options.ops);assert.ok(s.symmetryRms<1e-14,group.id);assert.ok(s.temporalRms>.01,group.id);assert.ok(s.spatialRms>.01,group.id);}
 });
 test('forward evolution and collocation use the same equations and preserve the instantaneous kernel',()=>{
-  const N=12,M=8,params={Du:.16,Dv:.08,F:.062,k:.0609,dx:1.5};
-  for(const g of groups){const field=makePreview({N,M,ops:g.render.ops}),state=projectKernel(field.slice(0,2*N*N),N,g.render.ops),p=createProblem({N,M,ops:g.render.ops,params});const a=rhs(state,N,params),b=p.rhsFrame(state);assert.ok(a.every((v,i)=>Math.abs(v-b[i])<1e-14));const stepper=createStepper(state,N,params);stepper.advance(10);const projected=projectKernel(stepper.state,N,g.render.ops);assert.ok(projected.every((v,i)=>Math.abs(v-stepper.state[i])<1e-14),g.id);}
+  const N=12,M=8;
+  for(const stencil of ['five-point','bulatov9'])for(const g of groups){const params={Du:.16,Dv:.08,F:.062,k:.0609,dx:1.5,stencil},field=makePreview({N,M,ops:g.render.ops}),state=projectKernel(field.slice(0,2*N*N),N,g.render.ops),p=createProblem({N,M,ops:g.render.ops,params});const a=rhs(state,N,params),b=p.rhsFrame(state);assert.ok(a.every((v,i)=>Math.abs(v-b[i])<1e-14),stencil+' '+g.id+' equation parity');const stepper=createStepper(state,N,params);stepper.advance(10);const projected=projectKernel(stepper.state,N,g.render.ops);assert.ok(projected.every((v,i)=>Math.abs(v-stepper.state[i])<1e-14),stencil+' '+g.id+' kernel invariance');}
+});
+test('Bulatov diagonal diffusion has the documented continuum normalization',()=>{
+  const N=16,S=N*N,field=new Float64Array(2*S),params={Du:.2097,Dv:.105,F:0,k:0,dx:1};
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)field[y*N+x]=1+.1*Math.cos(2*Math.PI*x/N);
+  const five=rhs(field,N,params),nine=rhs(field,N,{...params,stencil:'bulatov9'});
+  for(let i=0;i<S;i++)assert.ok(Math.abs(nine[i]-1.2*five[i])<3e-16,'axis-aligned Fourier mode has exactly 1.2× diffusion');
+});
+test('CPU fallback honors smaller timesteps and rejects invalid integration inputs',()=>{
+  const N=4,initial=new Float64Array(2*N*N);initial.fill(1,0,N*N);
+  const params={Du:.16,Dv:.08,F:.062,k:.0609,dx:1,dt:.1,stencil:'bulatov9'},stepper=createStepper(initial,N,params);
+  assert.equal(stepper.maxDt,.1);assert.deepEqual(stepper.advance(0),initial);assert.deepEqual(stepper.advance(5),initial);
+  assert.throws(()=>createStepper(initial,N,{...params,stencil:'invalid'}),/stencil/);
+  assert.throws(()=>createStepper(initial,N,{...params,dx:0}),/positive/);
+  assert.throws(()=>createStepper(initial,N,{...params,dt:-1}),/positive/);
+  assert.throws(()=>stepper.advance(-1),/nonnegative/);
 });
 test('bundled spiral trajectory is finite, fourfold, moving, and replays the actual PDE',()=>{
   const bytes=readFileSync(new URL('../data/spiral-trajectory.f32',import.meta.url));

@@ -21,10 +21,12 @@ export function createProblem(options = {}) {
   if (!Number.isInteger(N)||!Number.isInteger(M)||N<4||M<4||N%4||M%4)
     throw new Error('N and M must be positive multiples of four (at least four).');
   const S=N*N, frames=M, length=2*S*M, points=S*M;
-  const params = {Du:0.16,Dv:0.08,F:0.026,k:0.055,dx:1,...options.params};
+  const params = {Du:0.16,Dv:0.08,F:0.026,k:0.055,dx:1,stencil:'five-point',...options.params};
   for (const key of ['Du','Dv','F','k','dx']) if(!Number.isFinite(params[key])||params[key]<0)
     throw new Error(`Invalid parameter ${key}`);
   if(!params.dx) throw new Error('dx must be positive.');
+  if(!['five-point','bulatov9'].includes(params.stencil))throw new Error('Unknown diffusion stencil.');
+  const nine=params.stencil==='bulatov9';
   const ops=options.ops??[{M:[[1,0],[0,1]],v:[0,0],s:1,tau:0}];
   if(!ops.length) throw new Error('At least one symmetry operation is required.');
   const periodBounds=options.periodBounds??[8,20000];
@@ -35,9 +37,12 @@ export function createProblem(options = {}) {
   const weights={temporal:1,spatial:1,phase:0.01,...options.weights};
   const concentrationBounds=options.concentrationBounds??[0,1.2];
   const left=new Int32Array(S),right=new Int32Array(S),up=new Int32Array(S),down=new Int32Array(S);
+  const upperLeft=new Int32Array(S),upperRight=new Int32Array(S),lowerLeft=new Int32Array(S),lowerRight=new Int32Array(S);
   for(let y=0;y<N;y++) for(let x=0;x<N;x++) {
     const p=y*N+x; left[p]=y*N+mod(x-1,N); right[p]=y*N+mod(x+1,N);
     up[p]=mod(y-1,N)*N+x;down[p]=mod(y+1,N)*N+x;
+    upperLeft[p]=mod(y-1,N)*N+mod(x-1,N);upperRight[p]=mod(y-1,N)*N+mod(x+1,N);
+    lowerLeft[p]=mod(y+1,N)*N+mod(x-1,N);lowerRight[p]=mod(y+1,N)*N+mod(x+1,N);
   }
   // Union-find creates the exact invariant subspace, including the closure of
   // the supplied operations. It avoids repeated averaging roundoff/drift.
@@ -80,8 +85,13 @@ export function createProblem(options = {}) {
     const {Du,Dv,F,k,dx}=params, invDx2=1/(dx*dx);
     for(let p=0;p<S;p++){
       const U=q[base+p],V=q[base+S+p],reaction=U*V*V;
-      const lapU=(q[base+left[p]]+q[base+right[p]]+q[base+up[p]]+q[base+down[p]]-4*U)*invDx2;
-      const lapV=(q[base+S+left[p]]+q[base+S+right[p]]+q[base+S+up[p]]+q[base+S+down[p]]-4*V)*invDx2;
+      let axialU=q[base+left[p]]+q[base+right[p]]+q[base+up[p]]+q[base+down[p]];
+      let axialV=q[base+S+left[p]]+q[base+S+right[p]]+q[base+S+up[p]]+q[base+S+down[p]];
+      if(nine){
+        axialU=.8*axialU+.2*(q[base+upperLeft[p]]+q[base+upperRight[p]]+q[base+lowerLeft[p]]+q[base+lowerRight[p]]);
+        axialV=.8*axialV+.2*(q[base+S+upperLeft[p]]+q[base+S+upperRight[p]]+q[base+S+lowerLeft[p]]+q[base+S+lowerRight[p]]);
+      }
+      const lapU=(axialU-4*U)*invDx2,lapV=(axialV-4*V)*invDx2;
       out[outBase+p]=Du*lapU-reaction+F*(1-U);
       out[outBase+S+p]=Dv*lapV+reaction-(F+k)*V;
     }
@@ -129,6 +139,13 @@ export function createProblem(options = {}) {
           for(const n of [left[p],right[p],up[p],down[p]]){
             lapWU+=-.5*(residual[base+n]+residual[prev+n]);
             lapWV+=-.5*(residual[base+S+n]+residual[prev+S+n]);
+          }
+          if(nine){
+            lapWU*=.8;lapWV*=.8;
+            for(const n of [upperLeft[p],upperRight[p],lowerLeft[p],lowerRight[p]]){
+              lapWU+=-.1*(residual[base+n]+residual[prev+n]);
+              lapWV+=-.1*(residual[base+S+n]+residual[prev+S+n]);
+            }
           }
           lapWU=(lapWU-4*wU)*invDx2;lapWV=(lapWV-4*wV)*invDx2;
           grad[i]=scale*((residual[prev+p]-residual[i])*invH+Du*lapWU+(-V*V-F)*wU+V*V*wV);
@@ -236,7 +253,7 @@ export function createProblem(options = {}) {
       if(!(closure.closureRms<=thresholds.closureRms&&closure.relativeClosure<=thresholds.relativeClosure))reasons.push('Independent forward integration does not close closely enough.');
       if(!(closure.trajectoryRms<=thresholds.trajectoryRms&&closure.relativeTrajectory<=thresholds.relativeTrajectory))reasons.push('Independent forward integration does not follow the candidate trajectory closely enough.');
     }
-    return {period,N,M,dx:params.dx,physicalSide:N*params.dx,frameDt:period/M,
+    return {period,N,M,dx:params.dx,stencil:params.stencil,physicalSide:N*params.dx,frameDt:period/M,
       pdeRms:e.pdeRms,relativePde:e.relativePde,timeDerivativeRms:e.timeDerivativeRms,rhsRms:e.rhsRms,
       temporalRms:e.temporalRms,spatialRms:e.spatialRms,nontrivial,minimum,maximum,symmetry,symmetryMax,
       temporalRepeats,faithfulTimeShifts,primitiveAtTestedShifts,

@@ -46,6 +46,24 @@ test('unprojected gradient and each species derivative agree with finite differe
   }
 });
 
+test('Bulatov nine-point collocation adjoint matches finite differences in both species and projected directions',()=>{
+  for(const id of ['g94','g99']){
+    const p=createProblem({N:8,M:8,ops:groups[id],params:{stencil:'bulatov9',Du:.2097,Dv:.105,dx:.9},minTemporal:0,minSpatial:0});
+    const q=p.project(randomArray(p.length,.4,.3)),direction=p.project(randomArray(p.length)),period=93,epsilon=1e-6;
+    const e=p.evaluate(q,period,{gradient:true}),plus=Float64Array.from(q,(x,i)=>x+epsilon*direction[i]),minus=Float64Array.from(q,(x,i)=>x-epsilon*direction[i]);
+    const numerical=(p.evaluate(plus,period).objective-p.evaluate(minus,period).objective)/(2*epsilon);
+    assert.ok(Math.abs(numerical-dot(e.gradient,direction))<1e-8,id+' projected derivative');
+    const unprojected=p.evaluate(q,period,{gradient:true,projectGradient:false});
+    for(const index of [0,63,64,127,513,1023]){
+      const a=q.slice(),b=q.slice();a[index]+=epsilon;b[index]-=epsilon;
+      const numeric=(p.evaluate(a,period).objective-p.evaluate(b,period).objective)/(2*epsilon);
+      assert.ok(Math.abs(numeric-unprojected.gradient[index])<1e-8,`${id} species/site ${index}`);
+    }
+    const rates=new Float64Array(p.length);for(let frame=0;frame<p.M;frame++)p.rhsFrame(q,frame*2*p.S,rates,frame*2*p.S);
+    assert.ok(p.symmetryDiagnostics(rates).every(result=>result.max<1e-14),id+' nine-point equivariance');
+  }
+});
+
 test('steady homogeneous solution is rejected despite zero PDE, symmetry, and shooting residuals',()=>{
   const p=createProblem({N:4,M:4,ops:groups.g94}),q=new Float64Array(p.length);
   for(let k=0;k<p.M;k++)q.fill(1,k*2*p.S,k*2*p.S+p.S);
@@ -89,6 +107,19 @@ test('physical grid spacing and independent RK4 match an exactly soluble diffusi
     assert.equal(result.finalState[p.S+i],0);
   }
   assert.ok(result.closureRms>.01);assert.ok(result.trajectoryRms>.01);
+});
+
+test('Bulatov nine-point independent shooting matches an exactly soluble two-direction Fourier mode',()=>{
+  const N=8,M=4,dx=1.3,Du=.2097,F=.026,T=16,p=createProblem({N,M,params:{stencil:'bulatov9',dx,Du,F},minTemporal:0,minSpatial:0}),q=new Float64Array(p.length);
+  const cx=Math.cos(2*Math.PI/N),cy=Math.cos(4*Math.PI/N),lambda=F+Du*(4-1.6*(cx+cy)-.8*cx*cy)/(dx*dx);
+  for(let frame=0;frame<M;frame++)for(let y=0;y<N;y++)for(let x=0;x<N;x++)q[frame*2*p.S+y*N+x]=1+.2*Math.cos(2*Math.PI*x/N)*Math.cos(4*Math.PI*y/N);
+  const rate=p.rhsFrame(q),result=p.shoot(q,T,{shootingDt:.05});assert.equal(result.computed,true);
+  for(let i=0;i<p.S;i++){
+    assert.ok(Math.abs(rate[i]+lambda*(q[i]-1))<1e-15,'analytic Laplacian eigenvalue');
+    assert.ok(Math.abs(result.finalState[i]-(1+(q[i]-1)*Math.exp(-lambda*T)))<1e-10,'independent RK4 trajectory');
+  }
+  assert.equal(p.diagnostics(q,T,{shooting:false}).stencil,'bulatov9');
+  assert.throws(()=>createProblem({params:{stencil:'invalid'}}),/stencil/);
 });
 
 test('a real Gray–Scott periodic oscillator passes independent validation, but is neither a glider nor a shifted 442 orbit',()=>{

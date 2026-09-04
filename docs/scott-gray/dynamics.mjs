@@ -11,20 +11,29 @@ export function projectKernel(state,N,ops) {
   return out;
 }
 export function rhs(state,N,p,out=new Float64Array(state.length)) {
-  const nn=N*N, inv=1/(p.dx*p.dx);
+  const nn=N*N, inv=1/(p.dx*p.dx),nine=p.stencil==='bulatov9';
   for(let y=0;y<N;y++) for(let x=0;x<N;x++) {
     const i=y*N+x, l=y*N+mod(x-1,N), r=y*N+mod(x+1,N), d=mod(y-1,N)*N+x, u=mod(y+1,N)*N+x;
     const U=state[i],V=state[nn+i],reaction=U*V*V;
-    out[i]=p.Du*inv*(state[l]+state[r]+state[d]+state[u]-4*U)-reaction+p.F*(1-U);
-    out[nn+i]=p.Dv*inv*(state[nn+l]+state[nn+r]+state[nn+d]+state[nn+u]-4*V)+reaction-(p.F+p.k)*V;
+    let lapU=state[l]+state[r]+state[d]+state[u],lapV=state[nn+l]+state[nn+r]+state[nn+d]+state[nn+u];
+    if(nine){
+      const dl=mod(y-1,N)*N+mod(x-1,N),dr=mod(y-1,N)*N+mod(x+1,N),ul=mod(y+1,N)*N+mod(x-1,N),ur=mod(y+1,N)*N+mod(x+1,N);
+      lapU=.8*lapU+.2*(state[dl]+state[dr]+state[ul]+state[ur]);
+      lapV=.8*lapV+.2*(state[nn+dl]+state[nn+dr]+state[nn+ul]+state[nn+ur]);
+    }
+    out[i]=p.Du*inv*(lapU-4*U)-reaction+p.F*(1-U);
+    out[nn+i]=p.Dv*inv*(lapV-4*V)+reaction-(p.F+p.k)*V;
   }
   return out;
 }
 export function createStepper(initial,N,p) {
+  if(p.stencil!==undefined&&!['five-point','bulatov9'].includes(p.stencil))throw Error('Unknown diffusion stencil.');
+  for(const key of ['Du','Dv','F','k','dx'])if(!Number.isFinite(p[key])||p[key]<0)throw Error(`Invalid parameter ${key}`);
+  if(!(p.dx>0)||(p.dt!==undefined&&!(Number.isFinite(p.dt)&&p.dt>0)))throw Error('Cell size and timestep must be positive.');
   let state=Float64Array.from(initial);const a=new Float64Array(state.length),b=a.slice(),mid=a.slice();
   // Explicit midpoint with a conservative diffusion / reaction step cap.
-  const maxDt=Math.min(.4,.18*p.dx*p.dx/Math.max(p.Du,p.Dv));
-  return {get state(){return state;},maxDt,advance(duration){const steps=Math.ceil(duration/maxDt),dt=duration/steps;
+  const maxDt=Math.min(.4,p.dt??.4,.18*p.dx*p.dx/Math.max(p.Du,p.Dv,1e-12));
+  return {get state(){return state;},maxDt,advance(duration){if(!Number.isFinite(duration)||duration<0)throw Error('Duration must be finite and nonnegative.');if(duration===0)return state;const steps=Math.ceil(duration/maxDt),dt=duration/steps;
     for(let s=0;s<steps;s++){rhs(state,N,p,a);for(let i=0;i<state.length;i++)mid[i]=state[i]+dt*.5*a[i];rhs(mid,N,p,b);for(let i=0;i<state.length;i++){state[i]+=dt*b[i];if(!Number.isFinite(state[i])||Math.abs(state[i])>10)throw Error('Integration diverged. Reduce the cell size or adjust the parameters.');}}
     return state;
   }};

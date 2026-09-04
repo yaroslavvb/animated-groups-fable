@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Gray–Scott WebGL2 numerical checks</title>
+<style>body{font:16px system-ui;max-width:1000px;margin:3rem auto;background:#151021;color:#eee}pre{white-space:pre-wrap}</style>
+<h1>Gray–Scott WebGL2 numerical checks</h1>
+<p id="status">Running real GPU tests…</p>
+<pre id="results"></pre>
+<script type="module">
+import {runWebGLTests} from './webgl.test.mjs';
+try {const result=await runWebGLTests();document.getElementById('status').textContent=result.passed?'All GPU checks passed':'GPU checks failed';document.getElementById('results').textContent=JSON.stringify(result,null,2);window.webglTestResult=result;}
+catch(error){document.getElementById('status').textContent='GPU checks failed';document.getElementById('results').textContent=error.stack;window.webglTestResult={passed:false,error:error.message};}
+</script>
