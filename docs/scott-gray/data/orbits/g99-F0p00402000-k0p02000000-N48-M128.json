@@ -1,0 +1,220 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 361.52641990525643,
+    "groupId": "g99",
+    "L": 256,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0.5,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.25,
+          0.75
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.75,
+          0.25
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.25,
+          0.25
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.75,
+          0.75
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      }
+    ],
+    "params": {
+      "F": 0.00402,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ]
+  },
+  "fieldUrl": "g99-F0p00402000-k0p02000000-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "d9599aa16c4692b4bfcc0f9e8699e3db5afe6456c26bc00d750ce97e1f1f0c5b",
+  "validationSummary": {
+    "period": 361.52641990525643,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.0009561496001670806,
+    "pdeRms": 1.1309546611858983e-06,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.059081678665215416,
+    "spatialRms": 0.05926203445952536,
+    "coarseReturnRms": 4.80451088902001e-09,
+    "refinedReturnRms": 4.803970160834513e-09,
+    "refinedTrajectoryRms": 7.673011830052356e-09,
+    "maxRefinedPhaseRms": 8.262124958966577e-09,
+    "coarseDt": 0.353053144438727,
+    "refinedDt": 0.1765265722193635,
+    "primitiveAtResolvedDivisors": true,
+    "projectionRms": 9.836794068335543e-13,
+    "projectionMax": 6.821515574628734e-12,
+    "quantizationMax": 1.4900590816768755e-08,
+    "admissionElapsedMs": 3175.8342640000046,
+    "coarseTrajectoryRms": 7.672878824297618e-09,
+    "maxCoarsePhaseRms": 8.262436190235985e-09
+  },
+  "provenance": {
+    "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+    "family": "rotating",
+    "spatialMode": 1,
+    "tiledFrom": null,
+    "sourceGroup": "g96",
+    "coordinateTransform": "q(-x-1/4,y-1/2,t)",
+    "note": "Coordinate variants of one continued branch; actual exported Float32 bytes independently revalidated. No glider morphology or continuum existence theorem is asserted.",
+    "spatialRefinement": {
+      "coarseN": 24,
+      "fineN": 48,
+      "coarsePeriod": 359.8217531742166,
+      "finePeriod": 361.52641990525643,
+      "relativePeriodDifference": 0.004737531058091493,
+      "initialFieldRmsDifference": 0.0035799847897390142
+    },
+    "exportThresholds": {
+      "maximumProjectionMax": 1e-08,
+      "maximumForwardErrorRms": 1e-06
+    }
+  }
+}

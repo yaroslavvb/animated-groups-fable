@@ -1,0 +1,152 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      }
+    ],
+    "params": {
+      "F": 0.004089987272497608,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ],
+    "period": 325.56596939424105,
+    "groupId": "g95",
+    "L": 256
+  },
+  "fieldUrl": "g95-standing-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "5f74e2d014893ad1797672a7a20958945b3b8e9fb96b1ea578ef5f4572b75e85",
+  "validationSummary": {
+    "period": 325.56596939424105,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.00024579572298734327,
+    "pdeRms": 5.8616803006367115e-8,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.012223586773281682,
+    "spatialRms": 0.012221119290787405,
+    "coarseReturnRms": 3.9976142156907956e-9,
+    "refinedReturnRms": 3.997610141600584e-9,
+    "refinedTrajectoryRms": 5.341545279936111e-9,
+    "maxRefinedPhaseRms": 4.084569876551385e-9,
+    "coarseDt": 0.3633548765560726,
+    "refinedDt": 0.1816774382780363,
+    "primitiveAtResolvedDivisors": true,
+    "projectionMax": 0,
+    "quantizationMax": 7.450580374879223e-9,
+    "admissionElapsedMs": 3878.152273
+  },
+  "provenance": {
+    "method": "Newton shooting of the standing chemical-wave branch with positive diffusion",
+    "derivedFrom": {
+      "method": "Powell hybrid Newton half-period unprojected RK4 shooting in exact x/y reflection kernel (including R180)",
+      "seed": "Fourier resampling of independently verified N24 standing orbit, holding L fixed",
+      "sourceGroup": "g95",
+      "spatialTranslation": [
+        0,
+        0
+      ],
+      "shootingResidualRms": 8.269899386885092e-14,
+      "additionalSymmetry": "Standing branch also has instantaneous x and y reflection symmetries; group validation establishes at least the stated cyclic colour action."
+    },
+    "sourceGroup": "g95",
+    "note": "These are coordinate variants of one standing chemical-wave branch, not three independently discovered branches or U-skate gliders. The actual Float32 payload is independently revalidated.",
+    "spatialRefinement": {
+      "coarseGrid": 24,
+      "fineGrid": 48,
+      "physicalSide": 256,
+      "comparison": "Fine grid restricted to the same nodes; same normalized phases and shooting phase condition",
+      "fieldRmsDifference": 0.00006951372354704396,
+      "fieldMaxDifference": 0.0002888313612185722,
+      "relativeToCoarseTemporalRms": 0.005664005224475641,
+      "coarsePeriod": 325.57591393274754,
+      "finePeriod": 325.56596939424105,
+      "relativePeriodDifference": 0.000030544453938144924
+    }
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "schema": "scott-gray-modal-ledger-v1",
+  "checkedAtUTC": "2026-09-04T22:19:32.247408+00:00",
+  "authorizedTaskBudgetUSD": 100,
+  "agentAllocationUSD": 15,
+  "providerReportedTotalUSD": "0.24425508",
+  "allTaskAppsStopped": true,
+  "activeTaskCount": 0,
+  "configuration": {
+    "gpu": "A100-40GB",
+    "cpuPhysicalCoresEach": 2,
+    "memoryRequestedGiBEach": 8,
+    "memoryLimitGiBEach": 16,
+    "retries": 0
+  },
+  "pricing": {
+    "checkedDate": "2026-09-04",
+    "A100_40GB_USDPerHour": 2.1,
+    "A100_80GB_USDPerHour": 2.5,
+    "cpuPhysicalCoreUSDPerHour": 0.0473,
+    "memoryGiBUSDPerHour": 0.008,
+    "officialSources": [
+      "https://modal.com/pricing",
+      "https://modal.com/docs/guide/billing"
+    ]
+  },
+  "conservativeEstimates": {
+    "resourceRateUSDPerContainerSecond": 0.00075572,
+    "note": "Uses the higher A100-80GB rounded rate plus two CPU cores and 16 GiB host memory. Full app lifetime includes idle/client-transfer time and therefore overestimates resource cost; it is not the provider charge."
+  },
+  "notes": [
+    "Costs are provider-reported resource usage for only these five task-created apps as of checkedAtUTC; final invoice may reconcile later. No unrelated account resources are included.",
+    "Initial bulk continuation computed 14 accepted preliminary orbits but the 66 MB movie transfer stalled. Its client was interrupted after zero GPU tasks remained and its app explicitly stopped; the compact recovery recomputed the 14 orbits and successfully returned small initial-state payloads. Both runs are charged and recorded.",
+    "No persistent endpoints, deployments, schedules, retry queues or active task GPU containers remain.",
+    "Rotating mode-3 Newton line search stalled; no orbit was exported and failure is not evidence of impossibility."
+  ],
+  "runs": [
+    {
+      "appId": "ap-J3B61GckuWI3aIbMdEF0Bb",
+      "purpose": "FP64 batched shooting benchmark",
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-04 14:59:23-07:00",
+      "stoppedAt": "2026-09-04 15:02:32-07:00",
+      "maxContainers": 1,
+      "timeoutSeconds": 600,
+      "startupTimeoutSeconds": 600,
+      "retries": 0,
+      "providerReportedCostUSD": "0.09117265",
+      "providerResourceRows": [
+        {
+          "resource": "Memory",
+          "costUSD": "0.00002000"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00080869"
+        },
+        {
+          "resource": "Memory",
+          "costUSD": "0.00256000"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00378400"
+        },
+        {
+          "resource": "A100-40GB",
+          "costUSD": "0.08399996"
+        }
+      ],
+      "elapsedAppSeconds": 189.0,
+      "conservativeLifetimeResourceBoundUSD": 0.14283108
+    },
+    {
+      "appId": "ap-TPH7NZHWx4Rog3xusY8Hwg",
+      "purpose": "Initial continuation; completed compute, stalled movie transfer",
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-04 15:05:52-07:00",
+      "stoppedAt": "2026-09-04 15:17:23-07:00",
+      "maxContainers": 1,
+      "timeoutSeconds": 900,
+      "startupTimeoutSeconds": 600,
+      "retries": 0,
+      "providerReportedCostUSD": "0.05270117",
+      "providerResourceRows": [
+        {
+          "resource": "Memory",
+          "costUSD": "0.00149335"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00220735"
+        },
+        {
+          "resource": "A100-40GB",
+          "costUSD": "0.04900047"
+        }
+      ],
+      "elapsedAppSeconds": 691.0,
+      "conservativeLifetimeResourceBoundUSD": 0.52220252
+    },
+    {
+      "appId": "ap-2lefrBnzb4AlAokSccyl9T",
+      "purpose": "Two parallel standing higher-mode seeds",
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-04 15:08:14-07:00",
+      "stoppedAt": "2026-09-04 15:09:32-07:00",
+      "maxContainers": 2,
+      "timeoutSeconds": 600,
+      "startupTimeoutSeconds": 600,
+      "retries": 0,
+      "providerReportedCostUSD": "0.03764289",
+      "providerResourceRows": [
+        {
+          "resource": "Memory",
+          "costUSD": "0.00106665"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00157665"
+        },
+        {
+          "resource": "A100-40GB",
+          "costUSD": "0.03499959"
+        }
+      ],
+      "elapsedAppSeconds": 78.0,
+      "conservativeLifetimeResourceBoundUSD": 0.11789232
+    },
+    {
+      "appId": "ap-6jw5J1EPikwReSMW9sj7Nj",
+      "purpose": "Compact-output continuation recovery",
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-04 15:12:45-07:00",
+      "stoppedAt": "2026-09-04 15:14:27-07:00",
+      "maxContainers": 1,
+      "timeoutSeconds": 900,
+      "startupTimeoutSeconds": 600,
+      "retries": 0,
+      "providerReportedCostUSD": "0.05771985",
+      "providerResourceRows": [
+        {
+          "resource": "Memory",
+          "costUSD": "0.00163556"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00241756"
+        },
+        {
+          "resource": "A100-40GB",
+          "costUSD": "0.05366673"
+        }
+      ],
+      "elapsedAppSeconds": 102.0,
+      "conservativeLifetimeResourceBoundUSD": 0.07708344
+    },
+    {
+      "appId": "ap-PhEkbuHYIafuiobVWBrOHa",
+      "purpose": "Rotating mode-3 attempt; unresolved",
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-04 15:17:22-07:00",
+      "stoppedAt": "2026-09-04 15:17:38-07:00",
+      "maxContainers": 1,
+      "timeoutSeconds": 600,
+      "startupTimeoutSeconds": 600,
+      "retries": 0,
+      "providerReportedCostUSD": "0.00501852",
+      "providerResourceRows": [
+        {
+          "resource": "Memory",
+          "costUSD": "0.00014221"
+        },
+        {
+          "resource": "CPU",
+          "costUSD": "0.00021020"
+        },
+        {
+          "resource": "A100-40GB",
+          "costUSD": "0.00466611"
+        }
+      ],
+      "elapsedAppSeconds": 16.0,
+      "conservativeLifetimeResourceBoundUSD": 0.01209152
+    }
+  ]
+}

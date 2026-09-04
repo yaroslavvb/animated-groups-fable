@@ -1,0 +1,229 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 331.0393003353177,
+    "groupId": "g99",
+    "L": 256,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0.5,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.25,
+          0.75
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.75,
+          0.25
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.25,
+          0.25
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.75,
+          0.75
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      }
+    ],
+    "params": {
+      "F": 0.00408,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ]
+  },
+  "fieldUrl": "g99-F0p00408000-k0p02000-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "66474d458ee595705c8dcbb3f60f22a18fdef27f4ecc505ad8ed0eca7600103a",
+  "validationSummary": {
+    "period": 331.0393003353177,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.00034343593335554114,
+    "pdeRms": 1.918024841930507e-7,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.028435677639702565,
+    "spatialRms": 0.02846626670335607,
+    "coarseReturnRms": 3.918926365943863e-9,
+    "refinedReturnRms": 3.918850536647208e-9,
+    "refinedTrajectoryRms": 5.074350195712091e-9,
+    "maxRefinedPhaseRms": 3.973632040913237e-9,
+    "coarseDt": 0.36946350483852425,
+    "refinedDt": 0.18473175241926212,
+    "primitiveAtResolvedDivisors": true,
+    "projectionRms": 1.6571513481493054e-12,
+    "projectionMax": 8.178957511262297e-12,
+    "quantizationMax": 7.450442901513199e-9,
+    "admissionElapsedMs": 4117.463656
+  },
+  "provenance": {
+    "method": "Quarter-period unprojected RK4 Newton shooting with phase condition in exact x→1/2−x and y→1/2−y reflection kernel",
+    "seed": "Coarse-grid parameter correction from F=0.004089987272497608 to F=0.00408 lifted to prior verified N48 field",
+    "sourceGroup": "g96",
+    "coordinateTransform": "q(-x-1/4,y-1/2,t)",
+    "continuation": {
+      "variedParameter": "F",
+      "fixedParameters": {
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "L": 256,
+        "stencil": "five-point"
+      }
+    },
+    "unquantizedShootingResidualRms": 1.0051990171231226e-13,
+    "unquantizedReturnRms": 5.076650072297088e-12,
+    "extraSymmetry": "Instantaneous mirrors x→1/2−x and y→1/2−y, also diagonal half-cell/time centering.",
+    "note": "Coordinate variants of the rotating chemical-wave branch; the actual Float32 payload was independently revalidated. These are not U-skate gliders.",
+    "spatialRefinement": {
+      "coarseGrid": 24,
+      "fineGrid": 48,
+      "physicalSide": 256,
+      "coarsePeriod": 331.03212938048057,
+      "finePeriod": 331.0393003353177,
+      "relativePeriodDifference": 0.000021662413405478826,
+      "fieldRmsDifference": 0.00014207025229800947,
+      "fieldMaxDifference": 0.0004995910443781892,
+      "relativeToCoarseTemporalRms": 0.004995738479748744,
+      "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
+    }
+  }
+}

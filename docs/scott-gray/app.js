@@ -1,280 +1,347 @@
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
-import {createStepper,projectKernel,movieStats,mapIndex} from './dynamics.mjs?v=20260904-gpu';
-import {createWebGLGrayScott} from './webgl.mjs';
+import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
+import {createWebGLGrayScott} from './webgl.mjs?v=20260904-atlas';
 import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs';
-import {PROFILES,makeInitial,nearestProfile,profilesForFilter,assessProfile,classifyRun,DEFAULT_FILTER} from './exploration.mjs';
-import {hasRefinedAcceptance} from './acceptance.mjs';
-import {renderField,clearCanvas,resampleState,valueAt,fmt} from './render.mjs';
-const $=id=>document.getElementById(id),nextFrame=()=>new Promise(requestAnimationFrame);
-let groups=[],group,profile=PROFILES[0],evidence={runs:[]},engine=null,record=null,activeConfig=null;
-let worker=null,job=0,busy=false,playing=false,phase=0,lastTime=0,lastStamp=0;
-let selectedGenerator='α',fallbackReason='',sessionVerified=[],scanPoints=[];
-const main=$('pattern'),gpuCanvas=$('gpu-pattern'),map=$('parameter-map');
-const filter=()=>$('filter').value;
-const settings=['feed','kill','length','du','dv'];
-const status=text=>{$('status').textContent=text;};
-const currentProfile=()=>({...profile,F:+$('feed').value,k:+$('kill').value,seed:$('seed').value});
-function config(N=+$('resolution').value){
-  return {N,M:+$('frames').value,period:+$('period').value,L:+$('length').value,seed:$('seed').value,ops:group.render.ops,groupId:group.id,
-    params:{Du:+$('du').value,Dv:+$('dv').value,F:+$('feed').value,k:+$('kill').value,dx:+$('length').value/N,stencil:$('stencil').value,dt:.4},minTemporal:.008,minSpatial:.012};
+import {PROFILES,makeInitial} from './exploration.mjs';
+import {analyticExclusion} from './feasibility.mjs';
+import {createSolutionAtlas} from './solution-atlas.mjs?v=20260904-atlas';
+import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260904-atlas';
+
+const $=id=>document.getElementById(id);
+const tick=()=>new Promise(requestAnimationFrame);
+const colors=['#d96c4a','#dda635','#4a9c8b','#8274ba'];
+let groups=[],group,atlas,record=null,worker=null,abort=null,job=0,busy=false,displayEngine=null;
+const recordNames=new Map(),recordDescriptions=new Map(),catalogLoads=new Map();
+const rememberedSelections=new Map(),thumbnailCache=new Map(),rangeCache=new Map();
+let catalogEntries=[],catalogReady=false,settingsRevision=0;
+let selectedParameterKey=null;
+let playing=false,phase=0,lastTime=0,selectedGenerator='α',attempts=[],displayRanges=null;
+const requestedGroup=/^#g9[4-9]$/.test(location.hash)?location.hash.slice(1):null;
+const main=$('pattern'),map=$('parameter-map');
+const numeric=['feed','kill','length','period','du','dv','iterations'];
+const range=()=>$('palette').value==='concentration'?displayRanges?.v:displayRanges?.u;
+const setStatus=text=>{$('status').textContent=text;};
+
+function fieldRanges(r){if(rangeCache.has(r.id))return rangeCache.get(r.id);const ranges=[[Infinity,-Infinity],[Infinity,-Infinity]],S=r.config.N*r.config.N;for(let t=0;t<r.config.M;t++)for(let c=0;c<2;c++)for(let i=0;i<S;i++){const v=r.field[t*2*S+c*S+i];ranges[c][0]=Math.min(ranges[c][0],v);ranges[c][1]=Math.max(ranges[c][1],v);}const result={u:ranges[0],v:ranges[1]};rangeCache.set(r.id,result);return result;}
+const parameterKey=c=>JSON.stringify([c.groupId,c.params.F,c.params.k,c.params.Du,c.params.Dv,c.L??c.N*c.params.dx,c.params.stencil??'five-point']);
+const number=value=>Number(value.toPrecision(11)).toString();
+function parameterSets(){const sets=new Map();for(const r of atlas.summaries(group.id)){const key=parameterKey(r.config);if(!sets.has(key))sets.set(key,{key,config:r.config,patterns:[]});sets.get(key).patterns.push(r);}return [...sets.values()].sort((a,b)=>a.config.params.F-b.config.params.F||a.config.params.k-b.config.params.k);}
+function physicalLabel(c){const p=c.params;return `F ${number(p.F)} · k ${number(p.k)} · Dᵤ ${number(p.Du)} · Dᵥ ${number(p.Dv)} · L ${number(c.L??c.N*p.dx)} · ${p.stencil==='bulatov9'?'Bulatov 9-point':'5-point'}`;}
+function config(){
+  const N=+$('resolution').value,L=+$('length').value;
+  return {N,M:+$('frames').value,L,period:+$('period').value,groupId:group.id,ops:group.render.ops,seed:$('seed').value,
+    params:{F:+$('feed').value,k:+$('kill').value,Du:+$('du').value,Dv:+$('dv').value,dx:L/N,stencil:$('stencil').value,dt:.4},
+    minTemporal:.008,minSpatial:.012};
 }
-function valid(ids=settings){return ids.every(id=>$(id).reportValidity());}
-function context(){const c=config();return {groupId:group.id,N:c.N,L:c.L,...c.params,dt:engine?.effectiveDt??.4,seed:engine?activeConfig.seed:c.seed,integrator:'midpoint',boundary:'periodic',precision:engine?.backend.startsWith('WebGL')?'float32':'float64',horizon:2000,observationStart:1800,observationEnd:2000,sampleInterval:50};}
-function verifiedForGroup(){return sessionVerified.filter(r=>r.config.groupId===group.id);}
-function candidates(){return profilesForFilter(filter(),evidence,group.id);}
-function syncRanges(){$('feed-range').value=$('feed').value;$('kill-range').value=$('kill').value;}
-function setPlaying(on){playing=!!on&&(!!engine||!!record);$('play').textContent=playing?'Ⅱ Pause':'▶ Play';$('play').setAttribute('aria-label',playing?'Pause animation':'Play animation');}
-function cancel(message){job++;if(worker){worker.terminate();worker=null;}busy=false;setPlaying(false);$('progress').hidden=true;restrictions();if(message)status(message);}
-function disposeEngine(){engine?.dispose();engine=null;gpuCanvas.hidden=true;main.hidden=false;}
-function restrictions(){
-  const strict=filter()==='periodic',empty=strict&&!verifiedForGroup().length,observed=filter()==='observed';
-  document.body.classList.toggle('empty-filter',empty);
-  $('parameters').disabled=strict||busy;
-  for(const id of ['length','resolution','seed','stencil','du','dv'])$(id).disabled=observed;
-  $('preset').disabled=busy||(strict?empty:!candidates().length);
-  for(const id of ['run','reset','next-preset','source-seed','solve','preview','scan'])$(id).disabled=strict||busy||(!candidates().length&&filter()!=='all');
-  $('source-seed').disabled||=observed;
-  $('scan').disabled||=filter()!=='all';
-  $('play').disabled=busy||(!engine&&!record);$('rewind').disabled=busy||!record;
-  $('phase').disabled=busy||!record;$('stop').disabled=!busy;
-  $('export').disabled=busy||(!engine&&!record);
-  $('filter').disabled=busy;
-  for(const id of ['period','iterations','solver-resolution','frames'])$(id).disabled=busy;
-  $('run').textContent=engine?'Resume evolution':'Start evolution';
-  $('empty-state').hidden=!empty;
+function setControls(c){
+  for(const [id,key] of [['feed','F'],['kill','k'],['du','Du'],['dv','Dv']])$(id).value=c.params[key];
+  $('length').value=c.L??c.params.dx*c.N;$('period').value=c.period;$('stencil').value=c.params.stencil??'five-point';
+  for(const [id,value] of [['resolution',c.N],['frames',c.M]]){
+    if(![...$(id).options].some(o=>+o.value===value)){const o=document.createElement('option');o.value=value;o.textContent=id==='resolution'?`${value} × ${value}`:`${value}`;$(id).append(o);}
+    $(id).value=value;
+  }
+  $('preset').value='custom';
 }
-function metrics(d){
-  $('pde').textContent=d?.relativePde!==undefined?(100*d.relativePde).toFixed(1)+'%':'—';
-  const sy=d?.symmetryRms??(d?.symmetry?Math.sqrt(d.symmetry.reduce((s,o)=>s+o.rms**2,0)/d.symmetry.length):undefined);
-  $('symmetry').textContent=fmt(sy);$('motion').textContent=fmt(d?.temporalRms);$('return').textContent=d?.closure?.computed?fmt(d.closure.closureRms):'—';
+function valid(){return numeric.every(id=>$(id).reportValidity());}
+function setPlaying(value){playing=!!record&&value;$('play').textContent=playing?'Ⅱ Pause':'▶ Play';$('play').setAttribute('aria-label',playing?'Pause animation':'Play animation');}
+function controls(){
+  $('search-settings').disabled=busy;$('preset').disabled=busy;$('search').disabled=busy;$('scan').disabled=busy;$('stop').disabled=!busy;
+  for(const id of ['play','rewind','phase','export'])$(id).disabled=!record;
+  $('solution').disabled=busy||!group||!atlas?.size(group.id);$('parameter-set').disabled=busy||!group||!atlas?.size(group.id);
+  for(const button of $('pattern-thumbnails').children)button.disabled=busy;
+  $('continue-seed').disabled=!record;
 }
+function cancel(message){
+  job++;abort?.abort();abort=null;
+  if(worker){worker.terminate();worker=null;}
+  busy=false;$('progress').hidden=true;if(group&&atlas)populateAtlas();controls();if(message)setStatus(message);
+}
+function named(){return GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator);}
 function overlay(){
   $('generator-overlay').hidden=!$('show-generators').checked;
   renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles:+$('tiles').value,selected:selectedGenerator,onSelect:g=>{selectedGenerator=g.name;$('operation').value=g.name;overlay();drawComparison();}});
-  const g=GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator);
-  $('generator-description').textContent=generatorDescription(g);
-  $('compare-label').textContent=`q(x, t + ${g.tau}T)`;
+  const g=named();$('generator-description').textContent=generatorDescription(g);
+  $('compare-label').textContent=`q(x, t + ${g.timeShift}T)`;
+  // A common four-phase key makes g95's half-cycle and g96's quarter-cycle
+  // actions directly comparable. These colors encode time, not concentrations.
+  const shift=Math.round(4*g.tau);
+  $('phase-permutation').replaceChildren();const row=document.createElement('div');row.className='phase-row';
+  for(let i=0;i<4;i++){
+    const pair=document.createElement('span');pair.className='phase-chip';
+    const a=document.createElement('i');a.style.setProperty('--phase-color',colors[i]);
+    const b=document.createElement('i');b.style.setProperty('--phase-color',colors[mod(i+shift,4)]);
+    pair.append(a,document.createTextNode(`${i}/4 → `),b,document.createTextNode(`${mod(i+shift,4)}/4`));row.append(pair);
+  }
+  $('phase-permutation').append(row);
+  $('phase-explanation').textContent=g.tau===0?'This generator leaves the phase unchanged.':`This generator cyclically shifts the phase by ${g.timeShift} of the period. Applying only its spatial rotation is not this symmetry.`;
   document.querySelector('.scale-label').textContent=`${$('tiles').value} × ${$('tiles').value} spatial cells`;
+}
+function colorScale(){const r=range();$('color-scale').textContent=r?`Fixed scale over the entire orbit: ${$('palette').value==='concentration'?'V':'U'} = ${r[0].toFixed(4)} … ${r[1].toFixed(4)}.`:'The concentration scale will be fixed across all phases of a verified orbit.';}
+function metrics(d){
+  $('pde').textContent=d?`${(100*d.relativePde).toFixed(2)}%`:'—';
+  const phaseErrors=d?.refinedPhase?.operations.map(o=>o.shiftedRms);
+  $('symmetry').textContent=fmt(phaseErrors?.length?Math.max(...phaseErrors):undefined);
+  $('motion').textContent=fmt(d?.temporalRms);$('return').textContent=fmt(d?.refinedClosure?.closureRms);
 }
 function drawComparison(){
   const a=$('compare-a'),b=$('compare-b');
-  if(!record){clearCanvas(a,engine?'Live field':'No recorded field');clearCanvas(b,'Future phase unavailable');$('comparison-error').textContent=engine?'Live evolution has no recorded future phase. The overlay marks the target, not a verified time symmetry.':'Select or solve a recorded candidate to compare time phases.';return;}
-  const {field,config:c}=record,g=GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator),op=c.ops[g.operationIndex],palette=$('palette').value;
-  renderField(a,field,c.N,c.M,phase,{palette,operation:op});
-  const end=(c.M-1)/c.M;
-  if(record.kind==='trajectory'&&phase+op.tau>end+1e-12){clearCanvas(b,'Beyond recording');$('comparison-error').textContent='No future frame was recorded at this phase; time is not wrapped.';return;}
-  renderField(b,field,c.N,c.M,mod(phase+op.tau),{palette});
-  let error=0;
+  if(!record){clearCanvas(a,'No verified orbit');clearCanvas(b,'No verified orbit');$('comparison-error').textContent='No verified orbit to compare. The phase key above specifies the required cyclic action.';return;}
+  const c=record.config,g=named(),op=group.render.ops[g.operationIndex],palette=$('palette').value;
+  renderField(a,record.field,c.N,c.M,phase,{palette,operation:op,range:range()});
+  renderField(b,record.field,c.N,c.M,mod(phase+op.tau),{palette,range:range()});
+  let shifted=0,spatial=0;
   for(let ch=0;ch<2;ch++)for(let y=0;y<c.N;y++)for(let x=0;x<c.N;x++){
-    const i=mapIndex(x,y,c.N,op,true),u=valueAt(field,ch,i%c.N,Math.floor(i/c.N),phase,c.N,c.M),v=valueAt(field,ch,x,y,mod(phase+op.tau),c.N,c.M);error+=(u-v)**2;
+    const j=mapIndex(x,y,c.N,op,true),u=valueAt(record.field,ch,j%c.N,Math.floor(j/c.N),phase,c.N,c.M);
+    shifted+=(u-valueAt(record.field,ch,x,y,mod(phase+op.tau),c.N,c.M))**2;
+    spatial+=(u-valueAt(record.field,ch,x,y,phase,c.N,c.M))**2;
   }
-  $('comparison-error').textContent=`Both concentrations · RMS difference ${fmt(Math.sqrt(error/(2*c.N*c.N)))}`;
+  $('comparison-error').textContent=`Both concentrations: rotation + phase RMS ${fmt(Math.sqrt(shifted/(2*c.N*c.N)))}; rotation alone RMS ${fmt(Math.sqrt(spatial/(2*c.N*c.N)))}.`;
 }
 function draw(){
-  const options={width:768,height:768,tiles:+$('tiles').value,palette:$('palette').value};
-  if(engine){engine.render(options);$('phase-label').textContent=`t = ${engine.time.toFixed(0)}`;}
-  else if(record){renderField(main,record.field,record.config.N,record.config.M,phase,options);$('phase').value=phase;$('phase-label').textContent=phase.toFixed(3)+' T';drawComparison();}
-  else{clearCanvas(main);$('phase-label').textContent='—';drawComparison();}
+  if(record){const options={tiles:+$('tiles').value,palette:$('palette').value,range:range()};if(displayEngine){const c=record.config,stride=2*c.N*c.N,ft=phase*c.M,t=Math.floor(ft),a=ft-t,current=new Float32Array(stride);for(let i=0;i<stride;i++)current[i]=(1-a)*record.field[t*stride+i]+a*record.field[mod(t+1,c.M)*stride+i];displayEngine.upload(current);displayEngine.render({width:768,height:768,...options});}else renderField(main,record.field,record.config.N,record.config.M,phase,options);$('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;}
+  else{clearCanvas(main);$('phase-label').textContent='—';}
+  drawComparison();
 }
 function animate(now){
-  if(playing&&!busy){try{
-    if(engine){engine.step(+$('speed').value);draw();if(now-lastStamp>1000){lastStamp=now;$('engine-label').textContent=`${engine.backend} · ${engine.N}² · t ${engine.time.toFixed(0)}`;}}
-    else if(record){phase+=(now-lastTime)/8000*Math.sqrt(+$('speed').value/32);if(record.kind==='trajectory'&&phase>=(record.config.M-1)/record.config.M){phase=(record.config.M-1)/record.config.M;setPlaying(false);}else phase=mod(phase);draw();}
-  }catch(error){setPlaying(false);status(error.message);}}
+  if(playing&&record){phase=mod(phase+(now-lastTime)/8000*+$('speed').value);draw();}
   lastTime=now;requestAnimationFrame(animate);
 }
-function cpuEngine(initial,c,canvas){
-  let p={...c.params},stepper=createStepper(initial,c.N,p),time=0;
-  return {N:c.N,backend:'CPU fallback',get time(){return time;},get maxDt(){return stepper.maxDt;},get effectiveDt(){return stepper.maxDt;},get params(){return {...p};},setParams(next){p={...p,...next};stepper=createStepper(stepper.state,c.N,p);},step(count){this.advance(count*stepper.maxDt);},advance(dt){stepper.advance(dt);time+=dt;},readback(){return stepper.state.slice();},render(options){renderField(canvas,stepper.state,c.N,1,0,options);},dispose(){}};
+function updateGroupCounts(){for(const b of $('groups').children){const count=atlas.size(b.dataset.id),badge=b.querySelector('.orbit-count');const saved=catalogEntries.filter(e=>e.groupId===b.dataset.id).length;badge.textContent=count?`${count}${catalogLoads.get(b.dataset.id)?.state==='loading'&&saved>count?'/'+saved:''} orbit${count===1?'':'s'}`:saved?(catalogLoads.get(b.dataset.id)?.state==='loading'?'checking…':`load ${saved}`):'unresolved';const assessment=$('feasibility-'+b.dataset.id);if(assessment)assessment.textContent=count?'Verified numerical example':saved?'Numerical example bundled; checked when opened':'Compatible; existence unresolved';} }
+function populateAtlas(){
+  updateGroupCounts();
+  const sets=parameterSets(),total=sets.reduce((sum,set)=>sum+set.patterns.length,0);
+  $('solution-count').textContent=`${sets.length} verified parameter set${sets.length===1?'':'s'} · ${total} pattern${total===1?'':'s'}`;
+  if(!sets.some(set=>set.key===selectedParameterKey))selectedParameterKey=sets[0]?.key??null;
+  $('parameter-set').replaceChildren();
+  for(const set of sets){const option=document.createElement('option');option.value=set.key;option.textContent=`F ${number(set.config.params.F)} · k ${number(set.config.params.k)}`;for(const [label,get] of [['Dᵤ',c=>c.params.Du],['Dᵥ',c=>c.params.Dv],['L',c=>c.L],['stencil',c=>c.params.stencil]])if(new Set(sets.map(s=>get(s.config))).size>1)option.textContent+=` · ${label} ${get(set.config)}`;$('parameter-set').append(option);}
+  if(!sets.length){const option=document.createElement('option');option.value='';option.textContent='No verified parameters';$('parameter-set').append(option);}
+  $('parameter-set').value=selectedParameterKey??'';
+  populatePatterns(sets.find(set=>set.key===selectedParameterKey));
+  $('map-status').textContent=sets.length?'Select a point to load its physical parameters, then choose a pattern.':'No eligible point to snap to. Existence remains unresolved.';
+  map.setAttribute('aria-disabled',String(!sets.length));controls();drawMap();
 }
-function newEngine(initial,c,canvas=gpuCanvas){
-  try{return createWebGLGrayScott({canvas,N:c.N,initial,params:c.params,onContextLost:()=>{if(canvas===gpuCanvas){setPlaying(false);status('WebGL context was lost. Reseed to restart the simulation.');}}});}
-  catch(error){fallbackReason=error.message;return cpuEngine(initial,c,canvas===gpuCanvas?main:document.createElement('canvas'));}
-}
-function startLive({initial=null,play=true,seedKind=null}={}){
-  if(filter()==='periodic'||!valid())return;
-  cancel();disposeEngine();record=null;metrics(null);const c=config();if(seedKind)c.seed=seedKind;
-  const state=initial||makeInitial(currentProfile(),{N:c.N,L:c.L,ops:c.ops});
-  engine=newEngine(projectKernel(state,c.N,c.ops),c);activeConfig=c;
-  const gpu=engine.backend.startsWith('WebGL');gpuCanvas.hidden=!gpu;main.hidden=gpu;
-  $('engine-label').textContent=`${engine.backend} · ${c.N}²`;
-  $('mode-label').textContent='Live Gray–Scott · periodicity unverified';
-  $('caption').textContent='Unforced chemical evolution. The marked generators are the target time symmetry; only their zero-time spatial kernel is imposed on the initial field.';
-  phase=0;restrictions();drawComparison();setPlaying(play);draw();
-  status(gpu?'Change F and k to explore live. Record a trial period when a pattern looks promising.':`CPU fallback: ${fallbackReason}`);updateEvidence();
-}
-function setProfile(p,{start=true}={}){
-  profile=p;$('feed').value=p.F;$('kill').value=p.k;$('du').value=p.Du;$('dv').value=p.Dv;$('stencil').value=p.stencil;$('seed').value=p.seed;$('preset').value=p.id;
-  if(filter()==='observed'){
-    const r=evidence.runs.find(r=>r.profileId===p.id&&r.context.groupId===group.id&&r.classification==='moving-pattern');
-    if(r){$('resolution').value=r.context.N;$('length').value=r.context.L;}
+function populatePatterns(set){
+  const patterns=set?.patterns??[];$('solution').replaceChildren();$('pattern-thumbnails').replaceChildren();
+  $('parameter-values').textContent=set?physicalLabel(set.config):'Parameters appear after an orbit passes verification.';
+  $('pattern-count').textContent=patterns.length===1?'1 verified pattern is known at this parameter set.':`${patterns.length} verified patterns at this parameter set.`;
+  const palette=$('palette').value;
+  for(let i=0;i<patterns.length;i++){
+    const summary=patterns[i],label=`${recordNames.get(summary.id)??('Pattern '+(i+1))} · T ${summary.config.period.toFixed(2)} · ${summary.config.N}²`,option=document.createElement('option');
+    option.value=summary.id;option.textContent=label;$('solution').append(option);
+    const key=summary.id+':'+palette;
+    if(!thumbnailCache.has(key)){
+      const r=record?.id===summary.id?record:atlas.get(summary.id),canvas=document.createElement('canvas');canvas.width=160;canvas.height=160;
+      const ranges=fieldRanges(r);renderField(canvas,r.field,r.config.N,r.config.M,0,{tiles:2,palette,range:palette==='concentration'?ranges.v:ranges.u});
+      thumbnailCache.set(key,canvas.toDataURL());
+    }
+    const button=document.createElement('button');button.type='button';button.className='pattern-thumb';button.setAttribute('aria-pressed',String(record?.id===summary.id));button.setAttribute('aria-label','Select '+label);
+    const image=document.createElement('img');image.src=thumbnailCache.get(key);image.alt='Verified concentration field at phase zero';image.width=160;image.height=160;
+    const text=document.createElement('span');text.textContent=label;button.append(image,text);button.onclick=()=>selectPattern(summary.id);$('pattern-thumbnails').append(button);
   }
-  syncRanges();drawMap();updateEvidence();if(start)startLive();
+  if(!patterns.length){const option=document.createElement('option');option.textContent='No verified patterns';option.value='';$('solution').append(option);}
+  if(patterns.some(r=>r.id===record?.id))$('solution').value=record.id;
 }
-function updateEvidence(){
-  if(filter()==='periodic'){$('preset-evidence').textContent=verifiedForGroup().length?'Numerically verified in this session; finite-grid tolerances apply.':'No verified nonuniform periodic solutions for this group.';return;}
-  const p=currentProfile(),same=Math.abs(p.F-profile.F)<1e-12&&Math.abs(p.k-profile.k)<1e-12;
-  if(!same){$('preset').value='custom';$('preset-evidence').textContent='Custom parameter pair · periodicity unverified. No matching preset test applies.';return;}
-  const result=assessProfile(profile,context(),evidence);
-  $('preset-evidence').textContent=`${profile.name} · ${result.message}`;
+function selectParameters(key){
+  const set=parameterSets().find(set=>set.key===key);if(!set||busy)return;
+  selectedParameterKey=key;selectRecord(atlas.get(set.patterns[0].id));
 }
-function fillPresets(){
-  $('preset').replaceChildren();
-  const add=(value,label)=>{const option=document.createElement('option');option.value=value;option.textContent=label;$('preset').append(option);};
-  if(filter()==='periodic'){verifiedForGroup().forEach((r,i)=>add('verified-'+i,`Orbit ${i+1} · F ${r.config.params.F} · k ${r.config.params.k}`));if(!verifiedForGroup().length)add('','No verified periodic solutions');}
-  else{if(filter()==='all')add('custom','Custom parameters');for(const p of candidates())add(p.id,p.name);if(!candidates().length)add('','No matching observed presets');$('preset').value=profile.id;}
+function selectPattern(id){
+  if(busy)return;const summary=atlas.summaries(group.id).find(r=>r.id===id);
+  if(summary&&parameterKey(summary.config)===selectedParameterKey){selectRecord(atlas.get(id));if(matchMedia('(max-width:720px)').matches)document.querySelector('.viewer').scrollIntoView({behavior:'smooth',block:'start'});}
 }
-function showRecord(r){
-  disposeEngine();record=r;phase=0;setPlaying(false);metrics(r.diagnostics);
-  if(filter()==='periodic'){const c=r.config;for(const [id,key] of [['feed','F'],['kill','k'],['du','Du'],['dv','Dv']])$(id).value=c.params[key];$('length').value=c.L??c.params.dx*c.N;$('stencil').value=c.params.stencil??'five-point';$('period').value=c.period;syncRanges();}
-  $('mode-label').textContent=r.diagnostics?.validated?'Periodic orbit · numerical checks passed':r.kind==='preview'?'Geometric seed · not a PDE solution':r.kind==='trajectory'?'Recorded trajectory · not periodic':'Periodic candidate · not verified';
-  $('caption').textContent=r.diagnostics?.validated?'This nonuniform orbit passed the PDE, symmetry, motion, return and refined forward checks on its numerical grid. Spatial and temporal refinement remain necessary for continuum accuracy.':r.kind==='preview'?'Exact time symmetry by geometric construction. This animation does not solve the Gray–Scott equations.':r.kind==='trajectory'?'Unforced forward evolution. Playback stops at the last recorded frame; its ends are not joined.':'The candidate is periodic and symmetric by construction, but has not passed all independent checks. It is not a verified periodic solution.';
-  $('engine-label').textContent=`Recorded · ${r.config.N}² × ${r.config.M} frames`;
-  restrictions();draw();
+function selectRecord(r,{updateSearch=true}={}){
+  if(!r||!atlas.isVerified(r,group.id))return;
+  selectedParameterKey=parameterKey(r.config);rememberedSelections.set(group.id,{key:selectedParameterKey,id:r.id});
+  displayEngine?.dispose();displayEngine=null;record=r;displayRanges=fieldRanges(r);phase=0;setPlaying(false);
+  try{displayEngine=createWebGLGrayScott({canvas:$('gpu-pattern'),N:r.config.N,initial:Float64Array.from(r.field.slice(0,2*r.config.N*r.config.N)),params:r.config.params,onContextLost:()=>{setPlaying(false);displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;draw();}});}catch{}
+  $('gpu-pattern').hidden=!displayEngine;main.hidden=!!displayEngine;if(updateSearch){setControls(r.config);$('seed').value='continue';}
+  $('solution').value=r.id;$('empty-state').hidden=true;$('mode-label').textContent='Verified periodic time symmetry';
+  $('engine-label').textContent=`${displayEngine?'WebGL playback':'CPU playback'} · ${r.config.N}² × ${r.config.M} · T ${r.config.period.toFixed(2)}`;
+  $('caption').textContent=(recordDescriptions.get(r.id)?recordDescriptions.get(r.id)+' ':'')+'This numerical orbit passed every generator’s phase-shift constraint, independent forward evolution and timestep refinement. The rotation-only comparison should differ for generators with a nonzero phase.';
+  metrics(r.diagnostics);colorScale();populateAtlas();controls();draw();
 }
-function applyFilter(){
-  cancel();disposeEngine();record=null;phase=0;metrics(null);fillPresets();
-  const strict=filter()==='periodic',list=candidates();
-  $('filter-count').textContent=strict?`${verifiedForGroup().length} verified orbits`:filter()==='all'?'81 source presets + free exploration':`${list.length} discrete preset points`;
-  $('filter-description').textContent={periodic:'Only nonuniform periodic orbits that pass all numerical checks for the selected group. An empty list is intentional.',all:'Explore freely. A failed seed or a decayed run does not establish that solutions are impossible.',source:'F and k snap together to exact Bulatov preset pairs. Source names are suggestions, not periodicity certificates.',observed:'F and k snap to presets with motion in a documented 2000-unit local test. The seed, grid and operator are locked to that test; periodicity remains unverified.'}[filter()];
-  if(strict){if(verifiedForGroup().length)showRecord(verifiedForGroup()[0]);else{$('mode-label').textContent='No verified periodic orbit';$('caption').textContent='The overlay marks the requested symmetry. No patterned orbit has passed all numerical checks for this group.';$('engine-label').textContent='Engine idle';status('Periodic-only filter: no verified patterned orbit is available.');draw();}}
-  else if(list.length){setProfile(list.find(p=>p.id===profile.id)||list[0]);}
-  else{status('No presets satisfy this filter for the selected group.');draw();}
-  restrictions();drawMap();updateEvidence();
+function emptyViewer(){
+  displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;record=null;displayRanges=null;setPlaying(false);phase=0;if($('seed').value==='continue')$('seed').value='skate';$('empty-state').hidden=false;$('mode-label').textContent='No verified solution';$('engine-label').textContent='Existence unresolved';
+  $('caption').textContent='The markers describe the requested rotation and phase shift. A chemical animation appears only after all numerical checks pass.';
+  metrics(null);colorScale();draw();controls();
 }
 function chooseGroup(id){
-  group=groups.find(g=>g.id===id)||groups[0];scanPoints=[];$('scan-results').replaceChildren();history.replaceState(null,'','#'+group.id);
+  cancel();group=groups.find(g=>g.id===id)||groups[0];history.replaceState(null,'','#'+group.id);
+  selectedParameterKey=rememberedSelections.get(group.id)?.key??null;
   for(const b of $('groups').children)b.setAttribute('aria-pressed',b.dataset.id===group.id);
-  const d=GROUP_DISPLAY[group.id];$('selected-id').textContent=group.id+' / COLOR GROUP';$('selected-title').innerHTML=d.shortHTML;$('group-label').textContent=group.id+' · '+d.shortText;
-  $('selected-description').textContent=group.id==='g96'?'The marked α and β quarter-turns advance three quarters of a cycle. A rotating packet must visit all four phases.':group.id==='g97'?'The marked α and β quarter-turns advance one quarter of a cycle: the opposite temporal handedness to g96.':DESCRIPTIONS[group.id][1];$('reference-link').href='../correspondence-p4.html#'+group.id;
-  $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · ${g.tau} T`;$('operation').append(o);}
-  selectedGenerator=d.namedGenerators[0].name;$('operation').value=selectedGenerator;overlay();applyFilter();
+  const d=GROUP_DISPLAY[group.id];$('selected-id').textContent=group.id+' / CYCLIC COLOR GROUP';$('selected-title').innerHTML=d.shortHTML;$('group-label').textContent=group.id+' · '+d.shortText;
+  const phases=d.namedGenerators.map(g=>`${g.name}: ${g.timeShift}T`).join(' · ');
+  $('selected-description').textContent=phases+'. These phase shifts act on both chemical concentrations.';
+  $('reference-link').href='../correspondence-p4.html#'+group.id;
+  $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · +${g.timeShift} T`;$('operation').append(o);}
+  selectedGenerator=d.namedGenerators[0].name;$('operation').value=selectedGenerator;overlay();populateAtlas();
+  const summaries=atlas.summaries(group.id),first=summaries.find(r=>r.id===rememberedSelections.get(group.id)?.id)??summaries.find(r=>parameterKey(r.config)===selectedParameterKey);if(first)selectRecord(atlas.get(first.id));else emptyViewer();
+  renderAttempts();setStatus(first?'Verified periodic orbit loaded. Rotation and phase shift are checked together.':'Checking the saved orbit for this exact cyclic time character…');if(catalogReady)loadGroup(group.id);
+}
+function mapBounds(){
+  const records=atlas.summaries(group.id),bounds={};
+  for(const [axis,limit,minSpan] of [['F',.2,.00002],['k',.08,.00002]]){
+    const values=records.map(r=>r.config.params[axis]);
+    if(!values.length){bounds[axis]=[0,limit];continue;}
+    const low=Math.min(...values),high=Math.max(...values),padding=Math.max(minSpan,(high-low)*.2);
+    bounds[axis]=[Math.max(0,low-padding),Math.min(limit,high+padding)];
+  }
+  return bounds;
 }
 function drawMap(){
-  const c=map.getContext('2d'),w=map.width,h=map.height,left=56,right=20,top=20,bottom=40,pw=w-left-right,ph=h-top-bottom;
-  c.clearRect(0,0,w,h);c.fillStyle='#fff';c.fillRect(0,0,w,h);c.font='20px sans-serif';c.lineWidth=1;
-  for(let i=0;i<=4;i++){const x=left+pw*i/4,y=top+ph*(1-i/4);c.strokeStyle='#ece9f0';c.beginPath();c.moveTo(x,top);c.lineTo(x,h-bottom);c.moveTo(left,y);c.lineTo(w-right,y);c.stroke();c.fillStyle='#807887';c.textAlign='center';c.fillText((.2*i/4).toFixed(2),x,h-10);c.textAlign='right';c.fillText((.08*i/4).toFixed(2),left-7,y+6);}
-  const strict=filter()==='periodic',allowed=new Set(candidates().map(p=>p.id));
-  const points=strict?verifiedForGroup().map(r=>r.config.params):PROFILES;
-  for(const p of points){const rows=evidence.runs.filter(r=>r.profileId===p.id&&r.context.groupId===group.id),moving=rows.some(r=>r.classification==='moving-pattern'),failed=rows.length&&!moving;
-    c.globalAlpha=strict||filter()==='all'||allowed.has(p.id)?1:.12;c.fillStyle=strict?'#5842ad':moving?'#3d9178':failed?'#c77e4a':'#a7a2b1';c.beginPath();c.arc(left+p.F/.2*pw,top+(1-p.k/.08)*ph,p.featured?5:3.3,0,2*Math.PI);c.fill();}
-  c.globalAlpha=1;if(!strict){const x=left+(+$('feed').value)/.2*pw,y=top+(1-(+$('kill').value)/.08)*ph;c.strokeStyle='#493088';c.lineWidth=3;c.beginPath();c.arc(x,y,10,0,2*Math.PI);c.stroke();}
+  if(!group||!atlas)return;
+  const c=map.getContext('2d'),w=map.width,h=map.height,left=80,right=20,top=20,bottom=40,pw=w-left-right,ph=h-top-bottom;
+  c.fillStyle='#fff';c.fillRect(0,0,w,h);c.font='20px sans-serif';c.lineWidth=1;
+  const bounds=mapBounds(),spanF=bounds.F[1]-bounds.F[0],spanK=bounds.k[1]-bounds.k[0];
+  c.font='15px sans-serif';
+  for(let i=0;i<=4;i++){const x=left+pw*i/4,y=top+ph*(1-i/4);c.strokeStyle='#ece9f0';c.beginPath();c.moveTo(x,top);c.lineTo(x,h-bottom);c.moveTo(left,y);c.lineTo(w-right,y);c.stroke();c.fillStyle='#807887';c.textAlign=i===4?'right':i===0?'left':'center';c.fillText((bounds.F[0]+spanF*i/4).toFixed(spanF<.001?6:4),x,h-10);c.textAlign='right';c.fillText((bounds.k[0]+spanK*i/4).toFixed(spanK<.001?5:3),left-7,y+6);}
+  const sets=parameterSets();
+  for(const set of sets){const p=set.config.params,x=left+(p.F-bounds.F[0])/spanF*pw,y=top+(1-(p.k-bounds.k[0])/spanK)*ph;c.fillStyle='#5842ad';c.beginPath();c.arc(x,y,7,0,2*Math.PI);c.fill();if(set.key===selectedParameterKey){c.strokeStyle='#5842ad';c.lineWidth=3;c.beginPath();c.arc(x,y,13,0,2*Math.PI);c.stroke();}}
+  if(!sets.length){c.fillStyle='#898091';c.textAlign='center';c.font='23px sans-serif';c.fillText('No verified points for '+group.id,left+pw/2,top+ph/2);}
 }
-function chemistryChanged(source){
-  if(filter()==='periodic'||busy)return;
-  if(source.endsWith('-range'))$(source.replace('-range','')).value=$(source).value;
-  if(!valid())return;
-  if(filter()!=='all'){
-    const p=nearestProfile(+$('feed').value,+$('kill').value,candidates());if(!p)return;
-    if(p.id!==profile.id){setProfile(p);return;}$('feed').value=p.F;$('kill').value=p.k;
+function snap(F,k){
+  if(busy)return;
+  const bounds=mapBounds(),r=atlas.nearest(group.id,{F,k},{scales:{F:bounds.F[1]-bounds.F[0],k:bounds.k[1]-bounds.k[0]}});
+  if(!r){$('map-status').textContent='No verified time-symmetric solution exists in this atlas for the selected group. There is nothing to snap to.';return;}
+  selectParameters(parameterKey(r.config));$('map-status').textContent=`Selected verified parameters: F ${number(r.config.params.F)}, k ${number(r.config.params.k)}. Pattern choices below use these same physical parameters.`;
+}
+function renderAttempts(){
+  $('search-results').replaceChildren();
+  for(const a of attempts.filter(a=>a.groupId===group.id).slice(-12).reverse()){
+    const row=document.createElement('div');row.className='trial-result'+(a.accepted?' accepted':'');
+    const heading=document.createElement('strong');heading.textContent=`F ${a.F.toFixed(6)} · k ${a.k.toFixed(6)} · ${a.accepted?'VERIFIED':a.excluded?'ANALYTICALLY EXCLUDED':'UNRESOLVED'}`;
+    const reason=document.createElement('p');reason.textContent=a.accepted?'All acceptance checks passed; added to the atlas.':a.reasons.join(' ');
+    row.append(heading,reason);if(a.excluded){const link=document.createElement('a');link.href='ANALYTIC-EXCLUSIONS.md';link.textContent='Proof and assumptions →';row.append(link);}$('search-results').append(row);
   }
-  syncRanges();if(engine){engine.setParams(config().params);activeConfig={...activeConfig,params:{...engine.params}};draw();}else if(record){record=null;startLive({play:false});}
-  updateEvidence();drawMap();status('Chemistry updated. Periodicity remains unverified.');
 }
-async function solve(){
-  if(filter()==='periodic'||!valid([...settings,'period','iterations']))return;
-  cancel();const token=job,iterationLimit=+$('iterations').value,c=config(+$('solver-resolution').value),M=c.M,stride=2*c.N*c.N;
-  let field;
-  if(record?.kind==='preview'){
-    field=new Float64Array(stride*M);
-    for(let t=0;t<M;t++){const old=record.config,frame=new Float64Array(2*old.N*old.N);for(let ch=0;ch<2;ch++)for(let y=0;y<old.N;y++)for(let x=0;x<old.N;x++)frame[ch*old.N*old.N+y*old.N+x]=valueAt(record.field,ch,x,y,t/M,old.N,old.M);field.set(resampleState(frame,old.N,c.N),t*stride);}
-  }else{
-    const source=engine?engine.readback():record?record.field.slice(0,2*record.config.N**2):makeInitial(currentProfile(),{N:c.N,L:c.L,ops:c.ops});
-    const sourceN=engine?.N??record?.config.N??c.N;
-    const temporary=newEngine(projectKernel(resampleState(source,sourceN,c.N),c.N,c.ops),c,document.createElement('canvas'));
-    busy=true;restrictions();$('progress').hidden=false;$('progress').value=0;field=new Float64Array(stride*M);field.set(temporary.readback());
-    try{
-      for(let t=1;t<M;t++){
-        let left=c.period/M;
-        while(left>1e-9){if(token!==job)return;const dt=Math.min(left,32*temporary.maxDt);temporary.advance(dt);left-=dt;await nextFrame();if(token!==job)return;}
-        field.set(temporary.readback(),t*stride);$('progress').value=t/M;status(`Recording trial period · ${t+1}/${M} frames · ${temporary.backend}`);
-      }
-    }finally{temporary.dispose();}
-    if(token!==job)return;
-  }
-  disposeEngine();record={kind:'candidate',config:c,field};busy=true;restrictions();$('progress').hidden=false;$('progress').value=0;
-  status('Optimizing the periodic field in the exact selected time symmetry…');
-  worker=new Worker(new URL('./worker.js?v=20260904-gpu',import.meta.url),{type:'module'});
-  worker.onerror=e=>{if(token!==job)return;cancel();showRecord(record);status('Search failed: '+e.message);};
-  worker.onmessage=({data})=>{
-    if(token!==job)return;
-    if(data.type==='error'){cancel();showRecord(record);status(data.message);return;}
-    if(data.type==='validating'){status('Checking independent forward return and full-trajectory agreement…');return;}
-    if(data.type==='progress'){
-      record={field:data.field,config:{...c,period:data.period},kind:'candidate',diagnostics:data};metrics(data);$('mode-label').textContent='Periodic search · unverified candidate';$('progress').value=data.iteration/iterationLimit;status(`Iteration ${data.iteration} · PDE RMS ${fmt(data.pdeRms)} · T ${data.period.toFixed(1)}`);draw();return;
-    }
-    if(data.type==='done'){
-      worker.terminate();worker=null;busy=false;$('progress').hidden=true;
-      const r={field:data.field,config:{...c,period:data.period},kind:'candidate',diagnostics:data.diagnostics};
-      // Only the worker's full acceptance pipeline, including refined independent
-      // integration, can add a nonuniform orbit to the strict session collection.
-      const accepted=hasRefinedAcceptance(data.diagnostics);
-      if(data.diagnostics.validated&&!accepted){data.diagnostics.validated=false;data.diagnostics.reasons.push('The complete refined acceptance record did not pass.');}
-      if(accepted)sessionVerified.push(r);
-      showRecord(r);$('period').value=Math.round(data.period);
-      status(`${data.iterations} iterations; ${data.reason}. ${data.diagnostics.validated?'All finite-grid numerical checks passed. This orbit is now in the verified-only filter.':data.diagnostics.reasons.join(' ')}`);
-    }
-  };
-  worker.postMessage({mode:'solve',config:c,field,iterations:iterationLimit});
+function setPreset(id){
+  settingsRevision++;
+  const p=PROFILES.find(p=>p.id===id);if(!p)return;
+  for(const [id,key] of [['feed','F'],['kill','k'],['du','Du'],['dv','Dv']])$(id).value=p[key];
+  $('stencil').value=p.stencil;setStatus('Starting parameters updated. They do not qualify as a solution until the full time-symmetry search passes.');
 }
-async function scan(){
-  if(filter()!=='all'||!valid())return;
-  cancel();const token=job,c=config(64),scanCanvas=document.createElement('canvas'),center={F:c.params.F,k:c.params.k},seed=currentProfile();busy=true;restrictions();scanPoints=[];$('scan-results').replaceChildren();$('progress').hidden=false;
+async function initialMovie(c,token){
+  if(c.seed==='continue'){if(!record||record.config.groupId!==c.groupId)throw Error('Select a verified orbit of this group to continue it.');const old=record.config,out=new Float64Array(2*c.N*c.N*c.M);for(let t=0;t<c.M;t++)for(let ch=0;ch<2;ch++)for(let y=0;y<c.N;y++)for(let x=0;x<c.N;x++)out[t*2*c.N*c.N+ch*c.N*c.N+y*c.N+x]=valueAt(record.field,ch,x*old.N/c.N,y*old.N/c.N,t/c.M,old.N,old.M);return out;}
+  if(c.seed!=='chemical')return makePreview({...c,F:c.params.F,k:c.params.k});
+  const initial=makeInitial({...c.params,seed:'skate'},{N:c.N,L:c.L,ops:c.ops}),canvas=document.createElement('canvas');
+  let engine,time=0;
+  try{engine=createWebGLGrayScott({canvas,N:c.N,initial:projectKernel(initial,c.N,c.ops),params:c.params});}
+  catch{const stepper=createStepper(projectKernel(initial,c.N,c.ops),c.N,c.params);engine={backend:'CPU midpoint',maxDt:stepper.maxDt,advance(t){stepper.advance(t);time+=t;},readback(){return stepper.state.slice();},dispose(){}};}
+  const stride=2*c.N*c.N,field=new Float64Array(stride*c.M);
   try{
-    for(let y=-1;y<=1;y++)for(let x=-1;x<=1;x++){
+    field.set(engine.readback());
+    for(let t=1;t<c.M;t++){
+      let remaining=c.period/c.M;
+      while(remaining>1e-9){if(token!==job)throw new DOMException('Cancelled','AbortError');const duration=Math.min(remaining,32*engine.maxDt);engine.advance(duration);remaining-=duration;await tick();}
+      if(token!==job)throw new DOMException('Cancelled','AbortError');field.set(engine.readback(),t*stride);
+      setStatus(`${engine.backend}: generating an internal chemical initial guess ${t+1}/${c.M}. It is not displayed as a solution.`);
+    }
+  }finally{engine.dispose();}
+  return field;
+}
+function optimize(c,field,iterations,token,label){
+  return new Promise((resolve,reject)=>{
+    const w=new Worker(new URL('./worker.js?v=20260904-atlas',import.meta.url),{type:'module'});worker=w;
+    const onAbort=()=>{w.terminate();reject(new DOMException('Cancelled','AbortError'));};abort.signal.addEventListener('abort',onAbort,{once:true});
+    const finish=()=>{abort?.signal.removeEventListener('abort',onAbort);w.terminate();if(worker===w)worker=null;};
+    w.onerror=e=>{finish();reject(Error(e.message));};
+    w.onmessage=({data})=>{
+      if(token!==job){finish();reject(new DOMException('Cancelled','AbortError'));return;}
+      if(data.type==='error'){finish();reject(Error(data.message));}
+      else if(data.type==='progress'){$('progress').value=data.iteration/iterations;setStatus(`${label} · iteration ${data.iteration}/${iterations} · PDE RMS ${fmt(data.pdeRms)} · relative mismatch ${(100*data.relativePde).toFixed(1)}%. Candidate remains outside the viewer.`);}
+      else if(data.type==='validating')setStatus(`${label} · checking independent periodic return…`);
+      else if(data.type==='done'){finish();resolve(data);}
+    };
+    w.postMessage({mode:'solve',config:c,field,iterations});
+  });
+}
+async function search(neighborhood=false){
+  if(!group||!atlas||busy||!valid())return;
+  cancel();const token=job,startAttempt=attempts.length,base=config(),iterations=+$('iterations').value,points=[];
+  if(neighborhood){for(let y=-1;y<=1;y++)for(let x=-1;x<=1;x++)points.push({F:Math.max(0,Math.min(.2,base.params.F+x*.0015)),k:Math.max(0,Math.min(.08,base.params.k+y*.0005))});}
+  else points.push({F:base.params.F,k:base.params.k});
+  abort=new AbortController();busy=true;controls();$('progress').hidden=false;$('progress').value=0;
+  try{
+    for(let i=0;i<points.length;i++){
       if(token!==job)return;
-      const F=Math.max(0,Math.min(.2,center.F+x*.0015)),k=Math.max(0,Math.min(.08,center.k+y*.0005)),params={...c.params,F,k};
-      const initial=makeInitial({...seed,F,k},{N:64,L:c.L,ops:c.ops}),test=newEngine(initial,{...c,params},scanCanvas);
-      const samples=[];let state;
-      try{for(let t=0;t<600;){if(token!==job)return;const dt=Math.min(12.8,600-t);test.advance(dt);t+=dt;if(t>=500)samples.push(test.readback());status(`Screening ${scanPoints.length+1}/9 · F ${F.toFixed(4)}, k ${k.toFixed(4)} · t ${t.toFixed(0)}`);await nextFrame();if(token!==job)return;}state=test.readback();}
-      finally{test.dispose();}
-      const movie=new Float64Array(samples.length*state.length);samples.forEach((s,i)=>movie.set(s,i*state.length));const stats=movieStats(movie,64,samples.length,[{M:[[1,0],[0,1]],v:[0,0],tau:0}]);
-      let minimum=Infinity,maximum=-Infinity,finite=true;for(const v of state){minimum=Math.min(minimum,v);maximum=Math.max(maximum,v);finite&&=Number.isFinite(v);}
-      const classification=classifyRun({...stats,minimum,maximum,finite}),point={F,k,classification,stats,context:{...c,params},horizon:600};scanPoints.push(point);
-      const b=document.createElement('button');b.className='scan-point '+classification;b.textContent=`F ${F.toFixed(4)} · k ${k.toFixed(4)} · ${classification.replaceAll('-',' ')}`;
-      b.onclick=()=>{if(busy)return;for(const [id,key] of [['feed','F'],['kill','k'],['du','Du'],['dv','Dv']])$(id).value=params[key];$('resolution').value='64';$('length').value=c.L;$('stencil').value=params.stencil;$('seed').value=c.seed;syncRanges();startLive();drawMap();};$('scan-results').append(b);$('progress').value=scanPoints.length/9;
+      const c={...base,params:{...base.params,...points[i]}},label=`${base.groupId} trial ${i+1}/${points.length}`;
+      const exclusion=analyticExclusion(c.params);
+      if(exclusion){attempts.push({groupId:c.groupId,F:c.params.F,k:c.params.k,accepted:false,excluded:true,reasons:[exclusion.conclusion]});renderAttempts();continue;}
+      setStatus(`${label} · constructing a full space–time initial guess…`);await tick();
+      const field=await initialMovie(c,token);if(token!==job)return;
+      const result=await optimize(c,field,iterations,token,label);if(token!==job)return;
+      let admission={accepted:false,reasons:result.diagnostics.reasons};
+      if(result.diagnostics.validated){
+        setStatus(`${label} · recomputing all phase constraints on independent trajectories…`);
+        admission=await atlas.admit({field:result.field,config:{...c,period:result.period}},{groupId:c.groupId,signal:abort.signal,onPhase:p=>setStatus(`${label} · ${typeof p==='string'?p:JSON.stringify(p)}`)});
+      }
+      if(token!==job)return;
+      attempts.push({groupId:c.groupId,F:c.params.F,k:c.params.k,period:result.period,accepted:admission.accepted,reasons:admission.reasons??[],diagnostics:result.diagnostics});
+      renderAttempts();populateAtlas();
+      if(admission.accepted)selectRecord(admission.record??atlas.get(admission.id),{updateSearch:false});
     }
-    status('Nine local screens complete. Click a result to explore it. None of these screens certify periodicity.');
-  }catch(e){status('Neighborhood screen stopped: '+e.message);}
-  finally{if(token===job){busy=false;$('progress').hidden=true;restrictions();}}
+    const passed=attempts.slice(startAttempt).filter(a=>a.groupId===base.groupId&&a.accepted).length,excluded=points.every(p=>analyticExclusion({...base.params,...p}));
+    setStatus(excluded?'These parameters are analytically excluded: at F = 0, nonnegative periodic solutions must be stationary. See the proof below.':passed?'Search complete. Accepted orbits are available in the atlas.':'Search complete: no verified solution found. These initial guesses failed; impossibility is not established.');
+  }catch(e){if(e.name!=='AbortError'&&token===job)setStatus(`Search failed: ${e.message}. No new solution was admitted.`);}
+  finally{if(token===job){busy=false;abort=null;$('progress').hidden=true;populateAtlas();if(!record){const first=atlas.summaries(group.id)[0];if(first)selectRecord(atlas.get(first.id),{updateSearch:false});}controls();}}
 }
-async function loadActualSeed(){
-  if(filter()==='periodic')return;
-  cancel();const token=job;status('Loading Bulatov’s actual U-skate chemical field…');
-  try{
-    const r=await fetch('data/bulatov-glider.f32');if(!r.ok)throw Error('Source field unavailable.');const data=new Float32Array(await r.arrayBuffer());if(token!==job)return;if(data.length!==128*128*2)throw Error('Unexpected source field size.');
-    const p=PROFILES.find(p=>p.id==='u-skate');setProfile(p,{start:false});$('resolution').value='128';$('length').value='128';
-    const planar=new Float64Array(data.length);for(let i=0;i<128*128;i++){planar[i]=data[2*i];planar[128*128+i]=data[2*i+1];}
-    startLive({initial:planar,seedKind:'bulatov-field-crop'});$('preset-evidence').textContent='Actual Bulatov field crop, projected to this group’s zero-time kernel. Its time symmetry and periodicity have not been verified.';
-  }catch(e){status(e.message);}
+
+// Validate one group's saved records on demand. Visiting another group never
+// labels the existing field with the new character, and cached accepted records
+// can be revisited without integrating again.
+async function loadGroup(id){
+  if(!catalogReady)return;
+  const previous=catalogLoads.get(id);if(previous&&previous.state!=='failed')return previous.promise;
+  const startJob=job,revision=settingsRevision,load={state:'loading',promise:null};catalogLoads.set(id,load);updateGroupCounts();
+  load.promise=(async()=>{
+    const entries=catalogEntries.filter(entry=>entry.groupId===id);
+    try{
+      for(let i=0;i<entries.length;i++){
+        const entry=entries[i],source=await fetch(entry.url);if(!source.ok)throw Error('Saved orbit metadata unavailable.');
+        const candidate=await source.json();
+        if(candidate.fieldUrl){const binary=await fetch(new URL(candidate.fieldUrl,source.url));if(!binary.ok)throw Error('Saved concentration field unavailable.');const bytes=await binary.arrayBuffer();if(candidate.fieldByteLength&&bytes.byteLength!==candidate.fieldByteLength)throw Error('Saved concentration field has an unexpected size.');candidate.field=new Float32Array(bytes);}
+        const result=await atlas.admit(candidate,{groupId:id,onPhase:p=>{if(group.id===id&&!busy&&job===startJob)setStatus(`Verifying saved orbit ${i+1}/${entries.length}: ${typeof p==='string'?p:JSON.stringify(p)}`);}});
+        if(result.accepted){recordNames.set(result.id,entry.patternName??entry.name?.split(' · F')[0]??'Periodic wave');recordDescriptions.set(result.id,entry.description??entry.name??'');updateGroupCounts();if(group.id===id&&!busy){populateAtlas();if(!record)selectRecord(result.record??atlas.get(result.id),{updateSearch:settingsRevision===revision});}}
+        else if(group.id===id&&!busy)setStatus('Saved orbit was not admitted: '+result.reasons.join(' '));
+      }
+      load.state='complete';updateGroupCounts();
+      if(group.id===id&&!busy&&job===startJob){populateAtlas();setStatus(atlas.size(id)?'Verified orbits ready. Click the parameter plane to snap to a solution of this time character.':'No saved orbit passed verification. Existence remains unresolved at these parameters.');}
+    }catch(error){load.state='failed';if(group.id===id&&!busy)setStatus('Could not verify saved orbits: '+error.message);}
+  })();return load.promise;
 }
-$('filter').value=DEFAULT_FILTER;
-$('filter').onchange=applyFilter;$('explore').onclick=()=>{$('filter').value='all';applyFilter();};
-$('preset').onchange=()=>{if(filter()==='periodic'){const r=verifiedForGroup()[Number($('preset').value.split('-')[1])];if(r)showRecord(r);}else{const p=PROFILES.find(p=>p.id===$('preset').value);if(p)setProfile(p);}};
-$('next-preset').onclick=()=>{const list=candidates(),i=list.findIndex(p=>p.id===profile.id);setProfile(list[(i+1)%list.length]);};
-for(const id of ['feed','kill','feed-range','kill-range','du','dv'])$(id).addEventListener('input',()=>chemistryChanged(id));
-for(const id of ['length','resolution','seed','stencil'])$(id).onchange=()=>{if(!busy&&filter()!=='periodic')startLive();};
-map.onclick=e=>{if(filter()==='periodic'||busy)return;const box=map.getBoundingClientRect(),x=(e.clientX-box.left)*map.width/box.width,y=(e.clientY-box.top)*map.height/box.height;
-  $('feed').value=Math.max(0,Math.min(.2,(x-56)/(map.width-76)*.2)).toFixed(5);$('kill').value=Math.max(0,Math.min(.08,(1-(y-20)/(map.height-60))*.08)).toFixed(5);chemistryChanged('feed');};
-$('run').onclick=()=>{if(engine){setPlaying(true);status('Live evolution resumed.');}else startLive();};$('reset').onclick=()=>startLive();
-$('play').onclick=()=>setPlaying(!playing);$('rewind').onclick=()=>{phase=0;draw();};$('phase').oninput=()=>{phase=+$('phase').value;if(record?.kind==='trajectory')phase=Math.min(phase,(record.config.M-1)/record.config.M);setPlaying(false);draw();};
-for(const canvas of [main,gpuCanvas]){canvas.onclick=()=>{if(!busy)setPlaying(!playing);};canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();if(!busy)setPlaying(!playing);}};}
-$('tiles').onchange=()=>{overlay();draw();};$('palette').onchange=draw;$('show-generators').onchange=overlay;
+
+$('focus-search').onclick=()=>{$('search-panel').open=true;$('search-panel').scrollIntoView({behavior:'smooth',block:'center'});$('search').focus({preventScroll:true});};
+$('parameter-set').onchange=()=>selectParameters($('parameter-set').value);
+$('solution').onchange=()=>selectPattern($('solution').value);
+map.onclick=e=>{if(!atlas||!group)return;const b=map.getBoundingClientRect(),x=(e.clientX-b.left)*map.width/b.width,y=(e.clientY-b.top)*map.height/b.height,bounds=mapBounds();snap(bounds.F[0]+Math.max(0,Math.min(1,(x-80)/(map.width-100)))*(bounds.F[1]-bounds.F[0]),bounds.k[0]+Math.max(0,Math.min(1,1-(y-20)/(map.height-60)))*(bounds.k[1]-bounds.k[0]));};
+map.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();const set=parameterSets().find(set=>set.key===selectedParameterKey);if(set)snap(set.config.params.F,set.config.params.k);}};
+$('preset').onchange=()=>setPreset($('preset').value);
+for(const id of numeric)$(id).addEventListener('input',()=>{$('preset').value='custom';settingsRevision++;});
+$('search').onclick=()=>search(false);$('scan').onclick=()=>search(true);
+$('stop').onclick=()=>cancel('Search cancelled. No unverified candidate was added to the atlas.');
+$('play').onclick=()=>setPlaying(!playing);$('rewind').onclick=()=>{phase=0;draw();};
+$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw();};
+for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=()=>setPlaying(!playing);canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}};}
+$('tiles').onchange=()=>{overlay();draw();};$('palette').onchange=()=>{colorScale();populatePatterns(parameterSets().find(set=>set.key===selectedParameterKey));controls();draw();};$('show-generators').onchange=overlay;
 $('operation').onchange=()=>{selectedGenerator=$('operation').value;overlay();drawComparison();};
-$('solve').onclick=()=>solve().catch(e=>{cancel();status(e.message);});$('scan').onclick=scan;
-$('stop').onclick=()=>{cancel('Experiment cancelled. No new periodic orbit was certified.');if(record)showRecord(record);};
-$('source-seed').onclick=loadActualSeed;
-$('preview').onclick=()=>{if(filter()==='periodic')return;cancel();const c=config(+$('solver-resolution').value),seed=c.seed==='broken-wave'?'spiral':c.seed==='spots'?'worms':'skate',field=makePreview({...c,seed,F:c.params.F,k:c.params.k});showRecord({field,config:c,kind:'preview',diagnostics:movieStats(field,c.N,c.M,c.ops)});status('Geometric time-symmetry seed ready. Record & solve uses this movie directly.');setPlaying(true);};
 $('export').onclick=()=>{
-  const c=record?.config??{...activeConfig,M:1,params:{...engine.params}},out={schema:'scott-gray-orbit-v2',kind:record?.kind??'live-state',layout:'frame-major; planar U then V; x-fast; node coordinates i/N,j/N',config:c,diagnostics:record?.diagnostics??{validated:false,time:engine.time},field:Array.from(record?.field??engine.readback()),neighborhoodScreens:scanPoints};
-  if(out.diagnostics.field){out.diagnostics={...out.diagnostics};delete out.diagnostics.field;}
-  const url=URL.createObjectURL(new Blob([JSON.stringify(out,(_,value)=>ArrayBuffer.isView(value)?Array.from(value):value)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-${group.id}-${out.kind}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  if(!record)return;
+  const out={schema:'scott-gray-verified-orbit-v3',...record,layout:'frame-major; planar U then V; x-fast; lattice nodes i/N,j/N'};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(out,(_,v)=>ArrayBuffer.isView(v)?Array.from(v):v)],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-${group.id}-verified.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
+
 try{
-  const [gr,er]=await Promise.all([fetch('groups.json'),fetch('data/preset-evidence.json')]);if(!gr.ok)throw Error('Group catalog unavailable.');groups=await gr.json();if(er.ok)evidence=await er.json();
-  $('groups').innerHTML=groups.map(g=>`<button class="group" data-id="${g.id}" aria-pressed="false"><strong>${GROUP_DISPLAY[g.id].shortHTML}</strong><span>${g.id}</span></button>`).join('');
+  const response=await fetch('groups.json');if(!response.ok)throw Error('Group catalog unavailable.');groups=await response.json();atlas=createSolutionAtlas(groups);
+  $('groups').innerHTML=groups.map(g=>`<button class="group" data-id="${g.id}" aria-pressed="false"><strong>${GROUP_DISPLAY[g.id].shortHTML}</strong><span>${g.id}<small class="orbit-count"></small></span></button>`).join('');
   for(const b of $('groups').children)b.onclick=()=>chooseGroup(b.dataset.id);
-  $('feasibility-rows').innerHTML=groups.map(g=>{const d=DESCRIPTIONS[g.id];return `<tr><td>${g.id} · ${GROUP_DISPLAY[g.id].shortHTML}</td><td>${d[4]}</td><td>${d[3]}</td><td>Compatible; existence open</td></tr>`;}).join('');
-  chooseGroup(/^#g9[4-9]$/.test(location.hash)?location.hash.slice(1):'g94');window.addEventListener('hashchange',()=>{if(/^#g9[4-9]$/.test(location.hash))chooseGroup(location.hash.slice(1));});requestAnimationFrame(animate);
-}catch(e){status(e.message);console.error(e);}
-fetch('data/search-results.json').then(r=>r.json()).then(data=>{$('search-results').innerHTML=data.results.map(r=>`<tr><td>${r.group}</td><td>${r.finalPdeRms.toExponential(2)}</td><td>${(100*r.relativePde).toFixed(1)}%</td><td>${r.closureRms.toFixed(4)}</td><td>Unverified</td></tr>`).join('');}).catch(()=>{$('search-results').innerHTML='<tr><td colspan="5">Saved search results unavailable.</td></tr>';});
+  for(const p of PROFILES){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;$('preset').append(o);}$('preset').value='u-skate';
+  $('feasibility-rows').innerHTML=groups.map(g=>`<tr><td>${g.id} · ${GROUP_DISPLAY[g.id].shortHTML}</td><td>${DESCRIPTIONS[g.id][4]}</td><td>${DESCRIPTIONS[g.id][3]}</td><td id="feasibility-${g.id}">Compatible; existence unresolved</td></tr>`).join('');
+  chooseGroup(requestedGroup??'g95');
+  window.addEventListener('hashchange',()=>{if(/^#g9[4-9]$/.test(location.hash))chooseGroup(location.hash.slice(1));});requestAnimationFrame(animate);
+  const manifestResponse=await fetch('data/verified-orbits.json');
+  if(!manifestResponse.ok)throw Error('Verified orbit catalog unavailable.');
+  const manifest=await manifestResponse.json();catalogEntries=manifest.orbits??[];catalogReady=true;updateGroupCounts();
+  await loadGroup(group.id);
+
+}catch(e){setStatus(e.message);console.error(e);}
+fetch('data/search-results.json').then(r=>r.json()).then(data=>{$('historical-results').innerHTML=data.results.map(r=>`<tr><td>${r.group}</td><td>${r.finalPdeRms.toExponential(2)}</td><td>${(100*r.relativePde).toFixed(1)}%</td><td>${r.closureRms.toFixed(4)}</td><td>Unverified</td></tr>`).join('');}).catch(()=>{});

@@ -1,0 +1,160 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 332.759633857897,
+    "groupId": "g94",
+    "L": 256,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      }
+    ],
+    "params": {
+      "F": 0.00407,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ]
+  },
+  "fieldUrl": "g94-F0p00407000-k0p02000-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "b6bf53d6f83774b621a63e1175b9ba943852030c650890d4b258582090f32ceb",
+  "validationSummary": {
+    "period": 332.759633857897,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.00035478422031876624,
+    "pdeRms": 1.681565863177625e-7,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.024217728403613827,
+    "spatialRms": 0.024243197799438006,
+    "coarseReturnRms": 3.8491809203067414e-9,
+    "refinedReturnRms": 3.849259554392645e-9,
+    "refinedTrajectoryRms": 4.983392824047299e-9,
+    "maxRefinedPhaseRms": 3.3689032304446053e-17,
+    "coarseDt": 0.3713835199306886,
+    "refinedDt": 0.1856917599653443,
+    "primitiveAtResolvedDivisors": true,
+    "projectionRms": 4.4510566288967635e-14,
+    "projectionMax": 1.9223511671384585e-13,
+    "quantizationMax": 7.4504986069534596e-9,
+    "admissionElapsedMs": 2758.223597
+  },
+  "provenance": {
+    "method": "Half-period unprojected RK4 Newton shooting with phase condition in exact x/y reflection kernel",
+    "seed": "Coarse-grid parameter correction from F=0.00408 to F=0.00407 lifted to prior verified N48 field",
+    "sourceGroup": "g95",
+    "spatialTranslation": [
+      0,
+      0.5
+    ],
+    "continuation": {
+      "variedParameter": "F",
+      "fixedParameters": {
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "L": 256,
+        "stencil": "five-point"
+      }
+    },
+    "unquantizedShootingResidualRms": 2.354331256684986e-13,
+    "unquantizedReturnRms": 2.8724494292945873e-12,
+    "extraSymmetry": "Instantaneous x/y mirror symmetries, also diagonal half-cell/time centering.",
+    "note": "Coordinate variants of the standing chemical-wave branch; the actual Float32 payload was independently revalidated. These are not U-skate gliders.",
+    "spatialRefinement": {
+      "coarseGrid": 24,
+      "fineGrid": 48,
+      "physicalSide": 256,
+      "coarsePeriod": 332.7210316392583,
+      "finePeriod": 332.759633857897,
+      "relativePeriodDifference": 0.00011601977322713975,
+      "fieldRmsDifference": 0.00023952089916338092,
+      "fieldMaxDifference": 0.0010060922801386762,
+      "relativeToCoarseTemporalRms": 0.00991465844120748,
+      "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
+    }
+  }
+}

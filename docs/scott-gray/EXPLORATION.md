@@ -1,95 +1,92 @@
-# Parameter exploration and evidence
+# Exploring verified periodic orbits
 
-The default filter is **Verified periodic solutions**. It currently contains no
-nonuniform 442 time-symmetric solution. A named preset or a moving animation is
-not enough to pass this filter. Use the other modes explicitly to explore
-candidates.
+The solution viewer and its two-dimensional parameter selector contain **only
+orbits accepted for the selected cyclic time character**. Every generator acts
+as `q(gx,t+tau*T)=q(x,t)` on both U and V. No forward-only chemical preset,
+geometric animation, or merely moving pattern can enter the atlas.
 
-- **Explore freely** accepts any F in [0, 0.2], k in [0, 0.08]. These are chart
-  bounds, not a proven existence region. Uniform steady solutions exist at every
-  nonnegative F,k; interesting moving or periodic patterns may not occur.
-- **Bulatov presets** snaps to 81 exact named F,k pairs from
-  [Vladimir Bulatov's source](https://github.com/vbulatov2011/symhub/blob/37e3520df40ba0ef38e2c916090790b9bbaec3dc/apps/symsim/gray_scott/js/gray_scott_presets.js).
-  The source names describe behaviors encountered in his simulator, with suitable
-  seeds and numerical settings. They are leads for exploration.
-- **Observed moving patterns** selects only discrete preset points with finite,
-  nonnegative, nonuniform changing concentrations in the recorded local screen.
-  Loading a tested point must also load its complete grid, seed, stencil and
-  numerical settings. An interval between tested points has no such evidence.
-- **Verified periodic solutions** requires the independent periodic return and
-  full time-symmetry checks described in `SOLVER.md`. No preset screen is accepted
-  as a substitute. The current evidence file marks every trial
-  `verifiedPeriodic: false`.
+The parameter plane snaps to the nearest admitted orbit of the current group,
+using distances normalized by its F and k axis ranges. Selection loads the exact
+period, grid, diffusion coefficients and stencil of that orbit. If a group has
+no accepted record, there is no point to snap to. This is not a proof of
+nonexistence.
 
-Bulatov's numerical defaults are Du=0.2097, Dv=0.105, Euler dt=0.8, and the
-nine-point stencil 0.8 times the four axial neighbors plus 0.2 times the four
-diagonal neighbors minus 4 times the center. Its leading continuum coefficient
-is 1.2. The local tests retain these diffusion coefficients and stencil weights,
-but use explicit midpoint dt=0.4 to match this laboratory's integrator.
+## Three stages of exploration
 
-## Reproducing the screen
+1. Choose the cyclic time symmetry g94–g99.
+2. Choose a precomputed physical parameter set. The dropdown and zoomed F/k
+   plane contain only parameter sets with an admitted nonuniform periodic field.
+   Diffusivities, cell length and stencil are shown beside the selector.
+3. Choose an actual pattern thumbnail at those parameters. Different periods or
+   spatial wavelengths can be distinct solutions of the same equations. Where
+   only one pattern is known, the interface explicitly says so. A different
+   time origin of the same loop is not a new discovered branch.
 
-With Node.js 20+ and a C++17 compiler, from the repository root:
+Each thumbnail is rendered from verified concentration data. Playback uses a
+fixed concentration scale for the whole orbit. Choosing a new pattern preserves
+its physical parameter set; choosing new parameters updates the available
+patterns. Only measured points are admitted, not the entire region between them.
+The open space between points does not imply either existence or impossibility.
 
-```sh
-node docs/scott-gray/tests/sample-presets.mjs docs/scott-gray
-```
+## Starting from a known orbit
 
-The script reads `exploration.mjs`, uses the same exported `makeInitial` function
-as the browser, and writes `data/preset-evidence.json`. It creates temporary
-native code build products outside the repository and removes them on exit.
-No Python packages or npm dependencies are required.
+Select a verified orbit and use **Continue the selected verified orbit** as the
+initial movie. Modify the search parameters, then search that point or a 3×3
+neighborhood. These actions run the periodic solver, followed by independent
+acceptance tests. The displayed orbit stays verified throughout; failed search
+candidates are reported in the search log and are never displayed as solutions.
 
-The screen tests 13 featured presets for each of the six groups. Every run uses
-N=64, L=128, periodic spatial boundaries, float32 concentrations, and a duration
-of 2000. Five observations at t=1800, 1850, 1900, 1950 and 2000 determine:
+The 81 source parameter pairs from
+[Bulatov's simulator](https://github.com/vbulatov2011/symhub/blob/37e3520df40ba0ef38e2c916090790b9bbaec3dc/apps/symsim/gray_scott/js/gray_scott_presets.js)
+are available only as starting guesses. The optional GPU chemical initial-guess
+mode computes a transient internally before projecting its entire space–time
+movie into the requested character. This is preparation for an orbit search,
+not a claimed time-symmetric solution.
 
-- Spatial RMS: fluctuations about each species' spatial mean, combined across
-  the observations; threshold 0.012.
-- Temporal RMS: fluctuations about each cell and species' five-sample mean;
-  threshold 0.0001.
-- Finite values and concentration range [-0.000001, 2].
+## Two efficient shooting constructions
 
-A passing run is classified `moving-pattern`. A low spatial RMS is
-`uniform-or-decayed`; a low temporal RMS with spatial contrast is
-`stationary-pattern`. Neither failure proves nonexistence. The tested state can
-be a transient or chaotic, and continuing longer can change its classification.
+The bundled standing and rotating concentration waves were found by solving a
+shorter return equation:
 
-Only each group's zero-time spatial kernel is built into the initial condition.
-The autonomous PDE preserves that kernel up to roundoff; the final kernel RMS is
-also recorded. The nonzero time shifts are **not imposed or tested** by this
-screen. For example, a g96 candidate has no nontrivial instantaneous kernel, and
-ordinary free evolution of it need not satisfy its quarter-period rotation.
+- g95 standing branch: `Phi(T/2,q) = q(R90^-1 x)`, with its same-time half-turn.
+- g96 rotating branch: `Phi(T/4,q) = q(R90^-1 x)`.
 
-The local `skate`, `spots` and `broken-wave` seeds are deterministic geometric
-initial concentrations. They are not evolved source fields or recreated source
-solutions. The separate `data/bulatov-glider.f32` source concentration crop keeps
-its existing provenance in `data/README.md`.
+`Phi` is unprojected numerical Gray–Scott evolution. A phase condition removes
+the arbitrary time origin. Analytic Hopf eigenmodes provide the initial state;
+additional mirror symmetries of these particular branches reduce the number of
+unknowns. This does not assert that every solution has those extra mirrors.
+Spatial translations and reflections of the two branches supply related
+examples of the other requested groups. Each derived example is separately
+checked against its full canonical operations.
 
-## Evidence admission and scope
+See [VERIFIED-ORBITS.md](VERIFIED-ORBITS.md) for the numerical evidence and
+[research/reproduce_orbits.py](research/reproduce_orbits.py) to reproduce both
+branches without using a prerecorded field. A broad census requires continuation,
+multiple initial branches, and stability/bifurcation analysis; these examples do
+not exhaust the parameter space.
 
-The observed-preset filter recomputes the classification from finite concentration
-and RMS statistics, checks the preset's exact F,k, and requires a complete recorded
-context. It rejects malformed records, mismatched labels and a final instantaneous
-kernel RMS above 0.001. The assessment function also compares the current F,k,
-boundary condition, precision and complete observation window against the record.
-Changing any of these settings removes that matching-evidence claim. A matching
-record describes the recorded run; it does not certify the current state or all
-future times.
+## Admission and exclusions
 
-A future periodic catalog entry cannot be admitted by setting
-`verifiedPeriodic: true`. It must associate a saved concentration asset (URL,
-SHA-256 and planar U/V layout) with its configuration and complete diagnostics:
-finite nontrivial variation, all group-operation errors, faithful nonzero time
-shifts, PDE residual, independent full-trajectory and return checks, and a smaller
-integration-step repeat of those checks. The numerical gates match this
-laboratory's default tolerances in `SOLVER.md`; supplied looser thresholds are
-not used to admit a catalog entry. Quarter/half-period repeat checks also reject
-trivial time characters at the tested fractions.
+`solution-atlas.mjs` ignores supplied validation flags and recomputes the PDE,
+all phase constraints, full independent return and trajectory error, and a second
+integration at half the actual timestep. Future phases come from actual
+integration beyond T, never from wrapping a transient recording. A fixed
+concentration scale over all frames keeps visual comparisons meaningful.
 
-This catalog gate checks an evidence record's completeness and measured results.
-It is not itself an orbit verifier or a mathematical existence proof. Diagnostics
-must be generated by independent integration of the saved orbit; loading an orbit
-must check the saved asset against its recorded hash. Continuum accuracy still
-requires a spatial and temporal refinement study. The current catalog has no
-such orbit assets, so its strict periodic collection remains empty.
+`phase-audit.mjs` also compares rotation alone with rotation plus phase, requires
+nonzero phases to exceed the measured numerical uncertainty, and tests resolved
+shorter periods using the complete temporal spectrum. Testing odd divisors
+prevents a triple repetition of a g97 movie from being mislabeled as g96.
+
+The zero-feed axis has an analytic exclusion for nonstationary nonnegative
+periodic solutions under positive diffusion and periodic boundaries. See
+[the proof](ANALYTIC-EXCLUSIONS.md). Other failed searches remain unresolved.
+
+## Historical forward-only screen
+
+`data/preset-evidence.json` preserves 78 earlier runs: 13 source presets in each
+of six instantaneous spatial kernels. Fifty-two showed motion, fourteen became
+stationary, and twelve became nearly uniform. They did not test the nonzero
+phase relations and are not selectable solution records. Reproduce that
+historical screen with `node tests/sample-presets.mjs .` from this directory;
+its labels must never substitute for periodic-orbit admission.

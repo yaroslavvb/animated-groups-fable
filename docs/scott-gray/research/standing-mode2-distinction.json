@@ -1,0 +1,57 @@
+{
+  "comparison": [
+    {
+      "spatialMode": 1,
+      "period": 346.0986014564915,
+      "F": 0.00403,
+      "k": 0.02,
+      "L": 256.0,
+      "spatialVariance": 0.0014094545486388575,
+      "axisFourierShells": {
+        "1": {
+          "power": 0.0006142497008263451,
+          "fractionOfSpatialVariance": 0.43580667529828476
+        },
+        "2": {
+          "power": 1.3868824620880762e-05,
+          "fractionOfSpatialVariance": 0.009839852327465403
+        },
+        "3": {
+          "power": 8.056903574331856e-05,
+          "fractionOfSpatialVariance": 0.05716327342454989
+        },
+        "4": {
+          "power": 4.535352809093333e-06,
+          "fractionOfSpatialVariance": 0.00321780706832528
+        }
+      }
+    },
+    {
+      "spatialMode": 2,
+      "period": 340.27682779902653,
+      "F": 0.00403,
+      "k": 0.02,
+      "L": 256.0,
+      "spatialVariance": 0.000597871641591763,
+      "axisFourierShells": {
+        "1": {
+          "power": 0.0,
+          "fractionOfSpatialVariance": 0.0
+        },
+        "2": {
+          "power": 0.0005600124346118667,
+          "fractionOfSpatialVariance": 0.9366766972270157
+        },
+        "3": {
+          "power": 0.0,
+          "fractionOfSpatialVariance": 0.0
+        },
+        "4": {
+          "power": 2.737291813150853e-06,
+          "fractionOfSpatialVariance": 0.004578393793462314
+        }
+      }
+    }
+  ],
+  "distinction": "Time-averaged spatial Fourier shell powers are invariant under time phase shifts, translations, and square-lattice rotations/reflections. The mode2 field has zero shell1 and dominant shell2, unlike the first standing pattern; this is not a phase or coordinate relabeling. Both patterns use the same F,k,L,N and physical diffusion coefficients."
+}

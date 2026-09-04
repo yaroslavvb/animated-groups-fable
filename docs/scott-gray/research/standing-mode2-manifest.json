@@ -1,0 +1,10 @@
+{
+  "schema": "scott-gray-verified-atlas-v1",
+  "orbits": [
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-mode2-F0p00403-N48-M128.json",
+      "name": "Standing mode 2 \u00b7 F 0.00403 \u00b7 k 0.020"
+    }
+  ]
+}

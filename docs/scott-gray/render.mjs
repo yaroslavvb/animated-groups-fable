@@ -15,7 +15,9 @@ export function clearCanvas(canvas,text=''){
   const c=canvas.getContext('2d');c.fillStyle='#271337';c.fillRect(0,0,canvas.width,canvas.height);
   if(text){c.fillStyle='#cbbfd7';c.font='12px sans-serif';c.textAlign='center';c.fillText(text,canvas.width/2,canvas.height/2);}
 }
-export function renderField(canvas,field,N,M,t,{tiles=1,palette='ember',operation=null}={}){
+export function renderField(canvas,field,N,M,t,{tiles=1,palette='ember',operation=null,range=null}={}){
+  if(range!==null&&(!Array.isArray(range)||range.length!==2||!range.every(Number.isFinite)||!(range[1]>range[0])))throw Error('A concentration range requires two finite increasing endpoints.');
+  const lower=range?.[0]??(palette==='concentration'?0:.3),span=range?range[1]-range[0]:(palette==='concentration'?.4:.56);
   if(paletteName!==palette){paletteName=palette;const stops=palettes[palette];colours=Array.from({length:1024},(_,i)=>{const v=i/1023;let j=1;while(j<stops.length-1&&stops[j][0]<v)j++;const a=stops[j-1],b=stops[j],f=(v-a[0])/(b[0]-a[0]);return [1,2,3].map(i=>Math.round(a[i]+(b[i]-a[i])*f));});}
   // A node at i/N belongs on the cell boundary at screen coordinate i*size/N,
   // not at the center of image pixel i. A periodic one-node border permits
@@ -24,9 +26,9 @@ export function renderField(canvas,field,N,M,t,{tiles=1,palette='ember',operatio
   for(let y=-1;y<=N;y++)for(let x=-1;x<=N;x++){
     let sx=x,sy=y;
     if(operation){const a=x-operation.v[0]*N,b=y-operation.v[1]*N;sx=operation.M[0][0]*a+operation.M[1][0]*b;sy=operation.M[0][1]*a+operation.M[1][1]*b;}
-    const v=valueAt(field,1,sx,sy,t,N,M),u=valueAt(field,0,sx,sy,t,N,M),z=palette==='concentration'?v/.4:(u-.3)/.56;
+    const v=valueAt(field,1,sx,sy,t,N,M),u=valueAt(field,0,sx,sy,t,N,M),z=((palette==='concentration'?v:u)-lower)/span;
     const rgb=colours[Math.max(0,Math.min(1023,Math.round(z*1023)))],i=((y+1)*padded+x+1)*4;
-    data.data.set([...rgb,255],i);
+    data.data[i]=rgb[0];data.data[i+1]=rgb[1];data.data[i+2]=rgb[2];data.data[i+3]=255;
   }
   ctx.putImageData(data,0,0);const c=canvas.getContext('2d'),sizeX=canvas.width/tiles,sizeY=canvas.height/tiles,unitX=sizeX/N,unitY=sizeY/N;
   c.imageSmoothingEnabled=true;c.imageSmoothingQuality='low';

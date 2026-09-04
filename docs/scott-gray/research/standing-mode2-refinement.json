@@ -1,0 +1,124 @@
+{
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 340.27682779902653,
+    "L": 256.0,
+    "groupId": "g95",
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.0
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.0
+      }
+    ],
+    "params": {
+      "F": 0.00403,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012
+  },
+  "period": 340.27682779902653,
+  "family": "standing",
+  "spatialMode": 2,
+  "rootConverged": true,
+  "rootMessage": "The solution converged.",
+  "shootingResidualRms": 2.4163486810312092e-14,
+  "fullReturnRms": 3.5550427678762557e-12,
+  "temporalRms": 0.024438276304502207,
+  "spatialRms": 0.024451413897600343,
+  "method": "Half-period RK4 Newton shooting on a smaller periodic cell, extended exactly by spatial repetition",
+  "seed": "Spatial refinement of the N24 mode2 solution, holding physical L256 fixed",
+  "tiledFrom": {
+    "N": 24,
+    "physicalSide": 128.0,
+    "tileFactor": 2
+  },
+  "extraSymmetry": "Half-cell translations in x and y, plus x/y mirrors; not compatible with a faithful half-period centering shift",
+  "elapsedSeconds": 2.617114305496216,
+  "calls": 349,
+  "spatialRefinement": {
+    "coarseGrid": 24,
+    "fineGrid": 48,
+    "physicalSide": 256,
+    "coarsePeriod": 340.3836526508506,
+    "finePeriod": 340.27682779902653,
+    "relativePeriodDifference": 0.0003138366105191128,
+    "fieldRmsDifference": 0.000507490842735865,
+    "fieldMaxDifference": 0.001341117219076371,
+    "relativeToCoarseTemporalRms": 0.020507065273090264,
+    "comparison": "Same normalized time phases on coincident nodes, with physical parameters and L256 fixed."
+  }
+}

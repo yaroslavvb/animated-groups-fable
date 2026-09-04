@@ -106,6 +106,21 @@ export async function runWebGLTests() {
     // With the linear concentration palette their rounding differs by ≤2 levels.
     expect(largestDifference<=2,`CPU/GPU coordinate or seam mismatch: ${largestDifference}`);return {maxChannelError:largestDifference};
   });
+  await test('A fixed concentration range reveals low-U orbits with matching CPU/GPU colors',()=>{
+    const low=new Float32Array(2*N*N);low.fill(.17,0,N*N);low.fill(.08,N*N);engine.upload(low);
+    const canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;
+    const gl=engine.canvas.getContext('webgl2'),gpu=new Uint8Array(4);
+    let largestDifference=0;
+    for(const [palette,range] of [['ember',[.13,.21]],['ceramic',[.13,.21]],['concentration',[.04,.12]]]){
+      renderField(canvas,low,N,1,0,{palette,range});engine.render({width:64,height:64,palette,range});
+      const cpu=canvas.getContext('2d').getImageData(32,32,1,1).data;gl.readPixels(32,31,1,1,gl.RGBA,gl.UNSIGNED_BYTE,gpu);
+      for(let ch=0;ch<3;ch++)largestDifference=Math.max(largestDifference,Math.abs(cpu[ch]-gpu[ch]));
+      expect(cpu[0]+cpu[1]+cpu[2]>150,'A low-concentration orbit remains clamped to the background');
+    }
+    expect(largestDifference<=1,`Custom concentration range differs by ${largestDifference} color levels`);
+    let rejected=0;for(const range of [[1,1],[2,1],[0,NaN]])for(const run of [()=>engine.render({range}),()=>renderField(canvas,low,N,1,0,{range})])try{run();}catch{rejected++;}
+    expect(rejected===6,'Invalid fixed color ranges were accepted');return {maxChannelError:largestDifference,invalidRangesRejected:rejected};
+  });
   await test('Diffusion timestep cap prevents oversized requests',()=>{
     engine.upload(initial);engine.setParams({Du:.3,Dv:.15,dx:.1,dt:2});const info=engine.step(1,4);
     expect(Math.abs(info.dt-.006)<1e-12,`Bad safe timestep ${info.dt}`);return {effectiveDt:info.dt};

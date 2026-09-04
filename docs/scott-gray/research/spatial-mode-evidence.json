@@ -1,0 +1,1151 @@
+{
+  "schema": "scott-gray-spatial-mode-evidence-v1",
+  "method": "Float32 bytes decoded to Float64; spatial mean removed per frame and species; 2D DFT energy averaged over all 128 phases and both species. Translation checks use every concentration sample.",
+  "caveat": "Different wavelengths on the same physical square are distinct patterns. Extra smaller spatial periods mean the displayed cell need not be spatially primitive. These measurements do not establish continuum existence, stability or full isotropy.",
+  "orbits": [
+    {
+      "metadata": "data/orbits/g95-F0p00403000-k0p02000-N48-M128.json",
+      "fieldSha256": "959aa64cdf56d62de3eb58bbbfc8ffe348e58699c12ed045b34036198b6f7c1a",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00403,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 346.0986014564915,
+      "spatialRms": 0.03754270301342265,
+      "principalAxialEnergyFractions": {
+        "1": 0.43580667577280113,
+        "2": 0.009839852272394395,
+        "3": 0.05716327389998639
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 0,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.1089516689432003
+        },
+        {
+          "kx": 0,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.10895166894320028
+        },
+        {
+          "kx": 1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.10895166894320028
+        },
+        {
+          "kx": -1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.10895166894320028
+        },
+        {
+          "kx": -2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.050808308443225404
+        },
+        {
+          "kx": 2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.050808308443225404
+        },
+        {
+          "kx": 1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.0508083084432254
+        },
+        {
+          "kx": 2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.0508083084432254
+        },
+        {
+          "kx": -2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.0508083084432254
+        },
+        {
+          "kx": 1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.05080830844322539
+        },
+        {
+          "kx": -1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.05080830844322539
+        },
+        {
+          "kx": -1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.05080830844322539
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.05331298457011189,
+          "max": 0.14648368954658508
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.05331298457011189,
+          "max": 0.14648368954658508
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.054021938945133845,
+          "max": 0.16850126534700394
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.054021938945133845,
+          "max": 0.16850126534700394
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.052348040286996085,
+          "max": 0.17305699735879898
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.052348040286996085,
+          "max": 0.17305699735879898
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.04439269538577979,
+          "max": 0.1607351079583168
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.04439269538577979,
+          "max": 0.1607351079583168
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-F0p00405000-k0p02000-N48-M128.json",
+      "fieldSha256": "3b6a2f233031f6866ee7f911b25836868bf40799f1c2f47aad9f00c01dc9ac67",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00405,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 339.3792169761228,
+      "spatialRms": 0.03156680281656971,
+      "principalAxialEnergyFractions": {
+        "1": 0.5899006055411575,
+        "2": 0.007564093074331698,
+        "3": 0.024462741158449614
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.1474751513852894
+        },
+        {
+          "kx": -1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.1474751513852894
+        },
+        {
+          "kx": 0,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.14747515138528938
+        },
+        {
+          "kx": 0,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.14747515138528935
+        },
+        {
+          "kx": 1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.040261419606059376
+        },
+        {
+          "kx": -1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.040261419606059376
+        },
+        {
+          "kx": -1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.040261419606059376
+        },
+        {
+          "kx": 1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.040261419606059376
+        },
+        {
+          "kx": 2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.040261419606059376
+        },
+        {
+          "kx": -2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.04026141960605937
+        },
+        {
+          "kx": -2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.04026141960605937
+        },
+        {
+          "kx": 2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.04026141960605936
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.04484943302582893,
+          "max": 0.12396324425935745
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.04484943302582893,
+          "max": 0.12396324425935745
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.04445994109604775,
+          "max": 0.1383354514837265
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.04445994109604775,
+          "max": 0.1383354514837265
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.041539139224861917,
+          "max": 0.137883722782135
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.041539139224861917,
+          "max": 0.137883722782135
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.033651769315071335,
+          "max": 0.12047560513019562
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.033651769315071335,
+          "max": 0.12047560513019562
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-F0p00407000-k0p02000-N48-M128.json",
+      "fieldSha256": "2af4581f06f67858eb7d2b134835284b0937c18e17901f7720e23d0d9df0c624",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00407,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 332.759633857897,
+      "spatialRms": 0.02424319779952151,
+      "principalAxialEnergyFractions": {
+        "1": 0.7754697678191891,
+        "2": 0.003946859129804474,
+        "3": 0.005608965634386473
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.19386744195479727
+        },
+        {
+          "kx": 0,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.19386744195479727
+        },
+        {
+          "kx": -1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.19386744195479727
+        },
+        {
+          "kx": 0,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.19386744195479724
+        },
+        {
+          "kx": 1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.023469369012023445
+        },
+        {
+          "kx": 2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.023469369012023445
+        },
+        {
+          "kx": -2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        },
+        {
+          "kx": -1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        },
+        {
+          "kx": 2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        },
+        {
+          "kx": -1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        },
+        {
+          "kx": 1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        },
+        {
+          "kx": -2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.02346936901202344
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.03443740963956111,
+          "max": 0.09480953216552734
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.034437409639561115,
+          "max": 0.09480953216552734
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.032519608201014086,
+          "max": 0.08991284668445587
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.032519608201014086,
+          "max": 0.08991284668445587
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.028871096929704312,
+          "max": 0.08621534705162048
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.028871096929704312,
+          "max": 0.08621534705162048
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.022164669143068645,
+          "max": 0.07039782404899597
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.022164669143068645,
+          "max": 0.07039782404899597
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-F0p00408000-k0p02000-N48-M128.json",
+      "fieldSha256": "f03c217ba7e80f1dfea53b456c0c4c5ce4d0c0e1e985d173cf982c922f044bbb",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00408,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 329.31034379922346,
+      "spatialRms": 0.01937523233284547,
+      "principalAxialEnergyFractions": {
+        "1": 0.8730961694374221,
+        "2": 0.0023517833348898195,
+        "3": 0.0015059730751753428
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.21827404235935555
+        },
+        {
+          "kx": 0,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.21827404235935555
+        },
+        {
+          "kx": -1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.21827404235935552
+        },
+        {
+          "kx": 0,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.21827404235935552
+        },
+        {
+          "kx": 1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.013458808256778414
+        },
+        {
+          "kx": 1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": -1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": 2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": 2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": -1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": -2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        },
+        {
+          "kx": -2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.01345880825677841
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.02750212665014954,
+          "max": 0.0745275616645813
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.02750212665014954,
+          "max": 0.0745275616645813
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.025092764677651563,
+          "max": 0.06687904894351959
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.025092764677651563,
+          "max": 0.06687904894351959
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.021558281158471387,
+          "max": 0.05668593943119049
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.021558281158471387,
+          "max": 0.05668593943119049
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.016027462290721453,
+          "max": 0.043660134077072144
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.016027462290721453,
+          "max": 0.043660134077072144
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-mode2-F0p00400000-k0p02000000-N48-M128.json",
+      "fieldSha256": "044cb654b52657309ff6fa64f45784bc7d490d14c9beeb96ab64153e1cb6af3d",
+      "groupId": "g95",
+      "params": {
+        "F": 0.004,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 354.13840674899126,
+      "spatialRms": 0.03637362333379263,
+      "principalAxialEnergyFractions": {
+        "1": 0.0,
+        "2": 0.832059340733071,
+        "3": 0.0
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 2,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.20801483518326774
+        },
+        {
+          "kx": 0,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.20801483518326774
+        },
+        {
+          "kx": -2,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.2080148351832677
+        },
+        {
+          "kx": 0,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.20801483518326766
+        },
+        {
+          "kx": -4,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.013450215091603589
+        },
+        {
+          "kx": 4,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.013450215091603589
+        },
+        {
+          "kx": 4,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.013450215091603586
+        },
+        {
+          "kx": -2,
+          "ky": 4,
+          "fractionOfSpatialEnergy": 0.013450215091603586
+        },
+        {
+          "kx": 2,
+          "ky": -4,
+          "fractionOfSpatialEnergy": 0.013450215091603586
+        },
+        {
+          "kx": -4,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.013450215091603586
+        },
+        {
+          "kx": 2,
+          "ky": 4,
+          "fractionOfSpatialEnergy": 0.013450215091603586
+        },
+        {
+          "kx": -2,
+          "ky": -4,
+          "fractionOfSpatialEnergy": 0.013450215091603584
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.0,
+          "max": 0.0
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.0,
+          "max": 0.0
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.04774418646441298,
+          "max": 0.13725508749485016
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.04774418646441298,
+          "max": 0.13725508749485016
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.0521323438492769,
+          "max": 0.13369161635637283
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.0521323438492769,
+          "max": 0.13369161635637283
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.04774418646441298,
+          "max": 0.13725508749485016
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.04774418646441298,
+          "max": 0.13725508749485016
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-mode2-F0p00403-N48-M128.json",
+      "fieldSha256": "9bd84a9069a6bc8c1bb5521664bf2326fc37921c89606a25eb512ff11535e5a0",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00403,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 340.27682779902653,
+      "spatialRms": 0.024451413898617727,
+      "principalAxialEnergyFractions": {
+        "1": 0.0,
+        "2": 0.93667669663212,
+        "3": 0.0
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 0,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.23416917415803007
+        },
+        {
+          "kx": 0,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.23416917415803
+        },
+        {
+          "kx": 2,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.23416917415803
+        },
+        {
+          "kx": -2,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.23416917415803
+        },
+        {
+          "kx": 2,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.005335205993551903
+        },
+        {
+          "kx": 2,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.005335205993551902
+        },
+        {
+          "kx": -2,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.005335205993551902
+        },
+        {
+          "kx": -2,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.005335205993551902
+        },
+        {
+          "kx": -4,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.004399079757807739
+        },
+        {
+          "kx": -2,
+          "ky": 4,
+          "fractionOfSpatialEnergy": 0.004399079757807739
+        },
+        {
+          "kx": -2,
+          "ky": -4,
+          "fractionOfSpatialEnergy": 0.004399079757807739
+        },
+        {
+          "kx": 4,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.004399079757807739
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.0,
+          "max": 0.0
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.0,
+          "max": 0.0
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.030791173201388432,
+          "max": 0.0782519280910492
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.030791173201388432,
+          "max": 0.0782519280910492
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.03486089792980163,
+          "max": 0.08840267360210419
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.03486089792980163,
+          "max": 0.08840267360210419
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.030791173201388432,
+          "max": 0.0782519280910492
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.030791173201388432,
+          "max": 0.0782519280910492
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-mode3-F0p00395000-k0p02000000-N48-M128.json",
+      "fieldSha256": "d255c42607813f9c550607bd812eaaf831be3539cd78c80292fb3a70658e42f1",
+      "groupId": "g95",
+      "params": {
+        "F": 0.00395,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 359.4407106712676,
+      "spatialRms": 0.030393614802849668,
+      "principalAxialEnergyFractions": {
+        "1": 1.1219545778593286e-21,
+        "2": 2.1225202689199742e-21,
+        "3": 0.9228743924143911
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 3,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.2307185981035978
+        },
+        {
+          "kx": -3,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.23071859810359777
+        },
+        {
+          "kx": 0,
+          "ky": -3,
+          "fractionOfSpatialEnergy": 0.23071859810359777
+        },
+        {
+          "kx": 0,
+          "ky": 3,
+          "fractionOfSpatialEnergy": 0.23071859810359777
+        },
+        {
+          "kx": -3,
+          "ky": 3,
+          "fractionOfSpatialEnergy": 0.009231257125087957
+        },
+        {
+          "kx": 3,
+          "ky": -3,
+          "fractionOfSpatialEnergy": 0.009231257125087955
+        },
+        {
+          "kx": 3,
+          "ky": 3,
+          "fractionOfSpatialEnergy": 0.009231257125087955
+        },
+        {
+          "kx": -3,
+          "ky": -3,
+          "fractionOfSpatialEnergy": 0.009231257125087955
+        },
+        {
+          "kx": -6,
+          "ky": -3,
+          "fractionOfSpatialEnergy": 0.003597458639184645
+        },
+        {
+          "kx": 3,
+          "ky": 6,
+          "fractionOfSpatialEnergy": 0.003597458639184645
+        },
+        {
+          "kx": 3,
+          "ky": -6,
+          "fractionOfSpatialEnergy": 0.003597458639184645
+        },
+        {
+          "kx": 6,
+          "ky": -3,
+          "fractionOfSpatialEnergy": 0.003597458639184645
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.043573320899028316,
+          "max": 0.11404509842395782
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.043573320899028316,
+          "max": 0.11404509842395782
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 3.3606208697288864e-11,
+          "max": 7.450580596923828e-09
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 3.3606208697288864e-11,
+          "max": 7.450580596923828e-09
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.03199226543868959,
+          "max": 0.09088411927223206
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.03199226543868959,
+          "max": 0.09088411927223206
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.043573320899028316,
+          "max": 0.11404509842395782
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.043573320899028316,
+          "max": 0.11404509842395782
+        }
+      ]
+    },
+    {
+      "metadata": "data/orbits/g95-standing-N48-M128.json",
+      "fieldSha256": "5f74e2d014893ad1797672a7a20958945b3b8e9fb96b1ea578ef5f4572b75e85",
+      "groupId": "g95",
+      "params": {
+        "F": 0.004089987272497608,
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "dx": 5.333333333333333,
+        "stencil": "five-point"
+      },
+      "L": 256,
+      "N": 48,
+      "M": 128,
+      "period": 325.56596939424105,
+      "spatialRms": 0.0122211192907879,
+      "principalAxialEnergyFractions": {
+        "1": 0.9643625560472177,
+        "2": 0.0010883333789313023,
+        "3": 0.00019097377744824377
+      },
+      "dominantFourierModes": [
+        {
+          "kx": 0,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.24109063901180447
+        },
+        {
+          "kx": 0,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.24109063901180447
+        },
+        {
+          "kx": 1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.24109063901180447
+        },
+        {
+          "kx": -1,
+          "ky": 0,
+          "fractionOfSpatialEnergy": 0.24109063901180441
+        },
+        {
+          "kx": 2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.003570314880045656
+        },
+        {
+          "kx": 1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.003570314880045656
+        },
+        {
+          "kx": 2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.003570314880045656
+        },
+        {
+          "kx": 1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.003570314880045656
+        },
+        {
+          "kx": -2,
+          "ky": 1,
+          "fractionOfSpatialEnergy": 0.003570314880045656
+        },
+        {
+          "kx": -1,
+          "ky": 2,
+          "fractionOfSpatialEnergy": 0.003570314880045655
+        },
+        {
+          "kx": -1,
+          "ky": -2,
+          "fractionOfSpatialEnergy": 0.003570314880045655
+        },
+        {
+          "kx": -2,
+          "ky": -1,
+          "fractionOfSpatialEnergy": 0.003570314880045655
+        }
+      ],
+      "spatialTranslationChecks": [
+        {
+          "axis": "x",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.01731864618809631,
+          "max": 0.04494504630565643
+        },
+        {
+          "axis": "y",
+          "divisor": 2,
+          "translationFraction": 0.5,
+          "rms": 0.01731864618809631,
+          "max": 0.04494504630565643
+        },
+        {
+          "axis": "x",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.015219130463766072,
+          "max": 0.039499327540397644
+        },
+        {
+          "axis": "y",
+          "divisor": 3,
+          "translationFraction": 0.3333333333333333,
+          "rms": 0.015219130463766072,
+          "max": 0.039499327540397644
+        },
+        {
+          "axis": "x",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.01260960564239329,
+          "max": 0.03278951346874237
+        },
+        {
+          "axis": "y",
+          "divisor": 4,
+          "translationFraction": 0.25,
+          "rms": 0.01260960564239329,
+          "max": 0.03278951346874237
+        },
+        {
+          "axis": "x",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.009048294802456315,
+          "max": 0.02359524369239807
+        },
+        {
+          "axis": "y",
+          "divisor": 6,
+          "translationFraction": 0.16666666666666666,
+          "rms": 0.009048294802456315,
+          "max": 0.02359524369239807
+        }
+      ]
+    }
+  ]
+}

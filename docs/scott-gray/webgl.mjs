@@ -88,6 +88,7 @@ uniform float uTiles;
 uniform mat2 uInverseMatrix;
 uniform vec2 uShift;
 uniform bool uConcentration;
+uniform vec2 uValueRange;
 out vec4 outColor;
 void main() {
   // Screen y increases downward, matching the CPU field and generator overlay.
@@ -98,7 +99,7 @@ void main() {
   vec2 a = fract(p);
   vec2 q = mix(mix(sampleNode(base),sampleNode(base+ivec2(1,0)),a.x),
                mix(sampleNode(base+ivec2(0,1)),sampleNode(base+ivec2(1,1)),a.x),a.y);
-  float value = clamp(uConcentration ? q.g/0.4 : (q.r-0.3)/0.56,0.0,1.0);
+  float value = clamp(((uConcentration ? q.g : q.r)-uValueRange.x)/uValueRange.y,0.0,1.0);
   outColor = texelFetch(uPalette,ivec2(int(floor(value*1023.0+0.5)),0),0);
 }`;
 
@@ -258,8 +259,9 @@ export function createWebGLGrayScott({canvas,N,initial,params={},stencil=params.
     for(let i=0;i<N*N;i++){planar[i]=packed[4*i];planar[N*N+i]=packed[4*i+1];}
     return planar;
   }
-  function render({width=canvas.width,height=canvas.height,tiles=1,palette='ember',operation=null}={}) {
+  function render({width=canvas.width,height=canvas.height,tiles=1,palette='ember',operation=null,range=null}={}) {
     assertReady();if(!(width>0&&height>0&&tiles>0)||![width,height,tiles].every(Number.isFinite))throw new Error('Invalid render size or tile count.');
+    if(range!==null&&(!Array.isArray(range)||range.length!==2||!range.every(Number.isFinite)||!(range[1]>range[0])))throw new Error('A concentration range requires two finite increasing endpoints.');
     if(canvas.width!==width)canvas.width=width;if(canvas.height!==height)canvas.height=height;
     if(currentPalette!==palette){bindTexture(paletteTexture,1);gl.texSubImage2D(gl.TEXTURE_2D,0,0,0,1024,1,gl.RGBA,gl.UNSIGNED_BYTE,paletteData(palette));currentPalette=palette;}
     if(operation)validateOperation(operation,N);
@@ -269,7 +271,9 @@ export function createWebGLGrayScott({canvas,N,initial,params={},stencil=params.
     gl.uniform1i(p.uniform('uN'),N);gl.uniform2f(p.uniform('uResolution'),canvas.width,canvas.height);gl.uniform1f(p.uniform('uTiles'),tiles);
     // For an orthogonal M, inverse is transpose; row-major M is its GL column-major inverse.
     gl.uniformMatrix2fv(p.uniform('uInverseMatrix'),false,matrix.flat());gl.uniform2f(p.uniform('uShift'),shift[0],shift[1]);
-    gl.uniform1i(p.uniform('uConcentration'),palette==='concentration');gl.drawArrays(gl.TRIANGLES,0,3);
+    gl.uniform1i(p.uniform('uConcentration'),palette==='concentration');
+    gl.uniform2f(p.uniform('uValueRange'),range?.[0]??(palette==='concentration'?0:.3),range?range[1]-range[0]:(palette==='concentration'?.4:.56));
+    gl.drawArrays(gl.TRIANGLES,0,3);
     return canvas;
   }
   try {if(initial)upload(initial);else {const initialState=new Float32Array(2*N*N);initialState.fill(1,0,N*N);upload(initialState);}}

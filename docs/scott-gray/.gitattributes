@@ -1,0 +1,3 @@
+# Concentration arrays are binary even when their first samples contain no NUL.
+*.f32 binary
+*.f64 binary

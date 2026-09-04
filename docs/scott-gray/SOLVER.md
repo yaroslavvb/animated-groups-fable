@@ -73,8 +73,9 @@ Canvas rows display increasing numerical y downward; overlay centers use
 the same coordinates without a y reflection. This makes R270 appear
 counterclockwise and R90 clockwise on the canvas. Applying the
 correspondence plate's y-up display transformation only to the overlay would
-misplace the g98/g99 centers. The markers denote the requested constraint,
-including when an evolving field does not satisfy its time shift.
+misplace the g98/g99 centers. The markers denote the requested constraint. The main viewer displays a chemical
+field only after verifying that constraint on both the sampled orbit and
+independent unprojected forward trajectories.
 
 ## Numerical method
 
@@ -184,21 +185,18 @@ From the repository root, serve the static site with:
 python3 -m http.server 8934 --directory docs
 ```
 
-Open http://localhost:8934/scott-gray/. The initial view restricts the gallery
-to verified patterned periodic orbits; it is empty until a candidate passes
-the numerical gates. Select **Explore all parameters** to start live chemistry,
-**Bulatov presets only** to snap to source parameter pairs, or **Observed moving
-patterns only** to restrict the choices to discrete, documented local tests.
-Observed motion is not a periodic-orbit certificate. The source-seed button
-loads actual U-skate concentrations; evolution applies only the instantaneous
-spatial kernel. **Record & solve** records a trial trajectory before optimizing
-its periodic continuation. **Geometric seed** instead supplies an explicitly
-labelled time-symmetric animation as the initial guess.
+The viewer contains only independently admitted periodic fields. Select a group,
+then a precomputed physical parameter set, then a verified pattern at those
+parameters. The map snaps to an actual record; thumbnails distinguish the
+available patterns and their periods. Search settings supply
+initial guesses or continue a selected verified orbit; they never replace the
+viewer with an unverified transient. Read [EXPLORATION.md](EXPLORATION.md) and
+[VERIFIED-ORBITS.md](VERIFIED-ORBITS.md) for the workflow and bundled evidence.
 
 From this directory (`docs/scott-gray`), with Node 20 or newer:
 
 ```sh
-node --test tests/core.test.mjs tests/dynamics.test.mjs tests/exploration.test.mjs tests/overlay.test.mjs
+node --test tests/*.test.mjs
 node search.mjs --group=all --iterations=200 --output=results
 node search.mjs --group=g96 --grid=64 --frames=64 --length=96 --period=1200 --iterations=1000 --output=results-fine
 ```
@@ -244,9 +242,59 @@ processing, and verification are documented in `data/README.md`.
 
 ## Current scientific result
 
-All six 200-iteration patterned searches reduced the residual and retained
-exact time symmetry, but failed independent forward closure and trajectory
-agreement. These are unverified candidates. The bundled real spiral movie
-is a transient, not a periodic orbit. The homogeneous oscillator is a
-successful solver verification case, not a glider. No nonuniform periodic
-442 Gray–Scott orbit is claimed by this implementation.
+The initial six 200-iteration U-skate searches reduced the residual and
+retained exact time symmetry, but failed independent forward closure and
+trajectory agreement. Those attempts remain unverified. Subsequent Newton
+shooting found nonuniform periodic standing and rotating concentration
+waves, including different standing spatial modes at identical physical
+parameters. Their separately checked coordinate variants satisfy all six
+requested time characters. See [the delivered-data evidence](VERIFIED-ORBITS.md),
+[distinct spatial modes](research/HIGHER-SPATIAL-MODES.md), and the current
+[asset manifest](data/verified-orbits.json).
+
+These are numerical solutions of the discretized equation with spatial
+refinement evidence, not a continuum existence proof or verified U-skate
+gliders. The bundled spiral recording remains a transient; the homogeneous
+oscillator remains a solver control rather than a patterned atlas solution.
+
+## Strict cyclic-phase admission
+
+`solution-atlas.mjs` is the only insertion path for browser solution records.
+It ignores submitted diagnostics, copies the complete field and parameters,
+and uses the exact selected `groups.json` operations. In addition to the gates
+above, it integrates through `T + max(tau)*T` so every future-phase comparison
+uses an actual independently evolved state. It repeats this at half the actual
+timestep, requires strictly positive diffusion, and returns immutable records.
+The parameter map can snap only to those records.
+
+`phase-audit.mjs` measures shifted, same-time and pure-phase differences over
+both species at every grid site. A nonzero phase must exceed 0.002 RMS and four
+times the measured numerical uncertainty. Shifted errors must meet the absolute
+0.01 and relative 0.1 bounds. For the exact candidate, symmetry tolerance remains
+1e-10. The temporal Fourier energy tests every resolved shorter-period divisor,
+including odd divisors, and rejects poorly resolved temporal spectra. This
+prevents an ordinary spatially symmetric animation or a repeated-period
+relabeling from passing as the requested cyclic character.
+
+These remain finite-grid tests. The bundled waves also have N24→N48 spatial
+refinement evidence; no continuum existence or exhaustive minimal-symmetry
+classification is claimed. Additional spatial symmetries of a particular
+solution are explicitly allowed, provided the selected phase character is
+satisfied and its nonzero shifts are resolved.
+
+## Independent shooting reproduction
+
+With Python, NumPy, SciPy and a C++17 compiler:
+
+```sh
+python3 research/reproduce_orbits.py --family rotating --grid 24 --frames 128 --output /tmp/gs-rotating
+python3 research/reproduce_orbits.py --family standing --grid 24 --frames 128 --output /tmp/gs-standing
+node research/audit_orbit.mjs /tmp/gs-rotating/g96.json
+node research/audit_orbit.mjs /tmp/gs-standing/g95.json
+```
+
+The shooting code starts from analytic spatial Hopf modes and solves the
+rotation-twisted quarter- or half-period return equation with a phase condition.
+It does not impose symmetry during RK4 evolution. The browser atlas then uses
+an independent JavaScript integrator and every catalog operation for admission.
+A root-solver success flag is never sufficient by itself.

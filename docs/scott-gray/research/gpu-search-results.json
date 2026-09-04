@@ -1,0 +1,2712 @@
+{
+  "schema": "scott-gray-gpu-search-results-v1",
+  "date": "2026-09-04",
+  "configuration": {
+    "N": 48,
+    "M": 128,
+    "L": 256,
+    "Du": 0.16,
+    "Dv": 0.08
+  },
+  "successfulBaseOrbits": 16,
+  "continuationFunctionSeconds": 85.500270188,
+  "records": [
+    {
+      "sourceFile": "g95-F0p00395000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 376.06632425013345,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00395,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 376.06632425013345,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 7.541953254485593e-15,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 1.351685172614224e-13,
+            "twoPeriodReturnRms": 3.230359210132125e-13,
+            "phase": [
+              {
+                "rms": 6.145502689538635e-17,
+                "max": 1.3600232051658168e-15
+              },
+              {
+                "rms": 9.555076707267234e-14,
+                "max": 8.053002709118573e-13
+              },
+              {
+                "rms": 9.555076707267234e-14,
+                "max": 8.053002709118573e-13
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 4.2122365788416057e-13,
+            "twoPeriodReturnRms": 1.007874198524782e-12,
+            "phase": [
+              {
+                "rms": 5.947346082107086e-17,
+                "max": 1.3600232051658168e-15
+              },
+              {
+                "rms": 2.9741687352510337e-13,
+                "max": 2.524119802060909e-12
+              },
+              {
+                "rms": 2.9741687352510337e-13,
+                "max": 2.524119802060909e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.055125166906281775,
+        "spatialRms": 0.055724412367323055,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 371.86244297083675,
+        "finePeriod": 376.06632425013345,
+        "relativePeriodDifference": 0.011304936432169788,
+        "initialFieldRmsDifference": 0.006356979954501765
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00398000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 364.08104179698427,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00398,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 364.08104179698427,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 2.6278086648793357e-15,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 1.2634188563074554e-13,
+            "twoPeriodReturnRms": 2.9612886807943736e-13,
+            "phase": [
+              {
+                "rms": 5.335411290344035e-17,
+                "max": 1.3877787807814457e-15
+              },
+              {
+                "rms": 8.582794178422915e-14,
+                "max": 7.670530877135207e-13
+              },
+              {
+                "rms": 8.582794178422915e-14,
+                "max": 7.670530877135207e-13
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 3.919550866631605e-13,
+            "twoPeriodReturnRms": 9.187616432402588e-13,
+            "phase": [
+              {
+                "rms": 4.834977136513622e-17,
+                "max": 8.604228440844963e-16
+              },
+              {
+                "rms": 2.636849449247903e-13,
+                "max": 2.3929747072770624e-12
+              },
+              {
+                "rms": 2.636849449247903e-13,
+                "max": 2.3929747072770624e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.049069333512305476,
+        "spatialRms": 0.049522569112979,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 361.53289557773275,
+        "finePeriod": 364.08104179698427,
+        "relativePeriodDifference": 0.007048172518795415,
+        "initialFieldRmsDifference": 0.0048344621737618715
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00400000-k0p01995000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 351.204169215883,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.01995,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 351.204169215883,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 5.179348335339745e-13,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 6.908809628128708e-13,
+            "twoPeriodReturnRms": 1.3806013996216842e-12,
+            "phase": [
+              {
+                "rms": 3.7041855329605197e-17,
+                "max": 4.996003610813204e-16
+              },
+              {
+                "rms": 3.446572818570957e-13,
+                "max": 2.8801128149069655e-12
+              },
+              {
+                "rms": 3.446572818570957e-13,
+                "max": 2.8801128149069655e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 6.531369098503879e-13,
+            "twoPeriodReturnRms": 1.2482748422999595e-12,
+            "phase": [
+              {
+                "rms": 4.5390132547662523e-17,
+                "max": 6.661338147750939e-16
+              },
+              {
+                "rms": 3.4417982861708073e-13,
+                "max": 2.9371782783726985e-12
+              },
+              {
+                "rms": 3.4417982861708073e-13,
+                "max": 2.9371782783726985e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.040480820208705255,
+        "spatialRms": 0.04077614708103178,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 350.2486960453485,
+        "finePeriod": 351.204169215883,
+        "relativePeriodDifference": 0.0027279849470469575,
+        "initialFieldRmsDifference": 0.0026560680337812588
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00400000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 356.6585392909725,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 356.6585392909725,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 7.203616881902697e-14,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 2.6870296111022393e-13,
+            "twoPeriodReturnRms": 5.961634370109266e-13,
+            "phase": [
+              {
+                "rms": 4.365831440402078e-17,
+                "max": 5.828670879282072e-16
+              },
+              {
+                "rms": 1.8394412507709355e-13,
+                "max": 1.4663548153492911e-12
+              },
+              {
+                "rms": 1.8394412507709355e-13,
+                "max": 1.4663548153492911e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 3.8803439238768404e-13,
+            "twoPeriodReturnRms": 8.797296305544773e-13,
+            "phase": [
+              {
+                "rms": 4.463394779403904e-17,
+                "max": 7.216449660063518e-16
+              },
+              {
+                "rms": 2.2722059530884434e-13,
+                "max": 2.1432855490388647e-12
+              },
+              {
+                "rms": 2.2722059530884434e-13,
+                "max": 2.1432855490388647e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.04472772940830182,
+        "spatialRms": 0.045095987852233343,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 355.0141079336252,
+        "finePeriod": 356.6585392909725,
+        "relativePeriodDifference": 0.004632016927211158,
+        "initialFieldRmsDifference": 0.0037652132226345335
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00400000-k0p02005000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 362.2994132194361,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.02005,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 362.2994132194361,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 9.645628092244528e-16,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 1.2630769083077794e-13,
+            "twoPeriodReturnRms": 2.954727113950445e-13,
+            "phase": [
+              {
+                "rms": 5.366128408994131e-17,
+                "max": 9.992007221626409e-16
+              },
+              {
+                "rms": 8.45128542533391e-14,
+                "max": 7.570610804918942e-13
+              },
+              {
+                "rms": 8.45128542533391e-14,
+                "max": 7.570610804918942e-13
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 3.9088980046987357e-13,
+            "twoPeriodReturnRms": 9.138468351152833e-13,
+            "phase": [
+              {
+                "rms": 4.9762412577638005e-17,
+                "max": 9.71445146547012e-16
+              },
+              {
+                "rms": 2.604302009296815e-13,
+                "max": 2.3303026175369723e-12
+              },
+              {
+                "rms": 2.604302009296815e-13,
+                "max": 2.3303026175369723e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.048608298845668245,
+        "spatialRms": 0.04905093779288732,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 359.8620442666739,
+        "finePeriod": 362.2994132194361,
+        "relativePeriodDifference": 0.006773064821907093,
+        "initialFieldRmsDifference": 0.004729388120421334
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00401000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 353.0752439551734,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00401,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 353.0752439551734,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 3.259590782821261e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 4.216808834075357e-12,
+            "twoPeriodReturnRms": 7.398707320715716e-12,
+            "phase": [
+              {
+                "rms": 4.4254363507996587e-17,
+                "max": 9.159339953157541e-16
+              },
+              {
+                "rms": 2.9781459220451205e-12,
+                "max": 2.532660192677838e-11
+              },
+              {
+                "rms": 2.9781459220451205e-12,
+                "max": 2.532660192677838e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 4.3033284505376855e-12,
+            "twoPeriodReturnRms": 7.701918785403108e-12,
+            "phase": [
+              {
+                "rms": 4.796364263755428e-17,
+                "max": 1.7208456881689926e-15
+              },
+              {
+                "rms": 3.0215524895038386e-12,
+                "max": 2.617811523109026e-11
+              },
+              {
+                "rms": 3.0215524895038386e-12,
+                "max": 2.617811523109026e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.04240586016171342,
+        "spatialRms": 0.042733527857472794,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 351.83670289085535,
+        "finePeriod": 353.0752439551734,
+        "relativePeriodDifference": 0.0035202156402149853,
+        "initialFieldRmsDifference": 0.0031536513277730916
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-F0p00402000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 349.55619765366464,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00402,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 349.55619765366464,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 2.770548378854049e-13,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 4.4977199417247583e-13,
+            "twoPeriodReturnRms": 9.43099006835678e-13,
+            "phase": [
+              {
+                "rms": 4.185859824877083e-17,
+                "max": 4.440892098500626e-16
+              },
+              {
+                "rms": 2.2996184775124243e-13,
+                "max": 1.6579237982483619e-12
+              },
+              {
+                "rms": 2.2996184775124243e-13,
+                "max": 1.6579237982483619e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 4.0531765036184955e-13,
+            "twoPeriodReturnRms": 7.992062689836425e-13,
+            "phase": [
+              {
+                "rms": 4.379819685249956e-17,
+                "max": 7.216449660063518e-16
+              },
+              {
+                "rms": 2.3505552528023833e-13,
+                "max": 1.2690959394490164e-12
+              },
+              {
+                "rms": 2.3505552528023833e-13,
+                "max": 1.2690959394490164e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.03993956253092121,
+        "spatialRms": 0.040225159630249877,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 348.6731195631387,
+        "finePeriod": 349.55619765366464,
+        "relativePeriodDifference": 0.00253268187588529,
+        "initialFieldRmsDifference": 0.0025200137827473728
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00395000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 398.9774322342758,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00395,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 398.9774322342758,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 1.6697497256216438e-13,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 2.827498961564559e-12,
+            "twoPeriodReturnRms": 3.8939972675586e-12,
+            "phase": [
+              {
+                "rms": 2.5138431732552393e-12,
+                "max": 4.9900472642860905e-11
+              },
+              {
+                "rms": 2.2331171802795874e-12,
+                "max": 6.003408881127825e-11
+              },
+              {
+                "rms": 2.894411809658317e-12,
+                "max": 5.1141091361728286e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 3.7647037255629125e-13,
+            "twoPeriodReturnRms": 7.816188332690666e-13,
+            "phase": [
+              {
+                "rms": 2.8820747945129364e-13,
+                "max": 6.1497196224280515e-12
+              },
+              {
+                "rms": 1.9778032785040409e-13,
+                "max": 4.6983528179112e-12
+              },
+              {
+                "rms": 3.6617178828596675e-13,
+                "max": 6.262601548456814e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.07765594323886599,
+        "spatialRms": 0.07801909535564935,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 389.8478822997805,
+        "finePeriod": 398.9774322342758,
+        "relativePeriodDifference": 0.02341823657124542,
+        "initialFieldRmsDifference": 0.009548177077262347
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00398000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 381.1604387426026,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00398,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 381.1604387426026,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 2.970432050352107e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 5.801202902617278e-12,
+            "twoPeriodReturnRms": 1.3071033557640369e-11,
+            "phase": [
+              {
+                "rms": 4.692330406274252e-12,
+                "max": 4.1403269701589807e-11
+              },
+              {
+                "rms": 2.8577419166624724e-12,
+                "max": 2.3911400637288693e-11
+              },
+              {
+                "rms": 5.841678661780381e-12,
+                "max": 4.618044835424939e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 5.520498810499187e-12,
+            "twoPeriodReturnRms": 1.2359551704210586e-11,
+            "phase": [
+              {
+                "rms": 4.432463454078283e-12,
+                "max": 4.0519698707441876e-11
+              },
+              {
+                "rms": 2.751515173465024e-12,
+                "max": 2.2882418182490483e-11
+              },
+              {
+                "rms": 5.5695505919805564e-12,
+                "max": 4.0165010206649754e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.06962278411739817,
+        "spatialRms": 0.06990194161866528,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 375.2483433980147,
+        "finePeriod": 381.1604387426026,
+        "relativePeriodDifference": 0.01575515374978509,
+        "initialFieldRmsDifference": 0.008106435782863693
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00400000-k0p01995000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 363.47423377449877,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.01995,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 363.47423377449877,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 3.2827697355760397e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 4.352146409497734e-12,
+            "twoPeriodReturnRms": 6.906945431097553e-12,
+            "phase": [
+              {
+                "rms": 2.9771879808393444e-12,
+                "max": 2.0334650630005058e-11
+              },
+              {
+                "rms": 2.210280308787738e-12,
+                "max": 1.9332535572402776e-11
+              },
+              {
+                "rms": 3.2612574468047406e-12,
+                "max": 1.617175837687057e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 4.551790464964922e-12,
+            "twoPeriodReturnRms": 7.711478682391623e-12,
+            "phase": [
+              {
+                "rms": 2.993847841221493e-12,
+                "max": 2.066813387102684e-11
+              },
+              {
+                "rms": 2.1364947975210987e-12,
+                "max": 1.9252016647541836e-11
+              },
+              {
+                "rms": 3.4986406051803103e-12,
+                "max": 1.595001908327731e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.05969400936551264,
+        "spatialRms": 0.0598799237115824,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 361.59995827150817,
+        "finePeriod": 363.47423377449877,
+        "relativePeriodDifference": 0.005183284621906203,
+        "initialFieldRmsDifference": 0.003845251390830744
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00400000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 370.9755855505012,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 370.9755855505012,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 2.611295871476506e-15,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 7.866108808760964e-13,
+            "twoPeriodReturnRms": 1.7956818303799665e-12,
+            "phase": [
+              {
+                "rms": 4.781617025712746e-13,
+                "max": 4.3524628345892324e-12
+              },
+              {
+                "rms": 3.953990643419012e-13,
+                "max": 4.974493039711092e-12
+              },
+              {
+                "rms": 6.428387107439374e-13,
+                "max": 4.779260320830758e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 1.7482009556662528e-14,
+            "twoPeriodReturnRms": 3.7855263061106097e-14,
+            "phase": [
+              {
+                "rms": 1.1745094146543333e-14,
+                "max": 1.0960676810611858e-13
+              },
+              {
+                "rms": 1.0554971589337333e-14,
+                "max": 1.3178347302300608e-13
+              },
+              {
+                "rms": 1.4145817569273901e-14,
+                "max": 9.842127113302013e-14
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.06445246374206458,
+        "spatialRms": 0.06468277159949509,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 367.307146992678,
+        "finePeriod": 370.9755855505012,
+        "relativePeriodDifference": 0.009987386817431831,
+        "initialFieldRmsDifference": 0.006139898700812901
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00400000-k0p02005000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 378.97773385110855,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.02005,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 378.97773385110855,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 4.849222970276336e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 9.165467647422667e-12,
+            "twoPeriodReturnRms": 2.0993456799219725e-11,
+            "phase": [
+              {
+                "rms": 7.683387924352786e-12,
+                "max": 6.533479313119983e-11
+              },
+              {
+                "rms": 4.660282123850991e-12,
+                "max": 3.8357900189467387e-11
+              },
+              {
+                "rms": 9.533496593062204e-12,
+                "max": 6.653427808700485e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 8.825468300069325e-12,
+            "twoPeriodReturnRms": 2.009342414985374e-11,
+            "phase": [
+              {
+                "rms": 7.477750905157824e-12,
+                "max": 6.40985320377041e-11
+              },
+              {
+                "rms": 4.617400002267439e-12,
+                "max": 3.9178549293694687e-11
+              },
+              {
+                "rms": 9.259496915568782e-12,
+                "max": 6.568562360698138e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.06905124064975157,
+        "spatialRms": 0.06932457907732176,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 373.3109062153604,
+        "finePeriod": 378.97773385110855,
+        "relativePeriodDifference": 0.015179914493253621,
+        "initialFieldRmsDifference": 0.008002016770797937
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00401000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 366.2314766722112,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00401,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 366.2314766722112,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 1.0092089864354236e-15,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 8.149350324742908e-13,
+            "twoPeriodReturnRms": 1.9043334515665385e-12,
+            "phase": [
+              {
+                "rms": 4.888948017028647e-13,
+                "max": 3.4546809857260996e-12
+              },
+              {
+                "rms": 3.4803151303582295e-13,
+                "max": 3.9321046418905325e-12
+              },
+              {
+                "rms": 6.46195769632493e-13,
+                "max": 3.762629097181502e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 2.02195769151571e-14,
+            "twoPeriodReturnRms": 4.795199139458869e-14,
+            "phase": [
+              {
+                "rms": 1.2118030149749585e-14,
+                "max": 8.298917109073045e-14
+              },
+              {
+                "rms": 8.300234396702843e-15,
+                "max": 9.284240043427872e-14
+              },
+              {
+                "rms": 1.6491020283222033e-14,
+                "max": 9.472977957614148e-14
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.06186013858804492,
+        "spatialRms": 0.06206584288729049,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 363.6343968008356,
+        "finePeriod": 366.2314766722112,
+        "relativePeriodDifference": 0.007142008275961009,
+        "initialFieldRmsDifference": 0.0048449745567866595
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g96-F0p00402000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 361.52641990525643,
+        "groupId": "g96",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.25
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.75
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00402,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 361.52641990525643,
+      "family": "rotating",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 1.8616223592821423e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 2.550244083541663e-12,
+            "twoPeriodReturnRms": 3.981077610279662e-12,
+            "phase": [
+              {
+                "rms": 1.847756460227463e-12,
+                "max": 1.2379541836082808e-11
+              },
+              {
+                "rms": 1.3698788957029774e-12,
+                "max": 1.0391160154554768e-11
+              },
+              {
+                "rms": 1.896229906740257e-12,
+                "max": 1.2628731393959924e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 2.678200273647532e-12,
+            "twoPeriodReturnRms": 4.50840490474278e-12,
+            "phase": [
+              {
+                "rms": 1.8006820577895725e-12,
+                "max": 1.1687040224472867e-11
+              },
+              {
+                "rms": 1.26678691422494e-12,
+                "max": 1.0301842712223674e-11
+              },
+              {
+                "rms": 2.053452941597662e-12,
+                "max": 9.399397926657116e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.05908167865250784,
+        "spatialRms": 0.059262034448954455,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 359.8217531742166,
+        "finePeriod": 361.52641990525643,
+        "relativePeriodDifference": 0.004737531058091493,
+        "initialFieldRmsDifference": 0.0035799847897390142
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required."
+    },
+    {
+      "sourceFile": "g95-mode2-F0p00400000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 354.13840674899126,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.004,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 354.13840674899126,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 9.183841378790258e-16,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 1.660305769037975e-13,
+            "twoPeriodReturnRms": 3.5073882962021656e-13,
+            "phase": [
+              {
+                "rms": 4.0375141558059356e-17,
+                "max": 6.106226635438361e-16
+              },
+              {
+                "rms": 1.312898102644186e-13,
+                "max": 1.3684331445773523e-12
+              },
+              {
+                "rms": 1.312898102644186e-13,
+                "max": 1.3684331445773523e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 2.1057070556158253e-13,
+            "twoPeriodReturnRms": 4.4507387750979306e-13,
+            "phase": [
+              {
+                "rms": 4.181555527876635e-17,
+                "max": 8.049116928532385e-16
+              },
+              {
+                "rms": 1.6587633570020802e-13,
+                "max": 1.7273127372874342e-12
+              },
+              {
+                "rms": 1.6587633570020802e-13,
+                "max": 1.7273127372874342e-12
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.03624563614476539,
+        "spatialRms": 0.036373623367348784,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 353.7893361373029,
+        "finePeriod": 354.13840674899126,
+        "relativePeriodDifference": 0.0009866623327303703,
+        "initialFieldRmsDifference": 0.0006784392150958986
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required.",
+      "spatialMode": 2
+    },
+    {
+      "sourceFile": "g95-mode3-F0p00395000-k0p02000000-N48-M128.json",
+      "config": {
+        "N": 48,
+        "M": 128,
+        "period": 359.4407106712676,
+        "groupId": "g95",
+        "L": 256,
+        "ops": [
+          {
+            "M": [
+              [
+                -1,
+                0
+              ],
+              [
+                0,
+                -1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          },
+          {
+            "M": [
+              [
+                0,
+                -1
+              ],
+              [
+                1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                0,
+                1
+              ],
+              [
+                -1,
+                0
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.5
+          },
+          {
+            "M": [
+              [
+                1,
+                0
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            "v": [
+              0.0,
+              0.0
+            ],
+            "s": 1,
+            "tau": 0.0
+          }
+        ],
+        "params": {
+          "F": 0.00395,
+          "k": 0.02,
+          "Du": 0.16,
+          "Dv": 0.08,
+          "dx": 5.333333333333333,
+          "stencil": "five-point"
+        },
+        "minTemporal": 0.008,
+        "minSpatial": 0.012,
+        "periodBounds": [
+          100,
+          600
+        ]
+      },
+      "period": 359.4407106712676,
+      "family": "standing",
+      "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+      "gpuResidualRms": 1.6948419763207445e-12,
+      "independent": {
+        "checks": [
+          {
+            "dtLimit": 0.2,
+            "returnRms": 3.57220977345311e-12,
+            "twoPeriodReturnRms": 6.634016333093634e-12,
+            "phase": [
+              {
+                "rms": 3.8814723798708897e-17,
+                "max": 4.163336342344337e-16
+              },
+              {
+                "rms": 2.7408932534800853e-12,
+                "max": 1.1992074000488628e-11
+              },
+              {
+                "rms": 2.7408932534800853e-12,
+                "max": 1.1992074000488628e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          },
+          {
+            "dtLimit": 0.1,
+            "returnRms": 3.68772827910838e-12,
+            "twoPeriodReturnRms": 6.909519238090717e-12,
+            "phase": [
+              {
+                "rms": 4.2780657117532993e-17,
+                "max": 8.326672684688674e-16
+              },
+              {
+                "rms": 2.7698519472465418e-12,
+                "max": 1.241007296926e-11
+              },
+              {
+                "rms": 2.7698519472465418e-12,
+                "max": 1.241007296926e-11
+              },
+              {
+                "rms": 0.0,
+                "max": 0.0
+              }
+            ]
+          }
+        ],
+        "temporalRms": 0.03026524879603264,
+        "spatialRms": 0.030393614714483107,
+        "preliminaryPassed": true
+      },
+      "refinement": {
+        "coarseN": 24,
+        "fineN": 48,
+        "coarsePeriod": 360.1697962275283,
+        "finePeriod": 359.4407106712676,
+        "relativePeriodDifference": 0.002024282890728979,
+        "initialFieldRmsDifference": 0.0014924682479764903
+      },
+      "caveat": "Numerical finite-grid branch; canonical Float32 atlas admission still required.",
+      "spatialMode": 3
+    }
+  ],
+  "unresolvedRotatingMode3": {
+    "attempts": [
+      {
+        "family": "rotating",
+        "target": {
+          "F": 0.00395,
+          "k": 0.02
+        },
+        "coarse": {
+          "period": 342.12850828003565,
+          "success": false,
+          "residualRms": 3.4982856035334304e-05,
+          "history": [
+            {
+              "iteration": 0,
+              "rms": 0.021164340374339594,
+              "period": 352.61872689843955
+            },
+            {
+              "iteration": 1,
+              "rms": 0.019551887740288505,
+              "period": 342.47086031531063
+            },
+            {
+              "iteration": 2,
+              "rms": 0.004207967067496348,
+              "period": 330.1314915613661
+            },
+            {
+              "iteration": 3,
+              "rms": 0.0010845766046510708,
+              "period": 331.1141921832906
+            },
+            {
+              "iteration": 4,
+              "rms": 9.277289013324051e-05,
+              "period": 337.7336042738901
+            },
+            {
+              "iteration": 5,
+              "rms": 3.79712166196204e-05,
+              "period": 341.13474434723827
+            },
+            {
+              "iteration": 6,
+              "rms": 3.508332854153238e-05,
+              "period": 342.30239210520904
+            },
+            {
+              "iteration": 7,
+              "rms": 3.49835747922258e-05,
+              "period": 342.1159793892715
+            },
+            {
+              "iteration": 8,
+              "rms": 3.4982856035334304e-05,
+              "period": 342.12850828003565,
+              "reason": "line search stalled"
+            }
+          ],
+          "seconds": 2.2609298310000003
+        }
+      }
+    ],
+    "functionSeconds": 4.280383194000001,
+    "gpu": "NVIDIA A100-SXM4-40GB"
+  },
+  "notes": [
+    "These reports precede canonical Float32 export. Delivered payloads were separately admitted using the stricter JavaScript atlas audit.",
+    "Coordinate variants do not count as additional independent branches."
+  ]
+}

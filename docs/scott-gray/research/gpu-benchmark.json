@@ -1,0 +1,219 @@
+{
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "cpu": "",
+  "cpuCompileSeconds": 1.0661315180000002,
+  "gpuCompileSeconds": 1.0001458629999993,
+  "rows": [
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 1,
+      "steps": 204,
+      "duration": 81.48677970582717,
+      "gpuSecondsMedian": 0.0028538430000004666,
+      "gpuTimes": [
+        0.002861711000000433,
+        0.0028538430000004666,
+        0.002853379000000267
+      ],
+      "cpuSecondsMedian": 0.01419666549999965,
+      "cpuTimes": [
+        0.014067728999999751,
+        0.014325601999999549
+      ],
+      "graphCaptureSeconds": 0.013307743999999566,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 4.974578314223077,
+      "speedupIncludingCompileAndCapture": 0.013968868869356079
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 32,
+      "steps": 204,
+      "duration": 81.48677970582717,
+      "gpuSecondsMedian": 0.004354761000000096,
+      "gpuTimes": [
+        0.004356844000000137,
+        0.004350478000000102,
+        0.004354761000000096
+      ],
+      "cpuSecondsMedian": 0.4528853475000001,
+      "cpuTimes": [
+        0.45264710100000016,
+        0.453123594
+      ],
+      "graphCaptureSeconds": 0.008377659999999842,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 103.99775039318808,
+      "speedupIncludingCompileAndCapture": 0.4471271174967756
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 256,
+      "steps": 204,
+      "duration": 81.48677970582717,
+      "gpuSecondsMedian": 0.02404786100000056,
+      "gpuTimes": [
+        0.02406332099999986,
+        0.02404786100000056,
+        0.024042487
+      ],
+      "cpuSecondsMedian": 3.8772882669999995,
+      "cpuTimes": [
+        3.792361195999999,
+        3.962215338
+      ],
+      "graphCaptureSeconds": 0.007315700000000369,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 161.23214729991616,
+      "speedupIncludingCompileAndCapture": 3.7588490970490627
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 1252,
+      "steps": 204,
+      "duration": 81.48677970582717,
+      "gpuSecondsMedian": 0.12287797900000008,
+      "gpuTimes": [
+        0.12404918299999856,
+        0.12282451999999999,
+        0.12287797900000008
+      ],
+      "cpuSecondsMedian": 18.298874536499998,
+      "cpuTimes": [
+        18.234666282,
+        18.363082790999997
+      ],
+      "graphCaptureSeconds": 0.008404252000000056,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": true,
+      "speedupWarm": 148.91907146763853,
+      "speedupIncludingCompileAndCapture": 16.17325452102483,
+      "finiteDifferenceJacobianMaxCpuGpuDifference": 0.0
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 1,
+      "steps": 407,
+      "duration": 162.78298469712053,
+      "gpuSecondsMedian": 0.005676627999996242,
+      "gpuTimes": [
+        0.005692992000000174,
+        0.005673997999998903,
+        0.005676627999996242
+      ],
+      "cpuSecondsMedian": 0.03185140700000133,
+      "cpuTimes": [
+        0.03176473700000315,
+        0.03193807699999951
+      ],
+      "graphCaptureSeconds": 0.021144802000002016,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 5.610973098822472,
+      "speedupIncludingCompileAndCapture": 0.031015015976756533
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 32,
+      "steps": 407,
+      "duration": 162.78298469712053,
+      "gpuSecondsMedian": 0.008590519000001962,
+      "gpuTimes": [
+        0.008606000999996866,
+        0.00858883800000143,
+        0.008590519000001962
+      ],
+      "cpuSecondsMedian": 0.9158836050000012,
+      "cpuTimes": [
+        0.9161911579999966,
+        0.9155760520000058
+      ],
+      "graphCaptureSeconds": 0.016043297999999595,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 106.61563113937494,
+      "speedupIncludingCompileAndCapture": 0.8937370860046722
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 256,
+      "steps": 407,
+      "duration": 162.78298469712053,
+      "gpuSecondsMedian": 0.04572651600000199,
+      "gpuTimes": [
+        0.047854464000003816,
+        0.04572651600000199,
+        0.04454140699999698
+      ],
+      "cpuSecondsMedian": 7.628108079,
+      "cpuTimes": [
+        7.280609677000001,
+        7.975606481
+      ],
+      "graphCaptureSeconds": 0.01825367800000066,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": false,
+      "speedupWarm": 166.8202335598817,
+      "speedupIncludingCompileAndCapture": 7.168425233853649
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 1252,
+      "steps": 407,
+      "duration": 162.78298469712053,
+      "gpuSecondsMedian": 0.24508699599999773,
+      "gpuTimes": [
+        0.24508699599999773,
+        0.24513405399999044,
+        0.24502603999999906
+      ],
+      "cpuSecondsMedian": 36.671616460500005,
+      "cpuTimes": [
+        36.17805258300001,
+        37.165180338
+      ],
+      "graphCaptureSeconds": 0.0169305750000035,
+      "gpuCpuMaxAbs": 0.0,
+      "gpuCpuRms": 0.0,
+      "reducedUnknowns": 1251,
+      "completeJacobianBatch": true,
+      "speedupWarm": 149.6269367979864,
+      "speedupIncludingCompileAndCapture": 29.054570487976907,
+      "finiteDifferenceJacobianMaxCpuGpuDifference": 0.0
+    }
+  ],
+  "precision": "float64",
+  "stencil": "five-point",
+  "integrator": "RK4",
+  "dtLimit": 0.4,
+  "scope": "Batched independent shooting, including complete finite-difference Jacobian perturbation sets.",
+  "functionSeconds": 140.773682647,
+  "estimatedFunctionCostUSD": 0.10638548744999082,
+  "costCaveat": "Conservative runtime estimate using A10080GB rate, two cores and16GiB; billing API remains authoritative. Image/startup not included.",
+  "clientRemoteWallSeconds": 151.79285798501223
+}

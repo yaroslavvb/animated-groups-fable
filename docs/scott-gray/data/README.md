@@ -1,5 +1,17 @@
 # Numerical data and provenance
 
+`verified-orbits.json` lists the periodic fields available in the current
+viewer. Each metadata file under `orbits/` specifies its physical parameters,
+canonical group operations, period, numerical checks, spatial refinement,
+and the SHA-256 hash and layout of its accompanying Float32 payload. The
+browser independently rechecks the actual bytes before admitting a record;
+saved validation summaries do not grant admission. See
+[the numerical evidence](../VERIFIED-ORBITS.md) and
+[distinct standing spatial modes](../research/HIGHER-SPATIAL-MODES.md).
+
+The older trajectories and seeds below are retained for reproducibility.
+They are not members of the verified atlas.
+
 `spiral-trajectory.f32` is a real, nonperiodic p4/442 spiral-wave trajectory
 generated from an adapted Bulatov field. Its 32 frames use the same five-point
 spatial equations as this solver, with forward Euler dt=0.8, Du=0.16, Dv=0.08,

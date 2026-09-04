@@ -1,0 +1,146 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      }
+    ],
+    "params": {
+      "Du": 0.16,
+      "Dv": 0.08,
+      "F": 0.004089987272497608,
+      "k": 0.02,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ],
+    "rateScale": 0.001,
+    "groupId": "g96",
+    "period": 325.9471188233087,
+    "L": 256
+  },
+  "fieldUrl": "g96-rotating-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "6654c978a2f88aac25babca5e3431ac16325d11c9be78f484f4c90bd3438d05e",
+  "validationSummary": {
+    "period": 325.9471188233087,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.0002542423895661538,
+    "pdeRms": 8.564473056249356e-8,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.01724854974915869,
+    "spatialRms": 0.01725801066581029,
+    "coarseReturnRms": 4.055543045184185e-9,
+    "refinedReturnRms": 4.055530546161662e-9,
+    "refinedTrajectoryRms": 5.199722442233544e-9,
+    "maxRefinedPhaseRms": 3.758112184603675e-9,
+    "coarseDt": 0.3637802665438713,
+    "refinedDt": 0.18189013327193565,
+    "primitiveAtResolvedDivisors": true,
+    "projectionMax": 0,
+    "quantizationMax": 7.4499526270255245e-9
+  },
+  "provenance": {
+    "method": "Newton-Krylov quarter-period unprojected RK4 shooting",
+    "derivedFrom": {
+      "groupId": "g96",
+      "transform": "original rotating branch",
+      "sameUnderlyingBranch": true
+    },
+    "sourceGroup": "g96",
+    "note": "These are coordinate variants of one small-amplitude rotating chemical branch, not three independently discovered branches or U-skate gliders. Quantized payload was independently revalidated. The browser recomputes admission from the field.",
+    "spatialRefinement": {
+      "coarseN": 24,
+      "fineN": 48,
+      "physicalSide": 256,
+      "M": 128,
+      "coarsePeriod": 325.96365688248665,
+      "finePeriod": 325.9471188233087,
+      "periodRelativeDifference": 0.00005073589901438691,
+      "fieldRmsDifferenceAtCoarseNodes": 0.00009106085268639867,
+      "fieldMaxDifferenceAtCoarseNodes": 0.00021136118715334162,
+      "notes": "Independent Newton solves of the same branch at fixedphysicalside, aligned by a phasecondition. Two gridsprovide finite-grid refinement evidence, not a continuum existence proof."
+    }
+  }
+}

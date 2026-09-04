@@ -1,5 +1,15 @@
 # Gray–Scott with the six 442 time symmetries
 
+**Numerical update, 4 September 2026:** The [verified atlas](scott-gray/)
+now contains nonuniform periodic standing and rotating chemical waves whose
+coordinate variants satisfy all six listed time characters. Each delivered
+field passes independent forward return, all generator phase tests, and
+actual timestep refinement. The reference fields come from two underlying
+branches; additional standing spatial modes supply distinct patterns at
+some of the same parameters. Coordinate copies can have extra symmetries
+and are not counted as new branches. This is not a continuum existence proof.
+[Evidence and spatial refinement](scott-gray/VERIFIED-ORBITS.md).
+
 This note concerns the **six forward-time groups g94–g99** in this project's 442/p4 correspondence, using their actual affine operations from [`data/catalog.json`](data/catalog.json). All six are compatible with an autonomous, isotropic Gray–Scott equation. None requires reversing time. That establishes the absence of a symmetry obstruction; it does **not** establish that a nonstationary periodic orbit exists for a particular feed, kill, diffusion ratio, domain size, or seed.
 
 A solver can search these six classes using ordinary forward integration plus a symmetry-twisted periodic closing condition. The difficult part is finding and refining a nontrivial recurrent orbit, especially one resembling the user's gliders. Repeating an attractive movie or imposing symmetry on its rendered frames is not, by itself, a periodic PDE solution.

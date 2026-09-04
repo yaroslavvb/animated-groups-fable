@@ -1,0 +1,157 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 336.2201243776618,
+    "groupId": "g97",
+    "L": 256,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      }
+    ],
+    "params": {
+      "F": 0.00407,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ]
+  },
+  "fieldUrl": "g97-F0p00407000-k0p02000-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "b7e8e06d3f1ad35fa42813dc6a5f540d7a3dd0349d254ef19273734383fbdb2b",
+  "validationSummary": {
+    "period": 336.2201243776618,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "relativePde": 0.0004378786799350621,
+    "pdeRms": 3.140731620577925e-7,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.036332147711816996,
+    "spatialRms": 0.03638548548697414,
+    "coarseReturnRms": 3.842085916369987e-9,
+    "refinedReturnRms": 3.842075314348643e-9,
+    "refinedTrajectoryRms": 5.197119234821256e-9,
+    "maxRefinedPhaseRms": 4.460969601141571e-9,
+    "coarseDt": 0.37524567452864044,
+    "refinedDt": 0.18762283726432022,
+    "primitiveAtResolvedDivisors": true,
+    "projectionRms": 2.42780274558724e-12,
+    "projectionMax": 1.380709435672145e-11,
+    "quantizationMax": 1.4884164123429855e-8,
+    "admissionElapsedMs": 3879.1200929999977
+  },
+  "provenance": {
+    "method": "Quarter-period unprojected RK4 Newton shooting with phase condition in exact x→1/2−x and y→1/2−y reflection kernel",
+    "seed": "Coarse-grid parameter correction from F=0.00408 to F=0.00407 lifted to prior verified N48 field",
+    "sourceGroup": "g96",
+    "coordinateTransform": "q(-x,y,t)",
+    "continuation": {
+      "variedParameter": "F",
+      "fixedParameters": {
+        "k": 0.02,
+        "Du": 0.16,
+        "Dv": 0.08,
+        "L": 256,
+        "stencil": "five-point"
+      }
+    },
+    "unquantizedShootingResidualRms": 9.060799573468712e-14,
+    "unquantizedReturnRms": 6.9010776043077015e-12,
+    "extraSymmetry": "Instantaneous mirrors x→1/2−x and y→1/2−y, also diagonal half-cell/time centering.",
+    "note": "Coordinate variants of the rotating chemical-wave branch; the actual Float32 payload was independently revalidated. These are not U-skate gliders.",
+    "spatialRefinement": {
+      "coarseGrid": 24,
+      "fineGrid": 48,
+      "physicalSide": 256,
+      "coarsePeriod": 336.1665107072548,
+      "finePeriod": 336.2201243776618,
+      "relativePeriodDifference": 0.00015948545943558236,
+      "fieldRmsDifference": 0.00029786808180827843,
+      "fieldMaxDifference": 0.0010931231952526765,
+      "relativeToCoarseTemporalRms": 0.008216384268503048,
+      "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
+    }
+  }
+}

@@ -1,0 +1,516 @@
+{
+  "schema": "scott-gray-verified-atlas-v1",
+  "preferredGroup": "g95",
+  "description": "Numerically verified standing and rotating waves at sampled physical parameters, including distinct spatial modes. Every selected group and saved field is independently checked before display.",
+  "orbits": [
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-mode3-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 spatial mode 3",
+      "description": "A spatially translated third-mode standing wave, separately verified against this group\u2019s full cyclic phase character."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-standing-N48-M128.json",
+      "name": "Standing concentration wave",
+      "description": "A translated standing wave; this same field also satisfies g98. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-mode2-F0p00403-N48-M128.json",
+      "name": "Standing mode 2 \u00b7 F 0.00403 \u00b7 k 0.020",
+      "patternName": "Standing wave \u00b7 spatial mode 2",
+      "description": "A second spatial mode at the same physical parameters. Its different wavelength and period distinguish it from the first standing pattern, and both concentrations satisfy g95\u2019s half-period shift."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-mode3-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 spatial mode 3",
+      "description": "A distinct standing-wave branch with spatial mode 3, found using the A100 shooting solver and independently checked from its actual saved concentrations."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-mode2-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 spatial mode 2",
+      "description": "A distinct standing-wave branch with spatial mode 2, found using the A100 shooting solver and independently checked from its actual saved concentrations."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-standing-N48-M128.json",
+      "name": "Standing concentration wave",
+      "description": "A standing wave: a quarter-turn requires a half-period time shift. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-rotating-N48-M128.json",
+      "name": "Rotating concentration wave",
+      "description": "A rotating wave: a quarter-turn is paired with a quarter-period time shift. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-rotating-N48-M128.json",
+      "name": "Rotating concentration wave",
+      "description": "The spatial reflection of the rotating branch, with opposite temporal handedness. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-mode3-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 spatial mode 3",
+      "description": "A spatially translated third-mode standing wave, separately verified against this group\u2019s full cyclic phase character."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Standing wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-standing-N48-M128.json",
+      "name": "Standing concentration wave",
+      "description": "A translated standing wave with half-period diagonal-cell exchange; it also satisfies g94. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00403000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00395000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00398000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00400000-k0p01995000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00400000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00400000-k0p02005000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00401000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00402000-k0p02000000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "patternName": "Rotating wave",
+      "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00405000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00407000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-F0p00408000-k0p02000-N48-M128.json",
+      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-rotating-N48-M128.json",
+      "name": "Rotating concentration wave",
+      "description": "A reflected, translated rotating wave with affine rotation centers. These are numerical waves, not gliders; additional symmetries are allowed."
+    }
+  ],
+  "preferredParameters": {
+    "F": 0.00403,
+    "k": 0.02
+  }
+}

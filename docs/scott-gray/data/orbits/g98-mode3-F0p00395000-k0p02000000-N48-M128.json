@@ -1,0 +1,213 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 128,
+    "period": 359.4407106712676,
+    "groupId": "g98",
+    "L": 256,
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0.5,
+          0.5
+        ],
+        "s": 1,
+        "tau": 0.5
+      }
+    ],
+    "params": {
+      "F": 0.00395,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "five-point"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012,
+    "periodBounds": [
+      100,
+      600
+    ]
+  },
+  "fieldUrl": "g98-mode3-F0p00395000-k0p02000000-N48-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; lattice nodes i/N,j/N",
+  "fieldValueCount": 589824,
+  "fieldByteLength": 2359296,
+  "fieldSha256": "d24e40cb640af4cb757138b21509af5c9f963cca37004a8b2e3296f4f9175b61",
+  "validationSummary": {
+    "period": 359.4407106712676,
+    "spatialGrid": 48,
+    "timeFrames": 128,
+    "pdeRms": 3.074986958273168e-7,
+    "relativePde": 0.0005421002603920125,
+    "candidateSymmetryMax": 0,
+    "temporalRms": 0.03026524889534915,
+    "spatialRms": 0.03039361480304159,
+    "coarseReturnRms": 4.0455848832246534e-9,
+    "refinedReturnRms": 4.04559670153854e-9,
+    "refinedTrajectoryRms": 5.314116024061326e-9,
+    "maxRefinedPhaseRms": 2.9338810427112853e-9,
+    "coarseDt": 0.35101631901490976,
+    "refinedDt": 0.17550815950745488,
+    "primitiveAtResolvedDivisors": true,
+    "projectionMax": 5.428713034660859e-12,
+    "quantizationMax": 1.4885081056625893e-8,
+    "admissionElapsedMs": 3097.455488
+  },
+  "provenance": {
+    "sourceGroup": "g95",
+    "coordinateTransform": "q(x,y+1/2,t)",
+    "sourceSpatialMode": 3,
+    "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
+    "note": "Actual exported Float32 samples independently admitted against the complete canonical time character, unprojected forward evolution, and a halved integration timestep.",
+    "spatialMode": 3,
+    "family": "standing",
+    "spatialRefinement": {
+      "coarseN": 24,
+      "fineN": 48,
+      "coarsePeriod": 360.1697962275283,
+      "finePeriod": 359.4407106712676,
+      "relativePeriodDifference": 0.002024282890728979,
+      "initialFieldRmsDifference": 0.0014924682479764903
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "platform": "macOS-26.6.2-x86_64-i386-64bit",
+  "processor": "i386",
+  "rows": [
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 1,
+      "steps": 204,
+      "seconds": [
+        0.014267527999999974,
+        0.016774179
+      ],
+      "medianSeconds": 0.015520853499999987
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 32,
+      "steps": 204,
+      "seconds": [
+        0.4669423180000001,
+        0.49886975999999983
+      ],
+      "medianSeconds": 0.48290603899999995
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 256,
+      "steps": 204,
+      "seconds": [
+        3.993072126,
+        3.8428361540000004
+      ],
+      "medianSeconds": 3.91795414
+    },
+    {
+      "family": "rotating",
+      "N": 48,
+      "batch": 1252,
+      "steps": 204,
+      "seconds": [
+        18.946382887000002,
+        18.585985288000003
+      ],
+      "medianSeconds": 18.7661840875
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 1,
+      "steps": 407,
+      "seconds": [
+        0.02950898600000329,
+        0.03522093800000192
+      ],
+      "medianSeconds": 0.032364962000002606
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 32,
+      "steps": 407,
+      "seconds": [
+        0.9354435780000045,
+        0.9232823700000026
+      ],
+      "medianSeconds": 0.9293629740000036
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 256,
+      "steps": 407,
+      "seconds": [
+        7.549233966000003,
+        7.554335115000001
+      ],
+      "medianSeconds": 7.551784540500002
+    },
+    {
+      "family": "standing",
+      "N": 48,
+      "batch": 1252,
+      "steps": 407,
+      "seconds": [
+        36.36577562100001,
+        36.694590343
+      ],
+      "medianSeconds": 36.53018298200001
+    }
+  ],
+  "compileSeconds": 1.9810935060000001
+}
