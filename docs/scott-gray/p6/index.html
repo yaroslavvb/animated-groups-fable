@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Explore precomputed periodic Gray–Scott patterns with the six cyclic-color time symmetries of 632 on a triangular lattice.">
+  <title>Scott–Gray · 632 periodic patterns</title>
+  <link rel="stylesheet" href="../style.css?v=20260904-precomputed"><link rel="stylesheet" href="style.css?v=20260904-p6">
+</head>
+<body>
+  <header><a class="brand" href="../../scott-gray-groups.html">Scott–Gray atlases</a><nav aria-label="Main navigation"><a href="../../scott-gray-groups.html">Choose a family</a><a href="../">442 atlas</a><a href="../../correspondence-p6.html">632 correspondence</a></nav></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">TRIANGULAR LATTICE / CYCLIC COLOR GROUPS</p><h1>632 periodic patterns</h1></div><p>Choose a symmetry, its parameters, then a pattern. <br>Every displayed orbit has been checked offline.</p></div>
+    <p class="eyebrow selection-step">1 · CHOOSE THE TIME SYMMETRY</p><div id="groups" class="groups" role="group" aria-label="Choose a 632 color group"></div>
+    <div class="solution-policy"><strong>Precomputed, verified solutions</strong><span id="solution-count">Loading catalog…</span><p>For both concentrations, every generator must obey <code>q(gx, t + τT) = q(x, t)</code>. Browsing downloads saved data and runs no numerical search.</p></div>
+    <div class="lab">
+      <section class="viewer" aria-label="Verified solution animation">
+        <div class="canvas-wrap">
+          <canvas id="pattern" width="384" height="384" tabindex="0" aria-label="Verified periodic solution. Press Space to play or pause."></canvas>
+          <canvas id="gpu-pattern" width="768" height="768" tabindex="0" hidden aria-label="Verified periodic orbit rendered with WebGL"></canvas>
+          <svg id="generator-overlay" class="generator-overlay" viewBox="0 0 768 768" aria-label="632 symmetry generators" hidden></svg>
+          <div class="image-label"><span id="mode-label">Loading catalog</span><span id="group-label">632</span></div>
+          <div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks are precomputed.</p></div>
+          <span class="scale-label" id="scale-label">Triangular lattice · 2 cell lengths across</span>
+        </div>
+        <div class="playback"><button id="play" disabled aria-label="Play animation">▶ Play</button><button id="rewind" disabled aria-label="Return to first frame">↤</button><input id="phase" aria-label="Animation phase" type="range" min="0" max="1" step="0.001" value="0" disabled><output id="phase-label">—</output><label>View <select id="tiles" aria-label="Visible cell lengths"><option value="1">1 cell</option><option value="2" selected>2 cells</option><option value="3">3 cells</option></select></label><label>Speed <select id="speed" aria-label="Playback speed"><option value="0.5">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label></div>
+        <div class="overlay-controls"><label><input type="checkbox" id="show-generators"> Generators</label><select id="operation" aria-label="Named generator"></select><span id="engine-label">No orbit loaded</span></div>
+        <div class="phase-rule"><p id="generator-description"></p><div id="phase-permutation" aria-label="Cyclic color permutation represents a time shift"></div><p id="phase-explanation" class="small"></p></div>
+        <p class="caption" id="caption">Only accepted numerical orbits appear here. An empty group means existence remains unresolved.</p>
+        <div class="metrics"><div><span>PDE mismatch</span><strong id="pde">—</strong></div><div><span>Forward phase error</span><strong id="symmetry">—</strong></div><div><span>Temporal variation</span><strong id="motion">—</strong></div><div><span>Forward return RMS</span><strong id="return">—</strong></div></div>
+        <div class="comparison"><div><p class="eyebrow">ROTATION + PHASE SHIFT</p><p id="comparison-error" class="small">Select a verified orbit to compare its actual concentration fields.</p></div><figure><canvas id="compare-a" width="160" height="160" aria-label="Spatially transformed concentration"></canvas><figcaption>q(g⁻¹x, t)</figcaption></figure><figure><canvas id="compare-b" width="160" height="160" aria-label="Time-shifted concentration"></canvas><figcaption id="compare-label">q(x, t + τT)</figcaption></figure></div>
+      </section>
+      <aside class="controls">
+        <div class="selected"><p class="eyebrow" id="selected-id"></p><h2 id="selected-title"></h2><p id="selected-description"></p><p class="small">Chaim short color notation · <a id="reference-link" href="../../correspondence-p6.html">reference generators ↗</a></p></div>
+        <section class="atlas-panel" aria-label="Verified parameter and pattern selectors">
+          <p class="eyebrow">2 · CHOOSE VERIFIED PARAMETERS</p><h3>Physical parameters</h3>
+          <label class="atlas-label" for="parameter-set">Available parameter sets</label><select id="parameter-set" disabled><option>No verified parameters</option></select>
+          <p id="parameter-values" class="parameter-values">Loading precomputed parameters…</p>
+          <div class="parameter-map-wrap"><canvas id="parameter-map" width="660" height="320" tabindex="0" aria-label="Verified parameter plane. Click to select the closest verified parameter set; the selector above also provides keyboard access."></canvas></div><p id="map-status" class="small" role="status">Only precomputed verified points can be selected.</p><p class="small">Feed F → · kill k ↑. The region between known points is unclassified.</p>
+          <div class="pattern-section"><p class="eyebrow">3 · CHOOSE A PATTERN</p><h3>Patterns at these parameters</h3><p id="pattern-count" class="small">Loading saved patterns…</p><div id="pattern-thumbnails" class="pattern-thumbnails" role="group" aria-label="Verified pattern thumbnails"></div>
+          <label class="atlas-label" for="solution">Verified periodic pattern</label><select id="solution" disabled><option>No verified patterns</option></select><p class="small">Choosing a pattern keeps F, k, diffusivities, lattice length and stencil fixed. Period and numerical grid belong to the pattern.</p></div>
+        </section>
+        <label class="stack">Colour map<select id="palette"><option value="ember">Ember / violet</option><option value="ceramic">Copper / porcelain</option><option value="concentration">Concentration V</option></select></label>
+        <p id="color-scale" class="small"></p><button id="export" class="text-button" disabled>↓ Export verified orbit + evidence</button><p id="status" role="status">Loading the precomputed catalog…</p>
+      </aside>
+    </div>
+    <section class="reading"><p class="eyebrow">EUCLIDEAN SPACE / CYCLIC TIME</p><h2>A triangular lattice, with the correct timing.</h2><p>The sixfold family uses lattice vectors (1, 0) and (−½, √3/2). The viewer draws them at their actual angles and lengths. Each rotation is combined with its assigned fraction of the period; its short color symbol encodes that cyclic action. A nonzero phase shift must make a measurable difference from the same spatial rotation at the original time.</p><p>The saved fields pass independent numerical checks for periodic return, time symmetry, motion and spatial structure. These finite-grid tests do not constitute a mathematical proof of a continuum orbit. No failed candidate is displayed as a solution, and an empty parameter list does not prove nonexistence.</p><p><a href="EVIDENCE.md">Numerical evidence and reproduction →</a> · <a href="CHARACTERS.md">632 character definitions and lattice geometry →</a> · <a href="../../scott-gray-groups.html">Explore other symmetry families →</a></p></section>
+    <footer>Gray–Scott reaction–diffusion patterns, inspired by <a href="https://github.com/vbulatov2011/symhub/tree/main/apps/symsim/gray_scott">Vladimir Bulatov’s SymHub</a>. Stored animations use WebGL playback, with a CPU fallback.</footer>
+  </main>
+  <script type="module" src="app.js?v=20260904-p6-final2"></script>
+</body>
+</html>

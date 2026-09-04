@@ -4,7 +4,10 @@
  * New candidates must still pass solution-atlas.mjs before joining this artifact.
  */
 const SCHEMA='scott-gray-precomputed-atlas-v1';
-const GATE='recomputed-from-field-v1';
+const FAMILIES={
+  p4:{ids:['g94','g95','g96','g97','g98','g99'],gate:'recomputed-from-field-v1',divisor:4,label:'442'},
+  p6:{ids:['g243','g244','g245','g246','g247','g248'],gate:'recomputed-triangular-field-v1',divisor:6,label:'632'},
+};
 const HASH=/^[a-f0-9]{64}$/i;
 const SHA256_K=new Uint32Array([
   0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
@@ -74,11 +77,12 @@ function validRange(range){return Array.isArray(range)&&range.length===2&&range.
  * Its verification certificate is trusted like application code; this loader
  * checks file integrity, not whether arbitrary imported fields solve the PDE.
  */
-export function createPrecomputedCatalog(manifest,{groups,fetcher=globalThis.fetch}={}){
-  if(manifest?.schema!==SCHEMA||manifest?.gateVersion!==GATE||!Array.isArray(manifest.orbits))throw Error('A supported precomputed atlas is required.');
+export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=globalThis.fetch}={}){
+  const definition=FAMILIES[family];
+  if(!definition||manifest?.schema!==SCHEMA||manifest?.gateVersion!==definition.gate||(manifest.family!==undefined&&manifest.family!==family)||!Array.isArray(manifest.orbits))throw Error('A supported precomputed atlas is required.');
   if(!Array.isArray(groups))throw Error('The canonical groups.json catalog is required.');
-  const canonical=new Map(groups.filter(group=>/^g9[4-9]$/.test(group?.id)&&Array.isArray(group.render?.ops)).map(group=>[group.id,snapshot(group.render.ops)]));
-  if(canonical.size!==6)throw Error('All six canonical 442 groups are required.');
+  const canonical=new Map(groups.filter(group=>definition.ids.includes(group?.id)&&Array.isArray(group.render?.ops)).map(group=>[group.id,snapshot(group.render.ops)]));
+  if(canonical.size!==6)throw Error(`All six canonical ${definition.label} groups are required.`);
   if(typeof fetcher!=='function')throw Error('A field fetcher is required.');
   const summaries=new Map(),byGroup=new Map([...canonical.keys()].map(id=>[id,[]]));
   for(const entry of manifest.orbits){
@@ -86,10 +90,11 @@ export function createPrecomputedCatalog(manifest,{groups,fetcher=globalThis.fet
     if(typeof entry?.id!=='string'||!entry.id||summaries.has(entry.id))throw Error('Every precomputed orbit needs a unique id.');
     if(!canonical.has(entry.groupId)||config?.groupId!==entry.groupId||!sameOps(config.ops,canonical.get(entry.groupId)))throw Error(`Precomputed orbit ${entry.id} does not match its canonical time-symmetry group.`);
     const {N,M,period}=config;
-    if(!Number.isInteger(N)||N<4||N%4||!Number.isInteger(M)||M<4||M%4||!Number.isFinite(period)||period<=0)throw Error(`Invalid grid or period for ${entry.id}.`);
+    if(!Number.isInteger(N)||N<definition.divisor||N%definition.divisor||!Number.isInteger(M)||M<definition.divisor||M%definition.divisor||!Number.isFinite(period)||period<=0)throw Error(`Invalid grid or period for ${entry.id}.`);
+    if(family==='p6'&&config.params?.stencil!=='triangular-six')throw Error(`A triangular diffusion stencil is required for ${entry.id}.`);
     if(!Number.isFinite(config.params?.F)||!Number.isFinite(config.params?.k))throw Error(`Invalid parameters for ${entry.id}.`);
     if(entry.fieldEncoding!=='float32-le'||entry.fieldValueCount!==2*N*N*M||entry.fieldByteLength!==4*entry.fieldValueCount||typeof entry.fieldUrl!=='string'||!entry.fieldUrl||!HASH.test(entry.fieldSha256))throw Error(`Invalid binary metadata for ${entry.id}.`);
-    if(verification?.passed!==true||verification.gateVersion!==GATE||verification.fieldSha256!==entry.fieldSha256||entry.diagnostics?.validated!==true)throw Error(`Missing offline verification certificate for ${entry.id}.`);
+    if(verification?.passed!==true||verification.gateVersion!==definition.gate||verification.fieldSha256!==entry.fieldSha256||entry.diagnostics?.validated!==true)throw Error(`Missing offline verification certificate for ${entry.id}.`);
     if(!validRange(entry.ranges?.u)||!validRange(entry.ranges?.v))throw Error(`Missing precomputed display ranges for ${entry.id}.`);
     if(['ember','ceramic','concentration'].some(palette=>typeof entry.thumbnails?.[palette]!=='string'||!entry.thumbnails[palette]))throw Error(`Missing precomputed thumbnails for ${entry.id}.`);
     if(Object.hasOwn(entry,'field'))throw Error('Precomputed summaries must not contain concentration fields.');

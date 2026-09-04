@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>632 playback WebGL tests</title><style>body{font:16px system-ui;max-width:900px;margin:40px auto;padding:20px}canvas{width:128px;height:128px;margin:4px}li{margin:10px 0}.pass{color:#176d47}.fail{color:#a22}</style><h1>632 playback WebGL tests</h1><p id="status">Running…</p><ol id="results"></ol><div id="canvases"></div><script type="module">
+import {createPlayer,renderPixels,mod} from '../playback.mjs?v=20260904-p6';
+const result=document.getElementById('results');let passed=0,failed=0;
+function report(name,error){const li=document.createElement('li');li.className=error?'fail':'pass';li.textContent=(error?'FAIL: ':'PASS: ')+name+(error?' — '+error.message:'');result.append(li);if(error)failed++;else passed++;}
+const N=12,M=12,S=N*N,field=new Float32Array(2*S*M);
+for(let t=0;t<M;t++)for(let c=0;c<2;c++)for(let y=0;y<N;y++)for(let x=0;x<N;x++)field[2*S*t+c*S+y*N+x]=.5+.2*Math.sin(2*Math.PI*(x/N+y/N-t/M))+.1*Math.cos(2*Math.PI*(y/N+c*.3+t/M));
+const record={config:{N,M},field,ranges:{u:[.15,.85],v:[.15,.85]}},canvas=document.createElement('canvas');canvas.width=64;canvas.height=64;document.getElementById('canvases').append(canvas);
+let player;
+try{player=createPlayer(canvas,record);report('WebGL 2 player creates a float texture and compiles its triangular interpolation shader');}catch(error){report('WebGL 2 player initialization',error);}
+if(player){
+  const gl=canvas.getContext('webgl2');
+  for(const palette of ['ember','ceramic','concentration'])for(const phase of [0,.217,.999])for(const tiles of [1,3]){
+    const name=`${palette}, phase ${phase}, ${tiles} cell lengths: GPU matches CPU triangular playback`;
+    try{
+      player.draw(phase,{palette,tiles});const pixels=new Uint8Array(64*64*4);gl.readPixels(0,0,64,64,gl.RGBA,gl.UNSIGNED_BYTE,pixels);const expected=renderPixels(record,phase,{width:64,palette,tiles});let maximum=0,total=0;
+      for(let y=0;y<64;y++)for(let x=0;x<64;x++)for(let c=0;c<4;c++){const difference=Math.abs(pixels[((63-y)*64+x)*4+c]-expected[(y*64+x)*4+c]);maximum=Math.max(maximum,difference);total+=difference;}
+      if(maximum>3||total/(64*64*4)>.05)throw Error(`pixel mismatch max ${maximum}, mean ${total/(64*64*4)}`);if(gl.getError()!==gl.NO_ERROR)throw Error('WebGL error');report(name);
+    }catch(error){report(name,error);}
+  }
+  player.dispose();
+}
+document.getElementById('status').textContent=`${passed} passed; ${failed} failed.`;
+</script></html>

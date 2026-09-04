@@ -1,0 +1,159 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 48,
+    "M": 192,
+    "period": 328.62958820673293,
+    "L": 256.0,
+    "groupId": "g245",
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.0
+      },
+      {
+        "M": [
+          [
+            -1,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.6666666666666666
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            -1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.3333333333333333
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.3333333333333333
+      },
+      {
+        "M": [
+          [
+            1,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.6666666666666666
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0.0,
+          0.0
+        ],
+        "s": 1,
+        "tau": 0.0
+      }
+    ],
+    "params": {
+      "F": 0.00408,
+      "k": 0.02,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "dx": 5.333333333333333,
+      "stencil": "triangular-six"
+    },
+    "minTemporal": 0.008,
+    "minSpatial": 0.012
+  },
+  "fieldUrl": "g245-F0p00408000-k0p02000000-mode1-N48-M192.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast; rhombic lattice nodes i/N,j/N",
+  "fieldByteLength": 3538944,
+  "fieldValueCount": 884736,
+  "fieldSha256": "84dc05c1b584d71d4d9056a47f1da985821fd9e487d437c9d25026162a58ffcb",
+  "provenance": {
+    "method": "Unprojected triangular-lattice RK4 twisted shooting with time phase condition",
+    "family": "Rotating hexagonal wave",
+    "spatialMode": 1,
+    "sourceCharge": 2,
+    "coordinateTransform": "q(y,x,t)",
+    "unquantizedShootingResidualRms": 1.2953740254627488e-15,
+    "unquantizedReturnRms": 3.884704415733068e-12,
+    "spatialRefinement": {
+      "coarseGrid": 24,
+      "fineGrid": 48,
+      "physicalSide": 256.0,
+      "coarsePeriod": 328.639670681723,
+      "finePeriod": 328.62958820673293,
+      "relativePeriodDifference": 3.067942153522638e-05,
+      "fieldRmsDifference": 0.00011073401273605361,
+      "fieldMaxDifference": 0.00033103520489732863,
+      "relativeToCoarseTemporalRms": 0.005286777233641276,
+      "comparison": "Full normalized-phase movies, Fourier-resampled to the coarse lattice; all physical parameters fixed."
+    },
+    "projection": "None: the exported movie is direct RK4 evolution, followed only by an optional exact lattice reflection and Float32 quantization.",
+    "note": "Finite-grid numerical evidence; no continuum existence theorem or glider morphology is asserted."
+  }
+}

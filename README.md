@@ -36,13 +36,15 @@ loop with ← → (shift for finer steps).
 - **History** — Fletcher 1956 (zero citations; his counts 7 and 194 vs the
   modern 13 and 275, explained), Shubnikov/Zamorzaev antisymmetry,
   Janssen–Janner–Ascher, choreographic crystals, the H/K theorem.
-- **Scott–Gray** (`docs/scott-gray/`) — a Gray–Scott laboratory for the six
-  forward 442 groups g94–g99: a real spiral-wave trajectory, exact time-symmetry
-  previews, an adapted Bulatov U-skate seed, live PDE evolution, and a projected
-  periodic-orbit solver with independent forward validation. All six symmetry
-  classes are compatible; the initial patterned searches remain unverified.
-  See [feasibility](docs/scott-gray-feasibility.md) and
-  [solver and reproduction](docs/scott-gray/SOLVER.md).
+- **Scott–Gray** ([wallpaper-family directory](docs/scott-gray-groups.html)) —
+  precomputed periodic Gray–Scott atlases for the six cyclic-color 442 groups
+  g94–g99 and the six 632 groups g243–g248. Select a symmetry, saved physical
+  parameters and a verified concentration pattern. Numerical admission runs
+  offline; browsing downloads only the selected animation. Both families have
+  independently checked nonuniform periodic examples, with optional generator
+  overlays and WebGL playback. See the [442 solver](docs/scott-gray/SOLVER.md),
+  [632 evidence](docs/scott-gray/p6/EVIDENCE.md), and
+  [632 search API](docs/scott-gray/research/p6/README.md).
 
 ## The computation (`enumerate/`)
 

@@ -1,0 +1,165 @@
+{
+  "schema": "scott-gray-candidate-atlas-v1",
+  "preferredGroup": "g248",
+  "description": "Offline triangular Gray\u2013Scott shooting candidates. Only fields accepted by the independent catalog build may be displayed.",
+  "orbits": [
+    {
+      "groupId": "g243",
+      "url": "data/orbits/g243-F0p00406000-k0p02000000-mode1-N48-M192.json",
+      "name": "Sixfold breathing wave \u00b7 F 0.00406",
+      "patternName": "Sixfold breathing wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g243",
+      "url": "data/orbits/g243-F0p00407000-k0p02000000-mode1-N48-M192.json",
+      "name": "Sixfold breathing wave \u00b7 F 0.00407",
+      "patternName": "Sixfold breathing wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g243",
+      "url": "data/orbits/g243-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Sixfold breathing wave \u00b7 F 0.00408",
+      "patternName": "Sixfold breathing wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-F0p00405000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00405",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-F0p00406000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-F0p00405000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00405",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-F0p00406000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-F0p00400000-k0p02000000-mode1-N48-M192.json",
+      "name": "Alternating hexagonal wave \u00b7 F 0.004",
+      "patternName": "Alternating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-F0p00404000-k0p02000000-mode1-N48-M192.json",
+      "name": "Alternating hexagonal wave \u00b7 F 0.00404",
+      "patternName": "Alternating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Alternating hexagonal wave \u00b7 F 0.00408",
+      "patternName": "Alternating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-F0p00400000-k0p02000000-mode2-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 spatial mode 2 \u00b7 F 0.004",
+      "patternName": "Rotating hexagonal wave \u00b7 spatial mode 2",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-F0p00404000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00404",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-F0p00404000-k0p02000000-mode1-shell3-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 spatial shell 3 \u00b7 F 0.00404",
+      "patternName": "Rotating hexagonal wave \u00b7 spatial shell 3",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-F0p00406000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-F0p00400000-k0p02000000-mode2-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 spatial mode 2 \u00b7 F 0.004",
+      "patternName": "Rotating hexagonal wave \u00b7 spatial mode 2",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-F0p00404000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00404",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-F0p00404000-k0p02000000-mode1-shell3-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 spatial shell 3 \u00b7 F 0.00404",
+      "patternName": "Rotating hexagonal wave \u00b7 spatial shell 3",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-F0p00406000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-F0p00408000-k0p02000000-mode1-N48-M192.json",
+      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "patternName": "Rotating hexagonal wave",
+      "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    }
+  ],
+  "preferredParameters": {
+    "F": 0.00404,
+    "k": 0.02
+  }
+}

@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Explore precomputed periodic Gray–Scott solutions by wallpaper symmetry, physical parameters and pattern.">
+<title>Periodic Gray–Scott patterns — Spacetime Groups</title>
+<link rel="stylesheet" href="css/style.css?v=collapsible-header-v1"><script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+<link rel="stylesheet" href="css/site-controls-v2.css"><link rel="stylesheet" href="css/correspondence.css?v=vladimir-catalog-v1">
+<style>
+.gray-scott-directory{max-width:1100px}.gray-scott-directory .directory{padding:2.25rem 0 1.25rem}.gray-scott-directory h1{margin-bottom:.7rem}.gray-scott-directory .directory-viewer-note{max-width:760px}
+.gray-scott-directory .family-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;margin-top:1.5rem}.gray-scott-directory .family-card img{aspect-ratio:16/10;object-fit:cover}
+.gray-scott-directory .family-card-caption{padding:1rem 1rem .2rem}.gray-scott-directory .family-card-orbifold{font-size:1.8rem}.gray-scott-directory .family-card-groups{padding:.4rem 1rem 1rem;font: .8rem/1.65 system-ui,sans-serif}
+.gray-scott-directory .family-card-count{top:.8rem;right:.8rem;font-size:.75rem}.atlas-route{display:flex;gap:.7rem;flex-wrap:wrap;margin:1.5rem 0;color:var(--muted);font-size:.85rem}.atlas-route b{font-weight:600;color:var(--text)}
+.atlas-note{max-width:800px;margin-top:2rem;font-size:.84rem;line-height:1.7;color:var(--muted)}
+@media(max-width:600px){.gray-scott-directory .family-grid{grid-template-columns:1fr}.gray-scott-directory .family-card img{aspect-ratio:16/9}.gray-scott-directory h1{font-size:1.8rem}}
+</style></head><body><a class="skip-link" href="#families">Skip to wallpaper groups</a>
+  <header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+        <span class="navgroup">
+          <span class="navgroup-label">Background</span>
+          <a href="index.html">Tutorial</a>
+          <a href="notation.html">Notation</a>
+          <a href="colourings-tutorial.html">Colourings</a>
+          <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+          <a href="hierarchy.html">Hierarchy</a>
+          <a href="history.html">History</a>
+        </span>
+        <span class="navgroup">
+          <span class="navgroup-label">Catalogues</span>
+          <a href="catalog.html">275 spacetime</a>
+          <a href="wallpaper.html">275 spacetime (grouped)</a>
+          <a href="correspondence.html">68 colored&lt;&gt;polar crystals</a>
+          <a href="patterns.html">609 patterns</a>
+          <a href="escher.html">107 Escher</a>
+          <a href="gallery.html">Gallery</a>
+        </span>
+        <span class="navgroup">
+          <span class="navgroup-label">Developer</span>
+          <a href="motifs.html">Motifs</a>
+          <a href="designer.html">Designer</a>
+          <a href="billiards.html">Billiards</a>
+        <a href="scott-gray-groups.html" aria-current="page">Scott–Gray</a>
+        </span>
+        <span class="navgroup navgroup-superseded">
+          <span class="navgroup-label">Superseded</span>
+          <a href="crystals-colored.html">269 coloured crystals</a>
+        </span>
+      </nav>
+  </div>
+</header>
+<main class="correspondence-page gray-scott-directory">
+<section class="directory"><h1>Periodic Gray–Scott patterns</h1><p class="directory-viewer-note">Explore chemical waves whose spatial symmetries advance the animation by a fixed fraction of its period. Each pattern and its valid parameters are computed and checked before publication.</p>
+<p class="atlas-route"><b>1. Choose a symmetry</b><span>→</span><b>2. Pick saved parameters</b><span>→</span><b>3. Explore its patterns</b></p></section>
+<section class="family-directory" id="families" aria-labelledby="families-title"><h2 id="families-title">Choose a wallpaper group</h2>
+<nav class="family-grid" aria-label="Gray–Scott wallpaper families">
+<a class="family-card" href="scott-gray/#g95" aria-label="442, p4: explore square-lattice periodic patterns">
+<img src="scott-gray/data/thumbnails/g95-F0p00403000-k0p02000-N48-M128-ember.png" width="160" height="160" alt="Standing concentration wave on a square lattice">
+<span class="family-card-count">6 time symmetries</span><span class="family-card-caption"><strong class="family-card-orbifold">442</strong><span class="family-card-hm">p4 · square lattice</span></span><span class="family-card-groups">77 saved patterns · 12 parameter sets<br>Standing waves, rotating waves and additional spatial modes.</span></a>
+<a class="family-card" href="scott-gray/p6/#g248" aria-label="632, p6: explore triangular-lattice periodic patterns">
+<img id="p6-preview" src="scott-gray/p6/data/thumbnails/g248-F0p00404000-k0p02000000-mode1-N48-M192-ember.png" width="160" height="160" alt="Rotating concentration wave on a triangular lattice">
+<span class="family-card-count">6 time symmetries</span><span class="family-card-caption"><strong class="family-card-orbifold">632</strong><span class="family-card-hm">p6 · triangular lattice</span></span><span class="family-card-groups" id="p6-summary">22 saved patterns · 6 parameter sets<br>Sixfold breathing, rotating and alternating waves.</span></a>
+</nav></section>
+<p class="atlas-note">Only numerically verified, spatially nonuniform periodic solutions are listed. The tests check both concentrations, every required time offset, independent forward evolution and timestep refinement. They establish finite-grid numerical examples; they are not proofs of continuum existence or an exhaustive list of solutions. Generator overlays are optional in both viewers.</p>
+<p class="atlas-note"><a href="correspondence.html">Color-group correspondence and generator notation →</a> · <a href="scott-gray/SOLVER.md">442 solver and evidence</a> · <a href="scott-gray/p6/CHARACTERS.md">632 time characters</a></p>
+</main></body></html>
