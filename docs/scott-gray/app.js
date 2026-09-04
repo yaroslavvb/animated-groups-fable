@@ -1,5 +1,5 @@
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
-import {createStepper,projectKernel,movieStats,mapIndex} from './dynamics.mjs';
+import {createStepper,projectKernel,movieStats,mapIndex} from './dynamics.mjs?v=20260904-gpu';
 import {createWebGLGrayScott} from './webgl.mjs';
 import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs';
 import {PROFILES,makeInitial,nearestProfile,profilesForFilter,assessProfile,classifyRun,DEFAULT_FILTER} from './exploration.mjs';
@@ -194,7 +194,7 @@ async function solve(){
   }
   disposeEngine();record={kind:'candidate',config:c,field};busy=true;restrictions();$('progress').hidden=false;$('progress').value=0;
   status('Optimizing the periodic field in the exact selected time symmetry…');
-  worker=new Worker(new URL('./worker.js',import.meta.url),{type:'module'});
+  worker=new Worker(new URL('./worker.js?v=20260904-gpu',import.meta.url),{type:'module'});
   worker.onerror=e=>{if(token!==job)return;cancel();showRecord(record);status('Search failed: '+e.message);};
   worker.onmessage=({data})=>{
     if(token!==job)return;

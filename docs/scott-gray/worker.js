@@ -1,5 +1,5 @@
-import {createProblem} from './core.mjs';
-import {createStepper,projectKernel,movieStats} from './dynamics.mjs';
+import {createProblem} from './core.mjs?v=20260904-gpu';
+import {createStepper,projectKernel,movieStats} from './dynamics.mjs?v=20260904-gpu';
 import {hasRefinedAcceptance,refinedShootingOptions} from './acceptance.mjs';
 self.onmessage=async({data})=>{try{const {mode,config:c,iterations}=data,{N,M,params,period,ops}=c,nn=N*N;
   if(mode==='evolve'){

@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore 442 Gray–Scott dynamics on the GPU, with Chaim color notation, exact generator overlays and independently checked periodic orbits.">
   <title>Scott–Gray · 442 laboratory — Spacetime Groups</title>
-  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="overlay.css">
+  <link rel="stylesheet" href="style.css?v=20260904-gpu"><link rel="stylesheet" href="overlay.css?v=20260904-gpu">
 </head>
 <body>
   <header><a class="brand" href="../index.html">Spacetime Groups</a><nav aria-label="Main navigation"><a href="../correspondence-p4.html">442 correspondence</a><a href="#feasibility">Feasibility</a><a href="#method">Solver notes</a></nav></header>
@@ -56,6 +56,6 @@
 ∂v/∂t = Dᵥ Δv + uv² − (F + k)v</pre><p>Live evolution integrates these equations on a periodic square, starting in the selected group’s zero-time-shift spatial symmetry. Future time shifts are a condition to solve for, not something a forward simulation can impose on demand.</p></div><div><p class="eyebrow">THE NUMERICAL SEARCH</p><h2>A loop has to earn its label.</h2><p>The solver minimizes a periodic Crank–Nicolson residual on a full space–time grid. Averaging over the exact catalog operations enforces the selected time symmetry, including the affine offsets of g99. Both concentrations and the period are optimized. A motion constraint discourages collapse into a steady state.</p><p>A small collocation residual alone is insufficient. A candidate must also pass an independent forward integration, retain spatial structure and motion, and satisfy every group operation. A successful finite-grid result still needs refinement in space and time; it is not a proof of a continuum orbit or of its minimal symmetry group.</p></div></section>
     <footer>Inspired by <a href="https://bulatov.org/symsim/240103_JMM/index.html">Vladimir Bulatov’s symmetry simulations</a> and <a href="https://github.com/vbulatov2011/symhub/tree/main/apps/symsim/gray_scott">SymHub’s Gray–Scott implementation</a>. Independent solver; the supplied U-skate images guide the shapes and colour maps. <a href="../index.html">Back to Spacetime Groups ↗</a></footer>
   </main>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=20260904-gpu"></script>
 </body>
 </html>
