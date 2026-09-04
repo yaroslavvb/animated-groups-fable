@@ -47,7 +47,10 @@ condition. Both the smaller-cell solve and the full-field independent atlas
 audit use forward reaction–diffusion evolution. The atlas audit projects
 only the measured shooting roundoff (RMS `1.15e-12` here), exports Float32,
 and independently integrates the exact decoded bytes at two timesteps.
-Only the resulting accepted field is selectable.
+Only the resulting accepted field is included in the offline catalog build.
+The browser reuses the stored parameters, diagnostics, and thumbnail from
+`../data/precomputed-atlas.json`, and checks the selected payload's SHA-256
+integrity before playback. It does not repeat the numerical audit on page load.
 
 At fixed physical parameters, N24-to-N48 refinement changes the period by
 0.0314% and the full movie by 2.05% of the coarse movie's temporal variation.

@@ -74,8 +74,9 @@ the same coordinates without a y reflection. This makes R270 appear
 counterclockwise and R90 clockwise on the canvas. Applying the
 correspondence plate's y-up display transformation only to the overlay would
 misplace the g98/g99 centers. The markers denote the requested constraint. The main viewer displays a chemical
-field only after verifying that constraint on both the sampled orbit and
-independent unprojected forward trajectories.
+field only after that constraint has been verified on both the sampled orbit
+and independent unprojected forward trajectories. For bundled fields this
+verification occurs offline, when building the published catalog.
 
 ## Numerical method
 
@@ -108,7 +109,7 @@ texture and ping-pong framebuffer architecture in
 [Bulatov's simulator](https://github.com/vbulatov2011/symhub/blob/37e3520df40ba0ef38e2c916090790b9bbaec3dc/apps/symsim/gray_scott/js/gray_scott_simulation.js):
 each fragment updates one lattice node, with U and V in the red/green channels
 of RGBA32F textures. A third float framebuffer holds the midpoint stage.
-The browser integrates with explicit midpoint; Bulatov's original shader
+The optional browser initial-guess simulation integrates with explicit midpoint; Bulatov's original shader
 uses forward Euler. Parameter edits update shader uniforms without reading
 the chemical field back to the CPU. The display also runs on the GPU;
 readback is reserved for recording, diagnostics and export.
@@ -193,6 +194,32 @@ initial guesses or continue a selected verified orbit; they never replace the
 viewer with an unverified transient. Read [EXPLORATION.md](EXPLORATION.md) and
 [VERIFIED-ORBITS.md](VERIFIED-ORBITS.md) for the workflow and bundled evidence.
 
+`research/build-catalog.mjs` performs numerical admission offline and writes
+`data/precomputed-atlas.json`, including accepted parameter sets, diagnostics,
+and thumbnails. Normal page loading reads this stored catalog. Selecting a
+pattern fetches its concentration payload and checks SHA-256 integrity; it
+does not rerun the PDE or search for valid parameters. Explicit new searches
+still run the solver and independent acceptance tests.
+
+After changing bundled orbits or the numerical acceptance code, rebuild the
+catalog from `docs/scott-gray` with:
+
+```sh
+node research/build-catalog.mjs --verify
+```
+
+This reruns independent admission and saves diagnostics and thumbnail URLs
+in `data/precomputed-atlas.json`, with generated images in `data/thumbnails/`.
+To check the committed catalog's source hashes, evidence, and deterministic
+thumbnails without reintegrating the PDE, run:
+
+```sh
+node research/build-catalog.mjs --check
+```
+
+The freshness check rejects changes to the source manifest, group actions,
+or verification code until a full offline rebuild has been performed.
+
 From this directory (`docs/scott-gray`), with Node 20 or newer:
 
 ```sh
@@ -259,13 +286,18 @@ oscillator remains a solver control rather than a patterned atlas solution.
 
 ## Strict cyclic-phase admission
 
-`solution-atlas.mjs` is the only insertion path for browser solution records.
-It ignores submitted diagnostics, copies the complete field and parameters,
+`solution-atlas.mjs` provides numerical admission for the offline catalog
+builder and for explicitly requested new searches. It ignores submitted
+diagnostics, copies the complete field and parameters,
 and uses the exact selected `groups.json` operations. In addition to the gates
 above, it integrates through `T + max(tau)*T` so every future-phase comparison
 uses an actual independently evolved state. It repeats this at half the actual
 timestep, requires strictly positive diffusion, and returns immutable records.
-The parameter map can snap only to those records.
+The offline builder stores accepted records in `data/precomputed-atlas.json`.
+The parameter map snaps to these precomputed records without repeating
+admission. The browser checks the selected binary's SHA-256 integrity; that
+inexpensive check establishes that playback uses the verified bytes, not a
+new numerical verification.
 
 `phase-audit.mjs` measures shifted, same-time and pure-phase differences over
 both species at every grid site. A nonzero phase must exceed 0.002 RMS and four
@@ -295,6 +327,6 @@ node research/audit_orbit.mjs /tmp/gs-standing/g95.json
 
 The shooting code starts from analytic spatial Hopf modes and solves the
 rotation-twisted quarter- or half-period return equation with a phase condition.
-It does not impose symmetry during RK4 evolution. The browser atlas then uses
+It does not impose symmetry during RK4 evolution. The offline audit then uses
 an independent JavaScript integrator and every catalog operation for admission.
 A root-solver success flag is never sufficient by itself.

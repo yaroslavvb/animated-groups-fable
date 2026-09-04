@@ -20,6 +20,12 @@ The manifest contains **77 entries at 12 physical parameter sets**, all with
 positive diffusion, nonuniform motion and the requested cyclic time character.
 Counts are g94: 13, g95: 15, g96: 12, g97: 12, g98: 13, g99: 12.
 Coordinate-related entries are not counted as independent discovered branches.
+These fields are numerically verified offline by
+[`research/build-catalog.mjs`](research/build-catalog.mjs). The resulting
+[`data/precomputed-atlas.json`](data/precomputed-atlas.json) stores the accepted
+parameter sets, diagnostics, and thumbnails. Opening the viewer reads this
+catalog; selecting a pattern fetches its concentration payload and checks its
+SHA-256 integrity. Neither action reruns the PDE or recomputes valid parameters.
 The common physical values are Dᵤ=.16, Dᵥ=.08, L=256, and the five-point stencil.
 Feed values run from .00395 to .004089987272497608; k is .02 except for the two
 additional points (.004,.01995) and (.004,.02005).
@@ -128,9 +134,11 @@ not automatically certified.
 
 ## What admission actually checks
 
-[`solution-atlas.mjs`](solution-atlas.mjs) accepts a field only after
-recomputing its diagnostics. A saved `validated: true` label cannot insert
-an orbit. Admission clones the field and configuration, obtains operations
+During the offline build, [`solution-atlas.mjs`](solution-atlas.mjs) accepts a
+field only after recomputing its diagnostics. A saved `validated: true` label
+cannot bypass that admission. The same independent numerical tests apply to
+new candidates from an explicitly requested manual search. Admission clones
+the field and configuration, obtains operations
 from the canonical [`groups.json`](groups.json), and requires positive
 diffusivities, physical concentrations, temporal RMS at least 0.008, and
 spatial RMS at least 0.012.
@@ -203,7 +211,7 @@ node --test tests/solution-atlas.test.mjs tests/phase-audit.test.mjs tests/bundl
 ```
 
 The reproduction scripts provide candidate fields, not automatic admission.
-The atlas must still recheck their concentrations, canonical operations,
+The offline audit must still recheck their concentrations, canonical operations,
 independent extended trajectories, refinement, and resolved phase contrast.
 The shipped-asset regression reads the actual manifest and binary bytes,
 checks each checksum, and runs fresh admission for every listed asset.
@@ -211,8 +219,14 @@ It also verifies that the real g95 half-shift movie is rejected under g96's
 quarter-shift character, and that repeating a single spatial frame cannot
 qualify as an orbit with genuine time symmetry.
 
+The catalog build stores the accepted results for reuse. These offline build
+and regression commands perform numerical verification; merely reopening
+the viewer does not. Regenerate the catalog after changing an orbit or its
+verification requirements so the published records match the audited data.
+
 The viewer uses one fixed concentration range over the entire selected
 movie for each channel, shared by the main image and comparisons. It never
 renormalizes individual frames to manufacture apparent motion. The browser
-displays only immutable records admitted by the atlas; presets and failed
+displays precomputed, admitted records after payload integrity checks, plus
+new manual-search results only after independent admission. Presets and failed
 searches remain starting guesses or unresolved attempts.

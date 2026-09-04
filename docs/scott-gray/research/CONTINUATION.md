@@ -60,7 +60,9 @@ closure, time resolution, phase contrast, shorter-period checks, and a
 halved timestep. Exports also meet explicitly recorded stricter limits:
 maximum projection change <= 1e-8; both full and refined independent return,
 path, and phase RMS <= 1e-6.
-The browser repeats its own admission checks when loading the field.
+Numerical admission is performed offline, not on each browser page load.
+The published viewer reads the stored catalog and checks only the selected
+payload's SHA-256 integrity before playback.
 
 The fundamental branches have the corresponding three coordinate variants:
 g95/g98/g94 for standing and g96/g97/g99 for rotating. They are two underlying
@@ -70,6 +72,12 @@ exports appear in `bundles/verified-orbits.json`; rejected results appear in
 per-point spatial refinement. Copy accepted metadata/binaries into the site's
 `data/orbits` directory and merge the generated orbit entries into its atlas
 manifest. `--url-prefix` changes the generated URL prefix when needed.
+Then run `node build-catalog.mjs --verify` from this research directory to
+regenerate the viewer catalog. It independently
+checks the bundled fields and writes `../data/precomputed-atlas.json` with
+accepted parameters, diagnostics, and thumbnails. The browser reuses those
+results. An explicitly requested new search still needs fresh independent
+admission before its result is shown as a solution.
 
 ## Validate saved GPU outputs locally
 

@@ -11,6 +11,13 @@ period, grid, diffusion coefficients and stencil of that orbit. If a group has
 no accepted record, there is no point to snap to. This is not a proof of
 nonexistence.
 
+The known solutions are verified **offline**, before publication, by
+`research/build-catalog.mjs`. Their accepted parameters, numerical diagnostics,
+and thumbnails are stored in `data/precomputed-atlas.json`. Opening the page
+reads this catalog; it does not recompute valid parameter sets or integrate the
+PDE. Selecting a pattern fetches its concentration payload and checks its
+SHA-256 integrity against the stored record before playback.
+
 ## Three stages of exploration
 
 1. Choose the cyclic time symmetry g94–g99.
@@ -22,7 +29,7 @@ nonexistence.
    only one pattern is known, the interface explicitly says so. A different
    time origin of the same loop is not a new discovered branch.
 
-Each thumbnail is rendered from verified concentration data. Playback uses a
+Each stored thumbnail was rendered offline from verified concentration data. Playback uses a
 fixed concentration scale for the whole orbit. Choosing a new pattern preserves
 its physical parameter set; choosing new parameters updates the available
 patterns. Only measured points are admitted, not the entire region between them.
@@ -67,11 +74,15 @@ not exhaust the parameter space.
 
 ## Admission and exclusions
 
-`solution-atlas.mjs` ignores supplied validation flags and recomputes the PDE,
+During the offline catalog build, and when the user explicitly starts a new
+search, `solution-atlas.mjs` ignores supplied validation flags and recomputes the PDE,
 all phase constraints, full independent return and trajectory error, and a second
 integration at half the actual timestep. Future phases come from actual
 integration beyond T, never from wrapping a transient recording. A fixed
 concentration scale over all frames keeps visual comparisons meaningful.
+These numerical checks are not repeated when opening the page or browsing
+the precomputed solutions. New manual-search candidates still need independent
+admission before they can be displayed as solutions.
 
 `phase-audit.mjs` also compares rotation alone with rotation plus phase, requires
 nonzero phases to exceed the measured numerical uncertainty, and tests resolved

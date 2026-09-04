@@ -1,6 +1,8 @@
 # Searching Gray–Scott orbits with cyclic time symmetry
 
-The solver found two nonuniform periodic branches, continued them in both feed and kill parameters, and found additional spatial wavelengths at the same physical parameters. The delivered atlas contains **77 verified group records at 12 physical parameter pairs**. Many records are coordinate variants of the same branch; 77 does not mean 77 distinct patterns. These are smooth concentration waves, not the gliders shown in Bulatov's examples. Every displayed field must pass a fresh, independent audit for its selected cyclic character; a moving transient or a symmetry-projected animation is not accepted.
+The solver found two nonuniform periodic branches, continued them in both feed and kill parameters, and found additional spatial wavelengths at the same physical parameters. The delivered atlas contains **77 verified group records at 12 physical parameter pairs**. Many records are coordinate variants of the same branch; 77 does not mean 77 distinct patterns. These are smooth concentration waves, not the gliders shown in Bulatov's examples. Every bundled field passes an independent offline audit for its selected cyclic character before publication; a moving transient or a symmetry-projected animation is not accepted.
+
+`build-catalog.mjs` performs the numerical verification offline and stores the accepted parameters, diagnostics, and thumbnails in `../data/precomputed-atlas.json`. Opening the viewer reuses that catalog. Selecting a pattern fetches its concentration payload and checks SHA-256 integrity; no PDE integration or parameter search runs on page load. Explicitly requested new searches still undergo independent numerical admission.
 
 ## What the solver actually solves
 
@@ -101,6 +103,8 @@ node audit-continuation.mjs higher-mode-results/mode-3/candidates.json --output 
 ```
 
 The exporter independently integrates every candidate, applies the group's canonical phase action, and writes only passing payloads plus a manifest. `--primary-only` avoids proposing invalid centered-character variants of the even standing mode. `node audit_orbit.mjs PATH-TO-METADATA.json` repeats the admission of an individual exported payload. No success flag from the cloud solver bypasses these checks.
+
+After incorporating accepted exports into the site's source manifest, run `node build-catalog.mjs --verify` from this research directory to regenerate the published catalog. Its stored results let visitors browse the known valid parameters and thumbnails without repeating these numerical calculations. `node build-catalog.mjs --check` checks source hashes, stored evidence, and deterministic thumbnails without reintegrating the PDE; it rejects a stale catalog.
 
 `modal_continuation.py` uses one A100, no retries, and a 900-second function timeout. `modal_seed_search.py` launches at most two seed jobs and two A100 containers, each with a 600-second timeout. Each container requests two CPU cores and 8 GiB of host memory, with a 16 GiB hard limit. All jobs stop after returning their results. A timeout bounds resource usage, not a promise that every search will converge.
 

@@ -31,4 +31,4 @@ From `docs/scott-gray`, with Python and NumPy installed:
 python3 research/analyze_spatial_modes.py --output research/spatial-mode-evidence.json
 ```
 
-The script verifies each payload hash and reads all shipped g95 metadata and binaries. It performs no symmetry projection, PDE evolution, or image construction. Independent PDE and time-character checks remain the responsibility of `solution-atlas.mjs` and the bundled-orbit regression tests.
+The script verifies each payload hash and reads all shipped g95 metadata and binaries. It performs no symmetry projection, PDE evolution, or image construction. Independent PDE and time-character checks run offline through `solution-atlas.mjs`, `build-catalog.mjs`, and the bundled-orbit regression tests. The viewer uses the resulting `../data/precomputed-atlas.json` and checks the selected payload's integrity without repeating numerical admission on page load.

@@ -1,19 +1,20 @@
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
 import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
-import {createWebGLGrayScott} from './webgl.mjs?v=20260904-atlas';
+import {createWebGLGrayScott} from './webgl.mjs?v=20260904-precomputed';
 import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs';
 import {PROFILES,makeInitial} from './exploration.mjs';
 import {analyticExclusion} from './feasibility.mjs';
-import {createSolutionAtlas} from './solution-atlas.mjs?v=20260904-atlas';
-import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260904-atlas';
+import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260904-precomputed';
+import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260904-precomputed';
 
 const $=id=>document.getElementById(id);
 const tick=()=>new Promise(requestAnimationFrame);
 const colors=['#d96c4a','#dda635','#4a9c8b','#8274ba'];
-let groups=[],group,atlas,record=null,worker=null,abort=null,job=0,busy=false,displayEngine=null;
-const recordNames=new Map(),recordDescriptions=new Map(),catalogLoads=new Map();
+let groups=[],group,saved,atlas=null,record=null,worker=null,abort=null,job=0,busy=false,displayEngine=null;
+let selectionToken=0,selectedPatternId=null;
+const recordNames=new Map(),recordDescriptions=new Map();
 const rememberedSelections=new Map(),thumbnailCache=new Map(),rangeCache=new Map();
-let catalogEntries=[],catalogReady=false,settingsRevision=0;
+let settingsRevision=0;
 let selectedParameterKey=null;
 let playing=false,phase=0,lastTime=0,selectedGenerator='α',attempts=[],displayRanges=null;
 const requestedGroup=/^#g9[4-9]$/.test(location.hash)?location.hash.slice(1):null;
@@ -22,10 +23,14 @@ const numeric=['feed','kill','length','period','du','dv','iterations'];
 const range=()=>$('palette').value==='concentration'?displayRanges?.v:displayRanges?.u;
 const setStatus=text=>{$('status').textContent=text;};
 
-function fieldRanges(r){if(rangeCache.has(r.id))return rangeCache.get(r.id);const ranges=[[Infinity,-Infinity],[Infinity,-Infinity]],S=r.config.N*r.config.N;for(let t=0;t<r.config.M;t++)for(let c=0;c<2;c++)for(let i=0;i<S;i++){const v=r.field[t*2*S+c*S+i];ranges[c][0]=Math.min(ranges[c][0],v);ranges[c][1]=Math.max(ranges[c][1],v);}const result={u:ranges[0],v:ranges[1]};rangeCache.set(r.id,result);return result;}
+const summaries=id=>[...(saved?.summaries(id)??[]),...(atlas?.summaries(id)??[])];
+const summaryById=id=>saved?.get(id)??summaries(group.id).find(r=>r.id===id);
+const verifiedRecord=r=>!!r&&(saved?.isVerified(r,group.id)||atlas?.isVerified(r,group.id));
+
+function fieldRanges(r){if(r.ranges)return r.ranges;if(rangeCache.has(r.id))return rangeCache.get(r.id);const ranges=[[Infinity,-Infinity],[Infinity,-Infinity]],S=r.config.N*r.config.N;for(let t=0;t<r.config.M;t++)for(let c=0;c<2;c++)for(let i=0;i<S;i++){const v=r.field[t*2*S+c*S+i];ranges[c][0]=Math.min(ranges[c][0],v);ranges[c][1]=Math.max(ranges[c][1],v);}const result={u:ranges[0],v:ranges[1]};rangeCache.set(r.id,result);return result;}
 const parameterKey=c=>JSON.stringify([c.groupId,c.params.F,c.params.k,c.params.Du,c.params.Dv,c.L??c.N*c.params.dx,c.params.stencil??'five-point']);
 const number=value=>Number(value.toPrecision(11)).toString();
-function parameterSets(){const sets=new Map();for(const r of atlas.summaries(group.id)){const key=parameterKey(r.config);if(!sets.has(key))sets.set(key,{key,config:r.config,patterns:[]});sets.get(key).patterns.push(r);}return [...sets.values()].sort((a,b)=>a.config.params.F-b.config.params.F||a.config.params.k-b.config.params.k);}
+function parameterSets(){if(!group)return[];const sets=new Map();for(const r of summaries(group.id)){const key=parameterKey(r.config);if(!sets.has(key))sets.set(key,{key,config:r.config,patterns:[]});sets.get(key).patterns.push(r);}return [...sets.values()].sort((a,b)=>a.config.params.F-b.config.params.F||a.config.params.k-b.config.params.k);}
 function physicalLabel(c){const p=c.params;return `F ${number(p.F)} · k ${number(p.k)} · Dᵤ ${number(p.Du)} · Dᵥ ${number(p.Dv)} · L ${number(c.L??c.N*p.dx)} · ${p.stencil==='bulatov9'?'Bulatov 9-point':'5-point'}`;}
 function config(){
   const N=+$('resolution').value,L=+$('length').value;
@@ -47,18 +52,19 @@ function setPlaying(value){playing=!!record&&value;$('play').textContent=playing
 function controls(){
   $('search-settings').disabled=busy;$('preset').disabled=busy;$('search').disabled=busy;$('scan').disabled=busy;$('stop').disabled=!busy;
   for(const id of ['play','rewind','phase','export'])$(id).disabled=!record;
-  $('solution').disabled=busy||!group||!atlas?.size(group.id);$('parameter-set').disabled=busy||!group||!atlas?.size(group.id);
+  $('solution').disabled=busy||!group||!summaries(group.id).length;$('parameter-set').disabled=busy||!group||!summaries(group.id).length;
   for(const button of $('pattern-thumbnails').children)button.disabled=busy;
   $('continue-seed').disabled=!record;
 }
 function cancel(message){
-  job++;abort?.abort();abort=null;
+  job++;selectionToken++;abort?.abort();abort=null;
   if(worker){worker.terminate();worker=null;}
-  busy=false;$('progress').hidden=true;if(group&&atlas)populateAtlas();controls();if(message)setStatus(message);
+  busy=false;$('progress').hidden=true;if(group&&saved)populateAtlas();controls();if(message)setStatus(message);
 }
 function named(){return GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator);}
 function overlay(){
-  $('generator-overlay').hidden=!$('show-generators').checked;
+  if(!group)return;
+  $('generator-overlay').toggleAttribute('hidden',!$('show-generators').checked);
   renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles:+$('tiles').value,selected:selectedGenerator,onSelect:g=>{selectedGenerator=g.name;$('operation').value=g.name;overlay();drawComparison();}});
   const g=named();$('generator-description').textContent=generatorDescription(g);
   $('compare-label').textContent=`q(x, t + ${g.timeShift}T)`;
@@ -106,7 +112,9 @@ function animate(now){
   if(playing&&record){phase=mod(phase+(now-lastTime)/8000*+$('speed').value);draw();}
   lastTime=now;requestAnimationFrame(animate);
 }
-function updateGroupCounts(){for(const b of $('groups').children){const count=atlas.size(b.dataset.id),badge=b.querySelector('.orbit-count');const saved=catalogEntries.filter(e=>e.groupId===b.dataset.id).length;badge.textContent=count?`${count}${catalogLoads.get(b.dataset.id)?.state==='loading'&&saved>count?'/'+saved:''} orbit${count===1?'':'s'}`:saved?(catalogLoads.get(b.dataset.id)?.state==='loading'?'checking…':`load ${saved}`):'unresolved';const assessment=$('feasibility-'+b.dataset.id);if(assessment)assessment.textContent=count?'Verified numerical example':saved?'Numerical example bundled; checked when opened':'Compatible; existence unresolved';} }
+function updateGroupCounts(){
+  for(const b of $('groups').children){const count=summaries(b.dataset.id).length;b.querySelector('.orbit-count').textContent=`${count} pattern${count===1?'':'s'}`;const assessment=$('feasibility-'+b.dataset.id);if(assessment)assessment.textContent=count?'Precomputed verified example':'Compatible; existence unresolved';}
+}
 function populateAtlas(){
   updateGroupCounts();
   const sets=parameterSets(),total=sets.reduce((sum,set)=>sum+set.patterns.length,0);
@@ -122,52 +130,71 @@ function populateAtlas(){
 }
 function populatePatterns(set){
   const patterns=set?.patterns??[];$('solution').replaceChildren();$('pattern-thumbnails').replaceChildren();
-  $('parameter-values').textContent=set?physicalLabel(set.config):'Parameters appear after an orbit passes verification.';
+  $('parameter-values').textContent=set?physicalLabel(set.config):'Choose a precomputed parameter set.';
   $('pattern-count').textContent=patterns.length===1?'1 verified pattern is known at this parameter set.':`${patterns.length} verified patterns at this parameter set.`;
   const palette=$('palette').value;
   for(let i=0;i<patterns.length;i++){
     const summary=patterns[i],label=`${recordNames.get(summary.id)??('Pattern '+(i+1))} · T ${summary.config.period.toFixed(2)} · ${summary.config.N}²`,option=document.createElement('option');
     option.value=summary.id;option.textContent=label;$('solution').append(option);
     const key=summary.id+':'+palette;
-    if(!thumbnailCache.has(key)){
+    if(summary.thumbnails){thumbnailCache.set(key,summary.thumbnails[palette]);}
+    else if(!thumbnailCache.has(key)){
       const r=record?.id===summary.id?record:atlas.get(summary.id),canvas=document.createElement('canvas');canvas.width=160;canvas.height=160;
-      const ranges=fieldRanges(r);renderField(canvas,r.field,r.config.N,r.config.M,0,{tiles:2,palette,range:palette==='concentration'?ranges.v:ranges.u});
-      thumbnailCache.set(key,canvas.toDataURL());
+      const ranges=fieldRanges(r);renderField(canvas,r.field,r.config.N,r.config.M,0,{tiles:2,palette,range:palette==='concentration'?ranges.v:ranges.u});thumbnailCache.set(key,canvas.toDataURL());
     }
-    const button=document.createElement('button');button.type='button';button.className='pattern-thumb';button.setAttribute('aria-pressed',String(record?.id===summary.id));button.setAttribute('aria-label','Select '+label);
-    const image=document.createElement('img');image.src=thumbnailCache.get(key);image.alt='Verified concentration field at phase zero';image.width=160;image.height=160;
+    const button=document.createElement('button');button.type='button';button.className='pattern-thumb';button.setAttribute('aria-pressed',String(selectedPatternId===summary.id));button.setAttribute('aria-label','Select '+label);
+    const image=document.createElement('img');image.src=thumbnailCache.get(key);image.alt='Verified concentration field at phase zero';image.decoding='async';image.width=160;image.height=160;
     const text=document.createElement('span');text.textContent=label;button.append(image,text);button.onclick=()=>selectPattern(summary.id);$('pattern-thumbnails').append(button);
   }
   if(!patterns.length){const option=document.createElement('option');option.textContent='No verified patterns';option.value='';$('solution').append(option);}
-  if(patterns.some(r=>r.id===record?.id))$('solution').value=record.id;
+  if(patterns.some(r=>r.id===selectedPatternId))$('solution').value=selectedPatternId;
 }
 function selectParameters(key){
   const set=parameterSets().find(set=>set.key===key);if(!set||busy)return;
-  selectedParameterKey=key;selectRecord(atlas.get(set.patterns[0].id));
+  selectedParameterKey=key;openPattern(set.patterns[0].id);
 }
 function selectPattern(id){
-  if(busy)return;const summary=atlas.summaries(group.id).find(r=>r.id===id);
-  if(summary&&parameterKey(summary.config)===selectedParameterKey){selectRecord(atlas.get(id));if(matchMedia('(max-width:720px)').matches)document.querySelector('.viewer').scrollIntoView({behavior:'smooth',block:'start'});}
+  if(busy)return;const summary=summaries(group.id).find(r=>r.id===id);
+  if(summary&&parameterKey(summary.config)===selectedParameterKey){openPattern(id);if(matchMedia('(max-width:720px)').matches)document.querySelector('.viewer').scrollIntoView({behavior:'smooth',block:'start'});}
+}
+async function openPattern(id,{updateSearch=true}={}){
+  const summary=summaryById(id);if(!summary||summary.config.groupId!==group.id)return;
+  const token=++selectionToken,targetGroup=group.id,revision=settingsRevision;
+  selectedPatternId=id;selectedParameterKey=parameterKey(summary.config);
+  rememberedSelections.set(targetGroup,{key:selectedParameterKey,id});
+  emptyViewer({loading:true});populateAtlas();setStatus('Loading the selected precomputed animation…');
+  try{
+    const loaded=saved.get(id)?await saved.load(id):atlas.get(id);
+    if(token!==selectionToken||group.id!==targetGroup)return;
+    selectRecord(loaded,{updateSearch:updateSearch&&settingsRevision===revision});setStatus(saved.isVerified(loaded)?'Precomputed animation ready. Parameters and orbit verification were calculated offline.':'Verified animation ready.');
+  }catch(error){
+    if(token!==selectionToken||group.id!==targetGroup)return;
+    emptyViewer({error:error.message});setStatus('Could not load this saved animation: '+error.message);
+  }
 }
 function selectRecord(r,{updateSearch=true}={}){
-  if(!r||!atlas.isVerified(r,group.id))return;
+  if(!verifiedRecord(r))return;
+  selectionToken++;selectedPatternId=r.id;
   selectedParameterKey=parameterKey(r.config);rememberedSelections.set(group.id,{key:selectedParameterKey,id:r.id});
   displayEngine?.dispose();displayEngine=null;record=r;displayRanges=fieldRanges(r);phase=0;setPlaying(false);
   try{displayEngine=createWebGLGrayScott({canvas:$('gpu-pattern'),N:r.config.N,initial:Float64Array.from(r.field.slice(0,2*r.config.N*r.config.N)),params:r.config.params,onContextLost:()=>{setPlaying(false);displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;draw();}});}catch{}
   $('gpu-pattern').hidden=!displayEngine;main.hidden=!!displayEngine;if(updateSearch){setControls(r.config);$('seed').value='continue';}
-  $('solution').value=r.id;$('empty-state').hidden=true;$('mode-label').textContent='Verified periodic time symmetry';
+  $('solution').value=r.id;$('empty-state').hidden=true;$('mode-label').textContent=saved.isVerified(r,group.id)?'Precomputed periodic time symmetry':'Verified periodic time symmetry';
   $('engine-label').textContent=`${displayEngine?'WebGL playback':'CPU playback'} · ${r.config.N}² × ${r.config.M} · T ${r.config.period.toFixed(2)}`;
-  $('caption').textContent=(recordDescriptions.get(r.id)?recordDescriptions.get(r.id)+' ':'')+'This numerical orbit passed every generator’s phase-shift constraint, independent forward evolution and timestep refinement. The rotation-only comparison should differ for generators with a nonzero phase.';
+  $('caption').textContent=(recordDescriptions.get(r.id)?recordDescriptions.get(r.id)+' ':'')+'This numerical orbit was verified before display: every generator’s phase-shift constraint, independent forward evolution and timestep refinement passed. The rotation-only comparison should differ for generators with a nonzero phase.';
   metrics(r.diagnostics);colorScale();populateAtlas();controls();draw();
 }
-function emptyViewer(){
-  displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;record=null;displayRanges=null;setPlaying(false);phase=0;if($('seed').value==='continue')$('seed').value='skate';$('empty-state').hidden=false;$('mode-label').textContent='No verified solution';$('engine-label').textContent='Existence unresolved';
-  $('caption').textContent='The markers describe the requested rotation and phase shift. A chemical animation appears only after all numerical checks pass.';
+function emptyViewer({loading=false,error=null}={}){
+  displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;record=null;displayRanges=null;setPlaying(false);phase=0;if($('seed').value==='continue')$('seed').value='skate';$('empty-state').hidden=false;$('mode-label').textContent=loading?'Loading saved animation':error?'Animation unavailable':'No verified solution';$('engine-label').textContent=loading?'Precomputed data':error?'Download failed':'Existence unresolved';
+  $('empty-state').querySelector('h2').textContent=loading?'Loading saved animation…':error?'Animation unavailable':'No verified solution for this group';
+  $('empty-description').textContent=loading?'The parameters and numerical checks are already computed. Only this animation is being downloaded.':error?saved?'Choose another pattern or select this one again to retry.':'The saved catalog could not load. Reload this page to retry.':'Existence is unresolved. An unsuccessful search is not a proof of impossibility.';
+  $('focus-search').hidden=loading||!!error;
+  $('caption').textContent=loading?'Loading the saved concentration field; no numerical search runs during browsing.':'The markers describe the requested rotation and phase shift.';
   metrics(null);colorScale();draw();controls();
 }
 function chooseGroup(id){
   cancel();group=groups.find(g=>g.id===id)||groups[0];history.replaceState(null,'','#'+group.id);
-  selectedParameterKey=rememberedSelections.get(group.id)?.key??null;
+  selectedParameterKey=rememberedSelections.get(group.id)?.key??null;selectedPatternId=rememberedSelections.get(group.id)?.id??null;
   for(const b of $('groups').children)b.setAttribute('aria-pressed',b.dataset.id===group.id);
   const d=GROUP_DISPLAY[group.id];$('selected-id').textContent=group.id+' / CYCLIC COLOR GROUP';$('selected-title').innerHTML=d.shortHTML;$('group-label').textContent=group.id+' · '+d.shortText;
   const phases=d.namedGenerators.map(g=>`${g.name}: ${g.timeShift}T`).join(' · ');
@@ -175,11 +202,11 @@ function chooseGroup(id){
   $('reference-link').href='../correspondence-p4.html#'+group.id;
   $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · +${g.timeShift} T`;$('operation').append(o);}
   selectedGenerator=d.namedGenerators[0].name;$('operation').value=selectedGenerator;overlay();populateAtlas();
-  const summaries=atlas.summaries(group.id),first=summaries.find(r=>r.id===rememberedSelections.get(group.id)?.id)??summaries.find(r=>parameterKey(r.config)===selectedParameterKey);if(first)selectRecord(atlas.get(first.id));else emptyViewer();
-  renderAttempts();setStatus(first?'Verified periodic orbit loaded. Rotation and phase shift are checked together.':'Checking the saved orbit for this exact cyclic time character…');if(catalogReady)loadGroup(group.id);
+  const available=summaries(group.id),first=available.find(r=>r.id===rememberedSelections.get(group.id)?.id)??available[0];
+  renderAttempts();if(first)openPattern(first.id);else{emptyViewer();setStatus('No precomputed orbit is available for this group.');}
 }
 function mapBounds(){
-  const records=atlas.summaries(group.id),bounds={};
+  const records=summaries(group.id),bounds={};
   for(const [axis,limit,minSpan] of [['F',.2,.00002],['k',.08,.00002]]){
     const values=records.map(r=>r.config.params[axis]);
     if(!values.length){bounds[axis]=[0,limit];continue;}
@@ -189,7 +216,7 @@ function mapBounds(){
   return bounds;
 }
 function drawMap(){
-  if(!group||!atlas)return;
+  if(!group||!saved)return;
   const c=map.getContext('2d'),w=map.width,h=map.height,left=80,right=20,top=20,bottom=40,pw=w-left-right,ph=h-top-bottom;
   c.fillStyle='#fff';c.fillRect(0,0,w,h);c.font='20px sans-serif';c.lineWidth=1;
   const bounds=mapBounds(),spanF=bounds.F[1]-bounds.F[0],spanK=bounds.k[1]-bounds.k[0];
@@ -201,7 +228,8 @@ function drawMap(){
 }
 function snap(F,k){
   if(busy)return;
-  const bounds=mapBounds(),r=atlas.nearest(group.id,{F,k},{scales:{F:bounds.F[1]-bounds.F[0],k:bounds.k[1]-bounds.k[0]}});
+  const bounds=mapBounds(),spanF=bounds.F[1]-bounds.F[0],spanK=bounds.k[1]-bounds.k[0];
+  const r=summaries(group.id).reduce((best,next)=>{const distance=p=>((p.F-F)/spanF)**2+((p.k-k)/spanK)**2;return !best||distance(next.config.params)<distance(best.config.params)?next:best;},null);
   if(!r){$('map-status').textContent='No verified time-symmetric solution exists in this atlas for the selected group. There is nothing to snap to.';return;}
   selectParameters(parameterKey(r.config));$('map-status').textContent=`Selected verified parameters: F ${number(r.config.params.F)}, k ${number(r.config.params.k)}. Pattern choices below use these same physical parameters.`;
 }
@@ -241,7 +269,7 @@ async function initialMovie(c,token){
 }
 function optimize(c,field,iterations,token,label){
   return new Promise((resolve,reject)=>{
-    const w=new Worker(new URL('./worker.js?v=20260904-atlas',import.meta.url),{type:'module'});worker=w;
+    const w=new Worker(new URL('./worker.js?v=20260904-precomputed',import.meta.url),{type:'module'});worker=w;
     const onAbort=()=>{w.terminate();reject(new DOMException('Cancelled','AbortError'));};abort.signal.addEventListener('abort',onAbort,{once:true});
     const finish=()=>{abort?.signal.removeEventListener('abort',onAbort);w.terminate();if(worker===w)worker=null;};
     w.onerror=e=>{finish();reject(Error(e.message));};
@@ -256,12 +284,13 @@ function optimize(c,field,iterations,token,label){
   });
 }
 async function search(neighborhood=false){
-  if(!group||!atlas||busy||!valid())return;
+  if(!group||!saved||busy||!valid())return;
   cancel();const token=job,startAttempt=attempts.length,base=config(),iterations=+$('iterations').value,points=[];
   if(neighborhood){for(let y=-1;y<=1;y++)for(let x=-1;x<=1;x++)points.push({F:Math.max(0,Math.min(.2,base.params.F+x*.0015)),k:Math.max(0,Math.min(.08,base.params.k+y*.0005))});}
   else points.push({F:base.params.F,k:base.params.k});
   abort=new AbortController();busy=true;controls();$('progress').hidden=false;$('progress').value=0;
   try{
+    if(!atlas){const {createSolutionAtlas}=await import('./solution-atlas.mjs?v=20260904-precomputed');if(token!==job)return;atlas=createSolutionAtlas(groups);}
     for(let i=0;i<points.length;i++){
       if(token!==job)return;
       const c={...base,params:{...base.params,...points[i]}},label=`${base.groupId} trial ${i+1}/${points.length}`;
@@ -283,42 +312,19 @@ async function search(neighborhood=false){
     const passed=attempts.slice(startAttempt).filter(a=>a.groupId===base.groupId&&a.accepted).length,excluded=points.every(p=>analyticExclusion({...base.params,...p}));
     setStatus(excluded?'These parameters are analytically excluded: at F = 0, nonnegative periodic solutions must be stationary. See the proof below.':passed?'Search complete. Accepted orbits are available in the atlas.':'Search complete: no verified solution found. These initial guesses failed; impossibility is not established.');
   }catch(e){if(e.name!=='AbortError'&&token===job)setStatus(`Search failed: ${e.message}. No new solution was admitted.`);}
-  finally{if(token===job){busy=false;abort=null;$('progress').hidden=true;populateAtlas();if(!record){const first=atlas.summaries(group.id)[0];if(first)selectRecord(atlas.get(first.id),{updateSearch:false});}controls();}}
-}
-
-// Validate one group's saved records on demand. Visiting another group never
-// labels the existing field with the new character, and cached accepted records
-// can be revisited without integrating again.
-async function loadGroup(id){
-  if(!catalogReady)return;
-  const previous=catalogLoads.get(id);if(previous&&previous.state!=='failed')return previous.promise;
-  const startJob=job,revision=settingsRevision,load={state:'loading',promise:null};catalogLoads.set(id,load);updateGroupCounts();
-  load.promise=(async()=>{
-    const entries=catalogEntries.filter(entry=>entry.groupId===id);
-    try{
-      for(let i=0;i<entries.length;i++){
-        const entry=entries[i],source=await fetch(entry.url);if(!source.ok)throw Error('Saved orbit metadata unavailable.');
-        const candidate=await source.json();
-        if(candidate.fieldUrl){const binary=await fetch(new URL(candidate.fieldUrl,source.url));if(!binary.ok)throw Error('Saved concentration field unavailable.');const bytes=await binary.arrayBuffer();if(candidate.fieldByteLength&&bytes.byteLength!==candidate.fieldByteLength)throw Error('Saved concentration field has an unexpected size.');candidate.field=new Float32Array(bytes);}
-        const result=await atlas.admit(candidate,{groupId:id,onPhase:p=>{if(group.id===id&&!busy&&job===startJob)setStatus(`Verifying saved orbit ${i+1}/${entries.length}: ${typeof p==='string'?p:JSON.stringify(p)}`);}});
-        if(result.accepted){recordNames.set(result.id,entry.patternName??entry.name?.split(' · F')[0]??'Periodic wave');recordDescriptions.set(result.id,entry.description??entry.name??'');updateGroupCounts();if(group.id===id&&!busy){populateAtlas();if(!record)selectRecord(result.record??atlas.get(result.id),{updateSearch:settingsRevision===revision});}}
-        else if(group.id===id&&!busy)setStatus('Saved orbit was not admitted: '+result.reasons.join(' '));
-      }
-      load.state='complete';updateGroupCounts();
-      if(group.id===id&&!busy&&job===startJob){populateAtlas();setStatus(atlas.size(id)?'Verified orbits ready. Click the parameter plane to snap to a solution of this time character.':'No saved orbit passed verification. Existence remains unresolved at these parameters.');}
-    }catch(error){load.state='failed';if(group.id===id&&!busy)setStatus('Could not verify saved orbits: '+error.message);}
-  })();return load.promise;
+  finally{if(token===job){busy=false;abort=null;$('progress').hidden=true;populateAtlas();if(!record){const first=summaries(group.id)[0];if(first)openPattern(first.id,{updateSearch:false});}controls();}}
 }
 
 $('focus-search').onclick=()=>{$('search-panel').open=true;$('search-panel').scrollIntoView({behavior:'smooth',block:'center'});$('search').focus({preventScroll:true});};
 $('parameter-set').onchange=()=>selectParameters($('parameter-set').value);
 $('solution').onchange=()=>selectPattern($('solution').value);
-map.onclick=e=>{if(!atlas||!group)return;const b=map.getBoundingClientRect(),x=(e.clientX-b.left)*map.width/b.width,y=(e.clientY-b.top)*map.height/b.height,bounds=mapBounds();snap(bounds.F[0]+Math.max(0,Math.min(1,(x-80)/(map.width-100)))*(bounds.F[1]-bounds.F[0]),bounds.k[0]+Math.max(0,Math.min(1,1-(y-20)/(map.height-60)))*(bounds.k[1]-bounds.k[0]));};
+map.onclick=e=>{if(!saved||!group)return;const b=map.getBoundingClientRect(),x=(e.clientX-b.left)*map.width/b.width,y=(e.clientY-b.top)*map.height/b.height,bounds=mapBounds();snap(bounds.F[0]+Math.max(0,Math.min(1,(x-80)/(map.width-100)))*(bounds.F[1]-bounds.F[0]),bounds.k[0]+Math.max(0,Math.min(1,1-(y-20)/(map.height-60)))*(bounds.k[1]-bounds.k[0]));};
 map.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();const set=parameterSets().find(set=>set.key===selectedParameterKey);if(set)snap(set.config.params.F,set.config.params.k);}};
 $('preset').onchange=()=>setPreset($('preset').value);
 for(const id of numeric)$(id).addEventListener('input',()=>{$('preset').value='custom';settingsRevision++;});
+for(const id of ['resolution','frames','stencil','seed'])$(id).addEventListener('change',()=>{settingsRevision++;});
 $('search').onclick=()=>search(false);$('scan').onclick=()=>search(true);
-$('stop').onclick=()=>cancel('Search cancelled. No unverified candidate was added to the atlas.');
+$('stop').onclick=()=>{cancel('Search cancelled. No unverified candidate was added to the atlas.');if(!record&&selectedPatternId)openPattern(selectedPatternId,{updateSearch:false});};
 $('play').onclick=()=>setPlaying(!playing);$('rewind').onclick=()=>{phase=0;draw();};
 $('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw();};
 for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=()=>setPlaying(!playing);canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}};}
@@ -331,17 +337,17 @@ $('export').onclick=()=>{
 };
 
 try{
-  const response=await fetch('groups.json');if(!response.ok)throw Error('Group catalog unavailable.');groups=await response.json();atlas=createSolutionAtlas(groups);
+  const [response,manifestResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json')]);
+  if(!response.ok||!manifestResponse.ok)throw Error('Precomputed solution catalog unavailable.');
+  const [catalog,manifest]=await Promise.all([response.json(),manifestResponse.json()]);groups=catalog;saved=createPrecomputedCatalog(manifest,{groups});
+  for(const entry of manifest.orbits){recordNames.set(entry.id,entry.patternName??entry.name?.split(' · F')[0]??'Periodic wave');recordDescriptions.set(entry.id,entry.description??'');}
   $('groups').innerHTML=groups.map(g=>`<button class="group" data-id="${g.id}" aria-pressed="false"><strong>${GROUP_DISPLAY[g.id].shortHTML}</strong><span>${g.id}<small class="orbit-count"></small></span></button>`).join('');
   for(const b of $('groups').children)b.onclick=()=>chooseGroup(b.dataset.id);
   for(const p of PROFILES){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;$('preset').append(o);}$('preset').value='u-skate';
   $('feasibility-rows').innerHTML=groups.map(g=>`<tr><td>${g.id} · ${GROUP_DISPLAY[g.id].shortHTML}</td><td>${DESCRIPTIONS[g.id][4]}</td><td>${DESCRIPTIONS[g.id][3]}</td><td id="feasibility-${g.id}">Compatible; existence unresolved</td></tr>`).join('');
-  chooseGroup(requestedGroup??'g95');
+  chooseGroup(requestedGroup??manifest.preferredGroup??'g95');
   window.addEventListener('hashchange',()=>{if(/^#g9[4-9]$/.test(location.hash))chooseGroup(location.hash.slice(1));});requestAnimationFrame(animate);
-  const manifestResponse=await fetch('data/verified-orbits.json');
-  if(!manifestResponse.ok)throw Error('Verified orbit catalog unavailable.');
-  const manifest=await manifestResponse.json();catalogEntries=manifest.orbits??[];catalogReady=true;updateGroupCounts();
-  await loadGroup(group.id);
 
-}catch(e){setStatus(e.message);console.error(e);}
+
+}catch(e){emptyViewer({error:e.message});setStatus(e.message);console.error(e);}
 fetch('data/search-results.json').then(r=>r.json()).then(data=>{$('historical-results').innerHTML=data.results.map(r=>`<tr><td>${r.group}</td><td>${r.finalPdeRms.toExponential(2)}</td><td>${(100*r.relativePde).toFixed(1)}%</td><td>${r.closureRms.toFixed(4)}</td><td>Unverified</td></tr>`).join('');}).catch(()=>{});

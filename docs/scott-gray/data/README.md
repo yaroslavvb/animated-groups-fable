@@ -1,13 +1,25 @@
 # Numerical data and provenance
 
-`verified-orbits.json` lists the periodic fields available in the current
-viewer. Each metadata file under `orbits/` specifies its physical parameters,
+`verified-orbits.json` lists the periodic fields used to build the viewer's
+catalog. Each metadata file under `orbits/` specifies its physical parameters,
 canonical group operations, period, numerical checks, spatial refinement,
 and the SHA-256 hash and layout of its accompanying Float32 payload. The
-browser independently rechecks the actual bytes before admitting a record;
-saved validation summaries do not grant admission. See
+offline builder, `../research/build-catalog.mjs`, independently rechecks the
+actual bytes with the numerical admission tests; saved validation summaries
+do not grant admission during that build. It writes `precomputed-atlas.json`,
+which stores the known-valid parameters, measured diagnostics, and thumbnail
+URLs; the images are generated in `thumbnails/`.
+The browser reads that catalog and fetches only the selected concentration
+payload, checking its SHA-256 integrity. It performs no PDE integration or
+parameter verification on page load. Explicit new searches still require
+independent numerical admission. See
 [the numerical evidence](../VERIFIED-ORBITS.md) and
 [distinct standing spatial modes](../research/HIGHER-SPATIAL-MODES.md).
+
+From `docs/scott-gray`, run `node research/build-catalog.mjs --verify` after
+changing source orbits or acceptance code. Run
+`node research/build-catalog.mjs --check` to check source hashes, stored evidence,
+and deterministic thumbnails without repeating numerical integration.
 
 The older trajectories and seeds below are retained for reproducibility.
 They are not members of the verified atlas.
