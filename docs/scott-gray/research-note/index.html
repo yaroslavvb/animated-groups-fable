@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Periodic Gray–Scott waves with cyclic time symmetry</title>
+  <meta name="description" content="A mathematical note on cyclic time-offset constraints, periodic-orbit computation, numerical verification, and the domain-length parameter L in the Gray–Scott system.">
+  <link rel="canonical" href="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/research-note/">
+  <style>
+    :root { color-scheme: light; --ink:#242d35; --muted:#5d6872; --line:#d8dfe0; --accent:#17635c; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#f7f8f5; color:var(--ink); font:17px/1.65 Georgia,serif; }
+    main { max-width:860px; margin:auto; padding:38px 32px 56px; }
+    nav, .eyebrow, figcaption, footer, table, .button { font-family:system-ui,sans-serif; }
+    nav { font-size:14px; margin-bottom:44px; }
+    a { color:var(--accent); text-decoration-thickness:1px; text-underline-offset:3px; }
+    a:hover { color:#092f2b; }
+    a:focus-visible, video:focus-visible { outline:3px solid #c88532; outline-offset:4px; }
+    .eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 12px; }
+    h1 { font-size:clamp(31px,5vw,44px); font-weight:normal; line-height:1.14; letter-spacing:-.025em; margin:0 0 24px; max-width:730px; }
+    p { margin:19px 0; }
+    .lead { font-size:20px; line-height:1.55; }
+    .equation { margin:22px 0; padding:18px 20px; background:#fff; border-left:3px solid #94b9ae; font-size:21px; line-height:1.85; }
+    .equation span { display:block; }
+    .equation small { display:block; font:14px/1.6 system-ui,sans-serif; color:var(--muted); margin-top:8px; }
+    .inline-math { white-space:nowrap; }
+    sup, sub { font-size:.72em; line-height:0; }
+    .citation { font:12px system-ui,sans-serif; vertical-align:super; white-space:nowrap; }
+    .length { margin:30px 0 24px; border:1px solid #c6d8cc; background:#edf3ed; padding:2px 23px; border-radius:8px; }
+    table { width:100%; border-collapse:collapse; font-size:14px; line-height:1.55; margin:22px 0 28px; }
+    caption { text-align:left; font-weight:650; padding-bottom:10px; font-size:15px; }
+    th, td { padding:11px 12px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; }
+    thead th { color:var(--muted); font-weight:500; font-size:12px; letter-spacing:.04em; text-transform:uppercase; }
+    tbody th { white-space:nowrap; font-weight:600; width:90px; }
+    figure { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; align-items:center; margin:30px 0; }
+    video { width:100%; height:auto; aspect-ratio:1; background:#150a25; border-radius:8px; display:block; }
+    figcaption { font-size:14px; line-height:1.6; }
+    figcaption p:first-child { margin-top:0; }
+    .button { display:inline-block; padding:8px 13px; background:var(--accent); color:#fff; border-radius:5px; text-decoration:none; font-size:14px; }
+    .button:hover { background:#104b46; color:#fff; }
+    footer { margin-top:34px; border-top:1px solid var(--line); padding-top:20px; font-size:12px; line-height:1.65; color:var(--muted); }
+    footer ol { padding-left:21px; }
+    footer li { margin:8px 0; overflow-wrap:anywhere; }
+    @media (max-width:560px) { main { padding:24px 20px 36px; } nav { margin-bottom:30px; } body { font-size:16px; } .lead { font-size:18px; } .equation { font-size:17px; padding:12px 13px; } .length { padding:1px 16px; } table { font-size:13px; } th,td { padding:10px 7px; } figure { grid-template-columns:1fr; gap:15px; } }
+    @media print { body { background:white; font-size:11pt; } main { max-width:none; padding:0; } nav,.button,video { display:none; } h1 { font-size:25pt; } .equation,.length,table,figure { break-inside:avoid; } figure { display:block; } footer { font-size:9pt; } }
+  </style>
+</head>
+<body>
+<main>
+  <nav aria-label="Related pages"><a href="../../scott-gray-groups.html">← Gray–Scott galleries</a> · <a href="../../transcripts/gray-scott-session/">Session transcript</a></nav>
+  <article>
+    <header>
+      <p class="eyebrow">Research note · 5 September 2026</p>
+      <h1>Periodic Gray–Scott waves with cyclic time symmetry</h1>
+    </header>
+
+    <p class="lead">This note describes the computation of periodic Gray–Scott solutions for which wallpaper-group operations act with prescribed time offsets. It extends the spatial symmetry setting illustrated by SymSim to constraints on the full space–time field. The governing reaction–diffusion equations remain unchanged. <a class="citation" href="#source-1" aria-label="Source 1">[1]</a></p>
+
+    <div class="equation" aria-label="The unchanged Gray–Scott equations">
+      <span>∂u/∂t = D<sub>u</sub> Δu − uv<sup>2</sup> + F(1 − u)</span>
+      <span>∂v/∂t = D<sub>v</sub> Δv + uv<sup>2</sup> − (F + k)v</span>
+    </div>
+
+    <p>Let u and v denote the concentrations. The coefficients are constant, and the spatial domain is a flat torus with periodic boundary conditions. For q = (u, v), the additional constraints are</p>
+
+    <div class="equation" aria-label="Periodicity and the time-offset symmetry condition">
+      <span>q(x, t + T) = q(x, t),</span>
+      <span>q(gx, t + τ<sub>g</sub>T) = q(x, t).</span>
+      <small>g is a spatial group operation; τ<sub>g</sub> ∈ ℝ/ℤ is its phase offset as a fraction of the period T.</small>
+    </div>
+
+    <p>The offsets define a character with finite cyclic image: <span class="inline-math">τ<sub>gh</sub> = τ<sub>g</sub> + τ<sub>h</sub> (mod 1)</span>. Cyclic colour permutations are represented by time translations acting on both concentrations, without exchanging the species. The formulation introduces no additional reaction term, forcing, or time reversal. The display palette is independent of this group-theoretic use of colour. <a class="citation" href="#source-2" aria-label="Source 2">[2]</a></p>
+
+    <p>For the <a href="../../correspondence-p4.html#g96">442 case g96, with short colour signature <sup>4</sup>4<sup>4</sup>4<sup>2</sup>2 in the correspondence catalog</a>, the canonical rotation R(x, y) = (−y, x) has τ = ¼. The condition is q(Rx, t + T/4) = q(x, t). The displayed generator α uses R⁻¹ and τ = ¾, giving an equivalent constraint. Case g97 has the same permutation orders and the opposite directed phase. <a class="citation" href="#source-2" aria-label="Source 2">[2]</a></p>
+
+    <div class="length" id="parameter-L">
+      <p><strong>Domain length L.</strong> For 442, L is the side length of the periodic square cell in the model’s spatial units. It specifies the translation cell; the rotational fundamental domain is smaller. For 632, L is the length of each basis vector of the triangular lattice, whose cell is a rhombus.</p>
+      <p>With N nodes along each lattice direction, the grid spacing is <span class="inline-math">h = L/N</span> (denoted <code>dx</code> in the implementation). In the example below, h = 256/48 ≈ 5.33. The discrete diffusion operator has coefficient <span class="inline-math">D/h<sup>2</sup></span>. In normalized square coordinates ξ = x/L, the continuum coefficient is <span class="inline-math">D/L<sup>2</sup></span>. Doubling L at fixed D reduces this coefficient by a factor of four and changes the admissible physical wavelengths. Increasing N at fixed L refines the discretization of the same physical problem. Varying L changes the domain and therefore the problem; display magnification and tile count do not affect it. <a class="citation" href="#source-3" aria-label="Source 3">[3]</a></p>
+    </div>
+
+    <table>
+      <caption>Parameters and numerical controls</caption>
+      <thead><tr><th scope="col">Symbol</th><th scope="col">Meaning</th><th scope="col">Example g96</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">F</th><td>Feed/replenishment rate; also contributes to v removal.</td><td>0.004</td></tr>
+        <tr><th scope="row">k</th><td>Additional v removal rate; total linear loss is F + k.</td><td>0.020</td></tr>
+        <tr><th scope="row">D<sub>u</sub>, D<sub>v</sub></th><td>Diffusion coefficients for the two species.</td><td>0.16, 0.08</td></tr>
+        <tr><th scope="row">L</th><td>Physical translation-cell side length.</td><td>256</td></tr>
+        <tr><th scope="row">T</th><td>Orbit period, solved along with the field, in model time units.</td><td>370.975586</td></tr>
+        <tr><th scope="row">N, M</th><td>N² spatial nodes; M saved phases per period. M does not set the integration timestep.</td><td>48, 128</td></tr>
+      </tbody>
+    </table>
+
+    <p><strong>Diffusion normalization.</strong> In the SymSim shader, DiffR and DiffG multiply unscaled neighbor differences; the corresponding coefficients in this implementation are D<sub>u</sub>/h² and D<sub>v</sub>/h². The example uses the five-point stencil. The optional SymSim nine-point weights (0.8 axial, 0.2 diagonal, −4 centre) have a leading continuum factor of 1.2. Matching continuum diffusion across these stencils requires dividing D by 1.2 in the nine-point version, or multiplying h by √1.2. Agreement in F and k alone is insufficient to reproduce a preset. <a class="citation" href="#source-1" aria-label="Source 1">[1]</a> <a class="citation" href="#source-3" aria-label="Source 3">[3]</a></p>
+
+    <p><strong>Periodic-orbit computation.</strong> For g96, the shooting equation is <span class="inline-math">Φ<sub>T/4</sub>(q₀) = q₀ ∘ R⁻¹</span>, where Φ denotes numerical Gray–Scott evolution. The unknowns are the initial field and T, with a phase condition fixing the time origin. Hopf-mode initial guesses and continuation generate candidates; GPU batching accelerates the independent trajectories required for Newton correction. SymSim presets provide additional possible initial guesses. The computed examples are concentration waves; a periodic U-skate glider has not been established. <a class="citation" href="#source-4" aria-label="Source 4">[4]</a></p>
+
+    <p><strong>Numerical verification.</strong> Independent, unprojected forward integration checks the return residual, the full trajectory, and every prescribed phase relation, followed by timestep refinement. The catalog additionally requires every rotation with nonzero time offset to exceed a prescribed same-time symmetry-error threshold in each concentration channel throughout interpolated playback. The results are numerical periodic orbits of the discretized equations, accepted within finite tolerances. They do not establish continuum existence, stability, or completeness. Failure of the search does not establish nonexistence. <a class="citation" href="#source-5" aria-label="Source 5">[5]</a></p>
+
+    <figure>
+      <video controls autoplay muted loop playsinline preload="metadata" aria-label="The g96 periodic concentration wave" poster="../../transcripts/gray-scott-session/assets/poster.png">
+        <source src="../../transcripts/gray-scott-session/assets/scott-gray-g96-signal.mp4" type="video/mp4">
+        <a href="../../transcripts/gray-scott-session/assets/scott-gray-g96-signal.mp4">Download the example animation</a>
+      </video>
+      <figcaption>
+        <p>The illustrated g96 orbit has an independently measured return residual of approximately 5.3 × 10⁻⁹ RMS across u and v. Refining N from 24 to 48 at fixed L changes its period by approximately 1%. Discrete-orbit closure and spatial discretization error are therefore assessed separately. The eight-second playback represents T ≈ 370.98 model time units. <a class="citation" href="#source-6" aria-label="Source 6">[6]</a></p>
+        <p>The catalog organizes precomputed fields by symmetry, admitted parameter set, and solution. Palette, tiling, and playback speed affect only the presentation.</p>
+        <a class="button" href="../#g96?v=1&amp;pattern=saved%3Ag96-F0p00400000-k0p02000000-N48-M128&amp;palette=ember&amp;tiles=3&amp;speed=1&amp;generator=%CE%B1&amp;overlay=0&amp;phase=0.09786249999999419&amp;play=1">View the illustrated orbit →</a>
+      </figcaption>
+    </figure>
+  </article>
+
+  <footer aria-label="Sources and implementation">
+    <p><strong>Sources and implementation.</strong> Equations and parameter meanings were checked against SymSim and the implementation that produced the saved orbit.</p>
+    <ol>
+      <li id="source-1"><a href="https://bulatov.org/symsim/240103_JMM/index.html#(1)">SymSim: Creating Symmetry Using Dynamics on Orbifolds</a> (JMM 2024); <a href="https://github.com/vbulatov2011/symhub/blob/37e3520df40ba0ef38e2c916090790b9bbaec3dc/apps/symsim/gray_scott/js/shaders/grayScottShader.glsl.mjs#L59-L89">Gray–Scott shader and diffusion weights</a>.</li>
+      <li id="source-2"><a href="https://github.com/yaroslavvb/animated-groups-fable/blob/48f751da77a01413bad466851e8bdf4ef4189b62/docs/scott-gray/SOLVER.md">Space–time constraints and directed generator conventions</a>; <a href="../p6/CHARACTERS.md">632 characters</a>.</li>
+      <li id="source-3"><a href="https://github.com/yaroslavvb/animated-groups-fable/blob/48f751da77a01413bad466851e8bdf4ef4189b62/docs/scott-gray/dynamics.mjs#L13-L25">Square-grid evolution</a>; <a href="../p6/EVIDENCE.md">triangular lattice and refinement</a>.</li>
+      <li id="source-4"><a href="../research/SEARCH.md">Shooting method, continuation and GPU batching</a>; <a href="../research/p6/README.md">632 search method</a>.</li>
+      <li id="source-5"><a href="https://github.com/yaroslavvb/animated-groups-fable/blob/48f751da77a01413bad466851e8bdf4ef4189b62/docs/scott-gray/solution-atlas.mjs">Independent orbit admission</a>; <a href="https://github.com/yaroslavvb/animated-groups-fable/blob/48f751da77a01413bad466851e8bdf4ef4189b62/docs/scott-gray/research/visible_time_symmetry.py">per-channel, whole-loop visibility criterion</a>.</li>
+      <li id="source-6"><a href="../data/orbits/g96-F0p00400000-k0p02000000-N48-M128.json">Example metadata and spatial refinement</a>; <a href="../data/precomputed-atlas.json">independently audited catalog</a>, record <code>saved:g96-F0p00400000-k0p02000000-N48-M128</code>.</li>
+    </ol>
+  </footer>
+</main>
+</body>
+</html>
