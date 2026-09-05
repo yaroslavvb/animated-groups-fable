@@ -1,4 +1,5 @@
 import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260904-visible-time';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260904-share-view';
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
 import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
 import {createWebGLGrayScott} from './webgl.mjs?v=20260904-precomputed';
@@ -19,7 +20,8 @@ const rememberedSelections=new Map(),thumbnailCache=new Map(),rangeCache=new Map
 let settingsRevision=0;
 let selectedParameterKey=null;
 let playing=false,phase=0,lastTime=0,selectedGenerator='α',attempts=[],displayRanges=null;
-const requestedGroup=/^#g9[4-9]$/.test(location.hash)?location.hash.slice(1):null;
+// Loading a field temporarily pauses the renderer, not the requested shared view.
+let pendingPlayback={phase:0,play:true};
 const main=$('pattern'),map=$('parameter-map');
 const numeric=['feed','kill','length','period','du','dv','iterations'];
 const range=()=>$('palette').value==='concentration'?displayRanges?.v:displayRanges?.u;
@@ -31,7 +33,18 @@ const summaryById=id=>saved?.get(id)??summaries(group.id).find(r=>r.id===id);
 const verifiedRecord=r=>!!r&&saved?.isVerified(r,group.id);
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){selectedGenerator=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();}
+function chooseGenerator(name){if(!group||!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===name))return;selectedGenerator=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();syncViewUrl();}
+function syncViewUrl(){
+  if(!group)return;
+  const hash=writeViewHash({groupId:group.id,patternId:selectedPatternId,palette:$('palette').value,tiles:+$('tiles').value,speed:+$('speed').value,generator:selectedGenerator,overlay:$('show-generators').checked,phase:record?phase:pendingPlayback.phase,play:record?playing:pendingPlayback.play});
+  if(location.hash!==hash)history.replaceState(null,'',hash);
+}
+function restoreView(defaultGroup){
+  const view=readViewState(location.hash);
+  $('palette').value=view.palette;$('tiles').value=view.tiles;$('speed').value=view.speed;$('show-generators').checked=view.overlay;
+  chooseGroup(groups.some(g=>g.id===view.groupId)?view.groupId:defaultGroup,{view});
+}
+function togglePlayback(){if(!record)return;setPlaying(!playing);syncViewUrl();}
 function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
 
 function fieldRanges(r){if(r.ranges)return r.ranges;if(rangeCache.has(r.id))return rangeCache.get(r.id);const ranges=[[Infinity,-Infinity],[Infinity,-Infinity]],S=r.config.N*r.config.N;for(let t=0;t<r.config.M;t++)for(let c=0;c<2;c++)for(let i=0;i<S;i++){const v=r.field[t*2*S+c*S+i];ranges[c][0]=Math.min(ranges[c][0],v);ranges[c][1]=Math.max(ranges[c][1],v);}const result={u:ranges[0],v:ranges[1]};rangeCache.set(r.id,result);return result;}
@@ -120,13 +133,27 @@ function drawComparison(){
   }
   $('comparison-error').textContent=`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*c.N*c.N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*c.N*c.N)))} RMS.`;
 }
+function useCpuPlayback(){
+  displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;$('engine-label').textContent='CPU playback';
+}
 function draw(){
-  if(record){const options={tiles:+$('tiles').value,palette:$('palette').value,range:range()};if(displayEngine){const c=record.config,stride=2*c.N*c.N,ft=phase*c.M,t=Math.floor(ft),a=ft-t,current=new Float32Array(stride);for(let i=0;i<stride;i++)current[i]=(1-a)*record.field[t*stride+i]+a*record.field[mod(t+1,c.M)*stride+i];displayEngine.upload(current);displayEngine.render({width:768,height:768,...options});}else renderField(main,record.field,record.config.N,record.config.M,phase,options);$('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;}
+  if(record){
+    const options={tiles:+$('tiles').value,palette:$('palette').value,range:range()};
+    if(displayEngine){
+      try{
+        const c=record.config,stride=2*c.N*c.N,ft=phase*c.M,t=Math.floor(ft),a=ft-t,current=new Float32Array(stride);
+        for(let i=0;i<stride;i++)current[i]=(1-a)*record.field[t*stride+i]+a*record.field[mod(t+1,c.M)*stride+i];
+        displayEngine.upload(current);displayEngine.render({width:768,height:768,...options});
+      }catch{useCpuPlayback();} // Context loss can precede its browser event.
+    }
+    if(!displayEngine)renderField(main,record.field,record.config.N,record.config.M,phase,options);
+    $('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;
+  }
   else{clearCanvas(main);$('phase-label').textContent='—';}
   drawComparison();
 }
 function animate(now){
-  if(playing&&record){phase=mod(phase+(now-lastTime)/8000*+$('speed').value);draw();}
+  if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}
   lastTime=now;requestAnimationFrame(animate);
 }
 function updateGroupCounts(){
@@ -174,27 +201,28 @@ function selectPattern(id){
   if(busy)return;const summary=summaries(group.id).find(r=>r.id===id);
   if(summary&&parameterKey(summary.config)===selectedParameterKey){openPattern(id);if(matchMedia('(max-width:720px)').matches)document.querySelector('.viewer').scrollIntoView({behavior:'smooth',block:'start'});}
 }
-async function openPattern(id,{updateSearch=true}={}){
+async function openPattern(id,{updateSearch=true,playback={phase:0,play:true}}={}){
   const summary=summaryById(id);if(!summary||summary.config.groupId!==group.id)return;
   const token=++selectionToken,targetGroup=group.id,revision=settingsRevision;
   selectedPatternId=id;selectedParameterKey=parameterKey(summary.config);
+  pendingPlayback={...playback};
   rememberedSelections.set(targetGroup,{key:selectedParameterKey,id});
-  emptyViewer({loading:true});populateAtlas();setStatus('Loading the selected precomputed animation…');
+  emptyViewer({loading:true});populateAtlas();syncViewUrl();setStatus('Loading the selected precomputed animation…');
   try{
     const loaded=await saved.load(id);
     if(token!==selectionToken||group.id!==targetGroup)return;
-    selectRecord(loaded,{updateSearch:updateSearch&&settingsRevision===revision});setStatus(saved.isVerified(loaded)?'Precomputed animation ready. Parameters and orbit verification were calculated offline.':'Verified animation ready.');
+    selectRecord(loaded,{updateSearch:updateSearch&&settingsRevision===revision,playback:pendingPlayback});setStatus(saved.isVerified(loaded)?'Precomputed animation ready. Parameters and orbit verification were calculated offline.':'Verified animation ready.');
   }catch(error){
     if(token!==selectionToken||group.id!==targetGroup)return;
     emptyViewer({error:error.message});setStatus('Could not load this saved animation: '+error.message);
   }
 }
-function selectRecord(r,{updateSearch=true}={}){
+function selectRecord(r,{updateSearch=true,playback={phase:0,play:true}}={}){
   if(!verifiedRecord(r))return;
   selectionToken++;selectedPatternId=r.id;
   selectedParameterKey=parameterKey(r.config);rememberedSelections.set(group.id,{key:selectedParameterKey,id:r.id});
-  displayEngine?.dispose();displayEngine=null;record=r;displayRanges=fieldRanges(r);phase=0;setPlaying(false);
-  try{displayEngine=createWebGLGrayScott({canvas:$('gpu-pattern'),N:r.config.N,initial:Float64Array.from(r.field.slice(0,2*r.config.N*r.config.N)),params:r.config.params,onContextLost:()=>{setPlaying(false);displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;draw();}});}catch{}
+  displayEngine?.dispose();displayEngine=null;record=r;displayRanges=fieldRanges(r);phase=playback.phase;lastTime=performance.now();setPlaying(playback.play);
+  try{displayEngine=createWebGLGrayScott({canvas:$('gpu-pattern'),N:r.config.N,initial:Float64Array.from(r.field.slice(0,2*r.config.N*r.config.N)),params:r.config.params,onContextLost:()=>{useCpuPlayback();draw();}});}catch{}
   $('gpu-pattern').hidden=!displayEngine;main.hidden=!!displayEngine;if(updateSearch){setControls(r.config);$('seed').value='continue';}
   $('solution').value=r.id;$('empty-state').hidden=true;$('mode-label').textContent=referenceGroup()?'Spatial reference · zero time offset':'Verified visible time symmetry';
   $('engine-label').textContent=`${displayEngine?'WebGL playback':'CPU playback'} · ${r.config.N}² × ${r.config.M} · T ${r.config.period.toFixed(2)}`;
@@ -210,18 +238,23 @@ function emptyViewer({loading=false,error=null}={}){
   $('caption').textContent=loading?'Loading the saved concentration field; no numerical search runs during browsing.':'The markers describe the requested rotation and phase shift.';
   metrics(null);colorScale();draw();controls();
 }
-function chooseGroup(id){
-  cancel();group=groups.find(g=>g.id===id)||groups[0];history.replaceState(null,'','#'+group.id);
-  selectedParameterKey=rememberedSelections.get(group.id)?.key??null;selectedPatternId=rememberedSelections.get(group.id)?.id??null;
+function chooseGroup(id,{view=null}={}){
+  cancel();group=groups.find(g=>g.id===id)||groups[0];
+  // A shared link takes precedence over this tab's remembered selections.
+  const remembered=view?null:rememberedSelections.get(group.id);
+  const requested=summaries(group.id).find(r=>r.id===(view?.patternId??remembered?.id));
+  selectedPatternId=requested?.id??null;selectedParameterKey=requested?parameterKey(requested.config):null;
   for(const b of $('groups').children)b.setAttribute('aria-pressed',b.dataset.id===group.id);
   const d=GROUP_DISPLAY[group.id];$('selected-id').textContent=group.id+(referenceGroup()?' / SPATIAL REFERENCE':' / CYCLIC COLOR GROUP');$('policy-label').textContent=referenceGroup()?'Spatial reference · all offsets zero':'Visible time-symmetric solutions';$('selected-title').innerHTML=d.shortHTML;$('group-label').textContent=group.id+' · '+d.shortText;
   const phases=d.namedGenerators.map(g=>`${g.name}: ${g.timeShift}T`).join(' · ');
   $('selected-description').textContent=phases+(referenceGroup()?'. Every generator is a spatial symmetry at each time.':'. These phase shifts act on both chemical concentrations.');
   $('reference-link').href='../correspondence-p4.html#'+group.id;
   $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · +${g.timeShift} T`;$('operation').append(o);}
-  selectedGenerator=rememberedGenerators.get(group.id)??d.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??d.namedGenerators[0].name;$('operation').value=selectedGenerator;overlay();populateAtlas();
-  const available=summaries(group.id),first=available.find(r=>r.id===rememberedSelections.get(group.id)?.id)??parameterSets()[0]?.patterns[0];
-  renderAttempts();if(first)openPattern(first.id);else{emptyViewer();setStatus('No precomputed orbit is available for this group.');}
+  const requestedGenerator=view?view.generator:rememberedGenerators.get(group.id);
+  selectedGenerator=d.namedGenerators.find(g=>g.name===requestedGenerator)?.name??d.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??d.namedGenerators[0].name;
+  rememberedGenerators.set(group.id,selectedGenerator);$('operation').value=selectedGenerator;overlay();populateAtlas();
+  const first=requested??parameterSets()[0]?.patterns[0];
+  renderAttempts();if(first)openPattern(first.id,{playback:view?{phase:view.phase,play:view.play}:{phase:0,play:true}});else{pendingPlayback={phase:0,play:true};emptyViewer();syncViewUrl();setStatus('No precomputed orbit is available for this group.');}
 }
 function mapBounds(){
   const records=summaries(group.id),bounds={};
@@ -345,10 +378,11 @@ for(const id of numeric)$(id).addEventListener('input',()=>{$('preset').value='c
 for(const id of ['resolution','frames','stencil','seed'])$(id).addEventListener('change',()=>{settingsRevision++;});
 $('search').onclick=()=>search(false);$('scan').onclick=()=>search(true);
 $('stop').onclick=()=>{cancel('Search cancelled. No unverified candidate was added to the atlas.');if(!record&&selectedPatternId)openPattern(selectedPatternId,{updateSearch:false});};
-$('play').onclick=()=>setPlaying(!playing);$('rewind').onclick=()=>{phase=0;draw();};
-$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw();};
-for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=()=>setPlaying(!playing);canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}};}
-$('tiles').onchange=()=>{overlay();draw();};$('palette').onchange=()=>{colorScale();populatePatterns(parameterSets().find(set=>set.key===selectedParameterKey));controls();draw();};$('show-generators').onchange=overlay;
+$('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw();syncViewUrl();};
+$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw();syncViewUrl();};
+for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=togglePlayback;canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();togglePlayback();}};}
+$('tiles').onchange=()=>{overlay();draw();syncViewUrl();};$('palette').onchange=()=>{colorScale();populatePatterns(parameterSets().find(set=>set.key===selectedParameterKey));controls();draw();syncViewUrl();};$('show-generators').onchange=()=>{overlay();syncViewUrl();};
+$('speed').onchange=syncViewUrl;
 $('operation').onchange=()=>chooseGenerator($('operation').value);
 $('export').onclick=()=>{
   if(!record)return;
@@ -365,8 +399,9 @@ try{
   for(const b of $('groups').children)b.onclick=()=>chooseGroup(b.dataset.id);
   for(const p of PROFILES){const o=document.createElement('option');o.value=p.id;o.textContent=p.name;$('preset').append(o);}$('preset').value='u-skate';
   $('feasibility-rows').innerHTML=groups.map(g=>`<tr><td>${g.id} · ${GROUP_DISPLAY[g.id].shortHTML}</td><td>${DESCRIPTIONS[g.id][4]}</td><td>${DESCRIPTIONS[g.id][3]}</td><td id="feasibility-${g.id}">Compatible; existence unresolved</td></tr>`).join('');
-  chooseGroup(requestedGroup??manifest.preferredGroup??'g95');
-  window.addEventListener('hashchange',()=>{if(/^#g9[4-9]$/.test(location.hash))chooseGroup(location.hash.slice(1));});requestAnimationFrame(animate);
+  const defaultGroup=manifest.preferredGroup??'g95';
+  restoreView(defaultGroup);
+  window.addEventListener('hashchange',()=>restoreView(defaultGroup));requestAnimationFrame(animate);
 
 
 }catch(e){emptyViewer({error:e.message});setStatus(e.message);console.error(e);}

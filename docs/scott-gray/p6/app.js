@@ -1,3 +1,4 @@
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260904-share-view';
 import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260904-visible-time';
 import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260904-visible-time';
 import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260904-p6';
@@ -9,9 +10,21 @@ const palette=()=>$('palette').value,tiles=()=>+$('tiles').value;
 const parameterKey=config=>JSON.stringify([config.params.F,config.params.k,config.params.Du,config.params.Dv,config.L??config.N*config.params.dx,config.params.stencil]);
 let groups=[],catalog=null,group=null,record=null,player=null,selectedId=null,selectedKey=null,preferredParameters=null,generatorName='α',selectionToken=0,phase=0,playing=false,lastTime=0,lastComparison=-Infinity;
 const remembered=new Map(),rememberedGenerators=new Map();
+let defaultGroupId='g243',requestedPlayback={phase:0,play:true};
+function syncUrl(){
+  if(!group)return;
+  const playback=record?{phase,play:playing}:requestedPlayback;
+  history.replaceState(null,'',writeViewHash({groupId:group.id,patternId:selectedId,palette:palette(),tiles:tiles(),speed:+$('speed').value,generator:generatorName,overlay:$('show-generators').checked,...playback}));
+}
+function restoreUrl(){
+  const view=readViewState(location.hash);
+  $('palette').value=view.palette;$('tiles').value=String(view.tiles);$('speed').value=String(view.speed);$('show-generators').checked=view.overlay;
+  chooseGroup(view.groupId??defaultGroupId,{view});
+}
+function togglePlayback(){if(!record)return;setPlaying(!playing);syncUrl();}
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){generatorName=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();}
+function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name))return;generatorName=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();syncUrl();}
 function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
 const entries=()=>catalog?.summaries(group?.id)??[];
 const generator=()=>group?.namedGenerators.find(item=>item.name===generatorName);
@@ -108,28 +121,35 @@ function populate(){
   $('parameter-values').textContent=set?`F ${number(set.config.params.F)} · k ${number(set.config.params.k)} · Dᵤ ${number(set.config.params.Du)} · Dᵥ ${number(set.config.params.Dv)} · L ${number(set.config.L??set.config.N*set.config.params.dx)} · triangular lattice`:'No precomputed verified parameters for this group.';
   populatePatterns(set);drawMap();controls();
 }
-async function openPattern(id){
+async function openPattern(id,{playback={phase:0,play:true}}={}){
   const summary=catalog?.get(id);if(!summary||summary.groupId!==group.id)return;
-  const token=++selectionToken,targetGroup=group.id;selectedId=id;selectedKey=parameterKey(summary.config);remembered.set(targetGroup,id);empty({loading:true});populate();$('status').textContent='Loading the selected precomputed animation…';
+  const token=++selectionToken,targetGroup=group.id;selectedId=id;selectedKey=parameterKey(summary.config);remembered.set(targetGroup,id);
+  // Loading clears the renderer, but must not replace the requested shared phase/play state.
+  requestedPlayback={...playback};empty({loading:true});populate();syncUrl();$('status').textContent='Loading the selected precomputed animation…';
   try{
     const loaded=await catalog.load(id);if(token!==selectionToken||group.id!==targetGroup)return;
-    if(!catalog.isVerified(loaded,targetGroup))throw Error('The saved orbit does not belong to this verified catalog.');record=loaded;
+    if(!catalog.isVerified(loaded,targetGroup))throw Error('The saved orbit does not belong to this verified catalog.');record=loaded;phase=requestedPlayback.phase;
     try{player=createPlayer($('gpu-pattern'),record,{onContextLost:()=>{player?.dispose();player=null;$('gpu-pattern').hidden=true;$('pattern').hidden=false;$('engine-label').textContent='CPU playback';draw(true);}});}catch{player=null;}
     $('gpu-pattern').hidden=!player;$('pattern').hidden=!!player;$('empty-state').hidden=true;$('mode-label').textContent=referenceGroup()?'Spatial reference · zero time offset':'Verified visible time symmetry';
     $('engine-label').textContent=`${player?'WebGL':'CPU'} playback · ${record.config.N}² × ${record.config.M} · T ${record.config.period.toFixed(2)}`;
     $('caption').textContent=record.description||'Independent numerical verification was completed before this field was published.';
     $('visibility-explanation').textContent=visibilityCaption(record);
-    $('status').textContent='Precomputed animation ready. The downloaded field passed its file-integrity check.';setMetrics(record.diagnostics);updateScale();populate();draw(true);setPlaying(!matchMedia('(prefers-reduced-motion: reduce)').matches);
+    $('status').textContent='Precomputed animation ready. The downloaded field passed its file-integrity check.';setMetrics(record.diagnostics);updateScale();populate();draw(true);lastTime=performance.now();setPlaying(requestedPlayback.play);
   }catch(error){if(token!==selectionToken||group.id!==targetGroup)return;empty({error:error.message});$('status').textContent=`Could not load this animation: ${error.message}`;}
 }
-function chooseGroup(id){
-  selectionToken++;group=groups.find(item=>item.id===id)??groups[0];if(!group)return;history.replaceState(null,'','#'+group.id);
+function chooseGroup(id,{view=null}={}){
+  selectionToken++;group=groups.find(item=>item.id===id)??groups.find(item=>item.id===defaultGroupId)??groups[0];if(!group)return;
   const preferred=preferredParameters&&entries().find(entry=>entry.config.params.F===preferredParameters.F&&entry.config.params.k===preferredParameters.k);
-  generatorName=rememberedGenerators.get(group.id)??group.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??group.namedGenerators[0].name;selectedId=remembered.get(group.id)??parameterSets()[0]?.patterns[0]?.id??preferred?.id??null;selectedKey=selectedId?parameterKey(catalog.get(selectedId).config):null;
+  const defaultGenerator=group.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??group.namedGenerators[0].name;
+  const requestedGenerator=view?view.generator:rememberedGenerators.get(group.id);
+  generatorName=group.namedGenerators.some(item=>item.name===requestedGenerator)?requestedGenerator:defaultGenerator;
+  const requestedId=view?view.patternId:remembered.get(group.id),requestedPattern=catalog.get(requestedId);
+  selectedId=requestedPattern?.groupId===group.id?requestedId:parameterSets()[0]?.patterns[0]?.id??preferred?.id??null;selectedKey=selectedId?parameterKey(catalog.get(selectedId).config):null;
+  const playback=view?{phase:view.phase,play:view.play}:{phase:0,play:true};
   $('group-label').textContent=group.id+' · 632';$('selected-id').textContent=group.id+(referenceGroup()?' / SPATIAL REFERENCE':' / CYCLIC COLOR GROUP');$('policy-label').textContent=referenceGroup()?'Spatial reference · all offsets zero':'Visible time-symmetric solutions';$('selected-title').innerHTML=group.shortHTML;
   $('selected-description').textContent=group.namedGenerators.map(g=>`${g.name}: ${g.timeShift} T`).join(' · ')+(referenceGroup()?'. Every generator is a spatial symmetry at each time.':'. Phase shifts act on both chemical concentrations.');$('reference-link').href='../../correspondence-p6.html#'+group.id;
   $('operation').replaceChildren();for(const named of group.namedGenerators){const option=document.createElement('option');option.value=named.name;option.textContent=`${named.name} · +${named.timeShift} T`;$('operation').append(option);}
-  $('operation').value=generatorName;overlay();populate();if(selectedId)openPattern(selectedId);else{empty();$('status').textContent='No precomputed orbit has passed verification for this group yet.';}
+  $('operation').value=generatorName;overlay();populate();if(selectedId)openPattern(selectedId,{playback});else{requestedPlayback=playback;empty();syncUrl();$('status').textContent='No precomputed orbit has passed verification for this group yet.';}
 }
 function mapBounds(){const sets=parameterSets(),bounds={};for(const [axis,minimum] of [['F',.00002],['k',.00002]]){const values=sets.map(set=>set.config.params[axis]);if(!values.length){bounds[axis]=[0,axis==='F'?.02:.08];continue;}const lo=Math.min(...values),hi=Math.max(...values),padding=Math.max(minimum,.2*(hi-lo));bounds[axis]=[Math.max(0,lo-padding),hi+padding];}return bounds;}
 function drawMap(){
@@ -144,15 +164,15 @@ function selectPattern(id){openPattern(id);if(matchMedia('(max-width:720px)').ma
 $('parameter-map').onclick=event=>{if(!catalog||!group)return;const canvas=$('parameter-map'),rect=canvas.getBoundingClientRect(),x=(event.clientX-rect.left)*canvas.width/rect.width,y=(event.clientY-rect.top)*canvas.height/rect.height,bounds=mapBounds(),scales={F:bounds.F[1]-bounds.F[0],k:bounds.k[1]-bounds.k[0]},point={F:bounds.F[0]+Math.max(0,Math.min(1,(x-80)/(canvas.width-100)))*scales.F,k:bounds.k[0]+Math.max(0,Math.min(1,1-(y-20)/(canvas.height-60)))*scales.k},sets=parameterSets(),distance=set=>((set.config.params.F-point.F)/scales.F)**2+((set.config.params.k-point.k)/scales.k)**2;sets.sort((a,b)=>distance(a)-distance(b)||Number(b.key===selectedKey)-Number(a.key===selectedKey));if(sets.length)selectParameters(sets[0].key);};
 $('parameter-map').onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectParameters(selectedKey);}};
 $('parameter-set').onchange=()=>selectParameters($('parameter-set').value);$('solution').onchange=()=>selectPattern($('solution').value);
-$('play').onclick=()=>setPlaying(!playing);$('rewind').onclick=()=>{phase=0;draw(true);};$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw(true);};
-for(const id of ['pattern','gpu-pattern']){$(id).onclick=()=>setPlaying(!playing);$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();setPlaying(!playing);}};}
-$('tiles').onchange=()=>{overlay();draw(true);};$('palette').onchange=()=>{updateScale();populatePatterns(parameterSets().find(set=>set.key===selectedKey));draw(true);};$('show-generators').onchange=overlay;$('operation').onchange=()=>chooseGenerator($('operation').value);
+$('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw(true);syncUrl();};$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw(true);syncUrl();};
+for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}
+$('tiles').onchange=()=>{overlay();draw(true);syncUrl();};$('palette').onchange=()=>{updateScale();populatePatterns(parameterSets().find(set=>set.key===selectedKey));draw(true);syncUrl();};$('show-generators').onchange=()=>{overlay();syncUrl();};$('operation').onchange=()=>chooseGenerator($('operation').value);$('speed').onchange=syncUrl;
 $('export').onclick=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify({schema:'scott-gray-verified-orbit-v3',family:'p6',...record,layout:'frame-major; planar U then V; triangular lattice coordinates; x-fast'})],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-632-${group.id}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-function animate(now){if(playing&&record){phase=mod(phase+Math.min(now-lastTime,100)/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
+function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 try{
   const [groupResponse,manifestResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'})]);if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
   for(const item of groups){const button=document.createElement('button');button.className='group';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');const symbol=document.createElement('strong');symbol.innerHTML=item.shortHTML;const label=document.createElement('span');label.textContent=item.id;const count=document.createElement('small');count.className='orbit-count';label.append(count);button.append(symbol,label);button.onclick=()=>chooseGroup(item.id);$('groups').append(button);}
   if(!manifestResponse.ok)throw Error('The precomputed 632 catalog could not load.');const manifest=await manifestResponse.json();if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');catalog=createPrecomputedCatalog(manifest,{groups,family:'p6'});preferredParameters=manifest.preferredParameters??null;
-  chooseGroup(/^#g24[3-8]$/.test(location.hash)?location.hash.slice(1):manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243');
-  window.addEventListener('hashchange',()=>{if(/^#g24[3-8]$/.test(location.hash))chooseGroup(location.hash.slice(1));});requestAnimationFrame(animate);
+  defaultGroupId=manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243';restoreUrl();
+  window.addEventListener('hashchange',restoreUrl);requestAnimationFrame(animate);
 }catch(error){empty({error:error.message});$('solution-count').textContent='Catalog unavailable';$('status').textContent=error.message;console.error(error);}
