@@ -4,7 +4,7 @@
     "N": 48,
     "M": 192,
     "period": 330.513814354525,
-    "L": 256.0,
+    "L": 256,
     "groupId": "g243",
     "ops": [
       {
@@ -19,11 +19,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -37,11 +37,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -55,11 +55,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -73,11 +73,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -91,11 +91,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -109,11 +109,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       }
     ],
     "params": {
@@ -144,10 +144,10 @@
     "spatialRefinement": {
       "coarseGrid": 24,
       "fineGrid": 48,
-      "physicalSide": 256.0,
+      "physicalSide": 256,
       "coarsePeriod": 330.4951685207554,
       "finePeriod": 330.513814354525,
-      "relativePeriodDifference": 5.64178709572444e-05,
+      "relativePeriodDifference": 0.0000564178709572444,
       "fieldRmsDifference": 0.0002077743309180274,
       "fieldMaxDifference": 0.0012483334453154693,
       "relativeToCoarseTemporalRms": 0.012209086530936733,
@@ -155,5 +155,21 @@
     },
     "projection": "None: the exported movie is direct RK4 evolution, followed only by an optional exact lattice reflection and Float32 quantization.",
     "note": "Finite-grid numerical evidence; no continuum existence theorem or glider morphology is asserted."
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": true,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.182816046122477e-9,
+    "operations": [],
+    "reasons": [],
+    "minimumRelativeColorRange": null,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

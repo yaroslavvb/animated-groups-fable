@@ -1,0 +1,3181 @@
+{
+  "schema": "scott-gray-p6-gpu-search-grid-v1",
+  "purpose": "Bounded corrections of explicit mixed-star and wavelength candidates. Numerical convergence is not catalog admission; every admitted field passes separate full-PDE and visible-offset checks.",
+  "allocationDollars": 15,
+  "phaseNotation": "Charge q means the combined space-time operation (x,t) -> (R60 x,t+qT/6) leaves the field invariant, modulo one cycle.",
+  "sourceHashScope": "SHA-256 of exact submitted metadata bytes followed by exact submitted Float64 initial-state bytes. Neither private paths nor payload buffers are published.",
+  "runs": [
+    {
+      "batch": 1,
+      "appId": "ap-ErDaZaDa14GNMzefglsStA",
+      "observedState": "stopped",
+      "jobCount": 2,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 300,
+      "startupTimeoutSeconds": 300,
+      "jobs": [
+        {
+          "name": "q2-w21-L512-f406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 2,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 333.44599703614836,
+          "inputMetadataAndInitialSha256": "9f89266988ced5b6b641306437ba40aa8fc27027e76279b83fba552339af10cc",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 89.532377673,
+            "shootingRms": 4.303659352675291e-13,
+            "independentCpuTwistedRms": 4.306884320406631e-13,
+            "gpuCpuFlowMaxDifference": 4.163336342344337e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-w21-L512-f406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 3,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 0,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 333.7235439380571,
+          "inputMetadataAndInitialSha256": "d012dc37eb7839703f8e4257fe4e956e73b0632298f09b055b119dadcb67bd6e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 44.162757032,
+            "shootingRms": 2.510906877770059e-15,
+            "independentCpuTwistedRms": 4.2760304586445137e-14,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 99.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 202.0
+    },
+    {
+      "batch": 2,
+      "appId": "ap-NuW80JqHgTE24pKhnNjhuu",
+      "observedState": "stopped",
+      "jobCount": 6,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 300,
+      "startupTimeoutSeconds": 300,
+      "jobs": [
+        {
+          "name": "root-q0-w41-mix0-F00406",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 330.03321766795545,
+          "inputMetadataAndInitialSha256": "1628f4189a8d5416dab81c1a77e3b0d9f8e08f2662575a6fffb7b06c5f46b5a2",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.827435807,
+            "shootingRms": 7.429456875775892e-14,
+            "independentCpuTwistedRms": 7.039152874452325e-13,
+            "gpuCpuFlowMaxDifference": 7.216449660063518e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "root-q0-w41-mix2-F00406",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 2.0,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 331.020368104067,
+          "inputMetadataAndInitialSha256": "3dec623bfadc0351176da38996a45f8849a1b8c3dd76d1dca6359f3e0eed2b95",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 8.764260400000001,
+            "shootingRms": 0.00044625642410808347,
+            "independentCpuTwistedRms": 0.00044766048725649547,
+            "gpuCpuFlowMaxDifference": 1.1379786002407855e-15,
+            "failureType": null
+          }
+        },
+        {
+          "name": "root-q3-w41-mix3-F00406",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 330.9018513208321,
+          "inputMetadataAndInitialSha256": "bcb6ccacd04c02094b4256651e71db21d01a128314c16797dcde6819d627a757",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 14.284627589,
+            "shootingRms": 9.951007923290831e-05,
+            "independentCpuTwistedRms": 9.96711968781806e-05,
+            "gpuCpuFlowMaxDifference": 5.273559366969494e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q0-w41-mix1-mirror0-L768-f4068-n24",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 0,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 331.03792574605063,
+          "inputMetadataAndInitialSha256": "e52569941fcd3f4b77fe707ff94b3ee239b7dac8c37222be751f9695e8b8dcac",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 2.6305908170000016,
+            "shootingRms": 2.388331054432724e-12,
+            "independentCpuTwistedRms": 2.6128458851960857e-12,
+            "gpuCpuFlowMaxDifference": 4.163336342344337e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q3-w41-mix1-mirror0-L768-f4068-n24",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 0,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 330.89947320702953,
+          "inputMetadataAndInitialSha256": "352bac861ef33d3bb0262a112334bc6fe2b4c073cf353f721d5fb68ffd02bb4e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 7.881026094000003,
+            "shootingRms": 6.459083151926551e-13,
+            "independentCpuTwistedRms": 6.238205696325397e-13,
+            "gpuCpuFlowMaxDifference": 6.938893903907228e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q3-w21-mix-1-mirror1-L768-f4068-n24",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 1,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 332.0655580452901,
+          "inputMetadataAndInitialSha256": "191595f7a1d144bd0e9470504e3586223fae1b644b843e686aaf9eaef6237ddf",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 10.297245744000005,
+            "shootingRms": 4.532324895827345e-05,
+            "independentCpuTwistedRms": 4.3834943088974056e-05,
+            "gpuCpuFlowMaxDifference": 4.996003610813204e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 42.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 88.0
+    },
+    {
+      "batch": 3,
+      "appId": "ap-HgX7vglCR0zAunl5fJQxLV",
+      "observedState": "stopped",
+      "jobCount": 6,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 300,
+      "startupTimeoutSeconds": 300,
+      "jobs": [
+        {
+          "name": "root-q0-w41-mix0-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 329.129339691515,
+          "inputMetadataAndInitialSha256": "fdba1dfe293babe010b93241c66c21bfad8b169eaa65f6b8bc64d9d44525b98e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 30.199720987000003,
+            "shootingRms": 4.535830884938728e-12,
+            "independentCpuTwistedRms": 4.831386761676771e-12,
+            "gpuCpuFlowMaxDifference": 5.273559366969494e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "root-q0-w41-mix2-F00406-hopf-predictor",
+          "parameters": {
+            "F": 0.0040560761832916,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 2.0,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 331.020368104067,
+          "inputMetadataAndInitialSha256": "b03edebab59a241d39efb3b7c66985354de2cd7b06293b8196cc5e91279510a3",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 19.670228894999997,
+            "shootingRms": 4.1022178141861885e-07,
+            "independentCpuTwistedRms": 4.114929853527017e-07,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-15,
+            "failureType": null
+          }
+        },
+        {
+          "name": "root-q3-w41-mix3-F00406-hopf-predictor",
+          "parameters": {
+            "F": 0.0040560761832916,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 330.9018513208321,
+          "inputMetadataAndInitialSha256": "8501e58949a5a445e76dce877aa606182f858fcc38f1e00875da28da991ca13e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 12.076658213999998,
+            "shootingRms": 1.6929400179502178e-13,
+            "independentCpuTwistedRms": 1.732396675700732e-13,
+            "gpuCpuFlowMaxDifference": 4.996003610813204e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q0-w41-mix1-mirror0-L768-f4068-n24-n96",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0,
+          "mirrorAxis": 0,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 331.32357953720737,
+          "inputMetadataAndInitialSha256": "5ca1835f943f3c3d44c310b121e84933fed099adf45a312bbd851d2462c6f30b",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 15.207347863000003,
+            "shootingRms": 2.6750924360275937e-12,
+            "independentCpuTwistedRms": 2.9938480452055326e-12,
+            "gpuCpuFlowMaxDifference": 6.106226635438361e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q3-w41-mix1-mirror0-L768-f4068-n24-n96",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0,
+          "mirrorAxis": 0,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 331.4807115066693,
+          "inputMetadataAndInitialSha256": "099b14c21163edd447f2e8143c12dd57b1088e71f8c17d9f85265b6ff9b785d4",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 28.359188090000004,
+            "shootingRms": 6.721641408687071e-12,
+            "independentCpuTwistedRms": 6.628478410503883e-12,
+            "gpuCpuFlowMaxDifference": 4.718447854656915e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "local-q3-w21-mix-1-mirror1-L768-f4068-n24-hopf-predictor",
+          "parameters": {
+            "F": 0.004067547627742013,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 1,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 332.0655580452901,
+          "inputMetadataAndInitialSha256": "40ddd3de38422ce974080f24a29dc8d3622d034600677f0ee282968d554716b4",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 17.001929084000004,
+            "shootingRms": 6.457819615711295e-05,
+            "independentCpuTwistedRms": 6.275222263122992e-05,
+            "gpuCpuFlowMaxDifference": 3.885780586188048e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 89.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 182.0
+    },
+    {
+      "batch": 4,
+      "appId": "ap-D1642dJmAUFEdKhFC8gzBi",
+      "observedState": "stopped",
+      "jobCount": 2,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 300,
+      "startupTimeoutSeconds": 300,
+      "jobs": [
+        {
+          "name": "q3-woven-mirror-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0,
+          "mirrorAxis": 0,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 331.63214903150686,
+          "inputMetadataAndInitialSha256": "4651df3ec50b9f1829cececf5fa3656c4f3a3a18a7bc7dc37e8ce6f53db873ae",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 50.64898199,
+            "shootingRms": 2.0568224600123452e-14,
+            "independentCpuTwistedRms": 4.47947236341979e-14,
+            "gpuCpuFlowMaxDifference": 4.440892098500626e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-woven-complex-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 332.210863355561,
+          "inputMetadataAndInitialSha256": "b9101df8e569ab81425cc79d0278fe494a9616b39c349846602fc4e90a9f9b75",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 32.158775133,
+            "shootingRms": 1.7943358613759515e-07,
+            "independentCpuTwistedRms": 1.7972539487614042e-07,
+            "gpuCpuFlowMaxDifference": 5.551115123125783e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 60.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 124.0
+    },
+    {
+      "batch": 5,
+      "appId": "ap-aIddJI9KKZwzsdNRN6wUbu",
+      "observedState": "stopped",
+      "jobCount": 7,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q0-w21-mix0-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 332.0014389737411,
+          "inputMetadataAndInitialSha256": "576cd6def1ebdb38df54457a6dca9bdbdd2398eedd803b82e7eae70c963ea09d",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 11.717788793,
+            "shootingRms": 2.2985694755298655e-14,
+            "independentCpuTwistedRms": 1.9660192147127038e-12,
+            "gpuCpuFlowMaxDifference": 4.718447854656915e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w21-mix1-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 332.96141226204685,
+          "inputMetadataAndInitialSha256": "3f6b5d47b16571da261fa73b92c30fe0c31b08647ef8e65d3925e87cf2be5cd0",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 21.617863094999997,
+            "shootingRms": 6.37762729388461e-14,
+            "independentCpuTwistedRms": 1.2459449237060214e-12,
+            "gpuCpuFlowMaxDifference": 9.43689570931383e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w32-mix3-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.66274971886327,
+          "inputMetadataAndInitialSha256": "4c9b6ee0676935e24d86fd24f15754151c431040ae496c7703be946b92202130",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 8.169619251,
+            "shootingRms": 1.4698516596510946e-14,
+            "independentCpuTwistedRms": 1.1867008794211847e-12,
+            "gpuCpuFlowMaxDifference": 6.938893903907228e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w41-mix1-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 329.9730542687795,
+          "inputMetadataAndInitialSha256": "e3bbb6a6f0c50043d261073a4ff17f3c46723b9cd17f7158c24def5ec5183a98",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 11.108570849000003,
+            "shootingRms": 4.594612296528142e-12,
+            "independentCpuTwistedRms": 4.5631932569410695e-12,
+            "gpuCpuFlowMaxDifference": 9.71445146547012e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w32-mix1-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.8212779876893,
+          "inputMetadataAndInitialSha256": "4cb2fd41bfffb273fe0ad365fffbbb19baed15d8e68104497bfd979fd40d1962",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.561432758000002,
+            "shootingRms": 8.946819471424951e-13,
+            "independentCpuTwistedRms": 1.4962023936716172e-12,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-15,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w31-mix1-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.1595491063378,
+          "inputMetadataAndInitialSha256": "fa076cc000d7e876fb162b27584ef3c0c9514d7f3766986f066fb6a9be261c26",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 19.800441053,
+            "shootingRms": 1.991957353213452e-06,
+            "independentCpuTwistedRms": 1.9983939318321344e-06,
+            "gpuCpuFlowMaxDifference": 7.494005416219807e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q0-w41-mix3-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 0,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.0730813301571,
+          "inputMetadataAndInitialSha256": "302f7a276ddc04aa7495a3df0e3c32b26d2cefbba2f7f8ddfb51635153d0fb44",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 5.879492587999998,
+            "shootingRms": 5.136034111885342e-14,
+            "independentCpuTwistedRms": 8.43289877674025e-13,
+            "gpuCpuFlowMaxDifference": 6.106226635438361e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 69.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 142.0
+    },
+    {
+      "batch": 6,
+      "appId": "ap-1DPSwzqYnEVbZHHnHa5ohK",
+      "observedState": "stopped",
+      "jobCount": 5,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q2-w31-mix3-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.90046171867374,
+          "inputMetadataAndInitialSha256": "56a11b74552aade2979b048c3bb143a8741d878ac637f1271faa7b87b023754d",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 18.529971739999997,
+            "shootingRms": 1.4835557668157387e-12,
+            "independentCpuTwistedRms": 1.485284108021033e-12,
+            "gpuCpuFlowMaxDifference": 4.440892098500626e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w41-mix1-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 329.9811953284396,
+          "inputMetadataAndInitialSha256": "5c14cbd0618649c59657128f0254688eaca9b25ae567878f406832f3ff342de8",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 17.739086748,
+            "shootingRms": 1.5955037617535993e-12,
+            "independentCpuTwistedRms": 1.5973469262527847e-12,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w31-mix3-adaptive-F004068",
+          "parameters": {
+            "F": 0.004068,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.25,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 331.5311663728759,
+          "inputMetadataAndInitialSha256": "3412c12ec7d32be4c9615bc1deaddaff164ccf526565a1284c1c5e3c2d426970",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 48.1456182,
+            "shootingRms": 5.488291207858664e-07,
+            "independentCpuTwistedRms": 5.494121746296708e-07,
+            "gpuCpuFlowMaxDifference": 4.163336342344337e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-w32-mix0-adaptive-F004062",
+          "parameters": {
+            "F": 0.004062,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.36818902462414,
+          "inputMetadataAndInitialSha256": "242696813fe7bcceb1d4e18fd4f8483819844980396962d70c3c04993ea26792",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 33.361358640999995,
+            "shootingRms": 0.0009997511036781014,
+            "independentCpuTwistedRms": 0.0010011035193823962,
+            "gpuCpuFlowMaxDifference": 4.718447854656915e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-complex-L768-predicted-fine96",
+          "parameters": {
+            "F": 0.0040560761832916,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 192,
+          "inputPeriod": 332.210863355561,
+          "inputMetadataAndInitialSha256": "8d4ab7fdcb99807921c1f54ab176a53b894c20cc7388ff9d7d420180756fa06d",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 83.42427907300001,
+            "shootingRms": 2.6174017803838694e-12,
+            "independentCpuTwistedRms": 2.618062986515393e-12,
+            "gpuCpuFlowMaxDifference": 1.304512053934559e-15,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 160.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 324.0
+    },
+    {
+      "batch": 7,
+      "appId": "ap-yhwQNazX65CJemfoANK8IA",
+      "observedState": "stopped",
+      "jobCount": 5,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-mode2-L512-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 335.5515958281165,
+          "inputMetadataAndInitialSha256": "c2818009caf723e45df61e24aeaba1d084869ec398ca57987882072f7e2afc56",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 5.2930813279999995,
+            "shootingRms": 5.661856892029509e-14,
+            "independentCpuTwistedRms": 5.733338466337544e-14,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mode3-L512-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 330.636276708251,
+          "inputMetadataAndInitialSha256": "d09b5a1308f464a23de237f155951b3ffe2b033c4ae94ad54083449f3d822328",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 3.401756097,
+            "shootingRms": 2.9304272489350256e-13,
+            "independentCpuTwistedRms": 2.916941372664373e-13,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wave21-L512-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 192,
+          "inputPeriod": 333.6405713804245,
+          "inputMetadataAndInitialSha256": "0cabb2b965d281cc8181de525769528895a44921bc897ebf8d363647c9a0343f",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 15.081535292000002,
+            "shootingRms": 5.6027018880645474e-14,
+            "independentCpuTwistedRms": 5.58611127392922e-14,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w31-mix3-adaptive-F004062-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 334.2588672958861,
+          "inputMetadataAndInitialSha256": "1f8c4bddeffb814d89a15b8578a1c6a76cef9af11efa4d7404020c3232b46247",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 90.535529376,
+            "shootingRms": 9.73386916523404e-12,
+            "independentCpuTwistedRms": 9.732940539349923e-12,
+            "gpuCpuFlowMaxDifference": 4.996003610813204e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w41-mix1-adaptive-F004062-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 328.8915111609999,
+          "inputMetadataAndInitialSha256": "d753fab6f239ff0869a1e4bedbb20528a63273bebe4432f4e510bcbbf74cebcc",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 41.04616774499999,
+            "shootingRms": 1.6921659154859093e-12,
+            "independentCpuTwistedRms": 1.6918598162403737e-12,
+            "gpuCpuFlowMaxDifference": 3.0531133177191805e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 114.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 232.0
+    },
+    {
+      "batch": 8,
+      "appId": "ap-b7mu9l1IKCTFpxDlfYOAqg",
+      "observedState": "stopped",
+      "jobCount": 8,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-mode2-L512-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 335.8138690325392,
+          "inputMetadataAndInitialSha256": "b5ab8300b8ab9051ffa40bf78f9321f67b3f88894a84542501725164098b798a",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 42.77499995,
+            "shootingRms": 2.015452237664472e-13,
+            "independentCpuTwistedRms": 2.0219590428233167e-13,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mode3-L512-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 330.502393221829,
+          "inputMetadataAndInitialSha256": "d455300571b9cc3c7c59500c0989d29c6f17d28d8b8b34e353034b1fddd583cb",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 22.985797547,
+            "shootingRms": 1.2758811376105516e-13,
+            "independentCpuTwistedRms": 1.2591696497518505e-13,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wave21-L512-F00406-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 7.757575757575758,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 333.67907823410405,
+          "inputMetadataAndInitialSha256": "23931a8cb29d0890b3562858ac46bc6e988e3b2b015e52aa77b52fc7b0408d12",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 38.496711327999996,
+            "shootingRms": 6.458623422976345e-12,
+            "independentCpuTwistedRms": 6.459240586217133e-12,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w31-mix3-adaptive-F004062-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.5,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 335.20276796590963,
+          "inputMetadataAndInitialSha256": "db60820a1e562b3e2d0c81045e77963de8431f321bf6e55d519048bb27a159eb",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.0589377589999955,
+            "shootingRms": 3.812839171294042e-12,
+            "independentCpuTwistedRms": 3.816836401161886e-12,
+            "gpuCpuFlowMaxDifference": 4.440892098500626e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q2-w41-mix1-adaptive-F004062-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 2,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": -1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 329.5820802318709,
+          "inputMetadataAndInitialSha256": "b009c254b13db92c5102c058ccbc7c870068bd2fdb59f12bc975b4a536933e2e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 2.785716751999999,
+            "shootingRms": 2.103233794870844e-12,
+            "independentCpuTwistedRms": 2.0959843889437366e-12,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-mirror-L768-F004056076-n48",
+          "parameters": {
+            "F": 0.0040560761832916,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 16.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 0,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.56537787727325,
+          "inputMetadataAndInitialSha256": "95a78ff164420b38bb0695a42eeb8e498aecc22e85542435ae9e44c7af9ec4ad",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 3.3605731500000005,
+            "shootingRms": 3.160774640420942e-14,
+            "independentCpuTwistedRms": 4.994729155998983e-14,
+            "gpuCpuFlowMaxDifference": 4.163336342344337e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q3-mirror-L768-F004056076-n96",
+          "parameters": {
+            "F": 0.0040560761832916,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.0,
+            "stencil": "triangular-six",
+            "L": 768.0
+          },
+          "charge": 3,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 1.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": 0,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 333.8072553176636,
+          "inputMetadataAndInitialSha256": "e8c86fe4efaaf85b6482e00bc1f507fd0da02344420282aa18ebe40791afae91",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 42.24644593800001,
+            "shootingRms": 1.4148778168609404e-13,
+            "independentCpuTwistedRms": 1.4483764423202036e-13,
+            "gpuCpuFlowMaxDifference": 5.551115123125783e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mixed-fundamental-L512-f40693-n24",
+          "parameters": {
+            "F": 0.0040692980109045635,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 24,
+          "frames": 96,
+          "inputPeriod": 331.17251743437583,
+          "inputMetadataAndInitialSha256": "292580b0cf41649d66fbffb7fe5f6441b40096c11713a5d5e8ac02452bdd1840",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.563038735000006,
+            "shootingRms": 2.358780353638639e-14,
+            "independentCpuTwistedRms": 2.3272499770745197e-14,
+            "gpuCpuFlowMaxDifference": 8.326672684688674e-17,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 109.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 222.0
+    },
+    {
+      "batch": 9,
+      "appId": "ap-iX0rbPTPvllkENZxxNsGjP",
+      "observedState": "stopped",
+      "jobCount": 6,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-mixed-L512-F004069298-n48",
+          "parameters": {
+            "F": 0.0040692980109045635,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.8061096507716,
+          "inputMetadataAndInitialSha256": "7ccc2fe681d54e300ea439905def729c27b2bb7a97ae94401e06f8d7fd898a70",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 13.774771832999999,
+            "shootingRms": 5.886554994855516e-12,
+            "independentCpuTwistedRms": 5.887267982160353e-12,
+            "gpuCpuFlowMaxDifference": 3.0531133177191805e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mixed-L512-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.8061096507716,
+          "inputMetadataAndInitialSha256": "3642634726d7399d64f1713a29a34ef650cde5289fa6b0d71ff9a04a81e3bfc0",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 28.16874619,
+            "shootingRms": 1.9114288409806965e-14,
+            "independentCpuTwistedRms": 1.944940104534003e-14,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-mode3-shell1-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 334.6944139938563,
+          "inputMetadataAndInitialSha256": "417372e4cb0968d21d3c9196c69fd5e5da38f05d0261dcb067a62f31a98bcfe0",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 26.937744918,
+            "shootingRms": 5.257495675321972e-13,
+            "independentCpuTwistedRms": 5.25609441132994e-13,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-mode4-shell1-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 335.55159582764736,
+          "inputMetadataAndInitialSha256": "0774c8186cb1650f6c871b35af4598e6485b6892e10103c3ddba1b2d91404309",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 12.972455945999997,
+            "shootingRms": 5.6620194094588713e-14,
+            "independentCpuTwistedRms": 5.733870014565145e-14,
+            "gpuCpuFlowMaxDifference": 8.326672684688674e-17,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-mode5-shell1-n90",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 11.377777777777778,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            5,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 90,
+          "frames": 96,
+          "inputPeriod": 334.47717730563846,
+          "inputMetadataAndInitialSha256": "ecf5dfa1a7918e97a83119c2dad8923a48984390ce1e0b746d7018e3aaf5070f",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.252117468000002,
+            "shootingRms": 2.0161767899809992e-13,
+            "independentCpuTwistedRms": 2.0284173495589547e-13,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-mode6-shell1-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            6,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 330.6362767084645,
+          "inputMetadataAndInitialSha256": "7b6262c95af27dfe53f9c6aeb4cc51453b1c1e085486f4c9929350d9d2598a6b",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 5.545472865999997,
+            "shootingRms": 2.9298608919763665e-13,
+            "independentCpuTwistedRms": 2.9167246937556293e-13,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 59.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 122.0
+    },
+    {
+      "batch": 10,
+      "appId": "ap-4yeDFLweoqqTjkkQebsw5k",
+      "observedState": "stopped",
+      "jobCount": 8,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-mixed-L512-F00406-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 7.757575757575758,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 333.95472238370326,
+          "inputMetadataAndInitialSha256": "8ec27f6aef7a4a5344742a4b1df7cfc6e50ddcf69d5c3ec7af4ff39ed0d053fa",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 45.443174647999996,
+            "shootingRms": 4.9075903492600447e-14,
+            "independentCpuTwistedRms": 4.945077593487343e-14,
+            "gpuCpuFlowMaxDifference": 2.7755575615628914e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q27-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            3
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 334.4523242821983,
+          "inputMetadataAndInitialSha256": "2d811eec4607d0fffb85b89224b2ca73cd9a313cca99c943cb83bb0c9b1a999b",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 24.358667002,
+            "shootingRms": 3.9271686636160305e-13,
+            "independentCpuTwistedRms": 3.922678720110963e-13,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q12-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.8100220389971,
+          "inputMetadataAndInitialSha256": "8413228375131297fd8e74938bdc16103bbb5167ade4f7f5fcf8c9bf712fd6e2",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 2.864276542999999,
+            "shootingRms": 1.0954140211832518e-14,
+            "independentCpuTwistedRms": 1.1206456535857432e-14,
+            "gpuCpuFlowMaxDifference": 8.326672684688674e-17,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q9-n72",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 14.222222222222221,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 72,
+          "frames": 96,
+          "inputPeriod": 335.8529796408049,
+          "inputMetadataAndInitialSha256": "d8912c7db2d4c7a1e8f82b2dc77a82a0da346cddb91584e415443c409ed6a09e",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.2570355770000035,
+            "shootingRms": 8.171449182056971e-13,
+            "independentCpuTwistedRms": 8.174849534690993e-13,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q16-n72",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 14.222222222222221,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 72,
+          "frames": 96,
+          "inputPeriod": 335.8138690325341,
+          "inputMetadataAndInitialSha256": "0332328b09f091e2b7f55163ab762b955df6fd4fd0086f90c0f2d01704682e13",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 3.8428033819999996,
+            "shootingRms": 6.993195956460289e-13,
+            "independentCpuTwistedRms": 7.003099937017032e-13,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mixed-L1024-seed-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.95472238370326,
+          "inputMetadataAndInitialSha256": "3a2e24ccb81a62dd5ee3e727e42dfad77e1f9b978c6451407c81d3c1c1ae95fb",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 96.41384453,
+            "shootingRms": 0.00020138949453938728,
+            "independentCpuTwistedRms": 0.00020141134551248692,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mixed-L1024-perturb31-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.95472238370326,
+          "inputMetadataAndInitialSha256": "7738be8060579617147c4126c05d2b271ec559aab5b35ee972dfe420267bb777",
+          "initialPerturbation": {
+            "wavevector": [
+              3,
+              1
+            ],
+            "rms": 0.004,
+            "purpose": "Nonlinear branch search; correction uses unmodified PDE."
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 94.005015025,
+            "shootingRms": 0.0019172855322860142,
+            "independentCpuTwistedRms": 0.0019174935597946231,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-mixed-L1024-perturb32-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 333.95472238370326,
+          "inputMetadataAndInitialSha256": "0ccca9b1ce80dca558d52e1d732e3a49a4525d3acf59541e1f0b25cfd9935751",
+          "initialPerturbation": {
+            "wavevector": [
+              3,
+              2
+            ],
+            "rms": 0.004,
+            "purpose": "Nonlinear branch search; correction uses unmodified PDE."
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 95.705168163,
+            "shootingRms": 0.0018391825311505705,
+            "independentCpuTwistedRms": 0.001839382084400322,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 256.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 516.0
+    },
+    {
+      "batch": 11,
+      "appId": "ap-dqlnjsKPyZvPfC0y88eGCv",
+      "observedState": "stopped",
+      "jobCount": 8,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-wide-L1024-Q12-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 335.33552952874965,
+          "inputMetadataAndInitialSha256": "adbee2274b1b0258f073b965425643e2f497616baf650c1b5a19691eaf34b475",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 18.704604408,
+            "shootingRms": 7.400009278018024e-14,
+            "independentCpuTwistedRms": 7.390990086964793e-14,
+            "gpuCpuFlowMaxDifference": 1.3877787807814457e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q27-n72",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 14.222222222222221,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            3
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 72,
+          "frames": 96,
+          "inputPeriod": 333.9898669443146,
+          "inputMetadataAndInitialSha256": "e48a33ae80b137d367951573232db6c29b6f7fb97a7acc2180f3976121798368",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 11.801629071,
+            "shootingRms": 9.620649049637107e-15,
+            "independentCpuTwistedRms": 1.161995245913794e-14,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q21-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 331.08451554384675,
+          "inputMetadataAndInitialSha256": "c8113e0a6827ee87d0c0f1ccbf5b9a8abfdf76cc2f6f6da1d078f1edb7167774",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 29.384901824,
+            "shootingRms": 3.587103639057513e-05,
+            "independentCpuTwistedRms": 3.588271125983437e-05,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q28-F00406-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 331.10911684475104,
+          "inputMetadataAndInitialSha256": "e5f9d36ca59cb458612a6653f14b997fdd1fb22f43cea5fdb9ad06a52e81a93c",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 63.872224118,
+            "shootingRms": 3.0434527368660754e-14,
+            "independentCpuTwistedRms": 3.058438614712033e-14,
+            "gpuCpuFlowMaxDifference": 2.220446049250313e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-analytic-L1024-Q13-a025-n24",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 42.666666666666664,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 24,
+          "frames": 96,
+          "inputPeriod": 326.42207825363187,
+          "inputMetadataAndInitialSha256": "5d3fcdc5a79867196a7faaf1b17e7ca28e1eeca3f2d33ae937cb7cdc2c3ab0e9",
+          "initialPredictor": {
+            "kind": "analytic R60 Hopf character at prescribed feed",
+            "amplitudeRms": 0.025,
+            "wavevector": [
+              3,
+              1
+            ]
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 9.141432124000005,
+            "shootingRms": 0.00011525114778516091,
+            "independentCpuTwistedRms": 0.00011530115913398814,
+            "gpuCpuFlowMaxDifference": 5.551115123125783e-17,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-analytic-L1024-Q19-a025-n24",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 42.666666666666664,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 0,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 24,
+          "frames": 96,
+          "inputPeriod": 326.6321945991536,
+          "inputMetadataAndInitialSha256": "abd95f5845fb6b342a8ae33f4a8499eb1ea208f60e4f520be16fc90d1369930d",
+          "initialPredictor": {
+            "kind": "analytic R60 Hopf character at prescribed feed",
+            "amplitudeRms": 0.025,
+            "wavevector": [
+              3,
+              2
+            ]
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 9.051560562000006,
+            "shootingRms": 0.00020093086798844462,
+            "independentCpuTwistedRms": 0.00020101805864840503,
+            "gpuCpuFlowMaxDifference": 8.326672684688674e-17,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-analytic-L1024-Q31-a025-n24",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 42.666666666666664,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            5,
+            1
+          ],
+          "reflectedMix": 0,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 24,
+          "frames": 96,
+          "inputPeriod": 327.00747705518484,
+          "inputMetadataAndInitialSha256": "ec510b84a76daff6607a4998ffb2ff873b04ab0e0c548cec3b2b3f87d63f137b",
+          "initialPredictor": {
+            "kind": "analytic R60 Hopf character at prescribed feed",
+            "amplitudeRms": 0.025,
+            "wavevector": [
+              5,
+              1
+            ]
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 6.775599981000013,
+            "shootingRms": 0.0007866596761852981,
+            "independentCpuTwistedRms": 0.0007870010342717873,
+            "gpuCpuFlowMaxDifference": 2.7755575615628914e-17,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-analytic-L1024-Q37-a025-n24",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 42.666666666666664,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            3
+          ],
+          "reflectedMix": 0,
+          "mixPhase": 0,
+          "mirrorAxis": null,
+          "grid": 24,
+          "frames": 96,
+          "inputPeriod": 327.17886282133253,
+          "inputMetadataAndInitialSha256": "05f5b8f2a2172c7626cddd6747f978bb86d2f75355a8c0e14de0dcbd853b5f24",
+          "initialPredictor": {
+            "kind": "analytic R60 Hopf character at prescribed feed",
+            "amplitudeRms": 0.025,
+            "wavevector": [
+              4,
+              3
+            ]
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 7.712957801000002,
+            "shootingRms": 0.0008121033770991328,
+            "independentCpuTwistedRms": 0.0008124557760634008,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 110.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 224.0
+    },
+    {
+      "batch": 12,
+      "appId": "ap-9dtZoxMTr81HrzCaHeOV7P",
+      "observedState": "stopped",
+      "jobCount": 8,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-wide-L1024-Q12-n72",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 14.222222222222221,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            2,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 72,
+          "frames": 96,
+          "inputPeriod": 335.8211113313472,
+          "inputMetadataAndInitialSha256": "e5039271fcba4af039c6ba6adcfcd7baf661585592c4d351148c02a21f82dc9f",
+          "seedMetadataCorrection": {
+            "submittedWavevector": [
+              0,
+              2
+            ],
+            "correctedWavevector": [
+              2,
+              2
+            ],
+            "reason": "A loop variable affected the recorded seed index. Input fields and physical PDE parameters were unchanged."
+          },
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 6.34090331,
+            "shootingRms": 5.949331230969796e-13,
+            "independentCpuTwistedRms": 5.953401230549134e-13,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q21-target-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 334.9449341560824,
+          "inputMetadataAndInitialSha256": "40f9d4e95db603c4596baae6b6b812c89dd21e92eb4f07331099179bec101223",
+          "seedMetadataCorrection": {
+            "submittedWavevector": [
+              0,
+              1
+            ],
+            "correctedWavevector": [
+              4,
+              1
+            ],
+            "reason": "A loop variable affected the recorded seed index. Input fields and physical PDE parameters were unchanged."
+          },
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 31.815494514999997,
+            "shootingRms": 4.0873422531832045e-14,
+            "independentCpuTwistedRms": 4.084022530272552e-14,
+            "gpuCpuFlowMaxDifference": 2.220446049250313e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q21-target-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 334.9449341560824,
+          "inputMetadataAndInitialSha256": "34d8560221be223a57a1df89181af7f0fcdf3f826fa8c8518b2a6711bcb0461d",
+          "seedMetadataCorrection": {
+            "submittedWavevector": [
+              0,
+              1
+            ],
+            "correctedWavevector": [
+              4,
+              1
+            ],
+            "reason": "A loop variable affected the recorded seed index. Input fields and physical PDE parameters were unchanged."
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 150.681603163,
+            "shootingRms": 0.0018465930827446756,
+            "independentCpuTwistedRms": 0.0018467433527592737,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q28-F00406-n96",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 10.666666666666666,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 96,
+          "frames": 96,
+          "inputPeriod": 333.6405713606716,
+          "inputMetadataAndInitialSha256": "61d07270b81ca0a5e63772851ae56696d19c23c02134f7553d7240c1ebaf8319",
+          "seedMetadataCorrection": {
+            "submittedWavevector": [
+              0,
+              2
+            ],
+            "correctedWavevector": [
+              4,
+              2
+            ],
+            "reason": "A loop variable affected the recorded seed index. Input fields and physical PDE parameters were unchanged."
+          },
+          "outcome": "rejected-by-unknown-limit",
+          "failureType": "ValueError",
+          "reason": "The seed lacked an exact translation reduction and exceeded the 10,000-variable bound."
+        },
+        {
+          "name": "q1-nonlinear-cell-Q13-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 335.88085099303447,
+          "inputMetadataAndInitialSha256": "31fcfaaf411319471d56929bff1b617bd6a5d71bba9ce1caf135cd60e76f6497",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 256.0,
+            "targetPhysicalCellSide": 284.0065004673173,
+            "latticeCoordinateMap": [
+              [
+                3,
+                1
+              ],
+              [
+                -1,
+                4
+              ]
+            ],
+            "sourceCellGrid": 48,
+            "isVerifiedSolution": false
+          },
+          "outcome": "result-not-collected",
+          "reason": "Batch collection aborted after another worker failed; no returned numerical result is claimed."
+        },
+        {
+          "name": "q1-nonlinear-cell-Q19-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 335.88085099303447,
+          "inputMetadataAndInitialSha256": "487e115c8f92642e7214ecb904e6c4b3df7f184db27346d5970e5253a53cb212",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 256.0,
+            "targetPhysicalCellSide": 234.92171148345523,
+            "latticeCoordinateMap": [
+              [
+                3,
+                2
+              ],
+              [
+                -2,
+                5
+              ]
+            ],
+            "sourceCellGrid": 48,
+            "isVerifiedSolution": false
+          },
+          "outcome": "result-not-collected",
+          "reason": "Batch collection aborted after another worker failed; no returned numerical result is claimed."
+        },
+        {
+          "name": "q1-nonlinear-cell-Q31-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            5,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.3640987573964,
+          "inputMetadataAndInitialSha256": "5172824e41a136706a2ad994e554029f41e556b6a6b9bf4194202a2aecc6c0b2",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 170.66666666666666,
+            "targetPhysicalCellSide": 183.9158292754175,
+            "latticeCoordinateMap": [
+              [
+                5,
+                1
+              ],
+              [
+                -1,
+                6
+              ]
+            ],
+            "sourceCellGrid": 32,
+            "isVerifiedSolution": false
+          },
+          "outcome": "result-not-collected",
+          "reason": "Batch collection aborted after another worker failed; no returned numerical result is claimed."
+        },
+        {
+          "name": "q1-nonlinear-cell-Q37-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            3
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.3640987573964,
+          "inputMetadataAndInitialSha256": "9abbcf5eca7c621e43f9a2a388c538bb4e97066d4d11716ac8c7873d72573a21",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 170.66666666666666,
+            "targetPhysicalCellSide": 168.34456300068587,
+            "latticeCoordinateMap": [
+              [
+                4,
+                3
+              ],
+              [
+                -3,
+                7
+              ]
+            ],
+            "sourceCellGrid": 32,
+            "isVerifiedSolution": false
+          },
+          "outcome": "result-not-collected",
+          "reason": "Batch collection aborted after another worker failed; no returned numerical result is claimed."
+        }
+      ],
+      "observedAppLifetimeSeconds": 174.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 352.0
+    },
+    {
+      "batch": 13,
+      "appId": "ap-1CTAMK7FFOGLf9cO00F4gb",
+      "observedState": "stopped",
+      "jobCount": 6,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-wide-L1024-Q21-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 15.515151515151516,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 336.73376844062307,
+          "inputMetadataAndInitialSha256": "f5261d61ebdb7e3b184237e13a25ac0421889331dcafd440fb64e94c1b6053e2",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 18.861639349999997,
+            "shootingRms": 8.959962271230223e-13,
+            "independentCpuTwistedRms": 8.951179915603977e-13,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-wide-L1024-Q28-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 15.515151515151516,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 333.6405713606716,
+          "inputMetadataAndInitialSha256": "781cdf3566304a1f12935765eb6444a860082c56ec17b400309fcd89cb3c4ac8",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 57.324920987999995,
+            "shootingRms": 3.221123610592054e-14,
+            "independentCpuTwistedRms": 3.235585176664157e-14,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q13-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 335.88085099303447,
+          "inputMetadataAndInitialSha256": "31fcfaaf411319471d56929bff1b617bd6a5d71bba9ce1caf135cd60e76f6497",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 256.0,
+            "targetPhysicalCellSide": 284.0065004673173,
+            "latticeCoordinateMap": [
+              [
+                3,
+                1
+              ],
+              [
+                -1,
+                4
+              ]
+            ],
+            "sourceCellGrid": 48,
+            "isVerifiedSolution": false
+          },
+          "resubmissionOf": {
+            "batch": 12,
+            "name": "q1-nonlinear-cell-Q13-L1024-n48"
+          },
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 102.907467897,
+            "shootingRms": 6.342422427710548e-05,
+            "independentCpuTwistedRms": 6.343110587200472e-05,
+            "gpuCpuFlowMaxDifference": 1.1102230246251565e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q19-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 335.88085099303447,
+          "inputMetadataAndInitialSha256": "487e115c8f92642e7214ecb904e6c4b3df7f184db27346d5970e5253a53cb212",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 256.0,
+            "targetPhysicalCellSide": 234.92171148345523,
+            "latticeCoordinateMap": [
+              [
+                3,
+                2
+              ],
+              [
+                -2,
+                5
+              ]
+            ],
+            "sourceCellGrid": 48,
+            "isVerifiedSolution": false
+          },
+          "resubmissionOf": {
+            "batch": 12,
+            "name": "q1-nonlinear-cell-Q19-L1024-n48"
+          },
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 23.940379107,
+            "shootingRms": 3.911569348543671e-12,
+            "independentCpuTwistedRms": 3.911828705551492e-12,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q31-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            5,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.3640987573964,
+          "inputMetadataAndInitialSha256": "5172824e41a136706a2ad994e554029f41e556b6a6b9bf4194202a2aecc6c0b2",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 170.66666666666666,
+            "targetPhysicalCellSide": 183.9158292754175,
+            "latticeCoordinateMap": [
+              [
+                5,
+                1
+              ],
+              [
+                -1,
+                6
+              ]
+            ],
+            "sourceCellGrid": 32,
+            "isVerifiedSolution": false
+          },
+          "resubmissionOf": {
+            "batch": 12,
+            "name": "q1-nonlinear-cell-Q31-L1024-n48"
+          },
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 47.564149619999995,
+            "shootingRms": 1.5558880831899442e-12,
+            "independentCpuTwistedRms": 1.5541071417321306e-12,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q37-L1024-n48",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 21.333333333333332,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            3
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 48,
+          "frames": 96,
+          "inputPeriod": 330.3640987573964,
+          "inputMetadataAndInitialSha256": "9abbcf5eca7c621e43f9a2a388c538bb4e97066d4d11716ac8c7873d72573a21",
+          "initialPredictor": {
+            "kind": "Nonlinear periodic-cell initial guess, followed by fresh PDE correction",
+            "sourcePhysicalCellSide": 170.66666666666666,
+            "targetPhysicalCellSide": 168.34456300068587,
+            "latticeCoordinateMap": [
+              [
+                4,
+                3
+              ],
+              [
+                -3,
+                7
+              ]
+            ],
+            "sourceCellGrid": 32,
+            "isVerifiedSolution": false
+          },
+          "resubmissionOf": {
+            "batch": 12,
+            "name": "q1-nonlinear-cell-Q37-L1024-n48"
+          },
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 19.262446151000006,
+            "shootingRms": 1.6786390044275108e-13,
+            "independentCpuTwistedRms": 1.678886156470278e-13,
+            "gpuCpuFlowMaxDifference": 1.6653345369377348e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 151.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 306.0
+    },
+    {
+      "batch": 14,
+      "appId": "ap-3M1GqBpgq3qX0SP7HiMXn9",
+      "observedState": "stopped",
+      "jobCount": 3,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-nonlinear-cell-Q19-L1024-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 15.515151515151516,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            3,
+            2
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 335.3779832827653,
+          "inputMetadataAndInitialSha256": "4dfe38e15e5c0915efffa497c7ea4ea9153522192efeaccc36156326d9eb2f52",
+          "outcome": "did-not-converge",
+          "result": {
+            "converged": false,
+            "seconds": 151.7331474,
+            "shootingRms": 4.608566851477365e-05,
+            "independentCpuTwistedRms": 4.6088313391819884e-05,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q31-L1024-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 15.515151515151516,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            5,
+            1
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 332.742776113161,
+          "inputMetadataAndInitialSha256": "d0b54db21fbc309939f525ef5c9628dd900f9ba980b572290f8f0bccfeec12e4",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 46.563492383,
+            "shootingRms": 2.792690655187477e-12,
+            "independentCpuTwistedRms": 2.7925979848031397e-12,
+            "gpuCpuFlowMaxDifference": 1.942890293094024e-16,
+            "failureType": null
+          }
+        },
+        {
+          "name": "q1-nonlinear-cell-Q37-L1024-n66",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 15.515151515151516,
+            "stencil": "triangular-six",
+            "L": 1024.0
+          },
+          "charge": 1,
+          "wavevector": [
+            4,
+            3
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 66,
+          "frames": 96,
+          "inputPeriod": 330.5628364530197,
+          "inputMetadataAndInitialSha256": "afbf5426220ff81db9e09c5c170d107bd62700de0fe724a0d88bb0c248f30227",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 55.769718076000004,
+            "shootingRms": 1.3525364097775553e-12,
+            "independentCpuTwistedRms": 1.3525457163086557e-12,
+            "gpuCpuFlowMaxDifference": 2.220446049250313e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 162.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 328.0
+    },
+    {
+      "batch": 15,
+      "appId": "ap-fKYmSCYgPfLHC4yWoARAtR",
+      "observedState": "stopped",
+      "jobCount": 1,
+      "gpu": "A100-40GB",
+      "maxContainers": 2,
+      "retries": 0,
+      "timeoutSeconds": 180,
+      "startupTimeoutSeconds": 180,
+      "jobs": [
+        {
+          "name": "q1-mixed-L512-n60",
+          "parameters": {
+            "F": 0.00406,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 8.533333333333333,
+            "stencil": "triangular-six",
+            "L": 512.0
+          },
+          "charge": 1,
+          "wavevector": [
+            1,
+            0
+          ],
+          "reflectedMix": 0.0,
+          "mixPhase": 0.0,
+          "mirrorAxis": null,
+          "grid": 60,
+          "frames": 96,
+          "inputPeriod": 333.9868923334233,
+          "inputMetadataAndInitialSha256": "00c3dd2edef2db7880164e24f327dd742ed8cdda1acee19043a81029d2772883",
+          "outcome": "converged-candidate",
+          "result": {
+            "converged": true,
+            "seconds": 22.567663947,
+            "shootingRms": 3.1801374644273106e-12,
+            "independentCpuTwistedRms": 3.1802894596798085e-12,
+            "gpuCpuFlowMaxDifference": 2.498001805406602e-16,
+            "failureType": null
+          }
+        }
+      ],
+      "observedAppLifetimeSeconds": 31.0,
+      "gpuSecondsUpperBoundFromAppLifetime": 66.0
+    }
+  ],
+  "totalJobs": 81,
+  "measuredFunctionSeconds": 2350.7081950849993,
+  "unreturnedResultCount": 5,
+  "allAppsObservedStopped": true,
+  "gpuSecondsUpperBoundForStoppedApps": 3430.0,
+  "metadataRepairs": [
+    {
+      "record": "q1-wide-L1024-Q12-F00406-n96",
+      "correctedWavevector": [
+        2,
+        2
+      ],
+      "configurationUnchanged": true,
+      "float64Identical": true,
+      "float32Identical": true,
+      "float32Sha256": "dd45cc494186f9ebd268b80392a471453268d1fc7b67a94de76445be7130e189"
+    },
+    {
+      "record": "q1-wide-L1024-Q27-n72",
+      "correctedWavevector": [
+        3,
+        3
+      ],
+      "configurationUnchanged": true,
+      "float64Identical": true,
+      "float32Identical": true,
+      "float32Sha256": "1bb47afd176763538a386413b049d9809e1ec848077cc43052cefb0cc895ab4d"
+    },
+    {
+      "record": "q1-wide-L1024-Q28-F00406-n48",
+      "correctedWavevector": [
+        4,
+        2
+      ],
+      "configurationUnchanged": true,
+      "float64Identical": true,
+      "float32Identical": true,
+      "float32Sha256": "a845a58906024c3dcd5c96586a1ce35f00ca9983118e9fbf0755de1b4cb2ab6e"
+    },
+    {
+      "record": "q1-wide-L1024-Q12-n72",
+      "correctedWavevector": [
+        2,
+        2
+      ],
+      "configurationUnchanged": true,
+      "float64Identical": true,
+      "float32Identical": true,
+      "float32Sha256": "4b2af6cb1e291fb640472a79a6021c95ab9a5b4c9682044d6c457316a595d2b6"
+    },
+    {
+      "record": "q1-wide-L1024-Q21-target-n48",
+      "correctedWavevector": [
+        4,
+        1
+      ],
+      "configurationUnchanged": true,
+      "float64Identical": true,
+      "float32Identical": true,
+      "float32Sha256": "a328ca39f9c7c81755748442db3e3ff4898ef2cc7f01526afeb27b9d65104289"
+    }
+  ],
+  "regressionTest": "test_seed_metadata.py checks recorded seed indices and full native movies on equivalent primitive/repeated physical cells.",
+  "billingCaveat": "Measured function seconds exclude startup and unreturned results, so they are not a billing statement. Each stopped-app upper bound charges two GPUs for its entire observed lifetime plus timestamp rounding margin. All batches share one allocation. Failed solves and bounded worker failures do not prove nonexistence."
+}

@@ -106,23 +106,23 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.0007044138033118042,
-    "pdeRms": 6.141040317653243e-07,
+    "pdeRms": 6.141040317653243e-7,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.044727729402334826,
     "spatialRms": 0.04509598784771962,
-    "coarseReturnRms": 4.547271810609433e-09,
-    "refinedReturnRms": 4.54813334296471e-09,
-    "refinedTrajectoryRms": 5.922965895789051e-09,
-    "maxRefinedPhaseRms": 4.991581835670746e-09,
+    "coarseReturnRms": 4.547271810609433e-9,
+    "refinedReturnRms": 4.54813334296471e-9,
+    "refinedTrajectoryRms": 5.922965895789051e-9,
+    "maxRefinedPhaseRms": 4.991581835670746e-9,
     "coarseDt": 0.39805640545867466,
     "refinedDt": 0.19902820272933733,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 1.0882052763443552e-13,
     "projectionMax": 8.007761120865098e-13,
-    "quantizationMax": 1.4894688427080638e-08,
+    "quantizationMax": 1.4894688427080638e-8,
     "admissionElapsedMs": 2524.3425300000017,
-    "coarseTrajectoryRms": 5.922536071655327e-09,
-    "maxCoarsePhaseRms": 4.990836663107113e-09
+    "coarseTrajectoryRms": 5.922536071655327e-9,
+    "maxCoarsePhaseRms": 4.990836663107113e-9
   },
   "provenance": {
     "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
@@ -141,8 +141,67 @@
       "initialFieldRmsDifference": 0.0037652132226345335
     },
     "exportThresholds": {
-      "maximumProjectionMax": 1e-08,
-      "maximumForwardErrorRms": 1e-06
+      "maximumProjectionMax": 1e-8,
+      "maximumForwardErrorRms": 0.000001
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.922965895789051e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.10288249099700394,
+            "minimumRelativeColorRange": 0.45918370769813627,
+            "phase": 0.05885004851896025,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.06254477707428754,
+            "minimumRelativeColorRange": 0.4289792576750852,
+            "phase": 0.48054946645415786,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.10288249099700394,
+            "minimumRelativeColorRange": 0.45918370769813627,
+            "phase": 0.05885004851896025,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.06254477707428754,
+            "minimumRelativeColorRange": 0.4289792576750852,
+            "phase": 0.48054946645415786,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.4289792576750852,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

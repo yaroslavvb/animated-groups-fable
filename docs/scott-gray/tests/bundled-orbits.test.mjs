@@ -35,7 +35,8 @@ test('every shipped Float32 orbit passes fresh canonical, full-forward and refin
     assert.equal(d.refinedPhase.primitiveAtResolvedDivisors,true);assert.equal(d.symmetryMax,0);
     assert.ok(d.refinedClosure.dt<=d.closure.dt/2);assert.ok(d.refinedClosure.steps>=2*d.closure.steps);
     for(const operation of d.refinedPhase.operations)if(operation.tau!==0){assert.ok(operation.sameTimeRms>operation.contrastFloor);assert.ok(operation.phaseRms>operation.contrastFloor);}
-    const reported=metadata.validationSummary.refinedReturnRms;
+    const reported=metadata.diversityAdmission?.refinedClosure?.closureRms??metadata.validationSummary?.refinedReturnRms;
+    assert.ok(Number.isFinite(reported),'The shipped field needs its independently measured return error.');
     assert.ok(Math.abs(d.refinedClosure.closureRms-reported)<Math.max(1e-12,reported*1e-4),'Recomputed error agrees with the actual Float32 payload report.');
     seen.add(entry.groupId);
   }

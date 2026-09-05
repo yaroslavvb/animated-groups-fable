@@ -40,3 +40,17 @@ test('a 632 artifact cannot be treated as a 442 orbit or lose its triangular dis
     m=>{m.orbits[0].offlineVerification.gateVersion='recomputed-from-field-v1';},
   ]){const changed=structuredClone(manifest);change(changed);assert.throws(()=>createPrecomputedCatalog(changed,{groups,family:'p6'}));}
 });
+
+test('browsing a larger gallery evicts old movies without invalidating a displayed record',async()=>{
+  const {bytes,manifest}=fixture(),requests=[];
+  manifest.orbits=Array.from({length:5},(_,i)=>({...structuredClone(manifest.orbits[0]),id:'saved:wave-'+i,fieldUrl:'wave-'+i+'.f32'}));
+  const saved=createPrecomputedCatalog(manifest,{groups,family:'p6',maxCachedOrbits:2,fetcher:async url=>{requests.push(url);return{ok:true,arrayBuffer:async()=>bytes};}});
+  const first=await saved.load('saved:wave-0');
+  await saved.load('saved:wave-1');await saved.load('saved:wave-0');await saved.load('saved:wave-2');
+  assert.equal(await saved.load('saved:wave-0'),first,'recently selected movie remains cached');
+  await saved.load('saved:wave-3');await saved.load('saved:wave-4');
+  assert.equal(saved.isVerified(first),true,'eviction does not change numerical evidence for immutable displayed fields');
+  const reloaded=await saved.load('saved:wave-0');
+  assert.notEqual(reloaded,first);assert.equal(saved.isVerified(reloaded),true);
+  assert.deepEqual(requests,['wave-0.f32','wave-1.f32','wave-2.f32','wave-3.f32','wave-4.f32','wave-0.f32']);
+});

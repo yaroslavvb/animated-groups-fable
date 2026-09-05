@@ -10,6 +10,7 @@ import {deflateSync} from 'node:zlib';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {basename,relative,resolve,sep} from 'node:path';
 import {createSolutionAtlas} from '../solution-atlas.mjs';
+import {auditVisibleTimeSymmetry,VISIBILITY_VERSION} from '../visible-time-symmetry.mjs';
 
 export const SCHEMA='scott-gray-precomputed-atlas-v1';
 export const GATE_VERSION='recomputed-from-field-v1';
@@ -73,7 +74,11 @@ export function compactDiagnostics(d){
   assert(out.refinedPhase.independentForwardFrames===true&&out.refinedPhase.primitiveAtResolvedDivisors===true,'Independent forward and primitive-period evidence is required.');
   return out;
 }
-function normalizedConfig(raw,ops){const params={Du:.16,Dv:.08,F:.026,k:.055,dx:1,stencil:'five-point',...raw.params};return{N:raw.N,M:raw.M,period:raw.period,L:raw.N*params.dx,groupId:raw.groupId,seed:typeof raw.seed==='string'?raw.seed:'submitted-field',params,ops,minTemporal:.008,minSpatial:.012};}
+export function normalizedConfig(raw,ops){
+  const params={Du:.16,Dv:.08,F:.026,k:.055,dx:1,stencil:'five-point',...raw.params},L=raw.N*params.dx;
+  assert(raw.L===undefined||(Number.isFinite(raw.L)&&Math.abs(raw.L-L)<=1e-10*Math.max(1,L)),'Physical cell length does not agree with N × dx.');
+  return{N:raw.N,M:raw.M,period:raw.period,L,groupId:raw.groupId,seed:typeof raw.seed==='string'?raw.seed:'submitted-field',params,ops,minTemporal:.008,minSpatial:.012};
+}
 async function inputFingerprint(){
   const sources=await Promise.all(VERIFIER_FILES.map(async name=>({name,sha256:sha256(await readFile(new URL(name,SITE)))})));
   return sha256(json(sources));
@@ -83,11 +88,13 @@ function makeEntry(source,metadata,metadataUrl,config,diagnostics,field,verifica
   const thumbnails=Object.fromEntries(Object.keys(PALETTES).map(palette=>[palette,`data/thumbnails/${stem}-${palette}.png`]));
   return{id:`saved:${stem}`,groupId:source.groupId,config,name:source.name??'Periodic wave',patternName:source.patternName??source.name?.split(' · F')[0]??'Periodic wave',description:source.description??source.name??'',metadataUrl:sitePath(metadataUrl),fieldUrl:sitePath(new URL(metadata.fieldUrl,metadataUrl)),fieldSha256:metadata.fieldSha256,fieldByteLength:metadata.fieldByteLength,fieldValueCount:metadata.fieldValueCount,fieldEncoding:'float32-le',ranges,diagnostics,offlineVerification:{gateVersion:GATE_VERSION,passed:true,fieldSha256:metadata.fieldSha256,configSha256:sha256(json(config)),verificationCodeSha256},thumbnails};
 }
-export async function buildCatalog({check=false,log=console.log}={}){
+export async function buildCatalog({check=false,incremental=false,log=console.log}={}){
   const [manifestBytes,groupBytes]=await Promise.all([readFile(new URL('data/verified-orbits.json',SITE)),readFile(new URL('groups.json',SITE))]);
   const manifest=JSON.parse(manifestBytes),groups=JSON.parse(groupBytes),verificationCodeSha256=await inputFingerprint();
-  const existing=check?JSON.parse(await readFile(OUTPUT)):null;
+  const existing=check||incremental?JSON.parse(await readFile(OUTPUT)):null;
   const catalog={schema:SCHEMA,gateVersion:GATE_VERSION,preferredGroup:manifest.preferredGroup,preferredParameters:manifest.preferredParameters,description:'Precomputed parameter sets and periodic fields. Each saved Float32 movie passed the complete independent numerical acceptance gate during this offline build. Browser playback checks payload integrity without re-integrating the equations.',sourceManifestSha256:sha256(manifestBytes),groupsSha256:sha256(groupBytes),verificationCodeSha256,orbits:[]};
+  catalog.visibilityPolicyVersion=VISIBILITY_VERSION;catalog.visibilityCodeSha256=sha256(await readFile(new URL('visible-time-symmetry.mjs',SITE)));
+  if(check)for(const key of ['visibilityPolicyVersion','visibilityCodeSha256'])assert(existing[key]===catalog[key],`Gallery visibility policy is stale: ${key}.`);
   if(check){for(const key of ['schema','gateVersion','sourceManifestSha256','groupsSha256','verificationCodeSha256'])assert(existing[key]===catalog[key],`Precomputed catalog is stale: ${key}. Run node research/build-catalog.mjs --verify.`);assert(existing.orbits.length===manifest.orbits.length,'Precomputed orbit count is stale.');}
   else await mkdir(new URL('data/thumbnails/',SITE),{recursive:true});
   const seen=new Set();
@@ -97,11 +104,17 @@ export async function buildCatalog({check=false,log=console.log}={}){
     const canonical=groups.find(group=>group.id===source.groupId);assert(canonical&&json(metadata.config.ops)===json(canonical.render.ops),'Orbit operations must match the canonical color group.');
     const field=decodeField(metadata,binary);let config,diagnostics;
     if(check){config=normalizedConfig(metadata.config,canonical.render.ops);diagnostics=compactDiagnostics(existing.orbits[index].diagnostics);}
-    else{
+    else if(incremental&&existing.verificationCodeSha256===verificationCodeSha256&&existing.orbits.some(e=>e.id===`saved:${basename(metadataUrl.pathname,'.json')}`&&e.fieldSha256===metadata.fieldSha256&&json(e.config)===json(normalizedConfig(metadata.config,canonical.render.ops)))){
+      const previous=existing.orbits.find(e=>e.id===`saved:${basename(metadataUrl.pathname,'.json')}`);
+      config=normalizedConfig(metadata.config,canonical.render.ops);diagnostics=compactDiagnostics(previous.diagnostics);
+      assert(previous.offlineVerification?.passed===true&&previous.offlineVerification.gateVersion===GATE_VERSION&&previous.offlineVerification.verificationCodeSha256===verificationCodeSha256&&previous.offlineVerification.fieldSha256===metadata.fieldSha256&&previous.offlineVerification.configSha256===sha256(json(config)),'Cached evidence must match the exact field, configuration, gate and verifier code.');
+    }else{
       const result=await createSolutionAtlas(groups).admit({field,config:metadata.config},{groupId:source.groupId});
       assert(result.accepted,`${source.url}: ${result.reasons.join(' ')}`);config=result.record.config;diagnostics=compactDiagnostics(result.record.diagnostics);
     }
     const entry=makeEntry(source,metadata,metadataUrl,config,diagnostics,field,verificationCodeSha256);
+    entry.visibleTimeSymmetry=auditVisibleTimeSymmetry({field,...config,noiseRms:diagnostics.phaseUncertaintyRms??0});
+    assert(entry.visibleTimeSymmetry.passed,`${source.url}: remove from gallery; ${entry.visibleTimeSymmetry.reasons.join(' ')}`);
     assert(!seen.has(entry.id),'Duplicate saved orbit identifier.');seen.add(entry.id);
     for(const [palette,path] of Object.entries(entry.thumbnails)){
       const png=thumbnail(field,config.N,entry.ranges,palette),target=new URL(path,SITE);
@@ -117,6 +130,6 @@ export async function buildCatalog({check=false,log=console.log}={}){
   log(`${check?'Checked':'Built'} ${catalog.orbits.length} offline-verified records; ${Buffer.byteLength(serialized)} catalog bytes; ${catalog.orbits.length*3} thumbnails.`);return catalog;
 }
 if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url){
-  const args=process.argv.slice(2);assert(args.every(arg=>['--check','--verify'].includes(arg))&&!(args.includes('--check')&&args.includes('--verify')),'Usage: node research/build-catalog.mjs [--verify | --check]');
-  await buildCatalog({check:args.includes('--check')});
+  const args=process.argv.slice(2);assert(args.length<=1&&args.every(arg=>['--check','--verify','--incremental'].includes(arg)),'Usage: node research/build-catalog.mjs [--verify | --check | --incremental]');
+  await buildCatalog({check:args.includes('--check'),incremental:args.includes('--incremental')});
 }

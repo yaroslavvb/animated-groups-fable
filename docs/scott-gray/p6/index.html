@@ -4,14 +4,14 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore precomputed periodic Gray–Scott patterns with the six cyclic-color time symmetries of 632 on a triangular lattice.">
   <title>Scott–Gray · 632 periodic patterns</title>
-  <link rel="stylesheet" href="../style.css?v=20260904-precomputed"><link rel="stylesheet" href="style.css?v=20260904-p6">
+  <link rel="stylesheet" href="../style.css?v=20260904-visible-time"><link rel="stylesheet" href="style.css?v=20260904-p6">
 </head>
 <body>
   <header><a class="brand" href="../../scott-gray-groups.html">Scott–Gray atlases</a><nav aria-label="Main navigation"><a href="../../scott-gray-groups.html">Choose a family</a><a href="../">442 atlas</a><a href="../../correspondence-p6.html">632 correspondence</a></nav></header>
   <main>
     <div class="intro"><div><p class="eyebrow">TRIANGULAR LATTICE / CYCLIC COLOR GROUPS</p><h1>632 periodic patterns</h1></div><p>Choose a symmetry, its parameters, then a pattern. <br>Every displayed orbit has been checked offline.</p></div>
     <p class="eyebrow selection-step">1 · CHOOSE THE TIME SYMMETRY</p><div id="groups" class="groups" role="group" aria-label="Choose a 632 color group"></div>
-    <div class="solution-policy"><strong>Precomputed, verified solutions</strong><span id="solution-count">Loading catalog…</span><p>For both concentrations, every generator must obey <code>q(gx, t + τT) = q(x, t)</code>. Browsing downloads saved data and runs no numerical search.</p></div>
+    <div class="solution-policy"><strong id="policy-label">Precomputed, verified solutions</strong><span id="solution-count">Loading catalog…</span><p>For both concentrations, every generator must obey <code>q(gx, t + τT) = q(x, t)</code>. Browsing downloads saved data and runs no numerical search.</p></div>
     <div class="lab">
       <section class="viewer" aria-label="Verified solution animation">
         <div class="canvas-wrap">
@@ -27,13 +27,13 @@
         <div class="phase-rule"><p id="generator-description"></p><div id="phase-permutation" aria-label="Cyclic color permutation represents a time shift"></div><p id="phase-explanation" class="small"></p></div>
         <p class="caption" id="caption">Only accepted numerical orbits appear here. An empty group means existence remains unresolved.</p>
         <div class="metrics"><div><span>PDE mismatch</span><strong id="pde">—</strong></div><div><span>Forward phase error</span><strong id="symmetry">—</strong></div><div><span>Temporal variation</span><strong id="motion">—</strong></div><div><span>Forward return RMS</span><strong id="return">—</strong></div></div>
-        <div class="comparison"><div><p class="eyebrow">ROTATION + PHASE SHIFT</p><p id="comparison-error" class="small">Select a verified orbit to compare its actual concentration fields.</p></div><figure><canvas id="compare-a" width="160" height="160" aria-label="Spatially transformed concentration"></canvas><figcaption>q(g⁻¹x, t)</figcaption></figure><figure><canvas id="compare-b" width="160" height="160" aria-label="Time-shifted concentration"></canvas><figcaption id="compare-label">q(x, t + τT)</figcaption></figure></div>
+        <div class="comparison"><div class="comparison-heading"><p class="eyebrow">SEE WHY THE TIME OFFSET MATTERS</p><p id="comparison-error" class="small">Select a verified orbit to compare.</p><p id="visibility-explanation" class="small"></p></div><figure><canvas id="compare-original" width="192" height="192" aria-label="Original concentration at the current phase"></canvas><figcaption><strong>Original</strong><span>q(x, t)</span></figcaption></figure><figure><canvas id="compare-a" width="192" height="192" aria-label="The selected rotation without a time offset"></canvas><figcaption><strong>Rotation only</strong><span>q(gx, t)</span></figcaption></figure><figure><canvas id="compare-b" width="192" height="192" aria-label="The selected rotation with its required time offset"></canvas><figcaption><strong>With phase shift</strong><span id="compare-label">q(gx, t + τT)</span></figcaption></figure></div>
       </section>
       <aside class="controls">
         <div class="selected"><p class="eyebrow" id="selected-id"></p><h2 id="selected-title"></h2><p id="selected-description"></p><p class="small">Chaim short color notation · <a id="reference-link" href="../../correspondence-p6.html">reference generators ↗</a></p></div>
         <section class="atlas-panel" aria-label="Verified parameter and pattern selectors">
           <p class="eyebrow">2 · CHOOSE VERIFIED PARAMETERS</p><h3>Physical parameters</h3>
-          <label class="atlas-label" for="parameter-set">Available parameter sets</label><select id="parameter-set" disabled><option>No verified parameters</option></select>
+          <label class="atlas-label" for="parameter-set">Available parameter sets · most patterns first</label><select id="parameter-set" disabled><option>No verified parameters</option></select>
           <p id="parameter-values" class="parameter-values">Loading precomputed parameters…</p>
           <div class="parameter-map-wrap"><canvas id="parameter-map" width="660" height="320" tabindex="0" aria-label="Verified parameter plane. Click to select the closest verified parameter set; the selector above also provides keyboard access."></canvas></div><p id="map-status" class="small" role="status">Only precomputed verified points can be selected.</p><p class="small">Feed F → · kill k ↑. The region between known points is unclassified.</p>
           <div class="pattern-section"><p class="eyebrow">3 · CHOOSE A PATTERN</p><h3>Patterns at these parameters</h3><p id="pattern-count" class="small">Loading saved patterns…</p><div id="pattern-thumbnails" class="pattern-thumbnails" role="group" aria-label="Verified pattern thumbnails"></div>
@@ -43,9 +43,9 @@
         <p id="color-scale" class="small"></p><button id="export" class="text-button" disabled>↓ Export verified orbit + evidence</button><p id="status" role="status">Loading the precomputed catalog…</p>
       </aside>
     </div>
-    <section class="reading"><p class="eyebrow">EUCLIDEAN SPACE / CYCLIC TIME</p><h2>A triangular lattice, with the correct timing.</h2><p>The sixfold family uses lattice vectors (1, 0) and (−½, √3/2). The viewer draws them at their actual angles and lengths. Each rotation is combined with its assigned fraction of the period; its short color symbol encodes that cyclic action. A nonzero phase shift must make a measurable difference from the same spatial rotation at the original time.</p><p>The saved fields pass independent numerical checks for periodic return, time symmetry, motion and spatial structure. These finite-grid tests do not constitute a mathematical proof of a continuum orbit. No failed candidate is displayed as a solution, and an empty parameter list does not prove nonexistence.</p><p><a href="EVIDENCE.md">Numerical evidence and reproduction →</a> · <a href="CHARACTERS.md">632 character definitions and lattice geometry →</a> · <a href="../../scott-gray-groups.html">Explore other symmetry families →</a></p></section>
+    <section class="reading"><p class="eyebrow">EUCLIDEAN SPACE / CYCLIC TIME</p><h2>A triangular lattice, with the correct timing.</h2><p>The sixfold family uses lattice vectors (1, 0) and (−½, √3/2). The viewer draws them at their actual angles and lengths. Each rotation is combined with its assigned fraction of the period; its short color symbol encodes that cyclic action. A nonzero phase shift must make a measurable difference from the same spatial rotation at the original time.</p><p>The saved fields pass independent numerical checks for periodic return, time symmetry, motion and spatial structure. These finite-grid tests do not constitute a mathematical proof of a continuum orbit. No failed candidate is displayed as a solution, and an empty parameter list does not prove nonexistence.</p><p><a href="../DIVERSITY.md">Current counts, diversity and refinement →</a> · <a href="EVIDENCE.md">Numerical evidence and reproduction →</a> · <a href="CHARACTERS.md">632 character definitions and lattice geometry →</a> · <a href="../../scott-gray-groups.html">Explore other symmetry families →</a></p></section>
     <footer>Gray–Scott reaction–diffusion patterns, inspired by <a href="https://github.com/vbulatov2011/symhub/tree/main/apps/symsim/gray_scott">Vladimir Bulatov’s SymHub</a>. Stored animations use WebGL playback, with a CPU fallback.</footer>
   </main>
-  <script type="module" src="app.js?v=20260904-p6-markers"></script>
+  <script type="module" src="app.js?v=20260904-visible-time"></script>
 </body>
 </html>

@@ -106,22 +106,22 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.001007629129470218,
-    "pdeRms": 1.072251445307672e-06,
+    "pdeRms": 0.000001072251445307672,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.055125166924898376,
     "spatialRms": 0.0557244123831573,
-    "coarseReturnRms": 4.966152825797975e-09,
-    "refinedReturnRms": 4.965822175935689e-09,
-    "refinedTrajectoryRms": 7.286793536160371e-09,
+    "coarseReturnRms": 4.966152825797975e-9,
+    "refinedReturnRms": 4.965822175935689e-9,
+    "refinedTrajectoryRms": 7.286793536160371e-9,
     "maxRefinedPhaseRms": 5.984234005066902e-17,
     "coarseDt": 0.36725226977552095,
     "refinedDt": 0.18362613488776047,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 3.682399945618311e-12,
     "projectionMax": 1.7619627978859853e-11,
-    "quantizationMax": 1.490077045085414e-08,
+    "quantizationMax": 1.490077045085414e-8,
     "admissionElapsedMs": 1958.2684400000007,
-    "coarseTrajectoryRms": 7.286989818401039e-09,
+    "coarseTrajectoryRms": 7.286989818401039e-9,
     "maxCoarsePhaseRms": 6.702387137799354e-17
   },
   "provenance": {
@@ -141,8 +141,24 @@
       "initialFieldRmsDifference": 0.006356979954501765
     },
     "exportThresholds": {
-      "maximumProjectionMax": 1e-08,
-      "maximumForwardErrorRms": 1e-06
+      "maximumProjectionMax": 1e-8,
+      "maximumForwardErrorRms": 0.000001
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": true,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 7.286989818401039e-9,
+    "operations": [],
+    "reasons": [],
+    "minimumRelativeColorRange": null,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

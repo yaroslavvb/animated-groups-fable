@@ -1,0 +1,382 @@
+{
+  "schema": "scott-gray-executed-search-grid-v1",
+  "family": "632",
+  "batchCount": 3,
+  "totalSubmittedJobs": 130,
+  "scope": "First 3 executed CPU discovery/continuation batches. Subsequent GPU refinement grids are recorded separately. This records sampled searches, not an exhaustive classification or nonexistence proof.",
+  "candidateScreen": "visible_time_symmetry.py",
+  "authoritativeSavedFieldVisibilityGate": "../visible-time-symmetry.mjs",
+  "visibilityCriterion": {
+    "minimumRelativeColorRange": 0.05,
+    "minimumAbsoluteRms": 0.002,
+    "noiseFactor": 100,
+    "channels": [
+      "U",
+      "V"
+    ],
+    "phaseCoverage": "Exact minimum of every linear playback interval, including the loop seam.",
+    "operations": "Every canonical rotation assigned a nonzero time offset; zero-offset spatial symmetries are allowed."
+  },
+  "batches": [
+    {
+      "id": "p6-cpu-1",
+      "label": "Mixed-star discovery",
+      "status": "executed",
+      "sampling": "Cartesian product of 4 charges, 4 wavevectors, and 4 paired mix/phase choices; feed is a solve unknown.",
+      "plannedJobs": 64,
+      "recordedResults": 64,
+      "planSha256": "ce456c7f7f344e863c8871b841fcf347b2ca016bb174b9a18a395e8944e64274",
+      "executedSourceSha256": {
+        "search.py": "8935a629ed79c1956c6681fe84ed9d3c82dfd1a570fbfda51154712bdddf5c56",
+        "gray_scott_triangular.cpp": "2094f29be1677599f17a10babb407387a4edb90dc65f1cfc5d6b65694ec1975d"
+      },
+      "physicalParameters": {
+        "Du": 0.16,
+        "Dv": 0.08,
+        "k": [
+          0.02
+        ],
+        "latticeSide": [
+          768.0
+        ],
+        "stencil": "triangular-six",
+        "targetFeeds": [],
+        "feedMode": "nonlinear unknown at prescribed seed amplitude"
+      },
+      "seedDimensions": {
+        "rotation60Charge": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "chargeMeaning": "Forward time offset charge/6 of the period; charge 0 is a spatial reference.",
+        "wavevectors": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        "pairedMixAndPhase": [
+          {
+            "reflectedMix": -1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 0.5,
+            "mixPhaseTurns": 0.25
+          },
+          {
+            "reflectedMix": 1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 2,
+            "mixPhaseTurns": 0.25
+          }
+        ],
+        "amplitudes": [
+          0.006,
+          0.018
+        ],
+        "jobsPerCharge": {
+          "0": 16,
+          "1": 16,
+          "2": 16,
+          "3": 16
+        },
+        "note": "Mix and phase are paired choices, not an additional Cartesian product. Later batches are selected-root continuations, not fresh exhaustive grids."
+      },
+      "numerics": {
+        "spatialGrid": [
+          24
+        ],
+        "savedPhases": [
+          192
+        ],
+        "solvers": [
+          "hybr",
+          "krylov"
+        ],
+        "maxFunctionEvaluations": [
+          8000
+        ],
+        "initialStepInFeed": [],
+        "maximumContinuationAttempts": 1,
+        "minimumAdaptiveStep": null,
+        "attemptTimeoutSeconds": 180
+      },
+      "resources": {
+        "maxContainers": 8,
+        "cpuPhysicalCoresPerContainer": 2,
+        "memoryGiBHardLimit": 8,
+        "gpu": null,
+        "subprocessTimeoutSeconds": 180,
+        "functionTimeoutSeconds": 240,
+        "startupTimeoutSeconds": 240,
+        "retries": 0
+      },
+      "recordedOutcomes": {
+        "candidate-seed": 7,
+        "search-failed": 42,
+        "trivial-candidate-seed": 15
+      },
+      "outcomeMeaning": "Solver seed outcomes are unverified discovery results. A candidate-seed is not a published orbit; full movies, spatial refinement and the independent saved-Float32 gate are still required."
+    },
+    {
+      "id": "p6-cpu-2",
+      "label": "Common-feed correction",
+      "status": "executed",
+      "sampling": "22 finite converged nonuniform seeds selected from discovery; one target feed, one-shot predictor correction.",
+      "plannedJobs": 22,
+      "recordedResults": 22,
+      "planSha256": "282f60dbf1613590df8f080bb74279d652ea59b629cfff5efb4927ee1d023d03",
+      "executedSourceSha256": {
+        "search.py": "8935a629ed79c1956c6681fe84ed9d3c82dfd1a570fbfda51154712bdddf5c56",
+        "gray_scott_triangular.cpp": "2094f29be1677599f17a10babb407387a4edb90dc65f1cfc5d6b65694ec1975d"
+      },
+      "physicalParameters": {
+        "Du": 0.16,
+        "Dv": 0.08,
+        "k": [
+          0.02
+        ],
+        "latticeSide": [
+          768.0
+        ],
+        "stencil": "triangular-six",
+        "targetFeeds": [
+          0.00406
+        ],
+        "feedMode": "fixed target"
+      },
+      "seedDimensions": {
+        "rotation60Charge": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "chargeMeaning": "Forward time offset charge/6 of the period; charge 0 is a spatial reference.",
+        "wavevectors": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        "pairedMixAndPhase": [
+          {
+            "reflectedMix": -1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 0.5,
+            "mixPhaseTurns": 0.25
+          },
+          {
+            "reflectedMix": 1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 2,
+            "mixPhaseTurns": 0.25
+          }
+        ],
+        "amplitudes": [
+          0.006,
+          0.018
+        ],
+        "jobsPerCharge": {
+          "0": 15,
+          "1": 1,
+          "2": 4,
+          "3": 2
+        },
+        "note": "Mix and phase are paired choices, not an additional Cartesian product. Later batches are selected-root continuations, not fresh exhaustive grids."
+      },
+      "numerics": {
+        "spatialGrid": [
+          24
+        ],
+        "savedPhases": [
+          192
+        ],
+        "solvers": [
+          "hybr"
+        ],
+        "maxFunctionEvaluations": [
+          12000
+        ],
+        "initialStepInFeed": [],
+        "maximumContinuationAttempts": 1,
+        "minimumAdaptiveStep": null,
+        "attemptTimeoutSeconds": 180
+      },
+      "resources": {
+        "maxContainers": 8,
+        "cpuPhysicalCoresPerContainer": 2,
+        "memoryGiBHardLimit": 8,
+        "gpu": null,
+        "subprocessTimeoutSeconds": 180,
+        "functionTimeoutSeconds": 240,
+        "startupTimeoutSeconds": 240,
+        "retries": 0
+      },
+      "recordedOutcomes": {
+        "candidate-seed": 3,
+        "search-failed": 19
+      },
+      "outcomeMeaning": "Solver seed outcomes are unverified discovery results. A candidate-seed is not a published orbit; full movies, spatial refinement and the independent saved-Float32 gate are still required."
+    },
+    {
+      "id": "p6-cpu-3",
+      "label": "Adaptive common-feed continuation",
+      "status": "executed",
+      "sampling": "The same 22 starting roots at 2 common target feeds; small steps, halving on Newton failure.",
+      "plannedJobs": 44,
+      "recordedResults": 44,
+      "planSha256": "3a39fd72ba9880826aed4c03fd0dfaca562737e1c6f973f3f3005b0c258d743b",
+      "executedSourceSha256": {
+        "search.py": "9a960be00f6f47ae983c4344e28da1955ce99e4f82f5d8290365179e55ab5b32",
+        "gray_scott_triangular.cpp": "2094f29be1677599f17a10babb407387a4edb90dc65f1cfc5d6b65694ec1975d"
+      },
+      "physicalParameters": {
+        "Du": 0.16,
+        "Dv": 0.08,
+        "k": [
+          0.02
+        ],
+        "latticeSide": [
+          768.0
+        ],
+        "stencil": "triangular-six",
+        "targetFeeds": [
+          0.004062,
+          0.004068
+        ],
+        "feedMode": "fixed target"
+      },
+      "seedDimensions": {
+        "rotation60Charge": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "chargeMeaning": "Forward time offset charge/6 of the period; charge 0 is a spatial reference.",
+        "wavevectors": [
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            3,
+            2
+          ],
+          [
+            4,
+            1
+          ]
+        ],
+        "pairedMixAndPhase": [
+          {
+            "reflectedMix": -1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 0.5,
+            "mixPhaseTurns": 0.25
+          },
+          {
+            "reflectedMix": 1,
+            "mixPhaseTurns": 0
+          },
+          {
+            "reflectedMix": 2,
+            "mixPhaseTurns": 0.25
+          }
+        ],
+        "amplitudes": [
+          0.006,
+          0.018
+        ],
+        "jobsPerCharge": {
+          "0": 30,
+          "1": 2,
+          "2": 8,
+          "3": 4
+        },
+        "note": "Mix and phase are paired choices, not an additional Cartesian product. Later batches are selected-root continuations, not fresh exhaustive grids."
+      },
+      "numerics": {
+        "spatialGrid": [
+          24
+        ],
+        "savedPhases": [
+          192
+        ],
+        "solvers": [
+          "hybr"
+        ],
+        "maxFunctionEvaluations": [
+          12000
+        ],
+        "initialStepInFeed": [
+          5e-06
+        ],
+        "maximumContinuationAttempts": 24,
+        "minimumAdaptiveStep": 2e-07,
+        "attemptTimeoutSeconds": 60
+      },
+      "resources": {
+        "maxContainers": 32,
+        "cpuPhysicalCoresPerContainer": 2,
+        "memoryGiBHardLimit": 8,
+        "gpu": null,
+        "subprocessTimeoutSeconds": 180,
+        "functionTimeoutSeconds": 240,
+        "startupTimeoutSeconds": 240,
+        "retries": 0
+      },
+      "recordedOutcomes": {
+        "candidate-seed": 18,
+        "stopped-continuation-seed": 17,
+        "trivial-candidate-seed": 9
+      },
+      "outcomeMeaning": "Solver seed outcomes are unverified discovery results. A candidate-seed is not a published orbit; full movies, spatial refinement and the independent saved-Float32 gate are still required."
+    }
+  ],
+  "relatedInventories": [
+    "search-grid-p4.json",
+    "p6/search-grid-gpu.json"
+  ],
+  "visibilityScreenTiming": "These historical CPU outcomes predate the new fast screen. Its criterion is recorded for subsequent search scheduling; final saved-field admission remains separate."
+}

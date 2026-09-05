@@ -2,10 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {inflateSync} from 'node:zlib';
-import {buildCatalog,decodeField,concentrationRanges,thumbnail,sha256,compactDiagnostics} from '../research/build-catalog.mjs';
+import {buildCatalog,decodeField,concentrationRanges,thumbnail,sha256,compactDiagnostics,normalizedConfig} from '../research/build-catalog.mjs';
 const site=new URL('../',import.meta.url);
 const metadata=JSON.parse(await readFile(new URL('data/orbits/g95-standing-N48-M128.json',site)));
 const binary=await readFile(new URL('data/orbits/'+metadata.fieldUrl,site));
+
+test('cached admission cannot silently relabel a field with a different physical cell',()=>{
+  const config=metadata.config,expected=config.N*config.params.dx;
+  assert.equal(normalizedConfig(config,config.ops).L,expected);
+  assert.throws(()=>normalizedConfig({...config,L:2*expected},config.ops),/Physical cell length/);
+  assert.throws(()=>normalizedConfig({...config,L:NaN},config.ops),/Physical cell length/);
+});
 
 test('precomputed build checks each exact Float32 payload before using saved evidence',()=>{
   const field=decodeField(metadata,binary);assert.equal(field.length,metadata.fieldValueCount);
@@ -45,8 +52,8 @@ test('compact evidence cannot hide a failed audit and never retains integrator s
 test('checked-in parameter catalog and thumbnails match every source without rerunning integration',async()=>{
   const catalog=await buildCatalog({check:true,log:()=>{}});
   const manifest=JSON.parse(await readFile(new URL('data/verified-orbits.json',site)));
-  assert.equal(catalog.orbits.length,manifest.orbits.length);assert.equal(catalog.orbits.length,77);
+  assert.equal(catalog.orbits.length,manifest.orbits.length);assert.ok(catalog.orbits.length>=77,'Preserve the original saved atlas while adding branches.');
   assert.deepEqual([...new Set(catalog.orbits.map(entry=>entry.groupId))].sort(),['g94','g95','g96','g97','g98','g99']);
-  assert.ok(JSON.stringify(catalog).length<700000,'Initial parameter manifest should remain small.');
+  assert.ok(JSON.stringify(catalog).length<2000000,'Initial parameter manifest should remain small even with the larger gallery.');
   for(const entry of catalog.orbits){assert.equal(entry.offlineVerification.passed,true);assert.ok(entry.id.startsWith('saved:'));assert.equal(entry.fieldSha256,entry.offlineVerification.fieldSha256);assert.deepEqual(Object.keys(entry.thumbnails),['ember','ceramic','concentration']);}
 });

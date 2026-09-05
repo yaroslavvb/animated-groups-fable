@@ -1,165 +1,461 @@
 {
   "schema": "scott-gray-candidate-atlas-v1",
   "preferredGroup": "g248",
-  "description": "Offline triangular Gray\u2013Scott shooting candidates. Only fields accepted by the independent catalog build may be displayed.",
+  "description": "Offline triangular Gray–Scott shooting candidates. Only fields accepted by the independent catalog build may be displayed.",
   "orbits": [
     {
       "groupId": "g243",
       "url": "data/orbits/g243-F0p00406000-k0p02000000-mode1-N48-M192.json",
-      "name": "Sixfold breathing wave \u00b7 F 0.00406",
+      "name": "Sixfold breathing wave · F 0.00406",
       "patternName": "Sixfold breathing wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g243",
       "url": "data/orbits/g243-F0p00407000-k0p02000000-mode1-N48-M192.json",
-      "name": "Sixfold breathing wave \u00b7 F 0.00407",
+      "name": "Sixfold breathing wave · F 0.00407",
       "patternName": "Sixfold breathing wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g243",
       "url": "data/orbits/g243-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Sixfold breathing wave \u00b7 F 0.00408",
+      "name": "Sixfold breathing wave · F 0.00408",
       "patternName": "Sixfold breathing wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g244",
       "url": "data/orbits/g244-F0p00405000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00405",
+      "name": "Rotating hexagonal wave · F 0.00405",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g244",
       "url": "data/orbits/g244-F0p00406000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "name": "Rotating hexagonal wave · F 0.00406",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g244",
       "url": "data/orbits/g244-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "name": "Rotating hexagonal wave · F 0.00408",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g245",
       "url": "data/orbits/g245-F0p00405000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00405",
+      "name": "Rotating hexagonal wave · F 0.00405",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g245",
       "url": "data/orbits/g245-F0p00406000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "name": "Rotating hexagonal wave · F 0.00406",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g245",
       "url": "data/orbits/g245-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "name": "Rotating hexagonal wave · F 0.00408",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g246",
       "url": "data/orbits/g246-F0p00400000-k0p02000000-mode1-N48-M192.json",
-      "name": "Alternating hexagonal wave \u00b7 F 0.004",
+      "name": "Alternating hexagonal wave · F 0.004",
       "patternName": "Alternating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g246",
       "url": "data/orbits/g246-F0p00404000-k0p02000000-mode1-N48-M192.json",
-      "name": "Alternating hexagonal wave \u00b7 F 0.00404",
+      "name": "Alternating hexagonal wave · F 0.00404",
       "patternName": "Alternating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g246",
       "url": "data/orbits/g246-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Alternating hexagonal wave \u00b7 F 0.00408",
+      "name": "Alternating hexagonal wave · F 0.00408",
       "patternName": "Alternating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g247",
       "url": "data/orbits/g247-F0p00400000-k0p02000000-mode2-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 spatial mode 2 \u00b7 F 0.004",
-      "patternName": "Rotating hexagonal wave \u00b7 spatial mode 2",
+      "name": "Rotating hexagonal wave · spatial mode 2 · F 0.004",
+      "patternName": "Rotating hexagonal wave · spatial mode 2",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g247",
       "url": "data/orbits/g247-F0p00404000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00404",
+      "name": "Rotating hexagonal wave · F 0.00404",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g247",
       "url": "data/orbits/g247-F0p00404000-k0p02000000-mode1-shell3-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 spatial shell 3 \u00b7 F 0.00404",
-      "patternName": "Rotating hexagonal wave \u00b7 spatial shell 3",
+      "name": "Rotating hexagonal wave · spatial shell 3 · F 0.00404",
+      "patternName": "Rotating hexagonal wave · spatial shell 3",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g247",
       "url": "data/orbits/g247-F0p00406000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "name": "Rotating hexagonal wave · F 0.00406",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g247",
       "url": "data/orbits/g247-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "name": "Rotating hexagonal wave · F 0.00408",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g248",
       "url": "data/orbits/g248-F0p00400000-k0p02000000-mode2-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 spatial mode 2 \u00b7 F 0.004",
-      "patternName": "Rotating hexagonal wave \u00b7 spatial mode 2",
+      "name": "Rotating hexagonal wave · spatial mode 2 · F 0.004",
+      "patternName": "Rotating hexagonal wave · spatial mode 2",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g248",
       "url": "data/orbits/g248-F0p00404000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00404",
+      "name": "Rotating hexagonal wave · F 0.00404",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g248",
       "url": "data/orbits/g248-F0p00404000-k0p02000000-mode1-shell3-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 spatial shell 3 \u00b7 F 0.00404",
-      "patternName": "Rotating hexagonal wave \u00b7 spatial shell 3",
+      "name": "Rotating hexagonal wave · spatial shell 3 · F 0.00404",
+      "patternName": "Rotating hexagonal wave · spatial shell 3",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g248",
       "url": "data/orbits/g248-F0p00406000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00406",
+      "name": "Rotating hexagonal wave · F 0.00406",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
     },
     {
       "groupId": "g248",
       "url": "data/orbits/g248-F0p00408000-k0p02000000-mode1-N48-M192.json",
-      "name": "Rotating hexagonal wave \u00b7 F 0.00408",
+      "name": "Rotating hexagonal wave · F 0.00408",
       "patternName": "Rotating hexagonal wave",
       "description": "Periodic concentration waves computed on the physical triangular lattice; prescribed generator phase shifts are checked independently before catalog admission."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-diversity-woven-21-L512-q2-f406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Woven rotating wave · shell7",
+      "patternName": "Woven rotating wave · shell7",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-diversity-woven-21-L512-q2-f406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Woven rotating wave · shell7",
+      "patternName": "Woven rotating wave · shell7",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-diversity-woven-21-L512-q3-f406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Woven standing wave · shell7",
+      "patternName": "Woven standing wave · shell7",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g243",
+      "url": "data/orbits/g243-diversity-woven-41-L768-q0-f4068-F0p00406800-k0p02000000-L768-N96-M96.json",
+      "name": "Woven sixfold wave · shell21",
+      "patternName": "Woven sixfold wave · shell21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-diversity-woven-41-L768-q3-f4068-F0p00406800-k0p02000000-L768-N96-M96.json",
+      "name": "Woven standing wave · shell21",
+      "patternName": "Woven standing wave · shell21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-diversity-woven-41-L768-q3-f406-F0p00406000-k0p02000000-L768-N96-M96.json",
+      "name": "Woven standing wave · shell21",
+      "patternName": "Woven standing wave · shell21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-diversity-complex-w41-L768-q3-f4056076-F0p00405608-k0p02000000-L768-N96-M96.json",
+      "name": "Interwoven half-cycle wave",
+      "patternName": "Interwoven half-cycle wave",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-mode2-L512-F00406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Rotating wave · Q4",
+      "patternName": "Rotating wave · Q4",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-mode2-L512-F00406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Rotating wave · Q4",
+      "patternName": "Rotating wave · Q4",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-mode3-L512-F00406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Rotating wave · Q9",
+      "patternName": "Rotating wave · Q9",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-mode3-L512-F00406-F0p00406000-k0p02000000-L512-N96-M96.json",
+      "name": "Rotating wave · Q9",
+      "patternName": "Rotating wave · Q9",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wave21-L512-F00406-F0p00406000-k0p02000000-L512-N66-M96.json",
+      "name": "Rotating wave · Q7",
+      "patternName": "Rotating wave · Q7",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wave21-L512-F00406-F0p00406000-k0p02000000-L512-N66-M96.json",
+      "name": "Rotating wave · Q7",
+      "patternName": "Rotating wave · Q7",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-diversity-q2-w31-mix3-adaptive-F004062-F00406-F0p00406000-k0p02000000-L768-N96-M96.json",
+      "name": "Interwoven rotating wave · Q13",
+      "patternName": "Interwoven rotating wave · Q13",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-diversity-q2-w31-mix3-adaptive-F004062-F00406-F0p00406000-k0p02000000-L768-N96-M96.json",
+      "name": "Interwoven rotating wave · Q13",
+      "patternName": "Interwoven rotating wave · Q13",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g244",
+      "url": "data/orbits/g244-diversity-q2-w41-mix1-adaptive-F004062-F00406-F0p00406000-k0p02000000-L768-N96-M96.json",
+      "name": "Interwoven rotating wave · Q21",
+      "patternName": "Interwoven rotating wave · Q21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g245",
+      "url": "data/orbits/g245-diversity-q2-w41-mix1-adaptive-F004062-F00406-F0p00406000-k0p02000000-L768-N96-M96.json",
+      "name": "Interwoven rotating wave · Q21",
+      "patternName": "Interwoven rotating wave · Q21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g246",
+      "url": "data/orbits/g246-diversity-q3-mirror-L768-F004056076-F0p00405608-k0p02000000-L768-N96-M96.json",
+      "name": "Mirror standing wave · Q21",
+      "patternName": "Mirror standing wave · Q21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q25-F00406-F0p00406000-k0p02000000-L1024-N90-M96.json",
+      "name": "Rotating wave · Q25",
+      "patternName": "Rotating wave · Q25",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q25-F00406-F0p00406000-k0p02000000-L1024-N90-M96.json",
+      "name": "Rotating wave · Q25",
+      "patternName": "Rotating wave · Q25",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q36-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q36",
+      "patternName": "Rotating wave · Q36",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q36-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q36",
+      "patternName": "Rotating wave · Q36",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-mixed-L512-F00406-F0p00406000-k0p02000000-L512-N66-M96.json",
+      "name": "Interwoven sixth-cycle wave",
+      "patternName": "Interwoven sixth-cycle wave",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-mixed-L512-F00406-F0p00406000-k0p02000000-L512-N66-M96.json",
+      "name": "Interwoven sixth-cycle wave",
+      "patternName": "Interwoven sixth-cycle wave",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q9-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q9",
+      "patternName": "Rotating wave · Q9",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q9-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q9",
+      "patternName": "Rotating wave · Q9",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q16-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q16",
+      "patternName": "Rotating wave · Q16",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q16-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q16",
+      "patternName": "Rotating wave · Q16",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q12-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q12",
+      "patternName": "Rotating wave · Q12",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q12-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q12",
+      "patternName": "Rotating wave · Q12",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q27-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q27",
+      "patternName": "Rotating wave · Q27",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q27-F00406-F0p00406000-k0p02000000-L1024-N96-M96.json",
+      "name": "Rotating wave · Q27",
+      "patternName": "Rotating wave · Q27",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q21-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q21",
+      "patternName": "Rotating wave · Q21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q21-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q21",
+      "patternName": "Rotating wave · Q21",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q28-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q28",
+      "patternName": "Rotating wave · Q28",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q28-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q28",
+      "patternName": "Rotating wave · Q28",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q31-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q31",
+      "patternName": "Rotating wave · Q31",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q31-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q31",
+      "patternName": "Rotating wave · Q31",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-wide-L1024-Q37-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q37",
+      "patternName": "Rotating wave · Q37",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-wide-L1024-Q37-F00406-F0p00406000-k0p02000000-L1024-N66-M96.json",
+      "name": "Rotating wave · Q37",
+      "patternName": "Rotating wave · Q37",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g248",
+      "url": "data/orbits/g248-diversity-q1-repeated-mixed-L1024-F00406-F0p00406000-k0p02000000-L1024-N120-M96.json",
+      "name": "Repeated interwoven wave",
+      "patternName": "Repeated interwoven wave",
+      "description": "The known interwoven L512 orbit repeats twice along each lattice direction, at unchanged physical grid spacing. This is an additional periodic branch at L1024 from an existing morphology, with the full enlarged movie independently evolved and checked."
+    },
+    {
+      "groupId": "g247",
+      "url": "data/orbits/g247-diversity-q1-repeated-mixed-L1024-F00406-F0p00406000-k0p02000000-L1024-N120-M96.json",
+      "name": "Repeated interwoven wave",
+      "patternName": "Repeated interwoven wave",
+      "description": "The known interwoven L512 orbit repeats twice along each lattice direction, at unchanged physical grid spacing. This is an additional periodic branch at L1024 from an existing morphology, with the full enlarged movie independently evolved and checked."
     }
   ],
   "preferredParameters": {
     "F": 0.00404,
     "k": 0.02
-  }
+  },
+  "excludedFromGallery": [],
+  "visibilityPolicyVersion": "per-channel-rotation-contrast-v1"
 }

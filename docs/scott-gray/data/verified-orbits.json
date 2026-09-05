@@ -6,80 +6,80 @@
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00403 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00395 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-mode3-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 spatial mode 3",
-      "description": "A spatially translated third-mode standing wave, separately verified against this group\u2019s full cyclic phase character."
+      "name": "Standing wave · spatial mode 3",
+      "description": "A spatially translated third-mode standing wave, separately verified against this group’s full cyclic phase character."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00398 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Standing wave · F 0.004 · k 0.01995",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.004 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Standing wave · F 0.004 · k 0.02005",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00401 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00402 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00405 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00407 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g94",
       "url": "data/orbits/g94-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00408 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -91,93 +91,93 @@
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00403 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-mode2-F0p00403-N48-M128.json",
-      "name": "Standing mode 2 \u00b7 F 0.00403 \u00b7 k 0.020",
-      "patternName": "Standing wave \u00b7 spatial mode 2",
-      "description": "A second spatial mode at the same physical parameters. Its different wavelength and period distinguish it from the first standing pattern, and both concentrations satisfy g95\u2019s half-period shift."
+      "name": "Standing mode 2 · F 0.00403 · k 0.020",
+      "patternName": "Standing wave · spatial mode 2",
+      "description": "A second spatial mode at the same physical parameters. Its different wavelength and period distinguish it from the first standing pattern, and both concentrations satisfy g95’s half-period shift."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00395 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-mode3-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 spatial mode 3",
+      "name": "Standing wave · spatial mode 3",
       "description": "A distinct standing-wave branch with spatial mode 3, found using the A100 shooting solver and independently checked from its actual saved concentrations."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00398 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Standing wave · F 0.004 · k 0.01995",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.004 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-mode2-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 spatial mode 2",
+      "name": "Standing wave · spatial mode 2",
       "description": "A distinct standing-wave branch with spatial mode 2, found using the A100 shooting solver and independently checked from its actual saved concentrations."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Standing wave · F 0.004 · k 0.02005",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00401 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00402 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00405 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00407 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g95",
       "url": "data/orbits/g95-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00408 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -189,74 +189,74 @@
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00403 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00395 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00398 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Rotating wave · F 0.004 · k 0.01995",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.004 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Rotating wave · F 0.004 · k 0.02005",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00401 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00402 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00405 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00407 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g96",
       "url": "data/orbits/g96-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00408 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -268,74 +268,74 @@
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00403 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00395 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00398 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Rotating wave · F 0.004 · k 0.01995",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.004 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Rotating wave · F 0.004 · k 0.02005",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00401 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00402 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00405 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00407 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g97",
       "url": "data/orbits/g97-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00408 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -347,80 +347,80 @@
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00403 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00395 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-mode3-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 spatial mode 3",
-      "description": "A spatially translated third-mode standing wave, separately verified against this group\u2019s full cyclic phase character."
+      "name": "Standing wave · spatial mode 3",
+      "description": "A spatially translated third-mode standing wave, separately verified against this group’s full cyclic phase character."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00398 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Standing wave · F 0.004 · k 0.01995",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.004 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Standing wave · F 0.004 · k 0.02005",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00401 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Standing wave · F 0.00402 · k 0.02",
       "patternName": "Standing wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00405 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00407 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g98",
       "url": "data/orbits/g98-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Standing wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Standing wave · F 0.00408 · k 0.020",
       "description": "Standing concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -432,74 +432,74 @@
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00403000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00403 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00403 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00395000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00395 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00395 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00398000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00398 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00398 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00400000-k0p01995000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.01995",
+      "name": "Rotating wave · F 0.004 · k 0.01995",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00400000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.004 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00400000-k0p02005000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.004 \u00b7 k 0.02005",
+      "name": "Rotating wave · F 0.004 · k 0.02005",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00401000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00401 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00401 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00402000-k0p02000000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00402 \u00b7 k 0.02",
+      "name": "Rotating wave · F 0.00402 · k 0.02",
       "patternName": "Rotating wave",
       "description": "A parameter continuation computed with the A100 shooting solver. Both concentrations in this saved field passed independent evolution, timestep refinement and every prescribed generator phase."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00405000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00405 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00405 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00407000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00407 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00407 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
       "groupId": "g99",
       "url": "data/orbits/g99-F0p00408000-k0p02000-N48-M128.json",
-      "name": "Rotating wave \u00b7 F 0.00408 \u00b7 k 0.020",
+      "name": "Rotating wave · F 0.00408 · k 0.020",
       "description": "Rotating concentration wave continued in feed F; each coordinate variant is separately checked. Additional symmetries are allowed."
     },
     {
@@ -507,10 +507,513 @@
       "url": "data/orbits/g99-rotating-N48-M128.json",
       "name": "Rotating concentration wave",
       "description": "A reflected, translated rotating wave with affine rotation centers. These are numerical waves, not gliders; additional symmetries are allowed."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-woven-1-3-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven standing wave · (1,3)",
+      "patternName": "Woven standing wave · (1,3)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-woven-21-f004-F0p00400000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-woven-21-f004-F0p00400000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (3,1)",
+      "patternName": "Oblique rotating wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (3,1)",
+      "patternName": "Oblique rotating wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-diagonal-2-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal rotating wave · (2,2)",
+      "patternName": "Diagonal rotating wave · (2,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-diagonal-2-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal rotating wave · (2,2)",
+      "patternName": "Diagonal rotating wave · (2,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-diagonal1-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal standing wave · (1,1)",
+      "patternName": "Diagonal standing wave · (1,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-diagonal2-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal standing wave · (2,2)",
+      "patternName": "Diagonal standing wave · (2,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique standing wave · (3,1)",
+      "patternName": "Oblique standing wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-diagonal1-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal standing wave · (1,1)",
+      "patternName": "Diagonal standing wave · (1,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-woven21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-woven21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-woven31-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (3,1)",
+      "patternName": "Woven rotating wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-woven31-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven rotating wave · (3,1)",
+      "patternName": "Woven rotating wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique rotating wave · (2,1)",
+      "patternName": "Oblique rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-woven21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-woven21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-woven21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-diagonal2-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Diagonal standing wave · (2,2)",
+      "patternName": "Diagonal standing wave · (2,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-woven-1-3-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Woven standing wave · (1,3)",
+      "patternName": "Woven standing wave · (1,3)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-axial2-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Axial standing wave · (2,0)",
+      "patternName": "Axial standing wave · (2,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-axial2-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Axial standing wave · (2,0)",
+      "patternName": "Axial standing wave · (2,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-axial3-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-axial3-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-axial3-f0p00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-diagonal-1-f00395-F0p00395000-k0p02000000-L256-N96-M128.json",
+      "name": "Diagonal rotating wave · (1,1)",
+      "patternName": "Diagonal rotating wave · (1,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-diagonal-1-f00395-F0p00395000-k0p02000000-L256-N96-M128.json",
+      "name": "Diagonal rotating wave · (1,1)",
+      "patternName": "Diagonal rotating wave · (1,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-40-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial rotating wave · (4,0)",
+      "patternName": "Axial rotating wave · (4,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-40-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial rotating wave · (4,0)",
+      "patternName": "Axial rotating wave · (4,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-axial1-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial standing wave · (1,0)",
+      "patternName": "Axial standing wave · (1,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-axial1-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial standing wave · (1,0)",
+      "patternName": "Axial standing wave · (1,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-axial1-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial standing wave · (1,0)",
+      "patternName": "Axial standing wave · (1,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-axial2-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial standing wave · (2,0)",
+      "patternName": "Axial standing wave · (2,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-axial2-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial standing wave · (2,0)",
+      "patternName": "Axial standing wave · (2,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-oblique21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-oblique21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-oblique21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique standing wave · (2,1)",
+      "patternName": "Oblique standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Woven standing wave · (2,1)",
+      "patternName": "Woven standing wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-32-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (3,2)",
+      "patternName": "Oblique rotating wave · (3,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-32-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (3,2)",
+      "patternName": "Oblique rotating wave · (3,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-32-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (3,2)",
+      "patternName": "Oblique rotating wave · (3,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-33-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Diagonal rotating wave · (3,3)",
+      "patternName": "Diagonal rotating wave · (3,3)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-33-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Diagonal rotating wave · (3,3)",
+      "patternName": "Diagonal rotating wave · (3,3)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-41-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (4,1)",
+      "patternName": "Oblique rotating wave · (4,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-41-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (4,1)",
+      "patternName": "Oblique rotating wave · (4,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-41-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Oblique rotating wave · (4,1)",
+      "patternName": "Oblique rotating wave · (4,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-42-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Oblique rotating wave · (4,2)",
+      "patternName": "Oblique rotating wave · (4,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-42-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Oblique rotating wave · (4,2)",
+      "patternName": "Oblique rotating wave · (4,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-42-woven-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Woven rotating wave · (4,2)",
+      "patternName": "Woven rotating wave · (4,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-42-woven-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Woven rotating wave · (4,2)",
+      "patternName": "Woven rotating wave · (4,2)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-axial3-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-axial3-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g99",
+      "url": "data/orbits/g99-diversity-p4-rotating-axial3-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.json",
+      "name": "Axial rotating wave · (3,0)",
+      "patternName": "Axial rotating wave · (3,0)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g96",
+      "url": "data/orbits/g96-diversity-p4-rotating-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
+    },
+    {
+      "groupId": "g97",
+      "url": "data/orbits/g97-diversity-p4-rotating-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "name": "Woven rotating wave · (2,1)",
+      "patternName": "Woven rotating wave · (2,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline."
     }
   ],
   "preferredParameters": {
     "F": 0.00403,
     "k": 0.02
-  }
+  },
+  "excludedFromGallery": [
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128.json",
+      "name": "Oblique standing wave · (3,1)",
+      "patternName": "Oblique standing wave · (3,1)",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline.",
+      "visibilityPolicyVersion": "per-channel-rotation-contrast-v1",
+      "reason": "Rotation 1, V: an unshifted frame is too close to its rotation near phase 0.1712. Rotation 2, V: an unshifted frame is too close to its rotation near phase 0.1712."
+    }
+  ],
+  "visibilityPolicyVersion": "per-channel-rotation-contrast-v1",
+  "refinementReplacements": [
+    {
+      "groupId": "g95",
+      "url": "data/orbits/g95-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N48-M128.json",
+      "name": "Standing woven21 f0038",
+      "patternName": "Standing woven21 f0038",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline.",
+      "replacedBy": "data/orbits/g95-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "reason": "Finer spatial correction of the same branch at identical physical parameters; one gallery choice only."
+    },
+    {
+      "groupId": "g98",
+      "url": "data/orbits/g98-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N48-M128.json",
+      "name": "Standing woven21 f0038",
+      "patternName": "Standing woven21 f0038",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline.",
+      "replacedBy": "data/orbits/g98-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "reason": "Finer spatial correction of the same branch at identical physical parameters; one gallery choice only."
+    },
+    {
+      "groupId": "g94",
+      "url": "data/orbits/g94-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N48-M128.json",
+      "name": "Standing woven21 f0038",
+      "patternName": "Standing woven21 f0038",
+      "description": "A separately solved spatial pattern at fixed physical parameters; every prescribed phase offset is checked offline.",
+      "replacedBy": "data/orbits/g94-diversity-p4-standing-woven21-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128.json",
+      "reason": "Finer spatial correction of the same branch at identical physical parameters; one gallery choice only."
+    }
+  ]
 }

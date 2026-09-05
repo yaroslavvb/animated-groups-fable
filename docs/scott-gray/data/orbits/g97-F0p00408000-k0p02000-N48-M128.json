@@ -153,5 +153,85 @@
       "relativeToCoarseTemporalRms": 0.004995738479748744,
       "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.074389563983754e-9,
+    "operations": [
+      {
+        "operation": 0,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.06657848264036545,
+            "minimumRelativeColorRange": 0.5721178037082536,
+            "phase": 0.16010594810380696,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.0419424254428171,
+            "minimumRelativeColorRange": 0.5564237020858269,
+            "phase": 0.3705784892093642,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 1,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04759075350769837,
+            "minimumRelativeColorRange": 0.4089537083733064,
+            "phase": 0.16003695728783263,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.03024171906413602,
+            "minimumRelativeColorRange": 0.4011978110814728,
+            "phase": 0.12094645894638045,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04759075350769837,
+            "minimumRelativeColorRange": 0.4089537083733064,
+            "phase": 0.4100369572878326,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.03024171906413602,
+            "minimumRelativeColorRange": 0.4011978110814728,
+            "phase": 0.12094645894638045,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.4011978110814728,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

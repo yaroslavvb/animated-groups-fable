@@ -156,5 +156,64 @@
       "relativeToCoarseTemporalRms": 0.006544776622041616,
       "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 4.9584156231948795e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.020822808660898896,
+            "minimumRelativeColorRange": 0.19409965436169282,
+            "phase": 0.3468928945914822,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01242711929560454,
+            "minimumRelativeColorRange": 0.17934908953832301,
+            "phase": 0.23543177816740646,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.020822808660898896,
+            "minimumRelativeColorRange": 0.19409965436169282,
+            "phase": 0.3468928945914822,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01242711929560454,
+            "minimumRelativeColorRange": 0.17934908953832301,
+            "phase": 0.23543177816740646,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.17934908953832301,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

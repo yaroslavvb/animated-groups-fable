@@ -156,5 +156,64 @@
       "relativeToCoarseTemporalRms": 0.04372012303416328,
       "comparison": "Same normalized time phases and coincident spatial nodes; domain and all physical parameters held fixed."
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.716847725869573e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.08284223701508399,
+            "minimumRelativeColorRange": 0.43880501045864784,
+            "phase": 0.2847430373341078,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.04960748563465439,
+            "minimumRelativeColorRange": 0.4040408437505147,
+            "phase": 0.19122870911551604,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.08284223701508399,
+            "minimumRelativeColorRange": 0.43880501045864784,
+            "phase": 0.2847430373341078,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.04960748563465439,
+            "minimumRelativeColorRange": 0.4040408437505147,
+            "phase": 0.19122870911551604,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.4040408437505147,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

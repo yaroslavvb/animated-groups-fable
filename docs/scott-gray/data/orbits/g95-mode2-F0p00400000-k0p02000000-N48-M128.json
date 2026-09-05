@@ -134,5 +134,64 @@
       "relativePeriodDifference": 0.0009866623327303703,
       "initialFieldRmsDifference": 0.0006784392150958986
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.531565606009621e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04344908600517309,
+            "minimumRelativeColorRange": 0.20703880561898644,
+            "phase": 0.2834409769282562,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02182863641311812,
+            "minimumRelativeColorRange": 0.16076663772514066,
+            "phase": 0.16439483118980425,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04344908600517309,
+            "minimumRelativeColorRange": 0.20703880561898644,
+            "phase": 0.2834409769282562,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02182863641311812,
+            "minimumRelativeColorRange": 0.16076663772514066,
+            "phase": 0.16439483118980425,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.16076663772514066,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

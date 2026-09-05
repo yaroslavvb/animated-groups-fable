@@ -214,5 +214,127 @@
       "fieldMaxDifferenceAtCoarseNodes": 0.00021136118715334162,
       "notes": "Independent Newton solves of the same branch at fixedphysicalside, aligned by a phasecondition. Two gridsprovide finite-grid refinement evidence, not a continuum existence proof."
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.1997224422335395e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.0407416881737272,
+            "minimumRelativeColorRange": 0.5415541936353667,
+            "phase": 0.14430386353689428,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02595905275923212,
+            "minimumRelativeColorRange": 0.5354417657639736,
+            "phase": 0.3480020515686535,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.028914353105357126,
+            "minimumRelativeColorRange": 0.38434070561066364,
+            "phase": 0.14410664984036048,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01847588225779614,
+            "minimumRelativeColorRange": 0.38109090928378964,
+            "phase": 0.8549526214309731,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 3,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.028914353105357126,
+            "minimumRelativeColorRange": 0.38434070561066364,
+            "phase": 0.14410664984036048,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01847588225779614,
+            "minimumRelativeColorRange": 0.38109090928378964,
+            "phase": 0.10495262143097306,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 4,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.028914353105357126,
+            "minimumRelativeColorRange": 0.38434070561066364,
+            "phase": 0.14410664984036048,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01847588225779614,
+            "minimumRelativeColorRange": 0.38109090928378964,
+            "phase": 0.10495262143097306,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 5,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.028914353105357126,
+            "minimumRelativeColorRange": 0.38434070561066364,
+            "phase": 0.14410664984036048,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.01847588225779614,
+            "minimumRelativeColorRange": 0.38109090928378964,
+            "phase": 0.8549526214309731,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.38109090928378964,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

@@ -14,6 +14,7 @@ import math
 import platform
 import subprocess
 import time
+from types import SimpleNamespace
 from pathlib import Path
 
 import numpy as np
@@ -30,6 +31,11 @@ def main():
     p.add_argument('--frames', type=int, default=192)
     p.add_argument('--mode', type=int, default=1, help='Spatial repetitions along each lattice direction.')
     p.add_argument('--shell', type=int, choices=[1,3], default=1, help='Squared length of the seed reciprocal wavevector: (1,0) or (1,1).')
+    p.add_argument('--wavevector', type=int, nargs=2, metavar=('A','B'), help='General reciprocal seed (A,B); overrides mode and shell and imposes no extra translations.')
+    p.add_argument('--seed-translations', action='store_true', help='Optionally retain the exact translations shared by the seed reciprocal stars; generic stars otherwise use the full torus.')
+    p.add_argument('--reflected-mix', type=float, default=0., help='Add the reflected reciprocal star with this relative amplitude.')
+    p.add_argument('--mix-phase', type=float, default=0., help='Temporal phase of the reflected star, in turns.')
+    p.add_argument('--mirror-axis', type=int, choices=range(6), help='Optional instantaneous mirror R^axis S (only charges zero and three).')
     p.add_argument('--amplitude', type=float, default=.015)
     p.add_argument('--feed', type=float)
     p.add_argument('--kill', type=float, default=.02)
@@ -39,9 +45,13 @@ def main():
     p.add_argument('--maxfev', type=int, default=8000)
     p.add_argument('--predictor', action='store_true', help='Scale the previous Hopf amplitude before changing feed.')
     p.add_argument('--method', choices=['hybr','krylov'], default='hybr')
+    p.add_argument('--precondition-state-mean', action='store_true', help='Use spatial mean reaction derivatives of the initial state in the Fourier preconditioner.')
+    p.add_argument('--export-initial', action='store_true', help='Export an already corrected input only if it independently satisfies the native shooting tolerance; skip a new Newton solve.')
     args = p.parse_args()
+    if args.export_initial and (args.initial is None or args.feed is None):p.error('--export-initial requires --initial and fixed --feed.')
     args.output.mkdir(parents=True, exist_ok=True)
     N,M,m,L,k=args.grid,args.frames,args.charge,args.length,args.kill
+    if args.mirror_axis is not None and m not in [0,3]:p.error('An instantaneous mirror is compatible only with charges zero and three.')
     if N<6 or N%6 or M<12 or M%6: p.error('Grid and frames must be multiples of six.')
     if args.mode<1 or N%args.mode or N//args.mode<6: p.error('Spatial mode must divide grid and leave at least six nodes per cell.')
     if args.shell==3 and (N//args.mode)%3: p.error('Shell three requires a cell divisible by three.')
@@ -53,12 +63,21 @@ def main():
         c=np.linalg.matrix_power(R,a%6)@coords%N
         return c[1]*N+c[0]
     inv=mapping(-1 if m else 0);inv=np.r_[inv,inv+S]
-    cell=N//args.mode
+    a,b=args.wavevector if args.wavevector else (args.mode,args.mode if args.shell==3 else 0)
+    repeat=math.gcd(a,b) if args.wavevector and args.seed_translations else (1 if args.wavevector else args.mode)
+    repeat=max(1,repeat)
+    if N%repeat:p.error('Seed translation repetitions must divide the grid.')
+    cell=N//repeat
+    third=(args.wavevector and args.seed_translations and (a//repeat-b//repeat)%3==0) or (args.shell==3 and not args.wavevector)
+    if third and cell%3:p.error('Seed one-third translation requires a cell divisible by three.')
     cells=[]
-    for a in range(0,6,order):
-        for shift in range(3 if args.shell==3 else 1):
-            c=(np.linalg.matrix_power(R,a)@coords+np.array([[shift*cell//3],[-shift*cell//3]]))%cell
-            cells.append(c[1]*cell+c[0])
+    for rotation_power in range(0,6,order):
+        transforms=[np.linalg.matrix_power(R,rotation_power)]
+        if args.mirror_axis is not None:transforms.append(np.linalg.matrix_power(R,rotation_power+args.mirror_axis)@np.array([[0,1],[1,0]]))
+        for transform in transforms:
+            for shift in range(3 if third else 1):
+                c=(transform@coords+np.array([[shift*cell//3],[-shift*cell//3]]))%cell
+                cells.append(c[1]*cell+c[0])
     labels=np.min(np.stack(cells),axis=0)
     _,spatial=np.unique(labels,return_inverse=True);count=spatial.max()+1
     expand=np.r_[spatial,spatial+count]
@@ -77,22 +96,31 @@ def main():
     def equilibrium(F):
         u=(1-np.sqrt(1-4*(F+k)**2/F))/2
         return np.array([u,F*(1-u)/(F+k)])
-    angle=2*np.pi*args.mode/N
-    lam=(8/3*(np.cos(angle)-1) if args.shell==1 else 2/3*(4*np.cos(angle)+2*np.cos(2*angle)-6))/h**2
-    hopf=brentq(lambda F:k-equilibrium(F)[1]**2+(Du+Dv)*lam,.0038,.0043)
+    a,b=args.wavevector if args.wavevector else (args.mode,args.mode if args.shell==3 else 0)
+    if a==0 and b==0:p.error('Seed wavevector must be nonzero.')
+    if max(abs(a),abs(b),abs(a+b))>=N/2:p.error('Every rotated seed wavevector must lie below the grid Nyquist frequency.')
+    lam=2/(3*h*h)*(2*np.cos(2*np.pi*a/N)+2*np.cos(2*np.pi*b/N)+2*np.cos(2*np.pi*(a+b)/N)-6)
+    hopf=brentq(lambda F:k-equilibrium(F)[1]**2+(Du+Dv)*lam,.002,.0043)
     F=args.feed if args.feed else hopf
     eq=equilibrium(F);u,v=eq
     jac=np.array([[-v*v-F+Du*lam,-2*u*v],[v*v,2*u*v-F-k+Dv*lam]])
     eigenvalues,vectors=np.linalg.eig(jac);idx=np.argmax(eigenvalues.imag)
     vec=vectors[:,idx]/vectors[0,idx]
-    coordinate=x if args.shell==1 else x+y
-    base=np.sin(2*np.pi*args.mode*coordinate/N) if m%2 else np.cos(2*np.pi*args.mode*coordinate/N)
-    psi=sum(np.exp(2j*np.pi*m*a/6)*base.reshape(-1)[mapping(a)] for a in range(6)).reshape(N,N)
+    coordinate=a*x+b*y
+    base=np.sin(2*np.pi*coordinate/N) if m%2 else np.cos(2*np.pi*coordinate/N)
+    psi=sum(np.exp(2j*np.pi*m*r/6)*base.reshape(-1)[mapping(r)] for r in range(6)).reshape(N,N)
+    if args.reflected_mix:
+        reflected=b*x+a*y
+        base2=np.sin(2*np.pi*reflected/N) if m%2 else np.cos(2*np.pi*reflected/N)
+        psi2=sum(np.exp(2j*np.pi*m*r/6)*base2.reshape(-1)[mapping(r)] for r in range(6)).reshape(N,N)
+        psi+=args.reflected_mix*np.exp(2j*np.pi*args.mix_phase)*psi2
     direction=np.real(vec[:,None,None]*psi).reshape(-1)
-    direction/=np.sqrt(np.mean(direction**2))
+    direction_norm=np.sqrt(np.mean(direction**2))
+    if direction_norm<1e-14:p.error('The selected character and star mixture cancel identically.')
+    direction/=direction_norm
     initial=np.repeat(eq,S)+args.amplitude*direction
     T=2*np.pi/eigenvalues[idx].imag
-    initial_source='Analytic first-shell Hopf character, with a prescribed nonzero spatial projection.'
+    initial_source=f'Analytic reciprocal ({a},{b}) Hopf character, reflected-star mixture {args.reflected_mix}, with a prescribed nonzero spatial projection.'
     if args.initial:
         meta=json.loads(args.initial.read_text()); cfg=meta['config'];old=cfg['N']
         binary=args.initial.parent/meta['fieldUrl']
@@ -120,20 +148,27 @@ def main():
     z=np.r_[initial[reps],np.log(T),F/.004] if fix_amplitude else np.r_[initial[reps],np.log(T)]
     print(json.dumps({'stage':'start','charge':m,'N':N,'unknowns':len(z),'F':F,'T':T,'rms':float(np.sqrt(np.mean(residual(z)**2)))}),flush=True)
     options={'xtol':1e-9,'maxfev':args.maxfev,'factor':.1} if args.method=='hybr' else {'fatol':1e-11,'maxiter':100,'jac_options':{'inner_maxiter':40}}
-    if args.method=='krylov' and not fix_amplitude:
+    if args.method=='krylov' and not args.export_initial:
         # Block Fourier preconditioner for D Phi_tau at the uniform equilibrium.
         # Rotation permutes equal-Laplacian Fourier modes; diagonalizing each
         # finite rotation cycle leaves only 2x2 concentration matrices to invert.
         freq=(R.T@coords)%N if m else coords.copy()
         permutation=freq[1]*N+freq[0];seen=set();blocks=[]
-        eu,ev=equilibrium(F);duration=T*fraction
+        # At an amplitude-constrained Hopf seed, the exact homogeneous block
+        # is singular. A small feed offset regularizes this preconditioner;
+        # the shooting equation itself always uses the requested feed.
+        precondition_feed=F-1e-5 if fix_amplitude else F
+        eu,ev=equilibrium(precondition_feed);duration=T*fraction
+        vv=ev*ev;uv=eu*ev
+        if args.precondition_state_mean:
+            components=initial.reshape(2,S);vv=float(np.mean(components[1]**2));uv=float(np.mean(components[0]*components[1]))
         for first in range(S):
             if first in seen:continue
             orbit=[];at=first
             while at not in seen:seen.add(at);orbit.append(at);at=int(permutation[at])
             ky,kx=divmod(first,N)
             eigenlap=2/(3*h*h)*(2*np.cos(2*np.pi*kx/N)+2*np.cos(2*np.pi*ky/N)+2*np.cos(2*np.pi*(kx+ky)/N)-6)
-            A=np.array([[-ev*ev-F+Du*eigenlap,-2*eu*ev],[ev*ev,2*eu*ev-F-k+Dv*eigenlap]])
+            A=np.array([[-vv-precondition_feed+Du*eigenlap,-2*uv],[vv,2*uv-precondition_feed-k+Dv*eigenlap]])
             E=expm(A*duration);ell=len(orbit)
             inverse=np.asarray([np.linalg.inv(E-np.exp(2j*np.pi*j/ell)*np.eye(2)) for j in range(ell)])
             blocks.append((np.asarray(orbit),inverse))
@@ -147,18 +182,35 @@ def main():
             return np.fft.ifft2(out.reshape(2,N,N)).real.reshape(-1)[reps]
         flowed=flow(initial,duration,F)
         period_column=(flow(flowed,.001,F)-flowed)/.001*duration
-        ab=approximate_inverse(period_column[reps])
-        schur=np.dot(ab[expand],tangent)
+        columns=[period_column[reps]]
+        if fix_amplitude:
+            columns.append(((flow(initial,duration,F+1e-7)-flow(initial,duration,F-1e-7))/(2e-7)*.004)[reps])
+        ab=np.stack([approximate_inverse(col) for col in columns],axis=1)
+        def constraints(reduced):
+            full=reduced[expand]
+            return np.r_[np.dot(full,tangent),np.mean(full*direction)] if fix_amplitude else np.array([np.dot(full,tangent)])
+        schur=np.stack([constraints(ab[:,j]) for j in range(ab.shape[1])],axis=1)
         def precondition(rhs):
-            ar=approximate_inverse(rhs[:-1]);t=(np.dot(ar[expand],tangent)-rhs[-1])/schur
-            return np.r_[ar-ab*t,t]
+            size=ab.shape[1];ar=approximate_inverse(rhs[:-size]);t=np.linalg.solve(schur,constraints(ar)-rhs[-size:])
+            return np.r_[ar-ab@t,t]
         options['jac_options']['inner_M']=LinearOperator((len(z),len(z)),matvec=precondition,dtype=float)
-    fit=root(residual,z,method=args.method,options=options)
+    if args.export_initial:
+        accepted=float(np.sqrt(np.mean(residual(z)**2)))<=1e-9
+        fit=SimpleNamespace(x=z,success=accepted,message='Independent native shooting accepted the supplied state.' if accepted else 'The supplied state failed independent native shooting; no export produced.')
+    else:fit=root(residual,z,method=args.method,options=options)
     state=fit.x[:len(reps)][expand];T=float(np.exp(fit.x[len(reps)]));F=float(.004*fit.x[-1] if fix_amplitude else args.feed)
     rms=float(np.sqrt(np.mean(residual(fit.x)**2)))
     report={'schema':'scott-gray-p6-search-candidate-v1','charge':m,'spatialMode':args.mode,'spatialShell':args.shell,'rootConverged':bool(fit.success),'rootMessage':fit.message,'shootingRms':rms,'calls':calls,'elapsedSeconds':time.time()-started,'initialSource':initial_source,'method':'Unprojected triangular-lattice RK4 twisted shooting with time phase condition','nonlinearSolver':'Fourier-block preconditioned Newton–Krylov' if args.method=='krylov' else 'Dense finite-difference Newton (MINPACK hybr)','hopfFeed':hopf,'prescribedAmplitude':args.amplitude if fix_amplitude else None,'caveat':'Unaudited finite-grid numerical candidate; requires independent verification of exported bytes.'}
-    report['searchSettings']={'N':N,'M':M,'feed':args.feed,'kill':k,'L':L,'charge':m,'mode':args.mode,'shell':args.shell,'predictor':args.predictor,'method':args.method}
-    if args.method=='krylov' and fix_amplitude:report['nonlinearSolver']='Unpreconditioned Newton–Krylov (amplitude-constrained seed solve)'
+    report['spatialWavevector']=[a,b]
+    report['spatialShell']=a*a+a*b+b*b if args.wavevector else args.shell
+    report['seedSquaredWaveNumber']=a*a+a*b+b*b
+    report['reflectedMix']=args.reflected_mix
+    report['mixPhase']=args.mix_phase
+    report['instantaneousMirrorAxis']=args.mirror_axis
+    report['preconditionStateMean']=args.precondition_state_mean
+    report['exportInitial']=args.export_initial
+    if args.export_initial:report['nonlinearSolver']='No new nonlinear solve; independent native shooting verification of the supplied corrected state.'
+    report['searchSettings']={'N':N,'M':M,'feed':args.feed,'kill':k,'L':L,'charge':m,'mode':args.mode,'shell':args.shell,'wavevector':[a,b],'reflectedMix':args.reflected_mix,'mixPhase':args.mix_phase,'instantaneousMirrorAxis':args.mirror_axis,'predictor':args.predictor,'method':args.method,'preconditionStateMean':args.precondition_state_mean,'seedTranslations':args.seed_translations,'translationRepeats':repeat,'thirdTranslation':bool(third)}
     if rms>1e-9:
         (args.output/'failed.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2));return
     frames=[];q=state.copy()

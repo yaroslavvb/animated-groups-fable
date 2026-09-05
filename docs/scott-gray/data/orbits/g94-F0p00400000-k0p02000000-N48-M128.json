@@ -106,22 +106,22 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.0007044138033118034,
-    "pdeRms": 6.141040317653238e-07,
+    "pdeRms": 6.141040317653238e-7,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.04472772940233476,
     "spatialRms": 0.045095987847719635,
-    "coarseReturnRms": 4.5472718106094275e-09,
-    "refinedReturnRms": 4.548133342964708e-09,
-    "refinedTrajectoryRms": 5.922965895789039e-09,
+    "coarseReturnRms": 4.5472718106094275e-9,
+    "refinedReturnRms": 4.548133342964708e-9,
+    "refinedTrajectoryRms": 5.922965895789039e-9,
     "maxRefinedPhaseRms": 4.5728203717291235e-17,
     "coarseDt": 0.39805640545867466,
     "refinedDt": 0.19902820272933733,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 1.1083616422773962e-13,
     "projectionMax": 5.097589017566406e-13,
-    "quantizationMax": 1.4894804722942467e-08,
+    "quantizationMax": 1.4894804722942467e-8,
     "admissionElapsedMs": 1722.3755649999985,
-    "coarseTrajectoryRms": 5.922536071655333e-09,
+    "coarseTrajectoryRms": 5.922536071655333e-9,
     "maxCoarsePhaseRms": 5.07797275915714e-17
   },
   "provenance": {
@@ -141,8 +141,24 @@
       "initialFieldRmsDifference": 0.0037652132226345335
     },
     "exportThresholds": {
-      "maximumProjectionMax": 1e-08,
-      "maximumForwardErrorRms": 1e-06
+      "maximumProjectionMax": 1e-8,
+      "maximumForwardErrorRms": 0.000001
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": true,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.922965895789039e-9,
+    "operations": [],
+    "reasons": [],
+    "minimumRelativeColorRange": null,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

@@ -1,0 +1,478 @@
+{
+  "schema": "scott-gray-orbit-binary-v1",
+  "config": {
+    "N": 96,
+    "M": 128,
+    "period": 504.6880893755347,
+    "L": 256,
+    "groupId": "g96",
+    "seed": "submitted-field",
+    "params": {
+      "Du": 0.16,
+      "Dv": 0.08,
+      "F": 0.0038,
+      "k": 0.02,
+      "dx": 2.6666666666666665,
+      "stencil": "five-point"
+    },
+    "ops": [
+      {
+        "M": [
+          [
+            -1,
+            0
+          ],
+          [
+            0,
+            -1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.5
+      },
+      {
+        "M": [
+          [
+            0,
+            -1
+          ],
+          [
+            1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.25
+      },
+      {
+        "M": [
+          [
+            0,
+            1
+          ],
+          [
+            -1,
+            0
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0.75
+      },
+      {
+        "M": [
+          [
+            1,
+            0
+          ],
+          [
+            0,
+            1
+          ]
+        ],
+        "v": [
+          0,
+          0
+        ],
+        "s": 1,
+        "tau": 0
+      }
+    ],
+    "minTemporal": 0.008,
+    "minSpatial": 0.012
+  },
+  "fieldUrl": "g96-diversity-p4-rotating-axial3-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128.f32",
+  "fieldEncoding": "float32-le",
+  "fieldLayout": "frame-major; planar U then V; x-fast",
+  "fieldValueCount": 2359296,
+  "fieldByteLength": 9437184,
+  "fieldSha256": "e239f9ec9a23855e2d0fb2e4986c41bf7bd884d41f3c0d0e45a3247c88d153b5",
+  "provenance": {
+    "method": "Unprojected RK4 twisted shooting; independent offline admission required.",
+    "branchId": "p4-rotating-axial3-F0038-f0p0038",
+    "shapeLabel": "Axial rotating wave · (3,0)",
+    "coordinateTransform": "identity",
+    "spatialRefinement": {
+      "coarseGrid": 48,
+      "fineGrid": 96,
+      "physicalSide": 256,
+      "coarsePeriod": 495.321145496096,
+      "finePeriod": 504.6880893755347,
+      "relativePeriodDifference": 0.018910849990175733,
+      "fieldRmsDifference": 0.007517825845982664,
+      "relativeToCoarseTemporalRms": 0.08025351314346912,
+      "comparison": "Whole normalized-phase movies, Fourier-resampled to coarse lattice; physical parameters held fixed."
+    },
+    "spectrum": [
+      {
+        "squaredWaveNumber": 9,
+        "fraction": 0.6199752190748771
+      },
+      {
+        "squaredWaveNumber": 36,
+        "fraction": 0.08494213277177183
+      },
+      {
+        "squaredWaveNumber": 81,
+        "fraction": 0.07607412298588118
+      },
+      {
+        "squaredWaveNumber": 45,
+        "fraction": 0.07199158086258511
+      },
+      {
+        "squaredWaveNumber": 18,
+        "fraction": 0.03423129904104539
+      },
+      {
+        "squaredWaveNumber": 90,
+        "fraction": 0.022081104401301562
+      },
+      {
+        "squaredWaveNumber": 117,
+        "fraction": 0.017886783539590924
+      },
+      {
+        "squaredWaveNumber": 144,
+        "fraction": 0.016597526105403607
+      }
+    ],
+    "sampledSymmetryRoundoffCorrection": {
+      "rms": 1.0441979728861605e-12,
+      "max": 3.5674851961431386e-11,
+      "maximumAllowed": 1e-8,
+      "originTranslation": [
+        0,
+        0
+      ]
+    },
+    "seedSettings": {
+      "wave": [
+        3,
+        0
+      ],
+      "charge": 1
+    },
+    "unquantizedShootingResidualRms": 3.094200137042717e-14,
+    "unquantizedReturnRms": 5.307314317294686e-12,
+    "note": "A new numerical branch, not a phase snapshot. Coordinate variants in different groups remain related branches. Finite-grid evidence; no continuum proof or glider claim."
+  },
+  "diversityAdmission": {
+    "N": 96,
+    "M": 128,
+    "period": 504.6880893755347,
+    "pdeRms": 0.000005302045020426855,
+    "relativePde": 0.003220890121457736,
+    "symmetryMax": 0,
+    "symmetry": [
+      {
+        "operation": 0,
+        "rms": 0,
+        "max": 0
+      },
+      {
+        "operation": 1,
+        "rms": 0,
+        "max": 0
+      },
+      {
+        "operation": 2,
+        "rms": 0,
+        "max": 0
+      },
+      {
+        "operation": 3,
+        "rms": 0,
+        "max": 0
+      }
+    ],
+    "temporalRms": 0.09656351747852744,
+    "spatialRms": 0.10011111092501399,
+    "minimum": 0.045113131403923035,
+    "maximum": 0.5050337910652161,
+    "nontrivial": true,
+    "faithfulTimeShifts": true,
+    "thresholds": {
+      "pdeRms": 0.0002,
+      "relativePde": 0.05,
+      "relativeClosure": 0.1,
+      "closureRms": 0.01,
+      "relativeTrajectory": 0.1,
+      "trajectoryRms": 0.01,
+      "symmetryMax": 1e-10
+    },
+    "refinementRms": 6.220463554826383e-10,
+    "phaseUncertaintyRms": 2.60753853839774e-8,
+    "atlasVerification": "recomputed-from-field-v1",
+    "validated": true,
+    "reasons": [],
+    "status": "independently verified periodic orbit",
+    "closure": {
+      "computed": true,
+      "steps": 1280,
+      "dt": 0.3942875698246365,
+      "integrationSteps": 2240,
+      "recordedFrames": 225,
+      "N": 96,
+      "M": 128,
+      "closureRms": 1.679336829747278e-8,
+      "closureURms": 2.0282956252980948e-8,
+      "closureVRms": 1.235459927269172e-8,
+      "closureMax": 8.879967955399692e-8,
+      "relativeClosure": 1.7391007220928003e-7,
+      "trajectoryRms": 2.6067339864488715e-8,
+      "trajectoryMax": 0.0000010727291081258361,
+      "relativeTrajectory": 2.69950189731699e-7,
+      "minimum": 0.04510879635465461,
+      "maximum": 0.5050636181222314
+    },
+    "refinedClosure": {
+      "computed": true,
+      "steps": 2560,
+      "dt": 0.19714378491231824,
+      "integrationSteps": 4480,
+      "recordedFrames": 225,
+      "N": 96,
+      "M": 128,
+      "closureRms": 1.69559932701366e-8,
+      "closureURms": 2.046454480559231e-8,
+      "closureVRms": 1.249855277437084e-8,
+      "closureMax": 8.8839027273524e-8,
+      "relativeClosure": 1.7559419657539978e-7,
+      "trajectoryRms": 2.60753853839774e-8,
+      "trajectoryMax": 0.0000010728790631187035,
+      "relativeTrajectory": 2.7003350814944897e-7,
+      "minimum": 0.04510879625128787,
+      "maximum": 0.5050641767854042
+    },
+    "candidatePhase": {
+      "passed": true,
+      "reasons": [],
+      "N": 96,
+      "M": 128,
+      "independentForwardFrames": false,
+      "primitiveAtResolvedDivisors": true,
+      "operations": [
+        {
+          "operation": 0,
+          "tau": 0.5,
+          "shiftedRms": 0,
+          "sameTimeRms": 0.18046331549315595,
+          "phaseRms": 0.18046331549315595,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 1,
+          "tau": 0.25,
+          "shiftedRms": 0,
+          "sameTimeRms": 0.14379142429815406,
+          "phaseRms": 0.14379142429815392,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 2,
+          "tau": 0.75,
+          "shiftedRms": 0,
+          "sameTimeRms": 0.14379142429815392,
+          "phaseRms": 0.14379142429815406,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 3,
+          "tau": 0,
+          "shiftedRms": 0,
+          "sameTimeRms": 0,
+          "phaseRms": 0,
+          "contrastFloor": 0.002,
+          "passed": true
+        }
+      ]
+    },
+    "independentPhase": {
+      "passed": true,
+      "reasons": [],
+      "N": 96,
+      "M": 128,
+      "independentForwardFrames": true,
+      "primitiveAtResolvedDivisors": true,
+      "operations": [
+        {
+          "operation": 0,
+          "tau": 0.5,
+          "shiftedRms": 4.32716717940868e-8,
+          "sameTimeRms": 0.18046331445322508,
+          "phaseRms": 0.1804633172333677,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 1,
+          "tau": 0.25,
+          "shiftedRms": 3.851007637075446e-8,
+          "sameTimeRms": 0.14379142351667873,
+          "phaseRms": 0.14379142442685308,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 2,
+          "tau": 0.75,
+          "shiftedRms": 2.084450468183486e-7,
+          "sameTimeRms": 0.14379142351667934,
+          "phaseRms": 0.1437914426896529,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 3,
+          "tau": 0,
+          "shiftedRms": 0,
+          "sameTimeRms": 0,
+          "phaseRms": 0,
+          "contrastFloor": 0.002,
+          "passed": true
+        }
+      ]
+    },
+    "refinedPhase": {
+      "passed": true,
+      "reasons": [],
+      "N": 96,
+      "M": 128,
+      "independentForwardFrames": true,
+      "primitiveAtResolvedDivisors": true,
+      "operations": [
+        {
+          "operation": 0,
+          "tau": 0.5,
+          "shiftedRms": 4.349114359449861e-8,
+          "sameTimeRms": 0.18046331449701478,
+          "phaseRms": 0.1804633173258597,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 1,
+          "tau": 0.25,
+          "shiftedRms": 3.868177906915826e-8,
+          "sameTimeRms": 0.1437914235654773,
+          "phaseRms": 0.14379142445205204,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 2,
+          "tau": 0.75,
+          "shiftedRms": 2.085594447135633e-7,
+          "sameTimeRms": 0.1437914235654773,
+          "phaseRms": 0.14379144292296278,
+          "contrastFloor": 0.002,
+          "passed": true
+        },
+        {
+          "operation": 3,
+          "tau": 0,
+          "shiftedRms": 0,
+          "sameTimeRms": 0,
+          "phaseRms": 0,
+          "contrastFloor": 0.002,
+          "passed": true
+        }
+      ]
+    }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 2.60753853839774e-8,
+    "operations": [
+      {
+        "operation": 0,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.22100843071618448,
+            "minimumRelativeColorRange": 0.4890215146319815,
+            "phase": 0.48080309719346914,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.11193904345437643,
+            "minimumRelativeColorRange": 0.41192803023428626,
+            "phase": 0.15271627673861543,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 1,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.16978721888082665,
+            "minimumRelativeColorRange": 0.37568522917064157,
+            "phase": 0.23733571101790107,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.09444788473336052,
+            "minimumRelativeColorRange": 0.3475617614497941,
+            "phase": 0.15972695910584922,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.16978721888082665,
+            "minimumRelativeColorRange": 0.37568522917064157,
+            "phase": 0.9873357110179013,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.09444788473336052,
+            "minimumRelativeColorRange": 0.3475617614497941,
+            "phase": 0.9097269591058492,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.3475617614497941,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
+  }
+}

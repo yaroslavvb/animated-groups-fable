@@ -4,7 +4,7 @@
     "N": 48,
     "M": 192,
     "period": 328.62958820673293,
-    "L": 256.0,
+    "L": 256,
     "groupId": "g245",
     "ops": [
       {
@@ -19,11 +19,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       },
       {
         "M": [
@@ -37,8 +37,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.6666666666666666
@@ -55,8 +55,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.3333333333333333
@@ -73,8 +73,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.3333333333333333
@@ -91,8 +91,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.6666666666666666
@@ -109,11 +109,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       }
     ],
     "params": {
@@ -144,10 +144,10 @@
     "spatialRefinement": {
       "coarseGrid": 24,
       "fineGrid": 48,
-      "physicalSide": 256.0,
+      "physicalSide": 256,
       "coarsePeriod": 328.639670681723,
       "finePeriod": 328.62958820673293,
-      "relativePeriodDifference": 3.067942153522638e-05,
+      "relativePeriodDifference": 0.00003067942153522638,
       "fieldRmsDifference": 0.00011073401273605361,
       "fieldMaxDifference": 0.00033103520489732863,
       "relativeToCoarseTemporalRms": 0.005286777233641276,
@@ -155,5 +155,106 @@
     },
     "projection": "None: the exported movie is direct RK4 evolution, followed only by an optional exact lattice reflection and Float32 quantization.",
     "note": "Finite-grid numerical evidence; no continuum existence theorem or glider morphology is asserted."
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.027344851569074e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.6666666666666665,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04107214892603627,
+            "minimumRelativeColorRange": 0.4248738978687772,
+            "phase": 0.6435147170583639,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02571915566997741,
+            "minimumRelativeColorRange": 0.41258647608095067,
+            "phase": 0.2484359539746388,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.33333333333333326,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04107214892603627,
+            "minimumRelativeColorRange": 0.4248738978687772,
+            "phase": 0.9768480503916974,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02571915566997741,
+            "minimumRelativeColorRange": 0.41258647608095067,
+            "phase": 0.5817692873079721,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 3,
+        "tau": 0.33333333333333326,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04107214892603627,
+            "minimumRelativeColorRange": 0.4248738978687772,
+            "phase": 0.9768480503916974,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02571915566997741,
+            "minimumRelativeColorRange": 0.41258647608095067,
+            "phase": 0.5817692873079721,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 4,
+        "tau": 0.6666666666666665,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.04107214892603627,
+            "minimumRelativeColorRange": 0.4248738978687772,
+            "phase": 0.6435147170583639,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02571915566997741,
+            "minimumRelativeColorRange": 0.41258647608095067,
+            "phase": 0.2484359539746388,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.41258647608095067,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

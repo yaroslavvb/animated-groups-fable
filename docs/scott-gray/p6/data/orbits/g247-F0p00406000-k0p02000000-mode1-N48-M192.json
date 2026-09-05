@@ -4,7 +4,7 @@
     "N": 48,
     "M": 192,
     "period": 335.88085101083954,
-    "L": 256.0,
+    "L": 256,
     "groupId": "g247",
     "ops": [
       {
@@ -19,8 +19,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.5
@@ -37,8 +37,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.3333333333333333
@@ -55,8 +55,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.6666666666666666
@@ -73,8 +73,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.16666666666666666
@@ -91,8 +91,8 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
         "tau": 0.8333333333333334
@@ -109,11 +109,11 @@
           ]
         ],
         "v": [
-          0.0,
-          0.0
+          0,
+          0
         ],
         "s": 1,
-        "tau": 0.0
+        "tau": 0
       }
     ],
     "params": {
@@ -135,7 +135,7 @@
   "fieldSha256": "124dd8776ce566dafcd74283c871828d6fdd28874d15826aa5a8011f45c7d159",
   "provenance": {
     "method": "Unprojected triangular-lattice RK4 twisted shooting with time phase condition",
-    "nonlinearSolver": "Fourier-block preconditioned Newton\u2013Krylov",
+    "nonlinearSolver": "Fourier-block preconditioned Newton–Krylov",
     "family": "Rotating hexagonal wave",
     "spatialMode": 1,
     "spatialShell": 1,
@@ -146,7 +146,7 @@
     "spatialRefinement": {
       "coarseGrid": 24,
       "fineGrid": 48,
-      "physicalSide": 256.0,
+      "physicalSide": 256,
       "coarsePeriod": 335.8138690531891,
       "finePeriod": 335.88085101083954,
       "relativePeriodDifference": 0.00019946155839038897,
@@ -157,5 +157,127 @@
     },
     "projection": "None: the exported movie is direct RK4 evolution, followed only by an optional exact lattice reflection and Float32 quantization.",
     "note": "Finite-grid numerical evidence; no continuum existence theorem or glider morphology is asserted."
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 4.991238710668896e-9,
+    "operations": [
+      {
+        "operation": 0,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.07109887613046116,
+            "minimumRelativeColorRange": 0.5240275969100402,
+            "phase": 0.3203142054906343,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.04466822955099788,
+            "minimumRelativeColorRange": 0.5087602372589816,
+            "phase": 0.13280856848292943,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 1,
+        "tau": 0.33333333333333326,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.0622373764704579,
+            "minimumRelativeColorRange": 0.4587147449413275,
+            "phase": 0.6536476213777671,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.03942807602195659,
+            "minimumRelativeColorRange": 0.44907616695875224,
+            "phase": 0.13281043027182182,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.6666666666666665,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.0622373764704579,
+            "minimumRelativeColorRange": 0.4587147449413275,
+            "phase": 0.32031428804443385,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.039428076021956526,
+            "minimumRelativeColorRange": 0.4490761669587515,
+            "phase": 0.13281043027182182,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 3,
+        "tau": 0.16666666666666674,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.03679638119210138,
+            "minimumRelativeColorRange": 0.2712042757989741,
+            "phase": 0.32031120906388,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.023742824828229,
+            "minimumRelativeColorRange": 0.27042498245911273,
+            "phase": 0.13282506814762485,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 4,
+        "tau": 0.8333333333333335,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.03679638119210138,
+            "minimumRelativeColorRange": 0.2712042757989741,
+            "phase": 0.15364454239721326,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.02374282482822892,
+            "minimumRelativeColorRange": 0.27042498245911184,
+            "phase": 0.13282506814762485,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.27042498245911184,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

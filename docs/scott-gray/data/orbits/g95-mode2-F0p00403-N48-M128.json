@@ -102,20 +102,20 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.00039689277175910604,
-    "pdeRms": 1.8712788717868223e-07,
+    "pdeRms": 1.8712788717868223e-7,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.024438276301483996,
     "spatialRms": 0.0244514138986166,
-    "coarseReturnRms": 3.6603438453916893e-09,
-    "refinedReturnRms": 3.660346534607407e-09,
-    "refinedTrajectoryRms": 5.2613543380118e-09,
-    "maxRefinedPhaseRms": 4.215408330946576e-09,
+    "coarseReturnRms": 3.6603438453916893e-9,
+    "refinedReturnRms": 3.660346534607407e-9,
+    "refinedTrajectoryRms": 5.2613543380118e-9,
+    "maxRefinedPhaseRms": 4.215408330946576e-9,
     "coarseDt": 0.37977324531141354,
     "refinedDt": 0.18988662265570677,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 1.1509365997788302e-12,
     "projectionMax": 7.480793762226767e-12,
-    "quantizationMax": 1.4882765020374222e-08,
+    "quantizationMax": 1.4882765020374222e-8,
     "admissionElapsedMs": 3040.3722199999997
   },
   "provenance": {
@@ -141,15 +141,15 @@
       "comparison": "Same normalized time phases on coincident nodes, with physical parameters and L256 fixed."
     },
     "exportThresholds": {
-      "maximumProjectionRms": 1e-08,
-      "maximumRefinedReturnRms": 1e-06,
-      "maximumRefinedTrajectoryRms": 1e-06,
-      "maximumRefinedPhaseRms": 1e-06
+      "maximumProjectionRms": 1e-8,
+      "maximumRefinedReturnRms": 0.000001,
+      "maximumRefinedTrajectoryRms": 0.000001,
+      "maximumRefinedPhaseRms": 0.000001
     },
     "spatialMode": 2,
     "tiledFrom": {
       "N": 24,
-      "physicalSide": 128.0,
+      "physicalSide": 128,
       "tileFactor": 2
     },
     "distinctFromFundamental": "Different wavelength and minimal temporal period at the same F, k, Du, Dv, L and N; see research/standing-mode2-distinction.json."
@@ -159,5 +159,64 @@
     "name": "Standing mode 2",
     "spatialMode": 2,
     "cellsPerSide": 2
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 5.2613543380118e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.0157233122725179,
+            "minimumRelativeColorRange": 0.1053358898216088,
+            "phase": 0.26220272469402905,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.008839671010036854,
+            "minimumRelativeColorRange": 0.0922019622737616,
+            "phase": 0.15195411247938906,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.0157233122725179,
+            "minimumRelativeColorRange": 0.1053358898216088,
+            "phase": 0.26220272469402905,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.008839671010036854,
+            "minimumRelativeColorRange": 0.0922019622737616,
+            "phase": 0.15195411247938906,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.0922019622737616,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

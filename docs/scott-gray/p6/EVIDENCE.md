@@ -4,8 +4,12 @@ All six requested cyclic color characters have nonuniform, time-dependent numeri
 
 These are finite-grid chemical waves. They are not proofs of continuum existence, a complete classification of periodic solutions, or verified gliders. Additional spatial symmetries are allowed. Opposite-handed entries are related by an exact spatial reflection, and each exported field is independently checked against its own directed time character.
 
+## Initial 22-entry atlas (historical)
+
+The snapshot below describes the first release. The current gallery adds branches and applies a throughout-cycle visibility filter; see [current counts and refinement evidence](../DIVERSITY.md).
+
 <!-- atlas-summary:start -->
-The atlas contains **22 independently verified records at 6 physical parameter sets**, spanning all six characters. All published fields use **48² spatial nodes and 192 saved phases**. Each group has three or four selectable parameter sets. For g247 and g248 at `F = 0.00404`, two distinct waves coexist: the first reciprocal shell has period `344.7403`, and reciprocal shell 3 has period `335.5436`.
+The atlas contains **22 independently verified records at 6 physical parameter sets**, spanning all six characters. The initially published fields use **48² spatial nodes and 192 saved phases**. Each group has three or four selectable parameter sets. For g247 and g248 at `F = 0.00404`, two distinct waves coexist: the first reciprocal shell has period `344.7403`, and reciprocal shell 3 has period `335.5436`.
 
 | Group | Available feed F (k = 0.02) | Saved patterns | Largest refined return RMS |
 | --- | --- | ---: | ---: |
@@ -16,7 +20,7 @@ The atlas contains **22 independently verified records at 6 physical parameter s
 | g247 | 0.00400, 0.00404, 0.00406, 0.00408 | 5 | 4.20e-09 |
 | g248 | 0.00400, 0.00404, 0.00406, 0.00408 | 5 | 4.20e-09 |
 
-Across all records, the largest independently refined time-symmetry RMS is **4.54e-09**, the largest PDE residual is **2.01e-07 RMS**, and the largest half-timestep trajectory difference is **5.55e-12 RMS**. Spatial refinement changes the period by at most **0.201%**, and changes the full movie by **0.53–4.19%** of the coarse temporal RMS. These spatial differences are much larger than the discrete shooting error and remain part of the accuracy assessment.
+Across these initial records, the largest independently refined time-symmetry RMS is **4.54e-09**, the largest PDE residual is **2.01e-07 RMS**, and the largest half-timestep trajectory difference is **5.55e-12 RMS**. Spatial refinement changes the period by at most **0.201%**, and changes the full movie by **0.53–4.19%** of the coarse temporal RMS. These spatial differences are much larger than the discrete shooting error and remain part of the accuracy assessment.
 
 [Complete saved diagnostics, hashes and provenance](data/precomputed-atlas.json).
 <!-- atlas-summary:end -->
@@ -79,7 +83,7 @@ Those cross-grid comparisons come from the Python/C++ search pipeline. They are 
 
 ## Reproduction and extension
 
-See [the search API and recorded attempts](../research/p6/README.md) for the branch search, Fourier-block Newton–Krylov preconditioner, continuation, spatial refinement and export commands. The search is local CPU computation; this 632 extension used no Modal GPUs or additional Modal spend.
+See [the search API and recorded attempts](../research/p6/README.md) for the branch search, Fourier-block Newton–Krylov preconditioner, continuation, spatial refinement and export commands. The initial 22-entry 632 atlas was computed on local CPUs without Modal spend. Later diversity searches use bounded Modal CPU and GPU batches; their results and spatial refinement are summarized in [the current diversity report](../DIVERSITY.md).
 
 From `docs/scott-gray`, rebuild numerical admission and all saved thumbnails with Node 20 or newer:
 

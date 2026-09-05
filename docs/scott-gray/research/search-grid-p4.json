@@ -1,0 +1,3049 @@
+{
+  "schema": "scott-gray-p4-search-grid-v1",
+  "purpose": "Systematic spatial-mode and reflected-star exploration at fixed physical parameters; filenames and coordinate copies never establish diversity.",
+  "solver": "Full-state FP64 CUDA RK4 twisted shooting, dense batched finite-difference Newton correction; independent CPU RK4 movie reconstruction and separate atlas admission.",
+  "currentSolverSourceSha256": "d362c830579252a6bcdbc40ea6a42c513672449beb002b3bb7de8c15864e6fcd",
+  "gpu": "A100-40GB",
+  "cpuCoresPerContainer": 2,
+  "hostMemoryLimitGiB": 16,
+  "startupTimeoutSeconds": 300,
+  "functionTimeoutSeconds": 300,
+  "numericalWorkLimitSeconds": 220,
+  "retries": 0,
+  "userTotalBudgetUSD": 100,
+  "p4AllocationUSD": 20,
+  "runs": [
+    {
+      "batch": 1,
+      "appId": "ap-2L5AfntQnuVuYrKdsXrWB0",
+      "status": "failed",
+      "returnedJobReports": 0,
+      "convergedJobReports": 0,
+      "convergedAtRequestedTarget": 0,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 2,
+      "initialManifestSha256": "4214c66973835a3f8523f13f17c279c23c4a590e7e91e8d941a1274e4177ceef",
+      "cases": [
+        {
+          "name": "rotating-oblique21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": null,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "41eb730e06b3b6b8e950964e8ff05ef75551ca7d6d910a83fbac2b7abf5f367d"
+        },
+        {
+          "name": "rotating-woven21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "66af0aa9fc2e8e22422e4ad65dbfe29b0f85e4378e137f4329eae2536d176dd1"
+        }
+      ]
+    },
+    {
+      "batch": 2,
+      "appId": "ap-nb2A0EAVuRXWvwm64RVTGY",
+      "status": "failed",
+      "returnedJobReports": 0,
+      "convergedJobReports": 0,
+      "convergedAtRequestedTarget": 0,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 2,
+      "initialManifestSha256": "4214c66973835a3f8523f13f17c279c23c4a590e7e91e8d941a1274e4177ceef",
+      "cases": [
+        {
+          "name": "rotating-oblique21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": null,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "41eb730e06b3b6b8e950964e8ff05ef75551ca7d6d910a83fbac2b7abf5f367d"
+        },
+        {
+          "name": "rotating-woven21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "66af0aa9fc2e8e22422e4ad65dbfe29b0f85e4378e137f4329eae2536d176dd1"
+        }
+      ]
+    },
+    {
+      "batch": 3,
+      "appId": "ap-D1EzDMh4y5VxjHX3CtbRq5",
+      "status": "completed",
+      "returnedJobReports": 7,
+      "convergedJobReports": 3,
+      "convergedAtRequestedTarget": 3,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 7,
+      "initialManifestSha256": "452ab47d5ce5c5c51274227e75fd4b73c88aeccc7393632de32ab7c44d75de3d",
+      "cases": [
+        {
+          "name": "rotating-oblique21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": null,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "41eb730e06b3b6b8e950964e8ff05ef75551ca7d6d910a83fbac2b7abf5f367d"
+        },
+        {
+          "name": "rotating-woven21",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "66af0aa9fc2e8e22422e4ad65dbfe29b0f85e4378e137f4329eae2536d176dd1"
+        },
+        {
+          "name": "standing-diagonal1",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "e70a96494002346901bb565ab4b4adc03485daea2aae860f431718796d08a842"
+        },
+        {
+          "name": "standing-oblique21",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "ceb873b6958a66d583ed84f590a9e04cc34cf93189b4ed95bd2874212d722850"
+        },
+        {
+          "name": "standing-oblique31",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "f3e0841540a6240c5ea6ea2c8439da90b9aaa8776ce5de669d4b5f9a29a1c237"
+        },
+        {
+          "name": "standing-diagonal2",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "deebfcfa881117091d546c36c74c682320dbc0c410f44e04f472a127451e94a9"
+        },
+        {
+          "name": "rotating-diagonal1",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "6e486f5f9bbc6a17ce745d38d8346d1a9e2ba85421295e3d1808b08606f62c7e"
+        }
+      ]
+    },
+    {
+      "batch": 4,
+      "appId": "ap-zgVHEkElaTg6qsJGMG3PwT",
+      "status": "completed",
+      "returnedJobReports": 5,
+      "convergedJobReports": 2,
+      "convergedAtRequestedTarget": 2,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 5,
+      "initialManifestSha256": "2444c0a33c8a0f4f6b711718f0a0e9064eea6ad6bb11b13905a2f61908fb6b2b",
+      "cases": [
+        {
+          "name": "standing-diagonal1",
+          "parameters": {
+            "F": 0.0040763228691965935,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "a9530be5524d102d6bf38b1008179a3751712eb057b3aa742276c23b1de3de7a"
+        },
+        {
+          "name": "standing-diagonal2",
+          "parameters": {
+            "F": 0.0039877787356761415,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "d4e62fe3a8411e957566b1724fee1a17f2a1090e6a7454f6af3761cf062c5c3f"
+        },
+        {
+          "name": "standing-oblique21",
+          "parameters": {
+            "F": 0.004032342627834421,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "236704a9745362ece59aacff379fc48e4e656fd9e09bc6b5a6c28820388ab484"
+        },
+        {
+          "name": "rotating-diagonal1",
+          "parameters": {
+            "F": 0.004076655694441599,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "ec42e841f700f641b2e7eff1b44370a1059c832304ab2f74675c697fe56dfdf2"
+        },
+        {
+          "name": "rotating-diagonal2",
+          "parameters": {
+            "F": 0.003987572432877345,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "2256d015db7f9807ef06d6a82a77dec42982163ff95f4880428e6ce1838d1713"
+        }
+      ]
+    },
+    {
+      "batch": 5,
+      "appId": "ap-r7pXEtW7IABt718ycS54qL",
+      "status": "completed",
+      "returnedJobReports": 8,
+      "convergedJobReports": 7,
+      "convergedAtRequestedTarget": 7,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 8,
+      "initialManifestSha256": "e75380cb14d7e85d75692cefa9f3b3744588c665698c04041cb9708136760ee3",
+      "cases": [
+        {
+          "name": "standing-diagonal1",
+          "parameters": {
+            "F": 0.0040763228691965935,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "a9530be5524d102d6bf38b1008179a3751712eb057b3aa742276c23b1de3de7a"
+        },
+        {
+          "name": "standing-diagonal2",
+          "parameters": {
+            "F": 0.0039877787356761415,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "d4e62fe3a8411e957566b1724fee1a17f2a1090e6a7454f6af3761cf062c5c3f"
+        },
+        {
+          "name": "standing-oblique21",
+          "parameters": {
+            "F": 0.004032342627834421,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "236704a9745362ece59aacff379fc48e4e656fd9e09bc6b5a6c28820388ab484"
+        },
+        {
+          "name": "rotating-oblique21-f00395",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": null,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "78aa97aa6f45f157f0d100b929fa5cb3ddb1184748c608eab09981a1f2a1860b"
+        },
+        {
+          "name": "rotating-woven21-f00395",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "481e921cb26c4b0221b70ac01595ad83105975664a2063ba52dd8fadf898164c"
+        },
+        {
+          "name": "rotating-woven31",
+          "parameters": {
+            "F": 0.003957532568976768,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "29d4835bebad6b9e31e9e5483c14a11bcbcfc65ab90ecab34debc8373fd14e79"
+        },
+        {
+          "name": "standing-woven21",
+          "parameters": {
+            "F": 0.004031479944380547,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "8a0f84729c33620359f5240e053a292927d146ec895212b7e06c5402a7d47892"
+        },
+        {
+          "name": "standing-quadrature21",
+          "parameters": {
+            "F": 0.00403092501514524,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 1.5707963267948966,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "87477aa0d192fa2240e85ca5dcf8a4ff766c53a2be3455f9b2e3fddbd493374e"
+        }
+      ]
+    },
+    {
+      "batch": 6,
+      "appId": "ap-zI99VdtOLI9NfdJbodHiIm",
+      "status": "failed",
+      "returnedJobReports": 7,
+      "convergedJobReports": 2,
+      "convergedAtRequestedTarget": 2,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 8,
+      "initialManifestSha256": "038d5b8c674d08e3d295e840f571085ddcad78240744ee4f5f0e03b56df138f2",
+      "cases": [
+        {
+          "name": "standing-woven31",
+          "parameters": {
+            "F": 0.003957845433035788,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0.0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "ea6f912587399b5caf4506e626cd1005e1a58dbc97a274d05d67adf4a1a0f51e"
+        },
+        {
+          "name": "standing-quadrature31",
+          "parameters": {
+            "F": 0.003957069973014577,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 1.5707963267948966,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "21051eea0432ca0b7d08e9be0813602fb0fd64a207080ecbe314365888cc9d3c"
+        },
+        {
+          "name": "rotating-quadrature21",
+          "parameters": {
+            "F": 0.004030539535080661,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 1.5707963267948966,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "2810f4f4ceb98b18ddf364f9368a3d3ca322dcdaba909d0dccf92b7a0a78323a"
+        },
+        {
+          "name": "rotating-quadrature31",
+          "parameters": {
+            "F": 0.003956520806288326,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 1.5707963267948966,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "2d56f433b192ebaf441a5c2eb49908c5e309fa48333e0222188baf51d9c760e8"
+        },
+        {
+          "name": "rotating-axial3",
+          "parameters": {
+            "F": 0.003973293879139794,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0.0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "76949cbe3fa4223f1dbd105da7e292be540e065e9f0a616289e5016d44afb8db"
+        },
+        {
+          "name": "standing-cross21",
+          "parameters": {
+            "F": 0.004035003798115719,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "fb558de11a22bb72b5cade6c8bff1670f5f15303752323bc6b25b8a8c37c10e8"
+        },
+        {
+          "name": "standing-axial2",
+          "parameters": {
+            "F": 0.004,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.00395
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "133c0b7e68782349495e5fbe329fdb87c0bc6ad75ead8ed8106803a4426fb73b"
+        },
+        {
+          "name": "rotating-diagonal1-refined96",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "6125858aa81af96e83f3d6195016e933b09d0a683fc7e875a5a0a66b8996b097"
+        }
+      ]
+    },
+    {
+      "batch": 7,
+      "appId": "ap-piLUnr4nKbsRSqvk4wHx5W",
+      "status": "completed",
+      "returnedJobReports": 5,
+      "convergedJobReports": 1,
+      "convergedAtRequestedTarget": 1,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 5,
+      "initialManifestSha256": "cfded490cf3059f1ab55356a54db9bd1b2da60773cea814b1486ad25c2ca7a24",
+      "cases": [
+        {
+          "name": "rotating-diagonal1-refined96",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            1,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "6125858aa81af96e83f3d6195016e933b09d0a683fc7e875a5a0a66b8996b097"
+        },
+        {
+          "name": "rotating-large-q13-0p045",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "907088fa9f546c06909bdeb13716f5a72e211fbc8d6d0cdac0e0a36f590d3676"
+        },
+        {
+          "name": "rotating-large-q13-0p065",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "830795b83d908388deaa37b667a42e9843069c87b717d63eeade9913225e84e2"
+        },
+        {
+          "name": "standing-large-q13-0p045",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "b9f0588dfeae41d96d3adf2f154c7b2aee4d5532716bf1ef456482c4a3edc554"
+        },
+        {
+          "name": "standing-large-q13-0p065",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "b8fe514c95b5be619b52ef6aa9391ad11ff9f8376c82eb66a32249f7b2d65f32"
+        }
+      ]
+    },
+    {
+      "batch": 8,
+      "appId": "ap-Pekpd6CGmGarSyVpCsuD5d",
+      "status": "completed",
+      "returnedJobReports": 10,
+      "convergedJobReports": 0,
+      "convergedAtRequestedTarget": 0,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 10,
+      "initialManifestSha256": "e77f11db36ca29a679f5019cefb2a67770252d4e9c3ac864b13997af1d8f370d",
+      "cases": [
+        {
+          "name": "standing-axial1-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "439c9d9259fe052ef9c618320c90053078693acfcf21705de2cea2e6d3d4ca16"
+        },
+        {
+          "name": "standing-axial1-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "b8179160fdc7180303087a46083d29f0daf3a160a03dbd2a788446ccf8e8abbb"
+        },
+        {
+          "name": "standing-axial2-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "f8c172109a8957d4d9c65f3ecfad7b202a9705de57f8970cc8f645b6ce224c2a"
+        },
+        {
+          "name": "standing-axial2-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "31392bd20bae49806f3da65e5da2d4158941163c73db59d02995e4148bcaa293"
+        },
+        {
+          "name": "standing-woven10-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "a96d17e03d16d86db62bfa044e23f7f5dc5eeea57c83a4e06635b7fdc39db3e4"
+        },
+        {
+          "name": "standing-woven10-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "da31927433dfec2f34c389c46fa0f36b5d933d985a7c7c0f1c42631df68520e3"
+        },
+        {
+          "name": "rotating-axial1-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "e6b2683e41e898581044302899fce1f0d8c70c7ba7a71562f0be01e748c5f319"
+        },
+        {
+          "name": "rotating-axial1-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "6cec8f4be9846ec3d46926432f35f24bfdc96fc52f65f1b8641218c0ccf5cb1d"
+        },
+        {
+          "name": "rotating-axial3-woven10-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "31e799504ec6a88026a1c48f373758a0d0427faa61492f490a051f5e0d5a3594"
+        },
+        {
+          "name": "rotating-axial3-woven10-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "0030c3b526d5b28cfd794a16a7590a5e6adebdb7b3472c06cade6473252cf59e"
+        }
+      ]
+    },
+    {
+      "batch": 9,
+      "appId": "ap-APQd8OvjEKjvcFSnjG9S33",
+      "status": "completed",
+      "returnedJobReports": 6,
+      "convergedJobReports": 0,
+      "convergedAtRequestedTarget": 0,
+      "maxConcurrentA100s": 2,
+      "numberOfJobs": 6,
+      "initialManifestSha256": "734bc7467ab2c543022954c493a64480775b26431261b8900dc0a89cbc58c542",
+      "cases": [
+        {
+          "name": "standing-axial2-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "c28ae91087478c3266737f3770ba4c109dafc09fe22c544a0cd423b1dd7199c0"
+        },
+        {
+          "name": "standing-woven10-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "a0dc69c69cd830d71e2791866c83db18d0dd625b11496a06237e42d711bd4bf6"
+        },
+        {
+          "name": "standing-axial1-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "79f4b5ad6ab62ffc665b64eeabf7adbcb0e9d7d0d8c2fcdd726aed2fb82dbd42"
+        },
+        {
+          "name": "rotating-axial3-woven10-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "d5e01d8b9becf1529cdb0461ed3ef473171eff4cca0abd9063e751fb76a77d75"
+        },
+        {
+          "name": "standing-axial1-oblique5-phase0",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "6616c5db3984b2bafd254a5c93c853f69d7744974f047274089892d71983a9cf"
+        },
+        {
+          "name": "standing-axial2-oblique5-phase0p25",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": false,
+          "targets": [],
+          "newtonIterationCapPerStep": 48,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "3bf0ca0ece36ce2eb5c5c541608e362ac8b8d41bbdcac520f2b26646fb62fea8"
+        }
+      ]
+    },
+    {
+      "batch": 10,
+      "appId": "ap-guTw4ykKdW4W5neaENhJ6w",
+      "status": "completed",
+      "returnedJobReports": 16,
+      "convergedJobReports": 6,
+      "convergedAtRequestedTarget": 6,
+      "maxConcurrentA100s": 4,
+      "numberOfJobs": 16,
+      "initialManifestSha256": "f7c8d9273b5d7d34ea73594f06974a757035dc93c0946a0616034516d3eefbf8",
+      "cases": [
+        {
+          "name": "standing-32-single-F0038",
+          "parameters": {
+            "F": 0.003911473884455413,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "43d39f439aac056f3b51135624e5deb976af57f21655923891099f866c480ac2"
+        },
+        {
+          "name": "standing-32-woven-F0038",
+          "parameters": {
+            "F": 0.003905088553147651,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "8494294a40354e221468402330bd901646966920fb9eeef359873fcf0d36c75e"
+        },
+        {
+          "name": "standing-40-single-F0038",
+          "parameters": {
+            "F": 0.0038691610495329458,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "a191b54bea08d32824622071319fe962e95c5a4bf7817dc3a8efa6cd2aa08271"
+        },
+        {
+          "name": "standing-41-single-F0038",
+          "parameters": {
+            "F": 0.00385384989430758,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "b25130a6eb075a3ec51eba681e599074ba622f8735f379134a5871424871f95c"
+        },
+        {
+          "name": "standing-41-woven-F0038",
+          "parameters": {
+            "F": 0.0038509680771858772,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "5e911fc6f1b6b9a7a60a53b92a7367781a65da55b4be391e6c706fc2d0fc92e0"
+        },
+        {
+          "name": "standing-33-single-F0038",
+          "parameters": {
+            "F": 0.0038356016388234387,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            3
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "f5614df5235fe7fb4c495d348e36daa672ca14b70d546360c66b0ff9d30dcd1f"
+        },
+        {
+          "name": "standing-42-single-F0038",
+          "parameters": {
+            "F": 0.003805355741424837,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "2ece50b3eec967dfd3e6cf925e371021653d2ab24560d97742a6169bba61ea8d"
+        },
+        {
+          "name": "standing-42-woven-F0038",
+          "parameters": {
+            "F": 0.0038072898832784354,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "8382926e42b7b0a777de95d9b57168a1889dd778602fa99797139088bcd4b556"
+        },
+        {
+          "name": "rotating-32-single-F0038",
+          "parameters": {
+            "F": 0.003910934076202251,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "42aeb2f7ebd9f65a036b3fb86a6db90521a74c4d49fecd5af83ddf9893df1085"
+        },
+        {
+          "name": "rotating-32-woven-F0038",
+          "parameters": {
+            "F": 0.003907826578809439,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "d7236aca875abb45faab26f660c8a0c3e7893adc7058f403560969d9b7213925"
+        },
+        {
+          "name": "rotating-40-single-F0038",
+          "parameters": {
+            "F": 0.003867894969161849,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "7513a1792a3094b7760f63ce3f09332a30324a4c2be96733126d0d4a0b8cef20"
+        },
+        {
+          "name": "rotating-41-single-F0038",
+          "parameters": {
+            "F": 0.003851871733886193,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "2706ac7f7c64bbb475e98bb1ee9bf7c77b5cd23ff7acc5f9b12a9451317baafd"
+        },
+        {
+          "name": "rotating-41-woven-F0038",
+          "parameters": {
+            "F": 0.003850106507045988,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "92a3c8f343c02b5e2522d118f351901674af361c027f8583aa7570551f29e486"
+        },
+        {
+          "name": "rotating-33-single-F0038",
+          "parameters": {
+            "F": 0.0038349695700396875,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            3
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "5627251469815d0b4961f4944a9bc0f373e00ee879837ef1fe967a8a7d4b5497"
+        },
+        {
+          "name": "rotating-42-single-F0038",
+          "parameters": {
+            "F": 0.003805344721207808,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "4e32371b5be37aa49ca588980985a1e279fca0cabac6ce1ecd2347339470cfb8"
+        },
+        {
+          "name": "rotating-42-woven-F0038",
+          "parameters": {
+            "F": 0.0038020939499276555,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "5ba1b86bf67238a1d0ccdd6165ded4b4ca81467cf09017a57d7178c3694c404f"
+        }
+      ]
+    },
+    {
+      "batch": 11,
+      "appId": "ap-PPV5XRnvyQXz0aQqpJO2ga",
+      "status": "completed",
+      "returnedJobReports": 8,
+      "convergedJobReports": 4,
+      "convergedAtRequestedTarget": 4,
+      "maxConcurrentA100s": 4,
+      "numberOfJobs": 8,
+      "initialManifestSha256": "198fa2ff7754cccf71084b5d7fff45f9572b60219450ee0eb596593f6a8b3691",
+      "cases": [
+        {
+          "name": "standing-axial1-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "b1f6ba8642020ceed6c1479c741686b8293d843b469e70db0975033f885a8565"
+        },
+        {
+          "name": "standing-axial2-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "47e0fa9365e22c44488ee96adada61e02bf89e5d84c0088386e84c6491ae5dc5"
+        },
+        {
+          "name": "standing-oblique21-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "d3b329101a3139a5e6172432ceeb9983b7174c07f9bd420cb3b3f8c7f253ca75"
+        },
+        {
+          "name": "standing-woven21-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "08e091813f406f69ba5886ab7c457eb1d274ee93824868ad8fb68671de95d731"
+        },
+        {
+          "name": "rotating-axial1-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "c54cc513773bf66a7b949eacf695800ab0bfce50966e9d713454fc273f71d54f"
+        },
+        {
+          "name": "rotating-axial3-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0.0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "198b92213a466615d40b6365104c2508dfec623a6e3ff089c2ca0531927cf6c0"
+        },
+        {
+          "name": "rotating-oblique21-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "addfefdd24c871f18f8bcf934f6afb87db393d07adc44be38cc7c4e11610cad2"
+        },
+        {
+          "name": "rotating-woven21-F0038",
+          "parameters": {
+            "F": 0.00395,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "72dbbb56855c9a8fedfef0e0bf9a9bad927cf09c240b9c2d05f6a236ddfc7f6f"
+        }
+      ]
+    },
+    {
+      "batch": 12,
+      "appId": "ap-p9SeZBzdKZLuFLgUPrmIGp",
+      "status": "completed",
+      "returnedJobReports": 16,
+      "convergedJobReports": 12,
+      "convergedAtRequestedTarget": 12,
+      "maxConcurrentA100s": 4,
+      "numberOfJobs": 16,
+      "initialManifestSha256": "b0b46bb445be35e6dbfa9db45c82fd653085348bee35fcefea289f36c15975eb",
+      "cases": [
+        {
+          "name": "standing-40-single-F0038-freefeed-adaptive",
+          "parameters": {
+            "F": 0.0038691610495329458,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": true,
+          "adaptiveHopfSteps": true,
+          "initialStateSha256": "a191b54bea08d32824622071319fe962e95c5a4bf7817dc3a8efa6cd2aa08271"
+        },
+        {
+          "name": "rotating-32-woven-F0038-freefeed-adaptive",
+          "parameters": {
+            "F": 0.003907826578809439,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": true,
+          "adaptiveHopfSteps": true,
+          "initialStateSha256": "d7236aca875abb45faab26f660c8a0c3e7893adc7058f403560969d9b7213925"
+        },
+        {
+          "name": "standing-32-single-F0038-resume",
+          "parameters": {
+            "F": 0.0038094593861739546,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 24,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "51002aee490421659f03c6c065c9f291da77320c1162ffb7d2896ddd615b89c6"
+        },
+        {
+          "name": "standing-axial1-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            1,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "22fc87c6abc814b9fbaefa1e915959c857738fcc97ce8d020488f6c1dd5215fb"
+        },
+        {
+          "name": "standing-axial2-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            2,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "9f8ca1ed0b65bb77448a167d6580905e3d349f04ff7b01c3b28d4e5a9e1a3367"
+        },
+        {
+          "name": "standing-oblique21-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "575bbfac219d34e703c9ee17844763859b34ba3180d70b0403caae457fd4c9aa"
+        },
+        {
+          "name": "rotating-axial3-F0038-resume",
+          "parameters": {
+            "F": 0.003828125,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0.0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "16ecda24ca36e998966ff37c5145bf4c57dde5acdc6e334c6341c84d492a5ee7"
+        },
+        {
+          "name": "rotating-oblique21-F0038-resume",
+          "parameters": {
+            "F": 0.003846875,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "c0f84400738a453f8a37b4c73f2c8d3bec9a9f04df6113391c90e8c2430562a6"
+        },
+        {
+          "name": "rotating-woven21-F0038-resume",
+          "parameters": {
+            "F": 0.0038562500000000003,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "60205afb0bd82262378593387021c7e88a336460621eede8816e8b5b6aeadd0d"
+        },
+        {
+          "name": "standing-woven21-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 1,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "8c179d9a8927f191642e078adfccc1fed82da1c41aadea547441724c53d6c51a"
+        },
+        {
+          "name": "rotating-32-single-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4.0,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "7f00a47ce968d44436e962f5d78e6200f92b15c68d9edf405716a515e4880daf"
+        },
+        {
+          "name": "rotating-40-single-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            4,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "64388e9356291ca2513f540d2fa1d9c7adcabdc1058f61360bcb9f6d6b8baa76"
+        },
+        {
+          "name": "rotating-41-single-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4.0,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            4,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "194ad36a1e7aac1e3e6ca5a07608189bec025ef830f2fea6240755a81d83a01e"
+        },
+        {
+          "name": "rotating-33-single-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4.0,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            3,
+            3
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "33005394e0fab84cca447cf6c8b20e01ac817c601e879c3acdde0790fe911c3e"
+        },
+        {
+          "name": "rotating-42-single-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "335d373c9408f51c947ab0b07a7418ee2473bf06b43fbb7c1d0682f329b8df5f"
+        },
+        {
+          "name": "rotating-42-woven-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            4,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "829fdd8f58545b3b0e137d5af25a01da0c5b06d197510a5eeb9248f1f44879a9"
+        }
+      ]
+    },
+    {
+      "batch": 13,
+      "appId": "ap-4RU3cSTNEU8GYHUrZSRAfH",
+      "status": "completed",
+      "returnedJobReports": 3,
+      "convergedJobReports": 0,
+      "convergedAtRequestedTarget": 0,
+      "maxConcurrentA100s": 4,
+      "numberOfJobs": 3,
+      "initialManifestSha256": "cad0496b54073a560e95500f5b981339c3d47f942341acde9c0d589f8ac18214",
+      "cases": [
+        {
+          "name": "standing-32-single-F0038-freefeed",
+          "parameters": {
+            "F": 0.003911473884455413,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": true,
+          "adaptiveHopfSteps": true,
+          "initialStateSha256": "43d39f439aac056f3b51135624e5deb976af57f21655923891099f866c480ac2"
+        },
+        {
+          "name": "standing-40-single-F0038-freefeed",
+          "parameters": {
+            "F": 0.0038691610495329458,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            4,
+            0
+          ],
+          "characterCharge": 2,
+          "reflectedStarRatio": 0.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": true,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": true,
+          "adaptiveHopfSteps": true,
+          "initialStateSha256": "a191b54bea08d32824622071319fe962e95c5a4bf7817dc3a8efa6cd2aa08271"
+        },
+        {
+          "name": "rotating-32-woven-F0038-freefeed",
+          "parameters": {
+            "F": 0.003907826578809439,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 5.333333333333333,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 48,
+          "frames": 128,
+          "wave": [
+            3,
+            2
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1.0,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [
+            0.0038
+          ],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": true,
+          "adaptiveHopfSteps": true,
+          "initialStateSha256": "d7236aca875abb45faab26f660c8a0c3e7893adc7058f403560969d9b7213925"
+        }
+      ]
+    },
+    {
+      "batch": 14,
+      "appId": "ap-LZ4rRJ45VrG9huqD67DUnx",
+      "status": "completed",
+      "returnedJobReports": 2,
+      "convergedJobReports": 2,
+      "convergedAtRequestedTarget": 2,
+      "maxConcurrentA100s": 4,
+      "numberOfJobs": 2,
+      "initialManifestSha256": "78894b1fdb0dcd9d668bccfa5b399394a97a6c1ce445fb5fb132f2433a050eb7",
+      "cases": [
+        {
+          "name": "rotating-axial3-F0038-N96",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 2.6666666666666665,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 96,
+          "frames": 128,
+          "wave": [
+            3,
+            0
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 0,
+          "reflectedStarPhaseRadians": 0.0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "767ccc5e6eb0165ce5089fecf4fc40b22586d1173c8b0c990bdac3a7dac5d742"
+        },
+        {
+          "name": "rotating-woven21-F0038-N64",
+          "parameters": {
+            "F": 0.0038,
+            "k": 0.02,
+            "Du": 0.16,
+            "Dv": 0.08,
+            "dx": 4.0,
+            "stencil": "five-point"
+          },
+          "physicalSide": 256.0,
+          "grid": 64,
+          "frames": 128,
+          "wave": [
+            2,
+            1
+          ],
+          "characterCharge": 1,
+          "reflectedStarRatio": 1,
+          "reflectedStarPhaseRadians": 0,
+          "axialMirrors": false,
+          "allowExistingExtraTranslations": true,
+          "targets": [],
+          "newtonIterationCapPerStep": 12,
+          "correctSeedWithFreeFeed": false,
+          "adaptiveHopfSteps": false,
+          "initialStateSha256": "665f7b4f94c4a4f7e08865626edfc837e8e2b8a92435ecb21779802c20262bd4"
+        }
+      ]
+    }
+  ]
+}

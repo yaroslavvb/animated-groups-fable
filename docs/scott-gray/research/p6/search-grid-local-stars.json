@@ -1,0 +1,989 @@
+{
+  "schema": "scott-gray-p6-local-star-sweep-v1",
+  "scope": "Local CPU exploratory Hopf seeds and feed continuation; candidate convergence is not catalog admission.",
+  "seedCount": 12,
+  "workers": 2,
+  "initialFeed": "Solved from prescribed spatial amplitude",
+  "targetFeed": 0.00406,
+  "initialFeedStep": 2e-06,
+  "continuationMaxAttempts": 20,
+  "softPerSeedDeadlineSeconds": 240,
+  "perSubprocessDeadlineSeconds": 110,
+  "deadlineCaveat": "The soft per-seed deadline is checked before starting each subprocess; an in-progress subprocess can run to its own limit.",
+  "driverSha256": "6aacd19c0f692890c262c63194c6386f11ad858c6d89ef6ecf42dd4170f30cac",
+  "roots": [
+    {
+      "seed": "mode3-shell1",
+      "grid": 36,
+      "wavevector": [
+        3,
+        0
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": true,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode3-shell1",
+          "outcome": "converged",
+          "F": 0.00408501426053293,
+          "period": 328.1133621375979,
+          "spatialRms": 0.020870628739645566,
+          "shootingRms": 9.152850559475058e-15,
+          "seconds": 5.884907960891724,
+          "recordSha256": "76ae2454b67ac94261fa2db534cb67fb800e3626ab121af2ef08e34f6e94ff17"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040600000",
+          "outcome": "converged",
+          "F": 0.00406,
+          "period": 334.6944139938563,
+          "spatialRms": 0.028373213804515608,
+          "shootingRms": 4.753096982344279e-13,
+          "seconds": 1.9765658378601074,
+          "recordSha256": "4a585c57bd758496d32be1b1cb7d1ea577448d858e78e43548e36845874d282c"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040610143",
+          "outcome": "converged",
+          "F": 0.004061014260532927,
+          "period": 334.42519305559847,
+          "spatialRms": 0.028095735961666868,
+          "shootingRms": 6.324520024029092e-13,
+          "seconds": 2.029046058654785,
+          "recordSha256": "8070c8c85aff904e115b280fb7ddd042476f8e838b991f4eba72d4f891c52c8e"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040630143",
+          "outcome": "converged",
+          "F": 0.004063014260532927,
+          "period": 333.89547763514383,
+          "spatialRms": 0.027535928770008163,
+          "shootingRms": 4.333229089632102e-13,
+          "seconds": 2.0791101455688477,
+          "recordSha256": "12dcdad49445115954e9435584fdf35fecc2e770b78bbd7a1459c74b837d13d6"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040650143",
+          "outcome": "converged",
+          "F": 0.004065014260532927,
+          "period": 333.3705638778399,
+          "spatialRms": 0.02696764707304014,
+          "shootingRms": 6.393797801809845e-13,
+          "seconds": 2.035616159439087,
+          "recordSha256": "c13c3a59bf0a0a57bfd77f33b8b78e40ebff6eaa013873a0d8ab8b8063a4e4b0"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040670143",
+          "outcome": "converged",
+          "F": 0.004067014260532928,
+          "period": 332.85350071556513,
+          "spatialRms": 0.026400211250112226,
+          "shootingRms": 8.213546795375252e-13,
+          "seconds": 2.056163787841797,
+          "recordSha256": "886d0f12f31c396c5d196463aeee1b6130d03d553c560db0894f75021d955247"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040690143",
+          "outcome": "converged",
+          "F": 0.004069014260532928,
+          "period": 332.34591526556153,
+          "spatialRms": 0.02584118223433694,
+          "shootingRms": 6.646769596199841e-13,
+          "seconds": 2.0340731143951416,
+          "recordSha256": "67526028237bd1a67705357cee80b573e46c5b779df8ce2db6054541aef7f94e"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040710143",
+          "outcome": "converged",
+          "F": 0.004071014260532928,
+          "period": 331.84735861139615,
+          "spatialRms": 0.025294529398799122,
+          "shootingRms": 2.0106216734877607e-12,
+          "seconds": 2.206306219100952,
+          "recordSha256": "ef52729eecfd264376b61ea56752e6325b07de5e9936e72f3a6e2801158a3b5d"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040730143",
+          "outcome": "converged",
+          "F": 0.004073014260532928,
+          "period": 331.3546808477994,
+          "spatialRms": 0.024758409400627197,
+          "shootingRms": 4.16759456663505e-13,
+          "seconds": 3.0987799167633057,
+          "recordSha256": "831b8c3900d657f108032a17ca762516783d1823b1cb21f2130e804b50d1fe8e"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040750143",
+          "outcome": "converged",
+          "F": 0.004075014260532929,
+          "period": 330.86179854500585,
+          "spatialRms": 0.024223444341943994,
+          "shootingRms": 7.236751029821009e-13,
+          "seconds": 2.563951015472412,
+          "recordSha256": "ba1af28f805d9ca1daadc816902cebc67a1db4c4157f504bdf5488486535f02d"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040770143",
+          "outcome": "converged",
+          "F": 0.004077014260532929,
+          "period": 330.3601889943045,
+          "spatialRms": 0.023672575406602957,
+          "shootingRms": 8.662142912632306e-13,
+          "seconds": 1.9955499172210693,
+          "recordSha256": "b1865d021fbce21f59809a3baaa0ea4fe86c8e3ef52398aa75a759541f578a40"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040790143",
+          "outcome": "converged",
+          "F": 0.004079014260532929,
+          "period": 329.84026592983474,
+          "spatialRms": 0.02308319031696094,
+          "shootingRms": 2.694628554111555e-13,
+          "seconds": 1.9939429759979248,
+          "recordSha256": "9c511d38e28ceb75cd0e617fbf9c1b50467c77c40c541c6d308e48010c8a8ed4"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040810143",
+          "outcome": "converged",
+          "F": 0.004081014260532929,
+          "period": 329.29373688239775,
+          "spatialRms": 0.022431656923037398,
+          "shootingRms": 3.2684347425971433e-13,
+          "seconds": 1.9584951400756836,
+          "recordSha256": "36510c23d9af2a2e49aa6e2b8cf4f84068f3152e1fc57b09bab317d677618bc1"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell1-F0.0040830143",
+          "outcome": "converged",
+          "F": 0.00408301426053293,
+          "period": 328.7169952140389,
+          "spatialRms": 0.02169907124720185,
+          "shootingRms": 7.10930802637222e-13,
+          "seconds": 1.9642159938812256,
+          "recordSha256": "9475e432956d5b602bc8c38a40cc5b4dc0b68711150eceb09f3c5f0203a552ac"
+        }
+      ]
+    },
+    {
+      "seed": "mode4-shell1",
+      "grid": 48,
+      "wavevector": [
+        4,
+        0
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": true,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode4-shell1",
+          "outcome": "converged",
+          "F": 0.00408231490845281,
+          "period": 327.765518374229,
+          "spatialRms": 0.01857064316950803,
+          "shootingRms": 4.868169466744232e-13,
+          "seconds": 3.6857259273529053,
+          "recordSha256": "883bf7ca96d71b6d0834edf851f3d9a09691710d5822d258e58523e92f1818e2"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040600000",
+          "outcome": "converged",
+          "F": 0.00406,
+          "period": 335.55159582764736,
+          "spatialRms": 0.029372507300376695,
+          "shootingRms": 2.6143702938400438e-14,
+          "seconds": 3.5959110260009766,
+          "recordSha256": "27765c6a2fda7165be68d2ad30306cb15d1370f5edffed6d8939cffb21d1f690"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040603149",
+          "outcome": "converged",
+          "F": 0.004060314908452807,
+          "period": 335.4573232766416,
+          "spatialRms": 0.02928734950272044,
+          "shootingRms": 5.352915928898641e-13,
+          "seconds": 3.9852099418640137,
+          "recordSha256": "d1c4d962a50c9a507fce9ae74f241ba23bf7b9c4a65da821408aefd973647b16"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040623149",
+          "outcome": "converged",
+          "F": 0.004062314908452807,
+          "period": 334.8479260470143,
+          "spatialRms": 0.02872217185415033,
+          "shootingRms": 6.495150702427908e-13,
+          "seconds": 3.8382680416107178,
+          "recordSha256": "e5d13e9ed3c08511b786e34bf6d46e6e553ddf396196c35b491a4413d249c63f"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040643149",
+          "outcome": "converged",
+          "F": 0.004064314908452807,
+          "period": 334.2215567974465,
+          "spatialRms": 0.028112357507670948,
+          "shootingRms": 5.978802163074917e-13,
+          "seconds": 3.6657309532165527,
+          "recordSha256": "20a255955bfd37f8e7a51dffed46e44c056d68ff93d9ed6b964bdb11d0a53b37"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040663149",
+          "outcome": "converged",
+          "F": 0.0040663149084528075,
+          "period": 333.58055583486345,
+          "spatialRms": 0.027452768689394242,
+          "shootingRms": 4.7295843713922466e-14,
+          "seconds": 3.8770852088928223,
+          "recordSha256": "46c82bcd19fe9d1742d28a069fa134ec3db5a138bd8347a1985d60d0df02dbe5"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040683149",
+          "outcome": "converged",
+          "F": 0.004068314908452808,
+          "period": 332.92616850227944,
+          "spatialRms": 0.02673424074028335,
+          "shootingRms": 3.9501165261456423e-13,
+          "seconds": 3.86116623878479,
+          "recordSha256": "b247963a01d52c954ee5f011a93fa0e68297de878ed6571263ec193fc32ab31b"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040703149",
+          "outcome": "converged",
+          "F": 0.004070314908452808,
+          "period": 332.25736751288815,
+          "spatialRms": 0.025942885463857906,
+          "shootingRms": 2.082924324488447e-14,
+          "seconds": 3.8140900135040283,
+          "recordSha256": "504068c2021e4a3dc7c5f6a296375aab0341e5fd6b9611604f2bc7a46dc47041"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040723149",
+          "outcome": "converged",
+          "F": 0.004072314908452808,
+          "period": 331.57122788641846,
+          "spatialRms": 0.02506172091417349,
+          "shootingRms": 2.137035576622194e-13,
+          "seconds": 4.123414039611816,
+          "recordSha256": "d4224d44273a573ad567e29a5f5609c9ac12bd158b35f40dc75b43ce061d928b"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040743149",
+          "outcome": "converged",
+          "F": 0.0040743149084528085,
+          "period": 330.8641766885086,
+          "spatialRms": 0.024072437464023176,
+          "shootingRms": 3.795868081195946e-13,
+          "seconds": 5.066328048706055,
+          "recordSha256": "da88fd4d51780d97db785af53ed649a1d2c29e573c3315327b217e8dfb3eb063"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040763149",
+          "outcome": "converged",
+          "F": 0.004076314908452809,
+          "period": 330.1329050983449,
+          "spatialRms": 0.022955449860570316,
+          "shootingRms": 4.875839476690832e-13,
+          "seconds": 3.6915688514709473,
+          "recordSha256": "7c6fe1bd84db20908c28fa01c95a48ea6e64c01c832c71118d777afbe6d8947f"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040783149",
+          "outcome": "converged",
+          "F": 0.004078314908452809,
+          "period": 329.3745694633106,
+          "spatialRms": 0.021688056226898466,
+          "shootingRms": 3.578057949857053e-13,
+          "seconds": 3.6286909580230713,
+          "recordSha256": "eaa62396f6be8c9989c2180cc22937d273d74cf599e5156a2c59ff90e309b153"
+        },
+        {
+          "record": "q1-wide-L1024-mode4-shell1-F0.0040803149",
+          "outcome": "converged",
+          "F": 0.004080314908452809,
+          "period": 328.5864864996985,
+          "spatialRms": 0.0202407570256695,
+          "shootingRms": 2.338203370825193e-13,
+          "seconds": 3.579862117767334,
+          "recordSha256": "8a620e45471189b5ecdc35f27b3876a08d5e0e77d19268ed7dd16cb7fdf75738"
+        }
+      ]
+    },
+    {
+      "seed": "mode5-shell1",
+      "grid": 60,
+      "wavevector": [
+        5,
+        0
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": true,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode5-shell1",
+          "outcome": "converged",
+          "F": 0.004072267888370126,
+          "period": 329.1428969442827,
+          "spatialRms": 0.018318531111659903,
+          "shootingRms": 1.8363704091877556e-13,
+          "seconds": 6.0482017993927,
+          "recordSha256": "dfa743531c80d14e969da31ae72d8becc79e03fd129f99660733b2c449235b24"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040600000",
+          "outcome": "converged",
+          "F": 0.00406,
+          "period": 334.47717730563846,
+          "spatialRms": 0.02731862351757524,
+          "shootingRms": 2.8482163574398514e-14,
+          "seconds": 6.062869071960449,
+          "recordSha256": "21e339fcfbb09025d7f5330cd7f67346cdba5a8047e9a10321f856b5bad4ab45"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040602679",
+          "outcome": "converged",
+          "F": 0.004060267888370124,
+          "period": 334.3694883841086,
+          "spatialRms": 0.02717482575105756,
+          "shootingRms": 8.053338464328961e-14,
+          "seconds": 6.2472429275512695,
+          "recordSha256": "da3fa772998f2cbd6cd0cb1b552f9496543fdc46ce5eea856c88bef9abcb67b6"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040622679",
+          "outcome": "converged",
+          "F": 0.0040622678883701245,
+          "period": 333.5546396555874,
+          "spatialRms": 0.026046019245729937,
+          "shootingRms": 5.954124122661257e-14,
+          "seconds": 6.506090879440308,
+          "recordSha256": "7b278c9ce5b0a58047fac7d991e70b05547ad99dab565786b65e10accef9033c"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040642679",
+          "outcome": "converged",
+          "F": 0.004064267888370125,
+          "period": 332.7197614810583,
+          "spatialRms": 0.024809983578343003,
+          "shootingRms": 4.32945373154538e-14,
+          "seconds": 6.287768840789795,
+          "recordSha256": "6aad0af13a9d573b304c27976d31aefb76c9e7b1d69f92b847ef62402676dae8"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040662679",
+          "outcome": "converged",
+          "F": 0.004066267888370125,
+          "period": 331.8634290988344,
+          "spatialRms": 0.023449452809125835,
+          "shootingRms": 4.3435204784225175e-14,
+          "seconds": 6.35686993598938,
+          "recordSha256": "5a386c3aba53052ee65091d172b31c70c0f94e1d1c804c1157228711a9b7c434"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040682679",
+          "outcome": "converged",
+          "F": 0.004068267888370125,
+          "period": 330.9837739867322,
+          "spatialRms": 0.021940540623933472,
+          "shootingRms": 6.749122623653331e-14,
+          "seconds": 6.385643720626831,
+          "recordSha256": "48b08df9ff3a397137ac208a9786a352429963bd0c060c2fb1a6024e7d73fb54"
+        },
+        {
+          "record": "q1-wide-L1024-mode5-shell1-F0.0040702679",
+          "outcome": "converged",
+          "F": 0.0040702678883701255,
+          "period": 330.0781916829069,
+          "spatialRms": 0.020248375639083858,
+          "shootingRms": 6.279376077119134e-14,
+          "seconds": 5.782408952713013,
+          "recordSha256": "e1ba50a57c8b76a5ff85e873f9c9dc901a9931d973022cd4be06a798c3d91947"
+        }
+      ]
+    },
+    {
+      "seed": "mode6-shell1",
+      "grid": 72,
+      "wavevector": [
+        6,
+        0
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": true,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode6-shell1",
+          "outcome": "converged",
+          "F": 0.004059384939635724,
+          "period": 330.9598864538142,
+          "spatialRms": 0.018232124816387706,
+          "shootingRms": 7.702451568235715e-13,
+          "seconds": 8.52431321144104,
+          "recordSha256": "b4ef570084ce2ae8f4e167e7c843dd4f61e299e2c005417e11457e3c2fb8083f"
+        },
+        {
+          "record": "q1-wide-L1024-mode6-shell1-F0.0040600000",
+          "outcome": "converged",
+          "F": 0.00406,
+          "period": 330.6362767084645,
+          "spatialRms": 0.01752156367811381,
+          "shootingRms": 3.3156899076942625e-14,
+          "seconds": 8.403496265411377,
+          "recordSha256": "860e915c67d9a5ceba0052d73ddd34a21a04830cc5666ca9113d392af6843479"
+        }
+      ]
+    },
+    {
+      "seed": "mode2-shell3",
+      "grid": 24,
+      "wavevector": [
+        2,
+        2
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode2-shell3",
+          "outcome": "converged",
+          "F": 0.004086894725856571,
+          "period": 327.2836380477791,
+          "spatialRms": 0.01906181839041069,
+          "shootingRms": 8.483124633104032e-14,
+          "seconds": 0.6546900272369385,
+          "recordSha256": "6e2a5a5661fff4e40a444d868afdb68a4ba10de04532d5d82b0e84be27d7694d"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040698947",
+          "outcome": "converged",
+          "F": 0.004069894725856574,
+          "period": 333.8100220389971,
+          "spatialRms": 0.026610343696731358,
+          "shootingRms": 3.687020339861313e-15,
+          "seconds": 0.36993408203125,
+          "recordSha256": "db5fe4c5740da0f6bec8cd9eed7f5d9a5b7d8d1e817e584dc3b5d6d1d7630241"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040703947",
+          "outcome": "converged",
+          "F": 0.004070394725856573,
+          "period": 333.5848014951572,
+          "spatialRms": 0.02636977715090304,
+          "shootingRms": 1.7410178581655587e-14,
+          "seconds": 0.3210182189941406,
+          "recordSha256": "69dc15afd907e3124d57afc31b131acdfa8f36616bf3e3049bee986d1f256e83"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040708947",
+          "outcome": "converged",
+          "F": 0.004070894725856573,
+          "period": 333.34617903417666,
+          "spatialRms": 0.02610447996900267,
+          "shootingRms": 1.6215146236138273e-13,
+          "seconds": 0.4300990104675293,
+          "recordSha256": "b1706ce7bdd89ad3b8d65625850463cae180143e5015eaf1e8043c18868c9464"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040713947",
+          "outcome": "converged",
+          "F": 0.004071394725856573,
+          "period": 333.09915996962513,
+          "spatialRms": 0.025823548129673628,
+          "shootingRms": 1.2741003844929515e-13,
+          "seconds": 0.35059094429016113,
+          "recordSha256": "c3579fa3d8a7584e6d12013c0b290db38204627ffca646cebc2053106c92b408"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040718947",
+          "outcome": "converged",
+          "F": 0.004071894725856572,
+          "period": 332.84680322447576,
+          "spatialRms": 0.025532959120851396,
+          "shootingRms": 1.3420050931995017e-13,
+          "seconds": 0.3312950134277344,
+          "recordSha256": "aa77420b9797defb84024bc7ff62e737e801cb7b8ae87b866625612d342334a4"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040723947",
+          "outcome": "converged",
+          "F": 0.004072394725856572,
+          "period": 332.5912519234423,
+          "spatialRms": 0.02523749210743427,
+          "shootingRms": 7.87491971419048e-15,
+          "seconds": 0.32662200927734375,
+          "recordSha256": "fa64bebc803143595e7a4171d7869aeace6ab5a3767bf124fe9ea2ce3bf0c2e3"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040728947",
+          "outcome": "converged",
+          "F": 0.0040728947258565715,
+          "period": 332.3342604945049,
+          "spatialRms": 0.024941853921518327,
+          "shootingRms": 9.335447050799584e-15,
+          "seconds": 0.33692383766174316,
+          "recordSha256": "1d502e73324ed496c59b5edb1b58654e71e0bdfba70493364ec0df239da20ffa"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040733947",
+          "outcome": "converged",
+          "F": 0.004073394725856571,
+          "period": 332.0775924446367,
+          "spatialRms": 0.024651768841660374,
+          "shootingRms": 1.4047853370679549e-14,
+          "seconds": 0.3488178253173828,
+          "recordSha256": "df6b529bb0be352f1dbbaf3a6cd0997135bd0c13e5f4e3ca2261516418977de2"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040738947",
+          "outcome": "converged",
+          "F": 0.004073894725856571,
+          "period": 331.82353707753845,
+          "spatialRms": 0.02437571673791755,
+          "shootingRms": 3.2486684651598476e-14,
+          "seconds": 0.3414320945739746,
+          "recordSha256": "c529f8e7e0933dba065301d163a3b4c3ce61c9874fe4ab063fe30d62f5097376"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040743947",
+          "outcome": "converged",
+          "F": 0.0040743947258565704,
+          "period": 331.57602057776876,
+          "spatialRms": 0.024128911728797862,
+          "shootingRms": 1.9999941453615233e-13,
+          "seconds": 0.41284918785095215,
+          "recordSha256": "47e6e961dc6c0b5f3844c66606f15a260aaffdd803ddfda65dc85a4f01d97f22"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040748947",
+          "outcome": "converged",
+          "F": 0.00407489472585657,
+          "period": 331.34418444016256,
+          "spatialRms": 0.023945839871743216,
+          "shootingRms": 9.500856227566805e-14,
+          "seconds": 0.32438206672668457,
+          "recordSha256": "1f4a6ca261b0c57abe0a0afa95ee67256010c7e5f52c5c4507203ad6ca7fd78f"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040753947",
+          "outcome": "converged",
+          "F": 0.00407539472585657,
+          "period": 331.16237725712307,
+          "spatialRms": 0.02394614714543406,
+          "shootingRms": 6.255317903869266e-13,
+          "seconds": 1.4115400314331055,
+          "recordSha256": "85db90373e555bf56b5edef05e5f388abb0af4756134dd2235d367167bb652c6"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040758947",
+          "outcome": "converged",
+          "F": 0.004075894725856569,
+          "period": 331.4497749572855,
+          "spatialRms": 0.025271547423920543,
+          "shootingRms": 1.7479452702755491e-15,
+          "seconds": 0.38607215881347656,
+          "recordSha256": "19220f801585443b7b80efa75fcd3f52d4f0b6042c412d1e24ee7cc0d464647e"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040768947",
+          "outcome": "converged",
+          "F": 0.0040768947258565695,
+          "period": 331.495744318616,
+          "spatialRms": 0.025855839212152943,
+          "shootingRms": 3.1808111268463936e-14,
+          "seconds": 0.4070148468017578,
+          "recordSha256": "e4e68c5fe6d32fa12b929f5dc0b93c56770f87071d9815a5a0001231b3fa489b"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040788947",
+          "outcome": "converged",
+          "F": 0.00407889472585657,
+          "period": 330.81318994957735,
+          "spatialRms": 0.025054471857672737,
+          "shootingRms": 3.1420619751320645e-13,
+          "seconds": 0.34048914909362793,
+          "recordSha256": "6704ef8398eb0d6c3112371a024757e24eff981c894f9d4db54d205f596af871"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040808947",
+          "outcome": "converged",
+          "F": 0.00408089472585657,
+          "period": 329.95944848688123,
+          "spatialRms": 0.023785685026300157,
+          "shootingRms": 1.0292650512356645e-13,
+          "seconds": 0.40079808235168457,
+          "recordSha256": "730790af1611d5205a755e70b7461cea5afc40ed52e7d313a2c4add2f3056c3e"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040828947",
+          "outcome": "converged",
+          "F": 0.00408289472585657,
+          "period": 329.0607778746764,
+          "spatialRms": 0.022319561866464627,
+          "shootingRms": 2.1750074451175285e-13,
+          "seconds": 0.3752298355102539,
+          "recordSha256": "402e882f8f2d9be48f402c37efc5664284c5ed7c4fa5d74aee3a8d9c77d4c0e1"
+        },
+        {
+          "record": "q1-wide-L1024-mode2-shell3-F0.0040848947",
+          "outcome": "converged",
+          "F": 0.0040848947258565705,
+          "period": 328.1612516852549,
+          "spatialRms": 0.020737295120196536,
+          "shootingRms": 3.5920097008993033e-13,
+          "seconds": 0.3592710494995117,
+          "recordSha256": "e048e1ab08932a6706df85f8bd3130700713263472377c125b818d2e5805fd2e"
+        }
+      ]
+    },
+    {
+      "seed": "mode3-shell3",
+      "grid": 36,
+      "wavevector": [
+        3,
+        3
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": true,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-mode3-shell3",
+          "outcome": "converged",
+          "F": 0.004071181867528202,
+          "period": 329.26843131987584,
+          "spatialRms": 0.01835785851876332,
+          "shootingRms": 8.314742442431379e-13,
+          "seconds": 0.8782269954681396,
+          "recordSha256": "71bec354275f804c30536ac59bb6b83d37d504ad4fd3573dc1646436648d96e8"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040600000",
+          "outcome": "converged",
+          "F": 0.00406,
+          "period": 334.4523242821983,
+          "spatialRms": 0.027166846573302574,
+          "shootingRms": 2.573560321672325e-13,
+          "seconds": 0.7336771488189697,
+          "recordSha256": "7da31797f824e1ccc36720f45d37224068cb3a821b52d465189c5b1b2d24b66d"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040611819",
+          "outcome": "converged",
+          "F": 0.004061181867528201,
+          "period": 333.9085248287869,
+          "spatialRms": 0.026414389447473863,
+          "shootingRms": 7.119044273964257e-14,
+          "seconds": 0.740947961807251,
+          "recordSha256": "b4c30dde7dba02a33b1f736aa0dd5eb05080d8a69a47ca88f185c8d88eb864c9"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040631819",
+          "outcome": "converged",
+          "F": 0.004063181867528201,
+          "period": 332.99173114258434,
+          "spatialRms": 0.025076422286934685,
+          "shootingRms": 4.2989748809477725e-14,
+          "seconds": 0.7378308773040771,
+          "recordSha256": "7ca880d85955b51f18f04eac045ccf5197c1de7da45be14aa61d82432b38a7d9"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040651819",
+          "outcome": "converged",
+          "F": 0.004065181867528201,
+          "period": 332.0743029329692,
+          "spatialRms": 0.023635314465882865,
+          "shootingRms": 2.865054626014958e-14,
+          "seconds": 0.7623553276062012,
+          "recordSha256": "3a357f4e5c2577e66fe4ce4df85e29303ae7e0559a2c77babab9b69f65db3d86"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040671819",
+          "outcome": "converged",
+          "F": 0.004067181867528202,
+          "period": 331.1510162802366,
+          "spatialRms": 0.022062014595818087,
+          "shootingRms": 8.985921876175083e-13,
+          "seconds": 0.9878079891204834,
+          "recordSha256": "03da5d6b0d3f7020297986cff7111b2054b306763cdce1f8bb1e9c4a9b5873a8"
+        },
+        {
+          "record": "q1-wide-L1024-mode3-shell3-F0.0040691819",
+          "outcome": "converged",
+          "F": 0.004069181867528202,
+          "period": 330.21726101853415,
+          "spatialRms": 0.02032013026725519,
+          "shootingRms": 4.134105504822756e-13,
+          "seconds": 0.7112360000610352,
+          "recordSha256": "514cc1c751b01dbabe7ce9affa2892de53316fab3a91cd591923b0d24ea0401c"
+        }
+      ]
+    },
+    {
+      "seed": "wave31",
+      "grid": 30,
+      "wavevector": [
+        3,
+        1
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave31",
+          "outcome": "failed",
+          "F": null,
+          "period": null,
+          "spatialRms": null,
+          "shootingRms": 1.5835953466340278e-05,
+          "seconds": 73.78809070587158,
+          "recordSha256": "b109a7658167590df0abe443cec768845e2ad646d46a9355f24fc541f3825a30"
+        }
+      ]
+    },
+    {
+      "seed": "wave32",
+      "grid": 30,
+      "wavevector": [
+        3,
+        2
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave32",
+          "outcome": "failed",
+          "F": null,
+          "period": null,
+          "spatialRms": null,
+          "shootingRms": 2.6728674487894757e-06,
+          "seconds": 73.26261711120605,
+          "recordSha256": "66ac2df2764772d4b570f3fe5da37f634c889061784b860ee3a39db3f8d7cbe4"
+        }
+      ]
+    },
+    {
+      "seed": "wave41",
+      "grid": 30,
+      "wavevector": [
+        4,
+        1
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave41",
+          "outcome": "converged",
+          "F": 0.004077303571579371,
+          "period": 328.4369905965243,
+          "spatialRms": 0.01862061770503741,
+          "shootingRms": 6.696672580934192e-14,
+          "seconds": 36.91001486778259,
+          "recordSha256": "fdc5d5490a253bb58b6bc1bcc9674ddac0591d589c2ca184afbae7bad6fe4071"
+        },
+        {
+          "record": "q1-wide-L1024-wave41-F0.0040693036",
+          "outcome": "failed",
+          "F": 0.00406930357157937,
+          "period": null,
+          "spatialRms": null,
+          "shootingRms": 8.676209666522974e-07,
+          "seconds": 71.30390095710754,
+          "recordSha256": "b5ac1b51b0f75bd12438216bedc33932dd56bcb0482fe77d6bedadd9b9ce1abc"
+        },
+        {
+          "record": "q1-wide-L1024-wave41-F0.0040703036",
+          "outcome": "converged",
+          "F": 0.00407030357157937,
+          "period": 331.08451554384675,
+          "spatialRms": 0.02331924323473155,
+          "shootingRms": 1.8545294290424635e-16,
+          "seconds": 39.16919684410095,
+          "recordSha256": "210456d33d6eec6b341d745ddafd490066e63195a60476cf93e5b193772ba102"
+        },
+        {
+          "record": "q1-wide-L1024-wave41-F0.0040713036",
+          "outcome": "converged",
+          "F": 0.00407130357157937,
+          "period": 330.7302512515717,
+          "spatialRms": 0.022783299582436727,
+          "shootingRms": 4.194416935507359e-16,
+          "seconds": 36.558159828186035,
+          "recordSha256": "cb50e9da7bd496ffc35c6c13e0d0ab1465ba3712b8de12c3851321c9be7cae5f"
+        },
+        {
+          "record": "q1-wide-L1024-wave41-F0.0040733036",
+          "outcome": "converged",
+          "F": 0.00407330357157937,
+          "period": 329.9983231408378,
+          "spatialRms": 0.021582573616885207,
+          "shootingRms": 1.3332863075076946e-15,
+          "seconds": 36.19414782524109,
+          "recordSha256": "eebf08f58ab19c2a03062d887162f9dac0b230545e1a82638e5bfa505fe4ee30"
+        },
+        {
+          "record": "q1-wide-L1024-wave41-F0.0040753036",
+          "outcome": "converged",
+          "F": 0.00407530357157937,
+          "period": 329.2333634571468,
+          "spatialRms": 0.020206596200551267,
+          "shootingRms": 9.30762299716115e-14,
+          "seconds": 18.960813760757446,
+          "recordSha256": "7a92e1f5620ec8d18b4eb0c42ed678d8364482253854c961b4cdb5c85ff1afc3"
+        }
+      ]
+    },
+    {
+      "seed": "wave42",
+      "grid": 30,
+      "wavevector": [
+        4,
+        2
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave42",
+          "outcome": "converged",
+          "F": 0.004070289874564322,
+          "period": 329.39565176045085,
+          "spatialRms": 0.018532871094161487,
+          "shootingRms": 1.8358620339529373e-16,
+          "seconds": 54.73344087600708,
+          "recordSha256": "ded857fdd04885c3c04ca77b9bc297451cfe1bc27e18a03a82b77a1314595e1e"
+        },
+        {
+          "record": "q1-wide-L1024-wave42-F0.0040662899",
+          "outcome": "converged",
+          "F": 0.004066289874564322,
+          "period": 331.10911684475104,
+          "spatialRms": 0.021680682372986697,
+          "shootingRms": 1.241136954994468e-13,
+          "seconds": 19.4554660320282,
+          "recordSha256": "39049ed1358ca144d452b9bb9a744f197c1705e6269a1f58a6114128ee45471f"
+        },
+        {
+          "record": "q1-wide-L1024-wave42-F0.0040672899",
+          "outcome": "converged",
+          "F": 0.004067289874564322,
+          "period": 330.69519351658033,
+          "spatialRms": 0.0209899355778551,
+          "shootingRms": 4.0828651885018215e-15,
+          "seconds": 20.120675086975098,
+          "recordSha256": "53f3a76f2c83085b1b20908355e09c00b7ab9abc1f8062e3f300f0e9b42e6e00"
+        },
+        {
+          "record": "q1-wide-L1024-wave42-F0.0040682899",
+          "outcome": "converged",
+          "F": 0.004068289874564322,
+          "period": 330.26554242887136,
+          "spatialRms": 0.020226170411305606,
+          "shootingRms": 1.2457762704300773e-15,
+          "seconds": 36.7279212474823,
+          "recordSha256": "6f7dc1f33c756e00492ac933d6e16e269be551dd7c69a76f946e67105632214e"
+        },
+        {
+          "record": "q1-wide-L1024-wave42-F0.0040692899",
+          "outcome": "converged",
+          "F": 0.004069289874564322,
+          "period": 329.8280031399796,
+          "spatialRms": 0.019401086871608266,
+          "shootingRms": 1.462988771352055e-14,
+          "seconds": 35.58277702331543,
+          "recordSha256": "abf3a854c80d6af3025307059a1c4082a4d7bc8495f9283634cda3bdb187f923"
+        }
+      ]
+    },
+    {
+      "seed": "wave51",
+      "grid": 30,
+      "wavevector": [
+        5,
+        1
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave51",
+          "outcome": "failed",
+          "F": null,
+          "period": null,
+          "spatialRms": null,
+          "shootingRms": 6.247942686044473e-09,
+          "seconds": 74.64442801475525,
+          "recordSha256": "45b3b6c31ed2fba02efbf9c1ecfd1a621db65082045a26fa14867a8ad76a479d"
+        }
+      ]
+    },
+    {
+      "seed": "wave43",
+      "grid": 30,
+      "wavevector": [
+        4,
+        3
+      ],
+      "amplitude": 0.018,
+      "charge": 1,
+      "L": 1024,
+      "k": 0.02,
+      "targetF": 0.00406,
+      "targetReached": false,
+      "attempts": [
+        {
+          "record": "q1-wide-L1024-wave43",
+          "outcome": "failed",
+          "F": null,
+          "period": null,
+          "spatialRms": null,
+          "shootingRms": 2.114344474063072e-05,
+          "seconds": 73.53566694259644,
+          "recordSha256": "45a14a789196dedab19d03b8f74ea761f88b886eab92ec280abfba16841150c4"
+        }
+      ]
+    }
+  ],
+  "compute": "Local CPU only, no extra Modal compute for this seed sweep."
+}

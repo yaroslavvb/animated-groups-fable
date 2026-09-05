@@ -1,0 +1,2810 @@
+{
+  "scope": "Linear dispersion and bounded unaudited seed prototypes. Star counts are not nonlinear orbit counts.",
+  "bandwidth": [
+    {
+      "family": "p4",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 5,
+      "geometricStarTypes": 4,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.00046147696336938334,
+          "period": 332.55557152529707,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.00038929298121090816,
+          "period": 333.0836504214543,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.00024616010484187004,
+          "period": 334.1398736240409,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.00017397612268339703,
+          "period": 334.6771878675078,
+          "translationIndex": 5
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p4",
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 9,
+      "geometricStarTypes": 7,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0007000761482061372,
+          "period": 337.93565030191735,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.0006278921660476608,
+          "period": 338.48299742525757,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0004847592896786237,
+          "period": 339.57793665466943,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.0004125753075201529,
+          "period": 340.13503704596684,
+          "translationIndex": 5
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 8,
+          "growthRate": 0.00019725844899263698,
+          "period": 341.8167156611873,
+          "translationIndex": 8
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.00012999368592859118,
+          "period": 342.34827854217417,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            3,
+            1
+          ],
+          "Q": 10,
+          "growthRate": 5.780970377011773e-05,
+          "period": 342.9220547307997,
+          "translationIndex": 10
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 10,
+          "stars": [
+            [
+              3,
+              1
+            ],
+            [
+              -3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        }
+      ]
+    },
+    {
+      "family": "p4",
+      "F": 0.0038,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 17,
+      "geometricStarTypes": 12,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0014051157107721765,
+          "period": 355.72483375487025,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.0013329317286137014,
+          "period": 356.33983481487576,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0011897988522446648,
+          "period": 357.5707898952489,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.0011176148700861904,
+          "period": 358.1974422205639,
+          "translationIndex": 5
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 8,
+          "growthRate": 0.0009022980115586787,
+          "period": 360.09049933878106,
+          "translationIndex": 8
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.0008350332484946347,
+          "period": 360.68932424103616,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            3,
+            1
+          ],
+          "Q": 10,
+          "growthRate": 0.0007628492663361594,
+          "period": 361.3359457853861,
+          "translationIndex": 10
+        },
+        {
+          "wavevector": [
+            3,
+            2
+          ],
+          "Q": 13,
+          "growthRate": 0.0005475324078086468,
+          "period": 363.28977999672077,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.0003468890373618564,
+          "period": 365.14500388096724,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            4,
+            1
+          ],
+          "Q": 17,
+          "growthRate": 0.0002747050552033769,
+          "period": 365.82078608467094,
+          "translationIndex": 17
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 18,
+          "growthRate": 0.00019276680405861724,
+          "period": 366.5933283601412,
+          "translationIndex": 18
+        },
+        {
+          "wavevector": [
+            4,
+            2
+          ],
+          "Q": 20,
+          "growthRate": 5.938819667586728e-05,
+          "period": 367.86341565570234,
+          "translationIndex": 20
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 10,
+          "stars": [
+            [
+              3,
+              1
+            ],
+            [
+              -3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              3,
+              2
+            ],
+            [
+              -3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 17,
+          "stars": [
+            [
+              4,
+              1
+            ],
+            [
+              -4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 20,
+          "stars": [
+            [
+              4,
+              2
+            ],
+            [
+              -4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        }
+      ]
+    },
+    {
+      "family": "p4",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 512,
+      "N": 96,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 24,
+      "geometricStarTypes": 16,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0005155956103535739,
+          "period": 332.16164967955996,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.0004975302751792897,
+          "period": 332.2929553362719,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.00046147696336938334,
+          "period": 332.55557152529707,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.0004434116281950972,
+          "period": 332.68744640236775,
+          "translationIndex": 5
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 8,
+          "growthRate": 0.00038929298121090816,
+          "period": 333.0836504214543,
+          "translationIndex": 8
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.0003715367489301137,
+          "period": 333.2140194366073,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            3,
+            1
+          ],
+          "Q": 10,
+          "growthRate": 0.00035347141375582946,
+          "period": 333.34684889030586,
+          "translationIndex": 10
+        },
+        {
+          "wavevector": [
+            3,
+            2
+          ],
+          "Q": 13,
+          "growthRate": 0.0002993527667716398,
+          "period": 333.7459255614258,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.00024616010484187004,
+          "period": 334.1398736240409,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            4,
+            1
+          ],
+          "Q": 17,
+          "growthRate": 0.000228094769667588,
+          "period": 334.2740519301776,
+          "translationIndex": 17
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 18,
+          "growthRate": 0.0002094125523323697,
+          "period": 334.4130183493269,
+          "translationIndex": 18
+        },
+        {
+          "wavevector": [
+            4,
+            2
+          ],
+          "Q": 20,
+          "growthRate": 0.00017397612268339703,
+          "period": 334.6771878675078,
+          "translationIndex": 20
+        },
+        {
+          "wavevector": [
+            4,
+            3
+          ],
+          "Q": 25,
+          "growthRate": 8.403590824412779e-05,
+          "period": 335.35108868403256,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            0
+          ],
+          "Q": 25,
+          "growthRate": 8.588391314281324e-05,
+          "period": 335.33719239284187,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            1
+          ],
+          "Q": 26,
+          "growthRate": 6.781857796852664e-05,
+          "period": 335.4731265282307,
+          "translationIndex": 26
+        },
+        {
+          "wavevector": [
+            5,
+            2
+          ],
+          "Q": 29,
+          "growthRate": 1.3699930984337411e-05,
+          "period": 335.8815466743536,
+          "translationIndex": 29
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 10,
+          "stars": [
+            [
+              3,
+              1
+            ],
+            [
+              -3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              3,
+              2
+            ],
+            [
+              -3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 17,
+          "stars": [
+            [
+              4,
+              1
+            ],
+            [
+              -4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 20,
+          "stars": [
+            [
+              4,
+              2
+            ],
+            [
+              -4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 25,
+          "stars": [
+            [
+              4,
+              3
+            ],
+            [
+              -4,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 26,
+          "stars": [
+            [
+              5,
+              1
+            ],
+            [
+              -5,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 29,
+          "stars": [
+            [
+              5,
+              2
+            ],
+            [
+              -5,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p4",
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 512,
+      "N": 96,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 34,
+      "geometricStarTypes": 22,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0007541947951903263,
+          "period": 337.5273936702328,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.0007361294600160412,
+          "period": 337.66347388626497,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0007000761482061372,
+          "period": 337.93565030191735,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.0006820108130318474,
+          "period": 338.07233142441174,
+          "translationIndex": 5
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 8,
+          "growthRate": 0.0006278921660476608,
+          "period": 338.48299742525757,
+          "translationIndex": 8
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.000610135933766865,
+          "period": 338.61813234998885,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            3,
+            1
+          ],
+          "Q": 10,
+          "growthRate": 0.0005920705985925858,
+          "period": 338.7558213611108,
+          "translationIndex": 10
+        },
+        {
+          "wavevector": [
+            3,
+            2
+          ],
+          "Q": 13,
+          "growthRate": 0.0005379519516083913,
+          "period": 339.1695207132513,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.0004847592896786237,
+          "period": 339.57793665466943,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            4,
+            1
+          ],
+          "Q": 17,
+          "growthRate": 0.00046669395450434515,
+          "period": 339.7170502225864,
+          "translationIndex": 17
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 18,
+          "growthRate": 0.00044801173716912317,
+          "period": 339.8611320454874,
+          "translationIndex": 18
+        },
+        {
+          "wavevector": [
+            4,
+            2
+          ],
+          "Q": 20,
+          "growthRate": 0.0004125753075201529,
+          "period": 340.13503704596684,
+          "translationIndex": 20
+        },
+        {
+          "wavevector": [
+            4,
+            3
+          ],
+          "Q": 25,
+          "growthRate": 0.00032263509308088083,
+          "period": 340.83384041728095,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            0
+          ],
+          "Q": 25,
+          "growthRate": 0.00032448309797956476,
+          "period": 340.8194296432101,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            1
+          ],
+          "Q": 26,
+          "growthRate": 0.00030641776280528163,
+          "period": 340.96039823812754,
+          "translationIndex": 26
+        },
+        {
+          "wavevector": [
+            5,
+            2
+          ],
+          "Q": 29,
+          "growthRate": 0.00025229911582109023,
+          "period": 341.38396830864144,
+          "translationIndex": 29
+        },
+        {
+          "wavevector": [
+            4,
+            4
+          ],
+          "Q": 32,
+          "growthRate": 0.00019725844899263698,
+          "period": 341.8167156611873,
+          "translationIndex": 32
+        },
+        {
+          "wavevector": [
+            5,
+            3
+          ],
+          "Q": 34,
+          "growthRate": 0.00016235890138181926,
+          "period": 342.09213798080157,
+          "translationIndex": 34
+        },
+        {
+          "wavevector": [
+            6,
+            0
+          ],
+          "Q": 36,
+          "growthRate": 0.00012999368592859118,
+          "period": 342.34827854217417,
+          "translationIndex": 36
+        },
+        {
+          "wavevector": [
+            6,
+            1
+          ],
+          "Q": 37,
+          "growthRate": 0.00011192835075430761,
+          "period": 342.49155080157266,
+          "translationIndex": 37
+        },
+        {
+          "wavevector": [
+            6,
+            2
+          ],
+          "Q": 40,
+          "growthRate": 5.780970377011773e-05,
+          "period": 342.9220547307997,
+          "translationIndex": 40
+        },
+        {
+          "wavevector": [
+            5,
+            4
+          ],
+          "Q": 41,
+          "growthRate": 3.698225729357714e-05,
+          "period": 343.088255095084,
+          "translationIndex": 41
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 10,
+          "stars": [
+            [
+              3,
+              1
+            ],
+            [
+              -3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              3,
+              2
+            ],
+            [
+              -3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 17,
+          "stars": [
+            [
+              4,
+              1
+            ],
+            [
+              -4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 20,
+          "stars": [
+            [
+              4,
+              2
+            ],
+            [
+              -4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 25,
+          "stars": [
+            [
+              4,
+              3
+            ],
+            [
+              -4,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 26,
+          "stars": [
+            [
+              5,
+              1
+            ],
+            [
+              -5,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 29,
+          "stars": [
+            [
+              5,
+              2
+            ],
+            [
+              -5,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 34,
+          "stars": [
+            [
+              5,
+              3
+            ],
+            [
+              -5,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 37,
+          "stars": [
+            [
+              6,
+              1
+            ],
+            [
+              -6,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 40,
+          "stars": [
+            [
+              6,
+              2
+            ],
+            [
+              -6,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 8
+        },
+        {
+          "Q": 41,
+          "stars": [
+            [
+              5,
+              4
+            ],
+            [
+              -5,
+              4
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p4",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 768,
+      "N": 126,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 53,
+      "geometricStarTypes": 33,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0005256307051598602,
+          "period": 332.08879258069385,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 2,
+          "growthRate": 0.0005176004647918671,
+          "period": 332.1470893114532,
+          "translationIndex": 2
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0005015599484986873,
+          "period": 332.26364974092144,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            2,
+            1
+          ],
+          "Q": 5,
+          "growthRate": 0.0004935297081306899,
+          "period": 332.3220585887069,
+          "translationIndex": 5
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 8,
+          "growthRate": 0.0004694589514695159,
+          "period": 332.49736461332066,
+          "translationIndex": 8
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.00046150851923803713,
+          "period": 332.5553413378141,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            3,
+            1
+          ],
+          "Q": 10,
+          "growthRate": 0.00045347827887004056,
+          "period": 332.61393748709673,
+          "translationIndex": 10
+        },
+        {
+          "wavevector": [
+            3,
+            2
+          ],
+          "Q": 13,
+          "growthRate": 0.00042940752220886895,
+          "period": 332.78980608006003,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.00040557599154164396,
+          "period": 332.96426122729173,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            4,
+            1
+          ],
+          "Q": 17,
+          "growthRate": 0.00039754575117364674,
+          "period": 333.02312052432234,
+          "translationIndex": 17
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 18,
+          "growthRate": 0.0003893560929482201,
+          "period": 333.08318737663194,
+          "translationIndex": 18
+        },
+        {
+          "wavevector": [
+            4,
+            2
+          ],
+          "Q": 20,
+          "growthRate": 0.00037347499451247513,
+          "period": 333.199779497086,
+          "translationIndex": 20
+        },
+        {
+          "wavevector": [
+            4,
+            3
+          ],
+          "Q": 25,
+          "growthRate": 0.00033342356525182235,
+          "period": 333.49448121953066,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            0
+          ],
+          "Q": 25,
+          "growthRate": 0.0003339014224862107,
+          "period": 333.4909595091312,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            5,
+            1
+          ],
+          "Q": 26,
+          "growthRate": 0.00032587118211821345,
+          "period": 333.55015873084534,
+          "translationIndex": 26
+        },
+        {
+          "wavevector": [
+            5,
+            2
+          ],
+          "Q": 29,
+          "growthRate": 0.00030180042545703816,
+          "period": 333.72783869415787,
+          "translationIndex": 29
+        },
+        {
+          "wavevector": [
+            4,
+            4
+          ],
+          "Q": 32,
+          "growthRate": 0.0002774910375554294,
+          "period": 333.9076302389061,
+          "translationIndex": 32
+        },
+        {
+          "wavevector": [
+            5,
+            3
+          ],
+          "Q": 34,
+          "growthRate": 0.0002617489961963882,
+          "period": 334.0242461282375,
+          "translationIndex": 34
+        },
+        {
+          "wavevector": [
+            6,
+            0
+          ],
+          "Q": 36,
+          "growthRate": 0.00024666300634360147,
+          "period": 334.1361411794811,
+          "translationIndex": 36
+        },
+        {
+          "wavevector": [
+            6,
+            1
+          ],
+          "Q": 37,
+          "growthRate": 0.00023863276597560273,
+          "period": 334.19575830658204,
+          "translationIndex": 37
+        },
+        {
+          "wavevector": [
+            6,
+            2
+          ],
+          "Q": 40,
+          "growthRate": 0.00021456200931442918,
+          "period": 334.3746934919389,
+          "translationIndex": 40
+        },
+        {
+          "wavevector": [
+            5,
+            4
+          ],
+          "Q": 41,
+          "growthRate": 0.0002058164684999946,
+          "period": 334.4397916914489,
+          "translationIndex": 41
+        },
+        {
+          "wavevector": [
+            6,
+            3
+          ],
+          "Q": 45,
+          "growthRate": 0.00017451058005378073,
+          "period": 334.67319798957544,
+          "translationIndex": 45
+        },
+        {
+          "wavevector": [
+            7,
+            0
+          ],
+          "Q": 49,
+          "growthRate": 0.00014407763156182524,
+          "period": 334.90066432735347,
+          "translationIndex": 49
+        },
+        {
+          "wavevector": [
+            5,
+            5
+          ],
+          "Q": 50,
+          "growthRate": 0.00013414189944455936,
+          "period": 334.97504911561407,
+          "translationIndex": 50
+        },
+        {
+          "wavevector": [
+            7,
+            1
+          ],
+          "Q": 50,
+          "growthRate": 0.00013604739119382563,
+          "period": 334.96077882274477,
+          "translationIndex": 50
+        },
+        {
+          "wavevector": [
+            6,
+            4
+          ],
+          "Q": 52,
+          "growthRate": 0.00011857805235738778,
+          "period": 335.0916900232819,
+          "translationIndex": 52
+        },
+        {
+          "wavevector": [
+            7,
+            2
+          ],
+          "Q": 53,
+          "growthRate": 0.00011197663453265468,
+          "period": 335.1412079199836,
+          "translationIndex": 53
+        },
+        {
+          "wavevector": [
+            7,
+            3
+          ],
+          "Q": 58,
+          "growthRate": 7.192520527200623e-05,
+          "period": 335.4422083029383,
+          "translationIndex": 58
+        },
+        {
+          "wavevector": [
+            6,
+            5
+          ],
+          "Q": 61,
+          "growthRate": 4.690348330194864e-05,
+          "period": 335.6307539668401,
+          "translationIndex": 61
+        },
+        {
+          "wavevector": [
+            8,
+            0
+          ],
+          "Q": 64,
+          "growthRate": 2.6400341546163738e-05,
+          "period": 335.7855378199434,
+          "translationIndex": 64
+        },
+        {
+          "wavevector": [
+            7,
+            4
+          ],
+          "Q": 65,
+          "growthRate": 1.599267757561285e-05,
+          "period": 335.8642072744919,
+          "translationIndex": 65
+        },
+        {
+          "wavevector": [
+            8,
+            1
+          ],
+          "Q": 65,
+          "growthRate": 1.8370101178168466e-05,
+          "period": 335.8462309136602,
+          "translationIndex": 65
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 5,
+          "stars": [
+            [
+              2,
+              1
+            ],
+            [
+              -2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 10,
+          "stars": [
+            [
+              3,
+              1
+            ],
+            [
+              -3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              3,
+              2
+            ],
+            [
+              -3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 17,
+          "stars": [
+            [
+              4,
+              1
+            ],
+            [
+              -4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 20,
+          "stars": [
+            [
+              4,
+              2
+            ],
+            [
+              -4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 25,
+          "stars": [
+            [
+              4,
+              3
+            ],
+            [
+              -4,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 26,
+          "stars": [
+            [
+              5,
+              1
+            ],
+            [
+              -5,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 29,
+          "stars": [
+            [
+              5,
+              2
+            ],
+            [
+              -5,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 34,
+          "stars": [
+            [
+              5,
+              3
+            ],
+            [
+              -5,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 37,
+          "stars": [
+            [
+              6,
+              1
+            ],
+            [
+              -6,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 40,
+          "stars": [
+            [
+              6,
+              2
+            ],
+            [
+              -6,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 8
+        },
+        {
+          "Q": 41,
+          "stars": [
+            [
+              5,
+              4
+            ],
+            [
+              -5,
+              4
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 45,
+          "stars": [
+            [
+              6,
+              3
+            ],
+            [
+              -6,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 9
+        },
+        {
+          "Q": 50,
+          "stars": [
+            [
+              7,
+              1
+            ],
+            [
+              -7,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 52,
+          "stars": [
+            [
+              6,
+              4
+            ],
+            [
+              -6,
+              4
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 53,
+          "stars": [
+            [
+              7,
+              2
+            ],
+            [
+              -7,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 58,
+          "stars": [
+            [
+              7,
+              3
+            ],
+            [
+              -7,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 2
+        },
+        {
+          "Q": 61,
+          "stars": [
+            [
+              6,
+              5
+            ],
+            [
+              -6,
+              5
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 65,
+          "stars": [
+            [
+              8,
+              1
+            ],
+            [
+              -8,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 65,
+          "stars": [
+            [
+              7,
+              4
+            ],
+            [
+              -7,
+              4
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p6",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 3,
+      "geometricStarTypes": 3,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.00043741563598322466,
+          "period": 332.7312586263755,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.0002457484088592358,
+          "period": 334.14292927051,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0001503264912798741,
+          "period": 334.8539123735676,
+          "translationIndex": 4
+        }
+      ],
+      "degenerateMixedStarPairs": []
+    },
+    {
+      "family": "p6",
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 5,
+      "geometricStarTypes": 4,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0006760148208199751,
+          "period": 338.1177412205925,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.00048434759369598754,
+          "period": 339.5811046494836,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.00038892567611662605,
+          "period": 340.31828268580233,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            -3,
+            1
+          ],
+          "Q": 7,
+          "growthRate": 0.00010429261884428893,
+          "period": 342.5521733437903,
+          "translationIndex": 7
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 7,
+          "stars": [
+            [
+              -3,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p6",
+      "F": 0.0038,
+      "k": 0.02,
+      "L": 256,
+      "N": 48,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 9,
+      "geometricStarTypes": 7,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.001381054383386021,
+          "period": 355.9294066927189,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.0011893871562620312,
+          "period": 357.5743527389254,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0010939652386826684,
+          "period": 358.40361674836294,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            -3,
+            1
+          ],
+          "Q": 7,
+          "growthRate": 0.0008093321814103326,
+          "period": 360.919076297964,
+          "translationIndex": 7
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.0006209444336826281,
+          "period": 362.619367138954,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 12,
+          "growthRate": 0.00034035813497013557,
+          "period": 365.2059623740802,
+          "translationIndex": 12
+        },
+        {
+          "wavevector": [
+            -4,
+            1
+          ],
+          "Q": 13,
+          "growthRate": 0.0002473923048217897,
+          "period": 366.07765424631356,
+          "translationIndex": 13
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 7,
+          "stars": [
+            [
+              -3,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              -4,
+              1
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p6",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 512,
+      "N": 96,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 14,
+      "geometricStarTypes": 10,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0005095738319621454,
+          "period": 332.2053971934368,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.00046145117718982866,
+          "period": 332.55575962562943,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.00043741563598322466,
+          "period": 332.7312586263755,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            -3,
+            1
+          ],
+          "Q": 7,
+          "growthRate": 0.0003654119362408567,
+          "period": 333.2590319019898,
+          "translationIndex": 7
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.00031749535006419974,
+          "period": 333.6119464496682,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 12,
+          "growthRate": 0.0002457484088592358,
+          "period": 334.14292927051,
+          "translationIndex": 12
+        },
+        {
+          "wavevector": [
+            -4,
+            1
+          ],
+          "Q": 13,
+          "growthRate": 0.0002218673638891824,
+          "period": 334.3203507403001,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.0001503264912798741,
+          "period": 334.8539123735676,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            -5,
+            2
+          ],
+          "Q": 19,
+          "growthRate": 7.893747143368295e-05,
+          "period": 335.3894378219088,
+          "translationIndex": 19
+        },
+        {
+          "wavevector": [
+            -5,
+            1
+          ],
+          "Q": 21,
+          "growthRate": 3.1432140030979074e-05,
+          "period": 335.74752741587986,
+          "translationIndex": 21
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 7,
+          "stars": [
+            [
+              -3,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              -4,
+              1
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 19,
+          "stars": [
+            [
+              -5,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 21,
+          "stars": [
+            [
+              -5,
+              1
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 3
+        }
+      ]
+    },
+    {
+      "family": "p6",
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 512,
+      "N": 96,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 20,
+      "geometricStarTypes": 14,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0007481730167988997,
+          "period": 337.5727315342594,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.000700050362026585,
+          "period": 337.9358452550409,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0006760148208199751,
+          "period": 338.1177412205925,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            -3,
+            1
+          ],
+          "Q": 7,
+          "growthRate": 0.0006040111210776082,
+          "period": 338.66479117509715,
+          "translationIndex": 7
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.0005560945349009532,
+          "period": 339.03062867156956,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 12,
+          "growthRate": 0.00048434759369598754,
+          "period": 339.5811046494836,
+          "translationIndex": 12
+        },
+        {
+          "wavevector": [
+            -4,
+            1
+          ],
+          "Q": 13,
+          "growthRate": 0.00046046654872593457,
+          "period": 339.76505285310213,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.00038892567611662605,
+          "period": 340.31828268580233,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            -5,
+            2
+          ],
+          "Q": 19,
+          "growthRate": 0.0003175366562704347,
+          "period": 340.8736095698278,
+          "translationIndex": 19
+        },
+        {
+          "wavevector": [
+            -5,
+            1
+          ],
+          "Q": 21,
+          "growthRate": 0.0002700313248677284,
+          "period": 341.24497382783744,
+          "translationIndex": 21
+        },
+        {
+          "wavevector": [
+            5,
+            0
+          ],
+          "Q": 25,
+          "growthRate": 0.00017522408718455068,
+          "period": 341.9905143288821,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 27,
+          "growthRate": 0.00012791690527693745,
+          "period": 342.3647380180958,
+          "translationIndex": 27
+        },
+        {
+          "wavevector": [
+            -6,
+            2
+          ],
+          "Q": 28,
+          "growthRate": 0.00010429261884428893,
+          "period": 342.5521733437903,
+          "translationIndex": 28
+        },
+        {
+          "wavevector": [
+            -6,
+            1
+          ],
+          "Q": 31,
+          "growthRate": 3.3520922367712364e-05,
+          "period": 343.1159043092283,
+          "translationIndex": 31
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 7,
+          "stars": [
+            [
+              -3,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              -4,
+              1
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 19,
+          "stars": [
+            [
+              -5,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 21,
+          "stars": [
+            [
+              -5,
+              1
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 3
+        },
+        {
+          "Q": 28,
+          "stars": [
+            [
+              -6,
+              2
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 31,
+          "stars": [
+            [
+              -6,
+              1
+            ],
+            [
+              5,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    },
+    {
+      "family": "p6",
+      "F": 0.004,
+      "k": 0.02,
+      "L": 768,
+      "N": 126,
+      "Du": 0.16,
+      "Dv": 0.08,
+      "CyclicStars": 31,
+      "geometricStarTypes": 21,
+      "types": [
+        {
+          "wavevector": [
+            1,
+            0
+          ],
+          "Q": 1,
+          "growthRate": 0.0005229539583705249,
+          "period": 332.1082206748297,
+          "translationIndex": 1
+        },
+        {
+          "wavevector": [
+            1,
+            1
+          ],
+          "Q": 3,
+          "growthRate": 0.0005015532936844165,
+          "period": 332.2636981299481,
+          "translationIndex": 3
+        },
+        {
+          "wavevector": [
+            2,
+            0
+          ],
+          "Q": 4,
+          "growthRate": 0.0004908596161556328,
+          "period": 332.34148810091796,
+          "translationIndex": 4
+        },
+        {
+          "wavevector": [
+            -3,
+            1
+          ],
+          "Q": 7,
+          "growthRate": 0.0004588051697365324,
+          "period": 332.5750633024181,
+          "translationIndex": 7
+        },
+        {
+          "wavevector": [
+            3,
+            0
+          ],
+          "Q": 9,
+          "growthRate": 0.0004374577104747637,
+          "period": 332.73095111821965,
+          "translationIndex": 9
+        },
+        {
+          "wavevector": [
+            2,
+            2
+          ],
+          "Q": 12,
+          "growthRate": 0.00040546964683148734,
+          "period": 332.9650404550233,
+          "translationIndex": 12
+        },
+        {
+          "wavevector": [
+            -4,
+            1
+          ],
+          "Q": 13,
+          "growthRate": 0.00039481586509850257,
+          "period": 333.04313842274684,
+          "translationIndex": 13
+        },
+        {
+          "wavevector": [
+            4,
+            0
+          ],
+          "Q": 16,
+          "growthRate": 0.00036288100687957244,
+          "period": 333.2776386730727,
+          "translationIndex": 16
+        },
+        {
+          "wavevector": [
+            -5,
+            2
+          ],
+          "Q": 19,
+          "growthRate": 0.00033098564795409446,
+          "period": 333.51245028082593,
+          "translationIndex": 19
+        },
+        {
+          "wavevector": [
+            -5,
+            1
+          ],
+          "Q": 21,
+          "growthRate": 0.00030974446726395326,
+          "period": 333.66916111197537,
+          "translationIndex": 21
+        },
+        {
+          "wavevector": [
+            5,
+            0
+          ],
+          "Q": 25,
+          "growthRate": 0.00026731491480565814,
+          "period": 333.98299727981515,
+          "translationIndex": 25
+        },
+        {
+          "wavevector": [
+            3,
+            3
+          ],
+          "Q": 27,
+          "growthRate": 0.00024612575101859327,
+          "period": 334.14012859747567,
+          "translationIndex": 27
+        },
+        {
+          "wavevector": [
+            -6,
+            2
+          ],
+          "Q": 28,
+          "growthRate": 0.00023553835206143077,
+          "period": 334.2187418030202,
+          "translationIndex": 28
+        },
+        {
+          "wavevector": [
+            -6,
+            1
+          ],
+          "Q": 31,
+          "growthRate": 0.00020380247713192067,
+          "period": 334.45478954039964,
+          "translationIndex": 31
+        },
+        {
+          "wavevector": [
+            6,
+            0
+          ],
+          "Q": 36,
+          "growthRate": 0.0001509970266155116,
+          "period": 334.8488970526405,
+          "translationIndex": 36
+        },
+        {
+          "wavevector": [
+            -7,
+            3
+          ],
+          "Q": 37,
+          "growthRate": 0.00014044714936647983,
+          "period": 334.92783731608756,
+          "translationIndex": 37
+        },
+        {
+          "wavevector": [
+            -7,
+            2
+          ],
+          "Q": 39,
+          "growthRate": 0.00011936505616995884,
+          "period": 335.0857884009023,
+          "translationIndex": 39
+        },
+        {
+          "wavevector": [
+            -7,
+            1
+          ],
+          "Q": 43,
+          "growthRate": 7.725328318233565e-05,
+          "period": 335.4021093528593,
+          "translationIndex": 43
+        },
+        {
+          "wavevector": [
+            4,
+            4
+          ],
+          "Q": 48,
+          "growthRate": 2.4707270891778307e-05,
+          "period": 335.7983308520279,
+          "translationIndex": 48
+        },
+        {
+          "wavevector": [
+            -8,
+            3
+          ],
+          "Q": 49,
+          "growthRate": 1.4212576652416781e-05,
+          "period": 335.8776693970882,
+          "translationIndex": 49
+        },
+        {
+          "wavevector": [
+            7,
+            0
+          ],
+          "Q": 49,
+          "growthRate": 1.421652690648356e-05,
+          "period": 335.8776395208828,
+          "translationIndex": 49
+        }
+      ],
+      "degenerateMixedStarPairs": [
+        {
+          "Q": 7,
+          "stars": [
+            [
+              -3,
+              1
+            ],
+            [
+              2,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 13,
+          "stars": [
+            [
+              -4,
+              1
+            ],
+            [
+              3,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 19,
+          "stars": [
+            [
+              -5,
+              2
+            ],
+            [
+              3,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 21,
+          "stars": [
+            [
+              -5,
+              1
+            ],
+            [
+              4,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 3
+        },
+        {
+          "Q": 28,
+          "stars": [
+            [
+              -6,
+              2
+            ],
+            [
+              4,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 4
+        },
+        {
+          "Q": 31,
+          "stars": [
+            [
+              -6,
+              1
+            ],
+            [
+              5,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 37,
+          "stars": [
+            [
+              -7,
+              3
+            ],
+            [
+              4,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 39,
+          "stars": [
+            [
+              -7,
+              2
+            ],
+            [
+              5,
+              2
+            ]
+          ],
+          "combinedTranslationIndex": 3
+        },
+        {
+          "Q": 43,
+          "stars": [
+            [
+              -7,
+              1
+            ],
+            [
+              6,
+              1
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        },
+        {
+          "Q": 49,
+          "stars": [
+            [
+              -8,
+              3
+            ],
+            [
+              5,
+              3
+            ]
+          ],
+          "combinedTranslationIndex": 1
+        }
+      ]
+    }
+  ],
+  "mixedSeedChecks": [
+    {
+      "ratio": 0.5,
+      "relativePhase": 0,
+      "characterError": 1.5543122344752192e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "ratio": 0.5,
+      "relativePhase": 1.5707963267948966,
+      "characterError": 1.6551843842577912e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "ratio": 1,
+      "relativePhase": 0,
+      "characterError": 1.6359904778802786e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "ratio": 1,
+      "relativePhase": 1.5707963267948966,
+      "characterError": 2.0658801409477063e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "ratio": 2,
+      "relativePhase": 0,
+      "characterError": 3.016336461716389e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "ratio": 2,
+      "relativePhase": 1.5707963267948966,
+      "characterError": 3.15438178803426e-15,
+      "instantaneousGridTranslations": [
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "shootingProbes": [
+    {
+      "relativePhase": 0,
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 256.0,
+      "N": 12,
+      "period": 363.69851606229616,
+      "shootingRms": 0.0006288297004065987,
+      "spatialRms": 0.05087878144217767,
+      "sameTimeRotationRms": 0.05583961376921465,
+      "calls": 1758,
+      "seconds": 1.6293517050000004,
+      "solverSuccess": false,
+      "message": "The number of calls to function has reached maxfev = 1600.",
+      "independentlyVerified": false
+    },
+    {
+      "relativePhase": 1.5707963267948966,
+      "F": 0.00395,
+      "k": 0.02,
+      "L": 256.0,
+      "N": 12,
+      "period": 359.9562628529555,
+      "shootingRms": 0.00023822837158186662,
+      "spatialRms": 0.04371789853314413,
+      "sameTimeRotationRms": 0.04722054157595196,
+      "calls": 1782,
+      "seconds": 1.6614465760000012,
+      "solverSuccess": false,
+      "message": "The number of calls to function has reached maxfev = 1600.",
+      "independentlyVerified": false
+    }
+  ]
+}

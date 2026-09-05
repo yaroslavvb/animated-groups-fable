@@ -9,6 +9,7 @@ import {basename,relative,resolve,sep} from 'node:path';
 import {sha256,decodeField,encodePng,concentrationRanges,compactDiagnostics} from './build-catalog.mjs';
 import {verifyCandidate,normalizeConfig,GATE_VERSION} from '../p6/verify.mjs';
 import {renderPixels} from '../p6/playback.mjs';
+import {auditVisibleTimeSymmetry,VISIBILITY_VERSION} from '../visible-time-symmetry.mjs';
 
 const ROOT=new URL('../p6/',import.meta.url),OUTPUT=new URL('data/precomputed-atlas.json',ROOT);
 const SCHEMA='scott-gray-precomputed-atlas-v1',PALETTES=['ember','ceramic','concentration'];
@@ -22,13 +23,15 @@ async function fingerprints(){
 }
 function compact(d){return{...compactDiagnostics(d),relativeRefinement:d.relativeRefinement,caveat:d.caveat};}
 
-export async function buildP6Catalog({check=false,log=console.log}={}){
+export async function buildP6Catalog({check=false,incremental=false,log=console.log}={}){
   const [manifestBytes,groupsBytes,code]=await Promise.all([readFile(new URL('data/candidate-orbits.json',ROOT)),readFile(new URL('groups.json',ROOT)),fingerprints()]);
-  const manifest=JSON.parse(manifestBytes),groups=JSON.parse(groupsBytes),old=check?JSON.parse(await readFile(OUTPUT)):null;
+  const manifest=JSON.parse(manifestBytes),groups=JSON.parse(groupsBytes),old=check||incremental?JSON.parse(await readFile(OUTPUT)):null;
   assert(Array.isArray(manifest.orbits),'Candidate manifest must list its orbits.');
   const catalog={schema:SCHEMA,family:'p6',gateVersion:GATE_VERSION,preferredGroup:manifest.preferredGroup??'g248',preferredParameters:manifest.preferredParameters,
     description:'Precomputed periodic Gray–Scott fields on the triangular lattice. Every exact saved Float32 field passed an independent JavaScript PDE, space–time character, primitive-period, extended forward-trajectory and half-timestep audit offline. Browsing only checks selected payload integrity.',
     sourceManifestSha256:sha256(manifestBytes),groupsSha256:sha256(groupsBytes),...code,orbits:[]};
+  catalog.visibilityPolicyVersion=VISIBILITY_VERSION;catalog.visibilityCodeSha256=sha256(await readFile(new URL('../visible-time-symmetry.mjs',ROOT)));
+  if(check)for(const key of ['visibilityPolicyVersion','visibilityCodeSha256'])assert(old[key]===catalog[key],`632 gallery visibility policy is stale: ${key}.`);
   if(check){
     for(const key of ['schema','family','gateVersion','sourceManifestSha256','groupsSha256','verificationCodeSha256','thumbnailCodeSha256'])assert(old[key]===catalog[key],`Precomputed 632 catalog is stale: ${key}. Run node research/build-p6-catalog.mjs --verify.`);
     assert(old.orbits.length===manifest.orbits.length,'632 orbit count is stale.');
@@ -41,7 +44,11 @@ export async function buildP6Catalog({check=false,log=console.log}={}){
     assert(json(metadata.config.ops)===json(group.render.ops),'Candidate must use the exact canonical 632 operations.');
     const field=decodeField(metadata,binary);let config,diagnostics;
     if(check){config=normalizeConfig(metadata.config);diagnostics=compact(old.orbits[index].diagnostics);}
-    else{
+    else if(incremental&&old.verificationCodeSha256===code.verificationCodeSha256&&old.orbits.some(e=>e.id===`saved:${basename(metadataUrl.pathname,'.json')}`&&e.fieldSha256===metadata.fieldSha256&&json(e.config)===json(normalizeConfig(metadata.config)))){
+      const previous=old.orbits.find(e=>e.id===`saved:${basename(metadataUrl.pathname,'.json')}`);
+      config=normalizeConfig(metadata.config);diagnostics=compact(previous.diagnostics);
+      assert(previous.offlineVerification?.passed===true&&previous.offlineVerification.gateVersion===GATE_VERSION&&previous.offlineVerification.verificationCodeSha256===code.verificationCodeSha256&&previous.offlineVerification.fieldSha256===metadata.fieldSha256&&previous.offlineVerification.configSha256===sha256(json(config)),'Cached evidence must match the exact field, configuration, gate and verifier code.');
+    }else{
       const result=await verifyCandidate({config:metadata.config,field});
       assert(result.accepted,`${source.url}: ${result.reasons.join(' ')}`);config=result.record.config;diagnostics=compact(result.diagnostics);
     }
@@ -51,6 +58,8 @@ export async function buildP6Catalog({check=false,log=console.log}={}){
       metadataUrl:inside(metadataUrl),fieldUrl:inside(fieldUrl),fieldEncoding:'float32-le',fieldSha256:metadata.fieldSha256,fieldByteLength:metadata.fieldByteLength,fieldValueCount:metadata.fieldValueCount,
       ranges,diagnostics,offlineVerification:{gateVersion:GATE_VERSION,passed:true,fieldSha256:metadata.fieldSha256,configSha256:sha256(json(config)),verificationCodeSha256:code.verificationCodeSha256},
       thumbnails,...(metadata.provenance?{provenance:metadata.provenance}:{})};
+    entry.visibleTimeSymmetry=auditVisibleTimeSymmetry({field,...config,noiseRms:diagnostics.phaseUncertaintyRms??0});
+    assert(entry.visibleTimeSymmetry.passed,`${source.url}: remove from gallery; ${entry.visibleTimeSymmetry.reasons.join(' ')}`);
     assert(!seen.has(entry.id),'Duplicate 632 orbit identifier.');seen.add(entry.id);
     for(const [palette,path] of Object.entries(thumbnails)){
       const pixels=renderPixels({config,field,ranges},0,{width:160,tiles:2,palette}),png=encodePng(160,160,pixels),target=new URL(path,ROOT);
@@ -70,6 +79,6 @@ export async function buildP6Catalog({check=false,log=console.log}={}){
 }
 
 if(process.argv[1]&&pathToFileURL(resolve(process.argv[1])).href===import.meta.url){
-  const args=process.argv.slice(2);assert(args.every(a=>['--check','--verify'].includes(a))&&!(args.includes('--check')&&args.includes('--verify')),'Usage: node research/build-p6-catalog.mjs [--verify | --check]');
-  await buildP6Catalog({check:args.includes('--check')});
+  const args=process.argv.slice(2);assert(args.length<=1&&args.every(a=>['--check','--verify','--incremental'].includes(a)),'Usage: node research/build-p6-catalog.mjs [--verify | --check | --incremental]');
+  await buildP6Catalog({check:args.includes('--check'),incremental:args.includes('--incremental')});
 }

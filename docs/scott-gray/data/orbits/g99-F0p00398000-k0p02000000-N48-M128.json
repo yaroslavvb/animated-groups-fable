@@ -178,23 +178,23 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.0013945488568417037,
-    "pdeRms": 1.9400903873535107e-06,
+    "pdeRms": 0.0000019400903873535107,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.06962278417687705,
     "spatialRms": 0.06990194167590949,
-    "coarseReturnRms": 5.872526851823312e-09,
-    "refinedReturnRms": 5.872592287990604e-09,
-    "refinedTrajectoryRms": 9.463100477678322e-09,
-    "maxRefinedPhaseRms": 1.1622548323716229e-08,
+    "coarseReturnRms": 5.872526851823312e-9,
+    "refinedReturnRms": 5.872592287990604e-9,
+    "refinedTrajectoryRms": 9.463100477678322e-9,
+    "maxRefinedPhaseRms": 1.1622548323716229e-8,
     "coarseDt": 0.37222699095957285,
     "refinedDt": 0.18611349547978642,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 2.30864450599542e-12,
     "projectionMax": 2.3933882653537353e-11,
-    "quantizationMax": 1.4899034561643987e-08,
+    "quantizationMax": 1.4899034561643987e-8,
     "admissionElapsedMs": 3219.2514530000044,
-    "coarseTrajectoryRms": 9.462703823849333e-09,
-    "maxCoarsePhaseRms": 1.162356197509982e-08
+    "coarseTrajectoryRms": 9.462703823849333e-9,
+    "maxCoarsePhaseRms": 1.162356197509982e-8
   },
   "provenance": {
     "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
@@ -213,8 +213,130 @@
       "initialFieldRmsDifference": 0.008106435782863693
     },
     "exportThresholds": {
-      "maximumProjectionMax": 1e-08,
-      "maximumForwardErrorRms": 1e-06
+      "maximumProjectionMax": 1e-8,
+      "maximumForwardErrorRms": 0.000001
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 9.463100477678322e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.1585706890880071,
+            "minimumRelativeColorRange": 0.5537730995140676,
+            "phase": 0.2545626168104853,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.09133138281691837,
+            "minimumRelativeColorRange": 0.4811016919120679,
+            "phase": 0.20798818991993584,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 2,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.11927492027197047,
+            "minimumRelativeColorRange": 0.4165413083160898,
+            "phase": 0.010649036685668412,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07239067647689028,
+            "minimumRelativeColorRange": 0.3813286940098709,
+            "phase": 0.71404802228702,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 3,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.11927492027197047,
+            "minimumRelativeColorRange": 0.4165413083160898,
+            "phase": 0.2606490366856682,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07239067647689028,
+            "minimumRelativeColorRange": 0.3813286940098709,
+            "phase": 0.96404802228702,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 4,
+        "tau": 0.25,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.11927492027197047,
+            "minimumRelativeColorRange": 0.4165413083160898,
+            "phase": 0.2606490366856682,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07239067647689028,
+            "minimumRelativeColorRange": 0.3813286940098709,
+            "phase": 0.96404802228702,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 5,
+        "tau": 0.75,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.11927492027197047,
+            "minimumRelativeColorRange": 0.4165413083160898,
+            "phase": 0.010649036685668412,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07239067647689028,
+            "minimumRelativeColorRange": 0.3813286940098709,
+            "phase": 0.71404802228702,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.3813286940098709,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

@@ -77,13 +77,14 @@ function validRange(range){return Array.isArray(range)&&range.length===2&&range.
  * Its verification certificate is trusted like application code; this loader
  * checks file integrity, not whether arbitrary imported fields solve the PDE.
  */
-export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=globalThis.fetch}={}){
+export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=globalThis.fetch,maxCachedOrbits=3}={}){
   const definition=FAMILIES[family];
   if(!definition||manifest?.schema!==SCHEMA||manifest?.gateVersion!==definition.gate||(manifest.family!==undefined&&manifest.family!==family)||!Array.isArray(manifest.orbits))throw Error('A supported precomputed atlas is required.');
   if(!Array.isArray(groups))throw Error('The canonical groups.json catalog is required.');
   const canonical=new Map(groups.filter(group=>definition.ids.includes(group?.id)&&Array.isArray(group.render?.ops)).map(group=>[group.id,snapshot(group.render.ops)]));
   if(canonical.size!==6)throw Error(`All six canonical ${definition.label} groups are required.`);
   if(typeof fetcher!=='function')throw Error('A field fetcher is required.');
+  if(!Number.isInteger(maxCachedOrbits)||maxCachedOrbits<1||maxCachedOrbits>32)throw Error('Cache capacity must be between 1 and 32 orbits.');
   const summaries=new Map(),byGroup=new Map([...canonical.keys()].map(id=>[id,[]]));
   for(const entry of manifest.orbits){
     const config=entry?.config,verification=entry?.offlineVerification;
@@ -95,6 +96,7 @@ export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=gl
     if(!Number.isFinite(config.params?.F)||!Number.isFinite(config.params?.k))throw Error(`Invalid parameters for ${entry.id}.`);
     if(entry.fieldEncoding!=='float32-le'||entry.fieldValueCount!==2*N*N*M||entry.fieldByteLength!==4*entry.fieldValueCount||typeof entry.fieldUrl!=='string'||!entry.fieldUrl||!HASH.test(entry.fieldSha256))throw Error(`Invalid binary metadata for ${entry.id}.`);
     if(verification?.passed!==true||verification.gateVersion!==definition.gate||verification.fieldSha256!==entry.fieldSha256||entry.diagnostics?.validated!==true)throw Error(`Missing offline verification certificate for ${entry.id}.`);
+    if(manifest.visibilityPolicyVersion&&(entry.visibleTimeSymmetry?.version!==manifest.visibilityPolicyVersion||entry.visibleTimeSymmetry.passed!==true))throw Error(`Missing visible time-symmetry certificate for ${entry.id}.`);
     if(!validRange(entry.ranges?.u)||!validRange(entry.ranges?.v))throw Error(`Missing precomputed display ranges for ${entry.id}.`);
     if(['ember','ceramic','concentration'].some(palette=>typeof entry.thumbnails?.[palette]!=='string'||!entry.thumbnails[palette]))throw Error(`Missing precomputed thumbnails for ${entry.id}.`);
     if(Object.hasOwn(entry,'field'))throw Error('Precomputed summaries must not contain concentration fields.');
@@ -104,7 +106,7 @@ export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=gl
   for(const entries of byGroup.values())Object.freeze(entries);
   const empty=Object.freeze([]),loaded=new Map(),inflight=new Map(),branded=new WeakSet();
   function load(id){
-    if(loaded.has(id))return Promise.resolve(loaded.get(id));
+    if(loaded.has(id)){const record=loaded.get(id);loaded.delete(id);loaded.set(id,record);return Promise.resolve(record);}
     if(inflight.has(id))return inflight.get(id);
     const summary=summaries.get(id);
     if(!summary)return Promise.reject(Error('Unknown precomputed orbit.'));
@@ -120,7 +122,10 @@ export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=gl
         if(!Number.isFinite(field[i]))throw Error('The downloaded orbit contains a non-finite concentration.');
       }
       const record=Object.freeze({...summary,atlasId:id,kind:'verified-periodic',field:Object.freeze(field)});
-      branded.add(record);loaded.set(id,record);return record;
+      branded.add(record);loaded.set(id,record);
+      // A large gallery must not retain every full movie in mobile memory.
+      while(loaded.size>maxCachedOrbits)loaded.delete(loaded.keys().next().value);
+      return record;
     })();
     inflight.set(id,request);
     // Delete failures as well as successes so a transient network error can retry.
@@ -139,6 +144,6 @@ export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=gl
   return Object.freeze({load,nearest,get:id=>summaries.get(id)||null,
     summaries:groupId=>groupId===undefined?all:byGroup.get(groupId)||empty,
     size:groupId=>groupId===undefined?summaries.size:byGroup.get(groupId)?.length||0,
-    isVerified:(record,groupId=record?.config?.groupId)=>branded.has(record)&&record.config.groupId===groupId&&loaded.get(record.id)===record,
+    isVerified:(record,groupId=record?.config?.groupId)=>branded.has(record)&&record.config.groupId===groupId,
   });
 }

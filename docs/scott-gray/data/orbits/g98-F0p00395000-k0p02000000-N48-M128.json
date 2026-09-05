@@ -178,23 +178,23 @@
     "spatialGrid": 48,
     "timeFrames": 128,
     "relativePde": 0.001007629129470218,
-    "pdeRms": 1.072251445307672e-06,
+    "pdeRms": 0.000001072251445307672,
     "candidateSymmetryMax": 0,
     "temporalRms": 0.055125166924898376,
     "spatialRms": 0.0557244123831573,
-    "coarseReturnRms": 4.966152825797975e-09,
-    "refinedReturnRms": 4.965822175935689e-09,
-    "refinedTrajectoryRms": 7.286793536160371e-09,
-    "maxRefinedPhaseRms": 7.747223867197198e-09,
+    "coarseReturnRms": 4.966152825797975e-9,
+    "refinedReturnRms": 4.965822175935689e-9,
+    "refinedTrajectoryRms": 7.286793536160371e-9,
+    "maxRefinedPhaseRms": 7.747223867197198e-9,
     "coarseDt": 0.36725226977552095,
     "refinedDt": 0.18362613488776047,
     "primitiveAtResolvedDivisors": true,
     "projectionRms": 3.685104464535172e-12,
     "projectionMax": 1.8215817743083562e-11,
-    "quantizationMax": 1.4900735145761956e-08,
+    "quantizationMax": 1.4900735145761956e-8,
     "admissionElapsedMs": 2975.018661,
-    "coarseTrajectoryRms": 7.286989818401039e-09,
-    "maxCoarsePhaseRms": 7.747260558516335e-09
+    "coarseTrajectoryRms": 7.286989818401039e-9,
+    "maxCoarsePhaseRms": 7.747260558516335e-9
   },
   "provenance": {
     "method": "GPU Newton shooting with batched finite-difference Jacobian and GPU dense solve",
@@ -213,8 +213,88 @@
       "initialFieldRmsDifference": 0.006356979954501765
     },
     "exportThresholds": {
-      "maximumProjectionMax": 1e-08,
-      "maximumForwardErrorRms": 1e-06
+      "maximumProjectionMax": 1e-8,
+      "maximumForwardErrorRms": 0.000001
     }
+  },
+  "visibleTimeSymmetry": {
+    "version": "per-channel-rotation-contrast-v1",
+    "passed": true,
+    "referenceOnly": false,
+    "thresholds": {
+      "minimumRelativeColorRange": 0.05,
+      "minimumAbsoluteRms": 0.002,
+      "noiseFactor": 100,
+      "effectiveAbsoluteFloor": 0.002
+    },
+    "noiseRms": 7.286989818401039e-9,
+    "operations": [
+      {
+        "operation": 1,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.12594340722010283,
+            "minimumRelativeColorRange": 0.45625236303042677,
+            "phase": 0.12103420502263873,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07420722044521717,
+            "minimumRelativeColorRange": 0.4149411841141396,
+            "phase": 0.4803804880791045,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 3,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.12594340722010283,
+            "minimumRelativeColorRange": 0.45625236303042677,
+            "phase": 0.12103420502263873,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07420722044521717,
+            "minimumRelativeColorRange": 0.4149411841141396,
+            "phase": 0.4803804880791045,
+            "passed": true
+          }
+        ],
+        "passed": true
+      },
+      {
+        "operation": 5,
+        "tau": 0.5,
+        "channels": [
+          {
+            "channel": "U",
+            "minimumRms": 0.12594340722010283,
+            "minimumRelativeColorRange": 0.45625236303042677,
+            "phase": 0.12103420502263873,
+            "passed": true
+          },
+          {
+            "channel": "V",
+            "minimumRms": 0.07420722044521717,
+            "minimumRelativeColorRange": 0.4149411841141396,
+            "phase": 0.4803804880791045,
+            "passed": true
+          }
+        ],
+        "passed": true
+      }
+    ],
+    "reasons": [],
+    "minimumRelativeColorRange": 0.4149411841141396,
+    "scope": "Both displayed concentrations; every nonzero-offset rotation; exact minimum over every linear playback segment, including the loop seam. Zero-offset spatial symmetries are allowed. This is a visibility policy, not a continuum existence proof."
   }
 }

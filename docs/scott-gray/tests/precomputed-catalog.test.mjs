@@ -23,6 +23,17 @@ function fixture(id='saved:one',groupId='g96',params={F:.004,k:.02}){
 const manifest=(...fixtures)=>({schema:'scott-gray-precomputed-atlas-v1',gateVersion,orbits:fixtures.map(fixture=>fixture.entry)});
 const response=bytes=>({ok:true,arrayBuffer:async()=>bytes.slice(0)});
 
+test('a visibility-filtered catalog rejects absent, failed or stale visibility certificates',()=>{
+  const item=fixture(),source=manifest(item);source.visibilityPolicyVersion='per-channel-rotation-contrast-v1';
+  assert.throws(()=>createPrecomputedCatalog(source,{groups}),/visible time-symmetry/);
+  item.entry.visibleTimeSymmetry={version:source.visibilityPolicyVersion,passed:false};
+  assert.throws(()=>createPrecomputedCatalog(source,{groups}),/visible time-symmetry/);
+  item.entry.visibleTimeSymmetry={version:'older-policy',passed:true};
+  assert.throws(()=>createPrecomputedCatalog(source,{groups}),/visible time-symmetry/);
+  item.entry.visibleTimeSymmetry={version:source.visibilityPolicyVersion,passed:true};
+  assert.equal(createPrecomputedCatalog(source,{groups}).size(),1);
+});
+
 test('portable SHA-256 matches published vectors, block boundaries, and binary byte views',async()=>{
   const vectors=[
     ['', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'],
