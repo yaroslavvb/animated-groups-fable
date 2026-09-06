@@ -17,6 +17,15 @@ if(player){
       if(maximum>3||total/(64*64*4)>.05)throw Error(`pixel mismatch max ${maximum}, mean ${total/(64*64*4)}`);if(gl.getError()!==gl.NO_ERROR)throw Error('WebGL error');report(name);
     }catch(error){report(name,error);}
   }
+  for(const viewMatrix of [[[5/31,1/31],[1/31,6/31]],[[.5,.5/Math.sqrt(3)],[0,1/Math.sqrt(3)]]]){
+    const name=`Affine cell viewport ${JSON.stringify(viewMatrix)}: GPU matches CPU`;
+    try{
+      const options={palette:'ember',viewMatrix,viewOrigin:[.31,-.27]};player.draw(.217,options);
+      const pixels=new Uint8Array(64*64*4);gl.readPixels(0,0,64,64,gl.RGBA,gl.UNSIGNED_BYTE,pixels);const expected=renderPixels(record,.217,{width:64,...options});let maximum=0,total=0;
+      for(let y=0;y<64;y++)for(let x=0;x<64;x++)for(let c=0;c<4;c++){const difference=Math.abs(pixels[((63-y)*64+x)*4+c]-expected[(y*64+x)*4+c]);maximum=Math.max(maximum,difference);total+=difference;}
+      if(maximum>3||total/(64*64*4)>.05)throw Error(`pixel mismatch max ${maximum}, mean ${total/(64*64*4)}`);report(name);
+    }catch(error){report(name,error);}
+  }
   player.dispose();
 }
 document.getElementById('status').textContent=`${passed} passed; ${failed} failed.`;

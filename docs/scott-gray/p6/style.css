@@ -6,4 +6,4 @@
 .generator-marker .verified-inner{fill:none;stroke:white;stroke-width:2}
 .approximate-controls{padding:12px 14px;background:#fff7e9;border:1px solid #edd2a6;border-radius:8px;margin:12px 0}
 .approximate-controls[hidden]{display:none}.approximate-controls label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600}.approximate-controls p{margin-bottom:0}
-.approximate-view-label{position:absolute;bottom:30px;left:10px;border-radius:4px;background:#281a10dd;color:#ffd495;padding:4px 7px;font-size:11px;pointer-events:none}.approximate-view-label[hidden]{display:none}
+.approximate-view-label{position:absolute;bottom:30px;left:10px;border-radius:4px;background:#281a10dd;color:#ffd495;padding:4px 7px;font-size:11px;line-height:1.4;pointer-events:none}.approximate-view-label[hidden]{display:none}

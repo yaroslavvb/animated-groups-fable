@@ -22,6 +22,16 @@ test('screen geometry aligns the reference generators and inverts without a shea
   assert.deepEqual(aa,[.5,.5]);near(bb[0],.5);assert.ok(bb[1]>.5);assert.ok(cc[0]<.5&&cc[1]>.5);
   for(const p of [[.1,.2],[.5,.5],[.98,.87]]){const q=latticeToScreen(screenToLattice(p,3),3);near(p[0],q[0]);near(p[1],q[1]);}
 });
+test('cell viewport maps overlay positions and pixel samples through one affine transform',()=>{
+  const options={viewMatrix:[[5/31,1/31],[1/31,6/31]],viewOrigin:[.31,-.27]};
+  for(const p of [[.03,.91],[.5,.5],[1,0]]){
+    const q=screenToLattice(p,1,options),back=latticeToScreen(q,1,options);near(back[0],p[0]);near(back[1],p[1]);
+  }
+  const record=projectedFixture(groups[3]),a=renderPixels(record,.1,{width:24,...options}),b=renderPixels(record,.1,{width:24,...options,viewOrigin:options.viewOrigin.map(x=>x+1)});
+  assert.deepEqual(a,b);assert.notDeepEqual(a,renderPixels(record,.1,{width:24}));
+  const legacyMatrix=[[2,2/Math.sqrt(3)],[0,4/Math.sqrt(3)]];
+  assert.deepEqual(renderPixels(record,.17,{width:24,tiles:2}),renderPixels(record,.17,{width:24,viewMatrix:legacyMatrix}));
+});
 test('named affine generators use matrix inverse rather than transpose in lattice coordinates',()=>{
   for(const group of groups)for(const op of group.namedGenerators)for(const p of [[.23,.71],[0,0],[-.8,.03]]){
     const transformed=op.matrix.map((row,i)=>row[0]*p[0]+row[1]*p[1]+op.translation[i]),back=inverseOperation(transformed,op);near(back[0],p[0]);near(back[1],p[1]);

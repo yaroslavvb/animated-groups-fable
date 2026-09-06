@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Describe approximate p6 repeats without admitting additional symmetries.
+"""Describe approximate p4/p6 repeats without admitting additional symmetries.
 
 Fourier peaks propose rational translation groups. Every proposed translation is
 then measured against both concentrations of every saved frame, using the actual
-triangular playback interpolant. The maximum is checked on the common refinement
+bilinear (p4) or triangular (p6) playback interpolant. The maximum is checked on the common refinement
 of the translated and original meshes, so it bounds every spatial point and every
 linearly interpolated playback phase. No concentration sample is changed.
 """
@@ -23,31 +23,35 @@ MAX_RELATIVE_RMS = .02
 MAX_INDEX = 144
 
 
-def translation_group(wave):
-    """Annihilator of one reciprocal 60-degree star, with exact integers."""
+def translation_group(wave, family="p6"):
+    """Annihilator of one reciprocal rotation star, with exact integers."""
     a, b = map(int, wave)
-    determinant = a * a + a * b + b * b
+    if family not in ("p4", "p6"):
+        raise ValueError("Unsupported wallpaper family: " + str(family))
+    determinant = a * a + b * b + (a * b if family == "p6" else 0)
     if not 1 < determinant <= MAX_INDEX:
         return None
-    # Rows (a,b), (a+b,-a); inverse = this adjugate / (-determinant).
-    numerator = np.array([[a, b], [a + b, -a]], dtype=np.int64)
+    # p6: rows (a,b), (a+b,-a); p4: rows (a,b), (-b,a).
+    numerator = np.array([[a, b], [a + b, -a]] if family == "p6"
+                         else [[a, -b], [b, a]], dtype=np.int64)
     vectors = {
         tuple(map(int, (numerator @ np.array([i, j])) % determinant))
         for i in range(determinant) for j in range(determinant)
     }
     if len(vectors) != determinant:
         raise ValueError("Reciprocal-star translation count is inconsistent")
-    # Check the actual finite group and its 60-degree conjugation closure.
+    # Check the actual finite group and its rotational conjugation closure.
     for x, y in vectors:
-        if ((x - y) % determinant, x % determinant) not in vectors:
-            raise ValueError("Translation group does not respect the p6 rotation")
+        rotated = ((x - y) % determinant, x % determinant) if family == "p6" else ((-y) % determinant, x % determinant)
+        if rotated not in vectors:
+            raise ValueError("Translation group does not respect the " + family + " rotation")
         for u, v in vectors:
             if ((x + u) % determinant, (y + v) % determinant) not in vectors:
                 raise ValueError("Translation group is not closed")
     return {"denominator": determinant, "numerators": sorted(vectors)}
 
 
-def reciprocal_candidates(transform):
+def reciprocal_candidates(transform, family="p6"):
     """Propose distinct stars from the twelve strongest nonconstant modes."""
     n = transform.shape[-1]
     power = np.mean(np.abs(transform) ** 2, axis=(0, 1))
@@ -59,7 +63,7 @@ def reciprocal_candidates(transform):
         if power[y, x] <= power.sum() * 1e-8:
             continue
         wave = [int(frequencies[x]), int(frequencies[y])]
-        group = translation_group(wave)
+        group = translation_group(wave, family)
         if group is None:
             continue
         key = (group["denominator"], tuple(group["numerators"]))
@@ -84,13 +88,19 @@ def extends_strict_group(group, strict):
     return True
 
 
-def sample_offset(field, offset):
-    """Actual p6 triangular interpolation at every mesh node plus pixel offset."""
+def sample_offset(field, offset, family="p6"):
+    """Actual playback interpolation at every mesh node plus pixel offset."""
     dx, dy = offset
     ix, iy = np.floor([dx, dy]).astype(int)
     fx, fy = dx - ix, dy - iy
     a = np.roll(field, (-iy, -ix), axis=(-2, -1))
     c = np.roll(field, (-iy - 1, -ix - 1), axis=(-2, -1))
+    if family == "p4":
+        b = np.roll(field, (-iy, -ix - 1), axis=(-2, -1))
+        d = np.roll(field, (-iy - 1, -ix), axis=(-2, -1))
+        return (1 - fy) * ((1 - fx) * a + fx * b) + fy * ((1 - fx) * d + fx * c)
+    if family != "p6":
+        raise ValueError("Unsupported playback family: " + str(family))
     if fx >= fy:
         b = np.roll(field, (-iy, -ix - 1), axis=(-2, -1))
         return (1 - fx) * a + (fx - fy) * b + fy * c
@@ -98,24 +108,27 @@ def sample_offset(field, offset):
     return (1 - fy) * a + (fy - fx) * b + fx * c
 
 
-def common_mesh_vertices(pixel_shift):
-    """All vertices of both triangular meshes' common refinement, modulo Z²."""
+def common_mesh_vertices(pixel_shift, family="p6"):
+    """All vertices of both interpolation meshes' common refinement, modulo Z²."""
     dx, dy = pixel_shift
     xs, ys, diagonals = (0., (-dx) % 1), (0., (-dy) % 1), (0., (-dx + dy) % 1)
     points = {(x, y) for x in xs for y in ys}
-    points.update((x, (x - diagonal) % 1) for x in xs for diagonal in diagonals)
-    points.update(((y + diagonal) % 1, y) for y in ys for diagonal in diagonals)
+    if family == "p6":
+        points.update((x, (x - diagonal) % 1) for x in xs for diagonal in diagonals)
+        points.update(((y + diagonal) % 1, y) for y in ys for diagonal in diagonals)
+    elif family != "p4":
+        raise ValueError("Unsupported playback family: " + str(family))
     rounded = {tuple(round(v % 1, 12) % 1 for v in point) for point in points}
     return sorted(rounded)
 
 
-def measure_translation(field, vector, ranges, screen_only=False):
+def measure_translation(field, vector, ranges, screen_only=False, family="p6"):
     shift = np.asarray(vector) * field.shape[-1]
-    offsets = [(0., 0.)] if screen_only else common_mesh_vertices(shift)
+    offsets = [(0., 0.)] if screen_only else common_mesh_vertices(shift, family)
     channel_max, squared_sum = np.zeros(2), np.zeros(2)
     sample_count = 0
     for offset in offsets:
-        difference = sample_offset(field, shift + offset) - sample_offset(field, offset)
+        difference = sample_offset(field, shift + offset, family) - sample_offset(field, offset, family)
         channel_max = np.maximum(channel_max, np.max(abs(difference), axis=(0, 2, 3)))
         squared_sum += np.sum(difference ** 2, axis=(0, 2, 3))
         sample_count += difference.shape[0] * difference.shape[2] * difference.shape[3]
@@ -137,7 +150,7 @@ def accepted(measurement):
             and measurement["maximumRelativeSampleRms"] <= MAX_RELATIVE_RMS)
 
 
-def spectral_defect(transform, group):
+def spectral_defect(transform, group, family="p6"):
     n = transform.shape[-1]
     k = np.rint(np.fft.fftfreq(n) * n).astype(int)
     x, y = np.meshgrid(k, k)
@@ -157,11 +170,11 @@ def spectral_defect(transform, group):
     return {
         "channelForbiddenPowerFraction": fraction.tolist(),
         "channelMaximumTranslationRms": maximum_rms.tolist(),
-        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured triangular playback errors.",
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured " + ("triangular" if family == "p6" else "bilinear") + " playback errors.",
     }
 
 
-def analyze(field, strict=((0., 0.),)):
+def analyze(field, strict=((0., 0.),), family="p6"):
     if field.ndim != 4 or field.shape[1] != 2 or field.shape[-2] != field.shape[-1]:
         raise ValueError("Expected [M,2,N,N] concentration movie")
     if not np.all(np.isfinite(field)):
@@ -172,13 +185,13 @@ def analyze(field, strict=((0., 0.),)):
         return None
     n = field.shape[-1]
     transform = np.fft.fft2(field, axes=(-2, -1)) / (n * n)
-    for group in reciprocal_candidates(transform):
+    for group in reciprocal_candidates(transform, family):
         if not extends_strict_group(group, strict):
             continue
         vectors = [np.array(v) / group["denominator"] for v in group["numerators"]]
-        if any(not accepted(measure_translation(field, v, ranges, screen_only=True)) for v in vectors):
+        if any(not accepted(measure_translation(field, v, ranges, screen_only=True, family=family)) for v in vectors):
             continue
-        measured = [measure_translation(field, v, ranges) for v in vectors]
+        measured = [measure_translation(field, v, ranges, family=family) for v in vectors]
         if not all(accepted(m) for m in measured):
             continue
         return {
@@ -190,12 +203,12 @@ def analyze(field, strict=((0., 0.),)):
             "maximumRelativeError": max(m["maximumRelativeError"] for m in measured),
             "maximumRelativeSampleRms": max(m["maximumRelativeSampleRms"] for m in measured),
             "translations": measured,
-            "spectralDefect": spectral_defect(transform, group),
+            "spectralDefect": spectral_defect(transform, group, family),
         }
     return None
 
 
-def canonical_symmetry_bound(field, operations):
+def canonical_symmetry_bound(field, operations, family="p6"):
     """Max residual of the rotations used to derive additional rotation centres."""
     m, _, n, _ = field.shape
     y, x = np.indices((n, n))
@@ -212,13 +225,14 @@ def canonical_symmetry_bound(field, operations):
         maximum = np.maximum(maximum, np.max(abs(transformed - field), axis=(0, 2, 3)))
     return {
         "channelMax": maximum.tolist(),
-        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p6 rotations preserve the triangular mesh and frame shifts, so the bound holds throughout the interpolated movie.",
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical " + family + " rotations preserve the " + ("triangular" if family == "p6" else "bilinear square") + " mesh and frame shifts, so the bound holds throughout the interpolated movie.",
     }
 
 
 def analyze_record(inputs):
     record, strict = inputs
-    base = ROOT / "p6"
+    family = strict["family"]
+    base = ROOT / "p6" if family == "p6" else ROOT
     payload = (base / record["fieldUrl"]).read_bytes()
     sha = hashlib.sha256(payload).hexdigest()
     if sha != record["fieldSha256"]:
@@ -227,19 +241,19 @@ def analyze_record(inputs):
     if strict["fieldSha256"] != sha or strict["N"] != n:
         raise ValueError("Strict translation evidence mismatch")
     field = np.frombuffer(payload, dtype="<f4").reshape(m, 2, n, n)
-    result = analyze(field, [t["v"] for t in strict["translations"]])
+    result = analyze(field, [t["v"] for t in strict["translations"]], family)
     if result:
-        result["canonicalSymmetryBound"] = canonical_symmetry_bound(field, record["config"]["ops"])
-        result = {"fieldSha256": sha, "family": "p6", "N": n, **result}
+        result["canonicalSymmetryBound"] = canonical_symmetry_bound(field, record["config"]["ops"], family)
+        result = {"fieldSha256": sha, "family": family, "N": n, **result}
     return record["id"], result
 
 
 def build(output, workers=1):
-    base = ROOT / "p6"
-    atlas = json.loads((base / "data/precomputed-atlas.json").read_text())
+    atlases = {family: json.loads((base / "data/precomputed-atlas.json").read_text())
+               for family, base in (("p4", ROOT), ("p6", ROOT / "p6"))}
     strict_index = json.loads((ROOT / "data/overlay-translations.json").read_text())
     orbits = {}
-    inputs = [(r, strict_index["orbits"][r["id"]]) for r in atlas["orbits"]]
+    inputs = [(r, strict_index["orbits"][r["id"]]) for atlas in atlases.values() for r in atlas["orbits"]]
     with ProcessPoolExecutor(max_workers=workers) as pool:
         for identifier, result in pool.map(analyze_record, inputs):
             if result:
@@ -247,13 +261,16 @@ def build(output, workers=1):
                 print(identifier, result["approximateTranslationCount"], result["maximumRelativeError"], flush=True)
     document = {
         "schema": "overlay-near-translations-v1",
-        "description": "Approximate smaller repeats of saved p6 movies, never verified additional symmetries. Reciprocal peaks only propose candidates. Every translation of a closed rational p6 group is checked in both concentrations of every saved frame using the actual triangular interpolant. No field or strict symmetry evidence is modified.",
+        "description": "Approximate smaller repeats of saved p4/p6 movies, never verified additional symmetries. Reciprocal peaks only propose candidates. Every translation of a closed rational rotation-invariant group is checked in both concentrations of every saved frame using the actual bilinear (p4) or triangular (p6) interpolant. No field or strict symmetry evidence is modified.",
         "thresholds": {"maximumRelativeErrorPerChannel": MAX_RELATIVE_MAX,
                        "maximumRelativeSampleRmsPerChannel": MAX_RELATIVE_RMS,
                        "relativeScale": "Each concentration's global maximum minus minimum over the full movie."},
-        "maximumErrorScope": "All spatial points and all linear playback phases: the difference is affine on the common refinement of the two triangular meshes; its absolute maximum occurs at a checked vertex. Temporal interpolation cannot increase the maximum.",
+        "maximumErrorScope": "All spatial points and all linear playback phases: the difference is bilinear on common-refinement rectangles (p4) or affine on common-refinement triangles (p6); its absolute maximum occurs at a checked vertex. Temporal interpolation cannot increase the maximum.",
         "rmsScope": "Finite-sample RMS at all common-refinement vertices in every mesh cell and every saved frame; this is not an area-integrated RMS or a continuum PDE verification.",
-        "counts": {"examined": len(atlas["orbits"]), "approximateOnly": len(orbits)},
+        "counts": {"examined": len(inputs), "approximateOnly": len(orbits),
+                   "families": {family: {"examined": len(atlas["orbits"]),
+                                         "approximateOnly": sum(r["family"] == family for r in orbits.values())}
+                                for family, atlas in atlases.items()}},
         "orbits": orbits,
     }
     output.parent.mkdir(parents=True, exist_ok=True)

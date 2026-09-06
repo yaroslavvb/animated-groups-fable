@@ -67,9 +67,9 @@ uses the saved audit; it does not rerun the search or integrate the PDE.
 
 ## Apparent repeats that fail the strict check
 
-The 632 viewer also offers an **optional approximate-centre inspection** when
-an offline audit identifies a smaller near-periodic lattice. This option is
-off by default. Dashed amber markers are explicitly approximate; they are
+Both viewers also offer **approximate-centre inspection** when
+an offline audit identifies a smaller near-periodic lattice. This inspection is
+available with the generator overlay, which remains off by default. When generators are enabled, approximate centres are included unless the user unchecks them. Dashed amber markers are explicitly approximate; they are
 never added to the strict symmetry certificate or used to admit a solution.
 The concentration samples, playback interpolation, and prescribed group
 operations remain unchanged.
@@ -87,17 +87,21 @@ Two reported g247 examples illustrate the distinction:
   180 additional ones dashed. The worst translation mismatch in the actual
   interpolated movie is about **3.53%** of a concentration's full range.
 
+The offline audit examines all 207 fields: 16 square-lattice and 14
+triangular-lattice fields have additional approximate repeats.
+
 Proposals come from dominant spatial Fourier modes, not pattern names or
 screenshots. Every translation in a proposed finite subgroup must be measured;
 the subgroup must contain the strict translations and close under addition
-and the 60° rotation. Both concentrations must stay below 5% maximum error and
+and the appropriate 90° or 60° rotation. Both concentrations must stay below 5% maximum error and
 2% sample RMS, relative to each concentration's range over the full movie.
 These are thresholds for displaying an approximate relation, not for calling
 it a symmetry.
 
 The maximum is evaluated at all vertices of the common refinement of the
-original and translated triangular meshes, at every saved phase. The
-difference is affine on each common piece, so these checks bound all spatial
+original and translated playback meshes, at every saved phase. The
+difference is affine on each triangular piece or bilinear on each rectangular
+piece; both attain their absolute maxima at vertices. These checks bound all spatial
 points; linear temporal interpolation cannot increase the maximum. Reported
 RMS is a finite-sample RMS at those vertices, not an area integral. Adding
 the measured canonical rotation residual to a translation's maximum bounds
@@ -107,24 +111,42 @@ Selecting a dashed marker displays its actual comparison error and explicitly
 states that it is not verified at the strict tolerance. Where an approximate higher-order
 centre coincides with a strict lower-order one, a solid outer ring and the
 selected-centre description preserve that distinction. Shared links include
-`approx=1` only when this inspection is enabled.
+`approx=1` or `approx=0` to preserve this inspection preference.
 
-## View width and spatial repeats
+## Pattern cells and shared framing
 
-The Width selector measures the square viewport's physical width in units of
-L, the simulation lattice length shown with the selected parameters. A width
-of L does not promise one primitive pattern repeat: a saved simulation cell
-can contain several smaller repeat cells. The marker count also refers to the
-simulation cell, not to the smallest possible repeat.
+The default selector now displays **1 cell**, **2 × 2 cells**, or **3 × 3
+cells**. These are actual blocks of the pattern's primitive translation cell,
+not multiples of the original simulation size L. Every block is outlined,
+and the field is clipped to its outer square or rhombus so partial cells
+outside the selected block cannot be mistaken for extra cells.
 
-For 442, the simulation cell is a square of side L. For 632, its lattice
-vectors are L(1, 0) and L(−1/2, √3/2), forming a rhombus of area √3 L²/2.
-The square viewport is therefore not the same shape as the 632 simulation
-cell. Fields and rotation centres use the same physical coordinate map.
+For a same-time translation subgroup of index d, a shortest primitive cell
+has side length L/√d. The viewer derives two primitive translation vectors
+from the checked subgroup. It applies one camera transformation to the saved
+field, CPU/GPU playback, comparison panels, cell boundaries, generator
+positions, and glyph orientations. Choosing a denser pattern therefore zooms
+in correspondingly; it no longer shrinks many motifs into a nominal one-cell
+view. Markers at boundaries are shared with neighbouring cells when counting
+centres per cell.
 
-Existing shared links retain their exact width: `tiles=1`, `tiles=2` and
-`tiles=3` mean L, 2 L and 3 L across respectively. Only the former cell-count
-labels have changed.
+For 442 the outlined cell is square. For 632 it is a 120° rhombus; its geometry
+is preserved without stretching it into a square. The camera rotates oblique
+primitive bases into the same display orientation. When a smaller cell is
+only approximate, that is stated in the dropdown and canvas label, with
+approximate generators drawn dashed. Scaling never changes the samples or
+promotes those operations to verified symmetries.
+
+The reported Q12 example uses a cell side L/√12 and Q31 uses an explicitly
+approximate cell side L/√31. Both now display one outlined cell at count 1.
+
+Version-1 links migrate their requested tile count to this corrected cell
+framing while retaining the selected pattern, palette, phase, and playback
+state. New links use version 2 and explicitly save `framing=cells` or
+`framing=simulation`, the count, and the approximate-overlay preference.
+**Simulation width** remains available as a separate view for reproducing the
+old physical crop: its 1, 2, and 3 options mean widths L, 2L, and 3L. It is not
+labelled as a pattern-cell count.
 
 ## Reproduction
 

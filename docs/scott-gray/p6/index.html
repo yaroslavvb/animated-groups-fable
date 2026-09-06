@@ -4,7 +4,7 @@
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Explore precomputed periodic Gray–Scott patterns with the six cyclic-color time symmetries of 632 on a triangular lattice.">
   <title>Scott–Gray · 632 periodic patterns</title>
-  <link rel="stylesheet" href="../style.css?v=20260904-visible-time"><link rel="stylesheet" href="style.css?v=20260905-repeat-scale">
+  <link rel="stylesheet" href="../style.css?v=20260905-cells"><link rel="stylesheet" href="style.css?v=20260905-cells">
 </head>
 <body>
   <header><a class="brand" href="../../scott-gray-groups.html">Scott–Gray atlases</a><nav aria-label="Main navigation"><a href="../../scott-gray-groups.html">Choose a family</a><a href="../">442 atlas</a><a href="../../correspondence-p6.html">632 correspondence</a></nav></header>
@@ -17,17 +17,18 @@
         <div class="canvas-wrap">
           <canvas id="pattern" width="384" height="384" tabindex="0" aria-label="Verified periodic solution. Press Space to play or pause."></canvas>
           <canvas id="gpu-pattern" width="768" height="768" tabindex="0" hidden aria-label="Verified periodic orbit rendered with WebGL"></canvas>
+          <svg id="cell-guide" class="cell-guide" viewBox="0 0 768 768" aria-label="Pattern cell boundaries"></svg>
           <svg id="generator-overlay" class="generator-overlay" viewBox="0 0 768 768" aria-label="632 symmetry generators" hidden></svg>
           <div class="image-label"><span id="mode-label">Loading catalog</span><span id="group-label">632</span></div>
           <div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks are precomputed.</p></div>
           <span class="scale-label" id="scale-label">Physical width 2 L · triangular lattice</span>
           <span class="approximate-view-label" id="approximate-view-label" hidden>Dashed: approximate centres</span>
         </div>
-        <div class="playback"><button id="play" disabled aria-label="Play animation">▶ Play</button><button id="rewind" disabled aria-label="Return to first frame">↤</button><input id="phase" aria-label="Animation phase" type="range" min="0" max="1" step="0.001" value="0" disabled><output id="phase-label">—</output><label>Width <select id="tiles" aria-label="Physical view width in simulation lattice lengths" aria-describedby="view-scale-explanation"><option value="1">L</option><option value="2" selected>2 L</option><option value="3">3 L</option></select></label><label>Speed <select id="speed" aria-label="Playback speed"><option value="0.5">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label></div>
-        <p class="small" id="view-scale-explanation">L is the simulation lattice length shown with the parameters. A pattern can repeat several times within L; the width does not count those smaller repeats.</p>
+        <div class="playback"><button id="play" disabled aria-label="Play animation">▶ Play</button><button id="rewind" disabled aria-label="Return to first frame">↤</button><input id="phase" aria-label="Animation phase" type="range" min="0" max="1" step="0.001" value="0" disabled><output id="phase-label">—</output><label>View <select id="framing" aria-label="View framing"><option value="cells">Pattern cells</option><option value="simulation">Simulation width</option></select></label><label><span id="tile-label">Cells</span> <select id="tiles" aria-label="Number of pattern cells" aria-describedby="view-scale-explanation"><option value="1">1 cell</option><option value="2" selected>2 × 2 cells</option><option value="3">3 × 3 cells</option></select></label><label>Speed <select id="speed" aria-label="Playback speed"><option value="0.5">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select></label></div>
+        <p class="small" id="view-scale-explanation">Each outlined region is one pattern repeat cell. The pattern and generators share this cell scale.</p>
         <div class="overlay-controls"><label><input type="checkbox" id="show-generators"> Generators</label><select id="operation" aria-label="Named generator"></select><span id="engine-label">No orbit loaded</span></div>
-        <p class="small" id="overlay-explanation" aria-live="polite"></p><p class="small">White: centres of the selected group. Mint: additional centres from this pattern’s checked spatial repeats. <a href="../ROTATION-CENTRES.md">Overlay details</a>.</p>
-        <div id="approximate-controls" class="approximate-controls" hidden><label><input type="checkbox" id="show-approximate"> Inspect approximate centres</label><p class="small" id="approximate-explanation"></p></div>
+        <p class="small" id="overlay-explanation" aria-live="polite"></p><p class="small">Solid white: centres of the selected group. Solid mint: additional centres from this pattern’s checked spatial repeats. <a href="../ROTATION-CENTRES.md">Overlay details</a>.</p>
+        <div id="approximate-controls" class="approximate-controls" hidden><label><input type="checkbox" id="show-approximate"> Show approximate centres</label><p class="small" id="approximate-explanation"></p></div>
         <p class="small">Selections are saved in the URL. Copy the address to share this view.</p>
         <div class="phase-rule"><p id="generator-description"></p><div id="phase-permutation" aria-label="Cyclic color permutation represents a time shift"></div><p id="phase-explanation" class="small"></p></div>
         <p class="caption" id="caption">Only accepted numerical orbits appear here. An empty group means existence remains unresolved.</p>
@@ -51,6 +52,6 @@
     <section class="reading"><p class="eyebrow">EUCLIDEAN SPACE / CYCLIC TIME</p><h2>A triangular lattice, with the correct timing.</h2><p>The sixfold family uses lattice vectors (1, 0) and (−½, √3/2). The viewer draws them at their actual angles and lengths. Each rotation is combined with its assigned fraction of the period; its short color symbol encodes that cyclic action. A nonzero phase shift must make a measurable difference from the same spatial rotation at the original time.</p><p>The saved fields pass independent numerical checks for periodic return, time symmetry, motion and spatial structure. These finite-grid tests do not constitute a mathematical proof of a continuum orbit. No failed candidate is displayed as a solution, and an empty parameter list does not prove nonexistence.</p><p><a href="../DIVERSITY.md">Current counts, diversity and refinement →</a> · <a href="EVIDENCE.md">Numerical evidence and reproduction →</a> · <a href="CHARACTERS.md">632 character definitions and lattice geometry →</a> · <a href="../../scott-gray-groups.html">Explore other symmetry families →</a></p></section>
     <footer>Gray–Scott reaction–diffusion patterns, inspired by <a href="https://github.com/vbulatov2011/symhub/tree/main/apps/symsim/gray_scott">Vladimir Bulatov’s SymHub</a>. Stored animations use WebGL playback, with a CPU fallback.</footer>
   </main>
-  <script type="module" src="app.js?v=20260905-repeat-scale"></script>
+  <script type="module" src="app.js?v=20260905-cells"></script>
 </body>
 </html>

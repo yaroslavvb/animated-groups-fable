@@ -15,3 +15,9 @@
 
 /* Three actual fields share one time origin, spatial view, and color range. */
 .comparison{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:20px}.comparison-heading{grid-column:1/-1}.comparison-heading p:last-child{margin-bottom:0}.comparison figcaption{font:12px/1.5 system-ui,sans-serif;overflow-wrap:anywhere}.comparison figcaption strong,.comparison figcaption span{display:block}.comparison figcaption span{font-size:11px;color:var(--muted)}#visibility-explanation{color:var(--accent)}@media(max-width:450px){.comparison{gap:9px;padding:12px}.comparison figcaption{font-size:11px}.comparison figcaption span{font-size:10px}}
+
+/* A visible cell block, rather than an unlabeled square crop of many repeats. */
+.cell-guide{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}.cell-guide[hidden]{display:none}
+.canvas-wrap.cell-framing{background:#eee9f3}.cell-framing .scale-label{color:#493b5d;text-shadow:none}.cell-framing .cell-boundary{stroke:#9c8daf}.cell-framing .cell-divisions{stroke:#fff;filter:drop-shadow(0 0 1px #302140)}
+.approximate-controls{padding:12px 14px;background:#fff7e9;border:1px solid #edd2a6;border-radius:8px;margin:12px 0}.approximate-controls[hidden]{display:none}.approximate-controls label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600}.approximate-controls p{margin-bottom:0}
+.approximate-view-label{position:absolute;bottom:30px;left:10px;border-radius:4px;background:#281a10dd;color:#ffd495;padding:4px 7px;font-size:11px;line-height:1.4;pointer-events:none}.approximate-view-label[hidden]{display:none}

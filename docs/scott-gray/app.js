@@ -1,15 +1,17 @@
-import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260904-visible-time';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-repeat-scale';
+import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260905-cells';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-cells';
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
-import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
-import {createWebGLGrayScott} from './webgl.mjs?v=20260904-precomputed';
-import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs?v=20260905-repeat-scale';
-import {rotationCentres} from './rotation-centres.mjs?v=20260905-repeat-scale';
-import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-repeat-scale';
+import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260905-cells';
+import {createWebGLGrayScott} from './webgl.mjs?v=20260905-cells';
+import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs?v=20260905-cells';
+import {rotationCentres} from './rotation-centres.mjs?v=20260905-cells';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-cells';
+import {overlayNearEvidence,withApproximateCentres,approximateCaption} from './overlay-near-data.mjs';
+import {updateCellFraming} from './cell-ui.mjs';
 import {PROFILES,makeInitial} from './exploration.mjs';
 import {analyticExclusion} from './feasibility.mjs';
-import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260904-visible-time';
-import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260904-precomputed';
+import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260905-cells';
+import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260905-cells';
 
 const $=id=>document.getElementById(id);
 const tick=()=>new Promise(requestAnimationFrame);
@@ -19,11 +21,12 @@ let selectionToken=0,selectedPatternId=null;
 const recordNames=new Map(),recordDescriptions=new Map();
 const rememberedGenerators=new Map();
 const rememberedSelections=new Map(),thumbnailCache=new Map(),rangeCache=new Map();
-let translationIndex=null,centres=[];
+let translationIndex=null,nearTranslationIndex=null,centres=[],strictCentres=[],cellView=null;
 const centreCache=new Map();
 let settingsRevision=0;
 let selectedParameterKey=null;
 let playing=false,phase=0,lastTime=0,selectedGenerator='α',attempts=[],displayRanges=null;
+let lastComparison=-Infinity;
 // Loading a field temporarily pauses the renderer, not the requested shared view.
 let pendingPlayback={phase:0,play:true};
 const main=$('pattern'),map=$('parameter-map');
@@ -37,18 +40,19 @@ const summaryById=id=>saved?.get(id)??summaries(group.id).find(r=>r.id===id);
 const verifiedRecord=r=>!!r&&saved?.isVerified(r,group.id);
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){if(!group||!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===name)&&!centres.some(g=>g.key===name))return;selectedGenerator=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncViewUrl();}
+function chooseGenerator(name){if(!group||!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===name)&&!centres.some(g=>g.key===name)&&!strictCentres.some(g=>g.key===name))return;selectedGenerator=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncViewUrl();}
 function syncViewUrl(){
   if(!group)return;
-  const hash=writeViewHash({groupId:group.id,patternId:selectedPatternId,palette:$('palette').value,tiles:+$('tiles').value,speed:+$('speed').value,generator:selectedGenerator,overlay:$('show-generators').checked,phase:record?phase:pendingPlayback.phase,play:record?playing:pendingPlayback.play});
+  const hash=writeViewHash({groupId:group.id,patternId:selectedPatternId,palette:$('palette').value,tiles:+$('tiles').value,framing:$('framing').value,speed:+$('speed').value,generator:selectedGenerator,overlay:$('show-generators').checked,approximate:$('show-approximate').checked,phase:record?phase:pendingPlayback.phase,play:record?playing:pendingPlayback.play});
   if(location.hash!==hash)history.replaceState(null,'',hash);
 }
 function restoreView(defaultGroup){
   const view=readViewState(location.hash);
   $('palette').value=view.palette;$('tiles').value=view.tiles;$('speed').value=view.speed;$('show-generators').checked=view.overlay;
+  $('framing').value=view.framing;$('show-approximate').checked=view.approximate;
   chooseGroup(groups.some(g=>g.id===view.groupId)?view.groupId:defaultGroup,{view});
 }
-function togglePlayback(){if(!record)return;setPlaying(!playing);syncViewUrl();}
+function togglePlayback(){if(!record)return;setPlaying(!playing);if(!playing)draw(true);syncViewUrl();}
 function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
 
 function fieldRanges(r){if(r.ranges)return r.ranges;if(rangeCache.has(r.id))return rangeCache.get(r.id);const ranges=[[Infinity,-Infinity],[Infinity,-Infinity]],S=r.config.N*r.config.N;for(let t=0;t<r.config.M;t++)for(let c=0;c<2;c++)for(let i=0;i<S;i++){const v=r.field[t*2*S+c*S+i];ranges[c][0]=Math.min(ranges[c][0],v);ranges[c][1]=Math.max(ranges[c][1],v);}const result={u:ranges[0],v:ranges[1]};rangeCache.set(r.id,result);return result;}
@@ -93,19 +97,27 @@ function cancel(message){
   if(worker){worker.terminate();worker=null;}
   busy=false;$('progress').hidden=true;if(group&&saved)populateAtlas();controls();if(message)setStatus(message);
 }
-function named(){return centres.find(g=>g.key===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators[0];}
+function named(){return centres.find(g=>g.key===selectedGenerator)??strictCentres.find(g=>g.key===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators[0];}
 function overlay(){
   if(!group)return;
   const summary=record?.id===selectedPatternId&&record?.config.groupId===group.id?record:summaryById(selectedPatternId),translations=overlayTranslations(translationIndex,summary),cacheKey=group.id+':'+(summary?.id??'base');
   if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:GROUP_DISPLAY[group.id].namedGenerators,ops:group.render.ops,family:'p4',translations}));
-  centres=centreCache.get(cacheKey);
-  if(!centres.some(g=>g.key===selectedGenerator)&&!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===selectedGenerator))selectedGenerator=selectedGenerator?.split('@')[0]??'α';
-  populateGeneratorChoices($('operation'),GROUP_DISPLAY[group.id].namedGenerators,centres,selectedGenerator);
+  const exactCentres=centreCache.get(cacheKey),near=overlayNearEvidence(nearTranslationIndex,summary,translations);
+  strictCentres=exactCentres;
+  cellView=updateCellFraming({family:'p4',translations,near,count:+$('tiles').value,framing:$('framing').value});
+  $('approximate-controls').hidden=!near;
+  const inspectApproximate=!!near&&$('show-approximate').checked;
+  if(inspectApproximate&&!centreCache.has(cacheKey+':near'))centreCache.set(cacheKey+':near',withApproximateCentres({...group,namedGenerators:GROUP_DISPLAY[group.id].namedGenerators},exactCentres,near));
+  centres=inspectApproximate?centreCache.get(cacheKey+':near'):exactCentres;
+  $('approximate-explanation').textContent=near?approximateCaption(near,inspectApproximate):'';
+  $('approximate-view-label').hidden=!inspectApproximate||!$('show-generators').checked;
+  if(!centres.some(g=>g.key===selectedGenerator)&&!exactCentres.some(g=>g.key===selectedGenerator)&&!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===selectedGenerator))selectedGenerator=selectedGenerator?.split('@')[0]??'α';
+  populateGeneratorChoices($('operation'),GROUP_DISPLAY[group.id].namedGenerators,[...centres,...exactCentres],selectedGenerator);
   $('generator-overlay').toggleAttribute('hidden',!$('show-generators').checked);
-  const tiles=+$('tiles').value,glyphScale=Math.max(.2,Math.min(1,2/tiles*Math.sqrt(4/centres.length)));
-  renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles,centres,glyphScale,selected:selectedGenerator,onSelect:g=>chooseGenerator(g.key)});
-  $('overlay-explanation').textContent=overlayCaption(centres,translations);
-  const g=named();$('generator-description').textContent=generatorDescription(g)+(selectedGenerator.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'');
+  const tiles=+$('tiles').value,glyphScale=cellView?1.3/tiles:Math.max(.2,Math.min(1,2/tiles*Math.sqrt(4/centres.length)));
+  renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles,centres,glyphScale,cellView,selected:selectedGenerator,onSelect:g=>chooseGenerator(g.key)});
+  $('overlay-explanation').textContent=overlayCaption(exactCentres,translations,{cellView,approximate:!!near,displayed:centres,inspect:inspectApproximate});
+  const g=named();$('generator-description').textContent=(g.approximate?'Approximate · ':'')+generatorDescription(g)+(selectedGenerator.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'')+(g.verifiedLowerOrder?` · verified ${g.verifiedLowerOrder.order}-fold centre here`:'');
   $('compare-label').textContent=`q(gx, t + ${g.timeShift}T)`;
   // A common four-phase key makes g95's half-cycle and g96's quarter-cycle
   // actions directly comparable. These colors encode time, not concentrations.
@@ -119,7 +131,6 @@ function overlay(){
   }
   $('phase-permutation').append(row);
   $('phase-explanation').textContent=g.tau===0?'This generator leaves the phase unchanged.':`This generator cyclically shifts the phase by ${g.timeShift} of the period. Applying only its spatial rotation is not this symmetry.`;
-  document.querySelector('.scale-label').textContent=`Physical width ${$('tiles').value==='1'?'L':$('tiles').value+' L'} · square lattice`;
 }
 function colorScale(){const r=range();$('color-scale').textContent=r?`Fixed scale over the entire orbit: ${$('palette').value==='concentration'?'V':'U'} = ${r[0].toFixed(4)} … ${r[1].toFixed(4)}.`:'The concentration scale will be fixed across all phases of a verified orbit.';}
 function metrics(d){
@@ -132,24 +143,26 @@ function drawComparison(){
   const original=$('compare-original'),a=$('compare-a'),b=$('compare-b');
   if(!record){clearCanvas(original,'No verified orbit');clearCanvas(a,'No verified orbit');clearCanvas(b,'No verified orbit');$('comparison-error').textContent='No verified orbit to compare. The phase key above specifies the required cyclic action.';return;}
   const c=record.config,g=named(),op={M:g.matrix,v:g.translation,tau:g.tau},palette=$('palette').value;
-  const options={tiles:+$('tiles').value,palette,range:range()},operation=inverseForRendering(op);
+  const options={tiles:+$('tiles').value,palette,range:range(),...cellView?.viewOptions},operation=inverseForRendering(op);
   renderField(original,record.field,c.N,c.M,phase,options);
   renderField(a,record.field,c.N,c.M,phase,{...options,operation});
   renderField(b,record.field,c.N,c.M,mod(phase+op.tau),{...options,operation});
   let shifted=0,spatial=0;
   for(let ch=0;ch<2;ch++)for(let y=0;y<c.N;y++)for(let x=0;x<c.N;x++){
-    const j=mapIndex(x,y,c.N,op),baseline=valueAt(record.field,ch,x,y,phase,c.N,c.M);
-    shifted+=(baseline-valueAt(record.field,ch,j%c.N,Math.floor(j/c.N),mod(phase+op.tau),c.N,c.M))**2;
-    spatial+=(baseline-valueAt(record.field,ch,j%c.N,Math.floor(j/c.N),phase,c.N,c.M))**2;
+    const u=op.M[0][0]*x+op.M[0][1]*y+op.v[0]*c.N,v=op.M[1][0]*x+op.M[1][1]*y+op.v[1]*c.N,baseline=valueAt(record.field,ch,x,y,phase,c.N,c.M);
+    shifted+=(baseline-valueAt(record.field,ch,u,v,mod(phase+op.tau),c.N,c.M))**2;
+    spatial+=(baseline-valueAt(record.field,ch,u,v,phase,c.N,c.M))**2;
   }
-  $('comparison-error').textContent=`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*c.N*c.N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*c.N*c.N)))} RMS.`;
+  $('comparison-error').textContent=(g.approximate?'Approximate centre · not verified at the strict tolerance. ':'')+`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*c.N*c.N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*c.N*c.N)))} RMS.`;
+  $('visibility-explanation').textContent=g.approximate?'The dashed marker describes a near-symmetry. The first and third images retain a small residual difference. Select a solid marker to inspect a verified operation.':visibilityCaption(record);
+  lastComparison=performance.now();
 }
 function useCpuPlayback(){
   displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;$('engine-label').textContent='CPU playback';
 }
-function draw(){
+function draw(forceComparison=true){
   if(record){
-    const options={tiles:+$('tiles').value,palette:$('palette').value,range:range()};
+    const options={tiles:+$('tiles').value,palette:$('palette').value,range:range(),...cellView?.viewOptions};
     if(displayEngine){
       try{
         const c=record.config,stride=2*c.N*c.N,ft=phase*c.M,t=Math.floor(ft),a=ft-t,current=new Float32Array(stride);
@@ -161,10 +174,10 @@ function draw(){
     $('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;
   }
   else{clearCanvas(main);$('phase-label').textContent='—';}
-  drawComparison();
+  if(forceComparison||performance.now()-lastComparison>200)drawComparison();
 }
 function animate(now){
-  if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}
+  if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw(false);}
   lastTime=now;requestAnimationFrame(animate);
 }
 function updateGroupCounts(){
@@ -218,7 +231,7 @@ async function openPattern(id,{updateSearch=true,playback={phase:0,play:true}}={
   selectedPatternId=id;selectedParameterKey=parameterKey(summary.config);
   pendingPlayback={...playback};
   rememberedSelections.set(targetGroup,{key:selectedParameterKey,id});
-  emptyViewer({loading:true});populateAtlas();syncViewUrl();setStatus('Loading the selected precomputed animation…');
+  emptyViewer({loading:true});overlay();populateAtlas();syncViewUrl();setStatus('Loading the selected precomputed animation…');
   try{
     const loaded=await saved.load(id);
     if(token!==selectionToken||group.id!==targetGroup)return;
@@ -331,7 +344,7 @@ async function initialMovie(c,token){
 }
 function optimize(c,field,iterations,token,label){
   return new Promise((resolve,reject)=>{
-    const w=new Worker(new URL('./worker.js?v=20260904-precomputed',import.meta.url),{type:'module'});worker=w;
+    const w=new Worker(new URL('./worker.js?v=20260905-cells',import.meta.url),{type:'module'});worker=w;
     const onAbort=()=>{w.terminate();reject(new DOMException('Cancelled','AbortError'));};abort.signal.addEventListener('abort',onAbort,{once:true});
     const finish=()=>{abort?.signal.removeEventListener('abort',onAbort);w.terminate();if(worker===w)worker=null;};
     w.onerror=e=>{finish();reject(Error(e.message));};
@@ -354,7 +367,7 @@ async function search(neighborhood=false){
   else points.push({F:base.params.F,k:base.params.k});
   abort=new AbortController();busy=true;controls();$('progress').hidden=false;$('progress').value=0;
   try{
-    if(!atlas){const {createSolutionAtlas}=await import('./solution-atlas.mjs?v=20260904-precomputed');if(token!==job)return;atlas=createSolutionAtlas(groups);}
+    if(!atlas){const {createSolutionAtlas}=await import('./solution-atlas.mjs?v=20260905-cells');if(token!==job)return;atlas=createSolutionAtlas(groups);}
     for(let i=0;i<points.length;i++){
       if(token!==job)return;
       const c={...base,params:{...base.params,...points[i]}},label=`${base.groupId} trial ${i+1}/${points.length}`;
@@ -393,6 +406,8 @@ $('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw();syncVie
 $('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw();syncViewUrl();};
 for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=togglePlayback;canvas.onkeydown=e=>{if(e.code==='Space'){e.preventDefault();togglePlayback();}};}
 $('tiles').onchange=()=>{overlay();draw();syncViewUrl();};$('palette').onchange=()=>{colorScale();populatePatterns(parameterSets().find(set=>set.key===selectedParameterKey));controls();draw();syncViewUrl();};$('show-generators').onchange=()=>{overlay();syncViewUrl();};
+$('framing').onchange=()=>{overlay();draw();syncViewUrl();};
+$('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();drawComparison();syncViewUrl();};
 $('speed').onchange=syncViewUrl;
 $('operation').onchange=()=>chooseGenerator($('operation').value);
 $('export').onclick=()=>{
@@ -402,8 +417,9 @@ $('export').onclick=()=>{
 };
 
 try{
-  const [response,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('data/overlay-translations.json?v=20260905-repeat-scale').catch(()=>null)]);
+  const [response,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('data/overlay-translations.json?v=20260905-cells').catch(()=>null),fetch('data/overlay-near-translations.json?v=20260905-cells').catch(()=>null)]);
   if(overlayResponse?.ok)translationIndex=await overlayResponse.json();
+  if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();
   if(!response.ok||!manifestResponse.ok)throw Error('Precomputed solution catalog unavailable.');
   const [catalog,manifest]=await Promise.all([response.json(),manifestResponse.json()]);groups=catalog;if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');saved=createPrecomputedCatalog(manifest,{groups});
   for(const entry of manifest.orbits){recordNames.set(entry.id,entry.patternName??entry.name?.split(' · F')[0]??'Periodic wave');recordDescriptions.set(entry.id,entry.description??'');}

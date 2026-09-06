@@ -694,22 +694,29 @@ const escape = value => String(value).replace(/[&<>"']/g, ch => ({'&':'&amp;','<
 
 export function generatorDescription(generator) {
   const turn = generator.order === 2 ? 'half-turn' : `quarter-turn ${generator.angleDegrees === 270 ? 'counterclockwise' : 'clockwise'}`;
-  return `${generator.name}: ${turn}; ${generator.tau ? `+${generator.timeShift} period` : 'no time shift'}`;
+  return `${generator.approximate?'Approximate ':''}${generator.name}: ${turn}; ${generator.tau ? `+${generator.timeShift} period` : 'no time shift'}`+(generator.verifiedLowerOrder?`; verified ${generator.verifiedLowerOrder.order}-fold centre at the same position`:'');
 }
 
 /** Complete rotation centres and their spatial-lattice translates. */
-export function generatorPlacements(groupId, {tiles = 2, width = 768, height = width, centres = null} = {}) {
+export function generatorPlacements(groupId, {tiles = 2, width = 768, height = width, centres = null, cellView = null} = {}) {
   const group = GROUP_DISPLAY[groupId];
   if (!group) throw new Error(`Unknown 442 group: ${groupId}`);
   if (!Number.isInteger(tiles) || tiles < 1 || tiles > 16) throw new Error('tiles must be an integer between 1 and 16.');
   if (!(width > 0 && height > 0)) throw new Error('Overlay dimensions must be positive.');
   const result = [];
+  const corners=cellView?.originalCorners;
+  if(cellView&&(!Array.isArray(corners)||corners.length!==4||typeof cellView.originalToScreen!=='function'||typeof cellView.contains!=='function'))throw new Error('A cell overlay needs the same cell viewport as the field renderer.');
+  const bounds=corners?{min:[0,1].map(i=>Math.min(...corners.map(p=>p[i]))),max:[0,1].map(i=>Math.max(...corners.map(p=>p[i])))}:null;
   for (const generator of centres??rotationCentres({namedGenerators:group.namedGenerators,family:'p4'})) {
     const x0 = mod(generator.centre[0]), y0 = mod(generator.centre[1]);
-    for (let iy = 0; iy + y0 <= tiles; iy++) {
-      for (let ix = 0; ix + x0 <= tiles; ix++) {
+    const minX=bounds?Math.floor(bounds.min[0]-x0)-1:0,maxX=bounds?Math.ceil(bounds.max[0]-x0)+1:Math.floor(tiles-x0);
+    const minY=bounds?Math.floor(bounds.min[1]-y0)-1:0,maxY=bounds?Math.ceil(bounds.max[1]-y0)+1:Math.floor(tiles-y0);
+    for (let iy = minY; iy <= maxY; iy++) {
+      for (let ix = minX; ix <= maxX; ix++) {
         const centre=[x0+ix,y0+iy],A=generator.matrix;
-        result.push({...generator,centre,translation:[centre[0]-A[0][0]*centre[0]-A[0][1]*centre[1],centre[1]-A[1][0]*centre[0]-A[1][1]*centre[1]],x:centre[0]*width/tiles,y:centre[1]*height/tiles,tileX:ix,tileY:iy});
+        if(cellView&&!cellView.contains(centre))continue;
+        const point=cellView?cellView.originalToScreen(centre):[centre[0]/tiles,centre[1]/tiles];
+        result.push({...generator,centre,translation:[centre[0]-A[0][0]*centre[0]-A[0][1]*centre[1],centre[1]-A[1][0]*centre[0]-A[1][1]*centre[1]],x:point[0]*width,y:point[1]*height,tileX:ix,tileY:iy});
       }
     }
   }
@@ -717,21 +724,21 @@ export function generatorPlacements(groupId, {tiles = 2, width = 768, height = w
 }
 
 /** SVG contents, useful with either the browser DOM or a static renderer. */
-export function generatorMarkup(groupId, {tiles = 2, width = 768, height = width, selected = null, interactive = true, labels = true, glyphScale = 1, centres = null} = {}) {
-  const placements = generatorPlacements(groupId, {tiles,width,height,centres});
+export function generatorMarkup(groupId, {tiles = 2, width = 768, height = width, selected = null, interactive = true, labels = true, glyphScale = 1, centres = null, cellView = null} = {}) {
+  const placements = generatorPlacements(groupId, {tiles,width,height,centres,cellView});
   const scaled = Number.isFinite(glyphScale) && glyphScale > 0 ? glyphScale : 1;
   const contents = placements.map(g => {
-    const active = selected === g.name || selected === g.key;
+    const active = (!g.approximate&&selected === g.name) || selected === g.key || (g.verifiedLowerOrder&&selected===g.verifiedLowerOrder.key);
     const description = generatorDescription(g);
     const labelX = Math.max(14,Math.min(width-14,g.x+(g.x>width-48?-25:25)*scaled));
     const labelY = Math.max(16,Math.min(height-16,g.y+(g.y<35?25:-24)*scaled));
-    return `<g class="sg-generator${g.extra?' extra-centre':''}${active?' is-selected':''}" data-generator="${g.name}" data-centre-key="${g.key}" data-operation-index="${g.operationIndex}" data-time-shift="${g.timeShift}" data-generator-symbol="${g.symbol}"${interactive?` role="button" tabindex="0" aria-label="${escape(description)} at (${g.centre.join(', ')})" aria-pressed="${active}"`:''}><title>${escape(description)} at (${g.centre.join(', ')})</title><circle class="sg-generator-hit" cx="${g.x}" cy="${g.y}" r="${24*scaled}"/><path class="sg-generator-glyph generator-symbol-core" transform="translate(${g.x} ${g.y}) rotate(${g.glyphAngle??0}) scale(${scaled})" d="${g.path}"/>${labels?`<text class="sg-generator-label" x="${labelX}" y="${labelY}" text-anchor="middle" dominant-baseline="central" style="font-size:${20*scaled}px">${g.name}</text>`:''}</g>`;
+    return `<g class="sg-generator${g.extra?' extra-centre':''}${g.approximate?' approximate-centre':''}${active?' is-selected':''}" data-generator="${g.name}" data-centre-key="${g.key}" data-lattice-point="${escape(JSON.stringify(g.centre))}" data-operation-index="${g.operationIndex}" data-time-shift="${g.timeShift}" data-generator-symbol="${g.symbol}"${interactive?` role="button" tabindex="0" aria-label="${escape(description)} at (${g.centre.join(', ')})" aria-pressed="${active}"`:''}><title>${escape(description)} at (${g.centre.join(', ')})</title><circle class="sg-generator-hit" cx="${g.x}" cy="${g.y}" r="${24*scaled}"/>${g.approximate?`<circle class="sg-generator-approximation" cx="${g.x}" cy="${g.y}" r="${24*scaled}"/>`:''}${g.verifiedLowerOrder?`<circle class="sg-generator-verified" cx="${g.x}" cy="${g.y}" r="${29*scaled}"/>`:''}<path class="sg-generator-glyph generator-symbol-core" transform="translate(${g.x} ${g.y}) rotate(${(g.glyphAngle??0)+(cellView?.glyphAngleOffset??0)}) scale(${scaled})" d="${g.path}"/>${labels?`<text class="sg-generator-label" x="${labelX}" y="${labelY}" text-anchor="middle" dominant-baseline="central" style="font-size:${20*scaled}px">${g.name}</text>`:''}</g>`;
   }).join('');
   return contents;
 }
 
 /** Re-render only when group, tiling, or selection changes, not every frame. */
-export function renderGeneratorOverlay(svg, {groupId, tiles = 2, selected = null, onSelect = null, width = 768, height = width, labels = true, glyphScale = 1, centres = null} = {}) {
+export function renderGeneratorOverlay(svg, {groupId, tiles = 2, selected = null, onSelect = null, width = 768, height = width, labels = true, glyphScale = 1, centres = null, cellView = null} = {}) {
   if (!svg || typeof svg.setAttribute !== 'function') throw new Error('Expected an SVG element.');
   svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
   svg.setAttribute('preserveAspectRatio','none');
@@ -739,7 +746,7 @@ export function renderGeneratorOverlay(svg, {groupId, tiles = 2, selected = null
   svg.setAttribute('aria-label',`Rotation centres for ${GROUP_DISPLAY[groupId]?.shortText || groupId}`);
   svg.classList.add('sg-generator-overlay');
   const all=centres??rotationCentres({namedGenerators:GROUP_DISPLAY[groupId].namedGenerators,family:'p4'});
-  svg.innerHTML = generatorMarkup(groupId,{tiles,width,height,selected,interactive:typeof onSelect==='function',labels,glyphScale,centres:all});
+  svg.innerHTML = generatorMarkup(groupId,{tiles,width,height,selected,interactive:typeof onSelect==='function',labels,glyphScale,centres:all,cellView});
   const activate = target => {
     const marker = target.closest?.('[data-generator]');
     if (!marker || !svg.contains(marker) || typeof onSelect !== 'function') return;

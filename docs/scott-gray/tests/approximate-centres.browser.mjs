@@ -3,7 +3,7 @@ const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=(process.argv[2]??'http://localhost:8934/').replace(/\/?$/,'/'),label=process.argv[3]??'local';
 const browser=await chromium.launch({channel:'chrome',headless:true});
 const id=(q,n)=>`saved:g247-diversity-q1-wide-L1024-Q${q}-F00406-F0p00406000-k0p02000000-L1024-N${n}-M96`;
-const hash=(q,n,phase)=>'#g247?'+new URLSearchParams({v:'1',pattern:id(q,n),palette:'ember',tiles:'1',speed:'1',generator:'α',overlay:'1',phase:String(phase),play:'0'});
+const hash=(q,n,phase)=>'#g247?'+new URLSearchParams({v:'2',pattern:id(q,n),palette:'ember',tiles:'1',framing:'simulation',speed:'1',generator:'α',overlay:'1',approx:'0',phase:String(phase),play:'0'});
 const ready=page=>page.waitForFunction(()=>document.querySelector('#empty-state').hidden);
 const keys=page=>page.locator('[data-centre-key]').evaluateAll(es=>[...new Set(es.map(e=>e.dataset.centreKey))]);
 try{
@@ -11,7 +11,7 @@ try{
  page.on('pageerror',e=>errors.push(e.message));
  const original=base+'scott-gray/p6/'+hash(31,66,0);
  await page.goto(original);await ready(page);
- assert.equal(page.url(),original,'old Q31 URL keeps width, controls and exact phase');
+ assert.equal(page.url(),original,'explicit simulation framing keeps width, controls and exact phase');
  assert.equal((await keys(page)).length,6);
  assert.equal(await page.locator('#show-approximate').isChecked(),false);
  assert.equal(await page.locator('.approximate-centre').count(),0);
@@ -48,9 +48,9 @@ try{
  assert.equal(await page.locator('#approximate-view-label').isVisible(),false);
  await page.locator('#show-generators').check();
  await page.selectOption('#solution',id(12,96));await ready(page);
- assert.equal(await page.locator('#show-approximate').isChecked(),false);
+ assert.equal(await page.locator('#show-approximate').isChecked(),true,'inspection preference persists across patterns');
  assert.equal(await page.locator('#approximate-controls').isVisible(),false);
- assert.equal(new URLSearchParams(page.url().split('?')[1]).has('approx'),false,'switching patterns normalizes the URL immediately');
+ assert.equal(await page.locator('.approximate-centre').count(),0,'no unverified markers appear on an exact-only pattern');
  assert.equal(new URLSearchParams(page.url().split('?')[1]).get('generator'),await page.locator('#operation').inputValue());
  const q12=base+'scott-gray/p6/'+hash(12,96,.34798750000000434);
  await page.goto(q12);await ready(page);

@@ -1,10 +1,11 @@
-import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-repeat-scale';
-import {rotationCentres} from '../rotation-centres.mjs?v=20260905-repeat-scale';
-import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-repeat-scale';
-import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-repeat-scale';
-import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260904-visible-time';
-import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260904-visible-time';
-import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260904-p6';
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-cells';
+import {rotationCentres} from '../rotation-centres.mjs?v=20260905-cells';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-cells';
+import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-cells';
+import {updateCellFraming} from '../cell-ui.mjs';
+import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260905-cells';
+import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260905-cells';
+import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260905-cells6';
 
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const number=value=>Number(value.toPrecision(11)).toString();
@@ -13,18 +14,19 @@ const palette=()=>$('palette').value,tiles=()=>+$('tiles').value;
 const parameterKey=config=>JSON.stringify([config.params.F,config.params.k,config.params.Du,config.params.Dv,config.L??config.N*config.params.dx,config.params.stencil]);
 let groups=[],catalog=null,group=null,record=null,player=null,selectedId=null,selectedKey=null,preferredParameters=null,generatorName='α',selectionToken=0,phase=0,playing=false,lastTime=0,lastComparison=-Infinity;
 const remembered=new Map(),rememberedGenerators=new Map();
-let translationIndex=null,nearTranslationIndex=null,centres=[],strictCentres=[];
+let translationIndex=null,nearTranslationIndex=null,centres=[],strictCentres=[],cellView=null;
 const centreCache=new Map();
 let defaultGroupId='g243',requestedPlayback={phase:0,play:true};
 function syncUrl(){
   if(!group)return;
   const playback=record?{phase,play:playing}:requestedPlayback;
-  history.replaceState(null,'',writeViewHash({groupId:group.id,patternId:selectedId,palette:palette(),tiles:tiles(),speed:+$('speed').value,generator:generatorName,overlay:$('show-generators').checked,approximate:$('show-approximate').checked,...playback}));
+  history.replaceState(null,'',writeViewHash({groupId:group.id,patternId:selectedId,palette:palette(),tiles:tiles(),framing:$('framing').value,speed:+$('speed').value,generator:generatorName,overlay:$('show-generators').checked,approximate:$('show-approximate').checked,...playback}));
 }
 function restoreUrl(){
   const view=readViewState(location.hash);
   $('palette').value=view.palette;$('tiles').value=String(view.tiles);$('speed').value=String(view.speed);$('show-generators').checked=view.overlay;
   $('show-approximate').checked=view.approximate;
+  $('framing').value=view.framing;
   chooseGroup(view.groupId??defaultGroupId,{view});
 }
 function togglePlayback(){if(!record)return;setPlaying(!playing);syncUrl();}
@@ -66,7 +68,7 @@ function empty({loading=false,error=null}={}){
 function selectedOperation(){const g=generator();return g?{M:g.matrix,v:g.translation,tau:g.tau}:null;}
 function drawComparison(){
   if(!record)return;
-  const op=selectedOperation(),operation=inverseForRendering(op),options={palette:palette(),tiles:tiles()};
+  const op=selectedOperation(),operation=inverseForRendering(op),options={palette:palette(),tiles:tiles(),...cellView?.viewOptions};
   drawCPU($('compare-original'),record,phase,options);
   drawCPU($('compare-a'),record,phase,{...options,operation});
   drawCPU($('compare-b'),record,phase+op.tau,{...options,operation});
@@ -83,7 +85,7 @@ function drawComparison(){
 }
 function draw(forceComparison=false){
   if(!record)return;
-  const options={tiles:tiles(),palette:palette()};
+  const options={tiles:tiles(),palette:palette(),...cellView?.viewOptions};
   if(player)player.draw(phase,options);else drawCPU($('pattern'),record,phase,options);
   $('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;
   if(forceComparison||performance.now()-lastComparison>180)drawComparison();
@@ -96,8 +98,8 @@ function overlay(){
   if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:group.namedGenerators,ops:group.render.ops,family:'p6',translations}));
   const exactCentres=centreCache.get(cacheKey),near=overlayNearEvidence(nearTranslationIndex,summary,translations);
   strictCentres=exactCentres;
+  cellView=updateCellFraming({family:'p6',translations,near,count:tiles(),framing:$('framing').value});
   $('approximate-controls').hidden=!near;
-  if(!near)$('show-approximate').checked=false;
   const inspectApproximate=!!near&&$('show-approximate').checked;
   $('approximate-view-label').hidden=!inspectApproximate||!$('show-generators').checked;
   if(inspectApproximate&&!centreCache.has(cacheKey+':near'))centreCache.set(cacheKey+':near',withApproximateCentres(group,exactCentres,near));
@@ -106,22 +108,24 @@ function overlay(){
   if(!centres.some(g=>g.key===generatorName)&&!exactCentres.some(g=>g.key===generatorName)&&!group.namedGenerators.some(g=>g.name===generatorName))generatorName=generatorName?.split('@')[0]??'α';
   populateGeneratorChoices($('operation'),group.namedGenerators,[...centres,...exactCentres],generatorName);
   const layer=$('generator-overlay');layer.toggleAttribute('hidden',!$('show-generators').checked);layer.replaceChildren();
-  const width=tiles(),extent=Math.ceil(2*width)+1,scale=Math.max(.2,Math.min(1,2/width*Math.sqrt(6/centres.length)));
+  const width=tiles(),extent=Math.ceil(2*width)+1,scale=cellView?1.3/width:Math.max(.2,Math.min(1,2/width*Math.sqrt(6/centres.length)));
   for(const named of centres)for(let j=-extent;j<=extent;j++)for(let i=-extent;i<=extent;i++){
-    const [x,y]=latticeToScreen([named.centre[0]+i,named.centre[1]+j],width);if(x<0||x>1||y<0||y>1)continue;
+    const originalPoint=[named.centre[0]+i,named.centre[1]+j];
+    if(cellView&&!cellView.contains(originalPoint))continue;
+    const [x,y]=cellView?cellView.originalToScreen(originalPoint):latticeToScreen(originalPoint,width);if(x<0||x>1||y<0||y>1)continue;
     const active=(!named.approximate&&named.name===generatorName)||named.key===generatorName||named.verifiedLowerOrder?.key===generatorName;
     const marker=svgElement('g',{transform:`translate(${768*x},${768*y}) scale(${scale})`,class:'generator-marker'+(named.extra?' extra-centre':'')+(named.approximate?' approximate-centre':'')+(active?' selected':''),'data-centre-key':named.key,'data-generator':named.name,'data-time-shift':named.timeShift,role:'button',tabindex:'0','aria-pressed':String(active),'aria-label':`${named.approximate?'Approximate ':''}${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift at (${named.centre.map((v,k)=>v+(k?j:i)).join(', ')})`+(named.verifiedLowerOrder?`; verified ${named.verifiedLowerOrder.order}-fold centre here`:'')});
-    marker.append(svgElement('circle',{r:20,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:`rotate(${named.glyphAngle??0}) scale(.8)`}));
+    marker.dataset.latticePoint=JSON.stringify(originalPoint);
+    marker.append(svgElement('circle',{r:20,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:`rotate(${(named.glyphAngle??0)+(cellView?.glyphAngleOffset??0)}) scale(.8)`}));
     if(named.verifiedLowerOrder)marker.append(svgElement('circle',{r:25,class:'verified-inner'}));
     const label=svgElement('text',{x:26,y:5});label.textContent=named.name;marker.append(label);
     const select=()=>chooseGenerator(named.key);marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
   }
-  $('overlay-explanation').textContent=overlayCaption(exactCentres,translations)+(inspectApproximate?` Inspection also shows ${centres.filter(g=>g.approximate).length} approximate centres per simulation cell.`:'');
+  $('overlay-explanation').textContent=overlayCaption(exactCentres,translations,{cellView,approximate:!!near,displayed:centres,inspect:inspectApproximate});
   const g=generator();$('generator-description').textContent=(g.approximate?'Approximate · ':'')+`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'')+(g.verifiedLowerOrder?` · verified ${g.verifiedLowerOrder.order}-fold rotation at the same centre`:'');$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
   const count=6,shift=Math.round(g.tau*count),row=document.createElement('div');row.className='phase-row';
   for(let i=0;i<count;i++){const chip=document.createElement('span');chip.className='phase-chip';for(const [index,label] of [[i,`${i}/6 → `],[mod(i+shift,count),`${mod(i+shift,count)}/6`]]){const color=document.createElement('i');color.style.setProperty('--phase-color',`hsl(${index*60+15} 55% 55%)`);chip.append(color,document.createTextNode(label));}row.append(chip);}
   $('phase-permutation').replaceChildren(row);$('phase-explanation').textContent=g.tau===0?'This generator preserves the phase.':'The cyclic color permutation advances the chemical phase. The spatial rotation alone is a different constraint.';
-  $('scale-label').textContent=`Physical width ${width===1?'L':width+' L'} · triangular lattice`;
 }
 function patternLabel(entry){return `${entry.patternName??entry.name??'Periodic wave'} · T ${entry.config.period.toFixed(2)} · ${entry.config.N}²`;}
 function populatePatterns(set){
@@ -191,11 +195,12 @@ $('parameter-set').onchange=()=>selectParameters($('parameter-set').value);$('so
 $('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw(true);syncUrl();};$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw(true);syncUrl();};
 for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}
 $('tiles').onchange=()=>{overlay();draw(true);syncUrl();};$('palette').onchange=()=>{updateScale();populatePatterns(parameterSets().find(set=>set.key===selectedKey));draw(true);syncUrl();};$('show-generators').onchange=()=>{overlay();syncUrl();};$('operation').onchange=()=>chooseGenerator($('operation').value);$('speed').onchange=syncUrl;
+$('framing').onchange=()=>{overlay();draw(true);syncUrl();};
 $('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();drawComparison();syncUrl();};
 $('export').onclick=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify({schema:'scott-gray-verified-orbit-v3',family:'p6',...record,layout:'frame-major; planar U then V; triangular lattice coordinates; x-fast'})],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-632-${group.id}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 try{
-  const [groupResponse,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-repeat-scale').catch(()=>null),fetch('../data/overlay-near-translations.json?v=20260905-repeat-scale').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
+  const [groupResponse,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-cells').catch(()=>null),fetch('../data/overlay-near-translations.json?v=20260905-cells').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
   for(const item of groups){const button=document.createElement('button');button.className='group';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');const symbol=document.createElement('strong');symbol.innerHTML=item.shortHTML;const label=document.createElement('span');label.textContent=item.id;const count=document.createElement('small');count.className='orbit-count';label.append(count);button.append(symbol,label);button.onclick=()=>chooseGroup(item.id);$('groups').append(button);}
   if(!manifestResponse.ok)throw Error('The precomputed 632 catalog could not load.');const manifest=await manifestResponse.json();if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');catalog=createPrecomputedCatalog(manifest,{groups,family:'p6'});preferredParameters=manifest.preferredParameters??null;
   defaultGroupId=manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243';restoreUrl();

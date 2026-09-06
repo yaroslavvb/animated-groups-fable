@@ -15,6 +15,11 @@ export function populateGeneratorChoices(select, named, centres, selected) {
   select.value=g?g.key:selected;
 }
 
-export function overlayCaption(centres, translations) {
+export function overlayCaption(centres, translations, {cellView=null, approximate=false, displayed=centres, inspect=false}={}) {
+  if(cellView){
+    const count=(approximate?displayed:centres).length/cellView.cell.index;
+    if(approximate&&!inspect)return 'The outlined cell follows the approximate repeat. Only verified centres are shown; enable approximate centres to see the smaller cell’s full marker pattern.';
+    return `${count} ${approximate?'rotation-centre positions per approximate':'verified rotation centres per'} pattern cell. Boundary centres are shared with neighbouring cells. ${approximate?'Dashed markers are approximate; solid markers remain verified. ':''}Select a marker to compare its rotation with its time shift.`;
+  }
   return `${centres.length} rotation centres per simulation cell. ${translations.length>1?'Includes additional centres from this pattern’s checked spatial repeats. ':''}Select a marker to compare its rotation with its time shift.`;
 }

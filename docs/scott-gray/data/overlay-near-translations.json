@@ -1,18 +1,5095 @@
 {
   "schema": "overlay-near-translations-v1",
-  "description": "Approximate smaller repeats of saved p6 movies, never verified additional symmetries. Reciprocal peaks only propose candidates. Every translation of a closed rational p6 group is checked in both concentrations of every saved frame using the actual triangular interpolant. No field or strict symmetry evidence is modified.",
+  "description": "Approximate smaller repeats of saved p4/p6 movies, never verified additional symmetries. Reciprocal peaks only propose candidates. Every translation of a closed rational rotation-invariant group is checked in both concentrations of every saved frame using the actual bilinear (p4) or triangular (p6) interpolant. No field or strict symmetry evidence is modified.",
   "thresholds": {
     "maximumRelativeErrorPerChannel": 0.05,
     "maximumRelativeSampleRmsPerChannel": 0.02,
     "relativeScale": "Each concentration's global maximum minus minimum over the full movie."
   },
-  "maximumErrorScope": "All spatial points and all linear playback phases: the difference is affine on the common refinement of the two triangular meshes; its absolute maximum occurs at a checked vertex. Temporal interpolation cannot increase the maximum.",
+  "maximumErrorScope": "All spatial points and all linear playback phases: the difference is bilinear on common-refinement rectangles (p4) or affine on common-refinement triangles (p6); its absolute maximum occurs at a checked vertex. Temporal interpolation cannot increase the maximum.",
   "rmsScope": "Finite-sample RMS at all common-refinement vertices in every mesh cell and every saved frame; this is not an area-integrated RMS or a continuum PDE verification.",
   "counts": {
-    "examined": 64,
-    "approximateOnly": 14
+    "examined": 207,
+    "approximateOnly": 30,
+    "families": {
+      "p4": {
+        "examined": 143,
+        "approximateOnly": 16
+      },
+      "p6": {
+        "examined": 64,
+        "approximateOnly": 14
+      }
+    }
   },
   "orbits": {
+    "saved:g96-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "75ed3f779072086edd0568a89f5fda2edcd85ee61cc5b6ac756a9543ad90d033",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          2,
+          1
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.19884217530488968,
+        0.12820562720298767
+      ],
+      "maximumRelativeError": 0.01491633748788642,
+      "maximumRelativeSampleRms": 0.003611002372648685,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411166,
+            0.00046295082401690094
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805511,
+            0.0036110023726486826
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486826,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.000694718639041117,
+            0.00046295082401690127
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805513,
+            0.003611002372648685
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.003611002372648685,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411114,
+            0.00046295082401689747
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805485,
+            0.0036110023726486553
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486553,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.00243743479251865,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411119,
+            0.0004629508240168978
+          ],
+          "channelRelativeMax": [
+            0.012258137836106804,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.0034938193468054875,
+            0.003611002372648658
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.003611002372648658,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          2.196981931965158e-10,
+          5.486075714570579e-10
+        ],
+        "channelMaximumTranslationRms": [
+          1.280510165751912e-06,
+          1.2501865398287816e-06
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g97-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "f97ad9fc2a82a8f875c82e1764d9169f149be12aa835350a0f48f5c7ccc62989",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -1,
+          -2
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.19884217530488968,
+        0.12820562720298767
+      ],
+      "maximumRelativeError": 0.01491633748788642,
+      "maximumRelativeSampleRms": 0.0036110023726486844,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.000694718639041117,
+            0.0004629508240169012
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805513,
+            0.0036110023726486844
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486844,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411119,
+            0.0004629508240168978
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.0034938193468054875,
+            0.003611002372648658
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.003611002372648658,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411166,
+            0.00046295082401690083
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805511,
+            0.0036110023726486818
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486818,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.00243743479251865,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411114,
+            0.00046295082401689747
+          ],
+          "channelRelativeMax": [
+            0.012258137836106804,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805485,
+            0.0036110023726486553
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486553,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          2.196981931965319e-10,
+          5.486075714570559e-10
+        ],
+        "channelMaximumTranslationRms": [
+          1.2805101657519338e-06,
+          1.2501865398287717e-06
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g99-diversity-p4-rotating-oblique-21-f004-F0p00400000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "168ce2d3818e0e2b92d43c68f6567d197a39e2c237b7803be0d1f33b85660997",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -1,
+          -2
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.19884217530488968,
+        0.12820562720298767
+      ],
+      "maximumRelativeError": 0.01491633748788642,
+      "maximumRelativeSampleRms": 0.0036110023726486844,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.000694718639041117,
+            0.0004629508240169012
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805513,
+            0.0036110023726486844
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486844,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411119,
+            0.0004629508240168978
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.0034938193468054875,
+            0.003611002372648658
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.003611002372648658,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.0024374347925186224,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411166,
+            0.00046295082401690083
+          ],
+          "channelRelativeMax": [
+            0.012258137836106664,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805511,
+            0.0036110023726486818
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486818,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.00243743479251865,
+            0.001912358403205916
+          ],
+          "channelSampleRms": [
+            0.0006947186390411114,
+            0.00046295082401689747
+          ],
+          "channelRelativeMax": [
+            0.012258137836106804,
+            0.01491633748788642
+          ],
+          "channelRelativeSampleRms": [
+            0.003493819346805485,
+            0.0036110023726486553
+          ],
+          "maximumRelativeError": 0.01491633748788642,
+          "maximumRelativeSampleRms": 0.0036110023726486553,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          2.196981931965319e-10,
+          5.486075714570559e-10
+        ],
+        "channelMaximumTranslationRms": [
+          1.2805101657519338e-06,
+          1.2501865398287717e-06
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g96-diversity-p4-rotating-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "449cba0901117d8c84ad405c4420be688450afb8be9539a3e8614e7ad4243726",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -1,
+          3
+        ],
+        "denominator": 10,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            9,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 2,
+      "approximateTranslationCount": 10,
+      "concentrationRanges": [
+        0.1332363411784172,
+        0.08316265046596527
+      ],
+      "maximumRelativeError": 0.014439071461272731,
+      "maximumRelativeSampleRms": 0.004672355996063667,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.1,
+            0.7
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985547,
+            0.00038625151090362604
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063611,
+            0.004644531033335709
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063611,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985607,
+            0.0003862515109036291
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.0046723559960636565,
+            0.004644531033335745
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.0046723559960636565,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.1
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447443
+          ],
+          "channelSampleRms": [
+            0.0006225276175985607,
+            0.00038625151090362973
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757635
+          ],
+          "channelRelativeSampleRms": [
+            0.0046723559960636565,
+            0.004644531033335753
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.0046723559960636565,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985547,
+            0.0003862515109036253
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063611,
+            0.0046445310333357
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063611,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            2.9802322387695312e-08,
+            1.4901161193847656e-08
+          ],
+          "channelSampleRms": [
+            9.793966282255297e-10,
+            6.887223319033645e-10
+          ],
+          "channelRelativeMax": [
+            2.2368013204285556e-07,
+            1.7918093170859233e-07
+          ],
+          "channelRelativeSampleRms": [
+            7.350822002189452e-09,
+            8.281630371860593e-09
+          ],
+          "maximumRelativeError": 2.2368013204285556e-07,
+          "maximumRelativeSampleRms": 8.281630371860593e-09,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447443
+          ],
+          "channelSampleRms": [
+            0.0006225276175985605,
+            0.00038625151090362876
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757635
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063655,
+            0.004644531033335742
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063655,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.9
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447998
+          ],
+          "channelSampleRms": [
+            0.0006225276175985557,
+            0.0003862515109036269
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563758301
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063619,
+            0.004644531033335719
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063619,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447998
+          ],
+          "channelSampleRms": [
+            0.0006225276175985542,
+            0.000386251510903625
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563758301
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063608,
+            0.0046445310333356965
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063608,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.3
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447443
+          ],
+          "channelSampleRms": [
+            0.000622527617598562,
+            0.00038625151090363065
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757635
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063667,
+            0.004644531033335764
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063667,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          3.539108760963106e-11,
+          8.690966346706373e-11
+        ],
+        "channelMaximumTranslationRms": [
+          3.205859118134529e-07,
+          3.0924766564295147e-07
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g97-diversity-p4-rotating-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "c397024dfe84b218926d2d5799e93358b2f09e4a949dc51c2966d30be47f657d",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          1,
+          3
+        ],
+        "denominator": 10,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            7,
+            1
+          ],
+          [
+            8,
+            4
+          ],
+          [
+            9,
+            7
+          ]
+        ]
+      },
+      "strictTranslationCount": 2,
+      "approximateTranslationCount": 10,
+      "concentrationRanges": [
+        0.1332363411784172,
+        0.08316265046596527
+      ],
+      "maximumRelativeError": 0.014439071461272731,
+      "maximumRelativeSampleRms": 0.004672355996063666,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.1,
+            0.3
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985607,
+            0.0003862515109036296
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.0046723559960636565,
+            0.004644531033335752
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.0046723559960636565,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985604,
+            0.0003862515109036287
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063654,
+            0.004644531033335741
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063654,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.9
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985619,
+            0.00038625151090363065
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063666,
+            0.004644531033335764
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063666,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447443
+          ],
+          "channelSampleRms": [
+            0.0006225276175985608,
+            0.00038625151090362913
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757635
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063657,
+            0.004644531033335746
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063657,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            2.9802322387695312e-08,
+            1.4901161193847656e-08
+          ],
+          "channelSampleRms": [
+            9.793966282255297e-10,
+            6.887223319033645e-10
+          ],
+          "channelRelativeMax": [
+            2.2368013204285556e-07,
+            1.7918093170859233e-07
+          ],
+          "channelRelativeSampleRms": [
+            7.350822002189452e-09,
+            8.281630371860593e-09
+          ],
+          "maximumRelativeError": 2.2368013204285556e-07,
+          "maximumRelativeSampleRms": 8.281630371860593e-09,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985543,
+            0.00038625151090362496
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.004672355996063609,
+            0.004644531033335696
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.004672355996063609,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.1
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447998
+          ],
+          "channelSampleRms": [
+            0.0006225276175985544,
+            0.000386251510903626
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563758301
+          ],
+          "channelRelativeSampleRms": [
+            0.00467235599606361,
+            0.004644531033335708
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.00467235599606361,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.0010899251699447998
+          ],
+          "channelSampleRms": [
+            0.0006225276175985544,
+            0.00038625151090362534
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563758301
+          ],
+          "channelRelativeSampleRms": [
+            0.00467235599606361,
+            0.0046445310333357
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.00467235599606361,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.7
+          ],
+          "channelMax": [
+            0.0019238090515136808,
+            0.001089925169944772
+          ],
+          "channelSampleRms": [
+            0.0006225276175985558,
+            0.0003862515109036269
+          ],
+          "channelRelativeMax": [
+            0.014439071461272731,
+            0.013105945563757968
+          ],
+          "channelRelativeSampleRms": [
+            0.00467235599606362,
+            0.004644531033335719
+          ],
+          "maximumRelativeError": 0.014439071461272731,
+          "maximumRelativeSampleRms": 0.00467235599606362,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          3.5391087609631123e-11,
+          8.690966346706448e-11
+        ],
+        "channelMaximumTranslationRms": [
+          3.205859118134481e-07,
+          3.092476656429342e-07
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g95-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "91e7d9bb84214fc0e91c1ba9008f1c485e6d9d883bfdadf4019b9244cb235dd5",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -1,
+          2
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.26805880665779114,
+        0.17309067398309708
+      ],
+      "maximumRelativeError": 0.024021721571514353,
+      "maximumRelativeSampleRms": 0.005033868391821355,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.0013218894011780113,
+            0.0008713156726825671
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266921,
+            0.0050338683918213535
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.0050338683918213535,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.006439234018325801,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.0013218894011780113,
+            0.0008713156726825674
+          ],
+          "channelRelativeMax": [
+            0.024021721571514148,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266921,
+            0.005033868391821355
+          ],
+          "maximumRelativeError": 0.024021721571514148,
+          "maximumRelativeSampleRms": 0.005033868391821355,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.006439234018325857,
+            0.0041485846042632335
+          ],
+          "channelSampleRms": [
+            0.0013218894011779994,
+            0.0008713156726825598
+          ],
+          "channelRelativeMax": [
+            0.024021721571514353,
+            0.02396769570998584
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266877,
+            0.005033868391821312
+          ],
+          "maximumRelativeError": 0.024021721571514353,
+          "maximumRelativeSampleRms": 0.005033868391821312,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263206
+          ],
+          "channelSampleRms": [
+            0.0013218894011779998,
+            0.00087131567268256
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998568
+          ],
+          "channelRelativeSampleRms": [
+            0.0049313410652668775,
+            0.005033868391821313
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.005033868391821313,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          6.30253555047778e-08,
+          1.667332210873605e-07
+        ],
+        "channelMaximumTranslationRms": [
+          2.257781697726016e-05,
+          2.165262559722922e-05
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g98-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "347e5f4bf9076f8f44710f6074357db4e74931aa125632923256cfcb8b1b5a90",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -1,
+          2
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.26805880665779114,
+        0.17309067398309708
+      ],
+      "maximumRelativeError": 0.024021721571514353,
+      "maximumRelativeSampleRms": 0.005033868391821355,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.0013218894011780113,
+            0.0008713156726825671
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266921,
+            0.0050338683918213535
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.0050338683918213535,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.006439234018325801,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.0013218894011780113,
+            0.0008713156726825674
+          ],
+          "channelRelativeMax": [
+            0.024021721571514148,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266921,
+            0.005033868391821355
+          ],
+          "maximumRelativeError": 0.024021721571514148,
+          "maximumRelativeSampleRms": 0.005033868391821355,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.006439234018325857,
+            0.0041485846042632335
+          ],
+          "channelSampleRms": [
+            0.0013218894011779994,
+            0.0008713156726825598
+          ],
+          "channelRelativeMax": [
+            0.024021721571514353,
+            0.02396769570998584
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065266877,
+            0.005033868391821312
+          ],
+          "maximumRelativeError": 0.024021721571514353,
+          "maximumRelativeSampleRms": 0.005033868391821312,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263206
+          ],
+          "channelSampleRms": [
+            0.0013218894011779998,
+            0.00087131567268256
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998568
+          ],
+          "channelRelativeSampleRms": [
+            0.0049313410652668775,
+            0.005033868391821313
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.005033868391821313,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          6.30253555047778e-08,
+          1.667332210873605e-07
+        ],
+        "channelMaximumTranslationRms": [
+          2.257781697726016e-05,
+          2.165262559722922e-05
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g94-diversity-p4-standing-oblique21-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "6feb5844033e85646e95018dd60805a1a1a2fc40dd875634166d4a5f279fbd2d",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -2,
+          -1
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.26805880665779114,
+        0.17309067398309708
+      ],
+      "maximumRelativeError": 0.024021721571514353,
+      "maximumRelativeSampleRms": 0.005033868391840283,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.001321889401172707,
+            0.0008713156726858432
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065247133,
+            0.005033868391840281
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.005033868391840281,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.006439234018325801,
+            0.004148584604263317
+          ],
+          "channelSampleRms": [
+            0.0013218894011727072,
+            0.0008713156726858436
+          ],
+          "channelRelativeMax": [
+            0.024021721571514148,
+            0.02396769570998632
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065247134,
+            0.005033868391840283
+          ],
+          "maximumRelativeError": 0.024021721571514148,
+          "maximumRelativeSampleRms": 0.005033868391840283,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.006439234018325857,
+            0.0041485846042632335
+          ],
+          "channelSampleRms": [
+            0.0013218894011726955,
+            0.000871315672685836
+          ],
+          "channelRelativeMax": [
+            0.024021721571514353,
+            0.02396769570998584
+          ],
+          "channelRelativeSampleRms": [
+            0.0049313410652470895,
+            0.005033868391840239
+          ],
+          "maximumRelativeError": 0.024021721571514353,
+          "maximumRelativeSampleRms": 0.005033868391840239,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.006439234018325829,
+            0.004148584604263206
+          ],
+          "channelSampleRms": [
+            0.001321889401172696,
+            0.0008713156726858361
+          ],
+          "channelRelativeMax": [
+            0.02402172157151425,
+            0.02396769570998568
+          ],
+          "channelRelativeSampleRms": [
+            0.004931341065247091,
+            0.0050338683918402394
+          ],
+          "maximumRelativeError": 0.02402172157151425,
+          "maximumRelativeSampleRms": 0.0050338683918402394,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          6.302535613753342e-08,
+          1.6673322246755125e-07
+        ],
+        "channelMaximumTranslationRms": [
+          2.2577817090533645e-05,
+          2.1652625686770456e-05
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g94-diversity-p4-standing-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "188d83e1ab183bbae08384309a02cfcbe15b222baf9f780357ddb43e5f1cf86c",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          3,
+          1
+        ],
+        "denominator": 10,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            7
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            5,
+            5
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            7,
+            9
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            9,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 2,
+      "approximateTranslationCount": 10,
+      "concentrationRanges": [
+        0.14459437131881714,
+        0.09040046483278275
+      ],
+      "maximumRelativeError": 0.013089887385707188,
+      "maximumRelativeSampleRms": 0.0033767574138652166,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.1,
+            0.7
+          ],
+          "channelMax": [
+            0.0018927240371703902,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.00048826011535399016,
+            0.00029561636635771067
+          ],
+          "channelRelativeMax": [
+            0.013089887385706805,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138651776,
+            0.0032700757336206598
+          ],
+          "maximumRelativeError": 0.013089887385706805,
+          "maximumRelativeSampleRms": 0.0033767574138651776,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.001892724037170418,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.0004882601153539935,
+            0.00029561636635771284
+          ],
+          "channelRelativeMax": [
+            0.013089887385706996,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138652006,
+            0.0032700757336206836
+          ],
+          "maximumRelativeError": 0.013089887385706996,
+          "maximumRelativeSampleRms": 0.0033767574138652006,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.1
+          ],
+          "channelMax": [
+            0.0018927240371703902,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.0004882601153539949,
+            0.0002956163663577135
+          ],
+          "channelRelativeMax": [
+            0.013089887385706805,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.00337675741386521,
+            0.0032700757336206906
+          ],
+          "maximumRelativeError": 0.013089887385706805,
+          "maximumRelativeSampleRms": 0.00337675741386521,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.0018927240371704457,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.0004882601153539888,
+            0.00029561636635771
+          ],
+          "channelRelativeMax": [
+            0.013089887385707188,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.003376757413865168,
+            0.0032700757336206524
+          ],
+          "maximumRelativeError": 0.013089887385707188,
+          "maximumRelativeSampleRms": 0.003376757413865168,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.0018927240371704457,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.00048826011535399336,
+            0.00029561636635771257
+          ],
+          "channelRelativeMax": [
+            0.013089887385707188,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138651997,
+            0.0032700757336206806
+          ],
+          "maximumRelativeError": 0.013089887385707188,
+          "maximumRelativeSampleRms": 0.0033767574138651997,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.9
+          ],
+          "channelMax": [
+            0.001892724037170418,
+            0.0009185767173767456
+          ],
+          "channelSampleRms": [
+            0.0004882601153539909,
+            0.0002956163663577114
+          ],
+          "channelRelativeMax": [
+            0.013089887385706996,
+            0.010161194625225354
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138651828,
+            0.003270075733620667
+          ],
+          "maximumRelativeError": 0.013089887385706996,
+          "maximumRelativeSampleRms": 0.0033767574138651828,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.001892724037170418,
+            0.0009185767173767456
+          ],
+          "channelSampleRms": [
+            0.0004882601153539886,
+            0.00029561636635770975
+          ],
+          "channelRelativeMax": [
+            0.013089887385706996,
+            0.010161194625225354
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138651667,
+            0.0032700757336206494
+          ],
+          "maximumRelativeError": 0.013089887385706996,
+          "maximumRelativeSampleRms": 0.0033767574138651667,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.3
+          ],
+          "channelMax": [
+            0.0018927240371704457,
+            0.0009185767173767179
+          ],
+          "channelSampleRms": [
+            0.0004882601153539958,
+            0.00029561636635771414
+          ],
+          "channelRelativeMax": [
+            0.013089887385707188,
+            0.010161194625225047
+          ],
+          "channelRelativeSampleRms": [
+            0.0033767574138652166,
+            0.003270075733620698
+          ],
+          "maximumRelativeError": 0.013089887385707188,
+          "maximumRelativeSampleRms": 0.0033767574138652166,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          7.173223691334529e-12,
+          1.7194933449660847e-11
+        ],
+        "channelMaximumTranslationRms": [
+          1.1255798939087621e-07,
+          1.0619643077788076e-07
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g96-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "bcf2f182e98f9429b9a1d0304f223bc044bc4b9efa3f518c7f3b53fb17f956f3",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          2,
+          1
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            3
+          ],
+          [
+            2,
+            1
+          ],
+          [
+            3,
+            4
+          ],
+          [
+            4,
+            2
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.3028419092297554,
+        0.19777699559926987
+      ],
+      "maximumRelativeError": 0.04581431528489638,
+      "maximumRelativeSampleRms": 0.00819937605228734,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.010667642354965312,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.0022188013523674996,
+            0.001621647961409992
+          ],
+          "channelRelativeMax": [
+            0.03522511921185965,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306655,
+            0.008199376052287339
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.008199376052287339,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.010667642354965368,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.002218801352367501,
+            0.0016216479614099921
+          ],
+          "channelRelativeMax": [
+            0.03522511921185983,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306659,
+            0.00819937605228734
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.00819937605228734,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.002218801352367484,
+            0.0016216479614099802
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.0073265994063066026,
+            0.00819937605228728
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.00819937605228728,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.0022188013523674844,
+            0.0016216479614099806
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306604,
+            0.008199376052287283
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.008199376052287283,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          1.5617054635375005e-06,
+          4.230047554180038e-06
+        ],
+        "channelMaximumTranslationRms": [
+          0.00017110609399078618,
+          0.0001673674573810554
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g97-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "e8d32d3a7c9a07660a02eb944abf8f3fcff58d54e73a33641c6a1a64756e4348",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          2,
+          -1
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.3028419092297554,
+        0.19777699559926987
+      ],
+      "maximumRelativeError": 0.04581431528489638,
+      "maximumRelativeSampleRms": 0.00819937605228734,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.010667642354965312,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.002218801352367501,
+            0.0016216479614099921
+          ],
+          "channelRelativeMax": [
+            0.03522511921185965,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306659,
+            0.00819937605228734
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.00819937605228734,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.0022188013523674844,
+            0.0016216479614099806
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306604,
+            0.008199376052287283
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.008199376052287283,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.010667642354965368,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.0022188013523675,
+            0.001621647961409992
+          ],
+          "channelRelativeMax": [
+            0.03522511921185983,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.0073265994063066555,
+            0.008199376052287339
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.008199376052287339,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.002218801352367484,
+            0.0016216479614099804
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.0073265994063066026,
+            0.008199376052287282
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.008199376052287282,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          1.5617054635375005e-06,
+          4.230047554180037e-06
+        ],
+        "channelMaximumTranslationRms": [
+          0.00017110609399078626,
+          0.0001673674573810554
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g99-diversity-p4-rotating-oblique21-f00395-f0p00395-F0p00395000-k0p02000000-L256-N48-M128": {
+      "fieldSha256": "e184df6e43d96e8c611a78a873b4e49883753ae94680a193ef50e068136521f3",
+      "family": "p4",
+      "N": 48,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          2,
+          -1
+        ],
+        "denominator": 5,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            1
+          ],
+          [
+            4,
+            3
+          ]
+        ]
+      },
+      "strictTranslationCount": 1,
+      "approximateTranslationCount": 5,
+      "concentrationRanges": [
+        0.3028419092297554,
+        0.19777699559926987
+      ],
+      "maximumRelativeError": 0.04581431528489638,
+      "maximumRelativeSampleRms": 0.00819937605228734,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.010667642354965312,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.002218801352367501,
+            0.0016216479614099921
+          ],
+          "channelRelativeMax": [
+            0.03522511921185965,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306659,
+            0.00819937605228734
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.00819937605228734,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.0022188013523674844,
+            0.0016216479614099806
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.007326599406306604,
+            0.008199376052287283
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.008199376052287283,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.010667642354965368,
+            0.009061017632484514
+          ],
+          "channelSampleRms": [
+            0.0022188013523675,
+            0.001621647961409992
+          ],
+          "channelRelativeMax": [
+            0.03522511921185983,
+            0.04581431528489638
+          ],
+          "channelRelativeSampleRms": [
+            0.0073265994063066555,
+            0.008199376052287339
+          ],
+          "maximumRelativeError": 0.04581431528489638,
+          "maximumRelativeSampleRms": 0.008199376052287339,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.010667642354964924,
+            0.009061017632484347
+          ],
+          "channelSampleRms": [
+            0.002218801352367484,
+            0.0016216479614099804
+          ],
+          "channelRelativeMax": [
+            0.03522511921185836,
+            0.04581431528489554
+          ],
+          "channelRelativeSampleRms": [
+            0.0073265994063066026,
+            0.008199376052287282
+          ],
+          "maximumRelativeError": 0.04581431528489554,
+          "maximumRelativeSampleRms": 0.008199376052287282,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          1.5617054635375005e-06,
+          4.230047554180037e-06
+        ],
+        "channelMaximumTranslationRms": [
+          0.00017110609399078626,
+          0.0001673674573810554
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g96-diversity-p4-rotating-33-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128": {
+      "fieldSha256": "ff64a0d2495d20e82079a9063ab3ca6dfe299940b2605b90c97676edc302406b",
+      "family": "p4",
+      "N": 64,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          3,
+          3
+        ],
+        "denominator": 18,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            12
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            3,
+            15
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            9,
+            15
+          ],
+          [
+            12,
+            0
+          ],
+          [
+            12,
+            6
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            15,
+            3
+          ],
+          [
+            15,
+            9
+          ],
+          [
+            15,
+            15
+          ]
+        ]
+      },
+      "strictTranslationCount": 2,
+      "approximateTranslationCount": 18,
+      "concentrationRanges": [
+        0.24619538336992264,
+        0.1407857909798622
+      ],
+      "maximumRelativeError": 0.03884084236852551,
+      "maximumRelativeSampleRms": 0.008217163190545464,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.0,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.004942347606023134,
+            0.00321778158346811
+          ],
+          "channelSampleRms": [
+            0.001241724624241069,
+            0.0008386960507943555
+          ],
+          "channelRelativeMax": [
+            0.02007489961173226,
+            0.022855868913137525
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684568,
+            0.005957249271798468
+          ],
+          "maximumRelativeError": 0.022855868913137525,
+          "maximumRelativeSampleRms": 0.005957249271798468,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.0,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410692,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684569,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110646,
+            0.0011568598193915502
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.00699506688524468,
+            0.008217163190545456
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545456,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.5
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410686,
+            0.0008386960507943553
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684566,
+            0.005957249271798466
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798466,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110657,
+            0.001156859819391551
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244684,
+            0.008217163190545461
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545461,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.0
+          ],
+          "channelMax": [
+            0.004942347606023134,
+            0.00321778158346811
+          ],
+          "channelSampleRms": [
+            0.001241724624241069,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173226,
+            0.022855868913137525
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684568,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137525,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.009562436077329844,
+            0.005314098464118094
+          ],
+          "channelSampleRms": [
+            0.001722153173511065,
+            0.0011568598193915506
+          ],
+          "channelRelativeMax": [
+            0.0388408423685254,
+            0.037745985778339056
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244682,
+            0.008217163190545457
+          ],
+          "maximumRelativeError": 0.0388408423685254,
+          "maximumRelativeSampleRms": 0.008217163190545457,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110652,
+            0.0011568598193915506
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.0069950668852446826,
+            0.008217163190545457
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545457,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410688,
+            0.0008386960507943553
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684567,
+            0.005957249271798466
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798466,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.5,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410701,
+            0.0008386960507943562
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.0050436551946845725,
+            0.005957249271798473
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798473,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.0
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410692,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684569,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110652,
+            0.0011568598193915508
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.0069950668852446826,
+            0.00821716319054546
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.00821716319054546,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110652,
+            0.0011568598193915508
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.0069950668852446826,
+            0.00821716319054546
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.00821716319054546,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110657,
+            0.001156859819391551
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244684,
+            0.008217163190545461
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545461,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.5
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410701,
+            0.0008386960507943561
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.0050436551946845725,
+            0.005957249271798472
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798472,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110665,
+            0.0011568598193915515
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244688,
+            0.008217163190545464
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545464,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          5.945764823413261e-08,
+          1.9478302229595588e-07
+        ],
+        "channelMaximumTranslationRms": [
+          2.6733862849391064e-05,
+          2.787546781240294e-05
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g97-diversity-p4-rotating-33-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N64-M128": {
+      "fieldSha256": "372d4830823e09567f526a3de0568eea941f57a7d1f020d117c361e5abd27b75",
+      "family": "p4",
+      "N": 64,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -3,
+          3
+        ],
+        "denominator": 18,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            6
+          ],
+          [
+            0,
+            12
+          ],
+          [
+            3,
+            3
+          ],
+          [
+            3,
+            9
+          ],
+          [
+            3,
+            15
+          ],
+          [
+            6,
+            0
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            9,
+            9
+          ],
+          [
+            9,
+            15
+          ],
+          [
+            12,
+            0
+          ],
+          [
+            12,
+            6
+          ],
+          [
+            12,
+            12
+          ],
+          [
+            15,
+            3
+          ],
+          [
+            15,
+            9
+          ],
+          [
+            15,
+            15
+          ]
+        ]
+      },
+      "strictTranslationCount": 2,
+      "approximateTranslationCount": 18,
+      "concentrationRanges": [
+        0.24619538336992264,
+        0.1407857909798622
+      ],
+      "maximumRelativeError": 0.03884084236852551,
+      "maximumRelativeSampleRms": 0.008217163190545464,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.0,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.004942347606023134,
+            0.00321778158346811
+          ],
+          "channelSampleRms": [
+            0.001241724624241069,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173226,
+            0.022855868913137525
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684568,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137525,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.0,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410692,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684569,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110646,
+            0.0011568598193915502
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.00699506688524468,
+            0.008217163190545456
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545456,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.5
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410686,
+            0.0008386960507943552
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684566,
+            0.005957249271798465
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798465,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.16666666666666666,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110655,
+            0.001156859819391551
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244683,
+            0.008217163190545461
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545461,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.0
+          ],
+          "channelMax": [
+            0.004942347606023134,
+            0.00321778158346811
+          ],
+          "channelSampleRms": [
+            0.001241724624241069,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173226,
+            0.022855868913137525
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684568,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137525,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.009562436077329844,
+            0.005314098464118094
+          ],
+          "channelSampleRms": [
+            0.001722153173511065,
+            0.0011568598193915506
+          ],
+          "channelRelativeMax": [
+            0.0388408423685254,
+            0.037745985778339056
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244682,
+            0.008217163190545457
+          ],
+          "maximumRelativeError": 0.0388408423685254,
+          "maximumRelativeSampleRms": 0.008217163190545457,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3333333333333333,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.001722153173511065,
+            0.0011568598193915506
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244682,
+            0.008217163190545457
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545457,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410686,
+            0.0008386960507943553
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684566,
+            0.005957249271798466
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798466,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.5,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410701,
+            0.0008386960507943562
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.0050436551946845725,
+            0.005957249271798473
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798473,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.0
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410692,
+            0.0008386960507943556
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.005043655194684569,
+            0.005957249271798469
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798469,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.001722153173511065,
+            0.0011568598193915508
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244682,
+            0.00821716319054546
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.00821716319054546,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6666666666666666,
+            0.6666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110655,
+            0.0011568598193915508
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244683,
+            0.00821716319054546
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.00821716319054546,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.16666666666666666
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110655,
+            0.001156859819391551
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244683,
+            0.008217163190545461
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545461,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.5
+          ],
+          "channelMax": [
+            0.004942347606023162,
+            0.003217781583468138
+          ],
+          "channelSampleRms": [
+            0.0012417246242410701,
+            0.0008386960507943561
+          ],
+          "channelRelativeMax": [
+            0.02007489961173237,
+            0.022855868913137723
+          ],
+          "channelRelativeSampleRms": [
+            0.0050436551946845725,
+            0.005957249271798472
+          ],
+          "maximumRelativeError": 0.022855868913137723,
+          "maximumRelativeSampleRms": 0.005957249271798472,
+          "meshVertexOffsets": 2
+        },
+        {
+          "v": [
+            0.8333333333333334,
+            0.8333333333333334
+          ],
+          "channelMax": [
+            0.009562436077329872,
+            0.005314098464118122
+          ],
+          "channelSampleRms": [
+            0.0017221531735110668,
+            0.0011568598193915515
+          ],
+          "channelRelativeMax": [
+            0.03884084236852551,
+            0.03774598577833926
+          ],
+          "channelRelativeSampleRms": [
+            0.006995066885244689,
+            0.008217163190545464
+          ],
+          "maximumRelativeError": 0.03884084236852551,
+          "maximumRelativeSampleRms": 0.008217163190545464,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          5.945764823413261e-08,
+          1.9478302229595594e-07
+        ],
+        "channelMaximumTranslationRms": [
+          2.6733862849391064e-05,
+          2.787546781240294e-05
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g96-diversity-p4-rotating-42-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128": {
+      "fieldSha256": "2ca74e55809477f694063536dc42e2318b8218f1af5eef5505b1c787320a33d6",
+      "family": "p4",
+      "N": 96,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          -2,
+          4
+        ],
+        "denominator": 20,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            10
+          ],
+          [
+            2,
+            6
+          ],
+          [
+            2,
+            16
+          ],
+          [
+            4,
+            2
+          ],
+          [
+            4,
+            12
+          ],
+          [
+            6,
+            8
+          ],
+          [
+            6,
+            18
+          ],
+          [
+            8,
+            4
+          ],
+          [
+            8,
+            14
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            12,
+            6
+          ],
+          [
+            12,
+            16
+          ],
+          [
+            14,
+            2
+          ],
+          [
+            14,
+            12
+          ],
+          [
+            16,
+            8
+          ],
+          [
+            16,
+            18
+          ],
+          [
+            18,
+            4
+          ],
+          [
+            18,
+            14
+          ]
+        ]
+      },
+      "strictTranslationCount": 4,
+      "approximateTranslationCount": 20,
+      "concentrationRanges": [
+        0.1323838084936142,
+        0.07839265465736389
+      ],
+      "maximumRelativeError": 0.007712253550630309,
+      "maximumRelativeSampleRms": 0.0021765564693283033,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.0,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.1,
+            0.3
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.0002832180390194301,
+            0.00017062603964230385
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943574,
+            0.0021765564693282894
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282894,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.1,
+            0.8
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942887,
+            0.0001706260396423031
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943483,
+            0.00217655646932828
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.00217655646932828,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.1
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.0002832180390194304,
+            0.00017062603964230414
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943596,
+            0.0021765564693282933
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282933,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.6
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.00028321803901942854,
+            0.00017062603964230306
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943457,
+            0.0021765564693282794
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282794,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.4
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.0002832180390194282,
+            0.00017062603964230274
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694343,
+            0.0021765564693282755
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282755,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.9
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.00028321803901943125,
+            0.00017062603964230455
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694366,
+            0.0021765564693282985
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282985,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.2
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.00028321803901942854,
+            0.00017062603964230311
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943457,
+            0.0021765564693282803
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282803,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.7
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942735,
+            0.00017062603964230233
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943366,
+            0.0021765564693282703
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282703,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.6,
+            0.3
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.00028321803901942816,
+            0.0001706260396423027
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943427,
+            0.002176556469328275
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328275,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.8
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942697,
+            0.000170626039642302
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694334,
+            0.002176556469328266
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328266,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.1
+          ],
+          "channelMax": [
+            0.0010209774971008112,
+            0.0004853487014770952
+          ],
+          "channelSampleRms": [
+            0.0002832180390194292,
+            0.0001706260396423034
+          ],
+          "channelRelativeMax": [
+            0.007712253550630099,
+            0.006191252274826535
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943505,
+            0.002176556469328284
+          ],
+          "maximumRelativeError": 0.007712253550630099,
+          "maximumRelativeSampleRms": 0.002176556469328284,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.6
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942724,
+            0.00017062603964230225
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943358,
+            0.002176556469328269
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328269,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.4
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942697,
+            0.00017062603964230192
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694334,
+            0.002176556469328265
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328265,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.9
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901943,
+            0.00017062603964230377
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943566,
+            0.0021765564693282885
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282885,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.2
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.0002832180390194315,
+            0.00017062603964230493
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943683,
+            0.0021765564693283033
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693283033,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.7
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901943033,
+            0.00017062603964230414
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694359,
+            0.0021765564693282933
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282933,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          1.3828352063639359e-14,
+          2.49170484852523e-14
+        ],
+        "channelMaximumTranslationRms": [
+          6.205087390192892e-09,
+          4.929275588998915e-09
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
+    "saved:g97-diversity-p4-rotating-42-single-F0038-f0p0038-F0p00380000-k0p02000000-L256-N96-M128": {
+      "fieldSha256": "285324928fd51a6abe219034e6ac81e742d942d853e908a3697a6d476b1e98e9",
+      "family": "p4",
+      "N": 96,
+      "classification": "approximate-only",
+      "proposal": {
+        "wavevector": [
+          2,
+          4
+        ],
+        "denominator": 20,
+        "numerators": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            10
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            2,
+            14
+          ],
+          [
+            4,
+            8
+          ],
+          [
+            4,
+            18
+          ],
+          [
+            6,
+            2
+          ],
+          [
+            6,
+            12
+          ],
+          [
+            8,
+            6
+          ],
+          [
+            8,
+            16
+          ],
+          [
+            10,
+            0
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            12,
+            4
+          ],
+          [
+            12,
+            14
+          ],
+          [
+            14,
+            8
+          ],
+          [
+            14,
+            18
+          ],
+          [
+            16,
+            2
+          ],
+          [
+            16,
+            12
+          ],
+          [
+            18,
+            6
+          ],
+          [
+            18,
+            16
+          ]
+        ]
+      },
+      "strictTranslationCount": 4,
+      "approximateTranslationCount": 20,
+      "concentrationRanges": [
+        0.1323838084936142,
+        0.07839265465736389
+      ],
+      "maximumRelativeError": 0.007712253550630309,
+      "maximumRelativeSampleRms": 0.0021765564693283033,
+      "translations": [
+        {
+          "v": [
+            0.0,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.0,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.1,
+            0.2
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.0002832180390194304,
+            0.00017062603964230423
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943596,
+            0.0021765564693282946
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282946,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.1,
+            0.7
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.0002832180390194292,
+            0.00017062603964230347
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943505,
+            0.0021765564693282846
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282846,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.4
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.00028321803901942854,
+            0.00017062603964230306
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943457,
+            0.0021765564693282794
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282794,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.2,
+            0.9
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.0002832180390194315,
+            0.00017062603964230493
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943683,
+            0.0021765564693283033
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693283033,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.1
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901943017,
+            0.00017062603964230385
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694358,
+            0.0021765564693282894
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282894,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.3,
+            0.6
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770397
+          ],
+          "channelSampleRms": [
+            0.0002832180390194282,
+            0.0001706260396423027
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274825827
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694343,
+            0.002176556469328275
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328275,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.3
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.00028321803901942827,
+            0.00017062603964230274
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943436,
+            0.0021765564693282755
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282755,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.4,
+            0.8
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942697,
+            0.00017062603964230198
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694334,
+            0.0021765564693282656
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282656,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.5,
+            0.0
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.5,
+            0.5
+          ],
+          "channelMax": [
+            0.0,
+            0.0
+          ],
+          "channelSampleRms": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeMax": [
+            0.0,
+            0.0
+          ],
+          "channelRelativeSampleRms": [
+            0.0,
+            0.0
+          ],
+          "maximumRelativeError": 0.0,
+          "maximumRelativeSampleRms": 0.0,
+          "meshVertexOffsets": 1
+        },
+        {
+          "v": [
+            0.6,
+            0.2
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.00028321803901942854,
+            0.00017062603964230306
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943457,
+            0.0021765564693282794
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282794,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.6,
+            0.7
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942724,
+            0.0001706260396423023
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943358,
+            0.00217655646932827
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.00217655646932827,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.4
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942724,
+            0.0001706260396423023
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943358,
+            0.00217655646932827
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.00217655646932827,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.7,
+            0.9
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.0002832180390194303,
+            0.00017062603964230412
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943587,
+            0.002176556469328293
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328293,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.1
+          ],
+          "channelMax": [
+            0.0010209774971008112,
+            0.0004853487014770952
+          ],
+          "channelSampleRms": [
+            0.00028321803901942887,
+            0.00017062603964230306
+          ],
+          "channelRelativeMax": [
+            0.007712253550630099,
+            0.006191252274826535
+          ],
+          "channelRelativeSampleRms": [
+            0.0021393706846943483,
+            0.0021765564693282794
+          ],
+          "maximumRelativeError": 0.007712253550630099,
+          "maximumRelativeSampleRms": 0.0021765564693282794,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.8,
+            0.6
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942697,
+            0.00017062603964230192
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694334,
+            0.002176556469328265
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.002176556469328265,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.3
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.0004853487014770119
+          ],
+          "channelSampleRms": [
+            0.00028321803901943125,
+            0.0001706260396423046
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.0061912522748254735
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694366,
+            0.0021765564693282994
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282994,
+          "meshVertexOffsets": 4
+        },
+        {
+          "v": [
+            0.9,
+            0.8
+          ],
+          "channelMax": [
+            0.001020977497100839,
+            0.00048534870147706743
+          ],
+          "channelSampleRms": [
+            0.00028321803901942995,
+            0.00017062603964230382
+          ],
+          "channelRelativeMax": [
+            0.007712253550630309,
+            0.006191252274826181
+          ],
+          "channelRelativeSampleRms": [
+            0.002139370684694356,
+            0.0021765564693282894
+          ],
+          "maximumRelativeError": 0.007712253550630309,
+          "maximumRelativeSampleRms": 0.0021765564693282894,
+          "meshVertexOffsets": 4
+        }
+      ],
+      "spectralDefect": {
+        "channelForbiddenPowerFraction": [
+          1.3828352063588596e-14,
+          2.491704848521662e-14
+        ],
+        "channelMaximumTranslationRms": [
+          6.205087390181813e-09,
+          4.929275589009523e-09
+        ],
+        "description": "Defect of the ordinary full-domain Fourier interpolant; diagnostic only, distinct from the measured bilinear playback errors."
+      },
+      "canonicalSymmetryBound": {
+        "channelMax": [
+          0.0,
+          0.0
+        ],
+        "derivedRotationMaximumBound": "For a derived rotation, add this per-channel canonical maximum to that translation's channelMax. Canonical p4 rotations preserve the bilinear square mesh and frame shifts, so the bound holds throughout the interpolated movie."
+      }
+    },
     "saved:g248-diversity-q1-wave21-L512-F00406-F0p00406000-k0p02000000-L512-N66-M96": {
       "fieldSha256": "1c9619605bc7ec1fb3c437b4c62a69db4e2e85d0236f00503ef16a532bf9c1ec",
       "family": "p6",

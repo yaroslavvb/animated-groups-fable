@@ -1,4 +1,5 @@
 import {mod} from './seeds.mjs';
+import {viewTransform,screenPointToLattice} from './view-transform.mjs';
 const palettes={ember:[[0,18,9,39],[.22,65,12,94],[.43,99,25,116],[.58,171,45,90],[.69,240,111,32],[.78,252,181,42],[.89,253,219,94],[1,252,242,158]],ceramic:[[0,91,64,57],[.15,171,111,87],[.33,247,159,119],[.48,239,175,130],[.59,77,41,97],[.68,37,47,120],[.77,117,125,180],[.86,208,213,235],[1,252,249,238]],concentration:[[0,18,18,24],[1,245,245,251]]};
 const tile=document.createElement('canvas'),ctx=tile.getContext('2d');
 let paletteName,colours;
@@ -15,10 +16,20 @@ export function clearCanvas(canvas,text=''){
   const c=canvas.getContext('2d');c.fillStyle='#271337';c.fillRect(0,0,canvas.width,canvas.height);
   if(text){c.fillStyle='#cbbfd7';c.font='12px sans-serif';c.textAlign='center';c.fillText(text,canvas.width/2,canvas.height/2);}
 }
-export function renderField(canvas,field,N,M,t,{tiles=1,palette='ember',operation=null,range=null}={}){
+export function renderField(canvas,field,N,M,t,{tiles=1,palette='ember',operation=null,range=null,viewMatrix=null,viewOrigin=null}={}){
   if(range!==null&&(!Array.isArray(range)||range.length!==2||!range.every(Number.isFinite)||!(range[1]>range[0])))throw Error('A concentration range requires two finite increasing endpoints.');
   const lower=range?.[0]??(palette==='concentration'?0:.3),span=range?range[1]-range[0]:(palette==='concentration'?.4:.56);
   if(paletteName!==palette){paletteName=palette;const stops=palettes[palette];colours=Array.from({length:1024},(_,i)=>{const v=i/1023;let j=1;while(j<stops.length-1&&stops[j][0]<v)j++;const a=stops[j-1],b=stops[j],f=(v-a[0])/(b[0]-a[0]);return [1,2,3].map(i=>Math.round(a[i]+(b[i]-a[i])*f));});}
+  if(viewMatrix!==null||viewOrigin!==null){
+    const view=viewTransform({family:'p4',tiles,viewMatrix,viewOrigin}),c=canvas.getContext('2d'),image=c.createImageData(canvas.width,canvas.height),channel=palette==='concentration'?1:0;
+    for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++){
+      let [sx,sy]=screenPointToLattice([(x+.5)/canvas.width,(y+.5)/canvas.height],view);
+      if(operation){const a=sx-operation.v[0],b=sy-operation.v[1];sx=operation.M[0][0]*a+operation.M[1][0]*b;sy=operation.M[0][1]*a+operation.M[1][1]*b;}
+      const z=(valueAt(field,channel,sx*N,sy*N,t,N,M)-lower)/span,rgb=colours[Math.max(0,Math.min(1023,Math.round(z*1023)))],i=4*(y*canvas.width+x);
+      image.data[i]=rgb[0];image.data[i+1]=rgb[1];image.data[i+2]=rgb[2];image.data[i+3]=255;
+    }
+    c.putImageData(image,0,0);return;
+  }
   // A node at i/N belongs on the cell boundary at screen coordinate i*size/N,
   // not at the center of image pixel i. A periodic one-node border permits
   // bilinear filtering across the seam without clamping the last sample.

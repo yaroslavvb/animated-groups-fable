@@ -10,3 +10,7 @@
 
 .sg-generator.extra-centre { color:#a9f5e4; }
 .sg-generator.extra-centre.is-selected,.sg-generator.extra-centre:hover,.sg-generator.extra-centre:focus { color:#ffdf74; }
+.sg-generator.approximate-centre { color:#ffd495; }
+.sg-generator-approximation { fill:none; stroke:#ffd495; stroke-width:2px; stroke-dasharray:4 3; }
+.sg-generator-verified { fill:none; stroke:#fff5d4; stroke-width:2px; }
+.sg-generator.approximate-centre.is-selected,.sg-generator.approximate-centre:hover,.sg-generator.approximate-centre:focus { color:#ffdf74; }

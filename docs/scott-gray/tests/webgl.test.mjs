@@ -121,6 +121,17 @@ export async function runWebGLTests() {
     let rejected=0;for(const range of [[1,1],[2,1],[0,NaN]])for(const run of [()=>engine.render({range}),()=>renderField(canvas,low,N,1,0,{range})])try{run();}catch{rejected++;}
     expect(rejected===6,'Invalid fixed color ranges were accepted');return {maxChannelError:largestDifference,invalidRangesRejected:rejected};
   });
+  await test('Oblique cell views match CPU and GPU for both the original and rotated comparison',()=>{
+    engine.upload(initial);const width=72,height=60,canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+    const gl=engine.canvas.getContext('webgl2');let largestDifference=0;
+    for(const viewMatrix of [[[.2,.3],[.3,-.2]],[[.5,0],[0,-.5]]])for(const operation of [null,{M:[[0,-1],[1,0]],v:[.5,.25],tau:0}])for(const palette of ['ember','concentration']){
+      const options={viewMatrix,viewOrigin:[.31,-.27],operation,palette};
+      renderField(canvas,initial,N,1,0,options);engine.render({width,height,...options});
+      const cpu=canvas.getContext('2d').getImageData(0,0,width,height).data,gpu=new Uint8Array(cpu.length);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,gpu);
+      for(let y=0;y<height;y++)for(let x=0;x<width;x++)for(let ch=0;ch<4;ch++)largestDifference=Math.max(largestDifference,Math.abs(cpu[4*(y*width+x)+ch]-gpu[4*((height-1-y)*width+x)+ch]));
+    }
+    expect(largestDifference<=3,`Cell view or rotation does not match: ${largestDifference}`);return {maxChannelError:largestDifference};
+  });
   await test('Diffusion timestep cap prevents oversized requests',()=>{
     engine.upload(initial);engine.setParams({Du:.3,Dv:.15,dx:.1,dt:2});const info=engine.step(1,4);
     expect(Math.abs(info.dt-.006)<1e-12,`Bad safe timestep ${info.dt}`);return {effectiveDt:info.dt};

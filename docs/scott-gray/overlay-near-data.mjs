@@ -6,7 +6,7 @@ const finitePair = pair => Array.isArray(pair) && pair.length === 2 && pair.ever
 export function overlayNearEvidence(index, record, strictTranslations = []) {
   if (index?.schema !== 'overlay-near-translations-v1' || !record) return null;
   const evidence = index.orbits?.[record.id];
-  if (!evidence || evidence.classification !== 'approximate-only' || evidence.family !== 'p6' ||
+  if (!evidence || evidence.classification !== 'approximate-only' || !['p4','p6'].includes(evidence.family) ||
       evidence.fieldSha256 !== record.fieldSha256 || evidence.N !== record.config.N) return null;
   const translations = evidence.translations, count = evidence.approximateTranslationCount;
   if (!strictTranslations.length || evidence.strictTranslationCount !== strictTranslations.length) return null;
@@ -19,7 +19,7 @@ export function overlayNearEvidence(index, record, strictTranslations = []) {
   const keys = new Set(translations.map(t => centreKey(t.v)));
   if (keys.size !== count || !keys.has('0,0') || strictTranslations.some(t => !keys.has(centreKey(t.v)))) return null;
   for (const {v: a} of translations) {
-    if (!keys.has(centreKey([a[0]-a[1],a[0]]))) return null;
+    if (!keys.has(centreKey(evidence.family==='p6'?[a[0]-a[1],a[0]]:[-a[1],a[0]]))) return null;
     for (const {v: b} of translations) if (!keys.has(centreKey([a[0]+b[0],a[1]+b[1]]))) return null;
   }
   return evidence;
@@ -28,7 +28,7 @@ export function overlayNearEvidence(index, record, strictTranslations = []) {
 /** Exact markers retain their classification; a dashed higher order is opt-in. */
 export function withApproximateCentres(group, exact, evidence) {
   const byPosition = new Map(exact.map(g => [centreKey(g.centre), g]));
-  const proposed = rotationCentres({namedGenerators: group.namedGenerators, ops: group.render.ops, family:'p6', translations:evidence.translations});
+  const proposed = rotationCentres({namedGenerators: group.namedGenerators, ops: group.render.ops, family:evidence.family, translations:evidence.translations});
   return proposed.map(g => {
     const verified = byPosition.get(centreKey(g.centre));
     if (verified && verified.order >= g.order) return verified;

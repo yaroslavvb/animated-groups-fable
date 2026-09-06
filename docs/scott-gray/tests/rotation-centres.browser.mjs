@@ -8,7 +8,7 @@ try{
  page.on('pageerror',e=>errors.push(e.message));
  const cases=[{path:'scott-gray/p6/',group:'g248',id:'saved:g248-F0p00404000-k0p02000000-mode1-shell3-N48-M192',count:18}, {path:'scott-gray/',group:'g96',id:'saved:g96-F0p00400000-k0p02000000-N48-M128',count:4}, {path:'scott-gray/',group:'g96',id:'saved:g96-diversity-p4-rotating-oblique-31-f00395-F0p00395000-k0p02000000-L256-N48-M128',count:8}, {path:'scott-gray/p6/',group:'g248',id:'saved:g248-F0p00404000-k0p02000000-mode1-N48-M192',count:6}];
  for(const c of cases){
-  const params=new URLSearchParams({v:'1',pattern:c.id,palette:'ember',tiles:'2',speed:'1',generator:'α',overlay:'1',phase:'.1296874999999396',play:'0'});
+  const params=new URLSearchParams({v:'2',framing:'simulation',approx:'0',pattern:c.id,palette:'ember',tiles:'2',speed:'1',generator:'α',overlay:'1',phase:'.1296874999999396',play:'0'});
   await page.goto(base+c.path+'#'+c.group+'?'+params);
   await page.waitForFunction(()=>document.querySelector('#empty-state').hidden,{},{timeout:30000});
   assert.equal(await page.locator('.scale-label').innerText(),`Physical width 2 L · ${c.path.includes('/p6/')?'triangular':'square'} lattice`);

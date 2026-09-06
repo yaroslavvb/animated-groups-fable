@@ -1,8 +1,10 @@
 /**
- * Shared, versioned gallery links: #g95?v=1&pattern=<stable catalog id>&…
+ * Shared, versioned gallery links: #g95?v=2&pattern=<stable catalog id>&…
  * A saved pattern identifies its physical parameters; catalog indexes are never
  * serialized. Legacy group anchors retain autoplay and the default view. Unknown
- * versions retain only the group. Catalog membership is checked by each gallery.
+ * versions retain only the group. Version 1 migrates its requested count to
+ * corrected pattern-cell framing. Version 2 records cells vs simulation width
+ * explicitly. Catalog membership is checked by each gallery.
  * Serialize after a user action, never on every animation frame: a paused link
  * keeps the exact numeric phase, while a playing link resumes from that phase.
  */
@@ -11,10 +13,11 @@ const DEFAULTS = Object.freeze({
   patternId: null,
   palette: 'ember',
   tiles: 2,
+  framing: 'cells',
   speed: 1,
   generator: null,
   overlay: false,
-  approximate: false,
+  approximate: true,
   phase: 0,
   play: true,
 });
@@ -47,6 +50,7 @@ function normalize(state = {}) {
     patternId: validPattern(state.patternId),
     palette: palettes.has(state.palette) ? state.palette : DEFAULTS.palette,
     tiles: numberChoice(state.tiles, [1, 2, 3], DEFAULTS.tiles),
+    framing: state.framing === 'simulation' ? 'simulation' : 'cells',
     speed: numberChoice(state.speed, [0.5, 1, 2], DEFAULTS.speed),
     generator: validGenerator(state.generator),
     overlay: booleanChoice(state.overlay, DEFAULTS.overlay),
@@ -62,12 +66,14 @@ export function readViewState(hash) {
   const separator = source.indexOf('?');
   const groupId = validGroup(separator < 0 ? source : source.slice(0, separator));
   const parameters = new URLSearchParams(separator < 0 ? '' : source.slice(separator + 1));
-  if (parameters.get('v') !== '1') return { ...DEFAULTS, groupId };
+  if (!['1','2'].includes(parameters.get('v'))) return { ...DEFAULTS, groupId };
   return normalize({
     groupId,
     patternId: parameters.get('pattern'),
     palette: parameters.get('palette'),
     tiles: parameters.get('tiles'),
+    // Old tile counts were presented as cells. Correct their framing on load.
+    framing: parameters.get('v') === '2' ? parameters.get('framing') : 'cells',
     speed: parameters.get('speed'),
     generator: parameters.get('generator'),
     overlay: parameters.get('overlay'),
@@ -81,14 +87,15 @@ export function writeViewHash(state) {
   const view = normalize(state ?? {});
   if (!view.groupId) return '';
   const parameters = new URLSearchParams();
-  parameters.set('v', '1');
+  parameters.set('v', '2');
   if (view.patternId) parameters.set('pattern', view.patternId);
   parameters.set('palette', view.palette);
   parameters.set('tiles', String(view.tiles));
+  parameters.set('framing', view.framing);
   parameters.set('speed', String(view.speed));
   if (view.generator) parameters.set('generator', view.generator);
   parameters.set('overlay', view.overlay ? '1' : '0');
-  if (view.approximate) parameters.set('approx', '1');
+  parameters.set('approx', view.approximate ? '1' : '0');
   parameters.set('phase', String(view.phase));
   parameters.set('play', view.play ? '1' : '0');
   return `#${view.groupId}?${parameters}`;
