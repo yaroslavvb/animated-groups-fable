@@ -22,6 +22,11 @@ try{
   for(const symbol of expected)assert.ok(symbols.includes(symbol),`${id}: missing ${symbol}`);
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`${id}: mobile overflow`);
   const group=metadata.groups.find(g=>g.id===id);
+  const labels=await page.locator('.wallpaper-generator text').allTextContents();
+  assert.ok(labels.length>0);
+  assert.ok(labels.every(label=>group.namedGenerators.some(generator=>generator.name===label)),`${id}: generator labels must retain the original letters without time notation`);
+  assert.match(await page.locator('#generator-description').innerText(),/ T$/,'time interpretation belongs in the selected-generator details');
+  assert.doesNotMatch(await page.locator('body').innerText(),/\bcolou?r(?:s|ing)?\b/i,'gallery wording describes time shifts');
   const paths=await page.locator('.wallpaper-generator.rotation path.generator-symbol-core').evaluateAll(items=>items.map(item=>item.getAttribute('d')));
   for(const generator of group.namedGenerators.filter(g=>g.kind==='rotation'))assert.ok(paths.includes(generator.glyph.path),`${id}: source glyph absent`);
   if(id==='g231')assert.equal(await page.locator('.generator-axis').first().getAttribute('stroke-dasharray'),'0 8');

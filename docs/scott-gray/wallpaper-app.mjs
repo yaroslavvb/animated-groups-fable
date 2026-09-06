@@ -1,7 +1,7 @@
 import {createWallpaperCatalog} from './wallpaper-atlas.mjs?v=20260905-gallery-fix';
 import {createWallpaperPlayer} from './wallpaper-playback.mjs';
 import {makeWallpaperCellView} from './wallpaper-cell.mjs?v=20260905-gallery-fix';
-import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260905-gallery-fix';
+import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260905-original-symbols';
 import {readViewState,writeViewHash} from './view-state.mjs';
 
 const root = new URL('./', import.meta.url);

@@ -157,7 +157,7 @@ function markerMarkup(item,index,size,selected,cellView){
  const color=active?'#b8fff0':'#fff';
  const symbol=wallpaperGeneratorSymbol(item);
  const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" data-generator-symbol="${symbol}" data-time-shift="${item.tau}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
- const label=(p,offset=8)=>`<text x="${num(p[0]+offset)}" y="${num(p[1]-offset)}" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke" stroke-linejoin="round" font-size="14" font-weight="600">${escape(item.name)} · ${item.phaseLabel}</text>`;
+ const label=(p,offset=8)=>`<text x="${num(p[0]+offset)}" y="${num(p[1]-offset)}" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke" stroke-linejoin="round" font-size="14" font-weight="600">${escape(item.name)}</text>`;
  if(item.kind==='rotation'){
   const p=item.screenPoint.map(x=>x*size),A=item.glyphMatrix??ID,matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
   const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) rotate(${num(cellView?.glyphAngleOffset??0)}) matrix(${matrix}) scale(1.25)" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
