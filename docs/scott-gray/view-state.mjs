@@ -20,6 +20,12 @@ const DEFAULTS = Object.freeze({
 
 const palettes = new Set(['ember', 'ceramic', 'concentration']);
 const generators = new Set(['α', 'β', 'γ']);
+const validGenerator = value => {
+  if (generators.has(value)) return value;
+  if (typeof value !== 'string' || value.length > 64) return null;
+  const match = value.match(/^([αβγ])@(0(?:\.\d{1,9})?),(0(?:\.\d{1,9})?)$/);
+  return match && Number(match[2]) < 1 && Number(match[3]) < 1 ? value : null;
+};
 const validGroup = value => typeof value === 'string' && /^g\d+$/.test(value) ? value : null;
 const validPattern = value => typeof value === 'string' && value.trim().length > 0 && value.length <= 512 ? value : null;
 const numberChoice = (value, choices, fallback) => {
@@ -41,7 +47,7 @@ function normalize(state = {}) {
     palette: palettes.has(state.palette) ? state.palette : DEFAULTS.palette,
     tiles: numberChoice(state.tiles, [1, 2, 3], DEFAULTS.tiles),
     speed: numberChoice(state.speed, [0.5, 1, 2], DEFAULTS.speed),
-    generator: generators.has(state.generator) ? state.generator : null,
+    generator: validGenerator(state.generator),
     overlay: booleanChoice(state.overlay, DEFAULTS.overlay),
     phase: validPhase(state.phase),
     play: booleanChoice(state.play, DEFAULTS.play),

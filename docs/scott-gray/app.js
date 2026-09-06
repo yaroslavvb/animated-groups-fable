@@ -1,9 +1,11 @@
 import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260904-visible-time';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260904-share-view';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-centres';
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
 import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
 import {createWebGLGrayScott} from './webgl.mjs?v=20260904-precomputed';
-import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs';
+import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs?v=20260905-centres';
+import {rotationCentres} from './rotation-centres.mjs?v=20260905-centres';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-centres';
 import {PROFILES,makeInitial} from './exploration.mjs';
 import {analyticExclusion} from './feasibility.mjs';
 import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260904-visible-time';
@@ -17,6 +19,8 @@ let selectionToken=0,selectedPatternId=null;
 const recordNames=new Map(),recordDescriptions=new Map();
 const rememberedGenerators=new Map();
 const rememberedSelections=new Map(),thumbnailCache=new Map(),rangeCache=new Map();
+let translationIndex=null,centres=[];
+const centreCache=new Map();
 let settingsRevision=0;
 let selectedParameterKey=null;
 let playing=false,phase=0,lastTime=0,selectedGenerator='α',attempts=[],displayRanges=null;
@@ -33,7 +37,7 @@ const summaryById=id=>saved?.get(id)??summaries(group.id).find(r=>r.id===id);
 const verifiedRecord=r=>!!r&&saved?.isVerified(r,group.id);
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){if(!group||!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===name))return;selectedGenerator=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();syncViewUrl();}
+function chooseGenerator(name){if(!group||!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===name)&&!centres.some(g=>g.key===name))return;selectedGenerator=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncViewUrl();}
 function syncViewUrl(){
   if(!group)return;
   const hash=writeViewHash({groupId:group.id,patternId:selectedPatternId,palette:$('palette').value,tiles:+$('tiles').value,speed:+$('speed').value,generator:selectedGenerator,overlay:$('show-generators').checked,phase:record?phase:pendingPlayback.phase,play:record?playing:pendingPlayback.play});
@@ -89,12 +93,19 @@ function cancel(message){
   if(worker){worker.terminate();worker=null;}
   busy=false;$('progress').hidden=true;if(group&&saved)populateAtlas();controls();if(message)setStatus(message);
 }
-function named(){return GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator);}
+function named(){return centres.find(g=>g.key===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators.find(g=>g.name===selectedGenerator)??GROUP_DISPLAY[group.id].namedGenerators[0];}
 function overlay(){
   if(!group)return;
+  const summary=record?.id===selectedPatternId&&record?.config.groupId===group.id?record:summaryById(selectedPatternId),translations=overlayTranslations(translationIndex,summary),cacheKey=group.id+':'+(summary?.id??'base');
+  if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:GROUP_DISPLAY[group.id].namedGenerators,ops:group.render.ops,family:'p4',translations}));
+  centres=centreCache.get(cacheKey);
+  if(!centres.some(g=>g.key===selectedGenerator)&&!GROUP_DISPLAY[group.id].namedGenerators.some(g=>g.name===selectedGenerator))selectedGenerator=selectedGenerator?.split('@')[0]??'α';
+  populateGeneratorChoices($('operation'),GROUP_DISPLAY[group.id].namedGenerators,centres,selectedGenerator);
   $('generator-overlay').toggleAttribute('hidden',!$('show-generators').checked);
-  renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles:+$('tiles').value,selected:selectedGenerator,onSelect:g=>chooseGenerator(g.name)});
-  const g=named();$('generator-description').textContent=generatorDescription(g);
+  const tiles=+$('tiles').value,glyphScale=Math.max(.2,Math.min(1,2/tiles*Math.sqrt(4/centres.length)));
+  renderGeneratorOverlay($('generator-overlay'),{groupId:group.id,tiles,centres,glyphScale,selected:selectedGenerator,onSelect:g=>chooseGenerator(g.key)});
+  $('overlay-explanation').textContent=overlayCaption(centres,translations);
+  const g=named();$('generator-description').textContent=generatorDescription(g)+(selectedGenerator.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'');
   $('compare-label').textContent=`q(gx, t + ${g.timeShift}T)`;
   // A common four-phase key makes g95's half-cycle and g96's quarter-cycle
   // actions directly comparable. These colors encode time, not concentrations.
@@ -228,7 +239,7 @@ function selectRecord(r,{updateSearch=true,playback={phase:0,play:true}}={}){
   $('engine-label').textContent=`${displayEngine?'WebGL playback':'CPU playback'} · ${r.config.N}² × ${r.config.M} · T ${r.config.period.toFixed(2)}`;
   $('caption').textContent=recordDescriptions.get(r.id)||'This numerical orbit passed independent forward evolution, phase and refinement checks before publication.';
   $('visibility-explanation').textContent=visibilityCaption(r);
-  metrics(r.diagnostics);colorScale();populateAtlas();controls();draw();
+  overlay();metrics(r.diagnostics);colorScale();populateAtlas();controls();draw();
 }
 function emptyViewer({loading=false,error=null}={}){
   displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;record=null;displayRanges=null;setPlaying(false);phase=0;if($('seed').value==='continue')$('seed').value='skate';$('empty-state').hidden=false;$('mode-label').textContent=loading?'Loading saved animation':error?'Animation unavailable':'No verified solution';$('engine-label').textContent=loading?'Precomputed data':error?'Download failed':'Existence unresolved';
@@ -251,7 +262,7 @@ function chooseGroup(id,{view=null}={}){
   $('reference-link').href='../correspondence-p4.html#'+group.id;
   $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · +${g.timeShift} T`;$('operation').append(o);}
   const requestedGenerator=view?view.generator:rememberedGenerators.get(group.id);
-  selectedGenerator=d.namedGenerators.find(g=>g.name===requestedGenerator)?.name??d.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??d.namedGenerators[0].name;
+  selectedGenerator=requestedGenerator??d.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??d.namedGenerators[0].name;
   rememberedGenerators.set(group.id,selectedGenerator);$('operation').value=selectedGenerator;overlay();populateAtlas();
   const first=requested??parameterSets()[0]?.patterns[0];
   renderAttempts();if(first)openPattern(first.id,{playback:view?{phase:view.phase,play:view.play}:{phase:0,play:true}});else{pendingPlayback={phase:0,play:true};emptyViewer();syncViewUrl();setStatus('No precomputed orbit is available for this group.');}
@@ -391,7 +402,8 @@ $('export').onclick=()=>{
 };
 
 try{
-  const [response,manifestResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'})]);
+  const [response,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('data/overlay-translations.json?v=20260905-centres').catch(()=>null)]);
+  if(overlayResponse?.ok)translationIndex=await overlayResponse.json();
   if(!response.ok||!manifestResponse.ok)throw Error('Precomputed solution catalog unavailable.');
   const [catalog,manifest]=await Promise.all([response.json(),manifestResponse.json()]);groups=catalog;if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');saved=createPrecomputedCatalog(manifest,{groups});
   for(const entry of manifest.orbits){recordNames.set(entry.id,entry.patternName??entry.name?.split(' · F')[0]??'Periodic wave');recordDescriptions.set(entry.id,entry.description??'');}

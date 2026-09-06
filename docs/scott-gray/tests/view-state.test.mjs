@@ -81,3 +81,12 @@ test('malformed percent escapes do not throw or change unrelated controls', () =
   assert.equal(state.palette, 'ceramic');
   assert.equal(state.play, false);
 });
+
+test('a selected rotation centre survives sharing without allowing arbitrary operation data', () => {
+  for (const generator of ['γ@0.5,0', 'β@0.111111111,0.222222222', 'α@0,0']) {
+    assert.equal(readViewState(writeViewHash({groupId:'g248',generator})).generator,generator);
+  }
+  for (const generator of ['α@1,0','α@-0.5,0','α@0.1,NaN','α@0.1,0.2<script>']) {
+    assert.equal(readViewState(writeViewHash({groupId:'g248',generator})).generator,null);
+  }
+});

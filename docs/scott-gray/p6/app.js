@@ -1,4 +1,6 @@
-import {readViewState,writeViewHash} from '../view-state.mjs?v=20260904-share-view';
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-centres';
+import {rotationCentres} from '../rotation-centres.mjs?v=20260905-centres';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-centres';
 import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260904-visible-time';
 import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260904-visible-time';
 import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260904-p6';
@@ -10,6 +12,8 @@ const palette=()=>$('palette').value,tiles=()=>+$('tiles').value;
 const parameterKey=config=>JSON.stringify([config.params.F,config.params.k,config.params.Du,config.params.Dv,config.L??config.N*config.params.dx,config.params.stencil]);
 let groups=[],catalog=null,group=null,record=null,player=null,selectedId=null,selectedKey=null,preferredParameters=null,generatorName='α',selectionToken=0,phase=0,playing=false,lastTime=0,lastComparison=-Infinity;
 const remembered=new Map(),rememberedGenerators=new Map();
+let translationIndex=null,centres=[];
+const centreCache=new Map();
 let defaultGroupId='g243',requestedPlayback={phase:0,play:true};
 function syncUrl(){
   if(!group)return;
@@ -24,10 +28,10 @@ function restoreUrl(){
 function togglePlayback(){if(!record)return;setPlaying(!playing);syncUrl();}
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name))return;generatorName=name;rememberedGenerators.set(group.id,name);$('operation').value=name;overlay();drawComparison();syncUrl();}
+function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name)&&!centres.some(g=>g.key===name))return;generatorName=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncUrl();}
 function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
 const entries=()=>catalog?.summaries(group?.id)??[];
-const generator=()=>group?.namedGenerators.find(item=>item.name===generatorName);
+const generator=()=>centres.find(item=>item.key===generatorName)??group?.namedGenerators.find(item=>item.name===generatorName)??group?.namedGenerators[0];
 // Presentation order: new mixtures first; this is not a scientific ranking.
 function patternOrder(a,b){
   const label=r=>r.patternName??r.name??r.id;
@@ -84,16 +88,23 @@ function updateScale(){if(!record)return;const key=palette()==='concentration'?'
 function svgElement(tag,attributes){const element=document.createElementNS(svgNS,tag);for(const [name,value] of Object.entries(attributes))element.setAttribute(name,value);return element;}
 function overlay(){
   if(!group)return;
+  const summary=record?.id===selectedId&&record?.groupId===group.id?record:catalog?.get(selectedId),translations=overlayTranslations(translationIndex,summary),cacheKey=group.id+':'+(summary?.id??'base');
+  if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:group.namedGenerators,ops:group.render.ops,family:'p6',translations}));
+  centres=centreCache.get(cacheKey);
+  if(!centres.some(g=>g.key===generatorName)&&!group.namedGenerators.some(g=>g.name===generatorName))generatorName=generatorName?.split('@')[0]??'α';
+  populateGeneratorChoices($('operation'),group.namedGenerators,centres,generatorName);
   const layer=$('generator-overlay');layer.toggleAttribute('hidden',!$('show-generators').checked);layer.replaceChildren();
-  const width=tiles(),extent=Math.ceil(2*width)+1;
-  for(const named of group.namedGenerators)for(let j=-extent;j<=extent;j++)for(let i=-extent;i<=extent;i++){
-    const [x,y]=latticeToScreen([named.centre[0]+i,named.centre[1]+j],width);if(x<.025||x>.975||y<.045||y>.96)continue;
-    const marker=svgElement('g',{transform:`translate(${768*x},${768*y})`,class:'generator-marker'+(named.name===generatorName?' selected':''),role:'button',tabindex:'0','aria-label':`${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift`});
-    marker.append(svgElement('circle',{r:23,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:'scale(.8)'}));
+  const width=tiles(),extent=Math.ceil(2*width)+1,scale=Math.max(.2,Math.min(1,2/width*Math.sqrt(6/centres.length)));
+  for(const named of centres)for(let j=-extent;j<=extent;j++)for(let i=-extent;i<=extent;i++){
+    const [x,y]=latticeToScreen([named.centre[0]+i,named.centre[1]+j],width);if(x<0||x>1||y<0||y>1)continue;
+    const active=named.name===generatorName||named.key===generatorName;
+    const marker=svgElement('g',{transform:`translate(${768*x},${768*y}) scale(${scale})`,class:'generator-marker'+(named.extra?' extra-centre':'')+(active?' selected':''),'data-centre-key':named.key,'data-generator':named.name,'data-time-shift':named.timeShift,role:'button',tabindex:'0','aria-pressed':String(active),'aria-label':`${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift at (${named.centre.map((v,k)=>v+(k?j:i)).join(', ')})`});
+    marker.append(svgElement('circle',{r:20,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:`rotate(${named.glyphAngle??0}) scale(.8)`}));
     const label=svgElement('text',{x:26,y:5});label.textContent=named.name;marker.append(label);
-    const select=()=>chooseGenerator(named.name);marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
+    const select=()=>chooseGenerator(named.key);marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
   }
-  const g=generator();$('generator-description').textContent=`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`;$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
+  $('overlay-explanation').textContent=overlayCaption(centres,translations);
+  const g=generator();$('generator-description').textContent=`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'');$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
   const count=6,shift=Math.round(g.tau*count),row=document.createElement('div');row.className='phase-row';
   for(let i=0;i<count;i++){const chip=document.createElement('span');chip.className='phase-chip';for(const [index,label] of [[i,`${i}/6 → `],[mod(i+shift,count),`${mod(i+shift,count)}/6`]]){const color=document.createElement('i');color.style.setProperty('--phase-color',`hsl(${index*60+15} 55% 55%)`);chip.append(color,document.createTextNode(label));}row.append(chip);}
   $('phase-permutation').replaceChildren(row);$('phase-explanation').textContent=g.tau===0?'This generator preserves the phase.':'The cyclic color permutation advances the chemical phase. The spatial rotation alone is a different constraint.';
@@ -134,7 +145,7 @@ async function openPattern(id,{playback={phase:0,play:true}}={}){
     $('engine-label').textContent=`${player?'WebGL':'CPU'} playback · ${record.config.N}² × ${record.config.M} · T ${record.config.period.toFixed(2)}`;
     $('caption').textContent=record.description||'Independent numerical verification was completed before this field was published.';
     $('visibility-explanation').textContent=visibilityCaption(record);
-    $('status').textContent='Precomputed animation ready. The downloaded field passed its file-integrity check.';setMetrics(record.diagnostics);updateScale();populate();draw(true);lastTime=performance.now();setPlaying(requestedPlayback.play);
+    $('status').textContent='Precomputed animation ready. The downloaded field passed its file-integrity check.';overlay();setMetrics(record.diagnostics);updateScale();populate();draw(true);lastTime=performance.now();setPlaying(requestedPlayback.play);
   }catch(error){if(token!==selectionToken||group.id!==targetGroup)return;empty({error:error.message});$('status').textContent=`Could not load this animation: ${error.message}`;}
 }
 function chooseGroup(id,{view=null}={}){
@@ -142,7 +153,7 @@ function chooseGroup(id,{view=null}={}){
   const preferred=preferredParameters&&entries().find(entry=>entry.config.params.F===preferredParameters.F&&entry.config.params.k===preferredParameters.k);
   const defaultGenerator=group.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??group.namedGenerators[0].name;
   const requestedGenerator=view?view.generator:rememberedGenerators.get(group.id);
-  generatorName=group.namedGenerators.some(item=>item.name===requestedGenerator)?requestedGenerator:defaultGenerator;
+  generatorName=requestedGenerator??defaultGenerator;
   const requestedId=view?view.patternId:remembered.get(group.id),requestedPattern=catalog.get(requestedId);
   selectedId=requestedPattern?.groupId===group.id?requestedId:parameterSets()[0]?.patterns[0]?.id??preferred?.id??null;selectedKey=selectedId?parameterKey(catalog.get(selectedId).config):null;
   const playback=view?{phase:view.phase,play:view.play}:{phase:0,play:true};
@@ -170,7 +181,7 @@ $('tiles').onchange=()=>{overlay();draw(true);syncUrl();};$('palette').onchange=
 $('export').onclick=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify({schema:'scott-gray-verified-orbit-v3',family:'p6',...record,layout:'frame-major; planar U then V; triangular lattice coordinates; x-fast'})],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-632-${group.id}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 try{
-  const [groupResponse,manifestResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'})]);if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
+  const [groupResponse,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-centres').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
   for(const item of groups){const button=document.createElement('button');button.className='group';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');const symbol=document.createElement('strong');symbol.innerHTML=item.shortHTML;const label=document.createElement('span');label.textContent=item.id;const count=document.createElement('small');count.className='orbit-count';label.append(count);button.append(symbol,label);button.onclick=()=>chooseGroup(item.id);$('groups').append(button);}
   if(!manifestResponse.ok)throw Error('The precomputed 632 catalog could not load.');const manifest=await manifestResponse.json();if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');catalog=createPrecomputedCatalog(manifest,{groups,family:'p6'});preferredParameters=manifest.preferredParameters??null;
   defaultGroupId=manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243';restoreUrl();

@@ -7,6 +7,7 @@
  * counterclockwise screen turn and R90 a clockwise screen turn. Do not flip
  * the stored centre.y: the overlay must use the same coordinates as the field.
  */
+import {rotationCentres} from './rotation-centres.mjs?v=20260905-centres';
 export const GROUP_DISPLAY = {
   "g94": {
     "id": "g94",
@@ -696,18 +697,19 @@ export function generatorDescription(generator) {
   return `${generator.name}: ${turn}; ${generator.tau ? `+${generator.timeShift} period` : 'no time shift'}`;
 }
 
-/** Named centres and their spatial-lattice translates, in SVG pixel units. */
-export function generatorPlacements(groupId, {tiles = 2, width = 768, height = width} = {}) {
+/** Complete rotation centres and their spatial-lattice translates. */
+export function generatorPlacements(groupId, {tiles = 2, width = 768, height = width, centres = null} = {}) {
   const group = GROUP_DISPLAY[groupId];
   if (!group) throw new Error(`Unknown 442 group: ${groupId}`);
   if (!Number.isInteger(tiles) || tiles < 1 || tiles > 16) throw new Error('tiles must be an integer between 1 and 16.');
   if (!(width > 0 && height > 0)) throw new Error('Overlay dimensions must be positive.');
   const result = [];
-  for (const generator of group.namedGenerators) {
+  for (const generator of centres??rotationCentres({namedGenerators:group.namedGenerators,family:'p4'})) {
     const x0 = mod(generator.centre[0]), y0 = mod(generator.centre[1]);
     for (let iy = 0; iy + y0 <= tiles; iy++) {
       for (let ix = 0; ix + x0 <= tiles; ix++) {
-        result.push({...generator, x:(x0+ix)*width/tiles, y:(y0+iy)*height/tiles, tileX:ix, tileY:iy});
+        const centre=[x0+ix,y0+iy],A=generator.matrix;
+        result.push({...generator,centre,translation:[centre[0]-A[0][0]*centre[0]-A[0][1]*centre[1],centre[1]-A[1][0]*centre[0]-A[1][1]*centre[1]],x:centre[0]*width/tiles,y:centre[1]*height/tiles,tileX:ix,tileY:iy});
       }
     }
   }
@@ -715,32 +717,33 @@ export function generatorPlacements(groupId, {tiles = 2, width = 768, height = w
 }
 
 /** SVG contents, useful with either the browser DOM or a static renderer. */
-export function generatorMarkup(groupId, {tiles = 2, width = 768, height = width, selected = null, interactive = true, labels = true, glyphScale = 1} = {}) {
-  const placements = generatorPlacements(groupId, {tiles,width,height});
+export function generatorMarkup(groupId, {tiles = 2, width = 768, height = width, selected = null, interactive = true, labels = true, glyphScale = 1, centres = null} = {}) {
+  const placements = generatorPlacements(groupId, {tiles,width,height,centres});
   const scaled = Number.isFinite(glyphScale) && glyphScale > 0 ? glyphScale : 1;
   const contents = placements.map(g => {
-    const active = selected === g.name;
+    const active = selected === g.name || selected === g.key;
     const description = generatorDescription(g);
     const labelX = Math.max(14,Math.min(width-14,g.x+(g.x>width-48?-25:25)*scaled));
     const labelY = Math.max(16,Math.min(height-16,g.y+(g.y<35?25:-24)*scaled));
-    return `<g class="sg-generator${active?' is-selected':''}" data-generator="${g.name}" data-operation-index="${g.operationIndex}" data-time-shift="${g.timeShift}" data-generator-symbol="${g.symbol}"${interactive?` role="button" tabindex="0" aria-label="${escape(description)}" aria-pressed="${active}"`:''}><title>${escape(description)}</title><circle class="sg-generator-hit" cx="${g.x}" cy="${g.y}" r="${24*scaled}"/><path class="sg-generator-glyph generator-symbol-core" transform="translate(${g.x} ${g.y}) scale(${scaled})" d="${g.path}"/>${labels?`<text class="sg-generator-label" x="${labelX}" y="${labelY}" text-anchor="middle" dominant-baseline="central">${g.name}</text>`:''}</g>`;
+    return `<g class="sg-generator${g.extra?' extra-centre':''}${active?' is-selected':''}" data-generator="${g.name}" data-centre-key="${g.key}" data-operation-index="${g.operationIndex}" data-time-shift="${g.timeShift}" data-generator-symbol="${g.symbol}"${interactive?` role="button" tabindex="0" aria-label="${escape(description)} at (${g.centre.join(', ')})" aria-pressed="${active}"`:''}><title>${escape(description)} at (${g.centre.join(', ')})</title><circle class="sg-generator-hit" cx="${g.x}" cy="${g.y}" r="${24*scaled}"/><path class="sg-generator-glyph generator-symbol-core" transform="translate(${g.x} ${g.y}) rotate(${g.glyphAngle??0}) scale(${scaled})" d="${g.path}"/>${labels?`<text class="sg-generator-label" x="${labelX}" y="${labelY}" text-anchor="middle" dominant-baseline="central" style="font-size:${20*scaled}px">${g.name}</text>`:''}</g>`;
   }).join('');
   return contents;
 }
 
 /** Re-render only when group, tiling, or selection changes, not every frame. */
-export function renderGeneratorOverlay(svg, {groupId, tiles = 2, selected = null, onSelect = null, width = 768, height = width, labels = true, glyphScale = 1} = {}) {
+export function renderGeneratorOverlay(svg, {groupId, tiles = 2, selected = null, onSelect = null, width = 768, height = width, labels = true, glyphScale = 1, centres = null} = {}) {
   if (!svg || typeof svg.setAttribute !== 'function') throw new Error('Expected an SVG element.');
   svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
   svg.setAttribute('preserveAspectRatio','none');
   svg.setAttribute('role','group');
-  svg.setAttribute('aria-label',`Named generators for ${GROUP_DISPLAY[groupId]?.shortText || groupId}`);
+  svg.setAttribute('aria-label',`Rotation centres for ${GROUP_DISPLAY[groupId]?.shortText || groupId}`);
   svg.classList.add('sg-generator-overlay');
-  svg.innerHTML = generatorMarkup(groupId,{tiles,width,height,selected,interactive:typeof onSelect==='function',labels,glyphScale});
+  const all=centres??rotationCentres({namedGenerators:GROUP_DISPLAY[groupId].namedGenerators,family:'p4'});
+  svg.innerHTML = generatorMarkup(groupId,{tiles,width,height,selected,interactive:typeof onSelect==='function',labels,glyphScale,centres:all});
   const activate = target => {
     const marker = target.closest?.('[data-generator]');
     if (!marker || !svg.contains(marker) || typeof onSelect !== 'function') return;
-    onSelect(GROUP_DISPLAY[groupId].namedGenerators.find(g => g.name === marker.dataset.generator));
+    onSelect(all.find(g => g.key === marker.dataset.centreKey));
   };
   svg.onclick = event => activate(event.target);
   svg.onkeydown = event => {

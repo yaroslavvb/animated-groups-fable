@@ -7,3 +7,6 @@
 .sg-generator.is-selected,.sg-generator:hover,.sg-generator:focus { color:#ffdf74; }
 .sg-generator:focus .sg-generator-hit { stroke:#fff5d4; stroke-width:2px; stroke-dasharray:3 3; }
 @media (forced-colors:active) { .sg-generator-overlay {color:CanvasText} .sg-generator-glyph,.sg-generator-label {stroke:Canvas} }
+
+.sg-generator.extra-centre { color:#a9f5e4; }
+.sg-generator.extra-centre.is-selected,.sg-generator.extra-centre:hover,.sg-generator.extra-centre:focus { color:#ffdf74; }
