@@ -5,7 +5,7 @@
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <meta content="Explore saved periodic Gray–Scott solutions with 2*22 time-shift symmetry." name="description"/>
 <title>Gray–Scott · 2*22 periodic patterns</title>
-<link href="../style.css?v=20260905-wallpaper" rel="stylesheet"/><link href="../wallpaper-style.css?v=wallpaper-17-v1" rel="stylesheet"/>
+<link href="../style.css?v=20260905-wallpaper" rel="stylesheet"/><link href="../wallpaper-style.css?v=20260905-gallery-fix" rel="stylesheet"/>
 </head>
 <body>
 <header><a class="brand" href="../../scott-gray-groups.html">Gray–Scott patterns</a><nav aria-label="Wallpaper groups"><a href="../../scott-gray-groups.html">All 17 wallpaper groups</a><select aria-label="Wallpaper group" data-family="cmm" id="family-nav"><option>2*22 · cmm</option></select></nav></header>
@@ -21,7 +21,7 @@
 <canvas aria-label="Verified periodic orbit rendered with WebGL" height="768" hidden="" id="gpu-pattern" tabindex="0" width="768"></canvas>
 <svg aria-label="Pattern cell boundaries" class="cell-guide" id="cell-guide" viewBox="0 0 768 768"></svg>
 <svg aria-label="2*22 symmetry generators" class="generator-overlay" hidden="" id="generator-overlay" viewBox="0 0 768 768"></svg>
-<div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks are precomputed.</p></div>
+<div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks are precomputed.</p><button hidden="" id="retry-animation" type="button">Retry animation</button></div>
 </div>
 <div class="view-caption"><span class="scale-label" id="scale-label">2 × 2 cells</span></div>
 <div class="playback"><button aria-label="Play animation" disabled="" id="play">▶ Play</button><button aria-label="Return to first frame" disabled="" id="rewind">↤</button><input aria-label="Animation phase" disabled="" id="phase" max="1" min="0" step="0.001" type="range" value="0"/><output id="phase-label">—</output><label>View <select aria-label="View framing" id="framing"><option value="cells">Pattern cells</option><option value="simulation">Simulation width</option></select></label><label><span id="tile-label">Cells</span> <select aria-describedby="view-scale-explanation" aria-label="Number of pattern cells" id="tiles"><option value="1">1 cell</option><option selected="" value="2">2 × 2 cells</option><option value="3">3 × 3 cells</option></select></label><label>Speed <select aria-label="Playback speed" id="speed"><option value="0.5">Slow</option><option selected="" value="1">Normal</option><option value="2">Fast</option></select></label></div>
@@ -52,6 +52,6 @@
 
 <footer><a href="../../scott-gray-groups.html">All wallpaper groups</a> · <a href="../research-note/">Research note</a></footer>
 </main>
-<script src="../wallpaper-app.mjs?v=wallpaper-17-v1" type="module"></script>
+<script src="../wallpaper-app.mjs?v=20260905-gallery-fix" type="module"></script>
 <script src="../family-navigation.mjs?v=20260905-wallpaper" type="module"></script></body>
 </html>

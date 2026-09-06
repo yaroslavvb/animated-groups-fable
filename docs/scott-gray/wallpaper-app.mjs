@@ -1,7 +1,7 @@
-import {createWallpaperCatalog} from './wallpaper-atlas.mjs';
+import {createWallpaperCatalog} from './wallpaper-atlas.mjs?v=20260905-gallery-fix';
 import {createWallpaperPlayer} from './wallpaper-playback.mjs';
-import {makeWallpaperCellView} from './wallpaper-cell.mjs';
-import {renderWallpaperOverlay} from './wallpaper-overlay.mjs';
+import {makeWallpaperCellView} from './wallpaper-cell.mjs?v=20260905-gallery-fix';
+import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260905-gallery-fix';
 import {readViewState,writeViewHash} from './view-state.mjs';
 
 const root = new URL('./', import.meta.url);
@@ -62,7 +62,8 @@ function empty({loading=false,error=null}={}) {
   document.querySelector('.canvas-wrap').classList.remove('cell-framing');
   const zeroOffset = group && !group.hasTimeShift;
   $('empty-state').querySelector('h2').textContent = loading ? 'Loading saved animation…' : error ? 'Animation unavailable' : zeroOffset ? 'Zero-offset symmetry' : 'No verified pattern yet';
-  $('empty-description').textContent = loading ? 'Downloading the saved concentration field.' : error ? 'Select the pattern again to retry.' : zeroOffset ? 'This symmetry type has no nonzero time shift.' : 'No candidate has passed verification for this time symmetry. Existence remains unresolved.';
+  $('empty-description').textContent = loading ? 'Downloading the saved concentration field.' : error ? error : zeroOffset ? 'This symmetry type has no nonzero time shift.' : 'No candidate has passed verification for this time symmetry. Existence remains unresolved.';
+  $('retry-animation').hidden=!error;
   $('mode-label').textContent = loading ? 'Loading saved animation' : error ? 'Download failed' : zeroOffset ? 'No time offset' : 'Existence unresolved';
   $('engine-label').textContent='No orbit loaded';$('phase-label').textContent='—';$('phase').value=0;
   $('display-range').textContent='';$('scale-label').textContent='';
@@ -199,7 +200,7 @@ function chooseGroup(id,{user=false,view=null}={}) {
   const requested=catalog.get(view?.patternId),rememberedId=remembered.get(group.id);
   selectedId=requested?.groupId===group.id?requested.id:rememberedId??parameterSets()[0]?.patterns[0]?.id??null;
   selectedKey=selectedId?parameterKey(catalog.get(selectedId).config):null;
-  renderGroups();populateSelectors();renderOverlay();
+  renderGroups();populateSelectors();
   if(selectedId)selectPattern(selectedId,{user,view});else{requestedPlayback=view?{phase:view.phase,play:view.play}:{phase:0,play:true};empty();renderOverlay();$('status').textContent=group.hasTimeShift?'No verified pattern in the saved search results.':'This entry has no nonzero time shift.';if(user)syncUrl();}
 }
 
@@ -210,6 +211,7 @@ function restoreUrl() {
   chooseGroup(view.groupId,{view});
 }
 
+$('retry-animation').onclick=()=>catalog&&selectedId?selectPattern(selectedId,{user:true,view:requestedPlayback}):location.reload();
 function togglePlayback(){if(!record)return;setPlaying(!playing);draw();syncUrl();}
 $('play').onclick=togglePlayback;
 for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}
@@ -233,7 +235,7 @@ $('export').onclick=()=>{if(!record)return;const blob=new Blob([JSON.stringify({
 function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 
 try{
-  const responses=await Promise.all([fetch(new URL('wallpaper-groups.json',root)),fetch(new URL('data/wallpaper-atlas.json',root))]);
+  const responses=await Promise.all([fetch(new URL('wallpaper-groups.json?v=20260905-gallery-fix',root)),fetch(new URL('data/wallpaper-atlas.json',root),{cache:'no-store'})]);
   if(responses.some(response=>!response.ok))throw Error('The saved wallpaper catalog could not be loaded.');
   const [metadata,data]=await Promise.all(responses.map(response=>response.json()));manifest=data;
   family=metadata.families.find(item=>item.id===familyId);if(!family)throw Error('Unknown wallpaper family.');

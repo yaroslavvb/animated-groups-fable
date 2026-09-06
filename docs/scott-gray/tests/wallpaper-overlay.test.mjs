@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {wallpaperGeneratorPlacements,wallpaperOperationGeometry,timeShiftLabel,renderWallpaperOverlay} from '../wallpaper-overlay.mjs';
+import {wallpaperGeneratorPlacements,wallpaperOperationGeometry,wallpaperGeneratorSymbol,timeShiftLabel,renderWallpaperOverlay} from '../wallpaper-overlay.mjs';
 import {primitiveCell} from '../cell-geometry.mjs';
 import {makeCellView} from '../cell-view.mjs';
 const catalog=JSON.parse(await readFile(new URL('../wallpaper-groups.json',import.meta.url)));
@@ -75,4 +75,63 @@ test('canonical translations retain their full vectors and clipped arrows never 
  renderWallpaperOverlay(svg,group,{cellView:view,translations});
  const xMarkup=svg.innerHTML.match(/<g[^>]+aria-label="X:[\s\S]+?<\/g>/)?.[0];
  assert.ok(xMarkup.includes('continues beyond cell'));assert.equal((xMarkup.match(/<path/g)||[]).length,2,'clipped X has a line and its shadow, no false arrowhead');
+});
+
+test('all named glyphs match their corresponding served plate, including phase-specific paths',async()=>{
+ for(const family of catalog.families){
+  const html=await readFile(new URL(`../../correspondence-${family.id}.html`,import.meta.url),'utf8');
+  for(const g of catalog.groups.filter(g=>g.family===family.id)){
+   const plate=html.match(new RegExp(`<svg[^>]+data-generator-overlay="${g.id}"[\\s\\S]*?<\\/svg>`))?.[0];
+   assert.ok(plate,g.id);
+   for(const generator of g.namedGenerators){
+    const markup=plate.match(new RegExp(`<g[^>]+data-generator="${generator.name}"[^>]*>[\\s\\S]*?<\\/g>`))?.[0];
+    assert.ok(markup,`${g.id} ${generator.name}`);
+    assert.equal(generator.glyph.symbol,markup.match(/data-generator-symbol="([^"]+)"/)[1]);
+    assert.equal(generator.glyph.sourceTimeShift,markup.match(/data-time-shift="([^"]+)"/)[1]);
+    assert.equal(wallpaperGeneratorSymbol(generator),generator.glyph.symbol);
+    if(generator.kind==='rotation')assert.equal(generator.glyph.path,markup.match(/class="[^"]*generator-symbol-core"[^>]+d="([^"]+)"/)[1]);
+   }
+  }
+ }
+});
+
+test('2222 variants render phase tails, retaining mixed zero and half-period generators',()=>{
+ const markup=id=>{
+  const svg={style:{},setAttribute(){},toggleAttribute(){},querySelectorAll(){return []}},group=byId(id);
+  const placements=renderWallpaperOverlay(svg,group,{cellView:camera(group)});
+  return {placements,html:svg.innerHTML};
+ };
+ const plain=markup('g5'),shifted=markup('g6'),mixed=markup('g7');
+ assert.ok(plain.placements.every(p=>p.glyph.symbol==='rotation-2-0'));
+ assert.ok(shifted.placements.every(p=>p.glyph.symbol==='rotation-2-1'));
+ assert.deepEqual(new Set(mixed.placements.map(p=>p.glyph.symbol)),new Set(['rotation-2-0','rotation-2-1']));
+ assert.notEqual(byId('g5').namedGenerators[0].glyph.path,byId('g6').namedGenerators[0].glyph.path);
+ assert.ok(shifted.html.includes(byId('g6').namedGenerators[0].glyph.path));
+ assert.ok(!shifted.html.includes('<polygon'),'no replacement regular polygons');
+});
+
+test('mirror and glide marks preserve the correspondence line styles and directional symbols',()=>{
+ for(const [id,expected] of [['g230','plane-m'],['g231','plane-c'],['g63','plane-axial'],['g59','plane-n'],['g75','plane-d']]){
+  const group=byId(id),svg={style:{},setAttribute(){},toggleAttribute(){},querySelectorAll(){return []}};
+  renderWallpaperOverlay(svg,group,{cellView:camera(group)});
+  const markup=svg.innerHTML.match(new RegExp(`<g[^>]+data-generator-symbol="${expected}"[^>]*>[\\s\\S]*?<\\/g>`))?.[0];
+  assert.ok(markup,`${id} ${expected}`);
+  const axis=markup.match(/<path class="generator-axis[^>]+>/)[0];
+  const dash={'plane-m':null,'plane-c':'0 8','plane-axial':'12 8','plane-n':'12 6.5 0 6.5','plane-d':'12 6.5 0 6.5'}[expected];
+  assert.equal(axis.match(/stroke-dasharray="([^"]+)"/)?.[1]??null,dash);
+  assert.equal(markup.includes('generator-glide-head'),expected==='plane-axial');
+  assert.equal(markup.includes('generator-quarter-arrow'),expected==='plane-d');
+ }
+});
+
+test('glyph conjugation transports handedness while preserving affine actions and time offsets',()=>{
+ const group=byId('g137'),placements=wallpaperGeneratorPlacements(group,{cellView:camera(group)}).filter(p=>p.kind==='rotation');
+ assert.ok(placements.length);
+ for(const item of placements){
+  assert.equal(item.tau,.25);assert.equal(item.glyph.symbol,'rotation-4-1');
+  assert.ok(item.glyphMatrix.flat().every(Number.isFinite));
+  const determinant=item.glyphMatrix[0][0]*item.glyphMatrix[1][1]-item.glyphMatrix[0][1]*item.glyphMatrix[1][0];
+  assert.equal(Math.abs(determinant),1);
+ }
+ assert.ok(placements.some(p=>p.glyphMatrix[0][0]*p.glyphMatrix[1][1]-p.glyphMatrix[0][1]*p.glyphMatrix[1][0]<0),'reflected centres need reflected phase tails');
 });

@@ -1,7 +1,7 @@
 /** Load the offline wallpaper atlas. Certificates are build artifacts, not
  * browser proofs; selected concentration bytes are checked against their hash.
  */
-import {sha256} from './precomputed-catalog.mjs';
+import {downloadOrbitBytes} from './precomputed-catalog.mjs?v=20260905-gallery-fix';
 const HASH=/^[a-f0-9]{64}$/i,SCHEMA='scott-gray-wallpaper-atlas-v1',GATE='wallpaper-offline-v1';
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const opsEqual=(a,b)=>Array.isArray(a)&&a.length===b.length&&a.every((op,i)=>equal(op.M,b[i].M)&&equal(op.v,b[i].v)&&op.s===b[i].s&&Math.abs(op.tau-b[i].tau)<1e-12);
@@ -10,6 +10,7 @@ const range=a=>Array.isArray(a)&&a.length===2&&a.every(Number.isFinite)&&a[1]>a[
 export function createWallpaperCatalog(manifest,{groups,baseUrl=new URL('./',import.meta.url),fetcher=globalThis.fetch,maxCachedOrbits=2}={}){
  if(manifest?.schema!==SCHEMA||manifest.gateVersion!==GATE||!Array.isArray(manifest.orbits))throw Error('Unsupported wallpaper atlas.');
  if(!Array.isArray(groups))throw Error('Canonical wallpaper groups required.');
+ if(typeof fetcher!=='function')throw Error('A field fetcher is required.');
  if(!Number.isInteger(maxCachedOrbits)||maxCachedOrbits<1||maxCachedOrbits>32)throw Error('Invalid cache capacity.');
  const canonical=new Map(groups.map(g=>[g.id,g])),byGroup=new Map(groups.map(g=>[g.id,[]])),entries=new Map(),loaded=new Map(),inflight=new Map(),branded=new WeakSet();
  for(const source of manifest.orbits){
@@ -38,7 +39,7 @@ export function createWallpaperCatalog(manifest,{groups,baseUrl=new URL('./',imp
   if(loaded.has(id)){const r=loaded.get(id);loaded.delete(id);loaded.set(id,r);return Promise.resolve(r);}
   if(inflight.has(id))return inflight.get(id);
   const summary=entries.get(id);if(!summary)return Promise.reject(Error('Unknown saved orbit.'));
-  const promise=(async()=>{const response=await fetcher(summary.fieldUrl);if(!response?.ok)throw Error('Animation download failed.');const bytes=await response.arrayBuffer();if(bytes.byteLength!==summary.fieldByteLength||await sha256(bytes)!==summary.fieldSha256)throw Error('Animation integrity check failed.');const view=new DataView(bytes),field=new Float32Array(summary.fieldValueCount);for(let i=0;i<field.length;i++){field[i]=view.getFloat32(i*4,true);if(!Number.isFinite(field[i]))throw Error('Invalid concentration data.');}const record=Object.freeze({...summary,field,kind:'verified-periodic'});branded.add(record);loaded.set(id,record);while(loaded.size>maxCachedOrbits)loaded.delete(loaded.keys().next().value);return record;})();inflight.set(id,promise);promise.then(()=>inflight.delete(id),()=>inflight.delete(id));return promise;
+  const promise=(async()=>{const bytes=await downloadOrbitBytes(summary.fieldUrl,{fetcher,byteLength:summary.fieldByteLength,fieldSha256:summary.fieldSha256});const view=new DataView(bytes),field=new Float32Array(summary.fieldValueCount);for(let i=0;i<field.length;i++){field[i]=view.getFloat32(i*4,true);if(!Number.isFinite(field[i]))throw Error('Invalid concentration data.');}const record=Object.freeze({...summary,field,kind:'verified-periodic'});branded.add(record);loaded.set(id,record);while(loaded.size>maxCachedOrbits)loaded.delete(loaded.keys().next().value);return record;})();inflight.set(id,promise);promise.then(()=>inflight.delete(id),()=>inflight.delete(id));return promise;
  };
  return Object.freeze({load,get:id=>entries.get(id)??null,summaries:id=>id===undefined?all:byGroup.get(id)??[],size:id=>id===undefined?all.length:byGroup.get(id)?.length??0,isVerified:(record,id=record?.groupId)=>branded.has(record)&&record.groupId===id});
 }

@@ -7,10 +7,10 @@ import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overl
 import {rotationCentres} from './rotation-centres.mjs?v=20260905-wallpaper';
 import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-wallpaper';
 import {overlayNearEvidence,withApproximateCentres,approximateCaption} from './overlay-near-data.mjs';
-import {updateCellFraming} from './cell-ui.mjs';
+import {updateCellFraming} from './cell-ui.mjs?v=20260905-gallery-fix';
 import {PROFILES,makeInitial} from './exploration.mjs';
 import {analyticExclusion} from './feasibility.mjs';
-import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260905-wallpaper';
+import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260905-gallery-fix';
 import {renderField,clearCanvas,valueAt,fmt} from './render.mjs?v=20260905-wallpaper';
 
 const $=id=>document.getElementById(id);
@@ -200,8 +200,9 @@ async function openPattern(id,{updateSearch=true,playback={phase:0,play:true}}={
   selectedPatternId=id;selectedParameterKey=parameterKey(summary.config);
   pendingPlayback={...playback};
   rememberedSelections.set(targetGroup,{key:selectedParameterKey,id});
-  emptyViewer({loading:true});overlay();populateAtlas();syncViewUrl();setStatus('Loading the selected precomputed animation…');
+  emptyViewer({loading:true});populateAtlas();syncViewUrl();setStatus('Loading the selected precomputed animation…');
   try{
+    overlay();
     const loaded=await saved.load(id);
     if(token!==selectionToken||group.id!==targetGroup)return;
     selectRecord(loaded,{updateSearch:updateSearch&&settingsRevision===revision,playback:pendingPlayback});setStatus(saved.isVerified(loaded)?'Precomputed animation ready. Parameters and orbit verification were calculated offline.':'Verified animation ready.');
@@ -211,8 +212,8 @@ async function openPattern(id,{updateSearch=true,playback={phase:0,play:true}}={
   }
 }
 function selectRecord(r,{updateSearch=true,playback={phase:0,play:true}}={}){
-  if(!verifiedRecord(r))return;
-  selectionToken++;selectedPatternId=r.id;
+  if(!verifiedRecord(r))throw Error('The saved orbit does not belong to this verified catalog.');
+  selectedPatternId=r.id;
   selectedParameterKey=parameterKey(r.config);rememberedSelections.set(group.id,{key:selectedParameterKey,id:r.id});
   displayEngine?.dispose();displayEngine=null;record=r;displayRanges=fieldRanges(r);phase=playback.phase;lastTime=performance.now();setPlaying(playback.play);
   try{displayEngine=createWebGLGrayScott({canvas:$('gpu-pattern'),N:r.config.N,initial:Float64Array.from(r.field.slice(0,2*r.config.N*r.config.N)),params:r.config.params,onContextLost:()=>{useCpuPlayback();draw();}});}catch{}
@@ -226,7 +227,8 @@ function selectRecord(r,{updateSearch=true,playback={phase:0,play:true}}={}){
 function emptyViewer({loading=false,error=null}={}){
   displayEngine?.dispose();displayEngine=null;$('gpu-pattern').hidden=true;main.hidden=false;record=null;displayRanges=null;setPlaying(false);phase=0;if($('seed').value==='continue')$('seed').value='skate';$('empty-state').hidden=false;$('mode-label').textContent=loading?'Loading saved animation':error?'Animation unavailable':'No verified solution';$('engine-label').textContent=loading?'Precomputed data':error?'Download failed':'Existence unresolved';
   $('empty-state').querySelector('h2').textContent=loading?'Loading saved animation…':error?'Animation unavailable':'No verified solution for this group';
-  $('empty-description').textContent=loading?'The parameters and numerical checks are already computed. Only this animation is being downloaded.':error?saved?'Choose another pattern or select this one again to retry.':'The saved catalog could not load. Reload this page to retry.':'Existence is unresolved. An unsuccessful search is not a proof of impossibility.';
+  $('empty-description').textContent=loading?'Downloading the saved animation.':error?error:'Existence is unresolved. An unsuccessful search is not a proof of impossibility.';
+  $('retry-animation').hidden=!error;
   $('focus-search').hidden=true;
   $('caption').textContent=loading?'Loading the saved concentration field; no numerical search runs during browsing.':'The markers describe the requested rotation and phase shift.';
   metrics(null);colorScale();draw();controls();
@@ -245,9 +247,9 @@ function chooseGroup(id,{view=null}={}){
   $('operation').replaceChildren();for(const g of d.namedGenerators){const o=document.createElement('option');o.value=g.name;o.textContent=`${g.name} · +${g.timeShift} T`;$('operation').append(o);}
   const requestedGenerator=view?view.generator:rememberedGenerators.get(group.id);
   selectedGenerator=requestedGenerator??d.namedGenerators.find(g=>mod(g.tau)!==0&&g.angleDegrees%360!==0)?.name??d.namedGenerators[0].name;
-  rememberedGenerators.set(group.id,selectedGenerator);$('operation').value=selectedGenerator;overlay();populateAtlas();
+  rememberedGenerators.set(group.id,selectedGenerator);$('operation').value=selectedGenerator;populateAtlas();
   const first=requested??parameterSets()[0]?.patterns[0];
-  renderAttempts();if(first)openPattern(first.id,{playback:view?{phase:view.phase,play:view.play}:{phase:0,play:true}});else{pendingPlayback={phase:0,play:true};emptyViewer();syncViewUrl();setStatus('No precomputed orbit is available for this group.');}
+  renderAttempts();if(first)openPattern(first.id,{playback:view?{phase:view.phase,play:view.play}:{phase:0,play:true}});else{pendingPlayback={phase:0,play:true};emptyViewer();overlay();syncViewUrl();setStatus('No precomputed orbit is available for this group.');}
 }
 function mapBounds(){
   const records=summaries(group.id),bounds={};
@@ -377,6 +379,7 @@ for(const canvas of [main,$('gpu-pattern')]){canvas.onclick=togglePlayback;canva
 $('tiles').onchange=()=>{overlay();draw();syncViewUrl();};$('palette').onchange=()=>{colorScale();populatePatterns(parameterSets().find(set=>set.key===selectedParameterKey));controls();draw();syncViewUrl();};$('show-generators').onchange=()=>{overlay();syncViewUrl();};
 $('framing').onchange=()=>{overlay();draw();syncViewUrl();};
 $('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();syncViewUrl();};
+$('retry-animation').onclick=()=>saved&&selectedPatternId?openPattern(selectedPatternId,{playback:pendingPlayback}):location.reload();
 $('speed').onchange=syncViewUrl;
 $('operation').onchange=()=>chooseGenerator($('operation').value);
 $('export').onclick=()=>{

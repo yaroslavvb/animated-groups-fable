@@ -8,6 +8,7 @@ metric for the oblique/rectangular families, not their abstract affine actions.
 from pathlib import Path
 import json, math, re, hashlib
 from fractions import Fraction
+from html.parser import HTMLParser
 
 ROOT = Path(__file__).resolve().parents[3]
 SOURCE = ROOT / 'data/clockwork-coloring-correspondence.json'
@@ -15,6 +16,45 @@ DESTINATION = ROOT / 'scott-gray/wallpaper-groups.json'
 ORDER = ['p1','p2','pm','pg','cm','pmm','pmg','pgg','cmm','p4','p4m','p4g','p3','p3m1','p31m','p6','p6m']
 TRIANGULAR = set(ORDER[-5:])
 SHAPES = dict(zip(ORDER, ['oblique','oblique','rectangular','rectangular','centered-rectangular','rectangular','rectangular','rectangular','centered-rectangular','square','square','square','triangular','triangular','triangular','triangular','triangular']))
+
+class PlateGlyphs(HTMLParser):
+    """Read the served correspondence's actual generator symbols, not facsimiles.
+
+    The fields below describe artwork only. Affine actions and time offsets
+    continue to come from the checked mathematical source JSON.
+    """
+    def __init__(self, html):
+        super().__init__()
+        self.groups = {}; self.group = None; self.generator = None
+        self.feed(html)
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == 'svg' and 'data-generator-overlay' in attrs:
+            self.group = self.groups.setdefault(attrs['data-generator-overlay'], {})
+        if self.group is None:
+            return
+        if tag == 'g' and 'data-generator' in attrs:
+            self.generator = {
+                'symbol': attrs['data-generator-symbol'],
+                'sourceKind': attrs['data-generator-kind'],
+                'sourceTimeShift': attrs['data-time-shift'],
+            }
+            self.group[attrs['data-generator']] = self.generator
+        if self.generator is not None and tag == 'path':
+            classes = attrs.get('class', '').split()
+            if 'generator-symbol-core' in classes:
+                self.generator['path'] = attrs['d']
+            if 'plate-generator-glide-head' in classes:
+                self.generator['directionStyle'] = 'half-arrow'
+            if 'plate-generator-quarter-arrow' in classes:
+                self.generator['directionStyle'] = 'quarter-arrows'
+
+    def handle_endtag(self, tag):
+        if tag == 'g':
+            self.generator = None
+        if tag == 'svg':
+            self.group = None
 
 def multiply(A, B):
     return [[sum(A[i][k]*B[k][j] for k in range(2)) for j in range(2)] for i in range(2)]
@@ -52,6 +92,7 @@ def build():
     families=[]; groups=[]
     for family in ORDER:
         html=(ROOT/f'correspondence-{family}.html').read_text()
+        plate_glyphs=PlateGlyphs(html).groups
         ids=re.findall(r'data-panel-id="(g\d+)"',html)
         expected={g['id'] for g in source['groups'] if g['parent']['hm']==family}
         assert set(ids)==expected and len(ids)==len(expected), family
@@ -66,7 +107,12 @@ def build():
                 op={**original,'v':[original['v'][i]+named['plate_lattice_shift'][i] for i in range(2)]}
                 assert abs(op['tau']-float(Fraction(named['time_shift'])))<1e-8,(gid,named)
                 marker=marker_for(op,basis)
-                generators.append({'name':named['generator'],'kind':marker['kind'],**op,'timeShift':named['time_shift'],'marker':marker})
+                glyph=plate_glyphs[gid][named['generator']]
+                assert glyph['sourceKind']==marker['kind'],(gid,named['generator'])
+                assert Fraction(glyph['sourceTimeShift'])==Fraction(named['time_shift']),(gid,named['generator'])
+                if marker['kind']=='rotation':
+                    assert glyph.get('path'),(gid,named['generator'])
+                generators.append({'name':named['generator'],'kind':marker['kind'],**op,'timeShift':named['time_shift'],'marker':marker,'glyph':glyph})
             denominators=[Fraction(a).limit_denominator(24).denominator for op in g['render']['ops'] for a in op['v']]
             mesh=math.lcm(*denominators)
             groups.append({'id':gid,'family':family,'orbifold':orbifold,'signature':g['book_color_signature'],'phaseOrder':g['clock_order'],'hasTimeShift':g['clock_order']>1,'lattice':lattice,'basis':basis,'ops':g['render']['ops'],'namedGenerators':generators,'meshMultiple':mesh,'frameMultiple':g['clock_order'],'reference':f'../correspondence-{family}.html#{gid}','feasibility':{'status':'not-obstructed-by-time-action' if g['clock_order']>1 else 'zero-offset-reference','reason':'Every operation advances time by a constant offset; spatial reflections do not reverse time.' if g['clock_order']>1 else 'This catalog entry assigns zero offset to every spatial operation. It has no nonzero time-shift generator to demonstrate.'}})

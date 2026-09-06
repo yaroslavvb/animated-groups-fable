@@ -55,6 +55,16 @@ test('simulation camera uses physical width and supplies its exact crop corners'
   assert.equal(view.clipPath,'');assert.equal(view.guideMarkup,'');
  }
 });
+test('phase-tail orientation follows the camera, including unrotated simulation framing',()=>{
+ const translations=subgroup(31,[[1,6]]);
+ for(const lattice of ['square','triangular']){
+  const cells=makeWallpaperCellView({lattice,translations,framing:'cells'});
+  const simulation=makeWallpaperCellView({lattice,translations,framing:'simulation'});
+  assert.ok(cells.cell.angleDegrees!==0,'exercise an oblique repeat lattice');
+  assert.equal(cells.glyphAngleOffset,cells.cell.angleDegrees);
+  assert.equal(simulation.glyphAngleOffset,0,'simulation camera does not rotate the field');
+ }
+});
 test('incomplete and inconsistent translation data is rejected',()=>{
  assert.throws(()=>wallpaperPrimitiveCell({translations:[[0,0],[1/3,0]]}),/complete finite subgroup/);
  assert.throws(()=>wallpaperPrimitiveCell({translations:[[0,0],[.5,0],[0,.5]]}),/complete finite subgroup/);

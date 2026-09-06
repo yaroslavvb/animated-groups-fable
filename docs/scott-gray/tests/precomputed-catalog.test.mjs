@@ -84,16 +84,30 @@ test('ordinary HTTP previews verify SHA-256 without WebCrypto and explicitly dec
   }finally{if(original)Object.defineProperty(globalThis,'crypto',original);else delete globalThis.crypto;}
 });
 
-test('byte corruption and transient network errors fail closed and allow retry',async()=>{
+test('byte corruption and transient network errors recover once with fresh verified bytes',async()=>{
   const a=fixture(),corrupt=a.bytes.slice(0);new Uint8Array(corrupt)[100]^=1;let fetches=0;
-  const catalog=createPrecomputedCatalog(manifest(a),{groups,fetcher:async()=>response(++fetches===1?corrupt:a.bytes)});
-  await assert.rejects(catalog.load(a.entry.id),/SHA-256 integrity/);assert.equal(catalog.isVerified(catalog.get(a.entry.id)),false);
-  const record=await catalog.load(a.entry.id);assert.equal(fetches,2);assert.equal(catalog.isVerified(record),true);
+  const options=[],catalog=createPrecomputedCatalog(manifest(a),{groups,fetcher:async(url,init)=>{options.push(init);return response(++fetches===1?corrupt:a.bytes);}});
+  assert.equal(catalog.isVerified(catalog.get(a.entry.id)),false);
+  const record=await catalog.load(a.entry.id);assert.equal(fetches,2);assert.equal(catalog.isVerified(record),true);assert.deepEqual(options,[undefined,{cache:'reload'}]);
   let attempts=0;const retry=createPrecomputedCatalog(manifest(a),{groups,fetcher:async()=>{
     if(++attempts===1)throw Error('Temporary network interruption');return response(a.bytes);
   }});
-  await assert.rejects(retry.load(a.entry.id),/Temporary network/);assert.equal(retry.isVerified(await retry.load(a.entry.id)),true);assert.equal(attempts,2);
+  assert.equal(retry.isVerified(await retry.load(a.entry.id)),true);assert.equal(attempts,2);
   await assert.rejects(retry.load('unknown'),/Unknown precomputed orbit/);assert.equal(attempts,2);
+});
+
+test('concurrent selections share the entire retry and permanent damage is never cached',async()=>{
+  const a=fixture(),corrupt=a.bytes.slice(0);new Uint8Array(corrupt)[100]^=1;let calls=0,release;
+  const hold=new Promise(resolve=>{release=resolve;});
+  const catalog=createPrecomputedCatalog(manifest(a),{groups,fetcher:async()=>{
+    calls++;if(calls===2)await hold;return response(corrupt);
+  }});
+  const first=catalog.load(a.entry.id),same=catalog.load(a.entry.id);assert.equal(first,same);
+  // Reach the retry while it is pending, then request the same selection again.
+  while(calls<2)await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(catalog.load(a.entry.id),first);release();
+  await assert.rejects(first,/SHA-256 integrity/);assert.equal(calls,2);assert.equal(catalog.isVerified(catalog.get(a.entry.id)),false);
+  await assert.rejects(catalog.load(a.entry.id),/SHA-256 integrity/);assert.equal(calls,4,'a later explicit selection gets a fresh bounded attempt, without caching damage');
 });
 
 test('truncated files, unsuccessful HTTP responses, and correctly hashed non-finite payloads are rejected',async()=>{

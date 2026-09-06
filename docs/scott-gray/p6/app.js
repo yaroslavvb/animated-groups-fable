@@ -2,9 +2,9 @@ import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-wallpape
 import {rotationCentres} from '../rotation-centres.mjs?v=20260905-wallpaper';
 import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-wallpaper';
 import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-wallpaper';
-import {updateCellFraming} from '../cell-ui.mjs';
+import {updateCellFraming} from '../cell-ui.mjs?v=20260905-gallery-fix';
 import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260905-wallpaper';
-import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260905-wallpaper';
+import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260905-gallery-fix';
 import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260905-wallpaper6';
 
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
@@ -57,7 +57,8 @@ function empty({loading=false,error=null}={}){
   player?.dispose();player=null;record=null;setPlaying(false);phase=0;
   $('gpu-pattern').hidden=true;$('pattern').hidden=false;$('empty-state').hidden=false;
   $('empty-state').querySelector('h2').textContent=loading?'Loading saved animation…':error?'Animation unavailable':'No verified orbit yet';
-  $('empty-description').textContent=loading?'The parameters and numerical checks are already computed. Only this animation is being downloaded.':error?'Choose another pattern or select this one again to retry.':'No precomputed parameter values have a verified orbit for this time symmetry. Existence remains unresolved.';
+  $('empty-description').textContent=loading?'Downloading the saved animation.':error?error:'No precomputed parameter values have a verified orbit for this time symmetry. Existence remains unresolved.';
+  $('retry-animation').hidden=!error;
   $('mode-label').textContent=loading?'Loading saved animation':error?'Download failed':'Existence unresolved';
   $('engine-label').textContent=loading?'Precomputed data':'No orbit loaded';
   $('caption').textContent=loading?'Loading a saved field. No numerical search runs during browsing.':error?error:'Failed or unverified candidates never appear in this viewer.';
@@ -134,8 +135,9 @@ async function openPattern(id,{playback={phase:0,play:true}}={}){
   const summary=catalog?.get(id);if(!summary||summary.groupId!==group.id)return;
   const token=++selectionToken,targetGroup=group.id;selectedId=id;selectedKey=parameterKey(summary.config);remembered.set(targetGroup,id);
   // Loading clears the renderer, but must not replace the requested shared phase/play state.
-  requestedPlayback={...playback};empty({loading:true});overlay();populate();syncUrl();$('status').textContent='Loading the selected precomputed animation…';
+  requestedPlayback={...playback};empty({loading:true});populate();syncUrl();$('status').textContent='Loading the selected precomputed animation…';
   try{
+    overlay();
     const loaded=await catalog.load(id);if(token!==selectionToken||group.id!==targetGroup)return;
     if(!catalog.isVerified(loaded,targetGroup))throw Error('The saved orbit does not belong to this verified catalog.');record=loaded;phase=requestedPlayback.phase;
     try{player=createPlayer($('gpu-pattern'),record,{onContextLost:()=>{player?.dispose();player=null;$('gpu-pattern').hidden=true;$('pattern').hidden=false;$('engine-label').textContent='CPU playback';draw(true);}});}catch{player=null;}
@@ -158,7 +160,7 @@ function chooseGroup(id,{view=null}={}){
   $('group-label').textContent=group.id+' · 632';$('selected-id').textContent=group.id+(referenceGroup()?' / SPATIAL REFERENCE':' / TIME-SHIFT SYMMETRY');$('policy-label').textContent=referenceGroup()?'Spatial reference · all offsets zero':'Visible time-symmetric solutions';$('selected-title').innerHTML=group.shortHTML;
   $('selected-description').textContent=group.namedGenerators.map(g=>`${g.name}: ${g.timeShift} T`).join(' · ')+(referenceGroup()?'. Every generator is a spatial symmetry at each time.':'. Phase shifts act on both chemical concentrations.');
   $('operation').replaceChildren();for(const named of group.namedGenerators){const option=document.createElement('option');option.value=named.name;option.textContent=`${named.name} · +${named.timeShift} T`;$('operation').append(option);}
-  $('operation').value=generatorName;overlay();populate();if(selectedId)openPattern(selectedId,{playback});else{requestedPlayback=playback;empty();syncUrl();$('status').textContent='No precomputed orbit has passed verification for this group yet.';}
+  $('operation').value=generatorName;populate();if(selectedId)openPattern(selectedId,{playback});else{requestedPlayback=playback;empty();overlay();syncUrl();$('status').textContent='No precomputed orbit has passed verification for this group yet.';}
 }
 function mapBounds(){const sets=parameterSets(),bounds={};for(const [axis,minimum] of [['F',.00002],['k',.00002]]){const values=sets.map(set=>set.config.params[axis]);if(!values.length){bounds[axis]=[0,axis==='F'?.02:.08];continue;}const lo=Math.min(...values),hi=Math.max(...values),padding=Math.max(minimum,.2*(hi-lo));bounds[axis]=[Math.max(0,lo-padding),hi+padding];}return bounds;}
 function drawMap(){
@@ -172,6 +174,7 @@ function selectParameters(key){const set=parameterSets().find(item=>item.key===k
 function selectPattern(id){openPattern(id);if(matchMedia('(max-width:720px)').matches)document.querySelector('.viewer').scrollIntoView({behavior:'smooth',block:'start'});}
 $('parameter-map').onclick=event=>{if(!catalog||!group)return;const canvas=$('parameter-map'),rect=canvas.getBoundingClientRect(),x=(event.clientX-rect.left)*canvas.width/rect.width,y=(event.clientY-rect.top)*canvas.height/rect.height,bounds=mapBounds(),scales={F:bounds.F[1]-bounds.F[0],k:bounds.k[1]-bounds.k[0]},point={F:bounds.F[0]+Math.max(0,Math.min(1,(x-80)/(canvas.width-100)))*scales.F,k:bounds.k[0]+Math.max(0,Math.min(1,1-(y-20)/(canvas.height-60)))*scales.k},sets=parameterSets(),distance=set=>((set.config.params.F-point.F)/scales.F)**2+((set.config.params.k-point.k)/scales.k)**2;sets.sort((a,b)=>distance(a)-distance(b)||Number(b.key===selectedKey)-Number(a.key===selectedKey));if(sets.length)selectParameters(sets[0].key);};
 $('parameter-map').onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();selectParameters(selectedKey);}};
+$('retry-animation').onclick=()=>catalog&&selectedId?openPattern(selectedId,{playback:requestedPlayback}):location.reload();
 $('parameter-set').onchange=()=>selectParameters($('parameter-set').value);$('solution').onchange=()=>selectPattern($('solution').value);
 $('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw(true);syncUrl();};$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw(true);syncUrl();};
 for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}

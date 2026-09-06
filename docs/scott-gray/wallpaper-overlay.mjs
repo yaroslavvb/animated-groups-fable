@@ -45,9 +45,13 @@ export function wallpaperOperationGeometry(op,group){
  const glide=dot(d,w),normal=sub(w,scale(d,glide)),axisPoint=mv(Bi,scale(normal,.5));
  return {kind:Math.abs(glide)<EPS?'mirror':'glide',axisPoint,axisDirection:mv(Bi,d),glideVector:mv(Bi,scale(d,glide))};
 }
-function conjugate(op,by){
+function conjugate(op,by,group){
  const M=mm(mm(by.M,op.M),inverse(by.M));
- return {...op,M,v:add(mv(by.M,op.v),sub(by.v,mv(M,by.v))),s:1};
+ const B=basisMatrix(group),A=mm(mm(B,by.M),inverse(B));
+ // Glyph paths use screen coordinates. Conjugation transports the artwork as
+ // well as its centre, including the handedness of phase tails under mirrors.
+ const glyphMatrix=[[A[0][0],-A[0][1]],[-A[1][0],A[1][1]]];
+ return {...op,M,v:add(mv(by.M,op.v),sub(by.v,mv(M,by.v))),glyphMatrix,s:1};
 }
 function moved(op,v){return {...op,v:add(op.v,sub(v,mv(op.M,v)))};}
 function cutLine(point,direction,corners){
@@ -82,7 +86,7 @@ export function wallpaperGeneratorPlacements(group,{cellView,translations=[]}={}
  if((max[0]-min[0])*(max[1]-min[1])>10000)throw Error('Overlay viewport is too large.');
  const templates=new Map();
  for(const source of group.namedGenerators)for(const op of group.ops){
-  const transformed=conjugate(source,op);
+  const transformed=conjugate(source,op,group);
   // Composing T_d with a generator is essential: conjugation alone moves a
   // rotation centre by d and misses new centres displaced by (I-M)^-1 d.
   const shifts=source.kind==='translation'?[[0,0]]:periods;
@@ -126,29 +130,57 @@ export function wallpaperGeneratorPlacements(group,{cellView,translations=[]}={}
  return [...result.values()];
 }
 
-function markerMarkup(item,index,size,selected){
+/** Same plane conventions as the correspondence plates: solid m, dotted c,
+ * long-dashed axial glide, and dash-dot n/d with the d direction chevrons. */
+const AXIS_STYLES={
+ 'plane-m':{width:2.2,dash:null},
+ 'plane-c':{width:3.4,dash:'0 8'},
+ 'plane-axial':{width:2.2,dash:'12 8'},
+ 'plane-n':{width:2.2,dash:'12 6.5 0 6.5'},
+ 'plane-d':{width:2.2,dash:'12 6.5 0 6.5'},
+};
+export function wallpaperGeneratorSymbol(item){
+ if(item.kind==='rotation'){
+  if(!item.glyph?.path||!item.glyph.symbol?.startsWith('rotation-'))throw Error('Missing correspondence rotation glyph.');
+  return item.glyph.symbol;
+ }
+ if(item.kind==='translation')return 'translation';
+ // A certified period can turn a named mirror into a parallel glide (or the
+ // converse). Choose the symbol of the resulting operation, not its parent.
+ const tau=wrap(item.tau);
+ if(item.kind==='mirror')return tau===0?'plane-m':'plane-c';
+ return tau===0?'plane-axial':Math.abs(tau-.5)<EPS?'plane-n':'plane-d';
+}
+function markerMarkup(item,index,size,selected,cellView){
  const title=`${item.name}: ${item.kind}, ${item.phaseLabel}${item.clippedStart||item.clippedEnd?' (continues beyond cell)':''}`;
  const active=selected===item.key||selected===item.name;
  const color=active?'#b8fff0':'#fff';
- const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
- const label=p=>`<text x="${num(p[0]+8)}" y="${num(p[1]-8)}" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke" stroke-linejoin="round" font-size="12" font-weight="600">${escape(item.name)} · ${item.phaseLabel}</text>`;
+ const symbol=wallpaperGeneratorSymbol(item);
+ const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" data-generator-symbol="${symbol}" data-time-shift="${item.tau}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
+ const label=(p,offset=8)=>`<text x="${num(p[0]+offset)}" y="${num(p[1]-offset)}" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke" stroke-linejoin="round" font-size="14" font-weight="600">${escape(item.name)} · ${item.phaseLabel}</text>`;
  if(item.kind==='rotation'){
-  const p=item.screenPoint.map(x=>x*size),r=11;
-  const vertices=Array.from({length:item.marker.order},(_,i)=>{const a=2*Math.PI*i/item.marker.order-Math.PI/2;return [p[0]+r*Math.cos(a),p[1]+r*Math.sin(a)].map(num).join(',')}).join(' ');
-  const symbol=item.marker.order===2?`<path d="M${num(p[0])} ${num(p[1]-r)} Q${num(p[0]+r)} ${num(p[1])} ${num(p[0])} ${num(p[1]+r)} Q${num(p[0]-r)} ${num(p[1])} ${num(p[0])} ${num(p[1]-r)} Z" fill="${color}"/>`:`<polygon points="${vertices}" fill="${color}"/>`;
-  return `<g ${common} data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="17" fill="#172032aa" stroke="${color}" stroke-width="1"/>${symbol}${label(p)}</g>`;
+  const p=item.screenPoint.map(x=>x*size),A=item.glyphMatrix??ID,matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
+  const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) rotate(${num(cellView?.glyphAngleOffset??0)}) matrix(${matrix}) scale(1.25)" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
+  return `<g ${common} data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="24" fill="#172032aa" stroke="${color}" stroke-width="1"/>${glyph}${label(p,23)}</g>`;
  }
  const [a,b]=item.screenSegment.map(p=>p.map(x=>x*size)),mid=scale(add(a,b),.5);
- const dash=item.kind==='glide'?' stroke-dasharray="8 6"':'';
- const arrow=item.kind!=='mirror'&&!item.clippedEnd;
- const line=`<path d="M${a.map(num).join(' ')} L${b.map(num).join(' ')}" stroke="#172032" stroke-width="5" fill="none"${dash}/><path d="M${a.map(num).join(' ')} L${b.map(num).join(' ')}" stroke="${color}" stroke-width="2" fill="none"${dash}/>`;
+ const style=AXIS_STYLES[symbol]??{width:2.2,dash:null},dash=style.dash?` stroke-dasharray="${style.dash}"`:'';
+ const line=`<path d="M${a.map(num).join(' ')} L${b.map(num).join(' ')}" stroke="#172032" stroke-width="6" fill="none" stroke-linecap="round"/><path class="generator-axis ${symbol}" d="M${a.map(num).join(' ')} L${b.map(num).join(' ')}" stroke="${color}" stroke-width="${style.width}" fill="none" stroke-linecap="round"${dash}/>`;
  let head='';
- if(arrow){
+ if(item.kind==='translation'&&!item.clippedEnd||symbol==='plane-axial'||symbol==='plane-d'){
   let d=sub(b,a);if(item.kind==='glide'){
    const positive=dot(item.marker.glideVector,sub(item.segment[1],item.segment[0]))>=0;if(!positive)d=scale(d,-1);
   }
-  d=scale(d,1/Math.hypot(...d));const tip=item.kind==='translation'?b:add(mid,scale(d,12)),tail=sub(tip,scale(d,10)),n=[-d[1]*5,d[0]*5];
-  head=`<path d="M${add(tail,n).map(num).join(' ')} L${tip.map(num).join(' ')} L${sub(tail,n).map(num).join(' ')}" stroke="${color}" stroke-width="2" fill="none"/>`;
+  d=scale(d,1/Math.hypot(...d));
+  if(symbol==='plane-axial'){
+   const tip=add(mid,scale(d,17)),tail=sub(tip,scale(d,15)),n=[-d[1]*9,d[0]*9];
+   head=`<path class="generator-glide-arrow" d="M${sub(mid,scale(d,17)).map(num).join(' ')} L${tip.map(num).join(' ')}" stroke="${color}" stroke-width="2.1" fill="none"/><path class="generator-glide-head" d="M${tip.map(num).join(' ')} L${tail.map(num).join(' ')} L${add(tail,n).map(num).join(' ')} Z" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke fill"/>`;
+  }else{
+   for(const offset of symbol==='plane-d'?[-28,28]:[null]){
+    const tip=offset===null?b:add(mid,scale(d,offset)),tail=sub(tip,scale(d,10)),n=[-d[1]*4.2,d[0]*4.2];
+    head+=`<path class="${symbol==='plane-d'?'generator-quarter-arrow':'generator-translation-arrow'}" d="M${add(tail,n).map(num).join(' ')} L${tip.map(num).join(' ')} L${sub(tail,n).map(num).join(' ')}" stroke="${color}" stroke-width="2.35" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+   }
+  }
  }
  return `<g ${common}><title>${escape(title)}</title>${line}${head}${label(mid)}</g>`;
 }
@@ -158,7 +190,7 @@ export function renderWallpaperOverlay(svg,group,{cellView,visible=true,translat
  svg.toggleAttribute('hidden',!visible);svg.style.pointerEvents='none';
  if(!visible){svg.innerHTML='';return [];}
  const placements=wallpaperGeneratorPlacements(group,{cellView,translations});
- svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected)).join('');
+ svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected,cellView)).join('');
  for(const element of svg.querySelectorAll('[data-generator-index]')){
   const item=placements[Number(element.getAttribute('data-generator-index'))];
   element.addEventListener('click',()=>onSelect?.(item));

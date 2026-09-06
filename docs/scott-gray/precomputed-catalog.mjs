@@ -62,6 +62,39 @@ export async function sha256(input){
   return sha256Portable(bytes);
 }
 
+/** Fetch a selected movie with one recovery attempt for an interrupted or stale
+ * download. A retry bypasses the HTTP cache; neither attempt can return bytes
+ * until their exact length and saved checksum agree. Decoding stays with the
+ * caller so a correctly hashed but invalid field is never treated as a network
+ * problem. Keep the first fetch argument list compatible with simple fixtures.
+ */
+export async function downloadOrbitBytes(url,{fetcher=globalThis.fetch,byteLength,fieldSha256}={}){
+  if(typeof fetcher!=='function'||!Number.isSafeInteger(byteLength)||byteLength<1||!HASH.test(fieldSha256))throw Error('Invalid saved animation download metadata.');
+  const retryable=(message,cause)=>Object.assign(Error(message,cause===undefined?undefined:{cause}),{retryable:true});
+  for(let attempt=0;attempt<2;attempt++){
+    try{
+      let response;
+      try{response=await (attempt===0?fetcher(url):fetcher(url,{cache:'reload'}));}
+      catch(error){if(error?.name==='AbortError')throw error;throw retryable('Could not download the selected orbit.',error);}
+      const status=response?.status;
+      if(!response||response.ok===false||status>=400){
+        const message=`Could not download the selected orbit${status?` (HTTP ${status})`:''}.`;
+        if(status===408||status===429||(status>=500&&status<=599))throw retryable(message);
+        throw Error(message);
+      }
+      if(typeof response.arrayBuffer!=='function')throw Error('Could not read the selected orbit download.');
+      let bytes;
+      try{bytes=await response.arrayBuffer();}
+      catch(error){if(error?.name==='AbortError')throw error;throw retryable('Could not read the selected orbit download.',error);}
+      if(!(bytes instanceof ArrayBuffer)||bytes.byteLength!==byteLength)throw retryable('The downloaded orbit has the wrong byte count.');
+      if(await sha256(bytes)!==fieldSha256.toLowerCase())throw retryable('The downloaded orbit failed its SHA-256 integrity check.');
+      return bytes;
+    }catch(error){
+      if(attempt!==0||error?.retryable!==true)throw error;
+    }
+  }
+}
+
 function snapshot(value){
   if(Array.isArray(value))return Object.freeze(value.map(snapshot));
   if(value&&typeof value==='object')return Object.freeze(Object.fromEntries(Object.entries(value).map(([key,item])=>[key,snapshot(item)])));
@@ -111,11 +144,7 @@ export function createPrecomputedCatalog(manifest,{groups,family='p4',fetcher=gl
     const summary=summaries.get(id);
     if(!summary)return Promise.reject(Error('Unknown precomputed orbit.'));
     const request=(async()=>{
-      const response=await fetcher(summary.fieldUrl);
-      if(!response||response.ok===false||typeof response.arrayBuffer!=='function')throw Error(`Could not download the selected orbit${response?.status?` (HTTP ${response.status})`:''}.`);
-      const bytes=await response.arrayBuffer();
-      if(!(bytes instanceof ArrayBuffer)||bytes.byteLength!==summary.fieldByteLength)throw Error('The downloaded orbit has the wrong byte count.');
-      if(await sha256(bytes)!==summary.fieldSha256.toLowerCase())throw Error('The downloaded orbit failed its SHA-256 integrity check.');
+      const bytes=await downloadOrbitBytes(summary.fieldUrl,{fetcher,byteLength:summary.fieldByteLength,fieldSha256:summary.fieldSha256});
       const view=new DataView(bytes),field=new Array(summary.fieldValueCount);
       for(let i=0;i<field.length;i++){
         field[i]=view.getFloat32(4*i,true);

@@ -20,11 +20,27 @@ test('canonical time offsets, independent dynamics, visibility, and cell evidenc
   const {manifest}=await fixture();const copy=structuredClone(manifest);corrupt(copy.orbits[0]);assert.throws(()=>createWallpaperCatalog(copy,opts));
  }
 });
-test('damaged downloads cannot be branded as verified and failures can be retried',async()=>{
+test('concurrent selections recover an interrupted download once and share the verified result',async()=>{
+ const {bytes,manifest}=await fixture();let attempts=0,release;const options=[],hold=new Promise(resolve=>{release=resolve;});
+ const bad=bytes.slice(0);new Uint8Array(bad)[0]^=1;
+ const catalog=createWallpaperCatalog(manifest,{...opts,fetcher:async(url,init)=>{options.push(init);attempts++;if(attempts===2)await hold;return {ok:true,arrayBuffer:async()=>attempts===1?bad:bytes};}});
+ const first=catalog.load('saved:test');assert.equal(first,catalog.load('saved:test'));
+ while(attempts<2)await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(first,catalog.load('saved:test'));release();
+ const loaded=await first;assert.ok(catalog.isVerified(loaded));assert.equal(attempts,2);assert.deepEqual(options,[undefined,{cache:'reload'}]);assert.equal(await catalog.load('saved:test'),loaded);assert.equal(attempts,2);
+});
+test('permanently damaged downloads never enter the cache and later explicit selections can retry',async()=>{
  const {bytes,manifest}=await fixture();let attempts=0;
  const bad=bytes.slice(0);new Uint8Array(bad)[0]^=1;
- const catalog=createWallpaperCatalog(manifest,{...opts,fetcher:async()=>({ok:true,arrayBuffer:async()=>++attempts===1?bad:bytes})});
- await assert.rejects(catalog.load('saved:test'),/integrity/);const loaded=await catalog.load('saved:test');assert.ok(catalog.isVerified(loaded));assert.equal(attempts,2);
+ const catalog=createWallpaperCatalog(manifest,{...opts,fetcher:async()=>({ok:true,arrayBuffer:async()=>++attempts<=2?bad:bytes})});
+ await assert.rejects(catalog.load('saved:test'),/integrity/);assert.equal(attempts,2);assert.equal(catalog.isVerified(catalog.get('saved:test')),false);
+ const loaded=await catalog.load('saved:test');assert.ok(catalog.isVerified(loaded));assert.equal(attempts,3);
+});
+test('correctly hashed nonfinite wallpaper concentrations fail without another download',async()=>{
+ const {bytes,entry,manifest}=await fixture();new DataView(bytes).setFloat32(0,NaN,true);const digest=await sha256(bytes);
+ entry.fieldSha256=digest;entry.offlineVerification.fieldSha256=digest;entry.translationVerification.fieldSha256=digest;let calls=0;
+ const catalog=createWallpaperCatalog(manifest,{...opts,fetcher:async()=>{calls++;return{ok:true,arrayBuffer:async()=>bytes};}});
+ await assert.rejects(catalog.load('saved:test'),/Invalid concentration/);assert.equal(calls,1);assert.equal(catalog.isVerified(catalog.get('saved:test')),false);
 });
 test('zero-offset references do not require a fictitious visible time shift',async()=>{
  const {manifest}=await fixture(),g={...group,hasTimeShift:false,ops:[group.ops[0]]};const r=manifest.orbits[0];r.config.ops=g.ops;r.wallpaperVerification.visibility={passed:false,applicable:false};assert.equal(createWallpaperCatalog(manifest,{...opts,groups:[g]}).size(),1);

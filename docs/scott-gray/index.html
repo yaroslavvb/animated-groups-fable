@@ -21,7 +21,7 @@
 <canvas aria-label="Verified periodic orbit rendered with WebGL" height="768" hidden="" id="gpu-pattern" tabindex="0" width="768"></canvas>
 <svg aria-label="Pattern cell boundaries" class="cell-guide" id="cell-guide" viewbox="0 0 768 768"></svg>
 <svg aria-label="Requested symmetry generators" class="generator-overlay" hidden="" id="generator-overlay"></svg>
-<div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks have already been computed.</p><button class="primary" hidden="" id="focus-search">Search this time symmetry →</button></div>
+<div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks have already been computed.</p><button hidden="" id="retry-animation" type="button">Retry animation</button><button class="primary" hidden="" id="focus-search">Search this time symmetry →</button></div>
 </div>
 <div class="view-caption"><span class="approximate-view-label" hidden="" id="approximate-view-label">Dashed: approximate centres</span><span class="scale-label">Physical width 2 L · square lattice</span></div>
 <div class="playback"><button aria-label="Play animation" disabled="" id="play">▶ Play</button><button aria-label="Return to first frame" disabled="" id="rewind">↤</button><input aria-label="Animation phase" disabled="" id="phase" max="1" min="0" step="0.001" type="range" value="0"/><output id="phase-label">—</output><label>View <select aria-label="View framing" id="framing"><option value="cells">Pattern cells</option><option value="simulation">Simulation width</option></select></label><label><span id="tile-label">Cells</span> <select aria-describedby="view-scale-explanation" aria-label="Number of pattern cells" id="tiles"><option value="1">1 cell</option><option selected="" value="2">2 × 2 cells</option><option value="3">3 × 3 cells</option></select></label><label>Speed <select id="speed"><option value="0.5">Slow</option><option selected="" value="1">Normal</option><option value="2">Fast</option></select></label></div>
@@ -71,6 +71,6 @@
 
 <footer><a href="../scott-gray-groups.html">All wallpaper groups</a> · <a href="research-note/">Research note</a></footer>
 </main>
-<script src="app.js?v=20260905-wallpaper" type="module"></script>
+<script src="app.js?v=20260905-gallery-fix" type="module"></script>
 <script src="family-navigation.mjs?v=20260905-wallpaper" type="module"></script></body>
 </html>

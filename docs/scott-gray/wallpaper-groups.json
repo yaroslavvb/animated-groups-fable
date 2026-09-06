@@ -484,6 +484,11 @@
               1.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "translation",
+            "sourceKind": "translation",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -516,6 +521,11 @@
               0.0,
               1.0
             ]
+          },
+          "glyph": {
+            "symbol": "translation",
+            "sourceKind": "translation",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -612,6 +622,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -642,6 +658,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -672,6 +694,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -702,6 +730,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -834,6 +868,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -864,6 +904,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -894,6 +940,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -924,6 +976,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -1020,6 +1078,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -1050,6 +1114,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -1080,6 +1150,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -1110,6 +1186,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -1244,6 +1326,11 @@
               0.5,
               0.5
             ]
+          },
+          "glyph": {
+            "symbol": "translation",
+            "sourceKind": "translation",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -1284,6 +1371,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -1324,6 +1416,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -1466,6 +1563,12 @@
               0.24999999999999994,
               0.24999999999999994
             ]
+          },
+          "glyph": {
+            "symbol": "plane-axial",
+            "sourceKind": "glide",
+            "sourceTimeShift": "0",
+            "directionStyle": "half-arrow"
           }
         },
         {
@@ -1506,6 +1609,12 @@
               -0.24999999999999994,
               -0.24999999999999994
             ]
+          },
+          "glyph": {
+            "symbol": "plane-axial",
+            "sourceKind": "glide",
+            "sourceTimeShift": "0",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -1612,6 +1721,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -1652,6 +1766,12 @@
               -0.4999999999999999,
               -0.4999999999999999
             ]
+          },
+          "glyph": {
+            "symbol": "plane-n",
+            "sourceKind": "glide",
+            "sourceTimeShift": "1/2",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -1758,6 +1878,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -1798,6 +1923,12 @@
               -0.4999999999999999,
               -0.4999999999999999
             ]
+          },
+          "glyph": {
+            "symbol": "plane-axial",
+            "sourceKind": "glide",
+            "sourceTimeShift": "0",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -1940,6 +2071,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -1980,6 +2116,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -2020,6 +2161,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -2060,6 +2206,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -2274,6 +2425,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -2314,6 +2470,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -2354,6 +2515,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -2394,6 +2560,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -2536,6 +2707,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -2576,6 +2752,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -2616,6 +2797,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -2656,6 +2842,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -3014,6 +3205,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3054,6 +3250,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3094,6 +3295,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -3134,6 +3340,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -3348,6 +3559,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3388,6 +3604,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3428,6 +3649,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3468,6 +3694,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -3610,6 +3841,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3650,6 +3886,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3690,6 +3931,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -3730,6 +3976,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -3862,6 +4113,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -3892,6 +4149,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -3932,6 +4195,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -4064,6 +4332,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -4094,6 +4368,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -4134,6 +4414,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -4338,6 +4623,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -4368,6 +4659,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -4408,6 +4705,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -4540,6 +4842,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -4570,6 +4878,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -4610,6 +4924,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -4814,6 +5133,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -4844,6 +5169,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -4884,6 +5215,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -5016,6 +5352,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -5046,6 +5388,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -5086,6 +5434,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -5434,6 +5787,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -5464,6 +5823,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -5504,6 +5869,12 @@
               0.0,
               -0.25
             ]
+          },
+          "glyph": {
+            "symbol": "plane-d",
+            "sourceKind": "glide",
+            "sourceTimeShift": "1/4",
+            "directionStyle": "quarter-arrows"
           }
         }
       ],
@@ -5636,6 +6007,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -5666,6 +6043,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -5706,6 +6089,12 @@
               0.0,
               0.5
             ]
+          },
+          "glyph": {
+            "symbol": "plane-axial",
+            "sourceKind": "glide",
+            "sourceTimeShift": "0",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -5838,6 +6227,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -5868,6 +6263,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -5908,6 +6309,12 @@
               0.0,
               0.5
             ]
+          },
+          "glyph": {
+            "symbol": "plane-n",
+            "sourceKind": "glide",
+            "sourceTimeShift": "1/2",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -6040,6 +6447,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -6070,6 +6483,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -6110,6 +6529,12 @@
               0.0,
               0.5
             ]
+          },
+          "glyph": {
+            "symbol": "plane-axial",
+            "sourceKind": "glide",
+            "sourceTimeShift": "0",
+            "directionStyle": "half-arrow"
           }
         }
       ],
@@ -6314,6 +6739,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -6354,6 +6785,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -6394,6 +6830,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -6598,6 +7039,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -6638,6 +7085,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -6678,6 +7130,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -6882,6 +7339,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -6922,6 +7385,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -6962,6 +7430,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -7166,6 +7639,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         },
         {
@@ -7206,6 +7685,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -7246,6 +7730,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -7450,6 +7939,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -7490,6 +7985,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -7530,6 +8030,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -7734,6 +8239,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         },
         {
@@ -7774,6 +8285,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -7814,6 +8330,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -7946,6 +8467,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "3/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z"
           }
         },
         {
@@ -7976,6 +8503,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "3/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z"
           }
         },
         {
@@ -8006,6 +8539,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -8138,6 +8677,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-3",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-7.9,-0.07 L-15.09,-7.25 L-16.57,-5.77 L-9.39,1.41 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z M7.9,0.07 L15.09,7.25 L16.57,5.77 L9.39,-1.41 Z"
           }
         },
         {
@@ -8168,6 +8713,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-3",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-7.9,-0.07 L-15.09,-7.25 L-16.57,-5.77 L-9.39,1.41 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z M7.9,0.07 L15.09,7.25 L16.57,5.77 L9.39,-1.41 Z"
           }
         },
         {
@@ -8198,6 +8749,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -8402,6 +8959,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z"
           }
         },
         {
@@ -8432,6 +8995,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-3",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "3/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-7.9,-0.07 L-15.09,-7.25 L-16.57,-5.77 L-9.39,1.41 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z M7.9,0.07 L15.09,7.25 L16.57,5.77 L9.39,-1.41 Z"
           }
         },
         {
@@ -8462,6 +9031,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -8594,6 +9169,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z"
           }
         },
         {
@@ -8624,6 +9205,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z"
           }
         },
         {
@@ -8654,6 +9241,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -8858,6 +9451,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z"
           }
         },
         {
@@ -8888,6 +9487,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z"
           }
         },
         {
@@ -8918,6 +9523,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -9050,6 +9661,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z"
           }
         },
         {
@@ -9080,6 +9697,12 @@
             ],
             "angleDegrees": 270.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z"
           }
         },
         {
@@ -9110,6 +9733,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -9324,6 +9953,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -9364,6 +9998,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -9404,6 +10043,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -9618,6 +10262,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -9658,6 +10307,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -9698,6 +10352,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -10056,6 +10715,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -10096,6 +10760,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -10136,6 +10805,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -10350,6 +11024,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -10390,6 +11069,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -10430,6 +11114,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -10788,6 +11477,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -10828,6 +11522,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -10868,6 +11567,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -11082,6 +11786,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -11122,6 +11831,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -11162,6 +11876,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -11510,6 +12229,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z"
           }
         },
         {
@@ -11550,6 +12275,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -11754,6 +12484,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z"
           }
         },
         {
@@ -11794,6 +12530,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -12142,6 +12883,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/4",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z"
           }
         },
         {
@@ -12182,6 +12929,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -12386,6 +13138,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z"
           }
         },
         {
@@ -12426,6 +13184,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -12630,6 +13393,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z"
           }
         },
         {
@@ -12670,6 +13439,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -12874,6 +13648,12 @@
             ],
             "angleDegrees": 90.0,
             "order": 4
+          },
+          "glyph": {
+            "symbol": "rotation-4-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z"
           }
         },
         {
@@ -12914,6 +13694,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -13028,6 +13813,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         },
         {
@@ -13058,6 +13849,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         },
         {
@@ -13088,6 +13885,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         }
       ],
@@ -13202,6 +14005,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -13232,6 +14041,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -13262,6 +14077,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         }
       ],
@@ -13484,6 +14305,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -13514,6 +14341,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         },
         {
@@ -13544,6 +14377,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         }
       ],
@@ -13658,6 +14497,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -13688,6 +14533,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -13718,6 +14569,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         }
       ],
@@ -13896,6 +14753,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -13936,6 +14798,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -13976,6 +14843,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -14154,6 +15026,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -14194,6 +15071,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -14234,6 +15116,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -14618,6 +15505,12 @@
             ],
             "angleDegrees": 240.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -14658,6 +15551,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -15042,6 +15940,12 @@
             ],
             "angleDegrees": 240.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -15082,6 +15986,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -15250,6 +16159,12 @@
             ],
             "angleDegrees": 240.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -15290,6 +16205,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -15458,6 +16378,12 @@
             ],
             "angleDegrees": 240.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -15498,6 +16424,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -15666,6 +16597,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-5",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "5/6",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M-8.29,-4 L-8.29,-13.44 L-10.39,-13.44 L-10.39,-4 Z M-7.61,5.18 L-15.79,0.46 L-16.84,2.28 L-8.66,7 Z M0.68,9.18 L-7.49,13.9 L-6.44,15.72 L1.73,11 Z M8.29,4 L8.29,13.44 L10.39,13.44 L10.39,4 Z M7.61,-5.18 L15.79,-0.46 L16.84,-2.28 L8.66,-7 Z"
           }
         },
         {
@@ -15696,6 +16633,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         },
         {
@@ -15726,6 +16669,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -15894,6 +16843,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/6",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M1.73,-11 L-6.44,-15.72 L-7.49,-13.9 L0.68,-9.18 Z M-8.66,-7 L-16.84,-2.28 L-15.79,-0.46 L-7.61,-5.18 Z M-10.39,4 L-10.39,13.44 L-8.29,13.44 L-8.29,4 Z M-1.73,11 L6.44,15.72 L7.49,13.9 L-0.68,9.18 Z M8.66,7 L16.84,2.28 L15.79,0.46 L7.61,5.18 Z M10.39,-4 L10.39,-13.44 L8.29,-13.44 L8.29,-4 Z"
           }
         },
         {
@@ -15924,6 +16879,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -15954,6 +16915,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -16122,6 +17089,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M1.73,-11 L-6.44,-15.72 L-7.49,-13.9 L0.68,-9.18 Z M-10.39,4 L-10.39,13.44 L-8.29,13.44 L-8.29,4 Z M8.66,7 L16.84,2.28 L15.79,0.46 L7.61,5.18 Z"
           }
         },
         {
@@ -16152,6 +17125,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-2",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"
           }
         },
         {
@@ -16182,6 +17161,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -16350,6 +17335,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-4",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "2/3",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M-7.61,5.18 L-15.79,0.46 L-16.84,2.28 L-8.66,7 Z M8.29,4 L8.29,13.44 L10.39,13.44 L10.39,4 Z"
           }
         },
         {
@@ -16380,6 +17371,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/3",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"
           }
         },
         {
@@ -16410,6 +17407,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -16578,6 +17581,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-3",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M0.68,9.18 L-7.49,13.9 L-6.44,15.72 L1.73,11 Z"
           }
         },
         {
@@ -16608,6 +17617,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -16638,6 +17653,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-1",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "1/2",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z"
           }
         }
       ],
@@ -16806,6 +17827,12 @@
             ],
             "angleDegrees": 60.0,
             "order": 6
+          },
+          "glyph": {
+            "symbol": "rotation-6-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z"
           }
         },
         {
@@ -16836,6 +17863,12 @@
             ],
             "angleDegrees": 120.0,
             "order": 3
+          },
+          "glyph": {
+            "symbol": "rotation-3-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"
           }
         },
         {
@@ -16866,6 +17899,12 @@
             ],
             "angleDegrees": 180.0,
             "order": 2
+          },
+          "glyph": {
+            "symbol": "rotation-2-0",
+            "sourceKind": "rotation",
+            "sourceTimeShift": "0",
+            "path": "M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z"
           }
         }
       ],
@@ -17152,6 +18191,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -17192,6 +18236,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -17232,6 +18281,11 @@
               -6.409875621278546e-17,
               6.409875621278546e-17
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -17518,6 +18572,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -17558,6 +18617,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -17598,6 +18662,11 @@
               -6.409875621278546e-17,
               6.409875621278546e-17
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         }
       ],
@@ -17884,6 +18953,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-c",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "1/2"
           }
         },
         {
@@ -17924,6 +18998,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -17964,6 +19043,11 @@
               -6.409875621278546e-17,
               6.409875621278546e-17
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],
@@ -18250,6 +19334,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -18290,6 +19379,11 @@
               0.0,
               0.0
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         },
         {
@@ -18330,6 +19424,11 @@
               -6.409875621278546e-17,
               6.409875621278546e-17
             ]
+          },
+          "glyph": {
+            "symbol": "plane-m",
+            "sourceKind": "mirror",
+            "sourceTimeShift": "0"
           }
         }
       ],

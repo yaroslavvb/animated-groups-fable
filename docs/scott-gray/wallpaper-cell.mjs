@@ -46,7 +46,7 @@ export function makeWallpaperCellView({lattice='square',translations=[],count=2,
  const originalToScreen=p=>latticePointToScreen(p,transform),screenToOriginal=p=>screenPointToLattice(p,transform),corners=originalCorners.map(originalToScreen);
  const contains=p=>{const q=framing==='cells'?mul(cell.inverse,p):originalToScreen(p),bound=framing==='cells'?count:1;return q.every(x=>Number.isFinite(x)&&x>=-EPS&&x<=bound+EPS);};
  const view={cell,count,countLabel,framing,cellCorners,originalCorners,corners,padding,originalToScreen,latticeToScreen:originalToScreen,screenToOriginal,cellToScreen:p=>originalToScreen(cellToLattice(p)),contains,
- viewOptions:{viewMatrix:transform.matrix,viewOrigin:transform.origin},latticeBounds:{min:[0,1].map(i=>Math.min(...originalCorners.map(p=>p[i]))),max:[0,1].map(i=>Math.max(...originalCorners.map(p=>p[i])))},glyphAngleOffset:cell.angleDegrees,
+ viewOptions:{viewMatrix:transform.matrix,viewOrigin:transform.origin},latticeBounds:{min:[0,1].map(i=>Math.min(...originalCorners.map(p=>p[i]))),max:[0,1].map(i=>Math.max(...originalCorners.map(p=>p[i])))},glyphAngleOffset:framing==='cells'?cell.angleDegrees:0,
  clipPath:framing==='cells'?`polygon(${corners.map(p=>p.map(x=>`${x*100}%`).join(' ')).join(', ')})`:''};
  view.guideMarkup=framing==='cells'?cellGuideMarkup(view):'';return view;
 }
