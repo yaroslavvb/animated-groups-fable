@@ -2,6 +2,7 @@
 // Requires Playwright and Chrome; PLAYWRIGHT_MODULE can point to an installed module.
 import assert from 'node:assert/strict';
 import {mkdir} from 'node:fs/promises';
+import {mainFrameScreenshot} from './browser-frame.mjs';
 import {readViewState} from '../view-state.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=(process.argv[2]??'http://localhost:8934/').replace(/\/?$/,'/');
@@ -9,7 +10,7 @@ const artifacts=process.env.VIEW_STATE_ARTIFACTS??'/tmp/scott-gray-view-state';
 await mkdir(artifacts,{recursive:true});
 const browser=await chromium.launch({channel:'chrome',headless:true,args:['--enable-unsafe-swiftshader']});
 const ready=page=>page.waitForFunction(()=>document.querySelector('#status')?.textContent.includes('ready'),{timeout:60000});
-const snapshot=page=>page.evaluate(()=>({
+const snapshot=async page=>({...await page.evaluate(()=>({
   group:document.querySelector('#groups [aria-pressed="true"]').dataset.id,
   parameter:document.querySelector('#parameter-set').value,
   pattern:document.querySelector('#solution').value,
@@ -20,14 +21,14 @@ const snapshot=page=>page.evaluate(()=>({
   overlay:document.querySelector('#show-generators').checked,
   phase:document.querySelector('#phase-label').textContent,
   play:document.querySelector('#play').getAttribute('aria-label'),
-  image:document.querySelector('#compare-original').toDataURL(),
-}));
+})),image:await mainFrameScreenshot(page)});
 try{
   for(const [family,path,initial,selected] of [['442','scott-gray/','g95','g96'],['632','scott-gray/p6/','g247','g248']]){
     const errors=[],context=await browser.newContext({viewport:{width:1440,height:1050},reducedMotion:'reduce'});
     context.on('page',page=>page.on('pageerror',error=>errors.push(error.message)));
     const page=await context.newPage();
     await page.goto(base+path+'#'+initial);await ready(page);
+    assert.equal(await page.locator('.comparison,#compare-original,#comparison-error').count(),0,'removed comparison/tutorial is absent');
     assert.equal(await page.locator('#play').getAttribute('aria-label'),'Pause animation','legacy links autoplay');
     assert.equal(await page.locator('#show-generators').isChecked(),false);
     const initialUrl=page.url();

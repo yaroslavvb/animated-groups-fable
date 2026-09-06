@@ -23,11 +23,11 @@ const DEFAULTS = Object.freeze({
 });
 
 const palettes = new Set(['ember', 'ceramic', 'concentration']);
-const generators = new Set(['α', 'β', 'γ']);
+const generators = new Set(['α', 'β', 'γ', 'δ', 'P', 'Q', 'R', 'S', 'X', 'Y', 'Z']);
 const validGenerator = value => {
   if (generators.has(value)) return value;
   if (typeof value !== 'string' || value.length > 64) return null;
-  const match = value.match(/^([αβγ])@(0(?:\.\d{1,9})?),(0(?:\.\d{1,9})?)$/);
+  const match = value.match(/^([αβγδPQRSXYZ])@(0(?:\.\d{1,9})?),(0(?:\.\d{1,9})?)$/);
   return match && Number(match[2]) < 1 && Number(match[3]) < 1 ? value : null;
 };
 const validGroup = value => typeof value === 'string' && /^g\d+$/.test(value) ? value : null;

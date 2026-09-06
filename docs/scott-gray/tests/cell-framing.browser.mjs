@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {mainFrameScreenshot} from './browser-frame.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=(process.argv[2]??'http://localhost:8934/').replace(/\/?$/,'/'),label=process.argv[3]??'local';
 const cases=[
@@ -11,7 +12,7 @@ const cases=[
 const path=c=>c.family==='p6'?'scott-gray/p6/':'scott-gray/';
 const params=page=>new URLSearchParams(page.url().split('?')[1]);
 const loaded=page=>page.waitForFunction(()=>document.querySelector('#empty-state').hidden&&!document.querySelector('#play').disabled,null,{timeout:45000});
-const frame=page=>page.locator('#compare-original').evaluate(canvas=>canvas.toDataURL());
+const frame=mainFrameScreenshot;
 const browser=await chromium.launch({channel:'chrome',headless:true});
 try{
   const page=await browser.newPage({viewport:{width:1440,height:1200}}),errors=[];
@@ -38,7 +39,7 @@ try{
       }
       const canvas=document.querySelector('#gpu-pattern').hidden?document.querySelector('#pattern'):document.querySelector('#gpu-pattern');
       const expectedClipStyle=document.createElement('canvas').style;expectedClipStyle.clipPath=view.clipPath;
-      const clips=['pattern','gpu-pattern','compare-original','compare-a','compare-b'].map(id=>document.getElementById(id).style.clipPath);
+      const clips=['pattern','gpu-pattern'].map(id=>document.getElementById(id).style.clipPath);
       return {index:cell.index,approximate:!!near,count:markers.length,weighted,expectedWeighted:expectedCentres.length/cell.index*count*count,maximumError,outside,
         guide:[...document.querySelectorAll('#cell-guide path')].map(p=>p.getAttribute('d')),expectedGuide:[...view.guideMarkup.matchAll(/ d="([^"]+)"/g)].map(m=>m[1]),guideHidden:document.querySelector('#cell-guide').hasAttribute('hidden'),clips,expectedClip:expectedClipStyle.clipPath,
         divisions:document.querySelector('[data-cell-divisions]')?.getAttribute('data-cell-divisions')??'0',canvasWidth:canvas.width,canvasHeight:canvas.height,
@@ -60,6 +61,7 @@ try{
   for(const c of cases){
     const query=new URLSearchParams({v:'1',pattern:c.id,palette:'ember',tiles:'1',speed:'1',generator:'α',overlay:'1',phase:String(c.phase),play:c.play?'1':'0'});
     await page.goto(base+path(c)+'#'+c.group+'?'+query);await loaded(page);
+    assert.equal(await page.locator('.comparison,#compare-original,#comparison-error').count(),0,'comparison/tutorial is absent');
     assert.equal(await page.locator('#framing').inputValue(),'cells');assert.equal(params(page).get('v'),'2');assert.equal(params(page).get('framing'),'cells');assert.equal(params(page).get('tiles'),'1');
     assert.equal(await page.locator('#show-approximate').isChecked(),true);
     if(c.play){assert.equal(await page.locator('#play').getAttribute('aria-label'),'Pause animation');await page.locator('#play').click();}

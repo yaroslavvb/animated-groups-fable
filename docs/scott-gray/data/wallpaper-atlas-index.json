@@ -1,0 +1,179 @@
+{
+  "schema": "scott-gray-wallpaper-index-v1",
+  "wallpaperGroupsSha256": "56f046e5b6d88868424c6ca5a71bc60cb17491cddec845e16350ed73ab21a3a9",
+  "uniqueFieldCount": 265,
+  "exampleCount": 613,
+  "families": [
+    {
+      "id": "p1",
+      "verifiedPatternCount": 12,
+      "verifiedExampleCount": 12,
+      "verifiedParameterCount": 11,
+      "timeSymmetryCount": 1,
+      "populatedSymmetryCount": 1,
+      "nonzeroTimeSymmetryCount": 0,
+      "verifiedNonzeroTimeSymmetryCount": 0
+    },
+    {
+      "id": "p2",
+      "verifiedPatternCount": 35,
+      "verifiedExampleCount": 35,
+      "verifiedParameterCount": 18,
+      "timeSymmetryCount": 3,
+      "populatedSymmetryCount": 3,
+      "nonzeroTimeSymmetryCount": 2,
+      "verifiedNonzeroTimeSymmetryCount": 2
+    },
+    {
+      "id": "pm",
+      "verifiedPatternCount": 6,
+      "verifiedExampleCount": 6,
+      "verifiedParameterCount": 2,
+      "timeSymmetryCount": 1,
+      "populatedSymmetryCount": 1,
+      "nonzeroTimeSymmetryCount": 0,
+      "verifiedNonzeroTimeSymmetryCount": 0
+    },
+    {
+      "id": "pg",
+      "verifiedPatternCount": 8,
+      "verifiedExampleCount": 8,
+      "verifiedParameterCount": 4,
+      "timeSymmetryCount": 1,
+      "populatedSymmetryCount": 1,
+      "nonzeroTimeSymmetryCount": 0,
+      "verifiedNonzeroTimeSymmetryCount": 0
+    },
+    {
+      "id": "cm",
+      "verifiedPatternCount": 25,
+      "verifiedExampleCount": 25,
+      "verifiedParameterCount": 12,
+      "timeSymmetryCount": 2,
+      "populatedSymmetryCount": 2,
+      "nonzeroTimeSymmetryCount": 1,
+      "verifiedNonzeroTimeSymmetryCount": 1
+    },
+    {
+      "id": "pmm",
+      "verifiedPatternCount": 29,
+      "verifiedExampleCount": 34,
+      "verifiedParameterCount": 20,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "pmg",
+      "verifiedPatternCount": 22,
+      "verifiedExampleCount": 23,
+      "verifiedParameterCount": 15,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "pgg",
+      "verifiedPatternCount": 29,
+      "verifiedExampleCount": 29,
+      "verifiedParameterCount": 20,
+      "timeSymmetryCount": 4,
+      "populatedSymmetryCount": 4,
+      "nonzeroTimeSymmetryCount": 3,
+      "verifiedNonzeroTimeSymmetryCount": 3
+    },
+    {
+      "id": "cmm",
+      "verifiedPatternCount": 36,
+      "verifiedExampleCount": 36,
+      "verifiedParameterCount": 19,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "p4",
+      "verifiedPatternCount": 136,
+      "verifiedExampleCount": 143,
+      "verifiedParameterCount": 13,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "p4m",
+      "verifiedPatternCount": 39,
+      "verifiedExampleCount": 52,
+      "verifiedParameterCount": 18,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "p4g",
+      "verifiedPatternCount": 57,
+      "verifiedExampleCount": 57,
+      "verifiedParameterCount": 19,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "p3",
+      "verifiedPatternCount": 46,
+      "verifiedExampleCount": 46,
+      "verifiedParameterCount": 21,
+      "timeSymmetryCount": 4,
+      "populatedSymmetryCount": 4,
+      "nonzeroTimeSymmetryCount": 3,
+      "verifiedNonzeroTimeSymmetryCount": 3
+    },
+    {
+      "id": "p3m1",
+      "verifiedPatternCount": 14,
+      "verifiedExampleCount": 14,
+      "verifiedParameterCount": 11,
+      "timeSymmetryCount": 2,
+      "populatedSymmetryCount": 2,
+      "nonzeroTimeSymmetryCount": 1,
+      "verifiedNonzeroTimeSymmetryCount": 1
+    },
+    {
+      "id": "p31m",
+      "verifiedPatternCount": 13,
+      "verifiedExampleCount": 13,
+      "verifiedParameterCount": 11,
+      "timeSymmetryCount": 4,
+      "populatedSymmetryCount": 4,
+      "nonzeroTimeSymmetryCount": 3,
+      "verifiedNonzeroTimeSymmetryCount": 3
+    },
+    {
+      "id": "p6",
+      "verifiedPatternCount": 64,
+      "verifiedExampleCount": 64,
+      "verifiedParameterCount": 11,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5
+    },
+    {
+      "id": "p6m",
+      "verifiedPatternCount": 16,
+      "verifiedExampleCount": 16,
+      "verifiedParameterCount": 14,
+      "timeSymmetryCount": 4,
+      "populatedSymmetryCount": 4,
+      "nonzeroTimeSymmetryCount": 3,
+      "verifiedNonzeroTimeSymmetryCount": 3
+    }
+  ],
+  "counting": "Family pattern counts deduplicate identical field bytes within that family. A field can satisfy several wallpaper subgroups. Examples count separately verified field/group pairs."
+}

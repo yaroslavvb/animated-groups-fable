@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {mainFrameScreenshot} from './browser-frame.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE??'playwright');
 const base=(process.argv[2]??'http://localhost:8934/').replace(/\/?$/,'/'),label=process.argv[3]??'local';
 const browser=await chromium.launch({channel:'chrome',headless:true});
@@ -18,7 +19,8 @@ try{
  assert.match(await page.locator('#scale-label').innerText(),/^Physical width L/);
  assert.equal(await page.locator('#tiles option:checked').innerText(),'L');
  assert.equal(await page.locator('#approximate-controls').isVisible(),true);
- const frame=await page.locator('#compare-original').evaluate(c=>c.toDataURL());
+ assert.equal(await page.locator('.comparison,#compare-original,#comparison-error').count(),0,'comparison/tutorial is absent');
+ const frame=await mainFrameScreenshot(page);
  await page.locator('.canvas-wrap').screenshot({path:`/tmp/q31-strict-${label}.png`});
  await page.locator('#show-approximate').check();
  assert.equal((await keys(page)).length,186);
@@ -29,14 +31,14 @@ try{
  });
  await page.locator(`[data-centre-key="${marker}"]`).first().click();
  assert.match(await page.locator('#operation option:checked').innerText(),/^Approximate/);
- assert.match(await page.locator('#comparison-error').innerText(),/not verified at the strict tolerance/);
- assert.match(await page.locator('#visibility-explanation').innerText(),/near-symmetry/);
- assert.equal(await page.locator('#compare-original').evaluate(c=>c.toDataURL()),frame,'inspection does not change the movie');
+ assert.match(await page.locator('#generator-description').innerText(),/^Approximate.*centre/);
+ assert.match(await page.locator('#approximate-explanation').textContent(),/fails the strict symmetry check/);
+ assert.equal(await mainFrameScreenshot(page),frame,'inspection does not change the movie');
  const share=page.url();assert.match(share,/&approx=1&/);
  await page.reload();await ready(page);
  assert.equal(page.url(),share);assert.equal(await page.locator('#operation').inputValue(),marker);
  assert.equal(await page.locator('#show-approximate').isChecked(),true);
- assert.equal(await page.locator('#compare-original').evaluate(c=>c.toDataURL()),frame);
+ assert.equal(await mainFrameScreenshot(page),frame);
  await page.locator('.canvas-wrap').screenshot({path:`/tmp/q31-approximate-${label}-desktop.png`});
  await page.setViewportSize({width:390,height:844});
  await page.locator('.canvas-wrap').screenshot({path:`/tmp/q31-approximate-${label}-mobile.png`});

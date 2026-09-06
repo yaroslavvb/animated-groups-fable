@@ -1,0 +1,200 @@
+{
+  "schema": "wallpaper-modal-batch-v1",
+  "budget": {
+    "maximumJobs": 36,
+    "maxContainers": 24,
+    "physicalCoresPerContainer": 2,
+    "memoryGiBHardLimit": 8,
+    "executionSeconds": 150,
+    "startupSeconds": 120,
+    "subprocessSeconds": 120,
+    "retries": 0,
+    "gpu": null,
+    "pricingURL": "https://modal.com/pricing",
+    "pricingChecked": "2026-09-05",
+    "resourceUSDPerSecond": 4.396e-05,
+    "reservedUSDIncludingThreeDollarBuildReserve": 3.4431168
+  },
+  "results": [
+    {
+      "id": "g270-L256-w21-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.347834499999999
+    },
+    {
+      "id": "g270-L256-w21-amp12",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.4860803369999998
+    },
+    {
+      "id": "g270-L256-w21-amp18",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.9953146920000004
+    },
+    {
+      "id": "g270-L256-w21-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 15.907410535999999
+    },
+    {
+      "id": "g270-L256-w31-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.121291359
+    },
+    {
+      "id": "g270-L256-w31-amp12",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.2373290159999994
+    },
+    {
+      "id": "g270-L256-w31-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 17.501414386999997
+    },
+    {
+      "id": "g270-L256-w31-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 21.885042290999998
+    },
+    {
+      "id": "g270-L256-w32-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.157708742
+    },
+    {
+      "id": "g270-L256-w32-amp12",
+      "outcome": "failed",
+      "elapsedSeconds": 13.462901638
+    },
+    {
+      "id": "g270-L256-w32-amp18",
+      "outcome": "candidate",
+      "elapsedSeconds": 13.055517409
+    },
+    {
+      "id": "g270-L256-w32-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 17.457418653
+    },
+    {
+      "id": "g270-L512-w21-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.929531628
+    },
+    {
+      "id": "g270-L512-w21-amp12",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.221911852
+    },
+    {
+      "id": "g270-L512-w21-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 10.979999514
+    },
+    {
+      "id": "g270-L512-w21-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 12.361670369
+    },
+    {
+      "id": "g270-L512-w31-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.987406032000001
+    },
+    {
+      "id": "g270-L512-w31-amp12",
+      "outcome": "candidate",
+      "elapsedSeconds": 11.143964045
+    },
+    {
+      "id": "g270-L512-w31-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 11.397693766
+    },
+    {
+      "id": "g270-L512-w31-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 13.102086445
+    },
+    {
+      "id": "g270-L512-w32-amp8",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.638430846
+    },
+    {
+      "id": "g270-L512-w32-amp12",
+      "outcome": "failed",
+      "elapsedSeconds": 15.803956003999998
+    },
+    {
+      "id": "g270-L512-w32-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 13.337850491000001
+    },
+    {
+      "id": "g270-L512-w32-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 17.902042115
+    },
+    {
+      "id": "g270-L1024-w21-amp8",
+      "outcome": "failed",
+      "elapsedSeconds": 12.414446564
+    },
+    {
+      "id": "g270-L1024-w21-amp12",
+      "outcome": "failed",
+      "elapsedSeconds": 13.531216708
+    },
+    {
+      "id": "g270-L1024-w21-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 14.24138932
+    },
+    {
+      "id": "g270-L1024-w21-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 13.028087916
+    },
+    {
+      "id": "g270-L1024-w31-amp8",
+      "outcome": "failed",
+      "elapsedSeconds": 12.707777613000001
+    },
+    {
+      "id": "g270-L1024-w31-amp12",
+      "outcome": "failed",
+      "elapsedSeconds": 11.677206813999998
+    },
+    {
+      "id": "g270-L1024-w31-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 14.128756339000002
+    },
+    {
+      "id": "g270-L1024-w31-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 12.158724959
+    },
+    {
+      "id": "g270-L1024-w32-amp8",
+      "outcome": "failed",
+      "elapsedSeconds": 17.161891668
+    },
+    {
+      "id": "g270-L1024-w32-amp12",
+      "outcome": "failed",
+      "elapsedSeconds": 19.500559783
+    },
+    {
+      "id": "g270-L1024-w32-amp18",
+      "outcome": "failed",
+      "elapsedSeconds": 10.883976329
+    },
+    {
+      "id": "g270-L1024-w32-amp35",
+      "outcome": "failed",
+      "elapsedSeconds": 21.335291377
+    }
+  ]
+}

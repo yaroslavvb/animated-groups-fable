@@ -8,7 +8,7 @@ export function updateCellFraming({family,translations,near,count,framing}) {
   const view=makeCellView(cell,count,{view:framing});
   const $=id=>document.getElementById(id);
   renderCellGuide($('cell-guide'),view);
-  for(const id of ['pattern','gpu-pattern','compare-original','compare-a','compare-b'])$(id).style.clipPath=view?.clipPath??'';
+  for(const id of ['pattern','gpu-pattern'])$(id).style.clipPath=view?.clipPath??'';
   document.querySelector('.canvas-wrap').classList.toggle('cell-framing',!!view);
   $('tile-label').textContent=view?'Cells':'Width';
   $('tiles').setAttribute('aria-label',view?'Number of pattern cells':'Simulation width in L');

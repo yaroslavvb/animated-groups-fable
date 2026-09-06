@@ -1,0 +1,405 @@
+{
+  "schema": "wallpaper-modal-batch-v1",
+  "budget": {
+    "maximumJobs": 77,
+    "maxContainers": 24,
+    "physicalCoresPerContainer": 2,
+    "memoryGiBHardLimit": 8,
+    "executionSeconds": 150,
+    "startupSeconds": 120,
+    "subprocessSeconds": 120,
+    "retries": 0,
+    "gpu": null,
+    "pricingURL": "https://modal.com/pricing",
+    "pricingChecked": "2026-09-05",
+    "resourceUSDPerSecond": 4.396e-05,
+    "reservedUSDIncludingThreeDollarBuildReserve": 3.9477776
+  },
+  "results": [
+    {
+      "id": "g137-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.2803921449999995
+    },
+    {
+      "id": "g137-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.122926454
+    },
+    {
+      "id": "g67-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.09418387
+    },
+    {
+      "id": "g139-w21-a55-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.2209941440000005
+    },
+    {
+      "id": "g7-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 8.83233104
+    },
+    {
+      "id": "g62-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 19.147396714
+    },
+    {
+      "id": "g6-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 10.295009779999999
+    },
+    {
+      "id": "g59-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.241903064
+    },
+    {
+      "id": "g66-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.328791284999999
+    },
+    {
+      "id": "g59-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.740978937
+    },
+    {
+      "id": "g6-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 11.854289673
+    },
+    {
+      "id": "g133-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.503867878
+    },
+    {
+      "id": "g6-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 23.897477788
+    },
+    {
+      "id": "g59-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 12.35959232
+    },
+    {
+      "id": "g74-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.8400692119999995
+    },
+    {
+      "id": "g64-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.462589401
+    },
+    {
+      "id": "g71-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 9.287537238
+    },
+    {
+      "id": "g138-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.128033053
+    },
+    {
+      "id": "g6-w11-a55-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 22.603735867
+    },
+    {
+      "id": "g57-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.823246612
+    },
+    {
+      "id": "g134-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.728539062
+    },
+    {
+      "id": "g225-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 17.66056408
+    },
+    {
+      "id": "g6-w12-a55-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 29.078886437
+    },
+    {
+      "id": "g131-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 8.039665867
+    },
+    {
+      "id": "g130-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.171216372
+    },
+    {
+      "id": "g65-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.643604821
+    },
+    {
+      "id": "g75-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.582847809
+    },
+    {
+      "id": "g139-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.5474221440000004
+    },
+    {
+      "id": "g60-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.8496978649999996
+    },
+    {
+      "id": "g70-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.670598444
+    },
+    {
+      "id": "g60-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.355991294000001
+    },
+    {
+      "id": "g130-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.722933213999999
+    },
+    {
+      "id": "g139-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.5294674739999996
+    },
+    {
+      "id": "g9-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 12.016591075000001
+    },
+    {
+      "id": "g60-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.1594955859999985
+    },
+    {
+      "id": "g130-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.135777603999999
+    },
+    {
+      "id": "g69-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.512157182999999
+    },
+    {
+      "id": "g57-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.30537327
+    },
+    {
+      "id": "g225-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 8.270162497
+    },
+    {
+      "id": "g71-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 8.038609958999999
+    },
+    {
+      "id": "g61-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.789543279
+    },
+    {
+      "id": "g225-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.851909044999999
+    },
+    {
+      "id": "g138-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.953903842000001
+    },
+    {
+      "id": "g64-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.556589824
+    },
+    {
+      "id": "g71-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.833509242
+    },
+    {
+      "id": "g61-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.066771634000002
+    },
+    {
+      "id": "g225-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 55.076688692999994
+    },
+    {
+      "id": "g6-w21-a55-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 50.435023959
+    },
+    {
+      "id": "g131-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.442341853999999
+    },
+    {
+      "id": "g55-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.053780477999998
+    },
+    {
+      "id": "g63-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.324849751
+    },
+    {
+      "id": "g73-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.908723068999999
+    },
+    {
+      "id": "g63-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.897034008999999
+    },
+    {
+      "id": "g73-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.682272812000001
+    },
+    {
+      "id": "g66-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.231408978000001
+    },
+    {
+      "id": "g133-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.994605736000002
+    },
+    {
+      "id": "g63-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.741248778000003
+    },
+    {
+      "id": "g6-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 21.792564225999996
+    },
+    {
+      "id": "g59-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.789228972999998
+    },
+    {
+      "id": "g62-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.237276138999999
+    },
+    {
+      "id": "g7-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.735692062999998
+    },
+    {
+      "id": "g62-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 14.276480031999998
+    },
+    {
+      "id": "g137-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.947262404
+    },
+    {
+      "id": "g139-w12-a55-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.8835052899999987
+    },
+    {
+      "id": "g62-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 5.6124574339999995
+    },
+    {
+      "id": "g226-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 38.788484707
+    },
+    {
+      "id": "g227-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.570031616000001
+    },
+    {
+      "id": "g235-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.589946263999998
+    },
+    {
+      "id": "g231-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.588937151000003
+    },
+    {
+      "id": "g234-w21-a25-refine24",
+      "outcome": "failed",
+      "elapsedSeconds": 14.393014645999997
+    },
+    {
+      "id": "g231-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 11.531192808
+    },
+    {
+      "id": "g231-w21-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 6.9627893709999995
+    },
+    {
+      "id": "g234-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.397401303999999
+    },
+    {
+      "id": "g227-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.088575369999997
+    },
+    {
+      "id": "g226-w12-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 20.634337119999998
+    },
+    {
+      "id": "g226-w10-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 7.790336200999999
+    },
+    {
+      "id": "g226-w11-a25-refine24",
+      "outcome": "candidate",
+      "elapsedSeconds": 8.246123263000001
+    }
+  ]
+}

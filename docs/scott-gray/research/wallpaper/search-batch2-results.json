@@ -1,0 +1,380 @@
+{
+  "schema": "wallpaper-modal-batch-v1",
+  "budget": {
+    "maximumJobs": 72,
+    "maxContainers": 24,
+    "physicalCoresPerContainer": 2,
+    "memoryGiBHardLimit": 8,
+    "executionSeconds": 150,
+    "startupSeconds": 120,
+    "subprocessSeconds": 120,
+    "retries": 0,
+    "gpu": null,
+    "pricingURL": "https://modal.com/pricing",
+    "pricingChecked": "2026-09-05",
+    "resourceUSDPerSecond": 4.396e-05,
+    "reservedUSDIncludingThreeDollarBuildReserve": 3.8862335999999997
+  },
+  "results": [
+    {
+      "id": "g226-w10-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 4.422920643
+    },
+    {
+      "id": "g226-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 6.607362141
+    },
+    {
+      "id": "g226-w11-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.3008360590000003
+    },
+    {
+      "id": "g226-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 6.394715716
+    },
+    {
+      "id": "g226-w21-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.0018562919999994
+    },
+    {
+      "id": "g226-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 6.444064877
+    },
+    {
+      "id": "g226-w12-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.789578605
+    },
+    {
+      "id": "g226-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 5.931263796
+    },
+    {
+      "id": "g227-w10-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.7335357000000005
+    },
+    {
+      "id": "g227-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.660480415
+    },
+    {
+      "id": "g227-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.169145614
+    },
+    {
+      "id": "g227-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.2159868339999997
+    },
+    {
+      "id": "g227-w21-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.101590383
+    },
+    {
+      "id": "g227-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 5.126503854
+    },
+    {
+      "id": "g227-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.7228462539999994
+    },
+    {
+      "id": "g227-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.9680182399999997
+    },
+    {
+      "id": "g231-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.033704661
+    },
+    {
+      "id": "g231-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.961682144
+    },
+    {
+      "id": "g231-w11-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.4497891600000004
+    },
+    {
+      "id": "g231-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.1965549069999994
+    },
+    {
+      "id": "g231-w21-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.7169994620000004
+    },
+    {
+      "id": "g231-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 5.453695753
+    },
+    {
+      "id": "g231-w12-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 3.6389795719999998
+    },
+    {
+      "id": "g231-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.296541479000001
+    },
+    {
+      "id": "g235-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.6863428690000006
+    },
+    {
+      "id": "g235-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.099849708000001
+    },
+    {
+      "id": "g235-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 1.5094034830000003
+    },
+    {
+      "id": "g235-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.0736043879999997
+    },
+    {
+      "id": "g235-w21-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.3980119989999995
+    },
+    {
+      "id": "g235-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 5.077872295000001
+    },
+    {
+      "id": "g235-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.605233147
+    },
+    {
+      "id": "g235-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.0568152899999994
+    },
+    {
+      "id": "g234-w10-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.099065242000001
+    },
+    {
+      "id": "g234-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.0441822409999997
+    },
+    {
+      "id": "g234-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.1657176639999998
+    },
+    {
+      "id": "g234-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.5137950079999998
+    },
+    {
+      "id": "g234-w21-a25",
+      "outcome": "candidate",
+      "elapsedSeconds": 2.561324463
+    },
+    {
+      "id": "g234-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.2142026040000005
+    },
+    {
+      "id": "g234-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.0178458569999993
+    },
+    {
+      "id": "g234-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.0275678779999993
+    },
+    {
+      "id": "g233-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.888325494000001
+    },
+    {
+      "id": "g233-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.504096601999999
+    },
+    {
+      "id": "g233-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 1.9886475199999998
+    },
+    {
+      "id": "g233-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.985320014
+    },
+    {
+      "id": "g233-w21-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.9298420729999997
+    },
+    {
+      "id": "g233-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.277516934
+    },
+    {
+      "id": "g233-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 4.037301977
+    },
+    {
+      "id": "g233-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.945956782
+    },
+    {
+      "id": "g270-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 1.9045311389999995
+    },
+    {
+      "id": "g270-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.7182236320000008
+    },
+    {
+      "id": "g270-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.195163312
+    },
+    {
+      "id": "g270-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.4888603620000005
+    },
+    {
+      "id": "g270-w21-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.0016159270000005
+    },
+    {
+      "id": "g270-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.586394938000001
+    },
+    {
+      "id": "g270-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.882299937000001
+    },
+    {
+      "id": "g270-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 4.248530537000001
+    },
+    {
+      "id": "g269-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.4053444729999995
+    },
+    {
+      "id": "g269-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.947931907000001
+    },
+    {
+      "id": "g269-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.633489730000001
+    },
+    {
+      "id": "g269-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.877638909
+    },
+    {
+      "id": "g269-w21-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.6739714710000015
+    },
+    {
+      "id": "g269-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.7243036279999995
+    },
+    {
+      "id": "g269-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.2492340030000006
+    },
+    {
+      "id": "g269-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.2571710449999998
+    },
+    {
+      "id": "g271-w10-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.1700113340000007
+    },
+    {
+      "id": "g271-w10-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 2.655026210000001
+    },
+    {
+      "id": "g271-w11-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 1.9122320350000006
+    },
+    {
+      "id": "g271-w11-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 1.947147922000001
+    },
+    {
+      "id": "g271-w21-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 3.5662447769999996
+    },
+    {
+      "id": "g271-w21-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 5.064773572
+    },
+    {
+      "id": "g271-w12-a25",
+      "outcome": "failed",
+      "elapsedSeconds": 2.3710614999999997
+    },
+    {
+      "id": "g271-w12-a55",
+      "outcome": "failed",
+      "elapsedSeconds": 3.3001863349999994
+    }
+  ]
+}

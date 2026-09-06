@@ -1,11 +1,11 @@
-import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-cells';
-import {rotationCentres} from '../rotation-centres.mjs?v=20260905-cells';
-import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-cells';
-import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-cells';
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-wallpaper';
+import {rotationCentres} from '../rotation-centres.mjs?v=20260905-wallpaper';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-wallpaper';
+import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-wallpaper';
 import {updateCellFraming} from '../cell-ui.mjs';
-import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260905-cells';
-import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260905-cells';
-import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260905-cells6';
+import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260905-wallpaper';
+import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260905-wallpaper';
+import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260905-wallpaper6';
 
 const $=id=>document.getElementById(id),svgNS='http://www.w3.org/2000/svg';
 const number=value=>Number(value.toPrecision(11)).toString();
@@ -32,8 +32,7 @@ function restoreUrl(){
 function togglePlayback(){if(!record)return;setPlaying(!playing);syncUrl();}
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name)&&!centres.some(g=>g.key===name)&&!strictCentres.some(g=>g.key===name))return;generatorName=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncUrl();}
-function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
+function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name)&&!centres.some(g=>g.key===name)&&!strictCentres.some(g=>g.key===name))return;generatorName=name;rememberedGenerators.set(group.id,name);overlay();syncUrl();}
 const entries=()=>catalog?.summaries(group?.id)??[];
 const generator=()=>centres.find(item=>item.key===generatorName)??strictCentres.find(item=>item.key===generatorName)??group?.namedGenerators.find(item=>item.name===generatorName)??group?.namedGenerators[0];
 // Presentation order: new mixtures first; this is not a scientific ranking.
@@ -62,38 +61,22 @@ function empty({loading=false,error=null}={}){
   $('mode-label').textContent=loading?'Loading saved animation':error?'Download failed':'Existence unresolved';
   $('engine-label').textContent=loading?'Precomputed data':'No orbit loaded';
   $('caption').textContent=loading?'Loading a saved field. No numerical search runs during browsing.':error?error:'Failed or unverified candidates never appear in this viewer.';
-  $('phase-label').textContent='—';$('phase').value=0;$('color-scale').textContent='';setMetrics(null);clear($('pattern'));clear($('compare-original'));clear($('compare-a'));$('visibility-explanation').textContent='';clear($('compare-b'));
-  $('comparison-error').textContent='Select a verified orbit to compare its actual concentration fields.';controls();
+  $('phase-label').textContent='—';$('phase').value=0;$('color-scale').textContent='';setMetrics(null);clear($('pattern'));
+  controls();
 }
 function selectedOperation(){const g=generator();return g?{M:g.matrix,v:g.translation,tau:g.tau}:null;}
-function drawComparison(){
-  if(!record)return;
-  const op=selectedOperation(),operation=inverseForRendering(op),options={palette:palette(),tiles:tiles(),...cellView?.viewOptions};
-  drawCPU($('compare-original'),record,phase,options);
-  drawCPU($('compare-a'),record,phase,{...options,operation});
-  drawCPU($('compare-b'),record,phase+op.tau,{...options,operation});
-  const N=record.config.N;let shifted=0,spatial=0;
-  for(let channel=0;channel<2;channel++)for(let y=0;y<N;y++)for(let x=0;x<N;x++){
-    const u=op.M[0][0]*x/N+op.M[0][1]*y/N+op.v[0],v=op.M[1][0]*x/N+op.M[1][1]*y/N+op.v[1],baseline=valueAt(record,channel,x/N,y/N,phase);
-    shifted+=(baseline-valueAt(record,channel,u,v,phase+op.tau))**2;
-    spatial+=(baseline-valueAt(record,channel,u,v,phase))**2;
-  }
-  const approximate=generator()?.approximate;
-  $('comparison-error').textContent=(approximate?'Approximate centre · not verified at the strict tolerance. ':'')+`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*N*N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*N*N)))} RMS.`;
-  $('visibility-explanation').textContent=approximate?'The dashed marker describes a near-symmetry. The first and third images have a small residual difference, even with the phase shift. Select a solid marker to inspect a verified operation.':visibilityCaption(record);
-  lastComparison=performance.now();
-}
+
 function draw(forceComparison=false){
   if(!record)return;
   const options={tiles:tiles(),palette:palette(),...cellView?.viewOptions};
   if(player)player.draw(phase,options);else drawCPU($('pattern'),record,phase,options);
   $('phase').value=phase;$('phase-label').textContent=`${phase.toFixed(3)} T`;
-  if(forceComparison||performance.now()-lastComparison>180)drawComparison();
 }
 function updateScale(){if(!record)return;const key=palette()==='concentration'?'v':'u',range=record.ranges[key];$('color-scale').textContent=`Fixed across the entire orbit: ${key.toUpperCase()} = ${range[0].toFixed(4)} … ${range[1].toFixed(4)}.`;}
 function svgElement(tag,attributes){const element=document.createElementNS(svgNS,tag);for(const [name,value] of Object.entries(attributes))element.setAttribute(name,value);return element;}
 function overlay(){
   if(!group)return;
+  document.querySelector('.phase-rule').hidden=!$('show-generators').checked;
   const summary=record?.id===selectedId&&record?.groupId===group.id?record:catalog?.get(selectedId),translations=overlayTranslations(translationIndex,summary),cacheKey=group.id+':'+(summary?.id??'base');
   if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:group.namedGenerators,ops:group.render.ops,family:'p6',translations}));
   const exactCentres=centreCache.get(cacheKey),near=overlayNearEvidence(nearTranslationIndex,summary,translations);
@@ -122,10 +105,8 @@ function overlay(){
     const select=()=>chooseGenerator(named.key);marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
   }
   $('overlay-explanation').textContent=overlayCaption(exactCentres,translations,{cellView,approximate:!!near,displayed:centres,inspect:inspectApproximate});
-  const g=generator();$('generator-description').textContent=(g.approximate?'Approximate · ':'')+`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'')+(g.verifiedLowerOrder?` · verified ${g.verifiedLowerOrder.order}-fold rotation at the same centre`:'');$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
-  const count=6,shift=Math.round(g.tau*count),row=document.createElement('div');row.className='phase-row';
-  for(let i=0;i<count;i++){const chip=document.createElement('span');chip.className='phase-chip';for(const [index,label] of [[i,`${i}/6 → `],[mod(i+shift,count),`${mod(i+shift,count)}/6`]]){const color=document.createElement('i');color.style.setProperty('--phase-color',`hsl(${index*60+15} 55% 55%)`);chip.append(color,document.createTextNode(label));}row.append(chip);}
-  $('phase-permutation').replaceChildren(row);$('phase-explanation').textContent=g.tau===0?'This generator preserves the phase.':'The cyclic color permutation advances the chemical phase. The spatial rotation alone is a different constraint.';
+  const g=generator();$('generator-description').textContent=(g.approximate?'Approximate · ':'')+`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'')+(g.verifiedLowerOrder?` · verified ${g.verifiedLowerOrder.order}-fold rotation at the same centre`:'');
+
 }
 function patternLabel(entry){return `${entry.patternName??entry.name??'Periodic wave'} · T ${entry.config.period.toFixed(2)} · ${entry.config.N}²`;}
 function populatePatterns(set){
@@ -161,7 +142,7 @@ async function openPattern(id,{playback={phase:0,play:true}}={}){
     $('gpu-pattern').hidden=!player;$('pattern').hidden=!!player;$('empty-state').hidden=true;$('mode-label').textContent=referenceGroup()?'Spatial reference · zero time offset':'Verified visible time symmetry';
     $('engine-label').textContent=`${player?'WebGL':'CPU'} playback · ${record.config.N}² × ${record.config.M} · T ${record.config.period.toFixed(2)}`;
     $('caption').textContent=record.description||'Independent numerical verification was completed before this field was published.';
-    $('visibility-explanation').textContent=visibilityCaption(record);
+
     $('status').textContent='Precomputed animation ready. The downloaded field passed its file-integrity check.';overlay();setMetrics(record.diagnostics);updateScale();populate();draw(true);lastTime=performance.now();setPlaying(requestedPlayback.play);
   }catch(error){if(token!==selectionToken||group.id!==targetGroup)return;empty({error:error.message});$('status').textContent=`Could not load this animation: ${error.message}`;}
 }
@@ -174,8 +155,8 @@ function chooseGroup(id,{view=null}={}){
   const requestedId=view?view.patternId:remembered.get(group.id),requestedPattern=catalog.get(requestedId);
   selectedId=requestedPattern?.groupId===group.id?requestedId:parameterSets()[0]?.patterns[0]?.id??preferred?.id??null;selectedKey=selectedId?parameterKey(catalog.get(selectedId).config):null;
   const playback=view?{phase:view.phase,play:view.play}:{phase:0,play:true};
-  $('group-label').textContent=group.id+' · 632';$('selected-id').textContent=group.id+(referenceGroup()?' / SPATIAL REFERENCE':' / CYCLIC COLOR GROUP');$('policy-label').textContent=referenceGroup()?'Spatial reference · all offsets zero':'Visible time-symmetric solutions';$('selected-title').innerHTML=group.shortHTML;
-  $('selected-description').textContent=group.namedGenerators.map(g=>`${g.name}: ${g.timeShift} T`).join(' · ')+(referenceGroup()?'. Every generator is a spatial symmetry at each time.':'. Phase shifts act on both chemical concentrations.');$('reference-link').href='../../correspondence-p6.html#'+group.id;
+  $('group-label').textContent=group.id+' · 632';$('selected-id').textContent=group.id+(referenceGroup()?' / SPATIAL REFERENCE':' / TIME-SHIFT SYMMETRY');$('policy-label').textContent=referenceGroup()?'Spatial reference · all offsets zero':'Visible time-symmetric solutions';$('selected-title').innerHTML=group.shortHTML;
+  $('selected-description').textContent=group.namedGenerators.map(g=>`${g.name}: ${g.timeShift} T`).join(' · ')+(referenceGroup()?'. Every generator is a spatial symmetry at each time.':'. Phase shifts act on both chemical concentrations.');
   $('operation').replaceChildren();for(const named of group.namedGenerators){const option=document.createElement('option');option.value=named.name;option.textContent=`${named.name} · +${named.timeShift} T`;$('operation').append(option);}
   $('operation').value=generatorName;overlay();populate();if(selectedId)openPattern(selectedId,{playback});else{requestedPlayback=playback;empty();syncUrl();$('status').textContent='No precomputed orbit has passed verification for this group yet.';}
 }
@@ -196,11 +177,11 @@ $('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw(true);syn
 for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}
 $('tiles').onchange=()=>{overlay();draw(true);syncUrl();};$('palette').onchange=()=>{updateScale();populatePatterns(parameterSets().find(set=>set.key===selectedKey));draw(true);syncUrl();};$('show-generators').onchange=()=>{overlay();syncUrl();};$('operation').onchange=()=>chooseGenerator($('operation').value);$('speed').onchange=syncUrl;
 $('framing').onchange=()=>{overlay();draw(true);syncUrl();};
-$('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();drawComparison();syncUrl();};
+$('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();syncUrl();};
 $('export').onclick=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify({schema:'scott-gray-verified-orbit-v3',family:'p6',...record,layout:'frame-major; planar U then V; triangular lattice coordinates; x-fast'})],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-632-${group.id}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 try{
-  const [groupResponse,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-cells').catch(()=>null),fetch('../data/overlay-near-translations.json?v=20260905-cells').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
+  const [groupResponse,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-wallpaper').catch(()=>null),fetch('../data/overlay-near-translations.json?v=20260905-wallpaper').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
   for(const item of groups){const button=document.createElement('button');button.className='group';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');const symbol=document.createElement('strong');symbol.innerHTML=item.shortHTML;const label=document.createElement('span');label.textContent=item.id;const count=document.createElement('small');count.className='orbit-count';label.append(count);button.append(symbol,label);button.onclick=()=>chooseGroup(item.id);$('groups').append(button);}
   if(!manifestResponse.ok)throw Error('The precomputed 632 catalog could not load.');const manifest=await manifestResponse.json();if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');catalog=createPrecomputedCatalog(manifest,{groups,family:'p6'});preferredParameters=manifest.preferredParameters??null;
   defaultGroupId=manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243';restoreUrl();

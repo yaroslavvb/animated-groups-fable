@@ -1,0 +1,4707 @@
+[
+  {
+    "jobId": "g6-w10-a55",
+    "groupId": "g6",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.87209974720247e-05,
+    "calls": 5625,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g6-w10-a55",
+      "groupId": "g6",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g7-w10-a25",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g7-w10-a55",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g7-w11-a55",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0003836505071374997,
+    "calls": 1561,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g7-w11-a55",
+      "groupId": "g7",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g7-w21-a55",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0026544108208533313,
+    "calls": 1253,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g7-w21-a55",
+      "groupId": "g7",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g7-w12-a25",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g7-w12-a55",
+    "groupId": "g7",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g9-w10-a55",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0020430159879642608,
+    "calls": 5596,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g9-w10-a55",
+      "groupId": "g9",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g9-w11-a25",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g9-w11-a55",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g9-w21-a25",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.8786550220240967e-05,
+    "calls": 2401,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g9-w21-a25",
+      "groupId": "g9",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g9-w21-a55",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.001129733366526487,
+    "calls": 3255,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g9-w21-a55",
+      "groupId": "g9",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g9-w12-a25",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.8786500508120143e-05,
+    "calls": 2401,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g9-w12-a25",
+      "groupId": "g9",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g9-w12-a55",
+    "groupId": "g9",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012578942070647799,
+    "calls": 3247,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g9-w12-a55",
+      "groupId": "g9",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g55-w10-a25",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g55-w10-a55",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g55-w11-a55",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00021340157906559154,
+    "calls": 2196,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g55-w11-a55",
+      "groupId": "g55",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g55-w21-a25",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.1774276658636713e-05,
+    "calls": 1546,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g55-w21-a25",
+      "groupId": "g55",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g55-w21-a55",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0004571946788603166,
+    "calls": 1718,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g55-w21-a55",
+      "groupId": "g55",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g55-w12-a25",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.5211778661612738e-05,
+    "calls": 1252,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g55-w12-a25",
+      "groupId": "g55",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g55-w12-a55",
+    "groupId": "g55",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00045771440972307726,
+    "calls": 1718,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g55-w12-a55",
+      "groupId": "g55",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g65-w10-a25",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g65-w10-a55",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g65-w11-a55",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000514469772124581,
+    "calls": 1111,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g65-w11-a55",
+      "groupId": "g65",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g65-w21-a25",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.7360094394136028e-05,
+    "calls": 749,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g65-w21-a25",
+      "groupId": "g65",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g65-w21-a55",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002450077232851404,
+    "calls": 1398,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g65-w21-a55",
+      "groupId": "g65",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g65-w12-a25",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g65-w12-a55",
+    "groupId": "g65",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g60-w10-a25",
+    "groupId": "g60",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g60-w10-a55",
+    "groupId": "g60",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g60-w11-a55",
+    "groupId": "g60",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002814306369131243,
+    "calls": 3170,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g60-w11-a55",
+      "groupId": "g60",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g60-w21-a55",
+    "groupId": "g60",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0008418656655681557,
+    "calls": 4563,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g60-w21-a55",
+      "groupId": "g60",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g60-w12-a55",
+    "groupId": "g60",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00021818350214178035,
+    "calls": 3035,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g60-w12-a55",
+      "groupId": "g60",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g74-w10-a25",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g74-w10-a55",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g74-w11-a55",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00034726901979551867,
+    "calls": 770,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g74-w11-a55",
+      "groupId": "g74",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g74-w21-a25",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g74-w21-a55",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g74-w12-a25",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g74-w12-a55",
+    "groupId": "g74",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g64-w10-a25",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g64-w10-a55",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g64-w11-a55",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000654831260731229,
+    "calls": 1487,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g64-w11-a55",
+      "groupId": "g64",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g64-w21-a55",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0010602043320602674,
+    "calls": 1259,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g64-w21-a55",
+      "groupId": "g64",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g64-w12-a25",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g64-w12-a55",
+    "groupId": "g64",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g61-w10-a25",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g61-w10-a55",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g61-w11-a55",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00027886002614846726,
+    "calls": 1864,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g61-w11-a55",
+      "groupId": "g61",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g61-w21-a25",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.469251959530115e-05,
+    "calls": 1072,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g61-w21-a25",
+      "groupId": "g61",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g61-w21-a55",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00047523172289037956,
+    "calls": 1675,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g61-w21-a55",
+      "groupId": "g61",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g61-w12-a55",
+    "groupId": "g61",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.007104252262393788,
+    "calls": 1701,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g61-w12-a55",
+      "groupId": "g61",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g62-w10-a55",
+    "groupId": "g62",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.158523518278899e-05,
+    "calls": 3172,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g62-w10-a55",
+      "groupId": "g62",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g62-w11-a55",
+    "groupId": "g62",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00039516856728480165,
+    "calls": 2639,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g62-w11-a55",
+      "groupId": "g62",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g62-w21-a55",
+    "groupId": "g62",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012883379787104658,
+    "calls": 1923,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g62-w21-a55",
+      "groupId": "g62",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g62-w12-a55",
+    "groupId": "g62",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0018707755343175556,
+    "calls": 4214,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g62-w12-a55",
+      "groupId": "g62",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g67-w10-a25",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g67-w10-a55",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g67-w11-a55",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.004017828992523544,
+    "calls": 1458,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g67-w11-a55",
+      "groupId": "g67",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g67-w21-a25",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.0497216430786928e-05,
+    "calls": 904,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g67-w21-a25",
+      "groupId": "g67",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g67-w21-a55",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0004840122143401577,
+    "calls": 980,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g67-w21-a55",
+      "groupId": "g67",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g67-w12-a25",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g67-w12-a55",
+    "groupId": "g67",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g57-w10-a25",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g57-w10-a55",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g57-w11-a55",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0005482162293950977,
+    "calls": 3127,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g57-w11-a55",
+      "groupId": "g57",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g57-w21-a55",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003784589560780554,
+    "calls": 2345,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g57-w21-a55",
+      "groupId": "g57",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g57-w12-a25",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 4.5089699795493256e-05,
+    "calls": 1711,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g57-w12-a25",
+      "groupId": "g57",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g57-w12-a55",
+    "groupId": "g57",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00045821264108569435,
+    "calls": 1870,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g57-w12-a55",
+      "groupId": "g57",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g66-w10-a25",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g66-w10-a55",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g66-w11-a55",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0033052304906867557,
+    "calls": 1969,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g66-w11-a55",
+      "groupId": "g66",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g66-w21-a55",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0025393213170568757,
+    "calls": 1112,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g66-w21-a55",
+      "groupId": "g66",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g66-w12-a25",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g66-w12-a55",
+    "groupId": "g66",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w10-a25",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w10-a55",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w11-a55",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00021929189973273638,
+    "calls": 794,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g75-w11-a55",
+      "groupId": "g75",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g75-w21-a25",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w21-a55",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w12-a25",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g75-w12-a55",
+    "groupId": "g75",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g63-w10-a55",
+    "groupId": "g63",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.90236594070181e-05,
+    "calls": 1692,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g63-w10-a55",
+      "groupId": "g63",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g63-w11-a55",
+    "groupId": "g63",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0005586826604124469,
+    "calls": 1853,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g63-w11-a55",
+      "groupId": "g63",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g63-w21-a25",
+    "groupId": "g63",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 3.1006946300643606e-05,
+    "calls": 1357,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g63-w21-a25",
+      "groupId": "g63",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g63-w21-a55",
+    "groupId": "g63",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00028168236323382453,
+    "calls": 1961,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g63-w21-a55",
+      "groupId": "g63",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g63-w12-a55",
+    "groupId": "g63",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.01382771130143617,
+    "calls": 1354,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g63-w12-a55",
+      "groupId": "g63",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g59-w10-a55",
+    "groupId": "g59",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00019149116988970022,
+    "calls": 1251,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g59-w10-a55",
+      "groupId": "g59",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g59-w11-a55",
+    "groupId": "g59",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002772653435402297,
+    "calls": 2657,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g59-w11-a55",
+      "groupId": "g59",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g59-w21-a55",
+    "groupId": "g59",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.009376933491839172,
+    "calls": 1553,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g59-w21-a55",
+      "groupId": "g59",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g59-w12-a55",
+    "groupId": "g59",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0017229465247705707,
+    "calls": 1748,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g59-w12-a55",
+      "groupId": "g59",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g72-w10-a25",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g72-w10-a55",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g72-w11-a25",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g72-w11-a55",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g72-w21-a25",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.3160233234448547e-05,
+    "calls": 578,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g72-w21-a25",
+      "groupId": "g72",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g72-w21-a55",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00053241666871363,
+    "calls": 825,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g72-w21-a55",
+      "groupId": "g72",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g72-w12-a25",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.3161879569350749e-05,
+    "calls": 578,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g72-w12-a25",
+      "groupId": "g72",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g72-w12-a55",
+    "groupId": "g72",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0005341441350751775,
+    "calls": 825,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g72-w12-a55",
+      "groupId": "g72",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g69-w10-a25",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g69-w10-a55",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g69-w11-a55",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0006850443685748019,
+    "calls": 1369,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g69-w11-a55",
+      "groupId": "g69",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g69-w21-a25",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g69-w21-a55",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g69-w12-a25",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g69-w12-a55",
+    "groupId": "g69",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w10-a25",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w10-a55",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w11-a55",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003894810186544076,
+    "calls": 1727,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g70-w11-a55",
+      "groupId": "g70",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g70-w21-a25",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w21-a55",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w12-a25",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g70-w12-a55",
+    "groupId": "g70",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g71-w10-a55",
+    "groupId": "g71",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002634042810235122,
+    "calls": 1279,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g71-w10-a55",
+      "groupId": "g71",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g71-w11-a25",
+    "groupId": "g71",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g71-w11-a55",
+    "groupId": "g71",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g71-w21-a55",
+    "groupId": "g71",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.001091318188960864,
+    "calls": 1260,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g71-w21-a55",
+      "groupId": "g71",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g71-w12-a55",
+    "groupId": "g71",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0009609488771549177,
+    "calls": 1283,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g71-w12-a55",
+      "groupId": "g71",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g73-w10-a55",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00020466619750252404,
+    "calls": 846,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g73-w10-a55",
+      "groupId": "g73",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g73-w11-a25",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g73-w11-a55",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g73-w21-a25",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.1650192135124326e-05,
+    "calls": 952,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g73-w21-a25",
+      "groupId": "g73",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g73-w21-a55",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002923450136995083,
+    "calls": 1129,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g73-w21-a55",
+      "groupId": "g73",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g73-w12-a55",
+    "groupId": "g73",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0009419504339124564,
+    "calls": 1152,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g73-w12-a55",
+      "groupId": "g73",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g131-w10-a25",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g131-w10-a55",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g131-w11-a25",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g131-w11-a55",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g131-w21-a55",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012924953612927247,
+    "calls": 840,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g131-w21-a55",
+      "groupId": "g131",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g131-w12-a55",
+    "groupId": "g131",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0014301064089807646,
+    "calls": 677,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g131-w12-a55",
+      "groupId": "g131",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g130-w10-a25",
+    "groupId": "g130",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g130-w10-a55",
+    "groupId": "g130",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g130-w11-a55",
+    "groupId": "g130",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0007770847418599727,
+    "calls": 1116,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g130-w11-a55",
+      "groupId": "g130",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g130-w21-a55",
+    "groupId": "g130",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 5.1518839410143394e-05,
+    "calls": 2002,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g130-w21-a55",
+      "groupId": "g130",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g130-w12-a55",
+    "groupId": "g130",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 5.104153121936936e-05,
+    "calls": 2004,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g130-w12-a55",
+      "groupId": "g130",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g138-w10-a25",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g138-w10-a55",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g138-w11-a25",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g138-w11-a55",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g138-w21-a55",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00044602523563254235,
+    "calls": 621,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g138-w21-a55",
+      "groupId": "g138",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g138-w12-a55",
+    "groupId": "g138",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000446015692955869,
+    "calls": 621,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g138-w12-a55",
+      "groupId": "g138",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w10-a25",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00024023257492807607,
+    "calls": 1048,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w10-a25",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w10-a55",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0027599994822686577,
+    "calls": 1167,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w10-a55",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w11-a25",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g129-w11-a55",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g129-w21-a25",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.9246099030868393e-05,
+    "calls": 1274,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w21-a25",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w21-a55",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0008968456286548629,
+    "calls": 1714,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w21-a55",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w12-a25",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.9246287730062037e-05,
+    "calls": 1274,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w12-a25",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g129-w12-a55",
+    "groupId": "g129",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0008786116732316531,
+    "calls": 1607,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g129-w12-a55",
+      "groupId": "g129",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w10-a25",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00019098964603319696,
+    "calls": 656,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w10-a25",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w10-a55",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.004469092387734376,
+    "calls": 567,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w10-a55",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w11-a25",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g136-w11-a55",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g136-w21-a25",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.6038148950552142e-05,
+    "calls": 866,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w21-a25",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w21-a55",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011470783018616333,
+    "calls": 1075,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w21-a55",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w12-a25",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.6038522437147407e-05,
+    "calls": 866,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w12-a25",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g136-w12-a55",
+    "groupId": "g136",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011470184295208376,
+    "calls": 1075,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g136-w12-a55",
+      "groupId": "g136",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g139-w10-a25",
+    "groupId": "g139",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g139-w10-a55",
+    "groupId": "g139",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g139-w11-a25",
+    "groupId": "g139",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g139-w11-a55",
+    "groupId": "g139",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g133-w10-a25",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g133-w10-a55",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g133-w11-a25",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g133-w11-a55",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g133-w21-a55",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.001228077596575876,
+    "calls": 970,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g133-w21-a55",
+      "groupId": "g133",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g133-w12-a55",
+    "groupId": "g133",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0007596970432677089,
+    "calls": 1607,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g133-w12-a55",
+      "groupId": "g133",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g137-w10-a55",
+    "groupId": "g137",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00011633025147536308,
+    "calls": 1068,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g137-w10-a55",
+      "groupId": "g137",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g137-w11-a25",
+    "groupId": "g137",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g137-w11-a55",
+    "groupId": "g137",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g137-w21-a55",
+    "groupId": "g137",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0005199831927873224,
+    "calls": 1062,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g137-w21-a55",
+      "groupId": "g137",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g137-w12-a55",
+    "groupId": "g137",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0005199873905978589,
+    "calls": 1062,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g137-w12-a55",
+      "groupId": "g137",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w10-a25",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002465684339955873,
+    "calls": 841,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w10-a25",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w10-a55",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002232626701955398,
+    "calls": 1024,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w10-a55",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w11-a55",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0007387625807477365,
+    "calls": 1114,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w11-a55",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w21-a25",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000359656627320806,
+    "calls": 1320,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w21-a25",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w21-a55",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0016409522180144025,
+    "calls": 1239,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w21-a55",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w12-a25",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 3.813124288965967e-05,
+    "calls": 1481,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w12-a25",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g134-w12-a55",
+    "groupId": "g134",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0008918353212505617,
+    "calls": 1982,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g134-w12-a55",
+      "groupId": "g134",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w10-a25",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00022370808320577404,
+    "calls": 686,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w10-a25",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w10-a55",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002588165325858838,
+    "calls": 758,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w10-a55",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w11-a25",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g135-w11-a55",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g135-w21-a25",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.8010661579463604e-05,
+    "calls": 1083,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w21-a25",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w21-a55",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0014886303569966702,
+    "calls": 1168,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w21-a55",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w12-a25",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 2.801093725747091e-05,
+    "calls": 1083,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w12-a25",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g135-w12-a55",
+    "groupId": "g135",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0014881483103693926,
+    "calls": 1168,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g135-w12-a55",
+      "groupId": "g135",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g225-w10-a55",
+    "groupId": "g225",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00017411391801415083,
+    "calls": 2672,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g225-w10-a55",
+      "groupId": "g225",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g225-w11-a55",
+    "groupId": "g225",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0003510428324359668,
+    "calls": 2967,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g225-w11-a55",
+      "groupId": "g225",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g225-w21-a55",
+    "groupId": "g225",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011418002673852755,
+    "calls": 3263,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g225-w21-a55",
+      "groupId": "g225",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g225-w12-a55",
+    "groupId": "g225",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011052909839385516,
+    "calls": 4150,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g225-w12-a55",
+      "groupId": "g225",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g226-w10-a55",
+    "groupId": "g226",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00017116365099067605,
+    "calls": 2679,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g226-w10-a55",
+      "groupId": "g226",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g226-w11-a55",
+    "groupId": "g226",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00034825549280815036,
+    "calls": 2963,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g226-w11-a55",
+      "groupId": "g226",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g226-w21-a55",
+    "groupId": "g226",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011493880014366545,
+    "calls": 4142,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g226-w21-a55",
+      "groupId": "g226",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g226-w12-a55",
+    "groupId": "g226",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012327568945356205,
+    "calls": 3860,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g226-w12-a55",
+      "groupId": "g226",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g227-w10-a55",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002355290656768363,
+    "calls": 1628,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g227-w10-a55",
+      "groupId": "g227",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g227-w11-a25",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g227-w11-a55",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g227-w21-a55",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0008807132346815086,
+    "calls": 1407,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g227-w21-a55",
+      "groupId": "g227",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g227-w12-a25",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g227-w12-a55",
+    "groupId": "g227",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g231-w10-a25",
+    "groupId": "g231",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g231-w10-a55",
+    "groupId": "g231",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g231-w11-a55",
+    "groupId": "g231",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0009715966821269679,
+    "calls": 1944,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g231-w11-a55",
+      "groupId": "g231",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g231-w21-a55",
+    "groupId": "g231",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0038735501669773464,
+    "calls": 1209,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g231-w21-a55",
+      "groupId": "g231",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g231-w12-a55",
+    "groupId": "g231",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0038739695350555434,
+    "calls": 1209,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g231-w12-a55",
+      "groupId": "g231",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g235-w10-a25",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g235-w10-a55",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g235-w11-a25",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g235-w11-a55",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g235-w21-a55",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012659207926753377,
+    "calls": 1085,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g235-w21-a55",
+      "groupId": "g235",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g235-w12-a25",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g235-w12-a55",
+    "groupId": "g235",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g234-w10-a55",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00014546193570452308,
+    "calls": 783,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g234-w10-a55",
+      "groupId": "g234",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g234-w11-a25",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g234-w11-a55",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g234-w21-a55",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00021121251053559005,
+    "calls": 974,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g234-w21-a55",
+      "groupId": "g234",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g234-w12-a25",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g234-w12-a55",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g233-w10-a25",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 6.770551481434204e-05,
+    "calls": 1178,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w10-a25",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g233-w10-a55",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0019853720183894124,
+    "calls": 1721,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w10-a55",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g233-w11-a25",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g233-w11-a55",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g233-w21-a25",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.0250406620274185e-05,
+    "calls": 1174,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w21-a25",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g233-w21-a55",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002090218211998981,
+    "calls": 1326,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w21-a55",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g233-w12-a25",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.024968737791996e-05,
+    "calls": 1174,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w12-a25",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g233-w12-a55",
+    "groupId": "g233",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003021086710549014,
+    "calls": 1508,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g233-w12-a55",
+      "groupId": "g233",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g270-w10-a25",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g270-w10-a55",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g270-w11-a25",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g270-w11-a55",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g270-w21-a25",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0007113724049660531,
+    "calls": 478,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-w21-a25",
+      "groupId": "g270",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g270-w21-a55",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0018410913728789122,
+    "calls": 855,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-w21-a55",
+      "groupId": "g270",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g270-w12-a25",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000711384333303812,
+    "calls": 478,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-w12-a25",
+      "groupId": "g270",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g270-w12-a55",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0018410558798650975,
+    "calls": 855,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-w12-a55",
+      "groupId": "g270",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w10-a25",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g269-w10-a55",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g269-w11-a25",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 3.84191339014462e-05,
+    "calls": 968,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w11-a25",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w11-a55",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0009878340793507395,
+    "calls": 1045,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w11-a55",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w21-a25",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0004116963660494519,
+    "calls": 991,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w21-a25",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w21-a55",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003092649213560015,
+    "calls": 1058,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w21-a55",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w12-a25",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0004653654452823429,
+    "calls": 786,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w12-a25",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g269-w12-a55",
+    "groupId": "g269",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0030926127589829978,
+    "calls": 1058,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g269-w12-a55",
+      "groupId": "g269",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w10-a25",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 7.642758622431104e-05,
+    "calls": 690,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w10-a25",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w10-a55",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003682323535350927,
+    "calls": 777,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w10-a55",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        0
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w11-a25",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g271-w11-a55",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "ValueError: This reciprocal mode cancels under the target character",
+    "shootingRms": null,
+    "calls": null,
+    "rootMessage": null,
+    "job": null
+  },
+  {
+    "jobId": "g271-w21-a25",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.94227391875037e-05,
+    "calls": 770,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w21-a25",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w21-a55",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.003290877692456302,
+    "calls": 1393,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w21-a55",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w12-a25",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.9423755240523e-05,
+    "calls": 770,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w12-a25",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.025,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g271-w12-a55",
+    "groupId": "g271",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.002999889241613403,
+    "calls": 1343,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g271-w12-a55",
+      "groupId": "g271",
+      "N": 12,
+      "M": 96,
+      "L": 256,
+      "wave": [
+        1,
+        2
+      ],
+      "amplitude": 0.055,
+      "maxfev": 7000
+    }
+  },
+  {
+    "jobId": "g234-w21-a25-refine24",
+    "groupId": "g234",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0003692535386776061,
+    "calls": 2481,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g234-w21-a25-refine24",
+      "groupId": "g234",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.025,
+      "maxfev": 12000,
+      "F": 0.003963330718290878
+    }
+  },
+  {
+    "jobId": "g270-L256-w21-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0011808106288777609,
+    "calls": 1859,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L256-w21-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L256-w31-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00018669226897502234,
+    "calls": 2227,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L256-w31-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L256-w31-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00260734732487061,
+    "calls": 2051,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L256-w31-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L256-w32-amp12",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 5.861231135449809e-05,
+    "calls": 1624,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L256-w32-amp12",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.012,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L256-w32-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.004708554724386811,
+    "calls": 1834,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L256-w32-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 256,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w21-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 8.830368034514697e-05,
+    "calls": 1634,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w21-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w21-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.001438479408299088,
+    "calls": 1452,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w21-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w31-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0001044680852511527,
+    "calls": 1456,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w31-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w31-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.009283005655414359,
+    "calls": 1617,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w31-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w32-amp12",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00011015809464680165,
+    "calls": 2223,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w32-amp12",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.012,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w32-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00034468868462154116,
+    "calls": 1844,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w32-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L512-w32-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.000788023178280818,
+    "calls": 2250,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L512-w32-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 512,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w21-amp8",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 9.248111921551471e-06,
+    "calls": 1827,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w21-amp8",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.008,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w21-amp12",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 7.77459474139132e-05,
+    "calls": 1657,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w21-amp12",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.012,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w21-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0002573844608554456,
+    "calls": 2237,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w21-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w21-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012682463433724307,
+    "calls": 1832,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w21-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        2,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w31-amp8",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.2555546074401718e-05,
+    "calls": 1826,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w31-amp8",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.008,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w31-amp12",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.00011296198165018164,
+    "calls": 1630,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w31-amp12",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.012,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w31-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0003835332756426913,
+    "calls": 2039,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w31-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w31-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0012347512175805723,
+    "calls": 1628,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w31-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        1
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w32-amp8",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 1.6489447219933084e-05,
+    "calls": 2257,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w32-amp8",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.008,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w32-amp12",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 8.825055754490253e-05,
+    "calls": 2058,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w32-amp12",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.012,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w32-amp18",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0003785900279377503,
+    "calls": 1639,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w32-amp18",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.018,
+      "maxfev": 12000
+    }
+  },
+  {
+    "jobId": "g270-L1024-w32-amp35",
+    "groupId": "g270",
+    "outcome": "failed",
+    "reason": "Shooting did not converge to tolerance",
+    "shootingRms": 0.0007542157271228384,
+    "calls": 3059,
+    "rootMessage": "The iteration is not making good progress, as measured by the \n improvement from the last five Jacobian evaluations.",
+    "job": {
+      "id": "g270-L1024-w32-amp35",
+      "groupId": "g270",
+      "N": 24,
+      "M": 192,
+      "L": 1024,
+      "wave": [
+        3,
+        2
+      ],
+      "amplitude": 0.035,
+      "maxfev": 12000
+    }
+  }
+]

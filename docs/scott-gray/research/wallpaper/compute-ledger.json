@@ -1,0 +1,94 @@
+{
+  "schema": "wallpaper-compute-ledger-v1",
+  "authorizedOverallUSD": 100,
+  "previousConservativeReservedUSD": 18.8180718,
+  "newAllocationUSD": 50,
+  "newConservativeResourceAndBuildBoundUSD": 20.4281808,
+  "combinedConservativeBoundUSD": 39.2462526,
+  "providerReportedChargesUSD": null,
+  "allTaskAppsStopped": true,
+  "totalSubmittedJobs": 441,
+  "totalReturnedJobs": 441,
+  "pricingChecked": "2026-09-05",
+  "pricingSource": "https://modal.com/pricing",
+  "resources": {
+    "cpuPhysicalCoresHardLimit": 2,
+    "memoryGiBHardLimit": 8,
+    "gpu": null,
+    "maxContainersPerApp": 24,
+    "retries": 0,
+    "subprocessSeconds": 120,
+    "functionSeconds": 150,
+    "startupSeconds": 120,
+    "scaleDownSeconds": 10,
+    "perContainerSecondUSD": 4.396e-05
+  },
+  "method": "Worst case for every job: full function timeout plus full startup timeout and scale-down allowance, plus $3 image-build/accounting reserve per app (including dry run). A conservative resource reservation, not provider-reported billing. No persistent deployments, schedules or retries were created.",
+  "notes": [
+    "All 441 submitted job identifiers were returned exactly once.",
+    "The first two completed batches logged a Python asynchronous-generator close warning after returning every result; the map iteration was corrected before subsequent batches. No jobs were repeated because of this warning.",
+    "Only newly created task apps were stopped; unrelated account apps were left unchanged."
+  ],
+  "runs": [
+    {
+      "appId": "ap-pbE3hgdn6uLCqSUwIhSNh0",
+      "submittedJobs": 0,
+      "returnedJobs": 0,
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-05 22:04:44-07:00",
+      "stoppedAt": "2026-09-05 22:04:46-07:00",
+      "reservedResourceUSD": 0.0,
+      "buildAndAccountingReserveUSD": 3,
+      "maximumConcurrentContainers": 0
+    },
+    {
+      "appId": "ap-bBMcYP16nVPtmD0Q1EtKSK",
+      "submittedJobs": 256,
+      "returnedJobs": 256,
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-05 22:04:59-07:00",
+      "stoppedAt": "2026-09-05 22:05:59-07:00",
+      "reservedResourceUSD": 3.1510528,
+      "buildAndAccountingReserveUSD": 3,
+      "maximumConcurrentContainers": 24
+    },
+    {
+      "appId": "ap-PDNQF2s5wjk6ew11YDopEy",
+      "submittedJobs": 72,
+      "returnedJobs": 72,
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-05 22:05:01-07:00",
+      "stoppedAt": "2026-09-05 22:05:24-07:00",
+      "reservedResourceUSD": 0.8862336,
+      "buildAndAccountingReserveUSD": 3,
+      "maximumConcurrentContainers": 24
+    },
+    {
+      "appId": "ap-9ASiE6OJhWrIaNRGfTHrSC",
+      "submittedJobs": 77,
+      "returnedJobs": 77,
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-05 22:08:04-07:00",
+      "stoppedAt": "2026-09-05 22:09:18-07:00",
+      "reservedResourceUSD": 0.9477776,
+      "buildAndAccountingReserveUSD": 3,
+      "maximumConcurrentContainers": 24
+    },
+    {
+      "appId": "ap-iWaaqSEMKJXzAxAO2P8CBV",
+      "submittedJobs": 36,
+      "returnedJobs": 36,
+      "state": "stopped",
+      "activeTasks": 0,
+      "createdAt": "2026-09-05 22:08:47-07:00",
+      "stoppedAt": "2026-09-05 22:09:29-07:00",
+      "reservedResourceUSD": 0.4431168,
+      "buildAndAccountingReserveUSD": 3,
+      "maximumConcurrentContainers": 24
+    }
+  ]
+}
