@@ -72,6 +72,10 @@ try{
     await page.selectOption('#framing','cells');assert.equal(await frame(page),oneCellFrame);
     await page.setViewportSize({width:390,height:844});
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,`${c.name} overflows a mobile viewport`);
+    assert.equal(await page.evaluate(()=>{
+      const image=document.querySelector('.canvas-wrap').getBoundingClientRect();
+      return document.querySelector('.viewer-labels').getBoundingClientRect().bottom<=image.top&&document.querySelector('.view-caption').getBoundingClientRect().top>=image.bottom;
+    }),true,'status labels cannot cover cell-boundary generators');
     await page.locator('.canvas-wrap').screenshot({path:`/tmp/cell-framing-${label}-${c.name}-mobile.png`});
     await page.setViewportSize({width:1440,height:1200});
     await page.selectOption('#palette','ceramic');await page.selectOption('#speed','2');

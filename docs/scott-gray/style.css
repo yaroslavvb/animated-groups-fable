@@ -21,3 +21,8 @@
 .canvas-wrap.cell-framing{background:#eee9f3}.cell-framing .scale-label{color:#493b5d;text-shadow:none}.cell-framing .cell-boundary{stroke:#9c8daf}.cell-framing .cell-divisions{stroke:#fff;filter:drop-shadow(0 0 1px #302140)}
 .approximate-controls{padding:12px 14px;background:#fff7e9;border:1px solid #edd2a6;border-radius:8px;margin:12px 0}.approximate-controls[hidden]{display:none}.approximate-controls label{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:600}.approximate-controls p{margin-bottom:0}
 .approximate-view-label{position:absolute;bottom:30px;left:10px;border-radius:4px;background:#281a10dd;color:#ffd495;padding:4px 7px;font-size:11px;line-height:1.4;pointer-events:none}.approximate-view-label[hidden]{display:none}
+
+/* Keep status text clear of rotation centres on all four cell boundaries. */
+.viewer-labels{position:static;margin:0 0 8px;line-height:1.4;color:var(--muted);text-shadow:none;font-size:11px}.viewer-labels span{background:#eee9f3;color:#493b5d}
+.view-caption{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:8px;line-height:1.4;min-height:16px}
+.view-caption .scale-label{position:static;margin-left:auto;color:#493b5d;text-shadow:none;font-size:11px;line-height:1.4}.view-caption .approximate-view-label{position:static;line-height:1.4}
