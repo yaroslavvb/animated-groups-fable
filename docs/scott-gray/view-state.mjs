@@ -14,6 +14,7 @@ const DEFAULTS = Object.freeze({
   speed: 1,
   generator: null,
   overlay: false,
+  approximate: false,
   phase: 0,
   play: true,
 });
@@ -49,6 +50,7 @@ function normalize(state = {}) {
     speed: numberChoice(state.speed, [0.5, 1, 2], DEFAULTS.speed),
     generator: validGenerator(state.generator),
     overlay: booleanChoice(state.overlay, DEFAULTS.overlay),
+    approximate: booleanChoice(state.approximate, DEFAULTS.approximate),
     phase: validPhase(state.phase),
     play: booleanChoice(state.play, DEFAULTS.play),
   };
@@ -69,6 +71,7 @@ export function readViewState(hash) {
     speed: parameters.get('speed'),
     generator: parameters.get('generator'),
     overlay: parameters.get('overlay'),
+    approximate: parameters.get('approx'),
     phase: parameters.get('phase'),
     play: parameters.get('play'),
   });
@@ -85,6 +88,7 @@ export function writeViewHash(state) {
   parameters.set('speed', String(view.speed));
   if (view.generator) parameters.set('generator', view.generator);
   parameters.set('overlay', view.overlay ? '1' : '0');
+  if (view.approximate) parameters.set('approx', '1');
   parameters.set('phase', String(view.phase));
   parameters.set('play', view.play ? '1' : '0');
   return `#${view.groupId}?${parameters}`;

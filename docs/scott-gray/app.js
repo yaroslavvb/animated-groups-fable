@@ -1,11 +1,11 @@
 import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260904-visible-time';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-centres';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-repeat-scale';
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
 import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260904-gpu';
 import {createWebGLGrayScott} from './webgl.mjs?v=20260904-precomputed';
-import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs?v=20260905-centres';
-import {rotationCentres} from './rotation-centres.mjs?v=20260905-centres';
-import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-centres';
+import {GROUP_DISPLAY,renderGeneratorOverlay,generatorDescription} from './overlay.mjs?v=20260905-repeat-scale';
+import {rotationCentres} from './rotation-centres.mjs?v=20260905-repeat-scale';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from './overlay-data.mjs?v=20260905-repeat-scale';
 import {PROFILES,makeInitial} from './exploration.mjs';
 import {analyticExclusion} from './feasibility.mjs';
 import {createPrecomputedCatalog} from './precomputed-catalog.mjs?v=20260904-visible-time';
@@ -119,7 +119,7 @@ function overlay(){
   }
   $('phase-permutation').append(row);
   $('phase-explanation').textContent=g.tau===0?'This generator leaves the phase unchanged.':`This generator cyclically shifts the phase by ${g.timeShift} of the period. Applying only its spatial rotation is not this symmetry.`;
-  document.querySelector('.scale-label').textContent=`${$('tiles').value} × ${$('tiles').value} spatial cells`;
+  document.querySelector('.scale-label').textContent=`Physical width ${$('tiles').value==='1'?'L':$('tiles').value+' L'} · square lattice`;
 }
 function colorScale(){const r=range();$('color-scale').textContent=r?`Fixed scale over the entire orbit: ${$('palette').value==='concentration'?'V':'U'} = ${r[0].toFixed(4)} … ${r[1].toFixed(4)}.`:'The concentration scale will be fixed across all phases of a verified orbit.';}
 function metrics(d){
@@ -402,7 +402,7 @@ $('export').onclick=()=>{
 };
 
 try{
-  const [response,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('data/overlay-translations.json?v=20260905-centres').catch(()=>null)]);
+  const [response,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('data/overlay-translations.json?v=20260905-repeat-scale').catch(()=>null)]);
   if(overlayResponse?.ok)translationIndex=await overlayResponse.json();
   if(!response.ok||!manifestResponse.ok)throw Error('Precomputed solution catalog unavailable.');
   const [catalog,manifest]=await Promise.all([response.json(),manifestResponse.json()]);groups=catalog;if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');saved=createPrecomputedCatalog(manifest,{groups});

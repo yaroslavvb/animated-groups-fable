@@ -4,7 +4,7 @@ import { readViewState, writeViewHash } from '../view-state.mjs';
 
 const defaults = {
   groupId: null, patternId: null, palette: 'ember', tiles: 2, speed: 1,
-  generator: null, overlay: false, phase: 0, play: true,
+  generator: null, overlay: false, approximate: false, phase: 0, play: true,
 };
 
 test('legacy links in both families retain autoplay and default controls', () => {
@@ -20,7 +20,7 @@ test('selected pattern and every view control round-trip without phase rounding'
   const view = {
     groupId: 'g248', patternId: 'saved:g248-F0.02-k0.05-N64-M96',
     palette: 'ceramic', tiles: 3, speed: 0.5, generator: 'β',
-    overlay: true, phase: 0.1371234567890123, play: false,
+    overlay: true, approximate: false, phase: 0.1371234567890123, play: false,
   };
   const hash = writeViewHash(view);
   assert.equal(hash, '#g248?v=1&pattern=saved%3Ag248-F0.02-k0.05-N64-M96&palette=ceramic&tiles=3&speed=0.5&generator=%CE%B2&overlay=1&phase=0.1371234567890123&play=0');
@@ -89,4 +89,14 @@ test('a selected rotation centre survives sharing without allowing arbitrary ope
   for (const generator of ['α@1,0','α@-0.5,0','α@0.1,NaN','α@0.1,0.2<script>']) {
     assert.equal(readViewState(writeViewHash({groupId:'g248',generator})).generator,null);
   }
+});
+
+test('approximate overlays are opt-in and preserve the original width and phase', () => {
+  const old = '#g247?v=1&pattern=saved%3Aexample&palette=ember&tiles=1&speed=1&generator=%CE%B1&overlay=1&phase=0.34798750000000434&play=0';
+  assert.equal(writeViewHash(readViewState(old)), old);
+  const view = {...readViewState(old), approximate: true, generator: 'α@0.032258065,0.193548387'};
+  const shared = writeViewHash(view);
+  assert.match(shared, /&approx=1&/);
+  assert.deepEqual(readViewState(shared), view);
+  assert.equal(readViewState(old+'&approx=garbage').approximate, false);
 });

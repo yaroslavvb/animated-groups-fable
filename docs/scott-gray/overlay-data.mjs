@@ -11,10 +11,10 @@ export function populateGeneratorChoices(select, named, centres, selected) {
   select.replaceChildren();
   for(const g of named){const option=document.createElement('option');option.value=g.name;option.textContent=`${g.name} · +${g.timeShift} T`;select.append(option);}
   const g=centres.find(g=>g.key===selected);
-  if(g){const option=document.createElement('option');option.value=g.key;option.textContent=`${g.name} · (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')}) · +${g.timeShift} T`;select.append(option);}
+  if(g){const option=document.createElement('option');option.value=g.key;option.textContent=(g.approximate?'Approximate · ':'')+`${g.name} · (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')}) · +${g.timeShift} T`;select.append(option);}
   select.value=g?g.key:selected;
 }
 
 export function overlayCaption(centres, translations) {
-  return `${centres.length} rotation centres per spatial cell. ${translations.length>1?'Includes additional centres from this pattern’s checked spatial repeats. ':''}Select a marker to compare its rotation with its time shift.`;
+  return `${centres.length} rotation centres per simulation cell. ${translations.length>1?'Includes additional centres from this pattern’s checked spatial repeats. ':''}Select a marker to compare its rotation with its time shift.`;
 }

@@ -8,7 +8,7 @@ map of its rotation centres.
 
 ## Required centres of the selected group
 
-Counts refer to one coordinate cell, with opposite boundaries identified.
+Counts refer to one simulation coordinate cell, with opposite boundaries identified.
 
 | Group | α | β | γ | Total |
 | --- | ---: | ---: | ---: | ---: |
@@ -50,7 +50,7 @@ the largest RMS error was 2.45×10⁻⁹.
 The cited g248 record at F=0.00404, k=0.02, spatial shell 3 has exact additional
 periods (1/3,2/3) and (2/3,1/3) in triangular lattice coordinates. Its original
 computational cell contains **3 sixfold, 6 threefold and 9 half-turn centres**.
-The denser overlay therefore contains 18 centres per cell.
+The denser overlay therefore contains 18 centres per simulation cell.
 
 Extra centres are found by solving (I−M)c=v+d+n for certified same-time
 translations d and integer vectors n. At coincident centres, the highest
@@ -62,8 +62,69 @@ White markers belong to the selected group’s complete centre map. Mint markers
 denote additional centres implied by the checked periods of the current
 solution. These are numerical properties of the saved fields, not new imposed
 equations or a complete classification of continuum symmetries. Only periods
-that preserve the actual spatial interpolation mesh are included. Browsing
+that preserve the actual spatial interpolation mesh enter the solid overlay. Browsing
 uses the saved audit; it does not rerun the search or integrate the PDE.
+
+## Apparent repeats that fail the strict check
+
+The 632 viewer also offers an **optional approximate-centre inspection** when
+an offline audit identifies a smaller near-periodic lattice. This option is
+off by default. Dashed amber markers are explicitly approximate; they are
+never added to the strict symmetry certificate or used to admit a solution.
+The concentration samples, playback interpolation, and prescribed group
+operations remain unchanged.
+
+Two reported g247 examples illustrate the distinction:
+
+- **Q12, N=96, L=1024:** the saved field has 12 exact same-time translations
+  modulo the simulation lattice. Its strict overlay contains 12 sixfold,
+  24 threefold and 36 half-turn centres: 72 in total per simulation cell.
+- **Q31, N=66, L=1024:** the strict translation subgroup contains only the
+  identity, hence six strict centres per simulation cell. The visually
+  repeated motifs suggest a smaller lattice of index 31, but its translations
+  are not mesh-compatible and the saved movie does not have those exact
+  periods. The optional inspection shows its 186 proposed centres, with the
+  180 additional ones dashed. The worst translation mismatch in the actual
+  interpolated movie is about **3.53%** of a concentration's full range.
+
+Proposals come from dominant spatial Fourier modes, not pattern names or
+screenshots. Every translation in a proposed finite subgroup must be measured;
+the subgroup must contain the strict translations and close under addition
+and the 60° rotation. Both concentrations must stay below 5% maximum error and
+2% sample RMS, relative to each concentration's range over the full movie.
+These are thresholds for displaying an approximate relation, not for calling
+it a symmetry.
+
+The maximum is evaluated at all vertices of the common refinement of the
+original and translated triangular meshes, at every saved phase. The
+difference is affine on each common piece, so these checks bound all spatial
+points; linear temporal interpolation cannot increase the maximum. Reported
+RMS is a finite-sample RMS at those vertices, not an area integral. Adding
+the measured canonical rotation residual to a translation's maximum bounds
+the corresponding derived rotation with its assigned time offset.
+
+Selecting a dashed marker displays its actual comparison error and explicitly
+states that it is not verified at the strict tolerance. Where an approximate higher-order
+centre coincides with a strict lower-order one, a solid outer ring and the
+selected-centre description preserve that distinction. Shared links include
+`approx=1` only when this inspection is enabled.
+
+## View width and spatial repeats
+
+The Width selector measures the square viewport's physical width in units of
+L, the simulation lattice length shown with the selected parameters. A width
+of L does not promise one primitive pattern repeat: a saved simulation cell
+can contain several smaller repeat cells. The marker count also refers to the
+simulation cell, not to the smallest possible repeat.
+
+For 442, the simulation cell is a square of side L. For 632, its lattice
+vectors are L(1, 0) and L(−1/2, √3/2), forming a rhombus of area √3 L²/2.
+The square viewport is therefore not the same shape as the 632 simulation
+cell. Fields and rotation centres use the same physical coordinate map.
+
+Existing shared links retain their exact width: `tiles=1`, `tiles=2` and
+`tiles=3` mean L, 2 L and 3 L across respectively. Only the former cell-count
+labels have changed.
 
 ## Reproduction
 
@@ -71,12 +132,16 @@ From the repository root:
 
 ```sh
 python3 docs/scott-gray/research/build-overlay-translations.py
+python3 docs/scott-gray/research/build-overlay-near-translations.py
 python3 -m unittest discover -s docs/scott-gray/research -p test_overlay_translations.py
+python3 -m unittest discover -s docs/scott-gray/research -p test_overlay_near_translations.py
 node --test docs/scott-gray/tests/rotation-centres.test.mjs docs/scott-gray/tests/overlay.test.mjs docs/scott-gray/tests/view-state.test.mjs
 ```
 
 Implementation: [rotation centre construction](rotation-centres.mjs),
 [translation audit](research/build-overlay-translations.py), and
-[saved translation evidence](data/overlay-translations.json).
+[saved translation evidence](data/overlay-translations.json). The separate
+[approximate-repeat audit](research/build-overlay-near-translations.py) produces
+[inspection evidence](data/overlay-near-translations.json).
 
 [442 gallery](./) · [632 gallery](p6/)

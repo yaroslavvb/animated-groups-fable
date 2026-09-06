@@ -11,6 +11,9 @@ try{
   const params=new URLSearchParams({v:'1',pattern:c.id,palette:'ember',tiles:'2',speed:'1',generator:'α',overlay:'1',phase:'.1296874999999396',play:'0'});
   await page.goto(base+c.path+'#'+c.group+'?'+params);
   await page.waitForFunction(()=>document.querySelector('#empty-state').hidden,{},{timeout:30000});
+  assert.equal(await page.locator('.scale-label').innerText(),`Physical width 2 L · ${c.path.includes('/p6/')?'triangular':'square'} lattice`);
+  assert.deepEqual(await page.locator('#tiles option').evaluateAll(es=>es.map(e=>[e.value,e.textContent])),[['1','L'],['2','2 L'],['3','3 L']]);
+  assert.match(await page.locator('#view-scale-explanation').innerText(),/pattern can repeat several times within L/);
   assert.match(await page.locator('#overlay-explanation').innerText(),new RegExp('^'+c.count+' rotation centres'));
   const keys=await page.locator('#generator-overlay [data-centre-key]').evaluateAll(es=>[...new Set(es.map(e=>e.dataset.centreKey))]);
   assert.equal(keys.length,c.count);

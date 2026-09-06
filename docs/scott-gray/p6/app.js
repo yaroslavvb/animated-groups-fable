@@ -1,6 +1,7 @@
-import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-centres';
-import {rotationCentres} from '../rotation-centres.mjs?v=20260905-centres';
-import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-centres';
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-repeat-scale';
+import {rotationCentres} from '../rotation-centres.mjs?v=20260905-repeat-scale';
+import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-repeat-scale';
+import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-repeat-scale';
 import {VISIBILITY_VERSION} from '../visible-time-symmetry.mjs?v=20260904-visible-time';
 import {createPrecomputedCatalog} from '../precomputed-catalog.mjs?v=20260904-visible-time';
 import {mod,latticeToScreen,createPlayer,drawCPU,valueAt} from './playback.mjs?v=20260904-p6';
@@ -12,26 +13,27 @@ const palette=()=>$('palette').value,tiles=()=>+$('tiles').value;
 const parameterKey=config=>JSON.stringify([config.params.F,config.params.k,config.params.Du,config.params.Dv,config.L??config.N*config.params.dx,config.params.stencil]);
 let groups=[],catalog=null,group=null,record=null,player=null,selectedId=null,selectedKey=null,preferredParameters=null,generatorName='α',selectionToken=0,phase=0,playing=false,lastTime=0,lastComparison=-Infinity;
 const remembered=new Map(),rememberedGenerators=new Map();
-let translationIndex=null,centres=[];
+let translationIndex=null,nearTranslationIndex=null,centres=[],strictCentres=[];
 const centreCache=new Map();
 let defaultGroupId='g243',requestedPlayback={phase:0,play:true};
 function syncUrl(){
   if(!group)return;
   const playback=record?{phase,play:playing}:requestedPlayback;
-  history.replaceState(null,'',writeViewHash({groupId:group.id,patternId:selectedId,palette:palette(),tiles:tiles(),speed:+$('speed').value,generator:generatorName,overlay:$('show-generators').checked,...playback}));
+  history.replaceState(null,'',writeViewHash({groupId:group.id,patternId:selectedId,palette:palette(),tiles:tiles(),speed:+$('speed').value,generator:generatorName,overlay:$('show-generators').checked,approximate:$('show-approximate').checked,...playback}));
 }
 function restoreUrl(){
   const view=readViewState(location.hash);
   $('palette').value=view.palette;$('tiles').value=String(view.tiles);$('speed').value=String(view.speed);$('show-generators').checked=view.overlay;
+  $('show-approximate').checked=view.approximate;
   chooseGroup(view.groupId??defaultGroupId,{view});
 }
 function togglePlayback(){if(!record)return;setPlaying(!playing);syncUrl();}
 const referenceGroup=()=>group.render.ops.every(op=>mod(op.tau)===0);
 function inverseForRendering(op){const [[a,b],[c,d]]=op.M,det=a*d-b*c,M=[[d/det,-b/det],[-c/det,a/det]];return {M,v:M.map(row=>-row[0]*op.v[0]-row[1]*op.v[1]),tau:-op.tau};}
-function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name)&&!centres.some(g=>g.key===name))return;generatorName=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncUrl();}
+function chooseGenerator(name){if(!group?.namedGenerators.some(item=>item.name===name)&&!centres.some(g=>g.key===name)&&!strictCentres.some(g=>g.key===name))return;generatorName=name;rememberedGenerators.set(group.id,name);overlay();drawComparison();syncUrl();}
 function visibilityCaption(r){const proof=r.visibleTimeSymmetry;if(referenceGroup())return 'Spatial reference: all required offsets are zero. The rotation alone agrees with the original throughout the cycle.';const minimum=proof?.operations?.flatMap(op=>op.channels.map(c=>c.minimumRelativeColorRange));return minimum?.length?`Visible time offset throughout the cycle: the smallest rotation-only difference in either concentration is ${(100*Math.min(...minimum)).toFixed(1)}% of its full color range. The first and third images agree.`:'The first and third images agree only after applying the prescribed phase shift.';}
 const entries=()=>catalog?.summaries(group?.id)??[];
-const generator=()=>centres.find(item=>item.key===generatorName)??group?.namedGenerators.find(item=>item.name===generatorName)??group?.namedGenerators[0];
+const generator=()=>centres.find(item=>item.key===generatorName)??strictCentres.find(item=>item.key===generatorName)??group?.namedGenerators.find(item=>item.name===generatorName)??group?.namedGenerators[0];
 // Presentation order: new mixtures first; this is not a scientific ranking.
 function patternOrder(a,b){
   const label=r=>r.patternName??r.name??r.id;
@@ -74,7 +76,9 @@ function drawComparison(){
     shifted+=(baseline-valueAt(record,channel,u,v,phase+op.tau))**2;
     spatial+=(baseline-valueAt(record,channel,u,v,phase))**2;
   }
-  $('comparison-error').textContent=`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*N*N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*N*N)))} RMS.`;
+  const approximate=generator()?.approximate;
+  $('comparison-error').textContent=(approximate?'Approximate centre · not verified at the strict tolerance. ':'')+`Difference from original, both concentrations: rotation only ${fmt(Math.sqrt(spatial/(2*N*N)))} RMS; with phase shift ${fmt(Math.sqrt(shifted/(2*N*N)))} RMS.`;
+  $('visibility-explanation').textContent=approximate?'The dashed marker describes a near-symmetry. The first and third images have a small residual difference, even with the phase shift. Select a solid marker to inspect a verified operation.':visibilityCaption(record);
   lastComparison=performance.now();
 }
 function draw(forceComparison=false){
@@ -90,25 +94,34 @@ function overlay(){
   if(!group)return;
   const summary=record?.id===selectedId&&record?.groupId===group.id?record:catalog?.get(selectedId),translations=overlayTranslations(translationIndex,summary),cacheKey=group.id+':'+(summary?.id??'base');
   if(!centreCache.has(cacheKey))centreCache.set(cacheKey,rotationCentres({namedGenerators:group.namedGenerators,ops:group.render.ops,family:'p6',translations}));
-  centres=centreCache.get(cacheKey);
-  if(!centres.some(g=>g.key===generatorName)&&!group.namedGenerators.some(g=>g.name===generatorName))generatorName=generatorName?.split('@')[0]??'α';
-  populateGeneratorChoices($('operation'),group.namedGenerators,centres,generatorName);
+  const exactCentres=centreCache.get(cacheKey),near=overlayNearEvidence(nearTranslationIndex,summary,translations);
+  strictCentres=exactCentres;
+  $('approximate-controls').hidden=!near;
+  if(!near)$('show-approximate').checked=false;
+  const inspectApproximate=!!near&&$('show-approximate').checked;
+  $('approximate-view-label').hidden=!inspectApproximate||!$('show-generators').checked;
+  if(inspectApproximate&&!centreCache.has(cacheKey+':near'))centreCache.set(cacheKey+':near',withApproximateCentres(group,exactCentres,near));
+  centres=inspectApproximate?centreCache.get(cacheKey+':near'):exactCentres;
+  $('approximate-explanation').textContent=near?approximateCaption(near,inspectApproximate):'';
+  if(!centres.some(g=>g.key===generatorName)&&!exactCentres.some(g=>g.key===generatorName)&&!group.namedGenerators.some(g=>g.name===generatorName))generatorName=generatorName?.split('@')[0]??'α';
+  populateGeneratorChoices($('operation'),group.namedGenerators,[...centres,...exactCentres],generatorName);
   const layer=$('generator-overlay');layer.toggleAttribute('hidden',!$('show-generators').checked);layer.replaceChildren();
   const width=tiles(),extent=Math.ceil(2*width)+1,scale=Math.max(.2,Math.min(1,2/width*Math.sqrt(6/centres.length)));
   for(const named of centres)for(let j=-extent;j<=extent;j++)for(let i=-extent;i<=extent;i++){
     const [x,y]=latticeToScreen([named.centre[0]+i,named.centre[1]+j],width);if(x<0||x>1||y<0||y>1)continue;
-    const active=named.name===generatorName||named.key===generatorName;
-    const marker=svgElement('g',{transform:`translate(${768*x},${768*y}) scale(${scale})`,class:'generator-marker'+(named.extra?' extra-centre':'')+(active?' selected':''),'data-centre-key':named.key,'data-generator':named.name,'data-time-shift':named.timeShift,role:'button',tabindex:'0','aria-pressed':String(active),'aria-label':`${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift at (${named.centre.map((v,k)=>v+(k?j:i)).join(', ')})`});
+    const active=(!named.approximate&&named.name===generatorName)||named.key===generatorName||named.verifiedLowerOrder?.key===generatorName;
+    const marker=svgElement('g',{transform:`translate(${768*x},${768*y}) scale(${scale})`,class:'generator-marker'+(named.extra?' extra-centre':'')+(named.approximate?' approximate-centre':'')+(active?' selected':''),'data-centre-key':named.key,'data-generator':named.name,'data-time-shift':named.timeShift,role:'button',tabindex:'0','aria-pressed':String(active),'aria-label':`${named.approximate?'Approximate ':''}${named.name}: ${named.angleDegrees}° rotation and ${named.timeShift} period phase shift at (${named.centre.map((v,k)=>v+(k?j:i)).join(', ')})`+(named.verifiedLowerOrder?`; verified ${named.verifiedLowerOrder.order}-fold centre here`:'')});
     marker.append(svgElement('circle',{r:20,class:'marker-halo'}),svgElement('path',{d:named.path,class:'marker-glyph',transform:`rotate(${named.glyphAngle??0}) scale(.8)`}));
+    if(named.verifiedLowerOrder)marker.append(svgElement('circle',{r:25,class:'verified-inner'}));
     const label=svgElement('text',{x:26,y:5});label.textContent=named.name;marker.append(label);
     const select=()=>chooseGenerator(named.key);marker.onclick=select;marker.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();select();}};layer.append(marker);
   }
-  $('overlay-explanation').textContent=overlayCaption(centres,translations);
-  const g=generator();$('generator-description').textContent=`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'');$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
+  $('overlay-explanation').textContent=overlayCaption(exactCentres,translations)+(inspectApproximate?` Inspection also shows ${centres.filter(g=>g.approximate).length} approximate centres per simulation cell.`:'');
+  const g=generator();$('generator-description').textContent=(g.approximate?'Approximate · ':'')+`${g.name} · ${g.angleDegrees}° rotation · +${g.timeShift} T`+(generatorName.includes('@')?` · centre (${g.centre.map(x=>Number(x.toFixed(4))).join(', ')})`:'')+(g.verifiedLowerOrder?` · verified ${g.verifiedLowerOrder.order}-fold rotation at the same centre`:'');$('compare-label').textContent=`q(gx, t + ${g.timeShift} T)`;
   const count=6,shift=Math.round(g.tau*count),row=document.createElement('div');row.className='phase-row';
   for(let i=0;i<count;i++){const chip=document.createElement('span');chip.className='phase-chip';for(const [index,label] of [[i,`${i}/6 → `],[mod(i+shift,count),`${mod(i+shift,count)}/6`]]){const color=document.createElement('i');color.style.setProperty('--phase-color',`hsl(${index*60+15} 55% 55%)`);chip.append(color,document.createTextNode(label));}row.append(chip);}
   $('phase-permutation').replaceChildren(row);$('phase-explanation').textContent=g.tau===0?'This generator preserves the phase.':'The cyclic color permutation advances the chemical phase. The spatial rotation alone is a different constraint.';
-  $('scale-label').textContent=`Triangular lattice · ${width} cell length${width===1?'':'s'} across`;
+  $('scale-label').textContent=`Physical width ${width===1?'L':width+' L'} · triangular lattice`;
 }
 function patternLabel(entry){return `${entry.patternName??entry.name??'Periodic wave'} · T ${entry.config.period.toFixed(2)} · ${entry.config.N}²`;}
 function populatePatterns(set){
@@ -136,7 +149,7 @@ async function openPattern(id,{playback={phase:0,play:true}}={}){
   const summary=catalog?.get(id);if(!summary||summary.groupId!==group.id)return;
   const token=++selectionToken,targetGroup=group.id;selectedId=id;selectedKey=parameterKey(summary.config);remembered.set(targetGroup,id);
   // Loading clears the renderer, but must not replace the requested shared phase/play state.
-  requestedPlayback={...playback};empty({loading:true});populate();syncUrl();$('status').textContent='Loading the selected precomputed animation…';
+  requestedPlayback={...playback};empty({loading:true});overlay();populate();syncUrl();$('status').textContent='Loading the selected precomputed animation…';
   try{
     const loaded=await catalog.load(id);if(token!==selectionToken||group.id!==targetGroup)return;
     if(!catalog.isVerified(loaded,targetGroup))throw Error('The saved orbit does not belong to this verified catalog.');record=loaded;phase=requestedPlayback.phase;
@@ -178,10 +191,11 @@ $('parameter-set').onchange=()=>selectParameters($('parameter-set').value);$('so
 $('play').onclick=togglePlayback;$('rewind').onclick=()=>{phase=0;draw(true);syncUrl();};$('phase').oninput=()=>{phase=mod(+$('phase').value);setPlaying(false);draw(true);syncUrl();};
 for(const id of ['pattern','gpu-pattern']){$(id).onclick=togglePlayback;$(id).onkeydown=event=>{if(event.code==='Space'){event.preventDefault();togglePlayback();}};}
 $('tiles').onchange=()=>{overlay();draw(true);syncUrl();};$('palette').onchange=()=>{updateScale();populatePatterns(parameterSets().find(set=>set.key===selectedKey));draw(true);syncUrl();};$('show-generators').onchange=()=>{overlay();syncUrl();};$('operation').onchange=()=>chooseGenerator($('operation').value);$('speed').onchange=syncUrl;
+$('show-approximate').onchange=()=>{if($('show-approximate').checked)$('show-generators').checked=true;overlay();drawComparison();syncUrl();};
 $('export').onclick=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify({schema:'scott-gray-verified-orbit-v3',family:'p6',...record,layout:'frame-major; planar U then V; triangular lattice coordinates; x-fast'})],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download=`scott-gray-632-${group.id}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function animate(now){if(playing&&record){phase=mod(phase+Math.max(0,Math.min(now-lastTime,100))/8000*+$('speed').value);draw();}lastTime=now;requestAnimationFrame(animate);}
 try{
-  const [groupResponse,manifestResponse,overlayResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-centres').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
+  const [groupResponse,manifestResponse,overlayResponse,nearResponse]=await Promise.all([fetch('groups.json'),fetch('data/precomputed-atlas.json',{cache:'no-store'}),fetch('../data/overlay-translations.json?v=20260905-repeat-scale').catch(()=>null),fetch('../data/overlay-near-translations.json?v=20260905-repeat-scale').catch(()=>null)]);if(overlayResponse?.ok)translationIndex=await overlayResponse.json();if(nearResponse?.ok)nearTranslationIndex=await nearResponse.json();if(!groupResponse.ok)throw Error('632 group definitions could not load.');groups=await groupResponse.json();
   for(const item of groups){const button=document.createElement('button');button.className='group';button.dataset.id=item.id;button.setAttribute('aria-pressed','false');const symbol=document.createElement('strong');symbol.innerHTML=item.shortHTML;const label=document.createElement('span');label.textContent=item.id;const count=document.createElement('small');count.className='orbit-count';label.append(count);button.append(symbol,label);button.onclick=()=>chooseGroup(item.id);$('groups').append(button);}
   if(!manifestResponse.ok)throw Error('The precomputed 632 catalog could not load.');const manifest=await manifestResponse.json();if(manifest.visibilityPolicyVersion!==VISIBILITY_VERSION)throw Error('The saved catalog needs the current throughout-cycle visibility check.');catalog=createPrecomputedCatalog(manifest,{groups,family:'p6'});preferredParameters=manifest.preferredParameters??null;
   defaultGroupId=manifest.preferredGroup??groups.find(item=>catalog.size(item.id))?.id??'g243';restoreUrl();
