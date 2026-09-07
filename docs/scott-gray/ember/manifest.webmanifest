@@ -1,0 +1,9 @@
+{
+  "name": "Ember — Spiral lattice",
+  "short_name": "Ember",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#120927",
+  "theme_color": "#120927"
+}

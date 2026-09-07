@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#120927">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="An endless ember-colored spiral lattice. A smooth, locally rendered WebGL animation with an immersive fullscreen view.">
+  <title>Ember — Spiral lattice</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+</head>
+<body>
+  <main aria-label="Ember spiral lattice">
+    <canvas id="pattern" aria-label="Animated ember spiral lattice. Press Space to pause or F for fullscreen."></canvas>
+    <div id="notice" role="status">Loading the spiral lattice…</div>
+    <div id="controls" aria-label="Animation controls">
+      <span class="name">Ember</span>
+      <button id="pause" type="button" aria-label="Pause animation" title="Pause · Space" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="pause-icon" d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <button id="fullscreen" type="button" aria-label="Enter fullscreen" title="Fullscreen · F" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+        <span id="fullscreen-label">Fullscreen</span>
+      </button>
+    </div>
+    <noscript>This animation needs JavaScript and WebGL. Enable JavaScript and reload to view it.</noscript>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
