@@ -26,6 +26,17 @@ Controls and cursor hide after inactivity. GPU context restoration resumes the
 pattern; hidden tabs suspend rendering. Fullscreen playback requests a screen
 wake lock where supported.
 
+Twitter/X sharing uses `social-preview.jpg` (1200×630) with large-summary and
+Open Graph metadata. `ember-preview.mp4` is an eight-second, 1080×1080, 30fps
+H.264 upload with two seamless loops and no controls or audio. Both come directly
+from the actual WebGL renderer. Regenerate them while the local server is running:
+
+```sh
+node tools/export_ember_social.mjs
+```
+
+The exporter evaluates exact animation phases, avoiding realtime capture jitter.
+
 Validation from the repository root (Node 20+):
 
 ```sh
