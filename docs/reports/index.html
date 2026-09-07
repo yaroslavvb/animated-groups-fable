@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reports — Spacetime Groups</title>
+  <meta name="description" content="Research reports and technical notes on space, time and color symmetry, periodic reaction–diffusion patterns, numerical verification and orbit searches.">
+  <link rel="canonical" href="https://yaroslavvb.github.io/animated-groups-fable/reports/">
+  <link rel="stylesheet" href="../css/style.css?v=collapsible-header-v1">
+  <script defer src="../js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+  <style>
+    .reports-intro { max-width:650px; }
+    .report-feature { margin:1.8rem 0 2rem; padding:1.2rem 1.4rem; }
+    .report-feature h2 { margin:.2rem 0 .65rem; padding:0; border:0; }
+    .report-feature .label { margin-bottom:.6rem; }
+    .report-list { list-style:none; padding:0; margin:.6rem 0 1.5rem; }
+    .report-list li { padding:1rem 0; border-bottom:1px solid var(--rule); }
+    .report-list li:last-child { border-bottom:0; }
+    .report-title { font-weight:650; text-decoration-thickness:1px; text-underline-offset:3px; }
+    .report-list p { margin:.25rem 0 0; font-size:.93rem; }
+    .report-format { display:inline-block; font-size:.72rem; color:var(--muted); margin-left:.5rem; font-weight:400; white-space:nowrap; }
+    .report-sections { display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; margin:1.2rem 0 1.8rem; font-size:.9rem; }
+    .report-footer { margin-top:2.5rem; border-top:1px solid var(--rule); padding-top:1rem; }
+    @media (max-width:520px) { .report-feature { padding:1rem; } .report-feature h2 { font-size:1.3rem; } }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="../index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="../index.html">Tutorial</a>
+        <a href="../notation.html">Notation</a>
+        <a href="../colourings-tutorial.html">Colourings</a>
+        <a href="../subgroups-vs-colourings.html">Subgroups</a>
+        <a href="../torus-cayley.html">Torus Cayley graphs</a>
+        <a href="../hierarchy.html">Hierarchy</a>
+        <a href="../history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="../catalog.html">275 spacetime</a>
+        <a href="../wallpaper.html">275 spacetime (grouped)</a>
+        <a href="../correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="../patterns.html">609 patterns</a>
+        <a href="../escher.html">107 Escher</a>
+        <a href="../gallery.html">Gallery</a>
+        <a href="../scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="./" class="here">Reports</a>
+        <a href="../motifs.html">Motifs</a>
+        <a href="../designer.html">Designer</a>
+        <a href="../billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="../crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+<main class="narrow">
+  <h1>Reports</h1>
+  <p class="subtitle">Research and development notes for Spacetime Groups.</p>
+  <p class="reports-intro">Mathematical explanations, numerical evidence, and recorded experiments behind the animations. Each report states its own scope; earlier search counts describe the catalog at the time of writing.</p>
+
+  <article class="thm report-feature" aria-labelledby="featured-report">
+    <span class="label">New report · 7 September 2026</span>
+    <h2 id="featured-report"><a href="space-time-color/">Space, time, and color symmetry</a></h2>
+    <p>Why a rotation, a time shift, and a color exchange can restore the same animation. A theory beginning with two colors and forward time, with the 442 family and the 68 polar animations as a starting point.</p>
+    <p><a href="space-time-color/">Read the report →</a></p>
+  </article>
+
+  <nav class="report-sections" aria-label="Report sections">
+    <a href="#mathematics">Mathematics</a>
+    <a href="#verification">Computation and verification</a>
+    <a href="#experiments">Search experiments</a>
+    <a href="#records">Data and records</a>
+  </nav>
+
+  <h2 id="mathematics">Mathematics</h2>
+  <ul class="report-list">
+    <li><a class="report-title" href="../scott-gray/research-note/">Periodic Gray–Scott waves with cyclic time symmetry</a><p>The equations, cyclic time constraints, domain length, and independent verification. The research note originally shared as the “note for Vladimir.”</p></li>
+    <li><a class="report-title" href="../scott-gray-feasibility.md">Gray–Scott with the six 442 time symmetries</a><span class="report-format">Markdown</span><p>Why the six forward-time characters are compatible with the equation, and what compatibility does and does not establish.</p></li>
+    <li><a class="report-title" href="../scott-gray/ANALYTIC-EXCLUSIONS.md">Analytic exclusions for periodic Gray–Scott motion</a><span class="report-format">Markdown</span><p>Parameter conditions that rule out certain periodic behavior before a numerical search.</p></li>
+    <li><a class="report-title" href="../scott-gray/p6/CHARACTERS.md">Cyclic time characters of 632</a><span class="report-format">Markdown</span><p>Exact affine actions and the six compatible characters on the triangular lattice.</p></li>
+    <li><a class="report-title" href="../scott-gray/ROTATION-CENTRES.md">Rotation centres in the Gray–Scott overlays</a><span class="report-format">Markdown</span><p>Required centres, extra symmetries of individual solutions, and apparent repeats that fail a strict check.</p></li>
+    <li><a class="report-title" href="../future-directions.html">Future directions</a><p>Connections and possible extensions of the spacetime-group project.</p></li>
+  </ul>
+
+  <h2 id="verification">Computation and verification</h2>
+  <ul class="report-list">
+    <li><a class="report-title" href="../scott-gray/research/generator-direction-audit.md">Generator direction and time-offset audit</a><span class="report-format">Markdown</span><p>Saved-field checks of forward and inverse time shifts, and the coordinate conventions behind displayed rotation arrows.</p></li>
+    <li><a class="report-title" href="../scott-gray/SOLVER.md">The 442 periodic-orbit solver</a><span class="report-format">Markdown</span><p>Conventions, symmetry constraints, numerical methods, and the generator overlays.</p></li>
+    <li><a class="report-title" href="../scott-gray/VERIFIED-ORBITS.md">Numerical verification of the bundled 442 orbits</a><span class="report-format">Markdown</span><p>Delivered data, orbit admission, parameter continuation, and spatial refinement.</p></li>
+    <li><a class="report-title" href="../scott-gray/p6/EVIDENCE.md">Verified periodic Gray–Scott waves for 632</a><span class="report-format">Markdown</span><p>Triangular-lattice dynamics, numerical evidence, and the limits of the original atlas.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/wallpaper/README.md">Periodic Gray–Scott orbits for all 17 wallpaper groups</a><span class="report-format">Markdown</span><p>Search, refinement, saved-data admission, and the shared catalog for the 17 galleries.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/equations/README.md">Periodic orbits of two more equations</a><span class="report-format">Markdown</span><p>Ginzburg–Landau and Brusselator solutions with the same prescribed time-shift actions.</p></li>
+    <li><a class="report-title" href="../scott-gray/DIVERSITY.md">Periodic-pattern diversity</a><span class="report-format">Markdown</span><p>Pattern choices at fixed parameters, distinct spatial shapes, and the scope of the 442/632 Gray–Scott search.</p></li>
+  </ul>
+
+  <h2 id="experiments">Search experiments</h2>
+  <ul class="report-list">
+    <li><a class="report-title" href="../scott-gray/EXPLORATION.md">Exploring verified periodic orbits</a><span class="report-format">Markdown</span><p>Starting from known solutions, shooting constructions, and independent admission.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/SEARCH.md">Searching Gray–Scott orbits with cyclic time symmetry</a><span class="report-format">Markdown</span><p>The original 442 search, GPU batching, measured CPU/GPU benchmarks, results, and costs.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/p6/README.md">Offline 632 periodic-orbit search</a><span class="report-format">Markdown</span><p>Hopf seeds, correction, morphology searches, GPU batches, and reproducible branches.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/CONTINUATION.md">Continuing verified time-symmetric Gray–Scott orbits</a><span class="report-format">Markdown</span><p>Following periodic branches through parameter space and validating the saved outputs.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/diversity_strategy.md">Searching for different periodic patterns</a><span class="report-format">Markdown</span><p>Mixed modes, deflation, secondary branches, localized seeds, and diversity criteria.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/diversity_p4_notes.md">Searching beyond the original 442 wave</a><span class="report-format">Markdown</span><p>Recorded experiments extending the original square-lattice solution family.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/HIGHER-SPATIAL-MODES.md">Distinct patterns at fixed physical parameters</a><span class="report-format">Markdown</span><p>Higher spatial wavelengths and why the prescribed time character still matters.</p></li>
+    <li><a class="report-title" href="../scott-gray/research/STANDING-MODE2.md">Two standing patterns at the same parameters</a><span class="report-format">Markdown</span><p>A reproducible comparison of the fundamental standing wave and its second spatial mode.</p></li>
+  </ul>
+
+  <h2 id="records">Data and records</h2>
+  <ul class="report-list">
+    <li><a class="report-title" href="../scott-gray/data/README.md">Numerical data and provenance</a><span class="report-format">Markdown</span><p>How saved orbits, catalogs, and verification evidence are organized.</p></li>
+    <li><a class="report-title" href="../transcripts/gray-scott-session/">Gray–Scott research session transcript</a><p>The archived discussion and example animation associated with the original research note.</p></li>
+  </ul>
+
+  <p class="hint report-footer">Technical notes labeled Markdown open their original published source. For the interactive patterns, visit the <a href="../scott-gray-groups.html">reaction–diffusion galleries</a> or the <a href="../correspondence.html">68 colored ↔ polar crystals</a>.</p>
+</main>
+</body>
+</html>

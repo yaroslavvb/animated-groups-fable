@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Space, time, and color symmetry — Reports</title>
+  <meta name="description" content="Why a phase shift, rotation, and color exchange can preserve a movie: an exact two-color theorem, an interactive 442 example, and a reproducible audit of the observed Gray–Scott wave.">
+  <link rel="canonical" href="https://yaroslavvb.github.io/animated-groups-fable/reports/space-time-color/">
+  <link rel="stylesheet" href="../../css/style.css?v=collapsible-header-v1">
+  <link rel="stylesheet" href="report.css">
+  <script defer src="../../js/site-header.js?v=collapsible-header-v1"></script>
+  <script type="module" src="demo.mjs"></script>
+</head>
+<body>
+  <a class="skip-link" href="#report">Skip to report</a>
+  <header class="site"><div class="inner">
+    <a class="title" href="../../index.html">Spacetime Groups</a>
+    <nav aria-label="Primary navigation">
+      <span class="navgroup"><span class="navgroup-label">Background</span><a href="../../index.html">Tutorial</a><a href="../../history.html">History</a></span>
+      <span class="navgroup"><span class="navgroup-label">Catalogues</span><a href="../../correspondence.html">68 colored&lt;&gt;polar crystals</a><a href="../../scott-gray-groups.html">Reaction–diffusion</a></span>
+      <span class="navgroup"><span class="navgroup-label">Developer</span><a href="../">Reports</a></span>
+    </nav>
+  </div></header>
+  <main class="report" id="report"><article>
+    <nav class="report-breadcrumb" aria-label="Breadcrumb"><a href="../../index.html">Developer</a> / <a href="../">Reports</a> / Space, time, and color</nav>
+    <p class="eyebrow">Research report · 7 September 2026</p>
+    <h1>Space, time, and color symmetry</h1>
+    <p class="lead">A movie can return to itself when we rotate the plane, advance its phase, and exchange its colors together. The right object is the group of these <em>triples</em>. A particularly simple theorem explains why a half-period color exchange produces a whole second family of symmetries.</p>
+    <div class="summary">
+      <p><strong>The key mechanism.</strong> If a half-period shift exchanges two colors, every ordinary space–time symmetry has a companion: add another half-period and exchange the colors. This companion is forced by composition.</p>
+      <p><strong>The linked example.</strong> The saved 2222/g6 movie actually comes from a 442/g96 rotating wave. Its extra quarter-turn/quarter-period symmetry is exact on the saved data. The apparent global color reversal is approximate, with measurable departures. The two effects have different explanations.</p>
+      <p><strong>Scope.</strong> Two color labels, periodic time, and operations that preserve the direction of time. This covers the framework behind the site's <a href="../../correspondence.html">68 forward/polar entries</a>; it is not a claim that those 68 entries are 68 two-color types, nor a new enumeration of all colored film groups.</p>
+    </div>
+    <nav class="contents" aria-label="Report contents">
+      <a href="#observation">The observed movie</a><a href="#triples">Symmetry triples</a><a href="#theorem">The half-period theorem</a><a href="#example">Try 442</a><a href="#characters">442 generator rules</a><a href="#mechanism">Why they arise</a><a href="#catalog">The 68 entries</a><a href="#sources">Sources &amp; reproduction</a>
+    </nav>
+
+    <h2 id="observation">1. What the observed movie actually does</h2>
+    <p>The motivating <a href="../../scott-gray/p2/#g6?v=2&amp;pattern=wallpaper%3Ag6%3A731aa45654d4d690&amp;palette=ember&amp;tiles=2&amp;framing=simulation&amp;speed=1&amp;generator=%CE%B1&amp;overlay=0&amp;approx=0&amp;phase=0&amp;play=1">2222/g6 animation</a> uses the saved field <code>g96-F0p00395000-k0p02000000-N48-M128</code>, with period <span class="math">T ≈ 398.977432</span>. Its catalog provenance is <code>audited-subgroup</code>: the field was tested against the smaller group, with extra symmetry allowed. Thus its 2222 label describes a verified subgroup, not necessarily its full symmetry.</p>
+    <p>Write <span class="math">q = (U,V)</span> for the two concentrations and let <span class="math">R(x,y) = (−y,x)</span>, a counterclockwise quarter-turn about the origin in mathematical coordinates. In units of one period, the data satisfy</p>
+    <div class="equation math"><span>q(Rx, t + ¼) = q(x,t),</span><span>q(R²x, t + ½) = q(x,t).</span><small>Both channels; every one of 128 saved phases and 48 × 48 spatial nodes. Maximum absolute error: 0 in the saved Float32 values. Rotation direction here is defined by the matrix, independently of screen/glyph conventions.</small></div>
+    <p>The Ember palette is a multicolor gradient of <strong>U alone</strong>. Its colors are neither the two chemical species nor literal two-color labels. To make “change the colors” testable, we audited two concrete interpretations: reversing the normalized scalar palette coordinate, and swapping two labels obtained by thresholding U.</p>
+    <div class="table-scroll"><table>
+      <caption>Results for the exact linked payload</caption>
+      <thead><tr><th>Test over the whole saved loop</th><th>Result</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>Quarter-turn + ¼ period, both U and V</td><td>Maximum error 0</td><td>Exact saved space–time symmetry</td></tr>
+        <tr><td>U(t + ½) versus U<sub>min</sub> + U<sub>max</sub> − U(t)</td><td>18.55% RMS / U range</td><td>Palette-coordinate reversal fails exactly</td></tr>
+        <tr><td>Best decreasing affine fit U(t + ½) ≈ a + bU(t)</td><td>17.40% RMS / U range; b ≈ −0.804</td><td>Changing the global midpoint does not repair it</td></tr>
+        <tr><td>Two labels, threshold U = 0.2213753; ½ period + swap</td><td>5.81% label mismatches</td><td>Close enough to suggest a visual complement</td></tr>
+        <tr><td>First harmonic / time-varying energy</td><td>U: 89.65%; V: 80.57%</td><td>A dominant oscillatory mode explains the resemblance</td></tr>
+      </tbody>
+    </table></div>
+    <p class="small">RMS averages every stored node and frame, normalized by the full movie's max−min for that channel. The threshold test counts unequal labels after exchange. These tests do not exhaust arbitrary nonlinear color maps, other rotation centers, or every possible phase. Byte-exact identities on this aligned grid also survive periodic linear/bilinear playback interpolation; they are not a proof of an exact continuum PDE solution. <a href="audit.json">Full audit</a> · <a href="audit.py">Reproduction script</a>.</p>
+
+    <h2 id="triples">2. Give each symmetry three coordinates</h2>
+    <p>For a two-color movie, encode the labels by <span class="math">f(x,t) ∈ {−1,+1}</span>. A signed scalar can generate these regions: its sign gives the labels, with its zero set treated as an uncolored boundary. Requiring the same identity for scalar amplitudes is a stronger test than matching just the labels. Normalize the movie's <em>primitive</em> period to 1. Define</p>
+    <div class="equation math"><span>S(f) = { (g,τ,ε) : f(gx,t + τ) = (−1)<sup>ε</sup> f(x,t) }.</span><small>g: a planar isometry, including its translation or rotation center. τ ∈ ℝ/ℤ: phase advance. ε ∈ {0,1}: keep or exchange the labels. Time reversal is excluded.</small></div>
+    <p>These triples form a subgroup of <span class="math">E(2) × (ℝ/ℤ) × C₂</span>. Composition is</p>
+    <div class="equation math"><span>(g,τ,ε)(h,σ,η) = (gh, τ + σ, ε + η),</span><small>Add phase modulo 1 and color parity modulo 2. This is a direct product of allowed operations; the subgroup preserving a particular movie need not split into independent factors.</small></div>
+    <p>A symmetry may therefore use all three coordinates even if none of its parts separately preserves the movie. For k colors, replace C₂ by the permutation group S<sub>k</sub> and replace the sign by a single global permutation of labels. This is a color-symmetry extension of ordinary space–time symmetry, not a redefinition of chemical concentrations. See the established <a href="#source-color">color-group framework</a>.</p>
+
+    <h2 id="theorem">3. The half-period theorem</h2>
+    <div class="thm">
+      <span class="label">Elementary lift theorem for two colors</span>
+      <p>Assume the movie has primitive period 1 and exchanging colors changes it. Among symmetries that leave every spatial point in place, there are only two possibilities:</p>
+      <p class="math">N = {(e,0,0)},<br>or N = {(e,0,0), (e,½,1)}.</p>
+      <p>In the second case, every symmetry <span class="math">(g,τ,ε)</span> has exactly one companion over the same spatial operation:</p>
+      <p class="math">(g, τ + ½, ε + 1).</p>
+    </div>
+    <p><strong>Proof.</strong> A pure phase shift with no color exchange is a period, hence zero modulo the primitive period. Squaring a pure phase-plus-swap gives a pure shift by 2τ, so 2τ = 0 modulo 1. The choice τ = 0 would say the movie equals its own color exchange; the only remaining choice is ½. Two different swap offsets would differ by an ordinary period, so there is at most one. Composing with this kernel element gives the companion. Two lifts of the same spatial operation differ by a kernel element, so there are no others.</p>
+    <p><strong>Applied to 442.</strong> Suppose a quarter-turn already gives <span class="math">(R,¼,0)</span>. If the movie also has the half-period swap <span class="math">(e,½,1)</span>, composition forces</p>
+    <div class="equation math"><span>(R,¼,0)(e,½,1) = (R,¾,1).</span><small>Rotate 90°, advance by ¾ of the loop, and exchange colors. This is an exact symmetry whenever both assumptions are exact.</small></div>
+    <p>This directly answers the “another level” observation: one additional temporal/color symmetry doubles the number of lifts of each spatial operation. It need not add a new spatial operation. Separately, a particular movie can also have a larger spatial projection, as the saved g6 example does.</p>
+    <p><strong>The character form.</strong> Let G be the spatial projection of S. If N is trivial, the unique lift defines a homomorphism <span class="math">G → (ℝ/ℤ) × C₂</span>. If the half-swap is present, lifts instead define a homomorphism into the quotient by N. This quotient is a circle: the invariant coordinate is <span class="math">θ = τ + ε/2</span> modulo 1. Thus color and time can become two descriptions of the same effective phase. This precise distinction prevents counting paired lifts as independent new group types.</p>
+
+    <h2 id="example">4. An exact two-color movie with 442 symmetry</h2>
+    <p>The following analytic model has the same directed quarter-turn relation as the saved g96 field. It realizes the required 442 subgroup and also has additional spatial symmetries; its full symmetry is not asserted to be only 442. It is a mathematical illustration, not a reaction–diffusion solution. On the unit square torus, set</p>
+    <div class="equation math"><span>f(x,y,t) = sin(2πx) cos(2πt) + sin(2πy) sin(2πt).</span><small>Positive regions are blue, negative regions are terracotta. Their common nodal boundary is uncolored. R(x,y) = (−y,x); t is measured in periods.</small></div>
+    <p>Direct substitution gives <span class="math">f(Rx,t+¼)=f(x,t)</span> and <span class="math">f(x,t+½)=−f(x,t)</span>. Therefore <span class="math">f(Rx,t+¾)=−f(x,t)</span>. The three panels below show the original, the spatial/temporal transform, and the result after the selected color operation.</p>
+    <section class="demo" id="symmetry-demo" aria-label="Interactive 442 symmetry experiment">
+      <div class="demo-panels">
+        <figure><canvas width="192" height="192" aria-label="Original two-color 442 movie"></canvas><figcaption>Original at phase t</figcaption></figure>
+        <figure><canvas width="192" height="192" aria-label="Movie after rotation and phase shift"></canvas><figcaption id="transformed-caption">90° rotation + ¾ period</figcaption></figure>
+        <figure><canvas width="192" height="192" aria-label="Transformed movie after the selected color exchange"></canvas><figcaption id="result-caption">Then exchange the two colors</figcaption></figure>
+      </div>
+      <div class="demo-controls"><button type="button" id="play" aria-pressed="false">Play</button><label>Phase <input id="phase" type="range" min="0" max="1" step="0.001" value="0.083"><output id="phase-value" for="phase">0.083</output></label></div>
+      <div class="demo-controls">
+        <label>Rotation <select id="rotation"><option value="0">0°</option><option value="1" selected>90°</option><option value="2">180°</option><option value="3">270°</option></select></label>
+        <label>Phase advance <select id="shift"><option value="0">0</option><option value="0.25">¼ period</option><option value="0.5">½ period</option><option value="0.75" selected>¾ period</option></select></label>
+        <label><input id="swap" type="checkbox" checked> Exchange colors</label>
+      </div>
+      <div class="demo-controls"><button type="button" data-preset="triple">All three</button><button type="button" data-preset="half">Half-period + color</button><button type="button" data-preset="spaceTime">Rotation + time</button></div>
+      <div class="demo-controls"><label>Static component ε <input id="bias" type="range" min="0" max="0.6" step="0.05" value="0"><output id="bias-value" for="bias">0.00</output></label></div>
+      <output class="demo-status" id="demo-status" aria-live="polite">Loading the whole-loop comparison…</output>
+      <noscript><p>The formulas and proof above apply without JavaScript. Enable JavaScript to run the comparison.</p></noscript>
+    </section>
+    <p>Increase the static component to add <span class="math">ε[cos(2πx)+cos(2πy)]</span>. It is unchanged by R, so the quarter-turn/quarter-period symmetry survives. But it does not change sign after half a period, so the color-swap symmetry breaks. The demo checks 12,696 samples spread across the whole loop, rather than trusting one matching frame. The formula proves the exact identities; the numerical check is a diagnostic.</p>
+    <p class="small">At nodal points a literal two-label assignment cannot equal its own swapped label. The boundary is therefore excluded from the colored regions; sampled zeros are drawn in the page's neutral color. In the image comparison, f(Rx,…) is a pullback: visible features can move in the opposite direction to the coordinate rotation.</p>
+
+    <h2 id="characters">5. Describe 442 using generator triples</h2>
+    <p>The orientation-preserving wallpaper group p4 has orbifold signature 442 and presentation</p>
+    <div class="equation math"><span>G = ⟨a,b,c | a⁴ = b⁴ = c² = abc = e⟩.</span><small>a and b are quarter-turn generators at inequivalent centers; c is a half-turn. These are abstract presentation generators, not a claim about the viewer's α/β naming convention.</small></div>
+    <p>When lifts are unique, decorate each generator by its phase and color bit: <span class="math">a ↦ (τ<sub>a</sub>,ε<sub>a</sub>)</span>, and similarly for b,c. The defining relations impose</p>
+    <div class="equation math"><span>4τ<sub>a</sub> = 4τ<sub>b</sub> = 2τ<sub>c</sub> = 0 (mod 1),</span><span>τ<sub>a</sub> + τ<sub>b</sub> + τ<sub>c</sub> = 0 (mod 1),</span><span>ε<sub>a</sub> + ε<sub>b</sub> + ε<sub>c</sub> = 0 (mod 2).</span></div>
+    <p>The order relations give no further restriction on a two-color bit because 4 and 2 are even. Thus there are four color-character assignments for these <em>named</em> generators:</p>
+    <table><thead><tr><th>ε<sub>a</sub></th><th>ε<sub>b</sub></th><th>ε<sub>c</sub></th><th>Color action</th></tr></thead><tbody>
+      <tr><td>0</td><td>0</td><td>0</td><td>Every generator keeps labels</td></tr><tr><td>1</td><td>0</td><td>1</td><td>a and c exchange labels</td></tr><tr><td>0</td><td>1</td><td>1</td><td>b and c exchange labels</td></tr><tr><td>1</td><td>1</td><td>0</td><td>Both quarter-turn generators exchange labels</td></tr>
+    </tbody></table>
+    <p>These are algebraically consistent homomorphisms, not four new inequivalent animation types or a promise that every motif realizes them. Equivalent choices of origin, generator names, and lattice can identify decorations. Motif stabilizers impose additional constraints: a color-swapping symmetry with zero phase cannot fix a point in the interior of a colored region.</p>
+    <p><strong>If the half-period swap is present,</strong> use the quotient character θ instead of treating τ and ε as independent. Generator relations must hold in that quotient; a relation's lift can end at the nontrivial element of N. In particular, for a spatial operation of order m, the general rule is <span class="math">(e,mτ,mε) ∈ N</span>. If N is trivial this is the usual pair of zero congruences. This also explains a useful parity check: an odd-order spatial rotation cannot exchange two colors at zero phase, but it can participate in a phase/color operation whose odd power is the half-period swap.</p>
+    <p>There is no need for an ambiguous prime on “442.” Record a presentation, the concrete centers/matrices, and the triples. That describes space, phase, and color simultaneously and makes every assertion testable.</p>
+
+    <h2 id="mechanism">6. Why these symmetries arise</h2>
+    <p><strong>A single oscillatory mode has an automatic sign reversal.</strong> For <span class="math">f(x,t)=Re[A(x)e<sup>2πit</sup>]</span>, advancing half a period multiplies f by −1. If A transforms by a one-dimensional complex character under a spatial operation, its phase can be canceled by a time shift. These two facts together create the three-part symmetry. This is the representation/character construction used in the <a href="#source-phase">spatio-temporal point-group literature</a>.</p>
+    <p><strong>The exact Fourier test is stronger than a visual resemblance.</strong> Expand a signed, periodic scalar field as <span class="math">f(x,t)=Σ<sub>n</sub> f<sub>n</sub>(x)e<sup>2πint</sup></span>. A triple is a symmetry if and only if every Fourier coefficient obeys</p>
+    <div class="equation math"><span>f<sub>n</sub>(gx) = (−1)<sup>ε</sup>e<sup>−2πinτ</sup> f<sub>n</sub>(x).</span><small>For a pure half-period swap, every even temporal harmonic must vanish, including n = 0. This is necessary and sufficient, not merely a first-harmonic heuristic.</small></div>
+    <p><strong>Near an oscillatory bifurcation, the symmetry can be approximate.</strong> A leading sinusoidal mode changes sign after half a cycle, while nonlinear terms generally introduce a stationary correction and higher harmonics. An underlying color/sign equivariance can prohibit the unwanted terms; without it, there is no reason for exact cancellation. For a concentration reversal about one fixed constant, its time average must also be spatially constant. Subtracting a different average at each point changes the observable being tested.</p>
+    <p>In the linked U movie, 89.65% of time-varying energy lies in the fundamental, but 8.70% lies in nonzero even harmonics; the temporal average also varies with position. Both obstruct exact global complementarity. Gray–Scott does not have a U↔V symmetry at these parameters: the two diffusion constants and reaction terms differ. Nor is U+V conserved. A display-palette resemblance is consequently not evidence of a chemical color-exchange law.</p>
+    <p><strong>An exact derived movie is possible.</strong> Define the odd part of the observed field by</p>
+    <div class="equation math"><span>b(x,t) = ½[U(x,t) − U(x,t+½)].</span></div>
+    <p>Then <span class="math">b(x,t+½)=−b(x,t)</span> identically. It inherits every existing space–time symmetry because this projection commutes with spatial operations and phase shifts. Therefore the saved g6 wave's odd part has an exact <span class="math">(R,¾,1)</span> relation, and thresholding b at zero gives an exact two-color version away from its nodal set. This is a filtered visualization of the orbit; it is not itself asserted to solve the original PDE.</p>
+
+    <h2 id="catalog">7. How to apply the theory to the 68 polar entries</h2>
+    <p>“Polar” here means the time direction is preserved, as in the site's 68 forward clockwork groups. Spatial mirrors and glides may still occur. The site's stored action list contains 51 entries with nonzero phase offsets and 17 zero-offset spatial references. Its counts classify ordinary uncolored space–time geometry; adding independent color data changes the classification problem.</p>
+    <ol>
+      <li><strong>Specify the observable.</strong> Use actual two-color labels, a signed contrast field, or an explicit fixed transformation of the palette coordinate. Record the primitive period and any neutral boundaries.</li>
+      <li><strong>Test the kernel first.</strong> Determine whether the pure half-period swap exists. It decides whether each spatial operation has one lift or a pair of lifts.</li>
+      <li><strong>Use the presentation to propose triples.</strong> Solve the phase/color congruences on the wallpaper generators, in the appropriate quotient. This provides a finite algebraic search for specified crystallographic actions and color group; the 68 labels alone do not determine the answer.</li>
+      <li><strong>Measure the actual movie.</strong> Check all phases and spatial points, separately per field channel or label. Check closures and primitive period; record RMS, maximum error, and mismatches. Search outside the nominal group for extra rotations and translations, since a saved field may have a larger symmetry group.</li>
+      <li><strong>Classify only after validation.</strong> Quotient equivalent decorated actions by spatial coordinate changes, allowed time conventions, and global color relabeling. Distinguish prescribed symmetry, measured full symmetry, and approximate symmetry.</li>
+    </ol>
+    <p>The natural next catalog is therefore a table attached to each saved movie: ordinary verified action, extra spatial symmetries, pure phase/color kernel, generator triples, and numerical residuals. This report supplies the theorem, a complete exact 442 illustration, and a reproducible audit of the motivating movie; it does not claim an exhaustive maximal-symmetry audit of all saved animations.</p>
+    <p><strong>Is there a “magic theorem”?</strong> The closest elementary answer is the character/lift construction above. The established <a href="#source-hk">H/K theorem</a> also relates the setwise and pointwise symmetries of a periodic orbit; for finite symmetry groups their quotient is cyclic. Its realization theorem includes representation and connectivity conditions and concerns an appropriate equivariant dynamical system. It does not guarantee a periodic solution of a particular Gray–Scott PDE, or an arbitrary color operation on its concentrations.</p>
+
+    <footer id="sources">
+      <h2>Sources and reproducibility</h2>
+      <p>The two-color lift theorem and analytic example are derived explicitly here. Established background and repository evidence:</p>
+      <ol>
+        <li id="source-phase">Padmanabhan, Kingsland, Munro, Litvin &amp; Gopalan, <a href="https://www.mdpi.com/2073-8994/9/9/187">“Spatio-Temporal Symmetry—Point Groups with Time Translations”</a>, <em>Symmetry</em> 9, 187 (2017). Section 2 constructs phase-shift groups from one-dimensional representations and normal subgroups.</li>
+        <li id="source-color">Ron Lifshitz, <a href="https://doi.org/10.1103/RevModPhys.69.1181">“Theory of color symmetry for periodic and quasiperiodic crystals”</a>, <em>Reviews of Modern Physics</em> 69, 1181 (1997). Color permutations combined with spatial operations.</li>
+        <li id="source-spacetime">Shenglong Xu &amp; Congjun Wu, <a href="https://arxiv.org/abs/1703.03388">“Space-Time Crystal and Space-Time Group”</a>, <em>Physical Review Letters</em> 120, 096401 (2018). Space–time groups, time screws, and time glides.</li>
+        <li id="source-hk">Pietro-Luciano Buono &amp; Martin Golubitsky, <a href="https://www.asc.ohio-state.edu/golubitsky.4/reprintweb-0.5/output/papers/buonoI.pdf">“Models of central pattern generators for quadruped locomotion. I. Primary gaits”</a>, <em>Journal of Mathematical Biology</em> 42 (2001), Appendix, Theorem A.1: the H/K theorem with representation and connectivity hypotheses. Also Golubitsky &amp; Stewart, <a href="https://www.asc.ohio-state.edu/golubitsky.4/reprintweb-0.5/output/papers/S0273-0979-06-01108-6.pdf">“Nonlinear dynamics of networks: the groupoid formalism”</a>, <em>Bulletin of the AMS</em> 43 (2006), Theorem 2.3, for the coupled-cell setting.</li>
+        <li>Repository: <a href="../../scott-gray/wallpaper-groups.json">68 directed affine actions and scope</a>; <a href="../../scott-gray/research/wallpaper/README.md">saved-byte admission and subgroup provenance</a>; <a href="../../scott-gray/data/orbits/g96-F0p00395000-k0p02000000-N48-M128.json">source metadata</a>; <a href="../../scott-gray/render.mjs">palette mapping</a>; <a href="../../scott-gray/research-note/">periodic-wave solver report</a>.</li>
+        <li>Related site essay: <a href="../../future-directions.html#checker">two colors and half-period shifts</a>. This report adds an independent color coordinate, the kernel/lift distinction, and an audit of the observed wave.</li>
+      </ol>
+      <p>Download <a href="audit.json">the numerical audit</a>, <a href="audit.py">its Python/NumPy script</a>, and <a href="model.mjs">the analytic demo model</a>. From a repository checkout, run <code>python3 docs/reports/space-time-color/audit.py --check</code> and <code>node --test docs/reports/space-time-color/model.test.mjs</code>.</p>
+      <p>The audited payload SHA-256 is <code>731aa45654d4d690f202dc48818e47c8fe023bfd5462284a8601f4bed6563483</code>. The audit covers this saved numerical field, with bounds and scope recorded in the JSON.</p>
+      <p><a href="../">← All reports</a></p>
+    </footer>
+  </article></main>
+</body>
+</html>

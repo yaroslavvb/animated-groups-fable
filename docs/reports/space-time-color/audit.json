@@ -1,0 +1,682 @@
+{
+  "schema": "space-time-color-observed-orbit-audit-v1",
+  "orbitId": "wallpaper:g6:731aa45654d4d690",
+  "fieldUrl": "../../scott-gray/data/orbits/g96-F0p00395000-k0p02000000-N48-M128.f32",
+  "metadataUrl": "../../scott-gray/data/orbits/g96-F0p00395000-k0p02000000-N48-M128.json",
+  "fieldSha256": "731aa45654d4d690f202dc48818e47c8fe023bfd5462284a8601f4bed6563483",
+  "fieldByteLength": 2359296,
+  "fieldShape": [
+    128,
+    2,
+    48,
+    48
+  ],
+  "fieldLayout": "Float32 little-endian; q[frame,channel,y,x], planar U then V; converted to Float64 for reductions.",
+  "period": 398.9774322342758,
+  "sourceGroupId": "g96",
+  "sourceKind": "audited-subgroup",
+  "operationConvention": "Compare q(R*x, t+tau*T) against q(x,t); x,y are periodic coordinates i/N. R90(x,y)=(-y,x) in mathematical coordinates, modulo the square lattice. All rotations have center (0,0).",
+  "normalization": "RMS = sqrt(mean(error^2)) over all 128 frames and 48*48 nodes separately for each channel; normalized RMS divides by that channel's global maximum-minus-minimum over the full saved movie.",
+  "testedScope": "All 16 combinations of rotations 0,90,180,270 degrees about the lattice origin and phases 0,1/4,1/2,3/4, without translation or color change. Additionally test scalar color reversal and best affine fit at T/2 with no rotation, and three specified binary thresholds. This is not an exhaustive search over centers, phase shifts, nonlinear palette permutations, or the maximal symmetry group.",
+  "exactnessScope": "Maximum 0 means byte-exact equality of the saved samples. Grid-aligned quarter-turn and frame-aligned quarter-period identities also commute with the site's periodic linear/bilinear interpolation. This audit does not rerun the PDE solver or establish a continuum existence theorem.",
+  "paletteInterpretation": {
+    "ember": "A multistop gradient of U, normalized by the orbit's full U range; not two species, two labels, or an RGB complement operation.",
+    "concentration": "The grayscale-like concentration palette displays V, normalized by the orbit's full V range.",
+    "source": "../../scott-gray/render.mjs"
+  },
+  "speciesInterpretation": {
+    "equations": "U_t=Du*lap(U)-U*V^2+F*(1-U); V_t=Dv*lap(V)+U*V^2-(F+k)*V",
+    "colorSwap": "Relabeling a displayed color does not interchange U and V or change the chemical state.",
+    "noSpeciesSwapSymmetry": "At the saved parameters Du=0.16 differs from Dv=0.08, and the feed/kill reaction terms differ. Exchanging U and V is not an equivariance of these equations.",
+    "noConservationAssumption": "On a periodic domain, d mean(U+V)/dt = F*(1-mean(U))-(F+k)*mean(V), which is generally nonzero. A two-color complement must not be inferred from conservation of total concentration.",
+    "source": "../../scott-gray/research/gray_scott_rk4.cpp"
+  },
+  "existingSourceValidationNotRerun": {
+    "candidateSymmetryMax": 0,
+    "refinedReturnRms": 7.967024695721742e-09,
+    "refinedTrajectoryRms": 1.4103014136263861e-08,
+    "refinedDt": 0.19481319933314248
+  },
+  "spaceTimeOperations": [
+    {
+      "rotationDegrees": 0,
+      "matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.0,
+      "maximumAbsolute": 0.0,
+      "rmsByChannel": [
+        0.0,
+        0.0
+      ],
+      "rmsOverChannelRange": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rotationDegrees": 0,
+      "matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.25,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 0,
+      "matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.5,
+      "maximumAbsolute": 0.2608790844678879,
+      "rmsByChannel": [
+        0.1800920731639162,
+        0.1035317476593813
+      ],
+      "rmsOverChannelRange": [
+        0.555476719372842,
+        0.4815517153005974
+      ]
+    },
+    {
+      "rotationDegrees": 0,
+      "matrix": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.75,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 90,
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.0,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 90,
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.25,
+      "maximumAbsolute": 0.0,
+      "rmsByChannel": [
+        0.0,
+        0.0
+      ],
+      "rmsOverChannelRange": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rotationDegrees": 90,
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.5,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 90,
+      "matrix": [
+        [
+          0,
+          -1
+        ],
+        [
+          1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.75,
+      "maximumAbsolute": 0.2608790844678879,
+      "rmsByChannel": [
+        0.1800920731639162,
+        0.1035317476593813
+      ],
+      "rmsOverChannelRange": [
+        0.555476719372842,
+        0.4815517153005974
+      ]
+    },
+    {
+      "rotationDegrees": 180,
+      "matrix": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.0,
+      "maximumAbsolute": 0.2608790844678879,
+      "rmsByChannel": [
+        0.1800920731639162,
+        0.1035317476593813
+      ],
+      "rmsOverChannelRange": [
+        0.555476719372842,
+        0.4815517153005974
+      ]
+    },
+    {
+      "rotationDegrees": 180,
+      "matrix": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.25,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 180,
+      "matrix": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.5,
+      "maximumAbsolute": 0.0,
+      "rmsByChannel": [
+        0.0,
+        0.0
+      ],
+      "rmsOverChannelRange": [
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "rotationDegrees": 180,
+      "matrix": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.75,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 270,
+      "matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.0,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 270,
+      "matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.25,
+      "maximumAbsolute": 0.2608790844678879,
+      "rmsByChannel": [
+        0.1800920731639162,
+        0.1035317476593813
+      ],
+      "rmsOverChannelRange": [
+        0.555476719372842,
+        0.4815517153005974
+      ]
+    },
+    {
+      "rotationDegrees": 270,
+      "matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.5,
+      "maximumAbsolute": 0.32409002259373665,
+      "rmsByChannel": [
+        0.13846933652729534,
+        0.08512773483923078
+      ],
+      "rmsOverChannelRange": [
+        0.42709538202666036,
+        0.39595010862130925
+      ]
+    },
+    {
+      "rotationDegrees": 270,
+      "matrix": [
+        [
+          0,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
+      ],
+      "translation": [
+        0,
+        0
+      ],
+      "phaseShift": 0.75,
+      "maximumAbsolute": 0.0,
+      "rmsByChannel": [
+        0.0,
+        0.0
+      ],
+      "rmsOverChannelRange": [
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "channels": [
+    {
+      "channel": "U",
+      "range": [
+        0.059269435703754425,
+        0.3834811747074127
+      ],
+      "rangeSpan": 0.3242117390036583,
+      "globalMean": 0.2167068786874956,
+      "spatialStdOfPerNodeTemporalMean": 0.010485996631955026,
+      "halfPeriodIdentity": {
+        "rms": 0.1800920731639162,
+        "rmsOverRange": 0.555476719372842
+      },
+      "halfPeriodReversalAboutGlobalMean": {
+        "map": "z -> 2*globalMean-z",
+        "rms": 0.05940675657125095,
+        "rmsOverRange": 0.18323444041173545
+      },
+      "halfPeriodReversalAboutRangeMidpoint": {
+        "map": "z -> minimum+maximum-z",
+        "rms": 0.06013600877124301,
+        "rmsOverRange": 0.18548374884897198
+      },
+      "halfPeriodBestAffineFit": {
+        "map": "z -> slope*z+offset (least squares; not required to be an involution)",
+        "slope": -0.8037299613899269,
+        "offset": 0.390880689927928,
+        "rms": 0.0564165602818733,
+        "rmsOverRange": 0.17401146687423527
+      },
+      "binaryThresholds": [
+        {
+          "thresholdName": "full-range midpoint",
+          "threshold": 0.22137530520558357,
+          "highLabelFraction": 0.4956190321180556,
+          "swapMismatchFraction": 0.05807834201388889,
+          "minimumPhaseMismatchFraction": 0.027777777777777776,
+          "maximumPhaseMismatchFraction": 0.08854166666666667
+        },
+        {
+          "thresholdName": "global mean",
+          "threshold": 0.2167068786874956,
+          "highLabelFraction": 0.5075954861111112,
+          "swapMismatchFraction": 0.06141493055555555,
+          "minimumPhaseMismatchFraction": 0.03125,
+          "maximumPhaseMismatchFraction": 0.09375
+        },
+        {
+          "thresholdName": "global median",
+          "threshold": 0.21958519518375397,
+          "highLabelFraction": 0.4999864366319444,
+          "swapMismatchFraction": 0.05856662326388889,
+          "minimumPhaseMismatchFraction": 0.033854166666666664,
+          "maximumPhaseMismatchFraction": 0.0920138888888889
+        }
+      ],
+      "temporalFourierEnergy": {
+        "normalization": "Fraction of all non-DC real-DFT energy, summed over spatial nodes; DC means per-node temporal mean.",
+        "firstHarmonicFraction": 0.8965292851887883,
+        "evenHarmonicFraction": 0.08696850812975938,
+        "firstEightHarmonics": [
+          {
+            "harmonic": 1,
+            "fraction": 0.8965292851887883
+          },
+          {
+            "harmonic": 2,
+            "fraction": 0.08294360666967272
+          },
+          {
+            "harmonic": 3,
+            "fraction": 0.015385090572396742
+          },
+          {
+            "harmonic": 4,
+            "fraction": 0.0036885582170836286
+          },
+          {
+            "harmonic": 5,
+            "fraction": 0.00100987514258663
+          },
+          {
+            "harmonic": 6,
+            "fraction": 0.00030064658166871694
+          },
+          {
+            "harmonic": 7,
+            "fraction": 9.49532032635416e-05
+          },
+          {
+            "harmonic": 8,
+            "fraction": 3.135173501354837e-05
+          }
+        ]
+      },
+      "derivedOddTemporalPart": {
+        "definition": "b(x,t) = (q(x,t)-q(x,t+T/2))/2",
+        "halfPeriodSignReversalMax": 0.0,
+        "quarterTurnThreeQuarterPeriodSignReversalMax": 0.0,
+        "zeroValueFraction": 0.001736111111111111,
+        "scope": "An exact algebraic projection of the saved movie, not a Gray-Scott concentration or independently evolved solution. A binary sign label is undefined at zero if exact label complementation is required."
+      }
+    },
+    {
+      "channel": "V",
+      "range": [
+        0.06812699139118195,
+        0.28312310576438904
+      ],
+      "rangeSpan": 0.2149961143732071,
+      "globalMean": 0.12918613066004683,
+      "spatialStdOfPerNodeTemporalMean": 0.0020973993788842623,
+      "halfPeriodIdentity": {
+        "rms": 0.1035317476593813,
+        "rmsOverRange": 0.4815517153005974
+      },
+      "halfPeriodReversalAboutGlobalMean": {
+        "map": "z -> 2*globalMean-z",
+        "rms": 0.04494268165773473,
+        "rmsOverRange": 0.20903950654531228
+      },
+      "halfPeriodReversalAboutRangeMidpoint": {
+        "map": "z -> minimum+maximum-z",
+        "rms": 0.10318011932572263,
+        "rmsOverRange": 0.4799162051208726
+      },
+      "halfPeriodBestAffineFit": {
+        "map": "z -> slope*z+offset (least squares; not required to be an involution)",
+        "slope": -0.6828797597273151,
+        "offset": 0.21740472452528115,
+        "rms": 0.04122593633468363,
+        "rmsOverRange": 0.19175200656473457
+      },
+      "binaryThresholds": [
+        {
+          "thresholdName": "full-range midpoint",
+          "threshold": 0.1756250485777855,
+          "highLabelFraction": 0.2216254340277778,
+          "swapMismatchFraction": 0.5567491319444444,
+          "minimumPhaseMismatchFraction": 0.5373263888888888,
+          "maximumPhaseMismatchFraction": 0.5859375
+        },
+        {
+          "thresholdName": "global mean",
+          "threshold": 0.12918613066004683,
+          "highLabelFraction": 0.3804796006944444,
+          "swapMismatchFraction": 0.2455512152777778,
+          "minimumPhaseMismatchFraction": 0.20572916666666666,
+          "maximumPhaseMismatchFraction": 0.2864583333333333
+        },
+        {
+          "thresholdName": "global median",
+          "threshold": 0.10719567909836769,
+          "highLabelFraction": 0.5,
+          "swapMismatchFraction": 0.072265625,
+          "minimumPhaseMismatchFraction": 0.03211805555555555,
+          "maximumPhaseMismatchFraction": 0.11631944444444445
+        }
+      ],
+      "temporalFourierEnergy": {
+        "normalization": "Fraction of all non-DC real-DFT energy, summed over spatial nodes; DC means per-node temporal mean.",
+        "firstHarmonicFraction": 0.8057421719745237,
+        "evenHarmonicFraction": 0.15739620404099464,
+        "firstEightHarmonics": [
+          {
+            "harmonic": 1,
+            "fraction": 0.8057421719745237
+          },
+          {
+            "harmonic": 2,
+            "fraction": 0.14756321601805916
+          },
+          {
+            "harmonic": 3,
+            "fraction": 0.034002557231393345
+          },
+          {
+            "harmonic": 4,
+            "fraction": 0.008948440934338567
+          },
+          {
+            "harmonic": 5,
+            "fraction": 0.002572187551079149
+          },
+          {
+            "harmonic": 6,
+            "fraction": 0.0007879875063280283
+          },
+          {
+            "harmonic": 7,
+            "fraction": 0.00025339158711726583
+          },
+          {
+            "harmonic": 8,
+            "fraction": 8.46573089884619e-05
+          }
+        ]
+      },
+      "derivedOddTemporalPart": {
+        "definition": "b(x,t) = (q(x,t)-q(x,t+T/2))/2",
+        "halfPeriodSignReversalMax": 0.0,
+        "quarterTurnThreeQuarterPeriodSignReversalMax": 0.0,
+        "zeroValueFraction": 0.001736111111111111,
+        "scope": "An exact algebraic projection of the saved movie, not a Gray-Scott concentration or independently evolved solution. A binary sign label is undefined at zero if exact label complementation is required."
+      }
+    }
+  ]
+}
