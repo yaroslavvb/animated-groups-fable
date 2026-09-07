@@ -25,9 +25,19 @@ const DEFAULTS = Object.freeze({
 
 const palettes = new Set(['ember', 'ceramic', 'concentration']);
 const generators = new Set(['α', 'β', 'γ', 'δ', 'P', 'Q', 'R', 'S', 'X', 'Y', 'Z']);
+// Operation placements use opKey's seven rounded numeric components. Small
+// values can stringify as 1e-9, so accept finite decimal/scientific notation.
+const operationNumber = /^-?(?:0|[1-9]\d*)(?:\.\d{1,9})?(?:e[+-]?\d+)?$/;
 const validGenerator = value => {
   if (generators.has(value)) return value;
-  if (typeof value !== 'string' || value.length > 64) return null;
+  if (typeof value !== 'string' || value.length > 256) return null;
+  const operation = value.match(/^([αβγδPQRSXYZ])@op:([^:]+):([^:]+):([^:]+)$/);
+  if (operation) {
+    const matrix = operation[2].split(','), translation = operation[3].split(',');
+    const numbers = [...matrix, ...translation, operation[4]];
+    return matrix.length === 4 && translation.length === 2
+      && numbers.every(number => number === number.trim() && operationNumber.test(number) && Number.isFinite(Number(number))) ? value : null;
+  }
   const match = value.match(/^([αβγδPQRSXYZ])@(0(?:\.\d{1,9})?),(0(?:\.\d{1,9})?)$/);
   return match && Number(match[2]) < 1 && Number(match[3]) < 1 ? value : null;
 };

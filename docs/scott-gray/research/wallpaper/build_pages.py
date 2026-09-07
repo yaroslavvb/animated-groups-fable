@@ -8,7 +8,7 @@ apps but receive the same header.
 import html, json, re
 from pathlib import Path
 HERE = Path(__file__).resolve().parent; ROOT = HERE.parent.parent; DOCS = ROOT.parent
-VERSION = '20260907-marker-spacing'
+VERSION = '20260907-generator-direction'
 STAR = '∗'
 SUMMARIES = {'p1': 'Translations only.', 'p2': 'Four half-turn centres.', 'pm': 'Parallel mirrors.', 'pg': 'Parallel glide reflections.', 'cm': 'Mirrors with glides between them.', 'pmm': 'Two families of mirrors at right angles.', 'pmg': 'Mirrors, glides and half-turns.', 'pgg': 'Two families of glides and half-turns.', 'cmm': 'Two families of mirrors and half-turns between them.', 'p4': 'Quarter-turns and half-turns.', 'p4m': 'A mirror triangle with corner orders 4, 4 and 2.', 'p4g': 'Quarter-turns and a mirror through the half-turns.', 'p3': 'Three third-turn centres.', 'p3m1': 'A mirror triangle with corner orders 3, 3 and 3.', 'p31m': 'A third-turn and a mirror triangle.', 'p6': 'Sixth-turns, third-turns and half-turns.', 'p6m': 'A mirror triangle with corner orders 6, 3 and 2.'}
 

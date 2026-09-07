@@ -30,6 +30,37 @@ function basisMatrix(group){
  return [[basis[0][0],basis[1][0]],[basis[0][1],basis[1][1]]];
 }
 
+/** Linear part of the actual saved-field camera, in screen coordinates (y down).
+ * Use the same map as playback, rather than assuming every lattice is y up. */
+function screenJacobian(cellView){
+ const o=cellView.originalToScreen([0,0]),x=sub(cellView.originalToScreen([1,0]),o),y=sub(cellView.originalToScreen([0,1]),o);
+ return [[x[0],y[0]],[x[1],y[1]]];
+}
+
+export function wallpaperScreenRotation(op,cellView){
+ const J=screenJacobian(cellView),A=mm(mm(J,op.M),inverse(J));
+ let angle=Math.atan2(A[1][0],A[0][0])*180/Math.PI;
+ if(Math.abs(Math.abs(angle)-180)<1e-6)angle=180;
+ return {angleDegrees:rounded(angle),direction:angle===180?'half-turn':angle>0?'clockwise':'counterclockwise'};
+}
+
+/** The plate artwork is in a y-down view of a y-up physical basis. Transport
+ * that entire frame through the field camera, including its handedness. */
+export function wallpaperGlyphTransform(item,group,cellView){
+ const S=[[1,0],[0,-1]],camera=mm(mm(screenJacobian(cellView),inverse(basisMatrix(group))),S);
+ const factor=Math.hypot(camera[0][0],camera[1][0]);
+ return mm(camera.map(row=>row.map(x=>x/factor)),item.glyphMatrix??ID);
+}
+
+export function wallpaperOperationLabel(item,cellView){
+ let action=item.kind;
+ if(item.kind==='rotation'&&cellView){
+  const rotation=wallpaperScreenRotation(item,cellView);
+  action=rotation.direction==='half-turn'?'180° turn':`${num(Math.abs(rotation.angleDegrees))}° ${rotation.direction}`;
+ }
+ return `${item.name}: ${action} · ${timeShiftLabel(item.tau)}${item.clippedStart||item.clippedEnd?' (continues beyond cell)':''}`;
+}
+
 /** Recover centre/axis directly from the affine action, never from glyph art. */
 export function wallpaperOperationGeometry(op,group){
  if(op.s!==undefined&&op.s!==1)throw Error('The animation overlay supports constant time offsets only.');
@@ -183,17 +214,18 @@ function markerScale(placements,size,displayWidth){
  }
  return factor;
 }
-function markerMarkup(item,index,size,selected,cellView,artScale){
- const title=`${item.name}: ${item.kind}, ${item.phaseLabel}${item.clippedStart||item.clippedEnd?' (continues beyond cell)':''}`;
- const active=selected===item.key||selected===item.name;
+function markerMarkup(item,index,size,selected,cellView,artScale,group){
+ const title=wallpaperOperationLabel(item,cellView);
+ const named=group.namedGenerators.find(op=>op.name===selected);
+ const active=selected===item.key||named?.name===item.name&&named.M.flat().every((x,i)=>Math.abs(x-item.M.flat()[i])<EPS);
  const color=active?'#b8fff0':'#fff';
  const symbol=wallpaperGeneratorSymbol(item);
  const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" data-generator-symbol="${symbol}" data-time-shift="${item.tau}" data-marker-scale="${num(artScale)}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
  const label=(p,offset=8)=>`<text x="${num(p[0]+offset*artScale)}" y="${num(p[1]-offset*artScale)}" fill="${color}" stroke="#172032" stroke-width="${num(3*artScale)}" paint-order="stroke" stroke-linejoin="round" font-size="${num(14*artScale)}" font-weight="600">${escape(item.name)}</text>`;
  if(item.kind==='rotation'){
-  const p=item.screenPoint.map(x=>x*size),A=item.glyphMatrix??ID,matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
-  const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) rotate(${num(cellView?.glyphAngleOffset??0)}) matrix(${matrix}) scale(${num(1.25*artScale)})" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
-  return `<g ${common} data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="${num(24*artScale)}" fill="#172032aa" stroke="${color}" stroke-width="${num(artScale)}"/>${glyph}${label(p,23)}</g>`;
+  const p=item.screenPoint.map(x=>x*size),A=wallpaperGlyphTransform(item,group,cellView),matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
+  const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) matrix(${matrix}) scale(${num(1.25*artScale)})" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
+  return `<g ${common} data-screen-angle="${num(wallpaperScreenRotation(item,cellView).angleDegrees)}" data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="${num(24*artScale)}" fill="#172032aa" stroke="${color}" stroke-width="${num(artScale)}"/>${glyph}${label(p,23)}</g>`;
  }
  const [a,b]=item.screenSegment.map(p=>p.map(x=>x*size)),mid=scale(add(a,b),.5);
  const style=AXIS_STYLES[symbol]??{width:2.2,dash:null},dash=style.dash?` stroke-dasharray="${style.dash}"`:'';
@@ -216,15 +248,15 @@ function markerMarkup(item,index,size,selected,cellView,artScale){
  }
  return `<g ${common}><title>${escape(title)}</title>${line}${head}${label(mid)}</g>`;
 }
-export function renderWallpaperOverlay(svg,group,{cellView,visible=true,translations=[],selected=null,onSelect=null,size=768}={}){
+export function renderWallpaperOverlay(svg,group,{cellView,visible=true,translations=[],placements=null,selected=null,onSelect=null,size=768}={}){
  if(!svg||typeof svg.setAttribute!=='function')throw Error('An SVG overlay element is required.');
  svg.setAttribute('viewBox',`0 0 ${size} ${size}`);svg.setAttribute('aria-label','Spatial generators and their time offsets');
  svg.toggleAttribute('hidden',!visible);svg.style.pointerEvents='none';
  if(!visible){svg.innerHTML='';return [];}
- const placements=wallpaperGeneratorPlacements(group,{cellView,translations});
+ placements??=wallpaperGeneratorPlacements(group,{cellView,translations});
  const displayWidth=svg.getBoundingClientRect?.().width||size;
  const artScale=markerScale(placements,size,displayWidth);
- svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected,cellView,artScale)).join('');
+ svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected,cellView,artScale,group)).join('');
  for(const element of svg.querySelectorAll('[data-generator-index]')){
   const item=placements[Number(element.getAttribute('data-generator-index'))];
   element.addEventListener('click',()=>onSelect?.(item));

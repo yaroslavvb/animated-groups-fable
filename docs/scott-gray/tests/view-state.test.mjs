@@ -52,3 +52,44 @@ test('phase validation and generator keys remain bounded',()=>{
  assert.equal(readViewState('#g95?v=2&pattern='+'x'.repeat(512)).patternId.length,512);
  assert.equal(readViewState('#g95?v=2&generator=%E0%A4%A&palette=ceramic').palette,'ceramic');
 });
+test('exact generator operation placements round-trip without collapsing to the named generator',()=>{
+ const placements=[
+  'P@op:1,0,0,-1:0,0.5:0',
+  'Q@op:1,0,0,-1:-0.5,1.25:0.5',
+  'R@op:1,0,0,1:1,0:0.333333333',
+  'α@op:0,-1,1,0:0.25,-0.75:0.25',
+  'α@op:0,1,-1,0:-0.25,0.75:0.25',
+  'β@op:1,-1e-9,1e-7,-1:0.000000001,-1e-8:0.166666667',
+ ];
+ for(const generator of placements){
+  const view={...defaults,groupId:'g95',generator,overlay:true,play:false,phase:0.1371234567890123};
+  const hash=writeViewHash(view);
+  assert.deepEqual(readViewState(hash),view,generator);
+  assert.equal(writeViewHash(readViewState(hash)),hash);
+  assert.match(hash,/%40op%3A/);
+ }
+ assert.notEqual(writeViewHash({groupId:'g95',generator:placements[3]}),writeViewHash({groupId:'g95',generator:placements[4]}));
+});
+test('malformed or nonfinite generator operations are rejected independently of other URL controls',()=>{
+ const invalid=[
+  'A@op:1,0,0,-1:0,0:0', 'P@other:1,0,0,-1:0,0:0',
+  'P@op:1,0,-1:0,0:0', 'P@op:1,0,0,0,-1:0,0:0',
+  'P@op:1,0,0,-1:0:0', 'P@op:1,0,0,-1:0,0,0:0',
+  'P@op:1,0,0,-1:0,0:0,0', 'P@op:1,0,0,-1:0,0:0:extra',
+  'P@op:1,,0,-1:0,0:0', 'P@op:1,0,0,-1:0,0:',
+  'P@op:1,0,0,-1:0,0:NaN', 'P@op:Infinity,0,0,-1:0,0:0',
+  'P@op:1,0,0,-1:0,0:1e999', 'P@op:1,0,0,-1:0,0:-1e999',
+  'P@op:01,0,0,-1:0,0:0', 'P@op:+1,0,0,-1:0,0:0',
+  'P@op:0x1,0,0,-1:0,0:0', 'P@op:1,0,0,-1:0,0:.5',
+  'P@op:1,0,0,-1:0,0:0.1234567891', 'P@op:1,0,0,-1:0,0:0 ',
+  'P@op:1,0,0,-1:0,0:0\n', 'P@op:1,0,0,-1:0,0:0\r\n',
+  'P@op:1,0,0,-1:0,0:0<script>', `P@op:${'1'.repeat(256)},0,0,-1:0,0:0`,
+ ];
+ for(const generator of invalid){
+  const hash='#g95?v=2&palette=ceramic&play=0&generator='+encodeURIComponent(generator);
+  const view=readViewState(hash);
+  assert.equal(view.generator,null,generator);
+  assert.equal(view.palette,'ceramic');assert.equal(view.play,false);
+  assert.equal(readViewState(writeViewHash({groupId:'g95',generator})).generator,null,generator);
+ }
+});

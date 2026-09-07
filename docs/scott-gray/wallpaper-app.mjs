@@ -1,8 +1,8 @@
 import {createWallpaperCatalog,MODELS} from './wallpaper-atlas.mjs?v=20260907-equations';
 import {createWallpaperPlayer} from './wallpaper-playback.mjs?v=20260907-equations';
 import {makeWallpaperCellView} from './wallpaper-cell.mjs?v=20260907-equations';
-import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260907-marker-spacing';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-marker-spacing';
+import {renderWallpaperOverlay,wallpaperGeneratorPlacements,wallpaperOperationLabel} from './wallpaper-overlay.mjs?v=20260907-generator-direction';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-generator-direction';
 
 const VERSION = '20260907-equations';
 const root = new URL('./', import.meta.url);
@@ -36,8 +36,7 @@ const remembered = new Map();
 const entries = () => catalog?.summaries(group?.id) ?? [];
 const modelEntries = model => entries().filter(item => item.model === model);
 const modelsPresent = () => MODEL_ORDER.filter(model => modelEntries(model).length);
-const selectedGenerator = () => group?.namedGenerators.find(item => item.name === generatorName) ?? group?.namedGenerators[0];
-const shiftText = shift => shift === '0' ? '0 T' : `+${shift} T`;
+const selectedGenerator = () => group?.namedGenerators.find(item => item.name === generatorName?.split('@')[0]) ?? group?.namedGenerators[0];
 
 function syncUrl() {
   if (!group) return;
@@ -167,13 +166,22 @@ function renderParameterMap(sets) {
 }
 
 function renderOverlay() {
-  const operation = selectedGenerator();
-  $('operation').replaceChildren(...(group?.namedGenerators ?? []).map(item => new Option(`${item.name} · ${shiftText(item.timeShift)}`, item.name)));
+  let operation = selectedGenerator();
+  // A reflected copy of α can turn the other way. Retain the actual placement
+  // on selection and in shared links instead of collapsing it to its name.
+  const placements = record && cellView && ($('show-generators').checked || generatorName?.includes('@'))
+    ? wallpaperGeneratorPlacements(group, {cellView, translations: record.translations ?? []}) : [];
+  const placement = placements.find(item => item.key === generatorName);
+  if (placement) operation = placement;
+  else if (record && generatorName?.includes('@')) generatorName = operation?.name;
+  const options = (group?.namedGenerators ?? []).map(item => new Option(wallpaperOperationLabel(item, cellView), item.name));
+  if (placement) options.push(new Option(`${wallpaperOperationLabel(placement, cellView)} · selected ${placement.kind === 'rotation' ? 'centre' : 'axis'}`, placement.key));
+  $('operation').replaceChildren(...options);
   $('operation').value = generatorName ?? '';
-  $('generator-description').textContent = operation ? `${operation.name}: ${operation.kind} · ${shiftText(operation.timeShift)}` : '';
+  $('generator-description').textContent = operation ? `${wallpaperOperationLabel(operation, cellView)}. The spatial transform gives the frame at the indicated later time.` : '';
   document.querySelector('.phase-rule').hidden = !$('show-generators').checked || !record;
   if (!record || !cellView) {$('generator-overlay').toggleAttribute('hidden', true); return;}
-  renderWallpaperOverlay($('generator-overlay'), group, {cellView, visible: $('show-generators').checked, selected: generatorName, translations: record.translations ?? [], onSelect: item => {generatorName = item.name; renderOverlay(); syncUrl();}});
+  renderWallpaperOverlay($('generator-overlay'), group, {cellView, placements, visible: $('show-generators').checked, selected: generatorName, translations: record.translations ?? [], onSelect: item => {generatorName = item.key; renderOverlay(); syncUrl();}});
 }
 
 // Marker caps are in displayed pixels, so recompute them when the viewer grows
@@ -245,7 +253,7 @@ function chooseModel(model, {user = false} = {}) {
 function chooseGroup(id, {user = false, view = null} = {}) {
   const next = groups.find(item => item.id === id) ?? groups.find(item => catalog.size(item.id) > 0) ?? groups[0];
   group = next; ++selectionToken;
-  generatorName = group.namedGenerators.some(item => item.name === view?.generator) ? view.generator : group.namedGenerators.find(item => item.tau !== 0)?.name ?? group.namedGenerators[0]?.name;
+  generatorName = group.namedGenerators.some(item => item.name === view?.generator?.split('@')[0]) ? view.generator : group.namedGenerators.find(item => item.tau !== 0)?.name ?? group.namedGenerators[0]?.name;
   $('group-label').textContent = `${group.id} · ${star(family.orbifold)}`; $('selected-id').textContent = group.id; $('selected-title').textContent = star(group.signature);
   $('selected-description').textContent = group.hasTimeShift ? `${plural(group.phaseOrder, 'phase')} per period` : 'Zero time offset';
   const requested = catalog.get(view?.patternId), rememberedId = remembered.get(group.id);
