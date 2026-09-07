@@ -1,4 +1,4 @@
-import {readViewState,writeViewHash} from '../view-state.mjs?v=20260905-wallpaper';
+import {readViewState,writeViewHash} from '../view-state.mjs?v=20260907-marker-spacing';
 import {rotationCentres} from '../rotation-centres.mjs?v=20260905-wallpaper';
 import {overlayTranslations,populateGeneratorChoices,overlayCaption} from '../overlay-data.mjs?v=20260905-wallpaper';
 import {overlayNearEvidence,withApproximateCentres,approximateCaption} from '../overlay-near-data.mjs?v=20260905-wallpaper';

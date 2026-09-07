@@ -1,8 +1,8 @@
 import {createWallpaperCatalog,MODELS} from './wallpaper-atlas.mjs?v=20260907-equations';
 import {createWallpaperPlayer} from './wallpaper-playback.mjs?v=20260907-equations';
 import {makeWallpaperCellView} from './wallpaper-cell.mjs?v=20260907-equations';
-import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260907-equations';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-equations';
+import {renderWallpaperOverlay} from './wallpaper-overlay.mjs?v=20260907-marker-spacing';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-marker-spacing';
 
 const VERSION = '20260907-equations';
 const root = new URL('./', import.meta.url);
@@ -175,6 +175,12 @@ function renderOverlay() {
   if (!record || !cellView) {$('generator-overlay').toggleAttribute('hidden', true); return;}
   renderWallpaperOverlay($('generator-overlay'), group, {cellView, visible: $('show-generators').checked, selected: generatorName, translations: record.translations ?? [], onSelect: item => {generatorName = item.name; renderOverlay(); syncUrl();}});
 }
+
+// Marker caps are in displayed pixels, so recompute them when the viewer grows
+// or shrinks without changing the field camera or the selected shared view.
+new ResizeObserver(() => {
+  if (record && cellView && $('show-generators').checked) renderOverlay();
+}).observe(document.querySelector('.canvas-wrap'));
 
 function updateFraming() {
   if (!record) return;

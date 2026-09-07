@@ -2,9 +2,10 @@
  * Shared, versioned gallery links: #g95?v=2&pattern=<stable catalog id>&…
  * A saved pattern identifies its physical parameters; catalog indexes are never
  * serialized. Legacy group anchors retain autoplay and the default view. Unknown
- * versions retain only the group. Version 1 migrates its requested count to
- * corrected pattern-cell framing. Version 2 records cells vs simulation width
- * explicitly. Catalog membership is checked by each gallery.
+ * versions retain only the group. Unspecified framing uses simulation width.
+ * Version 1 migrates an explicitly requested tile count to corrected pattern-cell
+ * framing; explicit framing choices in either version are retained. Version 2
+ * records cells vs simulation width. Catalog membership is checked by each gallery.
  * Serialize after a user action, never on every animation frame: a paused link
  * keeps the exact numeric phase, while a playing link resumes from that phase.
  */
@@ -13,7 +14,7 @@ const DEFAULTS = Object.freeze({
   patternId: null,
   palette: 'ember',
   tiles: 2,
-  framing: 'cells',
+  framing: 'simulation',
   speed: 1,
   generator: null,
   overlay: false,
@@ -50,7 +51,7 @@ function normalize(state = {}) {
     patternId: validPattern(state.patternId),
     palette: palettes.has(state.palette) ? state.palette : DEFAULTS.palette,
     tiles: numberChoice(state.tiles, [1, 2, 3], DEFAULTS.tiles),
-    framing: state.framing === 'simulation' ? 'simulation' : 'cells',
+    framing: ['cells', 'simulation'].includes(state.framing) ? state.framing : DEFAULTS.framing,
     speed: numberChoice(state.speed, [0.5, 1, 2], DEFAULTS.speed),
     generator: validGenerator(state.generator),
     overlay: booleanChoice(state.overlay, DEFAULTS.overlay),
@@ -67,13 +68,17 @@ export function readViewState(hash) {
   const groupId = validGroup(separator < 0 ? source : source.slice(0, separator));
   const parameters = new URLSearchParams(separator < 0 ? '' : source.slice(separator + 1));
   if (!['1','2'].includes(parameters.get('v'))) return { ...DEFAULTS, groupId };
+  // Version 1 called its explicit tile choice a cell count. Preserve that view,
+  // while links without a framing/count choice receive the current default.
+  const legacyCellCount = parameters.get('v') === '1'
+    && !parameters.has('framing')
+    && numberChoice(parameters.get('tiles'), [1, 2, 3], null) !== null;
   return normalize({
     groupId,
     patternId: parameters.get('pattern'),
     palette: parameters.get('palette'),
     tiles: parameters.get('tiles'),
-    // Old tile counts were presented as cells. Correct their framing on load.
-    framing: parameters.get('v') === '2' ? parameters.get('framing') : 'cells',
+    framing: legacyCellCount ? 'cells' : parameters.get('framing'),
     speed: parameters.get('speed'),
     generator: parameters.get('generator'),
     overlay: parameters.get('overlay'),

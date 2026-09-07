@@ -1,5 +1,5 @@
 import {VISIBILITY_VERSION} from './visible-time-symmetry.mjs?v=20260905-wallpaper';
-import {readViewState,writeViewHash} from './view-state.mjs?v=20260905-wallpaper';
+import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-marker-spacing';
 import {makePreview,mod,DESCRIPTIONS} from './seeds.mjs';
 import {createStepper,projectKernel,mapIndex} from './dynamics.mjs?v=20260905-wallpaper';
 import {createWebGLGrayScott} from './webgl.mjs?v=20260905-wallpaper';

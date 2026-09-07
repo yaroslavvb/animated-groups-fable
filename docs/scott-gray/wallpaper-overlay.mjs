@@ -127,6 +127,26 @@ export function wallpaperGeneratorPlacements(group,{cellView,translations=[]}={}
    }
   }
  }
+ // Integer lattice translations act by LEFT composition as well as by
+ // conjugation. For a rotation the former moves its centre by (I-M)^-1 z,
+ // whereas moved(template,z) above only moves it by z. The distinction is
+ // essential after a saved orbit admits a smaller repeat cell. Preserve the
+ // named representatives placed above, then fill the remaining centre cosets.
+ for(const template of templates.values()){
+  const geometry=wallpaperOperationGeometry(template,group);
+  if(geometry.kind!=='rotation')continue;
+  const C=template.M.map((r,i)=>r.map((x,j)=>(i===j?1:0)-x)),Ci=inverse(C);
+  const shiftedCorners=corners.map(p=>sub(mv(C,p),template.v));
+  const low=[0,1].map(k=>Math.ceil(Math.min(...shiftedCorners.map(p=>p[k]))-EPS));
+  const high=[0,1].map(k=>Math.floor(Math.max(...shiftedCorners.map(p=>p[k]))+EPS));
+  for(let i=low[0];i<=high[0];i++)for(let j=low[1];j<=high[1];j++){
+   const v=add(template.v,[i,j]),point=mv(Ci,v);if(!contains(point))continue;
+   const geometricKey=`rotation:${pointKey(point)}`,previous=result.get(geometricKey);
+   if(previous&&previous.marker.order>=geometry.order)continue;
+   const operation={...template,v},key=`${operation.name}@${point.map(wrap).join(',')}`;
+   result.set(geometricKey,{...operation,key,kind:'rotation',marker:{...geometry,centre:point},point,screenPoint:cellView.originalToScreen(point),phaseLabel:timeShiftLabel(operation.tau)});
+  }
+ }
  return [...result.values()];
 }
 
@@ -151,17 +171,29 @@ export function wallpaperGeneratorSymbol(item){
  if(item.kind==='mirror')return tau===0?'plane-m':'plane-c';
  return tau===0?'plane-axial':Math.abs(tau-.5)<EPS?'plane-n':'plane-d';
 }
-function markerMarkup(item,index,size,selected,cellView){
+/** Size the artwork, never its affine positions. The label and glyph fit in a
+ * 54-unit radius before scaling; 120 units between centres leaves a clear gap.
+ * A CSS-pixel cap also keeps a sparse, full-width desktop view unobtrusive. */
+function markerScale(placements,size,displayWidth){
+ let factor=Math.min(1,14*size/(24*displayWidth));
+ const points=placements.filter(item=>item.kind==='rotation').map(item=>item.screenPoint);
+ for(let i=0;i<points.length;i++)for(let j=0;j<i;j++){
+  const distance=Math.hypot(points[i][0]-points[j][0],points[i][1]-points[j][1])*size;
+  if(distance>EPS)factor=Math.min(factor,distance/120);
+ }
+ return factor;
+}
+function markerMarkup(item,index,size,selected,cellView,artScale){
  const title=`${item.name}: ${item.kind}, ${item.phaseLabel}${item.clippedStart||item.clippedEnd?' (continues beyond cell)':''}`;
  const active=selected===item.key||selected===item.name;
  const color=active?'#b8fff0':'#fff';
  const symbol=wallpaperGeneratorSymbol(item);
- const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" data-generator-symbol="${symbol}" data-time-shift="${item.tau}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
- const label=(p,offset=8)=>`<text x="${num(p[0]+offset)}" y="${num(p[1]-offset)}" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke" stroke-linejoin="round" font-size="14" font-weight="600">${escape(item.name)}</text>`;
+ const common=`class="wallpaper-generator ${item.kind}${active?' selected':''}" data-generator-index="${index}" data-generator-key="${escape(item.key)}" data-generator-symbol="${symbol}" data-time-shift="${item.tau}" data-marker-scale="${num(artScale)}" tabindex="0" role="button" aria-label="${escape(title)}" style="cursor:pointer;pointer-events:auto"`;
+ const label=(p,offset=8)=>`<text x="${num(p[0]+offset*artScale)}" y="${num(p[1]-offset*artScale)}" fill="${color}" stroke="#172032" stroke-width="${num(3*artScale)}" paint-order="stroke" stroke-linejoin="round" font-size="${num(14*artScale)}" font-weight="600">${escape(item.name)}</text>`;
  if(item.kind==='rotation'){
   const p=item.screenPoint.map(x=>x*size),A=item.glyphMatrix??ID,matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
-  const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) rotate(${num(cellView?.glyphAngleOffset??0)}) matrix(${matrix}) scale(1.25)" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
-  return `<g ${common} data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="24" fill="#172032aa" stroke="${color}" stroke-width="1"/>${glyph}${label(p,23)}</g>`;
+  const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) rotate(${num(cellView?.glyphAngleOffset??0)}) matrix(${matrix}) scale(${num(1.25*artScale)})" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
+  return `<g ${common} data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="${num(24*artScale)}" fill="#172032aa" stroke="${color}" stroke-width="${num(artScale)}"/>${glyph}${label(p,23)}</g>`;
  }
  const [a,b]=item.screenSegment.map(p=>p.map(x=>x*size)),mid=scale(add(a,b),.5);
  const style=AXIS_STYLES[symbol]??{width:2.2,dash:null},dash=style.dash?` stroke-dasharray="${style.dash}"`:'';
@@ -173,12 +205,12 @@ function markerMarkup(item,index,size,selected,cellView){
   }
   d=scale(d,1/Math.hypot(...d));
   if(symbol==='plane-axial'){
-   const tip=add(mid,scale(d,17)),tail=sub(tip,scale(d,15)),n=[-d[1]*9,d[0]*9];
-   head=`<path class="generator-glide-arrow" d="M${sub(mid,scale(d,17)).map(num).join(' ')} L${tip.map(num).join(' ')}" stroke="${color}" stroke-width="2.1" fill="none"/><path class="generator-glide-head" d="M${tip.map(num).join(' ')} L${tail.map(num).join(' ')} L${add(tail,n).map(num).join(' ')} Z" fill="${color}" stroke="#172032" stroke-width="3" paint-order="stroke fill"/>`;
+   const tip=add(mid,scale(d,17*artScale)),tail=sub(tip,scale(d,15*artScale)),n=[-d[1]*9*artScale,d[0]*9*artScale];
+   head=`<path class="generator-glide-arrow" d="M${sub(mid,scale(d,17*artScale)).map(num).join(' ')} L${tip.map(num).join(' ')}" stroke="${color}" stroke-width="${num(2.1*artScale)}" fill="none"/><path class="generator-glide-head" d="M${tip.map(num).join(' ')} L${tail.map(num).join(' ')} L${add(tail,n).map(num).join(' ')} Z" fill="${color}" stroke="#172032" stroke-width="${num(3*artScale)}" paint-order="stroke fill"/>`;
   }else{
    for(const offset of symbol==='plane-d'?[-28,28]:[null]){
-    const tip=offset===null?b:add(mid,scale(d,offset)),tail=sub(tip,scale(d,10)),n=[-d[1]*4.2,d[0]*4.2];
-    head+=`<path class="${symbol==='plane-d'?'generator-quarter-arrow':'generator-translation-arrow'}" d="M${add(tail,n).map(num).join(' ')} L${tip.map(num).join(' ')} L${sub(tail,n).map(num).join(' ')}" stroke="${color}" stroke-width="2.35" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const tip=offset===null?b:add(mid,scale(d,offset*artScale)),tail=sub(tip,scale(d,10*artScale)),n=[-d[1]*4.2*artScale,d[0]*4.2*artScale];
+    head+=`<path class="${symbol==='plane-d'?'generator-quarter-arrow':'generator-translation-arrow'}" d="M${add(tail,n).map(num).join(' ')} L${tip.map(num).join(' ')} L${sub(tail,n).map(num).join(' ')}" stroke="${color}" stroke-width="${num(2.35*artScale)}" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
    }
   }
  }
@@ -190,7 +222,9 @@ export function renderWallpaperOverlay(svg,group,{cellView,visible=true,translat
  svg.toggleAttribute('hidden',!visible);svg.style.pointerEvents='none';
  if(!visible){svg.innerHTML='';return [];}
  const placements=wallpaperGeneratorPlacements(group,{cellView,translations});
- svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected,cellView)).join('');
+ const displayWidth=svg.getBoundingClientRect?.().width||size;
+ const artScale=markerScale(placements,size,displayWidth);
+ svg.innerHTML=placements.map((p,i)=>markerMarkup(p,i,size,selected,cellView,artScale)).join('');
  for(const element of svg.querySelectorAll('[data-generator-index]')){
   const item=placements[Number(element.getAttribute('data-generator-index'))];
   element.addEventListener('click',()=>onSelect?.(item));

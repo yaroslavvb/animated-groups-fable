@@ -1,11 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readViewState,writeViewHash} from '../view-state.mjs';
-const defaults={groupId:null,patternId:null,palette:'ember',tiles:2,framing:'cells',speed:1,generator:null,overlay:false,approximate:true,phase:0,play:true};
+const defaults={groupId:null,patternId:null,palette:'ember',tiles:2,framing:'simulation',speed:1,generator:null,overlay:false,approximate:true,phase:0,play:true};
 
-test('bare anchors default to cell framing, autoplay and hidden generators',()=>{
+test('bare anchors default to simulation width, autoplay and hidden generators',()=>{
  for(const groupId of ['g95','g248'])assert.deepEqual(readViewState('#'+groupId),{...defaults,groupId});
  for(const input of ['',null,undefined,'#invalid'])assert.deepEqual(readViewState(input),defaults);
+});
+test('unspecified framing uses simulation width while explicit shared framing is retained',()=>{
+ for(const query of ['v=2','v=2&tiles=1','v=1','v=1&tiles=99','v=1&tiles=','v=2&framing=invalid']){
+  assert.equal(readViewState('#g95?'+query).framing,'simulation',query);
+ }
+ for(const version of ['1','2'])for(const framing of ['cells','simulation']){
+  const requested=readViewState(`#g95?v=${version}&tiles=3&framing=${framing}`);
+  assert.equal(requested.framing,framing);assert.equal(requested.tiles,3);
+  assert.deepEqual(readViewState(writeViewHash(requested)),requested);
+ }
+ const written=writeViewHash({groupId:'g95'});
+ assert.match(written,/&framing=simulation&/);
+ assert.equal(readViewState(written).framing,'simulation');
 });
 test('the reported old Q31 link migrates its requested count to real cells',()=>{
  const old='#g247?v=1&pattern=saved%3AQ31&palette=ember&tiles=1&speed=1&generator=%CE%B1&overlay=1&phase=0.34798750000000434&play=0';
