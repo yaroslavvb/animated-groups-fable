@@ -61,6 +61,18 @@ export function wallpaperOperationLabel(item,cellView){
  return `${item.name}: ${action} · ${timeShiftLabel(item.tau)}${item.clippedStart||item.clippedEnd?' (continues beyond cell)':''}`;
 }
 
+/** A separate measurement of the movie, never part of the group action. In
+ * particular the original 2₁ tails do not choose a half-turn direction. */
+function motionArrow(point,direction,artScale,color){
+ if(!['clockwise','counterclockwise'].includes(direction))return '';
+ const sign=direction==='clockwise'?1:-1,start=sign===1?-30:210,end=sign===1?210:-30;
+ const at=angle=>add(point,scale([Math.cos(angle*Math.PI/180),Math.sin(angle*Math.PI/180)],30*artScale));
+ const a=at(start),b=at(end),theta=end*Math.PI/180,d=scale([-Math.sin(theta),Math.cos(theta)],sign);
+ const tail=sub(b,scale(d,6*artScale)),normal=scale([-d[1],d[0]],3*artScale);
+ const arc=`M${a.map(num).join(' ')} A${num(30*artScale)} ${num(30*artScale)} 0 1 ${sign===1?1:0} ${b.map(num).join(' ')}`;
+ return `<g class="local-motion-arrow" data-motion-direction="${direction}" aria-hidden="true"><path d="${arc}" stroke="#172032" stroke-width="${num(4*artScale)}" fill="none"/><path d="${arc}" stroke="${color}" stroke-width="${num(1.7*artScale)}" fill="none"/><path d="M${b.map(num).join(' ')} L${add(tail,normal).map(num).join(' ')} L${sub(tail,normal).map(num).join(' ')} Z" fill="${color}" stroke="#172032" stroke-width="${num(artScale)}"/></g>`;
+}
+
 /** Recover centre/axis directly from the affine action, never from glyph art. */
 export function wallpaperOperationGeometry(op,group){
  if(op.s!==undefined&&op.s!==1)throw Error('The animation overlay supports constant time offsets only.');
@@ -215,7 +227,9 @@ function markerScale(placements,size,displayWidth){
  return factor;
 }
 function markerMarkup(item,index,size,selected,cellView,artScale,group){
- const title=wallpaperOperationLabel(item,cellView);
+ const motion=item.localMotion?.direction;
+ const halfTurn=item.kind==='rotation'&&item.marker.order===2;
+ const title=wallpaperOperationLabel(item,cellView)+(halfTurn?'. Half-turn symbols do not specify a motion direction.':'')+(item.kind==='rotation'?motion?` Local motion: ${motion}.`:' Local motion: no reliable direction measured.':'');
  const named=group.namedGenerators.find(op=>op.name===selected);
  const active=selected===item.key||named?.name===item.name&&named.M.flat().every((x,i)=>Math.abs(x-item.M.flat()[i])<EPS);
  const color=active?'#b8fff0':'#fff';
@@ -225,7 +239,7 @@ function markerMarkup(item,index,size,selected,cellView,artScale,group){
  if(item.kind==='rotation'){
   const p=item.screenPoint.map(x=>x*size),A=wallpaperGlyphTransform(item,group,cellView),matrix=[A[0][0],A[1][0],A[0][1],A[1][1],0,0].map(num).join(' ');
   const glyph=`<path class="generator-symbol-core" transform="translate(${p.map(num).join(' ')}) matrix(${matrix}) scale(${num(1.25*artScale)})" d="${escape(item.glyph.path)}" fill="${color}" stroke="#172032" stroke-width="2" paint-order="stroke fill" stroke-linejoin="round"/>`;
-  return `<g ${common} data-screen-angle="${num(wallpaperScreenRotation(item,cellView).angleDegrees)}" data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="${num(24*artScale)}" fill="#172032aa" stroke="${color}" stroke-width="${num(artScale)}"/>${glyph}${label(p,23)}</g>`;
+  return `<g ${common} data-screen-angle="${num(wallpaperScreenRotation(item,cellView).angleDegrees)}" data-lattice-point="${escape(pointKey(item.point))}"><title>${escape(title)}</title><circle cx="${num(p[0])}" cy="${num(p[1])}" r="${num(24*artScale)}" fill="#172032aa" stroke="${color}" stroke-width="${num(artScale)}"/>${glyph}${motionArrow(p,motion,artScale,color)}${label(p,23)}</g>`;
  }
  const [a,b]=item.screenSegment.map(p=>p.map(x=>x*size)),mid=scale(add(a,b),.5);
  const style=AXIS_STYLES[symbol]??{width:2.2,dash:null},dash=style.dash?` stroke-dasharray="${style.dash}"`:'';

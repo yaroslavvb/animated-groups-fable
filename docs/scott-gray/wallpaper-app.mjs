@@ -1,8 +1,9 @@
 import {createWallpaperCatalog,MODELS} from './wallpaper-atlas.mjs?v=20260907-equations';
 import {createWallpaperPlayer} from './wallpaper-playback.mjs?v=20260907-equations';
 import {makeWallpaperCellView} from './wallpaper-cell.mjs?v=20260907-equations';
-import {renderWallpaperOverlay,wallpaperGeneratorPlacements,wallpaperOperationLabel} from './wallpaper-overlay.mjs?v=20260907-generator-direction';
+import {renderWallpaperOverlay,wallpaperGeneratorPlacements,wallpaperOperationLabel} from './wallpaper-overlay.mjs?v=20260907-local-motion';
 import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-generator-direction';
+import {createLocalMotionCatalog,localMotionCentreKey} from './local-motion.mjs?v=20260907-local-motion';
 
 const VERSION = '20260907-equations';
 const root = new URL('./', import.meta.url);
@@ -29,6 +30,7 @@ const parameterKey = config => JSON.stringify([config.model ?? 'gray-scott', ...
 const parameterText = (config, names) => names.map(name => `${EQUATIONS[config.model ?? 'gray-scott'].labels[name] ?? name} ${fixed(config.params[name])}`).join(' · ');
 const patternLabel = record => `${record.patternName ?? record.name ?? 'Periodic wave'} · T ${record.config.period.toFixed(2)} · ${record.config.N}²`;
 let family, groups, manifest, catalog, group, record, player, cellView;
+let motionCatalog = null, motionState = 'loading';
 let selectedId = null, selectedKey = null, generatorName = null, modelId = null, lastBackend = null;
 let phase = 0, playing = false, lastTime = 0, selectionToken = 0, mapGeometry;
 let requestedPlayback = {phase: 0, play: true};
@@ -171,6 +173,8 @@ function renderOverlay() {
   // on selection and in shared links instead of collapsing it to its name.
   const placements = record && cellView && ($('show-generators').checked || generatorName?.includes('@'))
     ? wallpaperGeneratorPlacements(group, {cellView, translations: record.translations ?? []}) : [];
+  const motions = motionCatalog?.forRecord(record, group, cellView) ?? new Map();
+  for (const item of placements) if (item.kind === 'rotation') item.localMotion = motions.get(localMotionCentreKey(item.point));
   const placement = placements.find(item => item.key === generatorName);
   if (placement) operation = placement;
   else if (record && generatorName?.includes('@')) generatorName = operation?.name;
@@ -178,10 +182,21 @@ function renderOverlay() {
   if (placement) options.push(new Option(`${wallpaperOperationLabel(placement, cellView)} · selected ${placement.kind === 'rotation' ? 'centre' : 'axis'}`, placement.key));
   $('operation').replaceChildren(...options);
   $('operation').value = generatorName ?? '';
-  $('generator-description').textContent = operation ? `${wallpaperOperationLabel(operation, cellView)}. The spatial transform gives the frame at the indicated later time.` : '';
+  const local = operation?.kind === 'rotation' ? motions.get(localMotionCentreKey(operation.point ?? operation.marker.centre)) : null;
+  const motionText = operation?.kind !== 'rotation' ? '' : motionState === 'loading' ? ' Motion measurement loading.' : motionState === 'unavailable' ? ' Motion measurement unavailable.' : local?.direction ? ` Local motion: ${local.direction}.` : ' Local motion: no reliable direction measured.';
+  $('generator-description').textContent = operation ? `${wallpaperOperationLabel(operation, cellView)}.${operation.kind === 'rotation' && operation.marker.order === 2 ? ' A half-turn has no clockwise/counterclockwise distinction.' : ''}${motionText}` : '';
   document.querySelector('.phase-rule').hidden = !$('show-generators').checked || !record;
   if (!record || !cellView) {$('generator-overlay').toggleAttribute('hidden', true); return;}
   renderWallpaperOverlay($('generator-overlay'), group, {cellView, placements, visible: $('show-generators').checked, selected: generatorName, translations: record.translations ?? [], onSelect: item => {generatorName = item.key; renderOverlay(); syncUrl();}});
+}
+
+async function loadLocalMotion() {
+  try {
+    const response = await fetch(new URL('data/local-motion.json?v=20260907-local-motion', root));
+    if (!response.ok) throw Error('Motion measurements unavailable.');
+    motionCatalog = createLocalMotionCatalog(await response.json()); motionState = 'ready';
+  } catch {motionCatalog = null; motionState = 'unavailable';}
+  renderOverlay();
 }
 
 // Marker caps are in displayed pixels, so recompute them when the viewer grows
@@ -302,5 +317,5 @@ try {
   family = metadata.families.find(item => item.id === familyId); if (!family) throw Error('Unknown wallpaper family.');
   groups = family.groupIds.map(id => metadata.groups.find(item => item.id === id));
   catalog = createWallpaperCatalog(manifest, {groups: metadata.groups, baseUrl: root});
-  restoreUrl(); window.addEventListener('hashchange', restoreUrl); requestAnimationFrame(animate);
+  restoreUrl(); loadLocalMotion(); window.addEventListener('hashchange', restoreUrl); requestAnimationFrame(animate);
 } catch (error) {empty({error: error.message}); $('status').textContent = error.message;}

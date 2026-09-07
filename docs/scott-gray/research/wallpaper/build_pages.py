@@ -8,7 +8,7 @@ apps but receive the same header.
 import html, json, re
 from pathlib import Path
 HERE = Path(__file__).resolve().parent; ROOT = HERE.parent.parent; DOCS = ROOT.parent
-VERSION = '20260907-generator-direction'
+VERSION = '20260907-local-motion'
 STAR = '∗'
 SUMMARIES = {'p1': 'Translations only.', 'p2': 'Four half-turn centres.', 'pm': 'Parallel mirrors.', 'pg': 'Parallel glide reflections.', 'cm': 'Mirrors with glides between them.', 'pmm': 'Two families of mirrors at right angles.', 'pmg': 'Mirrors, glides and half-turns.', 'pgg': 'Two families of glides and half-turns.', 'cmm': 'Two families of mirrors and half-turns between them.', 'p4': 'Quarter-turns and half-turns.', 'p4m': 'A mirror triangle with corner orders 4, 4 and 2.', 'p4g': 'Quarter-turns and a mirror through the half-turns.', 'p3': 'Three third-turn centres.', 'p3m1': 'A mirror triangle with corner orders 3, 3 and 3.', 'p31m': 'A third-turn and a mirror triangle.', 'p6': 'Sixth-turns, third-turns and half-turns.', 'p6m': 'A mirror triangle with corner orders 6, 3 and 2.'}
 
@@ -74,7 +74,7 @@ def page(family, index, families, prefix, app):
         <div class="view-caption"><span class="scale-label" id="scale-label">Physical width 2 L</span></div>
         <div class="playback"><button aria-label="Play animation" disabled id="play" type="button">▶ Play</button><button aria-label="Return to first frame" disabled id="rewind" type="button">↤</button><input aria-label="Animation phase" disabled id="phase" max="1" min="0" step="0.001" type="range" value="0"><output id="phase-label">—</output><label>View <select aria-label="View framing" id="framing"><option value="cells">Pattern cells</option><option selected value="simulation">Simulation width</option></select></label><label><span id="tile-label">Width</span> <select aria-describedby="view-scale-explanation" aria-label="Simulation width" id="tiles"><option value="1">L</option><option selected value="2">2 L</option><option value="3">3 L</option></select></label><label>Speed <select aria-label="Playback speed" id="speed"><option value="0.5">Slow</option><option selected value="1">Normal</option><option value="2">Fast</option></select></label></div>
         <div class="overlay-controls"><label><input id="show-generators" type="checkbox"> Generators</label><select aria-label="Named generator" id="operation"></select><span id="engine-label">No orbit loaded</span></div>
-        <div class="phase-rule"><p id="generator-description"></p></div>
+        <div class="phase-rule"><p id="generator-description"></p><p class="small">Symbols: time-shift symmetry. Curved arrows: measured local motion.</p></div>
         <details class="numerical-record"><summary>Numerical record</summary><p class="small" id="view-scale-explanation">The displayed width is measured in simulation lattice lengths L.</p><p class="caption" id="caption">Only accepted numerical orbits appear here. An empty entry means existence remains unresolved.</p><div class="metrics"><div><span>Forward trajectory RMS</span><strong id="pde">—</strong></div><div><span>Time-symmetry error</span><strong id="symmetry">—</strong></div><div><span>Temporal variation</span><strong id="motion">—</strong></div><div><span>Forward return RMS</span><strong id="return">—</strong></div></div></details>
       </section>
       <aside class="controls">
