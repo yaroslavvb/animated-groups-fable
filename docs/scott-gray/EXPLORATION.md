@@ -1,5 +1,7 @@
 # Exploring verified periodic orbits
 
+> **Scope.** This document describes the original 442 (p4) Gray–Scott catalog and its solver. The site now covers all 17 wallpaper groups and two further equations; see [research/wallpaper/README.md](research/wallpaper/README.md) and [research/equations/README.md](research/equations/README.md). Counts below refer to the 442 catalog at the time it was written.
+
 The solution viewer and its two-dimensional parameter selector contain **only
 orbits accepted for the selected cyclic time character**. Every generator acts
 as `q(gx,t+tau*T)=q(x,t)` on both U and V. No forward-only chemical preset,
@@ -20,7 +22,7 @@ SHA-256 integrity against the stored record before playback.
 
 ## Three stages of exploration
 
-1. Choose the cyclic time symmetry g94–g99.
+1. Choose the cyclic time symmetry (g94–g99 on the 442 page; every other wallpaper page lists its own entries).
 2. Choose a precomputed physical parameter set. The dropdown and zoomed F/k
    plane contain only parameter sets with an admitted nonuniform periodic field.
    Diffusivities, cell length and stencil are shown beside the selector.

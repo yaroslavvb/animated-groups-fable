@@ -3,135 +3,172 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Explore precomputed periodic Gray–Scott solutions for all 17 wallpaper groups, with verified time-shift symmetries.">
-  <meta name="theme-color" content="#faf9f6">
-  <title>Periodic Gray–Scott patterns — Spacetime Groups</title>
+  <meta name="description" content="Numerically verified periodic solutions of the Gray–Scott, complex Ginzburg–Landau and Brusselator equations whose wallpaper-group operations act with prescribed time shifts, one page per wallpaper group.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Periodic reaction–diffusion patterns — Spacetime Groups</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
   <link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
-  <link rel="stylesheet" href="css/scott-gray-directory.css?v=wallpaper-17-v1">
-  <script type="module" src="js/scott-gray-directory.mjs?v=wallpaper-17-v1"></script>
+  <script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="stylesheet" href="css/scott-gray-directory.css?v=20260907-equations">
+  <script type="module" src="js/scott-gray-directory.mjs?v=20260907-equations"></script>
 </head>
 <body>
   <a class="skip-link" href="#families">Skip to wallpaper groups</a>
   <header class="site">
-    <div class="inner">
-      <a class="title" href="index.html">Spacetime Groups</a>
-      <nav aria-label="Primary navigation"><a href="scott-gray-groups.html" aria-current="page">Gray–Scott</a></nav>
-    </div>
-  </header>
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="index.html">Tutorial</a>
+        <a href="notation.html">Notation</a>
+        <a href="colourings-tutorial.html">Colourings</a>
+        <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+        <a href="hierarchy.html">Hierarchy</a>
+        <a href="history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="catalog.html">275 spacetime</a>
+        <a href="wallpaper.html">275 spacetime (grouped)</a>
+        <a href="correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="patterns.html">609 patterns</a>
+        <a href="escher.html">107 Escher</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="scott-gray-groups.html" class="here">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="motifs.html">Motifs</a>
+        <a href="designer.html">Designer</a>
+        <a href="billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
   <main class="gray-scott-directory">
     <section class="directory" aria-labelledby="page-title">
       <p class="overline">Time-shift symmetries</p>
-      <h1 id="page-title">Periodic Gray–Scott patterns</h1>
-      <p>Saved periodic solutions, grouped by wallpaper symmetry.</p>
+      <h1 id="page-title">Periodic reaction–diffusion patterns</h1>
+      <p>Saved periodic solutions of three equations — Gray–Scott, complex Ginzburg–Landau and the Brusselator — whose wallpaper-group operations advance the pattern by prescribed fractions of its period, grouped by wallpaper group. Each entry is one row of the <a href="correspondence.html">clockwork/colouring correspondence</a>; every animation was re-verified from its saved bytes.</p>
     </section>
     <section id="families" aria-labelledby="families-title">
       <div class="family-directory-heading"><h2 id="families-title">The 17 wallpaper groups</h2><p id="atlas-summary" aria-live="polite"></p></div>
-      <nav class="family-grid" aria-label="Gray–Scott wallpaper groups">
-        <a class="family-card" data-family="p1" href="scott-gray/p1/" aria-label="◦, p1: periodic Gray–Scott patterns">
+      <nav class="family-grid" aria-label="Wallpaper groups">
+        <a class="family-card" data-family="p1" href="scott-gray/p1/" aria-label="◦, p1: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p1.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">◦</strong><span class="family-card-hm">p1</span></span>
-          <span class="family-card-count">1 type</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">1 time symmetry</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p2" href="scott-gray/p2/" aria-label="2222, p2: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p2" href="scott-gray/p2/" aria-label="2222, p2: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p2.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">2222</strong><span class="family-card-hm">p2</span></span>
-          <span class="family-card-count">3 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">3 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="pm" href="scott-gray/pm/" aria-label="∗∗, pm: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="pm" href="scott-gray/pm/" aria-label="∗∗, pm: periodic reaction–diffusion patterns">
           <img src="img/mathworld/pm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗∗</strong><span class="family-card-hm">pm</span></span>
-          <span class="family-card-count">1 type</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">1 time symmetry</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="pg" href="scott-gray/pg/" aria-label="××, pg: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="pg" href="scott-gray/pg/" aria-label="××, pg: periodic reaction–diffusion patterns">
           <img src="img/mathworld/pg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">××</strong><span class="family-card-hm">pg</span></span>
-          <span class="family-card-count">1 type</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">1 time symmetry</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="cm" href="scott-gray/cm/" aria-label="∗×, cm: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="cm" href="scott-gray/cm/" aria-label="∗×, cm: periodic reaction–diffusion patterns">
           <img src="img/mathworld/cm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗×</strong><span class="family-card-hm">cm</span></span>
-          <span class="family-card-count">2 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">2 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="pmm" href="scott-gray/pmm/" aria-label="∗2222, pmm: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="pmm" href="scott-gray/pmm/" aria-label="∗2222, pmm: periodic reaction–diffusion patterns">
           <img src="img/mathworld/pmm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗2222</strong><span class="family-card-hm">pmm</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="pmg" href="scott-gray/pmg/" aria-label="22∗, pmg: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="pmg" href="scott-gray/pmg/" aria-label="22∗, pmg: periodic reaction–diffusion patterns">
           <img src="img/mathworld/pmg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">22∗</strong><span class="family-card-hm">pmg</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="pgg" href="scott-gray/pgg/" aria-label="22×, pgg: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="pgg" href="scott-gray/pgg/" aria-label="22×, pgg: periodic reaction–diffusion patterns">
           <img src="img/mathworld/pgg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">22×</strong><span class="family-card-hm">pgg</span></span>
-          <span class="family-card-count">4 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">4 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="cmm" href="scott-gray/cmm/" aria-label="2∗22, cmm: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="cmm" href="scott-gray/cmm/" aria-label="2∗22, cmm: periodic reaction–diffusion patterns">
           <img src="img/mathworld/cmm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">2∗22</strong><span class="family-card-hm">cmm</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p4" href="scott-gray/#g95" aria-label="442, p4: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p4" href="scott-gray/" aria-label="442, p4: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p4.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">442</strong><span class="family-card-hm">p4</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p4m" href="scott-gray/p4m/" aria-label="∗442, p4m: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p4m" href="scott-gray/p4m/" aria-label="∗442, p4m: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p4m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗442</strong><span class="family-card-hm">p4m</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p4g" href="scott-gray/p4g/" aria-label="4∗2, p4g: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p4g" href="scott-gray/p4g/" aria-label="4∗2, p4g: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p4g.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">4∗2</strong><span class="family-card-hm">p4g</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p3" href="scott-gray/p3/" aria-label="333, p3: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p3" href="scott-gray/p3/" aria-label="333, p3: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p3.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">333</strong><span class="family-card-hm">p3</span></span>
-          <span class="family-card-count">4 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">4 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p3m1" href="scott-gray/p3m1/" aria-label="∗333, p3m1: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p3m1" href="scott-gray/p3m1/" aria-label="∗333, p3m1: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p3m1.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗333</strong><span class="family-card-hm">p3m1</span></span>
-          <span class="family-card-count">2 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">2 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p31m" href="scott-gray/p31m/" aria-label="3∗3, p31m: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p31m" href="scott-gray/p31m/" aria-label="3∗3, p31m: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p31m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">3∗3</strong><span class="family-card-hm">p31m</span></span>
-          <span class="family-card-count">4 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">4 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p6" href="scott-gray/p6/#g248" aria-label="632, p6: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p6" href="scott-gray/p6/" aria-label="632, p6: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p6.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">632</strong><span class="family-card-hm">p6</span></span>
-          <span class="family-card-count">6 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">6 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
-        <a class="family-card" data-family="p6m" href="scott-gray/p6m/" aria-label="∗632, p6m: periodic Gray–Scott patterns">
+        <a class="family-card" data-family="p6m" href="scott-gray/p6m/" aria-label="∗632, p6m: periodic reaction–diffusion patterns">
           <img src="img/mathworld/p6m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">∗632</strong><span class="family-card-hm">p6m</span></span>
-          <span class="family-card-count">4 types</span>
-          <span class="family-card-results"><span data-pattern-count>Search results</span><small data-parameter-count></small></span>
+          <span class="family-card-count">4 time symmetries</span>
+          <span class="family-card-results"><span data-pattern-count>Verified patterns</span><small data-equations></small></span>
         </a>
       </nav>
     </section>
-    <p class="atlas-note">Only numerically verified periodic patterns appear in the galleries.</p>
+    <p class="atlas-note">Only numerically verified periodic patterns appear in the galleries. Counts are loaded from the saved index; each card also opens without them.</p>
   </main>
+  <footer class="site">
+    Spacetime groups: the crystallography of looping animations ·
+    <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+  </footer>
 </body>
 </html>

@@ -1,5 +1,7 @@
 # Numerical verification of the bundled 442 orbits
 
+> **Scope.** This document describes the original 442 (p4) Gray–Scott catalog and its solver. The site now covers all 17 wallpaper groups and two further equations; see [research/wallpaper/README.md](research/wallpaper/README.md) and [research/equations/README.md](research/equations/README.md). Counts below refer to the 442 catalog at the time it was written.
+
 The reference atlas contains nonuniform periodic chemical waves satisfying
 all six requested 442 time characters. The reference solutions come from
 **two computed branches**, a rotating wave and a standing wave. The atlas

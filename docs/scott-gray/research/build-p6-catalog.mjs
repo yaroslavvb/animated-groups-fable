@@ -6,7 +6,7 @@
 import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {basename,relative,resolve,sep} from 'node:path';
-import {sha256,decodeField,encodePng,concentrationRanges,compactDiagnostics} from './build-catalog.mjs';
+import {sha256,decodeField,encodePng,concentrationRanges,compactDiagnostics,samePixels} from './build-catalog.mjs';
 import {verifyCandidate,normalizeConfig,GATE_VERSION} from '../p6/verify.mjs';
 import {renderPixels} from '../p6/playback.mjs';
 import {auditVisibleTimeSymmetry,VISIBILITY_VERSION} from '../visible-time-symmetry.mjs';
@@ -63,7 +63,7 @@ export async function buildP6Catalog({check=false,incremental=false,log=console.
     assert(!seen.has(entry.id),'Duplicate 632 orbit identifier.');seen.add(entry.id);
     for(const [palette,path] of Object.entries(thumbnails)){
       const pixels=renderPixels({config,field,ranges},0,{width:160,tiles:2,palette}),png=encodePng(160,160,pixels),target=new URL(path,ROOT);
-      if(check)assert((await readFile(target)).equals(png),`632 thumbnail is stale: ${path}`);else await writeFile(target,png);
+      if(check)assert(samePixels(await readFile(target),png),`632 thumbnail is stale: ${path}`);else await writeFile(target,png);
     }
     catalog.orbits.push(entry);
     if(!check)log(`[${index+1}/${manifest.orbits.length}] ${entry.id}: independently verified; return RMS ${diagnostics.refinedClosure.closureRms.toExponential(3)}`);

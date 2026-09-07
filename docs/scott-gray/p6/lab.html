@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="Explore saved periodic Gray–Scott solutions with 632 time-shift symmetry." name="description"/>
+<title>632 p6 laboratory — Spacetime Groups</title>
+<link href="../style.css?v=20260905-wallpaper" rel="stylesheet"/><link href="style.css?v=20260905-wallpaper" rel="stylesheet"/>
+<link rel="stylesheet" href="../../css/style.css?v=collapsible-header-v1">
+<script defer src="../../js/site-header.js?v=collapsible-header-v1"></script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="../../index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="../../index.html">Tutorial</a>
+        <a href="../../notation.html">Notation</a>
+        <a href="../../colourings-tutorial.html">Colourings</a>
+        <a href="../../subgroups-vs-colourings.html">Subgroups</a>
+        <a href="../../torus-cayley.html">Torus Cayley graphs</a>
+        <a href="../../hierarchy.html">Hierarchy</a>
+        <a href="../../history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="../../catalog.html">275 spacetime</a>
+        <a href="../../wallpaper.html">275 spacetime (grouped)</a>
+        <a href="../../correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="../../patterns.html">609 patterns</a>
+        <a href="../../escher.html">107 Escher</a>
+        <a href="../../gallery.html">Gallery</a>
+        <a href="../../scott-gray-groups.html" class="here">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="../../motifs.html">Motifs</a>
+        <a href="../../designer.html">Designer</a>
+        <a href="../../billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="../../crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+<main>
+<div class="intro"><div><p class="family-breadcrumb"><a href="../../scott-gray-groups.html">Periodic reaction–diffusion patterns</a> · <a href="index.html">632 p6 catalog page</a> · laboratory</p><p class="eyebrow">PERIODIC REACTION–DIFFUSION</p><h1>632 · p6</h1></div></div>
+<p class="eyebrow selection-step">1 · CHOOSE THE TIME SYMMETRY</p><div aria-label="632 time-shift symmetry" class="groups" id="groups" role="group"></div>
+<div class="solution-policy"><strong id="policy-label">Precomputed, verified solutions</strong><span id="solution-count">Loading catalog…</span></div>
+<div class="lab">
+<section aria-label="Verified solution animation" class="viewer">
+<div class="image-label viewer-labels"><span id="mode-label">Loading catalog</span><span id="group-label">632</span></div>
+<div class="canvas-wrap">
+<canvas aria-label="Verified periodic solution. Press Space to play or pause." height="384" id="pattern" tabindex="0" width="384"></canvas>
+<canvas aria-label="Verified periodic orbit rendered with WebGL" height="768" hidden="" id="gpu-pattern" tabindex="0" width="768"></canvas>
+<svg aria-label="Pattern cell boundaries" class="cell-guide" id="cell-guide" viewbox="0 0 768 768"></svg>
+<svg aria-label="632 symmetry generators" class="generator-overlay" hidden="" id="generator-overlay" viewbox="0 0 768 768"></svg>
+<div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and numerical checks are precomputed.</p><button hidden="" id="retry-animation" type="button">Retry animation</button></div>
+</div>
+<div class="view-caption"><span class="approximate-view-label" hidden="" id="approximate-view-label">Dashed: approximate centres</span><span class="scale-label" id="scale-label">Physical width 2 L · triangular lattice</span></div>
+<div class="playback"><button aria-label="Play animation" disabled="" id="play">▶ Play</button><button aria-label="Return to first frame" disabled="" id="rewind">↤</button><input aria-label="Animation phase" disabled="" id="phase" max="1" min="0" step="0.001" type="range" value="0"/><output id="phase-label">—</output><label>View <select aria-label="View framing" id="framing"><option value="cells">Pattern cells</option><option value="simulation">Simulation width</option></select></label><label><span id="tile-label">Cells</span> <select aria-describedby="view-scale-explanation" aria-label="Number of pattern cells" id="tiles"><option value="1">1 cell</option><option selected="" value="2">2 × 2 cells</option><option value="3">3 × 3 cells</option></select></label><label>Speed <select aria-label="Playback speed" id="speed"><option value="0.5">Slow</option><option selected="" value="1">Normal</option><option value="2">Fast</option></select></label></div>
+
+<div class="overlay-controls"><label><input id="show-generators" type="checkbox"/> Generators</label><select aria-label="Named generator" id="operation"></select><span id="engine-label">No orbit loaded</span></div>
+
+<div class="approximate-controls" hidden="" id="approximate-controls"><label><input id="show-approximate" type="checkbox"/> Show approximate centres</label></div>
+
+<div class="phase-rule"><p id="generator-description"></p></div>
+
+
+
+<details class="numerical-record"><summary>Numerical record</summary><p class="small" id="view-scale-explanation">Each outlined region is one pattern repeat cell. The pattern and generators share this cell scale.</p><p aria-live="polite" class="small" id="overlay-explanation"></p><p class="small" id="approximate-explanation"></p><p class="caption" id="caption">Only accepted numerical orbits appear here. An empty group means existence remains unresolved.</p><div class="metrics"><div><span>PDE mismatch</span><strong id="pde">—</strong></div><div><span>Forward phase error</span><strong id="symmetry">—</strong></div><div><span>Temporal variation</span><strong id="motion">—</strong></div><div><span>Forward return RMS</span><strong id="return">—</strong></div></div></details></section>
+<aside class="controls">
+<div class="selected"><p class="eyebrow" id="selected-id"></p><h2 id="selected-title"></h2><p id="selected-description"></p></div>
+<section aria-label="Verified parameter and pattern selectors" class="atlas-panel">
+<p class="eyebrow">2 · CHOOSE VERIFIED PARAMETERS</p><h3>Physical parameters</h3>
+<label class="atlas-label" for="parameter-set">Saved parameters</label><select disabled="" id="parameter-set"><option>No verified parameters</option></select>
+<p class="parameter-values" id="parameter-values">Loading precomputed parameters…</p>
+<div class="parameter-map-wrap"><canvas aria-label="Verified parameter plane. Click to select the closest verified parameter set; the selector above also provides keyboard access." height="320" id="parameter-map" tabindex="0" width="660"></canvas></div><p class="small" hidden="" id="map-status" role="status">Only precomputed verified points can be selected.</p>
+<div class="pattern-section"><p class="eyebrow">3 · CHOOSE A PATTERN</p><h3>Patterns at these parameters</h3><p class="small" id="pattern-count">Loading saved patterns…</p><div aria-label="Verified pattern thumbnails" class="pattern-thumbnails" id="pattern-thumbnails" role="group"></div>
+<label class="atlas-label" for="solution">Verified periodic pattern</label><select disabled="" id="solution"><option>No verified patterns</option></select></div>
+</section>
+<label class="stack">Appearance<select id="palette"><option value="ember">Ember / violet</option><option value="ceramic">Copper / porcelain</option><option value="concentration">Concentration V</option></select></label>
+<p class="small" id="color-scale"></p><button class="text-button" disabled="" id="export">↓ Export verified orbit + evidence</button><p id="status" role="status">Loading the precomputed catalog…</p>
+</aside>
+</div>
+
+<footer><a href="../../scott-gray-groups.html">All wallpaper groups</a> · <a href="../research-note/">Research note</a></footer>
+</main>
+<script src="app.js?v=20260905-gallery-fix" type="module"></script>
+<script src="../family-navigation.mjs?v=20260905-wallpaper" type="module"></script></body>
+</html>

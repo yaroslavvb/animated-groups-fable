@@ -4,8 +4,26 @@
     {
       "name": "docs",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "8934", "--directory", "docs"],
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8934",
+        "--directory",
+        "docs"
+      ],
       "port": 8934
+    },
+    {
+      "name": "docs-8936",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "8936",
+        "--directory",
+        "docs"
+      ],
+      "port": 8936
     }
   ]
 }

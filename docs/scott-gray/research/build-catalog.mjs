@@ -6,7 +6,7 @@
  */
 import {readFile,writeFile,mkdir,readdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
-import {deflateSync} from 'node:zlib';
+import {deflateSync,inflateSync} from 'node:zlib';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 import {basename,relative,resolve,sep} from 'node:path';
 import {createSolutionAtlas} from '../solution-atlas.mjs';
@@ -40,6 +40,9 @@ export function concentrationRanges(field,N,M){
 const crcTable=Uint32Array.from({length:256},(_,i)=>{let c=i;for(let j=0;j<8;j++)c=(c&1)?0xedb88320^(c>>>1):c>>>1;return c>>>0;});
 function crc32(bytes){let c=0xffffffff;for(const b of bytes)c=crcTable[(c^b)&255]^(c>>>8);return(c^0xffffffff)>>>0;}
 function chunk(type,data){const body=Buffer.concat([Buffer.from(type),data]),head=Buffer.alloc(4),tail=Buffer.alloc(4);head.writeUInt32BE(data.length);tail.writeUInt32BE(crc32(body));return Buffer.concat([head,body,tail]);}
+/** Decoded scanlines of a PNG written by encodePng: deflate output differs between zlib versions, pixels do not. */
+export function pngPixels(png){const parts=[];let offset=8;while(offset<png.length){const length=png.readUInt32BE(offset),type=png.toString('ascii',offset+4,offset+8);if(type==='IDAT')parts.push(png.subarray(offset+8,offset+8+length));offset+=12+length;}return inflateSync(Buffer.concat(parts));}
+export const samePixels=(a,b)=>pngPixels(a).equals(pngPixels(b));
 export function encodePng(width,height,rgba){
   assert(rgba.length===4*width*height,'Wrong thumbnail pixel count.');
   const header=Buffer.alloc(13);header.writeUInt32BE(width,0);header.writeUInt32BE(height,4);header[8]=8;header[9]=6;
@@ -118,7 +121,7 @@ export async function buildCatalog({check=false,incremental=false,log=console.lo
     assert(!seen.has(entry.id),'Duplicate saved orbit identifier.');seen.add(entry.id);
     for(const [palette,path] of Object.entries(entry.thumbnails)){
       const png=thumbnail(field,config.N,entry.ranges,palette),target=new URL(path,SITE);
-      if(check)assert((await readFile(target)).equals(png),`Precomputed thumbnail is stale: ${path}`);else await writeFile(target,png);
+      if(check)assert(samePixels(await readFile(target),png),`Precomputed thumbnail is stale: ${path}`);else await writeFile(target,png);
     }
     catalog.orbits.push(entry);if(!check)log(`[${index+1}/${manifest.orbits.length}] ${entry.id}: verified; return RMS ${diagnostics.refinedClosure.closureRms.toExponential(3)}`);
   }

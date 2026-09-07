@@ -1,0 +1,121 @@
+{
+ "schema": "equations-compute-ledger-v1",
+ "session": "2026-09-06/07",
+ "authorizedOverallUSD": 100,
+ "previousCombinedConservativeBoundUSD": 39.2462526,
+ "previousLedgers": [
+  "../wallpaper/compute-ledger.json",
+  "../diversity-compute-ledger.json",
+  "../compute-ledger.json"
+ ],
+ "thisSessionConservativeBoundUSD": 54.6616,
+ "combinedConservativeBoundUSD": 93.9078,
+ "providerReportedChargesUSD": null,
+ "pricingChecked": "2026-09-05",
+ "pricingSource": "https://modal.com/pricing",
+ "resources": {
+  "cpuPhysicalCoresHardLimit": 2,
+  "memoryGiBHardLimit": 8,
+  "gpu": null,
+  "maxContainersPerApp": 24,
+  "retries": 0,
+  "functionSeconds": 420,
+  "startupSeconds": 120,
+  "scaleDownSeconds": 10,
+  "perContainerSecondUSD": 4.396e-05
+ },
+ "method": "Worst case for every job: full function timeout plus full startup timeout and scale-down allowance at the CPU/memory rate, plus a $3 image-build/accounting reserve per app, counting five dry-run apps that stopped within seconds. A conservative reservation, not a provider invoice. No persistent deployments, schedules, retries or GPUs were created; all task apps are stopped.",
+ "totalSubmittedJobs": 1020,
+ "totalReturnedJobs": 1020,
+ "runs": [
+  {
+   "batch": "batch1",
+   "appId": "ap-49xcWgZv0K6v49OkLgl7P9",
+   "model": "ginzburg-landau",
+   "submittedJobs": 68,
+   "returnedJobs": 68,
+   "outcomes": {
+    "failed": 43,
+    "candidate": 25
+   },
+   "state": "stopped",
+   "reservedUSDIncludingThreeDollarBuildReserve": 4.644104,
+   "maximumConcurrentContainers": 24
+  },
+  {
+   "batch": "batch2",
+   "appId": "ap-Z6c63R4anrpgiaZXS2HnbT",
+   "model": "ginzburg-landau",
+   "submittedJobs": 250,
+   "returnedJobs": 250,
+   "outcomes": {
+    "candidate": 68,
+    "failed": 176,
+    "function-error": 6
+   },
+   "state": "stopped",
+   "reservedUSDIncludingThreeDollarBuildReserve": 9.0445,
+   "maximumConcurrentContainers": 24
+  },
+  {
+   "batch": "batch3",
+   "appId": "ap-42ALNDG3Md4Dx4U7RO88Af",
+   "model": "ginzburg-landau",
+   "submittedJobs": 250,
+   "returnedJobs": 250,
+   "outcomes": {
+    "failed": 142,
+    "candidate": 108
+   },
+   "state": "stopped",
+   "reservedUSDIncludingThreeDollarBuildReserve": 9.0445,
+   "maximumConcurrentContainers": 24
+  },
+  {
+   "batch": "batch4",
+   "appId": "ap-4aDyD3Px4GUQzF1RVZwRLE",
+   "model": "ginzburg-landau",
+   "submittedJobs": 248,
+   "returnedJobs": 248,
+   "outcomes": {
+    "failed": 189,
+    "candidate": 59
+   },
+   "state": "stopped",
+   "reservedUSDIncludingThreeDollarBuildReserve": 8.996144,
+   "maximumConcurrentContainers": 24
+  },
+  {
+   "batch": "bruss1",
+   "appId": "ap-k1mgki3njSu81pez9EzPN9",
+   "model": "brusselator",
+   "submittedJobs": 204,
+   "returnedJobs": 204,
+   "outcomes": {
+    "failed": 122,
+    "candidate": 81,
+    "function-error": 1
+   },
+   "state": "stopped",
+   "reservedUSDIncludingThreeDollarBuildReserve": 7.932312,
+   "maximumConcurrentContainers": 24
+  }
+ ],
+ "dryRunApps": [
+  {
+   "appId": "ap-TxBKnJ9bnwLJm0McXMonQP",
+   "purpose": "dry run of modal_cgl.py",
+   "state": "stopped"
+  },
+  {
+   "appId": "ap-n8Yb0EalrI4qwB2eIl1AX2",
+   "purpose": "dry run of modal_equations.py",
+   "state": "stopped"
+  }
+ ],
+ "notes": [
+  "Every submitted job identifier was returned exactly once (order_outputs=True).",
+  "function-error outcomes are Modal-side exceptions (container preemption after the 420 s limit); they were not retried.",
+  "One container was preempted and restarted by the provider during bruss1; the job returned once."
+ ]
+}

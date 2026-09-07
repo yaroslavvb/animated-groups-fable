@@ -2,7 +2,7 @@
 
 `groups.json` copies the six forward cyclic colour actions, affine operations,
 Chaim short forms, named generators, and generator glyph paths from the existing
-[632 correspondence page](https://yaroslavvb.github.io/animated-groups-fable/correspondence-p6.html)
+[632 correspondence page](../../correspondence-p6.html)
 and `docs/data/clockwork-coloring-correspondence.json`. The data is a group
 specification, not evidence that a Gray–Scott solution exists.
 

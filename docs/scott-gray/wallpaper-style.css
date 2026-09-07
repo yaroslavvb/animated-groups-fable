@@ -1,2 +1,21 @@
 .group strong{font-size:22px}.group>span{font-size:11px}.phase-rule p{overflow-wrap:anywhere}.canvas-wrap canvas{touch-action:manipulation}.pattern-thumbnails:empty{margin:0}.selected h2{white-space:nowrap}.selected p,.caption{overflow-wrap:anywhere}.generator-overlay:not([hidden]){display:block}.playback label:last-child{display:flex}.pattern-thumb{width:100%}.parameter-map-wrap[hidden]{display:none}.group[aria-pressed=false]:hover{background:#f6f3fb}
 @media(max-width:720px){.group strong{font-size:20px}.metrics{grid-template-columns:repeat(2,1fr)}.image-label{font-size:10px}.playback{gap:8px}.groups.variable-groups .group{border-bottom:1px solid var(--rule)}#family-nav{max-width:100%}}
+
+/* Family pages under the site header: breadcrumb, title, pager (mirrors css/correspondence.css). */
+.family-breadcrumb{margin:0 0 .7rem;color:var(--muted);font-size:.78rem}.family-breadcrumb a{color:inherit}
+.family-page-header h1{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem .65rem;max-width:none;margin:0 0 .6rem}
+.family-page-header .family-hm{color:var(--muted);font-size:.5em;font-weight:500}
+.family-page-header .family-summary{max-width:64ch;margin:0 0 .8rem;color:var(--muted);font-size:.92rem}
+.family-pager{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem 1.4rem;margin:0 0 1.5rem;font-size:.82rem}
+.family-pager-link{color:var(--accent);text-decoration:none}.family-pager-link:hover,.family-pager-link:focus-visible{text-decoration:underline}.family-pager-index{color:var(--muted)}
+.family-select{display:inline-flex;align-items:center;gap:.4rem;color:var(--muted)}.family-select select{font-size:13px;padding:4px 8px}
+.zero-offset-note{margin:-2px 0 12px;max-width:64ch}
+/* Equation tabs: one saved catalog per equation, same time-shift actions. */
+.equations{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 6px}
+.equation{padding:6px 11px;font-size:13px;border:1px solid var(--rule);border-radius:999px;background:#fff;color:var(--ink)}
+.equation small{color:var(--muted);font-size:11px;margin-left:5px}
+.equation[aria-pressed=true]{border-color:var(--accent);background:#e8eff8;color:var(--accent);font-weight:600}
+.equation[aria-pressed=true] small{color:inherit}
+.equation-description{font:12px/1.6 ui-monospace,monospace;color:var(--muted);margin:2px 0 14px;overflow-wrap:anywhere}
+.page-links{margin:26px 0 0;font-size:13px;color:var(--muted)}
+.group[aria-pressed=true]{background:#e8eff8}.pattern-thumb[aria-pressed=true]{background:#e8eff8}

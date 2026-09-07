@@ -1,5 +1,7 @@
 # Gray–Scott space-time orbit solver
 
+> **Scope.** This document describes the original 442 (p4) Gray–Scott catalog and its solver. The site now covers all 17 wallpaper groups and two further equations; see [research/wallpaper/README.md](research/wallpaper/README.md) and [research/equations/README.md](research/equations/README.md). Counts below refer to the 442 catalog at the time it was written.
+
 `core.mjs` has no dependencies. It runs in browsers, module workers, and Node.
 It searches for a nonconstant solution of the **actual two-species Gray–Scott
 equations**, not merely a seamless animation. Search failure is reported as an
@@ -38,7 +40,7 @@ side is `N*dx`. **Keep `N*dx` fixed when refining N.** Physical frame spacing is
 `period/M`. Parameters `F` and `k` are feed and kill rates.
 
 An operation has catalog shape `{M:[[a,b],[c,d]],v:[vx,vy],s:1,tau}` and means
-`q(A*x+v,t+tau*T)=q(x,t)`. Projection uses exact integer-node orbits, including
+`q(M*x+v,t+tau*T)=q(x,t)`. Projection uses exact integer-node orbits, including
 the generated closure of the supplied operations. All g94–g99 operations map
 the grid exactly. Fractional time or spatial sampling incompatible with the
 grid is rejected. Negative time direction is rejected; it is not an

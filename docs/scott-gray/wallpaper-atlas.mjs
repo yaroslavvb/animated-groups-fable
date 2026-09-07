@@ -3,6 +3,8 @@
  */
 import {downloadOrbitBytes} from './precomputed-catalog.mjs?v=20260905-gallery-fix';
 const HASH=/^[a-f0-9]{64}$/i,SCHEMA='scott-gray-wallpaper-atlas-v1',GATE='wallpaper-offline-v1';
+/** Each saved record names its equation; parameters are validated per model. */
+export const MODELS=Object.freeze({'gray-scott':Object.freeze({name:'Gray–Scott',parameters:['F','k','Du','Dv'],diffusion:['Du','Dv']}),'ginzburg-landau':Object.freeze({name:'Ginzburg–Landau',parameters:['alpha','beta','D'],diffusion:['D']}),'brusselator':Object.freeze({name:'Brusselator',parameters:['a','b','Du','Dv'],diffusion:['Du','Dv']})});
 const equal=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
 const opsEqual=(a,b)=>Array.isArray(a)&&a.length===b.length&&a.every((op,i)=>equal(op.M,b[i].M)&&equal(op.v,b[i].v)&&op.s===b[i].s&&Math.abs(op.tau-b[i].tau)<1e-12);
 const freeze=o=>{if(o&&typeof o==='object'){for(const v of Object.values(o))freeze(v);Object.freeze(o);}return o;};
@@ -19,9 +21,12 @@ export function createWallpaperCatalog(manifest,{groups,baseUrl=new URL('./',imp
   if(typeof entry.id!=='string'||!entry.id||entries.has(entry.id))throw Error('Orbit ids must be unique.');
   if(!Number.isInteger(c.N)||c.N<4||c.N%g.meshMultiple||!Number.isInteger(c.M)||c.M<8||c.M%g.frameMultiple||!Number.isFinite(c.period)||c.period<=0)throw Error('Incompatible orbit dimensions.');
   if(g.lattice==='triangular'&&c.params.stencil!=='triangular-six'||g.lattice==='square'&&!['five-point','bulatov9'].includes(c.params.stencil))throw Error('Orbit metric and diffusion stencil differ.');
-  if(![c.L,c.params.F,c.params.k,c.params.Du,c.params.Dv,c.params.dx].every(Number.isFinite)||c.L<=0||c.params.Du<=0||c.params.Dv<=0)throw Error('Invalid saved parameters.');
+  const model=c.model??'gray-scott',spec=MODELS[model];if(!spec)throw Error(`Unknown equation for ${entry.id}.`);
+  if(![c.L,c.params.dx,...spec.parameters.map(name=>c.params[name])].every(Number.isFinite)||c.L<=0||spec.diffusion.some(name=>c.params[name]<=0))throw Error('Invalid saved parameters.');
+  entry.model=model;
   if(entry.fieldEncoding!=='float32-le'||!HASH.test(entry.fieldSha256)||entry.fieldValueCount!==2*c.N*c.N*c.M||entry.fieldByteLength!==4*entry.fieldValueCount||typeof entry.fieldUrl!=='string')throw Error('Invalid field metadata.');
-  if(v?.passed!==true||v.gateVersion!==GATE||v.fieldSha256!==entry.fieldSha256||w?.passed!==true||w.phaseRelations?.passed!==true||w.independentDynamics?.passed!==true||w.temporalResolution?.passed!==true||w.forwardTargetPhaseBounds?.passed!==true||g.hasTimeShift&&w.visibility?.passed!==true)throw Error(`Missing offline verification for ${entry.id}.`);
+  const gate=v?.gateVersion===GATE?{verificationCodeSha256:manifest.verificationCodeSha256}:manifest.equationGates?.[v?.gateVersion];
+  if(v?.passed!==true||!gate||v.verificationCodeSha256!==gate.verificationCodeSha256||v.fieldSha256!==entry.fieldSha256||w?.passed!==true||w.phaseRelations?.passed!==true||w.independentDynamics?.passed!==true||w.temporalResolution?.passed!==true||w.forwardTargetPhaseBounds?.passed!==true||g.hasTimeShift&&w.visibility?.passed!==true)throw Error(`Missing offline verification for ${entry.id}.`);
   if(!range(entry.ranges?.u)||!range(entry.ranges?.v))throw Error('Missing concentration ranges.');
   for(const name of ['ember','ceramic','concentration'])if(typeof entry.thumbnails?.[name]!=='string')throw Error('Missing pattern thumbnail.');
   const tv=entry.translationVerification;

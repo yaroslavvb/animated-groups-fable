@@ -40,13 +40,16 @@ export function makeWallpaperCellView({lattice='square',translations=[],count=2,
   const c=Math.cos(cell.angle),s=Math.sin(cell.angle),rotation=[[c,s],[-s,c]],metric=matrix(lattice);
   originalCorners=cellCorners.map(cellToLattice);
   const cart=originalCorners.map(p=>mul(rotation,mul(metric,p))),extent=[0,1].map(axis=>Math.max(...cart.map(p=>p[axis]))-Math.min(...cart.map(p=>p[axis]))),scale=Math.max(...extent)/(1-2*padding);
-  const viewMatrix=mm(inv(metric),[[c,-s],[s,c]]).map(r=>r.map(v=>v*scale));
+  // Square families keep the saved field's downward second screen axis (as the thumbnails,
+  // the simulation framing and the 442 cell camera do); the triangular camera keeps y up.
+  const orient=lattice==='square'?[[c,s],[s,-c]]:[[c,-s],[s,c]];
+  const viewMatrix=mm(inv(metric),orient).map(r=>r.map(v=>v*scale));
   transform=viewTransform({family:cell.family,viewMatrix,viewOrigin:cellToLattice([count/2,count/2])});
  }
  const originalToScreen=p=>latticePointToScreen(p,transform),screenToOriginal=p=>screenPointToLattice(p,transform),corners=originalCorners.map(originalToScreen);
  const contains=p=>{const q=framing==='cells'?mul(cell.inverse,p):originalToScreen(p),bound=framing==='cells'?count:1;return q.every(x=>Number.isFinite(x)&&x>=-EPS&&x<=bound+EPS);};
  const view={cell,count,countLabel,framing,cellCorners,originalCorners,corners,padding,originalToScreen,latticeToScreen:originalToScreen,screenToOriginal,cellToScreen:p=>originalToScreen(cellToLattice(p)),contains,
- viewOptions:{viewMatrix:transform.matrix,viewOrigin:transform.origin},latticeBounds:{min:[0,1].map(i=>Math.min(...originalCorners.map(p=>p[i]))),max:[0,1].map(i=>Math.max(...originalCorners.map(p=>p[i])))},glyphAngleOffset:framing==='cells'?cell.angleDegrees:0,
+ viewOptions:{viewMatrix:transform.matrix,viewOrigin:transform.origin},latticeBounds:{min:[0,1].map(i=>Math.min(...originalCorners.map(p=>p[i]))),max:[0,1].map(i=>Math.max(...originalCorners.map(p=>p[i])))},glyphAngleOffset:framing==='cells'?(lattice==='square'?-1:1)*cell.angleDegrees:0,
  clipPath:framing==='cells'?`polygon(${corners.map(p=>p.map(x=>`${x*100}%`).join(' ')).join(', ')})`:''};
  view.guideMarkup=framing==='cells'?cellGuideMarkup(view):'';return view;
 }

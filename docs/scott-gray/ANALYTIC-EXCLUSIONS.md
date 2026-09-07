@@ -35,7 +35,7 @@ Both fields are spatially constant. Their reduced equations then force
 them to be constant in time as well (`v = 0` when `k > 0`). Thus no
 nonstationary nonnegative time-periodic solution exists at zero feed.
 The same energy argument applies to the periodic finite grids used here:
-both supported symmetric diffusion stencils have nonpositive energy forms.
+the supported symmetric diffusion stencils (five-point, nine-point and the six-neighbour triangular Laplacian) all have nonpositive energy forms.
 
 `feasibility.mjs` checks these parameter assumptions and returns this
 certificate. It uses exact `F === 0`; small positive feed is not covered.

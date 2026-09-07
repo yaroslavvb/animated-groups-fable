@@ -1,8 +1,13 @@
 {
   "schema": "scott-gray-wallpaper-index-v1",
+  "models": {
+    "gray-scott": 254,
+    "ginzburg-landau": 65,
+    "brusselator": 51
+  },
   "wallpaperGroupsSha256": "b29347079a191e4080e9c79d6597a588f05f912a5889b32c49e2c46460cf290f",
-  "uniqueFieldCount": 265,
-  "exampleCount": 613,
+  "uniqueFieldCount": 370,
+  "exampleCount": 720,
   "families": [
     {
       "id": "p1",
@@ -12,17 +17,25 @@
       "timeSymmetryCount": 1,
       "populatedSymmetryCount": 1,
       "nonzeroTimeSymmetryCount": 0,
-      "verifiedNonzeroTimeSymmetryCount": 0
+      "verifiedNonzeroTimeSymmetryCount": 0,
+      "models": {
+        "gray-scott": 12
+      }
     },
     {
       "id": "p2",
-      "verifiedPatternCount": 35,
-      "verifiedExampleCount": 35,
-      "verifiedParameterCount": 18,
+      "verifiedPatternCount": 42,
+      "verifiedExampleCount": 42,
+      "verifiedParameterCount": 24,
       "timeSymmetryCount": 3,
       "populatedSymmetryCount": 3,
       "nonzeroTimeSymmetryCount": 2,
-      "verifiedNonzeroTimeSymmetryCount": 2
+      "verifiedNonzeroTimeSymmetryCount": 2,
+      "models": {
+        "brusselator": 3,
+        "ginzburg-landau": 4,
+        "gray-scott": 35
+      }
     },
     {
       "id": "pm",
@@ -32,7 +45,10 @@
       "timeSymmetryCount": 1,
       "populatedSymmetryCount": 1,
       "nonzeroTimeSymmetryCount": 0,
-      "verifiedNonzeroTimeSymmetryCount": 0
+      "verifiedNonzeroTimeSymmetryCount": 0,
+      "models": {
+        "gray-scott": 6
+      }
     },
     {
       "id": "pg",
@@ -42,97 +58,143 @@
       "timeSymmetryCount": 1,
       "populatedSymmetryCount": 1,
       "nonzeroTimeSymmetryCount": 0,
-      "verifiedNonzeroTimeSymmetryCount": 0
+      "verifiedNonzeroTimeSymmetryCount": 0,
+      "models": {
+        "gray-scott": 8
+      }
     },
     {
       "id": "cm",
-      "verifiedPatternCount": 25,
-      "verifiedExampleCount": 25,
-      "verifiedParameterCount": 12,
+      "verifiedPatternCount": 28,
+      "verifiedExampleCount": 28,
+      "verifiedParameterCount": 15,
       "timeSymmetryCount": 2,
       "populatedSymmetryCount": 2,
       "nonzeroTimeSymmetryCount": 1,
-      "verifiedNonzeroTimeSymmetryCount": 1
+      "verifiedNonzeroTimeSymmetryCount": 1,
+      "models": {
+        "brusselator": 2,
+        "ginzburg-landau": 1,
+        "gray-scott": 25
+      }
     },
     {
       "id": "pmm",
-      "verifiedPatternCount": 29,
-      "verifiedExampleCount": 34,
-      "verifiedParameterCount": 20,
+      "verifiedPatternCount": 34,
+      "verifiedExampleCount": 39,
+      "verifiedParameterCount": 23,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "ginzburg-landau": 5,
+        "gray-scott": 29
+      }
     },
     {
       "id": "pmg",
-      "verifiedPatternCount": 22,
-      "verifiedExampleCount": 23,
-      "verifiedParameterCount": 15,
+      "verifiedPatternCount": 34,
+      "verifiedExampleCount": 35,
+      "verifiedParameterCount": 23,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "brusselator": 5,
+        "ginzburg-landau": 7,
+        "gray-scott": 22
+      }
     },
     {
       "id": "pgg",
-      "verifiedPatternCount": 29,
-      "verifiedExampleCount": 29,
-      "verifiedParameterCount": 20,
+      "verifiedPatternCount": 41,
+      "verifiedExampleCount": 41,
+      "verifiedParameterCount": 29,
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
-      "verifiedNonzeroTimeSymmetryCount": 3
+      "verifiedNonzeroTimeSymmetryCount": 3,
+      "models": {
+        "brusselator": 6,
+        "ginzburg-landau": 6,
+        "gray-scott": 29
+      }
     },
     {
       "id": "cmm",
-      "verifiedPatternCount": 36,
-      "verifiedExampleCount": 36,
-      "verifiedParameterCount": 19,
+      "verifiedPatternCount": 47,
+      "verifiedExampleCount": 47,
+      "verifiedParameterCount": 25,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "brusselator": 5,
+        "ginzburg-landau": 6,
+        "gray-scott": 36
+      }
     },
     {
       "id": "p4",
-      "verifiedPatternCount": 136,
-      "verifiedExampleCount": 143,
-      "verifiedParameterCount": 13,
-      "timeSymmetryCount": 6,
-      "populatedSymmetryCount": 6,
-      "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
-    },
-    {
-      "id": "p4m",
-      "verifiedPatternCount": 39,
-      "verifiedExampleCount": 52,
+      "verifiedPatternCount": 141,
+      "verifiedExampleCount": 151,
       "verifiedParameterCount": 18,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "brusselator": 7,
+        "ginzburg-landau": 10,
+        "gray-scott": 124
+      }
     },
     {
-      "id": "p4g",
-      "verifiedPatternCount": 57,
-      "verifiedExampleCount": 57,
-      "verifiedParameterCount": 19,
+      "id": "p4m",
+      "verifiedPatternCount": 43,
+      "verifiedExampleCount": 56,
+      "verifiedParameterCount": 20,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "ginzburg-landau": 4,
+        "gray-scott": 39
+      }
+    },
+    {
+      "id": "p4g",
+      "verifiedPatternCount": 70,
+      "verifiedExampleCount": 70,
+      "verifiedParameterCount": 25,
+      "timeSymmetryCount": 6,
+      "populatedSymmetryCount": 6,
+      "nonzeroTimeSymmetryCount": 5,
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "brusselator": 5,
+        "ginzburg-landau": 8,
+        "gray-scott": 57
+      }
     },
     {
       "id": "p3",
-      "verifiedPatternCount": 46,
-      "verifiedExampleCount": 46,
-      "verifiedParameterCount": 21,
+      "verifiedPatternCount": 58,
+      "verifiedExampleCount": 58,
+      "verifiedParameterCount": 28,
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
-      "verifiedNonzeroTimeSymmetryCount": 3
+      "verifiedNonzeroTimeSymmetryCount": 3,
+      "models": {
+        "brusselator": 6,
+        "ginzburg-landau": 6,
+        "gray-scott": 46
+      }
     },
     {
       "id": "p3m1",
@@ -142,27 +204,40 @@
       "timeSymmetryCount": 2,
       "populatedSymmetryCount": 2,
       "nonzeroTimeSymmetryCount": 1,
-      "verifiedNonzeroTimeSymmetryCount": 1
+      "verifiedNonzeroTimeSymmetryCount": 1,
+      "models": {
+        "gray-scott": 14
+      }
     },
     {
       "id": "p31m",
-      "verifiedPatternCount": 13,
-      "verifiedExampleCount": 13,
-      "verifiedParameterCount": 11,
+      "verifiedPatternCount": 19,
+      "verifiedExampleCount": 19,
+      "verifiedParameterCount": 16,
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
-      "verifiedNonzeroTimeSymmetryCount": 3
+      "verifiedNonzeroTimeSymmetryCount": 3,
+      "models": {
+        "brusselator": 2,
+        "ginzburg-landau": 4,
+        "gray-scott": 13
+      }
     },
     {
       "id": "p6",
-      "verifiedPatternCount": 64,
-      "verifiedExampleCount": 64,
-      "verifiedParameterCount": 11,
+      "verifiedPatternCount": 78,
+      "verifiedExampleCount": 78,
+      "verifiedParameterCount": 16,
       "timeSymmetryCount": 6,
       "populatedSymmetryCount": 6,
       "nonzeroTimeSymmetryCount": 5,
-      "verifiedNonzeroTimeSymmetryCount": 5
+      "verifiedNonzeroTimeSymmetryCount": 5,
+      "models": {
+        "brusselator": 10,
+        "ginzburg-landau": 4,
+        "gray-scott": 64
+      }
     },
     {
       "id": "p6m",
@@ -172,7 +247,10 @@
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
-      "verifiedNonzeroTimeSymmetryCount": 3
+      "verifiedNonzeroTimeSymmetryCount": 3,
+      "models": {
+        "gray-scott": 16
+      }
     }
   ],
   "counting": "Family pattern counts deduplicate identical field bytes within that family. A field can satisfy several wallpaper subgroups. Examples count separately verified field/group pairs."

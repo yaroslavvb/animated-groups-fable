@@ -67,3 +67,23 @@ The wrapper enforces two physical CPU cores and 8 GiB memory per container, at m
 `compute-ledger.json` records every task-created app, its final stopped state, all job counts, hard resource limits, and pricing source. All 441 jobs returned, and all task apps have zero active tasks. The conservative new resource and build/accounting reservation is **$20.43**. Including the earlier $18.82 conservative reservation, the combined bound is **$39.25**, within the user's $100 ceiling. This bound is deliberately conservative and is not a provider invoice.
 
 The verifier fingerprint is SHA-256 of the concatenated file bytes in this fixed order: `audit.py`, `search.py`, `../gray_scott_rk4.cpp`, `../p6/gray_scott_triangular.cpp`, `audit_subgroups.py`, `check_source_certificates.mjs`. The ordered names are also recorded in the catalog. Configuration fingerprints use JavaScript `JSON.stringify` serialization to match browser validation exactly.
+
+## One catalog for all 17 pages (September 2026)
+
+The 442 and 632 pages originally ran their own apps over their own catalogs. Their
+saved fields are now re-audited against the canonical wallpaper actions by
+`legacy_subgroups.py` (same admission as `audit_subgroups.py`, cap 24 per entry,
+original dynamics certificates retained) and merged into `data/wallpaper-atlas.json`
+by `merge_atlas.py`, together with the Ginzburg–Landau and Brusselator records of
+[`../equations/`](../equations/README.md). All 17 pages are rendered from one
+template by `build_pages.py` (the site header and navigation are copied from
+`docs/index.html` at build time) and driven by `wallpaper-app.mjs`; the original
+442 and 632 laboratories remain at `scott-gray/lab.html` and `scott-gray/p6/lab.html`.
+`build_index.py` counts the merged catalog once and records per-equation counts for
+the directory page.
+
+Two presentation fixes landed with the merge: the shared app's "Pattern cells"
+framing had mirrored square-lattice fields vertically relative to the simulation
+framing and the thumbnails (`wallpaper-cell.mjs`), and `build_catalog.py`'s
+triangular thumbnails were mirrored relative to the triangular playback camera
+(now regenerated, y up). Neither touches the saved fields or their certificates.

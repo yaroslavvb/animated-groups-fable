@@ -2,11 +2,14 @@
 import {createPlayer,drawCPU} from './p6/playback.mjs';
 import {createWebGLGrayScott} from './webgl.mjs';
 import {renderField} from './render.mjs';
+/** The WebGL engine only displays uploaded saved frames here; its simulation uniforms are
+ * irrelevant to playback, so non-Gray–Scott records hand it placeholder chemistry. */
+const displayParams=record=>record.model==='gray-scott'||!record.model?record.config.params:{Du:.16,Dv:.08,F:.026,k:.055,dx:record.config.params.dx,stencil:'five-point'};
 export function createWallpaperPlayer(gpuCanvas,cpuCanvas,record){
  const triangular=record.config.params.stencil==='triangular-six',c=record.config;
  let engine=null,lost=false;
  const fallback=()=>{lost=true;engine?.dispose();engine=null;gpuCanvas.hidden=true;cpuCanvas.hidden=false;};
- try{engine=triangular?createPlayer(gpuCanvas,record,{onContextLost:fallback}):createWebGLGrayScott({canvas:gpuCanvas,N:c.N,initial:Float32Array.from(record.field.slice(0,2*c.N*c.N)),params:c.params,onContextLost:fallback});}catch{fallback();}
+ try{engine=triangular?createPlayer(gpuCanvas,record,{onContextLost:fallback}):createWebGLGrayScott({canvas:gpuCanvas,N:c.N,initial:Float32Array.from(record.field.slice(0,2*c.N*c.N)),params:displayParams(record),onContextLost:fallback});}catch{fallback();}
  gpuCanvas.hidden=!engine;cpuCanvas.hidden=!!engine;
  const loss=e=>{e.preventDefault();fallback();};if(!triangular)gpuCanvas.addEventListener('webglcontextlost',loss);
  return {get backend(){return engine?'WebGL playback':'CPU playback';},draw(phase,options={}){

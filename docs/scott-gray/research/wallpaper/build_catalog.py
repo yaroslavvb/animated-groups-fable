@@ -13,7 +13,7 @@ def encoded(obj):return json.dumps(obj,separators=(',',':'),ensure_ascii=False,a
 
 def thumbnail(field,output,lattice,palette):
  n=field.shape[-1];size=160;y,x=np.indices((size,size));xx=(x+.5)/size*2;yy=(y+.5)/size*2
- if lattice=='triangular':yy=yy/(np.sqrt(3)/2);xx=xx+yy*.5
+ if lattice=='triangular':yy=-yy/(np.sqrt(3)/2);xx=xx+yy*.5   # y up, as the triangular playback camera draws it
  channel=1 if palette=='concentration' else 0;grid=field[0,channel];lo,hi=float(field[:,channel].min()),float(field[:,channel].max());xf=(xx*n)%n;yf=(yy*n)%n;ix=np.floor(xf).astype(int);iy=np.floor(yf).astype(int);fx=xf-ix;fy=yf-iy
  if lattice=='triangular':
   q00=grid[iy,ix];q10=grid[iy,(ix+1)%n];q01=grid[(iy+1)%n,ix];q11=grid[(iy+1)%n,(ix+1)%n]

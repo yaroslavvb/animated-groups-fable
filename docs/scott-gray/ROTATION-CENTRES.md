@@ -1,5 +1,7 @@
 # Rotation centres in the Gray–Scott overlays
 
+> **Scope.** This document describes the original 442 (p4) Gray–Scott catalog and its solver. The site now covers all 17 wallpaper groups and two further equations; see [research/wallpaper/README.md](research/wallpaper/README.md) and [research/equations/README.md](research/equations/README.md). Counts below refer to the 442 catalog at the time it was written.
+
 The overlay shows rotation centres, including the equivalent centres generated
 by the selected group. The original display repeated only the three named
 representatives α, β and γ by integer cell translations. Those representatives

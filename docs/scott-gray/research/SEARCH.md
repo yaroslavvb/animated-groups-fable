@@ -1,5 +1,7 @@
 # Searching Gray–Scott orbits with cyclic time symmetry
 
+> **Scope.** GPU search notes for the original 442 catalog; the atlas sizes quoted here are those of the time of writing. See `../VERIFIED-ORBITS.md` for the delivered 442 manifest and `wallpaper/README.md` for the 17-group extension.
+
 The solver found two nonuniform periodic branches, continued them in both feed and kill parameters, and found additional spatial wavelengths at the same physical parameters. The delivered atlas contains **77 verified group records at 12 physical parameter pairs**. Many records are coordinate variants of the same branch; 77 does not mean 77 distinct patterns. These are smooth concentration waves, not the gliders shown in Bulatov's examples. Every bundled field passes an independent offline audit for its selected cyclic character before publication; a moving transient or a symmetry-projected animation is not accepted.
 
 `build-catalog.mjs` performs the numerical verification offline and stores the accepted parameters, diagnostics, and thumbnails in `../data/precomputed-atlas.json`. Opening the viewer reuses that catalog. Selecting a pattern fetches its concentration payload and checks SHA-256 integrity; no PDE integration or parameter search runs on page load. Explicitly requested new searches still undergo independent numerical admission.

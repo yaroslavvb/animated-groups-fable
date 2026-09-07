@@ -1,0 +1,3677 @@
+{
+ "schema": "rdlab-cgl-batch-v1",
+ "budget": {
+  "maximumJobs": 204,
+  "maxContainers": 24,
+  "physicalCoresPerContainer": 2,
+  "memoryGiBHardLimit": 8,
+  "executionSeconds": 420,
+  "startupSeconds": 120,
+  "retries": 0,
+  "gpu": null,
+  "pricingURL": "https://modal.com/pricing",
+  "resourceUSDPerSecond": 4.396e-05,
+  "reservedUSDIncludingThreeDollarBuildReserve": 7.932312
+ },
+ "results": [
+  {
+   "id": "g6-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g6",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.182773619
+  },
+  {
+   "id": "g6-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g6",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 35.035521613
+  },
+  {
+   "id": "g6-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g6",
+   "family": "p2",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 28.451503135
+  },
+  {
+   "id": "g6-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g6",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 16.828527835000003
+  },
+  {
+   "id": "g7-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g7",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 17.109856834000002
+  },
+  {
+   "id": "g7-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g7",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 46.725207148
+  },
+  {
+   "id": "g7-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g7",
+   "family": "p2",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 37.135386606
+  },
+  {
+   "id": "g7-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g7",
+   "family": "p2",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 23.830210482
+  },
+  {
+   "id": "g9-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g9",
+   "family": "cm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.699825322
+  },
+  {
+   "id": "g9-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g9",
+   "family": "cm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 43.825353126
+  },
+  {
+   "id": "g9-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g9",
+   "family": "cm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 72.546324372
+  },
+  {
+   "id": "g9-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g9",
+   "family": "cm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 10.440762992
+  },
+  {
+   "id": "g55-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g55",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 7.712607466
+  },
+  {
+   "id": "g55-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g55",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 10.212780990999999
+  },
+  {
+   "id": "g55-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g55",
+   "family": "pmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.3935765800000004
+  },
+  {
+   "id": "g55-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g55",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.798934288
+  },
+  {
+   "id": "g65-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g65",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 10.373063059
+  },
+  {
+   "id": "g65-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g65",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 10.457580594
+  },
+  {
+   "id": "g65-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g65",
+   "family": "pmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.2837791989999996
+  },
+  {
+   "id": "g65-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g65",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 28.770090958999997
+  },
+  {
+   "id": "g60-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g60",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.368469797
+  },
+  {
+   "id": "g60-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g60",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 10.452434907999999
+  },
+  {
+   "id": "g60-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g60",
+   "family": "pmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 13.391561660999999
+  },
+  {
+   "id": "g60-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g60",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 8.256106867
+  },
+  {
+   "id": "g74-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g74",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.531268277
+  },
+  {
+   "id": "g74-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g74",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.389440605
+  },
+  {
+   "id": "g74-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g74",
+   "family": "pmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.892036900999999
+  },
+  {
+   "id": "g74-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g74",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.729097268000004
+  },
+  {
+   "id": "g64-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g64",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.666651989
+  },
+  {
+   "id": "g64-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g64",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.406883467999998
+  },
+  {
+   "id": "g64-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g64",
+   "family": "pmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 11.961638365000002
+  },
+  {
+   "id": "g64-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g64",
+   "family": "pmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.835700935
+  },
+  {
+   "id": "g61-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g61",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 25.49195759
+  },
+  {
+   "id": "g61-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g61",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 32.065305924
+  },
+  {
+   "id": "g61-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g61",
+   "family": "pmg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 19.649405968
+  },
+  {
+   "id": "g61-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g61",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 33.704055322
+  },
+  {
+   "id": "g62-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g62",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.905448228
+  },
+  {
+   "id": "g62-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g62",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 27.838754394
+  },
+  {
+   "id": "g62-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g62",
+   "family": "pmg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 73.424053267
+  },
+  {
+   "id": "g62-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g62",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.711550578999997
+  },
+  {
+   "id": "g67-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g67",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 15.012390688
+  },
+  {
+   "id": "g67-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g67",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 21.924899438000004
+  },
+  {
+   "id": "g67-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g67",
+   "family": "pmg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 11.091416136
+  },
+  {
+   "id": "g67-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g67",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 34.426514858
+  },
+  {
+   "id": "g57-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g57",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.294468352999999
+  },
+  {
+   "id": "g57-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g57",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.327447586000002
+  },
+  {
+   "id": "g57-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g57",
+   "family": "pmg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 12.007939996999998
+  },
+  {
+   "id": "g57-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g57",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.811689204
+  },
+  {
+   "id": "g66-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g66",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 17.458526646999996
+  },
+  {
+   "id": "g66-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g66",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 54.85945589
+  },
+  {
+   "id": "g66-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g66",
+   "family": "pmg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 41.657294743
+  },
+  {
+   "id": "g66-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g66",
+   "family": "pmg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 54.697106313999996
+  },
+  {
+   "id": "g75-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g75",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 11.497079178
+  },
+  {
+   "id": "g75-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g75",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 26.148988655000004
+  },
+  {
+   "id": "g75-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g75",
+   "family": "pgg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 13.800453173999998
+  },
+  {
+   "id": "g75-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g75",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 49.740165823000005
+  },
+  {
+   "id": "g63-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g63",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 17.277543293999997
+  },
+  {
+   "id": "g63-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g63",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 20.795428838999996
+  },
+  {
+   "id": "g63-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g63",
+   "family": "pgg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 47.337772034000004
+  },
+  {
+   "id": "g63-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g63",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.078234092
+  },
+  {
+   "id": "g59-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g59",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.566283941999998
+  },
+  {
+   "id": "g59-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g59",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 26.169557533000003
+  },
+  {
+   "id": "g59-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g59",
+   "family": "pgg",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 67.43299360399999
+  },
+  {
+   "id": "g59-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g59",
+   "family": "pgg",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.723526012
+  },
+  {
+   "id": "g72-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g72",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.2083749290000014
+  },
+  {
+   "id": "g72-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g72",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.637843198999995
+  },
+  {
+   "id": "g72-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g72",
+   "family": "cmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 39.656497977
+  },
+  {
+   "id": "g72-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g72",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.007076388999998
+  },
+  {
+   "id": "g69-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g69",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.690068085
+  },
+  {
+   "id": "g69-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g69",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 11.803591705999999
+  },
+  {
+   "id": "g69-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g69",
+   "family": "cmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.1831274769999993
+  },
+  {
+   "id": "g69-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g69",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 28.227878504000003
+  },
+  {
+   "id": "g70-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g70",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 25.395156236
+  },
+  {
+   "id": "g70-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g70",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 41.88975197599999
+  },
+  {
+   "id": "g70-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g70",
+   "family": "cmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 49.386665048999994
+  },
+  {
+   "id": "g70-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g70",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.130126341
+  },
+  {
+   "id": "g71-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g71",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.126487165
+  },
+  {
+   "id": "g71-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g71",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 26.214412208000006
+  },
+  {
+   "id": "g71-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g71",
+   "family": "cmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 34.435745048
+  },
+  {
+   "id": "g71-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g71",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 16.18676907599999
+  },
+  {
+   "id": "g73-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g73",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.702618752999996
+  },
+  {
+   "id": "g73-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g73",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.264228656999997
+  },
+  {
+   "id": "g73-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g73",
+   "family": "cmm",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 12.681389988
+  },
+  {
+   "id": "g73-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g73",
+   "family": "cmm",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 6.264757927000005
+  },
+  {
+   "id": "g96-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g96",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.577197192999996
+  },
+  {
+   "id": "g96-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g96",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 31.062185922000005
+  },
+  {
+   "id": "g96-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g96",
+   "family": "p4",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 53.735668784
+  },
+  {
+   "id": "g96-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g96",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 10.125798009999997
+  },
+  {
+   "id": "g97-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g97",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 11.361173184999998
+  },
+  {
+   "id": "g97-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g97",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 48.05047285399999
+  },
+  {
+   "id": "g97-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g97",
+   "family": "p4",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 55.024754449
+  },
+  {
+   "id": "g97-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g97",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 10.466244203000002
+  },
+  {
+   "id": "g99-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g99",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 8.900340151999998
+  },
+  {
+   "id": "g99-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g99",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 38.64920713000001
+  },
+  {
+   "id": "g99-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g99",
+   "family": "p4",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 39.5896087
+  },
+  {
+   "id": "g99-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g99",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 8.320878948
+  },
+  {
+   "id": "g95-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g95",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 25.068556349999994
+  },
+  {
+   "id": "g95-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g95",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 37.235218543
+  },
+  {
+   "id": "g95-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g95",
+   "family": "p4",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 42.03841320000001
+  },
+  {
+   "id": "g95-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g95",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 40.79182313
+  },
+  {
+   "id": "g98-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g98",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 6.531388011999994
+  },
+  {
+   "id": "g98-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g98",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 24.756426069
+  },
+  {
+   "id": "g98-bruss-a2b52-L40-s1",
+   "outcome": "function-error",
+   "error": "Task's current input in-01M1YGFGSP4NV012VGRDKYP6MG:1788804055862-0 hit its timeout of 420s"
+  },
+  {
+   "id": "g98-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g98",
+   "family": "p4",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 7.3181994809999935
+  },
+  {
+   "id": "g131-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g131",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 1.7211334280000017
+  },
+  {
+   "id": "g131-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g131",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.227207364999998
+  },
+  {
+   "id": "g131-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g131",
+   "family": "p4m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 12.875935349000002
+  },
+  {
+   "id": "g131-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g131",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.9983768580000003
+  },
+  {
+   "id": "g130-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g130",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.238273276000001
+  },
+  {
+   "id": "g130-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g130",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.367640516999998
+  },
+  {
+   "id": "g130-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g130",
+   "family": "p4m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.0440477089999973
+  },
+  {
+   "id": "g130-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g130",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.862259814
+  },
+  {
+   "id": "g138-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g138",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.1438121949999953
+  },
+  {
+   "id": "g138-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g138",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.104701719000005
+  },
+  {
+   "id": "g138-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g138",
+   "family": "p4m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 12.772987700000002
+  },
+  {
+   "id": "g138-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g138",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 1.893379796000005
+  },
+  {
+   "id": "g129-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g129",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 8.434752383999992
+  },
+  {
+   "id": "g129-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g129",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 44.836847989999995
+  },
+  {
+   "id": "g129-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g129",
+   "family": "p4m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 6.430941249
+  },
+  {
+   "id": "g129-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g129",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 20.364081287000005
+  },
+  {
+   "id": "g136-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g136",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.3768836379999954
+  },
+  {
+   "id": "g136-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g136",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 30.80007135800001
+  },
+  {
+   "id": "g136-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g136",
+   "family": "p4m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 1.748060860999999
+  },
+  {
+   "id": "g136-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g136",
+   "family": "p4m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 7.3961561750000016
+  },
+  {
+   "id": "g139-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g139",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.2247129799999925
+  },
+  {
+   "id": "g139-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g139",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 6.786186620000009
+  },
+  {
+   "id": "g139-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g139",
+   "family": "p4g",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 25.617917614000007
+  },
+  {
+   "id": "g139-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g139",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.0013140220000025
+  },
+  {
+   "id": "g133-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g133",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.050137464999992
+  },
+  {
+   "id": "g133-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g133",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 19.39837079
+  },
+  {
+   "id": "g133-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g133",
+   "family": "p4g",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 35.87750048999999
+  },
+  {
+   "id": "g133-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g133",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.9642576810000065
+  },
+  {
+   "id": "g137-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g137",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 8.752054219000001
+  },
+  {
+   "id": "g137-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g137",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 33.14969497999999
+  },
+  {
+   "id": "g137-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g137",
+   "family": "p4g",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 33.96913231699999
+  },
+  {
+   "id": "g137-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g137",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 10.485347827000012
+  },
+  {
+   "id": "g134-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g134",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 20.439708259
+  },
+  {
+   "id": "g134-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g134",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 44.93809658299999
+  },
+  {
+   "id": "g134-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g134",
+   "family": "p4g",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 24.872001953999998
+  },
+  {
+   "id": "g134-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g134",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 26.956820456
+  },
+  {
+   "id": "g135-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g135",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.394234818000001
+  },
+  {
+   "id": "g135-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g135",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 23.246922108999996
+  },
+  {
+   "id": "g135-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g135",
+   "family": "p4g",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.219410902000007
+  },
+  {
+   "id": "g135-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g135",
+   "family": "p4g",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 17.793983138000016
+  },
+  {
+   "id": "g225-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g225",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 24.61950835800002
+  },
+  {
+   "id": "g225-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g225",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 65.26644039400001
+  },
+  {
+   "id": "g225-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g225",
+   "family": "p3",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 74.940024261
+  },
+  {
+   "id": "g225-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g225",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 33.845314085
+  },
+  {
+   "id": "g226-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g226",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 25.339923896000016
+  },
+  {
+   "id": "g226-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g226",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 55.019753358
+  },
+  {
+   "id": "g226-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g226",
+   "family": "p3",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 158.42088940600001
+  },
+  {
+   "id": "g226-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g226",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 32.190489883
+  },
+  {
+   "id": "g227-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g227",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.315639262999994
+  },
+  {
+   "id": "g227-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g227",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 53.750972524000005
+  },
+  {
+   "id": "g227-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g227",
+   "family": "p3",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 29.97775474699999
+  },
+  {
+   "id": "g227-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g227",
+   "family": "p3",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 18.691311402999986
+  },
+  {
+   "id": "g231-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g231",
+   "family": "p3m1",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 5.8114779560000045
+  },
+  {
+   "id": "g231-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g231",
+   "family": "p3m1",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 14.165549438000014
+  },
+  {
+   "id": "g231-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g231",
+   "family": "p3m1",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 11.980182297999988
+  },
+  {
+   "id": "g231-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g231",
+   "family": "p3m1",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.325559139999996
+  },
+  {
+   "id": "g235-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g235",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.0471710870000095
+  },
+  {
+   "id": "g235-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g235",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 13.535337495999983
+  },
+  {
+   "id": "g235-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g235",
+   "family": "p31m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 1.5466033129999914
+  },
+  {
+   "id": "g235-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g235",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.350288335999998
+  },
+  {
+   "id": "g234-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g234",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.031569821999994
+  },
+  {
+   "id": "g234-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g234",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 47.591588675
+  },
+  {
+   "id": "g234-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g234",
+   "family": "p31m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 29.253733033000003
+  },
+  {
+   "id": "g234-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g234",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 14.352914606000013
+  },
+  {
+   "id": "g233-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g233",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 34.553424766999996
+  },
+  {
+   "id": "g233-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g233",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 23.540048831999997
+  },
+  {
+   "id": "g233-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g233",
+   "family": "p31m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 13.608487607
+  },
+  {
+   "id": "g233-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g233",
+   "family": "p31m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 50.928266763
+  },
+  {
+   "id": "g247-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g247",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 8.595058302000012
+  },
+  {
+   "id": "g247-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g247",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 52.664552458
+  },
+  {
+   "id": "g247-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g247",
+   "family": "p6",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 45.48765335800002
+  },
+  {
+   "id": "g247-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g247",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 16.84078788299999
+  },
+  {
+   "id": "g248-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g248",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 9.102600069
+  },
+  {
+   "id": "g248-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g248",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 52.97802132800001
+  },
+  {
+   "id": "g248-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g248",
+   "family": "p6",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 38.26589754099999
+  },
+  {
+   "id": "g248-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g248",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 16.501478759999998
+  },
+  {
+   "id": "g244-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g244",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 9.990473574999982
+  },
+  {
+   "id": "g244-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g244",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 58.503651609
+  },
+  {
+   "id": "g244-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g244",
+   "family": "p6",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 28.489441497
+  },
+  {
+   "id": "g244-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g244",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 19.513166795000018
+  },
+  {
+   "id": "g245-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g245",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 15.709242756999998
+  },
+  {
+   "id": "g245-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g245",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 23.359321074
+  },
+  {
+   "id": "g245-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g245",
+   "family": "p6",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 57.187276817
+  },
+  {
+   "id": "g245-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g245",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 12.583314897999998
+  },
+  {
+   "id": "g246-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g246",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 36.015619915
+  },
+  {
+   "id": "g246-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g246",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 59.465390387000014
+  },
+  {
+   "id": "g246-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g246",
+   "family": "p6",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "candidate",
+   "elapsedSeconds": 63.34258743699999
+  },
+  {
+   "id": "g246-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g246",
+   "family": "p6",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 51.834754124
+  },
+  {
+   "id": "g270-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g270",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 3.1248941940000066
+  },
+  {
+   "id": "g270-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g270",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 9.098833049000007
+  },
+  {
+   "id": "g270-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g270",
+   "family": "p6m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 1.572593889999979
+  },
+  {
+   "id": "g270-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g270",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 2.7566791120000005
+  },
+  {
+   "id": "g269-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g269",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 6.158936676000025
+  },
+  {
+   "id": "g269-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g269",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 13.772491654999982
+  },
+  {
+   "id": "g269-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g269",
+   "family": "p6m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 11.815524489999973
+  },
+  {
+   "id": "g269-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g269",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 4.422731795999994
+  },
+  {
+   "id": "g271-bruss-a1b21-L40-s1",
+   "model": "brusselator",
+   "groupId": "g271",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 37.79147977300002
+  },
+  {
+   "id": "g271-bruss-a1b23-L40-s1",
+   "model": "brusselator",
+   "groupId": "g271",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.3,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 14.246152142999996
+  },
+  {
+   "id": "g271-bruss-a2b52-L40-s1",
+   "model": "brusselator",
+   "groupId": "g271",
+   "family": "p6m",
+   "params": {
+    "a": 2.0,
+    "b": 5.2,
+    "Du": 1.0,
+    "Dv": 1.0
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 6.300761343999994
+  },
+  {
+   "id": "g271-bruss-a1b21d-L40-s1",
+   "model": "brusselator",
+   "groupId": "g271",
+   "family": "p6m",
+   "params": {
+    "a": 1.0,
+    "b": 2.1,
+    "Du": 1.4,
+    "Dv": 0.7
+   },
+   "L": 40.0,
+   "N": 36,
+   "M": 96,
+   "seed": 1,
+   "outcome": "failed",
+   "elapsedSeconds": 40.932231728000005
+  }
+ ]
+}

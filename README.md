@@ -36,15 +36,18 @@ loop with ← → (shift for finer steps).
 - **History** — Fletcher 1956 (zero citations; his counts 7 and 194 vs the
   modern 13 and 275, explained), Shubnikov/Zamorzaev antisymmetry,
   Janssen–Janner–Ascher, choreographic crystals, the H/K theorem.
-- **Scott–Gray** ([wallpaper-family directory](docs/scott-gray-groups.html)) —
-  precomputed periodic Gray–Scott atlases for the six cyclic-color 442 groups
-  g94–g99 and the six 632 groups g243–g248. Select a symmetry, saved physical
-  parameters and a verified concentration pattern. Numerical admission runs
-  offline; browsing downloads only the selected animation. Both families have
-  independently checked nonuniform periodic examples, with optional generator
-  overlays and WebGL playback. See the [442 solver](docs/scott-gray/SOLVER.md),
-  [632 evidence](docs/scott-gray/p6/EVIDENCE.md), and
-  [632 search API](docs/scott-gray/research/p6/README.md).
+- **Reaction–diffusion** ([directory of the 17 wallpaper groups](docs/scott-gray-groups.html)) —
+  numerically verified time-periodic solutions of the Gray–Scott, complex
+  Ginzburg–Landau and Brusselator equations whose wallpaper-group operations
+  advance the pattern by prescribed fractions of its period: one page per
+  wallpaper group, one entry per forward action of the correspondence (68 in
+  all, 51 with a nonzero time shift), one saved catalog per equation. Every
+  record was re-admitted from its saved bytes (exact affine phase relations,
+  per-channel visibility of every nonzero shift, and unprojected forward
+  integration at two timesteps); browsing downloads only the selected animation.
+  See the [17-group Gray–Scott search](docs/scott-gray/research/wallpaper/README.md),
+  the [Ginzburg–Landau and Brusselator methods](docs/scott-gray/research/equations/README.md),
+  and the original [442 solver notes](docs/scott-gray/SOLVER.md).
 
 ## The computation (`enumerate/`)
 

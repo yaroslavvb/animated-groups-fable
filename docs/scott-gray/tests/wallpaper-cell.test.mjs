@@ -61,8 +61,16 @@ test('phase-tail orientation follows the camera, including unrotated simulation 
   const cells=makeWallpaperCellView({lattice,translations,framing:'cells'});
   const simulation=makeWallpaperCellView({lattice,translations,framing:'simulation'});
   assert.ok(cells.cell.angleDegrees!==0,'exercise an oblique repeat lattice');
-  assert.equal(cells.glyphAngleOffset,cells.cell.angleDegrees);
+  assert.equal(cells.glyphAngleOffset,(lattice==='square'?-1:1)*cells.cell.angleDegrees);
   assert.equal(simulation.glyphAngleOffset,0,'simulation camera does not rotate the field');
+ }
+});
+test('both framings keep the same vertical orientation of the saved field',()=>{
+ for(const lattice of ['square','triangular'])for(const translations of [[],subgroup(31,[[1,6]])]){
+  const cells=makeWallpaperCellView({lattice,translations,framing:'cells',count:2}),simulation=makeWallpaperCellView({lattice,translations,framing:'simulation',count:2});
+  const hand=view=>{const o=view.originalToScreen([0,0]),a=view.originalToScreen([1,0]),b=view.originalToScreen([0,1]);return Math.sign((a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]));};
+  assert.equal(hand(cells),hand(simulation),`${lattice}: the camera must not mirror the field between framings`);
+  if(lattice==='square'&&!translations.length)assert.ok(cells.originalToScreen([0,1])[1]>cells.originalToScreen([0,0])[1],'square lattice y increases down the screen, like the thumbnails');
  }
 });
 test('incomplete and inconsistent translation data is rejected',()=>{

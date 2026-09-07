@@ -1,5 +1,7 @@
 # Numerical data and provenance
 
+> **Scope.** This file documents the 442 manifests and seeds. The 17-group Gray–Scott catalog is `wallpaper-atlas.json` with its movies in `wallpaper-orbits/` (built by `../research/wallpaper/build_catalog.py`, merged by `merge_atlas.py`), the directory counts are `wallpaper-atlas-index.json`, and the Ginzburg–Landau and Brusselator records are `equation-atlas.json` with movies in `equation-orbits/` (built by `../research/equations/build_equation_atlas.py`).
+
 `verified-orbits.json` lists the periodic fields used to build the viewer's
 catalog. Each metadata file under `orbits/` specifies its physical parameters,
 canonical group operations, period, numerical checks, spatial refinement,
