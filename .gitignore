@@ -4,3 +4,4 @@ __pycache__/
 wolfram/out-test/
 wolfram/*.gif
 escher-source/
+.wrangler/
