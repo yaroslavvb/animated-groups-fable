@@ -46,7 +46,71 @@ try {
   assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390, 'mobile controls fit');
   await page.screenshot({path: `/tmp/plume-${label}-mobile.png`});
 
+  // Dragging pans the endless pattern: a 95 CSS px drag (190 device px, a
+  // quarter repeat) shifts the image exactly, and the reset button appears.
   await page.setViewportSize({width: 1280, height: 800});
+  const beforeDrag = await pixels();
+  assert.equal(await page.locator('#reset').isVisible(), false, 'reset hidden at home');
+  await page.mouse.move(640, 300); await page.mouse.down();
+  await page.mouse.move(700, 300, {steps: 4}); await page.mouse.move(735, 300, {steps: 4});
+  await page.waitForTimeout(200); // A pause before release means no fling.
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  const afterDrag = await pixels();
+  assert.ok(averageDifference(beforeDrag, afterDrag, 0, 0, 190, 0, 2200, 1200) < 1.5, 'the pattern moved with the pointer');
+  assert.ok(averageDifference(beforeDrag, afterDrag, 0, 0, 0, 0, 2200, 1200) > 5, 'and it moved');
+  assert.equal(await page.locator('#reset').isVisible(), true, 'reset shown after panning');
+  // A quick release keeps the pattern gliding for a moment, then it settles.
+  await page.mouse.move(640, 500); await page.mouse.down();
+  await page.mouse.move(540, 500, {steps: 3}); await page.mouse.up();
+  await page.waitForTimeout(120);
+  const gliding = await pixels();
+  await page.waitForTimeout(250);
+  assert.ok(averageDifference(gliding, await pixels()) > 3, 'inertia keeps panning after release');
+  await page.waitForTimeout(1600);
+  const settled = await pixels();
+  await page.waitForTimeout(200);
+  assert.equal(averageDifference(settled, await pixels()), 0, 'and it comes to rest');
+  // The wheel zooms in about the pointer (Chrome scales the delta by the device pixel ratio, so only the direction is checked here).
+  await page.keyboard.press('s');
+  await page.mouse.move(640, 400);
+  await page.mouse.wheel(0, -200);
+  await page.waitForTimeout(300);
+  const wheelScale = Number((await page.locator('#stats').textContent()).match(/(\d+) px per repeat/)[1]);
+  assert.ok(wheelScale > 380 && wheelScale < 760, `wheel zoomed in to ${wheelScale} px per repeat`);
+  await page.keyboard.press('0');
+  // The + key zooms 1.25× about the centre: a repeat is then 475 CSS px, 950 device px.
+  await page.keyboard.press('+');
+  await page.waitForTimeout(300);
+  assert.match(await page.locator('#stats').textContent(), /475 px per repeat/);
+  await page.keyboard.press('s');
+  const zoomed = await pixels();
+  assert.ok(averageDifference(zoomed, zoomed, 0, 0, 950, 0, 1000, 1000) < 1, 'zoomed tiling repeats every 950 device px');
+  assert.ok(averageDifference(zoomed, zoomed, 0, 0, 760, 0, 1000, 1000) > 5, 'and no longer every 760');
+  await page.keyboard.press('0');
+  await page.waitForTimeout(300);
+  assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'the 0 key restores the home view exactly');
+  assert.equal(await page.locator('#reset').isVisible(), false);
+  // A two-finger pinch (touch, via the devtools protocol) zooms in as well.
+  const touch = await context.newCDPSession(page);
+  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: true});
+  const fingers = (x1, x2) => [{x: x1, y: 400, id: 1}, {x: x2, y: 400, id: 2}];
+  await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: fingers(600, 680)});
+  for (let i = 1; i <= 5; i++) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: fingers(600 - 8 * i, 680 + 8 * i)});
+  await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: false});
+  await page.waitForTimeout(300);
+  const pinched = await pixels();
+  assert.ok(averageDifference(pinched, pinched, 0, 0, 1520, 0, 1000, 1000) < 1, 'pinching the fingers apart doubled the repeat');
+  assert.equal(await page.locator('#reset').isVisible(), true);
+  await page.locator('#reset').click();
+  await page.waitForTimeout(300);
+  assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'the reset button restores the home view');
+  // The stats readout appears on the S key and names the render size.
+  await page.keyboard.press('s');
+  assert.match(await page.locator('#stats').textContent(), /2560×1600 px · quality 1\.00 · 380 px per repeat · (9|16) taps/);
+  await page.keyboard.press('s');
+  assert.equal(await page.locator('#stats').isVisible(), false);
   const paused = await pixels();
   assert.equal(averageDifference(paused, await pixels()), 0, 'paused frame is stable');
   await page.keyboard.press('Space');
@@ -79,5 +143,5 @@ try {
   await page.goto(`${base}?play=1`); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Pause animation');
   assert.deepEqual(errors, [], 'no browser errors or missing assets');
-  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, pause/play, idle controls, fullscreen, GPU recovery, and reduced motion passed`);
+  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, reset, stats, pause/play, idle controls, fullscreen, GPU recovery, and reduced motion passed`);
 } finally {await browser.close();}

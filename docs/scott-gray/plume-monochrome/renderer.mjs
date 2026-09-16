@@ -1,8 +1,12 @@
 // The saved orbit wallpaper:g6:731aa45654d4d690 is a Gray–Scott rotating wave:
 // 128 frames of a 48×48 periodic lattice over one period. Every frame is
-// spectrally (Dirichlet-kernel) upsampled to 96×96 on load, then the GPU
-// reconstructs each device pixel with periodic Catmull–Rom interpolation in
-// x, y and time. Against the exact band-limited reconstruction of the saved
+// spectrally (Dirichlet-kernel) upsampled to 96×96 on load. Each displayed
+// frame is then reconstructed in two cheap steps: the CPU blends the four
+// nearest saved frames with periodic Catmull–Rom weights into one 96×96
+// texture (37 thousand multiply-adds), and the GPU reconstructs every device
+// pixel from that texture with periodic bicubic Catmull–Rom interpolation:
+// nine bilinear fetches where float textures filter, sixteen point fetches
+// otherwise. Against the exact band-limited reconstruction of the saved
 // samples this differs by under 0.4 of one 8-bit colour level; the original
 // page's bilinear playback differs by up to 9 levels.
 export const INITIAL_PHASE = 0;
@@ -14,6 +18,8 @@ export const LOOP_SECONDS = 8; // The source's speed=1: one period per 8 s.
 export const TILE_PIXELS = 760 / 2;
 export const scaleFor = (width, height) => Math.min(TILE_PIXELS, Math.min(width, height) / 2);
 export const CENTER = [1, 1]; // Lattice coordinates at the screen centre (tiles/2).
+export const MIN_SCALE = 24; // CSS pixels per lattice length; pages raise it to keep a texel per device pixel.
+export const MAX_SCALE = 8000;
 export const GRID_SIZE = 48;
 export const FRAMES = 128;
 export const UPSAMPLE = 2;
@@ -31,55 +37,64 @@ export const VALUE_RANGE = [0.059269435703754425, 0.3834811747074127];
 // period shift.
 export const STYLES = ['ember', 'monochrome'];
 
+export const wrap = value => value - Math.floor(value);
+
 const vertex = `#version 300 es
 void main() {
   vec2 p = vec2(float((gl_VertexID << 1) & 2), float(gl_VertexID & 2));
   gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
 }`;
 
-const fragment = `#version 300 es
+const fragment = `
 precision highp float;
 precision highp int;
-precision highp sampler3D;
-uniform highp sampler3D uField;
+uniform highp sampler2D uFrame;
 uniform vec2 uResolution;
 uniform vec2 uCssSize;
 uniform vec2 uCenter;
-uniform float uTilePixels;
-uniform float uPhase;
+uniform float uScale;
 uniform vec2 uValueRange;
 uniform int uStyle;
 out vec4 color;
-const int N = ${TEXTURE_SIZE};
-const int M = ${FRAMES};
-float node(ivec2 p, int k) {
-  return texelFetch(uField, ivec3(((p % N) + N) % N, ((k % M) + M) % M), 0).r;
+const float N = ${TEXTURE_SIZE}.0;
+// Node i of the periodic lattice is texel i, centred at (i + 0.5) / N; the
+// texture repeats, so no wrapping arithmetic is needed.
+#ifdef TAPS9
+float field(vec2 q) {
+  // Catmull–Rom from nine bilinear fetches: the two positive inner weights of
+  // each axis share one linearly filtered fetch (Sigg & Hadwiger).
+  vec2 p = fract(q) * N;
+  vec2 base = floor(p), f = p - base, c = base + 0.5;
+  vec2 w0 = f * (-0.5 + f * (1.0 - 0.5 * f));
+  vec2 w1 = 1.0 + f * f * (-2.5 + 1.5 * f);
+  vec2 w2 = f * (0.5 + f * (2.0 - 1.5 * f));
+  vec2 w3 = f * f * (-0.5 + 0.5 * f);
+  vec2 w12 = w1 + w2;
+  vec2 t0 = (c - 1.0) / N, t12 = (c + w2 / w12) / N, t3 = (c + 2.0) / N;
+  return (texture(uFrame, vec2(t0.x, t0.y)).r * w0.x + texture(uFrame, vec2(t12.x, t0.y)).r * w12.x + texture(uFrame, vec2(t3.x, t0.y)).r * w3.x) * w0.y
+       + (texture(uFrame, vec2(t0.x, t12.y)).r * w0.x + texture(uFrame, vec2(t12.x, t12.y)).r * w12.x + texture(uFrame, vec2(t3.x, t12.y)).r * w3.x) * w12.y
+       + (texture(uFrame, vec2(t0.x, t3.y)).r * w0.x + texture(uFrame, vec2(t12.x, t3.y)).r * w12.x + texture(uFrame, vec2(t3.x, t3.y)).r * w3.x) * w3.y;
 }
+#else
 vec4 cubicWeights(float t) {
   float t2 = t*t, t3 = t2*t;
   return vec4(-.5*t + t2 - .5*t3, 1.0 - 2.5*t2 + 1.5*t3,
               .5*t + 2.0*t2 - 1.5*t3, -.5*t2 + .5*t3);
 }
-float field(vec2 q, float phase) {
-  // Periodic Catmull–Rom reconstruction in space and time, across repeat
-  // boundaries and across the end of the period.
-  vec2 p = fract(q) * float(N);
-  float t = fract(phase) * float(M);
-  ivec2 base = ivec2(floor(p));
-  int frame = int(floor(t));
-  vec4 wx = cubicWeights(fract(p.x)), wy = cubicWeights(fract(p.y)), wt = cubicWeights(fract(t));
+float field(vec2 q) {
+  // Catmull–Rom from sixteen point fetches.
+  vec2 p = fract(q) * N;
+  vec2 base = floor(p);
+  vec4 wx = cubicWeights(p.x - base.x), wy = cubicWeights(p.y - base.y);
   float value = 0.0;
-  for (int k = 0; k < 4; k++) {
-    float plane = 0.0;
-    for (int j = 0; j < 4; j++) {
-      float row = 0.0;
-      for (int i = 0; i < 4; i++) row += wx[i] * node(base + ivec2(i-1, j-1), frame + k - 1);
-      plane += wy[j] * row;
-    }
-    value += wt[k] * plane;
+  for (int j = 0; j < 4; j++) {
+    float row = 0.0;
+    for (int i = 0; i < 4; i++) row += wx[i] * texture(uFrame, (base + vec2(float(i) - 0.5, float(j) - 0.5)) / N).r;
+    value += wy[j] * row;
   }
   return value;
 }
+#endif
 vec3 ember(float t) {
   // Continuous interpolation of the source's exact ember colour stops.
   if (t < .22) return mix(vec3(18,9,39),vec3(65,12,94),t/.22);
@@ -93,8 +108,8 @@ vec3 ember(float t) {
 void main() {
   vec2 screen = gl_FragCoord.xy / uResolution - .5;
   screen.y = -screen.y; // Lattice y grows downward on screen, as on the source page.
-  vec2 q = uCenter + screen * uCssSize / uTilePixels;
-  float value = field(q, uPhase);
+  vec2 q = uCenter + screen * uCssSize / uScale;
+  float value = field(q);
   if (uStyle == 1) {
     // Black and white only, with the zero contour anti-aliased over one pixel.
     float edge = max(0.5 * fwidth(value), 1e-7);
@@ -145,9 +160,9 @@ export function upsample2(source, n, kernel = halfSampleKernel(n)) {
 }
 
 /** The U channel of every saved frame, spectrally doubled, as one x-fastest
- * volume (x, y, frame) ready for a 3D texture. For the monochrome style the
- * volume holds U(x,t) − U(−x,t) instead; the doubled grid is closed under the
- * half-turn, and trigonometric interpolation commutes with it. */
+ * volume (x, y, frame). For the monochrome style the volume holds
+ * U(x,t) − U(−x,t) instead; the doubled grid is closed under the half-turn,
+ * and trigonometric interpolation commutes with it. */
 export function upsampledVolume(planar, style = 'ember') {
   if (!STYLES.includes(style)) throw new Error(`Unknown style: ${style}`);
   const count = GRID_SIZE * GRID_SIZE, plane = TEXTURE_SIZE * TEXTURE_SIZE, n = TEXTURE_SIZE;
@@ -163,18 +178,131 @@ export function upsampledVolume(planar, style = 'ember') {
   return volume;
 }
 
-/** `tilePixels` is CSS pixels per lattice length: a number, or a function of
- * the canvas CSS width and height evaluated on every draw. */
-export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = CENTER, style = 'ember'} = {}) {
+/** Catmull–Rom weights for a fractional position t in [0, 1). */
+export const cubicWeights = t => [-.5*t + t*t - .5*t*t*t, 1 - 2.5*t*t + 1.5*t*t*t, .5*t + 2*t*t - 1.5*t*t*t, -.5*t*t + .5*t*t*t];
+
+/** The field at one phase: periodic Catmull–Rom over the four nearest saved
+ * frames, written into `out` (one TEXTURE_SIZE² plane). */
+export function frameAt(volume, phase, out = new Float32Array(TEXTURE_SIZE * TEXTURE_SIZE)) {
+  const plane = TEXTURE_SIZE * TEXTURE_SIZE, t = wrap(phase) * FRAMES, k = Math.floor(t);
+  const [w0, w1, w2, w3] = cubicWeights(t - k);
+  const a = ((k - 1) % FRAMES + FRAMES) % FRAMES * plane, b = k % FRAMES * plane, c = (k + 1) % FRAMES * plane, d = (k + 2) % FRAMES * plane;
+  for (let i = 0; i < plane; i++) out[i] = w0 * volume[a + i] + w1 * volume[b + i] + w2 * volume[c + i] + w3 * volume[d + i];
+  return out;
+}
+
+/** The viewport: which lattice point sits at the screen centre and how many
+ * CSS pixels one lattice length spans. Lattice x runs right and y runs down,
+ * the pattern repeats every lattice length, and the centre is kept wrapped
+ * into [0, 1)² so panning never loses precision. `tilePixels` is either a
+ * fixed scale or a function of the canvas CSS size that applies until the
+ * viewer zooms. */
+export function createView({tilePixels = scaleFor, center = CENTER, minScale = MIN_SCALE, maxScale = MAX_SCALE} = {}) {
+  if (!(minScale > 0 && maxScale >= minScale)) throw new Error('The zoom limits must be positive and ordered.');
+  const fallback = typeof tilePixels === 'function' ? tilePixels : () => tilePixels;
+  const clamp = scale => Math.min(maxScale, Math.max(minScale, scale));
+  const initialScale = typeof tilePixels === 'number' ? clamp(tilePixels) : null;
+  const home = [wrap(center[0]), wrap(center[1])];
+  let userScale = initialScale;
+  const current = [...home];
+  const view = {
+    get center() { return [...current]; },
+    get minScale() { return minScale; },
+    get maxScale() { return maxScale; },
+    get zoomed() { return userScale !== initialScale; },
+    scale(width, height) { return userScale ?? clamp(fallback(width, height)); },
+    isHome() { return userScale === initialScale && current[0] === home[0] && current[1] === home[1]; },
+    reset() { userScale = initialScale; current[0] = home[0]; current[1] = home[1]; },
+    latticeAt([x, y], width, height) {
+      const s = view.scale(width, height);
+      return [current[0] + (x - width / 2) / s, current[1] + (y - height / 2) / s];
+    },
+    /** Shows lattice point `lattice` at CSS pixel `point`, optionally at a new scale. */
+    pin(lattice, [x, y], scale, width, height) {
+      if (scale !== undefined) userScale = clamp(scale);
+      const s = view.scale(width, height);
+      current[0] = wrap(lattice[0] - (x - width / 2) / s);
+      current[1] = wrap(lattice[1] - (y - height / 2) / s);
+    },
+    panBy(dx, dy, width, height) {
+      const s = view.scale(width, height);
+      current[0] = wrap(current[0] - dx / s);
+      current[1] = wrap(current[1] - dy / s);
+    },
+    zoomAt(factor, point, width, height) {
+      view.pin(view.latticeAt(point, width, height), point, view.scale(width, height) * factor, width, height);
+    },
+    snapshot() { return {center: [...current], scale: userScale}; },
+    restore({center: [x, y], scale}) { current[0] = wrap(x); current[1] = wrap(y); userScale = scale === null ? null : clamp(scale); },
+  };
+  return view;
+}
+
+/** Keeps continuous playback at the display's cadence by trading render
+ * resolution. `display` seeds the display's frame interval in ms (measured
+ * from idle animation frames before rendering starts). When frames arrive
+ * late it lowers the quality factor a step at a time and keeps each step only
+ * if the cadence actually improves, so a display that simply runs at 60 Hz is
+ * not mistaken for a slow GPU; a probe that continuous drawing abandons is
+ * reverted. `probeSoon()` asks for one such trial at the next window (at most
+ * every 30 s), used when a touch begins because phones raise their refresh
+ * rate under a finger. Quality climbs back once frames stay on time. */
+export function createGovernor({enabled = true, step = 0.85, floor = 0.5, window = 45, display = null} = {}) {
+  let quality = 1, last = null, changed = 0, probe = null, ceiling = 1, ceilingUntil = 0, blockedUntil = 0, wanted = false, lastRequest = -Infinity;
+  if (display !== null && !(display >= 4 && display <= 200)) display = null;
+  const deltas = [];
+  const revert = now => { quality = probe.quality; probe = null; blockedUntil = now + 4000; changed = now; };
+  const governor = {
+    get quality() { return quality; },
+    get display() { return display; },
+    get enabled() { return enabled; },
+    probeSoon(now) { if (enabled && now - lastRequest >= 30000) { wanted = true; lastRequest = now; } },
+    tick(now, continuous) {
+      if (!enabled) return;
+      if (!continuous) { if (probe) revert(now); last = null; deltas.length = 0; return; }
+      if (last !== null) { const dt = now - last; if (dt > 2 && dt < 200) deltas.push(dt); }
+      last = now;
+      if (deltas.length < window) return;
+      const sorted = deltas.slice().sort((a, b) => a - b);
+      const fast = sorted[Math.floor(sorted.length * 0.2)];
+      const mean = deltas.reduce((a, b) => a + b, 0) / deltas.length;
+      deltas.length = 0;
+      display = Math.max(4, display === null ? fast : Math.min(display, fast));
+      if (probe) {
+        if (mean < 0.85 * probe.mean) { probe = null; } // The lower resolution paid off: keep it.
+        else if (probe.steps < 2 && quality > floor) { quality = Math.max(floor, quality * step); probe.steps++; changed = now; return; }
+        else { display = Math.max(display, mean); revert(now); return; }
+      }
+      const late = mean > 1.35 * display;
+      if ((late || wanted) && quality > floor && now >= blockedUntil) {
+        wanted = false;
+        if (late) { ceiling = quality; ceilingUntil = now + 20000; }
+        probe = {quality, mean, steps: 1};
+        quality = Math.max(floor, quality * step); changed = now;
+      } else if (!late && quality < 1 && now - changed > 2500 && mean <= 1.1 * display) {
+        wanted = false;
+        const next = Math.min(1, quality / step);
+        if (next <= ceiling || now > ceilingUntil) { quality = next; changed = now; }
+      } else wanted = false;
+    },
+  };
+  return governor;
+}
+
+/** A WebGL 2 renderer for the saved orbit on `canvas`. Options: `style`
+ * ('ember' or 'monochrome'), `view` (from createView; one is created from
+ * `tilePixels`/`center` otherwise), `pixelRatio` (pins the device pixel ratio
+ * and disables adaptive resolution), `adaptive` (default true) and `display`
+ * (the display's frame interval in ms, if measured). */
+export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = CENTER, style = 'ember', view = createView({tilePixels, center}), pixelRatio = null, adaptive = true, display = null} = {}) {
   if (!STYLES.includes(style)) throw new Error(`Unknown style: ${style}`);
   if (planar.length !== FIELD_BYTES / 4 || !planar.every(Number.isFinite)) {
     throw new Error('The pattern data is incomplete. Please reload.');
   }
-  const scale = typeof tilePixels === 'function' ? tilePixels : () => tilePixels;
-  if (!(scale(1000, 1000) > 0) || !Number.isFinite(scale(1000, 1000))) throw new Error('The scale must be a positive number of pixels per lattice length.');
+  if (pixelRatio !== null && !(pixelRatio > 0 && Number.isFinite(pixelRatio))) throw new Error('The pixel ratio must be a positive number.');
   const gl = canvas.getContext('webgl2', {alpha: false, antialias: false, depth: false, stencil: false, powerPreference: 'high-performance'});
   if (!gl) throw new Error('WebGL 2 is unavailable. Enable hardware acceleration or open this page in a recent browser.');
-  if (gl.getParameter(gl.MAX_3D_TEXTURE_SIZE) < Math.max(TEXTURE_SIZE, FRAMES)) throw new Error('This GPU cannot hold the animation volume.');
+  const linear = !!gl.getExtension('OES_texture_float_linear');
   function compile(type, source) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, source); gl.compileShader(shader);
@@ -185,46 +313,66 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
     return shader;
   }
   const program = gl.createProgram();
-  const shaders = [compile(gl.VERTEX_SHADER, vertex), compile(gl.FRAGMENT_SHADER, fragment)];
+  const shaders = [compile(gl.VERTEX_SHADER, vertex), compile(gl.FRAGMENT_SHADER, `#version 300 es\n${linear ? '#define TAPS9\n' : ''}${fragment}`)];
   for (const shader of shaders) gl.attachShader(program, shader);
   gl.linkProgram(program);
   for (const shader of shaders) gl.deleteShader(shader);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Could not start the WebGL renderer.');
   const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
   gl.useProgram(program);
-  const texture = gl.createTexture(); gl.bindTexture(gl.TEXTURE_3D, texture);
-  gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_S, gl.REPEAT);
-  gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.REPEAT);
-  gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.REPEAT);
+  const volume = upsampledVolume(planar, style);
+  const frame = new Float32Array(TEXTURE_SIZE * TEXTURE_SIZE);
+  // Two textures alternate so an upload never waits for the previous draw.
+  const textures = [0, 1].map(() => {
+    const texture = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, linear ? gl.LINEAR : gl.NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, TEXTURE_SIZE, TEXTURE_SIZE, 0, gl.RED, gl.FLOAT, frameAt(volume, 0, frame));
+    return texture;
+  });
+  if (gl.getError() !== gl.NO_ERROR) throw new Error('The GPU rejected the pattern texture.');
+  let textureIndex = 0, lastPhase = 0;
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-  gl.texImage3D(gl.TEXTURE_3D, 0, gl.R32F, TEXTURE_SIZE, TEXTURE_SIZE, FRAMES, 0, gl.RED, gl.FLOAT, upsampledVolume(planar, style));
-  if (gl.getError() !== gl.NO_ERROR) throw new Error('The GPU rejected the animation volume.');
-  gl.uniform1i(gl.getUniformLocation(program, 'uField'), 0);
-  gl.uniform2f(gl.getUniformLocation(program, 'uCenter'), center[0], center[1]);
+  gl.uniform1i(gl.getUniformLocation(program, 'uFrame'), 0);
   gl.uniform2f(gl.getUniformLocation(program, 'uValueRange'), VALUE_RANGE[0], VALUE_RANGE[1] - VALUE_RANGE[0]);
   gl.uniform1i(gl.getUniformLocation(program, 'uStyle'), STYLES.indexOf(style));
-  const tileLocation = gl.getUniformLocation(program, 'uTilePixels');
   const resolution = gl.getUniformLocation(program, 'uResolution');
   const cssSize = gl.getUniformLocation(program, 'uCssSize');
-  const phaseLocation = gl.getUniformLocation(program, 'uPhase');
+  const centerLocation = gl.getUniformLocation(program, 'uCenter');
+  const scaleLocation = gl.getUniformLocation(program, 'uScale');
   const maxSize = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
+  const governor = createGovernor({enabled: adaptive && pixelRatio === null, display});
   gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
   return {
-    style,
-    draw(phase) {
+    style, view, taps: linear ? 9 : 16,
+    get quality() { return governor.quality; },
+    get display() { return governor.display; },
+    /** Call when a touch begins: the governor then tries a lower resolution once, in case the display sped up. */
+    touched() { governor.probeSoon(performance.now()); },
+    /** Draws the pattern at `phase`. Pass continuous=true from an animation
+     * loop so the adaptive resolution can read the frame cadence. */
+    draw(phase, {continuous = false} = {}) {
       const width = canvas.clientWidth, height = canvas.clientHeight;
-      gl.uniform1f(tileLocation, scale(width, height));
-      // Native device pixels, with hardware limits and a 32-megapixel ceiling.
-      const ratio = Math.min(devicePixelRatio || 1, maxSize / width, maxSize / height, Math.sqrt(33554432 / (width * height)));
+      if (!(width > 0 && height > 0)) return;
+      governor.tick(performance.now(), continuous);
+      // Native device pixels (times the quality factor), with hardware limits and a 32-megapixel ceiling.
+      const ratio = Math.min((pixelRatio ?? devicePixelRatio ?? 1) * governor.quality, maxSize / width, maxSize / height, Math.sqrt(33554432 / (width * height)));
       const w = Math.max(1, Math.round(width * ratio)), h = Math.max(1, Math.round(height * ratio));
       if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
       gl.viewport(0, 0, w, h);
+      const p = wrap(phase);
+      if (p !== lastPhase) {
+        textureIndex ^= 1; gl.bindTexture(gl.TEXTURE_2D, textures[textureIndex]);
+        gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, TEXTURE_SIZE, TEXTURE_SIZE, gl.RED, gl.FLOAT, frameAt(volume, p, frame));
+        lastPhase = p;
+      }
+      const [cx, cy] = view.center;
       gl.uniform2f(resolution, w, h); gl.uniform2f(cssSize, width, height);
-      gl.uniform1f(phaseLocation, ((phase % 1) + 1) % 1);
+      gl.uniform2f(centerLocation, cx, cy); gl.uniform1f(scaleLocation, view.scale(width, height));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
-    dispose() { gl.deleteTexture(texture); gl.deleteProgram(program); gl.deleteVertexArray(vao); },
+    dispose() { for (const texture of textures) gl.deleteTexture(texture); gl.deleteProgram(program); gl.deleteVertexArray(vao); },
   };
 }

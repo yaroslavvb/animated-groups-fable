@@ -12,21 +12,30 @@ computation are required. Cloudflare Pages can deploy the folder directly.
 (2,359,296 bytes). Its SHA-256 is
 `731aa45654d4d690f202dc48818e47c8fe023bfd5462284a8601f4bed6563483`.
 
-Rendering, compared with the source page's bilinear playback of linearly
-blended frames:
+Rendering (WebGL 2), compared with the source page's bilinear playback of
+linearly blended frames:
 
 - On load, every frame's U channel is doubled to 96×96 by exact trigonometric
   (Dirichlet-kernel) interpolation, the band-limited reconstruction of the
   periodic samples. The saved samples are kept unchanged.
-- The GPU holds all 128 upsampled frames in one float 3D texture and
-  reconstructs each device pixel with periodic Catmull–Rom interpolation in x,
-  y and time, across repeat boundaries and across the end of the period.
+- Each displayed frame is blended on the CPU from the four nearest saved
+  frames with periodic Catmull–Rom weights (37 thousand multiply-adds) into a
+  96×96 float texture. The GPU then reconstructs every device pixel from that
+  texture with periodic bicubic Catmull–Rom interpolation: nine bilinear
+  fetches where float textures filter (`OES_texture_float_linear`), sixteen
+  point fetches otherwise. That is the whole per-pixel cost, so phones can
+  hold their display's refresh rate.
 - Against the exact band-limited reconstruction of the saved samples, the
   displayed value differs by under 0.4 of one 8-bit colour level (the source
   page: up to 9 levels). Temporal Catmull–Rom at half the saved frame rate
   differs from the skipped frames by under 0.2 of a level.
 - The original ember colour stops and the orbit's `ranges.u` normalisation are
   applied continuously, at native device pixels, with sub-byte dithering.
+- Adaptive resolution: when continuous frames arrive later than the display's
+  cadence (measured from idle animation frames while the pattern downloads),
+  the render resolution is lowered a step at a time, each step kept only if
+  the cadence actually improves, and raised again once frames stay on time.
+  `?dpr=1` (or any ratio) pins the resolution and turns this off.
 
 Spatial and temporal interpolation improve display quality; they do not claim
 a higher-resolution PDE solution.
@@ -39,10 +48,19 @@ length>` fixes the scale. The loop takes eight seconds (the source's speed=1)
 and begins at phase 0. Screens with reduced-motion enabled start paused.
 Optional `?play=0&phase=0.25` parameters support reproducible still views.
 
+The pattern is endless: drag it with a finger or the mouse (a quick release
+keeps it gliding), pinch or scroll to zoom about the fingers or pointer, use
+the arrow keys to pan and + / − to zoom, and press 0 or the recentre button
+to return to the home view. Zooming out stops where one texel of the 96-node
+grid spans one device pixel; zooming in stops at 8000 CSS pixels per repeat.
+`?x=&y=` place a lattice point at the screen centre.
+
 Click Fullscreen, double-click the pattern, or press F. Space plays/pauses.
-Controls and cursor hide after inactivity. GPU context restoration resumes the
-pattern; hidden tabs suspend rendering. Fullscreen playback requests a screen
-wake lock where supported.
+Controls and cursor hide after inactivity. Pressing S, or tapping the name in
+the control bar, shows frame statistics: frames per second, render size,
+quality factor, pixels per repeat, taps per pixel and the display cadence.
+GPU context restoration resumes the pattern; hidden tabs suspend rendering.
+Fullscreen playback requests a screen wake lock where supported.
 
 Twitter/X sharing uses `social-preview.jpg` (1200×630) with large-summary and
 Open Graph metadata. `plume-preview.mp4` is an eight-second,

@@ -1,10 +1,11 @@
 # Plume Monochrome
 
-Plume in black and white only. Same verified orbit, same viewer, same
-framing and eight-second loop as `../plume/` (see its README for the data
-provenance, interpolation and controls); `app.mjs`, `renderer.mjs` and
-`field.f32` are byte-identical copies, and `index.html` selects the style with
-`data-style="monochrome"` on the canvas.
+Plume in black and white only. Same verified orbit, same WebGL 2 viewer with
+endless finger panning, pinch and scroll zoom, adaptive resolution and frame
+statistics, same framing and eight-second loop as `../plume/` (see its README
+for the data provenance, interpolation and controls); `app.mjs`,
+`renderer.mjs` and `field.f32` are byte-identical copies, and `index.html`
+selects the style with `data-style="monochrome"` on the canvas.
 
 Instead of colouring U, the page draws the sign of
 
@@ -12,8 +13,9 @@ Instead of colouring U, the page draws the sign of
 
 white where the pattern exceeds its own half-turn image and black where it
 falls short, with the zero contour anti-aliased over one device pixel. The
-half-turn is taken about the lattice origin, which the source page places at
-the corners of the displayed 2 L × 2 L window.
+half-turn is taken about the lattice origin, which the home view places at
+the screen centre (and, one repeat away, at the corners of the source page's
+2 L × 2 L window).
 
 The saved orbit satisfies U(−x, t) = U(x, t + T/2) and U(Rx, t + T/4) = U(x, t)
 for the quarter turn R (both hold exactly on the saved samples; see the tests).
