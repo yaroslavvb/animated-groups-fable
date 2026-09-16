@@ -1,5 +1,5 @@
 /** Export the actual WebGL renderer as a still and a seamless uploadable MP4.
- * Usage: node tools/export_ember_social.mjs [viewer URL] [output directory] [loops] [video name]
+ * Usage: node tools/export_ember_social.mjs [viewer URL] [output directory] [loops] [video name] [fps]
  * The viewer must export createRenderer, INITIAL_PHASE and LOOP_SECONDS from
  * ./renderer.mjs and load ./field.f32, as the ember and plume viewers do.
  * Requires Playwright/Chrome and ffmpeg. No realtime screen recording is used:
@@ -15,6 +15,7 @@ const url = process.argv[2] ?? 'http://localhost:8934/scott-gray/ember/';
 const output = resolve(process.argv[3] ?? 'docs/scott-gray/ember');
 const loops = Math.max(1, Math.round(Number(process.argv[4] ?? 2)));
 const videoName = process.argv[5] ?? 'ember-preview.mp4';
+const fps = Math.max(1, Math.round(Number(process.argv[6] ?? 30)));
 const temporary = await mkdtemp(join(tmpdir(), 'ember-social-'));
 await mkdir(output, {recursive: true});
 function ffmpeg(args) {
@@ -48,7 +49,7 @@ try {
     };
     return {phase: INITIAL_PHASE, seconds: LOOP_SECONDS};
   });
-  const fps = 30, frameCount = fps * seconds;
+  const frameCount = fps * seconds;
   const encoder = ffmpeg(['-f', 'image2pipe', '-framerate', String(fps), '-i', 'pipe:0', '-an',
     '-vf', 'scale=out_color_matrix=bt709', '-c:v', 'libx264', '-preset', 'slow', '-crf', '18',
     '-pix_fmt', 'yuv420p', '-profile:v', 'high', '-level:v', '4.1', '-maxrate', '12M', '-bufsize', '24M',
@@ -63,5 +64,5 @@ try {
   loop.stdin.end(); await loop.completion;
   await page.setViewportSize({width: 1200, height: 630});
   await writeFile(join(output, 'social-preview.jpg'), Buffer.from(await page.evaluate(phase => window.exportFrame(phase, 'image/jpeg'), phase), 'base64'));
-  console.log(`Exported ${seconds * loops}-second 1080×1080 30fps ${videoName} and 1200×630 social-preview.jpg`);
+  console.log(`Exported ${seconds * loops}-second 1080×1080 ${fps}fps ${videoName} and 1200×630 social-preview.jpg`);
 } finally { await browser.close(); await rm(temporary, {recursive: true, force: true}); }
