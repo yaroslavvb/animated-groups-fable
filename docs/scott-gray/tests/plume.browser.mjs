@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 const runtime = '/Users/yaroslavvb/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ?? `${runtime}playwright/index.mjs`);
 const {PNG} = (await import(process.env.PNGJS_MODULE ?? `${runtime}pngjs/lib/png.js`)).default;
-const base = (process.argv[2] ?? 'http://localhost:8934/scott-gray/p2-ember/').replace(/\/?$/, '/');
+const base = (process.argv[2] ?? 'http://localhost:8934/scott-gray/plume/').replace(/\/?$/, '/');
 const label = process.argv[3] ?? 'local';
 const browser = await chromium.launch({channel: 'chrome', headless: true});
 const errors = [];
@@ -25,7 +25,7 @@ try {
   assert.equal(await page.locator('#notice').isVisible(), false);
   const large = await pixels();
   assert.ok(new Set(large.data).size > 200, 'nonblank rendered image');
-  await page.screenshot({path: `/tmp/p2-ember-${label}-desktop.png`});
+  await page.screenshot({path: `/tmp/plume-${label}-desktop.png`});
 
   // Resizing must reveal/crop repeats, without stretching or zooming them.
   await page.setViewportSize({width: 760, height: 760});
@@ -44,7 +44,7 @@ try {
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth && document.documentElement.scrollHeight === innerHeight), 'mobile fills viewport without scrolling');
   const bounds = await page.locator('#controls').boundingBox();
   assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390, 'mobile controls fit');
-  await page.screenshot({path: `/tmp/p2-ember-${label}-mobile.png`});
+  await page.screenshot({path: `/tmp/plume-${label}-mobile.png`});
 
   await page.setViewportSize({width: 1280, height: 800});
   const paused = await pixels();

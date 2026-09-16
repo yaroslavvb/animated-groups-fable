@@ -13,6 +13,8 @@ let playing = params.has('play') ? params.get('play') !== '0' : !matchMedia('(pr
 // Optional scale=<CSS pixels per lattice length> fixes the scale for reproducible views.
 const requestedScale = Number(params.get('scale'));
 const tilePixels = params.has('scale') && requestedScale >= 40 && requestedScale <= 4000 ? requestedScale : scaleFor;
+// The page picks the style: data-style="monochrome" on the canvas, else ember.
+const style = canvas.dataset.style || 'ember';
 let renderer, field, frame = 0, lastTime = null, idleTimer, wakeLock;
 
 function showControls() {
@@ -110,7 +112,7 @@ canvas.addEventListener('webglcontextrestored', () => start());
 
 function start() {
   try {
-    renderer = createRenderer(canvas, field, {tilePixels});
+    renderer = createRenderer(canvas, field, {tilePixels, style});
     renderer.draw(phase); lastTime = null;
     canvas.dataset.ready = 'true';
     notice.hidden = true; pauseButton.disabled = false; fullscreenButton.disabled = false;
@@ -120,7 +122,7 @@ function start() {
 
 try {
   const response = await fetch('./field.f32');
-  if (!response.ok) throw new Error('The rotating wave could not load. Please reload to try again.');
+  if (!response.ok) throw new Error('The pattern could not load. Please reload to try again.');
   const bytes = await response.arrayBuffer();
   if (bytes.byteLength !== FIELD_BYTES) throw new Error('The pattern download is incomplete. Please reload.');
   const view = new DataView(bytes);

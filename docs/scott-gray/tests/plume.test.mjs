@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import test from 'node:test';
-import {FIELD_BYTES, FRAMES, GRID_SIZE, INITIAL_PHASE, LOOP_SECONDS, TEXTURE_SIZE, TILE_PIXELS, VALUE_RANGE, halfSampleKernel, scaleFor, upsample2, upsampledVolume} from '../p2-ember/renderer.mjs';
+import {FIELD_BYTES, FRAMES, GRID_SIZE, INITIAL_PHASE, LOOP_SECONDS, TEXTURE_SIZE, TILE_PIXELS, VALUE_RANGE, halfSampleKernel, scaleFor, upsample2, upsampledVolume} from '../plume/renderer.mjs';
 
 const saved = await readFile(new URL('../data/orbits/g96-F0p00395000-k0p02000000-N48-M128.f32', import.meta.url));
-const shipped = await readFile(new URL('../p2-ember/field.f32', import.meta.url));
+const shipped = await readFile(new URL('../plume/field.f32', import.meta.url));
 const planar = new Float32Array(shipped.buffer, shipped.byteOffset, shipped.byteLength / 4);
 const count = GRID_SIZE * GRID_SIZE;
 const at = (frame, x, y) => planar[frame * 2 * count + (((y % GRID_SIZE) + GRID_SIZE) % GRID_SIZE) * GRID_SIZE + (((x % GRID_SIZE) + GRID_SIZE) % GRID_SIZE)];

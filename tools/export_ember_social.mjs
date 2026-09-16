@@ -1,7 +1,7 @@
 /** Export the actual WebGL renderer as a still and a seamless uploadable MP4.
  * Usage: node tools/export_ember_social.mjs [viewer URL] [output directory] [loops] [video name]
  * The viewer must export createRenderer, INITIAL_PHASE and LOOP_SECONDS from
- * ./renderer.mjs and load ./field.f32, as the ember and p2-ember viewers do.
+ * ./renderer.mjs and load ./field.f32, as the ember and plume viewers do.
  * Requires Playwright/Chrome and ffmpeg. No realtime screen recording is used:
  * every frame is evaluated at its exact phase so slow exports cannot stutter.
  */

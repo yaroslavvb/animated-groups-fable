@@ -21,6 +21,15 @@ export const TEXTURE_SIZE = GRID_SIZE * UPSAMPLE;
 export const FIELD_BYTES = FRAMES * 2 * GRID_SIZE * GRID_SIZE * 4;
 // record.ranges.u of the saved orbit: the same normalisation as the source page.
 export const VALUE_RANGE = [0.059269435703754425, 0.3834811747074127];
+// Plume shows U with the ember palette. Plume Monochrome shows the sign of
+// w(x,t) = U(x,t) − U(−x,t), the part of U that the half-turn reverses: white
+// where U exceeds its half-turn image, black where it falls short. Because the
+// orbit satisfies U(−x,t) = U(x,t+T/2) and U(Rx,t+T/4) = U(x,t) for the
+// quarter-turn R, the monochrome animation is exactly reproduced by a quarter
+// turn with a quarter-period shift, and exactly colour-reversed by a half
+// turn, by a half-period shift, or by a quarter turn with a three-quarter
+// period shift.
+export const STYLES = ['ember', 'monochrome'];
 
 const vertex = `#version 300 es
 void main() {
@@ -39,6 +48,7 @@ uniform vec2 uCenter;
 uniform float uTilePixels;
 uniform float uPhase;
 uniform vec2 uValueRange;
+uniform int uStyle;
 out vec4 color;
 const int N = ${TEXTURE_SIZE};
 const int M = ${FRAMES};
@@ -85,6 +95,12 @@ void main() {
   screen.y = -screen.y; // Lattice y grows downward on screen, as on the source page.
   vec2 q = uCenter + screen * uCssSize / uTilePixels;
   float value = field(q, uPhase);
+  if (uStyle == 1) {
+    // Black and white only, with the zero contour anti-aliased over one pixel.
+    float edge = max(0.5 * fwidth(value), 1e-7);
+    color = vec4(vec3(smoothstep(-edge, edge, value)), 1.0);
+    return;
+  }
   float t = clamp((value - uValueRange.x) / uValueRange.y, 0.0, 1.0);
   // Sub-byte, stationary dither reduces banding without animation noise.
   float dither = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(.06711056,.00583715)))) - .5;
@@ -129,17 +145,28 @@ export function upsample2(source, n, kernel = halfSampleKernel(n)) {
 }
 
 /** The U channel of every saved frame, spectrally doubled, as one x-fastest
- * volume (x, y, frame) ready for a 3D texture. */
-export function upsampledVolume(planar) {
-  const count = GRID_SIZE * GRID_SIZE, plane = TEXTURE_SIZE * TEXTURE_SIZE;
+ * volume (x, y, frame) ready for a 3D texture. For the monochrome style the
+ * volume holds U(x,t) − U(−x,t) instead; the doubled grid is closed under the
+ * half-turn, and trigonometric interpolation commutes with it. */
+export function upsampledVolume(planar, style = 'ember') {
+  if (!STYLES.includes(style)) throw new Error(`Unknown style: ${style}`);
+  const count = GRID_SIZE * GRID_SIZE, plane = TEXTURE_SIZE * TEXTURE_SIZE, n = TEXTURE_SIZE;
   const kernel = halfSampleKernel(GRID_SIZE), volume = new Float32Array(plane * FRAMES);
-  for (let k = 0; k < FRAMES; k++) volume.set(upsample2(planar.subarray(k * 2 * count, k * 2 * count + count), GRID_SIZE, kernel), k * plane);
+  for (let k = 0; k < FRAMES; k++) {
+    const frame = upsample2(planar.subarray(k * 2 * count, k * 2 * count + count), GRID_SIZE, kernel);
+    if (style === 'monochrome') {
+      const turned = new Float32Array(plane);
+      for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) turned[y * n + x] = frame[y * n + x] - frame[((n - y) % n) * n + (n - x) % n];
+      volume.set(turned, k * plane);
+    } else volume.set(frame, k * plane);
+  }
   return volume;
 }
 
 /** `tilePixels` is CSS pixels per lattice length: a number, or a function of
  * the canvas CSS width and height evaluated on every draw. */
-export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = CENTER} = {}) {
+export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = CENTER, style = 'ember'} = {}) {
+  if (!STYLES.includes(style)) throw new Error(`Unknown style: ${style}`);
   if (planar.length !== FIELD_BYTES / 4 || !planar.every(Number.isFinite)) {
     throw new Error('The pattern data is incomplete. Please reload.');
   }
@@ -172,11 +199,12 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
   gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_T, gl.REPEAT);
   gl.texParameteri(gl.TEXTURE_3D, gl.TEXTURE_WRAP_R, gl.REPEAT);
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-  gl.texImage3D(gl.TEXTURE_3D, 0, gl.R32F, TEXTURE_SIZE, TEXTURE_SIZE, FRAMES, 0, gl.RED, gl.FLOAT, upsampledVolume(planar));
+  gl.texImage3D(gl.TEXTURE_3D, 0, gl.R32F, TEXTURE_SIZE, TEXTURE_SIZE, FRAMES, 0, gl.RED, gl.FLOAT, upsampledVolume(planar, style));
   if (gl.getError() !== gl.NO_ERROR) throw new Error('The GPU rejected the animation volume.');
   gl.uniform1i(gl.getUniformLocation(program, 'uField'), 0);
   gl.uniform2f(gl.getUniformLocation(program, 'uCenter'), center[0], center[1]);
   gl.uniform2f(gl.getUniformLocation(program, 'uValueRange'), VALUE_RANGE[0], VALUE_RANGE[1] - VALUE_RANGE[0]);
+  gl.uniform1i(gl.getUniformLocation(program, 'uStyle'), STYLES.indexOf(style));
   const tileLocation = gl.getUniformLocation(program, 'uTilePixels');
   const resolution = gl.getUniformLocation(program, 'uResolution');
   const cssSize = gl.getUniformLocation(program, 'uCssSize');
@@ -184,6 +212,7 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
   const maxSize = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
   gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
   return {
+    style,
     draw(phase) {
       const width = canvas.clientWidth, height = canvas.clientHeight;
       gl.uniform1f(tileLocation, scale(width, height));

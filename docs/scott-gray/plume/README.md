@@ -1,4 +1,4 @@
-# Rotating wave (p2 ember)
+# Plume
 
 A self-contained WebGL 2 viewer for `wallpaper:g6:731aa45654d4d690`, the
 "Rotating wave · F 0.00395 · k 0.02" Gray–Scott orbit shown on the 2222 (p2)
@@ -45,13 +45,13 @@ pattern; hidden tabs suspend rendering. Fullscreen playback requests a screen
 wake lock where supported.
 
 Twitter/X sharing uses `social-preview.jpg` (1200×630) with large-summary and
-Open Graph metadata. `rotating-wave-preview.mp4` is an eight-second,
+Open Graph metadata. `plume-preview.mp4` is an eight-second,
 1080×1080, 30fps H.264 upload of one seamless loop with no controls or audio.
 Both come directly from the actual WebGL renderer. Regenerate them while the
 local server is running:
 
 ```sh
-node tools/export_ember_social.mjs http://localhost:8934/scott-gray/p2-ember/ docs/scott-gray/p2-ember 1 rotating-wave-preview.mp4
+node tools/export_ember_social.mjs http://localhost:8934/scott-gray/plume/ docs/scott-gray/plume 1 plume-preview.mp4
 ```
 
 The exporter evaluates exact animation phases, avoiding realtime capture jitter.
@@ -59,8 +59,8 @@ The exporter evaluates exact animation phases, avoiding realtime capture jitter.
 Validation from the repository root (Node 20+):
 
 ```sh
-node --test docs/scott-gray/tests/p2-ember.test.mjs
-node docs/scott-gray/tests/p2-ember.browser.mjs http://localhost:8934/scott-gray/p2-ember/
+node --test docs/scott-gray/tests/plume.test.mjs
+node docs/scott-gray/tests/plume.browser.mjs http://localhost:8934/scott-gray/plume/
 ```
 
 The browser check requires Playwright with Chrome installed. Set
@@ -68,5 +68,5 @@ The browser check requires Playwright with Chrome installed. Set
 Codex runtime. Deploy with Wrangler using your authenticated personal account:
 
 ```sh
-npx wrangler pages deploy docs/scott-gray/p2-ember --project-name p2-ember --branch main
+npx wrangler pages deploy docs/scott-gray/plume --project-name plume-wave --branch main
 ```
