@@ -52,6 +52,7 @@ uniform highp sampler2D uFrame;
 uniform vec2 uResolution;
 uniform vec2 uCssSize;
 uniform vec2 uCenter;
+uniform vec2 uRotation; // (cos, sin) of the screen-to-lattice rotation, the inverse of the view's turn
 uniform float uScale;
 uniform vec2 uValueRange;
 uniform int uStyle;
@@ -108,7 +109,8 @@ vec3 ember(float t) {
 void main() {
   vec2 screen = gl_FragCoord.xy / uResolution - .5;
   screen.y = -screen.y; // Lattice y grows downward on screen, as on the source page.
-  vec2 q = uCenter + screen * uCssSize / uScale;
+  vec2 o = screen * uCssSize / uScale;
+  vec2 q = uCenter + vec2(uRotation.x * o.x - uRotation.y * o.y, uRotation.y * o.x + uRotation.x * o.y);
   float value = field(q);
   if (uStyle == 1) {
     // Black and white only, with the zero contour anti-aliased over one pixel.
@@ -191,49 +193,66 @@ export function frameAt(volume, phase, out = new Float32Array(TEXTURE_SIZE * TEX
   return out;
 }
 
-/** The viewport: which lattice point sits at the screen centre and how many
- * CSS pixels one lattice length spans. Lattice x runs right and y runs down,
- * the pattern repeats every lattice length, and the centre is kept wrapped
- * into [0, 1)² so panning never loses precision. `tilePixels` is either a
- * fixed scale or a function of the canvas CSS size that applies until the
- * viewer zooms. */
-export function createView({tilePixels = scaleFor, center = CENTER, minScale = MIN_SCALE, maxScale = MAX_SCALE} = {}) {
+/** Angles are kept in (−π, π]. */
+export const wrapAngle = angle => { const a = angle - 2 * Math.PI * Math.floor((angle + Math.PI) / (2 * Math.PI)); return a <= -Math.PI ? a + 2 * Math.PI : a; };
+/** Snaps an angle to the nearest quarter turn when within `tolerance` (4° by default), since the lattice is square. */
+export function snapAngle(angle, tolerance = Math.PI / 45) {
+  const quarter = Math.round(angle / (Math.PI / 2)) * (Math.PI / 2);
+  return Math.abs(wrapAngle(angle - quarter)) <= tolerance ? wrapAngle(quarter) : angle;
+}
+
+/** The viewport: which lattice point sits at the screen centre, how many CSS
+ * pixels one lattice length spans, and how far the pattern is turned on
+ * screen (radians, clockwise positive since screen y runs down). Lattice x
+ * runs right and y runs down at angle 0, the pattern repeats every lattice
+ * length, and the centre is kept wrapped into [0, 1)² so panning never loses
+ * precision. `tilePixels` is either a fixed scale or a function of the canvas
+ * CSS size that applies until the viewer zooms. */
+export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, minScale = MIN_SCALE, maxScale = MAX_SCALE} = {}) {
   if (!(minScale > 0 && maxScale >= minScale)) throw new Error('The zoom limits must be positive and ordered.');
+  if (!Number.isFinite(angle)) throw new Error('The angle must be finite.');
   const fallback = typeof tilePixels === 'function' ? tilePixels : () => tilePixels;
   const clamp = scale => Math.min(maxScale, Math.max(minScale, scale));
   const initialScale = typeof tilePixels === 'number' ? clamp(tilePixels) : null;
-  const home = [wrap(center[0]), wrap(center[1])];
-  let userScale = initialScale;
+  const home = [wrap(center[0]), wrap(center[1])], homeAngle = wrapAngle(angle);
+  let userScale = initialScale, turn = homeAngle;
   const current = [...home];
+  // Screen offset (CSS pixels, y down) to lattice offset at the current scale and angle.
+  const toLattice = (dx, dy, s) => { const c = Math.cos(turn), n = Math.sin(turn); return [(c * dx + n * dy) / s, (-n * dx + c * dy) / s]; };
   const view = {
     get center() { return [...current]; },
+    get angle() { return turn; },
     get minScale() { return minScale; },
     get maxScale() { return maxScale; },
     get zoomed() { return userScale !== initialScale; },
     scale(width, height) { return userScale ?? clamp(fallback(width, height)); },
-    isHome() { return userScale === initialScale && current[0] === home[0] && current[1] === home[1]; },
-    reset() { userScale = initialScale; current[0] = home[0]; current[1] = home[1]; },
+    isHome() { return userScale === initialScale && turn === homeAngle && current[0] === home[0] && current[1] === home[1]; },
+    reset() { userScale = initialScale; turn = homeAngle; current[0] = home[0]; current[1] = home[1]; },
     latticeAt([x, y], width, height) {
-      const s = view.scale(width, height);
-      return [current[0] + (x - width / 2) / s, current[1] + (y - height / 2) / s];
+      const [dx, dy] = toLattice(x - width / 2, y - height / 2, view.scale(width, height));
+      return [current[0] + dx, current[1] + dy];
     },
-    /** Shows lattice point `lattice` at CSS pixel `point`, optionally at a new scale. */
-    pin(lattice, [x, y], scale, width, height) {
+    /** Shows lattice point `lattice` at CSS pixel `point`, optionally at a new scale and angle. */
+    pin(lattice, [x, y], width, height, {scale, angle} = {}) {
       if (scale !== undefined) userScale = clamp(scale);
-      const s = view.scale(width, height);
-      current[0] = wrap(lattice[0] - (x - width / 2) / s);
-      current[1] = wrap(lattice[1] - (y - height / 2) / s);
+      if (angle !== undefined) turn = wrapAngle(angle);
+      const [dx, dy] = toLattice(x - width / 2, y - height / 2, view.scale(width, height));
+      current[0] = wrap(lattice[0] - dx);
+      current[1] = wrap(lattice[1] - dy);
     },
     panBy(dx, dy, width, height) {
-      const s = view.scale(width, height);
-      current[0] = wrap(current[0] - dx / s);
-      current[1] = wrap(current[1] - dy / s);
+      const [lx, ly] = toLattice(dx, dy, view.scale(width, height));
+      current[0] = wrap(current[0] - lx);
+      current[1] = wrap(current[1] - ly);
     },
     zoomAt(factor, point, width, height) {
-      view.pin(view.latticeAt(point, width, height), point, view.scale(width, height) * factor, width, height);
+      view.pin(view.latticeAt(point, width, height), point, width, height, {scale: view.scale(width, height) * factor});
     },
-    snapshot() { return {center: [...current], scale: userScale}; },
-    restore({center: [x, y], scale}) { current[0] = wrap(x); current[1] = wrap(y); userScale = scale === null ? null : clamp(scale); },
+    rotateAt(delta, point, width, height) {
+      view.pin(view.latticeAt(point, width, height), point, width, height, {angle: turn + delta});
+    },
+    snapshot() { return {center: [...current], scale: userScale, angle: turn}; },
+    restore({center: [x, y], scale, angle = 0}) { current[0] = wrap(x); current[1] = wrap(y); userScale = scale === null ? null : clamp(scale); turn = wrapAngle(angle); },
   };
   return view;
 }
@@ -341,6 +360,7 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
   const resolution = gl.getUniformLocation(program, 'uResolution');
   const cssSize = gl.getUniformLocation(program, 'uCssSize');
   const centerLocation = gl.getUniformLocation(program, 'uCenter');
+  const rotationLocation = gl.getUniformLocation(program, 'uRotation');
   const scaleLocation = gl.getUniformLocation(program, 'uScale');
   const maxSize = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
   const governor = createGovernor({enabled: adaptive && pixelRatio === null, display});
@@ -368,9 +388,10 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
         gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, TEXTURE_SIZE, TEXTURE_SIZE, gl.RED, gl.FLOAT, frameAt(volume, p, frame));
         lastPhase = p;
       }
-      const [cx, cy] = view.center;
+      const [cx, cy] = view.center, angle = view.angle;
       gl.uniform2f(resolution, w, h); gl.uniform2f(cssSize, width, height);
       gl.uniform2f(centerLocation, cx, cy); gl.uniform1f(scaleLocation, view.scale(width, height));
+      gl.uniform2f(rotationLocation, Math.cos(angle), -Math.sin(angle)); // screen-to-lattice turns the other way
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
     dispose() { for (const texture of textures) gl.deleteTexture(texture); gl.deleteProgram(program); gl.deleteVertexArray(vao); },

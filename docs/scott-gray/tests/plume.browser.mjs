@@ -98,7 +98,6 @@ try {
   await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: fingers(600, 680)});
   for (let i = 1; i <= 5; i++) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: fingers(600 - 8 * i, 680 + 8 * i)});
   await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
-  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: false});
   await page.waitForTimeout(300);
   const pinched = await pixels();
   assert.ok(averageDifference(pinched, pinched, 0, 0, 1520, 0, 1000, 1000) < 1, 'pinching the fingers apart doubled the repeat');
@@ -106,6 +105,32 @@ try {
   await page.locator('#reset').click();
   await page.waitForTimeout(300);
   assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'the reset button restores the home view');
+  // Two fingers turning and spreading at once: from 100 px apart horizontally to
+  // 200 px apart vertically about the screen centre is a clockwise quarter turn
+  // with a doubling. The result must be the home image turned and enlarged
+  // about the centre: pixel (cx+u, cy+v) shows what (cx+v/2, cy−u/2) showed.
+  const spin = (t) => { const a = t * Math.PI / 2, r = 50 + 50 * t; return [{x: 640 - r * Math.cos(a), y: 400 - r * Math.sin(a), id: 1}, {x: 640 + r * Math.cos(a), y: 400 + r * Math.sin(a), id: 2}]; };
+  await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: spin(0)});
+  for (let i = 1; i <= 8; i++) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: spin(i / 8)});
+  await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: false});
+  await page.waitForTimeout(300);
+  const turned = await pixels();
+  let total = 0, count = 0;
+  for (let v = -400; v < 400; v += 2) for (let u = -400; u < 400; u += 2) for (let c = 0; c < 3; c++) {
+    total += Math.abs(turned.data[4 * ((800 + v) * turned.width + 1280 + u) + c] - beforeDrag.data[4 * ((800 - u / 2) * beforeDrag.width + 1280 + v / 2) + c]); count++;
+  }
+  assert.ok(total / count < 1.5, `two-finger turn and zoom together match the turned, enlarged home image (mean difference ${(total / count).toFixed(2)})`);
+  await page.keyboard.press('s');
+  assert.match(await page.locator('#stats').textContent(), /760 px per repeat · turned 90°/);
+  // The ] key turns 15° clockwise, Shift+] a quarter turn; [ turns back.
+  await page.keyboard.press('0'); await page.keyboard.press(']'); await page.waitForTimeout(200);
+  assert.match(await page.locator('#stats').textContent(), /turned 15°/);
+  await page.keyboard.press('['); await page.keyboard.press('Shift+]'); await page.waitForTimeout(200);
+  assert.match(await page.locator('#stats').textContent(), /turned 90°/);
+  await page.keyboard.press('s');
+  await page.keyboard.press('0'); await page.waitForTimeout(300);
+  assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'reset also clears the turn');
   // The stats readout appears on the S key and names the render size.
   await page.keyboard.press('s');
   assert.match(await page.locator('#stats').textContent(), /2560×1600 px · quality 1\.00 · 380 px per repeat · (9|16) taps/);
@@ -143,5 +168,5 @@ try {
   await page.goto(`${base}?play=1`); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Pause animation');
   assert.deepEqual(errors, [], 'no browser errors or missing assets');
-  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, reset, stats, pause/play, idle controls, fullscreen, GPU recovery, and reduced motion passed`);
+  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn, reset, stats, pause/play, idle controls, fullscreen, GPU recovery, and reduced motion passed`);
 } finally {await browser.close();}

@@ -49,16 +49,20 @@ and begins at phase 0. Screens with reduced-motion enabled start paused.
 Optional `?play=0&phase=0.25` parameters support reproducible still views.
 
 The pattern is endless: drag it with a finger or the mouse (a quick release
-keeps it gliding), pinch or scroll to zoom about the fingers or pointer, use
-the arrow keys to pan and + / − to zoom, and press 0 or the recentre button
-to return to the home view. Zooming out stops where one texel of the 96-node
-grid spans one device pixel; zooming in stops at 8000 CSS pixels per repeat.
-`?x=&y=` place a lattice point at the screen centre.
+keeps it gliding). Two fingers pan, zoom and turn it at once about their
+midpoint; a turn that ends within 4° of a quarter turn snaps to it, since the
+lattice is square. The wheel or a trackpad pinch zooms about the pointer. On
+the keyboard the arrows pan, + / − zoom, ] and [ turn by 15° (a quarter turn
+with Shift), and 0 or the recentre button returns to the home view. Zooming
+out stops where one texel of the 96-node grid spans one device pixel; zooming
+in stops at 8000 CSS pixels per repeat. `?x=&y=` place a lattice point at the
+screen centre and `?angle=` (degrees, clockwise) turns the home view.
 
 Click Fullscreen, double-click the pattern, or press F. Space plays/pauses.
 Controls and cursor hide after inactivity. Pressing S, or tapping the name in
 the control bar, shows frame statistics: frames per second, render size,
-quality factor, pixels per repeat, taps per pixel and the display cadence.
+quality factor, pixels per repeat, the turn, taps per pixel and the display
+cadence.
 GPU context restoration resumes the pattern; hidden tabs suspend rendering.
 Fullscreen playback requests a screen wake lock where supported.
 

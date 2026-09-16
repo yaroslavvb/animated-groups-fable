@@ -1,4 +1,4 @@
-import {createRenderer, createView, FIELD_BYTES, INITIAL_PHASE, LOOP_SECONDS, MAX_SCALE, MIN_SCALE, scaleFor, wrap} from './renderer.mjs';
+import {createRenderer, createView, FIELD_BYTES, INITIAL_PHASE, LOOP_SECONDS, MAX_SCALE, MIN_SCALE, scaleFor, snapAngle, wrap} from './renderer.mjs';
 
 const canvas = document.querySelector('#pattern');
 const notice = document.querySelector('#notice');
@@ -23,8 +23,8 @@ const style = canvas.dataset.style || 'ember';
 const pixelRatio = number('dpr', 0.25, 4);
 // Zooming out stops where one texel of the 96-node grid spans one device pixel.
 const minScale = Math.max(MIN_SCALE, 64 / (devicePixelRatio || 1));
-// scale=<CSS pixels per lattice length> fixes the initial scale; x=&y= place a lattice point at the centre.
-const view = createView({tilePixels: number('scale', minScale, MAX_SCALE) ?? scaleFor, center: [number('x', -1e9, 1e9) ?? 1, number('y', -1e9, 1e9) ?? 1], minScale});
+// scale=<CSS pixels per lattice length> fixes the initial scale; x=&y= place a lattice point at the centre; angle=<degrees> turns the pattern clockwise.
+const view = createView({tilePixels: number('scale', minScale, MAX_SCALE) ?? scaleFor, center: [number('x', -1e9, 1e9) ?? 1, number('y', -1e9, 1e9) ?? 1], angle: (number('angle', -1e6, 1e6) ?? 0) * Math.PI / 180, minScale});
 let showStats = params.get('stats') === '1';
 let renderer, field, scheduled = false, dirty = false, lastTime = null, idleTimer, wakeLock;
 
@@ -110,7 +110,8 @@ function renderStats() {
   if (!showStats || !renderer) return;
   const [width, height] = size();
   const cadence = renderer.display ? ` · display ${Math.round(1000 / renderer.display)} Hz` : '';
-  stats.textContent = `${playing ? `${Math.round(fps)} fps` : 'paused'} · ${canvas.width}×${canvas.height} px · quality ${renderer.quality.toFixed(2)} · ${Math.round(view.scale(width, height))} px per repeat · ${renderer.taps} taps${cadence}`;
+  const turned = view.angle ? ` · turned ${Math.round(view.angle * 180 / Math.PI)}°` : '';
+  stats.textContent = `${playing ? `${Math.round(fps)} fps` : 'paused'} · ${canvas.width}×${canvas.height} px · quality ${renderer.quality.toFixed(2)} · ${Math.round(view.scale(width, height))} px per repeat${turned} · ${renderer.taps} taps${cadence}`;
 }
 function toggleStats() { showStats = !showStats; renderStats(); }
 
@@ -145,8 +146,9 @@ async function toggleFullscreen() {
   showControls();
 }
 
-// Pointer gestures: one finger or a mouse pans; two fingers pan and zoom about
-// their midpoint; a released pan keeps gliding. The pattern is periodic, so
+// Pointer gestures: one finger or a mouse pans; two fingers pan, zoom and
+// turn about their midpoint, and a turn that ends within 4° of a quarter turn
+// snaps to it; a released pan keeps gliding. The pattern is periodic, so
 // panning is endless in every direction.
 const pointers = new Map();
 const samples = [];
@@ -155,20 +157,23 @@ function summarize() {
   const points = [...pointers.values()];
   const mid = points.reduce(([x, y], p) => [x + p.x / points.length, y + p.y / points.length], [0, 0]);
   const dist = points.length > 1 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : 0;
-  return {mid, dist, count: points.length};
+  const heading = points.length > 1 ? Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x) : 0;
+  return {mid, dist, heading, count: points.length};
 }
 function beginGesture() {
-  const {mid, dist, count} = summarize();
+  const {mid, dist, heading, count} = summarize();
   if (!count) { gesture = null; return; }
   const [width, height] = size();
-  gesture = {anchor: view.latticeAt(mid, width, height), dist0: dist, scale0: view.scale(width, height), multi: count > 1};
+  gesture = {anchor: view.latticeAt(mid, width, height), mid, dist0: dist, heading0: heading, scale0: view.scale(width, height), angle0: view.angle, multi: count > 1};
   samples.length = 0;
 }
 function moveGesture(time) {
   if (!gesture) return;
-  const {mid, dist} = summarize();
+  const {mid, dist, heading} = summarize();
   const [width, height] = size();
-  view.pin(gesture.anchor, mid, gesture.multi && gesture.dist0 > 0 ? gesture.scale0 * dist / gesture.dist0 : undefined, width, height);
+  gesture.mid = mid;
+  if (gesture.multi && gesture.dist0 > 0) view.pin(gesture.anchor, mid, width, height, {scale: gesture.scale0 * dist / gesture.dist0, angle: gesture.angle0 + heading - gesture.heading0});
+  else view.pin(gesture.anchor, mid, width, height);
   samples.push({time, mid});
   while (samples.length > 6) samples.shift();
   updateReset(); requestDraw();
@@ -183,6 +188,11 @@ function endGesture(time) {
     }
   }
   gesture = null;
+}
+function settleTurn() {
+  if (!gesture?.multi) return;
+  const snapped = snapAngle(view.angle);
+  if (snapped !== view.angle) { const [width, height] = size(); view.pin(gesture.anchor, gesture.mid, width, height, {angle: snapped}); requestDraw(); }
 }
 function stepFling(dt) {
   if (!fling || dt <= 0) return;
@@ -211,6 +221,7 @@ canvas.addEventListener('pointermove', event => {
 });
 for (const type of ['pointerup', 'pointercancel']) canvas.addEventListener(type, event => {
   if (!pointers.has(event.pointerId)) return;
+  settleTurn();
   pointers.delete(event.pointerId);
   if (pointers.size) beginGesture(); else { endGesture(event.timeStamp); document.body.classList.remove('dragging'); }
 });
@@ -229,6 +240,7 @@ canvas.addEventListener('touchmove', event => event.preventDefault(), {passive: 
 
 function resetView() { view.reset(); fling = null; updateReset(); requestDraw(); showControls(); }
 function zoomCenter(factor) { const [width, height] = size(); view.zoomAt(factor, [width / 2, height / 2], width, height); updateReset(); requestDraw(); }
+function turnCenter(delta) { const [width, height] = size(); view.rotateAt(delta, [width / 2, height / 2], width, height); updateReset(); requestDraw(); }
 function pan(dx, dy) { const [width, height] = size(); view.panBy(dx, dy, width, height); fling = null; updateReset(); requestDraw(); }
 
 pauseButton.addEventListener('click', event => { togglePause(); if (event.detail) pauseButton.blur(); });
@@ -251,6 +263,8 @@ document.addEventListener('keydown', event => {
   else if (key === '0' || key === 'home') { event.preventDefault(); resetView(); }
   else if (key === '+' || key === '=') { event.preventDefault(); zoomCenter(1.25); }
   else if (key === '-' || key === '_') { event.preventDefault(); zoomCenter(0.8); }
+  else if (key === ']' || key === '}') { event.preventDefault(); turnCenter((event.shiftKey ? 90 : 15) * Math.PI / 180); }
+  else if (key === '[' || key === '{') { event.preventDefault(); turnCenter(-(event.shiftKey ? 90 : 15) * Math.PI / 180); }
   else if (key === 'arrowleft') { event.preventDefault(); pan(pace, 0); }
   else if (key === 'arrowright') { event.preventDefault(); pan(-pace, 0); }
   else if (key === 'arrowup') { event.preventDefault(); pan(0, pace); }

@@ -1,8 +1,8 @@
 # Plume Monochrome
 
 Plume in black and white only. Same verified orbit, same WebGL 2 viewer with
-endless finger panning, pinch and scroll zoom, adaptive resolution and frame
-statistics, same framing and eight-second loop as `../plume/` (see its README
+endless finger panning, two-finger zoom and turn, scroll zoom, adaptive
+resolution and frame statistics, same framing and eight-second loop as `../plume/` (see its README
 for the data provenance, interpolation and controls); `app.mjs`,
 `renderer.mjs` and `field.f32` are byte-identical copies, and `index.html`
 selects the style with `data-style="monochrome"` on the canvas.

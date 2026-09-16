@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import test from 'node:test';
-import {FIELD_BYTES, FRAMES, GRID_SIZE, INITIAL_PHASE, LOOP_SECONDS, MAX_SCALE, MIN_SCALE, TEXTURE_SIZE, TILE_PIXELS, VALUE_RANGE, createGovernor, createView, cubicWeights, frameAt, halfSampleKernel, scaleFor, upsample2, upsampledVolume} from '../plume/renderer.mjs';
+import {FIELD_BYTES, FRAMES, GRID_SIZE, INITIAL_PHASE, LOOP_SECONDS, MAX_SCALE, MIN_SCALE, TEXTURE_SIZE, TILE_PIXELS, VALUE_RANGE, createGovernor, createView, cubicWeights, frameAt, halfSampleKernel, scaleFor, snapAngle, upsample2, upsampledVolume, wrapAngle} from '../plume/renderer.mjs';
 
 const saved = await readFile(new URL('../data/orbits/g96-F0p00395000-k0p02000000-N48-M128.f32', import.meta.url));
 const shipped = await readFile(new URL('../plume/field.f32', import.meta.url));
@@ -117,13 +117,44 @@ test('the view pans endlessly, zooms about the pointer, and returns home', () =>
 test('a two-finger gesture keeps the anchored lattice point under the moving midpoint while scaling', () => {
   const view = createView(), size = [390, 844];
   const anchor = view.latticeAt([150, 400], ...size), scale0 = view.scale(...size);
-  view.pin(anchor, [200, 300], scale0 * 2, ...size);
+  view.pin(anchor, [200, 300], ...size, {scale: scale0 * 2, angle: 0.4});
   assert.equal(view.scale(...size), 2 * scale0);
+  assert.equal(view.angle, 0.4);
   const moved = view.latticeAt([200, 300], ...size);
   const same = (a, b) => Math.abs(a - b - Math.round(a - b)) < 1e-9;
-  assert.ok(same(moved[0], anchor[0]) && same(moved[1], anchor[1]));
-  view.pin(anchor, [50, 50], undefined, ...size);
+  assert.ok(same(moved[0], anchor[0]) && same(moved[1], anchor[1]), 'scaling and turning together keep the anchor under the midpoint');
+  view.pin(anchor, [50, 50], ...size);
   assert.equal(view.scale(...size), 2 * scale0, 'a one-finger pin leaves the scale alone');
+  assert.equal(view.angle, 0.4, 'and the angle');
+});
+
+test('turning the view rotates the lattice clockwise on screen and snaps near quarter turns', () => {
+  const view = createView(), size = [1440, 1000], centre = [720, 500];
+  // Before turning, the lattice point one repeat above the centre is straight up.
+  assert.deepEqual(view.latticeAt([720, 120], ...size).map(v => +v.toFixed(9)), [0, -1]);
+  view.rotateAt(Math.PI / 2, centre, ...size);
+  assert.equal(view.angle, Math.PI / 2);
+  assert.deepEqual(view.center, [0, 0], 'turning about the centre keeps it');
+  // A quarter turn clockwise carries what was above the centre to its right.
+  assert.deepEqual(view.latticeAt([1100, 500], ...size).map(v => +v.toFixed(9)), [0, -1]);
+  // Panning follows the screen: dragging right by a repeat moves the centre one lattice unit along the turned axis.
+  const near = (actual, expected) => actual.every((v, i) => Math.abs(v - expected[i] - Math.round(v - expected[i])) < 1e-9);
+  view.panBy(380, 0, ...size);
+  assert.ok(near(view.center, [0, 0]), 'a whole repeat is invisible');
+  view.panBy(190, 0, ...size);
+  assert.ok(near(view.center, [0, 0.5]), `half a repeat along the turned axis: ${view.center}`);
+  assert.ok(!view.isHome());
+  view.rotateAt(-Math.PI / 2, [100, 100], ...size);
+  assert.ok(Math.abs(view.angle) < 1e-12);
+  view.reset(); assert.ok(view.isHome()); assert.equal(view.angle, 0);
+  assert.equal(createView({angle: 3 * Math.PI}).angle, Math.PI);
+  assert.equal(wrapAngle(-Math.PI), Math.PI);
+  assert.equal(snapAngle(Math.PI / 2 + 0.03), Math.PI / 2);
+  assert.equal(snapAngle(-Math.PI / 2 - 0.05), -Math.PI / 2);
+  assert.equal(snapAngle(0.3), 0.3, 'far from a quarter turn nothing snaps');
+  assert.equal(snapAngle(Math.PI - 0.01), Math.PI);
+  const snapshot = view.snapshot();
+  view.rotateAt(1, centre, ...size); view.restore(snapshot); assert.equal(view.angle, 0);
 });
 
 test('the adaptive-resolution governor lowers quality only when it speeds the cadence up, and climbs back', () => {
