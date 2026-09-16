@@ -1,0 +1,9 @@
+{
+  "name": "Rotating wave — Ember lattice",
+  "short_name": "Rotating wave",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#120927",
+  "theme_color": "#120927"
+}

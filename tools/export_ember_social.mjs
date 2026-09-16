@@ -1,5 +1,7 @@
 /** Export the actual WebGL renderer as a still and a seamless uploadable MP4.
- * Usage: node tools/export_ember_social.mjs [viewer URL] [output directory]
+ * Usage: node tools/export_ember_social.mjs [viewer URL] [output directory] [loops] [video name]
+ * The viewer must export createRenderer, INITIAL_PHASE and LOOP_SECONDS from
+ * ./renderer.mjs and load ./field.f32, as the ember and p2-ember viewers do.
  * Requires Playwright/Chrome and ffmpeg. No realtime screen recording is used:
  * every frame is evaluated at its exact phase so slow exports cannot stutter.
  */
@@ -11,6 +13,8 @@ import {once} from 'node:events';
 const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ?? '/Users/yaroslavvb/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs');
 const url = process.argv[2] ?? 'http://localhost:8934/scott-gray/ember/';
 const output = resolve(process.argv[3] ?? 'docs/scott-gray/ember');
+const loops = Math.max(1, Math.round(Number(process.argv[4] ?? 2)));
+const videoName = process.argv[5] ?? 'ember-preview.mp4';
 const temporary = await mkdtemp(join(tmpdir(), 'ember-social-'));
 await mkdir(output, {recursive: true});
 function ffmpeg(args) {
@@ -53,9 +57,9 @@ try {
     if (i % fps === 0) console.log(`Rendered ${i}/${frameCount} exact-phase frames`);
   }
   encoder.stdin.end(); await encoder.completion;
-  const loop = ffmpeg(['-stream_loop', '1', '-i', join(temporary, 'cycle.mp4'), '-an', '-c', 'copy', '-movflags', '+faststart', join(output, 'ember-preview.mp4')]);
+  const loop = ffmpeg(['-stream_loop', String(loops - 1), '-i', join(temporary, 'cycle.mp4'), '-an', '-c', 'copy', '-movflags', '+faststart', join(output, videoName)]);
   loop.stdin.end(); await loop.completion;
   await page.setViewportSize({width: 1200, height: 630});
   await writeFile(join(output, 'social-preview.jpg'), Buffer.from(await page.evaluate(phase => window.exportFrame(phase, 'image/jpeg'), phase), 'base64'));
-  console.log('Exported 8-second 1080×1080 30fps MP4 and 1200×630 JPEG');
+  console.log(`Exported ${seconds * loops}-second 1080×1080 30fps ${videoName} and 1200×630 social-preview.jpg`);
 } finally { await browser.close(); await rm(temporary, {recursive: true, force: true}); }
