@@ -36,10 +36,12 @@ try {
     if (!response.ok) throw new Error('Could not fetch seed');
     const view = new DataView(await response.arrayBuffer());
     const field = Float32Array.from({length: view.byteLength / 4}, (_, i) => view.getFloat32(i * 4, true));
+    // The page's canvas may select a renderer style (Plume Monochrome).
+    const style = document.querySelector('#pattern')?.dataset.style;
     const canvas = document.createElement('canvas');
     canvas.style.cssText = 'width:100%;height:100%;display:block';
     document.body.replaceChildren(canvas);
-    const renderer = createRenderer(canvas, field);
+    const renderer = createRenderer(canvas, field, style ? {style} : {});
     window.exportFrame = (phase, type = 'image/png') => {
       renderer.draw(phase);
       return canvas.toDataURL(type, .96).split(',')[1];
