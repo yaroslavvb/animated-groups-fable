@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14110f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Every one of the three colours is light (L* 51 / 59 / 79), so a translucent
+       status bar would put white iOS glyphs at about 1.75:1 over the pattern.
+       An opaque bar keeps the clock readable; the Fullscreen button still gives
+       an edge-to-edge view. -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="A verified Gray–Scott rotating wave on a triangular lattice, painted in three colours whose symmetry group is S₃ — not cyclic. Slide the picture by one motif and the colours step round, with no waiting. But to exchange two colours you must turn it upside down, wait half a period and swap teal and sand all at once: any two of the three fail.">
+  <title>Trefoil — Turn, wait, swap two colours</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Trefoil — A colour symmetry that is not a cycle">
+  <meta property="og:description" content="Slide it by one motif and the three colours step round for free. Exchange two of them, and it takes a half-turn, half a period and the swap — all three at once, and provably so.">
+  <meta property="og:url" content="https://trefoil-wave.pages.dev/">
+  <meta property="og:image" content="https://trefoil-wave.pages.dev/social-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Interlocking terracotta, teal and sand regions on a triangular lattice, captured from the Trefoil animation.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Trefoil — A colour symmetry that is not a cycle">
+  <meta name="twitter:description" content="Slide it by one motif and the three colours step round for free. Exchange two of them, and it takes a half-turn, half a period and the swap — all three at once, and provably so.">
+  <meta name="twitter:image" content="https://trefoil-wave.pages.dev/social-preview.jpg">
+  <meta name="twitter:image:alt" content="Interlocking terracotta, teal and sand regions on a triangular lattice, captured from the Trefoil animation.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+</head>
+<body>
+  <main aria-label="Trefoil three-colour wave lattice with an S3 colour symmetry">
+    <canvas id="pattern" aria-label="Animated lattice of interlocking terracotta, teal and sand regions turning steadily clockwise. Sliding the view by one motif steps the colours round; a half-turn with half a period exchanges teal and sand. Drag to pan, pinch or scroll to zoom, two fingers to turn. Press Space to pause or F for fullscreen."></canvas>
+    <div id="notice" role="status">Loading Trefoil…</div>
+    <div id="controls" aria-label="Animation controls">
+      <span class="name">Trefoil</span>
+      <button id="pause" type="button" aria-label="Pause animation" title="Pause · Space" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="pause-icon" d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <button id="reset" type="button" aria-label="Reset view" title="Reset view · 0" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <button id="fullscreen" type="button" aria-label="Enter fullscreen" title="Fullscreen · F" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+        <span id="fullscreen-label">Fullscreen</span>
+      </button>
+    </div>
+    <div id="stats" hidden aria-live="off"></div>
+    <noscript>This animation needs JavaScript and WebGL. Enable JavaScript and reload to view it.</noscript>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
