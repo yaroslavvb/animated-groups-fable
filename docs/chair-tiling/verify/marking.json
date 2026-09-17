@@ -1,0 +1,4733 @@
+{
+ "_about": "Reconstruction of the marked 3-D chair that Chaim Goodman-Strauss drew on 2026-09-17, with the marking M24 determined by the drawing and verified by computation.  See tiling-spec.md.",
+ "_generated": "2026-09-17T13:44:44",
+ "conventions": {
+  "cell": "an integer triple c denotes the closed unit cube [c, c+1].",
+  "chair": "C = [0,2]^3 minus [1,2]^3 = the 7 cells {0,1}^3 minus (1,1,1).",
+  "far_corner": [
+   0,
+   0,
+   0
+  ],
+  "notch_cell": [
+   1,
+   1,
+   1
+  ],
+  "concave_corner": [
+   1,
+   1,
+   1
+  ],
+  "facet": "a unit square of the boundary, written (cell, outward normal); there are 24, of which 21 outer and 3 in the notch.",
+  "site": "the marked corner of a facet: the concave corner (1,1,1) for the three notch facets, otherwise 2*cell.  There are 8 sites, each shared by exactly 3 facets.",
+  "pose": "a signed permutation (perm, signs) with (L v)_i = signs_i * v_{perm_i}, plus an integer translation.",
+  "orientations": "the 24 orientation-preserving cubic frames.  Reflected copies are NOT allowed (see the caveats in tiling-spec.md)."
+ },
+ "symbols": {
+  "F": {
+   "name": "purple-filled",
+   "glyph": "solid triangular arrowhead",
+   "matches": "H"
+  },
+  "H": {
+   "name": "purple-hollow",
+   "glyph": "open hook / V arrowhead",
+   "matches": "F"
+  },
+  "B": {
+   "name": "blue",
+   "glyph": "pale-blue arrow",
+   "matches": "B"
+  }
+ },
+ "matching_rule": {
+  "statement": "Two chairs may share a unit facet only if the two marks on it point at the SAME corner of that square and their types are complementary: purple-filled with purple-hollow, blue with blue.",
+  "complement": {
+   "F": "H",
+   "H": "F",
+   "B": "B"
+  }
+ },
+ "stars": {
+  "000": {
+   "site": [
+    0,
+    0,
+    0
+   ],
+   "x": "H",
+   "y": "F",
+   "z": "B"
+  },
+  "001": {
+   "site": [
+    0,
+    0,
+    2
+   ],
+   "x": "F",
+   "y": "H",
+   "z": "B"
+  },
+  "010": {
+   "site": [
+    0,
+    2,
+    0
+   ],
+   "x": "H",
+   "y": "B",
+   "z": "F"
+  },
+  "011": {
+   "site": [
+    0,
+    2,
+    2
+   ],
+   "x": "B",
+   "y": "H",
+   "z": "F"
+  },
+  "100": {
+   "site": [
+    2,
+    0,
+    0
+   ],
+   "x": "B",
+   "y": "F",
+   "z": "H"
+  },
+  "101": {
+   "site": [
+    2,
+    0,
+    2
+   ],
+   "x": "F",
+   "y": "B",
+   "z": "H"
+  },
+  "110": {
+   "site": [
+    2,
+    2,
+    0
+   ],
+   "x": "H",
+   "y": "F",
+   "z": "B"
+  },
+  "dent": {
+   "site": [
+    1,
+    1,
+    1
+   ],
+   "x": "F",
+   "y": "H",
+   "z": "B"
+  }
+ },
+ "facets": [
+  {
+   "id": 0,
+   "cell": [
+    0,
+    0,
+    0
+   ],
+   "outward_normal": [
+    -1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     1,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     0,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     0,
+     1,
+     1
+    ],
+    "arrow_head": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 1,
+   "cell": [
+    0,
+    0,
+    0
+   ],
+   "outward_normal": [
+    0,
+    -1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     0,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     0,
+     1
+    ],
+    "arrow_head": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 2,
+   "cell": [
+    0,
+    0,
+    0
+   ],
+   "outward_normal": [
+    0,
+    0,
+    -1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     0
+    ],
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     1,
+     0
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     0,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     0
+    ],
+    "arrow_head": [
+     0,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 3,
+   "cell": [
+    0,
+    0,
+    1
+   ],
+   "outward_normal": [
+    -1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     0,
+     0,
+     2
+    ],
+    [
+     0,
+     1,
+     1
+    ],
+    [
+     0,
+     1,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     0,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     0,
+     1,
+     1
+    ],
+    "arrow_head": [
+     0,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 4,
+   "cell": [
+    0,
+    0,
+    1
+   ],
+   "outward_normal": [
+    0,
+    -1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     1
+    ],
+    [
+     0,
+     0,
+     2
+    ],
+    [
+     1,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     0,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     0,
+     1
+    ],
+    "arrow_head": [
+     0,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 5,
+   "cell": [
+    0,
+    0,
+    1
+   ],
+   "outward_normal": [
+    0,
+    0,
+    1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     0,
+     2
+    ],
+    [
+     0,
+     1,
+     2
+    ],
+    [
+     1,
+     0,
+     2
+    ],
+    [
+     1,
+     1,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     0,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     2
+    ],
+    "arrow_head": [
+     0,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 6,
+   "cell": [
+    0,
+    1,
+    0
+   ],
+   "outward_normal": [
+    -1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     1,
+     1
+    ],
+    [
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     2,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     0,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     0,
+     1,
+     1
+    ],
+    "arrow_head": [
+     0,
+     2,
+     0
+    ]
+   }
+  },
+  {
+   "id": 7,
+   "cell": [
+    0,
+    1,
+    0
+   ],
+   "outward_normal": [
+    0,
+    0,
+    -1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     1,
+     0
+    ],
+    [
+     0,
+     2,
+     0
+    ],
+    [
+     1,
+     1,
+     0
+    ],
+    [
+     1,
+     2,
+     0
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     0,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     0
+    ],
+    "arrow_head": [
+     0,
+     2,
+     0
+    ]
+   }
+  },
+  {
+   "id": 8,
+   "cell": [
+    0,
+    1,
+    0
+   ],
+   "outward_normal": [
+    0,
+    1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     2,
+     0
+    ],
+    [
+     0,
+     2,
+     1
+    ],
+    [
+     1,
+     2,
+     0
+    ],
+    [
+     1,
+     2,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     0,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     2,
+     1
+    ],
+    "arrow_head": [
+     0,
+     2,
+     0
+    ]
+   }
+  },
+  {
+   "id": 9,
+   "cell": [
+    0,
+    1,
+    1
+   ],
+   "outward_normal": [
+    -1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     1,
+     1
+    ],
+    [
+     0,
+     1,
+     2
+    ],
+    [
+     0,
+     2,
+     1
+    ],
+    [
+     0,
+     2,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     0,
+     2,
+     2
+    ],
+    "arrow_tail": [
+     0,
+     1,
+     1
+    ],
+    "arrow_head": [
+     0,
+     2,
+     2
+    ]
+   }
+  },
+  {
+   "id": 10,
+   "cell": [
+    0,
+    1,
+    1
+   ],
+   "outward_normal": [
+    0,
+    0,
+    1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     1,
+     2
+    ],
+    [
+     0,
+     2,
+     2
+    ],
+    [
+     1,
+     1,
+     2
+    ],
+    [
+     1,
+     2,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     0,
+     2,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     2
+    ],
+    "arrow_head": [
+     0,
+     2,
+     2
+    ]
+   }
+  },
+  {
+   "id": 11,
+   "cell": [
+    0,
+    1,
+    1
+   ],
+   "outward_normal": [
+    0,
+    1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     0,
+     2,
+     1
+    ],
+    [
+     0,
+     2,
+     2
+    ],
+    [
+     1,
+     2,
+     1
+    ],
+    [
+     1,
+     2,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     0,
+     2,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     2,
+     1
+    ],
+    "arrow_head": [
+     0,
+     2,
+     2
+    ]
+   }
+  },
+  {
+   "id": 12,
+   "cell": [
+    0,
+    1,
+    1
+   ],
+   "outward_normal": [
+    1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": true,
+   "corners": [
+    [
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     1,
+     2
+    ],
+    [
+     1,
+     2,
+     1
+    ],
+    [
+     1,
+     2,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     1,
+     1,
+     1
+    ],
+    "arrow_tail": [
+     1,
+     2,
+     2
+    ],
+    "arrow_head": [
+     1,
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": 13,
+   "cell": [
+    1,
+    0,
+    0
+   ],
+   "outward_normal": [
+    0,
+    -1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     0,
+     1
+    ],
+    [
+     2,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     2,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     0,
+     1
+    ],
+    "arrow_head": [
+     2,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 14,
+   "cell": [
+    1,
+    0,
+    0
+   ],
+   "outward_normal": [
+    0,
+    0,
+    -1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     0,
+     0
+    ],
+    [
+     1,
+     1,
+     0
+    ],
+    [
+     2,
+     0,
+     0
+    ],
+    [
+     2,
+     1,
+     0
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     2,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     0
+    ],
+    "arrow_head": [
+     2,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 15,
+   "cell": [
+    1,
+    0,
+    0
+   ],
+   "outward_normal": [
+    1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     2,
+     0,
+     0
+    ],
+    [
+     2,
+     0,
+     1
+    ],
+    [
+     2,
+     1,
+     0
+    ],
+    [
+     2,
+     1,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     2,
+     0,
+     0
+    ],
+    "arrow_tail": [
+     2,
+     1,
+     1
+    ],
+    "arrow_head": [
+     2,
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "id": 16,
+   "cell": [
+    1,
+    0,
+    1
+   ],
+   "outward_normal": [
+    0,
+    -1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     0,
+     1
+    ],
+    [
+     1,
+     0,
+     2
+    ],
+    [
+     2,
+     0,
+     1
+    ],
+    [
+     2,
+     0,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     2,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     0,
+     1
+    ],
+    "arrow_head": [
+     2,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 17,
+   "cell": [
+    1,
+    0,
+    1
+   ],
+   "outward_normal": [
+    0,
+    0,
+    1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     0,
+     2
+    ],
+    [
+     1,
+     1,
+     2
+    ],
+    [
+     2,
+     0,
+     2
+    ],
+    [
+     2,
+     1,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     2,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     2
+    ],
+    "arrow_head": [
+     2,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 18,
+   "cell": [
+    1,
+    0,
+    1
+   ],
+   "outward_normal": [
+    0,
+    1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": true,
+   "corners": [
+    [
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     1,
+     2
+    ],
+    [
+     2,
+     1,
+     1
+    ],
+    [
+     2,
+     1,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     1,
+     1,
+     1
+    ],
+    "arrow_tail": [
+     2,
+     1,
+     2
+    ],
+    "arrow_head": [
+     1,
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": 19,
+   "cell": [
+    1,
+    0,
+    1
+   ],
+   "outward_normal": [
+    1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     2,
+     0,
+     1
+    ],
+    [
+     2,
+     0,
+     2
+    ],
+    [
+     2,
+     1,
+     1
+    ],
+    [
+     2,
+     1,
+     2
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     2,
+     0,
+     2
+    ],
+    "arrow_tail": [
+     2,
+     1,
+     1
+    ],
+    "arrow_head": [
+     2,
+     0,
+     2
+    ]
+   }
+  },
+  {
+   "id": 20,
+   "cell": [
+    1,
+    1,
+    0
+   ],
+   "outward_normal": [
+    0,
+    0,
+    -1
+   ],
+   "axis": "z",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     1,
+     0
+    ],
+    [
+     1,
+     2,
+     0
+    ],
+    [
+     2,
+     1,
+     0
+    ],
+    [
+     2,
+     2,
+     0
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     2,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     1,
+     0
+    ],
+    "arrow_head": [
+     2,
+     2,
+     0
+    ]
+   }
+  },
+  {
+   "id": 21,
+   "cell": [
+    1,
+    1,
+    0
+   ],
+   "outward_normal": [
+    0,
+    0,
+    1
+   ],
+   "axis": "z",
+   "is_notch_facet": true,
+   "corners": [
+    [
+     1,
+     1,
+     1
+    ],
+    [
+     1,
+     2,
+     1
+    ],
+    [
+     2,
+     1,
+     1
+    ],
+    [
+     2,
+     2,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "B",
+    "name": "blue",
+    "site": [
+     1,
+     1,
+     1
+    ],
+    "arrow_tail": [
+     2,
+     2,
+     1
+    ],
+    "arrow_head": [
+     1,
+     1,
+     1
+    ]
+   }
+  },
+  {
+   "id": 22,
+   "cell": [
+    1,
+    1,
+    0
+   ],
+   "outward_normal": [
+    0,
+    1,
+    0
+   ],
+   "axis": "y",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     1,
+     2,
+     0
+    ],
+    [
+     1,
+     2,
+     1
+    ],
+    [
+     2,
+     2,
+     0
+    ],
+    [
+     2,
+     2,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "F",
+    "name": "purple-filled",
+    "site": [
+     2,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     1,
+     2,
+     1
+    ],
+    "arrow_head": [
+     2,
+     2,
+     0
+    ]
+   }
+  },
+  {
+   "id": 23,
+   "cell": [
+    1,
+    1,
+    0
+   ],
+   "outward_normal": [
+    1,
+    0,
+    0
+   ],
+   "axis": "x",
+   "is_notch_facet": false,
+   "corners": [
+    [
+     2,
+     1,
+     0
+    ],
+    [
+     2,
+     1,
+     1
+    ],
+    [
+     2,
+     2,
+     0
+    ],
+    [
+     2,
+     2,
+     1
+    ]
+   ],
+   "mark": {
+    "type": "H",
+    "name": "purple-hollow",
+    "site": [
+     2,
+     2,
+     0
+    ],
+    "arrow_tail": [
+     2,
+     1,
+     1
+    ],
+    "arrow_head": [
+     2,
+     2,
+     0
+    ]
+   }
+  }
+ ],
+ "substitution": {
+  "supertile": "S = [0,4]^3 minus [2,4]^3 = the chair at scale 2",
+  "children": [
+   {
+    "slot": "000",
+    "role": "corner",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "det": 1
+   },
+   {
+    "slot": "001",
+    "role": "corner",
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ],
+    "det": 1
+   },
+   {
+    "slot": "010",
+    "role": "corner",
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ],
+    "det": 1
+   },
+   {
+    "slot": "011",
+    "role": "corner",
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     0,
+     4,
+     4
+    ],
+    "det": 1
+   },
+   {
+    "slot": "100",
+    "role": "corner",
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ],
+    "det": 1
+   },
+   {
+    "slot": "101",
+    "role": "corner",
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     0,
+     4
+    ],
+    "det": 1
+   },
+   {
+    "slot": "110",
+    "role": "corner",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     0
+    ],
+    "det": 1
+   },
+   {
+    "slot": "dent",
+    "role": "central",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ],
+    "det": 1
+   }
+  ],
+  "note": "These eight frames are FORCED by the requirement that the supertile, read at double scale, carries the same marking."
+ },
+ "contact_atlas": {
+  "proper": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     -1,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     -1,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     -1,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     3,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -1,
+     3,
+     3
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     3,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   }
+  ],
+  "proper_count": 44,
+  "improper_count": 16,
+  "improper": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     4,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     2,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     4,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     4,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     2,
+     0,
+     0
+    ]
+   }
+  ],
+  "note": "the 44 orientation-preserving entries are identical, as a set of poses, to the 44-pose contact atlas A44 reported for Tsiokos's Chair44 (2026), as transcribed in tiling-matching-system.json.  That transcription, not the paper itself, is what the comparison is against."
+ },
+ "notch_fillers": [
+  {
+   "slot": "110",
+   "perm": [
+    0,
+    1,
+    2
+   ],
+   "signs": [
+    -1,
+    -1,
+    1
+   ],
+   "translation": [
+    3,
+    3,
+    1
+   ]
+  },
+  {
+   "slot": "000",
+   "perm": [
+    0,
+    1,
+    2
+   ],
+   "signs": [
+    1,
+    1,
+    1
+   ],
+   "translation": [
+    1,
+    1,
+    1
+   ]
+  },
+  {
+   "slot": "010",
+   "perm": [
+    0,
+    2,
+    1
+   ],
+   "signs": [
+    1,
+    1,
+    -1
+   ],
+   "translation": [
+    1,
+    1,
+    3
+   ]
+  },
+  {
+   "slot": "001",
+   "perm": [
+    1,
+    0,
+    2
+   ],
+   "signs": [
+    1,
+    1,
+    -1
+   ],
+   "translation": [
+    1,
+    1,
+    3
+   ]
+  },
+  {
+   "slot": "011",
+   "perm": [
+    1,
+    2,
+    0
+   ],
+   "signs": [
+    -1,
+    -1,
+    1
+   ],
+   "translation": [
+    3,
+    3,
+    1
+   ]
+  },
+  {
+   "slot": "101",
+   "perm": [
+    2,
+    0,
+    1
+   ],
+   "signs": [
+    -1,
+    -1,
+    1
+   ],
+   "translation": [
+    3,
+    3,
+    1
+   ]
+  },
+  {
+   "slot": "100",
+   "perm": [
+    2,
+    1,
+    0
+   ],
+   "signs": [
+    1,
+    1,
+    -1
+   ],
+   "translation": [
+    1,
+    1,
+    3
+   ]
+  }
+ ],
+ "verification": {
+  "facet_count": 24,
+  "type_census_M24": {
+   "F": 8,
+   "H": 8,
+   "B": 8
+  },
+  "marking_symmetry_group_order": 1,
+  "shape_symmetry_group_order": 6,
+  "child_frames": {
+   "(0, 0, 0)": {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ],
+    "det": 1
+   },
+   "(0, 0, 1)": {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ],
+    "det": 1
+   },
+   "(0, 1, 0)": {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ],
+    "det": 1
+   },
+   "(0, 1, 1)": {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     0,
+     4,
+     4
+    ],
+    "det": 1
+   },
+   "(1, 0, 0)": {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ],
+    "det": 1
+   },
+   "(1, 0, 1)": {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     0,
+     4
+    ],
+    "det": 1
+   },
+   "(1, 1, 0)": {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     0
+    ],
+    "det": 1
+   },
+   "dent": {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ],
+    "det": 1
+   }
+  },
+  "substitution_consistency": {
+   "1": {
+    "chairs": 8,
+    "cells": 56,
+    "partition_ok": true,
+    "directed_interior_contacts": 96,
+    "violations": 0
+   },
+   "2": {
+    "chairs": 64,
+    "cells": 448,
+    "partition_ok": true,
+    "directed_interior_contacts": 1152,
+    "violations": 0
+   },
+   "3": {
+    "chairs": 512,
+    "cells": 3584,
+    "partition_ok": true,
+    "directed_interior_contacts": 10752,
+    "violations": 0
+   }
+  },
+  "self_similarity": {
+   "1": {
+    "reproduces_M": true,
+    "mismatches": 0
+   },
+   "2": {
+    "reproduces_M": true,
+    "mismatches": 0
+   }
+  },
+  "central_child_dent_star": {
+   "x": "F",
+   "y": "H",
+   "z": "B"
+  },
+  "dent_translation_legal": true,
+  "dent_translation_shared_facets": 3,
+  "atlas": {
+   "total": 60,
+   "proper": 44,
+   "improper": 16,
+   "distinct_frames": 25,
+   "identity_frame_translations": [
+    [
+     -1,
+     -1,
+     -1
+    ],
+    [
+     1,
+     1,
+     1
+    ]
+   ]
+  },
+  "atlas_occurring_level3": 30,
+  "d1_notch_fillers": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   }
+  ],
+  "d1_bare_notch_fillers": 60,
+  "generated": "2026-09-17T13:24:41",
+  "force_out": {
+   "allow_reflections": false,
+   "shell_cells": 22,
+   "atlas_size": 44,
+   "first_shells": 33,
+   "chairs_per_shell": [
+    7,
+    8
+   ],
+   "notch_fillers": 7,
+   "notch_fillers_are_exactly_the_substitution_ones": true,
+   "notch_slot_distribution": {
+    "(0, 0, 0)": 3,
+    "(1, 1, 0)": 8,
+    "(0, 1, 0)": 2,
+    "(0, 1, 1)": 8,
+    "(1, 0, 1)": 8,
+    "(0, 0, 1)": 2,
+    "(1, 0, 0)": 2
+   },
+   "first_shell_forces_supertile": {
+    "all8": 0,
+    "total": 33,
+    "missing_hist": {
+     "6": 1,
+     "4": 24,
+     "3": 8
+    }
+   },
+   "centre_vs_corner_conflict": {
+    "(0, 0, 0)": {
+     "cell_overlaps": 12,
+     "mark_conflicts": 0
+    },
+    "(0, 0, 1)": {
+     "cell_overlaps": 11,
+     "mark_conflicts": 3
+    },
+    "(0, 1, 0)": {
+     "cell_overlaps": 11,
+     "mark_conflicts": 3
+    },
+    "(0, 1, 1)": {
+     "cell_overlaps": 9,
+     "mark_conflicts": 3
+    },
+    "(1, 0, 0)": {
+     "cell_overlaps": 11,
+     "mark_conflicts": 3
+    },
+    "(1, 0, 1)": {
+     "cell_overlaps": 9,
+     "mark_conflicts": 3
+    },
+    "(1, 1, 0)": {
+     "cell_overlaps": 9,
+     "mark_conflicts": 3
+    }
+   }
+  },
+  "force2_out": {
+   "parent_is_function_of_filler": true,
+   "competing_groups": {
+    "tested": 2156,
+    "legal": 269,
+    "same_parent": 18,
+    "disjoint_parents": 189,
+    "halved_rel_pose_in_A44": 135,
+    "failures": 116
+   },
+   "nu_map": {
+    "chairs": 4096,
+    "preimage_hist": {
+     "1": 511,
+     "7": 512
+    },
+    "zero_preimages": 3073,
+    "central_children": 512,
+    "exactly7": 512,
+    "seven_subset_of_central": true
+   },
+   "coarse_atlas": {
+    "supertiles": 512,
+    "relative_poses": 30,
+    "all_even": true,
+    "halved_subset_of_A44": true,
+    "realised": 30
+   }
+  },
+  "force3_out": {
+   "first_shells": 33,
+   "pre_values": [
+    0,
+    1,
+    7
+   ],
+   "table": [
+    {
+     "chairs": 7,
+     "nu_slot": "(0, 0, 0)",
+     "pre": 0,
+     "count": 1
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(0, 0, 1)",
+     "pre": 0,
+     "count": 1
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(0, 1, 0)",
+     "pre": 0,
+     "count": 1
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(0, 1, 1)",
+     "pre": 0,
+     "count": 4
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(1, 0, 0)",
+     "pre": 0,
+     "count": 1
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(1, 0, 1)",
+     "pre": 0,
+     "count": 4
+    },
+    {
+     "chairs": 7,
+     "nu_slot": "(1, 1, 0)",
+     "pre": 0,
+     "count": 4
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(0, 0, 0)",
+     "pre": 1,
+     "count": 1
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(0, 0, 1)",
+     "pre": 1,
+     "count": 1
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(0, 1, 0)",
+     "pre": 1,
+     "count": 1
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(0, 1, 1)",
+     "pre": 1,
+     "count": 4
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(1, 0, 0)",
+     "pre": 1,
+     "count": 1
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(1, 0, 1)",
+     "pre": 1,
+     "count": 4
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(1, 1, 0)",
+     "pre": 1,
+     "count": 4
+    },
+    {
+     "chairs": 8,
+     "nu_slot": "(0, 0, 0)",
+     "pre": 7,
+     "count": 1
+    }
+   ],
+   "centre_shells": 1,
+   "centre_shell_is_supertile": true,
+   "competing_groups_corrected": {
+    "tested": 2156,
+    "legal": 207,
+    "same": 18,
+    "disjoint": 189,
+    "coarse_ok": 135,
+    "failures": 54,
+    "failure_kinds": {
+     "NOT-IN-A44": 54
+    }
+   }
+  },
+  "force4_out": {
+   "supertile_atlas": 44,
+   "odd_translations": 0,
+   "halved_equals_A44": true,
+   "halved_count": 44
+  },
+  "search_out": {
+   "tested": 1679616,
+   "level1_solutions": 18,
+   "level2_solutions": 18,
+   "all_proper": 12,
+   "equivalence_classes": 3,
+   "class_sizes": [
+    6,
+    6,
+    6
+   ],
+   "M24_found": true
+  },
+  "classes_out": {
+   "n": 18,
+   "rows": [
+    {
+     "i": 0,
+     "stars": [
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 13,
+     "tot": 33,
+     "whit": 37,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 1,
+     "stars": [
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": true,
+     "hit": 11,
+     "tot": 33,
+     "whit": 33,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 2,
+     "stars": [
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 29,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 3,
+     "stars": [
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": false,
+     "hit": 30,
+     "tot": 33,
+     "whit": 80,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 4,
+     "stars": [
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 9,
+     "tot": 33,
+     "whit": 27,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 5,
+     "stars": [
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 10,
+     "tot": 33,
+     "whit": 26,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 6,
+     "stars": [
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 13,
+     "tot": 33,
+     "whit": 35,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 7,
+     "stars": [
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": true,
+     "hit": 33,
+     "tot": 33,
+     "whit": 89,
+     "wtot": 89,
+     "is_M24": true
+    },
+    {
+     "i": 8,
+     "stars": [
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 27,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 9,
+     "stars": [
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 29,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 10,
+     "stars": [
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 12,
+     "tot": 33,
+     "whit": 28,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 11,
+     "stars": [
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 33,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 12,
+     "stars": [
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 33,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 13,
+     "stars": [
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 12,
+     "tot": 33,
+     "whit": 34,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 14,
+     "stars": [
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 11,
+     "tot": 33,
+     "whit": 31,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 15,
+     "stars": [
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "F",
+       "H",
+       "B"
+      ],
+      [
+       "H",
+       "B",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "F",
+       "B",
+       "H"
+      ],
+      [
+       "H",
+       "F",
+       "B"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 44,
+     "Aminus": 16,
+     "eqA44": false,
+     "hit": 30,
+     "tot": 33,
+     "whit": 80,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 16,
+     "stars": [
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ]
+     ],
+     "all_proper": true,
+     "Aplus": 62,
+     "Aminus": 48,
+     "eqA44": false,
+     "hit": 10,
+     "tot": 33,
+     "whit": 28,
+     "wtot": 89,
+     "is_M24": false
+    },
+    {
+     "i": 17,
+     "stars": [
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "H",
+       "F"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ],
+      [
+       "B",
+       "F",
+       "H"
+      ]
+     ],
+     "all_proper": false,
+     "Aplus": 40,
+     "Aminus": 40,
+     "eqA44": false,
+     "hit": 9,
+     "tot": 33,
+     "whit": 25,
+     "wtot": 89,
+     "is_M24": false
+    }
+   ]
+  }
+ },
+ "tsiokos_panel_map": {
+  "_note": "Tsiokos Chair44 panel IDs mapped onto the 24 facets used here. The three D4 motif classes coincide exactly with the three symbols: A = purple-hollow (H), B = purple-filled (F), C = blue (B).",
+  "dictionary": {
+   "A": "H",
+   "B": "F",
+   "C": "B"
+  },
+  "panels": [
+   {
+    "panel": 0,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     0,
+     0,
+     0
+    ],
+    "outward_normal": [
+     -1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 1,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     0,
+     0,
+     1
+    ],
+    "outward_normal": [
+     -1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 2,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     0,
+     1,
+     0
+    ],
+    "outward_normal": [
+     -1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 3,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     0,
+     1,
+     1
+    ],
+    "outward_normal": [
+     -1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 4,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     0,
+     1,
+     1
+    ],
+    "outward_normal": [
+     1,
+     0,
+     0
+    ],
+    "is_notch": true
+   },
+   {
+    "panel": 5,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     1,
+     0,
+     0
+    ],
+    "outward_normal": [
+     1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 6,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     1,
+     0,
+     1
+    ],
+    "outward_normal": [
+     1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 7,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     1,
+     1,
+     0
+    ],
+    "outward_normal": [
+     1,
+     0,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 8,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     0,
+     0,
+     0
+    ],
+    "outward_normal": [
+     0,
+     -1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 9,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     0,
+     0,
+     1
+    ],
+    "outward_normal": [
+     0,
+     -1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 10,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     0,
+     1,
+     0
+    ],
+    "outward_normal": [
+     0,
+     1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 11,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     0,
+     1,
+     1
+    ],
+    "outward_normal": [
+     0,
+     1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 12,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     1,
+     0,
+     0
+    ],
+    "outward_normal": [
+     0,
+     -1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 13,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     1,
+     0,
+     1
+    ],
+    "outward_normal": [
+     0,
+     -1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 14,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     1,
+     0,
+     1
+    ],
+    "outward_normal": [
+     0,
+     1,
+     0
+    ],
+    "is_notch": true
+   },
+   {
+    "panel": 15,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     1,
+     1,
+     0
+    ],
+    "outward_normal": [
+     0,
+     1,
+     0
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 16,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     0,
+     0,
+     0
+    ],
+    "outward_normal": [
+     0,
+     0,
+     -1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 17,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     0,
+     0,
+     1
+    ],
+    "outward_normal": [
+     0,
+     0,
+     1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 18,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     0,
+     1,
+     0
+    ],
+    "outward_normal": [
+     0,
+     0,
+     -1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 19,
+    "tsiokos_motif": "B",
+    "symbol": "F",
+    "cell": [
+     0,
+     1,
+     1
+    ],
+    "outward_normal": [
+     0,
+     0,
+     1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 20,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     1,
+     0,
+     0
+    ],
+    "outward_normal": [
+     0,
+     0,
+     -1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 21,
+    "tsiokos_motif": "A",
+    "symbol": "H",
+    "cell": [
+     1,
+     0,
+     1
+    ],
+    "outward_normal": [
+     0,
+     0,
+     1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 22,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     1,
+     1,
+     0
+    ],
+    "outward_normal": [
+     0,
+     0,
+     -1
+    ],
+    "is_notch": false
+   },
+   {
+    "panel": 23,
+    "tsiokos_motif": "C",
+    "symbol": "B",
+    "cell": [
+     1,
+     1,
+     0
+    ],
+    "outward_normal": [
+     0,
+     0,
+     1
+    ],
+    "is_notch": true
+   }
+  ]
+ }
+}

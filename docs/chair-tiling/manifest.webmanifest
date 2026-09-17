@@ -1,0 +1,11 @@
+{
+  "name": "Chair tiling — the marked chair",
+  "short_name": "Chair tiling",
+  "description": "An interactive reconstruction of Chaim Goodman-Strauss's marked chair: one 3-D tile whose 24 facets carry three kinds of arrow, and the hierarchy of supertiles those arrows force.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070810",
+  "theme_color": "#070810"
+}

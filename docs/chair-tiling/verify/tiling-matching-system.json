@@ -1,0 +1,8039 @@
+{
+ "_about": "Machine-readable discrete matching system of Chair44 (R44), the seven-cube-chair aperiodic monotile of Ioannis Tsiokos (2026), plus the eight-chair substitution. Extracted and re-derived from the author's repository by an independent reader on 2026-09-17.",
+ "source": {
+  "paper": "Ioannis Tsiokos, 'A Strongly Aperiodic Monotile in Three Dimensions', v2, 16 September 2026, 62 pp.",
+  "zenodo_v2": "https://doi.org/10.5281/zenodo.22792358",
+  "zenodo_v1": "https://zenodo.org/records/22734468",
+  "zenodo_concept_doi": "10.5281/zenodo.22734467",
+  "repository": "https://github.com/ioannist/six-birds-tiles",
+  "release_checkpoint_commit": "137e46b15d36266c37879478cfc62af6e4469147",
+  "mathematical_baseline_commit": "d90313a717",
+  "files_read": [
+   "solid/r44_solid.json",
+   "solid/native_panels.csv",
+   "certificates/candidate_certificate.json",
+   "verify/packets/einstein_macrostate/src/framed_chair.py"
+  ],
+  "r44_solid_json_sha256": "f320d7a0c2d784a3eb29f001dc035808f67591d9ea8d3dd45949e66442f0ed55",
+  "candidate_certificate_json_sha256": "44e9b3f6048497de02d1be72d0c80ddc94aaaf235382138c7468ffdbc5de5ff2",
+  "license": "CC BY 4.0 (paper); see repository LICENSE for code"
+ },
+ "coordinate_convention": {
+  "carrier": "P = union over a in {0,1}^3 \\ {(1,1,1)} of (a + [0,1]^3): the 2x2x2 cube of unit cells minus the corner cell [1,2]^3.",
+  "axes": "x = axis 0, y = axis 1, z = axis 2. Unit = one carrier cell edge.",
+  "panels": "24 unit squares of the boundary of P: 21 on the six outer faces (4+4+4+3+3+3) and 3 inset notch faces (panels 4 at x=1, 14 at y=1, 23 at z=1).",
+  "panel_ids": "0..23 as in solid/native_panels.csv; identical to the IDs in Figure 3 of the paper; they are the sorted order of (normal_axis, doubled centre) used by framed_chair.py NATIVE.",
+  "in_panel_axes": "for a panel with outward normal along axis n, the in-panel coordinates (u,v) are the two remaining axes in increasing index order: n=x -> (y,z); n=y -> (x,z); n=z -> (x,y). This matches the six diagram headings of Figure 3.",
+  "feature_positions": "each panel carries exactly 8 features at in-panel offsets (+-1/8,+-1/4) and (+-1/4,+-1/8) from the panel centre. The offset index k=0..7 enumerates them as [(s*u/8, t*v/8) for (u,v) in ((1,2),(2,1)) for (s,t) in ((-1,-1),(-1,1),(1,-1),(1,1))], i.e. k=0:(-1/8,-1/4) 1:(-1/8,+1/4) 2:(+1/8,-1/4) 3:(+1/8,+1/4) 4:(-1/4,-1/8) 5:(-1/4,+1/8) 6:(+1/4,-1/8) 7:(+1/4,+1/8).",
+  "role_index": "role = 8*panel + k, 0..191, the indexing used by the solid file's 'profile' array.",
+  "feature_shape": "axis-parallel square pyramid, base side 1/50 (half-width eta = 1/100), apex displaced along the OUTWARD normal by a/10000. a>0 is a protrusion (bump), a<0 a recess (dent). |a| in 1..12.",
+  "verified": "the 'profile' array of solid/r44_solid.json is entrywise equal to the a_0..a_7 columns of solid/native_panels.csv, and both agree with Figure 3 of the paper (spot-checked on panels 0, 3, 13)."
+ },
+ "matching_rule": {
+  "statement": "There is NO imposed matching rule: Chair44 is a bare solid and the only rule is that copies must not overlap. The discrete rule below is a THEOREM about the shape, valid for registered (integer-lattice, cubic-frame) placements.",
+  "discrete_form": "When two panels meet face to face their outward normals are opposite. At every point of space where a feature of one coincides with a feature of the other, the two signed coefficients must sum to zero: a_u + a_v = 0, i.e. a bump of magnitude m meets a dent of the same magnitude m. Because each of the twelve magnitudes 1..12 is carried by exactly one signed group, the profiles across a shared panel are compared centre by centre with no tolerance.",
+  "consequence": "two panels can meet only if, after the change of in-panel coordinates induced by the relative pose, their 8-vectors of coefficients are exact entrywise negatives."
+ },
+ "panels": [
+  {
+   "panel": 0,
+   "normal_axis": 0,
+   "outward_sign": -1,
+   "panel_centre": [
+    "0",
+    "1/2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "3/8",
+      "1/4"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "-1/10000",
+      "3/8",
+      "1/4"
+     ],
+     "role": 0
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "3/8",
+      "3/4"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "-1/5000",
+      "3/8",
+      "3/4"
+     ],
+     "role": 1
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "5/8",
+      "1/4"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "-3/10000",
+      "5/8",
+      "1/4"
+     ],
+     "role": 2
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "5/8",
+      "3/4"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "-1/2500",
+      "5/8",
+      "3/4"
+     ],
+     "role": 3
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "1/4",
+      "3/8"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "-1/2000",
+      "1/4",
+      "3/8"
+     ],
+     "role": 4
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "1/4",
+      "5/8"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "-3/5000",
+      "1/4",
+      "5/8"
+     ],
+     "role": 5
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "3/4",
+      "3/8"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "-7/10000",
+      "3/4",
+      "3/8"
+     ],
+     "role": 6
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "3/4",
+      "5/8"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "-1/1250",
+      "3/4",
+      "5/8"
+     ],
+     "role": 7
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 1,
+   "normal_axis": 0,
+   "outward_sign": -1,
+   "panel_centre": [
+    "0",
+    "1/2",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -2,
+    -1,
+    -4,
+    -3,
+    -6,
+    -5,
+    -8,
+    -7
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "3/8",
+      "5/4"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "1/5000",
+      "3/8",
+      "5/4"
+     ],
+     "role": 8
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "3/8",
+      "7/4"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "1/10000",
+      "3/8",
+      "7/4"
+     ],
+     "role": 9
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "5/8",
+      "5/4"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "1/2500",
+      "5/8",
+      "5/4"
+     ],
+     "role": 10
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "5/8",
+      "7/4"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "3/10000",
+      "5/8",
+      "7/4"
+     ],
+     "role": 11
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "1/4",
+      "11/8"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "3/5000",
+      "1/4",
+      "11/8"
+     ],
+     "role": 12
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "1/4",
+      "13/8"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "1/2000",
+      "1/4",
+      "13/8"
+     ],
+     "role": 13
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "3/4",
+      "11/8"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "1/1250",
+      "3/4",
+      "11/8"
+     ],
+     "role": 14
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "3/4",
+      "13/8"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "7/10000",
+      "3/4",
+      "13/8"
+     ],
+     "role": 15
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 2,
+   "normal_axis": 0,
+   "outward_sign": -1,
+   "panel_centre": [
+    "0",
+    "3/2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    6,
+    8,
+    5,
+    7,
+    2,
+    4,
+    1,
+    3
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "11/8",
+      "1/4"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "-3/5000",
+      "11/8",
+      "1/4"
+     ],
+     "role": 16
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "11/8",
+      "3/4"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "-1/1250",
+      "11/8",
+      "3/4"
+     ],
+     "role": 17
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "13/8",
+      "1/4"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "-1/2000",
+      "13/8",
+      "1/4"
+     ],
+     "role": 18
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "13/8",
+      "3/4"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "-7/10000",
+      "13/8",
+      "3/4"
+     ],
+     "role": 19
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "5/4",
+      "3/8"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "-1/5000",
+      "5/4",
+      "3/8"
+     ],
+     "role": 20
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "5/4",
+      "5/8"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "-1/2500",
+      "5/4",
+      "5/8"
+     ],
+     "role": 21
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "7/4",
+      "3/8"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "-1/10000",
+      "7/4",
+      "3/8"
+     ],
+     "role": 22
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "7/4",
+      "5/8"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "-3/10000",
+      "7/4",
+      "5/8"
+     ],
+     "role": 23
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 3,
+   "normal_axis": 0,
+   "outward_sign": -1,
+   "panel_centre": [
+    "0",
+    "3/2",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    9,
+    10,
+    11,
+    12,
+    -9,
+    -11,
+    -10,
+    -12
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "11/8",
+      "5/4"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "-9/10000",
+      "11/8",
+      "5/4"
+     ],
+     "role": 24
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "11/8",
+      "7/4"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "-1/1000",
+      "11/8",
+      "7/4"
+     ],
+     "role": 25
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "0",
+      "13/8",
+      "5/4"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "-11/10000",
+      "13/8",
+      "5/4"
+     ],
+     "role": 26
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "0",
+      "13/8",
+      "7/4"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "-3/2500",
+      "13/8",
+      "7/4"
+     ],
+     "role": 27
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "5/4",
+      "11/8"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "9/10000",
+      "5/4",
+      "11/8"
+     ],
+     "role": 28
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "5/4",
+      "13/8"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "11/10000",
+      "5/4",
+      "13/8"
+     ],
+     "role": 29
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "0",
+      "7/4",
+      "11/8"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "1/1000",
+      "7/4",
+      "11/8"
+     ],
+     "role": 30
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "0",
+      "7/4",
+      "13/8"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "3/2500",
+      "7/4",
+      "13/8"
+     ],
+     "role": 31
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 4,
+   "normal_axis": 0,
+   "outward_sign": 1,
+   "panel_centre": [
+    "1",
+    "3/2",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": true,
+   "coefficients_by_offset_index": [
+    -1,
+    -2,
+    -3,
+    -4,
+    -5,
+    -6,
+    -7,
+    -8
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "1",
+      "11/8",
+      "5/4"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "9999/10000",
+      "11/8",
+      "5/4"
+     ],
+     "role": 32
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "1",
+      "11/8",
+      "7/4"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "4999/5000",
+      "11/8",
+      "7/4"
+     ],
+     "role": 33
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "1",
+      "13/8",
+      "5/4"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "9997/10000",
+      "13/8",
+      "5/4"
+     ],
+     "role": 34
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "1",
+      "13/8",
+      "7/4"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "2499/2500",
+      "13/8",
+      "7/4"
+     ],
+     "role": 35
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1",
+      "5/4",
+      "11/8"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "1999/2000",
+      "5/4",
+      "11/8"
+     ],
+     "role": 36
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1",
+      "5/4",
+      "13/8"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "4997/5000",
+      "5/4",
+      "13/8"
+     ],
+     "role": 37
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1",
+      "7/4",
+      "11/8"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "9993/10000",
+      "7/4",
+      "11/8"
+     ],
+     "role": 38
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1",
+      "7/4",
+      "13/8"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "1249/1250",
+      "7/4",
+      "13/8"
+     ],
+     "role": 39
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 5,
+   "normal_axis": 0,
+   "outward_sign": 1,
+   "panel_centre": [
+    "2",
+    "1/2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -12,
+    -11,
+    -10,
+    -9,
+    12,
+    10,
+    11,
+    9
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "3/8",
+      "1/4"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "4997/2500",
+      "3/8",
+      "1/4"
+     ],
+     "role": 40
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "3/8",
+      "3/4"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "19989/10000",
+      "3/8",
+      "3/4"
+     ],
+     "role": 41
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "5/8",
+      "1/4"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "1999/1000",
+      "5/8",
+      "1/4"
+     ],
+     "role": 42
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "5/8",
+      "3/4"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "19991/10000",
+      "5/8",
+      "3/4"
+     ],
+     "role": 43
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "1/4",
+      "3/8"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "5003/2500",
+      "1/4",
+      "3/8"
+     ],
+     "role": 44
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "1/4",
+      "5/8"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "2001/1000",
+      "1/4",
+      "5/8"
+     ],
+     "role": 45
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "3/4",
+      "3/8"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "20011/10000",
+      "3/4",
+      "3/8"
+     ],
+     "role": 46
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "3/4",
+      "5/8"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "20009/10000",
+      "3/4",
+      "5/8"
+     ],
+     "role": 47
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 6,
+   "normal_axis": 0,
+   "outward_sign": 1,
+   "panel_centre": [
+    "2",
+    "1/2",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -7,
+    -5,
+    -8,
+    -6,
+    -3,
+    -1,
+    -4,
+    -2
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "3/8",
+      "5/4"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "19993/10000",
+      "3/8",
+      "5/4"
+     ],
+     "role": 48
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "3/8",
+      "7/4"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "3999/2000",
+      "3/8",
+      "7/4"
+     ],
+     "role": 49
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "5/8",
+      "5/4"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "2499/1250",
+      "5/8",
+      "5/4"
+     ],
+     "role": 50
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "5/8",
+      "7/4"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "9997/5000",
+      "5/8",
+      "7/4"
+     ],
+     "role": 51
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "1/4",
+      "11/8"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "19997/10000",
+      "1/4",
+      "11/8"
+     ],
+     "role": 52
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "1/4",
+      "13/8"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "19999/10000",
+      "1/4",
+      "13/8"
+     ],
+     "role": 53
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "3/4",
+      "11/8"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "4999/2500",
+      "3/4",
+      "11/8"
+     ],
+     "role": 54
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "3/4",
+      "13/8"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "9999/5000",
+      "3/4",
+      "13/8"
+     ],
+     "role": 55
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 7,
+   "normal_axis": 0,
+   "outward_sign": 1,
+   "panel_centre": [
+    "2",
+    "3/2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    1,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    3,
+    4,
+    1,
+    2,
+    7,
+    8,
+    5,
+    6
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "11/8",
+      "1/4"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "20003/10000",
+      "11/8",
+      "1/4"
+     ],
+     "role": 56
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "11/8",
+      "3/4"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "5001/2500",
+      "11/8",
+      "3/4"
+     ],
+     "role": 57
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "2",
+      "13/8",
+      "1/4"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "20001/10000",
+      "13/8",
+      "1/4"
+     ],
+     "role": 58
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "2",
+      "13/8",
+      "3/4"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "10001/5000",
+      "13/8",
+      "3/4"
+     ],
+     "role": 59
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "5/4",
+      "3/8"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "20007/10000",
+      "5/4",
+      "3/8"
+     ],
+     "role": 60
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "5/4",
+      "5/8"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "2501/1250",
+      "5/4",
+      "5/8"
+     ],
+     "role": 61
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "2",
+      "7/4",
+      "3/8"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "4001/2000",
+      "7/4",
+      "3/8"
+     ],
+     "role": 62
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "2",
+      "7/4",
+      "5/8"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "10003/5000",
+      "7/4",
+      "5/8"
+     ],
+     "role": 63
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 8,
+   "normal_axis": 1,
+   "outward_sign": -1,
+   "panel_centre": [
+    "1/2",
+    "0",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -1,
+    -2,
+    -3,
+    -4,
+    -5,
+    -6,
+    -7,
+    -8
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "0",
+      "1/4"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "3/8",
+      "1/10000",
+      "1/4"
+     ],
+     "role": 64
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "0",
+      "3/4"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "3/8",
+      "1/5000",
+      "3/4"
+     ],
+     "role": 65
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "0",
+      "1/4"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "5/8",
+      "3/10000",
+      "1/4"
+     ],
+     "role": 66
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "0",
+      "3/4"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "5/8",
+      "1/2500",
+      "3/4"
+     ],
+     "role": 67
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "0",
+      "3/8"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "1/4",
+      "1/2000",
+      "3/8"
+     ],
+     "role": 68
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "0",
+      "5/8"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "1/4",
+      "3/5000",
+      "5/8"
+     ],
+     "role": 69
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "0",
+      "3/8"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "3/4",
+      "7/10000",
+      "3/8"
+     ],
+     "role": 70
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "0",
+      "5/8"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "3/4",
+      "1/1250",
+      "5/8"
+     ],
+     "role": 71
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 9,
+   "normal_axis": 1,
+   "outward_sign": -1,
+   "panel_centre": [
+    "1/2",
+    "0",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    2,
+    1,
+    4,
+    3,
+    6,
+    5,
+    8,
+    7
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "0",
+      "5/4"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "3/8",
+      "-1/5000",
+      "5/4"
+     ],
+     "role": 72
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "0",
+      "7/4"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "3/8",
+      "-1/10000",
+      "7/4"
+     ],
+     "role": 73
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "0",
+      "5/4"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "5/8",
+      "-1/2500",
+      "5/4"
+     ],
+     "role": 74
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "0",
+      "7/4"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "5/8",
+      "-3/10000",
+      "7/4"
+     ],
+     "role": 75
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "0",
+      "11/8"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "1/4",
+      "-3/5000",
+      "11/8"
+     ],
+     "role": 76
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "0",
+      "13/8"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "1/4",
+      "-1/2000",
+      "13/8"
+     ],
+     "role": 77
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "0",
+      "11/8"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "3/4",
+      "-1/1250",
+      "11/8"
+     ],
+     "role": 78
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "0",
+      "13/8"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "3/4",
+      "-7/10000",
+      "13/8"
+     ],
+     "role": 79
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 10,
+   "normal_axis": 1,
+   "outward_sign": 1,
+   "panel_centre": [
+    "1/2",
+    "2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    12,
+    11,
+    10,
+    9,
+    -12,
+    -10,
+    -11,
+    -9
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "2",
+      "1/4"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "3/8",
+      "5003/2500",
+      "1/4"
+     ],
+     "role": 80
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "2",
+      "3/4"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "3/8",
+      "20011/10000",
+      "3/4"
+     ],
+     "role": 81
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "2",
+      "1/4"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "5/8",
+      "2001/1000",
+      "1/4"
+     ],
+     "role": 82
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "2",
+      "3/4"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "5/8",
+      "20009/10000",
+      "3/4"
+     ],
+     "role": 83
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "2",
+      "3/8"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "1/4",
+      "4997/2500",
+      "3/8"
+     ],
+     "role": 84
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "2",
+      "5/8"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "1/4",
+      "1999/1000",
+      "5/8"
+     ],
+     "role": 85
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "2",
+      "3/8"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "3/4",
+      "19989/10000",
+      "3/8"
+     ],
+     "role": 86
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "2",
+      "5/8"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "3/4",
+      "19991/10000",
+      "5/8"
+     ],
+     "role": 87
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 11,
+   "normal_axis": 1,
+   "outward_sign": 1,
+   "panel_centre": [
+    "1/2",
+    "2",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    7,
+    5,
+    8,
+    6,
+    3,
+    1,
+    4,
+    2
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "2",
+      "5/4"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "3/8",
+      "20007/10000",
+      "5/4"
+     ],
+     "role": 88
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "2",
+      "7/4"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "3/8",
+      "4001/2000",
+      "7/4"
+     ],
+     "role": 89
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "2",
+      "5/4"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "5/8",
+      "2501/1250",
+      "5/4"
+     ],
+     "role": 90
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "2",
+      "7/4"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "5/8",
+      "10003/5000",
+      "7/4"
+     ],
+     "role": 91
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "2",
+      "11/8"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "1/4",
+      "20003/10000",
+      "11/8"
+     ],
+     "role": 92
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "2",
+      "13/8"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "1/4",
+      "20001/10000",
+      "13/8"
+     ],
+     "role": 93
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "2",
+      "11/8"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "3/4",
+      "5001/2500",
+      "11/8"
+     ],
+     "role": 94
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "2",
+      "13/8"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "3/4",
+      "10001/5000",
+      "13/8"
+     ],
+     "role": 95
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 12,
+   "normal_axis": 1,
+   "outward_sign": -1,
+   "panel_centre": [
+    "3/2",
+    "0",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -6,
+    -8,
+    -5,
+    -7,
+    -2,
+    -4,
+    -1,
+    -3
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "0",
+      "1/4"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "11/8",
+      "3/5000",
+      "1/4"
+     ],
+     "role": 96
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "0",
+      "3/4"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "11/8",
+      "1/1250",
+      "3/4"
+     ],
+     "role": 97
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "0",
+      "1/4"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "13/8",
+      "1/2000",
+      "1/4"
+     ],
+     "role": 98
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "0",
+      "3/4"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "13/8",
+      "7/10000",
+      "3/4"
+     ],
+     "role": 99
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "0",
+      "3/8"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "5/4",
+      "1/5000",
+      "3/8"
+     ],
+     "role": 100
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "0",
+      "5/8"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "5/4",
+      "1/2500",
+      "5/8"
+     ],
+     "role": 101
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "0",
+      "3/8"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "7/4",
+      "1/10000",
+      "3/8"
+     ],
+     "role": 102
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "0",
+      "5/8"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "7/4",
+      "3/10000",
+      "5/8"
+     ],
+     "role": 103
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 13,
+   "normal_axis": 1,
+   "outward_sign": -1,
+   "panel_centre": [
+    "3/2",
+    "0",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -9,
+    -10,
+    -11,
+    -12,
+    9,
+    11,
+    10,
+    12
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "0",
+      "5/4"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "11/8",
+      "9/10000",
+      "5/4"
+     ],
+     "role": 104
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "0",
+      "7/4"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "11/8",
+      "1/1000",
+      "7/4"
+     ],
+     "role": 105
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "0",
+      "5/4"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "13/8",
+      "11/10000",
+      "5/4"
+     ],
+     "role": 106
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "0",
+      "7/4"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "13/8",
+      "3/2500",
+      "7/4"
+     ],
+     "role": 107
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "0",
+      "11/8"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "5/4",
+      "-9/10000",
+      "11/8"
+     ],
+     "role": 108
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "0",
+      "13/8"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "5/4",
+      "-11/10000",
+      "13/8"
+     ],
+     "role": 109
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "0",
+      "11/8"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "7/4",
+      "-1/1000",
+      "11/8"
+     ],
+     "role": 110
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "0",
+      "13/8"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "7/4",
+      "-3/2500",
+      "13/8"
+     ],
+     "role": 111
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 14,
+   "normal_axis": 1,
+   "outward_sign": 1,
+   "panel_centre": [
+    "3/2",
+    "1",
+    "3/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": true,
+   "coefficients_by_offset_index": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "1",
+      "5/4"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "11/8",
+      "10001/10000",
+      "5/4"
+     ],
+     "role": 112
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "1",
+      "7/4"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "11/8",
+      "5001/5000",
+      "7/4"
+     ],
+     "role": 113
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "1",
+      "5/4"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "13/8",
+      "10003/10000",
+      "5/4"
+     ],
+     "role": 114
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "1",
+      "7/4"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "13/8",
+      "2501/2500",
+      "7/4"
+     ],
+     "role": 115
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "1",
+      "11/8"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "5/4",
+      "2001/2000",
+      "11/8"
+     ],
+     "role": 116
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "1",
+      "13/8"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "5/4",
+      "5003/5000",
+      "13/8"
+     ],
+     "role": 117
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "1",
+      "11/8"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "7/4",
+      "10007/10000",
+      "11/8"
+     ],
+     "role": 118
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "1",
+      "13/8"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "7/4",
+      "1251/1250",
+      "13/8"
+     ],
+     "role": 119
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 15,
+   "normal_axis": 1,
+   "outward_sign": 1,
+   "panel_centre": [
+    "3/2",
+    "2",
+    "1/2"
+   ],
+   "in_panel_axes": [
+    0,
+    2
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -3,
+    -4,
+    -1,
+    -2,
+    -7,
+    -8,
+    -5,
+    -6
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "2",
+      "1/4"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "11/8",
+      "19997/10000",
+      "1/4"
+     ],
+     "role": 120
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "2",
+      "3/4"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "11/8",
+      "4999/2500",
+      "3/4"
+     ],
+     "role": 121
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "2",
+      "1/4"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "13/8",
+      "19999/10000",
+      "1/4"
+     ],
+     "role": 122
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "2",
+      "3/4"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "13/8",
+      "9999/5000",
+      "3/4"
+     ],
+     "role": 123
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "2",
+      "3/8"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "5/4",
+      "19993/10000",
+      "3/8"
+     ],
+     "role": 124
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "2",
+      "5/8"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "5/4",
+      "2499/1250",
+      "5/8"
+     ],
+     "role": 125
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "2",
+      "3/8"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "7/4",
+      "3999/2000",
+      "3/8"
+     ],
+     "role": 126
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "2",
+      "5/8"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "7/4",
+      "9997/5000",
+      "5/8"
+     ],
+     "role": 127
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 16,
+   "normal_axis": 2,
+   "outward_sign": -1,
+   "panel_centre": [
+    "1/2",
+    "1/2",
+    "0"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    12,
+    11,
+    10,
+    9,
+    -12,
+    -10,
+    -11,
+    -9
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "1/4",
+      "0"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "3/8",
+      "1/4",
+      "-3/2500"
+     ],
+     "role": 128
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "3/4",
+      "0"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "3/8",
+      "3/4",
+      "-11/10000"
+     ],
+     "role": 129
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "1/4",
+      "0"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "5/8",
+      "1/4",
+      "-1/1000"
+     ],
+     "role": 130
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "3/4",
+      "0"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "5/8",
+      "3/4",
+      "-9/10000"
+     ],
+     "role": 131
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "3/8",
+      "0"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "1/4",
+      "3/8",
+      "3/2500"
+     ],
+     "role": 132
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "5/8",
+      "0"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "1/4",
+      "5/8",
+      "1/1000"
+     ],
+     "role": 133
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "3/8",
+      "0"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "3/4",
+      "3/8",
+      "11/10000"
+     ],
+     "role": 134
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "5/8",
+      "0"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "3/4",
+      "5/8",
+      "9/10000"
+     ],
+     "role": 135
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 17,
+   "normal_axis": 2,
+   "outward_sign": 1,
+   "panel_centre": [
+    "1/2",
+    "1/2",
+    "2"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -12,
+    -11,
+    -10,
+    -9,
+    12,
+    10,
+    11,
+    9
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "1/4",
+      "2"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "3/8",
+      "1/4",
+      "4997/2500"
+     ],
+     "role": 136
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "3/4",
+      "2"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "3/8",
+      "3/4",
+      "19989/10000"
+     ],
+     "role": 137
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "1/4",
+      "2"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "5/8",
+      "1/4",
+      "1999/1000"
+     ],
+     "role": 138
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "3/4",
+      "2"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "5/8",
+      "3/4",
+      "19991/10000"
+     ],
+     "role": 139
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "3/8",
+      "2"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "1/4",
+      "3/8",
+      "5003/2500"
+     ],
+     "role": 140
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "5/8",
+      "2"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "1/4",
+      "5/8",
+      "2001/1000"
+     ],
+     "role": 141
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "3/8",
+      "2"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "3/4",
+      "3/8",
+      "20011/10000"
+     ],
+     "role": 142
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "5/8",
+      "2"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "3/4",
+      "5/8",
+      "20009/10000"
+     ],
+     "role": 143
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 18,
+   "normal_axis": 2,
+   "outward_sign": -1,
+   "panel_centre": [
+    "1/2",
+    "3/2",
+    "0"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -2,
+    -1,
+    -4,
+    -3,
+    -6,
+    -5,
+    -8,
+    -7
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "5/4",
+      "0"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "3/8",
+      "5/4",
+      "1/5000"
+     ],
+     "role": 144
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "7/4",
+      "0"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "3/8",
+      "7/4",
+      "1/10000"
+     ],
+     "role": 145
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "5/4",
+      "0"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "5/8",
+      "5/4",
+      "1/2500"
+     ],
+     "role": 146
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "7/4",
+      "0"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "5/8",
+      "7/4",
+      "3/10000"
+     ],
+     "role": 147
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "11/8",
+      "0"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "1/4",
+      "11/8",
+      "3/5000"
+     ],
+     "role": 148
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "13/8",
+      "0"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "1/4",
+      "13/8",
+      "1/2000"
+     ],
+     "role": 149
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "11/8",
+      "0"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "3/4",
+      "11/8",
+      "1/1250"
+     ],
+     "role": 150
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "13/8",
+      "0"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "3/4",
+      "13/8",
+      "7/10000"
+     ],
+     "role": 151
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 19,
+   "normal_axis": 2,
+   "outward_sign": 1,
+   "panel_centre": [
+    "1/2",
+    "3/2",
+    "2"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    -7,
+    -5,
+    -8,
+    -6,
+    -3,
+    -1,
+    -4,
+    -2
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "3/8",
+      "5/4",
+      "2"
+     ],
+     "a": -7,
+     "signed_height": "-7/10000",
+     "apex": [
+      "3/8",
+      "5/4",
+      "19993/10000"
+     ],
+     "role": 152
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "3/8",
+      "7/4",
+      "2"
+     ],
+     "a": -5,
+     "signed_height": "-1/2000",
+     "apex": [
+      "3/8",
+      "7/4",
+      "3999/2000"
+     ],
+     "role": 153
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "5/8",
+      "5/4",
+      "2"
+     ],
+     "a": -8,
+     "signed_height": "-1/1250",
+     "apex": [
+      "5/8",
+      "5/4",
+      "2499/1250"
+     ],
+     "role": 154
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "5/8",
+      "7/4",
+      "2"
+     ],
+     "a": -6,
+     "signed_height": "-3/5000",
+     "apex": [
+      "5/8",
+      "7/4",
+      "9997/5000"
+     ],
+     "role": 155
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "1/4",
+      "11/8",
+      "2"
+     ],
+     "a": -3,
+     "signed_height": "-3/10000",
+     "apex": [
+      "1/4",
+      "11/8",
+      "19997/10000"
+     ],
+     "role": 156
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "1/4",
+      "13/8",
+      "2"
+     ],
+     "a": -1,
+     "signed_height": "-1/10000",
+     "apex": [
+      "1/4",
+      "13/8",
+      "19999/10000"
+     ],
+     "role": 157
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "3/4",
+      "11/8",
+      "2"
+     ],
+     "a": -4,
+     "signed_height": "-1/2500",
+     "apex": [
+      "3/4",
+      "11/8",
+      "4999/2500"
+     ],
+     "role": 158
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "3/4",
+      "13/8",
+      "2"
+     ],
+     "a": -2,
+     "signed_height": "-1/5000",
+     "apex": [
+      "3/4",
+      "13/8",
+      "9999/5000"
+     ],
+     "role": 159
+    }
+   ],
+   "motif_class": "B"
+  },
+  {
+   "panel": 20,
+   "normal_axis": 2,
+   "outward_sign": -1,
+   "panel_centre": [
+    "3/2",
+    "1/2",
+    "0"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    6,
+    8,
+    5,
+    7,
+    2,
+    4,
+    1,
+    3
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "1/4",
+      "0"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "11/8",
+      "1/4",
+      "-3/5000"
+     ],
+     "role": 160
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "3/4",
+      "0"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "11/8",
+      "3/4",
+      "-1/1250"
+     ],
+     "role": 161
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "1/4",
+      "0"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "13/8",
+      "1/4",
+      "-1/2000"
+     ],
+     "role": 162
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "3/4",
+      "0"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "13/8",
+      "3/4",
+      "-7/10000"
+     ],
+     "role": 163
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "3/8",
+      "0"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "5/4",
+      "3/8",
+      "-1/5000"
+     ],
+     "role": 164
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "5/8",
+      "0"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "5/4",
+      "5/8",
+      "-1/2500"
+     ],
+     "role": 165
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "3/8",
+      "0"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "7/4",
+      "3/8",
+      "-1/10000"
+     ],
+     "role": 166
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "5/8",
+      "0"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "7/4",
+      "5/8",
+      "-3/10000"
+     ],
+     "role": 167
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 21,
+   "normal_axis": 2,
+   "outward_sign": 1,
+   "panel_centre": [
+    "3/2",
+    "1/2",
+    "2"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    3,
+    4,
+    1,
+    2,
+    7,
+    8,
+    5,
+    6
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "1/4",
+      "2"
+     ],
+     "a": 3,
+     "signed_height": "3/10000",
+     "apex": [
+      "11/8",
+      "1/4",
+      "20003/10000"
+     ],
+     "role": 168
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "3/4",
+      "2"
+     ],
+     "a": 4,
+     "signed_height": "1/2500",
+     "apex": [
+      "11/8",
+      "3/4",
+      "5001/2500"
+     ],
+     "role": 169
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "1/4",
+      "2"
+     ],
+     "a": 1,
+     "signed_height": "1/10000",
+     "apex": [
+      "13/8",
+      "1/4",
+      "20001/10000"
+     ],
+     "role": 170
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "3/4",
+      "2"
+     ],
+     "a": 2,
+     "signed_height": "1/5000",
+     "apex": [
+      "13/8",
+      "3/4",
+      "10001/5000"
+     ],
+     "role": 171
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "3/8",
+      "2"
+     ],
+     "a": 7,
+     "signed_height": "7/10000",
+     "apex": [
+      "5/4",
+      "3/8",
+      "20007/10000"
+     ],
+     "role": 172
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "5/8",
+      "2"
+     ],
+     "a": 8,
+     "signed_height": "1/1250",
+     "apex": [
+      "5/4",
+      "5/8",
+      "2501/1250"
+     ],
+     "role": 173
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "3/8",
+      "2"
+     ],
+     "a": 5,
+     "signed_height": "1/2000",
+     "apex": [
+      "7/4",
+      "3/8",
+      "4001/2000"
+     ],
+     "role": 174
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "5/8",
+      "2"
+     ],
+     "a": 6,
+     "signed_height": "3/5000",
+     "apex": [
+      "7/4",
+      "5/8",
+      "10003/5000"
+     ],
+     "role": 175
+    }
+   ],
+   "motif_class": "A"
+  },
+  {
+   "panel": 22,
+   "normal_axis": 2,
+   "outward_sign": -1,
+   "panel_centre": [
+    "3/2",
+    "3/2",
+    "0"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": false,
+   "coefficients_by_offset_index": [
+    9,
+    10,
+    11,
+    12,
+    -9,
+    -11,
+    -10,
+    -12
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "5/4",
+      "0"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "11/8",
+      "5/4",
+      "-9/10000"
+     ],
+     "role": 176
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "7/4",
+      "0"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "11/8",
+      "7/4",
+      "-1/1000"
+     ],
+     "role": 177
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "5/4",
+      "0"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "13/8",
+      "5/4",
+      "-11/10000"
+     ],
+     "role": 178
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "7/4",
+      "0"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "13/8",
+      "7/4",
+      "-3/2500"
+     ],
+     "role": 179
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "11/8",
+      "0"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "5/4",
+      "11/8",
+      "9/10000"
+     ],
+     "role": 180
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "13/8",
+      "0"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "5/4",
+      "13/8",
+      "11/10000"
+     ],
+     "role": 181
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "11/8",
+      "0"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "7/4",
+      "11/8",
+      "1/1000"
+     ],
+     "role": 182
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "13/8",
+      "0"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "7/4",
+      "13/8",
+      "3/2500"
+     ],
+     "role": 183
+    }
+   ],
+   "motif_class": "C"
+  },
+  {
+   "panel": 23,
+   "normal_axis": 2,
+   "outward_sign": 1,
+   "panel_centre": [
+    "3/2",
+    "3/2",
+    "1"
+   ],
+   "in_panel_axes": [
+    0,
+    1
+   ],
+   "is_notch_panel": true,
+   "coefficients_by_offset_index": [
+    -12,
+    -11,
+    -10,
+    -9,
+    12,
+    10,
+    11,
+    9
+   ],
+   "features": [
+    {
+     "k": 0,
+     "offset_eighths": [
+      -1,
+      -2
+     ],
+     "offset": [
+      "-1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "11/8",
+      "5/4",
+      "1"
+     ],
+     "a": -12,
+     "signed_height": "-3/2500",
+     "apex": [
+      "11/8",
+      "5/4",
+      "2497/2500"
+     ],
+     "role": 184
+    },
+    {
+     "k": 1,
+     "offset_eighths": [
+      -1,
+      2
+     ],
+     "offset": [
+      "-1/8",
+      "1/4"
+     ],
+     "centre": [
+      "11/8",
+      "7/4",
+      "1"
+     ],
+     "a": -11,
+     "signed_height": "-11/10000",
+     "apex": [
+      "11/8",
+      "7/4",
+      "9989/10000"
+     ],
+     "role": 185
+    },
+    {
+     "k": 2,
+     "offset_eighths": [
+      1,
+      -2
+     ],
+     "offset": [
+      "1/8",
+      "-1/4"
+     ],
+     "centre": [
+      "13/8",
+      "5/4",
+      "1"
+     ],
+     "a": -10,
+     "signed_height": "-1/1000",
+     "apex": [
+      "13/8",
+      "5/4",
+      "999/1000"
+     ],
+     "role": 186
+    },
+    {
+     "k": 3,
+     "offset_eighths": [
+      1,
+      2
+     ],
+     "offset": [
+      "1/8",
+      "1/4"
+     ],
+     "centre": [
+      "13/8",
+      "7/4",
+      "1"
+     ],
+     "a": -9,
+     "signed_height": "-9/10000",
+     "apex": [
+      "13/8",
+      "7/4",
+      "9991/10000"
+     ],
+     "role": 187
+    },
+    {
+     "k": 4,
+     "offset_eighths": [
+      -2,
+      -1
+     ],
+     "offset": [
+      "-1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "5/4",
+      "11/8",
+      "1"
+     ],
+     "a": 12,
+     "signed_height": "3/2500",
+     "apex": [
+      "5/4",
+      "11/8",
+      "2503/2500"
+     ],
+     "role": 188
+    },
+    {
+     "k": 5,
+     "offset_eighths": [
+      -2,
+      1
+     ],
+     "offset": [
+      "-1/4",
+      "1/8"
+     ],
+     "centre": [
+      "5/4",
+      "13/8",
+      "1"
+     ],
+     "a": 10,
+     "signed_height": "1/1000",
+     "apex": [
+      "5/4",
+      "13/8",
+      "1001/1000"
+     ],
+     "role": 189
+    },
+    {
+     "k": 6,
+     "offset_eighths": [
+      2,
+      -1
+     ],
+     "offset": [
+      "1/4",
+      "-1/8"
+     ],
+     "centre": [
+      "7/4",
+      "11/8",
+      "1"
+     ],
+     "a": 11,
+     "signed_height": "11/10000",
+     "apex": [
+      "7/4",
+      "11/8",
+      "10011/10000"
+     ],
+     "role": 190
+    },
+    {
+     "k": 7,
+     "offset_eighths": [
+      2,
+      1
+     ],
+     "offset": [
+      "1/4",
+      "1/8"
+     ],
+     "centre": [
+      "7/4",
+      "13/8",
+      "1"
+     ],
+     "a": 9,
+     "signed_height": "9/10000",
+     "apex": [
+      "7/4",
+      "13/8",
+      "10009/10000"
+     ],
+     "role": 191
+    }
+   ],
+   "motif_class": "C"
+  }
+ ],
+ "motif_classes": {
+  "_note": "Independently computed here: under the dihedral group D4 acting on the 8 in-panel feature positions, the 24 panels fall into exactly THREE classes of eight. This reproduces the A/B/C 'three face motifs' reported in yamaton/aperiodic-chair-lab (strong/audit/face_motifs.json) for its own curved-cap realization of the same discrete system.",
+  "classes": {
+   "A": {
+    "canonical_word_by_offset_index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8
+    ],
+    "panels": [
+     0,
+     2,
+     7,
+     9,
+     11,
+     14,
+     20,
+     21
+    ]
+   },
+   "B": {
+    "canonical_word_by_offset_index": [
+     -8,
+     -6,
+     -7,
+     -5,
+     -4,
+     -2,
+     -3,
+     -1
+    ],
+    "panels": [
+     1,
+     4,
+     6,
+     8,
+     12,
+     15,
+     18,
+     19
+    ]
+   },
+   "C": {
+    "canonical_word_by_offset_index": [
+     -12,
+     -11,
+     -10,
+     -9,
+     12,
+     10,
+     11,
+     9
+    ],
+    "panels": [
+     3,
+     5,
+     10,
+     13,
+     16,
+     17,
+     22,
+     23
+    ]
+   }
+  },
+  "relations": [
+   {
+    "claim": "motif C (panels 3,5,10,13,16,17,22,23) is the entrywise negative of itself under the in-panel reflection that swaps the two in-panel axes (the diagonal reflection). It is the only D4 element with that property. In CGS's words at the meeting, 'the blue marking matches itself'.",
+    "element": "swap_uv (rot=0, ref=1)"
+   },
+   {
+    "claim": "motif A (panels 0,2,7,9,11,14,20,21) and motif B (panels 1,4,6,8,12,15,18,19) are entrywise negatives of each other after an in-panel reflection: A = -(B o g) with g = swap_uv then rot270. In CGS's words, 'the empty purple marking with the full purple marking'.",
+    "element": "swap_uv then rot270"
+   },
+   {
+    "claim": "A uses only the magnitudes 1..8 with + sign and B only 1..8 with - sign; C uses 9..12 with four + and four - (so C is 'half full').",
+    "element": null
+   }
+  ],
+  "plain_language": "Three marking types, eight panels each. Two of them (A, all bumps of magnitudes 1..8; B, all dents of magnitudes 1..8) are complementary to each other; the third (C, magnitudes 9..12 with mixed polarity) is complementary to itself under the diagonal reflection of the panel.",
+  "d4_convention": "g=(rot,ref) acts on an in-panel offset (u,v) by: if ref, swap u,v first; then apply (u,v)->(-v,u) rot times.",
+  "cross_validation_yamaton": {
+   "_what": "Independent confirmation that the three-class partition computed here from Tsiokos's raw panel data is the same partition that yamaton/aperiodic-chair-lab computed from its own, geometrically different (curved polynomial-cap) realization.",
+   "source_file": "aperiodic-chair-lab/strong/audit/chair44_comparison.json, key face_motif_correspondence (24 entries)",
+   "class_map": {
+    "A_here": "B_yamaton",
+    "B_here": "C_yamaton",
+    "C_here": "A_yamaton"
+   },
+   "warning": "The letters A/B/C are assigned differently in the two projects. Do not identify them by name.",
+   "yamaton_rule_table_verbatim": {
+    "A and A": "U2 = V1",
+    "B and C": "U2 = -U1",
+    "C and B": "U2 = -U1",
+    "note": "'In particular, C cannot meet C.' (strong/MOTIF_GROUPING.md)"
+   },
+   "translated_into_the_labels_used_here": [
+    "yamaton 'A meets A' == C_here is self-complementary (matches the diagonal-reflected negative of itself)",
+    "yamaton 'B meets C' == A_here meets B_here (the mutually complementary pair)",
+    "yamaton 'C cannot meet C' == B_here cannot meet B_here (two all-dent panels cannot face each other)"
+   ],
+   "matches_CGS_description": "CGS at the meeting: 'the two purple markings match, so you have to have the empty purple marking with the full purple marking, and the blue marking matches itself.' Purple pair = A_here/B_here (all-bump / all-dent, magnitudes 1..8); blue = C_here (magnitudes 9..12, mixed polarity)."
+  }
+ },
+ "notch_translation_identity": [
+  {
+   "notch_panel": 4,
+   "opposite_outer_panel": 0,
+   "entrywise_negation_holds": true,
+   "note": "the notch panel is the exact entrywise negative of the outer panel with the same in-panel coordinates; hence a copy translated by (1,1,1) plugs the notch and all three notch panels match"
+  },
+  {
+   "notch_panel": 14,
+   "opposite_outer_panel": 8,
+   "entrywise_negation_holds": true,
+   "note": "the notch panel is the exact entrywise negative of the outer panel with the same in-panel coordinates; hence a copy translated by (1,1,1) plugs the notch and all three notch panels match"
+  },
+  {
+   "notch_panel": 23,
+   "opposite_outer_panel": 16,
+   "entrywise_negation_holds": true,
+   "note": "the notch panel is the exact entrywise negative of the outer panel with the same in-panel coordinates; hence a copy translated by (1,1,1) plugs the notch and all three notch panels match"
+  }
+ ],
+ "substitution": {
+  "name": "universal eight-chair grouping / eight-child dissection",
+  "statement": "Eight properly rotated chair carriers partition the doubled chair 2P exactly (56 unit cells), so the chair is a rep-8 rep-tile. Seven children sit at the corners 4a, a in {0,1}^3 \\ {(1,1,1)}, and one 'central' child sits at (1,1,1) in the coordinates of 2P.",
+  "frame_action": "a frame is (p,s) with p a permutation of the axes and s a sign vector, acting by G(x)_i = s_i * x_{p_i}; a pose is a frame followed by a translation. Refinement: (G,t) -> {(G*H, 2t + G*u) : (H,u) a child pose}.",
+  "children": [
+   {
+    "child": "000",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "child": "001",
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "child": "010",
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "child": "011",
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     0,
+     4,
+     4
+    ]
+   },
+   {
+    "child": "100",
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "child": "101",
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     0,
+     4
+    ]
+   },
+   {
+    "child": "110",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     0
+    ]
+   },
+   {
+    "child": "central",
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ]
+   }
+  ],
+  "children_raw_from_certificate": [
+   [
+    [
+     [
+      0,
+      1,
+      2
+     ],
+     [
+      1,
+      1,
+      1
+     ]
+    ],
+    [
+     0,
+     0,
+     0
+    ]
+   ],
+   [
+    [
+     [
+      1,
+      0,
+      2
+     ],
+     [
+      1,
+      1,
+      -1
+     ]
+    ],
+    [
+     0,
+     0,
+     4
+    ]
+   ],
+   [
+    [
+     [
+      0,
+      2,
+      1
+     ],
+     [
+      1,
+      -1,
+      1
+     ]
+    ],
+    [
+     0,
+     4,
+     0
+    ]
+   ],
+   [
+    [
+     [
+      2,
+      0,
+      1
+     ],
+     [
+      1,
+      -1,
+      -1
+     ]
+    ],
+    [
+     0,
+     4,
+     4
+    ]
+   ],
+   [
+    [
+     [
+      2,
+      1,
+      0
+     ],
+     [
+      -1,
+      1,
+      1
+     ]
+    ],
+    [
+     4,
+     0,
+     0
+    ]
+   ],
+   [
+    [
+     [
+      1,
+      2,
+      0
+     ],
+     [
+      -1,
+      1,
+      -1
+     ]
+    ],
+    [
+     4,
+     0,
+     4
+    ]
+   ],
+   [
+    [
+     [
+      0,
+      1,
+      2
+     ],
+     [
+      -1,
+      -1,
+      1
+     ]
+    ],
+    [
+     4,
+     4,
+     0
+    ]
+   ],
+   [
+    [
+     [
+      0,
+      1,
+      2
+     ],
+     [
+      1,
+      1,
+      1
+     ]
+    ],
+    [
+     1,
+     1,
+     1
+    ]
+   ]
+  ],
+  "all_child_frames_are_proper_rotations": true,
+  "paper_reference": "Table 1 and Figure 5, page 13 of the v2 PDF"
+ },
+ "contact_atlas_A44": {
+  "meaning": "the 44 legal relative poses of a neighbouring chair, expressed in the coordinate frame of a root chair normalized to the identity pose at the origin. Each entry is ((permutation, signs), translation).",
+  "how_obtained": "a root chair in the identity pose has 22 grid cells adjacent to it across its 24 panels; a neighbour in one of the 48 signed frames covering a shell cell gives 2388 candidate poses after deduplication and overlap rejection; exactly 44 of them have matching feature profiles on every shared panel.",
+  "distinct_relative_rotations": 19,
+  "rotation_group_generated": 24,
+  "improper_relative_contacts": 0,
+  "contacts": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     -1,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     -1,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     -1,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     3,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -1,
+     3,
+     3
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     3,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   }
+  ],
+  "paper_reference": "Figure 7, page 15 of the v2 PDF",
+  "pure_translation_contacts": {
+   "_note": "The only two contacts in A44 whose relative frame is the identity are the pure translations by +-(1,1,1): a second, unrotated chair plugging the notch (or the tile itself sitting in a neighbour's notch). Verified here by scanning certificates/candidate_certificate.json 'legal_contacts'.",
+   "indices_zero_based": {
+    "minus": 8,
+    "plus": 9
+   },
+   "entries": [
+    [
+     [
+      [
+       0,
+       1,
+       2
+      ],
+      [
+       1,
+       1,
+       1
+      ]
+     ],
+     [
+      -1,
+      -1,
+      -1
+     ]
+    ],
+    [
+     [
+      [
+       0,
+       1,
+       2
+      ],
+      [
+       1,
+       1,
+       1
+      ]
+     ],
+     [
+      1,
+      1,
+      1
+     ]
+    ]
+   ]
+  }
+ },
+ "closed_contact_set_30": {
+  "meaning": "the closure of the 21 internal face contacts of the eight-child dissection under refinement; the profile (the height table) was solved from the 372 sign equations these impose, whose solution space has dimension 12 (the twelve magnitudes).",
+  "counts": {
+   "internal_face_contacts": 21,
+   "closed_states": 30,
+   "sign_equations": 372,
+   "balanced_components": 12
+  },
+  "contacts": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     -1,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     1,
+     1,
+     1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     -1,
+     3,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     -1,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     -2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     3,
+     -1,
+     3
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     3,
+     3,
+     1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -1,
+     3,
+     3
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     3,
+     -1,
+     -1
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     4,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     4,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     1,
+     1,
+     3
+    ]
+   }
+  ]
+ },
+ "parent_atlas_halving": {
+  "meaning": "the decisive finite identity: enumerate 8*44*8 parent-contact candidates, deduplicate to 697, keep the 116 with disjoint parent bodies, test every fine contact across the two parents -> 44 legal parent contacts, all with even translation; halving the translations returns exactly A44.",
+  "candidates": 697,
+  "nonoverlapping": 116,
+  "legal": 44,
+  "all_even_translations": true,
+  "half_of_parent_atlas_equals_fine_atlas": true,
+  "macro_contacts": [
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     -4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     6,
+     6,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     6,
+     6,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     -4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     -2,
+     -2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     1,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     1
+    ],
+    "translation": [
+     2,
+     2,
+     2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     8,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     -2,
+     6,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     8,
+     0
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     8
+    ]
+   },
+   {
+    "perm": [
+     0,
+     2,
+     1
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     6
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     8,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     8,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     -2,
+     -2,
+     6
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     8
+    ]
+   },
+   {
+    "perm": [
+     1,
+     0,
+     2
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     6
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     -4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     6,
+     6,
+     2
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     -4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     6,
+     -2,
+     6
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     1,
+     2,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     -4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     -1,
+     1
+    ],
+    "translation": [
+     6,
+     6,
+     2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     -4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     -1,
+     1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     -2,
+     6,
+     6
+    ]
+   },
+   {
+    "perm": [
+     2,
+     0,
+     1
+    ],
+    "signs": [
+     1,
+     -1,
+     -1
+    ],
+    "translation": [
+     4,
+     4,
+     4
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     6,
+     -2,
+     -2
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     -1,
+     1,
+     1
+    ],
+    "translation": [
+     8,
+     0,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     -1,
+     1
+    ],
+    "translation": [
+     0,
+     8,
+     0
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     0,
+     0,
+     8
+    ]
+   },
+   {
+    "perm": [
+     2,
+     1,
+     0
+    ],
+    "signs": [
+     1,
+     1,
+     -1
+    ],
+    "translation": [
+     2,
+     2,
+     6
+    ]
+   }
+  ]
+ },
+ "shell_cells_22": [
+  [
+   -1,
+   0,
+   0
+  ],
+  [
+   -1,
+   0,
+   1
+  ],
+  [
+   -1,
+   1,
+   0
+  ],
+  [
+   -1,
+   1,
+   1
+  ],
+  [
+   0,
+   -1,
+   0
+  ],
+  [
+   0,
+   -1,
+   1
+  ],
+  [
+   0,
+   0,
+   -1
+  ],
+  [
+   0,
+   0,
+   2
+  ],
+  [
+   0,
+   1,
+   -1
+  ],
+  [
+   0,
+   1,
+   2
+  ],
+  [
+   0,
+   2,
+   0
+  ],
+  [
+   0,
+   2,
+   1
+  ],
+  [
+   1,
+   -1,
+   0
+  ],
+  [
+   1,
+   -1,
+   1
+  ],
+  [
+   1,
+   0,
+   -1
+  ],
+  [
+   1,
+   0,
+   2
+  ],
+  [
+   1,
+   1,
+   -1
+  ],
+  [
+   1,
+   1,
+   1
+  ],
+  [
+   1,
+   2,
+   0
+  ],
+  [
+   2,
+   0,
+   0
+  ],
+  [
+   2,
+   0,
+   1
+  ],
+  [
+   2,
+   1,
+   0
+  ]
+ ],
+ "independent_checks_run_here": [
+  "python3 verify/packets/einstein_macrostate/src/replay.py : PASS in 2.6 s (verify.py + edge_audit.py), reproducing 21->30 contact closure, 372 equations, kernel dimension 12, 2388->44 atlas, 19 rotations generating the 24-element group, 33 first shells, 14/18 completions, 28 parent conflicts, 697->116->44 parent census with coarse==fine, mesh V=2138 E=6408 F=4272 chi=2, volume 7.",
+  "verify/boundary_sphere.py, verify/tube_formula_controls.py, verify/substitution_modular_coincidence.py, verify/seed_language_closure.py : PASS.",
+  "profile array == native_panels.csv == Figure 3 of the paper.",
+  "24 panels fall into exactly 3 D4-classes of 8 (computed here).",
+  "notch panels 4/14/23 are exact entrywise negatives of outer panels 0/8/16 (computed here)."
+ ],
+ "known_reproducibility_gap": "verify/replay.py (the single top-level entry point) fails: the packet verify/packets/r44_unrestricted_alignment/src/replay.py needs upstream/einstein_r44_proof_submission.zip, which .gitignore line 47 (/verify/packets/*/upstream/*.zip) excludes from the repository. The einstein_macrostate packet replays fine on its own.",
+ "magnitude_census": {
+  "note": "each of the 12 magnitudes is carried by exactly 16 of the 192 features, 8 as bumps (+) and 8 as dents (-). Verified here from solid/r44_solid.json.",
+  "per_magnitude": {
+   "1": {
+    "plus": 8,
+    "minus": 8
+   },
+   "2": {
+    "plus": 8,
+    "minus": 8
+   },
+   "3": {
+    "plus": 8,
+    "minus": 8
+   },
+   "4": {
+    "plus": 8,
+    "minus": 8
+   },
+   "5": {
+    "plus": 8,
+    "minus": 8
+   },
+   "6": {
+    "plus": 8,
+    "minus": 8
+   },
+   "7": {
+    "plus": 8,
+    "minus": 8
+   },
+   "8": {
+    "plus": 8,
+    "minus": 8
+   },
+   "9": {
+    "plus": 8,
+    "minus": 8
+   },
+   "10": {
+    "plus": 8,
+    "minus": 8
+   },
+   "11": {
+    "plus": 8,
+    "minus": 8
+   },
+   "12": {
+    "plus": 8,
+    "minus": 8
+   }
+  }
+ },
+ "figure_numbering": {
+  "panel_recipe_six_grids": {
+   "v2": "Figure 3, PDF page 10",
+   "v1": "Figure 4, PDF page 11"
+  },
+  "solid_render": {
+   "v2": "Figure 1, PDF page 3",
+   "v1": "Figure 1, PDF page 3"
+  },
+  "44_contact_atlas_table": {
+   "v2": "Figure 7, PDF page 15",
+   "v1": "Figure 8"
+  },
+  "eight_child_dissection": {
+   "v2": "Figure 5, PDF page 13",
+   "v1": "Figure 6"
+  }
+ },
+ "shell_structure_from_paper": {
+  "quote": "A root chair in the identity pose has 22 grid cells adjacent to it across its 24 panels (the 21 outer panels face distinct exterior cells, while all three notch panels face the missing cell (1,1,1), giving 22 distinct shell cells)",
+  "where": "Tsiokos v2 PDF page 51 (Appendix C, census provenance)",
+  "why_it_matters": [
+   "It is the paper's own statement of the '21 outer panels' count that CGS half-remembered as 'all those crazy 21 markings'.",
+   "It is also the paper's own statement that all three notch panels face the single cell (1,1,1) - the geometric fact behind the pure translation contact."
+  ],
+  "arithmetic": "22 shell cells x 48 signed frames x 7 cells of the neighbour = 7392 raw placements; after deduplication and overlap rejection 2388 candidate contact poses remain, of which 44 are legal."
+ }
+}

@@ -1,0 +1,416 @@
+
+==============================================================================
+0. CONVENTIONS
+==============================================================================
+cells K            : ((0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), (1, 0, 0), (1, 0, 1), (1, 1, 0))
+facets             : 24  (outer 21, notch 3)
+sites              : 8  ->  [(0, 0, 0), (0, 0, 1), (0, 1, 0), (0, 1, 1), 'dent', (1, 0, 0), (1, 0, 1), (1, 1, 0)]
+M24 type census    : {'F': 8, 'H': 8, 'B': 8}
+
+facet (cell, dir)            axis   kind       mark site
+((0, 0, 0), (-1, 0, 0))      x      outer      H    (0, 0, 0)
+((0, 0, 0), (0, -1, 0))      y      outer      F    (0, 0, 0)
+((0, 0, 0), (0, 0, -1))      z      outer      B    (0, 0, 0)
+((0, 0, 1), (-1, 0, 0))      x      outer      F    (0, 0, 2)
+((0, 0, 1), (0, -1, 0))      y      outer      H    (0, 0, 2)
+((0, 0, 1), (0, 0, 1))       z      outer      B    (0, 0, 2)
+((0, 1, 0), (-1, 0, 0))      x      outer      H    (0, 2, 0)
+((0, 1, 0), (0, 0, -1))      z      outer      F    (0, 2, 0)
+((0, 1, 0), (0, 1, 0))       y      outer      B    (0, 2, 0)
+((0, 1, 1), (-1, 0, 0))      x      outer      B    (0, 2, 2)
+((0, 1, 1), (0, 0, 1))       z      outer      F    (0, 2, 2)
+((0, 1, 1), (0, 1, 0))       y      outer      H    (0, 2, 2)
+((0, 1, 1), (1, 0, 0))       x      notch      F    (1, 1, 1)
+((1, 0, 0), (0, -1, 0))      y      outer      F    (2, 0, 0)
+((1, 0, 0), (0, 0, -1))      z      outer      H    (2, 0, 0)
+((1, 0, 0), (1, 0, 0))       x      outer      B    (2, 0, 0)
+((1, 0, 1), (0, -1, 0))      y      outer      B    (2, 0, 2)
+((1, 0, 1), (0, 0, 1))       z      outer      H    (2, 0, 2)
+((1, 0, 1), (0, 1, 0))       y      notch      H    (1, 1, 1)
+((1, 0, 1), (1, 0, 0))       x      outer      F    (2, 0, 2)
+((1, 1, 0), (0, 0, -1))      z      outer      B    (2, 2, 0)
+((1, 1, 0), (0, 0, 1))       z      notch      B    (1, 1, 1)
+((1, 1, 0), (0, 1, 0))       y      outer      F    (2, 2, 0)
+((1, 1, 0), (1, 0, 0))       x      outer      H    (2, 2, 0)
+
+==============================================================================
+1. STRUCTURAL PROPERTIES OF M24
+==============================================================================
+every site carries one F, one H and one B : True
+dent star = complement of far-corner star : True
+isometries preserving chair+marking       : 1 (expect 1 = identity)
+isometries preserving the bare chair       : 6 (expect 6 = S3)
+
+==============================================================================
+2. SUBSTITUTION: the 8 child frames forced by self-similarity
+==============================================================================
+(0, 0, 0)     perm=(0, 1, 2) signs=(1, 1, 1)  t=(0, 0, 0)  det=+1
+(0, 0, 1)     perm=(1, 0, 2) signs=(1, 1, -1)  t=(0, 0, 4)  det=+1
+(0, 1, 0)     perm=(0, 2, 1) signs=(1, -1, 1)  t=(0, 4, 0)  det=+1
+(0, 1, 1)     perm=(2, 0, 1) signs=(1, -1, -1)  t=(0, 4, 4)  det=+1
+(1, 0, 0)     perm=(2, 1, 0) signs=(-1, 1, 1)  t=(4, 0, 0)  det=+1
+(1, 0, 1)     perm=(1, 2, 0) signs=(-1, 1, -1)  t=(4, 0, 4)  det=+1
+(1, 1, 0)     perm=(0, 1, 2) signs=(-1, -1, 1)  t=(4, 4, 0)  det=+1
+dent          perm=(0, 1, 2) signs=(1, 1, 1)  t=(1, 1, 1)  det=+1
+all children are proper rotations: True
+
+==============================================================================
+3. (a) SUBSTITUTION CONSISTENCY at levels 1, 2, 3
+==============================================================================
+level 1: 8 chairs, 56 cells, partition=True, 96 directed interior contacts, 0 violations  (0.0s)
+level 2: 64 chairs, 448 cells, partition=True, 1152 directed interior contacts, 0 violations  (0.0s)
+level 3: 512 chairs, 3584 cells, partition=True, 10752 directed interior contacts, 0 violations  (0.0s)
+
+==============================================================================
+4. (b) SELF-SIMILARITY: the supertile read at double scale reproduces M
+==============================================================================
+level 1 supertile coarse-read == M24 : True 
+level 2 supertile coarse-read == M24 : True 
+central child's dent star at (2,2,2)      : {'x': 'F', 'y': 'H', 'z': 'B'}   parent dent star: {'x': 'F', 'y': 'H', 'z': 'B'}
+
+==============================================================================
+5. (c) DENT vs BACK COMPLEMENTARITY  ("shift the tile forward")
+==============================================================================
+C and C+(1,1,1): legal = True , shared facets = 3
+  notch cell (1,1,1) covered by the shifted copy: True
+   facet (1, 0, 1) dir (0, 1, 0) : ('H', (1, 1, 1))  vs  ('F', (1, 1, 1))
+   facet (1, 1, 0) dir (0, 0, 1) : ('B', (1, 1, 1))  vs  ('B', (1, 1, 1))
+   facet (0, 1, 1) dir (1, 0, 0) : ('F', (1, 1, 1))  vs  ('H', (1, 1, 1))
+
+==============================================================================
+6. CONTACT ATLAS: every legal neighbour of one chair
+==============================================================================
+legal neighbour poses (48 frames, |t|<=4): 60   (0.4s)
+  proper (rotation) neighbours  : 44
+  improper (reflected) neighbours: 16
+  distinct relative frames      : 25
+  neighbours with the IDENTITY frame: [((-1, -1, -1), 3), ((1, 1, 1), 3)]
+relative poses actually occurring in the level-3 supertile: 30
+  all of them are in the atlas: True
+
+==============================================================================
+7. (d) FORCING
+==============================================================================
+(d1) legal neighbour poses whose body contains the notch cell (1,1,1): 7
+      (((0, 1, 2), (1, 1, 1)), (1, 1, 1))  shared facets: 3
+      (((0, 1, 2), (-1, -1, 1)), (3, 3, 1))  shared facets: 3
+      (((0, 2, 1), (1, 1, -1)), (1, 1, 3))  shared facets: 3
+      (((1, 0, 2), (1, 1, -1)), (1, 1, 3))  shared facets: 3
+      (((1, 2, 0), (-1, -1, 1)), (3, 3, 1))  shared facets: 3
+      (((2, 0, 1), (-1, -1, 1)), (3, 3, 1))  shared facets: 3
+      (((2, 1, 0), (1, 1, -1)), (1, 1, 3))  shared facets: 3
+(d1') poses of a BARE chair that cover the notch without overlapping: 60
+
+(d2) see force.py
+
+wrote verify_out.json
+
+==============================================================================
+1. FIRST SHELL OF A CHAIR
+==============================================================================
+shell cells (face-adjacent, outside): 22
+[(-1, 0, 0), (-1, 0, 1), (-1, 1, 0), (-1, 1, 1), (0, -1, 0), (0, -1, 1), (0, 0, -1), (0, 0, 2), (0, 1, -1), (0, 1, 2), (0, 2, 0), (0, 2, 1), (1, -1, 0), (1, -1, 1), (1, 0, -1), (1, 0, 2), (1, 1, -1), (1, 1, 1), (1, 2, 0), (2, 0, 0), (2, 0, 1), (2, 1, 0)]
+atlas size (24 proper frames): 44   (0.2s)
+candidates per shell cell: min 2 max 7
+
+==============================================================================
+2. COMPLETE FIRST SHELLS (exhaustive)
+==============================================================================
+complete legal first shells: 33   (0.0s)
+chairs per shell: [7, 8]
+
+==============================================================================
+3. THE NOTCH FILLER
+==============================================================================
+atlas poses covering the notch cell: 7
+predicted notch fillers from the substitution (one per child slot): 7
+   (((0, 1, 2), (1, 1, 1)), (1, 1, 1))             role a=(0, 0, 0)
+   (((0, 1, 2), (-1, -1, 1)), (3, 3, 1))           role a=(1, 1, 0)
+   (((0, 2, 1), (1, 1, -1)), (1, 1, 3))            role a=(0, 1, 0)
+   (((1, 0, 2), (1, 1, -1)), (1, 1, 3))            role a=(0, 0, 1)
+   (((1, 2, 0), (-1, -1, 1)), (3, 3, 1))           role a=(0, 1, 1)
+   (((2, 0, 1), (-1, -1, 1)), (3, 3, 1))           role a=(1, 0, 1)
+   (((2, 1, 0), (1, 1, -1)), (1, 1, 3))            role a=(1, 0, 0)
+atlas notch fillers == substitution notch fillers: True
+over the 33 complete first shells, the notch filler slot is:
+   a=(0, 0, 0) : 3 shells
+   a=(0, 0, 1) : 2 shells
+   a=(0, 1, 0) : 2 shells
+   a=(0, 1, 1) : 8 shells
+   a=(1, 0, 0) : 2 shells
+   a=(1, 0, 1) : 8 shells
+   a=(1, 1, 0) : 8 shells
+
+==============================================================================
+4. DOES THE FIRST SHELL FORCE THE 8-CHAIR SUPERTILE?
+==============================================================================
+first shells in which all 8 chairs of the forced supertile are present: 0 / 33
+histogram of how many of the 8 are missing: {3: 8, 4: 24, 6: 1}
+slots sometimes absent from the first shell: {'(0, 0, 1)': 13, '(0, 1, 0)': 13, '(0, 1, 1)': 21, '(1, 0, 0)': 13, '(1, 0, 1)': 21, '(1, 1, 0)': 21, '(0, 0, 0)': 24}
+
+==============================================================================
+5. SUPERTILE COMPATIBILITY OF EVERY LEGAL PAIR
+==============================================================================
+the 8 chairs of the supertile, seen from its CENTRAL child:
+   (0, 0, 0)    (((0, 1, 2), (1, 1, 1)), (-1, -1, -1))
+   (0, 0, 1)    (((1, 0, 2), (1, 1, -1)), (-1, -1, 3))
+   (0, 1, 0)    (((0, 2, 1), (1, -1, 1)), (-1, 3, -1))
+   (0, 1, 1)    (((2, 0, 1), (1, -1, -1)), (-1, 3, 3))
+   (1, 0, 0)    (((2, 1, 0), (-1, 1, 1)), (3, -1, -1))
+   (1, 0, 1)    (((1, 2, 0), (-1, 1, -1)), (3, -1, 3))
+   (1, 1, 0)    (((0, 1, 2), (-1, -1, 1)), (3, 3, -1))
+   dent         (((0, 1, 2), (1, 1, 1)), (0, 0, 0))
+slot a=(0, 0, 0)     X-as-centre vs X-as-corner-child: 12 cell overlaps, 0 mark conflicts
+slot a=(0, 0, 1)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(0, 1, 0)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(0, 1, 1)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+slot a=(1, 0, 0)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(1, 0, 1)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+slot a=(1, 1, 0)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+
+wrote force_out.json
+
+==============================================================================
+1. FIRST SHELL OF A CHAIR
+==============================================================================
+shell cells (face-adjacent, outside): 22
+[(-1, 0, 0), (-1, 0, 1), (-1, 1, 0), (-1, 1, 1), (0, -1, 0), (0, -1, 1), (0, 0, -1), (0, 0, 2), (0, 1, -1), (0, 1, 2), (0, 2, 0), (0, 2, 1), (1, -1, 0), (1, -1, 1), (1, 0, -1), (1, 0, 2), (1, 1, -1), (1, 1, 1), (1, 2, 0), (2, 0, 0), (2, 0, 1), (2, 1, 0)]
+atlas size (48 frames): 60   (0.5s)
+candidates per shell cell: min 2 max 11
+
+==============================================================================
+2. COMPLETE FIRST SHELLS (exhaustive)
+==============================================================================
+complete legal first shells: 49   (0.0s)
+chairs per shell: [7, 8]
+
+==============================================================================
+3. THE NOTCH FILLER
+==============================================================================
+atlas poses covering the notch cell: 7
+predicted notch fillers from the substitution (one per child slot): 7
+   (((0, 1, 2), (1, 1, 1)), (1, 1, 1))             role a=(0, 0, 0)
+   (((0, 1, 2), (-1, -1, 1)), (3, 3, 1))           role a=(1, 1, 0)
+   (((0, 2, 1), (1, 1, -1)), (1, 1, 3))            role a=(0, 1, 0)
+   (((1, 0, 2), (1, 1, -1)), (1, 1, 3))            role a=(0, 0, 1)
+   (((1, 2, 0), (-1, -1, 1)), (3, 3, 1))           role a=(0, 1, 1)
+   (((2, 0, 1), (-1, -1, 1)), (3, 3, 1))           role a=(1, 0, 1)
+   (((2, 1, 0), (1, 1, -1)), (1, 1, 3))            role a=(1, 0, 0)
+atlas notch fillers == substitution notch fillers: True
+over the 49 complete first shells, the notch filler slot is:
+   a=(0, 0, 0) : 4 shells
+   a=(0, 0, 1) : 3 shells
+   a=(0, 1, 0) : 3 shells
+   a=(0, 1, 1) : 12 shells
+   a=(1, 0, 0) : 3 shells
+   a=(1, 0, 1) : 12 shells
+   a=(1, 1, 0) : 12 shells
+
+==============================================================================
+4. DOES THE FIRST SHELL FORCE THE 8-CHAIR SUPERTILE?
+==============================================================================
+first shells in which all 8 chairs of the forced supertile are present: 0 / 49
+histogram of how many of the 8 are missing: {3: 12, 4: 36, 6: 1}
+slots sometimes absent from the first shell: {'(0, 0, 1)': 19, '(0, 1, 0)': 19, '(0, 1, 1)': 31, '(1, 0, 0)': 19, '(1, 0, 1)': 31, '(1, 1, 0)': 31, '(0, 0, 0)': 36}
+
+==============================================================================
+5. SUPERTILE COMPATIBILITY OF EVERY LEGAL PAIR
+==============================================================================
+the 8 chairs of the supertile, seen from its CENTRAL child:
+   (0, 0, 0)    (((0, 1, 2), (1, 1, 1)), (-1, -1, -1))
+   (0, 0, 1)    (((1, 0, 2), (1, 1, -1)), (-1, -1, 3))
+   (0, 1, 0)    (((0, 2, 1), (1, -1, 1)), (-1, 3, -1))
+   (0, 1, 1)    (((2, 0, 1), (1, -1, -1)), (-1, 3, 3))
+   (1, 0, 0)    (((2, 1, 0), (-1, 1, 1)), (3, -1, -1))
+   (1, 0, 1)    (((1, 2, 0), (-1, 1, -1)), (3, -1, 3))
+   (1, 1, 0)    (((0, 1, 2), (-1, -1, 1)), (3, 3, -1))
+   dent         (((0, 1, 2), (1, 1, 1)), (0, 0, 0))
+slot a=(0, 0, 0)     X-as-centre vs X-as-corner-child: 12 cell overlaps, 0 mark conflicts
+slot a=(0, 0, 1)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(0, 1, 0)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(0, 1, 1)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+slot a=(1, 0, 0)     X-as-centre vs X-as-corner-child: 11 cell overlaps, 3 mark conflicts
+slot a=(1, 0, 1)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+slot a=(1, 1, 0)     X-as-centre vs X-as-corner-child: 9 cell overlaps, 3 mark conflicts
+
+wrote force_out.json
+
+==============================================================================
+1. THE CANDIDATE PARENT IS A FUNCTION OF THE NOTCH FILLER ALONE
+==============================================================================
+For X at pose p with notch filler Y at pose q, the parent supertile is
+S = (L_q, t_q - L_q(1,1,1)) and X is its child in slot ROLE(p^-1 q).
+consistency X in slot a of S(nu(X)) for all 7 slots: True
+=> two chairs with the SAME notch filler always get the SAME parent.
+
+==============================================================================
+2. NO COMPETING GROUPS  (exhaustive over legal 4-chair configurations)
+==============================================================================
+configurations tested (X, nu(X), X', nu(X')) : 2156
+   of which legal 4-chair patches            : 269
+   with the SAME parent supertile            : 18
+   with different, cell-disjoint parents     : 189
+        ... whose halved relative pose is in A44 : 135
+   parents overlapping / odd offset / other  : 116
+   failure kinds: Counter({'OVERLAP': 62, 'NOT-IN-A44': 54})
+   e.g. [((((0, 1, 2), (1, 1, 1)), (-1, -1, -1)), (((0, 1, 2), (-1, -1, 1)), (3, 3, 1)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), 'OVERLAP', 16), ((((0, 1, 2), (1, 1, 1)), (-1, -1, -1)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), 'OVERLAP', 19), ((((0, 1, 2), (1, 1, 1)), (-1, -1, -1)), (((0, 2, 1), (1, 1, -1)), (1, 1, 3)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), 'OVERLAP', 18)]
+   (0.1s)
+
+==============================================================================
+3. THE NOTCH MAP nu ON THE LEVEL-4 SUBSTITUTION TILING
+==============================================================================
+level-4 supertile: 4096 chairs
+chairs whose notch cell lies outside the patch: 1
+number of nu-preimages: 0 -> 3073 ,  {1: 511, 7: 512}
+true central children in the patch: 512
+chairs with exactly 7 nu-preimages     : 512
+  {7 preimages} == {central children}  : True  (subset: True )
+  central children with <7 preimages (boundary effects): 0
+
+==============================================================================
+4. COARSENING: the supertile atlas halves onto A44
+==============================================================================
+level-1 supertiles in the patch: 512
+distinct relative poses between adjacent supertiles: 30
+   all with even translation: True
+   halved poses, all in A44 : True  (30 of them)
+   A44 entries realised     : 30 / 44
+
+wrote force2_out.json
+
+==============================================================================
+1. COMPLETE FIRST SHELLS
+==============================================================================
+complete legal first shells: 33
+
+| #chairs | slot of nu(X) | |pre(X)| | count |
+|---|---|---|---|
+| 7 | (0, 0, 0) | 0 | 1 |
+| 7 | (0, 0, 1) | 0 | 1 |
+| 7 | (0, 1, 0) | 0 | 1 |
+| 7 | (0, 1, 1) | 0 | 4 |
+| 7 | (1, 0, 0) | 0 | 1 |
+| 7 | (1, 0, 1) | 0 | 4 |
+| 7 | (1, 1, 0) | 0 | 4 |
+| 8 | (0, 0, 0) | 1 | 1 |
+| 8 | (0, 0, 1) | 1 | 1 |
+| 8 | (0, 1, 0) | 1 | 1 |
+| 8 | (0, 1, 1) | 1 | 4 |
+| 8 | (1, 0, 0) | 1 | 1 |
+| 8 | (1, 0, 1) | 1 | 4 |
+| 8 | (1, 1, 0) | 1 | 4 |
+| 8 | (0, 0, 0) | 7 | 1 |
+
+|pre(X)| values that occur: [0, 1, 7]
+
+==============================================================================
+2. THE CENTRE CRITERION
+==============================================================================
+shells with |pre(X)| == 7 (X is a CENTRE)       : 1
+shells with |pre(X)| != 7                        : 32  values [0, 1]
+in every such shell, {X} u pre(X) is exactly an 8-chair supertile: True
+
+==============================================================================
+3. IS THE GROUPING RULE CONSISTENT?
+==============================================================================
+Rule:  X is a centre  iff  |pre(X)| = 7 ;
+       group(X) = {X} u pre(X)      if X is a centre,
+       group(X) = {nu(X)} u pre(nu(X)) otherwise.
+
+slots of nu(X) over the centre shells : Counter({'(0, 0, 0)': 1})
+slots of nu(X) over the other shells  : Counter({'(1, 1, 0)': 8, '(0, 1, 1)': 8, '(1, 0, 1)': 8, '(0, 1, 0)': 2, '(0, 0, 0)': 2, '(0, 0, 1)': 2, '(1, 0, 0)': 2})
+
+==============================================================================
+4. COMPETING GROUPS UNDER THE CORRECTED RULE
+==============================================================================
+legal 4-chair configurations with X, X' both non-centres: 207 / 2156 tested
+   same parent                       : 18
+   different, cell-disjoint parents  : 189
+      of those, halved rel. pose in A44: 135
+   failures                          : 54 Counter({'NOT-IN-A44': 54})
+   examples: [((((1, 0, 2), (1, 1, -1)), (0, 0, 0)), (((0, 1, 2), (-1, -1, 1)), (3, 3, 1)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), 'NOT-IN-A44'), ((((1, 0, 2), (1, 1, -1)), (0, 0, 0)), (((0, 1, 2), (-1, -1, 1)), (3, 3, 1)), (((1, 2, 0), (-1, -1, 1)), (3, 3, 1)), 'NOT-IN-A44'), ((((1, 0, 2), (1, 1, -1)), (0, 0, 0)), (((0, 1, 2), (-1, -1, 1)), (3, 3, 1)), (((2, 0, 1), (-1, -1, 1)), (3, 3, 1)), 'NOT-IN-A44'), ((((1, 0, 2), (1, 1, -1)), (0, 0, 0)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), (((0, 1, 2), (-1, -1, 1)), (3, 3, 1)), 'NOT-IN-A44'), ((((1, 0, 2), (1, 1, -1)), (0, 0, 0)), (((0, 1, 2), (1, 1, 1)), (1, 1, 1)), (((0, 2, 1), (1, 1, -1)), (1, 1, 3)), 'NOT-IN-A44')]
+
+wrote force3_out.json
+A44 (fine atlas, proper frames): 44
+supertile cells: 56
+
+==============================================================================
+SUPERTILE ATLAS (exhaustive over 24 proper frames, |t| <= 9)
+==============================================================================
+legal supertile neighbours: 44   (19.3s)
+   with ODD translation (would break registration): 0
+   halved poses: 44 distinct
+   halved atlas == A44 : True
+   halved atlas subset of A44: True    superset: True
+
+wrote force4_out.json
+M21: 21 marked facets, 3 blank (the three at the far corner (0,0,0))
+  (c) translation by (1,1,1): legal=False (blank_ok=False), shared facets=1
+  (c) translation by (1,1,1): legal=False (blank_ok=True), shared facets=1
+  (a) level-1 supertile: 6 directed contacts where one side is blank, 0 type/site violations
+  (b) coarse read: 21 of the 24 parent marks are missing
+tested 1679616 markings, 18 satisfy (a)+(b)+(c) at level 1   (84.7s)
+of those, 18 also satisfy (a)+(b) at level 2
+of those, 12 have all eight child frames orientation-preserving
+equivalence classes of solutions under (6 chair symmetries) x (6 symbol relabellings): 3
+class sizes: [6, 6, 6]
+M24 is among the solutions: True
+M24 class size (number of markings in its class): 6
+all solutions are in M24's class: False
+wrote search_out.json
+markings satisfying (a)+(b)+(c) at levels 1 and 2: 18
+
+#   stars 000/001/010/011/100/101/110/dent proper |A+|  |A-|  ==A44    sketch       weighted
+0   FHB/FHB/HFB/HFB/HFB/HFB/FHB/HFB False  40    40    False    13/33        37/89 
+1   FHB/HFB/FBH/BFH/BHF/HBF/FHB/HFB True   44    16    True     11/33        33/89 
+2   FHB/HFB/HFB/FHB/HFB/FHB/FHB/HFB True   62    48    False    11/33        29/89 
+3   FBH/FHB/HBF/BHF/BFH/FBH/HFB/HBF True   44    16    False    30/33        80/89 
+4   FBH/HBF/FBH/HBF/HBF/FBH/HBF/HBF False  40    40    False     9/33        27/89 
+5   FBH/HBF/HBF/FBH/HBF/FBH/FBH/HBF True   62    48    False    10/33        26/89 
+6   HFB/FHB/FHB/HFB/FHB/HFB/HFB/FHB True   62    48    False    13/33        35/89 
+7   HFB/FHB/HBF/BHF/BFH/FBH/HFB/FHB True   44    16    True     33/33        89/89   <-- M24
+8   HFB/HFB/FHB/FHB/FHB/FHB/HFB/FHB False  40    40    False    11/33        27/89 
+9   HBF/FBH/FBH/HBF/FBH/HBF/HBF/FBH True   62    48    False    11/33        29/89 
+10  HBF/FBH/HBF/FBH/FBH/HBF/FBH/FBH False  40    40    False    12/33        28/89 
+11  HBF/HFB/FBH/BFH/BHF/HBF/FHB/FBH True   44    16    False    11/33        33/89 
+12  BFH/HFB/FBH/BFH/BHF/HBF/FHB/BHF True   44    16    False    11/33        33/89 
+13  BFH/BHF/BHF/BFH/BFH/BHF/BHF/BHF False  40    40    False    12/33        34/89 
+14  BFH/BHF/BHF/BFH/BHF/BFH/BFH/BHF True   62    48    False    11/33        31/89 
+15  BHF/FHB/HBF/BHF/BFH/FBH/HFB/BFH True   44    16    False    30/33        80/89 
+16  BHF/BFH/BFH/BHF/BFH/BHF/BHF/BFH True   62    48    False    10/33        28/89 
+17  BHF/BFH/BFH/BHF/BHF/BFH/BFH/BFH False  40    40    False     9/33        25/89 
+
+best weighted sketch agreement: 89/89, achieved by #[7]
+solutions whose proper atlas equals Tsiokos A44: [1, 7]
+solutions with all-proper child frames: [1, 2, 3, 5, 6, 7, 9, 11, 12, 14, 15, 16]
+wrote classes_out.json
+panel  Tsiokos   ours   facet (cell,dir)               notch
+0      A         H      ((0, 0, 0), (-1, 0, 0))        False
+1      B         F      ((0, 0, 1), (-1, 0, 0))        False
+2      A         H      ((0, 1, 0), (-1, 0, 0))        False
+3      C         B      ((0, 1, 1), (-1, 0, 0))        False
+4      B         F      ((0, 1, 1), (1, 0, 0))         True
+5      C         B      ((1, 0, 0), (1, 0, 0))         False
+6      B         F      ((1, 0, 1), (1, 0, 0))         False
+7      A         H      ((1, 1, 0), (1, 0, 0))         False
+8      B         F      ((0, 0, 0), (0, -1, 0))        False
+9      A         H      ((0, 0, 1), (0, -1, 0))        False
+10     C         B      ((0, 1, 0), (0, 1, 0))         False
+11     A         H      ((0, 1, 1), (0, 1, 0))         False
+12     B         F      ((1, 0, 0), (0, -1, 0))        False
+13     C         B      ((1, 0, 1), (0, -1, 0))        False
+14     A         H      ((1, 0, 1), (0, 1, 0))         True
+15     B         F      ((1, 1, 0), (0, 1, 0))         False
+16     C         B      ((0, 0, 0), (0, 0, -1))        False
+17     C         B      ((0, 0, 1), (0, 0, 1))         False
+18     B         F      ((0, 1, 0), (0, 0, -1))        False
+19     B         F      ((0, 1, 1), (0, 0, 1))         False
+20     A         H      ((1, 0, 0), (0, 0, -1))        False
+21     A         H      ((1, 0, 1), (0, 0, 1))         False
+22     C         B      ((1, 1, 0), (0, 0, -1))        False
+23     C         B      ((1, 1, 0), (0, 0, 1))         True
+
+cross-tabulation Tsiokos class x our symbol: {('A', 'H'): 8, ('B', 'F'): 8, ('C', 'B'): 8}
+the two 3-class partitions coincide exactly: True
+dictionary: {'A': 'H', 'B': 'F', 'C': 'B'}
+wrote marking.json  (24 facets, 44 atlas entries)

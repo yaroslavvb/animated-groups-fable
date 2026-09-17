@@ -1,0 +1,9 @@
+{
+  "name": "Gyre — Turn, wait, recolour",
+  "short_name": "Gyre",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14110f",
+  "theme_color": "#14110f"
+}

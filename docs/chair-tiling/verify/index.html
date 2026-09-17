@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Chair tiling — verification</title>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin: 0 auto; padding: 32px 20px 64px; max-width: 46rem; background: #0a0c12; color: #ddd8ce;
+           font: 15px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    h1 { font-size: 20px; margin: 0 0 4px; color: #f2efe8; }
+    h2 { font-size: 15px; margin: 28px 0 6px; color: #f2efe8; }
+    p { margin: 0 0 12px; }
+    a { color: #9ec6f5; }
+    ul { padding-left: 20px; margin: 0 0 12px; }
+    li { margin: 2px 0; }
+    code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; }
+    pre { padding: 12px 14px; border-radius: 10px; background: #141822; overflow-x: auto; }
+    .note { color: #a9a49a; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Chair tiling — verification bundle</h1>
+  <p class="note"><a href="../">Back to the viewer</a></p>
+
+  <p>These are the files the viewer's claims come from. They are pure <code>python3</code>
+  with no dependencies and no network, and the one external input they need — the
+  transcription of I. Tsiokos's paper that the contact atlas and the panel map are compared
+  against — is shipped here as <a href="./tiling-matching-system.json">tiling-matching-system.json</a>.
+  <code>./runall.sh</code> re-runs the lot in about three and a half minutes.
+  <b>Note</b> that the last step, <code>export.py</code>, <b>overwrites</b>
+  <code>marking.json</code> in this directory.</p>
+
+  <p class="note"><b>Chirality, corrected 2026-09-17.</b> The marked tile is chiral, and the
+  hand sketch is the only thing that says which of the two mirror images CGS meant. The first
+  transcription of the photograph interchanged <code>x</code> and <code>y</code>, so the first
+  version of this bundle described the mirror image. The evidence tables in
+  <code>classes.py</code> have been re-read against the axes CGS wrote on the photograph
+  himself (<code>+x</code> to the lower left, <code>+y</code> to the right), and everything
+  here — including the viewer — is the corrected marking. Nothing structural changed: the
+  mirror satisfies the same statements and has the same 44-pose atlas. See
+  <a href="./tiling-spec.md">tiling-spec.md</a>, the note at the head of the file and §6.</p>
+
+  <h2>Read this first</h2>
+  <ul>
+    <li><a href="./tiling-spec.md">tiling-spec.md</a> — the write-up: what the marking is, why the
+      three marks the sketch omits are forced, and a section headed <i>What is not proved</i>.</li>
+    <li><a href="./runall.log">runall.log</a> — the full output of one complete run.</li>
+    <li><a href="./marking.json">marking.json</a> — the machine-readable marking: 24 facets with
+      their marks and sites, the 8 substitution frames, the 44-pose contact atlas, the 7 notch
+      fillers, and the map onto I. Tsiokos's panel IDs. The viewer's
+      <code>marking.data.mjs</code> is generated from this file.</li>
+  </ul>
+
+  <h2>Scripts</h2>
+  <ul>
+    <li><a href="./chair.py">chair.py</a> — the model: cells, facets, sites, poses, the matching rule.</li>
+    <li><a href="./verify.py">verify.py</a> — substitution consistency, self-similarity, dent/back complementarity, the contact atlas.</li>
+    <li><a href="./force.py">force.py</a> — 22 shell cells, 33 complete first shells, the 7 notch fillers.</li>
+    <li><a href="./force2.py">force2.py</a> — the notch map over a 4096-chair patch.</li>
+    <li><a href="./force3.py">force3.py</a> — the grouping theorem from the 33 shells.</li>
+    <li><a href="./force4.py">force4.py</a> — half the supertile atlas equals the chair atlas.</li>
+    <li><a href="./m21.py">m21.py</a> — why the literal 21-mark reading of the sketch cannot be right.</li>
+    <li><a href="./search.py">search.py</a> — all 1 679 616 candidate markings.</li>
+    <li><a href="./classes.py">classes.py</a> — the survivors scored against the sketch.</li>
+    <li><a href="./panelmap.py">panelmap.py</a> — Tsiokos's 24 panels mapped onto these 24 facets.</li>
+    <li><a href="./tiling-matching-system.json">tiling-matching-system.json</a> — the transcription
+      of the Zenodo paper the previous two compare against. It is a reading of that paper, not the
+      paper.</li>
+    <li><a href="./export.py">export.py</a> — writes marking.json.</li>
+    <li><a href="./runall.sh">runall.sh</a> — runs the lot.</li>
+  </ul>
+
+  <h2>The page's own check</h2>
+  <p>The viewer does not use the python at runtime; it builds the patch itself in JavaScript.
+  <code>tools/check.mjs</code> re-runs the two statements the picture depends on against that
+  JavaScript, and reproduces the python's contact counts:</p>
+<pre>node docs/chair-tiling/tools/check.mjs
+
+level 1: 56 cells, exact partition, 48 shared facets, 0 violations
+level 2: 448 cells, exact partition, 576 shared facets, 0 violations
+level 3: 3584 cells, exact partition, 5376 shared facets, 0 violations</pre>
+  <p class="note">(The write-up counts each shared facet twice, once from each side: 96, 1152, 10752.)</p>
+</body>
+</html>

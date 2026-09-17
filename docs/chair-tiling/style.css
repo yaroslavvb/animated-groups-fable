@@ -1,0 +1,158 @@
+:root {
+  color-scheme: dark;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --ink: #f2efe8;
+  --purple: #8b5cf6;
+  --blue: #3ba3e6;
+  /* What the marks and the facets actually look like on the object: the
+     shader's PURPLE, BLUE and BONE as they come out after shading, so the
+     legend is a picture of the page rather than an approximation of it. */
+  --mark-purple: #6b32c2;
+  --mark-blue: #1e8ccb;
+  --facet: #c9c4b6;
+  --panel: #0e1119e8;
+}
+* { box-sizing: border-box; }
+html, body, main { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body {
+  overscroll-behavior: none;
+  color: var(--ink);
+  background: #070810 radial-gradient(120% 90% at 50% 34%, #1b2136 0%, #0d1019 46%, #05060b 100%) fixed;
+}
+main { position: fixed; inset: 0; }
+canvas {
+  display: block; width: 100%; height: 100%;
+  touch-action: none; cursor: grab; user-select: none;
+  -webkit-user-select: none; -webkit-touch-callout: none;
+}
+body.dragging canvas { cursor: grabbing; }
+[hidden] { display: none !important; }
+
+/* Controls -------------------------------------------------------------- */
+/* left/right: 0 with auto inline margins, not left: 50% with a transform: an
+   auto-width fixed box anchored at left: 50% may only use the half of the
+   viewport to its right, which wrapped the bar onto three rows on a phone. */
+#controls {
+  position: fixed; left: 0; right: 0; bottom: max(18px, env(safe-area-inset-bottom));
+  margin-inline: auto; width: max-content;
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 4px;
+  max-width: min(600px, calc(100vw - 16px));
+  padding: 6px; border: 1px solid #ffffff2e; border-radius: 26px;
+  background: var(--panel); box-shadow: 0 6px 34px #00000099;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  transition: opacity .55s ease;
+}
+#controls .group {
+  display: flex; align-items: center; gap: 2px;
+  border-radius: 999px; background: #ffffff14;
+}
+#level-label {
+  min-width: 5.6em; padding: 0 2px; text-align: center;
+  font-size: 13px; letter-spacing: .02em; font-variant-numeric: tabular-nums;
+}
+button {
+  min-width: 42px; min-height: 42px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 999px; padding: 9px;
+  background: transparent; color: inherit; font: inherit; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+button svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+button:hover { background: #ffffff1f; }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+button:disabled { opacity: .35; cursor: default; }
+button[aria-pressed="true"] { background: #ffffff2b; }
+/* Holds its place in the bar, so nothing moves when it comes and goes. */
+button.invisible { visibility: hidden; pointer-events: none; }
+body.quiet #controls { opacity: 0; pointer-events: none; }
+body.quiet #controls:focus-within { opacity: 1; pointer-events: auto; }
+/* A touch screen has no hover to bring the bar back, so it only dims. */
+@media (pointer: coarse) {
+  body.quiet #controls { opacity: .3; pointer-events: auto; }
+}
+
+/* Caption --------------------------------------------------------------- */
+#caption {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(12px, env(safe-area-inset-left));
+  width: min(392px, calc(100vw - 24px));
+  border: 1px solid #ffffff24; border-radius: 16px;
+  background: var(--panel); box-shadow: 0 6px 34px #0009;
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+#caption summary {
+  display: flex; align-items: center; gap: 9px;
+  padding: 11px 14px; font-size: 14px; font-weight: 600; letter-spacing: .01em;
+  cursor: pointer; list-style: none; border-radius: 16px;
+}
+#caption summary::-webkit-details-marker { display: none; }
+#caption summary:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+#caption .dot {
+  width: 9px; height: 9px; border-radius: 3px; flex: none;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+}
+#caption .chev {
+  margin-left: auto; width: 9px; height: 9px; flex: none;
+  border-right: 1.7px solid currentColor; border-bottom: 1.7px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px); opacity: .65;
+  transition: transform .2s ease;
+}
+#caption[open] .chev { transform: rotate(225deg) translate(-2px, -2px); }
+#caption .body {
+  max-height: min(62vh, 620px); overflow-y: auto; overscroll-behavior: contain;
+  padding: 0 15px 14px; font-size: 13px; line-height: 1.52; color: #ddd8ceef;
+}
+/* It scrolls, so it is focusable and the arrow keys reach it. */
+#caption .body:focus-visible { outline: 2px solid var(--ink); outline-offset: -3px; }
+/* A fade at the foot of the panel, so it is clear the text scrolls. */
+#caption[open]::after {
+  content: ""; position: absolute; left: 1px; right: 1px; bottom: 1px; height: 22px;
+  border-radius: 0 0 15px 15px; pointer-events: none;
+  background: linear-gradient(to top, #0e1119f2, #0e111900);
+}
+#caption p { margin: 0 0 9px; }
+#caption b { color: var(--ink); }
+#caption a { color: #9ec6f5; }
+#caption .rule {
+  padding: 7px 10px; border-radius: 9px; background: #ffffff10;
+  color: var(--ink); font-size: 12.5px; text-align: center;
+}
+#caption .credit { margin-top: 12px; padding-top: 10px; border-top: 1px solid #ffffff1c; font-size: 11.5px; color: #b9b3a9; }
+/* One facet each, with the glyph at exactly the proportions the shader draws:
+   the marked corner at the top right, the arrow along the facet's diagonal. */
+#caption .legend { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 2px 0 11px; padding: 0; list-style: none; }
+#caption .legend li { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+#caption .legend svg { width: 36px; height: 36px; flex: none; }
+#caption .legend .tile { fill: var(--facet); }
+#caption .legend .shaft, #caption .legend .barb { fill: none; stroke-linecap: round; }
+#caption .legend .shaft { stroke-width: 2.99; }
+#caption .legend .barb { stroke-width: 2.86; }
+#caption .legend polygon { stroke: none; }
+#caption .legend .purple { stroke: var(--mark-purple); fill: var(--mark-purple); }
+#caption .legend .blue { stroke: var(--mark-blue); fill: var(--mark-blue); }
+
+/* Notice and stats ------------------------------------------------------ */
+#notice {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  max-width: min(420px, calc(100% - 40px)); padding: 16px 22px;
+  border-radius: 14px; background: #060810ee; text-align: center; font-size: 15px; line-height: 1.5;
+}
+#hud {
+  position: fixed; right: max(12px, env(safe-area-inset-right)); top: max(12px, env(safe-area-inset-top));
+  padding: 6px 10px; border-radius: 8px; background: #060810cc;
+  font: 11.5px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; color: #cfcabf;
+  pointer-events: none; text-align: right;
+}
+noscript { position: fixed; inset: 40% 20px auto; padding: 20px; text-align: center; background: #060810; border-radius: 12px; }
+
+@media (max-width: 720px) {
+  #caption { width: calc(100vw - 20px); left: 10px; }
+  #caption .body { max-height: min(52vh, 460px); }
+  #controls { gap: 2px; padding: 5px; }
+  button { min-width: 40px; min-height: 40px; padding: 8px; }
+  #level-label { font-size: 12px; min-width: 5.2em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #controls, #caption .chev { transition: none; }
+}

@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070810">
+  <meta name="robots" content="noindex">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="An interactive reconstruction of Chaim Goodman-Strauss's marked chair: one 3-D tile whose 24 facets carry three kinds of arrow, and the hierarchy of supertiles those arrows force.">
+  <title>Chair tiling — the marked chair</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Chair tiling — the marked chair">
+  <meta property="og:description" content="One tile: a 2x2x2 cube with a cell removed, marked with three arrows. Eight of them are forced into a chair twice as big, with one in the middle — and the big chair carries the same marks, for ever.">
+  <meta property="og:url" content="https://chair-tiling.pages.dev/">
+  <meta property="og:image" content="https://chair-tiling.pages.dev/social-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A hexagonal isometric view of a chair-shaped solid built from smaller chairs, its faces ruled into rhombi and marked with purple and blue arrows.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Chair tiling — the marked chair">
+  <meta name="twitter:description" content="One tile, three arrows, and a hierarchy that repeats at every scale.">
+  <meta name="twitter:image" content="https://chair-tiling.pages.dev/social-preview.jpg">
+  <meta name="twitter:image:alt" content="A hexagonal isometric view of a chair-shaped solid built from smaller chairs, its faces ruled into rhombi and marked with purple and blue arrows.">
+  <link rel="icon" href="data:,">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main>
+    <canvas id="view" aria-label="A three-dimensional chair tiling seen down its body diagonal. Drag to orbit, pinch or scroll to zoom, two fingers to pan."></canvas>
+    <div id="notice" role="status">Building the tiling…</div>
+
+    <details id="caption" aria-label="About this tiling">
+      <summary><span class="dot" aria-hidden="true"></span>The marked chair<span class="chev" aria-hidden="true"></span></summary>
+      <div class="body" tabindex="0" role="region" aria-label="About this tiling">
+        <p><b>The tile.</b> A 2&times;2&times;2 cube with one of its eight cells taken out &mdash; a
+        <i>chair</i>, the three-dimensional L-tile. Each of its 24 unit facets carries exactly one of
+        three marks, drawn along that facet's diagonal and pointing at one of its corners. Three
+        facets meet at each of the eight marked corners, and each corner gets one of each mark.
+        (The sketch draws 21 of the 24; the three it leaves blank are forced by the two facts
+        below up to a relabelling, which the notch marks in the sketch settle. At the level the
+        page opens on, the reconstructed ones are the marks at the six corners of the hexagon.)</p>
+
+        <ul class="legend">
+          <li><svg viewBox="0 0 40 40" aria-hidden="true"><rect class="tile" x="1.2" y="1.2" width="37.6" height="37.6" rx="3"/><path class="shaft purple" d="M5.40 34.60 L30.00 10.00"/><polygon class="purple" points="35.20,4.80 24.74,8.77 31.23,15.26"/></svg><span>filled purple</span></li>
+          <li><svg viewBox="0 0 40 40" aria-hidden="true"><rect class="tile" x="1.2" y="1.2" width="37.6" height="37.6" rx="3"/><path class="shaft purple" d="M5.40 34.60 L30.00 10.00"/><path class="barb purple" d="M35.20 4.80 L24.74 8.77 M35.20 4.80 L31.23 15.26"/></svg><span>hollow purple</span></li>
+          <li><svg viewBox="0 0 40 40" aria-hidden="true"><rect class="tile" x="1.2" y="1.2" width="37.6" height="37.6" rx="3"/><path class="shaft blue" d="M19.69 20.31 L30.70 9.30"/><polygon class="blue" points="35.20,4.80 26.18,8.29 31.71,13.82"/></svg><span>blue</span></li>
+        </ul>
+
+        <p><b>The rule.</b> Two chairs may share a facet only when their two marks point at the same
+        corner of it and the marks are complementary:</p>
+        <p class="rule">filled purple meets hollow purple &middot; blue meets blue</p>
+
+        <p><b>What Chaim Goodman-Strauss pointed out.</b> First: eight chairs are forced together
+        into a chair twice as big, seven around the outside and one in the middle, plugging the
+        notch. Second: the marks on the corners of that big chair are exactly the marks of the
+        middle one &mdash; so the big chairs obey the same rule, are forced into chairs twice as big
+        again, and the argument repeats at every scale.</p>
+
+        <p><b>Which way round.</b> The marked tile is chiral: its mirror image satisfies everything
+        on this page equally well, so only the drawing says which of the two it is. CGS wrote the
+        axes beside his single-tile figure &mdash; <i>+x</i> to the lower left, <i>+y</i> to the
+        right &mdash; and read with those, the pit shows the hollow purple V on its left wall and
+        the solid head on its right. That is what is drawn here.</p>
+
+        <p><b>What has been checked by computer</b> (scripts and log in
+        <a href="./verify/">verify/</a>, write-up in <a href="./verify/tiling-spec.md">tiling-spec.md</a>):
+        the substitution is consistent at levels&nbsp;1&ndash;3 (12&nbsp;000 facet contacts, no violation);
+        the supertile read at double scale carries the same marking, exactly, at levels&nbsp;1 and&nbsp;2;
+        a chair and the copy shifted by (1,&nbsp;1,&nbsp;1) into its notch match; a chair has exactly 44
+        legal neighbours <i>up to rotation</i> &mdash; the same 44 poses as the contact atlas reported
+        for I.&nbsp;Tsiokos's independent bumps-and-dents realization, with the three marks matching
+        his three motif classes panel&nbsp;for&nbsp;panel &mdash; and 16 more if reflected copies are
+        allowed, which the arrows cannot rule out; and of the 1&nbsp;679&nbsp;616 candidate markings
+        only 18 are consistent with the substitution, of which exactly one agrees with every symbol
+        readable in the sketch.</p>
+
+        <p><b>What has not been proved.</b> Aperiodicity. Forcing is proved only as a local theorem
+        &mdash; from the shell of neighbours around a chair you can tell whether it is a middle one
+        &mdash; and the induction to aperiodicity is not formalised. The marks are also blind to
+        reflection, so the 16 reflected neighbours are excluded by fiat rather than by the rule, and
+        registration (facets meeting square on) is assumed rather than derived.</p>
+
+        <p class="credit">Construction explained by Chaim Goodman-Strauss in conversation,
+        17&nbsp;September&nbsp;2026 (unpublished); the <i>marking</i> is reconstructed from a hand sketch
+        &mdash; errors are ours. The tile and its substitution are the n&nbsp;=&nbsp;3 case of
+        C.&nbsp;Goodman-Strauss, <i>An aperiodic pair of tiles in E<sup>n</sup> for all n&nbsp;&ge;&nbsp;3</i>
+        (<a href="https://strauss.hosted.uark.edu/papers/Newpaper.pdf">1999</a>); the 44 poses above are
+        compared against the atlas reported for I.&nbsp;Tsiokos, <i>A Strongly Aperiodic Monotile in
+        Three Dimensions</i> (<a href="https://zenodo.org/records/22792358">Zenodo, 2026</a>).<br>
+        <a href="https://yaroslavvb.github.io/animated-groups-fable/reports/symmetry-meeting-notes-week-38/">Meeting notes</a>
+        &middot; <a href="./README.md">About this page</a></p>
+      </div>
+    </details>
+
+    <div id="controls" aria-label="View controls">
+      <div class="group" role="group" aria-label="Substitution level">
+        <button id="level-down" type="button" title="Fewer levels · [" aria-label="Fewer substitution levels">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg>
+        </button>
+        <span id="level-label" aria-live="polite">Level 1</span>
+        <button id="level-up" type="button" title="More levels · ]" aria-label="More substitution levels">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+      <button id="explode" type="button" title="Pull the eight sub-chairs apart · E" aria-label="Pull the eight sub-chairs apart" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v5M12 16v5M3 12h5M16 12h5M6.5 6.5l2.5 2.5M15 15l2.5 2.5M17.5 6.5L15 9M9 15l-2.5 2.5"/></svg>
+      </button>
+      <button id="markings" type="button" title="Show or hide the markings · M" aria-label="Hide the markings" aria-pressed="true">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19L17 7"/><path d="M11 5h8v8"/></svg>
+      </button>
+      <button id="colours" type="button" title="Colour: plain, by sub-chair, middle versus corner · C" aria-label="Change colouring">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><circle cx="7" cy="16" r="3.2"/><circle cx="17" cy="16" r="3.2"/></svg>
+      </button>
+      <button id="reset" type="button" title="Reset the view · 0" aria-label="Reset the view" class="invisible">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 1 2.6 5.7"/><path d="M3.5 17.5L7 17l.6 3.4"/></svg>
+      </button>
+      <button id="fullscreen" type="button" title="Fullscreen · F" aria-label="Enter fullscreen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+      </button>
+    </div>
+
+    <div id="hud" hidden aria-live="off"></div>
+    <noscript>This page needs JavaScript and WebGL 2.</noscript>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
