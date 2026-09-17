@@ -166,6 +166,7 @@ function beginGesture() {
   const [width, height] = size();
   gesture = {anchor: view.latticeAt(mid, width, height), mid, dist0: dist, heading0: heading, scale0: view.scale(width, height), angle0: view.angle, multi: count > 1};
   samples.length = 0;
+  samples.push({time: performance.now(), mid});
 }
 function moveGesture(time) {
   if (!gesture) return;
@@ -174,8 +175,9 @@ function moveGesture(time) {
   gesture.mid = mid;
   if (gesture.multi && gesture.dist0 > 0) view.pin(gesture.anchor, mid, width, height, {scale: gesture.scale0 * dist / gesture.dist0, angle: gesture.angle0 + heading - gesture.heading0});
   else view.pin(gesture.anchor, mid, width, height);
+  // Release velocity comes from the last 100 ms of movement.
   samples.push({time, mid});
-  while (samples.length > 6) samples.shift();
+  while (samples.length > 1 && time - samples[0].time > 100) samples.shift();
   updateReset(); requestDraw();
 }
 function endGesture(time) {
@@ -207,7 +209,7 @@ function stepFling(dt) {
 }
 canvas.addEventListener('pointerdown', event => {
   if (event.button !== undefined && event.button !== 0 && event.pointerType === 'mouse') return;
-  canvas.setPointerCapture(event.pointerId);
+  try { canvas.setPointerCapture(event.pointerId); } catch { /* Synthetic pointers cannot be captured; the gesture still works. */ }
   pointers.set(event.pointerId, {x: event.clientX, y: event.clientY});
   fling = null; beginGesture();
   if (event.pointerType === 'touch') renderer?.touched();
@@ -217,16 +219,17 @@ canvas.addEventListener('pointerdown', event => {
 canvas.addEventListener('pointermove', event => {
   if (!pointers.has(event.pointerId)) return;
   pointers.set(event.pointerId, {x: event.clientX, y: event.clientY});
-  moveGesture(event.timeStamp);
+  moveGesture(performance.now());
 });
 for (const type of ['pointerup', 'pointercancel']) canvas.addEventListener(type, event => {
   if (!pointers.has(event.pointerId)) return;
   settleTurn();
   pointers.delete(event.pointerId);
-  if (pointers.size) beginGesture(); else { endGesture(event.timeStamp); document.body.classList.remove('dragging'); }
+  if (pointers.size) beginGesture(); else { endGesture(performance.now()); document.body.classList.remove('dragging'); }
 });
 canvas.addEventListener('wheel', event => {
   event.preventDefault();
+  if (event.ctrlKey && performance.now() - trackpad.time < 150) return; // Safari reports the same pinch as a gesture event.
   const [width, height] = size();
   const step = event.deltaMode === 1 ? 40 : event.deltaMode === 2 ? 400 : 1;
   const factor = Math.exp(-event.deltaY * step * (event.ctrlKey ? 0.01 : 0.0022));
@@ -234,8 +237,37 @@ canvas.addEventListener('wheel', event => {
   fling = null; updateReset(); requestDraw(); showControls();
 }, {passive: false});
 canvas.addEventListener('contextmenu', event => event.preventDefault());
-// Safari's own pinch and double-tap zoom must not fight the gesture.
-for (const type of ['gesturestart', 'gesturechange', 'gestureend']) document.addEventListener(type, event => event.preventDefault());
+// Safari reports trackpad pinches and two-finger turns as gesture events with a
+// cumulative scale and rotation (degrees, clockwise). They zoom and turn the
+// view about the pointer whenever no touch pointers are active; on iPhone and
+// iPad the pointer events above already handle the fingers, and the gesture
+// events are only cancelled so Safari does not zoom the page itself.
+const trackpad = {time: -Infinity, anchor: null, scale0: 0, angle0: 0, point: [0, 0]};
+document.addEventListener('gesturestart', event => {
+  event.preventDefault();
+  if (pointers.size || event.target !== canvas) return;
+  const [width, height] = size();
+  trackpad.point = [event.clientX, event.clientY];
+  trackpad.anchor = view.latticeAt(trackpad.point, width, height);
+  trackpad.scale0 = view.scale(width, height); trackpad.angle0 = view.angle; trackpad.time = performance.now();
+  fling = null; showControls();
+});
+document.addEventListener('gesturechange', event => {
+  event.preventDefault();
+  if (pointers.size || !trackpad.anchor) return;
+  const [width, height] = size();
+  view.pin(trackpad.anchor, trackpad.point, width, height, {scale: trackpad.scale0 * event.scale, angle: trackpad.angle0 + event.rotation * Math.PI / 180});
+  trackpad.time = performance.now();
+  updateReset(); requestDraw();
+});
+document.addEventListener('gestureend', event => {
+  event.preventDefault();
+  if (!trackpad.anchor) return;
+  const snapped = snapAngle(view.angle);
+  if (snapped !== view.angle) { const [width, height] = size(); view.pin(trackpad.anchor, trackpad.point, width, height, {angle: snapped}); }
+  trackpad.anchor = null; trackpad.time = performance.now();
+  updateReset(); requestDraw();
+});
 canvas.addEventListener('touchmove', event => event.preventDefault(), {passive: false});
 
 function resetView() { view.reset(); fling = null; updateReset(); requestDraw(); showControls(); }

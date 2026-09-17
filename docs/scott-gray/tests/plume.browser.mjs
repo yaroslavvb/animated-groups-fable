@@ -1,16 +1,52 @@
 import assert from 'node:assert/strict';
 const runtime = '/Users/yaroslavvb/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/';
-const {chromium} = await import(process.env.PLAYWRIGHT_MODULE ?? `${runtime}playwright/index.mjs`);
+const playwright = await import(process.env.PLAYWRIGHT_MODULE ?? `${runtime}playwright/index.mjs`);
+// BROWSER=webkit runs the same checks in Playwright's WebKit (Safari's engine);
+// multi-touch is then dispatched as synthetic pointer events, and Safari's
+// trackpad gesture events are exercised as well.
+const engine = process.env.BROWSER === 'webkit' ? 'webkit' : 'chromium';
 const {PNG} = (await import(process.env.PNGJS_MODULE ?? `${runtime}pngjs/lib/png.js`)).default;
 const base = (process.argv[2] ?? 'http://localhost:8934/scott-gray/plume/').replace(/\/?$/, '/');
-const label = process.argv[3] ?? 'local';
-const browser = await chromium.launch({channel: 'chrome', headless: true});
+const label = `${process.argv[3] ?? 'local'} (${engine})`;
+const browser = engine === 'webkit' ? await playwright.webkit.launch({headless: true}) : await playwright.chromium.launch({channel: 'chrome', headless: true});
+const notes = [];
 const errors = [];
 const context = await browser.newContext({viewport: {width: 1440, height: 1000}, deviceScaleFactor: 2});
 const page = await context.newPage();
 page.on('pageerror', error => errors.push(error.message));
 page.on('response', response => {if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);});
 const ready = () => page.waitForSelector('canvas[data-ready="true"]');
+let touch = null;
+/** Two fingers through a sequence of positions: real touch input through the
+ * devtools protocol in Chromium, synthetic pointer events in WebKit. */
+async function fingers(frames) {
+  if (engine === 'chromium') {
+    touch ??= await context.newCDPSession(page);
+    await touch.send('Emulation.setTouchEmulationEnabled', {enabled: true});
+    const points = frame => frame.map(([x, y], i) => ({x, y, id: i + 1}));
+    await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: points(frames[0])});
+    for (const frame of frames.slice(1)) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: points(frame)});
+    await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+    await touch.send('Emulation.setTouchEmulationEnabled', {enabled: false});
+    return;
+  }
+  await page.evaluate(frames => {
+    const canvas = document.querySelector('canvas');
+    const fire = (type, [x, y], id) => canvas.dispatchEvent(new PointerEvent(type, {pointerId: id, pointerType: 'touch', isPrimary: id === 1, clientX: x, clientY: y, buttons: type === 'pointerup' ? 0 : 1, bubbles: true, cancelable: true}));
+    frames[0].forEach((point, i) => fire('pointerdown', point, i + 1));
+    for (const frame of frames.slice(1)) frame.forEach((point, i) => fire('pointermove', point, i + 1));
+    frames[frames.length - 1].forEach((point, i) => fire('pointerup', point, i + 1));
+  }, frames);
+}
+/** The home image turned a quarter turn clockwise and doubled about the centre:
+ * pixel (cx+u, cy+v) must show what (cx+v/2, cy−u/2) showed. */
+function turnedAndDoubled(home, turned) {
+  let total = 0, count = 0;
+  for (let v = -400; v < 400; v += 2) for (let u = -400; u < 400; u += 2) for (let c = 0; c < 3; c++) {
+    total += Math.abs(turned.data[4 * ((800 + v) * turned.width + 1280 + u) + c] - home.data[4 * ((800 - u / 2) * home.width + 1280 + v / 2) + c]); count++;
+  }
+  return total / count;
+}
 async function pixels() { return PNG.sync.read(await page.locator('canvas').screenshot()); }
 function averageDifference(a, b, x1 = 0, y1 = 0, x2 = 0, y2 = 0, width = a.width, height = a.height) {
   let total = 0;
@@ -91,13 +127,8 @@ try {
   await page.waitForTimeout(300);
   assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'the 0 key restores the home view exactly');
   assert.equal(await page.locator('#reset').isVisible(), false);
-  // A two-finger pinch (touch, via the devtools protocol) zooms in as well.
-  const touch = await context.newCDPSession(page);
-  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: true});
-  const fingers = (x1, x2) => [{x: x1, y: 400, id: 1}, {x: x2, y: 400, id: 2}];
-  await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: fingers(600, 680)});
-  for (let i = 1; i <= 5; i++) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: fingers(600 - 8 * i, 680 + 8 * i)});
-  await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
+  // A two-finger pinch zooms in as well.
+  await fingers(Array.from({length: 6}, (_, i) => [[600 - 8 * i, 400], [680 + 8 * i, 400]]));
   await page.waitForTimeout(300);
   const pinched = await pixels();
   assert.ok(averageDifference(pinched, pinched, 0, 0, 1520, 0, 1000, 1000) < 1, 'pinching the fingers apart doubled the repeat');
@@ -109,20 +140,35 @@ try {
   // 200 px apart vertically about the screen centre is a clockwise quarter turn
   // with a doubling. The result must be the home image turned and enlarged
   // about the centre: pixel (cx+u, cy+v) shows what (cx+v/2, cy−u/2) showed.
-  const spin = (t) => { const a = t * Math.PI / 2, r = 50 + 50 * t; return [{x: 640 - r * Math.cos(a), y: 400 - r * Math.sin(a), id: 1}, {x: 640 + r * Math.cos(a), y: 400 + r * Math.sin(a), id: 2}]; };
-  await touch.send('Input.dispatchTouchEvent', {type: 'touchStart', touchPoints: spin(0)});
-  for (let i = 1; i <= 8; i++) await touch.send('Input.dispatchTouchEvent', {type: 'touchMove', touchPoints: spin(i / 8)});
-  await touch.send('Input.dispatchTouchEvent', {type: 'touchEnd', touchPoints: []});
-  await touch.send('Emulation.setTouchEmulationEnabled', {enabled: false});
+  const spin = t => { const a = t * Math.PI / 2, r = 50 + 50 * t; return [[640 - r * Math.cos(a), 400 - r * Math.sin(a)], [640 + r * Math.cos(a), 400 + r * Math.sin(a)]]; };
+  await fingers(Array.from({length: 9}, (_, i) => spin(i / 8)));
   await page.waitForTimeout(300);
-  const turned = await pixels();
-  let total = 0, count = 0;
-  for (let v = -400; v < 400; v += 2) for (let u = -400; u < 400; u += 2) for (let c = 0; c < 3; c++) {
-    total += Math.abs(turned.data[4 * ((800 + v) * turned.width + 1280 + u) + c] - beforeDrag.data[4 * ((800 - u / 2) * beforeDrag.width + 1280 + v / 2) + c]); count++;
-  }
-  assert.ok(total / count < 1.5, `two-finger turn and zoom together match the turned, enlarged home image (mean difference ${(total / count).toFixed(2)})`);
+  const turnDifference = turnedAndDoubled(beforeDrag, await pixels());
+  assert.ok(turnDifference < 1.5, `two-finger turn and zoom together match the turned, enlarged home image (mean difference ${turnDifference.toFixed(2)})`);
   await page.keyboard.press('s');
   assert.match(await page.locator('#stats').textContent(), /760 px per repeat · turned 90°/);
+  // Safari's trackpad gesture events (a pinch with rotation) must do the same.
+  // Safari itself constructs GestureEvents; other engines get a plain event
+  // carrying the same fields, which exercises the page's handler.
+  await page.keyboard.press('s'); await page.keyboard.press('0'); await page.waitForTimeout(200);
+  const gestureEvents = await page.evaluate(() => {
+    const canvas = document.querySelector('canvas');
+    let native = true;
+    const fire = (type, scale, rotation) => {
+      let event;
+      try { event = document.createEvent('GestureEvent'); event.initGestureEvent(type, true, true, window, 0, 0, 0, 640, 400, false, false, false, false, canvas, scale, rotation); }
+      catch { native = false; event = new Event(type, {bubbles: true, cancelable: true}); Object.defineProperties(event, {scale: {value: scale}, rotation: {value: rotation}, clientX: {value: 640}, clientY: {value: 400}}); }
+      canvas.dispatchEvent(event);
+    };
+    fire('gesturestart', 1, 0); fire('gesturechange', 1.4, 40); fire('gesturechange', 2, 88); fire('gestureend', 2, 88);
+    return native;
+  });
+  await page.waitForTimeout(300);
+  const gestureDifference = turnedAndDoubled(beforeDrag, await pixels());
+  assert.ok(gestureDifference < 1.5, `Safari gesture events turn and zoom, snapping 88° to a quarter turn (mean difference ${gestureDifference.toFixed(2)})`);
+  await page.keyboard.press('s');
+  assert.match(await page.locator('#stats').textContent(), /760 px per repeat · turned 90°/);
+  notes.push(gestureEvents ? 'native Safari gesture events' : 'Safari gesture handler with synthetic events');
   // The ] key turns 15° clockwise, Shift+] a quarter turn; [ turns back.
   await page.keyboard.press('0'); await page.keyboard.press(']'); await page.waitForTimeout(200);
   assert.match(await page.locator('#stats').textContent(), /turned 15°/);
@@ -146,11 +192,17 @@ try {
   await page.waitForFunction(() => document.body.classList.contains('quiet'), null, {timeout: 6000});
   await page.mouse.move(20, 20);
   assert.equal(await page.locator('body').evaluate(b => b.classList.contains('quiet')), false);
-  await page.getByRole('button', {name: 'Enter fullscreen', exact: true}).click();
-  await page.waitForFunction(() => !!document.fullscreenElement);
-  await page.waitForFunction(() => document.body.classList.contains('quiet'), null, {timeout: 6000});
-  await page.keyboard.press('f');
-  await page.waitForFunction(() => !document.fullscreenElement);
+  try {
+    await page.getByRole('button', {name: 'Enter fullscreen', exact: true}).click();
+    await page.waitForFunction(() => !!document.fullscreenElement, null, {timeout: 4000});
+    await page.waitForFunction(() => document.body.classList.contains('quiet'), null, {timeout: 6000});
+    await page.keyboard.press('f');
+    await page.waitForFunction(() => !document.fullscreenElement, null, {timeout: 4000});
+    notes.push('fullscreen');
+  } catch (error) {
+    if (engine === 'chromium') throw error;
+    notes.push('fullscreen unavailable in headless WebKit');
+  }
   await page.keyboard.press('Space');
 
   // A restored GPU context must redraw and permit playback without reloading.
@@ -168,5 +220,5 @@ try {
   await page.goto(`${base}?play=1`); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Pause animation');
   assert.deepEqual(errors, [], 'no browser errors or missing assets');
-  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn, reset, stats, pause/play, idle controls, fullscreen, GPU recovery, and reduced motion passed`);
+  console.log(`${label}: retina rendering, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn, reset, stats, pause/play, idle controls, GPU recovery, and reduced motion passed (${notes.join('; ')})`);
 } finally {await browser.close();}

@@ -51,9 +51,13 @@ Optional `?play=0&phase=0.25` parameters support reproducible still views.
 The pattern is endless: drag it with a finger or the mouse (a quick release
 keeps it gliding). Two fingers pan, zoom and turn it at once about their
 midpoint; a turn that ends within 4° of a quarter turn snaps to it, since the
-lattice is square. The wheel or a trackpad pinch zooms about the pointer. On
-the keyboard the arrows pan, + / − zoom, ] and [ turn by 15° (a quarter turn
-with Shift), and 0 or the recentre button returns to the home view. Zooming
+lattice is square. The wheel or a trackpad pinch zooms about the pointer, and
+on a Mac trackpad in Safari a two-finger turn turns the pattern too (Safari
+reports trackpad pinches and turns as gesture events with a scale and a
+rotation; the page uses them whenever no touch pointers are active, so
+iPhone and iPad keep using the pointer events). On the keyboard the arrows
+pan, + / − zoom, ] and [ turn by 15° (a quarter turn with Shift), and 0 or
+the recentre button returns to the home view. Zooming
 out stops where one texel of the 96-node grid spans one device pixel; zooming
 in stops at 8000 CSS pixels per repeat. `?x=&y=` place a lattice point at the
 screen centre and `?angle=` (degrees, clockwise) turns the home view.
@@ -83,11 +87,16 @@ Validation from the repository root (Node 20+):
 ```sh
 node --test docs/scott-gray/tests/plume.test.mjs
 node docs/scott-gray/tests/plume.browser.mjs http://localhost:8934/scott-gray/plume/
+BROWSER=webkit node docs/scott-gray/tests/plume.browser.mjs http://localhost:8934/scott-gray/plume/
 ```
 
-The browser check requires Playwright with Chrome installed. Set
-`PLAYWRIGHT_MODULE` and `PNGJS_MODULE` if those packages are outside the bundled
-Codex runtime. Deploy with Wrangler using your authenticated personal account:
+The browser check requires Playwright with Chrome installed; `BROWSER=webkit`
+runs the same checks in Playwright's WebKit (Safari's engine), with
+multi-touch as synthetic pointer events and Safari's gesture events as
+synthetic events. Set `PLAYWRIGHT_MODULE` and `PNGJS_MODULE` if those packages
+are outside the bundled Codex runtime. Safari caps page rendering at 60
+frames per second even on 120 Hz screens; Chrome on Android follows the
+display's current refresh rate. Deploy with Wrangler using your authenticated personal account:
 
 ```sh
 npx wrangler pages deploy docs/scott-gray/plume --project-name plume-wave --branch main
