@@ -1,39 +1,28 @@
-// Gyre: three colours that can only be cycled by turning, waiting and
-// recolouring all at once.
+// Triskele: a three-colour rotating wave on the triangular lattice.
 //
 // The saved orbit wallpaper:g225:8fcde9bc1178d93d (= wallpaper:g247:8fcde9…,
 // "Interwoven sixth-cycle wave") is a Gray–Scott rotating wave on a hexagonal
 // lattice: 96 frames of a 66×66 periodic lattice over one period T, planar U
-// then V, x fastest, float32 little-endian. It is the very field ../triskele/
-// paints, byte for byte — only the rule that colours it is different.
+// then V, x fastest, float32 little-endian. On the saved samples it satisfies,
+// bit for bit,
 //
-// Let g be the third-turn of the plane about the point p = (1/18, 1/9), which
-// is NOT a symmetry centre of the wave. In lattice coordinates
+//     U(R x, t + 2T/3) = U(x, t),          R = the 120° turn about the origin,
 //
-//     g(q) = S q + w,     S(u, v) = (v − u, −u),     w = (0, 1/6) = (I − S) p,
+// and the whole sixfold family U(R60^j x, t + j·5T/6) = U(x, t). Rewritten, the
+// 120° turn is a pure time shift of the field:
 //
-// with S³ = I, so g³ = 1 and the three points q, g q, g² q are one orbit of the
-// turn about p. Paint each point by whichever member of that orbit leads, each
-// read at its own third of the cycle:
+//     U(R x, t) = U(x, t + T/3).
 //
-//     colour(x, t) = argmax over k in {0,1,2} of U(g^k x, t + k T/3).
+// So the three values U(x, t), U(Rx, t), U(R²x, t) are the same point of the
+// plane at the three instants t, t + T/3, t + 2T/3, and the colouring
 //
-// The list compared at (g x, t + T/3) is the list compared at (x, t) shifted
-// one place along — U(g^k(g x), t + (k+1)T/3) = U(g^(k+1) x, t + (k+1)T/3) —
-// so, exactly and for any field, any centre and any reconstruction filter,
+//     colour(x, t) = argmax over k in {0,1,2} of U(R^k x, t)
 //
-//     colour(g x, t + T/3) = colour(x, t) − 1   (mod 3).
-//
-// Neither half of that is true on its own here (measured: 42.8 % agreement at
-// best for the turn alone, the same for the shift alone, 0 % for the pair
-// without the recolouring), and no other operation of the lattice maps the
-// picture to itself. The colour-preserving group is exactly the translations.
-//
-// The texture holds the field at the three instants t, t + T/3, t + 2T/3 as its
-// three channels, so value k is channel k read at g^k x: three positions, one
-// channel each. Unlike Triskele no symmetrised kernel is needed — both sides of
-// the law read the SAME channel at the SAME position, so plain Catmull–Rom
-// carries the identity exactly (checked off-node to 1.1e−15).
+// only needs one sampling position per pixel with three time channels. The
+// texture holds those three channels; the fragment shader reconstructs them
+// with a Catmull–Rom kernel symmetrised over the three turns, so both the
+// 120° turn and the T/3 shift permute the three reconstructed values exactly
+// (see the note on `SYMMETRISED` below), not merely to interpolation accuracy.
 export const ORBIT_ID = 'wallpaper:g225:8fcde9bc1178d93d';
 export const FIELD_SHA256 = '8fcde9bc1178d93d9d92aae2387cd0dc864c37755dab0ce08a263f007056536c';
 export const INITIAL_PHASE = 0;
@@ -45,11 +34,9 @@ export const FIELD_BYTES = FRAMES * 2 * GRID_SIZE * GRID_SIZE * 4;
 // Home framing: one lattice length across 380 CSS pixels, as on ../plume/.
 export const TILE_PIXELS = 380;
 export const scaleFor = (width, height) => Math.min(TILE_PIXELS, Math.min(width, height) / 2);
-// Lattice coordinates at the screen centre: the turn centre p, the one point
-// the picture's threefold colour cycle holds still. Nothing marks it in a still
-// frame — the field has no symmetry there at all — but the colour at p steps
-// back one place every third of a period, three times a loop.
-export const CENTER = [1 / 18, 1 / 9];
+// Lattice coordinates at the screen centre. The origin is a sixfold centre of
+// the orbit and a threefold colour-cycling centre of the picture.
+export const CENTER = [0, 0];
 export const MIN_SCALE = 24; // CSS pixels per lattice length; pages raise it to keep a texel per device pixel.
 export const MAX_SCALE = 8000;
 // Shutter integration ("temporal anti-aliasing"). A display shows a frame for a
@@ -69,23 +56,24 @@ export const MAX_SCALE = 8000;
 // sampling calls for: consecutive frames' sub-samples then tile the timeline
 // evenly, so the animation is drawn at TAA_LAYERS × the frame rate and box
 // filtered down to it, and nothing between two displayed frames is left out.
-// Measured on this pattern, that removes about nine tenths of the largest
-// frame-to-frame jumps wherever the motion is fast enough to make them.
 // SHUTTER = 0.5 is the film convention (a 180° shutter), sharper but only half
 // sampled; ?shutter= dials it, and 0 turns the integration off.
-// The default is 0.3 of a frame interval — crisper than the full box filter, at
-// the user's request (17 September 2026: "decrease it by 70%"); ?shutter=1
-// restores the full filter described above.
+// The symmetrised kernel below is run per sub-sample, so every layer obeys the
+// two colour-cycling identities exactly and the shutter only ever blends
+// pictures that already do.
 export const TAA_LAYERS = 3; // Up to 81 texture taps per pixel; ?taa= overrides.
 export const MAX_TAA_LAYERS = 5;
+// The default is 0.3 of a frame interval — crisper than the full box filter, at
+// the user's request (17 September 2026: "decrease it by 70%"); ?shutter=1
+// restores the full filter.
 export const SHUTTER = 0.3;
-// The shutter costs two extra samplings of the field per pixel, so it is spent
-// only where it can do something. MOTION_PIXELS is how far the picture must
-// travel on screen between one displayed frame and the next — in CSS pixels,
-// counting both the pattern's own boundaries and the view's motion — before the
-// integration switches on. Below about one pixel a frame there is nothing to
-// integrate: measured on this page, the home framing moves 0.34 px a frame and
-// makes no frame-to-frame colour flips at all.
+// The shutter costs two extra samplings of the field per pixel — and here each
+// sampling is three turned readings — so it is spent only where it can do
+// something. MOTION_PIXELS is how far the picture must travel on screen between
+// one displayed frame and the next, in CSS pixels, counting both the pattern's
+// own boundaries and the view's motion, before the integration switches on.
+// Below about one pixel a frame there is nothing to integrate: measured on this
+// page, the home framing moves 0.33 px a frame.
 // ?motion= dials it (0 keeps the shutter on whenever anything moves).
 export const MOTION_PIXELS = 0.75;
 // And the other end: a handful of sub-samples reconstructs a smear only while
@@ -97,11 +85,12 @@ export const MOTION_PIXELS = 0.75;
 // own motion never reaches that width (7 px a frame at the deepest zoom), so
 // this bounds panning and flinging only.
 export const SMEAR_PIXELS = 6;
-// How fast the pattern's colour boundaries sweep, in lattice lengths per period,
-// measured from the saved nodes: 2.91 colour changes per node per period over
-// 6.84 boundary crossings per lattice length. It turns a framing (CSS pixels per
-// lattice length) into the on-screen speed of the picture's own motion.
-export const BOUNDARY_SPEED = 0.43;
+// How fast this colouring's boundaries sweep, in lattice lengths per period,
+// measured from the saved nodes: 3.00 colour changes per node per period over
+// 66 × 0.1076 = 7.10 boundary crossings per lattice length. It turns a framing
+// (CSS pixels per lattice length) into the on-screen speed of the picture's own
+// motion.
+export const BOUNDARY_SPEED = 0.42;
 export const FALLBACK_INTERVAL = 1000 / 60; // ms, until the display's cadence is known.
 export const SQRT3 = Math.sqrt(3);
 // Terracotta, teal, sand. Every pair stays at least 24 CIELAB units apart in
@@ -118,21 +107,10 @@ const mod = (value, n) => ((value % n) + n) % n;
  * `toPlane` and `fromPlane` are inverse to each other. */
 export const toPlane = ([u, v]) => [u - v / 2, -SQRT3 * v / 2];
 export const fromPlane = ([x, y]) => [x - y / SQRT3, -2 * y / SQRT3];
-/** The turns about the lattice origin are integer matrices in lattice
- * coordinates, so each maps every lattice grid to itself: R(u, v) = (−v, u − v)
- * is the 120° turn (anticlockwise as the picture is drawn) and S = R² the 240°
- * one. Gyre's rule is built on S. */
+/** The 120° turn about the lattice origin is an integer matrix in lattice
+ * coordinates, so it maps every lattice grid to itself: R(u, v) = (−v, u − v). */
 export const turn120 = ([u, v]) => [-v, u - v];
 export const turn240 = ([u, v]) => [v - u, -u];
-/** The turn centre p, and the translation w = (I − S) p that makes S a turn
- * about it rather than about the origin. w is 1/6 of a lattice length along a2
- * — exactly 11 of the 66 nodes — so g maps saved nodes to saved nodes and every
- * claim about the colouring can be checked in exact integer arithmetic. */
-export const TURN_CENTRE = [1 / 18, 1 / 9];
-export const TURN_OFFSET = [0, 1 / 6];
-/** g: the third-turn of the plane about `TURN_CENTRE`, in lattice coordinates.
- * g(q) = S q + w; g³ is the identity and g fixes p. */
-export const gTurn = ([u, v]) => [v - u + TURN_OFFSET[0], -u + TURN_OFFSET[1]];
 
 const vertex = `#version 300 es
 void main() {
@@ -149,9 +127,15 @@ precision highp int;
 // uRotation[i] — so a pan, a zoom or a turn is integrated exactly as the phase
 // is. With one layer they hold the frame's own view and the draw is identical
 // to one from a viewer with no shutter at all.
+//
+// One shader is compiled per layer count the viewer can draw at, and the
+// one-layer one carries no loop at all: a loop whose trip count only the
+// uniform knows is not free even when it runs zero times — on a software GPU
+// the same draw measured 14.2 ms with it and 12.3 ms without, so a viewer whose
+// shutter is switched off would have paid a fifth of a frame for a feature it
+// was not using. See \`build\` in createRenderer.
 uniform highp sampler2DArray uFrame;
-uniform int uLayers;
-uniform vec2 uResolution;
+${layers > 1 ? 'uniform int uLayers;\n' : ''}uniform vec2 uResolution;
 uniform vec2 uCssSize;
 uniform vec2 uCenter[${layers}];
 uniform vec2 uRotation[${layers}]; // (cos, sin) of the screen-to-plane rotation, the inverse of the view's turn
@@ -200,24 +184,26 @@ vec3 field(vec2 q, float layer) {
   return value;
 }
 #endif
-// Channel k of the texture is the field at phase φ + k/3. The colouring reads
-// channel k at g^k q, where g is the third-turn about p:
+// Channel k of the texture is U(x, t + k T/3) = U(R^k x, t) on the lattice
+// nodes. Reconstructing channel k at x alone would inherit the Catmull–Rom
+// kernel's orientation, which the 120° turn does not preserve. Averaging the
+// three turned readings instead,
 //
-//     value_k(x) = field(g^k x)[k],      colour = argmax_k value_k.
+//     w_k(x) = (1/3) sum over j of  field(R^-j x)[k + j],
 //
-// Three positions, one channel each. A third of a period renames channel k as
-// channel k + 1 exactly (T/3 is a whole 32 saved frames), and g^k(g x) =
-// g^(k+1) x, so value_k(g x, φ + 1/3) and value_(k+1)(x, φ) are literally the
-// same texture fetch: the colour law is exact for any reconstruction filter,
-// and no symmetrised kernel is needed here — Triskele's averaging of three
-// turned readings would be wasted work.
-// The positions are built one from the last rather than from closed forms, so
-// that the two sides of the law evaluate the same float expressions.
-const float W = 0.16666666666666666; // w = (0, 1/6), the translation part of g
+// gives w_k(R x) = w_(k+1)(x) and, because a T/3 shift renames channel k as
+// channel k+1, the same cyclic renaming in time — both identities exactly, at
+// every point, for the values the shader actually compares.
+#define SYMMETRISED 1
+// The three symmetrised values at one lattice point, read from one layer of the
+// shutter. Every sub-sample runs this identical kernel, so each of the pictures
+// the shutter averages obeys both identities exactly; the shutter can only
+// blend colours that the rule already assigned.
 vec3 weights(vec2 q, float layer) {
-  vec2 q1 = vec2(q.y - q.x, -q.x + W);    // g q
-  vec2 q2 = vec2(q1.y - q1.x, -q1.x + W); // g² q
-  return vec3(field(q, layer).r, field(q1, layer).g, field(q2, layer).b);
+  vec2 q1 = vec2(q.y - q.x, -q.x); // R^-1 q
+  vec2 q2 = vec2(-q.y, q.x - q.y); // R^-2 q = R q
+  vec3 a = field(q, layer), b = field(q1, layer), c = field(q2, layer);
+  return (a + b.gbr + c.brg) / 3.0;
 }
 // Anti-aliased argmax: each colour's weight is how far it leads the better of
 // the other two, softened over about one device pixel of the same margin.
@@ -250,8 +236,8 @@ void main() {
   // still has one sharp boundary, only displaced, while the colours' average
   // carries the boundary across every pixel it swept.
   vec3 sum = paint(w, e);
-  for (int i = 1; i < uLayers; i++) sum += paint(weights(latticeAt(screen, i), float(i)), e);
-  color = vec4(sum / float(uLayers), 1.0);
+${layers > 1 ? `  for (int i = 1; i < uLayers; i++) sum += paint(weights(latticeAt(screen, i), float(i)), e);
+  color = vec4(sum / float(uLayers), 1.0);` : `  color = vec4(sum, 1.0); // one layer: the average of one colour is that colour`}
 }`;
 
 /** The U channel of every saved frame, as one x-fastest volume (x, y, frame).
@@ -333,13 +319,15 @@ export function framesAt(volume, phases, out = new Float32Array(4 * GRID_SIZE * 
   return out;
 }
 
-/** The three values the colouring compares at lattice point (u, v), the CPU
- * twin of the shader's `weights`: value k is channel k — the field at phase
- * φ + k/3 — read at g^k (u, v). `plane` is one RGBA frame from frameAt. */
+/** The three reconstructed values at lattice point (u, v), the CPU twin of the
+ * shader's symmetrised Catmull–Rom. `plane` is one RGBA frame from frameAt. */
 export function valuesAt(plane, [u, v]) {
+  const points = [[u, v], turn240([u, v]), turn120([u, v])];
   const out = [0, 0, 0];
-  let point = [u, v];
-  for (let k = 0; k < 3; k++) { out[k] = bicubicRGB(plane, point)[k]; point = gTurn(point); }
+  for (let j = 0; j < 3; j++) {
+    const rgb = bicubicRGB(plane, points[j]);
+    for (let k = 0; k < 3; k++) out[k] += rgb[(k + j) % 3] / 3;
+  }
   return out;
 }
 
@@ -449,17 +437,25 @@ export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, m
  * its 20 s cooling-off expires, and the shutter comes back only at full
  * resolution, after two clean windows, and after a wait that doubles every time
  * it has to be dropped again soon after — so a GPU that cannot hold the cadence
- * with it settles instead of flickering between the two states.
+ * with it settles instead of flickering between the two states. A probe that
+ * did not pay for itself doubles its own wait the same way, and is believed:
+ * the cadence it measured becomes the display's, since a frame rate the pixel
+ * count could not change is not the pixel count's fault.
+ *
+ * `display` is only ever taken from idle frames. If it was never measured the
+ * governor assumes an ordinary 60 Hz screen rather than adopting the cadence of
+ * a page already struggling — a page that draws at 5 fps must not conclude that
+ * its display refreshes at 5 Hz, since it would then have nothing to give up.
  *
  * `probeSoon()` asks for one lower-resolution trial at the next window (at most
  * every 30 s), used when a touch begins because phones raise their refresh rate
  * under a finger; it never touches the shutter. */
 export function createGovernor({enabled = true, step = 0.85, floor = 0.5, window = 45, display = null} = {}) {
   let quality = 1, last = null, changed = 0, probe = null, ceiling = 1, ceilingUntil = 0, blockedUntil = 0, wanted = false, lastRequest = -Infinity;
-  let shutter = true, shutterWait = 20000, shutterUntil = 0, shutterSince = -Infinity, clean = 0;
+  let shutter = true, shutterWait = 20000, shutterUntil = 0, shutterSince = -Infinity, clean = 0, probeWait = 4000;
   if (display !== null && !(display >= 4 && display <= 200)) display = null;
   const deltas = [];
-  const revert = now => { quality = probe.quality; probe = null; blockedUntil = now + 4000; changed = now; };
+  const revert = now => { quality = probe.quality; probe = null; blockedUntil = now + probeWait; changed = now; };
   const governor = {
     get quality() { return quality; },
     get display() { return display; },
@@ -472,18 +468,38 @@ export function createGovernor({enabled = true, step = 0.85, floor = 0.5, window
     tick(now, continuous, shuttered = false) {
       if (!enabled) return;
       if (!continuous) { if (probe) revert(now); last = null; deltas.length = 0; return; }
-      if (last !== null) { const dt = now - last; if (dt > 2 && dt < 200) deltas.push(dt); }
+      // A page drawing at 5 fps produces 200 ms intervals, and a window made
+      // only of intervals shorter than that would never fill on the very GPU
+      // the governor exists for. Only a gap long enough to be a hidden tab
+      // coming back — not a slow frame — is thrown away.
+      if (last !== null) { const dt = now - last; if (dt > 2 && dt < 1000) deltas.push(dt); }
       last = now;
       if (deltas.length < window) return;
       const sorted = deltas.slice().sort((a, b) => a - b);
       const fast = sorted[Math.floor(sorted.length * 0.2)];
       const mean = deltas.reduce((a, b) => a + b, 0) / deltas.length;
       deltas.length = 0;
-      display = Math.max(4, display === null ? fast : Math.min(display, fast));
+      // An unmeasured display is never seeded from a cadence measured under
+      // load: these intervals are what this page manages, not what the screen
+      // can show, and adopting them would make a page stuck at 5 fps decide
+      // that 5 fps *is* the refresh rate and give up nothing to recover. So it
+      // starts from the ordinary 60 Hz assumption instead, and a failed probe
+      // below raises it if the display really is slower.
+      display = Math.max(4, display === null ? Math.min(fast, FALLBACK_INTERVAL) : Math.min(display, fast));
       if (probe) {
-        if (mean < 0.85 * probe.mean) { probe = null; } // The lower resolution paid off: keep it.
+        if (mean < 0.85 * probe.mean) { probe = null; probeWait = 4000; } // The lower resolution paid off: keep it.
         else if (probe.steps < 2 && quality > floor) { quality = Math.max(floor, quality * step); probe.steps++; changed = now; return; }
-        else { display = Math.max(display, mean); revert(now); return; }
+        else {
+          // Lowering the resolution did not help, so this cadence belongs to
+          // the display or to the rest of the frame, not to the pixel count:
+          // believe it — including the cadence at the level being reverted to,
+          // or the same level reads as late again the moment it is restored —
+          // and wait longer before trying the same thing again.
+          display = Math.max(display, mean, probe.mean);
+          revert(now);
+          probeWait = Math.min(120000, 2 * probeWait);
+          return;
+        }
       }
       const late = mean > 1.35 * display;
       clean = late || mean > 1.1 * display ? 0 : clean + 1;
@@ -549,14 +565,37 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
     }
     return shader;
   }
-  const program = gl.createProgram();
-  const shaders = [compile(gl.VERTEX_SHADER, vertex), compile(gl.FRAGMENT_SHADER, `#version 300 es\n${linear ? '#define TAPS9\n' : ''}${fragment(maxLayers)}`)];
-  for (const shader of shaders) gl.attachShader(program, shader);
-  gl.linkProgram(program);
-  for (const shader of shaders) gl.deleteShader(shader);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Could not start the WebGL renderer.');
+  /** One program per layer count the draw can use, with its uniform locations
+   * and the constants that never change. */
+  function build(layers) {
+    const program = gl.createProgram();
+    const shaders = [compile(gl.VERTEX_SHADER, vertex), compile(gl.FRAGMENT_SHADER, `#version 300 es\n${linear ? '#define TAPS9\n' : ''}${fragment(layers)}`)];
+    for (const shader of shaders) gl.attachShader(program, shader);
+    gl.linkProgram(program);
+    for (const shader of shaders) gl.deleteShader(shader);
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Could not start the WebGL renderer.');
+    gl.useProgram(program);
+    gl.uniform1i(gl.getUniformLocation(program, 'uFrame'), 0);
+    for (const [index, hex] of palette.entries()) gl.uniform3fv(gl.getUniformLocation(program, `uColor${index}`), rgb(hex));
+    return {
+      program, layers,
+      count: gl.getUniformLocation(program, 'uLayers'), // absent from the one-layer shader
+      resolution: gl.getUniformLocation(program, 'uResolution'),
+      cssSize: gl.getUniformLocation(program, 'uCssSize'),
+      center: gl.getUniformLocation(program, 'uCenter[0]'),
+      rotation: gl.getUniformLocation(program, 'uRotation[0]'),
+      scale: gl.getUniformLocation(program, 'uScale[0]'),
+    };
+  }
   const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
-  gl.useProgram(program);
+  // Two programs, not one with a switched-off loop: a draw with the shutter
+  // gated off then costs exactly what a viewer built without a shutter costs,
+  // down to the last bit of the picture and the last percent of the frame time.
+  // They share the one texture array, so nothing about the upload changes.
+  const single = build(1);
+  const multi = maxLayers > 1 ? build(maxLayers) : single;
+  let active = single;
+  gl.useProgram(active.program);
   const volume = uVolume(planar);
   const plane = 4 * GRID_SIZE * GRID_SIZE;
   const frame = new Float32Array(plane * maxLayers);
@@ -578,21 +617,13 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
   // The per-sub-sample view, uploaded as three small uniform arrays.
   const centers = new Float32Array(2 * maxLayers), rotations = new Float32Array(2 * maxLayers), scales = new Float32Array(maxLayers);
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-  gl.uniform1i(gl.getUniformLocation(program, 'uFrame'), 0);
-  const layerLocation = gl.getUniformLocation(program, 'uLayers');
-  gl.uniform1i(layerLocation, 1);
-  for (const [index, hex] of palette.entries()) gl.uniform3fv(gl.getUniformLocation(program, `uColor${index}`), rgb(hex));
-  const resolution = gl.getUniformLocation(program, 'uResolution');
-  const cssSize = gl.getUniformLocation(program, 'uCssSize');
-  const centerLocation = gl.getUniformLocation(program, 'uCenter[0]');
-  const rotationLocation = gl.getUniformLocation(program, 'uRotation[0]');
-  const scaleLocation = gl.getUniformLocation(program, 'uScale[0]');
   const maxSize = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE), ...gl.getParameter(gl.MAX_VIEWPORT_DIMS));
   const governor = createGovernor({enabled: adaptive && pixelRatio === null, display});
   gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND);
   return {
     view, palette,
-    /** Texture fetches per pixel in the last draw, the shutter included. */
+    /** Texture fetches per pixel in the last draw, the shutter included: three
+     * turned readings of the symmetrised kernel, once per sub-sample. */
     get taps() { return (linear ? 9 : 16) * 3 * layers; },
     get quality() { return governor.quality; },
     get display() { return governor.display; },
@@ -652,9 +683,18 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
       // is spent only where it can do something: on a picture actually moving
       // more than `motion` CSS pixels a frame, and never on a viewer the
       // governor has had to slow down — frame rate is not traded for blur.
+      // `travel > 0` is the first condition and not a consequence of the last:
+      // with ?motion=0 — "integrate whenever anything moves at all" — a picture
+      // that is not moving at all would otherwise satisfy `0 >= 0` and pay for
+      // three sub-samples of the same instant of the same view.
       // The gate reads the motion itself, not the smear (travel × shutter): a
       // narrower shutter blurs less but should switch on in the same places.
-      layers = maxLayers > 1 && shutter > 0 && governor.shutter && travel >= motion ? maxLayers : 1;
+      layers = maxLayers > 1 && shutter > 0 && governor.shutter && travel > 0 && travel >= motion ? maxLayers : 1;
+      if (layers !== active.layers) {
+        active = layers > 1 ? multi : single;
+        gl.useProgram(active.program);
+        if (active.count) gl.uniform1i(active.count, layers);
+      }
       const p = wrap(phase);
       if (p !== lastPhase || layers !== lastLayers || moving !== lastMoving) {
         textureIndex ^= 1; gl.bindTexture(gl.TEXTURE_2D_ARRAY, textures[textureIndex]);
@@ -662,7 +702,6 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
         // holds the same instant and only the view varies across the shutter.
         const phases = moving ? shutterPhases(p, layers, interval, shutter) : new Array(layers).fill(p);
         gl.texSubImage3D(gl.TEXTURE_2D_ARRAY, 0, 0, 0, 0, GRID_SIZE, GRID_SIZE, layers, gl.RGBA, gl.FLOAT, framesAt(volume, phases, frame));
-        if (layers !== lastLayers) gl.uniform1i(layerLocation, layers);
         lastPhase = p; lastLayers = layers; lastMoving = moving;
       }
       // Each sub-sample reads the view it had at its own instant of the
@@ -674,12 +713,16 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
         const turn = angle + step.angle * offset;
         rotations[2 * j] = Math.cos(turn); rotations[2 * j + 1] = -Math.sin(turn); // screen-to-plane turns the other way
       }
-      gl.uniform2f(resolution, w, h); gl.uniform2f(cssSize, width, height);
-      gl.uniform2fv(centerLocation, centers.subarray(0, 2 * layers));
-      gl.uniform1fv(scaleLocation, scales.subarray(0, layers));
-      gl.uniform2fv(rotationLocation, rotations.subarray(0, 2 * layers));
+      gl.uniform2f(active.resolution, w, h); gl.uniform2f(active.cssSize, width, height);
+      gl.uniform2fv(active.center, centers.subarray(0, 2 * layers));
+      gl.uniform1fv(active.scale, scales.subarray(0, layers));
+      gl.uniform2fv(active.rotation, rotations.subarray(0, 2 * layers));
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     },
-    dispose() { for (const texture of textures) gl.deleteTexture(texture); gl.deleteProgram(program); gl.deleteVertexArray(vao); },
+    dispose() {
+      for (const texture of textures) gl.deleteTexture(texture);
+      for (const shader of new Set([single, multi])) gl.deleteProgram(shader.program);
+      gl.deleteVertexArray(vao);
+    },
   };
 }

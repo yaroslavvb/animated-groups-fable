@@ -1,21 +1,17 @@
-// Gyre in a real browser engine: the entangled colour symmetry on the pixels
-// the page actually draws, the shader against an independent reconstruction of
-// the same rule, the viewer's gestures and layout, the Safari trackpad
-// pinch-and-turn, and the shutter that integrates each displayed frame.
-//
-// Usage: node tests/gyre.browser.mjs [base-url] [label]
-//        BROWSER=webkit runs the same checks in Playwright's WebKit.
 import assert from 'node:assert/strict';
 // The module under test also exposes the rule on the CPU, which is what the
 // shader is compared against below. The field itself is fetched from whatever
 // copy of the page is being tested, so a live deployment is checked against its
 // own bytes.
-import {colourAt, fromPlane, frameAt, gTurn, TURN_CENTRE, uVolume, valuesAt} from '../gyre/renderer.mjs';
+import {colourAt, fromPlane, frameAt, uVolume, valuesAt} from '../triskele/renderer.mjs';
 const runtime = '/Users/yaroslavvb/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE ?? `${runtime}playwright/index.mjs`);
+// BROWSER=webkit runs the same checks in Playwright's WebKit (Safari's engine);
+// multi-touch is then dispatched as synthetic pointer events, and Safari's
+// trackpad gesture events are exercised as well.
 const engine = process.env.BROWSER === 'webkit' ? 'webkit' : 'chromium';
 const {PNG} = (await import(process.env.PNGJS_MODULE ?? `${runtime}pngjs/lib/png.js`)).default;
-const base = (process.argv[2] ?? 'http://localhost:8934/scott-gray/gyre/').replace(/\/?$/, '/');
+const base = (process.argv[2] ?? 'http://localhost:8934/scott-gray/triskele/').replace(/\/?$/, '/');
 const label = `${process.argv[3] ?? 'local'} (${engine})`;
 const shots = process.env.SHOT_DIR ?? '/tmp';
 const fieldBytes = await (await fetch(new URL('field.f32', base))).arrayBuffer();
@@ -56,7 +52,7 @@ async function fingers(frames) {
  * separate streams, each event carrying only its own quantity; `steps` says
  * exactly what to send. Safari itself constructs GestureEvents; other engines
  * get a plain event with the same fields, which exercises the page's handler. */
-async function gesture(steps, at = [720, 400]) {
+async function gesture(steps, at = [640, 400]) {
   return page.evaluate(({steps, at}) => {
     const canvas = document.querySelector('canvas');
     let native = true;
@@ -77,7 +73,7 @@ async function gesture(steps, at = [720, 400]) {
   }, {steps, at});
 }
 async function pixels() { return PNG.sync.read(await page.locator('canvas').screenshot()); }
-async function shot(query) { await page.goto(base + query); await ready(); await page.waitForTimeout(150); return pixels(); }
+/** The stats overlay's text, shown and hidden again if it was not already up. */
 const statsText = async () => {
   const shown = await page.locator('#stats').isVisible();
   if (!shown) await page.keyboard.press('s');
@@ -94,6 +90,13 @@ function averageDifference(a, b, x1 = 0, y1 = 0, x2 = 0, y2 = 0, width = a.width
   }
   return total / (width * height * 3);
 }
+/** The share of pixels that agree in all three channels. */
+function exactShare(a, b) {
+  let same = 0;
+  const count = a.width * a.height;
+  for (let i = 0; i < count; i++) if (a.data[4*i] === b.data[4*i] && a.data[4*i+1] === b.data[4*i+1] && a.data[4*i+2] === b.data[4*i+2]) same++;
+  return same / count;
+}
 /** Which of the three colours each pixel shows, and how sure that reading is. */
 function classify(image) {
   const out = new Uint8Array(image.width * image.height), pure = new Uint8Array(out.length);
@@ -107,24 +110,22 @@ function classify(image) {
   }
   return {colour: out, pure};
 }
-/** How often `after` shows colour (before + step) mod 3 at the same pixel, over
- * the pattern only (skipping antialiased edges and the strip the control bar
- * covers). */
-function cycleAgreement(before, after, step) {
+/** How often `after` shows colour (before + step) mod 3, over the pattern only
+ * (skipping antialiased edges and the strip the control bar covers). */
+function cycleAgreement(before, after, step, image) {
   const a = classify(before), b = classify(after);
   let same = 0, total = 0;
-  for (let y = 0; y < before.height - 220; y++) for (let x = 0; x < before.width; x++) {
-    const i = y * before.width + x;
+  for (let y = 0; y < image.height - 220; y++) for (let x = 0; x < image.width; x++) {
+    const i = y * image.width + x;
     if (!a.pure[i] || !b.pure[i]) continue;
     total++; if ((a.colour[i] + step) % 3 === b.colour[i]) same++;
   }
   return same / total;
 }
 /** How often `after` shows, at each point, the colour `before` shows a turn of
- * `degrees` away about the screen centre — which at the home framing is the
- * turn centre p itself. Negative degrees is the picture turned clockwise on
- * screen. A cyclic colour step is allowed; antialiased pixels and the strip the
- * control bar covers are skipped. */
+ * `degrees` away about the screen centre (positive = anticlockwise on screen,
+ * where y runs down), allowing a cyclic colour step. Antialiased pixels and the
+ * strip the control bar covers are skipped. */
 function turnAgreement(before, after, degrees, step, radius = 700) {
   const a = classify(before), b = classify(after);
   const t = degrees * Math.PI / 180, cos = Math.cos(t), sin = Math.sin(t);
@@ -158,69 +159,55 @@ try {
   await page.goto(`${base}?play=0`); await ready();
   assert.deepEqual(await page.locator('canvas').evaluate(c => [c.width, c.height]), [2880, 2000], 'native retina resolution');
   assert.equal(await page.locator('#notice').isVisible(), false);
-  const home = await pixels();
-  assert.ok(new Set(home.data).size > 30, 'nonblank rendered image');
-  await page.screenshot({path: `${shots}/gyre-${label}-desktop.png`});
-  // Three colours, each holding about a third of the plane: the symmetry makes
-  // the three regions images of one another over the loop, and no single frame
-  // is allowed to let one of them dominate either.
-  const share = areas(home);
-  for (const value of share) assert.ok(Math.abs(value - 1 / 3) < 0.04, `colour areas ${share.map(v => v.toFixed(4))}`);
+  const large = await pixels();
+  assert.ok(new Set(large.data).size > 30, 'nonblank rendered image');
+  await page.screenshot({path: `${shots}/triskele-${label}-desktop.png`});
+  // Three colours, each holding about a third of the plane — the symmetry makes
+  // the three regions images of one another, so none may dominate.
+  const share = areas(large);
+  for (const value of share) assert.ok(Math.abs(value - 1 / 3) < 0.02, `colour areas ${share.map(v => v.toFixed(4))}`);
 
-  // ---- the entangled colour symmetry, on the pixels the page draws ----
-  // Wait a third of a period and the whole picture has turned a third of a turn
-  // CLOCKWISE about the screen centre — which is p, the turn centre — with every
-  // region taking the colour of the one before it.
-  const third = await shot(`?play=0&phase=${1 / 3}`);
-  assert.ok(turnAgreement(home, third, -120, 2) > 0.99, 'a third of a period turns the picture a third of a turn clockwise and steps every colour back one');
-  notes.push(`turn + wait + recolour: ${(100 * turnAgreement(home, third, -120, 2)).toFixed(2)}% of the picture`);
-  // Every proper part of that fails, and this is the point of the page.
-  assert.ok(turnAgreement(home, third, -120, 0) < 0.5, 'the same turn and wait WITHOUT the recolouring is not a symmetry');
-  assert.ok(turnAgreement(home, third, -120, 1) < 0.5, 'nor with the colours stepped the other way');
-  assert.ok(turnAgreement(home, third, 120, 2) < 0.5, 'and the picture does not turn anticlockwise');
-  for (const step of [0, 1, 2]) {
-    // The turn alone: the same frame compared with itself, turned.
-    assert.ok(turnAgreement(home, home, -120, step) < 0.5, `the turn alone is not a symmetry (colour step ${step})`);
-    assert.ok(turnAgreement(home, home, 120, step) < 0.5, `nor the other way (colour step ${step})`);
-    // The wait alone: the same pixels, a third of a period later.
-    assert.ok(cycleAgreement(home, third, step) < 0.5, `the wait alone is not a symmetry (colour step ${step})`);
+  // ---- the three-colour spacetime symmetry, on the pixels the page draws ----
+  // A third of a turn cycles the colours one place backwards.
+  await page.goto(`${base}?play=0&angle=120`); await ready();
+  const turnedOnly = await pixels();
+  assert.ok(cycleAgreement(large, turnedOnly, 2, large) > 0.99, 'a 120° turn steps every colour back one place');
+  assert.ok(cycleAgreement(large, turnedOnly, 0, large) < 0.1, 'and it is not simply the same picture');
+  // So does waiting a third of a period.
+  await page.goto(`${base}?play=0&phase=${1 / 3}`); await ready();
+  const shiftedOnly = await pixels();
+  assert.ok(cycleAgreement(large, shiftedOnly, 2, large) > 0.99, 'a T/3 shift steps every colour back one place');
+  // Equivalently: a third of a period later the whole picture, colours and all,
+  // is the home picture turned a third of a turn clockwise about its centre.
+  assert.ok(turnAgreement(large, shiftedOnly, -120, 0) > 0.99, 'a third of a period turns the picture a third of a turn clockwise');
+  assert.ok(turnAgreement(large, shiftedOnly, 120, 0) < 0.1, 'and not anticlockwise');
+  // A clockwise third of a turn alone therefore steps the colours back one place.
+  assert.ok(turnAgreement(large, large, -120, 1) > 0.99, 'turning the picture clockwise a third of a turn steps every colour back');
+  assert.ok(turnAgreement(large, large, 120, 2) > 0.99, 'and anticlockwise steps it forward');
+  // Together they are the identity. The rule is exact; the only difference the
+  // screen can show comes from rounding cos and sin of the view's turn, which
+  // moves a colour boundary by a fraction of a pixel.
+  const identities = [];
+  for (const [angle, phase, name] of [[120, 2 / 3, 'a 120° turn with a 2T/3 shift'], [240, 1 / 3, 'a 240° turn with a T/3 shift'], [180, 1 / 2, 'a half turn with a half-period shift'], [60, 5 / 6, 'a 60° turn with a 5T/6 shift']]) {
+    await page.goto(`${base}?play=0&angle=${angle}&phase=${phase}`); await ready();
+    const again = await pixels();
+    const [identical, mean] = [exactShare(large, again), averageDifference(large, again)];
+    assert.ok(identical > 0.999 && mean < 0.002, `${name} leaves the picture untouched (${(100 * identical).toFixed(4)}% of pixels identical, mean difference ${mean.toExponential(2)})`);
+    identities.push(`${name}: ${(100 * identical).toFixed(4)}% identical`);
   }
-  notes.push(`the parts fail: turn alone ≤ ${(100 * Math.max(...[0, 1, 2].map(k => turnAgreement(home, home, -120, k)))).toFixed(1)}%, wait alone ≤ ${(100 * Math.max(...[0, 1, 2].map(k => cycleAgreement(home, third, k)))).toFixed(1)}%`);
-  // The sharpest statement of the law needs no resampling at all: turning the
-  // VIEW a third of a turn clockwise about the same point draws, pixel for
-  // pixel, the frame a third of a period later with its colours stepped on one.
-  const turned = await shot('?play=0&angle=120');
-  assert.ok(cycleAgreement(turned, third, 2) > 0.999, 'the view turned 120° clockwise is the frame at T/3 with the colours stepped back one');
-  for (const step of [0, 1]) assert.ok(cycleAgreement(turned, third, step) < 0.1, `and it is nothing else (step ${step})`);
-  const twoThirds = await shot(`?play=0&phase=${2 / 3}`);
-  const back = await shot('?play=0&angle=240');
-  assert.ok(cycleAgreement(back, twoThirds, 1) > 0.999, 'and two thirds of a turn matches the frame at 2T/3 with the colours stepped the other way');
-  // A still frame on its own has no symmetry to find: the view turned by a
-  // third is a different picture however the colours are relabelled.
-  for (const step of [0, 1, 2]) assert.ok(cycleAgreement(turned, home, step) < 0.5, `a single frame has no threefold symmetry (step ${step})`);
-
-  // The turn centre is the free demonstration of the law: g fixes p, so the
-  // colour of the middle pixel simply steps back one place every T/3.
-  const centre = [];
-  for (let k = 0; k < 12; k++) {
-    const image = await shot(`?play=0&phase=${k / 12}`);
-    const {colour} = classify(image);
-    centre.push(colour[(image.height / 2) * image.width + image.width / 2]);
-  }
-  assert.deepEqual(centre, [2, 1, 1, 1, 1, 0, 0, 0, 0, 2, 2, 2], `the colour at the turn centre over twelve phases: ${centre}`);
-  for (let k = 0; k < 12; k++) assert.equal((centre[k] - centre[(k + 4) % 12] + 3) % 3, 1, 'the centre steps back exactly one colour every third of a period');
-  notes.push(`the fixed point steps 2,1,1,1,1,0,0,0,0,2,2,2 over the loop`);
+  notes.push(`turn+shift identities (${identities.join('; ')})`);
 
   // ---- the shader against an independent reconstruction of the same rule ----
   // Every check above is self-consistent: a shader with a half-texel offset, a
-  // transposed lattice basis or the wrong sense of turn could still satisfy
-  // them. So map each device pixel back through the shader's own documented
+  // transposed lattice basis or a reversed rotation sense would still satisfy
+  // them, because such an error is itself symmetric under the turns being
+  // tested. So map each device pixel back through the shader's own documented
   // screen → plane → lattice chain and compare the colour it painted with the
   // one the module's CPU reconstruction computes there.
   {
     const plane = frameAt(volume, 0);
     let checked = 0, wrong = 0;
-    for (const [scale, phase, cx, cy] of [[380, 0, TURN_CENTRE[0], TURN_CENTRE[1]], [1500, 0.41, 0.5, 0.5], [95, 0.77, 0.25, 0.75]]) {
+    for (const [scale, phase, cx, cy] of [[380, 0, 0, 0], [1500, 0.41, 0.5, 0.5], [95, 0.77, 0.25, 0.75]]) {
       await page.goto(`${base}?play=0&scale=${scale}&phase=${phase}&x=${cx}&y=${cy}`); await ready();
       await page.waitForTimeout(150);
       const {cssWidth, cssHeight} = await page.locator('canvas').evaluate(c => ({cssWidth: c.clientWidth, cssHeight: c.clientHeight}));
@@ -242,22 +229,16 @@ try {
       }
     }
     assert.ok(checked > 20000, `enough pixels compared against the CPU reconstruction (${checked})`);
-    assert.equal(wrong, 0, `the shader paints argmax_k U(g^k x, t + k T/3): ${wrong} of ${checked} pixels disagree with the CPU reconstruction`);
+    assert.equal(wrong, 0, `the shader paints argmax_k U(R^k x, t): ${wrong} of ${checked} pixels disagree with the CPU reconstruction`);
     notes.push(`shader matches the CPU reconstruction on ${checked} pixels`);
-    // And the CPU reconstruction carries the law off the nodes, which is what
-    // makes the comparison above a comparison with the rule and not with itself.
-    const later = frameAt(volume, 1 / 3);
-    for (const point of [[0.137, 0.62], [0.9, 0.04], TURN_CENTRE]) {
-      assert.equal(colourAt(later, gTurn(point)), (colourAt(frameAt(volume, 0), point) + 2) % 3, `the law at ${point}`);
-    }
   }
 
   await page.goto(`${base}?play=0`); await ready();
 
-  // ---- framing, tiling and the endless pan ----
+  // Resizing must reveal/crop repeats, without stretching or zooming them.
   await page.setViewportSize({width: 760, height: 760});
   const square = await pixels();
-  assert.ok(averageDifference(home, square, 680, 240, 0, 0, 1520, 1300) < 1, 'center crop retains exact scale');
+  assert.ok(averageDifference(large, square, 680, 240, 0, 0, 1520, 1300) < 1, 'center crop retains exact scale');
   // The lattice repeats every lattice length along a1: 380 CSS px, 760 device px at DPR 2.
   await page.setViewportSize({width: 1520, height: 1000});
   const repeated = await pixels();
@@ -270,7 +251,7 @@ try {
   assert.ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth && document.documentElement.scrollHeight === innerHeight), 'mobile fills viewport without scrolling');
   const bounds = await page.locator('#controls').boundingBox();
   assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390, 'mobile controls fit');
-  await page.screenshot({path: `${shots}/gyre-${label}-mobile.png`});
+  await page.screenshot({path: `${shots}/triskele-${label}-mobile.png`});
 
   // Dragging pans the endless pattern: a 95 CSS px drag (190 device px, a
   // quarter repeat) shifts the image exactly, and the reset button appears.
@@ -298,16 +279,18 @@ try {
   await page.waitForTimeout(200);
   assert.equal(averageDifference(settled, await pixels()), 0, 'and it comes to rest');
   // The wheel zooms in about the pointer (Chrome scales the delta by the device pixel ratio, so only the direction is checked here).
+  await page.keyboard.press('s');
   await page.mouse.move(640, 400);
   await page.mouse.wheel(0, -200);
   await page.waitForTimeout(300);
-  const wheelScale = scaleOf(await statsText());
+  const wheelScale = Number((await page.locator('#stats').textContent()).match(/(\d+) px per repeat/)[1]);
   assert.ok(wheelScale > 380 && wheelScale < 760, `wheel zoomed in to ${wheelScale} px per repeat`);
   await page.keyboard.press('0');
   // The + key zooms 1.25× about the centre: a repeat is then 475 CSS px, 950 device px.
   await page.keyboard.press('+');
   await page.waitForTimeout(300);
-  assert.equal(scaleOf(await statsText()), 475);
+  assert.match(await page.locator('#stats').textContent(), /475 px per repeat/);
+  await page.keyboard.press('s');
   const zoomed = await pixels();
   assert.ok(averageDifference(zoomed, zoomed, 0, 0, 950, 0, 1000, 1000) < 1, 'zoomed tiling repeats every 950 device px');
   assert.ok(averageDifference(zoomed, zoomed, 0, 0, 760, 0, 1000, 1000) > 5, 'and no longer every 760');
@@ -325,23 +308,25 @@ try {
   await page.waitForTimeout(300);
   assert.equal(averageDifference(beforeDrag, await pixels()), 0, 'the reset button restores the home view');
   // Two fingers turning about the screen centre: 58° must snap to a sixth of a
-  // turn, since the lattice is triangular — even though the picture's own
-  // colour symmetry is only a third of a turn.
+  // turn, since the lattice is triangular. The home view is centred on a
+  // threefold centre, so the result must equal the same view asked for by URL.
   const spin = t => { const a = t * 58 * Math.PI / 180, r = 90; return [[640 - r * Math.cos(a), 400 - r * Math.sin(a)], [640 + r * Math.cos(a), 400 + r * Math.sin(a)]]; };
   await fingers(Array.from({length: 9}, (_, i) => spin(i / 8)));
   await page.waitForTimeout(300);
   const spun = await pixels();
-  assert.match(await statsText(), /380 px per repeat · turned 60°/);
+  await page.keyboard.press('s');
+  assert.match(await page.locator('#stats').textContent(), /380 px per repeat · turned 60°/);
+  await page.keyboard.press('s');
   await page.goto(`${base}?play=0&angle=60`); await ready();
   await page.waitForTimeout(150);
   assert.ok(averageDifference(spun, await pixels()) < 1.5, 'the two-finger turn snapped to the same sixth of a turn the URL asks for');
   await page.goto(`${base}?play=0`); await ready(); await page.waitForTimeout(150);
-
   // ---- the Mac trackpad: a pinch and a turn at the same time ----
   // macOS sends the two as separate streams of gesture events, each event
   // carrying only its own quantity. Each stream must accumulate on its own:
   // applying both fields of every event lets them cancel, which is why the two
-  // only ever worked one at a time.
+  // only ever worked one at a time. Every pattern below must end zoomed AND
+  // turned.
   const patterns = {
     // magnify, rotate, magnify, rotate — the rotate events name no zoom.
     split: [['gesturestart', 1, 0], ['gesturechange', 1.2, 0], ['gesturechange', 1, 15], ['gesturechange', 1.4, 0], ['gesturechange', 1, 30], ['gestureend', 1, 30]],
@@ -411,6 +396,26 @@ try {
   const mirrored = await statsText();
   assert.equal(turnOf(mirrored), 20, `the turn survives a pinch passing through 1×: ${mirrored}`);
   assert.equal(scaleOf(mirrored), 532, 'and the zoom is held at its last named value');
+  // One event naming both quantities is not enough to conclude that this Safari
+  // names both in every event. A single coalesced event in an otherwise split
+  // stream must not switch the handler into a mode where the next magnify event
+  // wipes the turn — the exact cancellation the two accumulators exist for.
+  await page.keyboard.press('0');
+  await gesture([['gesturestart', 1, 0], ['gesturechange', 1.4, 0], ['gesturechange', 1, 20], ['gesturechange', 1.45, 21], ['gesturechange', 1.6, 0], ['gestureend', 1.6, 0]]);
+  await page.waitForTimeout(150);
+  const coalesced = await statsText();
+  assert.equal(turnOf(coalesced), 21, `one event naming both does not strand the turn: ${coalesced}`);
+  assert.equal(scaleOf(coalesced), 608, 'and the pinch goes on (380 → 608 px per repeat)');
+  // A stream that really does name both in every event is still believed — and
+  // even there, a neutral field arriving beside a moving one is held rather
+  // than allowed to cancel the other accumulator.
+  await page.keyboard.press('0');
+  await gesture([['gesturestart', 1, 0], ['gesturechange', 1.2, 10], ['gesturechange', 1.3, 20], ['gesturechange', 1.4, 0], ['gestureend', 1.4, 0]]);
+  await page.waitForTimeout(150);
+  const latched = await statsText();
+  assert.equal(scaleOf(latched), 532, `a cumulative stream still zooms: ${latched}`);
+  assert.equal(turnOf(latched), 20, 'and a lone 0° beside a moving scale does not wipe the turn');
+  assert.match(latched, /both 2 of 4/, `two events named both: ${latched}`);
   // A gesture that names nothing at all moves nothing; and the turn still snaps.
   await page.keyboard.press('0');
   await gesture([['gesturestart', 1, 0], ['gesturechange', 1, 0], ['gestureend', 1, 0]]);
@@ -476,29 +481,24 @@ try {
   // nothing moving there is nothing to integrate, so ?taa=0 and the default
   // agree to the last bit — which is what the pixel comparisons above rely on.
   await page.goto(`${base}?play=0&taa=0`); await ready();
-  const still = await pixels();
+  await page.waitForTimeout(150);
+  const withoutShutter = await pixels();
   assert.match(await statsText(), /shutter off/, 'the stats overlay names the shutter');
-  await page.goto(`${base}?play=0&taa=3`); await ready();
-  assert.equal(averageDifference(still, await pixels()), 0, 'a paused frame is identical with and without the shutter');
-  await page.goto(`${base}?play=0&taa=5`); await ready();
-  assert.equal(averageDifference(still, await pixels()), 0, 'five layers make no difference to a still picture either');
-  // The shutter is spent only where the picture actually moves. At the home
-  // framing the pattern travels a third of a pixel a frame and there is nothing
-  // to integrate, so it stays off — and the taps count says so; zoomed in to
-  // 2400 px per repeat it moves 2.2 px a frame and the shutter engages.
-  await page.goto(`${base}?taa=3&play=1&stats=1`); await ready();
-  await page.waitForTimeout(600);
-  const homeStats = await page.locator('#stats').textContent();
-  assert.match(homeStats, /shutter off \(of 3\)/, `the home framing does not pay for a shutter: ${homeStats}`);
-  assert.match(homeStats, /(27|48) taps/, `one sampling of the field per pixel: ${homeStats}`);
-  await page.goto(`${base}?taa=3&play=1&stats=1&scale=2400`); await ready();
-  await page.waitForTimeout(600);
-  const zoomStats = await page.locator('#stats').textContent();
-  assert.match(zoomStats, /shutter 3×0\.30 frame/, `three sub-samples over three tenths of a frame interval: ${zoomStats}`);
-  assert.match(zoomStats, /(81|144) taps/, `and three samplings of the field per pixel: ${zoomStats}`);
-  await page.goto(`${base}?taa=0&play=1&stats=1&scale=2400`); await ready();
+  await page.goto(`${base}?play=0`); await ready();
   await page.waitForTimeout(400);
-  assert.match(await page.locator('#stats').textContent(), /shutter off/);
+  assert.equal(averageDifference(withoutShutter, await pixels()), 0, 'a still frame is bit-identical with the shutter available and with it off');
+  assert.match(await statsText(), /shutter off \(of 3\)/, 'and the overlay says the shutter is not being paid for');
+  // ?motion=0 asks for the shutter whenever anything moves at all — which is
+  // not the same as asking for it when nothing does. A still view at a still
+  // phase has nothing to integrate: three sub-samples would be three copies of
+  // one instant, three times the texture work for a picture that must come out
+  // bit-identical anyway.
+  for (const query of ['play=0&motion=0', 'play=0&taa=5&shutter=2&motion=0']) {
+    await page.goto(`${base}?${query}`); await ready();
+    await page.waitForTimeout(400);
+    assert.equal(averageDifference(withoutShutter, await pixels()), 0, `?${query} draws the same bits as no shutter at all`);
+    assert.match(await statsText(), /shutter off \(of [35]\)/, `?${query} pays for one sub-sample: ${await statsText()}`);
+  }
   // ?shutter=0 asks for no integration, and must cost nothing as well as show
   // nothing: a zero-width shutter collapses to a single sub-sample.
   await page.goto(`${base}?taa=3&play=1&stats=1&scale=2400&shutter=0`); await ready();
@@ -506,6 +506,13 @@ try {
   const zeroWidth = await page.locator('#stats').textContent();
   assert.match(zeroWidth, /shutter off \(of 3\)/, `a zero-width shutter draws one layer: ${zeroWidth}`);
   assert.match(zeroWidth, /(27|48) taps/, `and costs one: ${zeroWidth}`);
+  // Zoomed in and playing, the shutter does switch itself on, and the overlay
+  // names its width and the taps it costs.
+  await page.goto(`${base}?taa=3&play=1&stats=1&scale=2400`); await ready();
+  await page.waitForTimeout(500);
+  const engaged = await page.locator('#stats').textContent();
+  assert.match(engaged, /shutter 3×0\.30 frame/, `the shutter engages at a fast framing: ${engaged}`);
+  assert.match(engaged, /(81|144) taps/, `and its cost is counted in the taps: ${engaged}`);
   // What the shutter draws, deterministically: the integrated frame must be the
   // mean of the frames at its own sub-phases, and it must paint intermediate
   // colours exactly where a boundary swept during the frame.
@@ -520,12 +527,11 @@ try {
       const canvas = document.createElement('canvas');
       canvas.style.cssText = `position:fixed;left:0;top:0;width:${W}px;height:${H}px;opacity:0.01;pointer-events:none`;
       document.body.append(canvas);
-      // Zoomed right in, and away from the turn centre (where the colouring is
-      // flat), so a boundary crosses many pixels in one frame: this is the
-      // fast-moving edge the shutter is for. The mechanism is checked at a
-      // full-frame shutter; the page's narrower default width is pinned by the
-      // node test and only scales the smear.
-      const renderer = mod.createRenderer(canvas, field, {pixelRatio: 1, adaptive: false, display, tilePixels: 2400, center: [0.35, 0.62], taa, shutter: 1});
+      // Zoomed right in, and clear of all three threefold centres (the nearest
+      // is a quarter of a lattice length away, 600 px off this 480 px canvas),
+      // so a boundary crosses many pixels in one frame: this is the fast-moving
+      // edge the shutter is for.
+      const renderer = mod.createRenderer(canvas, field, {pixelRatio: 1, adaptive: false, display, tilePixels: 2400, center: [0.25, 0.25], taa, shutter: 1});
       renderer.draw(phase, {continuous: true, moving});
       const gl = canvas.getContext('webgl2');
       const data = new Uint8Array(W * H * 4);
@@ -562,16 +568,22 @@ try {
     return {worst, changed, movedStatic, blendOn, blendOff, total: W * H, phases};
   }, {base, palette: PALETTE});
   assert.ok(shutter.worst <= 2, `the integrated frame is the mean of its sub-phases (worst channel error ${shutter.worst}/255)`);
+  // A pixel every sub-phase agrees on should come out as it would have without
+  // the shutter, and here it does to a level out of 255. That last level is a
+  // property of this framing and not a guarantee: sub-sample 0 is fetched
+  // through constant indices and the rest through dynamically indexed uniform
+  // arrays, which a driver need not compile to the same arithmetic, and the
+  // N-way average rounds. It bounds nothing the page actually draws — a picture
+  // still enough for every sub-phase to agree everywhere is drawn with one
+  // layer, through the one-layer shader, bit-identical by construction.
   assert.ok(shutter.movedStatic <= 1, `pixels no boundary crossed are unchanged (worst ${shutter.movedStatic}/255)`);
   assert.ok(shutter.changed > 0.002 * shutter.total, `a fast boundary sweeps pixels (${(100 * shutter.changed / shutter.total).toFixed(2)}% of the frame)`);
   assert.ok(shutter.blendOn > 20 * Math.max(1, shutter.blendOff), `the shutter paints intermediate colours where the plain frame has none (${shutter.blendOn} vs ${shutter.blendOff} pixels)`);
-  notes.push(`shutter blends ${shutter.blendOn} pixels a plain frame paints pure, worst deviation from the mean of its sub-phases ${shutter.worst}/255`);
+  notes.push(`shutter blends ${shutter.blendOn} pixels a plain frame paints pure, worst deviation from the mean of its sub-phases ${shutter.worst.toFixed(2)}/255`);
   // Frame rate is never traded for motion blur, and the two are not traded
   // together either: the shutter is a rung of its own ABOVE the resolution
   // ladder, so a GPU that cannot keep up loses the blur first and the pixels
-  // only if that was not enough. Hanging the shutter on the quality factor
-  // instead would put a 2.5× cost step on the very value the governor moves up
-  // and down, and it would cross it for ever.
+  // only if that was not enough.
   const governed = await page.evaluate(async ({base}) => {
     const mod = await import(`${base}renderer.mjs`);
     const bytes = await (await fetch(`${base}field.f32`)).arrayBuffer();
@@ -659,7 +671,11 @@ try {
 
   // ---- the rest of the viewer ----
   await page.goto(`${base}?play=0`); await ready();
-  assert.match(await statsText(), /2560×1600 px · quality 1\.00 · 380 px per repeat · (27|48) taps/);
+  await page.waitForTimeout(150);
+  // The stats readout appears on the S key and names the render size.
+  await page.keyboard.press('s');
+  assert.match(await page.locator('#stats').textContent(), /2560×1600 px · quality 1\.00 · 380 px per repeat · (27|48) taps/);
+  await page.keyboard.press('s');
   assert.equal(await page.locator('#stats').isVisible(), false);
   const paused = await pixels();
   assert.equal(averageDifference(paused, await pixels()), 0, 'paused frame is stable');
@@ -683,6 +699,7 @@ try {
     notes.push('fullscreen unavailable in headless WebKit');
   }
   await page.keyboard.press('Space');
+
   // A restored GPU context must redraw and permit playback without reloading.
   await page.evaluate(() => {
     const gl = document.querySelector('canvas').getContext('webgl2');
@@ -698,5 +715,5 @@ try {
   await page.goto(`${base}?play=1`); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Pause animation');
   assert.deepEqual(errors, [], 'no browser errors or missing assets');
-  console.log(`${label}: retina rendering, balanced three-colour areas (${share.map(v => v.toFixed(3)).join(' / ')}), the entangled law on rendered pixels with every part of it failing, shader against the CPU rule, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn snapped to 60°, trackpad pinch-and-turn in four event patterns, shutter, reset, stats, pause/play, idle controls, GPU recovery, and reduced motion passed (${notes.join('; ')})`);
+  console.log(`${label}: retina rendering, balanced three-colour areas (${share.map(v => v.toFixed(3)).join(' / ')}), turn and shift colour cycles, shader against the CPU rule, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn snapped to 60°, trackpad pinch-and-turn in four event patterns, the shutter, reset, stats, pause/play, idle controls, GPU recovery, and reduced motion passed (${notes.join('; ')})`);
 } finally {await browser.close();}

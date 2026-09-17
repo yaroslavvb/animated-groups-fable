@@ -1,0 +1,9 @@
+{
+  "name": "Triskele — Three-colour rotating wave",
+  "short_name": "Triskele",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14110f",
+  "theme_color": "#14110f"
+}
