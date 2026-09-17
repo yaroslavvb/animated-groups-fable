@@ -101,3 +101,17 @@ display's current refresh rate. Deploy with Wrangler using your authenticated pe
 ```sh
 npx wrangler pages deploy docs/scott-gray/plume --project-name plume-wave --branch main
 ```
+
+The same folder is also published on spacesheep as the public space
+`https://spacesheep.dev/@yaroslavvb/plume` (uuid
+`268d3da1-ac83-4bec-8ac7-b10de15746e1`). Spacesheep serves the files from a
+per-space origin inside a sandboxed frame under its own header; fullscreen is
+not permitted there, so the Fullscreen button opens the viewer in its own tab
+instead. Update it with the standalone CLI (signed in on this machine), always
+naming the space so the CLI's folder state file is not needed, and delete that
+file afterwards:
+
+```sh
+npx --yes spacesheep deploy docs/scott-gray/plume --space 268d3da1-ac83-4bec-8ac7-b10de15746e1 -m "<what changed>" --json
+rm -f docs/scott-gray/plume/.spacesheep.json
+```

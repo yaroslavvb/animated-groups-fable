@@ -5,3 +5,4 @@ wolfram/out-test/
 wolfram/*.gif
 escher-source/
 .wrangler/
+.spacesheep.json

@@ -129,7 +129,17 @@ function fullscreenChanged() {
   requestDraw(); showControls(); updateWakeLock();
 }
 
+// Inside a host page's sandboxed frame (spacesheep embeds the viewer that way)
+// fullscreen is not permitted, so the button opens the viewer in its own tab.
+const embedded = window.top !== window && document.fullscreenEnabled === false && !document.webkitFullscreenEnabled;
+if (embedded) {
+  fullscreenButton.setAttribute('aria-label', 'Open in its own tab');
+  fullscreenButton.title = 'Open in its own tab';
+  document.querySelector('#fullscreen-label').textContent = 'Open full page';
+}
+
 async function toggleFullscreen() {
+  if (embedded) { window.open(location.href, '_blank', 'noopener'); showControls(); return; }
   try {
     if (document.fullscreenElement) await document.exitFullscreen();
     else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
