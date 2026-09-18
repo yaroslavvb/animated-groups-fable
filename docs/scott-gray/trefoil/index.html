@@ -33,20 +33,47 @@
 <body>
   <main aria-label="Trefoil three-colour wave lattice with an S3 colour symmetry">
     <canvas id="pattern" aria-label="Animated lattice of interlocking terracotta, teal and sand regions turning steadily clockwise. Sliding the view by one motif steps the colours round; a half-turn with half a period exchanges teal and sand. Drag to pan, pinch or scroll to zoom, two fingers to turn. Press Space to pause or F for fullscreen."></canvas>
+    <!-- The generator marks. Drawn through the same camera as the pattern, so
+         they stay glued to it; never a pointer target, so every canvas gesture
+         keeps working through them. -->
+    <svg id="generators" role="img" aria-label="Generator marks" hidden></svg>
     <div id="notice" role="status">Loading Trefoil…</div>
     <div id="controls" aria-label="Animation controls">
       <span class="name">Trefoil</span>
       <button id="pause" type="button" aria-label="Pause animation" title="Pause · Space" disabled>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path id="pause-icon" d="M8 5v14M16 5v14"/></svg>
       </button>
+      <!-- The off state has to look unchecked and not disabled, so the icon
+           carries a slash of its own rather than the control being faded. -->
+      <label id="generators-toggle" title="Generators · G">
+        <input type="checkbox" id="generators-check">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 19.3 7.8v8.4L12 20.4 4.7 16.2V7.8Z"/><circle cx="12" cy="12" r="2.1"/><path class="slash" d="M4.8 19.2 19.2 4.8"/></svg>
+        <span class="word">Generators</span>
+      </label>
+      <button id="notation" type="button" aria-expanded="false" aria-controls="legend" title="Notation · N">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5zM8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg>
+        <span class="word">Notation</span>
+      </button>
       <button id="reset" type="button" aria-label="Reset view" title="Reset view · 0" hidden>
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
       </button>
       <button id="fullscreen" type="button" aria-label="Enter fullscreen" title="Fullscreen · F" disabled>
         <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
-        <span id="fullscreen-label">Fullscreen</span>
+        <span id="fullscreen-label" class="word">Fullscreen</span>
       </button>
     </div>
+    <!-- A labelled region, not a dialog: the picture behind it stays live and
+         interactive, so claiming a modal role would be a lie to a screen
+         reader. Esc closes it, and so does a tap outside. -->
+    <aside id="legend" role="region" aria-labelledby="legend-title" hidden>
+      <div class="legend-head">
+        <h2 id="legend-title">Reading the generator marks</h2>
+        <button id="legend-close" type="button" aria-label="Close the notation panel" title="Close · Esc">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="legend-body" id="legend-body"></div>
+    </aside>
     <div id="stats" hidden aria-live="off"></div>
     <noscript>This animation needs JavaScript and WebGL. Enable JavaScript and reload to view it.</noscript>
   </main>

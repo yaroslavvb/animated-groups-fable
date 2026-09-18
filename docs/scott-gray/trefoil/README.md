@@ -35,9 +35,17 @@ it is **fully entangled** (nothing at all is visible in a single frame). This
 page is the third possibility, and the most entangled one a non-cyclic colour
 group permits: **half entangled, and provably maximally so** — a non-cyclic
 colour group could also have landed in the un-entangled case, with every swap
-free as well, and this wave does not. Serve this folder as
-static files; no build, dependencies, remote data or server computation are
-required.
+free as well, and this wave does not.
+
+**The page draws its own generators.** Four marks sit on the picture — a
+sixth-turn, a third, a half and the free slide — each saying in one glyph what to
+do, how long to wait and what becomes of the colours, in a notation that extends
+the site's [clockwork orbifold symbols](../../notation.html) with a colour
+superscript (§4). Trefoil's symbol is **6₅⁽¹²⁾ 3₂⁽⁰²¹⁾ 2₁⁽⁰¹⁾ · τ⁽⁰²¹⁾**. Press
+**G** for the marks, **N** for the legend that reads them.
+
+Serve this folder as static files; no build, dependencies, remote data or server
+computation are required.
 
 ## 1. The theorem: what a colour group can and cannot be
 
@@ -322,6 +330,129 @@ junction. **Unlike `../gyre/`, there is no degenerate neighbourhood anywhere
 else**: the three samples stay `|b| = 1/√3` apart everywhere in the plane, so
 nothing collapses and no disc of the picture moves faster than the rest.
 
+### The generators, drawn on the picture: clockwork-colour notation
+
+The table above is the whole group; the page draws **four generators of it**, on
+the picture itself, in a notation that is the site's own
+[clockwork orbifold notation](../../notation.html) with one new decoration.
+
+> **nₖ^(σ)** — a gyration of order *n* whose **anticlockwise** generator advances
+> the film by *k/n* of a period and permutes the colours by σ, written in cycle
+> notation over the colour digits **0** terracotta, **1** teal, **2** sand. The
+> superscript is omitted when σ is the identity, exactly as the subscript is
+> omitted when *k* = 0, so every undecorated symbol elsewhere on the site keeps
+> its meaning. A generator that is not a gyration keeps the same two
+> decorations: a translation is `τ_q^(σ)` and a pure wait `ω_q^(σ)`.
+
+Those digits are not arbitrary labels. Colour *c* is the class of `c·b` in
+`L′/L ≅ ℤ₃`, so the superscript is algebra, not a legend. And the notation brings
+a **second consistency rule** alongside the one the site already has: round any
+relation of the group the time subscripts must sum to a whole number of periods
+**and** the colour superscripts must compose to the identity. They are the same
+statement — that the relation holds in the full spacetime-colour group.
+
+Trefoil's symbol is
+
+    6₅⁽¹²⁾ 3₂⁽⁰²¹⁾ 2₁⁽⁰¹⁾ · τ⁽⁰²¹⁾
+
+The first three terms are the symbol proper; the fourth is a **reminder, not new
+data**. `notation.html` writes no translation into an orbifold symbol, and this
+one is forced: composing the three turns the other way round the relation gives
+`γβα = τ` in space, in time (`3/6 + 4/6 + 5/6 = 2` periods) and in colour
+(`(0 1)(0 2 1)(1 2) = (0 2 1)`). It is written down because a **bare τ** — colour
+with no time at all — is the whole difference between this page and its siblings,
+and a reader should not have to derive it to see it.
+
+Strip the superscripts and it is **6₅3₂2₁** — the catalogue's `g247`, `p6`,
+orbifold 632 — on the fine lattice `L′ = L + ℤb`. Keep only the *symmetries*
+whose superscript is empty — the kernel of the colour homomorphism, one sixth of
+the group, and not a subset of the four marks, every one of which recolours — and
+it is **3₂3₂3₂**, `g225`, `p3`, on the coarse lattice `L`, which is `../gyre/`'s
+own film group. The superscripts between them realise all six permutations of
+three colours, so the colour group is the whole of `S₃`.
+
+The four, in the site's own presentation of 632 (`αβγ = 1`, as in
+[`correspondence-p6.html`](../../correspondence-p6.html)):
+
+| Generator | Centre | Rotation | Time | Colour | Screen offset at home |
+| --- | --- | --- | --- | --- | --- |
+| **α** `6₅⁽¹²⁾` | `(0, 0)` | 60° anticlockwise | 5T/6 | teal ↔ sand | the screen centre |
+| **β** `3₂⁽⁰²¹⁾` | `(1/3, 0)` | 120° anticlockwise | 2T/3 | each steps back one | `(+219.39, 0)` px |
+| **γ** `2₁⁽⁰¹⁾` | `(1/3, 1/6)` | a half turn | T/2 | terracotta ↔ teal | `(+164.54, −95.00)` px |
+| **τ** `τ⁽⁰²¹⁾` | — | none | **none** | each steps back one | `b = (0, −380.00)` px |
+
+Read round the triangle: `5/6 + 2/3 + 1/2 = 2` whole periods, and
+`(1 2)·(0 2 1)·(0 1) = ()`. The three centres are the corners of the 30-60-90
+fundamental triangle of 632 on `L′`, right-angled at γ, and the free translation
+is one motif straight up out of α. Trefoil is the only one of the three siblings
+with a **bare τ** — a generator that is pure colour and pure space, no time at
+all — and that bare τ is Corollary B of §1 made visible. Its siblings:
+`../gyre/` is `3₂⁽⁰¹²⁾3₂⁽⁰¹²⁾3₂⁽⁰¹²⁾` (colour only in the gyrations) and
+`../triskele/` is `6₅ 3₂ 2₁ · ω₁⁄₃⁽⁰²¹⁾` (every gyration colour-preserving, the
+colour carried by a pure wait).
+
+**One rule gives the whole periodic set.** For the rotation by `R_m` (*m* sixths
+of a turn, anticlockwise) about a point `p`, put `v = (I − R_m)p`. Then `p` is a
+centre exactly when `v ∈ L′`; `v ≡ j b (mod L)` for a unique `j ∈ {0,1,2}` — the
+class of the centre in `L′/L`, and **not** the subscript `k` of the symbol, which
+is the time numerator (α has `k = 5`, `j = 0`; γ has `k = 1`, `j = 2`); the time
+shift is `−m/6` of a period and the colour permutation is
+
+    σ(c) = (−1)^m · c − j   (mod 3).
+
+The node test re-derives every centre of one cell of the sixth-grid from that
+rule and checks each against the field: three sixfold centres (exactly `L′`), six
+threefold-only, nine twofold-only, eighteen non-centres refused, and for every
+centre exactly **one** of the eighteen (wait, recolouring) pairs works. Two
+consequences fall straight out. Every transposition has *m* **odd**, so a colour
+swap always costs an odd sixth of a period — §1's theorem, read locally at one
+centre. And all three transpositions occur among the half-turns — `(1 2)` at the
+origin, `(0 2)` one `b` away, `(0 1)` two — which is the cleanest sight of the
+colour group being the whole of `S₃`.
+
+### Reading a mark
+
+Each mark is a **coin** and a **chip**, and each carries exactly one kind of
+thing — the discipline `notation.html` already states for the plate symbols.
+
+- **The coin** is what to do and how long to wait: the site's own rotation-order
+  glyph (hexagon, triangle, lens, with the International Tables screw tails,
+  lifted verbatim from `../wallpaper-groups.json`), a **violet clock dial** on the
+  rim filling *k/n* **clockwise from twelve**, and a short arc just outside giving
+  the generator's **anticlockwise** sense, and the tails are drawn back from the
+  body so that the polygon still reads as a polygon. Playing the film runs the
+  other way — but only a *third* of a turn at a time: every third of the loop it
+  carries the picture 120° clockwise with the colours unchanged, and a sixth of a
+  turn clockwise is a symmetry only if teal and sand change places with it. (The
+  underlying wave `U` does turn a sixth at a time; the three-colour picture does
+  not, and that is the whole thesis of this page.)
+- **The chip** is what becomes of the colours: three palette dots at fixed
+  stations — 0 terracotta at twelve, 1 teal at four, 2 sand at eight, always, and
+  those digits are the ones the superscript is written in — with three chasing
+  arrows on the rim for a cycle, a straight double-headed arrow **through the two
+  dots it exchanges** and a ring round the one left alone for a swap, and three
+  plain dots for the identity. The swap's arrow was twice redrawn: on the ring the
+  dots sit on it was eaten by their ink halos, and as an arc near the rim it
+  touched nothing — so it never said *which* two colours it moved, and for α's
+  `(1 2)`, which runs between the four and eight o'clock stations, the chip read
+  as a smiling face.
+- **τ** gets a plain line with a **full** arrowhead — the plate key reserves a
+  full head for a whole primitive translation — a chip, and **no dial at all**.
+  The empty clock is how the page shows that this generator is free.
+
+The clock's accent is **violet** because it must never be read as one of the
+three colours: amber was tried first, and at marker size an amber wedge and the
+sand dot `#e2be68` are the same thing.
+
+With two colours the only non-identity superscript is `(01)`, which is exactly
+Shubnikov's colour prime: `2₁⁽⁰¹⁾` is what the two-colour literature writes
+`2₁′`. Black-and-white antisymmetry is the *n* = 2 case of this notation, so the
+site's existing two-colour plates need no change. The prime itself is **not**
+reused here, because this site has already spent it: `notation.html` rule 4 gives
+`′` to **time reversal** (`/1′`, `/m′`, `/2′`) and contrasts it with the
+crystallographers' colour prime. The colour action is a superscript for exactly
+that reason.
+
 ## 5. Rendering
 
 WebGL 2, one full-screen triangle, no per-pixel work beyond the sampling.
@@ -486,6 +617,87 @@ symmetries, three keeping the colours and three swapping a pair. Zooming out
 stops where one node of the 66-node lattice spans one device pixel; zooming in
 stops at 8000 CSS pixels per lattice length.
 
+### The generator marks
+
+The marks of §4 are **on by default** — the page is about its generators — and
+`generators.mjs` draws them as an SVG layer over the canvas, placed through the
+viewer's own camera rather than by rotating a finished picture, so they stay glued
+to the pattern through a pan, a zoom, a turn, a momentum glide and a resize. The
+layer takes no pointer events at all, so every gesture works straight through a
+mark.
+
+They are periodic, and they repeat with the **coarse** lattice `L`, not with `L′`:
+translating by `b` carries a sixfold centre to a sixfold centre but conjugates the
+permutation, so one repeat of the annotation is one `L`-cell — which is also
+exactly the cell the four marks triangulate. Every repeat whose α centre is
+within reach of the window is drawn — the margin covers the fundamental triangle
+*and* the τ arrow, which is 0.578 of a lattice length, so no arrowhead that would
+be on screen is ever left out.
+
+Only one piece of a mark turns when the view does: the crystallographic order
+glyph, whose screw tails are lattice directions. The clock, the sense arc, the
+colour chip and the label stay upright and stay put — twelve o'clock has to remain
+at twelve, the colour stations where the legend put them, and the chip and the
+label out of each other's way at every angle. The τ arrow turns, being a lattice
+vector; its chip does not.
+
+The labels are set with real `tspan` subscripts and superscripts, not with the
+Unicode characters ₅ ⁽ ⁰ ⁾. Those have no glyph in the serif stack in WebKit —
+every browser on iOS — where each is given a full-width fallback box and the
+symbol shatters into `α 6₅`, `(0`, `21)` strewn across the picture; and even
+where they do render, `6₅⁽¹²⁾` is not distinguishable from sixty-five at label
+size. The digits *are* the notation, so they are markup on the artwork exactly as
+they are in the panel. A label whose box would cross the edge of the window is
+dropped rather than clipped: half a symbol with no mark under it is worse than no
+symbol.
+
+**Thinning.** The fundamental triangle is fixed by the group, so the marks crowd
+together as the view zooms out and there is nothing for it but to shrink, thin and
+give up. What stops being legible is a *mark*, not a gap, so the thinning is
+driven by the size the marks are drawn at, and each piece **fades out over a
+window that ends where it leaves the document** — nothing ever pops away at full
+strength:
+
+| mark size | what is drawn |
+| --- | --- |
+| 1 → 0.88 | everything |
+| 0.88 → 0.74 | β's and γ's labels fade out |
+| 0.78 → 0.66 | γ fades out |
+| 0.62 → 0.50 | β fades out, leaving **α and the slide** |
+| 0.58 → 0.46 | their two labels fade out as well |
+
+A **phone at its home framing sits at 0.64** and is the densest view the page
+has — the marks are two thirds the size but only 56 px apart, where a desktop
+gives 110 — so it thins where a desktop does not: α, β and the slide, with α's
+and the slide's labels. Below the window given by `fadeWindow` the whole layer
+fades out; on a laptop that is 18 CSS pixels between the β and γ centres, about
+five times out from the home framing.
+
+**The cap follows the window, not a constant.** `MAX_UNITS` is a ceiling of 320
+repeats against runaway DOM, and the fade is derived *from it and from the
+window's own diagonal*, so the layer has always faded out before the ceiling can
+bite. A fixed cap of 64 failed exactly here: on a 2880 × 2000 window it drew a
+fully opaque disc of marks with a third of the screen bare around it. The stats
+overlay counts the repeats on screen (`marks 13`, or `marks off`).
+
+Units are **pooled**: a zoom that brings new repeats into view appends only those,
+and only a change of *tier* — which marks and labels are drawn at all — rebuilds
+the layer. Every other draw moves existing nodes with transforms, and a draw whose
+view has not moved does nothing at all. Playback never moves the view, so the
+marks cost the animation nothing — measured at 2880 × 2000 device pixels, 60 fps
+with them and 60 without, and 61 fps with 137 repeats on screen at the deep
+zoom-out.
+
+**The notation panel** is a labelled region and not a dialog: the picture behind
+it stays live and keeps every gesture, so claiming a modal role would be a lie to
+a screen reader. `Esc`, `N`, the close button and a **tap outside** all dismiss
+it — a *drag* outside does not, since that is a pan and the panel may well be
+wanted while the picture moves under it. When there is more of it below the fold
+it says so, with a fade and a `more ↓` cue. A short window (a phone on its side)
+gets the full height instead of the bottom dock, and a short wide one lays the
+body out in two columns, so the symbol and the generator table are in the first
+screenful rather than three screens down.
+
 ### Momentum
 
 **Everything a gesture can move keeps moving when you let go**, not just the
@@ -632,12 +844,17 @@ pinch-and-turn on a real Mac.**
 | `]` `[` | turn 15° a press, 60° with Shift, 3° a repeat while held |
 | arrows | pan (240 px with Shift) |
 | `0` / Home / the recentre button | back to the home view |
+| `G` / the **Generators** checkbox | the generator marks on or off, remembered |
+| `N` / the **Notation** button / Esc / a tap outside | the legend that explains them |
 | Space, `F`, `S`, double-click | pause, fullscreen, stats, fullscreen |
 
 `?scale=`, `?x=`, `?y=`, `?angle=` (degrees, clockwise), `?phase=`, `?play=0`,
 `?dpr=` and `?stats=1` behave as on `../gyre/`, alongside `?taa=`, `?shutter=`
 and `?motion=` above; a finite value outside the allowed range is clamped to the
 nearest one it may take, so a hand-edited link still does what it asks for.
+`?generators=0` (or `?gen=0`) shares a view **without** the marks and
+`?generators=1` with them; either wins over what this viewer last chose, which is remembered in
+`localStorage` under `trefoil:generators` and never leaves the browser.
 Controls and cursor hide after inactivity; GPU context restoration resumes the
 pattern; hidden tabs suspend rendering. Inside a frame that is not allowed to go
 fullscreen, the button instead reads "Open full page" and opens the viewer in its
@@ -662,7 +879,8 @@ the home frame:
 
 Twitter/X sharing uses `social-preview.jpg` (1200 × 630) with large-summary and
 Open Graph metadata, rendered straight from the WebGL viewer at
-`?play=0&phase=0.31&scale=572` with the controls hidden.
+`?play=0&phase=0.31&scale=572` with the controls hidden — and with the generator
+marks off, which is what `?generators=0` is for.
 
 ## 9. Validation
 
@@ -675,7 +893,7 @@ BROWSER=webkit node docs/scott-gray/tests/trefoil.browser.mjs http://localhost:8
 node docs/scott-gray/tests/trefoil.browser.mjs https://trefoil-wave.pages.dev/ live
 ```
 
-The **node test** (34 tests, about seven seconds) works on the saved samples in
+The **node test** (42 tests, about eight seconds) works on the saved samples in
 exact integer arithmetic: the field's SHA-256 and byte identity with the atlas
 orbit and with both sibling pages; the field's own sixfold screw, bit-exact; that
 `b` is a whole (22, 44) nodes, that `3b ∈ L`, that `|b| = 1/√3` and how each turn
@@ -705,6 +923,29 @@ that never passes the give and ends on the limit exactly, the turn easing onto a
 sixth only from inside the 4° tolerance, and the aiming of a thrown turn — that
 it lands on a sixth, that a nudge smaller than the correction is left where it
 was thrown, and that nothing is ever pulled back to a sixth behind the fingers.
+
+Eight of those tests cover the **generator marks**, and nothing the page draws is
+taken on trust from the module that draws it: each of the four generators exact at
+all 418 176 node-frames with its stated wait and recolouring, **and** failing with
+every one of the other five recolourings and with its wait removed; `αβγ = 1` at
+once in space (the composed affine map is the identity at three independent
+points), in time (`5/6 + 2/3 + 1/2 = 2`) and in colour (`(1 2)(0 2 1)(0 1) = ()`);
+the master rule re-derived over a whole cell of the sixth-grid — 180 (point, turn)
+pairs, every centre found with exactly one lift and every non-centre refused at
+all eighteen lifts — with the three sixfold centres coming out as exactly `L′`,
+and a swap costing an odd sixth of a period at every one of them; `screenOf` as
+the exact inverse of the viewer's own `view.latticeAt` over 120 random cameras at
+three window sizes, and the fundamental triangle in CSS pixels, right-angled at γ
+with `|αβ| = 2|βγ|`; the thinning and the fade swept a twentieth of a pixel at a
+time, so that every piece is shown to leave the document at an opacity of a few
+thousandths, and the cap checked against the real repeat count at six window sizes
+and 868 zooms, with the marks required to reach the corners for as long as they
+are visible; that every label is built of tspans and carries no Unicode
+sub/superscript; that a swap's arrow runs through the two dots it exchanges and
+misses the third; and that the legend prints the same symbol, waits and colours
+the marks carry — including that it does not claim the film turns the coloured
+picture a sixth at a time, and that the cycling icon and the sentence beside it
+agree.
 
 The **browser test** (Chromium and WebKit, local and live) checks the rendered
 pixels. The headline: **the frame at T/2, turned half a turn about the screen
@@ -752,6 +993,38 @@ adding nothing; the Mac trackpad throwing its pinch, its turn and both
 interleaved, and throwing nothing when the stream stopped before it ended;
 reduced motion throwing nothing at all; and the one-finger pan fling unchanged), reset, stats, pause/play, idle controls, GPU
 recovery and reduced motion.
+
+The **generator marks** have their own section at the end of the browser run, and
+it is where the "glued to the pattern" claim is actually settled. The marks are on
+by default; every one of β and γ sits at the offset from an α that the plane
+transform predicts, at 0° **and** at 60°; a keyboard pan of 96 px moves every α
+still inside the layer's ring by exactly 96 px; a 1.25× zoom about the screen
+centre scales every offset from it; `?angle=60` turns the whole set about the
+screen centre while the `cc-turn` group — the order glyph, and nothing else — is
+the piece that carries `rotate(60)`. Every label is measured in the engine under
+test: four distinct labels, each built of tspans, each between 30 and 86 px wide
+and under 40 px tall, none carrying a Unicode sub/superscript — which is what the
+shattered iOS rendering looked like from the outside, and what nothing asserted
+before. Zoomed out to 276 and 200 px a repeat, on two window sizes, the furthest
+corner of the window is within 1.2 repeats of a mark while the layer is still
+visible: the annotation covers the whole window or it is gone. At 390 × 844 the
+marks thin to α, β and the slide with only α's and the slide's labels. The layer's
+computed `pointer-events` is `none` and a drag straight across a mark still pans.
+The checkbox, `G` and `?generators=0` each switch the marks off, the first two are
+remembered across a reload and the query is not, so a share link never overwrites
+what the viewer chose. The panel opens from the button and from `N`, closes from
+`Esc`, from `N` and from a tap outside but **not** from a drag that starts
+outside, carries `role="region"` and its `more ↓` cue, and at 390 × 844 fits the
+screen, sits above the control bar, leaves the picture in view and adds no
+horizontal scroll; at 844 × 390 it is over 280 px high, still clears the control
+bar, and lays its body out in two columns with the generator table in the first
+screenful. Finally the frame rate is measured with the marks and without, at
+2880 × 2000 device pixels: 60 fps either way, and 61 fps with 137 repeats on
+screen at 150 px a repeat.
+
+Every pixel check in the run is made with the marks switched **off**, through the
+viewer's own preference — an element screenshot captures whatever is drawn over
+the canvas, and the overlay is drawn over the canvas.
 
 One gap is not closed by either test: headless WebKit cannot construct a real
 `GestureEvent`, so the trackpad path — including its momentum, which the browser

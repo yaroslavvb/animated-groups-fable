@@ -1,5 +1,6 @@
 import {CENTER, createRenderer, createView, FIELD_BYTES, GRID_SIZE, INITIAL_PHASE, LOOP_SECONDS, MAX_SCALE, MAX_TAA_LAYERS, MIN_SCALE, MOTION_PIXELS, scaleFor, SHUTTER, snapAngle, TAA_LAYERS, wrap} from './renderer.mjs';
 import {advanceFling, createFling, ELASTIC_GIVE, estimateVelocity, NO_THROW, trimSamples, WINDOW_MS} from './momentum.mjs';
+import {createGeneratorOverlay, legendMarkup} from './generators.mjs';
 
 const canvas = document.querySelector('#pattern');
 const notice = document.querySelector('#notice');
@@ -9,6 +10,12 @@ const pauseButton = document.querySelector('#pause');
 const fullscreenButton = document.querySelector('#fullscreen');
 const resetButton = document.querySelector('#reset');
 const stats = document.querySelector('#stats');
+const generatorLayer = document.querySelector('#generators');
+const generatorCheck = document.querySelector('#generators-check');
+const generatorToggle = document.querySelector('#generators-toggle');
+const notationButton = document.querySelector('#notation');
+const legend = document.querySelector('#legend');
+const legendClose = document.querySelector('#legend-close');
 const params = new URLSearchParams(location.search);
 // A finite value out of range clamps to the nearest allowed one rather than
 // being dropped, so a hand-edited share link still does what it asks for.
@@ -42,7 +49,15 @@ const taa = Math.max(1, Math.round(number('taa', 0, MAX_TAA_LAYERS) ?? TAA_LAYER
 const shutter = number('shutter', 0, 2) ?? SHUTTER;
 const motion = number('motion', 0, 1000) ?? MOTION_PIXELS;
 let showStats = params.get('stats') === '1';
-let renderer, field, scheduled = false, dirty = false, lastTime = null, idleTimer, wakeLock;
+// The generator marks are on unless this viewer has turned them off — the page
+// is about its generators, so they are what it opens with. `?generators=0`
+// shares a view without them and wins over what the viewer last chose, which
+// is remembered here alone and never leaves the browser.
+const STORE_KEY = 'trefoil:generators';
+const stored = (() => { try { return localStorage.getItem(STORE_KEY); } catch { return null; } })();
+const askedGenerators = params.get('generators') ?? params.get('gen');
+let showGenerators = askedGenerators !== null ? askedGenerators !== '0' : stored !== '0';
+let renderer, field, overlay, scheduled = false, dirty = false, lastTime = null, idleTimer, wakeLock;
 
 // While the pattern downloads, idle animation frames reveal the display's
 // frame interval, so adaptive resolution starts out knowing the target cadence.
@@ -62,9 +77,66 @@ function showControls() {
   document.body.classList.remove('quiet');
   clearTimeout(idleTimer);
   if (playing && renderer) idleTimer = setTimeout(() => {
-    if (!controls.contains(document.activeElement)) document.body.classList.add('quiet');
+    // The notation panel is a deliberate choice, so the bar that dismisses it
+    // stays with it; everything else fades as it always did.
+    if (!controls.contains(document.activeElement) && legend.hidden) document.body.classList.add('quiet');
   }, 2600);
 }
+
+// ---- the generator marks ----------------------------------------------------
+// The overlay is redrawn from the same view the shader reads, on every frame
+// that draws anything; a frame whose view has not moved costs nothing, so
+// playback — which never moves the view — is untouched.
+overlay = createGeneratorOverlay(generatorLayer, view);
+generatorLayer.setAttribute('aria-label', overlay.description());
+function updateOverlay(force = false) {
+  if (!showGenerators || !renderer) return;
+  const [width, height] = size();
+  overlay.update(width, height, {force});
+}
+function setGenerators(on, {remember = true} = {}) {
+  showGenerators = on;
+  // `hidden` is an HTMLElement property and an SVG element does not reflect it,
+  // so the attribute itself is what the stylesheet is given.
+  if (on) generatorLayer.removeAttribute('hidden'); else generatorLayer.setAttribute('hidden', '');
+  generatorCheck.checked = on;
+  // The state is the checkbox's own, announced natively; an aria-label on the
+  // <label> would never be read, and one on the <input> would replace the
+  // accessible name "Generators" that the visible word gives it.
+  generatorToggle.dataset.on = String(on);
+  if (remember) { try { localStorage.setItem(STORE_KEY, on ? '1' : '0'); } catch { /* Private browsing: the choice lasts this visit. */ } }
+  if (on) updateOverlay(true); else overlay.clear();
+  renderStats();
+}
+function toggleGenerators() { setGenerators(!showGenerators); showControls(); }
+
+// ---- the notation panel -----------------------------------------------------
+// It is a side panel and not a modal — the picture behind it stays live and
+// keeps every gesture — so it is a labelled region, it closes on a tap outside
+// as well as on Esc, and it says when there is more of it below the fold.
+let legendBuilt = false;
+const legendBody = document.querySelector('#legend-body');
+function updateLegendScroll() {
+  const more = legendBody.scrollHeight - legendBody.clientHeight - legendBody.scrollTop > 4;
+  legend.dataset.more = more ? '1' : '0';
+}
+legendBody.addEventListener('scroll', updateLegendScroll, {passive: true});
+function openLegend() {
+  if (!legendBuilt) { legendBody.innerHTML = legendMarkup(); legendBuilt = true; }
+  legend.hidden = false;
+  notationButton.setAttribute('aria-expanded', 'true');
+  showControls();
+  legendClose.focus({preventScroll: true});
+  updateLegendScroll();
+}
+function closeLegend({restore = true} = {}) {
+  if (legend.hidden) return;
+  legend.hidden = true;
+  notationButton.setAttribute('aria-expanded', 'false');
+  if (restore) notationButton.focus({preventScroll: true});
+  showControls();
+}
+function toggleLegend() { if (legend.hidden) openLegend(); else closeLegend(); }
 
 function updatePause() {
   const label = playing ? 'Pause animation' : 'Play animation';
@@ -108,6 +180,7 @@ function frame(time) {
     // the callback, so both the phase and the cadence the governor measures
     // follow the display instead of the main thread's jitter.
     renderer.draw(phase, {continuous: animating || !!fling, moving: animating, time});
+    updateOverlay();
     dirty = false;
     if (animating) countFrame(time); else renderStats();
   }
@@ -142,7 +215,10 @@ function renderStats() {
   const shutterNote = renderer.maxLayers > 1
     ? ` · shutter ${renderer.layers > 1 ? `${renderer.layers}×${renderer.shutter.toFixed(2)} frame` : `off (of ${renderer.maxLayers})`}`
     : ' · shutter off';
-  stats.textContent = `${playing ? `${Math.round(fps)} fps` : 'paused'} · ${canvas.width}×${canvas.height} px · quality ${renderer.quality.toFixed(2)} · ${Math.round(view.scale(width, height))} px per repeat${turned} · ${renderer.taps} taps${cadence}${shutterNote}${gestureNote()}`;
+  // How many repeats of the annotation are on screen, or that it is off: the
+  // one number that says whether the overlay is thinning out or gone.
+  const marks = showGenerators ? ` · marks ${overlay.count}` : ' · marks off';
+  stats.textContent = `${playing ? `${Math.round(fps)} fps` : 'paused'} · ${canvas.width}×${canvas.height} px · quality ${renderer.quality.toFixed(2)} · ${Math.round(view.scale(width, height))} px per repeat${turned} · ${renderer.taps} taps${cadence}${shutterNote}${marks}${gestureNote()}`;
 }
 function toggleStats() { showStats = !showStats; renderStats(); }
 
@@ -555,10 +631,26 @@ function pan(dx, dy) { stopFling(); endWheel(); const [width, height] = size(); 
 pauseButton.addEventListener('click', event => { togglePause(); if (event.detail) pauseButton.blur(); });
 fullscreenButton.addEventListener('click', event => { toggleFullscreen(); if (event.detail) fullscreenButton.blur(); });
 resetButton.addEventListener('click', event => { resetView(); if (event.detail) resetButton.blur(); });
+generatorCheck.addEventListener('change', () => { setGenerators(generatorCheck.checked); showControls(); });
+notationButton.addEventListener('click', event => { toggleLegend(); if (event.detail && legend.hidden) notationButton.blur(); });
+legendClose.addEventListener('click', () => closeLegend());
 nameLabel.addEventListener('click', toggleStats);
 canvas.addEventListener('dblclick', toggleFullscreen);
 document.addEventListener('pointermove', showControls, {passive: true});
 document.addEventListener('pointerdown', showControls, {passive: true});
+// A tap outside the panel dismisses it — on a phone that gesture is the natural
+// one, and without this it pans the picture behind instead. A DRAG that happens
+// to start outside must not: it is a pan, and the reader may well want the
+// panel open while moving the picture under it.
+let legendTap = null;
+document.addEventListener('pointerdown', event => {
+  legendTap = !legend.hidden && !legend.contains(event.target) && !controls.contains(event.target)
+    ? [event.clientX, event.clientY] : null;
+}, {passive: true});
+document.addEventListener('pointerup', event => {
+  if (legendTap && Math.hypot(event.clientX - legendTap[0], event.clientY - legendTap[1]) < 8) closeLegend({restore: false});
+  legendTap = null;
+}, {passive: true});
 document.addEventListener('focusin', showControls);
 document.addEventListener('focusout', showControls);
 // The zoom and turn keys repeat while held, in smaller steps: holding ] turns
@@ -573,9 +665,14 @@ document.addEventListener('keydown', event => {
   const key = event.key.toLowerCase(), pace = event.shiftKey ? 240 : 48;
   const turn = (repeating ? 3 : event.shiftKey ? 60 : 15) * Math.PI / 180;
   const zoom = repeating ? 1.05 : 1.25;
-  if (event.code === 'Space' && event.target.tagName !== 'BUTTON') { event.preventDefault(); togglePause(); }
+  if (key === 'escape') { if (!legend.hidden) { event.preventDefault(); closeLegend(); } return; }
+  // Space belongs to whatever control has focus — a button, or the generator
+  // checkbox — and pauses the animation only when nothing has.
+  if (event.code === 'Space' && !['BUTTON', 'INPUT'].includes(event.target.tagName)) { event.preventDefault(); togglePause(); }
   else if (key === 'f') { event.preventDefault(); toggleFullscreen(); }
   else if (key === 's') { event.preventDefault(); toggleStats(); }
+  else if (key === 'g') { event.preventDefault(); toggleGenerators(); }
+  else if (key === 'n') { event.preventDefault(); toggleLegend(); }
   else if (key === '0' || key === 'home') { event.preventDefault(); resetView(); }
   else if (key === '+' || key === '=') { event.preventDefault(); zoomCenter(zoom); }
   else if (key === '-' || key === '_') { event.preventDefault(); zoomCenter(1 / zoom); }
@@ -603,6 +700,7 @@ function start() {
     renderer.draw(phase); lastTime = null;
     canvas.dataset.ready = 'true';
     notice.hidden = true; pauseButton.disabled = false; fullscreenButton.disabled = false;
+    setGenerators(showGenerators, {remember: false});
     updatePause(); updateReset(); renderStats(); showControls(); schedule(); updateWakeLock();
   } catch (error) { notice.textContent = error.message; notice.hidden = false; }
 }

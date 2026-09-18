@@ -13,7 +13,57 @@ button:last-child { padding-inline: 12px 17px; }
 button:hover { background: #f4ece222; }
 button:focus-visible { outline: 2px solid #f4ece2; outline-offset: 2px; }
 button:disabled { opacity: .45; cursor: wait; }
-svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* Icons only: the generator overlay and the legend's own artwork size
+   themselves, so this must never reach an svg outside the control bar. */
+#controls svg, #legend-close svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* The generator marks. Never a pointer target — every canvas gesture has to
+   keep working through them — and no transition, so they never lag the
+   pattern they are glued to. */
+#generators { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+#generators-toggle { position: relative; min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border-radius: 999px; padding: 10px; font-size: 14px; cursor: pointer; }
+#generators-toggle input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+#generators-toggle:hover { background: #f4ece222; }
+/* On: a filled pill. Off: an outlined one with the icon struck through — never
+   the .45 fade `button:disabled` uses, which read as "unavailable" rather than
+   "unchecked". */
+#generators-toggle[data-on="true"] { background: #f4ece21c; }
+#generators-toggle[data-on="false"] { box-shadow: inset 0 0 0 1px #f4ece23d; }
+#generators-toggle[data-on="true"] .slash { display: none; }
+#generators-toggle[data-on="false"] svg { opacity: .8; }
+#generators-toggle:focus-within { outline: 2px solid #f4ece2; outline-offset: 2px; }
+#notation[aria-expanded="true"] { background: #f4ece21c; }
+/* Opaque: the overlay's paper-white ink is high enough in contrast to read
+   straight through even a 98 % panel in WebKit, and a generator mark crossing
+   the symbol block is worse than losing the tint of the pattern behind. The
+   blur stays for the border and the corners. */
+#legend { position: fixed; top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); width: min(410px, calc(100% - 28px)); max-height: min(calc(100% - 140px), 760px); display: flex; flex-direction: column; border: 1px solid #f4ece233; border-radius: 18px; background: #14110f; box-shadow: 0 10px 44px #000000aa; -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); overflow: hidden; }
+/* A panel that is cut off has to look cut off. */
+#legend[data-more="1"] .legend-body { -webkit-mask-image: linear-gradient(#000 calc(100% - 34px), #0000); mask-image: linear-gradient(#000 calc(100% - 34px), #0000); }
+#legend[data-more="1"]::after { content: "more ↓"; position: absolute; right: 16px; bottom: 7px; padding: 1px 7px; border-radius: 999px; background: #f4ece21f; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: #f4ece2b3; pointer-events: none; }
+.legend-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 8px 10px 18px; border-bottom: 1px solid #f4ece21f; }
+.legend-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: .02em; }
+#legend-close { min-width: 38px; min-height: 38px; padding: 8px; }
+.legend-body { padding: 4px 18px 18px; overflow-y: auto; overscroll-behavior: contain; font-size: 13px; line-height: 1.5; color: #f4ece2d9; -webkit-overflow-scrolling: touch; }
+.legend-body p { margin: 12px 0; }
+.legend-body .lede { color: #f4ece2; }
+.legend-body h3 { margin: 18px 0 8px; font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: #f4ece299; }
+.cc-anatomy { display: block; margin: 6px auto 2px; max-width: 320px; font-family: system-ui, sans-serif; }
+.legend-body dl { margin: 6px 0 0; display: grid; grid-template-columns: 54px 1fr; gap: 10px 12px; align-items: center; }
+.legend-body dt { display: flex; align-items: center; justify-content: center; }
+.legend-body dd { margin: 0; }
+.legend-body dd b { color: #f4ece2; font-weight: 600; }
+.symbol { margin: 14px 0 12px; padding: 11px 12px; border-radius: 12px; background: #f4ece210; text-align: center; font-family: ui-serif, Georgia, serif; font-size: 21px; letter-spacing: .01em; color: #f4ece2; }
+/* Real subscripts and superscripts, at a size that cannot be mistaken for the
+   digit beside them — the whole point of the notation is the decoration. */
+.legend-body sub, .legend-body sup { font-size: .62em; line-height: 0; }
+.legend-body sup { vertical-align: .52em; }
+.legend-body sub { vertical-align: -.22em; }
+.legend-body table { width: 100%; border-collapse: collapse; margin: 4px 0 2px; }
+.legend-body th { padding: 4px 6px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: #f4ece280; border-bottom: 1px solid #f4ece21f; }
+.legend-body td { padding: 7px 6px; vertical-align: top; border-bottom: 1px solid #f4ece214; }
+.legend-body td:first-child { white-space: nowrap; font-family: ui-serif, Georgia, serif; font-size: 15px; color: #f4ece2; }
+.legend-body .swatch { display: inline-block; width: 9px; height: 9px; border-radius: 50%; vertical-align: baseline; }
+.legend-body .foot { color: #f4ece2aa; }
 body.quiet { cursor: none; }
 body.quiet #controls { opacity: 0; pointer-events: none; }
 body.dragging.quiet { cursor: grabbing; }
@@ -22,8 +72,33 @@ body.quiet #controls:focus-within { opacity: 1; pointer-events: auto; }
 #stats { position: fixed; top: max(12px, env(safe-area-inset-top)); left: max(12px, env(safe-area-inset-left)); max-width: calc(100% - 24px); padding: 6px 10px; border-radius: 8px; background: #14110fcc; font: 12px/1.4 ui-monospace, monospace; pointer-events: none; }
 [hidden] { display: none !important; }
 noscript { position: fixed; inset: 35% 20px auto; text-align: center; padding: 24px; background: #14110f; }
+/* Six controls do not fit a narrow window with their words, so under 700 px
+   every one of them keeps just its icon; the titles and the labels stay. */
+@media (max-width: 700px) { .word { display: none; } button:last-child { padding-inline: 10px; } }
+/* The legend never covers the whole canvas on a phone: it sits above the
+   control bar and keeps the top half of the picture in view. */
+@media (max-width: 640px) {
+  #legend { top: auto; left: max(8px, env(safe-area-inset-left)); right: max(8px, env(safe-area-inset-right)); width: auto; bottom: calc(max(18px, env(safe-area-inset-bottom)) + 74px); max-height: min(54vh, 460px); }
+}
+/* A phone on its side is 390 px tall, and the rule above would leave the body
+   190 px high — three screenfuls of scrolling with the artwork's explanation in
+   the last of them. Short windows get the full height instead, and a wide short
+   one gets two columns, which fits the symbol, the table and "Reading a mark"
+   in one view. */
+@media (max-height: 560px) {
+  #legend { top: max(8px, env(safe-area-inset-top)); bottom: calc(max(24px, env(safe-area-inset-bottom)) + 66px); left: auto; max-height: none; }
+  .legend-body { padding-bottom: 10px; }
+}
+/* Two columns as a GRID, not as CSS columns: multicol in a fixed-height box
+   overflows sideways, so the panel would have needed horizontal scrolling and
+   the "more" cue would never have fired. A grid overflows downward, which is
+   the direction the panel already scrolls. */
+@media (max-height: 560px) and (min-width: 700px) {
+  #legend { width: min(680px, calc(100% - 28px)); }
+  .legend-body { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 0 20px; }
+  .legend-body > * { min-width: 0; }
+  .cc-anatomy { max-width: 240px; }
+}
 @media (max-width: 480px) { #controls { bottom: max(18px, env(safe-area-inset-bottom)); max-width: calc(100% - 16px); } }
-/* On the narrowest phones the bar grows past the screen once the reset button
-   appears, so the fullscreen button drops its word and keeps just its icon. */
-@media (max-width: 360px) { #fullscreen-label { display: none; } button:last-child { padding-inline: 10px; } }
+@media (max-width: 360px) { button:last-child { padding-inline: 10px; } .name { padding: 0 8px 0 12px; } #controls { gap: 4px; } }
 @media (prefers-reduced-motion: reduce) { #controls { transition: none; } }

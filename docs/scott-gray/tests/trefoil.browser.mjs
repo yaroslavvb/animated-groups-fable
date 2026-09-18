@@ -12,7 +12,8 @@ import assert from 'node:assert/strict';
 // shader is compared against below. The field itself is fetched from whatever
 // copy of the page is being tested, so a live deployment is checked against its
 // own bytes.
-import {colourAt, fromPlane, frameAt, halfTurn, MAX_SCALE, offsetBy, TILE_PIXELS, uVolume, valuesAt} from '../trefoil/renderer.mjs';
+import {colourAt, fromPlane, frameAt, halfTurn, MAX_SCALE, offsetBy, TILE_PIXELS, toPlane, uVolume, valuesAt} from '../trefoil/renderer.mjs';
+import {byName, centreOf, MAX_UNITS} from '../trefoil/generators.mjs';
 import {ELASTIC_GIVE, MAX_ZOOM_RATE, ZOOM_TAU} from '../trefoil/momentum.mjs';
 const runtime = '/Users/yaroslavvb/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/';
 const playwright = await import(process.env.PLAYWRIGHT_MODULE ?? `${runtime}playwright/index.mjs`);
@@ -175,7 +176,14 @@ function areas(image) {
   return counts.map(c => c / total);
 }
 try {
+  // The generator marks are on by default and sit ON TOP of the canvas, and an
+  // element screenshot takes whatever is over it — so every pixel check below
+  // runs with them switched off, through the very preference a viewer would
+  // use. The overlay has its own section at the end, which clears this again.
+  await page.goto(base); await ready();
+  await page.evaluate(() => { try { localStorage.setItem('trefoil:generators', '0'); } catch {} });
   await page.goto(`${base}?play=0`); await ready();
+  assert.equal(await page.locator('#generators').evaluate(n => n.hasAttribute('hidden')), true, 'the pixel checks run with the marks off');
   assert.deepEqual(await page.locator('canvas').evaluate(c => [c.width, c.height]), [2880, 2000], 'native retina resolution');
   assert.equal(await page.locator('#notice').isVisible(), false);
   const home = await pixels();
@@ -584,14 +592,22 @@ try {
   // length passes at 2.2 px a frame; with the shipped 0.3 shutter the same
   // 0.75 px of smear asks for 2.5 px of travel, so 2400 is still off and the
   // pattern engages the shutter by itself only past about 2730.
+  // The stats line only says what the shutter is doing once frames are actually
+  // being counted; over the network the first ones can be a moment late, so the
+  // reading waits for a non-zero frame rate rather than for a fixed 600 ms.
+  const playing = async () => {
+    await page.waitForTimeout(600);
+    await page.waitForFunction(() => /[1-9]\d* fps/.test(document.querySelector('#stats')?.textContent ?? ''), null, {timeout: 5000})
+      .catch(() => {});
+  };
   await page.goto(`${base}?taa=3&play=1&stats=1`); await ready();
-  await page.waitForTimeout(600);
+  await playing();
   const homeStats = await page.locator('#stats').textContent();
   assert.match(homeStats, /shutter off \(of 3\)/, `the home framing does not pay for a shutter: ${homeStats}`);
   assert.match(homeStats, /(27|48) taps/, `one sampling of the field per pixel: ${homeStats}`);
   for (const [scale, on] of [[2400, false], [3000, true]]) {
     await page.goto(`${base}?taa=3&play=1&stats=1&scale=${scale}`); await ready();
-    await page.waitForTimeout(600);
+    await playing();
     const text = await page.locator('#stats').textContent();
     assert.match(text, on ? /shutter 3×0\.30 frame/ : /shutter off \(of 3\)/, `the default shutter at ${scale} px per repeat: ${text}`);
   }
@@ -1060,12 +1076,275 @@ try {
   });
   await page.waitForFunction(() => document.querySelector('#notice').hidden && !document.querySelector('#pause').disabled);
 
+  // ---- the generator marks and the notation panel --------------------------
+  // The overlay is an SVG layer over the canvas, placed through the very
+  // transform the shader uses. What is checked here is that it is really glued
+  // to the pattern — under a pan, a zoom and a turn — that it never takes a
+  // pointer away from the canvas, that the three ways of switching it off all
+  // work and are remembered, and that it costs the animation nothing.
+  await page.setViewportSize({width: 1440, height: 1000});
+  await page.goto(base); await ready();
+  await page.evaluate(() => { try { localStorage.clear(); } catch {} });
+  await page.goto(base); await ready();
+  await page.waitForTimeout(200);
+  const layerHidden = () => page.locator('#generators').evaluate(n => n.hasAttribute('hidden'));
+  const unitCount = () => page.locator('#generators .cc-unit').count();
+  /** Where each mark of a kind sits on screen, from the SVG transforms alone. */
+  const placed = async selector => (await page.$$eval(`#generators ${selector}`, nodes => nodes.map(node => {
+    const m = node.getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\)/);
+    return [Number(m[1]), Number(m[2])];
+  })));
+  const near = (a, list, tolerance = 0.2) => list.some(b => Math.hypot(a[0] - b[0], a[1] - b[1]) < tolerance);
+  /** The screen offset of a generator's centre from its unit's origin, at a
+   * given scale and turn — the same arithmetic the shader does, done here
+   * independently of the module under test. */
+  const expectedOffset = (item, scale, degrees) => {
+    const [px, py] = toPlane(centreOf(item));
+    const t = degrees * Math.PI / 180, c = Math.cos(t), s = Math.sin(t);
+    return [scale * (c * px - s * py), scale * (s * px + c * py)];
+  };
+
+  assert.equal(await layerHidden(), false, 'the marks are on by default — the page is about its generators');
+  const units = await unitCount();
+  assert.ok(units >= 7 && units <= MAX_UNITS, `${units} repeats annotated at the home framing`);
+  assert.equal(await page.locator('#generators .cc-marker').count(), 3 * units, 'three gyrations per repeat');
+  assert.equal(await page.locator('#generators .cc-translation').count(), units, 'one slide per repeat');
+  assert.equal(await page.locator('#generators').evaluate(n => getComputedStyle(n).pointerEvents), 'none',
+    'the overlay must never take a pointer from the canvas');
+  assert.match(await statsText(), new RegExp(`marks ${units}`), 'the stats overlay counts the repeats');
+  // The fundamental triangle, in the CSS pixels the design was drawn against.
+  const alphas = await placed('.cc-marker[data-name="alpha"]');
+  for (const name of ['beta', 'gamma']) {
+    const want = expectedOffset(byName(name), HOME, 0);
+    for (const spot of await placed(`.cc-marker[data-name="${name}"]`)) {
+      assert.ok(near([spot[0] - want[0], spot[1] - want[1]], alphas),
+        `${name} at ${spot} is not ${want} from any α`);
+    }
+  }
+  assert.ok(near([720, 500], alphas, 0.05), 'α sits at the centre of the screen at the home view');
+  // THE LABELS ARE MARKUP, NOT UNICODE. In WebKit — every browser on iOS — the
+  // characters ₅ ⁽ ⁰ ⁾ have no glyph in the serif stack and each is given a
+  // full-width fallback box, so a Unicode label shatters into fragments strewn
+  // across the picture; in Chromium it renders, but 6₅⁽¹²⁾ is indistinguishable
+  // from sixty-five. Both engines must draw the same narrow box, built of
+  // tspans, carrying no such character anywhere on the artwork.
+  const labels = await page.$$eval('#generators text', nodes => nodes.map(node => {
+    const box = node.getBBox();
+    return {text: node.textContent, width: box.width, height: box.height, tspans: node.querySelectorAll('tspan').length};
+  }));
+  const distinct = new Map(labels.map(item => [item.text, item]));
+  assert.equal(distinct.size, 4, `four distinct labels, not ${[...distinct.keys()]}`);
+  for (const item of distinct.values()) {
+    assert.ok(!/[⁰-₟¹²³]/.test(item.text), `the label "${item.text}" is set in Unicode sub/superscripts`);
+    assert.equal(item.tspans, item.text.startsWith('τ') ? 1 : 2, `"${item.text}" is not built of tspans`);
+    assert.ok(item.width > 30 && item.width < 86, `the label "${item.text}" measures ${item.width.toFixed(1)} px — a fallback box?`);
+    assert.ok(item.height < 40, `the label "${item.text}" is ${item.height.toFixed(1)} px tall`);
+  }
+  notes.push(`labels ${[...distinct.values()].map(l => `${l.text} ${l.width.toFixed(0)}px`).join(', ')}`);
+  // Glued to the pattern: a pan carries every mark with it, to the pixel. The
+  // keyboard pan is used because it is exact — 48 px a press — and because a
+  // released drag is thrown, and where the glide ends is not the point here.
+  for (const key of ['ArrowLeft', 'ArrowLeft', 'ArrowUp', 'ArrowUp']) { await page.keyboard.press(key); await page.waitForTimeout(90); }
+  await page.waitForTimeout(400);
+  const dragged = await placed('.cc-marker[data-name="alpha"]');
+  // The layer keeps a ring of repeats around the window — wide enough to hold
+  // every arrowhead that reaches the screen — so the outermost marks are
+  // replaced by their neighbours rather than moved. Every mark that is still
+  // comfortably inside that ring after the pan must be exactly 96 px along.
+  const inside = ([x, y]) => x > -600 && y > -600 && x < 1440 + 600 && y < 1000 + 600;
+  let carried = 0, expected = 0;
+  for (const [x, y] of alphas) {
+    if (!inside([x + 96, y + 96])) continue;
+    expected++;
+    if (near([x + 96, y + 96], dragged)) carried++;
+  }
+  assert.ok(expected >= 7 && carried === expected, `only ${carried} of ${expected} α marks followed the pan`);
+  assert.equal(await page.locator('#reset').isVisible(), true, 'the pan really moved the view');
+  // A zoom about the centre of the screen scales every offset from it.
+  await page.keyboard.press('0'); await page.waitForTimeout(400);
+  await page.keyboard.press('+'); await page.waitForTimeout(500);
+  const zoomScale = scaleOf(await statsText());
+  assert.equal(zoomScale, Math.round(HOME * 1.25), 'the keyboard zoom is a quarter');
+  const zoomed = await placed('.cc-marker[data-name="alpha"]');
+  let scaled = 0;
+  for (const [x, y] of alphas) if (near([720 + (x - 720) * 1.25, 500 + (y - 500) * 1.25], zoomed, 1)) scaled++;
+  assert.ok(scaled >= 3, `only ${scaled} α marks scaled with the zoom`);
+  // A sixth of a turn turns the marks with the pattern about the same point —
+  // and turns nothing inside them: the clocks, the colour chips and the labels
+  // stay upright, so only the crystallographic glyph carries the new angle.
+  await page.goto(base); await ready(); await page.waitForTimeout(200);
+  const flat = await placed('.cc-marker[data-name="alpha"]');
+  await page.goto(`${base}?angle=60`); await ready(); await page.waitForTimeout(200);
+  assert.equal(turnOf(await statsText()), 60);
+  const turned60 = await placed('.cc-marker[data-name="alpha"]');
+  const c60 = Math.cos(Math.PI / 3), s60 = Math.sin(Math.PI / 3);
+  let rotated = 0;
+  for (const [x, y] of flat) {
+    const dx = x - 720, dy = y - 500;
+    if (near([720 + c60 * dx - s60 * dy, 500 + s60 * dx + c60 * dy], turned60, 1)) rotated++;
+  }
+  assert.ok(rotated >= 3, `only ${rotated} of ${flat.length} α marks turned with the pattern`);
+  for (const name of ['beta', 'gamma']) {
+    const want = expectedOffset(byName(name), HOME, 60);
+    const alphaNow = await placed('.cc-marker[data-name="alpha"]');
+    for (const spot of await placed(`.cc-marker[data-name="${name}"]`)) {
+      assert.ok(near([spot[0] - want[0], spot[1] - want[1]], alphaNow, 0.3),
+        `turned 60°, ${name} at ${spot} is not ${want} from any α`);
+    }
+  }
+  assert.equal(await page.locator('#generators .cc-marker[data-name="alpha"] .cc-turn').first().getAttribute('transform'), 'rotate(60.00)',
+    'the order glyph is the piece that carries the turn');
+  assert.equal(await page.locator('#generators .cc-marker[data-name="alpha"] .cc-chip').first().evaluate(n => n.closest('[transform*="rotate"]')?.classList.contains('cc-turn') ?? false), false,
+    'nothing inside the chip turns with the view');
+  // ZOOMED OUT, THE ANNOTATION COVERS THE WHOLE WINDOW OR NOTHING AT ALL. With a
+  // fixed cap on the repeats it did neither: on a large window it drew a fully
+  // opaque disc of marks with a third of the screen bare around it. The cap is
+  // now derived from the window's own diagonal, and the fade is derived from the
+  // cap, so every corner has a mark near it for as long as anything is drawn.
+  for (const [scale, viewport] of [[276, [1440, 1000]], [200, [1440, 1000]], [276, [1680, 1050]]]) {
+    await page.setViewportSize({width: viewport[0], height: viewport[1]});
+    await page.goto(`${base}?scale=${scale}`); await ready(); await page.waitForTimeout(220);
+    const spread = await page.evaluate(() => {
+      const marks = [...document.querySelectorAll('#generators .cc-marker[data-name="alpha"]')]
+        .map(node => node.getAttribute('transform').match(/translate\(([-\d.]+) ([-\d.]+)\)/).slice(1).map(Number));
+      const corners = [[0, 0], [innerWidth, 0], [0, innerHeight], [innerWidth, innerHeight]];
+      return {
+        count: marks.length,
+        opacity: Number(document.querySelector('#generators').style.opacity),
+        worst: Math.max(...corners.map(c => Math.min(...marks.map(p => Math.hypot(p[0] - c[0], p[1] - c[1]))))),
+      };
+    });
+    assert.ok(spread.opacity > 0.4, `${viewport} at ${scale}: the layer is at ${spread.opacity}`);
+    assert.ok(spread.worst < scale * 1.2,
+      `${viewport} at ${scale} px a repeat: the furthest corner is ${spread.worst.toFixed(0)} px from any mark`);
+    assert.ok(spread.count <= MAX_UNITS);
+  }
+  await page.setViewportSize({width: 1440, height: 1000});
+  // Off and on: the checkbox, the G key and the query, each remembered but for
+  // the query, which is a share link and must not change what the viewer chose.
+  await page.goto(base); await ready(); await page.waitForTimeout(150);
+  await page.locator('#generators-check').setChecked(false);
+  await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), true, 'the checkbox hides the marks');
+  assert.equal(await unitCount(), 0, 'and takes them out of the document');
+  assert.match(await statsText(), /marks off/);
+  await page.goto(base); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), true, 'the choice is remembered across a reload');
+  assert.equal(await page.locator('#generators-check').isChecked(), false);
+  await page.keyboard.press('g'); await page.waitForTimeout(200);
+  assert.equal(await layerHidden(), false, 'G brings them back');
+  assert.equal(await page.locator('#generators-check').isChecked(), true);
+  await page.goto(base); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), false, 'and that is remembered too');
+  await page.goto(`${base}?generators=0`); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), true, '?generators=0 opens a view without them');
+  await page.goto(base); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), false, 'a shared link leaves the viewer’s own choice alone');
+  // The canvas keeps every gesture through the overlay.
+  await page.mouse.move(720, 500); await page.mouse.down();
+  await page.mouse.move(640, 430, {steps: 5}); await page.mouse.up();
+  await page.waitForTimeout(400);
+  assert.equal(await page.locator('#reset').isVisible(), true, 'a drag straight across a mark still pans');
+  await page.keyboard.press('0'); await page.waitForTimeout(350);
+  // The notation panel.
+  assert.equal(await page.locator('#legend').isVisible(), false);
+  await page.getByRole('button', {name: 'Notation'}).click();
+  await page.waitForTimeout(200);
+  assert.equal(await page.locator('#legend').isVisible(), true, 'the Notation button opens the panel');
+  assert.equal(await page.locator('#notation').getAttribute('aria-expanded'), 'true');
+  assert.equal(await page.locator('#legend-body .symbol').innerHTML(),
+    '6<sub>5</sub><sup>(12)</sup> 3<sub>2</sub><sup>(021)</sup> 2<sub>1</sub><sup>(01)</sup> · τ<sup>(021)</sup>',
+    'the panel prints the page’s symbol, with real subscripts and superscripts');
+  assert.ok((await page.locator('#legend-body').textContent()).includes('65(12) 32(021) 21(01) · τ(021)'));
+  assert.equal(await page.locator('#legend-body table tbody tr').count(), 4, 'one row per generator');
+  assert.ok(await page.locator('#legend svg').count() >= 5, 'the panel draws the anatomy and the key');
+  // It is a side panel over a live picture, not a modal — so it says so, and it
+  // admits when it is cut off.
+  assert.equal(await page.locator('#legend').getAttribute('role'), 'region', 'a dialog role over a live canvas would be a lie');
+  assert.equal(await page.locator('#legend').getAttribute('data-more'), '1', 'the panel says there is more below the fold');
+  await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+  assert.equal(await page.locator('#legend').isVisible(), false, 'Escape closes it');
+  await page.keyboard.press('n'); await page.waitForTimeout(200);
+  assert.equal(await page.locator('#legend').isVisible(), true, 'N opens it');
+  // A tap on the picture dismisses it; a drag that starts there does not, since
+  // that is a pan and the panel may well be wanted while the picture moves.
+  await page.mouse.move(300, 300); await page.mouse.down();
+  await page.mouse.move(220, 240, {steps: 5}); await page.mouse.up();
+  await page.waitForTimeout(250);
+  assert.equal(await page.locator('#legend').isVisible(), true, 'a drag across the picture leaves the panel open');
+  await page.keyboard.press('0'); await page.waitForTimeout(350);
+  await page.mouse.click(300, 300); await page.waitForTimeout(200);
+  assert.equal(await page.locator('#legend').isVisible(), false, 'a tap outside closes it');
+  await page.keyboard.press('n'); await page.waitForTimeout(200);
+  await page.keyboard.press('n'); await page.waitForTimeout(200);
+  assert.equal(await page.locator('#legend').isVisible(), false, 'and N closes it again');
+  // A phone on its side is the panel's worst case: the bottom-docked layout
+  // would leave it 190 px high. It gets the full height and two columns there.
+  await page.setViewportSize({width: 844, height: 390});
+  await page.goto(base); await ready(); await page.waitForTimeout(200);
+  await page.keyboard.press('n'); await page.waitForTimeout(250);
+  const landscape = await page.locator('#legend').boundingBox();
+  const landscapeBar = await page.locator('#controls').boundingBox();
+  assert.ok(landscape.height > 280, `the landscape panel is only ${landscape.height} px high`);
+  assert.ok(landscape.y + landscape.height <= landscapeBar.y + 2, 'and still sits above the control bar');
+  assert.equal(await page.locator('#legend-body').evaluate(n => getComputedStyle(n).display), 'grid', 'two columns in landscape');
+  assert.ok(await page.locator('#legend-body table').isVisible(), 'the table is in the first screenful');
+  const firstScreen = await page.locator('#legend-body table').boundingBox();
+  assert.ok(firstScreen.y + 40 < landscape.y + landscape.height, 'the generator table is visible without scrolling');
+  await page.keyboard.press('Escape');
+  // On a phone it must leave the picture visible and never overflow the screen.
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto(base); await ready(); await page.waitForTimeout(250);
+  assert.ok(await unitCount() >= 4, 'the marks survive a phone');
+  // A PHONE IS THE DENSEST VIEW THE PAGE HAS — the marks are smaller there but
+  // sit closer together — so it thins where a desktop does not: γ goes, and only
+  // α and the slide keep their labels.
+  const phoneMarks = await page.$$eval('#generators .cc-unit:first-child .cc-marker', nodes => nodes.map(n => n.dataset.name));
+  assert.deepEqual(phoneMarks, ['alpha', 'beta'], 'a phone drops γ');
+  const phoneLabels = await page.$$eval('#generators .cc-unit:first-child text', nodes => nodes.map(n => n.textContent.slice(0, 1)));
+  assert.deepEqual(phoneLabels.sort(), ['α', 'τ'], 'and keeps only α’s and the slide’s labels');
+  assert.equal(await page.locator('#generators .cc-marker[data-name="gamma"]').count(), 0);
+  await page.keyboard.press('n'); await page.waitForTimeout(250);
+  const panel = await page.locator('#legend').boundingBox();
+  assert.ok(panel.x >= 0 && panel.x + panel.width <= 390, `the panel fits the screen: ${JSON.stringify(panel)}`);
+  assert.ok(panel.height <= 844 * 0.62, 'the panel leaves the picture in view');
+  assert.ok(await page.evaluate(() => document.documentElement.scrollWidth === innerWidth), 'the panel adds no horizontal scroll');
+  const bar = await page.locator('#controls').boundingBox();
+  assert.ok(panel.y + panel.height <= bar.y + 2, 'the panel sits above the control bar');
+  assert.ok((await page.locator('#legend-body').evaluate(n => n.scrollHeight)) > 0);
+  await page.screenshot({path: `${shots}/trefoil-${label}-notation.png`});
+  await page.keyboard.press('Escape');
+  await page.setViewportSize({width: 1440, height: 1000});
+  // The marks cost the animation nothing: they are redrawn only when the view
+  // moves, and playing the film never moves it.
+  const framesIn = async ms => page.evaluate(ms => new Promise(resolve => {
+    let n = 0; const start = performance.now();
+    const tick = () => { n++; if (performance.now() - start < ms) requestAnimationFrame(tick); else resolve(n / ((performance.now() - start) / 1000)); };
+    requestAnimationFrame(tick);
+  }), ms);
+  await page.goto(`${base}?generators=0`); await ready(); await page.waitForTimeout(400);
+  const bare = await framesIn(1500);
+  await page.goto(base); await ready(); await page.waitForTimeout(400);
+  const annotated = await framesIn(1500);
+  notes.push(`${Math.round(annotated)} fps with the marks, ${Math.round(bare)} without, at ${await page.locator('canvas').evaluate(c => `${c.width}×${c.height}`)}`);
+  assert.ok(annotated > bare * 0.9, `the marks cost ${Math.round(bare - annotated)} fps of ${Math.round(bare)}`);
+  // Zoomed out the layer carries an order of magnitude more repeats than it does
+  // at home — the price of covering the window instead of capping at a disc —
+  // and the frame budget has to hold there too. Units are pooled, so a zoom that
+  // adds repeats adds only the new ones.
+  await page.goto(`${base}?scale=150`); await ready(); await page.waitForTimeout(400);
+  const crowdedCount = await unitCount();
+  const crowded = await framesIn(1200);
+  notes.push(`${Math.round(crowded)} fps with ${crowdedCount} repeats at 150 px a repeat`);
+  assert.ok(crowdedCount > 60, `only ${crowdedCount} repeats at the deep zoom-out`);
+  assert.ok(crowded > bare * 0.85, `${crowdedCount} repeats cost ${Math.round(bare - crowded)} fps of ${Math.round(bare)}`);
+
   await page.emulateMedia({reducedMotion: 'reduce'});
   await page.goto(base); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Play animation');
   await page.goto(`${base}?play=1`); await ready();
   assert.equal(await page.locator('#pause').getAttribute('aria-label'), 'Pause animation');
   assert.deepEqual(errors, [], 'no browser errors or missing assets');
-  console.log(`${label}: retina rendering, three colours at a third each, the entangled swap exact on rendered pixels with every part of it failing, the free 3-cycle exact, the threefold and sixfold laws, the triple junction at the half-turn centre, shader against the CPU rule, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn snapped to 60°, trackpad pinch-and-turn in four event patterns, shutter, momentum on pinch/turn/wheel with the elastic limit, reset, stats, pause/play, idle controls, GPU recovery and reduced motion passed`);
+  console.log(`${label}: retina rendering, three colours at a third each, the entangled swap exact on rendered pixels with every part of it failing, the free 3-cycle exact, the threefold and sixfold laws, the triple junction at the half-turn centre, shader against the CPU rule, fixed scale, seamless tiling, mobile layout, drag pan, wheel zoom, pinch zoom, two-finger turn snapped to 60°, trackpad pinch-and-turn in four event patterns, shutter, momentum on pinch/turn/wheel with the elastic limit, reset, stats, pause/play, idle controls, GPU recovery, the generator marks through a pan, a zoom and a sixth of a turn, the notation panel and reduced motion passed`);
   for (const note of notes) console.log(`  · ${note}`);
 } finally {await browser.close();}

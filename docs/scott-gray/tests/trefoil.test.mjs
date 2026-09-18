@@ -20,7 +20,13 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {readFile} from 'node:fs/promises';
 import test from 'node:test';
-import {bicubic, BOUNDARY_SPEED, colourAt, createGovernor, cubicWeights, FALLBACK_INTERVAL, FIELD_BYTES, FIELD_SHA256, FRAMES, frameAt, framesAt, GRID_SIZE, HALF, halfTurn, LOOP_SECONDS, MAX_SCALE, MAX_TAA_LAYERS, MIN_SCALE, MOTIF_PIXELS, MOTION_PIXELS, NO_MOTION, OFFSET, OFFSET_NODES, offsetBy, PALETTE, patternMotion, scaleFor, SHUTTER, shutterOffsets, shutterPhases, SIXTH, SMEAR_PIXELS, snapAngle, SQRT3, TAA_LAYERS, THIRD, TILE_PIXELS, toPlane, turn120, turn240, uVolume, valuesAt, viewDelta, viewMotion, wrap, wrapAngle} from '../trefoil/renderer.mjs';
+import {
+  byName, centreOf, CHIP, fadeWindow, FULL_SPACING, GENERATORS, GLYPH, glyphMarkup, label,
+  legendMarkup, markerMarkup, markScale, MAX_UNITS, NODES_PER_SIXTH, nodesOf,
+  OFFSET_SIXTHS, RAMPS, screenOf, SYMBOL, SYMBOL_ASCII, SYMBOL_HTML, symmetryFor, translationMarkup,
+  unitsInView,
+} from '../trefoil/generators.mjs';
+import {bicubic, BOUNDARY_SPEED, colourAt, createGovernor, createView, cubicWeights, FALLBACK_INTERVAL, FIELD_BYTES, FIELD_SHA256, FRAMES, frameAt, framesAt, GRID_SIZE, HALF, halfTurn, LOOP_SECONDS, MAX_SCALE, MAX_TAA_LAYERS, MIN_SCALE, MOTIF_PIXELS, MOTION_PIXELS, NO_MOTION, OFFSET, OFFSET_NODES, offsetBy, PALETTE, patternMotion, scaleFor, SHUTTER, shutterOffsets, shutterPhases, SIXTH, SMEAR_PIXELS, snapAngle, SQRT3, TAA_LAYERS, THIRD, TILE_PIXELS, toPlane, turn120, turn240, uVolume, valuesAt, viewDelta, viewMotion, wrap, wrapAngle} from '../trefoil/renderer.mjs';
 import {
   advanceFling, createFling, elasticProfile, ELASTIC_GIVE, ELASTIC_MS, estimateVelocity,
   MAX_PAN_SPEED, MAX_STEP, MAX_TURN_RATE, MAX_ZOOM_RATE, MIN_PAN_SPEED, MIN_SPAN_MS,
@@ -493,6 +499,409 @@ test('at the half-turn centre the law is left with nothing but the swap', () => 
     }));
     assert.ok(seen.size > 1, `the ring of radius ${radius} about the centre shows more than one colour`);
   }
+});
+
+// ---- the generator marks ----------------------------------------------------
+// The overlay claims four annotated generators and a rule that produces every
+// rotation centre of the coloured picture from scratch. Both are checked here
+// against the field itself, in the same exact integer arithmetic as the laws
+// above: nothing the page draws is taken on trust from the module that draws it.
+
+/** A generator's action on the saved nodes: the integer matrix, the translation
+ * part (I − M)p in whole nodes, the time shift in frames, and the colours. */
+function actionOf(item) {
+  if (item.kind === 'translation') {
+    return {matrix: OPS['1'], shift: 0, perm: item.perm,
+      offset: item.vectorSixths.map(s => s * NODES_PER_SIXTH)};
+  }
+  const [[a, b], [c, d]] = item.turn, [pu, pv] = nodesOf(item);
+  // x ↦ M(x − p) + p, so the translation part is (I − M)p.
+  return {matrix: item.turn, shift: item.sixths * SIXTH, perm: item.perm,
+    offset: [pu - (a * pu + b * pv), pv - (c * pu + d * pv)]};
+}
+
+test('the four generators the page draws are exact at all 418 176 node-frames', () => {
+  assert.equal(NODES_PER_SIXTH, 11, 'a sixth of the lattice is a whole 11 nodes');
+  assert.deepEqual(OFFSET_SIXTHS.map(s => s * NODES_PER_SIXTH), OFFSET_NODES, 'b is (2, 4) sixths');
+  assert.deepEqual(GENERATORS.map(g => g.name), ['alpha', 'beta', 'gamma', 'tau']);
+  for (const item of GENERATORS) {
+    const {matrix, offset, shift, perm} = actionOf(item);
+    assert.equal(agreement(matrix, offset, shift, perm), 1,
+      `${item.ascii} (${item.name}) is not a symmetry: v=(${offset}) shift ${shift}/${FRAMES} colour ${perm}`);
+    // Every part of it is load-bearing. Drop the recolouring and it fails; keep
+    // it and drop the wait and it fails; take any other recolouring and it
+    // fails. (A colour-preserving generator has no wait to drop: β and τ are
+    // the two whose failure modes differ, and both are covered below.)
+    for (const other of PERMS) {
+      if (other.every((c, i) => c === perm[i])) continue;
+      assert.notEqual(agreement(matrix, offset, shift, other), 1, `${item.ascii} also holds with colour ${other}`);
+    }
+    if (shift) assert.notEqual(agreement(matrix, offset, 0, perm), 1, `${item.ascii} holds without its wait`);
+  }
+  // The centres, as the overlay places them: α at the origin, β and γ at the
+  // two other corners of the 30-60-90 fundamental triangle of 632 on L′.
+  assert.deepEqual(GENERATORS.map(centreOf), [[0, 0], [1 / 3, 0], [1 / 3, 1 / 6], [1 / 3, 2 / 3]]);
+  assert.deepEqual(byName('tau').vectorSixths.map(s => s / 6), OFFSET, 'τ is the translation by b');
+});
+
+test('αβγ = 1 — in space, in time and in colour at once', () => {
+  // Round any relation of the group the motions compose to the identity, the
+  // time shifts add to a whole number of periods, and — the new rule — the
+  // colour permutations compose to the identity. The three are one statement.
+  const [alpha, beta, gamma] = ['alpha', 'beta', 'gamma'].map(byName).map(actionOf);
+  const apply = ({matrix: [[a, b], [c, d]], offset: [vx, vy]}, [x, y]) => [a * x + b * y + vx, c * x + d * y + vy];
+  // αβγ as a map of the plane: the identity on the nose, at three independent
+  // points, which pins down an affine map of the plane exactly.
+  for (const point of [[0, 0], [1, 0], [0, 1]]) {
+    assert.deepEqual(apply(alpha, apply(beta, apply(gamma, point))), point, `αβγ moves ${point}`);
+  }
+  // Time: 5/6 + 2/3 + 1/2 = 2 whole periods.
+  const sixths = ['alpha', 'beta', 'gamma'].map(name => byName(name).sixths);
+  assert.deepEqual(sixths, [5, 4, 3]);
+  assert.equal(sixths.reduce((a, b) => a + b), 12, 'the waits do not add to a whole number of periods');
+  assert.equal(alpha.shift + beta.shift + gamma.shift, 2 * FRAMES);
+  // Colour: (1 2)(0 2 1)(0 1) = ().
+  const composed = [0, 1, 2].map(c => alpha.perm[beta.perm[gamma.perm[c]]]);
+  assert.deepEqual(composed, IDENTITY, 'the colour superscripts do not compose to the identity');
+  // And the symbol the legend prints is exactly what the four carry.
+  assert.equal(SYMBOL, GENERATORS.slice(0, 3).map(g => g.symbol).join(' ') + ' · ' + byName('tau').symbol);
+  assert.equal(SYMBOL_HTML, GENERATORS.slice(0, 3).map(g => g.html).join(' ') + ' · ' + byName('tau').html);
+  assert.equal(SYMBOL_ASCII, GENERATORS.slice(0, 3).map(g => g.ascii).join(' ') + ' . ' + byName('tau').ascii);
+  assert.equal(SYMBOL, '6₅⁽¹²⁾ 3₂⁽⁰²¹⁾ 2₁⁽⁰¹⁾ · τ⁽⁰²¹⁾');
+});
+
+test('one rule gives every rotation centre of the coloured picture, and no others', () => {
+  // For the rotation by R_m about p put v = (I − R_m)p. Then p is a centre
+  // exactly when v ∈ L′ = L + ℤb; v ≡ k b (mod L) for a unique k in {0,1,2};
+  // the wait is −m/6 of a period and the colours go by σ(c) = (−1)^m c − k.
+  // Centres live on the sixth-grid, so one L-cell of it — 36 points — times the
+  // five turns is the whole periodic set, tested exhaustively.
+  const TURNS = ['R60', 'R120', 'R180', 'R240', 'R300'];
+  const classes = new Map();
+  let centres = 0, refusals = 0;
+  for (const [index, name] of TURNS.entries()) {
+    const m = index + 1, [[a, b], [c, d]] = OPS[name], value = agreementsFor(OPS[name]);
+    for (let pu = 0; pu < 6; pu++) for (let pv = 0; pv < 6; pv++) {
+      // (I − R_m)p, in sixths of the lattice basis — all integers.
+      const vs = [pu - (a * pu + b * pv), pv - (c * pu + d * pv)];
+      const k = [0, 1, 2].find(j => mod(vs[0] - j * OFFSET_SIXTHS[0], 6) === 0 && mod(vs[1] - j * OFFSET_SIXTHS[1], 6) === 0);
+      const offset = vs.map(s => s * NODES_PER_SIXTH);
+      if (k === undefined) {
+        // Not a centre at all: no wait and no recolouring rescues it.
+        for (let shift = 0; shift < FRAMES; shift += SIXTH) {
+          for (const [p, perm] of PERMS.entries()) {
+            assert.ok(value(offset[0], offset[1], shift, p) < 0.99,
+              `${name} about (${pu}/6, ${pv}/6) is not a centre yet agrees with ${perm} at ${shift}/${FRAMES}`);
+          }
+        }
+        refusals++;
+        continue;
+      }
+      const {sixths, perm} = symmetryFor(m, k);
+      const index2 = PERMS.findIndex(p => p.every((c2, i) => c2 === perm[i]));
+      assert.ok(value(offset[0], offset[1], sixths * SIXTH, index2) > 0.999,
+        `${name} about (${pu}/6, ${pv}/6) should be exact with ${sixths}/6 and ${perm}`);
+      // Exactly one of the eighteen (wait, recolouring) pairs works.
+      let hits = 0;
+      for (let shift = 0; shift < FRAMES; shift += SIXTH) {
+        for (let p = 0; p < PERMS.length; p++) if (value(offset[0], offset[1], shift, p) > 0.999) hits++;
+      }
+      assert.equal(hits, 1, `${name} about (${pu}/6, ${pv}/6) has ${hits} lifts, not one`);
+      centres++;
+      const key = `${[pu, pv]}`;
+      classes.set(key, (classes.get(key) ?? 0) + 1);
+    }
+  }
+  // Half the 36 points of the cell are centres and half are not. Three are
+  // sixfold — they are exactly L′ ∩ the cell, the three cosets 0, b, 2b — six
+  // are threefold only (R120 and R240) and nine are twofold only, which is
+  // p6 on L′ seen through a lattice three times too large.
+  const orders = [...classes.values()].sort((a, b) => a - b);
+  assert.equal(orders.filter(n => n === 5).length, 3, 'sixfold centres');
+  assert.equal(orders.filter(n => n === 2).length, 6, 'threefold-only centres');
+  assert.equal(orders.filter(n => n === 1).length, 9, 'twofold-only centres');
+  assert.equal(orders.length, 18, 'half the sixth-grid carries a centre');
+  assert.equal(centres + refusals, 5 * 36);
+  assert.equal(centres, 3 * 5 + 6 * 2 + 9 * 1);
+  // The sixfold centres are the fine lattice itself: 0, b and 2b in the cell.
+  assert.deepEqual([...classes].filter(([, n]) => n === 5).map(([key]) => key).sort(),
+    ['0,0', '2,4', '4,2'], 'the sixfold centres are L′ ∩ the cell');
+  // Each of the page's own generators is the rule read at its own centre.
+  for (const item of GENERATORS) {
+    if (item.kind !== 'rotation') continue;
+    const m = Math.round(item.degrees / 60), [[a, b], [c, d]] = item.turn, [pu, pv] = item.centreSixths;
+    const vs = [pu - (a * pu + b * pv), pv - (c * pu + d * pv)];
+    const k = [0, 1, 2].find(j => mod(vs[0] - j * OFFSET_SIXTHS[0], 6) === 0 && mod(vs[1] - j * OFFSET_SIXTHS[1], 6) === 0);
+    const {sixths, perm} = symmetryFor(m, k);
+    assert.equal(sixths, item.sixths, `${item.ascii}: the rule says ${sixths}/6`);
+    assert.deepEqual(perm, item.perm, `${item.ascii}: the rule says ${perm}`);
+    // A colour swap is odd, always — the theorem of the README, read locally.
+    const swaps = [0, 1, 2].some(c => perm[c] !== c) && [0, 1, 2].filter(c => perm[c] !== c).length === 2;
+    assert.equal(swaps, m % 2 === 1 && k === 0 ? true : swaps, 'a swap is available only at an odd turn');
+    if (swaps) assert.equal(m % 2, 1, `${item.ascii} swaps two colours at an even turn`);
+  }
+  // A swap always costs an ODD sixth of a period, at every centre.
+  for (let m = 1; m <= 5; m++) for (let k = 0; k < 3; k++) {
+    const {sixths, perm} = symmetryFor(m, k);
+    const moved = [0, 1, 2].filter(c => perm[c] !== c).length;
+    if (moved === 2) assert.equal(sixths % 2, 1, `a swap at ${sixths}/6 of a period`);
+    if (moved !== 2) assert.notEqual(moved, 2);
+  }
+});
+
+test('the marks are placed by the viewer\'s own camera, exactly', () => {
+  // screenOf is the inverse of view.latticeAt — that is the whole reason the
+  // marks stay glued to the pattern through a pan, a zoom, a turn, a glide and
+  // a resize: they go through the same transform the shader does.
+  const view = createView();
+  const sizes = [[1440, 900], [390, 844], [2880, 1800]];
+  let seed = 7;
+  const random = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
+  for (const [width, height] of sizes) {
+    for (let trial = 0; trial < 40; trial++) {
+      view.restore({center: [random(), random()], scale: 120 + random() * 2000, angle: (random() - 0.5) * 7});
+      for (const point of [[0, 0], [1, 0], [0, 1], [1 / 3, 2 / 3], [-2.5, 4.25]]) {
+        const screen = screenOf(point, view, width, height);
+        const back = view.latticeAt(screen, width, height);
+        const [cx, cy] = view.center;
+        // latticeAt measures from the wrapped centre, so compare the offsets.
+        assert.ok(Math.abs(back[0] - point[0]) < 1e-9 && Math.abs(back[1] - point[1]) < 1e-9,
+          `${point} → ${screen} → ${back} at ${width}×${height}, centre ${[cx, cy]}`);
+      }
+    }
+  }
+  // At the home framing the three marks are the fundamental triangle, in the
+  // CSS pixels the design was drawn against, and b is one motif straight up.
+  view.reset();
+  const [width, height] = [1440, 900];
+  const at = item => screenOf(centreOf(item), view, width, height).map(v => Number(v.toFixed(2)));
+  const origin = at(byName('alpha'));
+  assert.deepEqual(origin, [width / 2, height / 2], 'α sits at the centre of the screen');
+  const offset = item => at(item).map((v, i) => Number((v - origin[i]).toFixed(2)));
+  assert.deepEqual(offset(byName('beta')), [219.39, 0]);
+  assert.deepEqual(offset(byName('gamma')), [164.54, -95]);
+  assert.deepEqual(offset(byName('tau')), [0, -380], 'the slide is one motif, straight up');
+  assert.equal(Math.round(TILE_PIXELS / 6), Math.round(219.39 / 2), '|αβ| is two sixths of a lattice length');
+  // Right-angled at γ: the 30-60-90 triangle of 632.
+  const exact = item => screenOf(centreOf(item), view, width, height).map((v, i) => v - [width / 2, height / 2][i]);
+  const [gx, gy] = exact(byName('gamma')), [bx, by] = exact(byName('beta'));
+  assert.ok(Math.abs((0 - gx) * (bx - gx) + (0 - gy) * (by - gy)) < 1e-9, 'the triangle is right-angled at γ');
+  assert.ok(Math.abs(Math.hypot(bx, by) / Math.hypot(bx - gx, by - gy) - 2) < 1e-12, '|αβ| is twice |βγ|');
+});
+
+test('the overlay thins out, fades and gives up as the marks crowd', () => {
+  const view = createView();
+  const [width, height] = [1440, 900];
+  // At the home framing every mark is drawn at full size and full strength.
+  const home = markScale(view, width, height);
+  assert.ok(Math.abs(home.spacing - TILE_PIXELS / 6) < 1e-9, 'spacing is |βγ|, a sixth of a lattice length');
+  assert.deepEqual([home.scale, home.lean, home.opacity], [1, false, 1]);
+  assert.deepEqual(home.marks, ['alpha', 'beta', 'gamma']);
+  assert.deepEqual(home.labels, {alpha: true, beta: true, gamma: true, tau: true});
+  // A phone at its home framing is the DENSEST view the page has: the marks are
+  // drawn at 0.64 but sit only 56 px apart, so it thins where a desktop does
+  // not — γ and the two crowded labels go, α, β and the slide stay.
+  const phone = markScale(createView(), 390, 844);
+  assert.ok(phone.scale > 0.6 && phone.scale < 0.66, `${phone.scale}`);
+  assert.deepEqual(phone.marks, ['alpha', 'beta'], 'a phone drops γ');
+  assert.deepEqual(phone.labels, {alpha: true, beta: false, gamma: false, tau: true});
+  assert.equal(phone.opacity, 1, 'and keeps what it draws at full strength');
+  assert.equal(phone.lean, false);
+  // Nothing ever pops away at full strength: each piece fades to nothing over a
+  // window that ENDS where it leaves the document. Swept a twentieth of a pixel
+  // at a time, every disappearance happens at an opacity of a few thousandths.
+  let previous = null;
+  const leaving = {};
+  for (let spacing = 200; spacing >= 3; spacing -= 0.05) {
+    const state = markScale(createView({tilePixels: 6 * spacing}), width, height);
+    if (previous) for (const [piece, value] of Object.entries(state.strength)) {
+      if (previous[piece] > 0 && value === 0) {
+        assert.ok(previous[piece] < 0.02, `${piece} left the document at opacity ${previous[piece]}`);
+        leaving[piece] = Number(spacing.toFixed(2));
+      }
+    }
+    previous = state.strength;
+  }
+  // The order they go in: β's and γ's labels first, then γ, then β, then the
+  // last two labels — leaving α and the slide, the two the page is about. α and
+  // the slide themselves never leave; the layer's own fade takes them.
+  assert.deepEqual(Object.keys(leaving).sort(), ['alphaLabel', 'beta', 'betaLabel', 'gamma', 'gammaLabel', 'tauLabel']);
+  assert.ok(leaving.betaLabel === leaving.gammaLabel && leaving.betaLabel > leaving.gamma, JSON.stringify(leaving));
+  assert.ok(leaving.gamma > leaving.beta && leaving.beta > leaving.alphaLabel, JSON.stringify(leaving));
+  assert.equal(leaving.alphaLabel, leaving.tauLabel);
+  assert.equal(markScale(createView({tilePixels: 6 * 42}), width, height).lean, true, 'α and the slide alone');
+  assert.equal(markScale(createView({tilePixels: 6 * 42}), width, height).opacity, 1, 'and at full strength, not on the way out');
+  // THE CAP MUST NEVER BITE WHILE ANYTHING IS VISIBLE. `unitsInView` keeps every
+  // repeat whose α centre is near the window, so the annotation covers the whole
+  // viewport until MAX_UNITS stops it — and `fadeWindow` is derived from
+  // MAX_UNITS and the window's own diagonal so that the layer has already gone
+  // by then. A fixed cap failed exactly here: at 2880 × 2000 it left a fully
+  // opaque disc of marks with a third of the screen bare around it.
+  for (const [w, h] of [[1440, 900], [390, 844], [844, 390], [1920, 1200], [2880, 2000], [3440, 1440]]) {
+    const {hide, fade} = fadeWindow(w, h);
+    assert.ok(fade > hide && hide >= 18, `${w}×${h}: ${hide}…${fade}`);
+    let biggest = 0;
+    for (let spacing = 3; spacing <= 220; spacing += 0.25) {
+      const v = createView({tilePixels: 6 * spacing});
+      const {opacity} = markScale(v, w, h);
+      const units = unitsInView(v, w, h).length;
+      assert.ok(units <= MAX_UNITS, `${units} repeats at ${w}×${h}, spacing ${spacing}`);
+      assert.ok(units < MAX_UNITS || opacity === 0,
+        `at ${w}×${h} the cap drops repeats at opacity ${opacity}`);
+      if (opacity > 0.02) biggest = Math.max(biggest, units);
+      // While the layer is visible its repeats must reach the corners.
+      if (opacity > 0.3) {
+        const furthest = Math.max(...unitsInView(v, w, h).map(c => c.from));
+        assert.ok(furthest > Math.hypot(w, h) / 2, `${w}×${h} at spacing ${spacing}: marks stop ${furthest} px out`);
+      }
+    }
+    assert.ok(biggest <= 240, `${w}×${h} builds ${biggest} repeats at once`);
+  }
+  // Every repeat found really is on screen, and the one at the centre is first.
+  const cells = unitsInView(view, width, height);
+  assert.ok(cells.length >= 7 && cells.length <= MAX_UNITS, `${cells.length} repeats at the home framing`);
+  assert.deepEqual(cells[0].cell, [0, 0], 'the nearest repeat is the one α is drawn at');
+  for (const cell of cells) {
+    assert.deepEqual(cell.at, screenOf(cell.cell, view, width, height));
+    assert.ok(cell.from <= 2 * Math.hypot(width, height), 'a repeat is kept only if it is near the window');
+  }
+  // The margin has to cover what a repeat actually draws: a third of a lattice
+  // length to the fundamental triangle, and 1/√3 of one along the τ arrow. Cut
+  // to the triangle alone it dropped whole rows of arrowheads at the edges.
+  const far = unitsInView(view, width, height).map(c => c.from);
+  assert.ok(Math.max(...far) > height / 2 + 0.578 * TILE_PIXELS,
+    'a repeat whose arrowhead is on screen is kept even when its α centre is not');
+});
+
+test('the legend says the same thing the marks do', () => {
+  const html = legendMarkup();
+  // The panel sets the symbol as markup, not as Unicode sub/superscripts: at
+  // 21 px in a serif face ⁽¹²⁾ is not distinguishable from (12) on the line.
+  assert.ok(html.includes(SYMBOL_HTML), 'the panel prints the page’s symbol');
+  assert.equal(SYMBOL_HTML.replace(/<\/?su[bp]>/g, ''), '65(12) 32(021) 21(01) · τ(021)', 'the markup says what the symbol says');
+  for (const item of GENERATORS) {
+    assert.ok(html.includes(item.html), `the table is missing ${item.ascii}`);
+    assert.ok(html.includes(item.colourShort), `the table is missing ${item.name}’s colours`);
+    assert.ok(html.includes(item.timeShort), `the table is missing ${item.name}’s wait`);
+  }
+  for (const colour of PALETTE) assert.ok(html.includes(colour), `the key is missing ${colour}`);
+  assert.ok(html.includes('g247') && html.includes('g225'), 'the catalogue numbers are named');
+  // The two senses are distinguished — and the sentence about playing the film
+  // is true of the COLOURED picture, which turns a third at a time with the
+  // colours unchanged. A sixth of a turn clockwise is a symmetry only with the
+  // swap; the page's whole thesis is that the two cannot be separated.
+  assert.ok(/anticlockwise/.test(html), 'the generator’s own sense is named');
+  assert.ok(/a third of a turn clockwise with the colours unchanged/.test(html));
+  assert.ok(!/a sixth of a turn clockwise every sixth of the loop/.test(html),
+    'the film does not turn the coloured picture a sixth at a time on its own');
+  // The cycling icon in the key and the sentence beside it must agree: both of
+  // the page's cycling marks run anticlockwise, and the caption says so.
+  assert.ok(/anticlockwise is terracotta → sand → teal/.test(html));
+  assert.ok(byName('tau').perm[0] !== 1, 'τ’s cycle is the anticlockwise one the caption describes');
+  // The rule's constant is not the k of n_k, and the panel says which is which.
+  assert.ok(/<i>j<\/i> ∈ \{0, 1, 2\}/.test(html) && /not the subscript of the symbol/.test(html));
+  assert.ok(!/c − k/.test(html), 'the rule must not reuse the letter the subscript already has');
+  // The colour-preserving subgroup is a sixth of the SYMMETRIES; every mark the
+  // page draws recolours, so "the generators whose superscript is empty" names
+  // the empty set.
+  assert.ok(/Keep only the <i>symmetries<\/i> whose superscript is empty/.test(html));
+  assert.ok(GENERATORS.every(g => g.cycle !== '()'), 'no drawn generator preserves the colours');
+  // The other two sixfold classes, and the fact that the layer can go away.
+  assert.ok(/6<sub>5<\/sub><sup>\(01\)<\/sup>/.test(html), 'the class at the head of the slide is named');
+  assert.ok(/hidden altogether/.test(html), 'the panel says the marks can be hidden by zooming out');
+  assert.ok(/τ <i>is<\/i> γβα/.test(html), 'the fourth term is given as a reminder, not as new data');
+  // Every rotation order the page draws has artwork, and it is the site's own —
+  // body first, screw tails after, so the overlay can draw them apart.
+  for (const item of GENERATORS) {
+    if (item.kind !== 'rotation') continue;
+    assert.ok(GLYPH[item.order], `no glyph for order ${item.order}`);
+    assert.ok(GLYPH[item.order].path.startsWith('M0,-'), 'the glyph is the crystallographic core, drawn from twelve');
+    const art = glyphMarkup(item.order);
+    assert.ok(art.includes('class="cc-body"') && art.includes('class="cc-tail"'), `order ${item.order} keeps its silhouette`);
+    assert.equal(art.match(/M/g).length, GLYPH[item.order].path.match(/M/g).length, 'every subpath is drawn exactly once');
+    assert.ok(art.indexOf('cc-tail') < art.indexOf('cc-body'), 'the tails go behind the body');
+  }
+  // A mark's markup carries what it means, for the tests in the browser.
+  const alpha = markerMarkup(byName('alpha'));
+  assert.ok(alpha.includes('data-name="alpha"') && alpha.includes('data-perm="021"') && alpha.includes('data-time="5/6"'));
+  assert.ok(alpha.includes('class="cc-turn"'), 'the order glyph is the only piece that turns with the view');
+  assert.ok(!translationMarkup(byName('tau')).includes('cc-dial'), 'the free slide has no clock at all');
+});
+
+test('the labels on the artwork are set with real tspans, not Unicode', () => {
+  // WebKit has no glyph for ₅ ⁽ ⁰ ⁾ in the serif stack and gives each a
+  // full-width fallback box, so a Unicode label shatters into fragments strewn
+  // across the picture; in Chromium it renders, but 6₅⁽¹²⁾ reads as 65(12).
+  // The digits ARE the notation, so the artwork sets them as markup.
+  const unicode = /[⁰-₟¹²³]/;
+  for (const item of GENERATORS) {
+    const text = label(item);
+    assert.ok(text.includes('<tspan'), `${item.name}'s label has no tspan`);
+    assert.ok(!unicode.test(text), `${item.name}'s label still carries Unicode sub/superscripts`);
+    assert.ok(text.includes(`>${item.sup}<`), `${item.name}'s superscript is missing`);
+    if (item.sub) assert.ok(text.includes(`>${item.sub}</tspan>`), `${item.name}'s subscript is missing`);
+    // The subscript drops and the superscript lifts, each relative to the last.
+    const shifts = [...text.matchAll(/dy="(-?[\d.]+)"/g)].map(m => Number(m[1]));
+    assert.equal(shifts.length, item.sub ? 2 : 1);
+    if (item.sub) assert.ok(shifts[0] > 0 && shifts[1] < -shifts[0], `${item.name}: ${shifts}`);
+    else assert.ok(shifts[0] < 0);
+    assert.ok(text.includes('paint-order="stroke"'), 'the ink halo still carries the whole label');
+    // What the label says is what the symbol says.
+    const plain = text.replace(/<[^>]+>/g, '');
+    assert.equal(plain, `${item.glyph === item.base ? '' : `${item.glyph} `}${item.base}${item.sub ?? ''}${item.sup}`);
+    assert.equal(`${item.base}${item.sub ? `_${item.sub}` : ''}^${item.sup}`.replace('τ_', 'tau_'),
+      item.ascii.replace('tau', 'τ').replace('τ^', 'τ^'), `${item.name}: the pieces and the ascii disagree`);
+  }
+  for (const item of GENERATORS) {
+    assert.ok(!unicode.test(markerMarkup(item.kind === 'rotation' ? item : byName('alpha'))), 'no Unicode digits on the artwork');
+  }
+  assert.ok(!unicode.test(translationMarkup(byName('tau'))), 'no Unicode digits on the slide');
+  // The Unicode form survives where it is read aloud rather than drawn.
+  assert.ok(unicode.test(SYMBOL) && byName('alpha').symbol === '6₅⁽¹²⁾');
+});
+
+test('a colour swap reaches the two dots it exchanges, and only those two', () => {
+  // On the ring the dots sit on, a swap's arrow was eaten by their ink halos;
+  // moved out to a plain arc it survived but touched nothing, and for α's (12)
+  // it ran under both dots and the chip read as a smiling face. It is now a
+  // staple: an arc on the rim with both ends turned in and pointing at the two
+  // dots. A cycle keeps three plain arcs — there is no pair for it to join.
+  const triadOf = name => markerMarkup(byName(name)).split('class="cc-triad"')[1].split('</g>')[0];
+  const swap = triadOf('alpha'), cycle = triadOf('gamma'), turning = triadOf('beta');
+  const station = (i, radius) => [Math.sin(i * 120 * Math.PI / 180) * radius, -Math.cos(i * 120 * Math.PI / 180) * radius];
+  const dotRing = CHIP * 0.44, dotSize = CHIP * 0.165, band = CHIP * 0.9;
+  for (const [name, markup] of [['alpha', swap], ['gamma', cycle]]) {
+    const moved = [0, 1, 2].filter(c => byName(name).perm[c] !== c);
+    // The shaft is one straight segment, and it runs through the centres of the
+    // two dots it exchanges — that is what says WHICH two colours they are.
+    const shaft = markup.match(/M(-?[\d.]+),(-?[\d.]+) L(-?[\d.]+),(-?[\d.]+)"/).slice(1).map(Number);
+    const [x1, y1, x2, y2] = shaft, len = Math.hypot(x2 - x1, y2 - y1);
+    const away = ([x, y]) => Math.abs((x2 - x1) * (y1 - y) - (x1 - x) * (y2 - y1)) / len;
+    const along = ([x, y]) => ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / (len * len);
+    for (const c of moved) {
+      const target = station(c, dotRing);
+      assert.ok(away(target) < 0.01 && along(target) > 0 && along(target) < 1,
+        `${name}: the arrow misses the dot for colour ${c} by ${away(target).toFixed(2)}`);
+    }
+    const fixed = [0, 1, 2].find(c => byName(name).perm[c] === c);
+    assert.ok(away(station(fixed, dotRing)) > dotSize + 3,
+      `${name}: the arrow runs through the colour it leaves alone`);
+    // Both heads stand clear of their dot, and the whole thing stays on the
+    // plate. No arc at all: an arc under two dots is what read as a mouth.
+    assert.ok(len > 2 * dotRing * Math.sin(Math.PI / 3) + 2 * dotSize, `${name}: the heads are not clear of the dots`);
+    assert.ok(Math.max(Math.hypot(x1, y1), Math.hypot(x2, y2)) + 2 < CHIP, 'the arrow stays on the plate');
+    assert.equal((markup.match(/A[\d.]+ /g) ?? []).length, 0, `${name}: a swap is drawn straight`);
+    assert.ok(band > dotRing + dotSize && band + 2 < CHIP, 'the band a cycle uses clears the dots and the plate');
+    assert.equal((markup.match(/stroke-dasharray/g) ?? []).length, 1, `${name}: the fixed colour is ringed, once`);
+  }
+  // Three chasing arrows for a cycle, each on the same band, and no ring.
+  // (Each arrow is drawn twice, once as its ink halo and once in paper.)
+  assert.equal((turning.match(/A[\d.]+ /g) ?? []).length, 6, 'three arcs for a 3-cycle');
+  assert.equal((turning.match(/stroke-dasharray/g) ?? []).length, 0, 'a cycle leaves no colour alone');
+  // The legend's key chip carries the digits the superscript is written in.
+  const key = legendMarkup();
+  assert.ok(/<text[^>]*>0<\/text>/.test(key) && /<text[^>]*>2<\/text>/.test(key),
+    'the key chip names the three stations 0, 1, 2');
 });
 
 test('the reconstruction the shader uses carries both headline laws off the nodes', () => {
