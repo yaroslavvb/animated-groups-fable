@@ -80,13 +80,18 @@ export const TAA_LAYERS = 3; // Up to 81 texture taps per pixel; ?taa= overrides
 export const MAX_TAA_LAYERS = 5;
 export const SHUTTER = 0.3;
 // The shutter costs two extra samplings of the field per pixel, so it is spent
-// only where it can do something. MOTION_PIXELS is how far the picture must
-// travel on screen between one displayed frame and the next — in CSS pixels,
-// counting both the pattern's own boundaries and the view's motion — before the
-// integration switches on. Below about one pixel a frame there is nothing to
-// integrate: measured on this page, the home framing moves 0.34 px a frame and
-// makes no frame-to-frame colour flips at all.
-// ?motion= dials it (0 keeps the shutter on whenever anything moves).
+// only where it can do something. MOTION_PIXELS is how wide the smear has to be
+// before it is worth drawing — in CSS pixels, counting both the pattern's own
+// boundaries and the view's motion — and a shutter of SHUTTER frame intervals
+// smears a picture travelling `travel` pixels a frame over `travel × SHUTTER` of
+// them. So the gate is on the smear, not on the travel: the picture must move
+// MOTION_PIXELS / SHUTTER = 2.5 CSS px a frame at the shipped 0.3 shutter, and
+// 0.75 px a frame at the full box filter `?shutter=1`. The pattern's own motion
+// reaches 2.5 px a frame at about 2790 CSS px per lattice length — against 837
+// px per lattice length with `?shutter=1` — so at ordinary framings the shutter
+// is for the view's motion: a drag, a glide, a pinch. Measured on this page the
+// home framing moves 0.34 px a frame, a tenth of what the gate asks for.
+// ?motion= dials it (0 keeps the shutter on whenever anything moves at all).
 export const MOTION_PIXELS = 0.75;
 // And the other end: a handful of sub-samples reconstructs a smear only while
 // they overlap. Past about SMEAR_PIXELS apart they read as that many copies of
@@ -379,11 +384,18 @@ export function snapAngle(angle, tolerance = Math.PI / 45) {
  * lattice coordinates wrapped into [0, 1)², so panning never loses precision
  * however far it goes. `tilePixels` is either a fixed scale or a function of the
  * canvas CSS size that applies until the viewer zooms. */
-export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, minScale = MIN_SCALE, maxScale = MAX_SCALE} = {}) {
+export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, minScale = MIN_SCALE, maxScale = MAX_SCALE, overshoot = 1} = {}) {
   if (!(minScale > 0 && maxScale >= minScale)) throw new Error('The zoom limits must be positive and ordered.');
   if (!Number.isFinite(angle)) throw new Error('The angle must be finite.');
+  if (!(overshoot >= 1)) throw new Error('The elastic overshoot must be at least 1.');
   const fallback = typeof tilePixels === 'function' ? tilePixels : () => tilePixels;
-  const clamp = scale => Math.min(maxScale, Math.max(minScale, scale));
+  // Every hand-made change to the zoom stops dead at a limit. Only a glide may
+  // pass one — by `overshoot`, for the moment it takes to spring back — so that
+  // a fling arriving at the end of the zoom range says so elastically instead
+  // of hitting a wall. Nothing that ends a gesture leaves the view out there.
+  const clamp = (scale, elastic = false) => elastic
+    ? Math.min(maxScale * overshoot, Math.max(minScale / overshoot, scale))
+    : Math.min(maxScale, Math.max(minScale, scale));
   const initialScale = typeof tilePixels === 'number' ? clamp(tilePixels) : null;
   const home = [wrap(center[0]), wrap(center[1])], homeAngle = wrapAngle(angle);
   let userScale = initialScale, turn = homeAngle;
@@ -406,9 +418,11 @@ export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, m
       const [dx, dy] = toLattice(x - width / 2, y - height / 2, view.scale(width, height));
       return [current[0] + dx, current[1] + dy];
     },
-    /** Shows lattice point `lattice` at CSS pixel `point`, optionally at a new scale and angle. */
-    pin(lattice, [x, y], width, height, {scale, angle} = {}) {
-      if (scale !== undefined) userScale = clamp(scale);
+    get overshoot() { return overshoot; },
+    /** Shows lattice point `lattice` at CSS pixel `point`, optionally at a new
+     * scale and angle. `elastic` lets a glide stretch a zoom limit; see clamp. */
+    pin(lattice, [x, y], width, height, {scale, angle, elastic = false} = {}) {
+      if (scale !== undefined) userScale = clamp(scale, elastic);
       if (angle !== undefined) turn = wrapAngle(angle);
       const [dx, dy] = toLattice(x - width / 2, y - height / 2, view.scale(width, height));
       current[0] = wrap(lattice[0] - dx);
@@ -419,8 +433,8 @@ export function createView({tilePixels = scaleFor, center = CENTER, angle = 0, m
       current[0] = wrap(current[0] - lx);
       current[1] = wrap(current[1] - ly);
     },
-    zoomAt(factor, point, width, height) {
-      view.pin(view.latticeAt(point, width, height), point, width, height, {scale: view.scale(width, height) * factor});
+    zoomAt(factor, point, width, height, {elastic = false} = {}) {
+      view.pin(view.latticeAt(point, width, height), point, width, height, {scale: view.scale(width, height) * factor, elastic});
     },
     rotateAt(delta, point, width, height) {
       view.pin(view.latticeAt(point, width, height), point, width, height, {angle: turn + delta});
@@ -649,12 +663,12 @@ export function createRenderer(canvas, planar, {tilePixels = scaleFor, center = 
       travel = viewPixels + patternPixels;
       lastView = here; lastDrawTime = now;
       // The shutter costs a sampling of the field per extra sub-sample, so it
-      // is spent only where it can do something: on a picture actually moving
-      // more than `motion` CSS pixels a frame, and never on a viewer the
-      // governor has had to slow down — frame rate is not traded for blur.
-      // The gate reads the motion itself, not the smear (travel × shutter): a
-      // narrower shutter blurs less but should switch on in the same places.
-      layers = maxLayers > 1 && shutter > 0 && governor.shutter && travel >= motion ? maxLayers : 1;
+      // is spent only where it can do something: where the smear it would draw
+      // — `travel × shutter` CSS pixels — is at least `motion` wide, and never
+      // on a viewer the governor has had to slow down: frame rate is not traded
+      // for blur. A picture standing still is never integrated, whatever
+      // `?motion=0` asks for: there is nothing there to smear.
+      layers = maxLayers > 1 && shutter > 0 && governor.shutter && travel > 0 && travel * shutter >= motion ? maxLayers : 1;
       const p = wrap(phase);
       if (p !== lastPhase || layers !== lastLayers || moving !== lastMoving) {
         textureIndex ^= 1; gl.bindTexture(gl.TEXTURE_2D_ARRAY, textures[textureIndex]);

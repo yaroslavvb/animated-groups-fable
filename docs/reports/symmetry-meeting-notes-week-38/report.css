@@ -1,0 +1,54 @@
+main.report {max-width:1000px;padding-top:2.1rem;}
+.report article {max-width:850px;margin:auto;}
+.report h1 {font:normal clamp(2.2rem,5vw,3.4rem)/1.1 Georgia,serif;letter-spacing:-.035em;max-width:800px;margin:.6rem 0 1.1rem;}
+.report h2 {margin-top:2.8rem;}
+.eyebrow,.report-breadcrumb {font-size:.83rem;color:var(--muted);}
+.eyebrow {text-transform:uppercase;letter-spacing:.08em;margin-top:2rem;}
+.lead {font:1.3rem/1.6 Georgia,serif;}
+.summary {border:1px solid #c9d8d4;background:#edf4f0;border-radius:9px;padding:1rem 1.3rem;margin:1.6rem 0;}
+.summary p:first-child {margin-top:0;}.summary p:last-child {margin-bottom:0;}
+.contents {display:flex;gap:.5rem 1.2rem;flex-wrap:wrap;padding:.8rem 0;border-block:1px solid var(--rule);font-size:.87rem;}
+.math {font-family:Georgia,serif;font-size:1.15rem;overflow-wrap:anywhere;}
+.equation {background:white;border-left:3px solid #7f9ab7;padding:.8rem 1.2rem;margin:1.25rem 0;}
+.equation span {display:block;}.equation small {display:block;font: .83rem/1.5 system-ui,sans-serif;color:var(--muted);margin-top:.55rem;}
+.table-scroll {max-width:100%;overflow-x:auto;}
+.report table {border-collapse:collapse;width:100%;font-size:.88rem;margin:1rem 0;}
+.report th,.report td {padding:.65rem .6rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule);}
+.report th {font-weight:600;}.report thead {background:#f0eee8;}
+.report code {overflow-wrap:anywhere;}.report li {margin:.45rem 0;}
+.small,.report footer {font-size:.87rem;color:var(--muted);}
+.report footer {margin-top:3rem;border-top:1px solid var(--rule);padding-top:1rem;}
+.report footer li {overflow-wrap:anywhere;}
+@media(max-width:560px){main.report{padding:1.3rem 1rem 3rem;}.lead{font-size:1.15rem;}.equation{padding:.75rem .85rem;}.math{font-size:1.03rem;}.report table{font-size:.8rem;}.report th,.report td{padding:.55rem .4rem;}}
+@media print{header.site,.contents{display:none!important;}main.report{max-width:none;padding:0;}.equation,.summary{break-inside:avoid;}.report h1{font-size:30pt;}.report h2{break-after:avoid;}a{color:inherit;}}
+
+/* --- week 38 report: figures, live embeds, lists --- */
+.report figure.fig {margin:1.7rem 0;}
+.report figure.fig img {display:block;width:100%;height:auto;border-radius:8px;border:1px solid var(--rule);background:#0a0c12;}
+.report figure.fig figcaption {font:.85rem/1.55 system-ui,sans-serif;color:var(--muted);margin-top:.55rem;}
+.fig-pair {display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;align-items:start;}
+.fig-pair figure {margin:0;}
+.fig-narrow {max-width:320px;}
+.embed {margin:1.5rem 0;border:1px solid var(--rule);border-radius:10px;overflow:hidden;background:var(--panel);}
+.embed iframe {display:block;width:100%;height:min(68vh,540px);border:0;background:#0a0c12;}
+.embed p {font:.83rem/1.5 system-ui,sans-serif;color:var(--muted);margin:0;padding:.6rem .85rem;border-top:1px solid var(--rule);}
+.summary ul {margin:.5rem 0 0;padding-left:1.15rem;}
+.summary li {margin:.3rem 0;}
+.keyed {list-style:none;padding-left:0;}
+.keyed > li {margin:.6rem 0;padding-left:0;}
+.keyed .who {display:inline-block;min-width:3.4rem;font-weight:650;}
+@media(max-width:560px){.embed iframe{height:min(60vh,400px);}.fig-narrow{max-width:none;}}
+/* Table captions live OUTSIDE the horizontal scroller, so that on a narrow screen
+   the caption wraps to the readable column while only the grid scrolls sideways.
+   (A <caption> is a child of <table> and would inherit the table's min-width.) */
+.report figure.table-fig {margin:1.4rem 0;}
+.report figure.table-fig > figcaption {font:.85rem/1.55 system-ui,sans-serif;color:var(--muted);margin:0 0 .45rem;}
+.report .table-scroll:focus-visible {outline:2px solid #7f9ab7;outline-offset:2px;}
+.report figure.table-fig table {margin:0;}
+/* Narrow screens: let wide tables scroll inside .table-scroll rather than crush
+   their columns to one word per line. */
+@media(max-width:620px){
+  .report .table-scroll table {min-width:29rem;}
+  .report .table-scroll table.wide {min-width:40rem;}
+  .report .table-scroll {border:1px solid var(--rule);border-radius:6px;}
+}

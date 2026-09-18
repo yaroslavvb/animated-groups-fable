@@ -1,0 +1,2407 @@
+{
+ "ns": [
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  12
+ ],
+ "groups": {
+  "p1": {
+   "orb": "o",
+   "ab": "Z^2",
+   "norm": 14976,
+   "norm_proper": 7488,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 3,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 9,
+     "onto": 8,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 8,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 16,
+     "onto": 12,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 12,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 25,
+     "onto": 24,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 24,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "6": {
+     "homs": 36,
+     "onto": 24,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 24,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 49,
+     "onto": 48,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 48,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "8": {
+     "homs": 64,
+     "onto": 48,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 48,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "12": {
+     "homs": 144,
+     "onto": 96,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 96,
+       "col": {
+        "X": 0,
+        "Y": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "p2": {
+   "orb": "2222",
+   "ab": "Z2+Z2+Z2",
+   "norm": 416,
+   "norm_proper": 208,
+   "n": {
+    "2": {
+     "homs": 8,
+     "onto": 7,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 1,
+        "\u03b3": 1,
+        "\u03b4": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 6,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 1,
+        "\u03b3": 1,
+        "\u03b4": 0
+       },
+       "u": [
+        0,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "pm": {
+   "orb": "**",
+   "ab": "Z^1+Z2+Z2",
+   "norm": 96,
+   "norm_proper": 48,
+   "n": {
+    "2": {
+     "homs": 8,
+     "onto": 7,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "P": 1,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 0,
+        "P": 0,
+        "Q": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 1,
+        "Q": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 3,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 16,
+     "onto": 8,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 3,
+        "P": 0,
+        "Q": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 2,
+        "Q": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 5,
+     "onto": 4,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "6": {
+     "homs": 24,
+     "onto": 14,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 4,
+        "P": 0,
+        "Q": 3
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 3,
+        "Q": 3
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 5,
+        "P": 0,
+        "Q": 3
+       },
+       "u": [
+        2,
+        2
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 2,
+        "P": 3,
+        "Q": 3
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 7,
+     "onto": 6,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 6,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "8": {
+     "homs": 32,
+     "onto": 16,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 8,
+       "col": {
+        "\u03b1": 5,
+        "P": 0,
+        "Q": 4
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 1,
+        "P": 4,
+        "Q": 4
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "12": {
+     "homs": 48,
+     "onto": 16,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 8,
+       "col": {
+        "\u03b1": 7,
+        "P": 0,
+        "Q": 6
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 1,
+        "P": 6,
+        "Q": 6
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "pg": {
+   "orb": "xx",
+   "ab": "Z^1+Z2",
+   "norm": 96,
+   "norm_proper": 48,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "Y": 1,
+        "Z": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "Y": 0,
+        "Z": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 3,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "Y": 2,
+        "Z": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 8,
+     "onto": 4,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "Y": 1,
+        "Z": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "Y": 1,
+        "Z": 3
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 5,
+     "onto": 4,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "Y": 3,
+        "Z": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "6": {
+     "homs": 12,
+     "onto": 6,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "Y": 2,
+        "Z": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "Y": 1,
+        "Z": 5
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 7,
+     "onto": 6,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 6,
+       "col": {
+        "Y": 4,
+        "Z": 3
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "8": {
+     "homs": 16,
+     "onto": 8,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "Y": 1,
+        "Z": 7
+       },
+       "u": [
+        2,
+        2
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "Y": 3,
+        "Z": 1
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "12": {
+     "homs": 24,
+     "onto": 8,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "Y": 1,
+        "Z": 11
+       },
+       "u": [
+        2,
+        2
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "Y": 5,
+        "Z": 1
+       },
+       "u": [
+        4,
+        4
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "cm": {
+   "orb": "*x",
+   "ab": "Z^1+Z2",
+   "norm": 48,
+   "norm_proper": 24,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Z": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 0,
+        "Z": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Z": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 3,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Z": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 8,
+     "onto": 4,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Z": 3
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 2,
+        "Z": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 5,
+     "onto": 4,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "P": 0,
+        "Z": 4
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "6": {
+     "homs": 12,
+     "onto": 6,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Z": 5
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 3,
+        "Z": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 3,
+        "Z": 1
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 7,
+     "onto": 6,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 6,
+       "col": {
+        "P": 0,
+        "Z": 6
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "8": {
+     "homs": 16,
+     "onto": 8,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "P": 0,
+        "Z": 7
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "P": 4,
+        "Z": 3
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "12": {
+     "homs": 24,
+     "onto": 8,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "P": 0,
+        "Z": 11
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "P": 6,
+        "Z": 5
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "pmm": {
+   "orb": "*2222",
+   "ab": "Z2+Z2+Z2+Z2",
+   "norm": 32,
+   "norm_proper": 16,
+   "n": {
+    "2": {
+     "homs": 16,
+     "onto": 15,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 1,
+        "R": 1,
+        "S": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Q": 1,
+        "R": 0,
+        "S": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "P": 0,
+        "Q": 0,
+        "R": 0,
+        "S": 1
+       },
+       "u": [
+        0,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "P": 1,
+        "Q": 1,
+        "R": 1,
+        "S": 0
+       },
+       "u": [
+        0,
+        1
+       ]
+      },
+      {
+       "size": 4,
+       "col": {
+        "P": 0,
+        "Q": 0,
+        "R": 1,
+        "S": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 16,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 16,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 16,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 16,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "pmg": {
+   "orb": "22*",
+   "ab": "Z2+Z2+Z2",
+   "norm": 16,
+   "norm_proper": 8,
+   "n": {
+    "2": {
+     "homs": 8,
+     "onto": 7,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 0,
+        "P": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 1,
+        "P": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 1,
+        "P": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 1,
+        "P": 0
+       },
+       "u": [
+        1,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 1,
+        "P": 1
+       },
+       "u": [
+        1,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "pgg": {
+   "orb": "22x",
+   "ab": "Z2+Z4",
+   "norm": 32,
+   "norm_proper": 16,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 0,
+        "Z": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 1,
+        "Z": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 4,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 4,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 2,
+        "Z": 3
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "cmm": {
+   "orb": "2*22",
+   "ab": "Z2+Z2+Z2",
+   "norm": 32,
+   "norm_proper": 16,
+   "n": {
+    "2": {
+     "homs": 8,
+     "onto": 7,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "P": 1,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 1,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 0,
+        "P": 0,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0,
+        "Q": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p4": {
+   "orb": "442",
+   "ab": "Z2+Z4",
+   "norm": 16,
+   "norm_proper": 8,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 1,
+        "\u03b3": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 1,
+        "\u03b3": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 4,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 3,
+        "\u03b2": 3,
+        "\u03b3": 2
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 3,
+        "\u03b2": 1,
+        "\u03b3": 0
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p4m": {
+   "orb": "*442",
+   "ab": "Z2+Z2+Z2",
+   "norm": 16,
+   "norm_proper": 8,
+   "n": {
+    "2": {
+     "homs": 8,
+     "onto": 7,
+     "classes": 5,
+     "classes_proper": 5,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "P": 0,
+        "Q": 1,
+        "R": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 0,
+        "R": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 1,
+        "R": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Q": 0,
+        "R": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "P": 0,
+        "Q": 1,
+        "R": 1
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p4g": {
+   "orb": "4*2",
+   "ab": "Z2+Z4",
+   "norm": 16,
+   "norm_proper": 8,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "P": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "P": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 8,
+     "onto": 4,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 3,
+        "P": 0
+       },
+       "u": [
+        2,
+        2
+       ]
+      },
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 2
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 8,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p3": {
+   "orb": "333",
+   "ab": "Z3+Z3",
+   "norm": 36,
+   "norm_proper": 18,
+   "n": {
+    "2": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "3": {
+     "homs": 9,
+     "onto": 8,
+     "classes": 2,
+     "classes_proper": 2,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 2,
+        "\u03b2": 2,
+        "\u03b3": 2
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 6,
+       "col": {
+        "\u03b1": 0,
+        "\u03b2": 1,
+        "\u03b3": 2
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 9,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 9,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p3m1": {
+   "orb": "*333",
+   "ab": "Z2",
+   "norm": 36,
+   "norm_proper": 18,
+   "n": {
+    "2": {
+     "homs": 2,
+     "onto": 1,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 1,
+        "R": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p31m": {
+   "orb": "3*3",
+   "ab": "Z6",
+   "norm": 12,
+   "norm_proper": 6,
+   "n": {
+    "2": {
+     "homs": 2,
+     "onto": 1,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 0,
+        "P": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 3,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "P": 0
+       },
+       "u": [
+        1,
+        1
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 6,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 2,
+        "P": 3
+       },
+       "u": [
+        2,
+        2
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 6,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p6": {
+   "orb": "632",
+   "ab": "Z6",
+   "norm": 12,
+   "norm_proper": 6,
+   "n": {
+    "2": {
+     "homs": 2,
+     "onto": 1,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 0,
+        "\u03b3": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 3,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 1,
+        "\u03b2": 2,
+        "\u03b3": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "4": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 6,
+     "onto": 2,
+     "classes": 1,
+     "classes_proper": 1,
+     "class_reps": [
+      {
+       "size": 2,
+       "col": {
+        "\u03b1": 5,
+        "\u03b2": 4,
+        "\u03b3": 3
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 2,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 6,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  },
+  "p6m": {
+   "orb": "*632",
+   "ab": "Z2+Z2",
+   "norm": 12,
+   "norm_proper": 6,
+   "n": {
+    "2": {
+     "homs": 4,
+     "onto": 3,
+     "classes": 3,
+     "classes_proper": 3,
+     "class_reps": [
+      {
+       "size": 1,
+       "col": {
+        "P": 0,
+        "Q": 1,
+        "R": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 1,
+        "R": 1
+       },
+       "u": [
+        0,
+        0
+       ]
+      },
+      {
+       "size": 1,
+       "col": {
+        "P": 1,
+        "Q": 0,
+        "R": 0
+       },
+       "u": [
+        0,
+        0
+       ]
+      }
+     ]
+    },
+    "3": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "4": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "5": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "6": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "7": {
+     "homs": 1,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "8": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    },
+    "12": {
+     "homs": 4,
+     "onto": 0,
+     "classes": 0,
+     "classes_proper": 0,
+     "class_reps": []
+    }
+   }
+  }
+ },
+ "totals": {
+  "2": [
+   74,
+   46,
+   46
+  ],
+  "3": [
+   26,
+   8,
+   8
+  ],
+  "4": [
+   40,
+   13,
+   13
+  ],
+  "5": [
+   36,
+   4,
+   4
+  ],
+  "6": [
+   54,
+   13,
+   13
+  ],
+  "7": [
+   66,
+   4,
+   4
+  ],
+  "8": [
+   80,
+   8,
+   8
+  ],
+  "12": [
+   128,
+   8,
+   8
+  ]
+ }
+}

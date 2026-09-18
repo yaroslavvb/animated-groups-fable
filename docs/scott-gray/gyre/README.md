@@ -319,15 +319,21 @@ Four properties make it safe here:
   moving there is nothing to integrate and the renderer uses a single layer, so
   `?taa=0`, `?taa=3` and `?taa=5` give the same paused frame to the last bit —
   which is what lets the pixel comparisons in the browser test be exact.
-- **It is spent only where it can do something.** Before each frame the renderer
-  works out how far the picture will travel on screen while that frame is shown:
-  the view's own step, plus the pattern's own boundaries at 0.426 lattice lengths
-  a period (measured above) times the framing. Under `MOTION_PIXELS = 0.75` CSS
-  pixels a frame there is nothing to integrate and the shutter stays off. At the
-  home framing the pattern moves 0.34 px a frame, so **the home view pays
-  nothing**; the shutter switches itself on past about **837 px per repeat**, or
-  the moment a finger or the wheel starts moving the view. Press **S** and the
-  overlay says which is in force.
+- **It is spent only where it can do something.** The gate is on the *smear* the
+  shutter would draw, not on the travel: a picture moving `travel` CSS px a frame
+  is smeared over `travel × SHUTTER` of them, and under `MOTION_PIXELS = 0.75` px
+  of smear there is nothing worth three taps. At the shipped 0.3 shutter that
+  asks for **2.5 CSS px of travel a frame** — which the pattern's own boundaries,
+  at 0.426 lattice lengths a period (measured above), reach only at about
+  **2790 CSS px per repeat**, and `?shutter=1` brings forward to 837 px per
+  repeat, the figure this page quoted while the gate read the travel rather than
+  the smear — the shutter itself has been 0.3 since the page was written, so that
+  number moved because the gate changed, not because the shutter narrowed. At the
+  home framing the pattern moves 0.34 px a frame, so **the home view pays nothing** —
+  and at ordinary framings what engages the shutter is the *view's* motion: a
+  drag, a glide, a pinch, the moment it passes 2.5 px a frame. A picture standing
+  perfectly still is never integrated, whatever `?motion=0` asks for: there is
+  nothing there to smear. Press **S** and the overlay says which is in force.
 - **Frame rate is never traded for it.** The shutter is the governor's *first*
   rung, above the resolution ladder: a GPU that cannot hold the cadence loses the
   motion blur first, and pixels only if that was not enough. Hanging it on the
@@ -348,12 +354,15 @@ the share of pixels whose colour changes by more than T/255 on some channel from
 one 60 Hz frame to the next. The palette's three pairs sit 104, 114 and 139 apart
 at their furthest channel, so **T = 104 is a whole colour flip however the three
 are arranged**, and T = 128 — the threshold this page used to quote — sees only
-teal ↔ sand:
+teal ↔ sand. **Every row was measured at `?shutter=1`**, the full frame interval
+this section is about, so these are the numbers that filter reaches and not the
+ones the shipped 0.3 shutter draws — for those, see the pan the browser test
+measures at both settings, below:
 
 | what is moving | shutter | > 104 (a colour flip) | > 128 | > 40 |
 | --- | --- | --- | --- | --- |
 | home framing, 380 px per repeat | off, by the gate | 0.000 → 0.000 % | 0.000 → 0.000 % | 0.202 → 0.202 % |
-| 2400 px per repeat | on | **0.308 → 0.123 %** | 0.105 → 0.007 % | 0.784 → 0.874 % |
+| 2400 px per repeat | off at the default, on here | **0.308 → 0.123 %** | 0.105 → 0.007 % | 0.784 → 0.874 % |
 | 8000 px per repeat | on | **0.868 → 0.303 %** | 0.247 → 0.077 % | 0.943 → 1.113 % |
 | a drag at 4 px a frame | on | **3.416 → 1.432 %** | 1.742 → 0.363 % | 8.155 → 9.505 % |
 | a drag at 12 px a frame | on | **12.744 → 4.666 %** | 7.093 → 2.093 % | 22.089 → 26.851 % |
@@ -388,14 +397,17 @@ something is moving that fast.
 | `?taa=0` or `?taa=1` | shutter off — the un-integrated picture the pixel comparisons need |
 | `?taa=2…5` | sub-samples per displayed frame (default 3; 5 is a soft ceiling) |
 | `?shutter=0…2` | the shutter's width as a share of a frame interval (default 0.3; `0.5` is the film convention, `1` the full box filter; `0` collapses it to a single sub-sample, so it draws *and costs* exactly what `?taa=1` does) |
-| `?motion=…` | how far the picture must move in a frame, in CSS pixels, before the shutter is worth paying for (default 0.75; `0` keeps it on whenever anything moves at all) |
+| `?motion=…` | how wide the smear must be, in CSS pixels, before the shutter is worth paying for — so the picture must move `motion / shutter` px a frame, 2.5 px at the defaults (default 0.75; `0` keeps it on whenever anything moves at all, but never over a still picture) |
 
 Press **S** and the stats overlay reads, for example,
-`60 fps · 2880×1800 px · quality 1.00 · 2400 px per repeat · 81 taps · display 60 Hz · shutter 3×1.00 frame`
+`60 fps · 2880×1800 px · quality 1.00 · 3000 px per repeat · 81 taps · display 60 Hz · shutter 3×0.30 frame`
 — or, at the home framing where nothing needs integrating,
-`… · 380 px per repeat · 27 taps · display 60 Hz · shutter off (of 3)`. The taps
-count is per pixel and includes the shutter, so it is the honest measure of what
-a frame costs.
+`60 fps · 2880×1800 px · quality 1.00 · 380 px per repeat · 27 taps · display 60 Hz · shutter off (of 3)`.
+Both are what the page actually prints at 1440 × 900 CSS pixels on a 2× screen.
+2400 px per repeat sits *below* the 2790 px per repeat the default shutter needs, and reads
+`… · 2400 px per repeat · 81 taps · display 60 Hz · shutter 3×1.00 frame` only
+with `?shutter=1`. The taps count is per pixel and includes the shutter, so it is
+the honest measure of what a frame costs.
 
 ## Framing and controls
 
@@ -411,6 +423,89 @@ lattice is triangular — even though the picture's own colour symmetry is only 
 third of a turn. Zooming out stops where one node of the 66-node lattice spans
 one device pixel; zooming in stops at 8000 CSS pixels per repeat, which is where
 the flat disc around `p` fills the screen.
+
+### Momentum
+
+**Everything a gesture can move keeps moving when you let go**, not just the
+pan: throw a pinch and the picture goes on growing for a moment, throw a turn and
+it goes on turning, and a two-finger gesture that did all three carries on doing
+all three as one glide. `momentum.mjs` holds the whole of it — the same file the
+sibling pages ship, byte for byte — with no DOM, no clock and no animation frame
+in it, which is what lets the node test check the behaviour rather than the
+wiring.
+
+The release velocity is the mean over the gesture's **last 100 ms** — first
+sample to last, divided by the time from the first sample to the release, so that
+a hesitation before letting go damps the throw. Then each of the three channels
+is floored and capped on its own:
+
+| | decay τ | thrown above | never above | so a glide adds at most |
+| --- | --- | --- | --- | --- |
+| pan | 0.35 s | 60 px/s | 6000 px/s | 2100 CSS px |
+| zoom | 0.22 s | ×1.35 a second | ×6 a second | **×1.49** |
+| turn | 0.25 s | 17°/s | 200°/s | **50°** |
+
+The pan's numbers are the ones this page always had, to the last digit — a node
+test asserts the one-finger fling is *bit-identical* to the code that shipped
+before momentum, velocity and displacement, on every frame of the glide. The zoom
+is integrated **multiplicatively** — a glide adds a *factor*, so it feels the
+same at every framing — and the turn is measured the short way round the circle,
+so two fingers crossing the atan2 seam do not read as a whole turn a frame.
+
+Four things keep it from ever running away, and they are the reason it reads as
+light rather than loose:
+
+- **A gesture that stops before it ends throws nothing.** A release more than
+  80 ms after the last movement is a stop; so is a pause of more than 50 ms
+  anywhere inside the window, which cuts the history there rather than averaging
+  across it.
+- **A scale or a turn needs more than 24 ms of movement to be measured at all.**
+  Fingers report every 8–16 ms, so this only ever rejects a burst of events
+  arriving in the same instant — which is not a fast pinch but no measurement.
+  (The pan has no such floor, so that its long-standing behaviour is untouched.)
+- **The fingers of a pinch never lift together.** What the pinch was doing is
+  kept for 120 ms as the first finger leaves; if the second follows inside that,
+  it is one release and the zoom and turn are thrown. If it stays down, the pinch
+  has ended and only the pan it goes on to make is thrown.
+- **Any new input cancels the glide** — a finger, the wheel, a trackpad pinch, a
+  key, the reset button — and a viewer who asks for reduced motion gets no glide
+  at all, on any gesture including the pan. A glide cut short *while it is
+  outside the zoom limits*, in the middle of the elastic below, is put back on
+  the limit as it is dropped: the excursion is the glide's to give and the
+  glide's to return, so whatever ends it early does the returning.
+
+**At the zoom limits the glide gives rather than stopping dead.** It passes the
+limit by up to **4 %**, by as much of that as it still had speed to spend, and is
+returned to the limit over **150 ms** — out fast, back smooth, landing on the
+limit exactly. The way out is a quarter sine rather than a cubic, because a cubic
+leaves the limit about twice as fast as the glide arrived at it, which reads as a
+pop. Only a glide may leave the allowed range, and only for those 150 ms; every
+hand-made zoom still stops flat against it, and a tap in the middle of the
+excursion lands the view on the limit rather than leaving it stretched. Measured
+in the browser test: a glide into the 8000 ceiling peaks around 8315 px per
+repeat — the test pins only that it passes 8000 and stops short of the 8326 the
+4 % allows, and the exact peak moves a few px run to run — and comes to rest at
+exactly 8000, and so does the same glide
+interrupted at its peak, and the same at the floor.
+
+**A thrown turn is aimed at a sixth of a turn.** When the glide starts, the angle
+it is heading for is worked out — `angle + rate × τ` — and the nearest sixth to
+*that* becomes the target, reached by moving the decay's own asymptote onto it,
+so the turn eases onto the sixth with the same exponential rather than being
+corrected at the end. Two guards keep it honest: the correction is never more
+than half a sixth (30°, the most it could ever be) and never more than the throw
+itself, so a small nudge is left exactly where it was thrown, and the target is
+never a sixth *behind* where the fingers let go. A turn that is not caught — a
+short flick between two sixths — still eases onto a sixth if it happens to stop
+within 4° of one, over 130 ms, which is the snap the fingers get.
+
+The wheel is a gesture too — a two-finger scroll arrives as thirty events — so a
+burst of them ends with the same glide, **gently**: three tenths of the measured
+rate (six for a trackpad pinch, which Chrome reports as a ctrl-wheel), capped at
+half of what a finger may throw, and only once at least three events have
+arrived. One notch of a mouse wheel moves the view exactly as far as it asks for
+and no further. Safari's trackpad `gestureend` throws the zoom and the turn like
+any other release.
 
 ### Pinching and turning at once on a Mac
 
@@ -471,9 +566,9 @@ Safari sends.
 | input | effect |
 | --- | --- |
 | drag / one finger | pan, endlessly, with a glide on release |
-| two fingers | pan, zoom and turn together; a turn within 4° of a sixth snaps |
-| trackpad pinch and two-finger turn (Safari) | zoom and turn, simultaneously |
-| wheel / two-finger scroll | zoom about the pointer |
+| two fingers | pan, zoom and turn together, all three gliding on release; a turn within 4° of a sixth snaps, and a thrown one is aimed at the nearest sixth |
+| trackpad pinch and two-finger turn (Safari) | zoom and turn, simultaneously, gliding on release |
+| wheel / two-finger scroll | zoom about the pointer, with a gentle glide after a burst |
 | Option + wheel | turn about the pointer |
 | `+` `−` | zoom about the centre, 1.25× a press, 1.05× a repeat while held |
 | `]` `[` | turn 15° a press, 60° with Shift, 3° a repeat while held |
@@ -556,9 +651,15 @@ patterns each ending at 1.4× **and** 30°, the neutral returns, the two *combin
 returns through neutral that used to collapse the view, the diagnostics, the Mac
 key and Option-wheel fallbacks, the shutter (still frames identical with
 `?taa=0/3/5`, a moving frame equal to the mean of its sub-samples, the gate
-leaving the home framing alone and engaging at 2400 px per repeat, `?shutter=0`
+leaving the home framing alone, still off at 2400 px per repeat and engaging at
+3000, `?shutter=0`
 costing one layer, the governor dropping the shutter before the resolution, and a
-12 px-a-frame pan whose colour flips fall from 13.6 % to 5.0 % of the screen),
+12 px-a-frame pan whose colour flips fall from 13.6 % of the screen to 11.9 % at
+the shipped 0.3 shutter and to 5.0 % at a full frame),
+the momentum (a
+pinch that keeps zooming and settles inside the limits, a thrown turn landing on
+a sixth, the elastic peak and its exact return to 8000, a glide cut short inside
+the excursion resting on the limit, the wheel burst and the trackpad throw),
 reset, stats, pause/play, idle controls, GPU recovery and reduced motion.
 
 One gap is not closed by either test: headless WebKit cannot construct a real

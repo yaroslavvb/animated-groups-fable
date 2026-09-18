@@ -1,0 +1,11 @@
+classes by m = ord(sigma(t)) = (coloured period)/(uncoloured period)
+n        m=1     m=2     m=3     m=4     m=6    total
+2        237      70       0       0       0      307
+3         24       0      65       0       0       89
+4         39     132       0      70       0      241
+6         24      27     235       0      67      353
+grand total over n in {2,3,4,6}: 990
+
+so: m=1 (colour independent of clock) : 324
+    m=n (colour IS the phase of an n-times-longer film): 272
+    1<m<n (genuinely mixed): 394
