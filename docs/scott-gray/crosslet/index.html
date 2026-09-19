@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#14110f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <!-- Every one of the three colours is light (L* 51 / 59 / 79), so a translucent
+       status bar would put white iOS glyphs at about 1.75:1 over the pattern.
+       An opaque bar keeps the clock readable; the Fullscreen button still gives
+       an edge-to-edge view. -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="A verified complex Ginzburg–Landau wave on a triangular lattice, cut into plus-shaped pieces in three colours by a rule with a fully entangled colour symmetry: turn it a third of a turn about one point, wait a third of a period and step every colour back one place, and the animation is unchanged. Freeze it and nothing but the lattice survives.">
+  <title>Crosslet — Plus-shaped pieces, turned and recoloured</title>
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Crosslet — Three colours welded to a turn and a wait">
+  <meta property="og:description" content="Plus-shaped pieces on a Ginzburg–Landau p3 wave. No single frame has any symmetry beyond its lattice: only the turn, the third of a period and the recolouring together leave the animation unchanged.">
+  <meta property="og:url" content="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/crosslet/">
+  <meta property="og:image" content="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/crosslet/social-preview.jpg">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Interlocking plus-shaped terracotta, teal and sand pieces on a triangular lattice, captured from the Crosslet animation.">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Crosslet — Three colours welded to a turn and a wait">
+  <meta name="twitter:description" content="Plus-shaped pieces on a Ginzburg–Landau p3 wave. No single frame has any symmetry beyond its lattice: only the turn, the third of a period and the recolouring together leave the animation unchanged.">
+  <meta name="twitter:image" content="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/crosslet/social-preview.jpg">
+  <meta name="twitter:image:alt" content="Interlocking plus-shaped terracotta, teal and sand pieces on a triangular lattice, captured from the Crosslet animation.">
+  <link rel="canonical" href="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/crosslet/">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="./manifest.webmanifest">
+</head>
+<body>
+  <main aria-label="Crosslet three-colour entangled wave lattice">
+    <canvas id="pattern" aria-label="Animated lattice of plus-shaped pieces in terracotta, teal and sand. Every third of a period the picture turns a third of a turn about one point and every colour steps back one place. Drag to pan, pinch or scroll to zoom, two fingers to turn. Press Space to pause or F for fullscreen."></canvas>
+    <!-- The generator marks. Drawn through the same camera as the pattern, so
+         they stay glued to it; never a pointer target, so every canvas gesture
+         keeps working through them. Hidden until the checkbox asks for them. -->
+    <svg id="generators" role="img" aria-label="Generator marks" hidden></svg>
+    <div id="notice" role="status">Loading Crosslet…</div>
+    <div id="controls" aria-label="Animation controls">
+      <span class="name">Crosslet</span>
+      <button id="pause" type="button" aria-label="Pause animation" title="Pause · Space" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="pause-icon" d="M8 5v14M16 5v14"/></svg>
+      </button>
+      <!-- The off state has to look unchecked and not disabled, so the icon
+           carries a slash of its own rather than the control being faded. -->
+      <label id="generators-toggle" title="Generators · G">
+        <input type="checkbox" id="generators-check">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.6 19.3 7.8v8.4L12 20.4 4.7 16.2V7.8Z"/><circle cx="12" cy="12" r="2.1"/><path class="slash" d="M4.8 19.2 19.2 4.8"/></svg>
+        <span class="word">Generators</span>
+      </label>
+      <button id="notation" type="button" aria-expanded="false" aria-controls="legend" title="Notation · N">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4.5h14v15H5zM8.5 9h7M8.5 12.5h7M8.5 16h4"/></svg>
+        <span class="word">Notation</span>
+      </button>
+      <button id="reset" type="button" aria-label="Reset view" title="Reset view · 0" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="1.6"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+      </button>
+      <button id="fullscreen" type="button" aria-label="Enter fullscreen" title="Fullscreen · F" disabled>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path id="fullscreen-icon" d="M9 4H4v5m11-5h5v5M4 15v5h5m11-5v5h-5"/></svg>
+        <span id="fullscreen-label" class="word">Fullscreen</span>
+      </button>
+    </div>
+    <!-- A labelled region, not a dialog: the picture behind it stays live and
+         interactive, so claiming a modal role would be a lie to a screen
+         reader. Esc closes it, and so does a tap outside. -->
+    <aside id="legend" role="region" aria-labelledby="legend-title" hidden>
+      <div class="legend-head">
+        <h2 id="legend-title">Reading the generator marks</h2>
+        <button id="legend-close" type="button" aria-label="Close the notation panel" title="Close · Esc">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div class="legend-body" id="legend-body"></div>
+    </aside>
+    <div id="stats" hidden aria-live="off"></div>
+    <noscript>This animation needs JavaScript and WebGL. Enable JavaScript and reload to view it.</noscript>
+  </main>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "Crosslet — Plus-shaped pieces, turned and recoloured",
+  "short_name": "Crosslet",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#14110f",
+  "theme_color": "#14110f"
+}
