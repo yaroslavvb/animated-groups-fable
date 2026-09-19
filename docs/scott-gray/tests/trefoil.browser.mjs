@@ -176,10 +176,11 @@ function areas(image) {
   return counts.map(c => c / total);
 }
 try {
-  // The generator marks are on by default and sit ON TOP of the canvas, and an
-  // element screenshot takes whatever is over it — so every pixel check below
-  // runs with them switched off, through the very preference a viewer would
-  // use. The overlay has its own section at the end, which clears this again.
+  // The generator marks are off by default, but they sit ON TOP of the canvas
+  // and an element screenshot takes whatever is over it — so the preference a
+  // viewer would use is written explicitly here, and every pixel check below is
+  // held to the marks being gone whatever this browser profile remembers. The
+  // overlay has its own section at the end, which clears this again.
   await page.goto(base); await ready();
   await page.evaluate(() => { try { localStorage.setItem('trefoil:generators', '0'); } catch {} });
   await page.goto(`${base}?play=0`); await ready();
@@ -1080,8 +1081,8 @@ try {
   // The overlay is an SVG layer over the canvas, placed through the very
   // transform the shader uses. What is checked here is that it is really glued
   // to the pattern — under a pan, a zoom and a turn — that it never takes a
-  // pointer away from the canvas, that the three ways of switching it off all
-  // work and are remembered, and that it costs the animation nothing.
+  // pointer away from the canvas, that the three ways of switching it on and off
+  // all work and are remembered, and that it costs the animation nothing.
   await page.setViewportSize({width: 1440, height: 1000});
   await page.goto(base); await ready();
   await page.evaluate(() => { try { localStorage.clear(); } catch {} });
@@ -1104,7 +1105,17 @@ try {
     return [scale * (c * px - s * py), scale * (s * px + c * py)];
   };
 
-  assert.equal(await layerHidden(), false, 'the marks are on by default — the page is about its generators');
+  // A FRESH VISIT IS THE PICTURE ALONE. The annotation is an option under it,
+  // never the opening state, on this page as on every other on the site.
+  assert.equal(await layerHidden(), true, 'the marks are off by default — a fresh visit is the picture alone');
+  assert.equal(await page.locator('#generators-check').isChecked(), false, 'and the checkbox underneath says so');
+  assert.equal(await unitCount(), 0, 'nothing is in the document to draw');
+  assert.match(await statsText(), /marks off/);
+  // Everything that follows studies the marks, so they are switched on the way a
+  // viewer does it — a remembered choice — and left on for the rest of the run.
+  await page.evaluate(() => { try { localStorage.setItem('trefoil:generators', '1'); } catch {} });
+  await page.goto(base); await ready(); await page.waitForTimeout(200);
+  assert.equal(await layerHidden(), false, 'the remembered choice opens with them');
   const units = await unitCount();
   assert.ok(units >= 7 && units <= MAX_UNITS, `${units} repeats annotated at the home framing`);
   assert.equal(await page.locator('#generators .cc-marker').count(), 3 * units, 'three gyrations per repeat');
@@ -1231,6 +1242,11 @@ try {
   await page.goto(base); await ready(); await page.waitForTimeout(150);
   assert.equal(await layerHidden(), true, 'the choice is remembered across a reload');
   assert.equal(await page.locator('#generators-check').isChecked(), false);
+  await page.goto(`${base}?generators=1`); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), false, '?generators=1 opens a view with them');
+  assert.equal(await page.locator('#generators-check').isChecked(), true);
+  await page.goto(base); await ready(); await page.waitForTimeout(150);
+  assert.equal(await layerHidden(), true, 'and that share link left the viewer’s own choice alone');
   await page.keyboard.press('g'); await page.waitForTimeout(200);
   assert.equal(await layerHidden(), false, 'G brings them back');
   assert.equal(await page.locator('#generators-check').isChecked(), true);

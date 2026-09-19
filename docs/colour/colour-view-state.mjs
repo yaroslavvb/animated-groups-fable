@@ -1,7 +1,7 @@
 /** Shared, versioned links for the two Colour explorer pages:
  *
  *   #g247?v=1&sub=featured&model=gray-scott&pattern=colour:trefoil:8fcde9bc1178
- *        &framing=endless&tiles=2&palette=colour&speed=1&marks=1&notation=0
+ *        &framing=endless&tiles=2&palette=colour&speed=1&marks=0&notation=0
  *        &phase=0.320&play=1&x=0.0556&y=0.1111&scale=380&angle=0
  *
  * Modelled line for line on `../scott-gray/view-state.mjs`: every field is
@@ -23,7 +23,10 @@ const DEFAULTS = Object.freeze({
   tiles: 2,
   palette: 'colour',
   speed: 1,
-  marks: true,
+  // The generator marks are an option, never the opening state: a link that says
+  // nothing about them shows the picture alone, and `marks=1` is what asks for
+  // the annotation.
+  marks: false,
   notation: false,
   phase: 0,
   play: true,

@@ -41,8 +41,9 @@ free as well, and this wave does not.
 sixth-turn, a third, a half and the free slide — each saying in one glyph what to
 do, how long to wait and what becomes of the colours, in a notation that extends
 the site's [clockwork orbifold symbols](../../notation.html) with a colour
-superscript (§4). Trefoil's symbol is **6₅⁽¹²⁾ 3₂⁽⁰²¹⁾ 2₁⁽⁰¹⁾ · τ⁽⁰²¹⁾**. Press
-**G** for the marks, **N** for the legend that reads them.
+superscript (§4). Trefoil's symbol is **6₅⁽¹²⁾ 3₂⁽⁰²¹⁾ 2₁⁽⁰¹⁾ · τ⁽⁰²¹⁾**. The
+page opens as the picture alone: tick **Generators** in the bar underneath, or
+press **G**, for the marks, and **N** for the legend that reads them.
 
 Serve this folder as static files; no build, dependencies, remote data or server
 computation are required.
@@ -619,7 +620,9 @@ stops at 8000 CSS pixels per lattice length.
 
 ### The generator marks
 
-The marks of §4 are **on by default** — the page is about its generators — and
+The marks of §4 are **off by default** — every picture on this site opens as the
+picture alone, and the **Generators** checkbox in the control bar under it (or
+`G`) is what adds the annotation; the choice is then remembered — and
 `generators.mjs` draws them as an SVG layer over the canvas, placed through the
 viewer's own camera rather than by rotating a finished picture, so they stay glued
 to the pattern through a pan, a zoom, a turn, a momentum glide and a resize. The
@@ -852,9 +855,10 @@ pinch-and-turn on a real Mac.**
 `?dpr=` and `?stats=1` behave as on `../gyre/`, alongside `?taa=`, `?shutter=`
 and `?motion=` above; a finite value outside the allowed range is clamped to the
 nearest one it may take, so a hand-edited link still does what it asks for.
-`?generators=0` (or `?gen=0`) shares a view **without** the marks and
-`?generators=1` with them; either wins over what this viewer last chose, which is remembered in
-`localStorage` under `trefoil:generators` and never leaves the browser.
+The marks start **off**: `?generators=1` (or `?gen=1`) shares a view **with**
+them and `?generators=0` without, and either wins over what this viewer last
+chose, which is remembered in `localStorage` under `trefoil:generators` and never
+leaves the browser.
 Controls and cursor hide after inactivity; GPU context restoration resumes the
 pattern; hidden tabs suspend rendering. Inside a frame that is not allowed to go
 fullscreen, the button instead reads "Open full page" and opens the viewer in its
@@ -880,7 +884,8 @@ the home frame:
 Twitter/X sharing uses `social-preview.jpg` (1200 × 630) with large-summary and
 Open Graph metadata, rendered straight from the WebGL viewer at
 `?play=0&phase=0.31&scale=572` with the controls hidden — and with the generator
-marks off, which is what `?generators=0` is for.
+marks off, which is now simply how the page opens (`?generators=0` pins it
+against a remembered choice).
 
 ## 9. Validation
 
@@ -995,8 +1000,9 @@ reduced motion throwing nothing at all; and the one-finger pan fling unchanged),
 recovery and reduced motion.
 
 The **generator marks** have their own section at the end of the browser run, and
-it is where the "glued to the pattern" claim is actually settled. The marks are on
-by default; every one of β and γ sits at the offset from an α that the plane
+it is where the "glued to the pattern" claim is actually settled. A fresh visit
+opens with no marks at all and the checkbox unticked, and the rest of the section
+runs with the remembered choice switched on; every one of β and γ sits at the offset from an α that the plane
 transform predicts, at 0° **and** at 60°; a keyboard pan of 96 px moves every α
 still inside the layer's ring by exactly 96 px; a 1.25× zoom about the screen
 centre scales every offset from it; `?angle=60` turns the whole set about the
@@ -1010,9 +1016,9 @@ corner of the window is within 1.2 repeats of a mark while the layer is still
 visible: the annotation covers the whole window or it is gone. At 390 × 844 the
 marks thin to α, β and the slide with only α's and the slide's labels. The layer's
 computed `pointer-events` is `none` and a drag straight across a mark still pans.
-The checkbox, `G` and `?generators=0` each switch the marks off, the first two are
-remembered across a reload and the query is not, so a share link never overwrites
-what the viewer chose. The panel opens from the button and from `N`, closes from
+The checkbox and `G` each switch the marks off and on and are remembered across a
+reload, while `?generators=0` and `?generators=1` decide one visit and are not
+remembered, so a share link never overwrites what the viewer chose. The panel opens from the button and from `N`, closes from
 `Esc`, from `N` and from a tap outside but **not** from a drag that starts
 outside, carries `role="region"` and its `more ↓` cue, and at 390 × 844 fits the
 screen, sits above the control bar, leaves the picture in view and adds no

@@ -496,6 +496,61 @@ await section('generator marks appear wherever the catalog carries them', async 
   await context.close();
 });
 
+// ---- 7a · the marks are an option, never the opening state ------------------
+// Site-wide rule: a visualisation opens as the picture alone and the annotation
+// is a checkbox under it. What has to hold is that a link saying nothing about
+// the marks draws none, that the box is live and draws them when ticked, that
+// the tick is this viewer's own and survives a fresh load, and that an explicit
+// `marks=` in a share link still decides the visit outright.
+
+await section('the generator marks are off until the checkbox under the viewer is ticked', async () => {
+  const entry = catalog.all('gyre').find(item => item.generators?.length) ?? catalog.all('gyre')[0];
+  const page_url = new URL('colour/gyre/', base).href;
+  const bare = `#${entry.groupId}?v=1&sub=all&pattern=${encodeURIComponent(entry.id)}&play=0&phase=0`;
+  const {context, page, errors} = await open('colour/gyre/', {hash: bare});
+  /** Every page opened in this context reports into the same `errors`. */
+  const watch = target => {
+    target.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+    target.on('pageerror', error => errors.push(`pageerror: ${error.message}`));
+  };
+  await ready(page);
+  await page.waitForTimeout(250);
+  const hidden = target => target.locator('#marks').evaluate(node => node.style.display);
+  const drawn = target => target.locator('#marks .cc-marker, #marks .cc-translation').count();
+  assert.equal(await hidden(page), 'none', 'a link that says nothing about the marks opens without them');
+  assert.equal(await page.locator('#show-marks').isChecked(), false, 'and the checkbox underneath is clear');
+  assert.equal(await drawn(page), 0, 'nothing is drawn over the picture');
+  assert.equal(await page.locator('#show-marks').isDisabled(), !entry.generators?.length,
+    'the checkbox is live exactly when the catalog carries this entry’s marks');
+  if (entry.generators?.length) {
+    await page.locator('#show-marks').check();
+    await page.waitForTimeout(250);
+    assert.notEqual(await hidden(page), 'none', 'ticking the box draws them');
+    assert.ok(await drawn(page) > 0, 'and there is something to see');
+    // A fresh load of the same bare link, in the same browser: the tick is
+    // remembered in `localStorage` and wins over the off default.
+    const remembered = await context.newPage();
+    watch(remembered);
+    await remembered.goto(page_url + bare, {waitUntil: 'domcontentloaded'});
+    await ready(remembered);
+    await remembered.waitForTimeout(250);
+    assert.equal(await remembered.locator('#show-marks').isChecked(), true, 'the remembered tick wins over the default');
+    assert.notEqual(await hidden(remembered), 'none', 'and the marks are there on the fresh load');
+    await remembered.close();
+    // …but a share link that names the marks decides the visit outright.
+    const shared = await context.newPage();
+    watch(shared);
+    await shared.goto(`${page_url + bare}&marks=0`, {waitUntil: 'domcontentloaded'});
+    await ready(shared);
+    await shared.waitForTimeout(250);
+    assert.equal(await shared.locator('#show-marks').isChecked(), false, 'marks=0 beats the remembered tick');
+    assert.equal(await hidden(shared), 'none', 'and draws nothing');
+    await shared.close();
+  }
+  assert.deepEqual(errors, [], 'console');
+  await context.close();
+});
+
 // ---- 7b · the export carries the tables its entry indexes -------------------
 
 await section('the exported record can be read without the catalog', async () => {

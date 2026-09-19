@@ -49,14 +49,16 @@ const taa = Math.max(1, Math.round(number('taa', 0, MAX_TAA_LAYERS) ?? TAA_LAYER
 const shutter = number('shutter', 0, 2) ?? SHUTTER;
 const motion = number('motion', 0, 1000) ?? MOTION_PIXELS;
 let showStats = params.get('stats') === '1';
-// The generator marks are on unless this viewer has turned them off — the page
-// is about its generators, so they are what it opens with. `?generators=0`
-// shares a view without them and wins over what the viewer last chose, which
-// is remembered here alone and never leaves the browser.
+// The generator marks are OFF until someone asks for them: every picture on
+// this site opens as the picture alone, and the checkbox under it — or `G` — is
+// what adds the annotation. A viewer who has turned them on keeps them on, and
+// `?generators=1` shares a view with them (`?generators=0` without); either
+// query wins over what the viewer last chose, which is remembered here alone
+// and never leaves the browser.
 const STORE_KEY = 'trefoil:generators';
 const stored = (() => { try { return localStorage.getItem(STORE_KEY); } catch { return null; } })();
 const askedGenerators = params.get('generators') ?? params.get('gen');
-let showGenerators = askedGenerators !== null ? askedGenerators !== '0' : stored !== '0';
+let showGenerators = askedGenerators !== null ? askedGenerators !== '0' : stored === '1';
 let renderer, field, overlay, scheduled = false, dirty = false, lastTime = null, idleTimer, wakeLock;
 
 // While the pattern downloads, idle animation frames reveal the display's

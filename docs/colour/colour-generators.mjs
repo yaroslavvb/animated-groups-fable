@@ -407,7 +407,7 @@ ${anatomySvg(lead)}
 ${CLOSING[kind] ?? ''}
 <p class="foot">The marks repeat with the pattern. Zoom out and they thin — first the labels, then the lowest-order turn —
 and about five times out the layer is hidden altogether; zoom back in and it returns. Press <b>G</b> for the marks,
-<b>N</b> for this panel, and share a view with <code>?marks=0</code> to open it without them.</p>
+<b>N</b> for this panel, and share a view with <code>&amp;marks=1</code> to open it <i>with</i> them (they are off until asked for).</p>
 ${foot}`;
 }
 

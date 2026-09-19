@@ -1,0 +1,135 @@
+{
+ "schema": "monochrome-compute-ledger-v1",
+ "session": "2026-09-19",
+ "authorizedOverallUSD": 100.0,
+ "sessionReservationCapUSD": 70.0,
+ "thisSessionConservativeBoundUSD": 69.912634,
+ "measuredWorkerSeconds": 105708.7,
+ "measuredWorkerSecondsUSD": 4.647,
+ "measuredScope": "Sum of the workers own elapsed seconds at the container rate. It is a floor, not the invoice: it excludes image build, container startup, the idle time a warm container spends between inputs and the scale-down window. It is recorded next to the reservation to show how conservative the reservation is.",
+ "providerReportedChargesUSD": null,
+ "pricingChecked": "2026-09-19",
+ "pricingSource": "https://modal.com/pricing",
+ "pricingQuoted": {
+  "cpuUSDPerPhysicalCoreSecond": 1.31e-05,
+  "memoryUSDPerGiBSecond": 2.22e-06
+ },
+ "resources": {
+  "cpuPhysicalCoresHardLimit": 2,
+  "memoryGiBHardLimit": 8,
+  "gpu": null,
+  "maxContainersPerApp": 24,
+  "retries": 0,
+  "functionSeconds": 300,
+  "workerWallClockSeconds": 260,
+  "startupSeconds": 120,
+  "scaleDownSeconds": 10,
+  "perContainerSecondUSD": 4.396e-05
+ },
+ "method": "Worst case for every job: full function timeout plus full startup timeout and the scale-down allowance at the CPU/memory rate, plus a $3 image-build and accounting reserve per app. A conservative reservation, not a provider invoice: the returned jobs averaged far less than the timeout. No persistent deployments, schedules, retries, endpoints or GPUs were created. Modal re-schedules an input whose container is preempted, which is not counted separately; one preemption was observed in the smoke batch.",
+ "totalSubmittedJobs": 2905,
+ "totalReturnedJobs": 2905,
+ "totalAdmittedRecords": 849,
+ "runs": [
+  {
+   "batch": "smoke",
+   "appId": "ap-B4MYwrUEU5chy2iLuiaF13",
+   "submittedJobs": 6,
+   "returnedJobs": 6,
+   "outcomes": {
+    "no-relative-equilibrium": 4,
+    "newton-not-converged": 1,
+    "budget": 1
+   },
+   "state": "stopped",
+   "admittedRecords": 0,
+   "reservedUSDIncludingThreeDollarBuildReserve": 3.1134168,
+   "measuredWorkerSeconds": 399.0,
+   "measuredWorkerSecondsUSD": 0.0175,
+   "maximumConcurrentContainers": 24,
+   "launched": "2026-09-19T15:12:56Z"
+  },
+  {
+   "batch": "sq-phase",
+   "appId": "ap-hz0SygLXcc7rnXxXQU8erq",
+   "submittedJobs": 1024,
+   "returnedJobs": 1024,
+   "outcomes": {
+    "no-relative-equilibrium": 202,
+    "audit-failed": 328,
+    "admitted": 492,
+    "not-admitted": 2
+   },
+   "state": "stopped",
+   "admittedRecords": 492,
+   "reservedUSDIncludingThreeDollarBuildReserve": 22.3564672,
+   "measuredWorkerSeconds": 11496.0,
+   "measuredWorkerSecondsUSD": 0.5054,
+   "maximumConcurrentContainers": 24,
+   "launched": "2026-09-19T15:22:44Z"
+  },
+  {
+   "batch": "sq-hopf",
+   "appId": "ap-MVSmbJkf9MKrrtLSaVIRYG",
+   "submittedJobs": 691,
+   "returnedJobs": 691,
+   "outcomes": {
+    "audit-failed": 75,
+    "newton-not-converged": 439,
+    "admitted": 35,
+    "budget": 105,
+    "converged-to-steady-state": 5,
+    "synchronised-to-uniform": 30,
+    "error": 1,
+    "not-admitted": 1
+   },
+   "state": "stopped",
+   "admittedRecords": 35,
+   "reservedUSDIncludingThreeDollarBuildReserve": 16.0618348,
+   "measuredWorkerSeconds": 59490.9,
+   "measuredWorkerSecondsUSD": 2.6152,
+   "maximumConcurrentContainers": 24,
+   "launched": "2026-09-19T15:23:14Z"
+  },
+  {
+   "batch": "sq-phase2",
+   "appId": "ap-a0g0iIi6bwlEu3HLkAeuGX",
+   "submittedJobs": 900,
+   "returnedJobs": 900,
+   "outcomes": {
+    "no-relative-equilibrium": 213,
+    "audit-failed": 362,
+    "admitted": 321,
+    "not-admitted": 4
+   },
+   "state": "stopped",
+   "admittedRecords": 321,
+   "reservedUSDIncludingThreeDollarBuildReserve": 20.01252,
+   "measuredWorkerSeconds": 9770.4,
+   "measuredWorkerSecondsUSD": 0.4295,
+   "maximumConcurrentContainers": 24,
+   "launched": "2026-09-19T15:25:57Z"
+  },
+  {
+   "batch": "probe",
+   "appId": "ap-8XNlXAZLrrIYPLqxMpyRUF",
+   "submittedJobs": 284,
+   "returnedJobs": 284,
+   "outcomes": {
+    "newton-not-converged": 107,
+    "error": 25,
+    "converged-to-steady-state": 15,
+    "synchronised-to-uniform": 102,
+    "budget": 34,
+    "admitted": 1
+   },
+   "state": "stopped",
+   "admittedRecords": 1,
+   "reservedUSDIncludingThreeDollarBuildReserve": 8.3683952,
+   "measuredWorkerSeconds": 24552.4,
+   "measuredWorkerSecondsUSD": 1.0793,
+   "maximumConcurrentContainers": 24,
+   "launched": "2026-09-19T15:27:57Z"
+  }
+ ]
+}

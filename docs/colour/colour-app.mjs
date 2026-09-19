@@ -84,7 +84,10 @@ let groupId = null, filter = 'all', pairs = KIND === 'trefoil';
 let modelId = null, parameterKey = null, selectedId = null, record = null;
 let renderer = null, view = null, overlay = null, gestures = null;
 let phase = 0, playing = false, lastTime = 0, selectionToken = 0, mapGeometry = null;
-let requested = {phase: 0, play: true}, requestedCamera = null, marksOn = true, notationOn = false;
+// `marksOn` opens false: the annotation is an option under the picture, never
+// what the picture opens as. `restoreUrl` then lets a remembered choice or an
+// explicit `marks=` in the link say otherwise.
+let requested = {phase: 0, play: true}, requestedCamera = null, marksOn = false, notationOn = false;
 let needsDraw = true, lastEngine = '', wasFixed = false;
 
 let canvas = $('pattern');
@@ -1117,6 +1120,9 @@ function restoreUrl() {
   $('tiles').value = String(state.tiles);
   $('palette').value = state.palette;
   $('speed').value = String(state.speed);
+  // Off unless asked for: `state.marks` defaults to false, a link that names
+  // `marks=` decides the visit outright, and otherwise a viewer who ticked the
+  // box last time keeps it ticked.
   marksOn = state.marks;
   if (!location.hash.includes('marks=')) {
     try { const saved = localStorage.getItem(`colour:${KIND}:marks`); if (saved !== null) marksOn = saved === '1'; } catch { /* ignore */ }

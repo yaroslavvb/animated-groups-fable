@@ -1,0 +1,40 @@
+{
+ "schema": "monochrome-reservations-v1",
+ "authorizedUSD": 100.0,
+ "sessionCapUSD": 70.0,
+ "perBatchCapUSD": 26.0,
+ "perContainerSecondUSD": 4.396e-05,
+ "batches": [
+  {
+   "batch": "smoke",
+   "jobs": 6,
+   "reservedUSD": 3.1134168,
+   "launched": "2026-09-19T15:12:56Z"
+  },
+  {
+   "batch": "sq-phase",
+   "jobs": 1024,
+   "reservedUSD": 22.3564672,
+   "launched": "2026-09-19T15:22:44Z"
+  },
+  {
+   "batch": "sq-hopf",
+   "jobs": 691,
+   "reservedUSD": 16.0618348,
+   "launched": "2026-09-19T15:23:14Z"
+  },
+  {
+   "batch": "sq-phase2",
+   "jobs": 900,
+   "reservedUSD": 20.01252,
+   "launched": "2026-09-19T15:25:57Z"
+  },
+  {
+   "batch": "probe",
+   "jobs": 284,
+   "reservedUSD": 8.3683952,
+   "launched": "2026-09-19T15:27:57Z"
+  }
+ ],
+ "totalReservedUSD": 69.912634
+}
