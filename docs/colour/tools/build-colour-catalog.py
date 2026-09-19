@@ -115,6 +115,12 @@ SHIPPED = {
 # script writes: the most legible pictures, spread over the three equations, the
 # film groups of the source fields and the cell sizes.  Every one of them is
 # exact; `featured` is a judgement about how it looks, nothing else.
+#
+# A key here exempts its entry from the budget trim AND protects that entry's
+# chirality partner (`featured_partners`, `select_entries`), because a blurb can
+# say "its mirror is in the catalog too" and the pages badge the mirror only
+# when it is shipped.  Say nothing here about another entry that the build does
+# not keep true by construction.
 FEATURED = {
     'colour:gyre:8fcde9bc1178': 'the centre and field the shipped ../scott-gray/gyre/ page uses: '
                                 'interlocking scroll hooks, colour-preserving subgroup exactly p1',
@@ -150,17 +156,25 @@ FEATURED = {
 
     # ---- the offline equation search (docs/scott-gray/research/colour/) ----
     # Chosen the same way: by looking at the 512-pixel thumbnails and the
-    # 12-frame strips of all 118 new entries, laid out as contact sheets per
-    # equation.  Two or three per equation, spread over the motifs the search
-    # actually produced - hexagon tilings, triangles, spirals and lozenges -
-    # and over both chiralities where the search found a pair.
+    # 12-frame strips of every search entry the build mined, laid out as contact
+    # sheets per equation.  Two or three per equation, spread over the motifs the search
+    # actually produced - hexagon tilings, triangles, spirals, scrolls,
+    # scallops and lozenges - and over both chiralities where the search found
+    # a pair.
     'colour:gyre:b5207a1aafaf': 'Brusselator: a flat hexagon tiling, three colours one per '
                                 'hexagon, with the area split exactly in thirds and no speckle '
                                 'at all - the plainest statement in the catalog of what a '
                                 'three-colouring of a wave is',
-    'colour:gyre:1cb589bef8b7': 'Brusselator on a p6m field: big triangles with teal arrowheads '
-                                'inside them, and the boldest area imbalance here (0.25) - the '
-                                'colours are decidedly not equal, and the law holds anyway',
+    # The g246 bru-e picture that used to stand here (field 1cb589bef8b7) left the
+    # catalog when the long batch found the same orbit again at a lower boundary
+    # density; the kept copy is a different phase of it and a quieter picture.  Its
+    # role — big triangles, the boldest area imbalance in the catalog — passes to
+    # this bru-d orbit on the same film group, which carries the motif and the claim.
+    'colour:gyre:0aa87383a573': 'Brusselator on a g246 field: whole triangles of one colour with '
+                                'teal and red wedges bitten out of them, and the boldest area '
+                                'imbalance in the catalog (0.248) - in its worst frame one colour '
+                                'holds 58% of the cell, while over the film the three shares are '
+                                'exactly a third each',
     'colour:trefoil:bc386cbb30c5': 'Brusselator, Trefoil: broad wave lozenges, 18 exact '
                                    'symmetries, colour-preserving p3 - and its mirror is in the '
                                    'catalog too, as the chirality partner the search found',
@@ -174,8 +188,13 @@ FEATURED = {
                                 'opposite chirality to the g225 ones the atlas already had',
     'colour:gyre:56cf777b57b5': 'the lambda-omega normal form: a clean hexagon tiling on a p31m '
                                 'field, exactly a third of every frame in each colour',
-    'colour:gyre:f7cf7381878b': 'the lambda-omega normal form on a p6 field: loose open scrolls, '
-                                'the least grid-like Gyre the search produced',
+    # Supersedes the lw-b g244 open scrolls (f7cf7381878b, boundary density 0.170,
+    # margin 0.96, speckle 9.6e-5) the previous build featured: same motif, same
+    # equation, and better on every measurement that bears on how it reads.
+    'colour:gyre:2facfcba0639': 'the lambda-omega normal form at the lw-d parameters: a dense '
+                                'field of small three-armed scrolls on a nine-op p3 field, '
+                                'speckle exactly 0 and an exact third of every frame in each '
+                                'colour - the cleanest scroll picture the search produced',
     'colour:gyre:76f88d20b6ac': 'Schnakenberg: rounded hexagons, boundary density 0.066 — the '
                                 'lowest of the new equations, though six Gray–Scott entries go '
                                 'lower — and speckle exactly 0',
@@ -189,6 +208,34 @@ FEATURED = {
     'colour:trefoil:3364a7645e6f': 'the Trefoil of the same Sel’kov orbit - the one place in '
                                    'the catalog where both colourings of one field are featured, '
                                    'so the two rules can be read against each other',
+
+    # ---- the two equations the long batch added (Lengyel-Epstein, rock-paper-scissors) ----
+    # Same judgement, same way: contact sheets of every entry these two equations
+    # produced, at 512 pixels, laid out per equation and per colouring.
+    'colour:gyre:c02dbaafcb27': 'Lengyel-Epstein, the CIMA reaction that first showed a Turing '
+                                'pattern in a laboratory: interlocking plus-shapes on a nine-op '
+                                'p3 field, boundary density 0.068 with no speckle at all and an '
+                                'exact third of every frame in each colour - the cleanest Gyre '
+                                'of the equations the long batch added',
+    'colour:trefoil:03ca299f9b36': 'Lengyel-Epstein, Trefoil: overlapping fish-scale scallops, a '
+                                   'motif no other equation in the catalog produces, with 18 '
+                                   'exact symmetries and colour-preserving p3 - the shape of the '
+                                   'shipped Trefoil page drawn by different chemistry',
+    'colour:trefoil:721371620bab': 'the g248 partner of the Lengyel-Epstein scallops: the same '
+                                   'picture at the opposite chirality, matched to its mirror by '
+                                   'Ma at 2.0e-5 relative RMS',
+    # Not "the most decisive argmax of the new equations": the other g227 rps
+    # entry, 54faf5565b0a, measures 1.311 against this one's 1.234.  This is the
+    # cleaner picture of the two (boundary density 0.075 against 0.085), which is
+    # why it is the one featured; the margin is a decisive one, not the largest.
+    'colour:gyre:5fc3cc7d4c15': 'rock-paper-scissors: one flat hexagon per species, speckle '
+                                'exactly 0, an exact third of every frame in each colour and a '
+                                'decisive argmax (margin 1.23) - the cyclic competition of three '
+                                'species drawn as plainly as three colours can draw it',
+    'colour:gyre:171743e84bbd': 'rock-paper-scissors on the p3 field of the opposite chirality: '
+                                'the same cyclic competition read as an irregular cellular '
+                                'tiling rather than a lattice - rounded cells of unequal size, '
+                                'the least grid-like picture the new equations gave',
 }
 
 # --------------------------------------------------------------------------- models
@@ -323,6 +370,54 @@ MODELS = {
             'extreme, so the colour shares swing inside a loop rather than holding a third '
             'each frame — worst deviation 0.206 across its entries here, against 0.254 for '
             'the Brusselator, 0.235 for Schnakenberg and 0.163 for Gray–Scott.',
+    },
+    'lengyel-epstein': {
+        'name': 'Lengyel–Epstein',
+        'axes': ['a', 'b'],
+        'labels': {'a': 'a', 'b': 'b', 'Du': 'Dᵤ', 'Dv': 'Dᵥ'},
+        'parameters': ['a', 'b', 'Du', 'Dv'],
+        'diffusion': ['Du', 'Dv'],
+        'channels': ['U', 'V'],
+        'equation': 'uₜ = Dᵤ∇²u + a − u − 4uv/(1 + u²)\n'
+                    'vₜ = Dᵥ∇²v + b(u − uv/(1 + u²))',
+        'equationHtml': 'u<sub>t</sub> = D<sub>u</sub>∇²u + a − u − 4uv/(1 + u²)<br>'
+                        'v<sub>t</sub> = D<sub>v</sub>∇²v + b(u − uv/(1 + u²))',
+        'description':
+            'The Lengyel–Epstein two-variable model of the CIMA chlorite–iodide–malonic-acid '
+            'reaction, the chemistry in which Turing patterns were first seen in a laboratory. '
+            'u is the iodide activator and v the chlorite inhibitor; the Michaelis-like term '
+            '4uv/(1 + u²) saturates, which is what lets the oscillation stay bounded without a '
+            'cubic. The uniform state is u* = a/5, v* = 1 + u*², and the Hopf locus is '
+            'b = (3u*² − 5)/u*; only the set just past it — a = 12, b = 4.9 — closed any '
+            'orbits here, and it is the latest equation in the catalog to carry a Trefoil as '
+            'well as a Gyre. The colourings read the iodide channel u.',
+    },
+    'rps': {
+        'name': 'Rock–paper–scissors',
+        'axes': ['e', 'd'],
+        'labels': {'e': 'e', 'd': 'd', 'mu': 'μ', 'D': 'D'},
+        'parameters': ['e', 'd', 'mu', 'D'],
+        'diffusion': ['D'],
+        'channels': ['u₀', 'u₁'],
+        'equation': 'u₂ = 1 − u₀ − u₁,  fᵢ = e uᵢ₊₁ − d uᵢ₊₂,  φ = Σ uᵢ fᵢ\n'
+                    '(uᵢ)ₜ = D∇²uᵢ + uᵢ(fᵢ − φ) + μ(1/3 − uᵢ)',
+        'equationHtml': 'u₂ = 1 − u₀ − u₁, &nbsp; f<sub>i</sub> = e u<sub>i+1</sub> − '
+                        'd u<sub>i+2</sub>, &nbsp; φ = Σ u<sub>i</sub> f<sub>i</sub><br>'
+                        '(u<sub>i</sub>)<sub>t</sub> = D∇²u<sub>i</sub> + '
+                        'u<sub>i</sub>(f<sub>i</sub> − φ) + μ(1/3 − u<sub>i</sub>)',
+        'description':
+            'The cyclic three-species replicator — rock beats scissors beats paper beats rock — '
+            'with equal diffusion and a small mutation rate μ holding the state off the '
+            'extinction boundary. It is the one equation in this catalog that is equivariant '
+            'under cyclic relabelling of its species: (u₀, u₁, u₂) → (u₁, u₂, u₀) leaves the '
+            'right-hand side unchanged. That is a symmetry of the chemistry and not of the '
+            'picture — the Z₃ a Gyre shows is the colouring’s own third-turn-and-third-period '
+            'screw, which on these orbits is not the relabelling — but it is the only family '
+            'here where the two are even the same group. Equal diffusion conserves '
+            'u₀ + u₁ + u₂ = 1 exactly, which is why two channels suffice; the colourings read '
+            'u₀. It was also the hardest family to close — half of its shooting runs (85 of 172) '
+            'ran out their ten-minute budget — so only a handful of its orbits are here, all of '
+            'them Gyres: it produced no Trefoil at all.',
     },
 }
 
@@ -2140,6 +2235,24 @@ def copy_field(rec, orbits_dir, report):
     return True
 
 
+def shipped_pairs(entries):
+    """The chirality pairs the catalog can actually show: two SHIPPED entries of
+    one kind whose `source.chirality` names each other."""
+    by_key = {(e['kind'], e['source']['fieldSha256']): e for e in entries}
+    pairs = set()
+    for e in entries:
+        chirality = e['source'].get('chirality')
+        if not chirality:
+            continue
+        mate = by_key.get((e['kind'], chirality['partnerSha256']))
+        if mate is None:
+            continue
+        back = (mate['source'].get('chirality') or {}).get('partnerSha256')
+        if back == e['source']['fieldSha256']:
+            pairs.add(tuple(sorted((e['id'], mate['id']))))
+    return pairs
+
+
 def summarise(entries):
     """The counts block: per kind x model x film group, featured, new vs existing."""
     by = {}
@@ -2159,7 +2272,15 @@ def summarise(entries):
         'all': tally(lambda e: True),
         'existing': tally(lambda e: e['source']['origin'] == 'atlas'),
         'new': tally(lambda e: e['source']['origin'] == 'record'),
-        'chiralityPairs': sum(1 for e in entries if e['source'].get('chirality')) // 2,
+        'chiralityPairs': len(shipped_pairs(entries)),
+        # An entry carries source.chirality for the mirror the SEARCH found; the
+        # trim can leave that partner unshipped, and two entries of one kind can
+        # each name a different mirror of the same orbit.  Only a mutual link
+        # between two shipped entries of the same kind is a pair the pages can
+        # put side by side, so that is what the count is — the rest are named
+        # here rather than folded into it.
+        'chiralityUnpaired': (sum(1 for e in entries if e['source'].get('chirality'))
+                              - 2 * len(shipped_pairs(entries))),
         'fullyEntangled': sum(1 for e in entries if e['metrics'].get('fullyEntangled')),
         'latticeOnly': sum(1 for e in entries
                            if e['metrics'].get('colourPreservingIsLatticeOnly')),
@@ -2248,7 +2369,22 @@ def compact(doc, runners=2):
     return doc
 
 
-def select_entries(entries, per_set, max_new=None):
+def featured_partners(entries):
+    """(kind, fieldSha256) of the chirality partner of every featured entry.
+
+    A featured blurb may say "its mirror is in the catalog too", and the pages
+    badge an entry with `mirror partner <group>` only when the partner is
+    shipped, so a trim that keeps a featured entry and drops its twin makes the
+    page contradict itself.  The pair is protected as a unit."""
+    want = set()
+    for e in entries:
+        chirality = e['source'].get('chirality')
+        if e.get('featured') and chirality:
+            want.add((e['kind'], chirality['partnerSha256']))
+    return want
+
+
+def select_entries(entries, per_set, max_new=None, report=None):
     """Choose which patterns to ship.
 
     The explorer's ladder is film group -> equation -> parameter set -> pattern,
@@ -2265,13 +2401,16 @@ def select_entries(entries, per_set, max_new=None):
     the cells, so a catalog trimmed to fit loses the twentieth pattern of a
     crowded cell before it loses the only pattern of a rare one.
 
-    Entries mined from the wallpaper atlas, and anything featured, are never
-    dropped: the first are the catalog the site already ships, and the second
-    are the pictures a person chose.
+    Entries mined from the wallpaper atlas, anything featured, and the chirality
+    partner of anything featured, are never dropped: the first are the catalog
+    the site already ships, the second are the pictures a person chose, and the
+    third is what keeps a featured pair a pair (see `featured_partners`).
     """
+    protected = featured_partners(entries)
     cells, kept = {}, []
     for e in entries:
-        if e['source']['origin'] != 'record' or e.get('featured'):
+        if (e['source']['origin'] != 'record' or e.get('featured')
+                or (e['kind'], e['source']['fieldSha256']) in protected):
             kept.append(e)
             continue
         key = (e['kind'], e['source']['model'], e['source']['provenance']['label'],
@@ -2284,11 +2423,45 @@ def select_entries(entries, per_set, max_new=None):
         limit = len(rows) if per_set <= 0 else per_set + (2 if key[0] == 'trefoil' else 0)
         for rank, e in enumerate(rows[:limit]):
             ranked.append((rank, key, e))
-    ranked.sort(key=lambda r: (r[0], r[1]))
+    # Interleave the kinds INSIDE a rank.  Ordering a rank by the cell key alone
+    # puts every 'gyre' cell before every 'trefoil' one, so a cut that lands
+    # inside rank 0 would take the whole of the scarcer colouring first; with the
+    # kinds interleaved the cut costs both in proportion.
+    slots, ordered = {}, []
+    for rank, key, e in sorted(ranked, key=lambda r: (r[0], r[1])):
+        slot = slots.get((rank, key[0]), 0)
+        slots[(rank, key[0])] = slot + 1
+        ordered.append(((rank, slot, key), e))
+    ordered.sort(key=lambda r: r[0])
+    ranked = [(k[0], k[2], e) for k, e in ordered]
+    rank0 = sum(1 for rank, _, _ in ranked if rank == 0)
     if max_new is not None:
         ranked = ranked[:max(0, max_new)]
+    if report is not None:
+        # How close the budget came to cutting into rank 0 — the one cut that
+        # would empty a (kind, equation, parameter set, group) cell.  Positive
+        # headroom is second-and-later patterns the round robin still carried.
+        report.clear()
+        report.update({
+            'rows': len(ordered), 'rank0Rows': rank0, 'taken': len(ranked),
+            'headroomOverRank0': len(ranked) - rank0,
+            'rank0ByKind': tally_kinds(e for k, e in ordered if k[0] == 0),
+            'takenByKind': tally_kinds(e for _, _, e in ranked),
+            'protectedPartners': sorted(f'{kind}:{sha[:12]}' for kind, sha in protected),
+            'note': 'the round robin over (kind, equation, parameter set, group) cells, '
+                    'rank-first and with the kinds interleaved inside a rank; maxNew takes '
+                    'its head. headroomOverRank0 < 0 means the cut fell inside rank 0 and a '
+                    'cell lost its only pattern.',
+        })
     kept.extend(e for _, _, e in ranked)
     return sorted(kept, key=entry_sort_key)
+
+
+def tally_kinds(entries):
+    counts = {}
+    for e in entries:
+        counts[e['kind']] = counts.get(e['kind'], 0) + 1
+    return dict(sorted(counts.items()))
 
 
 def prune(directory, keep, suffix):
@@ -2374,7 +2547,7 @@ def main(argv=None):
                     help="where admitted records' fields are copied")
     ap.add_argument('--thumb-bytes', type=int, default=40000,
                     help='hard ceiling on one thumbnail, in bytes')
-    ap.add_argument('--json-mb', type=float, default=3.0,
+    ap.add_argument('--json-mb', type=float, default=4.5,
                     help='ceiling on the catalog JSON, in megabytes')
     ap.add_argument('--per-set', type=int, default=3,
                     help='patterns kept per (kind, equation, parameter set, film group) for '
@@ -2517,8 +2690,9 @@ def main(argv=None):
     build_out = os.path.join(os.path.dirname(args.out), 'colour-atlas-build.json')
     blank = {'copied': 0, 'kept': 0, 'bytes': 0}
     blank_thumbs = {'written': 0, 'maxBytes': 0, 'over': []}
+    selection = {}
     def trial(per_set, max_new):
-        chosen = select_entries(entries, per_set, max_new)
+        chosen = select_entries(entries, per_set, max_new, report=selection)
         doc = compact(make_doc(copy.deepcopy(chosen), blank, blank_thumbs), args.runners)
         size = len(json.dumps(doc, separators=(',', ':')))
         print(f'  per-set {per_set}'
@@ -2539,6 +2713,22 @@ def main(argv=None):
     while size > args.json_mb * 1e6 and max_new > floor:
         max_new = max(floor, int(max_new * 0.92) - 1)
         chosen, size = trial(per_set, max_new)
+    if selection.get('headroomOverRank0', 0) < 0:
+        print(f"WARNING: the budget cut {-selection['headroomOverRank0']} rank-0 patterns; "
+              'a parameter set now ships nothing', file=sys.stderr)
+
+    # A featured entry's chirality partner is protected from the trim, but the
+    # partner has to have been mined in the first place — a dedupe can retire
+    # it.  Say so here rather than letting a blurb promise a mirror the pages
+    # cannot show.
+    chosen_keys = {(e['kind'], e['source']['fieldSha256']) for e in chosen}
+    orphaned = sorted(f'{kind}:{sha[:12]}' for kind, sha in featured_partners(chosen)
+                      if (kind, sha) not in chosen_keys)
+    if orphaned:
+        notes.append('featured entries whose chirality partner is NOT shipped: '
+                     + ', '.join(orphaned))
+        print(f'WARNING: featured chirality partner missing: {", ".join(orphaned)}',
+              file=sys.stderr)
 
     # ------------------------------------------------- the fields the pages load
     by_sha = {f['orbit']['fieldSha256']: f for f in fields}
@@ -2567,6 +2757,7 @@ def main(argv=None):
                    'generated': doc['generated'], 'builderSha256': builder_sha,
                    'recordDirs': doc['source']['recordDirs'],
                    'perParameterSet': per_set, 'maxNew': max_new,
+                   'roundRobin': selection,
                    'minedFields': len(fields), 'entriesMined': len(entries),
                    'entriesShipped': len(chosen),
                    'duplicatesDropped': dropped, 'chiralityPairs': pairs,

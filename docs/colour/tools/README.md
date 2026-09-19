@@ -65,7 +65,14 @@ test, `motion_match`:
   sub-frame shift is found too;
 * a **proper** motion within 1e-3 relative RMS means one orbit reached twice:
   the copy whose best measured colouring has the lower boundary density is kept
-  and the other is dropped, with the relation recorded;
+  and the other is dropped, with the relation recorded. That tie-break reads the
+  **search's** number — `boundaryDensity` on the record's own finalists, the
+  fraction of *nodes* with any differing neighbour — while the picture the site
+  ships is measured here, by this script's own turn-centre sweep, and its
+  `metrics.boundaryDensity` is the fraction of lattice *edges* crossing a
+  boundary. The two are different quantities on the same colouring (0.216
+  against 0.076 on one worked example), so the kept copy is the cleaner one by
+  the search's reckoning and not necessarily by the catalog's — see §6;
 * a **mirror** means the two chiralities: **both are kept**, and each carries
   `source.chirality` naming its partner, the mirror that relates them and the
   residual.
@@ -117,9 +124,11 @@ every centre in view and not only at the generators.
 
 `atlas.models` is the equation table the pages read: `name`, `axes`, `labels`,
 `parameters`, `diffusion`, `channels`, `equation` (plain text), `equationHtml`
-and a one-paragraph `description`. Seven equations are in it today —
+and a one-paragraph `description`. Nine equations are in it today —
 Gray–Scott, Ginzburg–Landau, cubic–quintic Ginzburg–Landau, the λ–ω normal
-form, Brusselator, Schnakenberg and Sel'kov.
+form, Brusselator, Schnakenberg, Sel'kov, Lengyel–Epstein and the cyclic
+rock–paper–scissors replicator. The last two arrived with the finished long
+batch: Lengyel–Epstein carries both colourings, `rps` only the Gyre.
 
 Per `research/colour-pages-design.md` §4 the pages read this table rather than
 closing over a list, so **adding an equation is adding one object to `MODELS`
@@ -131,7 +140,7 @@ are not among its `parameters`.
 
 | | ceiling | shipped |
 | --- | --- | --- |
-| `colour-atlas.json` | 3.0 MB (`--json-mb`) | see `counts` in the file |
+| `colour-atlas.json` | 4.5 MB (`--json-mb`) | see `counts` in the file |
 | one thumbnail | 40 000 bytes (`--thumb-bytes`) | max 17 633 |
 | fields in the JSON | never inline | `source.fieldUrl`, `field.sha256`, `byteLength` |
 
@@ -150,11 +159,32 @@ set contributes: `--per-set N`, lowered automatically until the JSON fits, with
 two extra allowed per Trefoil cell because Trefoil is the scarcer colouring. If
 one pattern per set is still too many, the selection falls back to the head of a
 **round robin** over the cells, so what goes is the twentieth pattern of a
-crowded cell and never the only pattern of a rare one. Atlas entries and
-featured entries are never dropped, so the budget always holds and the ladder
-never loses a rung. Every entry that was mined but not shipped is named in
+crowded cell and never the only pattern of a rare one. Inside one rank the two
+colourings are **interleaved**, because ordering a rank by the cell key alone
+would put every Gyre cell before every Trefoil one and a cut landing inside rank
+0 would take the whole of the scarcer colouring first. Three kinds of entry are
+never dropped: atlas entries, featured entries, and **the chirality partner of a
+featured entry** — a featured blurb can say the mirror is in the catalog, and the
+pages badge `mirror partner <group>` only when it is, so the pair is protected as
+a unit. Every entry that was mined but not shipped is named in
 `colour-atlas-build.json`, so widening the catalog is `--per-set 3 --json-mb 5`
 and nothing else.
+
+The finished long batch is what this costs in practice: 569 entries mined,
+`--per-set 3` would ship 423 of them at 4.41 MB, `--per-set 2` 361 at 3.87 MB, so
+the loop settles at `--per-set 1` (284 entries, 3.18 MB) and then takes the first
+115 rows of the round robin — 268 entries, 2 998 751 bytes against the 3 000 000
+ceiling (`perParameterSet` and `maxNew` in the build record). The 19 featured
+search entries and the 4 chirality partners they protect are not in the round
+robin at all, so the 138 record entries that ship are those 23 plus the 115. All 301 that went are
+second and later patterns of crowded cells; every one of the 75 (colouring,
+equation, film group) cells — `len(counts.byKindModelGroup)`, so the number
+stays right as the catalog grows — still ships at least one pattern. The build
+record's `roundRobin` says how close the cut came: `rank0Rows` is the number of
+cells the round robin offered a first pattern for, `taken` is how many rows the
+budget bought, and `headroomOverRank0` is the difference — **+3** on this build,
+so nothing was cut inside rank 0 and no cell lost its only pattern. Negative
+headroom is a warning on stderr.
 
 Thumbnails and orbit files this build did not write are deleted (`--no-prune`
 keeps them).
@@ -164,10 +194,42 @@ keeps them).
 `FEATURED` in the script is a dict of entry id → one sentence. It is a
 **judgement about how a picture looks**, nothing else; every entry in the
 catalog is exact. The sixteen atlas entries were chosen by eye from the
-512-pixel thumbnails and the 12-frame strips, and the fourteen search entries
-were chosen the same way, from contact sheets of all 118 new pictures laid out
-per equation — two or three per equation, spread over the motifs the search
-actually produced and over both chiralities where it found a pair.
+512-pixel thumbnails and the 12-frame strips, and the nineteen search entries
+were chosen the same way, from contact sheets of every search picture the build
+mined, laid out per equation — two or three per equation, spread over the motifs
+the search actually produced and over both chiralities where it found a pair.
+
+Two cautions the finished long batch taught.
+
+**A `FEATURED` key names a field, and a later batch can retire that field.** When
+the search finds one orbit twice, the copy with the lower boundary density is
+kept (§2) — so a featured id can vanish from a rebuild even though nothing
+failed. The build record names it under `duplicatesDropped`, with `sameOrbitAs`;
+the replacement is a different phase of the same orbit and usually a different
+picture, so re-point the key by eye rather than by job name. This happened once,
+to the g246 Brusselator triangles (`1cb589bef8b7`), and the slot went to
+`0aa87383a573`. Worth knowing when you re-point: that tie-break is decided on the
+**search's** node-boundary density, which is not the edge density the catalog
+publishes and not measured at the turn centre this script's own sweep will
+choose, so the copy it keeps can be the duller picture of the two. Look before
+accepting a replacement.
+
+**A blurb can promise something the trim then takes away.** A sentence like "its
+mirror is in the catalog too" is a claim about *another* entry, and a pair split
+by the budget puts a `no mirror partner` badge next to it on the page. The
+partner of anything featured is now exempt from the trim (§5) and
+`catalog.test.mjs` asserts it, so the promise holds by construction; a partner
+lost to the *dedupe* rather than the trim cannot be protected that way and is
+reported as a `WARNING` and a line in the build record's `notes`.
+
+Two numbers near this that mean less than they look. `counts.chiralityPairs`
+counts only **whole** pairs — two shipped entries of one kind naming each other;
+the search's own links can dangle or be one-way, and those are counted apart in
+`counts.chiralityUnpaired`. And `report_colour.py`'s `usable-gyre` /
+`usable-trefoil` tallies are a stricter editorial gate than this builder's: they
+also require `exactColourPreservingCount == 0`, which the catalog does not, so a
+record can ship here and not be counted usable there (the featured `rps`
+picture `5fc3cc7d4c15` is one).
 
 To re-do that judgement: run with `--strips DIR`, tile the PNGs, look, edit
 `FEATURED`, re-run.
@@ -196,7 +258,7 @@ To re-do that judgement: run with `--strips DIR`, tile the PNGs, look, edit
 
 --per-set N          patterns kept per (kind, equation, parameter set, group)  (3)
 --runners N          alternate Gyre turn centres listed per entry              (2)
---json-mb F          ceiling on the catalog JSON, in megabytes               (3.0)
+--json-mb F          ceiling on the catalog JSON, in megabytes               (4.5)
 --thumb-bytes N      ceiling on one thumbnail                              (40000)
 ```
 

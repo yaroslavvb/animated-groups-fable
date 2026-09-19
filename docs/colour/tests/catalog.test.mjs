@@ -236,6 +236,37 @@ test('catalog: the diversity the explorer pages need', () => {
   assert.ok([...byField.values()].some(n => n === 2), 'no field carries both colourings');
 });
 
+test('catalog: featured chirality pairs are whole, and counts.chiralityPairs counts pairs', () => {
+  // A featured blurb may say the mirror is in the catalog, and the pages badge
+  // `mirror partner <group>` only when the partner is shipped — so a trim that
+  // keeps one half of a featured pair makes the page contradict itself. The
+  // builder protects the partner of anything featured; this is that promise.
+  const shipped = new Map(entries.map(e => [`${e.kind}|${e.source.fieldSha256}`, e]));
+  for (const e of entries) {
+    if (!e.featured || !e.source.chirality) continue;
+    assert.ok(shipped.has(`${e.kind}|${e.source.chirality.partnerSha256}`),
+      `${e.id} is featured and names a chirality partner the catalog does not ship`);
+  }
+  // counts.chiralityPairs is a count of PAIRS the pages can put side by side:
+  // two shipped entries of one kind naming each other. The search's own links
+  // can dangle (the partner was trimmed) or be one-way (two entries naming one
+  // mirror), and those are counted apart, in chiralityUnpaired.
+  const pairs = new Set();
+  let carried = 0;
+  for (const e of entries) {
+    if (!e.source.chirality) continue;
+    carried += 1;
+    const mate = shipped.get(`${e.kind}|${e.source.chirality.partnerSha256}`);
+    if (mate?.source.chirality?.partnerSha256 === e.source.fieldSha256) {
+      pairs.add([e.id, mate.id].sort().join(' '));
+    }
+  }
+  assert.equal(catalog.counts.chiralityPairs, pairs.size, 'counts.chiralityPairs');
+  assert.equal(catalog.counts.chiralityUnpaired, carried - 2 * pairs.size,
+    'counts.chiralityUnpaired');
+  assert.ok(pairs.size >= 1, 'no whole chirality pair in the catalog');
+});
+
 // ---------------------------------------------------------------- per-entry schema
 
 test('entries: schema gates', () => {
@@ -314,7 +345,7 @@ test('catalog: the JSON stays small enough to ship', () => {
   // selection until it holds. Asserting the same number here is what stops the
   // ceiling from quietly becoming advisory.
   const bytes = fs.statSync(path.join(COLOUR, 'data', 'colour-atlas.json')).size;
-  assert.ok(bytes <= 3.0e6, `colour-atlas.json is ${(bytes / 1e6).toFixed(3)} MB, ceiling 3 MB`);
+  assert.ok(bytes <= 4.5e6, `colour-atlas.json is ${(bytes / 1e6).toFixed(3)} MB, ceiling 4.5 MB`);
   // Fields are never inline: the whole catalog must stay well under what one
   // orbit weighs on disk.
   for (const e of entries) {
