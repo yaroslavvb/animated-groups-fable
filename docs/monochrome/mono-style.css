@@ -1,0 +1,101 @@
+/* mono-style.css — the only new stylesheet the Monochrome pages need.
+   Everything else is `css/style.css`, `scott-gray/style.css`,
+   `scott-gray/wallpaper-style.css` and, on the landing,
+   `css/scott-gray-directory.css`. This file is the wireframe's own <style>
+   block with the parts the live page needs added: the tier chips, the rule
+   variants, the mark layer and the landing's classics. */
+
+/* --- step 2: the rule ---------------------------------------------------- */
+.mono-page .rules{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 8px}
+.mono-page .rule{padding:6px 11px;font-size:13px;border:1px solid var(--rule);border-radius:999px;background:#fff;color:var(--ink);text-align:left}
+.mono-page .rule[aria-pressed=true]{border-color:#111;background:#111;color:#fff;font-weight:600}
+.mono-page .rule small{display:block;color:var(--muted);font-size:11px;margin-top:1px}
+.mono-page .rule[aria-pressed=true] small{color:#d8d5cf}
+.mono-page .rule:disabled{opacity:.42}
+.mono-page .rule-tiers{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:12px;color:var(--muted)}
+.mono-page .tier{padding:4px 10px;font-size:12px;border:1px solid var(--rule);border-radius:999px;background:#fff;color:var(--ink)}
+.mono-page .tier[aria-checked=true]{border-color:var(--accent);background:#e8eff8;color:var(--accent);font-weight:600}
+.mono-page .tier:disabled{opacity:.45}
+.mono-page .rule-variants{display:flex;align-items:center;gap:8px;margin:0 0 8px;font-size:12px;color:var(--muted)}
+.mono-page .rule-variants select{font-size:12px;max-width:min(100%,32rem)}
+.mono-page .rule-variants[hidden]{display:none}
+.mono-page .rule-law{margin:0 0 20px;padding:11px 14px;background:#f2f1ee;border-left:3px solid #111;border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
+.mono-page .rule-law b{font-weight:650}
+.mono-page .rule-law code{font:12.5px/1.6 ui-monospace,monospace;background:#fff;padding:1px 5px;border-radius:3px}
+.mono-page .rule-law .small{display:block;margin:7px 0 0}
+
+/* --- the viewer ---------------------------------------------------------- */
+/* The viewer's ink is the two-tone black, not the wallpaper pages' violet. */
+.mono-page .canvas-wrap{background:#000}
+.mono-page .canvas-wrap canvas{image-rendering:auto}
+.mono-page .viewer-labels span{background:#ebeae7;color:#2f2d29}
+.mono-page .marks-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none;overflow:visible}
+.mono-page .canvas-wrap.endless canvas{touch-action:none;cursor:grab}
+.mono-page .canvas-wrap.endless canvas:active{cursor:grabbing}
+.mono-page .canvas-wrap.simulation canvas{touch-action:manipulation;cursor:default}
+/* The generator marks are OFF by default everywhere; the checkbox sits under
+   the picture, first in the overlay row, so it reads as an opt-in. */
+.mono-page .overlay-controls{border-top:1px solid var(--rule);padding-top:10px}
+.mono-page .overlay-controls label{font-size:13px;font-weight:600}
+.mono-page .marks-note{font-size:11px!important;color:var(--muted);margin:2px 0 10px}
+.mono-page .notation-panel{margin:10px 0 16px;padding:12px 15px;background:#f6f5f2;border:1px solid var(--rule);border-radius:7px}
+.mono-page .notation-panel h2{font-size:15px;margin:0}
+.mono-page .notation-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.mono-page .notation-panel ul{margin:8px 0;padding-left:18px}
+.mono-page .notation-panel li{margin:2px 0}
+
+/* --- the measured two-colour table --------------------------------------- */
+.mono-page .two-colour{margin:18px 0;border-top:1px solid var(--rule);padding-top:12px;font-size:12px;color:var(--muted)}
+.mono-page .two-colour summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:13px}
+.mono-page .two-colour table{margin:12px 0 6px}
+.mono-page .two-colour td:first-child{font-size:13px;white-space:normal}
+.mono-page .two-colour td:last-child{color:var(--muted);font:12px ui-monospace,monospace}
+.mono-page .swatch{display:inline-block;width:26px;height:13px;border:1px solid #9c988f;vertical-align:-2px;margin-right:7px;border-radius:2px}
+.mono-page .swatch.keep{background:linear-gradient(90deg,#fff 50%,#111 50%)}
+.mono-page .swatch.swap{background:linear-gradient(90deg,#111 50%,#fff 50%)}
+.mono-page .two-colour tr.swap td:nth-child(3){color:#8a3324;font-weight:600}
+.mono-page .two-colour tr.keep td:nth-child(3){color:#45705a;font-weight:600}
+.mono-page .two-colour .count{font:600 13px ui-monospace,monospace;color:var(--ink)}
+.mono-page .pattern-thumb img{background:#000}
+.mono-page .thumb-tag{color:var(--muted);font-size:10px}
+
+/* --- the named classics, on the landing and on every family page --------- */
+.classics{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 22px}
+.classic{display:flex;gap:10px;align-items:center;padding:8px 12px 8px 8px;border:1px solid var(--rule);border-radius:7px;background:#fff;text-decoration:none;color:inherit;flex:1 1 300px;min-width:0}
+.classic:hover,.classic:focus-visible{border-color:var(--accent)}
+.classic img{width:52px;height:52px;border-radius:4px;background:#000;flex:0 0 auto}
+.classic b{display:block;font-size:13.5px}
+.classic span span{display:block;font-size:11.5px;color:var(--muted)}
+
+/* --- the landing --------------------------------------------------------- */
+.mono-directory .family-card img{aspect-ratio:1;background:#000;image-rendering:pixelated}
+.mono-directory .theorem{margin:0 0 1.6rem;padding:14px 18px;background:#f2f1ee;border-left:3px solid #111;border-radius:0 7px 7px 0;font-size:.9rem;line-height:1.65;max-width:72ch}
+.mono-directory .theorem b{font-weight:650}
+.mono-directory .theorem code{font:12.5px/1.6 ui-monospace,monospace;background:#fff;padding:1px 5px;border-radius:3px}
+.mono-directory .family-card-count{background:#111f;color:#fff;border-color:#ffffff55}
+
+@media(max-width:720px){
+  /* The ladder must read 1 → 2 → 3 → 4 → 5 → picture → evidence on a phone. */
+  .mono-page .controls{display:contents}
+  .mono-page .selected{order:0}
+  .mono-page .atlas-panel{order:1}
+  .mono-page .viewer{order:2}
+  .mono-page .controls>label.stack{order:3}
+  .mono-page .controls>#display-range{order:4}
+  .mono-page .controls>#export{order:5}
+  .mono-page .controls>#status{order:6}
+  /* Four columns of table at 358 px are four slivers: each row becomes a card. */
+  .mono-page .two-colour thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .mono-page .two-colour tr{display:block;border-bottom:1px solid var(--rule);padding:9px 0}
+  .mono-page .two-colour td{display:inline;border:0;padding:0 10px 0 0}
+  .mono-page .two-colour td:first-child{display:block;margin-bottom:3px}
+  .mono-page .two-colour td[data-label]::before{content:attr(data-label) " ";color:var(--muted);font-size:11px}
+  .mono-page .rule small{font-size:10.5px}
+  .classic{flex-basis:100%}
+}
+
+/* p1's orbifold signature is a single WHITE BULLET, which at the card's 1.45rem
+   sits a third the height of "2222" beside it and reads as a list bullet rather
+   than as a symbol. It is the one glyph of the seventeen that needs the room. */
+.mono-directory .family-card[data-family="p1"] .family-card-orbifold { font-size: 2.6em; line-height: .55; vertical-align: -.06em; }
+.mono-page[data-family="p1"] .family-orbifold { font-size: 1.5em; line-height: .7; vertical-align: -.05em; }

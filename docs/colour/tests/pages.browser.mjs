@@ -116,25 +116,41 @@ await section('every href on the three new pages resolves', async () => {
 
 // ---- 3 · the nav group is on every page, including the two reports ---------
 
-await section('the Colour nav group appears across the site', async () => {
+await section('the Colourings nav group appears across the site', async () => {
   // The standalone viewers (`scott-gray/gyre/` and its siblings) carry no site
   // header at all — they are edge-to-edge immersive pages — so they are not in
   // the sample, and the insertion script skips them for the same reason.
+  //
+  // Since `monochrome/tools/add-nav.py` ran, the group is called "Colourings"
+  // and holds four links, and "Showcase" is the FIRST link under Catalogues.
+  // The sample spans every shape of header the script has to handle: the 44
+  // pages at prefix '', the 4 at '../', the 21 at '../../', the two report
+  // pages that write one group per line, and the 19 pages that were stamped
+  // already carrying the finished nav.
   const sample = [
     'index.html', 'notation.html', 'scott-gray-groups.html', 'colourings-tutorial.html',
     'scott-gray/pg/', 'scott-gray/p6m/', 'scott-gray/index.html', 'correspondence-p6.html',
     'reports/', 'reports/space-time-color/', 'reports/symmetry-meeting-notes-week-38/',
     'colour/', 'colour/gyre/', 'colour/trefoil/',
+    'monochrome/', 'monochrome/p4g/', 'showcase/',
   ];
   const {context, page} = await open('index.html');
   for (const path of sample) {
     await page.goto(new URL(path, base).href, {waitUntil: 'domcontentloaded'});
-    const group = page.locator('.navgroup', {has: page.locator('.navgroup-label', {hasText: /^Colour$/})});
-    assert.equal(await group.count(), 1, `${path} has exactly one Colour navgroup`);
+    assert.equal(await page.locator('.navgroup', {has: page.locator('.navgroup-label', {hasText: /^Colour$/})}).count(),
+                 0, `${path} has no old "Colour" navgroup left`);
+    const group = page.locator('.navgroup', {has: page.locator('.navgroup-label', {hasText: /^Colourings$/})});
+    assert.equal(await group.count(), 1, `${path} has exactly one Colourings navgroup`);
     const links = group.locator('a');
-    assert.equal(await links.count(), 3, `${path}: the Colour group has three links`);
-    assert.deepEqual(await links.allTextContents(), ['Entangled colourings', 'Gyre', 'Trefoil'], `${path}: the Colour links`);
-    for (const href of await links.evaluateAll(nodes => nodes.map(node => node.href))) {
+    assert.deepEqual(await links.allTextContents(),
+                     ['Entangled colourings', 'Gyre', 'Trefoil', 'Monochrome'], `${path}: the Colourings links`);
+    // Showcase leads the Catalogues group, on both header formats.
+    const catalogues = page.locator('.navgroup', {has: page.locator('.navgroup-label', {hasText: /^Catalogues$/})});
+    assert.equal(await catalogues.count(), 1, `${path} has exactly one Catalogues navgroup`);
+    assert.equal(await catalogues.locator('a').first().textContent(), 'Showcase',
+                 `${path}: Showcase is the first Catalogues link`);
+    for (const href of await group.locator('a').evaluateAll(nodes => nodes.map(node => node.href))
+                        .then(async hrefs => hrefs.concat(await catalogues.locator('a').first().evaluateAll(n => n.map(e => e.href))))) {
       assert.ok((await fetch(href)).status < 400, `${path}: ${href} resolves`);
     }
     assert.ok(await page.locator('.navgroup a.here').count() <= 1, `${path}: at most one current link`);
@@ -182,15 +198,33 @@ await section('the ladder selects and updates the URL', async () => {
   }
 
   // A thumbnail.
+  //
+  // The caption is a sentence about the ENTRY — its name, its equation, its
+  // grid and its verification — and since the equation search landed, one
+  // (film group, equation) cell can hold several verified orbits that share
+  // all four: `colour:gyre:fe951021e03f` and `colour:gyre:656008906a2a` are
+  // both "Ginzburg–Landau cgl-d on g248 · 36² nodes, 96 frames", so
+  // "the caption changed" is not a true test of "the viewer moved".  Prefer a
+  // thumbnail the caption can distinguish, and assert against the catalog's
+  // own sentence rather than against mere inequality.
   const thumbs = page.locator('.pattern-thumb');
   if (await thumbs.count() > 1) {
-    const second = thumbs.nth(1), id = await second.getAttribute('data-pattern-id');
+    const ids = await thumbs.evaluateAll(nodes => nodes.map(node => node.dataset.patternId));
+    const current = decodeURIComponent(await hash()).match(/pattern=([^&]*)/)?.[1];
+    const nameOf = id => catalog.get(id)?.name;
+    const differs = ids.findIndex(id => id !== current && nameOf(id) !== nameOf(current));
+    const index = differs >= 0 ? differs : ids.findIndex(id => id !== current);
+    const pick = thumbs.nth(index), id = ids[index];
     const wasCaption = await caption();
-    await second.click();
+    await pick.click();
     await ready(page);
     assert.match(decodeURIComponent(await hash()), new RegExp(`pattern=${id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`), 'the pattern is in the hash');
-    assert.notEqual(await caption(), wasCaption, 'and the caption follows the thumbnail');
-    assert.equal(await second.getAttribute('aria-pressed'), 'true');
+    assert.ok((await caption()).startsWith(nameOf(id)),
+              `the caption is the catalog's own name for what was clicked ("${(await caption()).slice(0, 60)}" vs "${nameOf(id)}")`);
+    if (differs >= 0) {
+      assert.notEqual(await caption(), wasCaption, 'and the caption follows the thumbnail');
+    }
+    assert.equal(await pick.getAttribute('aria-pressed'), 'true');
   }
 
   // A hand-edited hash never throws, and an unknown version keeps the group.
