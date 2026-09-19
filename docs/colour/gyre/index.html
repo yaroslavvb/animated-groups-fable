@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gyre: numerically verified three-colour films whose colour group is Z₃ and whose every recolouring is welded to a third-turn and a third of a period, drawn from seven reaction–diffusion equations of the atlas and of the equation search.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Gyre — Entangled colourings — Spacetime Groups</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+  <link rel="stylesheet" href="../../css/style.css?v=collapsible-header-v1">
+  <script defer src="../../js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="stylesheet" href="../../scott-gray/style.css?v=20260907-local-motion">
+  <link rel="stylesheet" href="../../scott-gray/wallpaper-style.css?v=20260907-local-motion">
+  <link rel="stylesheet" href="../colour-style.css?v=20260919-colour-v1">
+</head>
+<body>
+  <a class="skip-link" href="#variants">Skip to the film groups</a>
+  <header class="site">
+  <div class="inner">
+    <a class="title" href="../../index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="../../index.html">Tutorial</a>
+        <a href="../../notation.html">Notation</a>
+        <a href="../../colourings-tutorial.html">Colourings</a>
+        <a href="../../subgroups-vs-colourings.html">Subgroups</a>
+        <a href="../../torus-cayley.html">Torus Cayley graphs</a>
+        <a href="../../hierarchy.html">Hierarchy</a>
+        <a href="../../history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="../../catalog.html">275 spacetime</a>
+        <a href="../../wallpaper.html">275 spacetime (grouped)</a>
+        <a href="../../correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="../../patterns.html">609 patterns</a>
+        <a href="../../escher.html">107 Escher</a>
+        <a href="../../gallery.html">Gallery</a>
+        <a href="../../scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colour</span>
+        <a href="../../colour/">Entangled colourings</a>
+        <a href="../../colour/gyre/" class="here">Gyre</a>
+        <a href="../../colour/trefoil/">Trefoil</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="../../reports/">Reports</a>
+        <a href="../../motifs.html">Motifs</a>
+        <a href="../../designer.html">Designer</a>
+        <a href="../../billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="../../crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+  <main class="reaction-diffusion-page colour-page" data-colouring="gyre">
+    <section class="family-page-header" aria-labelledby="page-title">
+      <p class="family-breadcrumb"><a href="../">Entangled colourings</a> <span aria-hidden="true">·</span> colouring 1 of 2</p>
+      <h1 id="page-title"><span class="family-orbifold">Gyre</span> <span class="family-hm">turn, wait, recolour</span></h1>
+      <p class="family-summary">Three colours welded to a third-turn about a point of no symmetry. Turn the picture a third of a turn about <i>p</i>, run the film on a third of a period and step every colour back one, and nothing changes; do any two of the three and it does. A cyclic colour group is <i>allowed</i> to be fully entangled — nothing at all surviving in a single frozen frame — and that is the character this catalog was selected for; the counts below say how many of the admitted entries actually have it, and every entry says for itself, in its badges and in its own measured table. Every entry is a saved orbit of the named equation, carrying its own verification and a colour law re-derived from its own bytes at every node-frame.</p>
+      <nav class="family-pager" aria-label="Neighbouring colourings"><a class="family-pager-link family-pager-prev" href="../" rel="prev"><span aria-hidden="true">←</span> Entangled colourings</a><a class="family-pager-link family-pager-index" href="../../scott-gray/triskele/">Triskele (the split sibling)</a><a class="family-pager-link family-pager-next" href="../trefoil/" rel="next">Trefoil · S₃ <span aria-hidden="true">→</span></a><label class="family-select"><span>Go to</span> <select aria-label="Colouring" id="colour-nav"><option selected value="./">Gyre · Z₃</option><option value="../trefoil/">Trefoil · S₃</option></select></label></nav>
+    </section>
+
+    <h2 class="eyebrow selection-step">1 · The base film group</h2>
+    <p class="small" id="step-1-note">The colour law is a theorem for <i>any</i> field on a triangular lattice and <i>any</i> turn centre, so every hexagonal film group can host it. What differs is what the picture then looks like, whether the argmax ever ties — where it does, the law fails at exactly those nodes and the field is refused — and whether any extra symmetry leaks into the colour-preserving subgroup.</p>
+    <div aria-label="Base film groups hosting the Gyre colouring" class="groups variable-groups" id="variants" role="group"></div>
+    <div class="subvariants" id="subvariants"></div>
+    <p class="small" id="variants-note"></p>
+
+    <div class="solution-policy"><strong id="policy-label">Loading catalog…</strong><span id="solution-count">…</span>
+      <p class="character-note" id="character-note"></p>
+      <p>The colour law is re-derived from the saved bytes at every node-frame before an entry is published, and the colour-preserving subgroup is measured by an exhaustive search over all twelve point operations, every node translation, every time shift and all six recolourings — not assumed.</p>
+    </div>
+
+    <noscript><p class="noscript-note">The viewer, the selection ladder and the measured symmetry table are built in the browser, so this page needs JavaScript. Without it, <a href="../">Entangled colourings</a> still explains the two rules and their theorem, and the standalone <a href="../../scott-gray/gyre/">Gyre</a>, <a href="../trefoil/">Trefoil</a> and <a href="../../scott-gray/triskele/">Triskele</a> pages each show one field.</p></noscript>
+    <div class="lab">
+      <aside class="controls">
+        <div class="selected"><p class="eyebrow" id="selected-id"></p><h2 id="selected-title"></h2><p id="selected-description"></p></div>
+        <div class="colour-badges" id="selected-badges" aria-label="What is true of this colouring"></div>
+        <section aria-label="Equation, verified parameters and pattern selectors" class="atlas-panel">
+          <h2 class="eyebrow">2 · Choose the equation</h2>
+          <div aria-label="Equation" class="equations" id="equations" role="group"></div>
+          <p class="equation-description" id="equation-description"></p>
+          <p class="small" id="equation-note"></p>
+          <h2 class="eyebrow">3 · Choose verified parameters</h2>
+          <label class="atlas-label" for="parameter-set">Saved parameters</label><select disabled id="parameter-set"><option>No verified parameters</option></select>
+          <p class="parameter-values" id="parameter-values">Loading precomputed parameters…</p>
+          <div class="parameter-map-wrap"><canvas aria-label="Verified parameter plane. Click to select the closest verified parameter set; the selector above also provides keyboard access." height="320" id="parameter-map" tabindex="0" width="660"></canvas><p class="small" id="parameter-map-caption"></p></div>
+          <div class="pattern-section"><h2 class="eyebrow">4 · Choose a pattern</h2><p class="small" id="pattern-count">Loading saved patterns…</p>
+            <div aria-label="Verified pattern thumbnails" class="pattern-thumbnails" id="pattern-thumbnails" role="group"></div>
+            <label class="atlas-label" for="solution">Verified colouring</label><select disabled id="solution"><option>No verified patterns</option></select>
+          </div>
+        </section>
+        <label class="stack">Appearance<select id="palette"><option value="colour">Three colours</option><option value="ember">Ember (the field)</option><option value="concentration">Second channel</option></select></label>
+        <p class="small" id="display-range"></p>
+        <button class="text-button" disabled id="export" type="button">↓ Export verified colouring + evidence</button>
+        <p id="status" role="status">Loading the precomputed catalog…</p>
+      </aside>
+
+      <section aria-label="Verified colouring animation" class="viewer">
+        <div class="image-label viewer-labels"><span id="mode-label">Loading catalog</span><span id="group-label"></span></div>
+        <div class="canvas-wrap endless">
+          <canvas aria-label="Three-colour Gyre animation. Drag to pan, scroll to zoom, two fingers to turn. Press Space to play or pause." height="768" id="pattern" tabindex="0" width="768"></canvas>
+          <svg aria-label="Generator marks in clockwork-colour notation" class="marks-layer" id="marks" viewBox="0 0 768 768"></svg>
+          <div id="empty-state"><div class="empty-symbol">∅</div><h2>Loading saved catalog…</h2><p id="empty-description">Parameters, thumbnails and the measured symmetry tables are precomputed.</p><button hidden id="retry-animation" type="button">Retry animation</button></div>
+        </div>
+        <div class="view-caption"><span class="viewer-hint" id="viewer-hint">Drag to pan · scroll to zoom · two fingers to turn · 0 resets</span><span class="scale-label" id="scale-label"></span></div>
+        <div class="playback"><button aria-label="Play animation" disabled id="play" type="button">▶ Play</button><button aria-label="Return to first frame" disabled id="rewind" type="button">↤</button><input aria-label="Animation phase" disabled id="phase" max="1" min="0" step="0.001" type="range" value="0"><output id="phase-label">—</output><label>View <select aria-label="View framing" id="framing"><option selected value="endless">Endless</option><option value="simulation">Simulation width</option></select></label><label><span id="tile-label">Width</span> <select aria-label="Simulation width" disabled id="tiles"><option value="1">L</option><option selected value="2">2 L</option><option value="3">3 L</option></select></label><label>Speed <select aria-label="Playback speed" id="speed"><option value="0.5">Slow</option><option selected value="1">Normal</option><option value="2">Fast</option></select></label></div>
+        <div class="overlay-controls"><label><input id="show-marks" type="checkbox" checked> Generator marks</label><button class="text-button" id="notation-open" type="button" aria-expanded="false" aria-controls="notation">Notation…</button><button class="text-button" id="reset-view" type="button">Reset view</button><button class="text-button" id="fullscreen" type="button">⤢ Fullscreen</button><span id="engine-label">No orbit loaded</span></div>
+
+        <div class="phase-rule" hidden>
+          <p id="generator-description"></p>
+          <div class="colour-key"><b><i style="background:#c9563e"></i>0 terracotta</b><b><i style="background:#57979a"></i>1 teal</b><b><i style="background:#e2be68"></i>2 sand</b></div>
+          <p class="small partner-line" id="alternates"></p>
+          <p class="small partner-line" hidden id="same-instant"></p>
+          <p class="small">Coin: the turn and how long you wait. Chip: what becomes of the colours.</p>
+        </div>
+
+        <div class="notation-panel" hidden id="notation" role="region" aria-label="Reading the generator marks"></div>
+      </section>
+
+      <section aria-label="Measured evidence for this colouring" class="evidence">
+        <details class="symmetry-record" open>
+          <summary>Measured symmetry table</summary>
+          <div class="table-scroll"><table>
+            <thead><tr><th>Operation</th><th>Time</th><th>Colour</th><th>Agreement</th></tr></thead>
+            <tbody id="symmetry-rows"></tbody>
+          </table></div>
+          <p class="small sym-more" id="symmetry-more"></p>
+          <p class="small" id="symmetry-foot"></p>
+        </details>
+
+        <details class="numerical-record">
+          <summary>Numerical record</summary>
+          <p class="caption" id="caption">Only colourings whose law was re-derived from the saved bytes at every node-frame appear here.</p>
+          <div class="metrics" id="metrics"></div>
+          <p class="provenance" id="provenance"></p>
+        </details>
+
+        <details class="refused-note" hidden id="refusals">
+          <summary>Why some fields cannot host this colouring — <span id="refusal-count"></span></summary>
+          <ul id="refusal-list"></ul>
+          <p class="small">Every refusal is logged with its reason in <code>colour-atlas-build.json</code>, beside the catalog. A tie in the argmax is decided by index order, and the relabelling does not carry index order along, so the colour law fails at exactly the tied nodes: the builder measures the law rather than assuming it, and admits only an exact 1.</p>
+        </details>
+      </section>
+    </div>
+    <p class="page-links"><a href="../">Entangled colourings</a> · <a href="../trefoil/">Trefoil · S₃</a> · <a href="../../scott-gray/triskele/">Triskele (the split sibling)</a> · <a href="../../scott-gray/gyre/">The standalone Gyre page</a> · <a href="../../notation.html">Notation</a> · <a href="../../scott-gray-groups.html">How the patterns are computed</a></p>
+  </main>
+  <footer class="site">
+    Spacetime groups: the crystallography of looping animations ·
+    <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+  </footer>
+  <script type="module" src="../colour-app.mjs?v=20260919-colour-v1"></script>
+  <script type="module">
+    const select = document.querySelector('#colour-nav');
+    if (select) select.onchange = () => { location.href = select.value; };
+  </script>
+</body>
+</html>

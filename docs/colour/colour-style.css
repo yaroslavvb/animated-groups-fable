@@ -1,0 +1,237 @@
+/* colour-style.css — the only new stylesheet the Colour category needs.
+   It sits on top of css/style.css, scott-gray/style.css and
+   scott-gray/wallpaper-style.css, all of which are reused verbatim. */
+
+/* Step 1's second row: the colouring's own discrete parameter / filter.
+   Two different kinds of control share the row, so they are drawn as two:
+   the mutually exclusive filters are a segmented radio group inside one
+   outline, and the independent chirality switch is a separate pill with a
+   tick. They used to be four identical `aria-pressed` buttons, two of which
+   were pressed at once on load. */
+.colour-page .subvariants{display:flex;flex-wrap:wrap;gap:6px 10px;margin:-14px 0 10px;align-items:center}
+.colour-page .subvariants>.subvariant-label{font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
+.colour-page .subvariant-set{display:inline-flex;flex-wrap:wrap;gap:4px;padding:3px;border:1px solid var(--rule);border-radius:999px;background:#f7f6fa}
+.colour-page .subvariant{padding:5px 10px;font-size:12px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--ink);cursor:pointer}
+.colour-page .subvariant.toggle{border-color:var(--rule);background:#fff}
+.colour-page .subvariant[aria-checked=true]{border-color:var(--accent);background:#e8eff8;color:var(--accent);font-weight:600}
+.colour-page .subvariant.toggle[aria-checked=true]::before{content:"✓ ";font-weight:700}
+.colour-page .subvariant small{color:#5b6370;font-size:11px;margin-left:5px}
+.colour-page .subvariant[aria-checked=true] small{color:inherit}
+.colour-page .subvariant:disabled{opacity:.45;cursor:default}
+.colour-page #variants-note{margin:0 0 20px}
+.colour-page .character-note{color:var(--ink)}
+.colour-page .group.is-empty{opacity:.5;cursor:pointer}
+.colour-page .group.is-empty strong{color:var(--muted)}
+.colour-page .noscript-note{margin:0 0 20px;padding:12px 14px;border-left:3px solid var(--accent);background:#f6f4fb;font-size:14px}
+
+/* The equation is set with a real line break between its two species. */
+.colour-page .equation-description{white-space:pre-line}
+
+/* Badges on a selected entry: the two flags the miner asked to be visible. */
+.colour-badges{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.colour-badge{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;line-height:1.5;border:1px solid var(--rule);background:#f5f3fa;color:var(--muted)}
+.colour-badge.yes{border-color:#9ec2ad;background:#eef6f1;color:#33604a}
+.colour-badge.no{border-color:#e0c49a;background:#fdf6ea;color:#8a5a22}
+.colour-badge.pick{border-color:#b9a7e8;background:#f1ecfd;color:#4c3390}
+
+/* The colour key: three fixed stations, always in the same order. */
+.colour-key{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;margin:0 0 10px;font-size:12px;color:var(--muted)}
+.colour-key b{display:inline-flex;align-items:center;gap:5px;font-weight:500;color:var(--ink)}
+.colour-key i{width:12px;height:12px;border-radius:50%;display:inline-block}
+
+/* The measured symmetry table, the one thing the wallpaper pages have no slot for. */
+.symmetry-record{font-size:12px;color:var(--muted);margin:16px 0 0;border-top:1px solid var(--rule);padding-top:12px}
+.symmetry-record summary{cursor:pointer;color:var(--accent);font-weight:600}
+.symmetry-record[open] summary{margin-bottom:10px}
+.symmetry-record table{margin:8px 0 0;font-size:13px}
+.symmetry-record td:first-child{font-size:13px;white-space:normal}
+.symmetry-record td:last-child{color:var(--muted);font-variant-numeric:tabular-nums}
+.symmetry-record tr.exact td:last-child{color:#45705a}
+.symmetry-record tr.fails td:last-child{color:#9a5a2a}
+.symmetry-record .sym-symbol{font:14px/1.4 ui-serif,Georgia,serif;white-space:nowrap}
+.symmetry-record .sym-more{margin:8px 0 0}
+
+/* The viewer chrome the standalone pages own, folded into the lab viewport. */
+.colour-page .canvas-wrap{background:#14110f}
+.colour-page .canvas-wrap.endless canvas{cursor:grab;touch-action:none}
+.colour-page .canvas-wrap.endless.dragging canvas{cursor:grabbing}
+.colour-page .canvas-wrap.simulation canvas{cursor:pointer;touch-action:manipulation}
+.colour-page .marks-layer{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.colour-page .notation-panel{margin:12px 0 0;padding:14px 16px;background:#14110f;color:#f7f2ea;border-radius:8px;font-size:13px;line-height:1.6}
+.colour-page .notation-panel[hidden]{display:none}
+.colour-page .notation-panel h3{color:#f7f2ea;font-size:15px;margin:14px 0 6px}
+.colour-page .notation-panel table{color:#f7f2ea;margin:10px 0}
+.colour-page .notation-panel th,.colour-page .notation-panel td{border-bottom-color:#40382f;padding:7px 14px 7px 0}
+.colour-page .notation-panel th{color:#bdb2a3}
+.colour-page .notation-panel td:last-child{color:#d9cfc1}
+.colour-page .notation-panel td:first-child{white-space:nowrap}
+.colour-page .notation-panel .symbol{font:20px/1.5 ui-serif,Georgia,serif;margin:6px 0 12px}
+.colour-page .notation-panel .lede{margin-top:0}
+.colour-page .notation-panel dl{margin:10px 0 0;display:grid;grid-template-columns:auto 1fr;gap:12px 14px;align-items:start}
+.colour-page .notation-panel dt{margin:0}
+.colour-page .notation-panel dd{margin:0;font-size:12px;line-height:1.65;color:#d9cfc1}
+.colour-page .notation-panel dd b{color:#f7f2ea}
+.colour-page .notation-panel .foot{font-size:12px;color:#bdb2a3}
+/* The panel is as wide as the viewer, which is far wider than a line of prose
+   should be, and the anatomy diagram would blow up to three times its drawn
+   size if it were allowed the full width. */
+.colour-page .notation-panel p,.colour-page .notation-panel dd{max-width:74ch}
+.colour-page .notation-panel .cc-anatomy{display:block;width:100%;max-width:330px;margin:4px 0 2px}
+.colour-page .notation-panel dt svg{display:block}
+.colour-page .notation-panel .swatch{display:inline-block;width:10px;height:10px;border-radius:50%;vertical-align:baseline}
+.colour-page .notation-panel a{color:#cdb4fe}
+.colour-page .notation-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.colour-page .notation-title{color:#f7f2ea;font-size:15px;font-weight:700;margin:0}
+.colour-page .notation-panel .symbol-note{margin:-6px 0 12px;color:#bdb2a3}
+.colour-page .notation-head button{background:transparent;border:0;color:#cdb4fe;padding:0;font-size:12px;cursor:pointer}
+/* `code` in the dark panel would otherwise be black on black (pass 1 defect). */
+.colour-page .notation-panel code{background:#2a241d;color:#f0e7da;padding:1px 5px;border-radius:3px;display:inline;font-size:12px}
+.colour-page .provenance{font-size:12px;color:var(--muted);margin:10px 0 0;overflow-wrap:anywhere}
+.colour-page .viewer-hint{font-size:11px;color:var(--muted);margin:0}
+.colour-page .metrics{grid-template-columns:repeat(4,1fr)}
+.colour-page .refused-note{font-size:12px;color:var(--muted);margin:14px 0 0;border-top:1px solid var(--rule);padding-top:10px}
+.colour-page .refused-note summary{cursor:pointer;color:var(--accent);font-weight:600}
+.colour-page .refused-note ul{margin:9px 0 0;padding-left:18px}
+.colour-page .refused-note li{margin:0 0 5px;line-height:1.5}
+.colour-page .partner-line{font-size:12px;color:var(--muted);margin:6px 0 0}
+.pattern-thumb canvas{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:3px}
+.pattern-thumb .thumb-tag{display:block;font-size:10px;color:var(--muted);padding:0 3px}
+.pattern-thumb[aria-pressed=true] .thumb-tag{color:var(--accent)}
+
+/* The landing page's theorem block and comparison table. `.table-scroll` lives
+   in scott-gray/style.css, which the landing does not load. */
+.gray-scott-directory .table-scroll{overflow:auto}
+.gray-scott-directory .family-card img{aspect-ratio:1}
+.gray-scott-directory h2{font-size:1.08rem;margin:0 0 1rem}
+/* Three cards, not seventeen, and their subtitles are sentences rather than
+   two-letter Hermann–Mauguin names — so the grid drops to two columns and then
+   to one earlier than the directory's own breakpoints, and the caption stacks
+   instead of squeezing a phrase into a 60 px column. */
+.gray-scott-directory .family-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gray-scott-directory .family-card-caption{flex-wrap:wrap}
+.gray-scott-directory .family-card-hm{min-width:0;overflow-wrap:anywhere;text-align:right;flex:1}
+@media(max-width:760px){
+  .gray-scott-directory .family-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gray-scott-directory .family-card-caption{display:block}
+  .gray-scott-directory .family-card-hm{display:block;text-align:left;margin-top:.1rem}
+}
+@media(max-width:470px){.gray-scott-directory .family-grid{grid-template-columns:minmax(0,1fr)}}
+.colour-theorem{margin:0 0 1.6rem;padding:1rem 1.2rem;border-left:3px solid var(--accent);background:var(--panel,#fafafa);font-size:.92rem;line-height:1.7}
+.colour-theorem p{margin:0 0 .6rem}
+.colour-theorem p:last-child{margin:0}
+.colour-compare{width:100%;border-collapse:collapse;font-size:.85rem;margin:1.4rem 0 0}
+.colour-compare th,.colour-compare td{text-align:left;border-bottom:1px solid var(--rule);padding:.5rem .8rem .5rem 0;white-space:normal}
+.colour-compare td:first-child,.colour-compare th:first-child{white-space:nowrap;font-size:inherit}
+.colour-compare td:last-child{color:inherit}
+.colour-marks-key{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem;margin:1rem 0 0;font-size:.8rem;color:var(--muted)}
+.colour-marks-key b{display:block;color:var(--ink);font-size:.86rem;margin-bottom:.2rem}
+@media(max-width:580px){.colour-marks-key{grid-template-columns:1fr}}
+
+/* --- contrast ---------------------------------------------------------------
+   The site's muted grey is 4.17–4.20:1 against the tinted panels the Colour
+   pages put it on, just under AA for body text, and the inline `code` inherits
+   a 0.86em of an already-12px parent and lands at 10.3px. Darkened and enlarged
+   only where that happens; the site's own grey is untouched elsewhere. This
+   block sits last among the unconditional rules so it wins on order as well as
+   on specificity. */
+.colour-page .small,.colour-page .caption,.colour-page .partner-line,
+.colour-page .provenance,.colour-page .symmetry-record,.colour-page .refused-note,
+.colour-page .solution-policy p,.colour-page .group span,.colour-page #variants-note,
+.colour-page #parameter-map-caption,.colour-page .viewer-hint,
+.colour-page .pattern-thumb .thumb-tag,.colour-page .subvariant small{color:#5b6370}
+.colour-page .symmetry-record td:last-child,.colour-page .metrics span{color:#5b6370}
+.colour-page .provenance code,.colour-page .symmetry-record code,
+.colour-page .refused-note code,.colour-page .small code{font-size:12px;color:#454b57}
+
+/* DOM order inside `.lab` is now `controls`, `viewer`, `evidence`, so the tab
+   ladder runs 1 → 2 → 3 → 4 → the viewer → the evidence. It used to run
+   1 → the viewer → three collapsible evidence blocks → 2 → 3 → 4, with step 2
+   nearly two thousand pixels back up the page. The grid puts the columns back
+   where they were drawn. */
+.colour-page .lab{grid-template-rows:auto auto}
+.colour-page .lab>.viewer{grid-column:1;grid-row:1;min-width:0}
+.colour-page .lab>.controls{grid-column:2;grid-row:1/span 2}
+.colour-page .lab>.evidence{grid-column:1;grid-row:2;min-width:0}
+
+/* The one-column fold is the sibling pages' own 950 px breakpoint, not 720:
+   between the two, an iPad in portrait was showing a 394 px picture beside a
+   303 px sidebar on a page whose subject is the picture. */
+@media(max-width:950px){
+  .colour-page .lab{display:flex;flex-direction:column}
+  .colour-page .lab>.viewer,.colour-page .lab>.controls,.colour-page .lab>.evidence{width:100%}
+}
+/* Above 1600 px the viewer stopped growing and the window filled with margin;
+   these pages exist to be looked at. */
+@media(min-width:1600px){
+  main.colour-page{max-width:1560px}
+  .colour-page .lab{grid-template-columns:minmax(760px,1.75fr) minmax(320px,360px)}
+  /* …but a row of four tiles should not stretch to 390 px each. */
+  .colour-page .groups.variable-groups,.colour-page .subvariants,
+  .colour-page #variants-note,.colour-page .solution-policy{max-width:1200px}
+}
+
+@media(max-width:950px){
+  .colour-page .subvariants{margin:-8px 0 12px}
+  .colour-page .notation-panel{padding:12px}
+  /* The picture first, then the ladder.
+     On a phone there is no second column, so the four-rung ladder pushed the
+     first frame of the film 2,700 px down the page — three screens past the
+     header, the tiles, the chips, the policy box and a 970 px atlas panel.
+     `display:contents` on `.lab` and `.controls` re-parents their children into
+     `main`'s flex box, so the order can be chosen freely without a second
+     markup: the reader meets the page's thesis, what is showing, the picture,
+     and only then the rungs that change it. Tab order stays the DOM's, which is
+     the ladder's. */
+  .colour-page{display:flex;flex-direction:column}
+  .colour-page .family-page-header{order:0}
+  .colour-page .lab{display:contents}
+  .colour-page .controls{display:contents}
+  .colour-page .selected{order:1;margin-bottom:10px;margin-top:0}
+  .colour-page .viewer{order:2;width:100%;margin-bottom:6px}
+  .colour-page .selection-step{order:3}
+  .colour-page #step-1-note{order:4}
+  .colour-page #variants{order:5}
+  .colour-page #subvariants{order:6}
+  .colour-page #variants-note{order:7}
+  .colour-page #selected-badges{order:8}
+  .colour-page .atlas-panel{order:9;margin-bottom:14px}
+  .colour-page .stack{order:10}
+  .colour-page #display-range{order:11}
+  .colour-page #export{order:12}
+  .colour-page .evidence{order:13;width:100%}
+  .colour-page .solution-policy{order:14}
+  .colour-page #status{order:15}
+  .colour-page noscript{order:0}
+  .colour-page .page-links{order:17}
+  /* Seven equation pills stacked vertically were 198 px of the atlas panel's
+     970; as a wrapping row they are two. */
+  .colour-page .equations{display:flex;flex-wrap:wrap;gap:6px}
+  .colour-page .equations .equation{flex:1 1 auto;min-width:0;text-align:left}
+}
+
+@media(max-width:720px){
+  /* Four tiles to a row rather than three, and the filter chips without their
+     notes: 160 px of the climb to the picture. */
+  .colour-page .groups.variable-groups{grid-template-columns:repeat(4,1fr)}
+  .colour-page .group:nth-child(-n+4){border-bottom:1px solid var(--rule)}
+  .colour-page .group:nth-child(4){border-right:0}
+  .colour-page .subvariant small{display:none}
+  .colour-page .metrics{grid-template-columns:repeat(2,1fr)}
+  /* A four-column table at 358 px is four slivers. One row becomes one card. */
+  .symmetry-record thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .symmetry-record table,.symmetry-record tbody,.symmetry-record tr,.symmetry-record td{display:block;width:100%}
+  .symmetry-record tr{border-bottom:1px solid var(--rule);padding:9px 0}
+  .symmetry-record td{border:0;padding:0}
+  .symmetry-record td:first-child{font-size:13px;color:var(--ink);margin-bottom:3px}
+  .symmetry-record td:not(:first-child){display:inline-block;width:auto;margin-right:12px;font-size:12px}
+  .symmetry-record td:nth-child(2)::before{content:"time ";color:var(--muted)}
+  .symmetry-record td:nth-child(3)::before{content:"colour ";color:var(--muted)}
+  .symmetry-record td:last-child::before{content:"agreement ";color:var(--muted)}
+  .colour-page .notation-panel table,.colour-page .notation-panel tbody,.colour-page .notation-panel tr,.colour-page .notation-panel td{display:block;width:100%}
+  .colour-page .notation-panel thead{display:none}
+  .colour-page .notation-panel tr{border-bottom:1px solid #40382f;padding:8px 0}
+  .colour-page .notation-panel td{border:0;padding:1px 0}
+  .colour-page .notation-panel td:first-child{font-size:14px}
+  .colour-page .notation-panel td:not(:first-child){display:inline-block;width:auto;margin-right:10px;font-size:12px;color:#d9cfc1}
+  .colour-page .notation-panel dl{grid-template-columns:auto 1fr;gap:9px 10px}
+}

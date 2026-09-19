@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Entangled colour symmetries: three pages paint the same verified reaction–diffusion waves with three different rules for assigning three colours, and the rule decides the colour group — Z₃ fully entangled, S₃ half entangled, Z₃ split.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Entangled colourings — Spacetime Groups</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+  <link rel="stylesheet" href="../css/style.css?v=collapsible-header-v1">
+  <script defer src="../js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="stylesheet" href="../css/scott-gray-directory.css?v=20260907-local-motion">
+  <link rel="stylesheet" href="colour-style.css?v=20260919-colour-v1">
+  <script type="module" src="colour-directory.mjs?v=20260919-colour-v1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#colourings">Skip to the three colourings</a>
+  <header class="site">
+  <div class="inner">
+    <a class="title" href="../index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="../index.html">Tutorial</a>
+        <a href="../notation.html">Notation</a>
+        <a href="../colourings-tutorial.html">Colourings</a>
+        <a href="../subgroups-vs-colourings.html">Subgroups</a>
+        <a href="../torus-cayley.html">Torus Cayley graphs</a>
+        <a href="../hierarchy.html">Hierarchy</a>
+        <a href="../history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="../catalog.html">275 spacetime</a>
+        <a href="../wallpaper.html">275 spacetime (grouped)</a>
+        <a href="../correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="../patterns.html">609 patterns</a>
+        <a href="../escher.html">107 Escher</a>
+        <a href="../gallery.html">Gallery</a>
+        <a href="../scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colour</span>
+        <a href="../colour/" class="here">Entangled colourings</a>
+        <a href="../colour/gyre/">Gyre</a>
+        <a href="../colour/trefoil/">Trefoil</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="../reports/">Reports</a>
+        <a href="../motifs.html">Motifs</a>
+        <a href="../designer.html">Designer</a>
+        <a href="../billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="../crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+  <main class="gray-scott-directory colour-page">
+    <section class="directory" aria-labelledby="page-title">
+      <p class="overline">Colour</p>
+      <h1 id="page-title">Entangled colour symmetries</h1>
+      <p>All three pages below paint the <i>same</i> verified reaction–diffusion waves — and, from this release, a whole catalog of them, over seven reaction–diffusion equations and every hexagonal film group the catalog found one in (the counts are on the right, and they grow as the search runs). Only the rule that assigns the three colours differs, and that rule decides the colour group: whether a recolouring can be seen in a single frozen frame, or only in the film.</p>
+    </section>
+
+    <div class="colour-theorem">
+      <p>Composing two symmetries adds their time shifts, so the time shift is a homomorphism to a circle. Every recolouring that needs no time shift forms a subgroup <b>ker θ̄</b>, and the quotient <b>Π / ker θ̄</b> — a finite subgroup of a circle — is therefore <b>cyclic</b>.</p>
+      <p>So a colour group can be <i>totally</i> entangled only when it is cyclic: Gyre, with <b>Z₃</b>, gets away with it. A non-cyclic colour group such as <b>S₃</b> must leave part of itself visible in a single frozen frame — Trefoil, whose 3-cycle is a plain slide and whose swaps are welded to a half-turn and half a period.</p>
+      <p>Triskele is the control: the turn alone <i>and</i> the wait alone each recolour, so the entanglement splits and every frame is a threefold rosette.</p>
+    </div>
+
+    <section id="colourings" aria-labelledby="colourings-title">
+      <div class="family-directory-heading"><h2 id="colourings-title">Three rules, three colour groups</h2><p id="atlas-summary" aria-live="polite"></p></div>
+      <nav class="family-grid" aria-label="Colourings">
+        <a class="family-card" data-colouring="gyre" href="gyre/" aria-label="Gyre: colour group Z₃, fully entangled">
+          <img src="data/thumbs/colour-gyre-8fcde9bc1178.png" width="320" height="320" loading="lazy" decoding="async" alt="">
+          <span class="family-card-caption"><strong class="family-card-orbifold">Gyre</strong><span class="family-card-hm">turn, wait, recolour</span></span>
+          <span class="family-card-count">colour group Z₃</span>
+          <span class="family-card-results"><span data-pattern-count>Verified colourings</span><small data-equations></small></span>
+        </a>
+        <a class="family-card" data-colouring="trefoil" href="trefoil/" aria-label="Trefoil: colour group S₃, half entangled">
+          <img src="data/thumbs/colour-trefoil-8fcde9bc1178.png" width="320" height="320" loading="lazy" decoding="async" alt="">
+          <span class="family-card-caption"><strong class="family-card-orbifold">Trefoil</strong><span class="family-card-hm">slide freely, swap with a half period</span></span>
+          <span class="family-card-count">colour group S₃</span>
+          <span class="family-card-results"><span data-pattern-count>Verified colourings</span><small data-equations></small></span>
+        </a>
+        <a class="family-card" data-colouring="triskele" href="../scott-gray/triskele/" aria-label="Triskele: the control, where the entanglement splits">
+          <img src="../scott-gray/triskele/social-preview.jpg" width="320" height="240" loading="lazy" decoding="async" alt="">
+          <span class="family-card-caption"><strong class="family-card-orbifold">Triskele</strong><span class="family-card-hm">the split sibling</span></span>
+          <span class="family-card-count">the control</span>
+          <span class="family-card-results"><span>Standalone viewer</span><small>one field, no catalog</small></span>
+        </a>
+      </nav>
+
+      <div class="table-scroll"><table class="colour-compare">
+        <thead><tr><th scope="col">Page</th><th scope="col">Colour group Π</th><th scope="col">ker θ̄ — recolourings needing no wait</th><th scope="col">What one frozen frame shows</th></tr></thead>
+        <tbody>
+          <tr><td><a href="gyre/">Gyre</a></td><td>Z₃, cyclic <small data-gyre-pi></small></td><td>trivial where the entanglement is total <small data-gyre-entangled></small></td><td>on a fully entangled entry, nothing but the lattice: no rotation centre, no mirror, no colour symmetry at all <small data-gyre-lattice></small></td></tr>
+          <tr><td><a href="trefoil/">Trefoil</a></td><td>S₃, not cyclic</td><td>the 3-cycle — a plain slide by <i>b</i></td><td>a threefold colour cycle on the finer lattice; the two-colour swaps are invisible</td></tr>
+          <tr><td><a href="../scott-gray/triskele/">Triskele</a></td><td>Z₃, split</td><td>the whole of Π</td><td>a threefold rosette, fully coloured — the turn alone already recolours</td></tr>
+        </tbody>
+      </table></div>
+
+      <p class="atlas-note" id="character-note">The rule is the same on every entry; the third and fourth columns describe the character this catalog selects for, and the figures beside them count the entries that actually have it. Each explorer page says, entry by entry, which side of that line the picture on screen falls.</p>
+      <h2 style="margin-top:2rem;font-size:1.08rem">How to read the marks</h2>
+      <div class="colour-marks-key">
+        <p><b>The coin</b> — what the motion is and how long you wait. The site's rotation-order glyph with its screw tails, a violet clock dial filling <i>k/n</i> clockwise from twelve, and a short anticlockwise arc for the sense. An empty ring means no waiting at all.</p>
+        <p><b>The chip</b> — what becomes of the colours. Three palette dots at fixed stations: 0 terracotta at twelve, 1 teal at four, 2 sand at eight. Chasing arrows cycle all three; a double-headed arrow joins the two it exchanges and rings the one left alone; three plain dots mean the colours never move.</p>
+        <p><b>The plain arrow</b> — a slide, with no turn and no wait at all. A full head means a whole step of the picture's own lattice. Written down, the two decorations are the symbol <i>n<sub>k</sub><sup>(σ)</sup></i>: see <a href="../notation.html">the notation page</a>.</p>
+      </div>
+
+      <p class="atlas-note">Only entries whose colour law was re-derived from the saved float32 bytes at every node-frame — with zero violations and zero argmax ties — appear here. The orbits themselves come with two different warrants, and each entry prints its own: an atlas orbit carries the wallpaper atlas’s offline verification, and a search record carries a re-integration from the exported bytes at two timestep limits with no symmetry projection. The colour-preserving subgroup is measured by an exhaustive search over all twelve point operations, every node translation, every time shift and all six recolourings, and every hit is re-checked in exact integer arithmetic. Fields that cannot host a colouring are listed, with their reason, on each page.</p>
+    </section>
+  </main>
+  <footer class="site">
+    Spacetime groups: the crystallography of looping animations ·
+    <a href="https://github.com/yaroslavvb/animated-groups-fable">source</a>
+  </footer>
+</body>
+</html>

@@ -58,6 +58,21 @@ each read at its own third of the cycle:
 carries saved nodes to saved nodes and every claim below is checked in exact
 integer arithmetic on the raw samples, with no interpolation anywhere.
 
+**One qualification, on "three different instants".** Because *this* field
+carries the threefold screw `U(S x + v, t + T/3) = U(x, t)` — the `g225`/`g247`
+operation with τ = 1/3, `S` being the very third-turn this rule is built on —
+the three numbers compared above are equal, bit for bit, to three readings of a
+**single** frame, `U(x + S^{−k}(offs_k − v_k), t)` with
+`offs = (0, w, w + S w)` and `v_k = v + S v + … + S^{k−1} v`, so "each read at
+its own third of the cycle" describes the renderer's texture layout rather than
+the mathematics; nothing else in this file changes, since the picture is the
+same picture and the exhaustive search below still finds exactly the three
+symmetries tabulated — see
+[`docs/colour/`](../../colour/gyre/) and the mining report's Surprise 1, which
+records the same collapse for 123 of the 200 catalogued Gyre colourings and
+verifies that in none of them do the three offsets form a translation orbit
+(so no Gyre in the catalog is a disguised Trefoil).
+
 ### The law
 
 At `(g x, t + T/3)` the three compared numbers are
