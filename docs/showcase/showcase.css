@@ -23,6 +23,9 @@
 .kind-bar .spacer { margin-left: auto; font: 11px ui-monospace, monospace; color: var(--muted); }
 .kind-bar label { display: inline-flex; gap: 5px; align-items: center; font-size: 12px; color: var(--muted); }
 
+/* The chip, quoted in the prose above the grid, drawn like the real one. */
+.chip-eg { display: inline-block; padding: 1px 8px; border-radius: 999px; background: #1b1626d9; color: #fff; font: 600 10.5px/1.6 -apple-system, BlinkMacSystemFont, sans-serif; vertical-align: 1px; }
+
 /* A section per wallpaper group. */
 .showcase-section { margin: 0 0 34px; scroll-margin-top: 64px; }
 .showcase-section h2 { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; font-size: 1.35rem; margin: 0 0 4px; padding-top: 6px; border-top: 2px solid var(--ink); }
@@ -32,8 +35,15 @@
 
 /* The grid. 148-pixel cards, as many as fit. */
 .loop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px; }
-.loop-card { display: block; position: relative; text-decoration: none; color: inherit; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #fff; }
-.loop-card:hover, .loop-card:focus-visible { border-color: var(--accent); box-shadow: 0 2px 10px #2711371f; }
+/* A card is a DIV holding one stretched link and, where the clip has
+ * look-alikes behind it, one button. It has to be a div: the chip is a
+ * <button>, and a button inside an <a> is invalid and unreachable by keyboard
+ * in every engine that tries to render it anyway. `a.open` fills the card, so
+ * the whole card is still one click; the chip sits over the art beside it. */
+.loop-card { display: block; position: relative; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: #fff; }
+.loop-card .open { display: block; text-decoration: none; color: inherit; border-radius: 5px; }
+.loop-card:hover, .loop-card:focus-within { border-color: var(--accent); box-shadow: 0 2px 10px #2711371f; }
+.loop-card .open:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .loop-card .art { position: relative; display: block; width: 100%; aspect-ratio: 1; background: #14110f; line-height: 0; }
 .loop-card .art img, .loop-card .art video { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
 .loop-card .art video { z-index: 1; }
@@ -59,9 +69,45 @@
   -webkit-line-clamp: 2; line-clamp: 2;
 }
 
-.load-more { display: flex; justify-content: center; margin: 14px 0 0; }
+/* The look-alike chip: "+6 alike" over the bottom-left of the art, opposite the
+ * signature, with the kind badge still top-left.
+ *
+ * It is anchored to the bottom of the ART and not of the card, and the art is a
+ * square as wide as the card — so its bottom edge is one card-WIDTH below the
+ * top. A percentage `top` would resolve against the card's height, which
+ * includes the two or three lines of metadata; a percentage MARGIN resolves
+ * against the containing block's width, which is exactly the number wanted. */
+.loop-card .alike {
+  position: absolute; z-index: 3; left: 5px; top: 0; margin-top: 100%;
+  transform: translateY(calc(-100% - 5px));
+  min-height: 24px; padding: 2px 8px; border: 0; border-radius: 999px;
+  background: #1b1626d9; color: #fff; cursor: pointer;
+  font: 600 10.5px/1.6 -apple-system, BlinkMacSystemFont, sans-serif;
+  letter-spacing: .02em; white-space: nowrap;
+}
+.loop-card .alike:hover { background: var(--accent); }
+.loop-card .alike:focus-visible { outline: 2px solid #fff; outline-offset: -4px; }
+.loop-card .alike[aria-expanded="true"] { background: var(--accent); }
+/* With the fold off there is nothing for the chip to do, and a control that
+ * does nothing is worse than no control. The count it carried is in the card's
+ * own `title` — "… — 6 more cards in this group look like this one", written by
+ * `card_title()` and `cardTitle()` alike — so it is still on the card and not
+ * only in a control that is gone. */
+.showcase[data-unfold="1"] .loop-card .alike { display: none; }
+
+/* A card that was folded behind the card before it, mounted because the reader
+ * opened that chip. Dashed, so the eye reads the run as one group, and it says
+ * the word as well — a dashed border is not a sentence. */
+.loop-card[data-alike-of] { border-style: dashed; background: #fcfbfa; }
+.loop-card[data-alike-of] .meta .alike-word { color: var(--accent); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; font-size: 9.5px; }
+
+.load-more { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 14px 0 0; }
 .load-more button { padding: 9px 22px; font-size: 14px; }
+.load-more[hidden] { display: none; }
 .mount-note { text-align: center; font: 11px ui-monospace, monospace; color: var(--muted); margin: 8px 0 0; }
+/* Shown only by the <noscript> block in index.html's head, which is also what
+ * takes the dead controls away. */
+.noscript-note { display: none; }
 
 /* p1's orbifold symbol is a lone ring. At rail and heading size it reads as a
  * bullet beside "2222" and "**" unless it is drawn a little larger. */
@@ -115,6 +161,43 @@
    * wider track, where the note is the whole point of the card. */
   .loop-card .meta .where { display: none; }
   .pinned-grid .loop-card .meta .where { display: block; }
+  /* The chip is bigger here than on a mouse, and it is bigger VISIBLY.
+   *
+   * It used to be 24 px with a transparent `::after` halo of `inset: -10px`
+   * ALL ROUND, on the argument that nothing else on the card was listening
+   * there. Something was: `a.open` wraps the whole card, art included, so the
+   * halo sat on top of the card's own link and took 27 % of a 115 px picture
+   * with it — a tap seven pixels ABOVE the chip, on the picture, folded the
+   * look-alikes instead of opening the card, and nothing on screen said why.
+   *
+   * A thumb still wants 44 px and a 112 px card cannot spare that much ink, so
+   * the pill is 38 px of real chip and the last 6 px are a halo that grows only
+   * DOWNWARD — away from the middle of the picture, into the strip between the
+   * chip and the signature, which is the one part of the art a thumb aiming at
+   * the chip overshoots into. Nothing above the pill, and nothing to either
+   * side of it, answers to the chip.
+   *
+   * 38 + 6 and not 36 + 8, for a reason worth a line: the pill's bottom lands
+   * on a fractional pixel, and WebKit rounds that boundary outward where
+   * Chromium rounds it in — so with an 8 px halo a real tap exactly 8 px below
+   * the pill folded the card in one engine and followed the link in the other.
+   * At 6 px the two engines agree everywhere a finger can land, and the tap box
+   * is still 44 px. */
+  .loop-card .alike { min-height: 38px; padding-block: 9px; }
+  .loop-card .alike::after { content: ''; position: absolute; inset: 0 0 -6px 0; }
+  /* The chip and the signature cannot share the bottom strip of a 117 px card:
+   * "+4 alike" is 65 px and "*²2²2²2²2" is 71 px, and the chip — which is above
+   * the signature — was drawn over its first two characters, leaving the card
+   * showing a signature no group has. So on the phone the chip takes the row
+   * ABOVE: still over the art, still left, with the signature alone on the
+   * bottom row. 34 px is the signature's own 18 px band, its 4 px inset, the
+   * 6 px halo under the chip and 6 px of air — so the tap box stops short of
+   * the signature rather than taking the corner of it. */
+  .loop-card .alike { transform: translateY(calc(-100% - 34px)); }
+  /* Two buttons side by side leave about 80 px each on a 390 px screen, which
+   * is a button that says "Show 50" and then stops. */
+  .load-more { flex-direction: column; align-items: stretch; }
+  .load-more button { min-height: 44px; }
   /* …except where dropping it would make two cards read alike. Twelve of the
      eighteen sections hold more than one film group — p6 holds g247 and g248 —
      and there two cards can agree about the name, the rule, the parameters and
