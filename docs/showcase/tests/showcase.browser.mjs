@@ -798,7 +798,21 @@ await section('an opened chip still says so after the kind filter rebuilds its c
 // to add it — and the next press took it away.
 await section('an opened chip still says so after the mount cap evicts and remounts it',
               async () => {
-  const {family, rep} = aChip();
+  // The FIRST section in document order that serves a chip: from the bottom of
+  // the page it is the furthest grid from the viewport, so it is what the cap
+  // takes out first. (With the wave fold the whole page holds barely more
+  // distinct cards than the cap, so the eviction has to land on the section
+  // nearest the top, not on whichever one `aChip()` prefers for its own test.)
+  const pick = (() => {
+    for (const f of doc.families) {
+      const reps = byFamily.get(f.id).filter(row => !row.alikeOf).slice(0, QUOTA);
+      const rep = reps.find(row => (row.alike ?? 0) >= 2);
+      if (rep) return {family: f.id, rep};
+    }
+    return null;
+  })();
+  assert.ok(pick, 'some served card has look-alikes behind it');
+  const {family, rep} = pick;
   const {context, page, errors} = await open({hash: `#${family}`});
   await page.waitForTimeout(600);
   const chip = () => page.locator(`#${family} .loop-card[data-id="${CSS_escape(rep.id)}"] .alike`);
@@ -808,14 +822,14 @@ await section('an opened chip still says so after the mount cap evicts and remou
   // A jump target is exempt from eviction for three seconds, which is exactly
   // the exemption this section has to wait out before it can evict the family.
   await page.waitForTimeout(3200);
-  // From the bottom of the page, the section this chip is in is the furthest
-  // grid from the viewport — so filling one of the big ones is what pushes it
-  // out. Pressure is applied until it goes.
+  // From the bottom of the page, every section that still has a bar is opened
+  // out, largest first, until the cap pushes the chip's section out.
   await page.evaluate(() => document.getElementById('p6m').scrollIntoView({behavior: 'instant'}));
   await page.waitForTimeout(500);
   let gone = [];
-  for (const big of ['p6', 'p3', 'p4', 'p4g', 'pmg']) {
-    if (big === family) continue;
+  const bigs = [...doc.families].sort((a, b) => b.counts.distinct - a.counts.distinct)
+    .filter(f => f.id !== family && f.counts.distinct > QUOTA).map(f => f.id);
+  for (const big of bigs) {
     await page.locator(`.show-all[data-family="${big}"]`).click();
     await page.waitForTimeout(600);
     gone = await page.$$eval('.loop-grid[data-unloaded]', ns => ns.map(n => n.dataset.family));
@@ -1334,8 +1348,12 @@ await section('the summary, the headings, the rail and the manifest agree', asyn
   assert.match(labels.distinct.text, /distinct-looking cards$/, 'the noun is on the span');
   assert.equal(num(labels.distinct.title), doc.counts.distinctClips,
                'and its title carries the picture-level figure');
-  assert.ok(doc.counts.distinctClips < doc.counts.distinct,
-            'which is the smaller of the two, because one picture is carded several times');
+  // It is the clip metric's own count and stops at the clip level: the wave fold
+  // takes the page's `distinct` below it, so the two are not ordered — only
+  // bounded by the clips there are.
+  assert.ok(doc.counts.distinctClips <= doc.counts.clips,
+            'which counts pictures, so it cannot exceed the clips');
+  assert.match(labels.distinct.title, /wave fold/, 'and the title says the wave fold goes further');
 
   // A pill is `<b><signature></b><span>count</span>`, and the signature is a
   // span of its own so p1's lone ring can be drawn larger — so `a span` finds
@@ -1518,13 +1536,14 @@ await section('no chip overlaps a signature or leaves its art, at any width', as
   for (const width of [1440, 1024, 760]) {
     const {context, page, errors} = await open({width, height: 1000});
     // The longest chips and the longest signatures are in the big sections, and
-    // most of them are past the served quota — so one is opened out first.
-    await page.locator('.show-all[data-family="pmm"]').click();
+    // most of them are past the served quota — so the biggest is opened out first.
+    const big = [...doc.families].sort((a, b) => b.counts.distinct - a.counts.distinct)[0].id;
+    await page.locator(`.show-all[data-family="${big}"]`).click();
     await page.waitForTimeout(700);
-    await page.$$eval('#pmm .loop-card .alike', nodes => nodes.slice(0, 40).forEach(n => n.click()));
+    await page.$$eval(`#${big} .loop-card .alike`, nodes => nodes.slice(0, 40).forEach(n => n.click()));
     await page.waitForTimeout(700);
-    const seen = await count(page, '#pmm .loop-card');
-    assert.ok(seen > QUOTA, `pmm is opened out at ${width} (${seen} cards)`);
+    const seen = await count(page, `#${big} .loop-card`);
+    assert.ok(seen > QUOTA, `${big} is opened out at ${width} (${seen} cards)`);
     await checkChipGeometry(page, width);
     assert.deepEqual(errors, [], 'console');
     await context.close();
