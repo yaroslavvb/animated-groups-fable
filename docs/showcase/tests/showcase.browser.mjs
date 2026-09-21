@@ -177,10 +177,24 @@ for (const [preview, rows] of byPreview) {
     for (const clip of cluster.members) byClip.set(clip, cluster);
   }
   const clipOf = row => row.preview.replace(/\.mp4$/, '');
-  const far = [];
+  // Two folds, two promises. `fold: 'look'` — the clips measure alike, and the
+  // distance to the card shown is under the threshold. `fold: 'wave'` — the
+  // catalogue calls it the same wave as the card shown: same name, film group
+  // and equation, whatever its parameters or the rule it was read by (the g6
+  // rotating wave, six cards in a row, is one card now).
+  const waveKey = row => [row.kind, row.groupId, row.equation, row.name].join('|');
+  const far = [], other = [];
+  let byWave = 0;
   for (const row of doc.rows) {
     if (!row.alikeOf) continue;
     const rep = rowById.get(row.alikeOf);
+    if (row.fold === 'wave') {
+      byWave += 1;
+      assert.ok(row.kind === 'ember' || row.kind === 'mono', `${row.id}: a colouring folded as a wave`);
+      if (waveKey(row) !== waveKey(rep)) other.push(`${row.id} is behind ${rep.id}, another wave`);
+      continue;
+    }
+    assert.equal(row.fold, 'look', `${row.id} says which fold it is under`);
     const cluster = byClip.get(clipOf(row));
     assert.ok(cluster && cluster === byClip.get(clipOf(rep)),
               `${row.id} and its rep are one cluster`);
@@ -189,6 +203,30 @@ for (const [preview, rows] of byPreview) {
   }
   assert.deepEqual(far.slice(0, 3), [],
                    `${far.length} folded cards are further than ${look.threshold} from the card shown`);
+  assert.deepEqual(other.slice(0, 3), [],
+                   `${other.length} cards are folded as a wave behind a card of another wave`);
+  assert.ok(byWave > 0, 'the wave fold is in the manifest');
+  // …and a second visible card of one wave in a section is only ever the card
+  // that could not fold: it already hides look-alikes of ANOTHER wave, which
+  // would otherwise land behind a card that is neither the same wave nor close.
+  const twice = [];
+  for (const [family, rows] of byFamily) {
+    const behind = new Map();
+    for (const row of rows) if (row.alikeOf) behind.set(row.alikeOf, [...(behind.get(row.alikeOf) ?? []), row]);
+    const shown = new Map();
+    for (const row of rows) {
+      if (row.alikeOf || !(row.kind === 'ember' || row.kind === 'mono')) continue;
+      shown.set(waveKey(row), [...(shown.get(waveKey(row)) ?? []), row]);
+    }
+    for (const [key, cards] of shown) {
+      if (cards.length < 2) continue;
+      const blocked = cards.filter(card => (behind.get(card.id) ?? []).some(f => waveKey(f) !== key));
+      if (cards.length - blocked.length > 1) {
+        twice.push(`${family}: ${cards.length} cards of ${key}, ${blocked.length} of them blocked`);
+      }
+    }
+  }
+  assert.deepEqual(twice.slice(0, 3), [], `${twice.length} waves are shown twice in a section for no reason`);
   const near = [];
   for (const [family, rows] of byFamily) {
     const shown = rows.filter(row => !row.alikeOf && byClip.has(clipOf(row)));
@@ -221,8 +259,8 @@ for (const [preview, rows] of byPreview) {
   const under = hidden.filter(row => !rowById.get(row.alikeOf)?.featured);
   assert.deepEqual(under.map(row => row.id).slice(0, 3), [],
                    `${under.length} featured rows are folded behind an unfeatured card`);
-  notes.push(`       fold: every hidden card within ${look.threshold} of the card shown, `
-             + `no two shown cards inside it (${doc.counts.folded} folded, `
+  notes.push(`       fold: every hidden card the same wave as the card shown or within ${look.threshold} of it, `
+             + `no two shown cards inside it (${doc.counts.folded} folded, ${byWave} of them as a wave, `
              + `${hidden.length} featured behind another featured card)`);
 }
 

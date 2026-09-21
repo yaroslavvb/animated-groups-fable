@@ -436,3 +436,26 @@ The page's numbers, and where each of them is printed:
 | cards in this family | — | `… of N loops` | `title` | `data-total` |
 | distinct-looking | `distinct-looking cards` | `N distinct of …` | the pill itself | `data-distinct` |
 | folded behind them | `folded behind them` | — | — | — |
+
+### One card per wave
+
+The clip metric is exact about pixels and wrong about people. Six cards of the
+g6 Gray–Scott rotating wave — F .00395 … .00408, read as half period, half
+slide, half turn and mirror — cycle through the same stripes, bones and
+chequers in a different order and at a slightly different spacing, so no
+alignment of one whole loop onto another is close and the metric calls them
+unrelated (0.8 to 1.41). A reader watching six synchronised loops in a row
+calls them the same card six times. The catalogue already says so: they share
+a *name* under one film group of one equation.
+
+So `make-manifest.py` folds twice. After the look-alike fold, `fold_waves()`
+folds every visible ember and black-and-white card of one `(kind, groupId,
+equation, name)` in a section behind one of them — the featured one, else the
+one already hiding the most, else the first — and the cards folded behind it
+come along. Colourings are left alone: a colouring is its own picture. Each
+folded row says which promise it is under, `fold: "look"` (within the
+threshold of the card shown) or `fold: "wave"` (the same wave as it). A card
+that already hides look-alikes of *another* wave is not folded, because its
+followers would land behind a card that is neither the same wave nor close to
+them; it stays visible, and the suite checks that every second card of a wave
+in a section is exactly that case.

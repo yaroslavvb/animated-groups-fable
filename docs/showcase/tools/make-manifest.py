@@ -297,7 +297,99 @@ def fold_look_alikes(rows, by_clip, threshold):
                 for row in near:
                     row['look'] = look
                     row['alikeOf'] = lead['id']
+                    row['fold'] = 'look'
                     folded += 1
+    return folded
+
+
+WAVE_KINDS = ('ember', 'mono')
+
+
+def wave_key(row):
+    """What the catalogue itself calls one wave: its name under one film group of
+    one equation.  Parameters and the two-colour rule are deliberately not in it."""
+    return (row['kind'], row['groupId'], row['equation'], row['name'])
+
+
+def fold_waves(rows):
+    """One card per WAVE in a section, on top of the look-alike fold.
+
+    The clip metric is exact about pixels and wrong about people.  Six cards of
+    the g6 Gray–Scott rotating wave — F .00395 … .00408, read as half period,
+    half slide, half turn and mirror — cycle through the same stripes, bones and
+    chequers in a different order and at a slightly different spacing, so no
+    alignment of one whole loop onto another is close and the metric calls them
+    unrelated (0.8 to 1.41); the reader, watching six synchronised loops in a
+    row, calls them the same card six times, which is what they are for browsing.
+    The catalogue already says so: they share a NAME under one film group of one
+    equation.  So, after the look-alike fold, every visible ember and black-and-
+    white card of one `wave_key` in a section folds behind one of them — the
+    featured one, else the one already hiding the most, else the first — and
+    the cards that were folded behind it come along.  Colourings are left alone:
+    a colouring is its own picture, not a reading of one.
+
+    One thing keeps the page's promise exact — that every hidden card is the
+    same wave as the card it is behind, or within the threshold of it.  A card
+    that already hides look-alikes of ANOTHER wave (the clip metric crosses
+    names; a `Standing wave` can measure alike a `Diagonal standing wave`) is
+    not folded, because its followers would land behind a card that is neither
+    the same wave nor close to them.  It stays visible, a second card of its
+    wave, and the suite checks that every such second card really is blocked.
+    `fold` says which promise a folded row is under: `look` or `wave`.
+    """
+    per_family = {}
+    for row in rows:
+        per_family.setdefault(row['family'], []).append(row)
+    folded = 0
+    for mine in per_family.values():
+        followers = {}
+        for row in mine:
+            if row.get('alikeOf'):
+                followers.setdefault(row['alikeOf'], []).append(row)
+        waves = {}
+        for row in mine:
+            if row['kind'] in WAVE_KINDS and not row.get('alikeOf'):
+                waves.setdefault(wave_key(row), []).append(row)
+        for key, shown in waves.items():
+            if len(shown) < 2:
+                continue
+            at = {row['id']: n for n, row in enumerate(shown)}
+            primary = min(shown, key=lambda r: (not r['featured'],
+                                                -len(followers.get(r['id'], [])), at[r['id']]))
+            for row in shown:
+                if row is primary:
+                    continue
+                tail = followers.get(row['id'], [])
+                if any(wave_key(f) != key for f in tail):
+                    continue                    # blocked: it hides another wave's look-alikes
+                row['alikeOf'] = primary['id']
+                row['fold'] = 'wave'
+                folded += 1
+                for f in tail:                  # the same wave as the primary, by the test above
+                    f['alikeOf'] = primary['id']
+                    f['fold'] = 'wave'
+                followers.setdefault(primary['id'], []).extend([row] + tail)
+                followers.pop(row['id'], None)
+        # Recount, and key every chip so the page can open it by (family, look).
+        behind = {}
+        for row in mine:
+            if row.get('alikeOf'):
+                behind.setdefault(row['alikeOf'], []).append(row)
+        for row in mine:
+            tail = behind.get(row['id'], [])
+            if tail:
+                row['alike'] = len(tail)
+                if not row.get('look'):
+                    row['look'] = 'wave:%s:%s:%s:%s' % (
+                        row['kind'], row['groupId'],
+                        re.sub(r'[^a-z0-9]+', '-', row['equation'].lower()).strip('-'),
+                        re.sub(r'[^a-z0-9]+', '-', row['name'].lower()).strip('-'))
+                for f in tail:
+                    f['look'] = row['look']
+            else:
+                row.pop('alike', None)
+                if not row.get('alikeOf'):
+                    row.pop('look', None)       # a card of its own carries no chip key
     return folded
 
 
@@ -345,6 +437,7 @@ def build(broad=False, by_clip=None, look_alikes_path=None, look_alikes=None):
     rows = sc.all_rows(groups, sc.KINDS, broad=broad)
     also_in(groups, rows)
     fold_look_alikes(rows, by_clip or {}, (look_alikes or {}).get('threshold', 0.0))
+    fold_waves(rows)
     # No two cards in one section may read the same. Returns the families whose
     # phone layout has to keep the group-and-equation line, because there it is
     # the line that tells two cards apart. Once per freshly built row set: it
@@ -387,7 +480,7 @@ def build(broad=False, by_clip=None, look_alikes_path=None, look_alikes=None):
             card['alsoIn'] = row['alsoIn']
         # The look-alike fold, per family. `look` is on both sides of it so the
         # page can key an expansion by (family, cluster) without a lookup.
-        for key in ('look', 'alike', 'alikeOf'):
+        for key in ('look', 'alike', 'alikeOf', 'fold'):
             if row.get(key):
                 card[key] = row[key]
         shipped.append(card)
@@ -649,10 +742,13 @@ def summary_html(doc):
     parts = [('clips', counts['clips'], 'pictures', ''),
              ('total', counts['total'], 'cards', ''),
              ('distinct', counts['distinct'], 'distinct-looking cards',
-              f'{spaced(counts["distinctClips"])} distinct-looking pictures: a picture is a '
-              'representative once in every wallpaper group that cards it'),
+              f'by the clip metric alone, {spaced(counts["distinctClips"])} distinct-looking '
+              'pictures, a picture being a representative once in every wallpaper group that '
+              'cards it; the wave fold — one card per named wave of a film group and equation — '
+              'takes the page further than that'),
              ('folded', counts['folded'], 'folded behind them',
-              'every one of them within the look-alike threshold of the card it is behind'),
+              'every one of them the same wave as the card it is behind — same name, film group '
+              'and equation — or within the look-alike threshold of it'),
              ('records', counts['records'], 'catalogue records', ''),
              ('ember', counts['ember'], 'field', ''),
              ('colour', counts['colour'], 'three-colour', ''),
