@@ -135,6 +135,16 @@
 .showcase[data-kind="viewer"] .loop-card:not([data-kind="viewer"]) { display: none; }
 .showcase-section[hidden] { display: none; }
 
+/* Cards read as pictures alone: no kind badge, no signature, no name/group/
+ * parameter caption, no "+N alike" chip. The underlying markup, fold and
+ * expand behaviour are unchanged — this is a visual override only. */
+.showcase .loop-card .badge,
+.showcase .loop-card .sig,
+.showcase .loop-card .meta,
+.showcase .loop-card .alike {
+  display: none !important;
+}
+
 @media (max-width: 720px) {
   .loop-grid { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 7px; }
   .pinned-grid { grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
