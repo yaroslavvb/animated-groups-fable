@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oscillatory spiral lattice, black and white · Brusselator · p3</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:#120922;color:#f1e9f7;font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;display:flex;justify-content:center;padding:20px 14px 32px}
+main{width:min(100%,640px)}
+h1{font-size:1.35rem;margin:0 0 2px}
+.sub{margin:0 0 14px;color:#b9a8c9;font-size:.92rem}
+.wrap{position:relative;width:100%;aspect-ratio:1;background:#271337;border-radius:6px;overflow:hidden}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+button,select{font:inherit;background:#2b1a3e;color:inherit;border:1px solid #5a4374;border-radius:5px;padding:5px 10px}
+button{cursor:pointer}
+input[type=range]{flex:1;min-width:120px}
+pre{background:#1b0f2c;border-radius:6px;padding:10px 12px;overflow-x:auto;font-size:.9rem;margin:10px 0}
+p.small{color:#b9a8c9;font-size:.85rem;margin:6px 0}
+a{color:#f5b86a}
+#msg{color:#f5b86a}
+</style>
+</head>
+<body>
+<main>
+  <h1>Oscillatory spiral lattice, black and white</h1>
+  <p class="sub">Brusselator reaction–diffusion · wallpaper group p3 (333) · time symmetry g227</p>
+  <div class="wrap"><canvas id="gpu" width="768" height="768" aria-label="Periodic Brusselator solution"></canvas><canvas id="cpu" width="384" height="384" hidden></canvas></div>
+  <div class="bar">
+    <button id="play" type="button" disabled>Ⅱ Pause</button>
+    <input id="phase" type="range" min="0" max="1" step="0.001" value="0" aria-label="Animation phase" disabled>
+    <select id="speed" aria-label="Playback speed"><option value="0.5">Slow</option><option value="1" selected>Normal</option><option value="2">Fast</option></select>
+  </div>
+  <p id="msg" role="status">Loading…</p>
+  <pre>uₜ = Dᵤ∇²u + a − (b + 1)u + u²v
+vₜ = Dᵥ∇²v + bu − u²v</pre>
+  <p class="small" id="params"></p>
+  <p class="small">One saved, independently re-verified periodic solution: after each period the pattern returns exactly, and the group's operations advance the pattern in time as well as moving it in space. Shown as 2 L of the simulation width, white where u is above its mean, black below.
+  Part of <a href="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/p3/#g227?v=2&amp;pattern=equation%3Abrusselator%3Ag227%3Ae47c12f9099fb9d2&amp;palette=ember&amp;tiles=2&amp;framing=simulation&amp;speed=1&amp;generator=%CE%B1&amp;overlay=0&amp;approx=0&amp;phase=0&amp;play=1">Spacetime Groups</a>.</p>
+</main>
+<script type="module" src="app.mjs"></script>
+</body>
+</html>
