@@ -5,9 +5,8 @@
 // to 72×72 on load; playback blends four frames with Catmull–Rom weights and
 // the GPU interpolates bicubically in lattice coordinates.
 //
-// The picture is the sign of w(x, t) = U(x, t) − U(x, t + T/2): white where U
-// is higher than it will be half a period later. Waiting half a period
-// exchanges black and white exactly.
+// The picture is white where w(x, t) = U(x, t) − U(x, t + T/2) exceeds THRESHOLD:
+// where U is well above what it will be half a period later.
 export const INITIAL_PHASE = 0;
 export const LOOP_SECONDS = 8; // The source's speed=1: one period per 8 s.
 // Source desktop canvas: 760 CSS pixels across 2 simulation lattice lengths
@@ -26,6 +25,9 @@ export const TEXTURE_SIZE = GRID_SIZE * UPSAMPLE;
 export const FIELD_BYTES = FRAMES * 2 * GRID_SIZE * GRID_SIZE * 4;
 export const VALUE_RANGE = [0.5700383186340332, 1.9851957559585571]; // record.ranges.u
 export const STYLES = ['ember', 'monochrome'];
+// White where w exceeds 30.1% of max|w| (0.4260): the largest cut at which the white
+// islands never join into a network, and still below where each one splits in three.
+export const THRESHOLD = 0.426;
 // Screen offsets (y down) to lattice offsets on the triangular lattice.
 const SQRT3 = Math.sqrt(3);
 export const toLatticeOffset = ([x, y]) => [x - y / SQRT3, -2 * y / SQRT3];
@@ -166,7 +168,7 @@ export function upsampledVolume(planar, style = 'ember') {
   const u = k => planar.subarray(k * 2 * count, k * 2 * count + count);
   for (let k = 0; k < FRAMES; k++) {
     let source = u(k);
-    if (style === 'monochrome') { const later = u((k + half) % FRAMES); source = source.map((value, i) => value - later[i]); }
+    if (style === 'monochrome') { const later = u((k + half) % FRAMES); source = source.map((value, i) => value - later[i] - THRESHOLD); }
     volume.set(upsample2(source, GRID_SIZE, kernel), k * plane);
   }
   return volume;
