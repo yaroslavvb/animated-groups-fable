@@ -1,0 +1,533 @@
+{
+ "url": "live/glue/test.html (served over http on a local port)",
+ "seed": "1",
+ "console": [],
+ "errors": [],
+ "loadAverage": [
+  3.4189453125,
+  3.01708984375,
+  3.2119140625
+ ],
+ "cpus": 16,
+ "sessions": [
+  {
+   "name": "desktop",
+   "viewport": {
+    "width": 1280,
+    "height": 900
+   },
+   "selfTest": {
+    "maxDifference": 0,
+    "representatives": 146,
+    "nodes": 1296,
+    "summary": {
+     "nodes": 1296,
+     "representatives": 146,
+     "reductionFactor": 8.876712328767123,
+     "instantaneousCopies": 290,
+     "delayedCopies": [
+      430,
+      430
+     ],
+     "delays": [
+      "1T/3",
+      "2T/3"
+     ]
+    }
+   },
+   "domainPainted": 407,
+   "domainCaption": "146 of the 1296 mesh nodes are integrated — one ninth of the drawn cell, a reduction of 8.877×. The stubs on the boundary are the glued edges: 46 of them read a neighbour at the same instant, 26 read the domain as it was T/3 ago and 26 as it was 2T/3 ago. The three marked corners are the cone points of the 333 orbifold; their labels 3, 3₁, 3₂ are the clockwork symbol r33₁3₂ itself.",
+   "noHorizontalScroll": true,
+   "atShot": {
+    "colours": 194,
+    "periods": 4,
+    "done": false
+   },
+   "assembledSeconds": 12.793,
+   "assembled": {
+    "T": 6.390172673334256,
+    "periods": 31,
+    "steps": 10415,
+    "stopReason": "period found",
+    "lastDeltaT": 0.000005073733126081947,
+    "seconds": 12.64860000000149,
+    "computeSeconds": 0.4505999999530613,
+    "rhsCalls": 41691,
+    "nodeEvals": 6086886,
+    "historySamples": 84903,
+    "published": 6.390159918584649,
+    "relativePeriodError": 0.0000019959984991328328,
+    "symmetryMaxRaw": 0.00005801531887072997,
+    "vortices": 18,
+    "totalCharge": 0,
+    "centres": [
+     {
+      "lattice": [
+       0.33333333333333337,
+       0.6666666666666667
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 1,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0.33333333333333326
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 0.9999967022211583,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 0.9999998111714794,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.000001500699986077706,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0.6666666666666665
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.0000015006999861300003,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.33333333333333326,
+       0.33333333333333326
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.0000015006999858493355,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0.6666666666666667
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.0000015003441114710512,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0.33333333333333326
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.000001500344111381592,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.33333333333333326,
+       0
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.0000015003441116035079,
+      "agrees": true
+     }
+    ],
+    "glue": {
+     "nodes": 1296,
+     "representatives": 146,
+     "reductionFactor": 8.876712328767123,
+     "instantaneousCopies": 290,
+     "delayedCopies": [
+      430,
+      430
+     ],
+     "delays": [
+      "1T/3",
+      "2T/3"
+     ]
+    },
+    "T0": 6.355087900738468,
+    "delays": 32,
+    "drift": [
+     0.09975353880749675,
+     0.01472450561209872,
+     0.007667148598427827,
+     0.0122880566412267,
+     0.022022318743198425,
+     0.03867670443867577,
+     0.0499679129815752,
+     0.044266564870546865,
+     0.03450700147255571,
+     0.028465410706991923,
+     0.02266531179075474,
+     0.016638685831758284,
+     0.011536834388390631,
+     0.007708077293077115,
+     0.004973184798956134,
+     0.003191235542897274,
+     0.002028682213831261,
+     0.0012826265660188618,
+     0.0008089987448438207,
+     0.0005103107017782284,
+     0.00032264390900848037,
+     0.00020492546247094965,
+     0.00013107312454783783,
+     0.00008464491464843765,
+     0.000055329448275517026,
+     0.00003668624045548861,
+     0.000024706671287433196,
+     0.000016903752210502423,
+     0.000011738338131899962,
+     0.000008258281699826144,
+     0.000005872499893452021
+    ]
+   },
+   "polished": {
+    "T": 6.390159918584547,
+    "iterations": 2,
+    "residualRms": 3.683705884827922e-14,
+    "seconds": 0.6800999999977648,
+    "rhsCalls": 18832,
+    "flows": 44,
+    "relativePeriodError": -1.598403163095446e-14,
+    "symmetryMaxRaw": 2.4811268595215097e-9
+   },
+   "totalSeconds": 13.526,
+   "noHorizontalScrollAfter": true,
+   "exported": [
+    {
+     "which": "glue",
+     "period": 6.390172673334256,
+     "bytes": 20736
+    },
+    {
+     "which": "polished",
+     "period": 6.390159918584547,
+     "bytes": 20736
+    }
+   ]
+  },
+  {
+   "name": "mobile390",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "selfTest": {
+    "maxDifference": 0,
+    "representatives": 146,
+    "nodes": 1296,
+    "summary": {
+     "nodes": 1296,
+     "representatives": 146,
+     "reductionFactor": 8.876712328767123,
+     "instantaneousCopies": 290,
+     "delayedCopies": [
+      430,
+      430
+     ],
+     "delays": [
+      "1T/3",
+      "2T/3"
+     ]
+    }
+   },
+   "domainPainted": 342,
+   "domainCaption": "146 of the 1296 mesh nodes are integrated — one ninth of the drawn cell, a reduction of 8.877×. The stubs on the boundary are the glued edges: 46 of them read a neighbour at the same instant, 26 read the domain as it was T/3 ago and 26 as it was 2T/3 ago. The three marked corners are the cone points of the 333 orbifold; their labels 3, 3₁, 3₂ are the clockwork symbol r33₁3₂ itself.",
+   "noHorizontalScroll": true,
+   "atShot": {
+    "colours": 155,
+    "periods": 4,
+    "done": false
+   },
+   "assembledSeconds": 12.679,
+   "assembled": {
+    "T": 6.390172673334256,
+    "periods": 31,
+    "steps": 10415,
+    "stopReason": "period found",
+    "lastDeltaT": 0.000005073733126081947,
+    "seconds": 12.539,
+    "computeSeconds": 0.48269999999552965,
+    "rhsCalls": 41691,
+    "nodeEvals": 6086886,
+    "historySamples": 84903,
+    "published": 6.390159918584649,
+    "relativePeriodError": 0.0000019959984991328328,
+    "symmetryMaxRaw": 0.00005801531887072997,
+    "vortices": 18,
+    "totalCharge": 0,
+    "centres": [
+     {
+      "lattice": [
+       0.33333333333333337,
+       0.6666666666666667
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 1,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0.33333333333333326
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 0.9999967022211583,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0
+      ],
+      "k": 0,
+      "predicted": 0,
+      "measured": 0,
+      "relativeAmplitude": 0.9999998111714794,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.000001500699986077706,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0.6666666666666665
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.0000015006999861300003,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.33333333333333326,
+       0.33333333333333326
+      ],
+      "k": 1,
+      "predicted": -1,
+      "measured": -1,
+      "relativeAmplitude": 0.0000015006999858493355,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.6666666666666667,
+       0.6666666666666667
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.0000015003441114710512,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0,
+       0.33333333333333326
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.000001500344111381592,
+      "agrees": true
+     },
+     {
+      "lattice": [
+       0.33333333333333326,
+       0
+      ],
+      "k": 2,
+      "predicted": 1,
+      "measured": 1,
+      "relativeAmplitude": 0.0000015003441116035079,
+      "agrees": true
+     }
+    ],
+    "glue": {
+     "nodes": 1296,
+     "representatives": 146,
+     "reductionFactor": 8.876712328767123,
+     "instantaneousCopies": 290,
+     "delayedCopies": [
+      430,
+      430
+     ],
+     "delays": [
+      "1T/3",
+      "2T/3"
+     ]
+    },
+    "T0": 6.355087900738468,
+    "delays": 32,
+    "drift": [
+     0.09975353880749675,
+     0.01472450561209872,
+     0.007667148598427827,
+     0.0122880566412267,
+     0.022022318743198425,
+     0.03867670443867577,
+     0.0499679129815752,
+     0.044266564870546865,
+     0.03450700147255571,
+     0.028465410706991923,
+     0.02266531179075474,
+     0.016638685831758284,
+     0.011536834388390631,
+     0.007708077293077115,
+     0.004973184798956134,
+     0.003191235542897274,
+     0.002028682213831261,
+     0.0012826265660188618,
+     0.0008089987448438207,
+     0.0005103107017782284,
+     0.00032264390900848037,
+     0.00020492546247094965,
+     0.00013107312454783783,
+     0.00008464491464843765,
+     0.000055329448275517026,
+     0.00003668624045548861,
+     0.000024706671287433196,
+     0.000016903752210502423,
+     0.000011738338131899962,
+     0.000008258281699826144,
+     0.000005872499893452021
+    ]
+   },
+   "polished": {
+    "T": 6.390159918584547,
+    "iterations": 2,
+    "residualRms": 3.683705884827922e-14,
+    "seconds": 0.6835999999977648,
+    "rhsCalls": 18832,
+    "flows": 44,
+    "relativePeriodError": -1.598403163095446e-14,
+    "symmetryMaxRaw": 2.4811268595215097e-9
+   },
+   "totalSeconds": 13.418,
+   "noHorizontalScrollAfter": true,
+   "exported": [
+    {
+     "which": "glue",
+     "period": 6.390172673334256,
+     "bytes": 20736
+    },
+    {
+     "which": "polished",
+     "period": 6.390159918584547,
+     "bytes": 20736
+    }
+   ]
+  }
+ ],
+ "timing": [
+  {
+   "name": "timing-7",
+   "viewport": {
+    "width": 1280,
+    "height": 900
+   },
+   "speed": "7",
+   "clickToPeriodFound": 25.005,
+   "clickToPolished": 25.741,
+   "glueT": 6.390172673334256,
+   "glueSeconds": 24.840699999999256,
+   "polishedT": 6.390159918584547,
+   "newtonSeconds": 0.6773000000007451,
+   "newtonIterations": 2
+  },
+  {
+   "name": "timing-14",
+   "viewport": {
+    "width": 1280,
+    "height": 900
+   },
+   "speed": "14",
+   "clickToPeriodFound": 12.589,
+   "clickToPolished": 13.328,
+   "glueT": 6.390172673334256,
+   "glueSeconds": 12.44710000000149,
+   "polishedT": 6.390159918584547,
+   "newtonSeconds": 0.6781000000014901,
+   "newtonIterations": 2
+  },
+  {
+   "name": "timing-56",
+   "viewport": {
+    "width": 1280,
+    "height": 900
+   },
+   "speed": "56",
+   "clickToPeriodFound": 3.308,
+   "clickToPolished": 4.094,
+   "glueT": 6.390172673334256,
+   "glueSeconds": 3.1625999999977648,
+   "polishedT": 6.390159918584547,
+   "newtonSeconds": 0.7281999999992549,
+   "newtonIterations": 2
+  },
+  {
+   "name": "timing-mobile390",
+   "viewport": {
+    "width": 390,
+    "height": 844
+   },
+   "speed": "14",
+   "clickToPeriodFound": 12.59,
+   "clickToPolished": 13.324,
+   "glueT": 6.390172673334256,
+   "glueSeconds": 12.444699999999255,
+   "polishedT": 6.390159918584547,
+   "newtonSeconds": 0.6838999999985099,
+   "newtonIterations": 2
+  }
+ ],
+ "loadAverageEnd": [
+  3.6826171875,
+  3.22216796875,
+  3.26904296875
+ ]
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delayed glue — a fundamental domain that remembers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23eb6834'/%3E%3Ccircle cx='8' cy='4.6' r='2' fill='%23f9f9f7'/%3E%3C/svg%3E">
+<meta name="description" content="Forward simulation on the 333 fundamental domain of the g227 clockwork group, with glued edges that read the domain's own past. The spiral lattice self-assembles from white noise and the period comes out of the delay.">
+<style>
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --code-bg: #f1f0ec;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c7: #4a3aa7;
+  --ok: #008300; --warn: #eda100; --bad: #e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --code-bg: #242422;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c7: #9085e9;
+    --ok: #3aa83a; --warn: #c98500; --bad: #e66767;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-text-size-adjust: 100%; }
+main { max-width: 940px; margin: 0 auto; padding: 28px 16px 72px; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 1.25rem; margin: 40px 0 10px; }
+.byline { color: var(--ink-2); font-size: 0.9rem; margin: 0 0 22px; }
+.lede { font-size: 1.05rem; }
+.small { font-size: 0.85rem; color: var(--ink-2); }
+a { color: var(--c1); }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { text-align: left; padding: 6px 9px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table-wrap { overflow-x: auto; }
+.ok { color: var(--ok); } .bad { color: var(--bad); }
+.math-display { display: block; overflow-x: auto; margin: 14px 0; color: var(--ink); }
+ul li { margin: 5px 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>A fundamental domain that remembers</h1>
+  <p class="byline">Delayed glue on the <b>333</b> orbifold of <b>g227</b> — standalone test page for
+    <code>live/glue/</code>.</p>
+
+  <p class="lede">A simulator like SymSim draws a wallpaper pattern by integrating one
+    fundamental domain and gluing its edges to copies of itself. The catalog's clockwork
+    convention is <code>q(Mx + v, t + τ<sub>g</sub>T) = q(x, t)</code>. Read that node-wise, with
+    <code>y = gx</code>:</p>
+  <p class="math-display"><code>q(y, t) = q(g⁻¹y, t − τ<sub>g</sub>T)</code></p>
+  <p>The neighbour across a glued edge is the representative's own <em>past</em>. Gluing with a
+    lag turns the reaction–diffusion equation on the fundamental domain into a
+    delay-differential equation whose only extra parameter is the period <b>T</b> — the delay.
+    Nothing else changes: the same six-neighbour triangular Laplacian, the same Brusselator, the
+    same RK4. Give the domain a history buffer and the clockwork orbit is no longer a saddle to
+    be solved for; it is an attractor you can watch assemble.</p>
+
+  <div id="glue"></div>
+
+  <h2>What the page just did</h2>
+  <ul class="small">
+    <li>White noise of rms <b>0.10</b> about the uniform equilibrium <b>(1, 2.3)</b> on the
+      <b>146</b> representatives, from a seeded generator — the same run every time.</li>
+    <li>RK4 on the delayed system, <code>dt = T/336</code> so that <b>T/3</b> is an exact number of
+      steps, with 4-point Lagrange interpolation of the history for the midpoint stages.</li>
+    <li>The delay starts at the Hopf period <b>6.355088</b> = 2π/Im λ and is updated once per
+      period by the phase-shift feedback
+      <code>T′ = T + ⟨q(t−T) − q(t), dq/dt⟩ / |dq/dt|²</code>.</li>
+    <li>It stops when the delay changes by less than <b>1e−5</b> twice running, and then — only
+      then — takes two Newton steps on the twisted shooting equation.</li>
+  </ul>
+
+  <h2>Self-test</h2>
+  <p class="small">The reduced right-hand side (146 nodes, six neighbours gathered through the
+    glue) against the full-torus right-hand side of <code>live/newton/core.mjs</code> (1296 nodes)
+    applied to the expanded field. These must agree to the last bit; if they do not, the glue
+    tables are wrong.</p>
+  <div class="card"><div id="selftest" class="small">running…</div></div>
+
+  <h2>Export</h2>
+  <p class="small">After a run, <code>window.__glue.state</code> holds the settled torus field as a
+    <code>Float64Array</code> of length 2592 (u then v, node = y·36 + x) and
+    <code>window.__glue.assembled</code> / <code>window.__glue.polished</code> hold the numbers. The
+    button writes the field to a file the Python lab can read with
+    <code>verify_glue.py</code>.</p>
+  <p><button id="export" style="font:inherit;font-size:0.86rem;border-radius:999px;padding:7px 16px;min-height:36px;cursor:pointer;background:var(--surface);color:var(--ink-2);border:1px solid var(--border)">download the settled state</button></p>
+
+<script type="module">
+import { mountGlueDemo } from './demo.mjs';
+import { selfTest } from './glue.mjs';
+
+const demo = mountGlueDemo(document.getElementById('glue'));
+window.__glue = demo.state;
+window.__glueDemo = demo;
+
+selfTest(36).then(r => {
+  const ok = r.maxDifference === 0;
+  document.getElementById('selftest').innerHTML =
+    `reduced vs full right-hand side: max difference <b>${r.maxDifference}</b>
+     <span class="${ok ? 'ok' : 'bad'}">${ok ? '✓ bitwise identical' : '✗'}</span><br>
+     representatives <b>${r.representatives}</b> of <b>${r.nodes}</b> nodes
+     (<b>${(r.nodes / r.representatives).toFixed(3)}×</b>), copies:
+     <b>${r.summary.instantaneousCopies}</b> instantaneous,
+     <b>${r.summary.delayedCopies[0]}</b> at T/3, <b>${r.summary.delayedCopies[1]}</b> at 2T/3.`;
+  window.__glueSelfTest = r;
+});
+
+document.getElementById('export').addEventListener('click', () => {
+  const s = (demo.state.polished && demo.state.polished.state) || (demo.state.assembled && demo.state.assembled.state);
+  if (!s) { alert('run the search first'); return; }
+  const T = (demo.state.polished || demo.state.assembled).T;
+  const blob = new Blob([s.buffer], { type: 'application/octet-stream' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `glue-state-T${T.toFixed(12)}.f64`;
+  a.click();
+});
+</script>
+</main>
+</body>
+</html>

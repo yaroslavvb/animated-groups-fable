@@ -1,0 +1,24 @@
+{
+ "relax1": {
+  "relax": 1,
+  "stopReason": "period found",
+  "periods": 31,
+  "T": 6.390172673334256,
+  "relativePeriodError": 0.0000019959984991328328,
+  "lastDeltaT": 0.000005073733126081947,
+  "wallSeconds": 0.421,
+  "delayMinLast40": 6.161038109507129,
+  "delayMaxLast40": 6.398810509817651
+ },
+ "relax2.5": {
+  "relax": 2.5,
+  "stopReason": "period budget spent",
+  "periods": 90,
+  "T": 7.053662320560832,
+  "relativePeriodError": 0.10383189316538136,
+  "lastDeltaT": 1.3544359419597036,
+  "wallSeconds": 1.229,
+  "delayMinLast40": 5.533898489072865,
+  "delayMaxLast40": 7.157539529953652
+ }
+}

@@ -1,0 +1,2185 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to find a time-symmetric animation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23eb6834'/%3E%3Ccircle cx='8' cy='4.6' r='2' fill='%23f9f9f7'/%3E%3C/svg%3E">
+<meta name="description" content="From a clockwork symbol and a local reaction-diffusion equation to a looping spiral lattice: the character that selects three plane waves, the theorem that fixes the vortices, Newton on one state and one number, and a fundamental domain glued to its own past. With two searches that run in the browser.">
+<style>
+
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --code-bg: #f1f0ec;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c7: #4a3aa7; --ref: #8c8b85;
+  --ok: #008300; --warn: #eda100; --bad: #e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --code-bg: #242422;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c7: #9085e9; --ref: #76756f;
+    --ok: #3aa83a; --warn: #c98500; --bad: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --code-bg: #242422;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c7: #9085e9; --ref: #76756f;
+  --ok: #3aa83a; --warn: #c98500; --bad: #e66767;
+}
+
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-text-size-adjust: 100%; }
+main { max-width: 940px; margin: 0 auto; padding: 28px 16px 72px; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 1.3rem; margin: 48px 0 10px; scroll-margin-top: 12px; }
+h3 { font-size: 1rem; margin: 26px 0 8px; scroll-margin-top: 12px; }
+h2 + p, h3 + p { margin-top: 6px; }
+.masthead { font-size: 0.82rem; color: var(--muted); margin: 0 0 14px; letter-spacing: 0.01em; }
+.masthead a { color: var(--ink-2); text-decoration: none; }
+.masthead a:hover { color: var(--c1); text-decoration: underline; }
+.byline { color: var(--ink-2); font-size: 0.9rem; margin: 0 0 20px; }
+.lede { font-size: 1.05rem; }
+.small { font-size: 0.85rem; color: var(--ink-2); }
+.muted { color: var(--muted); }
+a { color: var(--c1); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre code { padding: 0; background: none; border-radius: 0; font-size: inherit; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; line-height: 1.45; }
+ol li, ul li { margin: 5px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 18px 0; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--grid); vertical-align: top;
+  overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
+th { color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+thead th { border-bottom: 2px solid var(--axis); }
+caption { caption-side: top; text-align: left; font-size: 0.85rem; color: var(--muted); padding-bottom: 6px; }
+details { margin: 12px 0; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 0.92rem; }
+details[open] > summary { margin-bottom: 8px; }
+.hlink { margin-left: 8px; color: var(--muted); text-decoration: none; font-weight: 400; opacity: 0; }
+h2:hover .hlink, h3:hover .hlink, .hlink:focus { opacity: 1; }
+
+/* the display equations are Unicode, not MathJax */
+.eq { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%;
+  margin: 16px 0; padding: 2px 0; text-align: center; color: var(--ink); }
+
+/* figures ---------------------------------------------------------------- */
+figure.fig { margin: 22px 0; }
+figure.fig img, figure.fig video { display: block; width: 100%; height: auto;
+  background: var(--page); border: 1px solid var(--grid); border-radius: 8px; }
+figure.fig figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 8px; line-height: 1.55; }
+figure.fig figcaption b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fig-note { color: var(--muted); }
+figure.fig.narrow img, figure.fig.narrow video { max-width: 620px; margin: 0 auto; }
+figure.fig.hero img, figure.fig.hero video { max-width: 460px; margin: 0 auto; }
+.fig-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 0 26px; align-items: start; }
+.fig-pair > figure.fig { margin: 18px 0; min-width: 0; }
+
+/* the reading guide ------------------------------------------------------ */
+.guide { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; margin: 20px 0; }
+.guide dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 14px; font-size: 0.9rem; }
+.guide dt { font-weight: 650; color: var(--ink); white-space: nowrap; }
+.guide dd { margin: 0; color: var(--ink-2); }
+@media (max-width: 599px) { .guide dl { grid-template-columns: 1fr; gap: 0; }
+  .guide dd { margin: 0 0 10px; } }
+
+nav.toc-line { margin: 6px 0 22px; font-size: 0.86rem; color: var(--ink-2); }
+nav.toc-line ol { display: inline; list-style: none; margin: 0; padding: 0; }
+nav.toc-line li { display: inline; }
+nav.toc-line li + li::before { content: " · "; color: var(--muted); }
+
+/* the two live demonstrations -------------------------------------------- */
+.demo { border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  padding: 14px 16px; margin: 22px 0; }
+.demo > h3 { margin-top: 0; }
+.demo .demo-lede { font-size: 0.9rem; color: var(--ink-2); margin: 0 0 12px; }
+.demo button.go { font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
+  background: var(--ink); color: var(--page); border: 1px solid var(--ink);
+  border-radius: 999px; padding: 8px 20px; min-height: 40px; }
+.demo button.go:hover { background: var(--c1); border-color: var(--c1); color: #fff; }
+.demo button.go:focus-visible { outline: 2px solid var(--c1); outline-offset: 3px; }
+.demo button.go[disabled], .demo button.go[disabled]:hover { opacity: 0.55; cursor: default;
+  background: var(--surface); color: var(--ink-2); border-color: var(--border); }
+.demo .demo-hint { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
+.demo .demo-slot { margin-top: 14px; }
+.demo iframe { display: block; width: 100%; border: 1px solid var(--grid); border-radius: 8px;
+  background: var(--page); }
+.demo .warn { font-size: 0.86rem; color: var(--ink-2); border-left: 3px solid var(--c4);
+  padding: 2px 0 2px 12px; margin: 12px 0 0; }
+.demo .warn code { white-space: nowrap; }
+
+/* small helpers ----------------------------------------------------------- */
+.keynum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; margin: 16px 0; }
+.keynum div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; }
+.keynum .v { font-size: 1.25rem; font-weight: 650; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.keynum .l { font-size: 0.78rem; color: var(--ink-2); }
+.aside { font-size: 0.88rem; color: var(--ink-2); border-left: 3px solid var(--grid);
+  padding: 2px 0 2px 12px; margin: 16px 0; }
+.footlinks { margin-top: 56px; border-top: 1px solid var(--grid); padding-top: 16px; font-size: 0.9rem; }
+.footlinks ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.footlinks li { margin: 7px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  figure.fig video[autoplay] { animation: none; }
+}
+
+@media (max-width: 599px) {
+  main { padding: 20px 12px 56px; }
+  h1 { font-size: 1.45rem; }
+  h2 { font-size: 1.15rem; margin: 38px 0 8px; }
+  table { font-size: 0.82rem; }
+  th, td { padding: 6px 6px; }
+}
+
+/* ---------------------------------------------- the theorem fragment's CSS */
+/* Scoped to this section so the fragment renders correctly whatever the shell
+   defines; colours are tokens only. */
+.thm figure { margin: 1.4rem 0; }
+.thm figure svg { width: 100%; max-width: 520px; height: auto; display: block; margin: 0 auto; }
+.thm figcaption { font-size: .875rem; color: var(--muted); margin-top: .45rem; line-height: 1.5; }
+.thm-box { border: 1px solid var(--grid); border-left: 3px solid var(--c1); border-radius: 6px;
+  background: var(--surface); padding: .85rem 1rem; margin: 1.3rem 0; }
+.thm-box > h4 { margin: 0 0 .4rem; font-size: 1rem; }
+.thm-box ol, .thm-box ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+.thm-eq { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%;
+  margin: .9rem 0; padding: .1rem 0; text-align: center; color: var(--ink); }
+.thm-proof { font-size: .95rem; color: var(--ink-2); margin: .7rem 0 1.2rem; }
+.thm-pf > summary { font-style: italic; }
+.thm-pf .thm-proof { margin: .2rem 0 .4rem; }
+.thm-note { font-size: .9rem; color: var(--muted); border-left: 3px solid var(--grid);
+  padding: .1rem 0 .1rem .8rem; margin: 1.1rem 0; }
+.thm-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.2rem 0; }
+.thm table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.thm th, .thm td { text-align: left; vertical-align: top; padding: .42rem .6rem; border-bottom: 1px solid var(--grid); }
+.thm thead th { border-bottom: 2px solid var(--axis); font-weight: 600; }
+.thm caption { caption-side: top; text-align: left; font-size: .875rem; color: var(--muted); padding-bottom: .5rem; }
+.thm td.num, .thm th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.thm-sig { white-space: nowrap; }
+.thm-ok { color: var(--c3); font-weight: 600; }
+.thm-no { color: var(--c2); font-weight: 600; }
+.thm details { margin: 1.2rem 0; }
+.thm summary { cursor: pointer; color: var(--ink-2); font-size: .92rem; }
+.thm details[open] summary { margin-bottom: .6rem; }
+.thm-legend { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; font-size: .85rem; color: var(--ink-2); margin: .5rem 0 0; }
+.thm-legend span i { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: 0; }
+.thm-refs { font-size: .9rem; }
+.thm-refs li { margin: .55rem 0; }
+@media (max-width: 480px) {
+  .thm table { font-size: .84rem; }
+  .thm th, .thm td { padding: .35rem .4rem; }
+}
+</style>
+</head>
+<body>
+<main>
+
+<p class="masthead">
+  <a href="../../">Animated groups</a> · <a href="../">reports</a> · <span>clockwork orbits</span>
+</p>
+
+<h1>How to find a time-symmetric animation</h1>
+
+<p class="byline">
+  From a clockwork symbol and a local equation to a looping spiral lattice, with two live
+  searches that run in this page. Worked example throughout:
+  <b>g227</b>, orbifold <b>333</b>, clockwork symbol <b>r33₁3₂</b>, the Brusselator at
+  <i>a</i> = <b>1</b>, <i>b</i> = <b>2.3</b>, <i>D<sub>u</sub></i> = <i>D<sub>v</sub></i> =
+  <b>1</b>, on a triangular mesh of <b>36</b> × <b>36</b> nodes over a cell of side <b>40</b>.
+  About an hour to read in full; the method itself is section <b>4</b>, and the two live searches
+  run wherever you reach them.
+</p>
+
+<figure class="fig hero" id="fig-final-orbit-ember">
+  <video controls autoplay muted loop playsinline poster="assets/poster-final-orbit-ember.webp" aria-label="Looping animation of a hexagonal spiral lattice in orange and violet, two lattice cells across, turning steadily."><source src="assets/final-orbit-ember.mp4" type="video/mp4"><p>Looping animation of a hexagonal spiral lattice in orange and violet, two lattice cells across, turning steadily.</p></video>
+  <figcaption>The finished animation in the site's ember palette — <b>48</b> frames, exactly one period of <b>6.390159918584649</b> time units. Every frame is produced afterwards, by a single forward integration from the one state the solver found.</figcaption>
+</figure>
+
+<p class="lede">
+  That animation is periodic in time, with period <b>T</b> = <b>6.390159918584649</b>, and it
+  obeys nine relations at once: turn the picture by <b>120</b>° about one of its <b>3₁</b>
+  centres and you get the same animation a third of a period later, while a turn about one of its
+  plain threefold centres leaves every frame exactly as it was. An agent produced it in a
+  <b>54</b>-second job on a two-core cloud machine on <b>7</b> September 2026, from two inputs — the
+  clockwork symbol <b>r33₁3₂</b> and the local rule of a reaction–diffusion equation. How did it
+  get from those to this, and how would a person do the same?
+</p>
+
+<p>
+  <b>The short answer.</b> The symbol picks out a single character of the group, and that
+  character admits only three plane waves out of the six shortest; adding them up draws the
+  finished picture before any equation has been touched. What is left is to solve one equation
+  in one state and one number — <i>S<sub>g</sub></i> Φ<sub><i>T</i>/3</sub>(<i>q</i><sub>0</sub>)
+  = <i>q</i><sub>0</sub> — which Newton's method does in <b>5</b> steps, and which a browser does
+  in about <b>1.6</b> seconds. Or, if you would rather simulate than solve: glue the fundamental
+  domain to its own <i>past</i>, and the same orbit stops being a saddle and becomes something the
+  simulation falls into on its own.
+</p>
+
+<div class="card">
+  <p class="small" style="margin:0 0 6px"><b>Four symbols, defined once, used throughout.</b></p>
+  <ul class="small" style="margin:0">
+    <li><i>q</i>(<i>x</i>, <i>t</i>) is the two-species state, <i>q</i> = (<i>u</i>, <i>v</i>);
+      <i>u</i> is the channel every figure plots, and every statement about <i>u</i> holds channel
+      by channel. <i>q</i><sub>0</sub> = <i>q</i>(·, 0) is one frame of it, one number per mesh
+      node per species.</li>
+    <li>Φ<sub><i>s</i></sub> is the time-<i>s</i> flow of the discretised equation: integrate the
+      state forward by <i>s</i> and return what you get.</li>
+    <li><i>S<sub>g</sub></i> is the permutation of mesh nodes induced by the symmetry <i>g</i>,
+      (<i>S<sub>g</sub>q</i>)(<i>x</i>) = <i>q</i>(<i>g</i><sup>−1</sup><i>x</i>). The <i>g</i> in
+      the equation above is a generator with <i>τ<sub>g</sub></i> = 1/3.</li>
+    <li><i>F</i>(<i>q</i>, <i>T</i>) := <i>S<sub>g</sub></i> Φ<sub><i>T</i>/3</sub>(<i>q</i>) −
+      <i>q</i> is the twisted shooting residual, and <i>F</i> = 0 is the equation the whole page
+      is about. In the equivariant-dynamics literature its solutions are <b>relative periodic
+      orbits</b>; the repository's own routine is called <code>rpo_polish</code>.</li>
+  </ul>
+</div>
+
+<div class="guide">
+  <dl>
+    <dt>If you build simulators</dt>
+    <dd>
+      <a href="#eigenfunction">Born as an eigenfunction</a> — at onset this really is a
+      stationary eigenproblem, and the analogy's limits are stated;
+      <a href="#glue">A fundamental domain that remembers</a> — the change a fundamental-domain
+      simulator with glued edges would need, which is a history buffer and nothing else.
+    </dd>
+    <dt>If you read orbifolds</dt>
+    <dd>
+      <a href="#theorem">A magic theorem for clockwork animations</a> — Conway's cost balances
+      the geometry; a second residue, from the same orbifold relation, balances the choreography.
+    </dd>
+    <dt>If you write solvers</dt>
+    <dd>
+      <a href="#fifth">Is there a fifth dimension?</a> — whether all the frames are computed
+      together, answered three ways, including the one that literally did it and failed.
+    </dd>
+  </dl>
+</div>
+
+<nav class="toc-line" aria-label="Contents">
+  <ol>
+    <li><a href="#constraint">The constraint</a></li>
+    <li><a href="#no-sim">Why you cannot just simulate</a></li>
+    <li><a href="#theorem">The magic theorem</a></li>
+    <li><a href="#pencil">Building the seed with a pencil</a></li>
+    <li><a href="#eigenfunction">Born as an eigenfunction</a></li>
+    <li><a href="#glue">A domain that remembers</a></li>
+    <li><a href="#fifth">Is there a fifth dimension?</a></li>
+    <li><a href="#done">How it was actually done</a></li>
+    <li><a href="#open">Open questions</a></li>
+    <li><a href="#reproduce">Reproduce it</a></li>
+  </ol>
+</nav>
+
+
+<!-- ======================================================== the constraint -->
+<h2 id="constraint">The constraint, in a simulator's language<a class="hlink" href="#constraint" aria-label="link to this section">#</a></h2>
+
+<p>
+  A simulator like <a href="https://symmhub.github.io/SymmHub/apps/symsim/">SymSim</a> draws a wallpaper pattern by integrating a
+  reaction–diffusion equation on one fundamental domain and gluing that domain's edges to copies
+  of itself. Every symmetry of the group is then true of every frame separately. A
+  <b>clockwork</b> group asks for something weaker and much more interesting: the symmetry is
+  allowed to cost time.
+</p>
+
+<p class="eq">
+  <i>u</i>(<i>g x</i>, <i>t</i> + <i>τ<sub>g</sub></i><i>T</i>) = <i>u</i>(<i>x</i>, <i>t</i>)
+  &nbsp; for every <i>g</i> in the group, every point, every instant.
+</p>
+
+<p>
+  Each symmetry <i>g</i> carries a fraction of the period <i>τ<sub>g</sub></i>. The symmetries
+  with <i>τ</i> = <b>0</b> hold frame by frame — they are the ones a fundamental-domain
+  simulation can impose directly, and they form a subgroup, the kernel. The rest hold only of the
+  movie as a whole. Applying the relation to a composition <i>hg</i> shows that <i>τ</i> is a
+  homomorphism from the group to ℝ/ℤ, so — granted that its image is finite, which is what the
+  catalogue encodes and what a rotation forces — the quotient by the kernel is cyclic; for g227 it
+  is cyclic of order <b>3</b>. That is the same data as a colour group whose colour permutation is cyclic, with
+  colours replaced by time offsets — which is why every entry of this catalogue appears on the
+  correspondence pages in exactly that form:
+  <a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a>.
+</p>
+
+<p>
+  Dividing the plane by g227 — by its rotations <i>and</i> its translations — gives Conway's
+  <b>333</b> orbifold: a turnover, which is a sphere with three cone points of order three. The
+  clockwork symbol <b>r33₁3₂</b> decorates those cone points with their time offsets: one turn
+  costs nothing, one costs a third of a period, one costs two thirds. That decorated orbifold,
+  plus the choice of equation, is the entire specification.
+</p>
+
+<figure class="fig" id="fig-decorated-orbifold">
+  <img src="assets/decorated-orbifold-g227.svg" alt="Diagram of the 333 orbifold of g227 drawn as a curved triangle with a dashed second face behind it. Each corner carries a coloured rotation marker and a label: 3 with time offset zero, 3 sub 1 with offset one third, 3 sub 2 with offset two thirds, and beside each the winding it forces: 0, minus 1, plus 1. To the right, three short equations for the Conway cost, the temporal residue and the index budget." loading="lazy" decoding="async">
+  <figcaption>The clockwork symbol, read as a decorated orbifold. Dividing the plane by g227 gives Conway's <b>333</b> turnover; the symbol r33₁3₂ then decorates each cone point with a time offset. Conway's magic theorem balances the geometry — the three costs sum to exactly 2, so the symbol tiles the plane. Applying the offset τ, which is a homomorphism, to the orbifold relation balances the choreography: 0/3 + 1/3 + 2/3 = 1, an integer, and the same sum is an integer for all <b>68</b> catalogue entries (values 0, 1 and 2). The offsets then force the windings 0, −1 and +1, which sum to zero over one primitive p3 cell when each is weighted by 1/3. Drawn on the simulation box, which is three p3 cells, that is six pinned vortices, three of each sign.</figcaption>
+</figure>
+
+<p class="aside">
+  A note on conventions, because it decides every sign below. The catalogue's convention is
+  <code>q(Mx + v, t + τT) = q(x, t)</code>, and the offsets are stored as fractions of the
+  unknown period. The period is therefore not a parameter you set; it is an unknown you solve
+  for, and it is the only extra unknown the clockwork constraint introduces.
+</p>
+
+<h3 id="box">How big is the box? The symbol says</h3>
+
+<p>
+  One more thing the symbol decides, and it settles every count on this page. The leading
+  <b>r</b> of <b>r33₁3₂</b> is a centring of the space–time lattice: g227 contains a translation
+  by a third of a cell that also waits a third of a period. Its square, the <b>(1/3, 2/3)</b>
+  translation with <i>τ</i> = <b>2/3</b>, is the one that does all the work in step <b>2</b> below.
+</p>
+
+<p>
+  The field is invariant under the kernel and no more, and the kernel meets the translation
+  lattice in a sublattice of index <b>3</b>. So the simulation box cannot be g227's own unit cell;
+  it has to be <b>three</b> of them. That is why the drawn cell — <b>36</b> × <b>36</b> nodes on a
+  side of <b>40</b> — carries <b>nine</b> threefold centres in three classes of three, where one
+  primitive cell holds three centres in three classes of one, and nine operations where the
+  orbifold shows three. Two pinned vortices per primitive cell; six on the screen.
+</p>
+
+<p class="aside">
+  Two words, used consistently from here on. The <b>p3 cell</b> is g227's own primitive cell:
+  three threefold centres, the cell Theorem C's budget is written over. The <b>box</b> is the
+  simulation cell on the screen, three p3 cells, nine centres, six of them charged. Every count
+  in the box is three times the orbifold count.
+</p>
+
+
+<!-- ==================================================== why not simulate ---->
+<h2 id="no-sim">Why you cannot just simulate it<a class="hlink" href="#no-sim" aria-label="link to this section">#</a></h2>
+
+<p>
+  The obvious method is to run the equation forward on a fundamental domain with glued edges and
+  wait. It does not work, and the reason is worth measuring rather than asserting.
+</p>
+
+<p>
+  Take the published orbit itself — the exact answer — and perturb it only by the round-off of
+  writing it to single precision. Integrate forward on the g227 torus with the <i>τ</i> = 0 part
+  of the symmetry imposed at every step, which is exactly what a fundamental-domain simulator
+  does — though on a larger domain than the one the glue section uses later: the kernel's own
+  fundamental domain is <b>434</b> of the box's <b>1296</b> nodes per species, almost exactly
+  three times the <b>146</b>-node domain of the full group. The orbit leaves.
+</p>
+
+<figure class="fig" id="fig-plain-sim-collapse">
+  <video controls muted loop playsinline preload="none" poster="assets/poster-plain-sim-collapse.webp" aria-label="Stroboscopic animation, one frame per period. It begins as a sharp spiral lattice, slowly loses contrast over the first third, and ends as an almost flat field blinking in unison."><source src="assets/plain-sim-collapse.mp4" type="video/mp4"><p>Stroboscopic animation, one frame per period. It begins as a sharp spiral lattice, slowly loses contrast over the first third, and ends as an almost flat field blinking in unison.</p></video>
+  <figcaption>Why you cannot simply run the simulation. This starts on the exact published orbit — perturbed only by float32 round-off — and integrates forward on the g227 torus with the part of the symmetry that acts on a single state imposed at every step, which is what a fundamental-domain simulator with glued edges does. One frame per period, <b>313</b> periods. The spirals fade and every cell ends oscillating in unison; the first period with no vortices left is <b>135</b>. The orbit is a saddle, leading Floquet multiplier <b>1.1608154</b> per period.</figcaption>
+</figure>
+
+<div class="keynum">
+  <div><div class="v">1.1608154</div><div class="l">leading Floquet multiplier per period — the orbit is a saddle</div></div>
+  <div><div class="v">135</div><div class="l">first period with no vortices left</div></div>
+  <div><div class="v">9 618 359</div><div class="l">right-hand-side evaluations spent simulating, orbits found: 0</div></div>
+</div>
+
+<p>
+  The killer detail is not that the orbit is unstable; it is <i>which way</i> it is unstable. The
+  leading unstable eigenvector is itself symmetric under the <i>τ</i> = 0 operations. Confining
+  the simulation to the fundamental domain does not delete the growing direction, because the
+  growing direction lives inside the fundamental domain's own subspace. The simulation ends on
+  the spatially uniform limit cycle: every cell oscillating in unison, no spirals, no screws, and
+  a picture with no structure at all.
+</p>
+
+<p>
+  There is a reason it must be this way, and it is visible further down this page. The uniform
+  state loses stability at <i>b</i> = <b>2</b>; the g227 pattern is not born until
+  <i>b</i><sub>c</sub> = <b>2.065630506987</b>. A branch that bifurcates from an equilibrium which
+  is already unstable inherits that instability, so the patterned orbit is a saddle from birth —
+  and the direction it inherits is the spatially uniform one, which is invariant under every
+  operation of the group and therefore lies inside the <i>τ</i> = 0 kernel. That is exactly the
+  measured leading eigenvector, and exactly the state the simulation ends on. The measurement
+  confirms an argument rather than replacing one. It also covers the survey: every published
+  Brusselator record sits above <i>b</i> = 1 + <i>a</i>², where the uniform cycle already exists.
+</p>
+
+<figure class="fig" id="fig-saddle-survey">
+  <img src="assets/saddle-survey.webp" alt="Scatter plot of the leading Floquet multiplier for fifty-one published orbits, all above one, ranging from about 1.04 to about 2.17, with one point annotated as the main experiment at 1.1608. Below, a bar chart showing the kernel-symmetric fraction of the leading mode is 1.0 for every entry." loading="lazy" decoding="async">
+  <figcaption>Every published clockwork Brusselator orbit is a saddle: all <b>51</b> records have a leading Floquet multiplier above 1, between <b>1.0395</b> and <b>2.1721</b>, and in every case the unstable direction lies inside the symmetric subspace that a fundamental-domain simulation preserves. Two honest denominators: those <b>51</b> records are only <b>25</b> distinct fields, each confirmed one to four times, and for <b>16</b> of those records the zero-offset part of the group is trivial, so the symmetry half of the statement has content for <b>35</b> records covering <b>20</b> fields.</figcaption>
+</figure>
+
+<p>
+  It is not a peculiarity of this one orbit, as the figure above records, and the two honest
+  denominators in its caption matter: a count of records is not a count of orbits. Two claims are
+  worth keeping apart here. That the <i>τ</i> ≠ 0 relations are not constraints on a single state
+  is <i>structural</i>: it holds for any equation, and it is why forward integration has nothing
+  to hold on to. That the resulting orbits are <i>unstable</i> is <i>empirical</i>, measured on
+  these records and explained above for this equation. What both mean in practice is the same:
+  any method built on running the equation forward and waiting will fail here for a reason that
+  has nothing to do with how long you wait.
+</p>
+
+<p>
+  One sentence is worth keeping for the rest of the page: <b>Newton's method works here not
+  because it is cleverer, but because the equation <i>F</i>(<i>q</i><sub>0</sub>, <i>T</i>) = 0
+  never asks whether its solution attracts.</b>
+</p>
+
+<!-- =========================================================== the theorem -->
+<section id="theorem" class="thm">
+  <h2>A magic theorem for clockwork animations</h2>
+
+  <p class="thm-lede">
+    Before any solver is started, the symbol alone decides a great deal about the picture: which
+    points must be dark, how much phase must wind around each of them, and how the windings must
+    balance across a cell. What follows is that statement, proved, and then tested against every
+    animation the project has published. It is deliberately arranged the way Conway's Magic
+    Theorem is arranged — a closure identity that the orbifold forces, and a topological budget
+    that the identity makes satisfiable.
+  </p>
+
+  <h3 id="theorem-setting">The data: a clockwork group</h3>
+
+  <p>
+    A <strong>clockwork animation</strong> is a field <em>u</em>(<em>x</em>, <em>t</em>) on the
+    plane, periodic in time with period <em>T</em>, together with a wallpaper group <em>G</em> and
+    a map <em>τ</em> assigning to each symmetry a fraction of the period, such that
+  </p>
+
+  <div class="thm-eq">
+    <em>u</em>(<em>g x</em>, <em>t</em> + <em>τ</em><sub><em>g</em></sub><em>T</em>)
+    = <em>u</em>(<em>x</em>, <em>t</em>) &nbsp; for every <em>g</em> ∈ <em>G</em>, every
+    <em>x</em>, every <em>t</em>.
+  </div>
+
+  <p>
+    Apply the relation twice, once at <em>gx</em> and once at <em>x</em>, and
+    <em>τ</em><sub><em>hg</em></sub> = <em>τ</em><sub><em>h</em></sub> +
+    <em>τ</em><sub><em>g</em></sub> drops out: <em>τ</em> is a homomorphism
+    <em>G</em> → ℝ/ℤ, the modulo coming from <em>T</em>-periodicity. That single fact carries the
+    whole theorem. Two consequences are worth naming at once. Its kernel
+    <em>K</em> = ker <em>τ</em> is the subgroup of <em>instantaneous</em> symmetries — the ones
+    that hold frame by frame — and the quotient <em>G</em>/<em>K</em> embeds in ℝ/ℤ. It is not
+    automatic that it is <em>finite</em>: a travelling wave <em>u</em>(<em>x</em>, <em>t</em>) =
+    <em>f</em>(<em>k</em>·<em>x</em> − <em>ωt</em>) satisfies the defining relation for every
+    lattice translation with <em>τ</em> generically irrational, and then the image of <em>τ</em>
+    is dense. Finiteness is an assumption here, and it is the one the catalogue encodes; for a
+    group with a rotation it is also forced, because invariance of <em>τ</em> on the translations
+    under an order-<em>n</em> rotation clears the denominators. Granted finiteness, a finite
+    subgroup of ℝ/ℤ is cyclic, so <em>G</em>/<em>K</em> is cyclic of some order <em>m</em>.
+  </p>
+
+  <p>
+    This is the same data as a <em>colour group</em> whose colour permutation is cyclic: a
+    wallpaper group with a homomorphism onto ℤ/<em>m</em>, colours replaced by time offsets
+    <em>k</em>/<em>m</em>. Every entry of the catalogue is listed in exactly that form on the
+    correspondence pages — for the worked example below,
+    <a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a>,
+    clockwork symbol <strong>r33₁3₂</strong>, orbifold <strong>333</strong>, <em>m</em> =
+    <strong>3</strong>. The catalogue's own notation page defines the decorations used below —
+    the subscripts, the tilde for a half-period mirror, the prefixes <strong>c</strong> and
+    <strong>r</strong>:
+    <a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation.html</a>. It is also the wallpaper instance of the pair (<em>H</em>, <em>K</em>) of
+    spatio-temporal and spatial symmetries that Golubitsky and Stewart attach to a periodic
+    solution of an equivariant system, with <em>H</em> = <em>G</em> and <em>H</em>/<em>K</em>
+    cyclic — here cyclic by construction rather than by hypothesis.
+  </p>
+
+  <p>
+    The object every statement below is about is the <strong>first temporal harmonic</strong> of a
+    channel,
+  </p>
+
+  <div class="thm-eq">
+    Â<sub><em>j</em></sub>(<em>x</em>) = (1/<em>T</em>) ∫<sub>0</sub><sup><em>T</em></sup>
+    <em>u</em>(<em>x</em>, <em>t</em>) e<sup>−2π<em>ijt</em>/<em>T</em></sup> d<em>t</em>,
+    &nbsp;&nbsp; Â := Â<sub>1</sub>.
+  </div>
+
+  <p>
+    It is one complex number per point: the amplitude and phase with which that point oscillates
+    at the fundamental frequency. Two pieces of housekeeping, once. A rotation centre in the plane
+    is a <em>gyration point</em>; its image downstairs is a <em>cone point</em> of the orbifold,
+    and "cone class" below means one orbit of gyration points. And <em>index</em>,
+    <em>winding</em> and <em>charge</em> are the same integer throughout — the number of turns
+    arg Â makes on a small loop — called by whichever of the three names the surrounding sentence
+    wants. On a stored movie it is one bin of a fast Fourier transform down
+    the frame axis, which is exact for the band-limited films the repository saves. Everything
+    that follows is a statement about Â, not about the equation that produced it — no
+    reaction–diffusion, no near-Hopf assumption, no small amplitude.
+  </p>
+
+  <h3 id="theorem-a">Theorem A — the character law</h3>
+
+  <div class="thm-box">
+    <h4>Theorem A.</h4>
+    <p style="margin:.2rem 0 0">
+      For every <em>g</em> ∈ <em>G</em> and every integer <em>j</em>,
+    </p>
+    <div class="thm-eq" style="margin:.6rem 0 .3rem">
+      Â<sub><em>j</em></sub>(<em>g x</em>) =
+      e<sup>−2π<em>i j τ</em><sub><em>g</em></sub></sup> Â<sub><em>j</em></sub>(<em>x</em>).
+    </div>
+    <p style="margin:.3rem 0 0">
+      That is, Â<sub><em>j</em></sub> transforms under the one-dimensional character
+      <em>χ</em><sub><em>j</em></sub>(<em>g</em>) = e<sup>−2π<em>ijτ</em><sub><em>g</em></sub></sup>
+      of <em>G</em>, which factors through <em>G</em>/<em>K</em> ≅ ℤ/<em>m</em>.
+    </p>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Substituting <em>s</em> = <em>t</em> + <em>τ</em><sub><em>g</em></sub><em>T</em> in the
+      defining relation gives <em>u</em>(<em>gx</em>, <em>s</em>) = <em>u</em>(<em>x</em>,
+      <em>s</em> − <em>τ</em><sub><em>g</em></sub><em>T</em>) for all <em>s</em>. Put that into the
+      integral defining Â<sub><em>j</em></sub>(<em>gx</em>) and shift the variable of integration by
+      <em>τ</em><sub><em>g</em></sub><em>T</em>; the integrand is <em>T</em>-periodic, so the shifted
+      interval is harmless, and the shift leaves behind the constant factor
+      e<sup>−2π<em>ijτ</em><sub><em>g</em></sub></sup>. ∎
+    </p>
+    </details>
+
+  <p>
+    <strong>The sign is a minus.</strong> It is worth saying loudly because the plus sign is the
+    natural guess and it is wrong: on the published g227 record the minus law holds to
+    <strong>8.6 × 10⁻¹⁶</strong> — on a symmetrised export, of which more below — while the plus
+    law is off by exactly
+    <strong>1.7320508</strong> = √3 = |1 − e<sup>4π<em>i</em>/3</sup>|, the largest error the
+    character can produce.
+    Flip any one of three conventions — the sense of the rotation, the sense of the winding, or
+    the sign in the exponent of Â — and the prediction flips with it. The repository's own earlier
+    note left that sign as an unresolved <em>∓</em>; this fixes it.
+  </p>
+
+  <p class="thm-note">
+    A corollary and an honest limit. Expanding <em>u</em> in harmonics, the <em>j</em>-th term
+    lives in the <em>χ</em><sub><em>j</em></sub> sector: the mean field is genuinely
+    <em>G</em>-invariant and all the defects live in the sectors with <em>j</em> not a multiple of
+    <em>m</em>. But Â<sub><em>j</em></sub> ≡ 0 always satisfies the constraint, so the theorem
+    gives no lower bound — an animation may hide its structure in a harmonic that vanishes. In the
+    <strong>532</strong> record–channel pairs tested, none did: |Â₁| relative to the field's span
+    stayed between <strong>0.172</strong> and <strong>0.251</strong>.
+  </p>
+
+  <h3 id="theorem-b">Theorem B — what a cone point must contain</h3>
+
+  <div class="thm-box">
+    <h4>Theorem B.</h4>
+    <p style="margin:.2rem 0 .3rem">
+      Let <em>p</em> be fixed by a rotation of order <em>n</em> ≥ 2, taken counterclockwise by
+      +2π/<em>n</em>, and let that rotation carry <em>τ</em> = <em>k</em>/<em>n</em>. Then for
+      every <em>j</em>:
+    </p>
+    <ol>
+      <li><strong>Forced zero.</strong> If <em>jk</em> ≢ 0 (mod <em>n</em>) then
+        Â<sub><em>j</em></sub>(<em>p</em>) = 0.</li>
+      <li><strong>Angular selection.</strong> In polar coordinates about <em>p</em>, only the
+        angular harmonics e<sup><em>iνθ</em></sup> with <em>ν</em> ≡ −<em>jk</em> (mod <em>n</em>)
+        survive.</li>
+      <li><strong>Forced winding.</strong> If Â<sub><em>j</em></sub> does not vanish on a small
+        circle about <em>p</em>, its winding number there satisfies
+        <em>w</em><sub><em>j</em></sub>(<em>p</em>) ≡ −<em>jk</em> (mod <em>n</em>).</li>
+      <li><strong>Or no index at all.</strong> If Â<sub><em>j</em></sub> vanishes along a curve
+        through <em>p</em>, no winding exists there and 2 and 3 say nothing. This alternative is
+        genuine and occurs in the data.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Write <em>z</em> for the complex coordinate centred at <em>p</em>; the rotation is
+      <em>z</em> ↦ <em>ζz</em> with <em>ζ</em> = e<sup>2π<em>i</em>/<em>n</em></sup>, and Theorem A
+      reads Â<sub><em>j</em></sub>(<em>ζz</em>) =
+      e<sup>−2π<em>ijk</em>/<em>n</em></sup>Â<sub><em>j</em></sub>(<em>z</em>). Expand the circle of
+      radius <em>r</em> as Σ<sub><em>ν</em></sub> <em>c</em><sub><em>ν</em></sub>(<em>r</em>)
+      e<sup><em>iνθ</em></sup>. Matching Fourier coefficients gives
+      <em>c</em><sub><em>ν</em></sub>(<em>r</em>)(e<sup>2π<em>iν</em>/<em>n</em></sup> −
+      e<sup>−2π<em>ijk</em>/<em>n</em></sup>) = 0, so <em>c</em><sub><em>ν</em></sub> vanishes unless
+      <em>ν</em> ≡ −<em>jk</em>, which is claim 2. Continuity at <em>p</em> kills every
+      <em>c</em><sub><em>ν</em></sub> with <em>ν</em> ≠ 0 as <em>r</em> → 0, and
+      Â<sub><em>j</em></sub>(<em>p</em>) is the limit of <em>c</em><sub>0</sub>; if <em>ν</em> = 0 is
+      excluded the value is 0, which is claim 1 (or directly: the value at a fixed point equals a
+      non-trivial root of unity times itself). For claim 3, let Δ be the continuous increment of
+      arg Â<sub><em>j</em></sub> across one sector of angle 2π/<em>n</em>. The relation makes the
+      increment the same on all <em>n</em> sectors and fixes it modulo 2π as
+      −2π<em>jk</em>/<em>n</em>, so the total winding is 2π<em>w</em><sub><em>j</em></sub> =
+      <em>n</em>Δ = −2π<em>jk</em> + 2π<em>nℓ</em>. ∎
+    </p>
+    </details>
+
+  <p>
+    The two halves are worth separating. Claim 1 says <em>where the picture must be dark</em>: any
+    rotation centre whose generator carries a non-zero offset is a zero of the first harmonic — a
+    point that does not oscillate at the fundamental frequency at all. Claim 3 says <em>how the
+    phase must run around it</em>: the offset is a topological charge, read modulo the order of
+    the centre. Neither statement mentions a partial differential equation.
+  </p>
+
+  <h3 id="theorem-c">Theorem C — the budget over one cell</h3>
+
+  <div class="thm-box">
+    <h4>Theorem C.</h4>
+    <p style="margin:.2rem 0 0">
+      Suppose the zeros of Â<sub><em>j</em></sub> on the torus are isolated. Then
+    </p>
+    <ol>
+      <li>the indices of Â<sub><em>j</em></sub> over one primitive cell of the translation lattice
+        of <em>G</em> sum to <strong>0</strong>;</li>
+      <li>every orbit of the orientation-preserving subgroup carries one common index, and a cone
+        class of order <em>n</em> has |<em>P</em>⁺|/<em>n</em> points in that cell, where
+        <em>P</em>⁺ is the <em>orientation-preserving</em> point group;</li>
+      <li>therefore
+        <span class="thm-sig">Σ<sub>cone classes</sub> <em>w</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>
+        + Σ<sub>free orbits</sub> <em>w</em><sub><em>f</em></sub> = 0</span>.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Â<sub><em>j</em></sub> is not in general a <em>function</em> on the torus: g227's translation
+      by (1/3, 2/3) carries <em>τ</em> = ⅔, so by Theorem A the identification multiplies
+      Â<sub><em>j</em></sub> by a constant phase, and Â<sub><em>j</em></sub> is a section of a flat
+      unitary line bundle. A flat bundle over a torus has first Chern number 0, which already gives
+      the claim; but the elementary version is more instructive, and it handles the twist
+      explicitly: cut along a fundamental parallelogram and count the
+      boundary winding; opposite edges are identified by translations under which
+      Â<sub><em>j</em></sub> is multiplied by a <em>constant</em> (Theorem A), and a constant factor
+      does not change increments of argument, so the paired edges cancel exactly. For 2, an
+      orientation-preserving symmetry multiplies Â<sub><em>j</em></sub> by a unimodular constant and
+      preserves orientation, so it carries the index at <em>x</em> to the index at <em>gx</em>; the
+      orbit sizes are orbit–stabiliser. Substituting 2 into 1 and dividing by the number of
+      orientation-preserving operations per cell gives 3. ∎
+    </p>
+    </details>
+
+  <p>
+    The lift-counting in claim 2 is the step that makes the budget an <em>orbifold</em> statement
+    rather than a torus statement: a cone point of order <em>n</em> is one point downstairs but
+    |<em>P</em>⁺|/<em>n</em> points upstairs, so it enters the balance with weight
+    1/<em>n</em>. The multiplicity law was checked against all <strong>68</strong> catalogue
+    entries and is exact in every one.
+  </p>
+
+  <h3 id="theorem-d">Theorem D — the temporal magic theorem</h3>
+
+  <p>
+    Conway's Magic Theorem says a wallpaper signature is legal exactly when its cost is 2 —
+    equivalently, when the orbifold Euler characteristic vanishes. The time offsets obey their own
+    closure identity, with the same source.
+  </p>
+
+  <div class="thm-box">
+    <h4>Theorem D.</h4>
+    <p style="margin:.2rem 0 0">
+      For an orientation-preserving group with cone classes of orders
+      <em>n</em><sub>1</sub>, …, <em>n</em><sub><em>s</em></sub> and offsets
+      <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>,
+    </p>
+    <div class="thm-eq" style="margin:.6rem 0 .2rem">
+      Σ<sub><em>c</em></sub> <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> ∈ ℤ.
+    </div>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Take Conway's orbifold presentation. For the sphere-with-cone-points cases 2222, 333, 442 and
+      632 the generators are the primitive counterclockwise rotations, one per cone class, with
+      <em>γ</em><sub><em>c</em></sub><sup><em>n</em><sub><em>c</em></sub></sup> = 1 and
+      <em>γ</em><sub>1</sub><em>γ</em><sub>2</sub>⋯<em>γ</em><sub><em>s</em></sub> = 1. Apply the
+      homomorphism <em>τ</em> to that last relation: each generator contributes
+      <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>, and the product relation says
+      the sum is 0 in ℝ/ℤ. For the torus case there are no cone points and the sum is empty. The
+      target is abelian, so the conjugacy ambiguity in the presentation is harmless and the argument
+      survives verbatim on higher-genus orbifolds. ∎
+    </p>
+    </details>
+
+  <p>
+    <strong>Theorems B and C are compatible if and only if D holds.</strong> B forces
+    Σ<em>w</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> ≡
+    −Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> modulo 1; C demands that the
+    same sum be an integer; the two can hold together exactly when
+    Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> is an integer, which is D.
+    That is the shape of Conway's theorem repeated one level up:
+    <strong>Conway's cost balances the geometry; this residue balances the choreography.</strong>
+  </p>
+
+  <p>
+    <strong>What the residue means for a group with mirrors.</strong> The proof uses the
+    orientation-preserving presentation, so for the forty-odd catalogue entries that have mirrors
+    or glides the sum below is taken over the cone classes of the group's <em>rotation
+    subgroup</em>, which is orientation-preserving and to which the theorem applies verbatim. That
+    is what the residue column of the table records, and it is why a <em>∗</em>-entry and its
+    rotation subgroup share a residue.
+  </p>
+
+  <p>
+    Checked that way on all <strong>68</strong> catalogue entries, the residue is an integer in
+    every one — the value is <strong>0</strong> for 27 entries, <strong>1</strong> for 32 and
+    <strong>2</strong> for 9. But a consistency check is the least of it. Conway's theorem is
+    famous because it <em>enumerates</em>, and so does this one. Take <strong>333</strong>: there
+    are 3³ = <strong>27</strong> ways to hang offsets on its three cone classes, Theorem D keeps
+    the <strong>9</strong> with <em>k</em>₁ + <em>k</em>₂ + <em>k</em>₃ ≡ 0 (mod 3), and
+    relabelling the classes collapses those to four multisets — {0,0,0}, {1,1,1}, {2,2,2} and
+    {0,1,2}. The catalogue's p3 entries are <strong>333</strong>, <strong>3₁3₁3₁</strong>,
+    <strong>3₂3₂3₂</strong> and <strong>r33₁3₂</strong>: exactly those four and no others.
+  </p>
+
+  <p>
+    What D does <em>not</em> do is guarantee existence. <strong>4₁4₃2</strong> has residue
+    ¼ + ¾ + 0 = <strong>1</strong>, an integer, and no group on a primitive lattice realises it;
+    it exists only on a centred space–time lattice, as <strong>c4₁4₃2</strong> — catalogue entry
+    g99. The residue decides what may be decorated; the lattice decides what can be built.
+  </p>
+
+  <h3 id="theorem-e">Theorem E — mirrors</h3>
+
+  <div class="thm-box">
+    <h4>Theorem E.</h4>
+    <ol>
+      <li><strong>Only two offsets.</strong> A reflection squares to the identity, so
+        2<em>τ</em> ≡ 0 and <em>τ</em> ∈ {0, ½}.</li>
+      <li><strong>A half-period mirror is a nodal line.</strong> If <em>τ</em> = ½ on a reflection
+        in a line <em>ℓ</em>, then on <em>ℓ</em> Theorem A reads Â<sub><em>j</em></sub> =
+        e<sup>−π<em>ij</em></sup>Â<sub><em>j</em></sub>, so Â<sub><em>j</em></sub> ≡ 0 along the
+        <em>whole line</em> for every odd <em>j</em>. The zero set is one-dimensional, not a
+        point.</li>
+      <li><strong>A neutral mirror carries no charge.</strong> If <em>τ</em> = 0, a reflection
+        reverses orientation while fixing Â<sub><em>j</em></sub>, so the index at a fixed point is
+        its own negative and vanishes; off the line, vortices come in mirror pairs ±<em>w</em>.</li>
+      <li><strong>A dihedral half-offset centre cannot have an isolated zero.</strong> If a centre
+        of even order <em>n</em> with <em>k</em> = <em>n</em>/2 also lies on a mirror, B demands a
+        non-zero index and E.3 demands zero; the only escape is B's fourth case — the index is
+        undefined and the zero set is a curve of <em>n</em> rays.</li>
+      <li><strong>Glides are free.</strong> A glide reflection has no fixed point, so it imposes no
+        pointwise condition.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      All five are one-line substitutions into Theorem A, together with the elementary fact that an
+      orientation-reversing map negates a winding number. ∎
+    </p>
+    </details>
+
+  <p>
+    Clause 2 is the familiar antisymmetry statement in a new setting: when <em>m</em> = 2 a
+    clockwork group is a two-colour group, a half-period mirror is a primed mirror, and the
+    statement is that the order parameter vanishes on a primed mirror. What is new here is that
+    the same argument runs for every <em>m</em> and every harmonic.
+  </p>
+
+  <p class="thm-note">
+    <strong>What this does and does not explain about the gaps in the atlas.</strong> Of the
+    <strong>51</strong> catalogue entries with a non-zero offset, <strong>35</strong> have a
+    Ginzburg–Landau record and <strong>29</strong> a Brusselator record. Every one of the
+    <strong>16</strong> entries with no Ginzburg–Landau record, and every one of the
+    <strong>22</strong> with no Brusselator record, is forced by the theorem to carry either a
+    nodal line or a core of charge ≥ 2 — <strong>16</strong>/16 and <strong>22</strong>/22, no
+    counter-examples (Fisher exact, <em>p</em> = <strong>7.8 × 10⁻⁴</strong> and
+    <strong>1.0 × 10⁻⁵</strong>).
+    Three qualifications, all of which matter. First, that composite predicate was chosen
+    <em>after</em> seeing which one reached 16/16 and 22/22: the scripts compute eight predicates
+    against two models, sixteen tests in all, and the quoted <em>p</em> values are not corrected
+    for that choice. Second, a predicate with no theorem content at all — "the group has
+    reflections" — reaches <em>p</em> = <strong>6.3 × 10⁻⁴</strong> on the Brusselator gap, so the
+    composite is not uniquely good; the sharpest single predictor is the forced nodal line alone,
+    <em>p</em> = <strong>7.0 × 10⁻⁸</strong>, and that one the repository's own notes had already
+    reported for Ginzburg–Landau.
+    Third, pushing the other way, the search budget was uniform: the Brusselator batch gave
+    exactly <strong>4</strong> jobs to each of the 51 entries, and all <strong>88</strong> jobs of
+    the 22 entries without a record failed, which removes the most obvious confounder.
+    The honest summary is a <em>necessary condition satisfied with no exceptions</em>, plus a
+    plausible mechanism — a one-dimensional zero set is fragile under a perturbation that does not
+    respect it, and a multiply charged core tends to split. It is not a demonstration that no
+    orbit exists for the missing entries. The decisive experiment, running the solver on those
+    entries and asking whether they fail for the predicted reason, has not been done.
+  </p>
+
+  <h3 id="theorem-examples">Three worked examples</h3>
+
+  <h4>g227 — r33₁3₂, the published spiral lattice</h4>
+
+  <p>
+    p3, orbifold <strong>333</strong>, <em>m</em> = <strong>3</strong>, residue
+    0 + ⅓ + ⅔ = <strong>1</strong>, forced windings <strong>(0, −1, +1)</strong>, and the budget
+    0 − ⅓ + ⅓ = 0 closing on its own — so <strong>no free vortices are needed</strong>. Per p3
+    cell that is two charged centres plus one neutral one where |Â| is instead maximal; on the
+    simulation box, which is three p3 cells, <strong>six</strong> pinned vortices, three of charge
+    −1 and three of charge +1, plus three neutral centres, total charge <strong>0</strong>.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 420 268" role="img"
+         aria-label="One primitive p3 cell drawn as a sixty-degree rhombus; the simulation box is three of them. The rhombus corners are one class of threefold centre with winding zero; the two triangle centroids are the other two classes, with windings minus one and plus one.">
+      <g transform="translate(28,24)">
+        <polygon points="0,207.8 240,207.8 360,0 120,0" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+        <line x1="240" y1="207.8" x2="120" y2="0" stroke="var(--grid)" stroke-width="1" stroke-dasharray="4 4"/>
+        <!-- class r: tau = 0, winding 0, at the rhombus corners -->
+        <g fill="var(--c1)">
+          <circle cx="0" cy="207.8" r="7"/><circle cx="240" cy="207.8" r="7"/>
+          <circle cx="360" cy="0" r="7"/><circle cx="120" cy="0" r="7"/>
+        </g>
+        <!-- class 3_1: tau = 1/3, winding -1 -->
+        <circle cx="120" cy="138.5" r="7" fill="var(--c2)"/>
+        <!-- class 3_2: tau = 2/3, winding +1 -->
+        <circle cx="240" cy="69.3" r="7" fill="var(--c3)"/>
+        <text x="120" y="126" text-anchor="middle" font-size="13" fill="var(--ink)">3₁ · τ = ⅓ · w = −1</text>
+        <text x="240" y="57" text-anchor="middle" font-size="13" fill="var(--ink)">3₂ · τ = ⅔ · w = +1</text>
+        <text x="8" y="228" font-size="13" fill="var(--ink)">3 · τ = 0 · w = 0</text>
+        <text x="360" y="228" text-anchor="end" font-size="11" fill="var(--muted)">one p3 cell — the box is three of these</text>
+      </g>
+    </svg>
+    <figcaption>
+      The forced structure of <strong>g227</strong>, schematically, on <em>one primitive p3
+      cell</em> — the simulation box drawn everywhere else on this page is three of these, with
+      nine centres rather than three. The three classes of threefold centre of a
+      <strong>333</strong> orbifold sit at the corners of the cell and at the two triangle
+      centroids. Which centroid class is labelled 3₁ and which 3₂ is a choice of basis;
+      what the symbol forces is that the three classes carry windings
+      <strong>0</strong>, <strong>−1</strong>, <strong>+1</strong>, that the two charged ones are
+      exact zeros of Â, and that the total over the cell is <strong>0</strong>.
+      <span class="thm-legend">
+        <span><i style="background:var(--c1)"></i>τ = 0, no charge, |Â| maximal</span>
+        <span><i style="background:var(--c2)"></i>τ = ⅓, w = −1</span>
+        <span><i style="background:var(--c3)"></i>τ = ⅔, w = +1</span>
+      </span>
+    </figcaption>
+  </figure>
+
+  <p>
+    All of that is legible in the published animation. The pattern turns; the cores do not move,
+    because Theorem B pins them to the group and not to the frame. Every third of a period the
+    picture returns to itself rotated by 120° about a <strong>3₁</strong> centre — the plain
+    centres are the ones that cost no time, and a turn about one of those is a symmetry of each
+    frame on its own.
+  </p>
+
+  <p>
+    The pair of orbifolds is worth reading off, because it says what a simulator has to work with.
+    In colour-group form g227 is <strong>333/333</strong>: the kernel is again a p3, on a lattice
+    three times coarser, so every frame separately still has threefold symmetry. Its neighbour
+    g226 is <strong>333/◦</strong> — every rotation carries <em>τ</em> = ⅓, the kernel is the
+    translation lattice alone, and no single frame has any rotational symmetry at all. That is
+    what the catalogue's <em>m</em> column measures, and it is why the entries with a trivial
+    kernel are the ones where a statement about the kernel-symmetric subspace has nothing to
+    say.
+  </p>
+
+  <h4>g226 — 3₁3₁3₁, where the group offers a choice</h4>
+
+  <p>
+    Again p3 and <strong>333</strong>, but now all three cone classes carry offset ⅓; the residue
+    is ⅓ + ⅓ + ⅓ = <strong>1</strong>, so the entry is legal. Theorem B allows −1 at each class,
+    but then Σ<em>w</em>/<em>n</em> = −1, and Theorem C needs the total to be 0. There are exactly
+    two cheap ways out, and <strong>the group does not choose between them</strong>:
+  </p>
+
+  <ul>
+    <li>move the leftover onto a cone — windings <strong>(−1, −1, +2)</strong>, legitimate because
+      +2 ≡ −1 (mod 3), cost <strong>4</strong> cores per cell; or</li>
+    <li>keep the minimal windings <strong>(−1, −1, −1)</strong> and pay for a free orbit of charge
+      <strong>+1</strong> — three extra vortices, cost <strong>6</strong>.</li>
+  </ul>
+
+  <p>
+    Both branches occur in the published data. The Brusselator records and three of the four
+    Gray–Scott rows take the doubled core; <strong>both</strong> Ginzburg–Landau records of g226
+    take the minimal windings with three free +1 vortices. The mirror-image statement holds for
+    g225, whose Gray–Scott row also takes the free-vortex branch.
+    It is tempting — and it was, at first, tempting here — to say that the doubled core is
+    arithmetically forced. It is not: it is merely the cheaper of two admissible structures, and
+    which one appears is a question for the dynamics, not for the symbol. The same caution applies
+    to g244, where nothing is forced at all — its minimal structure
+    6₂[−2] 3₂[+1] 3₂[+1] already balances, and the one Gray–Scott record that departs from it
+    simply chooses −2 at the threefold classes and pays with free charge.
+  </p>
+
+  <h4>g133 — 4₂∗~2, a mirror example</h4>
+
+  <p>
+    Orbifold <strong>4*2</strong>, <em>m</em> = <strong>2</strong>. Its boundary is a single
+    circle with one corner, so there is one class of mirror line — the two perpendicular families
+    one sees in the plane are conjugate by the fourfold rotation — and it carries <em>τ</em> = ½,
+    which is the single tilde in the catalogue's symbol <strong>4₂∗~2</strong>. By Theorem E.2 the
+    first harmonic vanishes identically along that whole family of lines: the picture is a grid of
+    dark lines, not a lattice of isolated cores. The
+    geometry is worth getting the right way round, because it is easy to invert. The lines cross
+    <strong>at the twofold centres</strong>, which therefore lie on a nodal curve
+    and have <em>no index at all</em> — Theorem B's fourth case, and exactly what the measurements
+    record. The fourfold centres, which carry <em>k</em> = <strong>2</strong> = <em>n</em>/2, sit
+    <em>off</em> the lines, at distance <strong>0.354</strong> in units of the cell edge, which is why
+    they can carry the measurable charges <strong>±2</strong> that the budget needs.
+    At such a chiral centre +<em>n</em>/2 and −<em>n</em>/2 are the same residue, so the group
+    cannot fix the sign: this is the one place where the theorem yields a dichotomy rather than a
+    value, and both branches — an isolated core of charge ±<em>n</em>/2, or a crossing of
+    <em>n</em> nodal rays with no index — are realised in the catalogue.
+  </p>
+
+  <details id="theorem-tested-box">
+    <summary>What was tested, and what the test can carry — 532 record–channel rows, and why the big number is weaker evidence than it looks</summary>
+
+  <p>
+    The experiment scripts applied every prediction above to <strong>532</strong> (record,
+    channel) pairs: all <strong>116</strong> published equation orbits — <strong>65</strong>
+    Ginzburg–Landau records and <strong>51</strong> Brusselator records — plus <strong>150</strong>
+    rows of the atlas produced by a third equation, Gray–Scott, a stratified sample covering all <strong>68</strong> catalogue entries,
+    both channels, in <strong>203</strong> seconds of local processor time and with
+    <strong>zero</strong> evaluations of any right-hand side. Across those rows,
+    <strong>2990</strong> rotation centres were examined, <strong>2032</strong> of them had a
+    well-defined index, and the congruence <em>w</em> ≡ −<em>k</em> (mod <em>n</em>) held at every
+    single one: <strong>0</strong> failures. The generalisation to higher harmonics was checked
+    separately on 13 groups at <em>j</em> = 1…4 — <strong>52</strong> pairs,
+    <strong>244</strong> measurable centres, again <strong>0</strong> failures.
+  </p>
+
+  <p>
+    <strong>That number is weaker evidence than it looks, and the reason is instructive.</strong>
+    Every movie the repository exports is passed through a space–time projection before it is
+    encoded, which averages over the group's action so that the defining relation holds exactly.
+    On the g227 record the nine operations agree <em>bitwise</em>. So residuals at the
+    <strong>10⁻¹⁵</strong> level in that sweep are the round-off of an identity — a check on the
+    implementation and on the sign conventions, not a measurement of the dynamics.
+    The independent evidence comes from fields no projector ever touched:
+  </p>
+
+  <div class="thm-tablewrap">
+    <table>
+      <caption>Theorems A and B measured on unprojected data; two channels where two figures
+        are given, and residuals relative to the field's own scale. On the double-precision field
+        the plus sign is off by <strong>1.7320508</strong>, exactly as on the exports.</caption>
+      <thead>
+        <tr><th>Field</th><th>Character law, minus sign</th>
+          <th>|Â| at a forced-zero centre</th><th>Windings</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Unprojected fourth-order Runge–Kutta replay of the g227 orbit, 336 steps from the
+            published first frame</td>
+          <td class="num"><strong>7.3 × 10⁻⁸</strong> / 5.7 × 10⁻⁸</td>
+          <td class="num">3.4 × 10⁻⁸ / 2.3 × 10⁻⁸</td>
+          <td>0, −1, +1 — unchanged</td>
+        </tr>
+        <tr>
+          <td>A double-precision g227 orbit from a different experiment, never projected (its own
+            symmetry residual is 1.1 × 10⁻⁹)</td>
+          <td class="num"><strong>4.1 × 10⁻¹⁰</strong> / 2.6 × 10⁻¹⁰</td>
+          <td class="num">2.6 × 10⁻¹¹</td>
+          <td>three at 0, three at +1, three at −1; total 0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    In other words: the theorem holds on unprojected trajectories to the accuracy the orbit itself
+    has, which is <strong>10⁻⁸</strong> for float32-stored fields and <strong>10⁻¹⁰</strong> for
+    double precision. That is the number to quote. What the big sweep genuinely adds is different
+    and more interesting: it records <em>which</em> of the structures the theorem permits each
+    equation actually selects — the sign at a half-offset centre, minimal windings against a
+    doubled core, free vortices present or absent.
+  </p>
+
+  <p>
+    Two predictions in the sweep failed, and both failures were deliberate over-reaches rather
+    than theorem failures.
+  </p>
+
+  <div class="thm-tablewrap">
+    <table>
+      <caption>The two checks that were <em>not</em> consequences of the theorem.</caption>
+      <thead><tr><th>Stronger guess</th><th class="num">Pass</th><th class="num">Fail</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>the index is always the <em>minimal</em> representative of −<em>k</em> mod <em>n</em></td>
+          <td class="num">398</td><td class="num thm-no">16</td>
+          <td>All in g225, g226, g244. For g225 and g226 the minimal windings do not sum to
+            zero, so the budget must be closed by a doubled core or by a free orbit — both are
+            legal and both occur in the published records. For g244 nothing is forced at all: one
+            record simply chose a non-minimal winding and paid for it.</td>
+        </tr>
+        <tr>
+          <td>cone indices plus free vortices sum to zero when counted by elementary mesh loops</td>
+          <td class="num">166</td><td class="num thm-no">4</td>
+          <td>A mesh artefact. Beside a core of charge ≥ 2 the phase jump between adjacent nodes
+            reaches <strong>0.96π</strong>–<strong>1.00π</strong> and the principal-value loop map
+            aliases; on a mesh refined twofold and fourfold the free charge is exactly zero. The
+            band-limited contour index used for every congruence test is stable on six radii.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </details>
+
+  <details>
+    <summary>All <strong>68</strong> catalogue entries: clockwork symbol, kernel, residue, forced minimum</summary>
+    <p class="thm-note" style="margin-top:.4rem">
+      These are the catalogue's own symbols, not a notation invented here: every one has Conway
+      cost exactly 2, so it still names a wallpaper group, and the decoration is what turns that
+      group into a clock. <strong>3₁</strong> is a threefold gyration point whose counterclockwise
+      generator carries <em>τ</em> = ⅓; <strong>2₁</strong> a half-turn at half a period;
+      <strong>~</strong> a mirror arc that holds only after half a period; <strong>×½</strong> a
+      glide that also waits half a period; and the prefixes <strong>c</strong> and
+      <strong>r</strong> a centring of the space–time lattice — a half-cell shift at half a
+      period, a third-cell shift at a third of a period. They are defined in full on the
+      catalogue's
+      <a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation page</a>.
+      The <em>Kernel</em> column is the orbifold of the subgroup with <em>τ</em> = 0 — the
+      symmetry a single frame still has, and the domain a fundamental-domain simulator would be
+      left with. The residue column is
+      Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> over the cone classes of the
+      group's rotation subgroup, an integer in every row — that is Theorem D. The last two columns
+      give the cheapest defect structure compatible with Theorems B and C, one winding per cone
+      class, and its cost in cores per primitive cell of the rotation subgroup's translation
+      lattice; a cheapest structure is not a forecast of what an equation will produce, only a
+      lower bound on what it must pay.
+    </p>
+    <div class="thm-tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Entry</th><th>Family</th><th>Orbifold</th><th class="num"><em>m</em></th>
+            <th>Kernel</th>
+            <th>Clockwork symbol</th>
+            <th class="num">Σ<em>k</em>/<em>n</em></th>
+            <th>Cheapest windings</th><th class="num">cores / cell</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>g1</td><td>p1</td><td>◦</td><td class="num">1</td><td class="thm-sig">◦</td><td class="thm-sig">◦</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g5</td><td>p2</td><td>2222</td><td class="num">1</td><td class="thm-sig">2222</td><td class="thm-sig">2222</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g6</td><td>p2</td><td>2222</td><td class="num">2</td><td class="thm-sig">◦</td><td class="thm-sig">2₁2₁2₁2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g7</td><td>p2</td><td>2222</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">c222₁2₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g8</td><td>cm</td><td>∗×</td><td class="num">1</td><td class="thm-sig">∗×</td><td class="thm-sig">∗×</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g9</td><td>cm</td><td>∗×</td><td class="num">2</td><td class="thm-sig">◦</td><td class="thm-sig">~∗×½</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g10</td><td>pm</td><td>∗∗</td><td class="num">1</td><td class="thm-sig">∗∗</td><td class="thm-sig">∗∗</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g11</td><td>pg</td><td>××</td><td class="num">1</td><td class="thm-sig">××</td><td class="thm-sig">××</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g54</td><td>pmm</td><td>∗2222</td><td class="num">1</td><td class="thm-sig">∗2222</td><td class="thm-sig">∗2222</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g55</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">∗~2~2~2~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g56</td><td>pmg</td><td>22∗</td><td class="num">1</td><td class="thm-sig">22∗</td><td class="thm-sig">22∗</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g57</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">22~∗</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g58</td><td>pgg</td><td>22×</td><td class="num">1</td><td class="thm-sig">22×</td><td class="thm-sig">22×</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g59</td><td>pgg</td><td>22×</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">22×½</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g60</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">∗∗</td><td class="thm-sig">∗2₁~2₁2₁~2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g61</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">××</td><td class="thm-sig">2₁2₁~∗</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g62</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">∗∗</td><td class="thm-sig">2₁2₁∗</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g63</td><td>pgg</td><td>22×</td><td class="num">2</td><td class="thm-sig">××</td><td class="thm-sig">2₁2₁×</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g64</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">c∗222₁2₁ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g65</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c∗222₁2₁ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g66</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c22₁∗ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g67</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">c22₁∗ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g68</td><td>cmm</td><td>2∗22</td><td class="num">1</td><td class="thm-sig">2∗22</td><td class="thm-sig">2∗22</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g69</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">2∗~2~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g70</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">∗×</td><td class="thm-sig">2₁∗2₁~2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g71</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">c2₁∗22ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g72</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">c2₁∗22ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g73</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c2∗2₁2₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g74</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">c∗22₁22₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g75</td><td>pgg</td><td>22×</td><td class="num">4</td><td class="thm-sig">2222</td><td class="thm-sig">c22₁×¼</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g94</td><td>p4</td><td>442</td><td class="num">1</td><td class="thm-sig">442</td><td class="thm-sig">442</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g95</td><td>p4</td><td>442</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">4₂4₂2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g96</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">◦</td><td class="thm-sig">4₁4₁2₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +1</td><td class="num">4</td></tr>
+          <tr><td>g97</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">◦</td><td class="thm-sig">4₃4₃2₁</td><td class="num">2</td><td class="thm-sig">+1, +1, −1</td><td class="num">4</td></tr>
+          <tr><td>g98</td><td>p4</td><td>442</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">c44₂2₁</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g99</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">2222</td><td class="thm-sig">c4₁4₃2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g128</td><td>p4m</td><td>∗442</td><td class="num">1</td><td class="thm-sig">∗442</td><td class="thm-sig">∗442</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g129</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">∗4₂~4₂2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g130</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">∗~4₂4₂~2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g131</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">∗~4~4~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g132</td><td>p4g</td><td>4∗2</td><td class="num">1</td><td class="thm-sig">4∗2</td><td class="thm-sig">4∗2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g133</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">4₂∗~2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g134</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">4₂∗2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g135</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">4∗~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g136</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">∗442</td><td class="thm-sig">c∗44₂2₁ᵃ</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g137</td><td>p4g</td><td>4∗2</td><td class="num">4</td><td class="thm-sig">∗2222</td><td class="thm-sig">c4₃∗2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g138</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">4∗2</td><td class="thm-sig">c∗44₂2₁ᵇ</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g139</td><td>p4g</td><td>4∗2</td><td class="num">4</td><td class="thm-sig">22×</td><td class="thm-sig">c4₁∗2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g224</td><td>p3</td><td>333</td><td class="num">1</td><td class="thm-sig">333</td><td class="thm-sig">333</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g225</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">◦</td><td class="thm-sig">3₂3₂3₂</td><td class="num">2</td><td class="thm-sig">+1, +1, −2</td><td class="num">4</td></tr>
+          <tr><td>g226</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">◦</td><td class="thm-sig">3₁3₁3₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +2</td><td class="num">4</td></tr>
+          <tr><td>g227</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">333</td><td class="thm-sig">r33₁3₂</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g230</td><td>p3m1</td><td>∗333</td><td class="num">1</td><td class="thm-sig">∗333</td><td class="thm-sig">∗333</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g231</td><td>p3m1</td><td>∗333</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">∗~3~3~3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g232</td><td>p31m</td><td>3∗3</td><td class="num">1</td><td class="thm-sig">3∗3</td><td class="thm-sig">3∗3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g233</td><td>p31m</td><td>3∗3</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">3∗~3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g234</td><td>p31m</td><td>3∗3</td><td class="num">3</td><td class="thm-sig">∗333</td><td class="thm-sig">r3₂∗3</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g235</td><td>p31m</td><td>3∗3</td><td class="num">6</td><td class="thm-sig">333</td><td class="thm-sig">r3₂∗~3</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g243</td><td>p6</td><td>632</td><td class="num">1</td><td class="thm-sig">632</td><td class="thm-sig">632</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g244</td><td>p6</td><td>632</td><td class="num">3</td><td class="thm-sig">2222</td><td class="thm-sig">6₂3₂2</td><td class="num">1</td><td class="thm-sig">−2, +1, 0</td><td class="num">4</td></tr>
+          <tr><td>g245</td><td>p6</td><td>632</td><td class="num">3</td><td class="thm-sig">2222</td><td class="thm-sig">6₄3₁2</td><td class="num">1</td><td class="thm-sig">+2, −1, 0</td><td class="num">4</td></tr>
+          <tr><td>g246</td><td>p6</td><td>632</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">6₃32₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+          <tr><td>g247</td><td>p6</td><td>632</td><td class="num">6</td><td class="thm-sig">◦</td><td class="thm-sig">6₅3₂2₁</td><td class="num">2</td><td class="thm-sig">+1, +1, −1</td><td class="num">6</td></tr>
+          <tr><td>g248</td><td>p6</td><td>632</td><td class="num">6</td><td class="thm-sig">◦</td><td class="thm-sig">6₁3₁2₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +1</td><td class="num">6</td></tr>
+          <tr><td>g268</td><td>p6m</td><td>∗632</td><td class="num">1</td><td class="thm-sig">∗632</td><td class="thm-sig">∗632</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g269</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">3∗3</td><td class="thm-sig">∗6₃~3~2₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+          <tr><td>g270</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">632</td><td class="thm-sig">∗~6~3~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g271</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">∗333</td><td class="thm-sig">∗~6₃32₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="thm-note">
+      Reading of the whole column: the residue is <strong>0</strong> in 27 entries,
+      <strong>1</strong> in 32 and <strong>2</strong> in 9. Of the <strong>51</strong> entries with
+      a non-zero offset, <strong>none</strong> requires a free vortex orbit — every clockwork group in
+      the catalogue can be <em>balanced</em> by putting all of its topological charge on cone
+      points, which is a statement about the arithmetic and not a promise that any particular
+      equation will produce it — and <strong>15</strong> require at least one core of charge ≥ 2,
+      because their minimal windings do not sum to zero. Nothing forbids free vortices; the second
+      reciprocal shell of g227 produces <strong>24</strong> cores in the box: the same six charged
+      cone points, with the same charges, plus <strong>18</strong> free ones in two orbits of nine,
+      whose charges must therefore sum to zero among themselves. They do — nine at
+      <strong>+1</strong> and nine at <strong>−1</strong>.
+    </p>
+  </details>
+
+  <h3 id="theorem-status">What is proved, what is measured, what is open</h3>
+
+  <p>
+    <strong>Proved</strong>, from the defining relation alone, with no equation and no
+    small-amplitude assumption: Theorems A, B, C, D, E. Each was independently re-derived during
+    review.
+    <strong>Measured</strong>, on unprojected data: the character law and the forced zeros and
+    windings of g227, to <strong>7.3 × 10⁻⁸</strong> and <strong>4.1 × 10⁻¹⁰</strong> on two
+    independent fields; and, on the symmetrised exports, the full catalogue sweep as a check of
+    conventions and implementation.
+    <strong>Open:</strong> whether a dynamically realised orbit can hide its structure in a
+    vanishing harmonic — permitted by the theorem, never observed here; which branch of the
+    half-offset tie a given equation selects; whether a forced structure is <em>attainable</em> at
+    all, which is the stability question the coverage gap gestures at without settling; and
+    harmonics beyond the fourth.
+  </p>
+
+</section>
+
+<p>
+  Two pictures of the theorem holding on the published orbit, and one of the sign being decided
+  by measurement rather than by taste.
+</p>
+
+<figure class="fig" id="fig-harmonic-phase-charges">
+  <img src="assets/harmonic-phase-charges.webp" alt="Two panels over several lattice cells. The left shows the phase of the first temporal harmonic as hue with the nine threefold centres marked by circles and up and down triangles, each labelled with a winding of 0, −1 or +1. The right shows the magnitude, dark at the marked screw centres." loading="lazy" decoding="async">
+  <figcaption>What the symbol forces, measured on the published orbit. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres — exactly −k mod 3 at a centre whose generator carries the offset k/3. The magnitude vanishes at the six screw centres and peaks at the three τ = 0 centres. The charges sum to zero over one cell, as the index budget demands.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-clockwork-with-cores">
+  <video controls muted loop playsinline preload="none" poster="assets/poster-clockwork-with-cores.webp" aria-label="Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are."><source src="assets/clockwork-with-cores.mp4" type="video/mp4"><p>Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.</p></video>
+  <figcaption>One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-cone-point-cores">
+  <img src="assets/cone-point-cores.webp" alt="Six panels of phase-as-hue close-ups around rotation centres, each labelled with a group, a centre type and a winding: a threefold centre with winding −1, a trio with −1, −1 and +2, a fourfold centre with −2, a sixfold centre resolved as six nodal rays with no index, the same symbol with winding +3, and a panel of crossing nodal lines." loading="lazy" decoding="async">
+  <figcaption>Six cores the symbols force, side by side. The theorem fixes the winding only modulo the order of the centre, which is why g226's three 3₁ centres can read −1, −1 and +2. A 4₂ centre is driven to −2; at a 6₃ centre the tie between ±3 need not be broken, and both outcomes occur in the published data — six nodal rays with no index, or a clean +3. In g133 the half-period mirror lines cross at the two-fold centres, which therefore lie on a nodal curve and carry no index at all, while the 4₂ cores sit off the lines and can be measured at ±2.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-character-law-sign">
+  <img src="assets/character-law-sign.webp" alt="Histogram on a logarithmic error axis. One population of blue bars clusters near 1e−15 and 1e−8; a separate orange population sits at and above 1, far to the right." loading="lazy" decoding="async">
+  <figcaption>The sign in the character law is not a convention. Over <b>186</b> published record–channel rows with a time-shift order of at least 3, testing Â(gx) = e^(−2πijτ) Â(x) never fails, and across all <b>532</b> rows of the sweep the worst error is <b>1.9e−08</b>, while on those <b>186</b> rows the opposite sign never gets below <b>1.73</b>. (Below m = 3 the two signs coincide, so only those rows can tell them apart.) One honest qualification: the published exports are symmetrised by the site's own projection step, so those tiny residuals are the round-off of an identity. Re-sourced on data that was never projected, the law still holds — <b>7.3e−08</b> on an unprojected replay and <b>4.1e−10</b> on a double-precision orbit from the delayed-glue route.</figcaption>
+</figure>
+
+
+<!-- ============================================================ the pencil -->
+<h2 id="pencil">Building the seed with a pencil<a class="hlink" href="#pencil" aria-label="link to this section">#</a></h2>
+
+<p>
+  Now the construction. Five steps; the first three need no partial differential equation at all
+  and cost <b>12</b> evaluations of a two-variable problem, about <b>0.17</b> seconds — and with
+  an analytic <b>2</b> × <b>2</b> Jacobian, none. That number is the whole pedagogy: the group
+  supplies essentially all of the structure, and the solver only sharpens it.
+</p>
+
+<h3 id="step1">1 · Read the character off the group</h3>
+
+<p>
+  Nine operations act on the box, and it is worth writing them down once, because everything
+  below refers back to them. They are the three rotations of the p3 point group — by 0°, 120° and
+  240° about the origin — each composed with one of the three translation cosets of the p3 lattice
+  inside the box. The rotations contribute nothing to <i>τ</i>; the three cosets contribute
+  <b>0</b>, <b>1/3</b> and <b>2/3</b>. So the nine split three and three and three, and that split
+  <i>is</i> the character, <i>g</i> ↦ e<sup>2π<i>iτ<sub>g</sub></i></sup>, a one-dimensional
+  representation of the group.
+</p>
+
+<p>
+  Everything below is the projection onto it, and the projector carries the <i>conjugate</i>
+  weight:
+</p>
+
+<p class="eq">
+  (<i>P f</i>)(<i>x</i>) = (1/9) Σ<sub><i>g</i></sub>
+  e<sup>2π<i>iτ<sub>g</sub></i></sup> <i>f</i>(<i>gx</i>)
+</p>
+
+<p>
+  The plus here and the minus in Theorem A are the same statement, which is worth saying because
+  the page has just insisted the sign is not a convention: substituting <i>g</i> → <i>gh</i> gives
+  (<i>Pf</i>)(<i>hx</i>) = e<sup>−2π<i>iτ<sub>h</sub></i></sup>(<i>Pf</i>)(<i>x</i>), so what
+  <i>P</i> produces obeys the minus law by construction.
+</p>
+
+<h3 id="step2">2 · Test the reciprocal shells — most of them cancel</h3>
+
+<p>
+  Project each plane wave e<sup><i>ik·x</i></sup> onto the character by averaging its nine
+  images with the character weights. For g227 the translation by <b>(1/3, 2/3)</b> carries
+  <i>τ</i> = <b>2/3</b>, and the projection survives only when
+</p>
+
+<p class="eq"><i>h</i> + 2<i>ℓ</i> ≡ 1 &nbsp;(mod 3)</p>
+
+<p>
+  for a wave whose reciprocal-lattice indices are the integers (<i>h</i>, <i>ℓ</i>) — not to be
+  confused with the Brusselator's parameters <i>a</i> and <i>b</i>. Of the six shortest reciprocal
+  vectors
+  exactly three pass — (1, 0), (0, −1) and (−1, 1) — and (−1, 0) does not. This is the step that
+  is easy to get wrong by hand: taking <i>the</i> first shell vector, without testing, gives
+  exactly zero half the time. The whole of the second shell cancels identically, projection norm
+  <b>2.1e−16</b>, so the next available wave is the third shell.
+</p>
+
+<figure class="fig" id="fig-reciprocal-selection">
+  <img src="assets/reciprocal-selection.svg" alt="The six shortest reciprocal vectors of the triangular lattice drawn as arrows from a common origin. Three of them — (1,0), (0,−1) and (−1,1), at 120 degrees to one another — are solid and orange and labelled with projection norm 0.5774; the other three are dashed grey and labelled 0.0000. A fainter outer ring of six small circles marks the next shell, all of which cancel." loading="lazy" decoding="async">
+  <figcaption>Which waves the clockwork character lets through. Every member of a reciprocal shell has to be tested: g227's translation by (1/3, 2/3) carries τ = 2/3, so the twisted star of a wave with reciprocal indices (h, ℓ) cancels identically unless h + 2ℓ ≡ 1 (mod 3). Of the six shortest vectors exactly three survive — (1,0), (0,−1), (−1,1), each with projection norm <b>0.5774</b>, the others exactly <b>0.0000</b> — and they sit at <b>120</b>° to one another. The whole of the next shell cancels, projection norm <b>2.1e−16</b>, so taking "the first shell vector" naively gives exactly zero. The shell after that survives again at |k|² = <b>0.1303</b> against <b>0.0328</b>, and seeding from it converges to a genuine, unpublished g227 orbit with <b>24</b> cores in the box instead of 6, at T = <b>6.3513842322</b>.</figcaption>
+</figure>
+
+<h3 id="step3">3 · Symmetrise into a three-wave star</h3>
+
+<p>
+  Average the nine character-weighted images of one surviving wave. The result has exactly three
+  Fourier components: three plane waves at <b>120</b>° to one another, a honeycomb of vortices and
+  antivortices. It satisfies the character law to <b>7.0e−16</b>, its modulus already has exact
+  zeros at the six screw centres with windings ∓<b>1</b>, and the three <i>τ</i> = 0 centres sit
+  at maxima. Everything the theorem predicted is already drawn.
+</p>
+
+<figure class="fig" id="fig-three-wave-star-seed">
+  <img src="assets/three-wave-star-seed.webp" alt="Three panels of the seed field over two lattice cells: the real part in the ember palette showing bright hexagonal blobs, the modulus in greyscale showing dark points on a honeycomb, and the phase in hue with black and white diamonds marking vortices of opposite sign." loading="lazy" decoding="async">
+  <figcaption>The seed, built from the clockwork symbol alone and before a single step of the reaction–diffusion equation. Symmetrising the three surviving waves gives a star with exactly three Fourier components — three plane waves at <b>120</b>°, |k|² = <b>0.032815</b> — that satisfies the character law to <b>7.0e−16</b>. Its modulus already has exact zeros at the six 3₁ and 3₂ screw centres of the box with windings ∓1, and the three τ = 0 centres sit at maxima. The picture is right before any computation of the dynamics.</figcaption>
+</figure>
+
+<h3 id="step4">4 · Lift through the Hopf eigenvector</h3>
+
+<p>
+  The star is a scalar field; the equation has two species. Linearise the reaction terms about
+  the uniform equilibrium (<i>a</i>, <i>b</i>/<i>a</i>) = (<b>1</b>, <b>2.3</b>), take the
+  oscillatory eigenvector <b>e</b> of that <b>2</b> × <b>2</b> matrix — eigenvalues
+  <b>0.15</b> ± <b>0.988686</b><i>i</i> — and set
+  <i>q</i> = <i>q</i>* + <i>A</i> Re(<i>ψ</i> <b>e</b>). The period estimate comes free from the
+  same matrix: <i>T</i><sub>0</sub> = 2π/|Im λ| = <b>6.355088</b>.
+</p>
+
+<h3 id="step5">5 · Newton on one state and one number</h3>
+
+<p>
+  The unknowns are the initial state, reduced by the instantaneous kernel — <b>434</b> values per
+  species rather than <b>1296</b> — plus log <i>T</i>. The equation is the twisted shooting
+  condition: integrate a third of a period with the flow Φ, apply the node permutation
+  <i>S<sub>g</sub></i> of a generator carrying <i>τ</i> = 1/3, and demand you are back where you
+  started.
+</p>
+
+<p class="eq">
+  <i>F</i>(<i>q</i><sub>0</sub>, <i>T</i>) := <i>S<sub>g</sub></i>
+  Φ<sub><i>T</i>/3</sub>(<i>q</i><sub>0</sub>) − <i>q</i><sub>0</sub> = 0
+  &nbsp;&nbsp;plus one phase condition to pin the time origin.
+</p>
+
+<p>
+  A third of a period and not a whole one, because <i>τ<sub>g</sub></i> = 1/3. That is worth three
+  things: the integration is three times cheaper, the threefold time symmetry is exact by
+  construction rather than approximately, and the unknown is genuinely one frame rather than a
+  movie.
+</p>
+
+<p>
+  Note what is <i>not</i> imposed. Only the <i>τ</i> = 0 operations touch the state. The
+  <i>τ</i> ≠ 0 relations are never enforced; they <i>are</i> the equation. Newton–Krylov takes
+  five steps:
+</p>
+
+<div class="table-wrap">
+<table>
+  <caption>The direct construction at <i>b</i> = 2.3, seed amplitude 0.558.</caption>
+  <thead><tr><th>step</th><th class="num">residual</th><th class="num">period reached</th></tr></thead>
+  <tbody>
+    <tr><td>seed</td><td class="num">1.90e−01</td><td class="num">6.355088</td></tr>
+    <tr><td>1</td><td class="num">5.57e−02</td><td class="num">6.379610</td></tr>
+    <tr><td>2</td><td class="num">5.40e−03</td><td class="num">6.367806</td></tr>
+    <tr><td>3</td><td class="num">6.01e−04</td><td class="num">6.389757</td></tr>
+    <tr><td>4</td><td class="num">3.47e−07</td><td class="num">6.390160</td></tr>
+    <tr><td>5</td><td class="num">2.43e−13</td><td class="num">6.390159918585</td></tr>
+    <tr><td class="muted">published record</td><td class="num muted">—</td><td class="num">6.390159918584649</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  The period agrees with the published record to a relative <b>7.5e−14</b>, and the fields agree
+  to rms <b>5.05e−08</b>, relative <b>1.99e−08</b> — which is <b>1.10</b>× the single-precision
+  round-off floor of the stored bytes, <b>4.64e−08</b>. In other words the two orbits are the
+  same to the accuracy at which the published one is stored. An independent check with an
+  alignment-free space–time Fourier invariant agrees (<b>4.86e−08</b>), which matters because the
+  usual comparison needs a fractional frame shift of <b>0.197</b> to line the two movies up.
+</p>
+
+<figure class="fig" id="fig-filmstrip-seed-to-orbit">
+  <img src="assets/filmstrip-seed-to-orbit.webp" alt="A strip of eight square panels of the same hexagonal pattern in the ember palette, labelled seed, iterate 0 through iterate 4, final, and published record. All eight look nearly identical; the later panels are slightly crisper." loading="lazy" decoding="async">
+  <figcaption>The hand-drawn seed, the Newton iterates, and the published record — all visibly the same picture. The group draws it; the solver only sharpens it. Five Newton–Krylov steps on the twisted shooting equation take the residual from <b>1.90e−01</b> to <b>2.43e−13</b> and the period from the Hopf estimate <b>6.355088</b> to <b>6.390159918585126</b>, against the published <b>6.390159918584649</b> — a relative difference of <b>7.5e−14</b>. The fields agree to rms <b>5.05e−08</b>, which is <b>1.10</b>× the float32 floor of the stored bytes (<b>4.64e−08</b>). The whole search costs <b>38 904</b> right-hand-side evaluations against the original pipeline's <b>293 095</b>, a factor of <b>7.53</b>.</figcaption>
+</figure>
+
+<h3 id="knob">The one knob, and how to remove it</h3>
+
+<p>
+  Everything above is fixed by the group except the seed amplitude <i>A</i>. The verified window
+  at <i>b</i> = 2.3 is <b>0.30</b> to <b>0.60</b>: at <b>0.30</b> Newton converges in <b>35</b>
+  iterations, at <b>0.25</b> it still stalls after <b>150</b>, and at <b>0.80</b> after
+  <b>60</b>. That knob can be predicted rather than tuned: take the root-mean-square amplitude of
+  the <i>spatially uniform</i> Brusselator limit cycle — a two-variable ordinary differential
+  equation with no space and no group in it — which gives <b>0.558</b> at <i>b</i> = 2.3 and
+  works at every <i>b</i> tested (<b>7</b> iterations at <i>b</i> = 2.1, <b>5</b> at 2.3,
+  <b>5</b> at 2.5). Honestly stated: <b>0.558</b> lands mid-window by construction plus luck, not
+  by a proof that it must, and that is question <b>1</b> in the open list below.
+</p>
+
+<figure class="fig" id="fig-amplitude-basin">
+  <img src="assets/amplitude-basin.webp" alt="Log-scale scatter plot of the final Newton residual against seed amplitude. Points between 0.30 and 0.60 sit at about 1e−15 and are marked as converged; points at 0.05, 0.10, 0.25, 0.70, 0.80 and 1.00 sit between 1e−3 and 1e−1 and are marked as not converged. A shaded band marks the window and a dotted line marks the amplitude 0.558." loading="lazy" decoding="async">
+  <figcaption>The one free knob in the construction, and where it works. The verified window at b = <b>2.3</b> is <b>0.30</b> to <b>0.60</b>: at <b>0.30</b> Newton converges in <b>35</b> iterations, and at <b>0.25</b>, the lower of the two amplitudes the original pipeline tried, it still stalls at <b>1.01e−02</b> after <b>150</b> iterations — though the original lifted a Ginzburg–Landau profile rather than this star, and converged from it. The knob can be removed: the amplitude is predictable in advance as the rms of the spatially uniform Brusselator limit cycle, a two-variable ordinary differential equation with no space and no group in it, which gives <b>0.558</b> at b = <b>2.3</b> and works at every b tested. Honestly stated: <b>0.558</b> lands mid-window by construction plus luck, not by a proof that it must.</figcaption>
+</figure>
+
+<h3 id="chirality">Two things the construction gives away for free</h3>
+
+<p>
+  <b>Chirality is the sign of the character.</b> Building the star with
+  e<sup>−2π<i>iτ</i></sup> instead of e<sup>+2π<i>iτ</i></sup> produces the mirror image of the
+  star, to <b>5.1e−16</b>, and lands in the conjugate character sector: every vortex charge
+  flips, and the resulting orbit fails against the catalogue's generator (residual <b>0.662</b>)
+  while satisfying the <i>inverse</i> generator to <b>4.7e−08</b>. The sign of the character is
+  the handedness of the clock. The honest limit: that the wrong sign can never be rescued is an
+  inference from the runs, not a proof — the Newton unknowns are kernel-projected only, so the
+  conjugate sector is not an invariant subspace of the iteration.
+</p>
+
+<p>
+  <b>The shell index is a dial for new orbits.</b> Seeding from the next allowed shell converges
+  in <b>8</b> iterations to <i>T</i> = <b>6.3513842322</b> — not the published orbit (relative rms
+  <b>0.171</b>) but a genuine, audit-passing g227 clockwork orbit with <b>24</b> cores in the
+  box instead of <b>6</b>, as the exactly doubled wavevector demands, total charge
+  still <b>0</b>, all nine centre charges as predicted. An entirely independent solver, described
+  below, found the same unpublished orbit at <b>6.351384224091878</b> — agreement to eight
+  digits.
+</p>
+
+<!-- live demo 1 -->
+<div class="demo" id="demo-newton">
+  <h3 style="margin-top:0">Live demonstration 1 · run the search here</h3>
+  <p class="demo-lede">
+    The whole of the construction above, in this browser: the symbol with the winding each centre
+    forces, the shell table in which three projections read <b>0.00</b> and three read
+    <b>0.58</b>, the three-wave seed, the live residual, and a verification table re-checked
+    centre by centre on the orbit the page has just computed. It takes about <b>1.6</b> seconds
+    and nothing is fetched from a stored answer. The panel's own amplitude control is the knob
+    discussed above. It runs at <b>0.5</b>, and the predicted <b>0.558</b> is also on its menu;
+    both are inside the window and both take <b>6</b> steps here, one more than the reference
+    implementation's <b>5</b> in the table above, because the two solvers stop on slightly
+    different criteria. Set it instead to <b>0.25</b> and watch Newton fail honestly:
+    it stops at the iteration limit and says, in so many words, that the animation below is not a
+    solution.
+  </p>
+  <p class="demo-lede" style="margin-top:-4px">
+    One detail in its log is worth watching: the per-step Krylov count <i>rises</i> as the
+    residual falls — <b>14</b>, <b>5</b>, <b>11</b>, <b>12</b>, <b>20</b>, <b>27</b> — because
+    each Newton step asks the inner solve for more accuracy than the last.
+  </p>
+  <p><button class="go" id="run-newton" type="button">Run the search</button></p>
+  <p class="demo-hint" id="hint-newton">
+    Loads a self-contained panel of about <b>70</b> kB and starts the search. Nothing runs until
+    you press it.
+  </p>
+  <div class="demo-slot" id="slot-newton"></div>
+</div>
+
+
+<!-- ===================================================== the eigenfunction -->
+<h2 id="eigenfunction">Born as an eigenfunction<a class="hlink" href="#eigenfunction" aria-label="link to this section">#</a></h2>
+
+<p>
+  A natural question from anyone who has solved a stationary Schrödinger equation: is finding
+  this orbit an eigenproblem? At its birth, it is — literally and not by analogy.
+</p>
+
+<p>
+  Linearise the Brusselator about its uniform state. A spatial mode with Laplacian eigenvalue
+  −|<i>k</i>|² is governed by a <b>2</b> × <b>2</b> matrix
+  <i>J</i> − |<i>k</i>|²<i>D</i>, and it goes Hopf — a pair of eigenvalues crossing the
+  imaginary axis — at
+</p>
+
+<p class="eq">
+  <i>b</i><sub>c</sub>(|<i>k</i>|²) = 1 + <i>a</i>² +
+  (<i>D<sub>u</sub></i> + <i>D<sub>v</sub></i>)|<i>k</i>|²,
+  &nbsp;&nbsp; <i>ω</i><sub>c</sub> = √(<i>a</i>² − |<i>k</i>|⁴)
+</p>
+
+<p class="small muted" style="margin-top:-6px">
+  That is the trace-zero condition, and it is a Hopf point only while the determinant stays
+  positive, here |<i>k</i>| &lt; 1.
+</p>
+
+<p>
+  For g227's surviving shell (|<i>k</i>| = <b>0.18114981</b> on the mesh; the continuum value
+  4π/(√3<i>L</i>) is <b>0.18137994</b>) that gives <i>b</i><sub>c</sub> =
+  <b>2.065630506987</b>, frequency <b>0.999461434543</b> and period <b>6.286571037185</b>. At
+  that value of <i>b</i>, the orbit <i>is</i> the eigenfunction of the linear operator
+  <i>J</i> + <i>D</i>∇² with eigenvalue <i>iω</i><sub>c</sub>, restricted to the one character
+  sector the clockwork symbol allows. Everything above onset is the nonlinear term bending an
+  eigenfunction.
+</p>
+
+<figure class="fig" id="fig-born-as-eigenfunction">
+  <img src="assets/born-as-eigenfunction.webp" alt="Six panels in two rows. The top row shows the phase of the first harmonic as hue for a near-onset orbit, the published orbit and the analytic eigenfunction; the bottom row shows the corresponding magnitudes in greyscale. The three columns look almost identical." loading="lazy" decoding="async">
+  <figcaption>At birth the orbit really is an eigenfunction. Linearising the Brusselator about its uniform state, a mode with wavenumber |k| goes Hopf at b = 1 + a² + (Du + Dv)|k|², which for g227's surviving shell is b = <b>2.065630506987</b> with frequency <b>0.999461434543</b> and period <b>6.286571037185</b>. At that point the orbit is the eigenfunction of the linear operator, restricted to the one character sector the clockwork symbol allows: the shape match of the near-onset orbit to the analytic eigenfunction is <b>1.0000</b>, and of the published orbit at b = <b>2.3</b> it is still <b>0.9664</b>. Everything above onset is the nonlinear term bending an eigenfunction, with amplitude growing like the square root of the distance from onset — measured exponent <b>0.5027</b> against the predicted <b>0.5</b>.</figcaption>
+</figure>
+
+<p>
+  Measured along a branch of <b>44</b> converged points from <i>b</i> − <i>b</i><sub>c</sub> =
+  <b>1.3e−4</b> up to <i>b</i> = <b>8.0</b>, with no corrector failure: the amplitude grows like
+  the square root of the distance from onset with fitted exponent <b>0.5027</b> against the
+  predicted <b>0.5</b>, the fit <i>A</i> = <b>0.77851</b>√(<i>b</i> − <i>b</i><sub>c</sub>)
+  scatters by <b>0.41</b> %, and <i>b</i><sub>c</sub> read back from the measured amplitudes
+  agrees to <b>9.3e−06</b>. The shape match of the near-onset orbit to the analytic eigenfunction
+  is <b>1.0000</b>; of the published orbit at <i>b</i> = 2.3 it is still <b>0.9664</b>.
+</p>
+
+<h3 id="analogy">Where the eigenproblem analogy is exact, and where it breaks</h3>
+
+<p>
+  Exact: the character sector plays the part of a Bloch sector or an irreducible representation.
+  A mode either lies in the sector the symbol allows or it does not, and modes in different
+  sectors do not mix at linear order. That is why the shell test above is a selection rule in
+  precisely the spectroscopic sense.
+</p>
+
+<p>
+  Not exact, in three ways worth stating. The operator <i>J</i> + <i>D</i>∇² is not
+  self-adjoint, so the eigenvalues are complex and there is no variational principle to minimise.
+  Away from onset the problem is genuinely nonlinear: the amplitude is not free, it is fixed by
+  the nonlinearity at ∝ √(<i>b</i> − <i>b</i><sub>c</sub>), which is why the seed needs an
+  amplitude at all. And the eigenproblem only determines the pattern at onset; the published
+  orbit sits at <i>b</i> = <b>2.3</b>, well above <i>b</i><sub>c</sub> = <b>2.066</b>, where the
+  shape has drifted by the <b>3</b> % that separates <b>0.9664</b> from <b>1</b>.
+</p>
+
+<p>
+  Still, the eigen-structure does not disappear above onset; it becomes nonlinear. In the shooting
+  formulation the unknowns are a state and a number, and they play exactly the roles of an
+  eigenvector and an eigenvalue: the state is determined only up to the time origin, which the
+  phase condition fixes the way a normalisation ⟨ψ|ψ⟩ = 1 fixes a wavefunction, and the period
+  <i>T</i> is the number the equation determines along with it. The solver is the matrix-free
+  machinery one would use on a large sparse eigenproblem — Newton outside, a Krylov method inside,
+  the Jacobian never assembled and reached only through directional derivatives, each of which is
+  one more integration of a third of a period. As <i>b</i> → <i>b</i><sub>c</sub> the nonlinearity
+  switches off and the problem degenerates to the honest linear one,
+  (<i>J</i> + <i>D</i>∇²)φ = <i>iω</i>φ in the single character sector the symbol allows. So: a
+  stationary eigenproblem at birth, and a nonlinear eigenproblem — same unknowns, same
+  normalisation, same Krylov solver — at finite amplitude.
+</p>
+
+<p>
+  One thing the twisted equation does <i>not</i> do is forbid the trivial answer. The uniform
+  oscillation is spatially constant, so <i>S<sub>g</sub>q</i> = <i>q</i> for every <i>g</i> and
+  the twisted residual at the uniform state is exactly <b>0</b>. It solves <i>F</i> = 0 too. What
+  protects Newton is the seed, not the equation — a point worth remembering when the descent
+  method below walks into precisely that solution.
+</p>
+
+<p>
+  The equivariant point does real work here, and it is the cleanest statement of what symmetry
+  buys. The uniform mode, |<i>k</i>| = 0, goes unstable <i>first</i>, at <i>b</i> = <b>2</b> —
+  before any pattern. But the uniform mode is not in the twisted sector, so it makes no
+  clockwork; it is exactly the state the plain simulation above collapsed onto. Symmetry is a
+  selection principle, not a description.
+</p>
+
+<p>
+  One more consequence of <i>D<sub>u</sub></i> = <i>D<sub>v</sub></i> is worth making explicit,
+  because it is easy to assume the opposite: there is <b>no Turing instability here at all</b>.
+  With equal diffusion the growth rate Re λ(|<i>k</i>|) = (<i>b</i> − 1 − <i>a</i>²)/2 −
+  <i>D</i>|<i>k</i>|² falls monotonically with |<i>k</i>|, so the linear problem has no preferred
+  finite wavelength — it prefers |<i>k</i>| = 0. The equation supplies no length scale. The scale
+  of the picture is set by the lattice and by which shell the character admits, which is also why
+  the shell index behaves as a dial for new orbits rather than as a tuning error.
+</p>
+
+<figure class="fig" id="fig-onset-spectrum">
+  <img src="assets/onset-spectrum.webp" alt="Growth-rate curves against wavenumber for three values of b, with numbered markers on the b = 2.3 curve. Filled markers label the shells whose star survives the symmetry; hollow markers label the shells that cancel. An annotation marks the point where the growth rate of the first surviving shell is exactly zero." loading="lazy" decoding="async">
+  <figcaption>Symmetry as a selection principle, not a description. The uniform mode goes unstable first, at b = 2 — but it is not in the twisted sector, so it makes no clockwork, and the first pattern the symbol admits is the lowest shell that survives the character. With equal diffusion the diffusion term is a multiple of the identity, so it moves only the real part of the eigenvalues: at a given b every mode oscillates at the same frequency, <b>0.988686</b> at b = <b>2.3</b>, which is why one 2 × 2 matrix supplies a usable period estimate T₀ = <b>6.355088</b> for any shell. The frequency at onset does depend on the shell, because the onset value of b does — ω = 1 at |k| = 0 against <b>0.999461434543</b> at g227's shell.</figcaption>
+</figure>
+
+<p class="aside">
+  A corollary worth having: firing the analytic eigenfunction straight at <i>b</i> = 2.3 with no
+  continuation at all converges in <b>6</b> Newton iterations. The continuation route
+  independently rediscovers the pencil-and-paper construction.
+</p>
+
+
+<!-- =============================================================== the glue -->
+<h2 id="glue">A fundamental domain that remembers<a class="hlink" href="#glue" aria-label="link to this section">#</a></h2>
+
+<p>
+  Back to the simulator. Read the clockwork convention node-wise, with <i>y</i> = <i>gx</i>:
+</p>
+
+<p class="eq">
+  <i>q</i>(<i>y</i>, <i>t</i>) = <i>q</i>(<i>g</i><sup>−1</sup><i>y</i>,
+  <i>t</i> − <i>τ<sub>g</sub></i><i>T</i>)
+</p>
+
+<p>
+  <b>The neighbour across a glued edge is the domain's own past.</b> For g227 the two non-trivial
+  classes of edge read the domain as it was <i>T</i>/3 and 2<i>T</i>/3 ago. Gluing with a lag
+  turns the reaction–diffusion equation on the fundamental domain into a delay-differential
+  equation whose only extra parameter is the period — the delay. Nothing else changes: the same
+  Laplacian, the same reaction terms, the same time stepper. A simulator that already glues edges
+  needs exactly one new thing, a history buffer.
+</p>
+
+<figure class="fig" id="fig-glue-fundamental-domain">
+  <img src="assets/glue-fundamental-domain.svg" alt="Two panels. On the left, a parallelogram drawn over a triangular dot mesh, divided into nine identical rhombi; a hexagon of three of them is tinted, one rhombus is filled, and nine rotation centres are marked in three colours. On the right, that single rhombus enlarged, its four edges drawn in three colours, its corners labelled 3, 3 sub 1 twice and 3 sub 2, with curved arrows showing which edges are glued to which." loading="lazy" decoding="async">
+  <figcaption>The fundamental domain of the <b>333</b> orbifold on the triangular mesh, and what each glued edge reads. One simulation cell of <b>36</b> × <b>36</b> nodes is exactly nine copies of the domain, so the <b>1296</b> nodes per channel reduce to <b>146</b> representatives — a factor of <b>8.877</b>. Two edges are glued by the turn about the τ = 0 centre and read the domain as it is now; the other two are glued by the turn about the 3₂ centre and by its inverse, which is why one reads the domain as it was T/3 ago and the other as it was 2T/3 ago. Of the non-representative nodes, <b>290</b> are copied instantaneously, <b>430</b> from t − T/3 and <b>430</b> from t − 2T/3. The panel counts edge stubs, which is a different quantity from the node counts here.</figcaption>
+</figure>
+
+<div class="keynum">
+  <div><div class="v">146</div><div class="l">representatives integrated, out of 1296 nodes per species — a factor of 8.877</div></div>
+  <div><div class="v">290</div><div class="l">nodes copied at the same instant</div></div>
+  <div><div class="v">430 + 430</div><div class="l">nodes read from <i>t</i> − <i>T</i>/3 and <i>t</i> − 2<i>T</i>/3</div></div>
+</div>
+
+<p>
+  Note the size against the previous section: the kernel alone leaves a fundamental domain of
+  <b>434</b> nodes, because the kernel is still a p3 on a coarser lattice. The whole group leaves
+  <b>146</b>. The plain simulation gets the first; only the delay buys the second, and the
+  difference is exactly the <i>τ</i> ≠ 0 operations.
+</p>
+
+<p>
+  <b>The direction of the delay is not a convention.</b> Reading from the past reproduces the
+  published record bitwise — maximum error exactly <b>0.0</b>. Reading from the future is wrong
+  by <b>1.042</b> on a field whose whole span is <b>2.546</b>. It is a one-line test and it
+  settles the sign of every offset in the catalogue.
+</p>
+
+<h3 id="assembly">It assembles itself</h3>
+
+<p>
+  Start from white noise on the <b>146</b> representatives. Start the delay at the Hopf period
+  <b>6.355088</b> — the only number available before anything has been computed — and correct it
+  once per period by a phase-shift feedback that asks how far the state has drifted from its own
+  delayed copy. After <b>47</b> periods, <b>300</b> time units of ordinary forward integration:
+  relative period error <b>+2.6e−06</b>, field agreeing with the published record to
+  <b>3.8e−06</b> relative, and the comparison already reporting the same orbit — before any
+  Newton step at all. Two Newton iterations then give <i>T</i> = <b>6.390159918584616</b> and the
+  repository's acceptance audit passes.
+</p>
+
+<figure class="fig" id="fig-glue-assembly-strip">
+  <img src="assets/glue-assembly-strip.webp" alt="Six square stills in a row, labelled from t = 0 to t = 300. The first is fine-grained noise, the next two are almost featureless, and the last three show blobs sharpening into the finished spiral lattice." loading="lazy" decoding="async">
+  <figcaption>White noise at t = 0, the published spiral lattice at t = <b>300</b> — and nothing in between but forward simulation on a fundamental domain whose edges read the past. The delay starts at the Hopf period and is updated once per period by a phase-shift feedback; after <b>47</b> periods the relative period error is <b>+2.6e−06</b> and the field agrees with the published record to <b>3.8e−06</b> relative, before any Newton step. Three further seeds, one of them chosen by an independent check, all land at about <b>1e−06</b>.</figcaption>
+</figure>
+
+<figure class="fig" id="fig-glue-self-assembly">
+  <video controls muted loop playsinline preload="none" poster="assets/poster-glue-self-assembly.webp" aria-label="Animation over 300 time units: a structureless grey oscillation, then six vortices nucleate and drift, lock onto fixed centres, and the finished spiral lattice breathes for the rest of the run."><source src="assets/glue-self-assembly.mp4" type="video/mp4"><p>Animation over 300 time units: a structureless grey oscillation, then six vortices nucleate and drift, lock onto fixed centres, and the finished spiral lattice breathes for the rest of the run.</p></video>
+  <figcaption>The same self-assembly as a movie, <b>300</b> time units of the delayed-glue simulation on the <b>146</b>-node domain. The six vortices nucleate out of the grey oscillation, drift, and lock onto the screw centres the symbol names.</figcaption>
+</figure>
+
+<p>
+  There is no amplitude to choose, no shell to choose and no sign to choose — the three knobs the
+  pencil construction has. Four seeds, one of them picked by an independent verifier, all land
+  within about <b>1e−06</b> relative period error.
+</p>
+
+<h3 id="why-glue-works">Why it works — the punchline that pairs with the collapse</h3>
+
+<p>
+  The same perturbation, measured the same way by a forward run in each setting, <b>grows</b> by
+  a factor of <b>1.150</b> per period on the torus and <b>decays</b> by a factor of <b>0.692</b>
+  per period inside the delayed glue. (The <b>1.1608154</b> quoted earlier is the same instability
+  measured properly, by Arnoldi on the monodromy operator; <b>1.150</b> is what a finite-time
+  forward run in this discretisation reads.) That is the whole story of this page in one
+  comparison: the orbit is unreachable by simulation on the torus and reachable by simulation on a
+  domain that remembers.
+</p>
+
+<p>
+  Why it contracts is worth stating carefully, because the tempting sentence claims too much. The
+  picture is that the directions which break the clockwork symmetry are simply not representable
+  on the glued domain, so they cannot grow. But the delayed system is not the torus system
+  restricted to an invariant subspace: its state is a history segment of length 2<i>T</i>/3, so it
+  is infinite-dimensional and has a spectrum of its own, including modes that live entirely in the
+  history. The contraction factor <b>0.692</b> was therefore measured, not proved.
+</p>
+
+<p>
+  One relation the glue never imposes confirms the theorem for free. The six screw-centre nodes
+  are asked to repeat after a third of a period, and they obey by barely moving: amplitude
+  <b>0.0013</b> against <b>1.415</b> at the <i>τ</i> = 0 centres, a factor of about <b>1100</b>.
+  That is Theorem B — the first harmonic vanishes at a screw centre — measured rather than
+  assumed.
+</p>
+
+<p class="aside">
+  A cross-experiment correction, because the numbers look contradictory otherwise. The glue's
+  original headline compared itself against a bare Newton run that failed in <b>40</b> iterations
+  — but that run used seed amplitude <b>0.25</b>, the one amplitude independently shown to lie
+  <i>outside</i> the convergence window. At amplitude <b>0.558</b> the same bare Newton converges
+  in <b>5</b> iterations. So the claim is not "the glue beats Newton"; it is "the glue removes the
+  amplitude knob", which is the stronger and the true one.
+</p>
+
+<!-- live demo 2 -->
+<div class="demo" id="demo-glue">
+  <h3 style="margin-top:0">Live demonstration 2 · watch it assemble</h3>
+  <p class="demo-lede">
+    The delayed glue running in this page, on the same <b>146</b> representatives: the drawn cell
+    coloured by how each node is fed, the pattern rebuilt through the glue, the delay converging
+    on the published period, and the residual on a logarithmic axis. From white noise to
+    "period found" takes about <b>13</b> seconds — the arithmetic itself takes <b>0.46</b>
+    seconds, and the rest is deliberate pacing so the assembly is watchable. The in-page run
+    stops at its own tolerance rather than running the full <b>47</b> periods described
+    above: with the first seed it settles after <b>31</b> periods at a delay of
+    <b>6.390172673334256</b>, a relative <b>2.00e−06</b> from the published period, and the
+    two Newton steps that follow take it to <b>6.390159918584547</b>. The other three seeds
+    land between <b>+2.25e−06</b> and <b>+2.86e−06</b> in <b>25</b> to <b>32</b> periods.
+  </p>
+  <p><button class="go" id="run-glue" type="button">Start from noise</button></p>
+  <p class="demo-hint" id="hint-glue">
+    Loads the delayed-glue modules and starts on the first seed at normal speed. Seed, speed and
+    the final Newton polish lock while it runs — press <b>Stop</b> to change them and start again.
+    The panel's interim symmetry error, printed before any Newton step, is <b>5.80e−5</b>; the two
+    Newton steps at the end drive the shooting residual it prints to <b>3.7e−14</b>, and the
+    symmetry error of the replayed movie to <b>2.5e−09</b>.
+  </p>
+  <div class="demo-slot" id="slot-glue"></div>
+</div>
+
+<p>
+  <b>This is the version worth adding to a fundamental-domain simulator.</b> The domain is the
+  one SymSim already builds; the edges are the ones it already glues; the only new object is a
+  ring buffer of past states, with four-point Lagrange interpolation so the midpoint stages of the
+  time stepper can ask for the field between stored samples. The delay update is two inner
+  products. Once per period, compare the domain with its own delayed copy and project the mismatch
+  onto the direction the trajectory is moving in:
+</p>
+
+<p class="eq">
+  δ<i>T</i> = ⟨ <i>q</i>(<i>t</i> − <i>T</i>) − <i>q</i>(<i>t</i>), <i>q̇</i>(<i>t</i>) ⟩ /
+  ⟨ <i>q̇</i>(<i>t</i>), <i>q̇</i>(<i>t</i>) ⟩, &nbsp;&nbsp;
+  <i>T</i> ← <i>T</i> + δ<i>T</i>
+</p>
+
+<p>
+  That is one Newton step on a phase condition, and it is the whole of the adaptation. What is
+  left of the mismatch after removing the tangent component is the shape error, and it is what
+  falls by a fixed factor per period in the panel above.
+</p>
+
+<p>
+  Seen this way the construction is a <b>time-delayed feedback control</b> of an unstable periodic
+  orbit in the sense of Pyragas: the feedback is built from <i>q</i>(<i>t</i>) −
+  <i>q</i>(<i>t</i> − <i>T</i>) and therefore vanishes identically on the target, so the orbit
+  itself is untouched and only its stability changes. What is new here is that the feedback is not
+  added to the right-hand side but carried by the boundary conditions, which is why it costs
+  nothing: the domain is already glued, and the glue is simply told to read an older frame. The
+  honest caveat is in the open questions: this was demonstrated for g227 at
+  <b>36</b> and <b>48</b> nodes across, with offsets 0, 1/3 and 2/3. Mirrors and glides, where
+  the offsets are 0 and 1/2, change the structure of the glue and are untested.
+</p>
+
+
+<!-- ====================================================== fifth dimension ---->
+<h2 id="fifth">Is there a fifth dimension?<a class="hlink" href="#fifth" aria-label="link to this section">#</a></h2>
+
+<p>
+  One participant asked whether all the frames of such an animation are computed together —
+  whether the whole movie evolves along some fifth axis. It is a good question with a precise
+  answer, and the answer is different for each of the three solvers on this page.
+</p>
+
+<ol>
+  <li>
+    <b>The first solver literally did it, and failed.</b> On <b>4</b> September 2026 the project's first
+    browser solver made the unknown the entire movie — every frame at once, plus the period —
+    tied the frames together with a trapezoidal defect, imposed the space–time symmetry as a hard
+    constraint, and slid the whole block downhill under a quasi-Newton descent. It never produced
+    an accepted orbit. The diagnosis has two parts, and they fail different tests. A trapezoidal
+    defect on <i>M</i> frames is only second-order accurate in <i>T</i>/<i>M</i>: a
+    <i>perfectly</i> converged trapezoidal solution still fails an independent replay with a
+    fourth-order stepper by <b>1.53e−03</b> against a gate of <b>1e−05</b>, at any frame count
+    that solver used. And least squares on a bare space–time residual has a trivial minimum, the
+    uniform state, which a descent method walks into: the iterate ends at
+    <b>5.15e−05</b> amplitude, <b>0.0038</b> % of the published orbit. The honest qualification
+    is that this second mechanism is not quite what the original code did — it carried a
+    nontriviality barrier, and with that barrier restored the descent stalls at <b>9.8</b> % of
+    the right amplitude instead of blanking the screen.
+  </li>
+  <li>
+    <b>The published method has no fifth dimension.</b> The unknown is one state and one number.
+    The remaining frames are not unknowns at all; they are produced afterwards by a single
+    forward integration once the state and the period are known. If you want an extra axis, the
+    only one is Newton's iteration count — and a step of one in that axis is what the first
+    solver was taking small steps along.
+  </li>
+  <li>
+    <b>The delayed glue needs no extra axis either.</b> Time runs forward, once, and the glue
+    carries the clock.
+  </li>
+</ol>
+
+<p>
+  And yet the idea is right, which is the interesting part. Solving all the frames at once works
+  very well provided time is represented spectrally and the loop is moved by Newton rather than by
+  descent: harmonic balance reaches an orbit in <b>16 992</b> field evaluations. The comparison
+  needs care, and the page owes it here, because this is the same numerator-and-denominator trap
+  corrected two sections above. Against the <i>same</i> shooting solver started from the
+  <i>same</i> seed, that is <b>11.6</b>× — but that shooting run used seed amplitude <b>0.25</b>,
+  the amplitude independently shown to lie outside the convergence window, and it cost
+  <b>197 005</b> evaluations. Against a correctly seeded shooting run, the <b>38 904</b>
+  evaluations in the table above, the honest factor is about <b>2.3</b>×. Harmonic balance
+  converges to a <i>different</i> orbit — <i>T</i> = <b>6.35138422409188</b>, the same unpublished
+  second-shell orbit the pencil construction reached from the other direction. Spectral refinement
+  of the published orbit converges in <b>2</b> iterations and <b>4 888</b> evaluations. But the
+  descent route, taken literally, produced <b>zero</b> admissible orbits for about <b>1e6</b>
+  evaluations, and that is the honest headline.
+</p>
+
+<figure class="fig" id="fig-fifth-dimension-flow">
+  <img src="assets/fifth-dimension-flow.webp" alt="Three panels: a tangle of closed loops in a projected coordinate plane coloured by a fictitious time, a log-scale plot of residual against fictitious time showing straight exponential decay, and a cost comparison of two solvers against right-hand-side evaluations." loading="lazy" decoding="async">
+  <figcaption>The version one participant imagined, taken literally: the whole movie as a single point tracing a path in a fictitious extra time, with the residual decaying like e^(−s) — and a step of one in that time is exactly Newton's method. Solving all the frames at once is real and can be cheaper: harmonic balance costs <b>16 992</b> field evaluations, about <b>2.3</b>× under a correctly seeded twisted shooting run. It is also where the honest failure lives: plain gradient descent on a space–time least-squares functional produced no admissible orbit at all for about a million evaluations, collapsing towards the uniform state; with the nontriviality barrier the original browser solver actually carried, it stalls at <b>9.8</b> % of the right amplitude instead of blanking the screen.</figcaption>
+</figure>
+
+
+<!-- ============================================================= how done ---->
+<h2 id="done">How it was actually done, and what changed<a class="hlink" href="#done" aria-label="link to this section">#</a></h2>
+
+<p>
+  Nothing above is how the published animation was found. The real pipeline ran on <b>7</b>
+  September 2026 as one job in one batch of <b>204</b>, and it had four stages:
+</p>
+
+<ol>
+  <li>solve for the uniform equilibrium, which is (<i>a</i>, <i>b</i>/<i>a</i>) = (<b>1</b>, <b>2.3</b>);</li>
+  <li>build a complex Ginzburg–Landau problem on the same mesh — near the Hopf point the
+    Brusselator reduces to it — integrate it from <b>seeded random noise</b> inside the character
+    subspace for <b>600</b> time units, and polish the result to a rotating wave, trying both
+    signs of the frequency and keeping the first whose audit passes;</li>
+  <li>lift that complex profile through the same <b>2</b> × <b>2</b> Hopf eigenvector, at
+    amplitude <b>0.25</b> or <b>0.50</b>;</li>
+  <li>Newton–Krylov on the same twisted shooting equation, then replay, audit, and a second solve
+    at a finer mesh.</li>
+</ol>
+
+<p>
+  It cost <b>53.750973</b> seconds of function time on a two-core container — about
+  <b>$0.0023</b> as this orbit's share of a <b>$0.200731</b> processor batch. No graphics
+  processor was used on this path at all; the project's single graphics-processor day belongs
+  entirely to a different equation. The original was neither slow nor expensive. What the newer
+  routes remove is the <b>random seed</b>, the <b>Ginzburg–Landau stage</b> and the
+  <b>infrastructure</b>.
+</p>
+
+<h3 id="sep4">The instructive early mistake</h3>
+
+<p>
+  Three days before that job ran, on <b>4</b> September 2026, the project briefly published
+  animations that looked like clockwork and were not. The live browser simulation enforced only
+  the zero-offset spatial subgroup and then <i>drew</i> the requested time-shift generators over
+  the result. For an entry whose instantaneous kernel is trivial, that means the fluid was the
+  same whichever clockwork symbol was selected, and only the decoration changed. The owner noticed
+  within the hour that switching between two entries made no difference to the picture, and the
+  mode was removed the same afternoon. The lesson is recorded in the repository's own notes on the
+  equation research: a time-shift character is not a constraint on a state, and it cannot be
+  imposed step by step. It can only be checked on a whole period — or solved for.
+</p>
+
+<div class="table-wrap">
+<table>
+  <caption>The same orbit, found five ways. Costs in full-field right-hand-side evaluations, the
+    only currency that survives a shared machine.</caption>
+  <thead><tr>
+    <th>route</th><th class="num">evaluations</th><th class="num">Newton steps</th>
+    <th class="num">period reached</th><th>same orbit?</th><th class="num">wall</th>
+  </tr></thead>
+  <tbody>
+    <tr><td>original pipeline, Ginzburg–Landau seed</td><td class="num">293 095</td><td class="num">43</td>
+      <td class="num">6.390159918584649</td><td>it <i>is</i> the record</td><td class="num">53.75 s</td></tr>
+    <tr><td>direct construction: symbol → star → Hopf lift → Newton</td><td class="num">38 904</td><td class="num">5</td>
+      <td class="num">6.390159918585126</td><td>yes, rms 5.05e−08</td><td class="num">10.1 s</td></tr>
+    <tr><td>the same algorithm in a browser</td><td class="num">41 028</td><td class="num">6</td>
+      <td class="num">6.390159918584618</td><td>yes, 6.9e−08 after a 0.211-frame shift</td><td class="num">1.59 s</td></tr>
+    <tr><td>delayed glue from white noise, then 2 Newton steps</td><td class="num">88 967</td><td class="num">2</td>
+      <td class="num">6.390159918584616</td><td>yes, rms 5.36e−08</td><td class="num">≈ 99 s</td></tr>
+    <tr><td>delayed glue, 4-period warm start</td><td class="num">51 564</td><td class="num">5</td>
+      <td class="num">6.390159918584609</td><td>yes</td><td class="num">—</td></tr>
+    <tr><td>continuation from onset, 44 branch points</td><td class="num">438 326</td><td class="num">3–6 each</td>
+      <td class="num">passes through it</td><td>yes, 1.20e−08</td><td class="num">1 421 s</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Like for like — orbit-finding only, direct construction against the original pipeline — that is
+  <b>7.53</b>× fewer right-hand-side evaluations, <b>7.53</b>× fewer time steps, <b>5.34</b>×
+  fewer trajectory integrations and <b>7.54</b>× fewer grid-point evaluations. Against the
+  recorded job the browser version uses about <b>7.1</b>× fewer right-hand-side evaluations. The
+  tempting comparison — <b>1.6</b> seconds in a page against <b>53.75</b> seconds of container
+  time, a factor of <b>33.8</b> — is not a fair one and is quoted here only to be disowned: that
+  job also produced a <b>96</b>-frame movie, two audits and a finer-mesh refinement, on a
+  different machine. Evaluations are the only currency that survives a change of hardware, which
+  is why every cost on this page is quoted in them.
+</p>
+
+<figure class="fig" id="fig-js-live-page">
+  <img src="assets/js-live-page.webp" alt="Screenshot of a dark web page shown at desktop width beside a narrow phone-width thumbnail of the same page. Sections are numbered: the clockwork symbol, the field, the seed with a shell table, a residual plot with an iteration table, and a verification table of predicted and measured windings." loading="lazy" decoding="async">
+  <figcaption>The whole construction as one page that runs in the browser: the symbol with the winding each centre forces, the shell table in which three projections read <b>0.00</b> and three read <b>0.58</b>, the three-wave seed, the live residual, and a verification table re-checked centre by centre on the orbit the page has just computed. It reaches T = <b>6.390159918584618</b> in 6 Newton iterations and <b>41 028</b> right-hand-side evaluations — <b>1.59</b> s at <b>1280</b> × <b>900</b> and <b>1.58</b> s at <b>390</b> × <b>844</b>, so there is no mobile penalty. It is the real computation, not a lookalike: the ported arithmetic matches the reference implementation to double round-off, and the reference check of the twisted residual on the page's own unprojected state reads <b>7.2e−16</b>, so no symmetry is smuggled into the trajectory.</figcaption>
+</figure>
+
+<h3 id="coverage">How far the deterministic recipe reaches, and where it trips</h3>
+
+<p>
+  Run the same construction across the whole catalogue, with no noise and no random numbers. It
+  is admitted for <b>29</b> of the <b>51</b> entries with a nonzero offset, for <b>8 702</b>
+  seconds of ordinary processor time and <b>$0</b>, against a strictly harder gate than the
+  repository's own <b>204</b>-job batch, which scored the same <b>29</b> for <b>9 309</b>
+  core-seconds and <b>$0.200731</b>. Not the same <b>29</b>, though: twenty-five overlap, four go
+  each way, and <b>18</b> entries — mostly mirror groups — are found by neither. And three
+  deductions belong in the same breath, because each of them shrinks the claim: the <b>29</b> are
+  only <b>16</b> distinct orbits; the <i>literal</i> recipe reaches <b>15</b>, the rest needing a
+  best-of-five adaptive procedure, so the knob count went up where the method was advertised as
+  knob-free; and all <b>29</b> clear the phase gate only after the site's export projection, raw
+  single precision scoring <b>2.384e−07</b> against a limit of <b>2e−07</b>.
+</p>
+
+<figure class="fig" id="fig-admitted-contact-sheet">
+  <img src="assets/admitted-contact-sheet.webp" alt="A grid of twenty-nine square thumbnails on a dark background, each a different periodic pattern in orange on violet, labelled with a group identifier, an orbifold symbol and a period." loading="lazy" decoding="async">
+  <figcaption>The periodic table of what a deterministic seed reaches: <b>29</b> of the <b>51</b> clockwork Brusselator entries, with no noise, no Ginzburg–Landau stage and no random numbers, for <b>8 702</b> seconds of ordinary processor time and no money at all — against the repository's own batch, which scored the same <b>29</b> for <b>9 309</b> core-seconds and <b>$0.200731</b>. Three honest deductions: it is not the same <b>29</b> (<b>25</b> overlap, four each way, and <b>18</b> entries are found by neither); the <b>29</b> entries are only <b>16</b> distinct orbits; and the literal recipe alone reaches <b>15</b>, while the <b>29</b> needed a five-stage adaptive procedure, so the knob count went up where the method was advertised as knob-free.</figcaption>
+</figure>
+
+<p>
+  The most instructive number in that sweep is a rejection statistic. Of <b>302</b> attempts,
+  <b>100</b> solved the shooting equation to <b>1e−8</b> or better and the audit rejected
+  <b>71</b> of those — <b>68</b> by one gate, the contrast floor. The deterministic seed's default
+  failure is the <b>standing-wave branch</b>: a perfectly valid solution of the equation whose
+  pattern nearly coincides with its own half-period image, so the picture briefly goes blank and
+  there is nothing to watch. The fix is a <b>quadrature seed</b>, <i>ψ</i> =
+  <i>e</i><sub>1</sub> + <i>i e</i><sub>2</sub> from two independent stars of the same character,
+  which makes the pattern travel rather than stand; <b>14</b> of the <b>29</b> needed it, it was
+  found by trial, and whether a group-theoretic criterion predicts in advance when it is mandatory
+  is open question <b>4</b>.
+</p>
+
+<figure class="fig" id="fig-why-rejected-contrast">
+  <img src="assets/why-rejected-contrast.webp" alt="Four small field images on the left, two nearly flat and two strongly patterned, each beside its image under a half-period operation. On the right, a contrast-against-time plot in which one curve stays flat and high while the other plunges below a dashed floor four times." loading="lazy" decoding="async">
+  <figcaption>The default failure mode, anatomised on one entry. The deterministic recipe solves the shooting equation to <b>3e−13</b> and is still rejected, because the orbit it lands on nearly coincides with its own half-period image: minimum contrast <b>0.0022</b>, against <b>0.518</b> for the published record and a floor of <b>0.05</b>. Across the whole sweep, of <b>302</b> attempts <b>100</b> solved the equation to <b>1e−8</b> or better and the audit rejected <b>71</b> of them — <b>68</b> by this single gate.</figcaption>
+</figure>
+
+<h3 id="failures">Honest failures, in one list</h3>
+
+<ul>
+  <li>Forward simulation cannot hold these orbits — not from the exact published state, and not
+    on the fundamental domain either.</li>
+  <li>The deterministic seed's default failure mode solves the equation and produces an invisible
+    animation: <b>68</b> of <b>71</b> rejections.</li>
+  <li>Gradient descent on a bare space–time functional collapses towards the uniform state, to
+    <b>0.0038</b> % of the published amplitude; with the barrier the original solver actually
+    carried, it stalls at <b>9.8</b> % instead.</li>
+  <li>The direct recipe's real edge is <b>resolution</b>, not symmetry. At <i>b</i> = <b>3.0</b>
+    Newton converges to residual <b>1.4e−15</b> with every winding correct, and the orbit still
+    fails the site's audit at <b>1.76e−06</b> against the <b>2e−07</b> limit, because <b>36</b>
+    nodes across no longer resolve it.</li>
+  <li><b>Eighteen</b> of <b>51</b> entries are found by neither route. The theorem says where
+    they are — every entry missing a record is forced to carry a nodal line or a core of winding
+    at least <b>2</b> in absolute value — but that is a necessary condition with uncorrected
+    significance levels, not a cause.</li>
+  <li>Three patterns run through the experiments themselves, and they are why several numbers
+    here are corrections of earlier ones: truncated budgets reported as failures invented sharp
+    thresholds that do not exist; every speed-up figure initially had a numerator and a
+    denominator measuring different work; and denominators of generality went uncontrolled —
+    <b>51</b> records are <b>25</b> fields, <b>29</b> entries are <b>16</b> orbits.</li>
+</ul>
+
+<p class="aside">
+  The first thing a sceptic should attack, answered in advance: no symmetry is smuggled in
+  anywhere. Only the <i>τ</i> = 0 kernel is ever projected onto a state; every <i>τ</i> ≠ 0
+  relation is an output. That was checked twice independently — the repository's own
+  <i>unprojected</i> twisted residual on the browser's state reads <b>7.2e−16</b>, and a
+  double-precision movie from the delayed glue satisfies all nine space–time relations at
+  <b>1.09e−09</b> with no projection applied. The published exports, by contrast, <i>are</i>
+  symmetrised by the site's own export step, which is why the character law is quoted above at
+  <b>7.3e−08</b> and <b>4.1e−10</b> on unprojected data rather than at the <b>1e−15</b> those
+  exports would flatter it with.
+</p>
+
+
+<!-- ======================================================== open questions -->
+<h2 id="open">What is still open<a class="hlink" href="#open" aria-label="link to this section">#</a></h2>
+
+<ol>
+  <li><b>Is the amplitude rule a theorem or a coincidence?</b> The uniform limit-cycle amplitude
+    lands inside the verified window at every <i>b</i> tested, and nothing here proves it must.
+    A normal-form estimate of the basin would settle it.</li>
+  <li><b>Can the wrong-chirality claim be proved?</b> Empirically the conjugate sign never reaches
+    the catalogue generator's orbit, but the Newton unknowns are kernel-projected only, so the
+    conjugate sector is not an invariant subspace and nothing structurally forbids the iterates
+    from leaving it.</li>
+  <li><b>Why do 18 of 51 entries resist both routes?</b> The theorem gives an exceptionless
+    necessary condition and no cause. Its significance levels are uncorrected for having chosen
+    the predicate after seeing which one worked, and one predicate with no theorem content at all
+    scores nearly as well. The decisive experiment — run the solver on the missing entries and
+    diagnose each failure — has not been done.</li>
+  <li><b>Does the standing-wave trap have a principled fix?</b> The quadrature seed works and was
+    found by trial. Is there a criterion that says in advance when the character star is real
+    times a global phase, so the quadrature seed is mandatory rather than a fallback?</li>
+  <li><b>Does the delayed glue generalise past order three?</b> Mirrors and glides change the
+    glue's structure, and the <b>18</b> entries neither route finds are mostly mirror groups.
+    This is the most valuable next experiment on the list, and the most easily done.</li>
+  <li><b>Is the 8.877× domain reduction real at scale?</b> It is arithmetically exact and
+    bitwise verified, but at <b>36</b> nodes across the array overhead eats it. It is a promise
+    about larger meshes, untested there.</li>
+  <li><b>What is the shell dial's reach?</b> The second surviving shell produced a genuine
+    unpublished <b>24</b>-vortex orbit, confirmed independently by a second method. How many
+    admissible orbits does each entry have, and does the shell index enumerate them?</li>
+</ol>
+
+
+<!-- =========================================================== reproduce ---->
+<h2 id="reproduce">Reproduce it<a class="hlink" href="#reproduce" aria-label="link to this section">#</a></h2>
+
+<p>
+  The scripts behind the two searches are published in <code>code/</code> next to this page,
+  with a <a href="code/README.md">README</a> that explains what each one does and what to expect.
+</p>
+
+<ul>
+  <li><code>code/lab.py</code> — the shared laboratory: loads a catalogue entry, builds the
+    character, the reciprocal shells and the three-wave star, lifts through the Hopf eigenvector,
+    runs Newton–Krylov on the twisted shooting equation, compares orbits and runs the acceptance
+    audit.</li>
+  <li><code>code/direct.py</code> — the deterministic construction of this page's first search,
+    end to end, in one command.</li>
+  <li><code>code/dde.py</code> — the delayed glue: the fundamental domain, the history buffer,
+    the four-point Lagrange interpolation, the delay update.</li>
+  <li><code>code/reduced.py</code> — the reduced right-hand side on the <b>146</b>
+    representatives and the expander back to the full cell.</li>
+</ul>
+
+<p>
+  They deliberately do not re-implement the equations. They import the repository's own numerics
+  through <code>docs/scott-gray/research/equations/rdlab.py</code> — its Laplacians, its
+  Brusselator, its time stepper, its residual, its audit — because the point was to measure the
+  published pipeline rather than a lookalike of it. Point the scripts at a checkout with the
+  <code>AGF_REPO</code> environment variable, or leave them where they are published and they
+  find it by walking up the tree. Python <b>3.10</b> or later with NumPy and SciPy; no graphics
+  processor, and no cost.
+</p>
+
+<p>
+  The two live demonstrations are equally readable: <code>live/newton/</code> is the search in
+  about <b>70</b> kB over the wire, and <code>live/glue/</code> is the delayed glue, whose reduced
+  right-hand side is checked against the full-torus one on every load and agrees bitwise. Each
+  folder has its own README with the verified numbers.
+</p>
+
+<figure class="fig narrow" id="fig-final-orbit-mono">
+  <video controls muted loop playsinline preload="none" poster="assets/poster-final-orbit-mono.webp" aria-label="The same looping spiral lattice animation rendered in black and white."><source src="assets/final-orbit-mono.mp4" type="video/mp4"><p>The same looping spiral lattice animation rendered in black and white.</p></video>
+  <figcaption>The same orbit in monochrome. The structure that matters is the geometry of the zeros and the direction they turn, not the colour.</figcaption>
+</figure>
+
+
+<!-- ========================================================= where it sits -->
+<section class="thm" id="refs">
+<h2 id="theorem-refs-h">Where this sits<a class="hlink" href="#theorem-refs-h" aria-label="link to this section">#</a></h2>
+
+
+  <ul class="thm-refs">
+    <li>
+      J. H. Conway, H. Burgiel, C. Goodman-Strauss, <em>The Symmetries of Things</em>, A K Peters,
+      2008 — the Magic Theorem and the orbifold signatures. Theorem D comes from the same orbifold
+      presentation as Conway's theorem: his statement is its Euler characteristic, this one is a
+      homomorphism applied to its defining relation.
+    </li>
+    <li>
+      M. Golubitsky, I. Stewart, <em>The Symmetry Perspective</em>, Birkhäuser, 2002 — the
+      <em>H</em>/<em>K</em> classification of spatio-temporal symmetries of periodic solutions. A
+      clockwork group is exactly such a pair, with <em>H</em>/<em>K</em> cyclic by construction.
+    </li>
+    <li>
+      M. Golubitsky, I. Stewart, D. G. Schaeffer, <em>Singularities and Groups in Bifurcation
+      Theory, Volume II</em>, Springer, 1988 — the equivariant Hopf theorem. Its isotropy
+      subgroups of Γ × S¹ are graphs of homomorphisms — twisted subgroups, which is precisely the
+      data (<em>G</em>, <em>τ</em>) — and the isotropy condition on the critical eigenmode
+      <em>is</em> Theorem A. What is added here is that the statement needs no bifurcation: it
+      holds at finite amplitude, for any equation.
+    </li>
+    <li>
+      J. Masajada, B. Dubik, "Optical vortex generation by three plane wave interference",
+      <em>Optics Communications</em> <strong>198</strong> (2001) 21–27 — three plane waves at 120°
+      produce a honeycomb vortex–antivortex lattice. That is the minimal p3 clockwork field, and
+      the charges it reports are the (0, −1, +1) of Theorem B. The optics derivation goes through
+      the interference geometry; Theorem B reaches the same charges from the symmetry alone.
+    </li>
+    <li>
+      <strong>Novelty, unproven.</strong> No prior statement of the winding congruence for general
+      wallpaper clockwork groups, of the residue identity, or of the multiplicity bookkeeping in
+      this combined form was found. The pieces are all classical; the combination may or may not
+      be in the literature, and "new" should be treated as unproven rather than claimed.
+    </li>
+  </ul>
+
+</section>
+
+
+<!-- ============================================================== footer ---->
+<div class="footlinks">
+  <p class="small"><b>Where to go next</b></p>
+  <ul>
+    <li><a href="../making-of/">The making of this site</a> — the seven-week timeline, who asked
+      for what and when, and what it all cost.</li>
+    <li><a href="../../scott-gray/p3/#g227?v=2&amp;pattern=equation%3Abrusselator%3Ag227%3Ae47c12f9099fb9d2&amp;palette=ember&amp;tiles=2&amp;framing=simulation&amp;speed=1&amp;overlay=0&amp;approx=1&amp;phase=0&amp;play=1">The g227 Brusselator entry in the showcase</a> — this orbit as the
+      site plays it, with the other patterns of the same group beside it.</li>
+    <li><a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a> — the catalogue entry: orbifold
+      <b>333</b>, clockwork symbol <b>r33₁3₂</b>, the colour group it corresponds to.</li>
+    <li><a href="https://brusselator-p3-spiral.mathornament.workers.dev/">The published animation, full screen</a>, and its
+      <a href="https://brusselator-p3-mono.mathornament.workers.dev/">monochrome twin</a>.</li>
+    <li><a href="https://symmhub.github.io/SymmHub/apps/symsim/">SymSim</a> — the fundamental-domain reaction–diffusion simulator the
+      delayed-glue section is written for.</li>
+  </ul>
+  <p class="small muted" style="margin-top:18px">
+    Every number on this page is the verified one. Where an experiment's own headline and its
+    independent check disagreed, the check won, and the correction is stated in place rather than
+    quietly applied.
+  </p>
+</div>
+
+</main>
+<script>
+
+(function () {
+  'use strict';
+  var isFile = location.protocol === 'file:';
+  var FILE_NOTE = 'The live demonstrations use ES modules and a module worker, which a browser ' +
+    'refuses to load from a <code>file://</code> address. Everything else on this page works ' +
+    'offline. To run them, serve this folder over http — for example ' +
+    '<code>python3 -m http.server</code> in the directory that contains this file, then open ' +
+    '<code>http://localhost:8000/</code>.';
+
+  function fail(slot, hint, btn, msg) {
+    btn.disabled = true;
+    hint.innerHTML = '';
+    var p = document.createElement('p');
+    p.className = 'warn';
+    p.innerHTML = msg;
+    slot.innerHTML = '';
+    slot.appendChild(p);
+  }
+
+  /* ---- demonstration 1: the Newton search, in an iframe (unmodified page) -- */
+  var btnN = document.getElementById('run-newton');
+  var slotN = document.getElementById('slot-newton');
+  var hintN = document.getElementById('hint-newton');
+  if (btnN) {
+    btnN.addEventListener('click', function () {
+      if (isFile) { fail(slotN, hintN, btnN, FILE_NOTE); return; }
+      btnN.disabled = true;
+      btnN.textContent = 'Running…';
+      hintN.textContent = 'The panel below is live/newton/ as published. If the search has not ' +
+        'started, press its own "run the search" button.';
+      var f = document.createElement('iframe');
+      f.title = 'The twisted shooting search for the g227 Brusselator orbit';
+      f.src = 'live/newton/index.html';
+      f.style.height = '2400px';
+      f.addEventListener('load', function () {
+        /* same origin over http: start the search without a second click, and
+           size the frame to its content. Both are optional niceties. */
+        try {
+          var d = f.contentDocument;
+          /* The panel is live/newton/index.html exactly as published. It is a
+             standalone page, so inside this tutorial its own title and opening
+             paragraphs repeat what has just been said; hide them here, at run
+             time, without touching the file. */
+          var s = d.createElement('style');
+          s.textContent = 'main > h1, main > p.lede { display: none; }' +
+            'main { padding-top: 10px; }';
+          d.head.appendChild(s);
+          var run = d.getElementById('run');
+          if (run) { run.click(); }
+          var fit = function () {
+            var h = Math.max(d.body.scrollHeight, d.documentElement.scrollHeight);
+            if (h > 200) { f.style.height = (h + 24) + 'px'; }
+          };
+          fit();
+          var t = setInterval(fit, 1000);
+          setTimeout(function () { clearInterval(t); }, 30000);
+        } catch (e) { /* cross-origin: the reader presses the panel's own button */ }
+        btnN.textContent = 'Running in the panel below';
+      });
+      slotN.appendChild(f);
+    });
+  }
+
+  /* ---- demonstration 2: the delayed glue, mounted straight into this page -- */
+  var btnG = document.getElementById('run-glue');
+  var slotG = document.getElementById('slot-glue');
+  var hintG = document.getElementById('hint-glue');
+  if (btnG) {
+    btnG.addEventListener('click', function () {
+      if (isFile) { fail(slotG, hintG, btnG, FILE_NOTE); return; }
+      btnG.disabled = true;
+      btnG.textContent = 'Loading…';
+      import('./live/glue/demo.mjs').then(function (m) {
+        var host = document.createElement('div');
+        slotG.appendChild(host);
+        var demo = m.mountGlueDemo(host);
+        window.__glue = demo.state;
+        btnG.textContent = 'Running in the panel below';
+        hintG.textContent = 'Seeded white noise, forward integration with the history buffer, ' +
+          'and the delay corrected once per period.';
+        var start = host.querySelector('.start');
+        if (start) { start.click(); }
+      }).catch(function (err) {
+        fail(slotG, hintG, btnG, isFile ? FILE_NOTE :
+          'The delayed-glue modules could not be loaded (' +
+          String(err && err.message ? err.message : err).replace(/[<>&]/g, '') +
+          '). The section above describes what they do.');
+      });
+    });
+  }
+
+  /* file:// readers get told once, up front, rather than after a dead click */
+  if (isFile) {
+    ['demo-newton', 'demo-glue'].forEach(function (id) {
+      var box = document.getElementById(id);
+      if (!box) { return; }
+      var p = document.createElement('p');
+      p.className = 'warn';
+      p.innerHTML = FILE_NOTE;
+      box.appendChild(p);
+    });
+  }
+})();
+
+</script>
+</body>
+</html>

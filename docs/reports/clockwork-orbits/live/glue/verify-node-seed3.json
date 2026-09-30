@@ -1,0 +1,1081 @@
+{
+  "source": {
+    "state": "glue-node-seed3.f64",
+    "meta": "glue-node-seed3.json"
+  },
+  "browser": {
+    "period": 6.39017821424359,
+    "relativePeriodError": 2.8630987602559254e-06,
+    "periods": 31,
+    "rhsCalls": 41703,
+    "stopReason": "period found"
+  },
+  "rawState": {
+    "twistedResidualRms": 7.826446469025446e-06,
+    "twistedResidualMax": 4.972595228625032e-05,
+    "symmetryErrorRaw": 8.668636985142975e-05,
+    "compareRaw": {
+      "periodA": 6.390159918584649,
+      "periodB": 6.39017821424359,
+      "periodDifference": 1.8295658940736814e-05,
+      "relativePeriodDifference": 2.8630987602559254e-06,
+      "rms": 2.3125941456609214e-05,
+      "max": 0.00016584124029117575,
+      "relativeRms": 9.084042791299097e-06,
+      "frameShift": 3,
+      "translation": [
+        0,
+        0
+      ],
+      "pointPart": [
+        [
+          -1,
+          1
+        ],
+        [
+          -1,
+          0
+        ]
+      ],
+      "fractionalFrameShift": -0.49511194413104437,
+      "fieldSpan": 2.5457763671875,
+      "sameOrbit": true
+    }
+  },
+  "polish": {
+    "iterations": 2,
+    "residual": 5.760927924843521e-16,
+    "success": true,
+    "period": 6.390159918584616,
+    "periodMinusPublished": -3.2862601528904634e-14,
+    "relativePeriodDifference": -5.142688437785348e-15,
+    "cost": {
+      "rhs_calls": 24824,
+      "rhs_node_evals": 32171904,
+      "rk4_steps": 6206,
+      "flow_calls": 58,
+      "flow_time": 6.314417739013152,
+      "residual_calls": 58
+    }
+  },
+  "compareWithPublished": {
+    "periodA": 6.390159918584649,
+    "periodB": 6.390159918584616,
+    "periodDifference": 3.2862601528904634e-14,
+    "relativePeriodDifference": 5.142688437785348e-15,
+    "rms": 5.5682493806391145e-08,
+    "max": 2.6361063820701247e-07,
+    "relativeRms": 2.1872500084486034e-08,
+    "frameShift": 3,
+    "translation": [
+      0,
+      0
+    ],
+    "pointPart": [
+      [
+        -1,
+        1
+      ],
+      [
+        -1,
+        0
+      ]
+    ],
+    "fractionalFrameShift": -0.49530768279253673,
+    "fieldSpan": 2.5457763671875,
+    "sameOrbit": true
+  },
+  "audit": {
+    "passed": true,
+    "certificate": {
+      "schema": "equation-orbit-certificate-v1",
+      "model": "brusselator",
+      "passed": true,
+      "limits": {
+        "symmetryMax": 2e-07,
+        "minimumAbsoluteContrast": 0.002,
+        "minimumRelativeRangeContrast": 0.05,
+        "minimumSpatialRms": 0.012,
+        "minimumTemporalRms": 0.008,
+        "trajectoryRms": 1e-05,
+        "closureRms": 1e-05,
+        "minimumRelativeSubperiodRms": 0.03,
+        "maximumTemporalTailEnergyFraction": 0.01,
+        "concentrationBounds": [
+          -1e-08,
+          50
+        ],
+        "forwardPhaseMax": 1.8515434038626761e-06,
+        "forwardPhaseRms": 1.8515434038626761e-06
+      },
+      "spatialRms": 0.44785928427293364,
+      "temporalRms": 0.4485478177767141,
+      "minimum": 0.5703017519014405,
+      "maximum": 3.116492923074345,
+      "phaseRelations": {
+        "passed": true,
+        "operations": [
+          {
+            "operation": 0,
+            "tau": 0.0,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 1.6452606627461234e-16
+          },
+          {
+            "operation": 1,
+            "tau": 0.6666666666666666,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 2.0222782211202022e-16
+          },
+          {
+            "operation": 2,
+            "tau": 0.3333333333333333,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 2.012451540128829e-16
+          },
+          {
+            "operation": 3,
+            "tau": 0.0,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 1.6452606627461234e-16
+          },
+          {
+            "operation": 4,
+            "tau": 0.6666666666666666,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 2.012451540128829e-16
+          },
+          {
+            "operation": 5,
+            "tau": 0.3333333333333333,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 2.0222782211202022e-16
+          },
+          {
+            "operation": 6,
+            "tau": 0.0,
+            "maximum": 0.0,
+            "rms": 0.0
+          },
+          {
+            "operation": 7,
+            "tau": 0.6666666666666666,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 1.8721630158306165e-16
+          },
+          {
+            "operation": 8,
+            "tau": 0.3333333333333333,
+            "maximum": 1.3322676295501878e-15,
+            "rms": 1.8721630158306165e-16
+          }
+        ]
+      },
+      "visibility": {
+        "passed": true,
+        "referenceOnly": false,
+        "operations": [
+          {
+            "operation": 1,
+            "tau": 0.6666666666666666,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          },
+          {
+            "operation": 2,
+            "tau": 0.3333333333333333,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          },
+          {
+            "operation": 4,
+            "tau": 0.6666666666666666,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          },
+          {
+            "operation": 5,
+            "tau": 0.3333333333333333,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          },
+          {
+            "operation": 7,
+            "tau": 0.6666666666666666,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          },
+          {
+            "operation": 8,
+            "tau": 0.3333333333333333,
+            "minimumRmsByChannel": [
+              0.4813368218950365,
+              0.7540006833645744
+            ],
+            "minimumRelativeRangeByChannel": [
+              0.341954496150106,
+              0.4072281977249811
+            ],
+            "passed": true
+          }
+        ]
+      },
+      "resolvedSubperiods": [
+        {
+          "divisor": 2,
+          "relativeProjectionRms": 0.9599119583666068
+        },
+        {
+          "divisor": 3,
+          "relativeProjectionRms": 0.995011460709108
+        },
+        {
+          "divisor": 4,
+          "relativeProjectionRms": 0.9991607831772341
+        },
+        {
+          "divisor": 5,
+          "relativeProjectionRms": 0.9998358262352541
+        },
+        {
+          "divisor": 6,
+          "relativeProjectionRms": 0.999965132885332
+        },
+        {
+          "divisor": 7,
+          "relativeProjectionRms": 0.9999921618694176
+        },
+        {
+          "divisor": 8,
+          "relativeProjectionRms": 0.9999981620127906
+        },
+        {
+          "divisor": 9,
+          "relativeProjectionRms": 0.9999995550204323
+        },
+        {
+          "divisor": 10,
+          "relativeProjectionRms": 0.9999998895602226
+        },
+        {
+          "divisor": 11,
+          "relativeProjectionRms": 0.9999999720403752
+        },
+        {
+          "divisor": 12,
+          "relativeProjectionRms": 0.999999992805983
+        },
+        {
+          "divisor": 13,
+          "relativeProjectionRms": 0.9999999981239152
+        },
+        {
+          "divisor": 14,
+          "relativeProjectionRms": 0.9999999995051673
+        },
+        {
+          "divisor": 15,
+          "relativeProjectionRms": 0.9999999998682128
+        },
+        {
+          "divisor": 16,
+          "relativeProjectionRms": 0.9999999999646058
+        },
+        {
+          "divisor": 17,
+          "relativeProjectionRms": 0.9999999999904237
+        },
+        {
+          "divisor": 18,
+          "relativeProjectionRms": 0.9999999999973915
+        },
+        {
+          "divisor": 19,
+          "relativeProjectionRms": 0.9999999999992847
+        },
+        {
+          "divisor": 20,
+          "relativeProjectionRms": 0.9999999999998019
+        },
+        {
+          "divisor": 21,
+          "relativeProjectionRms": 0.9999999999999442
+        },
+        {
+          "divisor": 22,
+          "relativeProjectionRms": 0.9999999999999835
+        },
+        {
+          "divisor": 23,
+          "relativeProjectionRms": 0.999999999999994
+        },
+        {
+          "divisor": 24,
+          "relativeProjectionRms": 0.999999999999998
+        }
+      ],
+      "temporalResolution": {
+        "passed": true,
+        "tailEnergyFraction": 5.10255192862773e-09,
+        "cutoffFrequency": 12.0,
+        "scope": "Fraction of nonconstant temporal Fourier energy above one quarter of the saved frame count."
+      },
+      "independentDynamics": {
+        "passed": true,
+        "method": "Independent RK4 full-cycle forward integration of the brusselator equations at two timestep limits, starting from the exported Float32 first frame; no symmetry projection.",
+        "checks": [
+          {
+            "dtLimit": 0.02,
+            "trajectoryRms": 2.790840528710044e-10,
+            "trajectoryMax": 1.6862760077174244e-09,
+            "closureRms": 5.762679369782618e-10
+          },
+          {
+            "dtLimit": 0.01,
+            "trajectoryRms": 1.8887155124956396e-09,
+            "trajectoryMax": 1.0800960126289283e-08,
+            "closureRms": 3.270944627962507e-09
+          }
+        ]
+      },
+      "scope": "Finite-grid numerical verification of a brusselator orbit, not a continuum existence proof or a maximal-symmetry classification.",
+      "forwardTargetPhaseBounds": {
+        "passed": true,
+        "rmsLimit": 1.8515434038626761e-06,
+        "maximumLimit": 1.8515434038626761e-06,
+        "checks": [
+          {
+            "integrationCheck": 0,
+            "trajectoryRms": 2.790840528710044e-10,
+            "trajectoryMax": 1.6862760077174244e-09,
+            "operations": [
+              {
+                "operation": 0,
+                "tau": 0.0,
+                "rmsUpperBound": 5.581682702680751e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 1,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 5.581683079698309e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 2,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 5.581683069871628e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 3,
+                "tau": 0.0,
+                "rmsUpperBound": 5.581682702680751e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 4,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 5.581683069871628e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 5,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 5.581683079698309e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 6,
+                "tau": 0.0,
+                "rmsUpperBound": 5.581681057420088e-10,
+                "maximumUpperBound": 3.3725520154348487e-09,
+                "passed": true
+              },
+              {
+                "operation": 7,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 5.581682929583104e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              },
+              {
+                "operation": 8,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 5.581682929583104e-10,
+                "maximumUpperBound": 3.3725533477024783e-09,
+                "passed": true
+              }
+            ],
+            "visibilityLowerBounds": [
+              {
+                "operation": 1,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              },
+              {
+                "operation": 2,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              },
+              {
+                "operation": 4,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              },
+              {
+                "operation": 5,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              },
+              {
+                "operation": 7,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              },
+              {
+                "operation": 8,
+                "minimumRmsLowerBoundByChannel": [
+                  0.4813368185224845,
+                  0.7540006799920224
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544929348491,
+                  0.40722819516174097
+                ],
+                "passed": true
+              }
+            ]
+          },
+          {
+            "integrationCheck": 1,
+            "trajectoryRms": 1.8887155124956396e-09,
+            "trajectoryMax": 1.0800960126289283e-08,
+            "operations": [
+              {
+                "operation": 0,
+                "tau": 0.0,
+                "rmsUpperBound": 3.777431189517346e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 1,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 3.777431227219102e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 2,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 3.7774312262364334e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 3,
+                "tau": 0.0,
+                "rmsUpperBound": 3.777431189517346e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 4,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 3.7774312262364334e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 5,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 3.777431227219102e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 6,
+                "tau": 0.0,
+                "rmsUpperBound": 3.777431024991279e-09,
+                "maximumUpperBound": 2.1601920252578566e-08,
+                "passed": true
+              },
+              {
+                "operation": 7,
+                "tau": 0.6666666666666666,
+                "rmsUpperBound": 3.777431212207581e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              },
+              {
+                "operation": 8,
+                "tau": 0.3333333333333333,
+                "rmsUpperBound": 3.777431212207581e-09,
+                "maximumUpperBound": 2.1601921584846195e-08,
+                "passed": true
+              }
+            ],
+            "visibilityLowerBounds": [
+              {
+                "operation": 1,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              },
+              {
+                "operation": 2,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              },
+              {
+                "operation": 4,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              },
+              {
+                "operation": 5,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              },
+              {
+                "operation": 7,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              },
+              {
+                "operation": 8,
+                "minimumRmsLowerBoundByChannel": [
+                  0.48133680029311626,
+                  0.7540006617626541
+                ],
+                "minimumRelativeRangeLowerBoundByChannel": [
+                  0.3419544755556951,
+                  0.4072281813068777
+                ],
+                "passed": true
+              }
+            ]
+          }
+        ],
+        "method": "Permutation-isometry triangle bounds: target phase RMS <= saved phase RMS + 2 trajectory RMS; target phase maximum <= saved phase maximum + 2 trajectory maximum. Per-channel same-time contrast >= saved minimum minus 2 trajectory maximum. Limits are the Gray\u2013Scott limits times the field range (1.852) so that the same relative accuracy is required of order-one fields.",
+        "scope": "Periodically extended samples of each independently integrated full cycle and their linear playback interpolation. This is a bound on the wrapped numerical orbit; independently measured closure errors are retained separately. It does not assert exact continuum or unwrapped-time equality.",
+        "rangeScale": 1.8515434038626761
+      }
+    },
+    "summary": {
+      "passed": true,
+      "symmetryMax": 1.3322676295501878e-15,
+      "phaseRelationsPassed": true,
+      "spatialRms": 0.44785928427293364,
+      "temporalRms": 0.4485478177767141,
+      "minimum": 0.5703017519014405,
+      "maximum": 3.116492923074345,
+      "visibilityPassed": true,
+      "tailEnergyFraction": 5.10255192862773e-09,
+      "trajectoryRms": [
+        2.790840528710044e-10,
+        1.8887155124956396e-09
+      ],
+      "closureRms": [
+        5.762679369782618e-10,
+        3.270944627962507e-09
+      ],
+      "dynamicsPassed": true,
+      "forwardBoundsPassed": true,
+      "limits": {
+        "symmetryMax": 2e-07,
+        "minimumAbsoluteContrast": 0.002,
+        "minimumRelativeRangeContrast": 0.05,
+        "minimumSpatialRms": 0.012,
+        "minimumTemporalRms": 0.008,
+        "trajectoryRms": 1e-05,
+        "closureRms": 1e-05,
+        "minimumRelativeSubperiodRms": 0.03,
+        "maximumTemporalTailEnergyFraction": 0.01
+      }
+    },
+    "config": {
+      "N": 36,
+      "M": 48,
+      "L": 40.0,
+      "period": 6.390159918584616,
+      "groupId": "g227",
+      "model": "brusselator",
+      "params": {
+        "a": 1.0,
+        "b": 2.3,
+        "Du": 1.0,
+        "Dv": 1.0,
+        "dx": 1.1111111111111112,
+        "stencil": "triangular-six"
+      },
+      "ops": [
+        {
+          "M": [
+            [
+              -1,
+              1
+            ],
+            [
+              -1,
+              0
+            ]
+          ],
+          "v": [
+            0.0,
+            0.0
+          ],
+          "s": 1,
+          "tau": 0.0
+        },
+        {
+          "M": [
+            [
+              -1,
+              1
+            ],
+            [
+              -1,
+              0
+            ]
+          ],
+          "v": [
+            0.3333333333333333,
+            0.6666666666666666
+          ],
+          "s": 1,
+          "tau": 0.6666666666666666
+        },
+        {
+          "M": [
+            [
+              -1,
+              1
+            ],
+            [
+              -1,
+              0
+            ]
+          ],
+          "v": [
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "s": 1,
+          "tau": 0.3333333333333333
+        },
+        {
+          "M": [
+            [
+              0,
+              -1
+            ],
+            [
+              1,
+              -1
+            ]
+          ],
+          "v": [
+            0.0,
+            0.0
+          ],
+          "s": 1,
+          "tau": 0.0
+        },
+        {
+          "M": [
+            [
+              0,
+              -1
+            ],
+            [
+              1,
+              -1
+            ]
+          ],
+          "v": [
+            0.3333333333333333,
+            0.6666666666666666
+          ],
+          "s": 1,
+          "tau": 0.6666666666666666
+        },
+        {
+          "M": [
+            [
+              0,
+              -1
+            ],
+            [
+              1,
+              -1
+            ]
+          ],
+          "v": [
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "s": 1,
+          "tau": 0.3333333333333333
+        },
+        {
+          "M": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "v": [
+            0.0,
+            0.0
+          ],
+          "s": 1,
+          "tau": 0.0
+        },
+        {
+          "M": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "v": [
+            0.3333333333333333,
+            0.6666666666666666
+          ],
+          "s": 1,
+          "tau": 0.6666666666666666
+        },
+        {
+          "M": [
+            [
+              1,
+              0
+            ],
+            [
+              0,
+              1
+            ]
+          ],
+          "v": [
+            0.6666666666666666,
+            0.3333333333333333
+          ],
+          "s": 1,
+          "tau": 0.3333333333333333
+        }
+      ]
+    }
+  },
+  "charges": [
+    {
+      "lattice": [
+        0.0,
+        0.0
+      ],
+      "cartesian": [
+        0.0,
+        0.0
+      ],
+      "order": 3,
+      "tau": 0.0,
+      "k": 0,
+      "predictedWinding": 0,
+      "measuredCharge": 0,
+      "agrees": true,
+      "vortexCount": 0,
+      "ringWinding": 0,
+      "amplitudeAtCentre": 0.2967961673933935,
+      "relativeAmplitudeAtCentre": 1.0,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.333333333,
+        0.0
+      ],
+      "cartesian": [
+        0.333333333,
+        0.0
+      ],
+      "order": 3,
+      "tau": 0.6666666666666666,
+      "k": 2,
+      "predictedWinding": 1,
+      "measuredCharge": 1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": 1,
+      "amplitudeAtCentre": 8.149004546454434e-12,
+      "relativeAmplitudeAtCentre": 2.745656932844823e-11,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.666666667,
+        0.0
+      ],
+      "cartesian": [
+        0.666666667,
+        0.0
+      ],
+      "order": 3,
+      "tau": 0.3333333333333333,
+      "k": 1,
+      "predictedWinding": -1,
+      "measuredCharge": -1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": -1,
+      "amplitudeAtCentre": 8.149097794962724e-12,
+      "relativeAmplitudeAtCentre": 2.7456883512115455e-11,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.0,
+        0.333333333
+      ],
+      "cartesian": [
+        -0.1666666665,
+        0.2886751343061377
+      ],
+      "order": 3,
+      "tau": 0.6666666666666666,
+      "k": 2,
+      "predictedWinding": 1,
+      "measuredCharge": 1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": 1,
+      "amplitudeAtCentre": 8.148969170907468e-12,
+      "relativeAmplitudeAtCentre": 2.7456450137060833e-11,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.333333333,
+        0.333333333
+      ],
+      "cartesian": [
+        0.1666666665,
+        0.2886751343061377
+      ],
+      "order": 3,
+      "tau": 0.3333333333333333,
+      "k": 1,
+      "predictedWinding": -1,
+      "measuredCharge": -1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": -1,
+      "amplitudeAtCentre": 8.149128683771468e-12,
+      "relativeAmplitudeAtCentre": 2.7456987586265113e-11,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.666666667,
+        0.333333333
+      ],
+      "cartesian": [
+        0.5000000005,
+        0.2886751343061377
+      ],
+      "order": 3,
+      "tau": 0.0,
+      "k": 0,
+      "predictedWinding": 0,
+      "measuredCharge": 0,
+      "agrees": true,
+      "vortexCount": 0,
+      "ringWinding": 0,
+      "amplitudeAtCentre": 0.2967961673653917,
+      "relativeAmplitudeAtCentre": 0.9999999999056532,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.0,
+        0.666666667
+      ],
+      "cartesian": [
+        -0.3333333335,
+        0.5773502694783008
+      ],
+      "order": 3,
+      "tau": 0.3333333333333333,
+      "k": 1,
+      "predictedWinding": -1,
+      "measuredCharge": -1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": -1,
+      "amplitudeAtCentre": 8.1490928106547e-12,
+      "relativeAmplitudeAtCentre": 2.745686671840795e-11,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.333333333,
+        0.666666667
+      ],
+      "cartesian": [
+        -4.999999858590343e-10,
+        0.5773502694783008
+      ],
+      "order": 3,
+      "tau": 0.0,
+      "k": 0,
+      "predictedWinding": 0,
+      "measuredCharge": 0,
+      "agrees": true,
+      "vortexCount": 0,
+      "ringWinding": 0,
+      "amplitudeAtCentre": 0.29679616737886366,
+      "relativeAmplitudeAtCentre": 0.9999999999510445,
+      "centreOnNode": true
+    },
+    {
+      "lattice": [
+        0.666666667,
+        0.666666667
+      ],
+      "cartesian": [
+        0.3333333335,
+        0.5773502694783008
+      ],
+      "order": 3,
+      "tau": 0.6666666666666666,
+      "k": 2,
+      "predictedWinding": 1,
+      "measuredCharge": 1,
+      "agrees": true,
+      "vortexCount": 1,
+      "ringWinding": 1,
+      "amplitudeAtCentre": 8.148940032333192e-12,
+      "relativeAmplitudeAtCentre": 2.7456351960003723e-11,
+      "centreOnNode": true
+    }
+  ],
+  "publishedPeriod": 6.390159918584649
+}

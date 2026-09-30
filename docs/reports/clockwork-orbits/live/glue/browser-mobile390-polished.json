@@ -1,0 +1,13 @@
+{
+ "which": "polished",
+ "period": 6.390159918584547,
+ "gluePeriod": 6.390172673334256,
+ "periods": 31,
+ "rhsCalls": 41691,
+ "stopReason": "period found",
+ "viewport": {
+  "width": 390,
+  "height": 844
+ },
+ "seed": "1"
+}

@@ -1,0 +1,322 @@
+{
+ "url": "live/newton/index.html (served over http on a local port)",
+ "amp": 0.5,
+ "console": [
+  "[desktop] warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently",
+  "[mobile390] warning: Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently"
+ ],
+ "errors": [],
+ "loadAverageStart": [
+  2.71435546875,
+  2.75341796875,
+  3.1337890625
+ ],
+ "cpus": 16,
+ "desktop": {
+  "name": "desktop",
+  "viewport": {
+   "width": 1280,
+   "height": 900
+  },
+  "symbolPaths": 10,
+  "seedText": "wave (-1,1) · |k|² = 0.03282 · ω = 0.988686 · T₀ = 6.355088 · growth rate 0.1172",
+  "shellRows": 3,
+  "seedPainted": 141,
+  "finished": true,
+  "wallSecondsBrowser": 1.559,
+  "loadAverage": [
+   2.89697265625,
+   2.79052734375,
+   3.14453125
+  ],
+  "result": {
+   "period": 6.390159918584618,
+   "iterations": 6,
+   "history": [
+    {
+     "i": 0,
+     "rms": 0.16773624981253107,
+     "T": 6.355087900738468,
+     "inner": 0,
+     "flows": 1,
+     "s": 0.04570000000298023
+    },
+    {
+     "i": 1,
+     "rms": 0.05852316799098386,
+     "T": 6.397557076171908,
+     "inner": 14,
+     "flows": 16,
+     "s": 0.26010000000149014
+    },
+    {
+     "i": 2,
+     "rms": 0.0064852861023903,
+     "T": 6.381491278618241,
+     "inner": 5,
+     "flows": 22,
+     "s": 0.3464000000022352
+    },
+    {
+     "i": 3,
+     "rms": 0.0004958365814218497,
+     "T": 6.389699151454893,
+     "inner": 11,
+     "flows": 34,
+     "s": 0.515
+    },
+    {
+     "i": 4,
+     "rms": 0.000001800421019585158,
+     "T": 6.390156696858769,
+     "inner": 12,
+     "flows": 47,
+     "s": 0.6966000000014901
+    },
+    {
+     "i": 5,
+     "rms": 1.9650309255845972e-10,
+     "T": 6.390159918537141,
+     "inner": 20,
+     "flows": 68,
+     "s": 0.9904000000022352
+    },
+    {
+     "i": 6,
+     "rms": 8.176656789692502e-16,
+     "T": 6.390159918584618,
+     "inner": 27,
+     "flows": 96,
+     "s": 1.3864000000022352
+    }
+   ],
+   "vortices": [
+    {
+     "charge": 1,
+     "lattice": [
+      0.3333333333333333,
+      0
+     ],
+     "amplitude": 4.707266746656109e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0.6666666666666666,
+      0
+     ],
+     "amplitude": 5.476878878547505e-16
+    },
+    {
+     "charge": 1,
+     "lattice": [
+      0,
+      0.3333333333333333
+     ],
+     "amplitude": 4.484265511090089e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0.3333333333333333,
+      0.3333333333333333
+     ],
+     "amplitude": 6.394299340594541e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0,
+      0.6666666666666666
+     ],
+     "amplitude": 7.557835048139692e-16
+    },
+    {
+     "charge": 1,
+     "lattice": [
+      0.6666666666666666,
+      0.6666666666666666
+     ],
+     "amplitude": 4.056398069528869e-16
+    }
+   ],
+   "playing": true,
+   "solved": true,
+   "symmetryMax": 1.3322676295501878e-15,
+   "verdict": "solved?\nresidual 8.177e-16 — yes\nperiod found\n6.390159918584618\npublished record\n6.390159918584649\nrelative difference\n4.86e-15\n(14 digits)\nNewton iterations\n6\ntrajectories integrated\n96\n(41,028 right-hand sides)\nwall clock\n1.39 s\nsearch, 1.47 s with the movie\nsymmetry error of the movie\n1.33e-15\n(atlas limit 2e-7)\nu range\n[0.5701, 1.9831]\n(record [0.5700, 1.9852])",
+   "charges": [
+    "(1/3, 2/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(2/3, 1/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(0/3, 0/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(2/3, 0/3) | 1/3 | -1 | -1 | 5.5e-16 | ✓",
+    "(0/3, 2/3) | 1/3 | -1 | -1 | 7.6e-16 | ✓",
+    "(1/3, 1/3) | 1/3 | -1 | -1 | 6.4e-16 | ✓",
+    "(2/3, 2/3) | 2/3 | +1 | +1 | 4.1e-16 | ✓",
+    "(0/3, 1/3) | 2/3 | +1 | +1 | 4.5e-16 | ✓",
+    "(1/3, 0/3) | 2/3 | +1 | +1 | 4.7e-16 | ✓"
+   ],
+   "status": "converged — 96 trajectories, 1.39 s"
+  },
+  "animates": 0.7443,
+  "scrollWidth": 1280,
+  "clientWidth": 1280,
+  "relativePeriodDifference": 4.8647052789861396e-15,
+  "matchingDigits": 14
+ },
+ "mobile": {
+  "name": "mobile390",
+  "viewport": {
+   "width": 390,
+   "height": 844
+  },
+  "symbolPaths": 10,
+  "seedText": "wave (-1,1) · |k|² = 0.03282 · ω = 0.988686 · T₀ = 6.355088 · growth rate 0.1172",
+  "shellRows": 3,
+  "seedPainted": 143,
+  "finished": true,
+  "wallSecondsBrowser": 1.56,
+  "loadAverage": [
+   3.62548828125,
+   2.943359375,
+   3.1962890625
+  ],
+  "result": {
+   "period": 6.390159918584618,
+   "iterations": 6,
+   "history": [
+    {
+     "i": 0,
+     "rms": 0.16773624981253107,
+     "T": 6.355087900738468,
+     "inner": 0,
+     "flows": 1,
+     "s": 0.04630000000074506
+    },
+    {
+     "i": 1,
+     "rms": 0.05852316799098386,
+     "T": 6.397557076171908,
+     "inner": 14,
+     "flows": 16,
+     "s": 0.26210000000149014
+    },
+    {
+     "i": 2,
+     "rms": 0.0064852861023903,
+     "T": 6.381491278618241,
+     "inner": 5,
+     "flows": 22,
+     "s": 0.3476000000014901
+    },
+    {
+     "i": 3,
+     "rms": 0.0004958365814218497,
+     "T": 6.389699151454893,
+     "inner": 11,
+     "flows": 34,
+     "s": 0.5159000000022351
+    },
+    {
+     "i": 4,
+     "rms": 0.000001800421019585158,
+     "T": 6.390156696858769,
+     "inner": 12,
+     "flows": 47,
+     "s": 0.6971000000014901
+    },
+    {
+     "i": 5,
+     "rms": 1.9650309255845972e-10,
+     "T": 6.390159918537141,
+     "inner": 20,
+     "flows": 68,
+     "s": 0.9897000000029802
+    },
+    {
+     "i": 6,
+     "rms": 8.176656789692502e-16,
+     "T": 6.390159918584618,
+     "inner": 27,
+     "flows": 96,
+     "s": 1.3793000000007452
+    }
+   ],
+   "vortices": [
+    {
+     "charge": 1,
+     "lattice": [
+      0.3333333333333333,
+      0
+     ],
+     "amplitude": 4.707266746656109e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0.6666666666666666,
+      0
+     ],
+     "amplitude": 5.476878878547505e-16
+    },
+    {
+     "charge": 1,
+     "lattice": [
+      0,
+      0.3333333333333333
+     ],
+     "amplitude": 4.484265511090089e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0.3333333333333333,
+      0.3333333333333333
+     ],
+     "amplitude": 6.394299340594541e-16
+    },
+    {
+     "charge": -1,
+     "lattice": [
+      0,
+      0.6666666666666666
+     ],
+     "amplitude": 7.557835048139692e-16
+    },
+    {
+     "charge": 1,
+     "lattice": [
+      0.6666666666666666,
+      0.6666666666666666
+     ],
+     "amplitude": 4.056398069528869e-16
+    }
+   ],
+   "playing": true,
+   "solved": true,
+   "symmetryMax": 1.3322676295501878e-15,
+   "verdict": "solved?\nresidual 8.177e-16 — yes\nperiod found\n6.390159918584618\npublished record\n6.390159918584649\nrelative difference\n4.86e-15\n(14 digits)\nNewton iterations\n6\ntrajectories integrated\n96\n(41,028 right-hand sides)\nwall clock\n1.38 s\nsearch, 1.47 s with the movie\nsymmetry error of the movie\n1.33e-15\n(atlas limit 2e-7)\nu range\n[0.5701, 1.9831]\n(record [0.5700, 1.9852])",
+   "charges": [
+    "(1/3, 2/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(2/3, 1/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(0/3, 0/3) | 0/3 | 0 | 0 | 1.0e+0 | ✓",
+    "(2/3, 0/3) | 1/3 | -1 | -1 | 5.5e-16 | ✓",
+    "(0/3, 2/3) | 1/3 | -1 | -1 | 7.6e-16 | ✓",
+    "(1/3, 1/3) | 1/3 | -1 | -1 | 6.4e-16 | ✓",
+    "(2/3, 2/3) | 2/3 | +1 | +1 | 4.1e-16 | ✓",
+    "(0/3, 1/3) | 2/3 | +1 | +1 | 4.5e-16 | ✓",
+    "(1/3, 0/3) | 2/3 | +1 | +1 | 4.7e-16 | ✓"
+   ],
+   "status": "converged — 96 trajectories, 1.38 s"
+  },
+  "animates": 0.745,
+  "scrollWidth": 390,
+  "clientWidth": 390,
+  "relativePeriodDifference": 4.8647052789861396e-15,
+  "matchingDigits": 14
+ },
+ "loadAverageEnd": [
+  4.09912109375,
+  3.07421875,
+  3.23974609375
+ ]
+}
