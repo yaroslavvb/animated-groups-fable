@@ -1,11 +1,26 @@
 # `code/` — the scripts behind the tutorial
 
-Four Python files, enough to reproduce the two searches the tutorial describes for the **g227**
-Brusselator spiral lattice. They are the experiment scripts as they were run, with one change:
-every hard-coded machine path has been replaced by discovery, so nothing private ships here.
+Two sets of scripts.
+
+**`ring/` is self-contained and needs nothing but NumPy and SciPy.** It is the three-cell
+walkthrough of section 2: the whole method — the character, the seed, Newton on one state and one
+number, the delayed glue, and the Floquet numbers that explain why one route works and the other
+does not — on six unknowns instead of 2 592. It computes every number that section quotes, draws
+its six figures, and writes the `results.json` the page reads at build time. Start there; it has
+[its own README](ring/README.md).
+
+```sh
+cd ring && python3 run_all.py          # about twelve minutes, or two with --quick
+```
+
+**The four files beside it reproduce the searches on the real problem**, the **g227** Brusselator
+spiral lattice. They are the experiment scripts as they were run, with one change: every
+hard-coded machine path has been replaced by discovery, so nothing private ships here. Unlike
+`ring/`, they need a checkout of the repository, for the reason in the next section.
 
 | file | what it is |
 |---|---|
+| `ring/` | the three-cell walkthrough: `ring.py`, the toy laboratory; `run_all.py`, which produces everything section 2 quotes; `results.json`, its output |
 | `lab.py` | the shared laboratory: loads a catalogue entry, builds the character, the reciprocal shells and the three-wave star, lifts through the Hopf eigenvector, runs Newton–Krylov on the twisted shooting equation, compares orbits and runs the site's own acceptance audit |
 | `direct.py` | the deterministic construction: symbol → star → Hopf lift → Newton. One command, no noise, no Ginzburg–Landau stage, no random numbers |
 | `dde.py` | the delayed glue: the `333` fundamental domain, the history buffer, four-point Lagrange interpolation, RK4 on the delay-differential system |
@@ -32,9 +47,10 @@ If neither works, `lab.py` says so and names the environment variable.
 
 ## Requirements
 
-Python 3.10 or later with `numpy` and `scipy`. `matplotlib` only for the figure scripts, which
-are not included here. Everything runs on an ordinary processor; no GPU is used anywhere in this
-tutorial, and neither search costs money.
+Python 3.10 or later with `numpy` and `scipy`. `ring/run_all.py` additionally imports
+`matplotlib` and `pillow`, but only in its figure stage, after `results.json` has been written.
+Everything runs on an ordinary processor; no GPU is used anywhere in this tutorial, and nothing
+here costs money.
 
 ## Reproduce
 

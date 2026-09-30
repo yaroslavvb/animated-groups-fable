@@ -382,8 +382,9 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <div id="tl" class="chart" aria-label="The whole project on one time axis: human inputs, agent threads, Modal compute and artifacts"></div>
   <p id="tl-readout"></p>
   <p class="tl-hint">
-    Drag, or swipe sideways with two fingers, to pan; pinch (or ⌘/Ctrl with the wheel) zooms,
-    Shift with the wheel pans, and with the chart
+    On a phone, slide one finger sideways to pan and pinch with two to zoom. With a trackpad,
+    swipe sideways with two fingers to pan and pinch to zoom; with a mouse, drag to pan, and ⌘ or
+    Ctrl with the wheel zooms while Shift with the wheel pans. With the chart
     focused the arrow keys pan and <kbd>+</kbd>/<kbd>−</kbd> zoom. Tab walks into each track and the
     arrow keys step from mark to mark; every mark has a sentence.
   </p>
@@ -1512,9 +1513,11 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     actually found, and whether that resembles solving a stationary Schrödinger equation; another
     participant asked whether all the frames evolve together in a fifth dimension. Both have an
     answer, and the second one has a surprising answer: that is exactly what the first solver did,
-    and it is the one that failed. Part III is a tutorial with a live search —
-    <a href="../clockwork-orbits/">How to find a time-symmetric animation</a>. The link is left
-    here although the page does not exist yet.
+    and it is the one that failed. Part III is a tutorial with live searches in it —
+    <a href="../clockwork-orbits/">How to find a time-symmetric animation</a> — which walks the
+    whole method through on three coupled cells before it touches the real mesh. What the symbol
+    forces before any solver starts has a report of its own,
+    <a href="../magic-theorem/">A magic theorem for clockwork animations</a>.
   </p>
 </div>
 
@@ -1569,7 +1572,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <li><a href="https://yaroslavvb.github.io/animated-groups-fable/reports/">Reports</a> · <a href="https://github.com/yaroslavvb/animated-groups-fable">the repository</a> · <a href="https://yaroslavvb.github.io/animated-groups/">the predecessor site</a></li>
 </ul>
 
-<p class="note">Page built 2026-09-30 14:32 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
+<p class="note">Page built 2026-09-30 15:27 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
 
 </main>
 
@@ -2519,27 +2522,75 @@ window.CK = (function () {
     /* pointer pan, wheel zoom, keyboard */
     const svg = frameTL.svg;
     svg.setAttribute('tabindex', '0');
-    let drag = null;
+    /* Gestures, for mouse and touch alike.
+       One pointer: a press that moves sideways more than PAN_SLOP pixels becomes a
+       pan. Until then it is a tap, and it reaches the mark underneath with its own
+       tooltip and click, which is why pointer capture starts only once the drag
+       does (a mark covers most of the chart on a phone). The CSS touch-action:
+       pan-y leaves vertical movement to the browser, so the page still scrolls.
+       Two touch pointers: pinch to zoom, keeping the time under the fingers'
+       midpoint fixed, and move the midpoint to pan. Lifting one finger carries on
+       as a one-finger drag. */
+    const pts = new Map();              // pointerId -> {x, y}
+    let g = null;                       // the gesture in progress
+    const PAN_SLOP = 6;
+    const plotW = () => Math.max(1, (svg.clientWidth || frameTL.W) - 2 * PAD);
+    const fracAt = clientX => {
+      const r = svg.getBoundingClientRect();
+      return Math.min(1, Math.max(0, (clientX - r.left - PAD) / Math.max(1, r.width - 2 * PAD)));
+    };
+    const twoFingers = () => {
+      const [a, b] = [...pts.values()];
+      return {d: Math.max(24, Math.hypot(a.x - b.x, a.y - b.y)), mid: (a.x + b.x) / 2};
+    };
+    const beginDrag = (id, x) => { g = {kind: 'drag', id, x0: x, v0: TL.v0, v1: TL.v1}; };
     svg.addEventListener('pointerdown', ev => {
-      /* the pointer almost never lands on the bare <svg>: a grid line, a track
-         band or a tick sits under it. Start the drag unless the pointer is on
-         a mark, which owns its own tooltip and click. */
-      const t = ev.target;
-      if (t !== svg && t.closest) {
-        const mark = t.closest('[tabindex]');
-        if (mark && mark !== svg) return;
+      if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      pts.set(ev.pointerId, {x: ev.clientX, y: ev.clientY});
+      if (pts.size === 1) {
+        g = {kind: 'press', id: ev.pointerId, x0: ev.clientX, v0: TL.v0, v1: TL.v1};
+      } else if (pts.size === 2) {
+        const f = twoFingers();
+        g = {kind: 'pinch', d0: f.d, t0: TL.v0 + fracAt(f.mid) * (TL.v1 - TL.v0),
+             v0: TL.v0, v1: TL.v1};
+        for (const id of pts.keys()) { try { svg.setPointerCapture(id); } catch (e) {} }
+        svg.classList.add('dragging');
       }
-      drag = {x: ev.clientX, v0: TL.v0, v1: TL.v1, w: svg.clientWidth || frameTL.W};
-      svg.classList.add('dragging'); svg.setPointerCapture(ev.pointerId);
     });
     svg.addEventListener('pointermove', ev => {
-      if (!drag) return;
-      const dm = (ev.clientX - drag.x) / (drag.w - 2 * PAD) * (drag.v1 - drag.v0);
-      setView(drag.v0 - dm, drag.v1 - dm);
+      if (!pts.has(ev.pointerId)) return;
+      pts.set(ev.pointerId, {x: ev.clientX, y: ev.clientY});
+      if (!g) return;
+      if (g.kind === 'pinch') {
+        if (pts.size < 2) return;
+        const f = twoFingers();
+        const span = (g.v1 - g.v0) * g.d0 / f.d;
+        const v0 = g.t0 - fracAt(f.mid) * span;
+        setView(v0, v0 + span);
+        return;
+      }
+      if (ev.pointerId !== g.id) return;
+      if (g.kind === 'press') {
+        if (Math.abs(ev.clientX - g.x0) < PAN_SLOP) return;
+        g.kind = 'drag';
+        try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
+        svg.classList.add('dragging');
+      }
+      const dm = (ev.clientX - g.x0) / plotW() * (g.v1 - g.v0);
+      setView(g.v0 - dm, g.v1 - dm);
     });
-    const stop = () => { drag = null; svg.classList.remove('dragging'); };
-    svg.addEventListener('pointerup', stop);
-    svg.addEventListener('pointercancel', stop);
+    /* on window, so a release outside the chart still ends the gesture */
+    const endPointer = ev => {
+      if (!pts.delete(ev.pointerId)) return;
+      if (g && g.kind === 'pinch' && pts.size === 1) {
+        const [id, p] = [...pts.entries()][0];
+        beginDrag(id, p.x);
+        return;
+      }
+      if (pts.size === 0) { g = null; svg.classList.remove('dragging'); }
+    };
+    window.addEventListener('pointerup', endPointer);
+    window.addEventListener('pointercancel', endPointer);
     /* A two-finger sideways swipe on a trackpad arrives as a wheel event with a
        horizontal delta: pan by exactly that many pixels, so the chart follows the
        fingers. Deltas are summed and applied once per animation frame, because a

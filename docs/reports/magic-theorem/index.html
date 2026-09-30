@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A magic theorem for clockwork animations</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%232a78d6'/%3E%3Cpath d='M8 3.2 L8 8 L11 9.8' stroke='%23f9f9f7' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<meta name="description" content="Five theorems about a periodic field whose wallpaper symmetries hold only after a time shift: a character law for the temporal harmonics, forced zeros and forced windings at rotation centres, an index budget over a cell, an integer residue identity that is the temporal twin of Conway's magic theorem, and what mirrors force. With proofs, three worked examples and a table of all 68 catalogue entries.">
+<style>
+
+:root {
+  color-scheme: light;
+  --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --grid: #e1e0d9; --axis: #c3c2b7; --border: rgba(11,11,11,0.10); --code-bg: #f1f0ec;
+  --c1: #2a78d6; --c2: #eb6834; --c3: #1baf7a; --c4: #eda100; --c5: #e87ba4; --c7: #4a3aa7; --ref: #8c8b85;
+  --ok: #008300; --warn: #eda100; --bad: #e34948;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --code-bg: #242422;
+    --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c7: #9085e9; --ref: #76756f;
+    --ok: #3aa83a; --warn: #c98500; --bad: #e66767;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --grid: #2c2c2a; --axis: #383835; --border: rgba(255,255,255,0.10); --code-bg: #242422;
+  --c1: #3987e5; --c2: #d95926; --c3: #199e70; --c4: #c98500; --c5: #d55181; --c7: #9085e9; --ref: #76756f;
+  --ok: #3aa83a; --warn: #c98500; --bad: #e66767;
+}
+
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; -webkit-text-size-adjust: 100%; }
+main { max-width: 940px; margin: 0 auto; padding: 28px 16px 72px; }
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 1.3rem; margin: 48px 0 10px; scroll-margin-top: 12px; }
+h3 { font-size: 1rem; margin: 26px 0 8px; scroll-margin-top: 12px; }
+h2 + p, h3 + p { margin-top: 6px; }
+.masthead { font-size: 0.82rem; color: var(--muted); margin: 0 0 14px; letter-spacing: 0.01em; }
+.masthead a { color: var(--ink-2); text-decoration: none; }
+.masthead a:hover { color: var(--c1); text-decoration: underline; }
+.byline { color: var(--ink-2); font-size: 0.9rem; margin: 0 0 20px; }
+.lede { font-size: 1.05rem; }
+.small { font-size: 0.85rem; color: var(--ink-2); }
+.muted { color: var(--muted); }
+.nowrap { white-space: nowrap; }
+a { color: var(--c1); }
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.86em; }
+code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre code { padding: 0; background: none; border-radius: 0; font-size: inherit; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; line-height: 1.45; }
+ol li, ul li { margin: 5px 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; margin: 18px 0; }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 0.86rem; }
+th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--grid); vertical-align: top;
+  overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
+th { color: var(--ink-2); font-weight: 600; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+thead th { border-bottom: 2px solid var(--axis); }
+caption { caption-side: top; text-align: left; font-size: 0.85rem; color: var(--muted); padding-bottom: 6px; }
+/* A <caption> takes the table's width, so inside a horizontal scroller it is clipped
+   on a narrow screen instead of wrapping.  Captions of tables that can outgrow the
+   column are emitted as a sibling of the scroller and styled to match. */
+.tcap { font-size: 0.85rem; color: var(--muted); line-height: 1.5; margin: 14px 0 -4px; }
+details { margin: 12px 0; }
+summary { cursor: pointer; color: var(--ink-2); font-size: 0.92rem; }
+details[open] > summary { margin-bottom: 8px; }
+.hlink { margin-left: 8px; color: var(--muted); text-decoration: none; font-weight: 400; opacity: 0; }
+h2:hover .hlink, h3:hover .hlink, .hlink:focus { opacity: 1; }
+
+/* the display equations are Unicode, not MathJax */
+.eq { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%;
+  margin: 16px 0; padding: 2px 0; text-align: center; color: var(--ink); }
+
+/* figures ---------------------------------------------------------------- */
+figure.fig { margin: 22px 0; }
+figure.fig img, figure.fig video { display: block; width: 100%; height: auto;
+  background: var(--page); border: 1px solid var(--grid); border-radius: 8px; }
+figure.fig figcaption { font-size: 0.85rem; color: var(--ink-2); margin-top: 8px; line-height: 1.55; }
+figure.fig figcaption b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.fig-note { color: var(--muted); }
+figure.fig.narrow img, figure.fig.narrow video { max-width: 620px; margin: 0 auto; }
+figure.fig.hero img, figure.fig.hero video { max-width: 460px; margin: 0 auto; }
+/* A video is only as sharp as its source: these caps keep each one at or below its
+   own frame size instead of upscaling it across the full column. */
+figure.fig.small img, figure.fig.small video { max-width: 480px; margin: 0 auto; }
+.fig-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: 0 26px; align-items: start; }
+.fig-pair > figure.fig { margin: 18px 0; min-width: 0; }
+/* The vector diagrams label themselves at 11.5-14 px inside a 1200-unit frame. Scaled
+   into a phone column that is 3.5 px, so on a narrow screen they are shown at their own
+   size in a horizontal scroller instead of being shrunk out of legibility. */
+figure.fig .panzoom { max-width: 100%; }
+figure.fig .pan-hint { display: none; font-size: 0.78rem; color: var(--muted); margin: 6px 0 0; }
+
+/* the reading guide ------------------------------------------------------ */
+.guide { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 12px 16px; margin: 20px 0; }
+.guide dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr);
+  gap: 4px 14px; font-size: 0.9rem; }
+.guide dt { font-weight: 650; color: var(--ink); white-space: nowrap; }
+.guide dd { margin: 0; color: var(--ink-2); }
+@media (max-width: 599px) { .guide dl { grid-template-columns: 1fr; gap: 0; }
+  .guide dd { margin: 0 0 10px; } }
+
+nav.toc-line { margin: 6px 0 22px; font-size: 0.86rem; color: var(--ink-2); }
+nav.toc-line ol { display: inline; list-style: none; margin: 0; padding: 0; }
+nav.toc-line li { display: inline; }
+nav.toc-line li + li::before { content: " · "; color: var(--muted); }
+
+/* the live demonstrations ------------------------------------------------ */
+.demo { border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  padding: 14px 16px; margin: 22px 0; }
+.demo > h3 { margin-top: 0; }
+.demo .demo-lede { font-size: 0.9rem; color: var(--ink-2); margin: 0 0 12px; }
+.demo button.go { font: inherit; font-size: 0.92rem; font-weight: 600; cursor: pointer;
+  background: var(--ink); color: var(--page); border: 1px solid var(--ink);
+  border-radius: 999px; padding: 8px 20px; min-height: 40px; }
+.demo button.go:hover { background: var(--c1); border-color: var(--c1); color: #fff; }
+.demo button.go:focus-visible { outline: 2px solid var(--c1); outline-offset: 3px; }
+.demo button.go[disabled], .demo button.go[disabled]:hover { opacity: 0.55; cursor: default;
+  background: var(--surface); color: var(--ink-2); border-color: var(--border); }
+.demo .demo-hint { font-size: 0.82rem; color: var(--muted); margin: 8px 0 0; }
+.demo .demo-slot { margin-top: 14px; }
+.demo iframe { display: block; width: 100%; border: 1px solid var(--grid); border-radius: 8px;
+  background: var(--page); }
+.demo .warn { font-size: 0.86rem; color: var(--ink-2); border-left: 3px solid var(--c4);
+  padding: 2px 0 2px 12px; margin: 12px 0 0; }
+.demo .warn code { white-space: nowrap; }
+
+/* the three-cell widget -------------------------------------------------- */
+.ringwidget { border: 1px solid var(--border); border-radius: 12px; background: var(--surface);
+  padding: 14px 16px; margin: 22px 0; }
+.ringwidget h3 { margin-top: 0; }
+.ringwidget canvas { display: block; width: 100%; height: auto; border-radius: 8px;
+  background: var(--page); border: 1px solid var(--grid); }
+.ringwidget .rw-controls { display: flex; flex-wrap: wrap; gap: 8px 10px; margin: 12px 0 10px;
+  align-items: center; }
+.ringwidget .rw-controls button { font: inherit; font-size: 0.86rem; cursor: pointer;
+  background: var(--page); color: var(--ink); border: 1px solid var(--axis);
+  border-radius: 999px; padding: 7px 14px; min-height: 38px; }
+.ringwidget .rw-controls button[aria-pressed="true"] { background: var(--ink); color: var(--page);
+  border-color: var(--ink); }
+.ringwidget .rw-controls button:focus-visible { outline: 2px solid var(--c1); outline-offset: 2px; }
+.ringwidget .rw-readout { font-size: 0.84rem; color: var(--ink-2); margin: 10px 0 0;
+  font-variant-numeric: tabular-nums; }
+.ringwidget .rw-readout b { color: var(--ink); }
+
+/* small helpers ----------------------------------------------------------- */
+.keynum { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px; margin: 16px 0; }
+.keynum div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 10px 12px; }
+.keynum .v { font-size: 1.25rem; font-weight: 650; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.keynum .l { font-size: 0.78rem; color: var(--ink-2); }
+.aside { font-size: 0.88rem; color: var(--ink-2); border-left: 3px solid var(--grid);
+  padding: 2px 0 2px 12px; margin: 16px 0; }
+.next { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--c1);
+  border-radius: 8px; padding: 12px 14px; margin: 20px 0; font-size: 0.92rem; }
+.next p { margin: 0 0 6px; }
+.next p:last-child { margin-bottom: 0; }
+.footlinks { margin-top: 56px; border-top: 1px solid var(--grid); padding-top: 16px; font-size: 0.9rem; }
+.footlinks ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.footlinks li { margin: 7px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  figure.fig video[autoplay] { animation: none; }
+}
+
+@media (max-width: 599px) {
+  main { padding: 20px 12px 56px; }
+  h1 { font-size: 1.45rem; }
+  h2 { font-size: 1.15rem; margin: 38px 0 8px; }
+  table { font-size: 0.82rem; }
+  th, td { padding: 6px 6px; }
+  /* the label column of the routes table, which hyphenates into fragments otherwise */
+  table.routes th:first-child, table.routes td:first-child { min-width: 9.5rem; }
+  figure.fig.diagram .panzoom { overflow-x: auto; -webkit-overflow-scrolling: touch;
+    border: 1px solid var(--grid); border-radius: 8px; }
+  figure.fig.diagram .panzoom img { width: auto; max-width: none; border: 0; border-radius: 0; }
+  figure.fig.diagram .pan-hint { display: block; }
+}
+
+/* ---------------------------------------------- the theorem fragment's CSS */
+/* Scoped to this section so the fragment renders correctly whatever the shell
+   defines; colours are tokens only. */
+.thm figure { margin: 1.4rem 0; }
+.thm figure svg { width: 100%; max-width: 520px; height: auto; display: block; margin: 0 auto; }
+.thm figcaption { font-size: .875rem; color: var(--muted); margin-top: .45rem; line-height: 1.5; }
+.thm-box { border: 1px solid var(--grid); border-left: 3px solid var(--c1); border-radius: 6px;
+  background: var(--surface); padding: .85rem 1rem; margin: 1.3rem 0; }
+.thm-box > h4 { margin: 0 0 .4rem; font-size: 1rem; }
+.thm-box ol, .thm-box ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+.thm-eq { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%;
+  margin: .9rem 0; padding: .1rem 0; text-align: center; color: var(--ink); }
+.thm-proof { font-size: .95rem; color: var(--ink-2); margin: .7rem 0 1.2rem; }
+.thm-pf > summary { font-style: italic; }
+.thm-pf .thm-proof { margin: .2rem 0 .4rem; }
+.thm-note { font-size: .9rem; color: var(--muted); border-left: 3px solid var(--grid);
+  padding: .1rem 0 .1rem .8rem; margin: 1.1rem 0; }
+.thm-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.2rem 0; }
+.thm table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+.thm th, .thm td { text-align: left; vertical-align: top; padding: .42rem .6rem; border-bottom: 1px solid var(--grid); }
+.thm thead th { border-bottom: 2px solid var(--axis); font-weight: 600; }
+.thm caption { caption-side: top; text-align: left; font-size: .875rem; color: var(--muted); padding-bottom: .5rem; }
+/* see .tcap in the page stylesheet: a caption that must wrap cannot live inside the scroller */
+.thm .tcap { font-size: .875rem; color: var(--muted); line-height: 1.5; margin: 1.2rem 0 -.4rem; }
+/* This table already scrolls sideways on a phone, so squeezing its prose column to 90 px
+   and hyphenating it into fragments buys nothing; give that column a floor instead. */
+@media (max-width: 599px) {
+  .thm table.wide-first th:first-child, .thm table.wide-first td:first-child { min-width: 9.5rem; }
+}
+.thm td.num, .thm th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.thm-sig { white-space: nowrap; }
+.thm-ok { color: var(--c3); font-weight: 600; }
+.thm-no { color: var(--c2); font-weight: 600; }
+.thm details { margin: 1.2rem 0; }
+.thm summary { cursor: pointer; color: var(--ink-2); font-size: .92rem; }
+.thm details[open] summary { margin-bottom: .6rem; }
+.thm-legend { display: flex; flex-wrap: wrap; gap: .3rem 1.1rem; font-size: .85rem; color: var(--ink-2); margin: .5rem 0 0; }
+.thm-legend span i { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .35rem; vertical-align: 0; }
+.thm-refs { font-size: .9rem; }
+.thm-refs li { margin: .55rem 0; }
+@media (max-width: 480px) {
+  .thm table { font-size: .84rem; }
+  .thm th, .thm td { padding: .35rem .4rem; }
+}
+.thm-lede { font-size: 1.05rem; }
+/* the fragment's own sections are this report's sections, so its scoped table
+   and box styles have to apply outside a .thm wrapper as well */
+.thm-box { border: 1px solid var(--grid); border-left: 3px solid var(--c1); border-radius: 6px;
+  background: var(--surface); padding: .85rem 1rem; margin: 1.3rem 0; }
+.thm-box > h4, .thm-box > h3 { margin: 0 0 .4rem; font-size: 1rem; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; }
+th, td { text-align: left; vertical-align: top; }
+.tcap, caption { color: var(--muted); }
+.thm-tablewrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 1.2rem 0; }
+@media (max-width: 599px) {
+  table.wide-first th:first-child, table.wide-first td:first-child { min-width: 9.5rem; }
+}
+</style>
+</head>
+<body>
+<main class="thm">
+
+<p class="masthead">
+  <a href="../../">Animated groups</a> · <a href="../">reports</a> · <span>magic theorem</span>
+</p>
+
+<h1>A magic theorem for clockwork animations</h1>
+
+<p class="byline">
+  Five theorems about a periodic field whose spatial symmetries are allowed to cost time, their
+  proofs, three worked examples, and a check against every animation this project has published.
+  Nothing below assumes a differential equation, a bifurcation, or a small amplitude. Companion to
+  the tutorial <a href="../clockwork-orbits/">How to find a time-symmetric animation</a>, which uses these
+  statements but does not prove them.
+</p>
+
+<nav class="toc-line" aria-label="Contents">
+  <ol>
+    <li><a href="#why">What is being claimed</a></li>
+    <li><a href="#theorem-setting">The data</a></li>
+    <li><a href="#theorem-a">A · the character law</a></li>
+    <li><a href="#theorem-b">B · cone points</a></li>
+    <li><a href="#theorem-c">C · the budget</a></li>
+    <li><a href="#theorem-d">D · the residue</a></li>
+    <li><a href="#theorem-e">E · mirrors</a></li>
+    <li><a href="#theorem-examples">Worked examples</a></li>
+    <li><a href="#theorem-status">What is proved</a></li>
+  </ol>
+</nav>
+
+<h2 id="why">What is being claimed<a class="hlink" href="#why" aria-label="link to this section">#</a></h2>
+
+<p class="lede">
+  Conway's Magic Theorem says that a wallpaper signature is legal exactly when its cost is
+  <b>2</b>. This report is the same shape of statement one level up. Decorate each symmetry of a
+  wallpaper group with a fraction of a period — the time by which the animation must be shifted
+  for that symmetry to hold — and a second closure identity appears, from the same orbifold
+  relation, with the same proof in one line:
+</p>
+
+<p class="eq">
+  Σ<sub><i>c</i></sub> <i>k<sub>c</sub></i>/<i>n<sub>c</sub></i> ∈ ℤ.
+</p>
+
+<p>
+  <b>Conway's cost balances the geometry; this residue balances the choreography.</b> It holds in
+  all <b>68</b> entries of this project's catalogue, and — like Conway's — it enumerates: on the
+  orbifold <b>333</b> there are 27 ways to hang offsets on the three cone classes, the identity
+  keeps <b>9</b>, relabelling collapses those to <b>4</b>, and the catalogue's four p3 clockwork
+  groups are exactly those four.
+</p>
+
+<p>
+  The identity does not stand alone. It is what makes two other forced structures compatible. A
+  rotation centre whose generator costs a non-zero fraction of a period must be a <i>zero</i> of
+  the first temporal harmonic — a point of the picture that does not oscillate at the fundamental
+  frequency at all — and the phase must wind around it by an amount the offset fixes modulo the
+  order of the centre (Theorem B). Those windings must cancel over one cell (Theorem C). B fixes
+  their sum modulo 1 and C demands it be an integer, so <b>B and C are simultaneously satisfiable
+  exactly when the residue identity holds</b>. That is Theorem D, and it is load-bearing rather
+  than decorative.
+</p>
+
+<div class="card">
+  <p class="small" style="margin:0 0 6px"><b>The five statements, in one place.</b></p>
+  <ul class="small" style="margin:0">
+    <li><b>A</b> — the <i>j</i>-th temporal harmonic transforms under a one-dimensional character:
+      Â<sub><i>j</i></sub>(<i>gx</i>) =
+      e<sup>−2π<i>ijτ<sub>g</sub></i></sup>Â<sub><i>j</i></sub>(<i>x</i>). The sign is a minus, and
+      that was settled by measurement.</li>
+    <li><b>B</b> — at a rotation centre of order <i>n</i> whose generator carries <i>τ</i> =
+      <i>k</i>/<i>n</i>: a forced zero when <i>jk</i> ≢ 0, an angular selection rule, and a winding
+      <i>w<sub>j</sub></i> ≡ −<i>jk</i> (mod <i>n</i>) — or no index at all, which is a genuine
+      fourth case that occurs in the data.</li>
+    <li><b>C</b> — the indices over one primitive cell sum to <b>0</b>, weighted 1/<i>n<sub>c</sub></i>
+      per cone class.</li>
+    <li><b>D</b> — Σ<i>k<sub>c</sub></i>/<i>n<sub>c</sub></i> ∈ ℤ, and B and C are compatible iff
+      it holds.</li>
+    <li><b>E</b> — a reflection forces <i>τ</i> ∈ {0, ½}; a half-period mirror is a nodal
+      <i>line</i>, not a point; a neutral mirror carries no charge; a dihedral half-offset centre
+      cannot have an isolated zero.</li>
+  </ul>
+</div>
+
+<p>
+  Everything is a statement about one object: the first temporal harmonic of the field, one complex
+  number per point of the plane. None of it mentions the equation that produced the animation, so
+  none of it can be used up by changing the equation. What changes with the equation is only
+  <i>which</i> of the permitted structures gets realised — and the last section of this report is
+  about exactly that gap.
+</p>
+
+<div class="next">
+  <p><b>Why this exists, and what it is for.</b> The project it comes from generates looping
+    reaction–diffusion animations whose wallpaper symmetries hold only after a time shift. Before
+    any solver is started, these statements say where the picture must be dark, how much phase must
+    wind around each dark point, and how the windings must balance — so a seed can be drawn by
+    hand, and a converged answer can be checked against a prediction made before it was computed.
+    The tutorial <a href="../clockwork-orbits/">How to find a time-symmetric animation</a> does that, twice.
+    <a href="../making-of/">The making of this site</a> is the timeline.</p>
+</div>
+
+<figure class="fig diagram" id="fig-decorated-orbifold">
+  <div class="panzoom"><img src="assets/decorated-orbifold-g227.svg" alt="Diagram of the 333 orbifold of g227 drawn as a curved triangle with a dashed second face behind it. Each corner carries a coloured rotation marker and a label: 3 with time offset zero, 3 sub 1 with offset one third, 3 sub 2 with offset two thirds, and beside each the winding it forces: 0, minus 1, plus 1. To the right, three short equations for the Conway cost, the temporal residue and the index budget." loading="lazy" decoding="async"></div>
+  <p class="pan-hint">Shown at its own size here: drag the diagram sideways to read its labels.</p>
+  <figcaption>The clockwork symbol, read as a decorated orbifold. Dividing the plane by g227 gives Conway's <b>333</b> turnover; the symbol r33₁3₂ then decorates each cone point with a time offset. Conway's magic theorem balances the geometry — the three costs sum to exactly 2, so the symbol tiles the plane. Applying the offset τ, which is a homomorphism, to the orbifold relation balances the choreography: 0/3 + 1/3 + 2/3 = 1, an integer, and the same sum is an integer for all <b>68</b> catalogue entries (values 0, 1 and 2). The offsets then force the windings 0, −1 and +1, which sum to zero over one primitive p3 cell when each is weighted by 1/3. Drawn on the simulation box, which is three p3 cells, that is six pinned vortices, three of each sign.</figcaption>
+</figure>
+
+<p class="thm-lede">
+    Before any solver is started, the symbol alone decides a great deal about the picture: which
+    points must be dark, how much phase must wind around each of them, and how the windings must
+    balance across a cell. What follows is that statement, proved, and then tested against every
+    animation the project has published. It is deliberately arranged the way Conway's Magic
+    Theorem is arranged — a closure identity that the orbifold forces, and a topological budget
+    that the identity makes satisfiable.
+  </p>
+
+  <h2 id="theorem-setting">The data: a clockwork group<a class="hlink" href="#theorem-setting" aria-label="link to this section">#</a></h2>
+
+  <p>
+    A <strong>clockwork animation</strong> is a field <em>u</em>(<em>x</em>, <em>t</em>) on the
+    plane, periodic in time with period <em>T</em>, together with a wallpaper group <em>G</em> and
+    a map <em>τ</em> assigning to each symmetry a fraction of the period, such that
+  </p>
+
+  <div class="thm-eq">
+    <em>u</em>(<em>g x</em>, <em>t</em> + <em>τ</em><sub><em>g</em></sub><em>T</em>)
+    = <em>u</em>(<em>x</em>, <em>t</em>) &nbsp; for every <em>g</em> ∈ <em>G</em>, every
+    <em>x</em>, every <em>t</em>.
+  </div>
+
+  <p>
+    Apply the relation twice, once at <em>gx</em> and once at <em>x</em>, and
+    <em>τ</em><sub><em>hg</em></sub> = <em>τ</em><sub><em>h</em></sub> +
+    <em>τ</em><sub><em>g</em></sub> drops out: <em>τ</em> is a homomorphism
+    <em>G</em> → ℝ/ℤ, the modulo coming from <em>T</em>-periodicity. That single fact carries the
+    whole theorem. Two consequences are worth naming at once. Its kernel
+    <em>K</em> = ker <em>τ</em> is the subgroup of <em>instantaneous</em> symmetries — the ones
+    that hold frame by frame — and the quotient <em>G</em>/<em>K</em> embeds in ℝ/ℤ. It is not
+    automatic that it is <em>finite</em>: a travelling wave <em>u</em>(<em>x</em>, <em>t</em>) =
+    <em>f</em>(<em>k</em>·<em>x</em> − <em>ωt</em>) satisfies the defining relation for every
+    lattice translation with <em>τ</em> generically irrational, and then the image of <em>τ</em>
+    is dense. Finiteness is an assumption here, and it is the one the catalogue encodes; for a
+    group with a rotation it is also forced, because invariance of <em>τ</em> on the translations
+    under an order-<em>n</em> rotation clears the denominators. Granted finiteness, a finite
+    subgroup of ℝ/ℤ is cyclic, so <em>G</em>/<em>K</em> is cyclic of some order <em>m</em>.
+  </p>
+
+  <p>
+    This is the same data as a <em>colour group</em> whose colour permutation is cyclic: a
+    wallpaper group with a homomorphism onto ℤ/<em>m</em>, colours replaced by time offsets
+    <em>k</em>/<em>m</em>. Every entry of the catalogue is listed in exactly that form on the
+    correspondence pages — for the worked example below,
+    <a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a>,
+    clockwork symbol <strong>r33₁3₂</strong>, orbifold <strong>333</strong>, <em>m</em> =
+    <strong>3</strong>. The catalogue's own notation page defines the decorations used below —
+    the subscripts, the tilde for a half-period mirror, the prefixes <strong>c</strong> and
+    <strong>r</strong>:
+    <a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation.html</a>. It is also the wallpaper instance of the pair (<em>H</em>, <em>K</em>) of
+    spatio-temporal and spatial symmetries that Golubitsky and Stewart attach to a periodic
+    solution of an equivariant system, with <em>H</em> = <em>G</em> and <em>H</em>/<em>K</em>
+    cyclic — here cyclic by construction rather than by hypothesis.
+  </p>
+
+  <p>
+    The object every statement below is about is the <strong>first temporal harmonic</strong> of a
+    channel,
+  </p>
+
+  <div class="thm-eq">
+    Â<sub><em>j</em></sub>(<em>x</em>) = (1/<em>T</em>) ∫<sub>0</sub><sup><em>T</em></sup>
+    <em>u</em>(<em>x</em>, <em>t</em>) e<sup>−2π<em>ijt</em>/<em>T</em></sup> d<em>t</em>,
+    &nbsp;&nbsp; Â := Â<sub>1</sub>.
+  </div>
+
+  <p>
+    It is one complex number per point: the amplitude and phase with which that point oscillates
+    at the fundamental frequency. Two pieces of housekeeping, once. A rotation centre in the plane
+    is a <em>gyration point</em>; its image downstairs is a <em>cone point</em> of the orbifold,
+    and "cone class" below means one orbit of gyration points. And <em>index</em>,
+    <em>winding</em> and <em>charge</em> are the same integer throughout — the number of turns
+    arg Â makes on a small loop — called by whichever of the three names the surrounding sentence
+    wants. On a stored movie it is one bin of a fast Fourier transform down
+    the frame axis, which is exact for the band-limited films the repository saves. Everything
+    that follows is a statement about Â, not about the equation that produced it — no
+    reaction–diffusion, no near-Hopf assumption, no small amplitude.
+  </p>
+
+<p>
+  The worked example throughout is the catalogue entry <b>g227</b>: p3, orbifold <b>333</b>,
+  clockwork symbol <b>r33₁3₂</b>, <i>m</i> = <b>3</b>, and — as a colour group — the entry at
+  <a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a>. The decorations are defined on the
+  catalogue's <a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation page</a>.
+</p>
+  <h2 id="theorem-a">Theorem A — the character law<a class="hlink" href="#theorem-a" aria-label="link to this section">#</a></h2>
+
+  <div class="thm-box">
+    <h3>Theorem A.</h3>
+    <p style="margin:.2rem 0 0">
+      For every <em>g</em> ∈ <em>G</em> and every integer <em>j</em>,
+    </p>
+    <div class="thm-eq" style="margin:.6rem 0 .3rem">
+      Â<sub><em>j</em></sub>(<em>g x</em>) =
+      e<sup>−2π<em>i j τ</em><sub><em>g</em></sub></sup> Â<sub><em>j</em></sub>(<em>x</em>).
+    </div>
+    <p style="margin:.3rem 0 0">
+      That is, Â<sub><em>j</em></sub> transforms under the one-dimensional character
+      <em>χ</em><sub><em>j</em></sub>(<em>g</em>) = e<sup>−2π<em>ijτ</em><sub><em>g</em></sub></sup>
+      of <em>G</em>, which factors through <em>G</em>/<em>K</em> ≅ ℤ/<em>m</em>.
+    </p>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Substituting <em>s</em> = <em>t</em> + <em>τ</em><sub><em>g</em></sub><em>T</em> in the
+      defining relation gives <em>u</em>(<em>gx</em>, <em>s</em>) = <em>u</em>(<em>x</em>,
+      <em>s</em> − <em>τ</em><sub><em>g</em></sub><em>T</em>) for all <em>s</em>. Put that into the
+      integral defining Â<sub><em>j</em></sub>(<em>gx</em>) and shift the variable of integration by
+      <em>τ</em><sub><em>g</em></sub><em>T</em>; the integrand is <em>T</em>-periodic, so the shifted
+      interval is harmless, and the shift leaves behind the constant factor
+      e<sup>−2π<em>ijτ</em><sub><em>g</em></sub></sup>. ∎
+    </p>
+    </details>
+
+  <p>
+    <strong>The sign is a minus.</strong> It is worth saying loudly because the plus sign is the
+    natural guess and it is wrong: on the published g227 record the minus law holds to
+    <strong>8.6 × 10⁻¹⁶</strong> — on a symmetrised export, of which more below — while the plus
+    law is off by exactly
+    <strong>1.7320508</strong> = √3 = |1 − e<sup>4π<em>i</em>/3</sup>|, the largest error the
+    character can produce.
+    Flip any one of three conventions — the sense of the rotation, the sense of the winding, or
+    the sign in the exponent of Â — and the prediction flips with it. The repository's own earlier
+    note left that sign as an unresolved <em>∓</em>; this fixes it.
+  </p>
+
+  <p class="thm-note">
+    A corollary and an honest limit. Expanding <em>u</em> in harmonics, the <em>j</em>-th term
+    lives in the <em>χ</em><sub><em>j</em></sub> sector: the mean field is genuinely
+    <em>G</em>-invariant and all the defects live in the sectors with <em>j</em> not a multiple of
+    <em>m</em>. But Â<sub><em>j</em></sub> ≡ 0 always satisfies the constraint, so the theorem
+    gives no lower bound — an animation may hide its structure in a harmonic that vanishes. In the
+    <strong>532</strong> record–channel pairs tested, none did: |Â₁| relative to the field's span
+    stayed between <strong>0.172</strong> and <strong>0.251</strong>.
+  </p>
+
+<figure class="fig" id="fig-character-law-sign">
+  <img src="assets/character-law-sign.webp" alt="Histogram on a logarithmic error axis. One population of blue bars clusters near 1e−15 and 1e−8; a separate orange population sits at and above 1, far to the right." loading="lazy" decoding="async">
+  <figcaption>The sign in the character law is not a convention. Over <b>186</b> published record–channel rows with a time-shift order of at least 3, testing Â(gx) = e^(−2πijτ) Â(x) never fails, and across all <b>532</b> rows of the sweep the worst error is <b>1.9e−08</b>, while on those <b>186</b> rows the opposite sign never gets below <b>1.73</b>. (Below m = 3 the two signs coincide, so only those rows can tell them apart.) One honest qualification: the published exports are symmetrised by the site's own projection step, so those tiny residuals are the round-off of an identity. Re-sourced on data that was never projected, the law still holds — <b>7.3e−08</b> on an unprojected replay and <b>4.1e−10</b> on a double-precision orbit from the delayed-glue route.</figcaption>
+</figure>
+  <h2 id="theorem-b">Theorem B — what a cone point must contain<a class="hlink" href="#theorem-b" aria-label="link to this section">#</a></h2>
+
+  <div class="thm-box">
+    <h3>Theorem B.</h3>
+    <p style="margin:.2rem 0 .3rem">
+      Let <em>p</em> be fixed by a rotation of order <em>n</em> ≥ 2, taken counterclockwise by
+      +2π/<em>n</em>, and let that rotation carry <em>τ</em> = <em>k</em>/<em>n</em>. Then for
+      every <em>j</em>:
+    </p>
+    <ol>
+      <li><strong>Forced zero.</strong> If <em>jk</em> ≢ 0 (mod <em>n</em>) then
+        Â<sub><em>j</em></sub>(<em>p</em>) = 0.</li>
+      <li><strong>Angular selection.</strong> In polar coordinates about <em>p</em>, only the
+        angular harmonics e<sup><em>iνθ</em></sup> with <em>ν</em> ≡ −<em>jk</em> (mod <em>n</em>)
+        survive.</li>
+      <li><strong>Forced winding.</strong> If Â<sub><em>j</em></sub> does not vanish on a small
+        circle about <em>p</em>, its winding number there satisfies
+        <em>w</em><sub><em>j</em></sub>(<em>p</em>) ≡ −<em>jk</em> (mod <em>n</em>).</li>
+      <li><strong>Or no index at all.</strong> If Â<sub><em>j</em></sub> vanishes along a curve
+        through <em>p</em>, no winding exists there and 2 and 3 say nothing. This alternative is
+        genuine and occurs in the data.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Write <em>z</em> for the complex coordinate centred at <em>p</em>; the rotation is
+      <em>z</em> ↦ <em>ζz</em> with <em>ζ</em> = e<sup>2π<em>i</em>/<em>n</em></sup>, and Theorem A
+      reads Â<sub><em>j</em></sub>(<em>ζz</em>) =
+      e<sup>−2π<em>ijk</em>/<em>n</em></sup>Â<sub><em>j</em></sub>(<em>z</em>). Expand the circle of
+      radius <em>r</em> as Σ<sub><em>ν</em></sub> <em>c</em><sub><em>ν</em></sub>(<em>r</em>)
+      e<sup><em>iνθ</em></sup>. Matching Fourier coefficients gives
+      <em>c</em><sub><em>ν</em></sub>(<em>r</em>)(e<sup>2π<em>iν</em>/<em>n</em></sup> −
+      e<sup>−2π<em>ijk</em>/<em>n</em></sup>) = 0, so <em>c</em><sub><em>ν</em></sub> vanishes unless
+      <em>ν</em> ≡ −<em>jk</em>, which is claim 2. Continuity at <em>p</em> kills every
+      <em>c</em><sub><em>ν</em></sub> with <em>ν</em> ≠ 0 as <em>r</em> → 0, and
+      Â<sub><em>j</em></sub>(<em>p</em>) is the limit of <em>c</em><sub>0</sub>; if <em>ν</em> = 0 is
+      excluded the value is 0, which is claim 1 (or directly: the value at a fixed point equals a
+      non-trivial root of unity times itself). For claim 3, let Δ be the continuous increment of
+      arg Â<sub><em>j</em></sub> across one sector of angle 2π/<em>n</em>. The relation makes the
+      increment the same on all <em>n</em> sectors and fixes it modulo 2π as
+      −2π<em>jk</em>/<em>n</em>, so the total winding is 2π<em>w</em><sub><em>j</em></sub> =
+      <em>n</em>Δ = −2π<em>jk</em> + 2π<em>nℓ</em>. ∎
+    </p>
+    </details>
+
+  <p>
+    The two halves are worth separating. Claim 1 says <em>where the picture must be dark</em>: any
+    rotation centre whose generator carries a non-zero offset is a zero of the first harmonic — a
+    point that does not oscillate at the fundamental frequency at all. Claim 3 says <em>how the
+    phase must run around it</em>: the offset is a topological charge, read modulo the order of
+    the centre. Neither statement mentions a partial differential equation.
+  </p>
+
+<figure class="fig" id="fig-cone-point-cores">
+  <img src="assets/cone-point-cores.webp" alt="Six panels of phase-as-hue close-ups around rotation centres, each labelled with a group, a centre type and a winding: a threefold centre with winding −1, a trio with −1, −1 and +2, a fourfold centre with −2, a sixfold centre resolved as six nodal rays with no index, the same symbol with winding +3, and a panel of crossing nodal lines." loading="lazy" decoding="async">
+  <figcaption>Six cores the symbols force, side by side. The theorem fixes the winding only modulo the order of the centre, which is why g226's three 3₁ centres can read −1, −1 and +2. A 4₂ centre is driven to −2; at a 6₃ centre the tie between ±3 need not be broken, and both outcomes occur in the published data — six nodal rays with no index, or a clean +3. In g133 the half-period mirror lines cross at the two-fold centres, which therefore lie on a nodal curve and carry no index at all, while the 4₂ cores sit off the lines and can be measured at ±2.</figcaption>
+</figure>
+  <h2 id="theorem-c">Theorem C — the budget over one cell<a class="hlink" href="#theorem-c" aria-label="link to this section">#</a></h2>
+
+  <div class="thm-box">
+    <h3>Theorem C.</h3>
+    <p style="margin:.2rem 0 0">
+      Suppose the zeros of Â<sub><em>j</em></sub> on the torus are isolated. Then
+    </p>
+    <ol>
+      <li>the indices of Â<sub><em>j</em></sub> over one primitive cell of the translation lattice
+        of <em>G</em> sum to <strong>0</strong>;</li>
+      <li>every orbit of the orientation-preserving subgroup carries one common index, and a cone
+        class of order <em>n</em> has |<em>P</em>⁺|/<em>n</em> points in that cell, where
+        <em>P</em>⁺ is the <em>orientation-preserving</em> point group;</li>
+      <li>therefore
+        <span class="thm-sig">Σ<sub>cone classes</sub> <em>w</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>
+        + Σ<sub>free orbits</sub> <em>w</em><sub><em>f</em></sub> = 0</span>.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Â<sub><em>j</em></sub> is not in general a <em>function</em> on the torus: g227's translation
+      by (1/3, 2/3) carries <em>τ</em> = ⅔, so by Theorem A the identification multiplies
+      Â<sub><em>j</em></sub> by a constant phase, and Â<sub><em>j</em></sub> is a section of a flat
+      unitary line bundle. A flat bundle over a torus has first Chern number 0, which already gives
+      the claim; but the elementary version is more instructive, and it handles the twist
+      explicitly: cut along a fundamental parallelogram and count the
+      boundary winding; opposite edges are identified by translations under which
+      Â<sub><em>j</em></sub> is multiplied by a <em>constant</em> (Theorem A), and a constant factor
+      does not change increments of argument, so the paired edges cancel exactly. For 2, an
+      orientation-preserving symmetry multiplies Â<sub><em>j</em></sub> by a unimodular constant and
+      preserves orientation, so it carries the index at <em>x</em> to the index at <em>gx</em>; the
+      orbit sizes are orbit–stabiliser. Substituting 2 into 1 and dividing by the number of
+      orientation-preserving operations per cell gives 3. ∎
+    </p>
+    </details>
+
+  <p>
+    The lift-counting in claim 2 is the step that makes the budget an <em>orbifold</em> statement
+    rather than a torus statement: a cone point of order <em>n</em> is one point downstairs but
+    |<em>P</em>⁺|/<em>n</em> points upstairs, so it enters the balance with weight
+    1/<em>n</em>. The multiplicity law was checked against all <strong>68</strong> catalogue
+    entries and is exact in every one.
+  </p>
+
+<figure class="fig" id="fig-harmonic-phase-charges">
+  <img src="assets/harmonic-phase-charges.webp" alt="Two panels over several lattice cells. The left shows the phase of the first temporal harmonic as hue with the nine threefold centres marked by circles and up and down triangles, each labelled with a winding of 0, −1 or +1. The right shows the magnitude, dark at the marked screw centres." loading="lazy" decoding="async">
+  <figcaption>What the symbol forces, measured on the published orbit. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres — exactly −k mod 3 at a centre whose generator carries the offset k/3. The magnitude vanishes at the six screw centres and peaks at the three τ = 0 centres. The charges sum to zero over one cell, as the index budget demands.</figcaption>
+</figure>
+  <h2 id="theorem-d">Theorem D — the temporal magic theorem<a class="hlink" href="#theorem-d" aria-label="link to this section">#</a></h2>
+
+  <p>
+    Conway's Magic Theorem says a wallpaper signature is legal exactly when its cost is 2 —
+    equivalently, when the orbifold Euler characteristic vanishes. The time offsets obey their own
+    closure identity, with the same source.
+  </p>
+
+  <div class="thm-box">
+    <h3>Theorem D.</h3>
+    <p style="margin:.2rem 0 0">
+      For an orientation-preserving group with cone classes of orders
+      <em>n</em><sub>1</sub>, …, <em>n</em><sub><em>s</em></sub> and offsets
+      <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>,
+    </p>
+    <div class="thm-eq" style="margin:.6rem 0 .2rem">
+      Σ<sub><em>c</em></sub> <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> ∈ ℤ.
+    </div>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      Take Conway's orbifold presentation. For the sphere-with-cone-points cases 2222, 333, 442 and
+      632 the generators are the primitive counterclockwise rotations, one per cone class, with
+      <em>γ</em><sub><em>c</em></sub><sup><em>n</em><sub><em>c</em></sub></sup> = 1 and
+      <em>γ</em><sub>1</sub><em>γ</em><sub>2</sub>⋯<em>γ</em><sub><em>s</em></sub> = 1. Apply the
+      homomorphism <em>τ</em> to that last relation: each generator contributes
+      <em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub>, and the product relation says
+      the sum is 0 in ℝ/ℤ. For the torus case there are no cone points and the sum is empty. The
+      target is abelian, so the conjugacy ambiguity in the presentation is harmless and the argument
+      survives verbatim on higher-genus orbifolds. ∎
+    </p>
+    </details>
+
+  <p>
+    <strong>Theorems B and C are compatible if and only if D holds.</strong> B forces
+    Σ<em>w</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> ≡
+    −Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> modulo 1; C demands that the
+    same sum be an integer; the two can hold together exactly when
+    Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> is an integer, which is D.
+    That is the shape of Conway's theorem repeated one level up:
+    <strong>Conway's cost balances the geometry; this residue balances the choreography.</strong>
+  </p>
+
+  <p>
+    <strong>What the residue means for a group with mirrors.</strong> The proof uses the
+    orientation-preserving presentation, so for the forty-odd catalogue entries that have mirrors
+    or glides the sum below is taken over the cone classes of the group's <em>rotation
+    subgroup</em>, which is orientation-preserving and to which the theorem applies verbatim. That
+    is what the residue column of the table records, and it is why a <strong>∗</strong>-entry and its
+    rotation subgroup share a residue.
+  </p>
+
+  <p>
+    Checked that way on all <strong>68</strong> catalogue entries, the residue is an integer in
+    every one — the value is <strong>0</strong> for 27 entries, <strong>1</strong> for 32 and
+    <strong>2</strong> for 9. But a consistency check is the least of it. Conway's theorem is
+    famous because it <em>enumerates</em>, and so does this one. Take <strong>333</strong>: there
+    are 3³ = <strong>27</strong> ways to hang offsets on its three cone classes, Theorem D keeps
+    the <strong>9</strong> with <em>k</em>₁ + <em>k</em>₂ + <em>k</em>₃ ≡ 0 (mod 3), and
+    relabelling the classes collapses those to four multisets — {0,0,0}, {1,1,1}, {2,2,2} and
+    {0,1,2}. The catalogue's p3 entries are <strong>333</strong>, <strong>3₁3₁3₁</strong>,
+    <strong>3₂3₂3₂</strong> and <strong>r33₁3₂</strong>: exactly those four and no others.
+  </p>
+
+  <p>
+    What D does <em>not</em> do is guarantee existence. <strong>4₁4₃2</strong> has residue
+    ¼ + ¾ + 0 = <strong>1</strong>, an integer, and no group on a primitive lattice realises it;
+    it exists only on a centred space–time lattice, as <strong>c4₁4₃2</strong> — catalogue entry
+    g99. The residue decides what may be decorated; the lattice decides what can be built.
+  </p>
+  <h2 id="theorem-e">Theorem E — mirrors<a class="hlink" href="#theorem-e" aria-label="link to this section">#</a></h2>
+
+  <div class="thm-box">
+    <h3>Theorem E.</h3>
+    <ol>
+      <li><strong>Only two offsets.</strong> A reflection squares to the identity, so
+        2<em>τ</em> ≡ 0 and <em>τ</em> ∈ {0, ½}.</li>
+      <li><strong>A half-period mirror is a nodal line.</strong> If <em>τ</em> = ½ on a reflection
+        in a line <em>ℓ</em>, then on <em>ℓ</em> Theorem A reads Â<sub><em>j</em></sub> =
+        e<sup>−π<em>ij</em></sup>Â<sub><em>j</em></sub>, so Â<sub><em>j</em></sub> ≡ 0 along the
+        <em>whole line</em> for every odd <em>j</em>. The zero set is one-dimensional, not a
+        point.</li>
+      <li><strong>A neutral mirror carries no charge.</strong> If <em>τ</em> = 0, a reflection
+        reverses orientation while fixing Â<sub><em>j</em></sub>, so the index at a fixed point is
+        its own negative and vanishes; off the line, vortices come in mirror pairs ±<em>w</em>.</li>
+      <li><strong>A dihedral half-offset centre cannot have an isolated zero.</strong> If a centre
+        of even order <em>n</em> with <em>k</em> = <em>n</em>/2 also lies on a mirror, B demands a
+        non-zero index and E.3 demands zero; the only escape is B's fourth case — the index is
+        undefined and the zero set is a curve of <em>n</em> rays.</li>
+      <li><strong>Glides are free.</strong> A glide reflection has no fixed point, so it imposes no
+        pointwise condition.</li>
+    </ol>
+  </div>
+
+  <details class="thm-pf">
+    <summary>Proof</summary>
+  <p class="thm-proof">
+      All five are one-line substitutions into Theorem A, together with the elementary fact that an
+      orientation-reversing map negates a winding number. ∎
+    </p>
+    </details>
+
+  <p>
+    Clause 2 is the familiar antisymmetry statement in a new setting: when <em>m</em> = 2 a
+    clockwork group is a two-colour group, a half-period mirror is a primed mirror, and the
+    statement is that the order parameter vanishes on a primed mirror. What is new here is that
+    the same argument runs for every <em>m</em> and every harmonic.
+  </p>
+
+  <p class="thm-note">
+    <strong>What this does and does not explain about the gaps in the atlas.</strong> Of the
+    <strong>51</strong> catalogue entries with a non-zero offset, <strong>35</strong> have a
+    Ginzburg–Landau record and <strong>29</strong> a Brusselator record. Every one of the
+    <strong>16</strong> entries with no Ginzburg–Landau record, and every one of the
+    <strong>22</strong> with no Brusselator record, is forced by the theorem to carry either a
+    nodal line or a core of charge ≥ 2 — <strong>16</strong>/16 and <strong>22</strong>/22, no
+    counter-examples (Fisher exact, <em>p</em> = <strong>7.8 × 10⁻⁴</strong> and
+    <strong>1.0 × 10⁻⁵</strong>).
+    Three qualifications, all of which matter. First, that composite predicate was chosen
+    <em>after</em> seeing which one reached 16/16 and 22/22: the scripts compute eight predicates
+    against two models, sixteen tests in all, and the quoted <em>p</em> values are not corrected
+    for that choice. Second, a predicate with no theorem content at all — "the group has
+    reflections" — reaches <em>p</em> = <strong>6.3 × 10⁻⁴</strong> on the Brusselator gap, so the
+    composite is not uniquely good; the sharpest single predictor is the forced nodal line alone,
+    <em>p</em> = <strong>7.0 × 10⁻⁸</strong>, and that one the repository's own notes had already
+    reported for Ginzburg–Landau.
+    Third, pushing the other way, the search budget was uniform: the Brusselator batch gave
+    exactly <strong>4</strong> jobs to each of the 51 entries, and all <strong>88</strong> jobs of
+    the 22 entries without a record failed, which removes the most obvious confounder.
+    The honest summary is a <em>necessary condition satisfied with no exceptions</em>, plus a
+    plausible mechanism — a one-dimensional zero set is fragile under a perturbation that does not
+    respect it, and a multiply charged core tends to split. It is not a demonstration that no
+    orbit exists for the missing entries. The decisive experiment, running the solver on those
+    entries and asking whether they fail for the predicted reason, has not been done.
+  </p>
+  <h2 id="theorem-examples">Three worked examples<a class="hlink" href="#theorem-examples" aria-label="link to this section">#</a></h2>
+
+  <h3>g227 — r33₁3₂, the published spiral lattice</h3>
+
+  <p>
+    p3, orbifold <strong>333</strong>, <em>m</em> = <strong>3</strong>, residue
+    0 + ⅓ + ⅔ = <strong>1</strong>, forced windings <strong>(0, −1, +1)</strong>, and the budget
+    0 − ⅓ + ⅓ = 0 closing on its own — so <strong>no free vortices are needed</strong>. Per p3
+    cell that is two charged centres plus one neutral one where |Â| is instead maximal; on the
+    simulation box, which is three p3 cells, <strong>six</strong> pinned vortices, three of charge
+    −1 and three of charge +1, plus three neutral centres, total charge <strong>0</strong>.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 420 268" role="img"
+         aria-label="One primitive p3 cell drawn as a sixty-degree rhombus; the simulation box is three of them. The rhombus corners are one class of threefold centre with winding zero; the two triangle centroids are the other two classes, with windings minus one and plus one.">
+      <g transform="translate(28,24)">
+        <polygon points="0,207.8 240,207.8 360,0 120,0" fill="none" stroke="var(--axis)" stroke-width="1.5"/>
+        <line x1="240" y1="207.8" x2="120" y2="0" stroke="var(--grid)" stroke-width="1" stroke-dasharray="4 4"/>
+        <!-- class r: tau = 0, winding 0, at the rhombus corners -->
+        <g fill="var(--c1)">
+          <circle cx="0" cy="207.8" r="7"/><circle cx="240" cy="207.8" r="7"/>
+          <circle cx="360" cy="0" r="7"/><circle cx="120" cy="0" r="7"/>
+        </g>
+        <!-- class 3_1: tau = 1/3, winding -1 -->
+        <circle cx="120" cy="138.5" r="7" fill="var(--c2)"/>
+        <!-- class 3_2: tau = 2/3, winding +1 -->
+        <circle cx="240" cy="69.3" r="7" fill="var(--c3)"/>
+        <text x="120" y="126" text-anchor="middle" font-size="13" fill="var(--ink)">3₁ · τ = ⅓ · w = −1</text>
+        <text x="240" y="57" text-anchor="middle" font-size="13" fill="var(--ink)">3₂ · τ = ⅔ · w = +1</text>
+        <text x="8" y="228" font-size="13" fill="var(--ink)">3 · τ = 0 · w = 0</text>
+        <text x="360" y="228" text-anchor="end" font-size="11" fill="var(--muted)">one p3 cell — the box is three of these</text>
+      </g>
+    </svg>
+    <figcaption>
+      The forced structure of <strong>g227</strong>, schematically, on <em>one primitive p3
+      cell</em> — the simulation box drawn everywhere else on this page is three of these, with
+      nine centres rather than three. The three classes of threefold centre of a
+      <strong>333</strong> orbifold sit at the corners of the cell and at the two triangle
+      centroids. Which centroid class is labelled 3₁ and which 3₂ is a choice of basis;
+      what the symbol forces is that the three classes carry windings
+      <strong>0</strong>, <strong>−1</strong>, <strong>+1</strong>, that the two charged ones are
+      exact zeros of Â, and that the total over the cell is <strong>0</strong>.
+      <span class="thm-legend">
+        <span><i style="background:var(--c1)"></i>τ = 0, no charge, |Â| maximal</span>
+        <span><i style="background:var(--c2)"></i>τ = ⅓, w = −1</span>
+        <span><i style="background:var(--c3)"></i>τ = ⅔, w = +1</span>
+      </span>
+    </figcaption>
+  </figure>
+
+  <p>
+    All of that is legible in the published animation. The pattern turns; the cores do not move,
+    because Theorem B pins them to the group and not to the frame. Every third of a period the
+    picture returns to itself rotated by 120° about a <strong>3₁</strong> centre — the plain
+    centres are the ones that cost no time, and a turn about one of those is a symmetry of each
+    frame on its own.
+  </p>
+
+  <p>
+    The pair of orbifolds is worth reading off, because it says what a simulator has to work with.
+    In colour-group form g227 is <strong>333/333</strong>: the kernel is again a p3, on a lattice
+    three times coarser, so every frame separately still has threefold symmetry. Its neighbour
+    g226 is <strong>333/◦</strong> — every rotation carries <em>τ</em> = ⅓, the kernel is the
+    translation lattice alone, and no single frame has any rotational symmetry at all. That is
+    what the catalogue's <em>m</em> column measures, and it is why the entries with a trivial
+    kernel are the ones where a statement about the kernel-symmetric subspace has nothing to
+    say.
+  </p>
+
+  <h3>g226 — 3₁3₁3₁, where the group offers a choice</h3>
+
+  <p>
+    Again p3 and <strong>333</strong>, but now all three cone classes carry offset ⅓; the residue
+    is ⅓ + ⅓ + ⅓ = <strong>1</strong>, so the entry is legal. Theorem B allows −1 at each class,
+    but then Σ<em>w</em>/<em>n</em> = −1, and Theorem C needs the total to be 0. There are exactly
+    two cheap ways out, and <strong>the group does not choose between them</strong>:
+  </p>
+
+  <ul>
+    <li>move the leftover onto a cone — windings <strong>(−1, −1, +2)</strong>, legitimate because
+      +2 ≡ −1 (mod 3), cost <strong>4</strong> cores per cell; or</li>
+    <li>keep the minimal windings <strong>(−1, −1, −1)</strong> and pay for a free orbit of charge
+      <strong>+1</strong> — three extra vortices, cost <strong>6</strong>.</li>
+  </ul>
+
+  <p>
+    Both branches occur in the published data. The Brusselator records and three of the four
+    Gray–Scott rows take the doubled core; <strong>both</strong> Ginzburg–Landau records of g226
+    take the minimal windings with three free +1 vortices. The mirror-image statement holds for
+    g225, whose Gray–Scott row also takes the free-vortex branch.
+    It is tempting — and it was, at first, tempting here — to say that the doubled core is
+    arithmetically forced. It is not: it is merely the cheaper of two admissible structures, and
+    which one appears is a question for the dynamics, not for the symbol. The same caution applies
+    to g244, where nothing is forced at all — its minimal structure
+    6₂[−2] 3₂[+1] 3₂[+1] already balances, and the one Gray–Scott record that departs from it
+    simply chooses −2 at the threefold classes and pays with free charge.
+  </p>
+
+  <h3>g133 — 4₂∗~2, a mirror example</h3>
+
+  <p>
+    Orbifold <strong>4*2</strong>, <em>m</em> = <strong>2</strong>. Its boundary is a single
+    circle with one corner, so there is one class of mirror line — the two perpendicular families
+    one sees in the plane are conjugate by the fourfold rotation — and it carries <em>τ</em> = ½,
+    which is the single tilde in the catalogue's symbol <strong>4₂∗~2</strong>. By Theorem E.2 the
+    first harmonic vanishes identically along that whole family of lines: the picture is a grid of
+    dark lines, not a lattice of isolated cores. The
+    geometry is worth getting the right way round, because it is easy to invert. The lines cross
+    <strong>at the twofold centres</strong>, which therefore lie on a nodal curve
+    and have <em>no index at all</em> — Theorem B's fourth case, and exactly what the measurements
+    record. The fourfold centres, which carry <em>k</em> = <strong>2</strong> = <em>n</em>/2, sit
+    <em>off</em> the lines, at distance <strong>0.354</strong> in units of the cell edge, which is why
+    they can carry the measurable charges <strong>±2</strong> that the budget needs.
+    At such a chiral centre +<em>n</em>/2 and −<em>n</em>/2 are the same residue, so the group
+    cannot fix the sign: this is the one place where the theorem yields a dichotomy rather than a
+    value, and both branches — an isolated core of charge ±<em>n</em>/2, or a crossing of
+    <em>n</em> nodal rays with no index — are realised in the catalogue.
+  </p>
+
+  <details id="theorem-tested-box">
+    <summary>What was tested, and what the test can carry — 532 record–channel rows, and why the big number is weaker evidence than it looks</summary>
+
+  <p>
+    The experiment scripts applied every prediction above to <strong>532</strong> (record,
+    channel) pairs: all <strong>116</strong> published equation orbits — <strong>65</strong>
+    Ginzburg–Landau records and <strong>51</strong> Brusselator records — plus <strong>150</strong>
+    rows of the atlas produced by a third equation, Gray–Scott, a stratified sample covering all <strong>68</strong> catalogue entries,
+    both channels, in <strong>203</strong> seconds of local processor time and with
+    <strong>zero</strong> evaluations of any right-hand side. Across those rows,
+    <strong>2990</strong> rotation centres were examined, <strong>2032</strong> of them had a
+    well-defined index, and the congruence <em>w</em> ≡ −<em>k</em> (mod <em>n</em>) held at every
+    single one: <strong>0</strong> failures. The generalisation to higher harmonics was checked
+    separately on 13 groups at <em>j</em> = 1…4 — <strong>52</strong> pairs,
+    <strong>244</strong> measurable centres, again <strong>0</strong> failures.
+  </p>
+
+  <p>
+    <strong>That number is weaker evidence than it looks, and the reason is instructive.</strong>
+    Every movie the repository exports is passed through a space–time projection before it is
+    encoded, which averages over the group's action so that the defining relation holds exactly.
+    On the g227 record the nine operations agree <em>bitwise</em>. So residuals at the
+    <strong>10⁻¹⁵</strong> level in that sweep are the round-off of an identity — a check on the
+    implementation and on the sign conventions, not a measurement of the dynamics.
+    The independent evidence comes from fields no projector ever touched:
+  </p>
+
+  <p class="tcap">Theorems A and B measured on unprojected data; two channels where two figures
+    are given, and residuals relative to the field's own scale. On the double-precision field
+    the plus sign is off by <strong>1.7320508</strong>, exactly as on the exports. The table
+    scrolls sideways on a narrow screen.</p>
+  <div class="thm-tablewrap">
+    <table class="wide-first">
+      <thead>
+        <tr><th>Field</th><th>Character law, minus sign</th>
+          <th>|Â| at a forced-zero centre</th><th>Windings</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Unprojected fourth-order Runge–Kutta replay of the g227 orbit, 336 steps from the
+            published first frame</td>
+          <td class="num"><strong>7.3 × 10⁻⁸</strong> / 5.7 × 10⁻⁸</td>
+          <td class="num">3.4 × 10⁻⁸ / 2.3 × 10⁻⁸</td>
+          <td>0, −1, +1 — unchanged</td>
+        </tr>
+        <tr>
+          <td>A double-precision g227 orbit from a different experiment, never projected (its own
+            symmetry residual is 1.1 × 10⁻⁹)</td>
+          <td class="num"><strong>4.1 × 10⁻¹⁰</strong> / 2.6 × 10⁻¹⁰</td>
+          <td class="num">2.6 × 10⁻¹¹</td>
+          <td>three at 0, three at +1, three at −1; total 0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    In other words: the theorem holds on unprojected trajectories to the accuracy the orbit itself
+    has, which is <strong>10⁻⁸</strong> for float32-stored fields and <strong>10⁻¹⁰</strong> for
+    double precision. That is the number to quote. What the big sweep genuinely adds is different
+    and more interesting: it records <em>which</em> of the structures the theorem permits each
+    equation actually selects — the sign at a half-offset centre, minimal windings against a
+    doubled core, free vortices present or absent.
+  </p>
+
+  <p>
+    Two predictions in the sweep failed, and both failures were deliberate over-reaches rather
+    than theorem failures.
+  </p>
+
+  <div class="thm-tablewrap">
+    <table>
+      <caption>The two checks that were <em>not</em> consequences of the theorem.</caption>
+      <thead><tr><th>Stronger guess</th><th class="num">Pass</th><th class="num">Fail</th><th>What it means</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>the index is always the <em>minimal</em> representative of −<em>k</em> mod <em>n</em></td>
+          <td class="num">398</td><td class="num thm-no">16</td>
+          <td>All in g225, g226, g244. For g225 and g226 the minimal windings do not sum to
+            zero, so the budget must be closed by a doubled core or by a free orbit — both are
+            legal and both occur in the published records. For g244 nothing is forced at all: one
+            record simply chose a non-minimal winding and paid for it.</td>
+        </tr>
+        <tr>
+          <td>cone indices plus free vortices sum to zero when counted by elementary mesh loops</td>
+          <td class="num">166</td><td class="num thm-no">4</td>
+          <td>A mesh artefact. Beside a core of charge ≥ 2 the phase jump between adjacent nodes
+            reaches <strong>0.96π</strong>–<strong>1.00π</strong> and the principal-value loop map
+            aliases; on a mesh refined twofold and fourfold the free charge is exactly zero. The
+            band-limited contour index used for every congruence test is stable on six radii.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  </details>
+
+  <details>
+    <summary>All <strong>68</strong> catalogue entries: clockwork symbol, kernel, residue, forced minimum</summary>
+    <p class="thm-note" style="margin-top:.4rem">
+      These are the catalogue's own symbols, not a notation invented here: every one has Conway
+      cost exactly 2, so it still names a wallpaper group, and the decoration is what turns that
+      group into a clock. <strong>3₁</strong> is a threefold gyration point whose counterclockwise
+      generator carries <em>τ</em> = ⅓; <strong>2₁</strong> a half-turn at half a period;
+      <strong>~</strong> a mirror arc that holds only after half a period; <strong>×½</strong> a
+      glide that also waits half a period; and the prefixes <strong>c</strong> and
+      <strong>r</strong> a centring of the space–time lattice — a half-cell shift at half a
+      period, a third-cell shift at a third of a period. They are defined in full on the
+      catalogue's
+      <a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation page</a>.
+      The <em>Kernel</em> column is the orbifold of the subgroup with <em>τ</em> = 0 — the
+      symmetry a single frame still has, and the domain a fundamental-domain simulator would be
+      left with. The residue column is
+      Σ<em>k</em><sub><em>c</em></sub>/<em>n</em><sub><em>c</em></sub> over the cone classes of the
+      group's rotation subgroup, an integer in every row — that is Theorem D. The last two columns
+      give the cheapest defect structure compatible with Theorems B and C, one winding per cone
+      class, and its cost in cores per primitive cell of the rotation subgroup's translation
+      lattice; a cheapest structure is not a forecast of what an equation will produce, only a
+      lower bound on what it must pay. Nine columns: the table scrolls sideways on a narrow
+      screen.
+    </p>
+    <div class="thm-tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Entry</th><th>Family</th><th>Orbifold</th><th class="num"><em>m</em></th>
+            <th>Kernel</th>
+            <th>Clockwork symbol</th>
+            <th class="num">Σ<em>k</em>/<em>n</em></th>
+            <th>Cheapest windings</th><th class="num">cores / cell</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>g1</td><td>p1</td><td>◦</td><td class="num">1</td><td class="thm-sig">◦</td><td class="thm-sig">◦</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g5</td><td>p2</td><td>2222</td><td class="num">1</td><td class="thm-sig">2222</td><td class="thm-sig">2222</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g6</td><td>p2</td><td>2222</td><td class="num">2</td><td class="thm-sig">◦</td><td class="thm-sig">2₁2₁2₁2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g7</td><td>p2</td><td>2222</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">c222₁2₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g8</td><td>cm</td><td>∗×</td><td class="num">1</td><td class="thm-sig">∗×</td><td class="thm-sig">∗×</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g9</td><td>cm</td><td>∗×</td><td class="num">2</td><td class="thm-sig">◦</td><td class="thm-sig">~∗×½</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g10</td><td>pm</td><td>∗∗</td><td class="num">1</td><td class="thm-sig">∗∗</td><td class="thm-sig">∗∗</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g11</td><td>pg</td><td>××</td><td class="num">1</td><td class="thm-sig">××</td><td class="thm-sig">××</td><td class="num">0</td><td class="thm-sig">—</td><td class="num">0</td></tr>
+          <tr><td>g54</td><td>pmm</td><td>∗2222</td><td class="num">1</td><td class="thm-sig">∗2222</td><td class="thm-sig">∗2222</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g55</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">∗~2~2~2~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g56</td><td>pmg</td><td>22∗</td><td class="num">1</td><td class="thm-sig">22∗</td><td class="thm-sig">22∗</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g57</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">22~∗</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g58</td><td>pgg</td><td>22×</td><td class="num">1</td><td class="thm-sig">22×</td><td class="thm-sig">22×</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g59</td><td>pgg</td><td>22×</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">22×½</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g60</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">∗∗</td><td class="thm-sig">∗2₁~2₁2₁~2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g61</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">××</td><td class="thm-sig">2₁2₁~∗</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g62</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">∗∗</td><td class="thm-sig">2₁2₁∗</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g63</td><td>pgg</td><td>22×</td><td class="num">2</td><td class="thm-sig">××</td><td class="thm-sig">2₁2₁×</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g64</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">c∗222₁2₁ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g65</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c∗222₁2₁ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g66</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c22₁∗ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g67</td><td>pmg</td><td>22∗</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">c22₁∗ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g68</td><td>cmm</td><td>2∗22</td><td class="num">1</td><td class="thm-sig">2∗22</td><td class="thm-sig">2∗22</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g69</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">2∗~2~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g70</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">∗×</td><td class="thm-sig">2₁∗2₁~2₁</td><td class="num">2</td><td class="thm-sig">−1, −1, +1, +1</td><td class="num">4</td></tr>
+          <tr><td>g71</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">c2₁∗22ᵃ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g72</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">c2₁∗22ᵇ</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g73</td><td>cmm</td><td>2∗22</td><td class="num">2</td><td class="thm-sig">22∗</td><td class="thm-sig">c2∗2₁2₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g74</td><td>pmm</td><td>∗2222</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">c∗22₁22₁</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g75</td><td>pgg</td><td>22×</td><td class="num">4</td><td class="thm-sig">2222</td><td class="thm-sig">c22₁×¼</td><td class="num">1</td><td class="thm-sig">0, 0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g94</td><td>p4</td><td>442</td><td class="num">1</td><td class="thm-sig">442</td><td class="thm-sig">442</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g95</td><td>p4</td><td>442</td><td class="num">2</td><td class="thm-sig">2222</td><td class="thm-sig">4₂4₂2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g96</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">◦</td><td class="thm-sig">4₁4₁2₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +1</td><td class="num">4</td></tr>
+          <tr><td>g97</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">◦</td><td class="thm-sig">4₃4₃2₁</td><td class="num">2</td><td class="thm-sig">+1, +1, −1</td><td class="num">4</td></tr>
+          <tr><td>g98</td><td>p4</td><td>442</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">c44₂2₁</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g99</td><td>p4</td><td>442</td><td class="num">4</td><td class="thm-sig">2222</td><td class="thm-sig">c4₁4₃2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g128</td><td>p4m</td><td>∗442</td><td class="num">1</td><td class="thm-sig">∗442</td><td class="thm-sig">∗442</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g129</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">∗2222</td><td class="thm-sig">∗4₂~4₂2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g130</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">∗~4₂4₂~2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g131</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">∗~4~4~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g132</td><td>p4g</td><td>4∗2</td><td class="num">1</td><td class="thm-sig">4∗2</td><td class="thm-sig">4∗2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g133</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">22×</td><td class="thm-sig">4₂∗~2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g134</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">2∗22</td><td class="thm-sig">4₂∗2</td><td class="num">1</td><td class="thm-sig">−2, +2, 0</td><td class="num">4</td></tr>
+          <tr><td>g135</td><td>p4g</td><td>4∗2</td><td class="num">2</td><td class="thm-sig">442</td><td class="thm-sig">4∗~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g136</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">∗442</td><td class="thm-sig">c∗44₂2₁ᵃ</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g137</td><td>p4g</td><td>4∗2</td><td class="num">4</td><td class="thm-sig">∗2222</td><td class="thm-sig">c4₃∗2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g138</td><td>p4m</td><td>∗442</td><td class="num">2</td><td class="thm-sig">4∗2</td><td class="thm-sig">c∗44₂2₁ᵇ</td><td class="num">1</td><td class="thm-sig">0, −2, +1</td><td class="num">4</td></tr>
+          <tr><td>g139</td><td>p4g</td><td>4∗2</td><td class="num">4</td><td class="thm-sig">22×</td><td class="thm-sig">c4₁∗2</td><td class="num">1</td><td class="thm-sig">−1, +1, 0</td><td class="num">2</td></tr>
+          <tr><td>g224</td><td>p3</td><td>333</td><td class="num">1</td><td class="thm-sig">333</td><td class="thm-sig">333</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g225</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">◦</td><td class="thm-sig">3₂3₂3₂</td><td class="num">2</td><td class="thm-sig">+1, +1, −2</td><td class="num">4</td></tr>
+          <tr><td>g226</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">◦</td><td class="thm-sig">3₁3₁3₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +2</td><td class="num">4</td></tr>
+          <tr><td>g227</td><td>p3</td><td>333</td><td class="num">3</td><td class="thm-sig">333</td><td class="thm-sig">r33₁3₂</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g230</td><td>p3m1</td><td>∗333</td><td class="num">1</td><td class="thm-sig">∗333</td><td class="thm-sig">∗333</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g231</td><td>p3m1</td><td>∗333</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">∗~3~3~3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g232</td><td>p31m</td><td>3∗3</td><td class="num">1</td><td class="thm-sig">3∗3</td><td class="thm-sig">3∗3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g233</td><td>p31m</td><td>3∗3</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">3∗~3</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g234</td><td>p31m</td><td>3∗3</td><td class="num">3</td><td class="thm-sig">∗333</td><td class="thm-sig">r3₂∗3</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g235</td><td>p31m</td><td>3∗3</td><td class="num">6</td><td class="thm-sig">333</td><td class="thm-sig">r3₂∗~3</td><td class="num">1</td><td class="thm-sig">0, −1, +1</td><td class="num">2</td></tr>
+          <tr><td>g243</td><td>p6</td><td>632</td><td class="num">1</td><td class="thm-sig">632</td><td class="thm-sig">632</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g244</td><td>p6</td><td>632</td><td class="num">3</td><td class="thm-sig">2222</td><td class="thm-sig">6₂3₂2</td><td class="num">1</td><td class="thm-sig">−2, +1, 0</td><td class="num">4</td></tr>
+          <tr><td>g245</td><td>p6</td><td>632</td><td class="num">3</td><td class="thm-sig">2222</td><td class="thm-sig">6₄3₁2</td><td class="num">1</td><td class="thm-sig">+2, −1, 0</td><td class="num">4</td></tr>
+          <tr><td>g246</td><td>p6</td><td>632</td><td class="num">2</td><td class="thm-sig">333</td><td class="thm-sig">6₃32₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+          <tr><td>g247</td><td>p6</td><td>632</td><td class="num">6</td><td class="thm-sig">◦</td><td class="thm-sig">6₅3₂2₁</td><td class="num">2</td><td class="thm-sig">+1, +1, −1</td><td class="num">6</td></tr>
+          <tr><td>g248</td><td>p6</td><td>632</td><td class="num">6</td><td class="thm-sig">◦</td><td class="thm-sig">6₁3₁2₁</td><td class="num">1</td><td class="thm-sig">−1, −1, +1</td><td class="num">6</td></tr>
+          <tr><td>g268</td><td>p6m</td><td>∗632</td><td class="num">1</td><td class="thm-sig">∗632</td><td class="thm-sig">∗632</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g269</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">3∗3</td><td class="thm-sig">∗6₃~3~2₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+          <tr><td>g270</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">632</td><td class="thm-sig">∗~6~3~2</td><td class="num">0</td><td class="thm-sig">0, 0, 0</td><td class="num">0</td></tr>
+          <tr><td>g271</td><td>p6m</td><td>∗632</td><td class="num">2</td><td class="thm-sig">∗333</td><td class="thm-sig">∗~6₃32₁</td><td class="num">1</td><td class="thm-sig">−3, 0, +1</td><td class="num">6</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="thm-note">
+      Reading of the whole column: the residue is <strong>0</strong> in 27 entries,
+      <strong>1</strong> in 32 and <strong>2</strong> in 9. Of the <strong>51</strong> entries with
+      a non-zero offset, <strong>none</strong> requires a free vortex orbit — every clockwork group in
+      the catalogue can be <em>balanced</em> by putting all of its topological charge on cone
+      points, which is a statement about the arithmetic and not a promise that any particular
+      equation will produce it — and <strong>15</strong> require at least one core of charge ≥ 2,
+      because their minimal windings do not sum to zero. Nothing forbids free vortices; the second
+      reciprocal shell of g227 produces <strong>24</strong> cores in the box: the same six charged
+      cone points, with the same charges, plus <strong>18</strong> free ones in two orbits of nine,
+      whose charges must therefore sum to zero among themselves. They do — nine at
+      <strong>+1</strong> and nine at <strong>−1</strong>.
+    </p>
+  </details>
+
+<figure class="fig narrow" id="fig-clockwork-with-cores">
+  <video controls muted loop playsinline preload="none" poster="assets/poster-clockwork-with-cores.webp" aria-label="Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are."><source src="assets/clockwork-with-cores.mp4" type="video/mp4"><p>Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.</p></video>
+  <figcaption>One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved.</figcaption>
+</figure>
+
+<h2 id="pencil">What it buys, before any solver starts<a class="hlink" href="#pencil" aria-label="link to this section">#</a></h2>
+
+<p>
+  The statements above are not only a check on an answer; they are enough to draw one. Project a
+  plane wave onto the character of Theorem A and most waves cancel identically — for g227, three of
+  the six shortest reciprocal vectors survive and three read exactly zero, and the whole of the
+  next shell cancels. Symmetrising one survivor gives a field with three Fourier components: three
+  plane waves at <b>120</b>°, which is the minimal p3 clockwork field.
+</p>
+
+<figure class="fig" id="fig-three-wave-star-seed">
+  <img src="assets/three-wave-star-seed.webp" alt="Three panels of the seed field over two lattice cells: the real part in the ember palette showing bright hexagonal blobs, the modulus in greyscale showing dark points on a honeycomb, and the phase in hue with black and white diamonds marking vortices of opposite sign." loading="lazy" decoding="async">
+  <figcaption>The seed, built from the clockwork symbol alone and before a single step of the reaction–diffusion equation. Symmetrising the three surviving waves gives a star with exactly three Fourier components — three plane waves at <b>120</b>°, |k|² = <b>0.032815</b> — that satisfies the character law to <b>7.0e−16</b>. Its modulus already has exact zeros at the six 3₁ and 3₂ screw centres of the box with windings ∓1, and the three τ = 0 centres sit at maxima. The picture is right before any computation of the dynamics.</figcaption>
+</figure>
+
+<p>
+  That picture already has the structure Theorems B and C forced: exact zeros at the six screw
+  centres with windings ∓<b>1</b>, maxima at the three <i>τ</i> = 0 centres, total charge
+  <b>0</b>, and the character law to <b>7.0e−16</b>. Lifting it through the oscillatory
+  eigenvector of a <b>2</b> × <b>2</b> matrix and handing it to Newton's method on a twisted
+  shooting equation reaches the published orbit in <b>5</b> steps. The construction, the solver
+  and two live searches are in the companion tutorial,
+  <a href="../clockwork-orbits/">How to find a time-symmetric animation</a>.
+</p>
+
+<p class="aside">
+  A structure the theorem permits is not a structure an equation will produce. Of the <b>51</b>
+  catalogue entries with a non-zero offset, <b>29</b> have a Brusselator record; every one of the
+  <b>22</b> without one is forced to carry a nodal line or a core of charge at least <b>2</b>.
+  That is an exceptionless necessary condition with a plausible mechanism — a one-dimensional zero
+  set is fragile, a multiply charged core tends to split — and it is not a proof that no orbit
+  exists. The qualifications are stated in full under Theorem E.
+</p>
+  <h2 id="theorem-status">What is proved, what is measured, what is open<a class="hlink" href="#theorem-status" aria-label="link to this section">#</a></h2>
+
+  <p>
+    <strong>Proved</strong>, from the defining relation alone, with no equation and no
+    small-amplitude assumption: Theorems A, B, C, D, E. Each was independently re-derived during
+    review.
+    <strong>Measured</strong>, on unprojected data: the character law and the forced zeros and
+    windings of g227, to <strong>7.3 × 10⁻⁸</strong> and <strong>4.1 × 10⁻¹⁰</strong> on two
+    independent fields; and, on the symmetrised exports, the full catalogue sweep as a check of
+    conventions and implementation.
+    <strong>Open:</strong> whether a dynamically realised orbit can hide its structure in a
+    vanishing harmonic — permitted by the theorem, never observed here; which branch of the
+    half-offset tie a given equation selects; whether a forced structure is <em>attainable</em> at
+    all, which is the stability question the coverage gap gestures at without settling; and
+    harmonics beyond the fourth.
+  </p>
+
+<section class="thm" id="refs">
+  <h2 id="theorem-refs">Where this sits<a class="hlink" href="#theorem-refs" aria-label="link to this section">#</a></h2>
+
+  <ul class="thm-refs">
+    <li>
+      J. H. Conway, H. Burgiel, C. Goodman-Strauss, <em>The Symmetries of Things</em>, A K Peters,
+      2008 — the Magic Theorem and the orbifold signatures. Theorem D comes from the same orbifold
+      presentation as Conway's theorem: his statement is its Euler characteristic, this one is a
+      homomorphism applied to its defining relation.
+    </li>
+    <li>
+      M. Golubitsky, I. Stewart, <em>The Symmetry Perspective</em>, Birkhäuser, 2002 — the
+      <em>H</em>/<em>K</em> classification of spatio-temporal symmetries of periodic solutions. A
+      clockwork group is exactly such a pair, with <em>H</em>/<em>K</em> cyclic by construction.
+    </li>
+    <li>
+      M. Golubitsky, I. Stewart, D. G. Schaeffer, <em>Singularities and Groups in Bifurcation
+      Theory, Volume II</em>, Springer, 1988 — the equivariant Hopf theorem. Its isotropy
+      subgroups of Γ × S¹ are graphs of homomorphisms — twisted subgroups, which is precisely the
+      data (<em>G</em>, <em>τ</em>) — and the isotropy condition on the critical eigenmode
+      <em>is</em> Theorem A. What is added here is that the statement needs no bifurcation: it
+      holds at finite amplitude, for any equation.
+    </li>
+    <li>
+      J. Masajada, B. Dubik, "Optical vortex generation by three plane wave interference",
+      <em>Optics Communications</em> <strong>198</strong> (2001) 21–27 — three plane waves at 120°
+      produce a honeycomb vortex–antivortex lattice. That is the minimal p3 clockwork field, and
+      the charges it reports are the (0, −1, +1) of Theorem B. The optics derivation goes through
+      the interference geometry; Theorem B reaches the same charges from the symmetry alone.
+    </li>
+    <li>
+      <strong>Novelty, unproven.</strong> No prior statement of the winding congruence for general
+      wallpaper clockwork groups, of the residue identity, or of the multiplicity bookkeeping in
+      this combined form was found. The pieces are all classical; the combination may or may not
+      be in the literature, and "new" should be treated as unproven rather than claimed.
+    </li>
+  </ul>
+
+</section>
+
+<div class="footlinks">
+  <p class="small"><b>Where to go next</b></p>
+  <ul>
+    <li><a href="../clockwork-orbits/">How to find a time-symmetric animation</a> — the constructive
+      companion: the same symbol turned into a seed by hand, Newton on one frame and one number, a
+      fundamental domain glued to its own past, and a walkthrough of the whole method on three
+      coupled cells before any of it touches a mesh.</li>
+    <li><a href="../making-of/">The making of this site</a> — the seven-week timeline, who asked for
+      what and when, and what it all cost.</li>
+    <li><a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a> — the catalogue entry the worked
+      example uses, as a colour group.</li>
+    <li><a href="https://yaroslavvb.github.io/animated-groups-fable/notation.html">notation.html</a> — the decorated signatures: the subscripts, the
+      tilde for a half-period mirror, the prefixes <b>c</b> and <b>r</b>.</li>
+  </ul>
+  <p class="small muted" style="margin-top:18px">
+    Where an experiment's own headline and its independent check disagreed, the check won: the
+    empirical residuals here are the honest unprojected numbers, <b>7.3e−08</b> and
+    <b>4.1e−10</b>, not the round-off of the symmetrised exports.
+  </p>
+</div>
+
+</main>
+</body>
+</html>

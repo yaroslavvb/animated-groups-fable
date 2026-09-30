@@ -1,0 +1,45 @@
+[
+  {
+    "id": "decorated-orbifold",
+    "file": "decorated-orbifold-g227.svg",
+    "alt": "Diagram of the 333 orbifold of g227 drawn as a curved triangle with a dashed second face behind it. Each corner carries a coloured rotation marker and a label: 3 with time offset zero, 3 sub 1 with offset one third, 3 sub 2 with offset two thirds, and beside each the winding it forces: 0, minus 1, plus 1. To the right, three short equations for the Conway cost, the temporal residue and the index budget.",
+    "caption": "The clockwork symbol, read as a decorated orbifold. Dividing the plane by g227 gives Conway's 333 turnover; the symbol r33₁3₂ then decorates each cone point with a time offset. Conway's magic theorem balances the geometry — the three costs sum to exactly 2, so the symbol tiles the plane. Applying the offset τ, which is a homomorphism, to the orbifold relation balances the choreography: 0/3 + 1/3 + 2/3 = 1, an integer, and the same sum is an integer for all 68 catalogue entries (values 0, 1 and 2). The offsets then force the windings 0, −1 and +1, which sum to zero over one primitive p3 cell when each is weighted by 1/3. Drawn on the simulation box, which is three p3 cells, that is six pinned vortices, three of each sign.",
+    "source_experiment": "theorem"
+  },
+  {
+    "id": "harmonic-phase-charges",
+    "file": "harmonic-phase-charges.webp",
+    "alt": "Two panels over several lattice cells. The left shows the phase of the first temporal harmonic as hue with the nine threefold centres marked by circles and up and down triangles, each labelled with a winding of 0, −1 or +1. The right shows the magnitude, dark at the marked screw centres.",
+    "caption": "What the symbol forces, measured on the published orbit. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres — exactly −k mod 3 at a centre whose generator carries the offset k/3. The magnitude vanishes at the six screw centres and peaks at the three τ = 0 centres. The charges sum to zero over one cell, as the index budget demands.",
+    "source_experiment": "theorem"
+  },
+  {
+    "id": "cone-point-cores",
+    "file": "cone-point-cores.webp",
+    "alt": "Six panels of phase-as-hue close-ups around rotation centres, each labelled with a group, a centre type and a winding: a threefold centre with winding −1, a trio with −1, −1 and +2, a fourfold centre with −2, a sixfold centre resolved as six nodal rays with no index, the same symbol with winding +3, and a panel of crossing nodal lines.",
+    "caption": "Six cores the symbols force, side by side. The theorem fixes the winding only modulo the order of the centre, which is why g226's three 3₁ centres can read −1, −1 and +2. A 4₂ centre is driven to −2; at a 6₃ centre the tie between ±3 need not be broken, and both outcomes occur in the published data — six nodal rays with no index, or a clean +3. In g133 the half-period mirror lines cross at the two-fold centres, which therefore lie on a nodal curve and carry no index at all, while the 4₂ cores sit off the lines and can be measured at ±2.",
+    "source_experiment": "theorem"
+  },
+  {
+    "id": "character-law-sign",
+    "file": "character-law-sign.webp",
+    "alt": "Histogram on a logarithmic error axis. One population of blue bars clusters near 1e−15 and 1e−8; a separate orange population sits at and above 1, far to the right.",
+    "caption": "The sign in the character law is not a convention. Over 186 published record–channel rows with a time-shift order of at least 3, testing Â(gx) = e^(−2πijτ) Â(x) never fails, and across all 532 rows of the sweep the worst error is 1.9e−08, while on those 186 rows the opposite sign never gets below 1.73. (Below m = 3 the two signs coincide, so only those rows can tell them apart.) One honest qualification: the published exports are symmetrised by the site's own projection step, so those tiny residuals are the round-off of an identity. Re-sourced on data that was never projected, the law still holds — 7.3e−08 on an unprojected replay and 4.1e−10 on a double-precision orbit from the delayed-glue route.",
+    "source_experiment": "theorem"
+  },
+  {
+    "id": "clockwork-with-cores",
+    "file": "clockwork-with-cores.mp4",
+    "poster": "poster-clockwork-with-cores.webp",
+    "alt": "Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.",
+    "caption": "One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved.",
+    "source_experiment": "theorem"
+  },
+  {
+    "id": "three-wave-star-seed",
+    "file": "three-wave-star-seed.webp",
+    "alt": "Three panels of the seed field over two lattice cells: the real part in the ember palette showing bright hexagonal blobs, the modulus in greyscale showing dark points on a honeycomb, and the phase in hue with black and white diamonds marking vortices of opposite sign.",
+    "caption": "The seed, built from the clockwork symbol alone and before a single step of the reaction–diffusion equation. Symmetrising the three surviving waves gives a star with exactly three Fourier components — three plane waves at 120°, |k|² = 0.032815 — that satisfies the character law to 7.0e−16. Its modulus already has exact zeros at the six 3₁ and 3₂ screw centres of the box with windings ∓1, and the three τ = 0 centres sit at maxima. The picture is right before any computation of the dynamics.",
+    "source_experiment": "direct"
+  }
+]

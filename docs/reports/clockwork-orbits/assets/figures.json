@@ -1,5 +1,47 @@
 [
   {
+    "id": "ring-constraint",
+    "file": "ring-constraint.webp",
+    "alt": "Three panels. Left: three coloured discs labelled 0, 1 and 2 on a circle, with a curved arrow and the caption move one cell equals wait T over 3. Middle: three time traces of u, identical in shape, each shifted a third of a period from the last, with dotted lines at the thirds and an arrow marking the offset. Right: a single closed loop in the u-v plane with three coloured dots spaced round it.",
+    "caption": "The clockwork constraint on three cells. The symmetry is rotation of the ring, its generator carries the time offset one third, and the constraint q(t + T/3) = S q(t) says that handing every cell's state to its neighbour is the same as waiting a third of a period. Three cells then carry one trace between them, each a third of a period behind the last, and at any instant they sit at three points a third of a lap apart on one loop. Applying the relation three times gives back the identity, so the period comes out as 6.3661055591 — a number nobody chose. This is the miniature of g227's r33₁3₂, with three cells in place of 2 592 mesh values.",
+    "source_experiment": "ring"
+  },
+  {
+    "id": "ring-plain-sim",
+    "file": "ring-plain-sim.webp",
+    "alt": "Three panels. Top left: the first forty time units of three traces, clearly out of phase. Bottom left: the last forty time units, the three traces exactly on top of one another. Right: a logarithmic plot of pattern amplitude against time for five runs, all straight lines falling from about 0.2 to about 1e-11, with a dashed horizontal line high above them marking where the clockwork orbit sits.",
+    "caption": "Why running the simulation forward does not work, measured rather than asserted. 5 random starts near the uniform equilibrium, integrated for 400 time units. Every one ends in the in-phase state, with all three cells oscillating in unison and the coupling term vanishing identically; the component of the state on the pattern the symmetry asks for falls by a factor 0.6808 per period, and the largest surviving amplitude of the five is 1.44e−10, against a clockwork orbit whose own pattern amplitude never goes below 0.241 anywhere in its period. The decay rate is predictable exactly: with equal diffusion the coupling is a multiple of the identity, so a pattern perturbation of the in-phase cycle decays like e^(−3DT), which is 0.6800.",
+    "source_experiment": "ring"
+  },
+  {
+    "id": "ring-seed",
+    "file": "ring-seed.webp",
+    "alt": "Three panels. Left: a logarithmic bar chart with two bars at 1e-16 labelled 0 and one bar at 1 labelled 1. Middle: three arrows from a common origin at 120 degrees to one another on a unit circle, labelled 0, 1 and 2. Right: the three time traces of the seed over one period, smooth and offset by a third of a period each.",
+    "caption": "The seed, drawn before a single step of the equation. Only one of the three patterns available on a three-cell ring survives the clockwork character; the other two project to exactly zero, which on a computer means round-off, 1.66e−16 and 2.48e−16. The survivor's phases are 1, e^(−2πi/3) and e^(−4πi/3) — the ring's copy of the three plane waves at 120° that the real problem's character admits. Multiplying it by the oscillatory eigenvector of the 2 × 2 reaction Jacobian, whose eigenvalues are 0.15 ± 0.988685997i, gives a complete initial state and the period estimate T₀ = 2π/ω = 6.3550868. The amplitude 0.5604 is the root-mean-square of the spatially uniform Brusselator limit cycle — a two-variable problem with no ring and no symmetry in it. What comes out is 1.72e−01 away from solving the problem.",
+    "source_experiment": "ring"
+  },
+  {
+    "id": "ring-newton",
+    "file": "ring-newton.webp",
+    "alt": "Three panels. Left: the twisted shooting residual against Newton step on a logarithmic axis, falling from about 0.17 to about 1e-12 in five steps. Middle: the period against Newton step, overshooting once and settling on a dashed line. Right: one closed loop in the u-v plane with three coloured dots on it and a cross marking the equilibrium.",
+    "caption": "Newton on one state and one number. The unknowns are the six state values and the period; the equations are the six components of S⁻¹Φ(T/3)(q₀) − q₀ and one phase condition that pins the time origin. 5 steps take the residual from 1.72e−01 to 9.02e−13 and the period from the Hopf estimate to 6.3661055591. The converged state is the clockwork one and not the synchronised one: its pattern amplitude runs between 0.241 and 0.346 over the period, where any in-phase state reads exactly 0, and the three cells sit spread round one loop. The real problem's table has the same shape and the same step count; the only difference is that its Jacobian is 869 × 869 and is never built.",
+    "source_experiment": "ring"
+  },
+  {
+    "id": "ring-glue",
+    "file": "ring-glue.webp",
+    "alt": "Three panels. Left: a diagram of one filled disc labelled q of t with two faint discs above it labelled q of t minus T over 3 and q of t minus 2T over 3, each with an arrow pointing into the filled one. Middle: the delay against periods of simulation, starting at the Hopf period, swinging low and high, and settling on a dashed line. Right: the shape error against periods for four seeds on a logarithmic axis, all four falling as parallel straight lines.",
+    "caption": "The delayed glue: the second route, which needs no Newton solve at all. Reading the constraint the other way round makes cell 1 the history of cell 0 delayed by T/3 and cell 2 its history delayed by 2T/3, so two of the three cells can be thrown away and the ordinary differential equation in six variables becomes a delay differential equation in two. The delay starts at the Hopf period and is corrected once per period by a single Newton step on a phase condition. From white noise — no amplitude, no pattern and no sign to choose — 23 periods bring it to 6.3661055591, a relative 7.73e−13 from the answer Newton found, and the shape error falls by a factor 0.257 per period, geometrically, because in this setting the orbit is an attractor. Four seeds, three of noise and one analytic, behave identically.",
+    "source_experiment": "ring"
+  },
+  {
+    "id": "ring-stability",
+    "file": "ring-stability.webp",
+    "alt": "Three panels. Left and middle: the Floquet multipliers of two orbits plotted in the complex plane against a dashed unit circle; the left has every point inside, the middle has a pair just outside on the positive real axis. Right: a horizontal bar chart of three growth factors per period against a vertical line at one, two bars short of it and one past it.",
+    "caption": "Why plain simulation fails and the delay works, computed exactly on six numbers. A Floquet multiplier is an eigenvalue of the monodromy — linearise about the orbit, integrate the linearisation once round the period, and read the eigenvalues. One is always exactly 1, because sliding along the orbit goes nowhere. The in-phase oscillation has everything else inside the unit circle, 0.6800 in the pattern direction, so it attracts and forward simulation ends there. The clockwork orbit has a pair at 1.2549 outside it: a saddle, which no amount of accuracy lets a simulation sit on. Inside the delayed glue the same orbit's shape error contracts by 0.257 per period. The delay changes the stability without touching the orbit, because the feedback it amounts to is built from q(t) − q(t − T) and vanishes identically on the answer. On the real problem the same three numbers are a perturbation that grows 1.150 per period on the torus, a leading Floquet multiplier of 1.1608154, and a decay of 0.692 per period inside the glue.",
+    "source_experiment": "ring"
+  },
+  {
     "id": "decorated-orbifold",
     "file": "decorated-orbifold-g227.svg",
     "alt": "Diagram of the 333 orbifold of g227 drawn as a curved triangle with a dashed second face behind it. Each corner carries a coloured rotation marker and a label: 3 with time offset zero, 3 sub 1 with offset one third, 3 sub 2 with offset two thirds, and beside each the winding it forces: 0, minus 1, plus 1. To the right, three short equations for the Conway cost, the temporal residue and the index budget.",
@@ -33,35 +75,6 @@
     "alt": "Log-scale scatter plot of the final Newton residual against seed amplitude. Points between 0.30 and 0.60 sit at about 1e−15 and are marked as converged; points at 0.05, 0.10, 0.25, 0.70, 0.80 and 1.00 sit between 1e−3 and 1e−1 and are marked as not converged. A shaded band marks the window and a dotted line marks the amplitude 0.558.",
     "caption": "The one free knob in the construction, and where it works. The verified window at b = 2.3 is 0.30 to 0.60: at 0.30 Newton converges in 35 iterations, and at 0.25, the lower of the two amplitudes the original pipeline tried, it still stalls at 1.01e−02 after 150 iterations — though the original lifted a Ginzburg–Landau profile rather than this star, and converged from it. The knob can be removed: the amplitude is predictable in advance as the rms of the spatially uniform Brusselator limit cycle, a two-variable ordinary differential equation with no space and no group in it, which gives 0.558 at b = 2.3 and works at every b tested. Honestly stated: 0.558 lands mid-window by construction plus luck, not by a proof that it must.",
     "source_experiment": "direct"
-  },
-  {
-    "id": "harmonic-phase-charges",
-    "file": "harmonic-phase-charges.webp",
-    "alt": "Two panels over several lattice cells. The left shows the phase of the first temporal harmonic as hue with the nine threefold centres marked by circles and up and down triangles, each labelled with a winding of 0, −1 or +1. The right shows the magnitude, dark at the marked screw centres.",
-    "caption": "What the symbol forces, measured on the published orbit. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres — exactly −k mod 3 at a centre whose generator carries the offset k/3. The magnitude vanishes at the six screw centres and peaks at the three τ = 0 centres. The charges sum to zero over one cell, as the index budget demands.",
-    "source_experiment": "theorem"
-  },
-  {
-    "id": "cone-point-cores",
-    "file": "cone-point-cores.webp",
-    "alt": "Six panels of phase-as-hue close-ups around rotation centres, each labelled with a group, a centre type and a winding: a threefold centre with winding −1, a trio with −1, −1 and +2, a fourfold centre with −2, a sixfold centre resolved as six nodal rays with no index, the same symbol with winding +3, and a panel of crossing nodal lines.",
-    "caption": "Six cores the symbols force, side by side. The theorem fixes the winding only modulo the order of the centre, which is why g226's three 3₁ centres can read −1, −1 and +2. A 4₂ centre is driven to −2; at a 6₃ centre the tie between ±3 need not be broken, and both outcomes occur in the published data — six nodal rays with no index, or a clean +3. In g133 the half-period mirror lines cross at the two-fold centres, which therefore lie on a nodal curve and carry no index at all, while the 4₂ cores sit off the lines and can be measured at ±2.",
-    "source_experiment": "theorem"
-  },
-  {
-    "id": "character-law-sign",
-    "file": "character-law-sign.webp",
-    "alt": "Histogram on a logarithmic error axis. One population of blue bars clusters near 1e−15 and 1e−8; a separate orange population sits at and above 1, far to the right.",
-    "caption": "The sign in the character law is not a convention. Over 186 published record–channel rows with a time-shift order of at least 3, testing Â(gx) = e^(−2πijτ) Â(x) never fails, and across all 532 rows of the sweep the worst error is 1.9e−08, while on those 186 rows the opposite sign never gets below 1.73. (Below m = 3 the two signs coincide, so only those rows can tell them apart.) One honest qualification: the published exports are symmetrised by the site's own projection step, so those tiny residuals are the round-off of an identity. Re-sourced on data that was never projected, the law still holds — 7.3e−08 on an unprojected replay and 4.1e−10 on a double-precision orbit from the delayed-glue route.",
-    "source_experiment": "theorem"
-  },
-  {
-    "id": "clockwork-with-cores",
-    "file": "clockwork-with-cores.mp4",
-    "poster": "poster-clockwork-with-cores.webp",
-    "alt": "Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.",
-    "caption": "One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved.",
-    "source_experiment": "theorem"
   },
   {
     "id": "final-orbit-ember",
@@ -155,7 +168,7 @@
     "id": "fifth-dimension-flow",
     "file": "fifth-dimension-flow.webp",
     "alt": "Three panels: a tangle of closed loops in a projected coordinate plane coloured by a fictitious time, a log-scale plot of residual against fictitious time showing straight exponential decay, and a cost comparison of two solvers against right-hand-side evaluations.",
-    "caption": "The version one participant imagined, taken literally: the whole movie as a single point tracing a path in a fictitious extra time, with the residual decaying like e^(−s) — and a step of one in that time is exactly Newton's method. Solving all the frames at once is real and can be cheaper: harmonic balance costs 16 992 field evaluations, about 2.3× under a correctly seeded twisted shooting run. It is also where the honest failure lives: plain gradient descent on a space–time least-squares functional produced no admissible orbit at all for about a million evaluations, collapsing towards the uniform state; with the nontriviality barrier the original browser solver actually carried, it stalls at 9.8 % of the right amplitude instead of blanking the screen.",
+    "caption": "The fifth-dimension question, taken literally: the whole movie as a single point tracing a path in a fictitious extra time, with the residual decaying like e^(−s) — and a step of one in that time is exactly Newton's method. Solving all the frames at once is real and can be cheaper: harmonic balance costs 16 992 field evaluations, about 2.3× under a correctly seeded twisted shooting run. It is also where the honest failure lives: plain gradient descent on a space–time least-squares functional produced no admissible orbit at all for about a million evaluations, collapsing towards the uniform state; with the nontriviality barrier the original browser solver actually carried, it stalls at 9.8 % of the right amplitude instead of blanking the screen.",
     "source_experiment": "spacetime"
   },
   {
