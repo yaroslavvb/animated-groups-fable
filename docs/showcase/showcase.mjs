@@ -659,6 +659,136 @@ function ensureMounted(family) {
   report();
 }
 
+// ---- holding the anchor ------------------------------------------------------
+
+/** A jump has to LAND, and one scroll does not land it.
+ *
+ * `scrollIntoView` puts the section under the rail in the frame it is called in.
+ * Everything this file does afterwards changes the height of the page ABOVE that
+ * section — the mount cap swaps a far family for its measured spacer, a remount
+ * puts the cards back, the kind filter hides a section, posters arrive — and the
+ * section slides with it, in the bad cases by thousands of pixels, into another
+ * group or into the footer. The scroll spy then wrote the hash of whatever had
+ * drifted to the top, so the reader could not even see they were in the wrong
+ * place. About half of cold deep links landed somewhere else; on a phone, more.
+ *
+ * So a jump holds its ground. Every frame, if the section has moved more than a
+ * pixel from where the scroll left it, it is put back; the hold ends once the
+ * position has been still for SETTLE, at CAP at the very latest, and at once and
+ * for good the moment the reader shows any intent to move: a wheel, a touch, a
+ * pointer, a navigation key — or, once the jump's first GRACE is over, any
+ * scroll it did not make itself (a scrollbar drag sends none of those events,
+ * and inside the grace it cannot be told from the jump's own animation).
+ * Nothing on this page is worth fighting a thumb over. */
+const HOLD_SETTLE = 600;   // ms of stillness that says the layout is done
+const HOLD_CAP = 4000;     // ms: the longest a jump may hold the page at all
+const HOLD_SETTLE_FIRST = 1200;  // ms to wait out a smooth scroll with no `scrollend`
+const HOLD_GRACE = 1000;   // ms in which a scroll is still the jump's own, not the reader's
+const HOLD_LEAP = 400;     // px of scroll nothing but somebody moving the page accounts for
+const NAV_KEYS = new Set(['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End',
+                          ' ', 'Spacebar']);
+const pageHeight = () => document.documentElement.scrollHeight;
+let hold = null;
+// The family a jump is holding on to, for the scroll spy: while the page is
+// being held the mark belongs to the target and to nothing that drifts past it.
+const holdFamily = () => hold?.family ?? '';
+
+/** Hold `family` where the scroll puts it. `scroll: true` does the scrolling as
+ * well, instantly — that is the boot deep link, a fragment navigation the
+ * browser has already given up on. A rail click and a `hashchange` are scrolled
+ * by the browser, smoothly (the site asks for that in CSS), and an instant
+ * correction mid-flight would cancel the very animation the reader is watching:
+ * those wait for the animation to stop and hold from wherever it stopped. */
+function holdAnchor(family, {scroll = false} = {}) {
+  const section = $(family);
+  if (!section) return;
+  endHold();
+  const mine = hold = {family, section, top: 0, still: 0, until: 0, frame: 0,
+                       scrollY: Math.round(scrollY), height: pageHeight(),
+                       grace: performance.now() + HOLD_GRACE,
+                       armed: false, stop: new AbortController()};
+  const signal = mine.stop.signal;
+  for (const type of ['wheel', 'touchstart', 'pointerdown']) {
+    addEventListener(type, endHold, {passive: true, signal});
+  }
+  addEventListener('keydown', event => { if (NAV_KEYS.has(event.key)) endHold(); }, {signal});
+  addEventListener('scroll', () => {
+    if (hold !== mine) return;
+    const height = pageHeight();
+    // Before the hold is armed the scrolling on screen is the browser's own
+    // animation towards the anchor, not something to read anything into.
+    if (!mine.armed) { mine.scrollY = Math.round(scrollY); mine.height = height; return; }
+    const moved = Math.abs(Math.round(scrollY) - mine.scrollY);
+    // A scroll this file did not perform is somebody else's, and the only
+    // somebody worth guessing about is the reader: a scrollbar drag sends no
+    // wheel and no pointer event at all. Two things are not the reader, though.
+    // A page that changed height under the scroll, because that is the clamp the
+    // engine applies when the document shrinks, and undoing exactly that drift
+    // is what the hold is for — unless the offset leapt, which a clamp of a few
+    // cards' worth of height does not do. And a jump still inside its grace:
+    // a deep link's own fragment scroll is an ANIMATION (the site asks for
+    // smooth scrolling), it keeps arriving for a few hundred ms after the
+    // instant scroll jumped ahead of it, and it lands on the offset the layout
+    // had before the mounting moved everything. Reading that as intent was what
+    // let the very jump being held throw the hold off.
+    if (performance.now() > mine.grace && (moved > HOLD_LEAP
+                                           || (moved > 1 && height === mine.height))) endHold();
+    else mine.height = height;
+  }, {passive: true, signal});
+  if (scroll) {
+    section.scrollIntoView({behavior: 'instant', block: 'start'});
+    armHold();
+  } else {
+    addEventListener('scrollend', armHold, {once: true, signal});
+    setTimeout(() => { if (hold === mine && !mine.armed) armHold(); }, HOLD_SETTLE_FIRST);
+  }
+}
+
+/** Where the jump was meant to end is where it is kept. A smooth scroll can
+ * stop short — the engine abandons it when the page changes under it, and a
+ * long rail jump then comes to rest thousands of pixels from its section, which
+ * the hold would otherwise keep, and name in the hash — so it is finished here,
+ * instantly: the section is mounted by now, and a scroll that did arrive moves
+ * nothing. The landing place is read back rather than assumed: near the end of
+ * the page a section cannot always reach the rail's line, and its place is then
+ * its own, not `scroll-margin-top`. */
+function armHold() {
+  if (!hold || hold.armed) return;
+  hold.section.scrollIntoView({behavior: 'instant', block: 'start'});
+  hold.armed = true;
+  hold.until = performance.now() + HOLD_CAP;
+  hold.still = performance.now();
+  hold.top = hold.section.getBoundingClientRect().top;
+  hold.scrollY = Math.round(scrollY);
+  hold.height = pageHeight();
+  hold.frame = requestAnimationFrame(keepAnchor);
+}
+
+function keepAnchor(now) {
+  if (!hold?.armed) return;
+  const {section} = hold;
+  // Nothing left to hold on to: the kind filter hid the section, or the cap ran
+  // out. A hold that cannot end is a page that cannot be read.
+  if (!section.isConnected || section.hidden || now > hold.until) return endHold();
+  if (Math.abs(section.getBoundingClientRect().top - hold.top) > 1) {
+    section.scrollIntoView({behavior: 'instant', block: 'start'});
+    hold.top = section.getBoundingClientRect().top;
+    hold.scrollY = Math.round(scrollY);
+    hold.height = pageHeight();
+    hold.still = now;
+  } else if (now - hold.still >= HOLD_SETTLE) {
+    return endHold();
+  }
+  hold.frame = requestAnimationFrame(keepAnchor);
+}
+
+function endHold() {
+  if (!hold) return;
+  cancelAnimationFrame(hold.frame);
+  hold.stop.abort();
+  hold = null;
+}
+
 // ---- the chip ----------------------------------------------------------------
 
 /** Every chip in a section says whether its cluster is open, in the label and
@@ -1034,10 +1164,14 @@ function watchScroll() {
       // top of the viewport — its own scroll-margin, plus the sticky rail — so
       // the mark has to sit below that, or a deep link to a section would be
       // rewritten to the one above it the moment it arrived.
-      let seen = currentFamily;
-      for (const section of document.querySelectorAll('.showcase-section')) {
-        if (section.hidden) continue;
-        if (section.getBoundingClientRect().top <= 160) seen = section.id;
+      // …and a jump that is still holding its section owns the mark outright:
+      // the drift it is undoing must not be written into the hash on the way.
+      let seen = holdFamily() || currentFamily;
+      if (!holdFamily()) {
+        for (const section of document.querySelectorAll('.showcase-section')) {
+          if (section.hidden) continue;
+          if (section.getBoundingClientRect().top <= 160) seen = section.id;
+        }
       }
       for (const anchor of document.querySelectorAll('.group-rail a')) {
         anchor.setAttribute('aria-current', String(anchor.getAttribute('href') === `#${seen}`));
@@ -1094,8 +1228,9 @@ async function start() {
     ensureMounted(wanted.family);
     // Instant, not smooth: a deep link is a fragment navigation, and the site's
     // smooth scrolling would spend a second and a half travelling ten thousand
-    // pixels the reader never asked to see.
-    document.getElementById(wanted.family)?.scrollIntoView({behavior: 'instant', block: 'start'});
+    // pixels the reader never asked to see. And held there, because the mounting
+    // this load has still to do would otherwise slide the section away again.
+    holdAnchor(wanted.family, {scroll: true});
     currentFamily = wanted.family;
   }
   updateChips();
@@ -1119,7 +1254,13 @@ async function start() {
     button.onclick = () => setKind(button.dataset.kind);
   }
   for (const anchor of document.querySelectorAll('.group-rail a')) {
-    anchor.addEventListener('click', () => ensureMounted(anchor.getAttribute('href').slice(1)));
+    anchor.addEventListener('click', () => {
+      // The click mounts the section and holds it: the hash it sets may be the
+      // one already in the bar, in which case no `hashchange` follows it.
+      const family = anchor.getAttribute('href').slice(1);
+      ensureMounted(family);
+      holdAnchor(family);
+    });
   }
   const toggle = $('play-previews');
   toggle.checked = playPreviews;
@@ -1146,7 +1287,13 @@ async function start() {
     if (next.unfold !== state.unfold) setUnfold(next.unfold, {write: false});
     else if (moved) for (const [family] of next.more) refresh(family);
     if (next.kind !== page.dataset.kind) setKind(next.kind, {write: false});
-    if (next.family) { ensureMounted(next.family); currentFamily = next.family; }
+    // The browser scrolls a fragment navigation itself; the hold only keeps the
+    // section there afterwards, from wherever that scroll came to rest.
+    if (next.family) {
+      ensureMounted(next.family);
+      holdAnchor(next.family);
+      currentFamily = next.family;
+    }
     updateChips();
     observeAll();
     report();
