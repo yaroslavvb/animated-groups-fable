@@ -81,6 +81,13 @@ Every card is only written when it has something behind it:
     that kind whose source names the group.  ``sub=all`` opens the trefoil
     page with its pairs chip off, so the page shows exactly that many.
 
+``shubnikov/#<hm>/gNNN``           the Shubnikov census, all 68.
+    Every cyclic colouring of the group (n = 2, 3, 4, 6), each drawn live as
+    a monochrome film.  The count is the number of classes in
+    docs/shubnikov/data/census.json filed under the group; the page opens on
+    the group's own tab and film.  The census names each film's family too,
+    and the module refuses to build if that ever disagrees with the entry's.
+
 the standalone full-screen viewers
     Eight pages under docs/scott-gray/ draw one saved field with no controls.
     A viewer claims the groups of the catalogued orbit its field.f32 bytes
@@ -235,6 +242,7 @@ WRITTEN_BY = {
     "data/designer-links.json": "node enumerate/designer_links.mjs",
     "data/patterns.json": "python3 enumerate/enumerate_patterns_k.py",
     "showcase/data/showcase.json": "python3 docs/showcase/tools/make-manifest.py",
+    "shubnikov/data/census.json": "python3 docs/shubnikov/tools/build_census.py",
 }
 
 
@@ -552,6 +560,10 @@ def load():
         source = entry["source"]
         for gid in source.get("groupIds") or [source["groupId"]]:
             colour_counts[entry["kind"]][gid] += 1
+    # the Shubnikov census: every cyclic colouring of every forward film group
+    census = _read_json("shubnikov/data/census.json")
+    shubnikov_counts = collections.Counter(cls["gid"] for cls in census["classes"])
+    shubnikov_family = dict((gid, film["family"]) for gid, film in census["films"].items())
 
     viewers = _viewer_links()
     pattern_targets = _pattern_targets(records, patterns)
@@ -582,6 +594,17 @@ def load():
             links.append({"name": "Trefoil explorer (three colours)",
                           "href": "colour/trefoil/#%s?v=1&sub=all" % gid,
                           "target": _plural(trefoil, "pattern"), "scope": "this group"})
+        if shubnikov_counts[gid]:
+            if shubnikov_family.get(gid) != hm:
+                raise SystemExit(
+                    "docs/shubnikov/data/census.json files %s under %s, the correspondence "
+                    "under %s; the Shubnikov link would open the wrong tab"
+                    % (gid, shubnikov_family.get(gid), hm))
+            links.append({"name": "Shubnikov colourings",
+                          "href": "shubnikov/#%s/%s" % (hm, gid),
+                          "target": _plural(shubnikov_counts[gid], "cyclic colouring")
+                          + ", each a live film",
+                          "scope": "this group"})
         for viewer in viewers.get(gid, ()):
             links.append({"name": viewer["name"], "href": viewer["href"],
                           "target": VIEWER_TARGET.get((viewer["name"], gid), viewer["target"]),
