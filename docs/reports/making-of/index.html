@@ -199,7 +199,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
 .controls.days button { padding: 3px 8px; font-variant-numeric: tabular-nums; }
 .controls.scrollrow { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
 .controls.scrollrow button { flex: 0 0 auto; white-space: nowrap; }
-#tl svg { touch-action: pan-y; cursor: grab; user-select: none; -webkit-user-select: none; }
+#tl svg { touch-action: pan-y; overscroll-behavior-x: contain; cursor: grab; user-select: none; -webkit-user-select: none; }
 #tl svg.dragging { cursor: grabbing; }
 #tl-readout { font-size: 0.86rem; color: var(--ink-2); margin: 8px 0 2px; }
 #tl-readout b { color: var(--ink); font-weight: 600; }
@@ -382,7 +382,8 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <div id="tl" class="chart" aria-label="The whole project on one time axis: human inputs, agent threads, Modal compute and artifacts"></div>
   <p id="tl-readout"></p>
   <p class="tl-hint">
-    Drag to pan. ⌘ or Ctrl with the wheel zooms, Shift with the wheel pans, and with the chart
+    Drag, or swipe sideways with two fingers, to pan; pinch (or ⌘/Ctrl with the wheel) zooms,
+    Shift with the wheel pans, and with the chart
     focused the arrow keys pan and <kbd>+</kbd>/<kbd>−</kbd> zoom. Tab walks into each track and the
     arrow keys step from mark to mark; every mark has a sentence.
   </p>
@@ -1568,7 +1569,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <li><a href="https://yaroslavvb.github.io/animated-groups-fable/reports/">Reports</a> · <a href="https://github.com/yaroslavvb/animated-groups-fable">the repository</a> · <a href="https://yaroslavvb.github.io/animated-groups/">the predecessor site</a></li>
 </ul>
 
-<p class="note">Page built 2026-09-30 09:52 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
+<p class="note">Page built 2026-09-30 14:32 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
 
 </main>
 
@@ -2539,13 +2540,34 @@ window.CK = (function () {
     const stop = () => { drag = null; svg.classList.remove('dragging'); };
     svg.addEventListener('pointerup', stop);
     svg.addEventListener('pointercancel', stop);
+    /* A two-finger sideways swipe on a trackpad arrives as a wheel event with a
+       horizontal delta: pan by exactly that many pixels, so the chart follows the
+       fingers. Deltas are summed and applied once per animation frame, because a
+       swipe fires dozens of events. A mostly vertical swipe is left alone, so the
+       page still scrolls; Shift+wheel on a mouse pans the same way. */
+    let panPx = 0, panQueued = false;
+    const flushPan = () => {
+      panQueued = false;
+      const w = (svg.clientWidth || frameTL.W) - 2 * PAD;
+      const dm = panPx / Math.max(1, w) * (TL.v1 - TL.v0);
+      panPx = 0;
+      if (dm) setView(TL.v0 + dm, TL.v1 + dm);
+    };
     svg.addEventListener('wheel', ev => {
       if (ev.ctrlKey || ev.metaKey) {
         ev.preventDefault();
         const r = svg.getBoundingClientRect();
         const frac = Math.min(1, Math.max(0, (ev.clientX - r.left - PAD) / (r.width - 2 * PAD)));
         zoom(ev.deltaY > 0 ? 1.25 : 0.8, TL.v0 + frac * (TL.v1 - TL.v0));
-      } else if (ev.shiftKey) { ev.preventDefault(); pan(ev.deltaY > 0 ? 0.2 : -0.2); }
+        return;
+      }
+      let dx = ev.deltaX;
+      if (ev.shiftKey && !dx) dx = ev.deltaY;           // a mouse wheel with Shift held
+      if (!dx || (!ev.shiftKey && Math.abs(dx) < Math.abs(ev.deltaY))) return;
+      ev.preventDefault();                               // also stops swipe-to-go-back
+      const unit = ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? (svg.clientWidth || frameTL.W) : 1;
+      panPx += dx * unit;
+      if (!panQueued) { panQueued = true; requestAnimationFrame(flushPan); }
     }, {passive: false});
     svg.addEventListener('keydown', ev => {
       if (ev.target !== svg) return;
