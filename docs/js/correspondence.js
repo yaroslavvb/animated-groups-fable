@@ -13,7 +13,7 @@ import {
   RING_W,
   buildClockworkGeometry,
   frac,
-} from "./correspondence-geometry.js?v=reflection-centering-v1";
+} from "./correspondence-geometry.js?v=family-frame-v1";
 
 "use strict";
 
@@ -23,6 +23,13 @@ import {
 // "Film unavailable; use the static plate."
 const DATA_URL = new URL(
   "../data/clockwork-coloring-correspondence.json?v=reflection-centering-v1",
+  import.meta.url,
+);
+// Every tab of a page is drawn in the frame of the page's plain wallpaper row,
+// so switching tabs changes colours, not the pattern.  The frames re-express
+// each record's own operations; enumerate/correspondence_frames.py writes them.
+const FRAMES_URL = new URL(
+  "../data/clockwork-coloring-frames.json?v=family-frame-v1",
   import.meta.url,
 );
 const BOOK_EXCERPT_TARGET = "clockwork-book-excerpt";
@@ -207,10 +214,14 @@ function validateRecord(record) {
 }
 
 class ClockworkPlayer {
-  constructor(root, record) {
+  // `frameRecord` is the plain wallpaper row whose frame this record shares;
+  // the film takes its scale and motif size from it (see buildClockworkGeometry).
+  constructor(root, record, frameRecord = record) {
     validateRecord(record);
+    validateRecord(frameRecord);
     this.root = root;
     this.record = record;
+    this.frameRecord = frameRecord;
     this.stage = root.querySelector("[data-film-stage]");
     this.canvas = root.querySelector("canvas");
     this.status = root.querySelector("[data-film-status]");
@@ -283,6 +294,7 @@ class ClockworkPlayer {
       height,
       dpr,
       this.record.viewport_center,
+      this.frameRecord.render,
     );
     this.stage.dataset.motifCircleDiameter = this.geometry.circleDiameter.toFixed(2);
     this.draw(this.phase);
@@ -441,6 +453,51 @@ class ClockworkPlayer {
   }
 }
 
+// Parts of a tab panel whose height differs from tab to tab: a heading that
+// wraps, a longer plate legend, a longer crystal caption (the pictures above
+// the captions have fixed proportions).  Each gets the height of its tallest
+// counterpart among the page's tabs, so the plate and the film sit at the same
+// place on every tab and switching tabs changes the picture, not the page.
+const STABLE_PANEL_PARTS = [
+  ".entry-header",
+  "figure.colour-plate > figcaption",
+  "figure.crystal-viewer > figcaption",
+];
+
+function stabilizePanelLayout(items) {
+  // Inactive panels are hidden and have no layout; show them for the
+  // measurement only.  Nothing paints until this task ends.
+  const restore = items.map(({ panel }) => {
+    const item = panel.parentElement?.matches("li") ? panel.parentElement : null;
+    const hidden = [panel.hidden, item?.hidden];
+    panel.hidden = false;
+    if (item) item.hidden = false;
+    return () => {
+      panel.hidden = hidden[0];
+      if (item) item.hidden = hidden[1];
+    };
+  });
+  const groups = STABLE_PANEL_PARTS.map((selector) => (
+    items.map(({ panel }) => panel.querySelector(selector)).filter(Boolean)
+  ));
+  // Clear everything, then read everything: one layout for the whole page.
+  for (const part of groups.flat()) part.style.minHeight = "";
+  const tallest = groups.map((parts) => (
+    Math.max(0, ...parts.map((part) => part.getBoundingClientRect().height))
+  ));
+  groups.forEach((parts, index) => {
+    for (const part of parts) {
+      const style = getComputedStyle(part);
+      const frame = style.boxSizing === "border-box" ? 0 : (
+        parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+        + parseFloat(style.borderTopWidth) + parseFloat(style.borderBottomWidth)
+      );
+      part.style.minHeight = `${tallest[index] - frame}px`;
+    }
+  });
+  for (const undo of restore) undo();
+}
+
 function initializeClockworkTabs() {
   // Suppress the browser's pre-enhancement anchor jump: before inactive
   // panels collapse, every later wallpaper section has the wrong offset.
@@ -537,6 +594,30 @@ function initializeClockworkTabs() {
     });
 
     activate(items[0].panel.id);
+
+    if (items.length > 1) {
+      let measuredWidth = -1;
+      let pending = 0;
+      const stabilize = () => {
+        pending = 0;
+        measuredWidth = host.getBoundingClientRect().width;
+        stabilizePanelLayout(items);
+      };
+      const schedule = () => {
+        if (!pending) pending = requestAnimationFrame(stabilize);
+      };
+      stabilize();
+      document.fonts?.ready.then(schedule);
+      window.addEventListener("load", schedule, { once: true });
+      // Heights follow the viewport as well as the host: the heading's font
+      // size keeps growing with the window after the host stops widening.
+      window.addEventListener("resize", schedule, { passive: true });
+      // The min-heights set here change only the host's height, so reacting
+      // to width alone cannot feed back into itself.
+      new ResizeObserver(() => {
+        if (Math.abs(host.getBoundingClientRect().width - measuredWidth) > 0.5) schedule();
+      }).observe(host);
+    }
   }
 
   const openFromHash = (scroll = true) => {
@@ -875,12 +956,25 @@ async function initialize() {
   const roots = [...document.querySelectorAll("[data-clockwork-player]")];
   if (roots.length === 0) return;
   let payload;
+  let frames = null;
   try {
-    const response = await fetch(DATA_URL, { credentials: "same-origin" });
+    const [response, framesResponse] = await Promise.all([
+      fetch(DATA_URL, { credentials: "same-origin" }),
+      fetch(FRAMES_URL, { credentials: "same-origin" }).catch((error) => error),
+    ]);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     payload = await response.json();
     if (!payload || !Array.isArray(payload.groups) || payload.groups.length !== 68) {
       throw new Error("expected 68 correspondence records");
+    }
+    // Only the films need the display frames; the names below do not.
+    try {
+      if (framesResponse instanceof Error) throw framesResponse;
+      if (!framesResponse.ok) throw new Error(`HTTP ${framesResponse.status}`);
+      frames = (await framesResponse.json())?.frames ?? null;
+      if (!frames) throw new Error("no frames in the file");
+    } catch (error) {
+      console.error("Clockwork display frames failed to load", error);
     }
   } catch (error) {
     for (const root of roots) {
@@ -892,6 +986,13 @@ async function initialize() {
     return;
   }
 
+  for (const record of payload.groups) {
+    const frame = frames?.[record.id];
+    if (!frame) continue;
+    record.render = frame.render;
+    record.viewport_center = frame.viewport_center;
+    record.frame_reference = frame.frame_reference;
+  }
   const records = new Map(payload.groups.map((record) => [record.id, record]));
   initializeChaimConwayNames(payload.groups);
   const players = [];
@@ -900,7 +1001,10 @@ async function initialize() {
     const record = records.get(root.dataset.groupId);
     try {
       if (!record) throw new Error(`missing record ${root.dataset.groupId}`);
-      const player = new ClockworkPlayer(root, record);
+      if (!frames?.[record.id]) throw new Error(`missing display frame for ${record.id}`);
+      const frameRecord = records.get(record.frame_reference);
+      if (!frameRecord) throw new Error(`missing frame reference for ${record.id}`);
+      const player = new ClockworkPlayer(root, record, frameRecord);
       players.push(player);
       playersById.set(record.id, player);
     } catch (error) {

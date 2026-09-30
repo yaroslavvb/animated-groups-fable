@@ -36,6 +36,9 @@ the same symbol the catalogue prints) under its heading and in its tab; the
 snapshot printed it only where the book signature needed disambiguating.
 
 Order of operations after editing the source:
+    python3 correspondence_frames.py --check  every tab of a page shares one
+                                            pattern and one set of generator
+                                            marks (see that script to rewrite)
     python3 correspondence_symbols.py       redraw the symbols in the source
     python3 vladimir_catalog_links.py       refresh the catalog links (needs a
                                             checkout of vbulatov2011/colorsym-catalog)

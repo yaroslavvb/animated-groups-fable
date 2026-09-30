@@ -78,6 +78,15 @@ test('canonical translations retain their full vectors and clipped arrows never 
 });
 
 test('all named glyphs match their corresponding served plate, including phase-specific paths',async()=>{
+ // A correspondence page draws every tab in the frame of its plain tab
+ // (data/clockwork-coloring-frames.json). Where that frame is a mirror image of
+ // the row's own setting (g99), the page serves an n_m screw as n_(n-m).
+ const frames=JSON.parse(await readFile(new URL('../../data/clockwork-coloring-frames.json',import.meta.url))).frames;
+ const pathBySymbol=new Map(catalog.groups.flatMap(g=>g.namedGenerators).filter(n=>n.kind==='rotation').map(n=>[n.glyph.symbol,n.glyph.path]));
+ const served=(g,symbol)=>{
+  const m=frames[g.id].mirrored&&symbol.match(/^rotation-(\d)-(\d)$/);
+  return m?`rotation-${m[1]}-${(m[1]-m[2])%m[1]}`:symbol;
+ };
  for(const family of catalog.families){
   const html=await readFile(new URL(`../../correspondence-${family.id}.html`,import.meta.url),'utf8');
   for(const g of catalog.groups.filter(g=>g.family===family.id)){
@@ -86,10 +95,11 @@ test('all named glyphs match their corresponding served plate, including phase-s
    for(const generator of g.namedGenerators){
     const markup=plate.match(new RegExp(`<g[^>]+data-generator="${generator.name}"[^>]*>[\\s\\S]*?<\\/g>`))?.[0];
     assert.ok(markup,`${g.id} ${generator.name}`);
-    assert.equal(generator.glyph.symbol,markup.match(/data-generator-symbol="([^"]+)"/)[1]);
+    const symbol=served(g,generator.glyph.symbol);
+    assert.equal(symbol,markup.match(/data-generator-symbol="([^"]+)"/)[1],`${g.id} ${generator.name}`);
     assert.equal(generator.glyph.sourceTimeShift,markup.match(/data-time-shift="([^"]+)"/)[1]);
     assert.equal(wallpaperGeneratorSymbol(generator),generator.glyph.symbol);
-    if(generator.kind==='rotation')assert.equal(generator.glyph.path,markup.match(/class="[^"]*generator-symbol-core"[^>]+d="([^"]+)"/)[1]);
+    if(generator.kind==='rotation')assert.equal(pathBySymbol.get(symbol),markup.match(/class="[^"]*generator-symbol-core"[^>]+d="([^"]+)"/)[1]);
    }
   }
  }

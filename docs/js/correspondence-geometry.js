@@ -55,15 +55,22 @@ function latticeToPixel(matrix, b1, b2) {
   return multiply2(multiply2(basis, matrix), invert2(basis));
 }
 
+// `sizingSpec` is the render of the tab whose frame this one shares (the plain
+// wallpaper row of the same page).  Scale and motif size come from it, so every
+// colouring of one wallpaper group is drawn at one size: a tab with a larger
+// colour cell shows fewer repeats of it instead of zooming out.
 export function buildClockworkGeometry(
   spec,
   width,
   height,
   dpr = 1,
   viewportCenter = [0, 0],
+  sizingSpec = spec,
 ) {
-  if (!spec || !Array.isArray(spec.ops) || !Array.isArray(spec.basis)) {
-    throw new Error("invalid clockwork render specification");
+  for (const candidate of [spec, sizingSpec]) {
+    if (!candidate || !Array.isArray(candidate.ops) || !Array.isArray(candidate.basis)) {
+      throw new Error("invalid clockwork render specification");
+    }
   }
   if (
     !Array.isArray(viewportCenter)
@@ -75,13 +82,13 @@ export function buildClockworkGeometry(
   const viewCenter = [...viewportCenter];
   const safeWidth = Math.max(1, Number(width));
   const safeHeight = Math.max(1, Number(height));
-  const basis = spec.basis;
+  const basis = sizingSpec.basis;
   const shortSide = Math.min(safeWidth, safeHeight);
   const horizontalExtent = Math.max(Math.abs(basis[0][0]), Math.abs(basis[1][0])) || 1;
   const verticalExtent = Math.max(Math.abs(basis[0][1]), Math.abs(basis[1][1])) || 1;
   const limitingExtent = shortSide === safeHeight ? verticalExtent : horizontalExtent;
   const cellFor = (count) => Math.max(shortSide / (count * limitingExtent), 24);
-  const uniqueSites = new Set(spec.ops.map((operation) => (
+  const uniqueSites = new Set(sizingSpec.ops.map((operation) => (
     `${operation.M.flat().join(",")}|${operation.v.map((value) => Math.round(frac(value) * 1e6)).join(",")}`
   ))).size;
   const basisDeterminant = Math.abs(
@@ -92,8 +99,8 @@ export function buildClockworkGeometry(
     const b1 = [basis[0][0] * cell, -basis[0][1] * cell];
     const b2 = [basis[1][0] * cell, -basis[1][1] * cell];
     const sites = [];
-    const base = spec.base || [0.31, 0.17];
-    for (const operation of spec.ops) {
+    const base = sizingSpec.base || [0.31, 0.17];
+    for (const operation of sizingSpec.ops) {
       const x = frac(
         operation.M[0][0] * base[0]
         + operation.M[0][1] * base[1]
@@ -143,7 +150,9 @@ export function buildClockworkGeometry(
     measured = measure(cell);
   }
 
-  const { b1, b2, motifRadius } = measured;
+  const { motifRadius } = measured;
+  const b1 = [spec.basis[0][0] * cell, -spec.basis[0][1] * cell];
+  const b2 = [spec.basis[1][0] * cell, -spec.basis[1][1] * cell];
   const circleDiameter = phaseCircleOuterDiameter(motifRadius);
   if (circleDiameter + 1e-6 < MIN_PHASE_CIRCLE_DIAMETER_PX) {
     throw new Error(`phase circle ${circleDiameter.toFixed(3)}px is below the minimum`);

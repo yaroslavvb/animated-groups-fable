@@ -1108,6 +1108,7 @@ nav a[aria-current="page"] {
 
 .crystal-viewer figcaption {
   display: grid;
+  align-content: start;
   gap: 0.35rem;
   padding: 0.78rem 0.9rem 0.88rem;
   border-top: 1px solid var(--line);
