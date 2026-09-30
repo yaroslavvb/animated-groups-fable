@@ -49,6 +49,18 @@ loop with ← → (shift for finer steps).
   the [Ginzburg–Landau and Brusselator methods](docs/scott-gray/research/equations/README.md),
   and the original [442 solver notes](docs/scott-gray/SOLVER.md).
 
+- **Shubnikov** ([docs/shubnikov/](docs/shubnikov/)) — the 990 cyclic
+  colourings σ: G ↠ ℤₙ (n = 2, 3, 4, 6) of the 68 forward film groups under
+  E_fwd, recomputed from the geometry and matched class by class against the
+  week-38 census, each drawn live as a monochrome film: a sum of clock-locked
+  travelling plane waves whose phase sector is the colour, so every symmetry
+  g advances every colour by exactly σ(g). The builder
+  (`docs/shubnikov/tools/build_census.py`) proves in exact rational arithmetic
+  that each picture's full symmetry group is G and nothing more. The n = 2
+  slice is Shubnikov's black-and-white groups; the 324 colourings the clock
+  cannot see carry their plane colour-group names
+  (`docs/shubnikov/tools/name_colourings.py`).
+
 ## The computation (`enumerate/`)
 
 The classification is recomputed from scratch in exact rational arithmetic

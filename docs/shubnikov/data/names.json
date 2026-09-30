@@ -1,0 +1,1561 @@
+{
+ "schema": "shubnikov-names-v1",
+ "method": "For every clock-invisible class (c_t = sigma(t) = 0) the colouring sigma: G -> Z_n kills the time translation, so it descends to the parent wallpaper group Gamma = G/<t>: the spatial parts (M | v) of the film's ops, with the translation lattice enlarged by the film's centring vectors, and sigmabar read off class.c (on the ops) and class.u (on the two lattice vectors). The pair (Gamma, ker sigmabar) is a k-coloured plane crystal with k = n, so it is one of the 269 entries of docs/data/colored.json. Gamma is carried onto the standard model of its type by an explicit affine map (A | t) (enumerate_colored.classify_with_map), and the entry is then determined twice over. Method A: every catalogue entry's subgroup is rebuilt from its own concrete realisation (entry.render) and closed under the affine normaliser of Gamma; the resulting orbits are checked to partition the complete list of index-k subgroups of Gamma, so looking the class's kernel up in the partition is an explicit affine conjugacy, not an inference. Method B: an affine- and recolouring-invariant fingerprint (types of H and of the colour kernel, lattice and point index; per coset of Gamma modulo the colour-period lattice the tuple (det M, tr M, order of M, does the coset contain a finite-order element, colour permutation); and for every M with rank(I - M) = 1 the colour permutations of the primitive translations along ker(I - M) and im(I - M), up to inversion), canonicalised over all k! recolourings; it is verified by exhaustive pairwise comparison to separate every pair of catalogue entries with the same (Gamma, k) except three pairs of non-cyclic entries, which no cyclic colouring can match. The two methods are required to agree on all 324 classes. Neither uses the coarse invariants kernel type / lattice index / point index, which do not separate the catalogue: three pairs of cyclic entries share all of them (p'b1m with p'bm, c4-pg-2 with c4-pg-3, c6-pm-6 with c6-pm-7) and are listed under summary.coarseInvariantCollisions together with what separates them.",
+ "sources": {
+  "census": "docs/shubnikov/data/census.json",
+  "catalogue": "docs/data/colored.json",
+  "symbols": "docs/data/colored-gs.json",
+  "engine": "enumerate/enumerate_colored.py"
+ },
+ "summary": {
+  "classes": 324,
+  "named": 324,
+  "byN": {
+   "2": 237,
+   "3": 24,
+   "4": 39,
+   "6": 24
+  },
+  "distinctColourGroups": 80,
+  "distinctByN": {
+   "2": 46,
+   "3": 8,
+   "4": 13,
+   "6": 13
+  },
+  "cyclicColourGroupsAvailable": 80,
+  "cyclicColourGroupsUnrealised": [],
+  "twoColourTypesRealised": 46,
+  "twoColourTypesTotal": 46,
+  "twoColourTypesMissing": [],
+  "fingerprintCollisionsAllNonCyclic": [
+   [
+    "c6-p4-1",
+    "c6-p4-2"
+   ],
+   [
+    "c6-p6m-2",
+    "c6-p6m-3"
+   ],
+   [
+    "c6-p6m-5",
+    "c6-p6m-6"
+   ]
+  ],
+  "coarseInvariantCollisions": [
+   {
+    "base": "pm",
+    "k": 2,
+    "kernel": "pm",
+    "latticeIndex": 2,
+    "pointIndex": 1,
+    "ids": [
+     "c2-pm-2",
+     "c2-pm-3"
+    ],
+    "separatedBy": "colour-moving element types"
+   },
+   {
+    "base": "pg",
+    "k": 4,
+    "kernel": "p1",
+    "latticeIndex": 2,
+    "pointIndex": 2,
+    "ids": [
+     "c4-pg-2",
+     "c4-pg-3"
+    ],
+    "separatedBy": "full fingerprint (axis/coset detail)"
+   },
+   {
+    "base": "pm",
+    "k": 6,
+    "kernel": "pm",
+    "latticeIndex": 6,
+    "pointIndex": 1,
+    "ids": [
+     "c6-pm-6",
+     "c6-pm-7"
+    ],
+    "separatedBy": "colour-moving element types"
+   }
+  ],
+  "symbolCoverage": {
+   "gs": "docs/data/colored-gs.json carries Grunbaum-Shephard and Shubnikov symbols for k = 2 (all 46) and k = 3 (all 23) only, so names for n = 4 and n = 6 give the colored.json id alone",
+   "namesWithGs": 261,
+   "namesWithShubnikov": 237
+  }
+ },
+ "names": {
+  "g1-n2-1": {
+   "colored": "c2-p1-1",
+   "gs": "p1[2]",
+   "shubnikov": "p′b1"
+  },
+  "g1-n3-1": {
+   "colored": "c3-p1-1",
+   "gs": "p1[3]"
+  },
+  "g1-n4-1": {
+   "colored": "c4-p1-1"
+  },
+  "g1-n6-1": {
+   "colored": "c6-p1-1"
+  },
+  "g5-n2-1": {
+   "colored": "c2-p2-1",
+   "gs": "p2[2]1",
+   "shubnikov": "p2′"
+  },
+  "g5-n2-2": {
+   "colored": "c2-p2-2",
+   "gs": "p2[2]2",
+   "shubnikov": "p′b2"
+  },
+  "g6-n2-1": {
+   "colored": "c2-p2-1",
+   "gs": "p2[2]1",
+   "shubnikov": "p2′"
+  },
+  "g6-n2-2": {
+   "colored": "c2-p2-2",
+   "gs": "p2[2]2",
+   "shubnikov": "p′b2"
+  },
+  "g7-n2-1": {
+   "colored": "c2-p2-2",
+   "gs": "p2[2]2",
+   "shubnikov": "p′b2"
+  },
+  "g7-n2-2": {
+   "colored": "c2-p2-2",
+   "gs": "p2[2]2",
+   "shubnikov": "p′b2"
+  },
+  "g7-n2-3": {
+   "colored": "c2-p2-1",
+   "gs": "p2[2]1",
+   "shubnikov": "p2′"
+  },
+  "g7-n2-4": {
+   "colored": "c2-p2-2",
+   "gs": "p2[2]2",
+   "shubnikov": "p′b2"
+  },
+  "g8-n2-1": {
+   "colored": "c2-cm-1",
+   "gs": "cm[2]1",
+   "shubnikov": "cm′"
+  },
+  "g8-n2-2": {
+   "colored": "c2-cm-2",
+   "gs": "cm[2]3",
+   "shubnikov": "p′cm"
+  },
+  "g8-n2-3": {
+   "colored": "c2-cm-3",
+   "gs": "cm[2]2",
+   "shubnikov": "p′cg"
+  },
+  "g8-n3-1": {
+   "colored": "c3-cm-2",
+   "gs": "cm[3]1"
+  },
+  "g8-n4-1": {
+   "colored": "c4-cm-4"
+  },
+  "g8-n4-2": {
+   "colored": "c4-cm-6"
+  },
+  "g8-n6-1": {
+   "colored": "c6-cm-5"
+  },
+  "g8-n6-2": {
+   "colored": "c6-cm-7"
+  },
+  "g8-n6-3": {
+   "colored": "c6-cm-3"
+  },
+  "g9-n2-1": {
+   "colored": "c2-cm-1",
+   "gs": "cm[2]1",
+   "shubnikov": "cm′"
+  },
+  "g9-n2-2": {
+   "colored": "c2-cm-2",
+   "gs": "cm[2]3",
+   "shubnikov": "p′cm"
+  },
+  "g9-n2-3": {
+   "colored": "c2-cm-3",
+   "gs": "cm[2]2",
+   "shubnikov": "p′cg"
+  },
+  "g9-n3-1": {
+   "colored": "c3-cm-2",
+   "gs": "cm[3]1"
+  },
+  "g9-n4-1": {
+   "colored": "c4-cm-4"
+  },
+  "g9-n4-2": {
+   "colored": "c4-cm-6"
+  },
+  "g9-n6-1": {
+   "colored": "c6-cm-5"
+  },
+  "g9-n6-2": {
+   "colored": "c6-cm-7"
+  },
+  "g9-n6-3": {
+   "colored": "c6-cm-3"
+  },
+  "g10-n2-1": {
+   "colored": "c2-pm-5",
+   "gs": "pm[2]2",
+   "shubnikov": "c′m"
+  },
+  "g10-n2-2": {
+   "colored": "c2-pm-1",
+   "gs": "pm[2]4",
+   "shubnikov": "pm′"
+  },
+  "g10-n2-3": {
+   "colored": "c2-pm-2",
+   "gs": "pm[2]5",
+   "shubnikov": "p′b1m"
+  },
+  "g10-n2-4": {
+   "colored": "c2-pm-3",
+   "gs": "pm[2]3",
+   "shubnikov": "p′bm"
+  },
+  "g10-n2-5": {
+   "colored": "c2-pm-4",
+   "gs": "pm[2]1",
+   "shubnikov": "p′bg"
+  },
+  "g10-n3-1": {
+   "colored": "c3-pm-2",
+   "gs": "pm[3]2"
+  },
+  "g10-n4-1": {
+   "colored": "c4-pm-6"
+  },
+  "g10-n4-2": {
+   "colored": "c4-pm-10"
+  },
+  "g10-n4-3": {
+   "colored": "c4-pm-8"
+  },
+  "g10-n6-1": {
+   "colored": "c6-pm-7"
+  },
+  "g10-n6-2": {
+   "colored": "c6-pm-6"
+  },
+  "g10-n6-3": {
+   "colored": "c6-pm-9"
+  },
+  "g10-n6-4": {
+   "colored": "c6-pm-11"
+  },
+  "g10-n6-5": {
+   "colored": "c6-pm-2"
+  },
+  "g11-n2-1": {
+   "colored": "c2-pg-1",
+   "gs": "pg[2]1",
+   "shubnikov": "pg′"
+  },
+  "g11-n2-2": {
+   "colored": "c2-pg-2",
+   "gs": "pg[2]2",
+   "shubnikov": "p′b1g"
+  },
+  "g11-n3-1": {
+   "colored": "c3-pg-2",
+   "gs": "pg[3]1"
+  },
+  "g11-n4-1": {
+   "colored": "c4-pg-3"
+  },
+  "g11-n4-2": {
+   "colored": "c4-pg-2"
+  },
+  "g11-n6-1": {
+   "colored": "c6-pg-5"
+  },
+  "g11-n6-2": {
+   "colored": "c6-pg-2"
+  },
+  "g54-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g54-n2-2": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g54-n2-3": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g54-n2-4": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g54-n2-5": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g55-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g55-n2-2": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g55-n2-3": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g55-n2-4": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g55-n2-5": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g56-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g56-n2-2": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g56-n2-3": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g56-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g56-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g57-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g57-n2-2": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g57-n2-3": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g57-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g57-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g58-n2-1": {
+   "colored": "c2-pgg-1",
+   "gs": "pgg[2]2",
+   "shubnikov": "pg′g′"
+  },
+  "g58-n2-2": {
+   "colored": "c2-pgg-2",
+   "gs": "pgg[2]1",
+   "shubnikov": "pgg′"
+  },
+  "g58-n4-1": {
+   "colored": "c4-pgg-3"
+  },
+  "g59-n2-1": {
+   "colored": "c2-pgg-1",
+   "gs": "pgg[2]2",
+   "shubnikov": "pg′g′"
+  },
+  "g59-n2-2": {
+   "colored": "c2-pgg-2",
+   "gs": "pgg[2]1",
+   "shubnikov": "pgg′"
+  },
+  "g59-n4-1": {
+   "colored": "c4-pgg-3"
+  },
+  "g60-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g60-n2-2": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g60-n2-3": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g60-n2-4": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g60-n2-5": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g60-n2-6": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g60-n2-7": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g60-n2-8": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g61-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g61-n2-2": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g61-n2-3": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g61-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g61-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g62-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g62-n2-2": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g62-n2-3": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g62-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g62-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g63-n2-1": {
+   "colored": "c2-pgg-1",
+   "gs": "pgg[2]2",
+   "shubnikov": "pg′g′"
+  },
+  "g63-n2-2": {
+   "colored": "c2-pgg-2",
+   "gs": "pgg[2]1",
+   "shubnikov": "pgg′"
+  },
+  "g63-n2-3": {
+   "colored": "c2-pgg-2",
+   "gs": "pgg[2]1",
+   "shubnikov": "pgg′"
+  },
+  "g63-n4-1": {
+   "colored": "c4-pgg-3"
+  },
+  "g64-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g64-n2-2": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g64-n2-3": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g64-n2-4": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g64-n2-5": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g64-n2-6": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g64-n2-7": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g64-n2-8": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g64-n2-9": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g64-n2-10": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g64-n2-11": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g65-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g65-n2-2": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g65-n2-3": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g65-n2-4": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g65-n2-5": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g65-n2-6": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g65-n2-7": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g65-n2-8": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g65-n2-9": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g65-n2-10": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g65-n2-11": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g66-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g66-n2-2": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g66-n2-3": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g66-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g66-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g66-n2-6": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g66-n2-7": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g67-n2-1": {
+   "colored": "c2-pmg-1",
+   "gs": "pmg[2]5",
+   "shubnikov": "pm′g′"
+  },
+  "g67-n2-2": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g67-n2-3": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g67-n2-4": {
+   "colored": "c2-pmg-4",
+   "gs": "pmg[2]1",
+   "shubnikov": "p′bmg"
+  },
+  "g67-n2-5": {
+   "colored": "c2-pmg-5",
+   "gs": "pmg[2]3",
+   "shubnikov": "p′bgg"
+  },
+  "g67-n2-6": {
+   "colored": "c2-pmg-2",
+   "gs": "pmg[2]4",
+   "shubnikov": "pmg′"
+  },
+  "g67-n2-7": {
+   "colored": "c2-pmg-3",
+   "gs": "pmg[2]2",
+   "shubnikov": "pm′g"
+  },
+  "g68-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g68-n2-2": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g68-n2-3": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g68-n2-4": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g68-n2-5": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g69-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g69-n2-2": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g69-n2-3": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g69-n2-4": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g69-n2-5": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g70-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g70-n2-2": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g70-n2-3": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g70-n2-4": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g70-n2-5": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g70-n2-6": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g70-n2-7": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g71-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g71-n2-2": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g71-n2-3": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g71-n2-4": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g71-n2-5": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g72-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g72-n2-2": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g72-n2-3": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g72-n2-4": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g72-n2-5": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g73-n2-1": {
+   "colored": "c2-cmm-1",
+   "gs": "cmm[2]4",
+   "shubnikov": "cm′m′"
+  },
+  "g73-n2-2": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g73-n2-3": {
+   "colored": "c2-cmm-4",
+   "gs": "cmm[2]3",
+   "shubnikov": "p′cmg"
+  },
+  "g73-n2-4": {
+   "colored": "c2-cmm-5",
+   "gs": "cmm[2]1",
+   "shubnikov": "p′cgg"
+  },
+  "g73-n2-5": {
+   "colored": "c2-cmm-3",
+   "gs": "cmm[2]5",
+   "shubnikov": "p′cmm"
+  },
+  "g73-n2-6": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g73-n2-7": {
+   "colored": "c2-cmm-2",
+   "gs": "cmm[2]2",
+   "shubnikov": "cmm′"
+  },
+  "g74-n2-1": {
+   "colored": "c2-pmm-1",
+   "gs": "pmm[2]5",
+   "shubnikov": "pm′m′"
+  },
+  "g74-n2-2": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g74-n2-3": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g74-n2-4": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g74-n2-5": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g74-n2-6": {
+   "colored": "c2-pmm-5",
+   "gs": "pmm[2]3",
+   "shubnikov": "c′mm"
+  },
+  "g74-n2-7": {
+   "colored": "c2-pmm-3",
+   "gs": "pmm[2]1",
+   "shubnikov": "p′bmm"
+  },
+  "g74-n2-8": {
+   "colored": "c2-pmm-4",
+   "gs": "pmm[2]4",
+   "shubnikov": "p′bgm"
+  },
+  "g74-n2-9": {
+   "colored": "c2-pmm-2",
+   "gs": "pmm[2]2",
+   "shubnikov": "pmm′"
+  },
+  "g75-n2-1": {
+   "colored": "c2-pgg-1",
+   "gs": "pgg[2]2",
+   "shubnikov": "pg′g′"
+  },
+  "g75-n2-2": {
+   "colored": "c2-pgg-2",
+   "gs": "pgg[2]1",
+   "shubnikov": "pgg′"
+  },
+  "g75-n4-1": {
+   "colored": "c4-pgg-3"
+  },
+  "g75-n4-2": {
+   "colored": "c4-pgg-3"
+  },
+  "g94-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g94-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g94-n4-1": {
+   "colored": "c4-p4-1"
+  },
+  "g94-n4-2": {
+   "colored": "c4-p4-4"
+  },
+  "g95-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g95-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g95-n4-1": {
+   "colored": "c4-p4-1"
+  },
+  "g95-n4-2": {
+   "colored": "c4-p4-4"
+  },
+  "g96-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g96-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g96-n4-1": {
+   "colored": "c4-p4-1"
+  },
+  "g96-n4-2": {
+   "colored": "c4-p4-4"
+  },
+  "g97-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g97-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g97-n4-1": {
+   "colored": "c4-p4-1"
+  },
+  "g97-n4-2": {
+   "colored": "c4-p4-4"
+  },
+  "g98-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g98-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g98-n2-3": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g98-n4-1": {
+   "colored": "c4-p4-4"
+  },
+  "g98-n4-2": {
+   "colored": "c4-p4-1"
+  },
+  "g99-n2-1": {
+   "colored": "c2-p4-1",
+   "gs": "p4[2]2",
+   "shubnikov": "p4′"
+  },
+  "g99-n2-2": {
+   "colored": "c2-p4-2",
+   "gs": "p4[2]1",
+   "shubnikov": "p′c4"
+  },
+  "g99-n4-1": {
+   "colored": "c4-p4-4"
+  },
+  "g99-n4-2": {
+   "colored": "c4-p4-1"
+  },
+  "g128-n2-1": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g128-n2-2": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g128-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g128-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g128-n2-5": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g129-n2-1": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g129-n2-2": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g129-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g129-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g129-n2-5": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g130-n2-1": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g130-n2-2": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g130-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g130-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g130-n2-5": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g131-n2-1": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g131-n2-2": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g131-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g131-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g131-n2-5": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g132-n2-1": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g132-n2-2": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g132-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g132-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g132-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g133-n2-1": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g133-n2-2": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g133-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g133-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g133-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g134-n2-1": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g134-n2-2": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g134-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g134-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g134-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g135-n2-1": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g135-n2-2": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g135-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g135-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g135-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g136-n2-1": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g136-n2-2": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g136-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g136-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g136-n2-5": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g136-n2-6": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g136-n2-7": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g137-n2-1": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g137-n2-2": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g137-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g137-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g137-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g138-n2-1": {
+   "colored": "c2-p4m-2",
+   "gs": "p4m[2]3",
+   "shubnikov": "p4′m′m"
+  },
+  "g138-n2-2": {
+   "colored": "c2-p4m-1",
+   "gs": "p4m[2]4",
+   "shubnikov": "p4′mm′"
+  },
+  "g138-n2-3": {
+   "colored": "c2-p4m-3",
+   "gs": "p4m[2]2",
+   "shubnikov": "p4m′m′"
+  },
+  "g138-n2-4": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g138-n2-5": {
+   "colored": "c2-p4m-4",
+   "gs": "p4m[2]5",
+   "shubnikov": "p′c4mm"
+  },
+  "g138-n2-6": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g138-n2-7": {
+   "colored": "c2-p4m-5",
+   "gs": "p4m[2]1",
+   "shubnikov": "p′c4gm"
+  },
+  "g139-n2-1": {
+   "colored": "c2-p4g-2",
+   "gs": "p4g[2]2",
+   "shubnikov": "p4′g′m"
+  },
+  "g139-n2-2": {
+   "colored": "c2-p4g-1",
+   "gs": "p4g[2]3",
+   "shubnikov": "p4′gm′"
+  },
+  "g139-n2-3": {
+   "colored": "c2-p4g-3",
+   "gs": "p4g[2]1",
+   "shubnikov": "p4g′m′"
+  },
+  "g139-n4-1": {
+   "colored": "c4-p4g-4"
+  },
+  "g139-n4-2": {
+   "colored": "c4-p4g-6"
+  },
+  "g224-n3-1": {
+   "colored": "c3-p3-1",
+   "gs": "p3[3]1"
+  },
+  "g224-n3-2": {
+   "colored": "c3-p3-2",
+   "gs": "p3[3]2"
+  },
+  "g225-n3-1": {
+   "colored": "c3-p3-1",
+   "gs": "p3[3]1"
+  },
+  "g225-n3-2": {
+   "colored": "c3-p3-2",
+   "gs": "p3[3]2"
+  },
+  "g226-n3-1": {
+   "colored": "c3-p3-1",
+   "gs": "p3[3]1"
+  },
+  "g226-n3-2": {
+   "colored": "c3-p3-2",
+   "gs": "p3[3]2"
+  },
+  "g227-n3-1": {
+   "colored": "c3-p3-2",
+   "gs": "p3[3]2"
+  },
+  "g227-n3-2": {
+   "colored": "c3-p3-2",
+   "gs": "p3[3]2"
+  },
+  "g227-n3-3": {
+   "colored": "c3-p3-1",
+   "gs": "p3[3]1"
+  },
+  "g230-n2-1": {
+   "colored": "c2-p3m1-1",
+   "gs": "p3m1[2]",
+   "shubnikov": "p3m′"
+  },
+  "g231-n2-1": {
+   "colored": "c2-p3m1-1",
+   "gs": "p3m1[2]",
+   "shubnikov": "p3m′"
+  },
+  "g232-n2-1": {
+   "colored": "c2-p31m-1",
+   "gs": "p31m[2]",
+   "shubnikov": "p31m′"
+  },
+  "g232-n3-1": {
+   "colored": "c3-p31m-2",
+   "gs": "p31m[3]2"
+  },
+  "g232-n6-1": {
+   "colored": "c6-p31m-4"
+  },
+  "g233-n2-1": {
+   "colored": "c2-p31m-1",
+   "gs": "p31m[2]",
+   "shubnikov": "p31m′"
+  },
+  "g233-n3-1": {
+   "colored": "c3-p31m-2",
+   "gs": "p31m[3]2"
+  },
+  "g233-n6-1": {
+   "colored": "c6-p31m-4"
+  },
+  "g234-n2-1": {
+   "colored": "c2-p31m-1",
+   "gs": "p31m[2]",
+   "shubnikov": "p31m′"
+  },
+  "g234-n3-1": {
+   "colored": "c3-p31m-2",
+   "gs": "p31m[3]2"
+  },
+  "g234-n6-1": {
+   "colored": "c6-p31m-4"
+  },
+  "g235-n2-1": {
+   "colored": "c2-p31m-1",
+   "gs": "p31m[2]",
+   "shubnikov": "p31m′"
+  },
+  "g235-n3-1": {
+   "colored": "c3-p31m-2",
+   "gs": "p31m[3]2"
+  },
+  "g235-n6-1": {
+   "colored": "c6-p31m-4"
+  },
+  "g243-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g243-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g243-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g244-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g244-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g244-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g245-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g245-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g245-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g246-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g246-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g246-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g247-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g247-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g247-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g248-n2-1": {
+   "colored": "c2-p6-1",
+   "gs": "p6[2]",
+   "shubnikov": "p6′"
+  },
+  "g248-n3-1": {
+   "colored": "c3-p6-1",
+   "gs": "p6[3]1"
+  },
+  "g248-n6-1": {
+   "colored": "c6-p6-1"
+  },
+  "g268-n2-1": {
+   "colored": "c2-p6m-2",
+   "gs": "p6m[2]1",
+   "shubnikov": "p6′m′m"
+  },
+  "g268-n2-2": {
+   "colored": "c2-p6m-3",
+   "gs": "p6m[2]3",
+   "shubnikov": "p6m′m′"
+  },
+  "g268-n2-3": {
+   "colored": "c2-p6m-1",
+   "gs": "p6m[2]2",
+   "shubnikov": "p6′mm′"
+  },
+  "g269-n2-1": {
+   "colored": "c2-p6m-2",
+   "gs": "p6m[2]1",
+   "shubnikov": "p6′m′m"
+  },
+  "g269-n2-2": {
+   "colored": "c2-p6m-3",
+   "gs": "p6m[2]3",
+   "shubnikov": "p6m′m′"
+  },
+  "g269-n2-3": {
+   "colored": "c2-p6m-1",
+   "gs": "p6m[2]2",
+   "shubnikov": "p6′mm′"
+  },
+  "g270-n2-1": {
+   "colored": "c2-p6m-2",
+   "gs": "p6m[2]1",
+   "shubnikov": "p6′m′m"
+  },
+  "g270-n2-2": {
+   "colored": "c2-p6m-3",
+   "gs": "p6m[2]3",
+   "shubnikov": "p6m′m′"
+  },
+  "g270-n2-3": {
+   "colored": "c2-p6m-1",
+   "gs": "p6m[2]2",
+   "shubnikov": "p6′mm′"
+  },
+  "g271-n2-1": {
+   "colored": "c2-p6m-2",
+   "gs": "p6m[2]1",
+   "shubnikov": "p6′m′m"
+  },
+  "g271-n2-2": {
+   "colored": "c2-p6m-3",
+   "gs": "p6m[2]3",
+   "shubnikov": "p6m′m′"
+  },
+  "g271-n2-3": {
+   "colored": "c2-p6m-1",
+   "gs": "p6m[2]2",
+   "shubnikov": "p6′mm′"
+  }
+ }
+}

@@ -11,6 +11,8 @@ Two changes, applied to all 88 pages under `docs/` that carry a site header:
 3. **Every page carries the "Superseded" group** — 86 of the 88 did, and the
    two report pages, written before it existed, stopped a reader there from
    reaching the superseded crystal catalogue at all.
+4. **"Shubnikov" joins the Colourings group** after Monochrome (29 Sep 2026):
+   the 990 cyclic colourings of the 68 forward film groups, docs/shubnikov/.
 
 Run from the repository root:
 
@@ -37,7 +39,9 @@ COLOURINGS = [
     ("colour/gyre/", "Gyre"),
     ("colour/trefoil/", "Trefoil"),
     ("monochrome/", "Monochrome"),
+    ("shubnikov/", "Shubnikov"),
 ]
+SHUBNIKOV = COLOURINGS[-1]
 # The fifth group. 86 of the 88 pages carry it; the two report pages were
 # written before it existed and carried four groups where every other page
 # carries five.
@@ -72,6 +76,7 @@ HERE = {
     "colour/gyre/index.html": "colour/gyre/",
     "colour/trefoil/index.html": "colour/trefoil/",
     "monochrome/index.html": "monochrome/",
+    "shubnikov/index.html": "shubnikov/",
 }
 
 
@@ -139,6 +144,31 @@ def rename_colour(text: str, here: str | None) -> tuple[str, bool]:
     return text[: match.start("open")] + rebuilt + text[match.end("close") :], True
 
 
+def add_shubnikov(text: str, here: str | None) -> tuple[str, bool]:
+    """Insert the Shubnikov anchor after Monochrome in an existing Colourings group.
+
+    Idempotent, and written in whichever of the two header shapes the page
+    already uses (one anchor per line, or the whole group on one line)."""
+    match = COLOURINGS_RE.search(text)
+    if match is None:
+        return text, False
+    body = match.group("body")
+    prefix_match = re.search(r'href="([^"]*?)colour/"', body)
+    if prefix_match is None:
+        raise ValueError("Colourings group has no recognisable link to read a prefix from")
+    prefix = prefix_match.group(1)
+    if f'href="{prefix}{SHUBNIKOV[0]}"' in body:
+        return text, False
+    mono = re.search(r'<a href="' + re.escape(prefix) + r'monochrome/"[^>]*>[^<]*</a>', body)
+    if mono is None:
+        raise ValueError("Colourings group has no Monochrome link to follow")
+    link = anchor(prefix, SHUBNIKOV[0], SHUBNIKOV[1], here)
+    inserted = (f"\n{match.group('lead')}  {link}" if "\n" in body else link)
+    new_body = body[: mono.end()] + inserted + body[mono.end():]
+    start, end = match.start("body"), match.end("body")
+    return text[:start] + new_body + text[end:], True
+
+
 ANY_GROUP = re.compile(
     r'(?P<lead>[ \t]*)<span class="navgroup(?: [^"]*)?">\s*'
     r'<span class="navgroup-label">(?P<label>[^<]*)</span>'
@@ -197,7 +227,7 @@ def missing(text: str) -> list[str]:
     else:
         names = ANCHOR.findall(col.group("body"))
         if len(names) != len(COLOURINGS) or not any(h.endswith("monochrome/") for h in names):
-            gaps.append("the Colourings group does not hold all four links")
+            gaps.append("the Colourings group does not hold all %d links" % len(COLOURINGS))
     if COLOUR.search(text):
         gaps.append('an old "Colour" group is still present')
     if "navgroup-superseded" not in text:
@@ -240,6 +270,7 @@ def main() -> int:
         try:
             out, did_showcase = add_showcase(out, here)
             out, did_colour = rename_colour(out, here)
+            out, did_shubnikov = add_shubnikov(out, here)
             out, did_superseded = add_superseded(out)
         except ValueError as exc:
             stale.append((rel, [str(exc)]))
