@@ -1,0 +1,260 @@
+/* The "Visualizations" section of a correspondence entry: the Showcase clips
+   of this group and the explorers, viewers and tools that draw it.
+
+   Written by enumerate/correspondence_visualizations.py, played by
+   js/correspondence-visualizations.js.  Every selector here is inside
+   .entry-visualizations; the page's own rules are untouched.  The link cards
+   deliberately look like .extra-link above them (same border, same #faf8f1
+   ground, name / target / small uppercase scope), and the clip art mirrors the
+   Showcase's loop cards (square, cover-cropped, kind badge top left). */
+
+.entry-visualizations {
+  margin-top: 1.1rem;
+}
+
+.entry-visualizations h4 {
+  margin: 0 0 0.36rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* ---- the Showcase clips -------------------------------------------------- */
+
+/* Two columns at every width.  The posters are 176 px square, so the grid is
+   capped just above two of them plus the gap: on a tablet the entry column is
+   wide enough to blow a poster up to twice its size, which reads as a soft,
+   oversized picture dominating the entry.  Narrower columns (desktop's ~406 px
+   and every phone) are unaffected. */
+.entry-visualizations .viz-clips {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.34rem;
+  max-width: 26rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry-visualizations .viz-clips li {
+  min-width: 0;
+}
+
+/* The cards of a row stay the same height however their captions wrap. */
+.entry-visualizations .viz-clip {
+  display: block;
+  overflow: hidden;
+  height: 100%;
+  min-width: 0;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #faf8f1;
+  color: inherit;
+  text-decoration: none;
+}
+
+.entry-visualizations .viz-clip:hover,
+.entry-visualizations .viz-clip:focus-visible {
+  border-color: var(--accent);
+  background: #fffdf7;
+}
+
+.entry-visualizations .viz-clip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.entry-visualizations .viz-clip-art {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #14110f;
+  line-height: 0;
+}
+
+.entry-visualizations .viz-clip-art img,
+.entry-visualizations .viz-clip-art video {
+  position: absolute;
+  display: block;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.entry-visualizations .viz-clip-art video {
+  z-index: 1;
+}
+
+.entry-visualizations .viz-clip-badge {
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  left: 4px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: #1b1626cc;
+  color: #fff;
+  font-size: 0.5rem;
+  font-weight: 640;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.entry-visualizations .viz-clip[data-kind="mono"] .viz-clip-badge {
+  background: #111e;
+}
+
+.entry-visualizations .viz-clip[data-kind="colour"] .viz-clip-badge {
+  background: #c9563ee6;
+}
+
+.entry-visualizations .viz-clip[data-kind="ember"] .viz-clip-badge {
+  background: #8a4b1fe6;
+}
+
+.entry-visualizations .viz-clip-name,
+.entry-visualizations .viz-clip-meta {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+  text-overflow: ellipsis;
+}
+
+.entry-visualizations .viz-clip-name {
+  padding: 0.34rem 0.42rem 0;
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 690;
+  line-height: 1.25;
+}
+
+.entry-visualizations .viz-clip-meta {
+  padding: 0.06rem 0.42rem 0.36rem;
+  color: #37413d;
+  font-size: 0.62rem;
+  line-height: 1.25;
+}
+
+.entry-visualizations .viz-more {
+  margin: 0.4rem 0 0.5rem;
+  font-size: 0.68rem;
+}
+
+.entry-visualizations .viz-more a {
+  color: var(--accent);
+}
+
+/* ---- the explorers, viewers and tools ------------------------------------ */
+
+.entry-visualizations .viz-links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: 0.34rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.entry-visualizations .viz-links li {
+  min-width: 0;
+}
+
+.entry-visualizations .viz-link {
+  display: grid;
+  align-content: start;
+  min-height: 4.25rem;
+  gap: 0.12rem;
+  padding: 0.48rem 0.52rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #faf8f1;
+  color: inherit;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.entry-visualizations .viz-link:hover,
+.entry-visualizations .viz-link:focus-visible {
+  border-color: var(--accent);
+  background: #fffdf7;
+}
+
+.entry-visualizations .viz-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.entry-visualizations .viz-link-name {
+  color: var(--text);
+  font-size: 0.7rem;
+  font-weight: 690;
+}
+
+.entry-visualizations .viz-link-target {
+  overflow-wrap: anywhere;
+  color: #37413d;
+  font-size: 0.65rem;
+}
+
+.entry-visualizations .viz-link-scope {
+  align-self: end;
+  color: var(--muted);
+  font-size: 0.54rem;
+  font-weight: 680;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+/* ---- phones -------------------------------------------------------------- */
+
+/* The link cards drop to one column where .extra-links-list does; the clips
+   keep their two columns, which is what keeps them large enough to read as
+   pictures rather than as a list of thumbnails. */
+@media (max-width: 430px) {
+  .entry-visualizations .viz-links {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-visualizations .viz-link {
+    min-height: 2.9rem;
+    padding: 0.55rem 0.62rem;
+  }
+
+  /* One line of 0.72rem text is a 14 px tap target; a thumb needs 44.  The
+     padding grows the link's own box (its margins shrink to pay for most of
+     it), so the words stay where they were and only the target grows. */
+  .entry-visualizations .viz-more {
+    margin: 0.1rem 0 0.15rem;
+    font-size: 0.72rem;
+  }
+
+  .entry-visualizations .viz-more a {
+    display: inline-block;
+    padding-block: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-visualizations .viz-clip-art video {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .entry-visualizations .viz-clip,
+  .entry-visualizations .viz-link {
+    border-color: CanvasText;
+  }
+
+  .entry-visualizations .viz-clip-badge {
+    background: Canvas;
+    color: CanvasText;
+    outline: 1px solid CanvasText;
+  }
+}

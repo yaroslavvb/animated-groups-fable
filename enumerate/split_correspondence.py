@@ -35,6 +35,18 @@ Every entry also shows its clockwork orbifold symbol (docs/data/catalog.json,
 the same symbol the catalogue prints) under its heading and in its tab; the
 snapshot printed it only where the book signature needed disambiguating.
 
+Every entry finally gets a "Visualizations" section under its Extra links: up
+to four Showcase clips of that very group, a line to the family's section of
+the Showcase, and a card for each explorer, full-screen viewer or tool that
+draws the group, each with a true count or a short true description.  The
+section is built by correspondence_visualizations.py from the shipped
+manifests; one of those manifests, docs/data/designer-links.json, is written by
+``node enumerate/designer_links.mjs`` (with ``--check`` to verify it is
+current) and must be re-run whenever the designer's group menu changes.  The 17
+family pages (not the index, which holds no entries) load
+css/correspondence-visualizations.css and js/correspondence-visualizations.js,
+which plays a clip while it is on screen and frees it again when it is not.
+
 Order of operations after editing the source:
     python3 correspondence_frames.py --check  every tab of a page shares one
                                             pattern and one set of generator
@@ -54,6 +66,7 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import correspondence_symbols  # noqa: E402
+import correspondence_visualizations  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "enumerate" / "correspondence-source.html"
@@ -213,8 +226,33 @@ def add_clockwork_symbols(fragment, gids, symbols):
     return fragment
 
 
+VISUALIZATIONS_ASSETS = (
+    '  <link rel="stylesheet" href="css/correspondence-visualizations.css?v=visualizations-v1">\n'
+    '  <script type="module" src="js/correspondence-visualizations.js?v=visualizations-v1"></script>\n'
+)
+
+
+def add_visualizations(fragment, gids, visualizations):
+    """Put the Visualizations section after each entry's Extra links.
+
+    It is the last block of the .entry-copy column, so it follows the closing
+    tag of details.extra-links; correspondence_visualizations.py renders it at
+    that element's own indentation."""
+    for gid in gids:
+        if gid not in visualizations:
+            raise ValueError("%s has no visualizations; the correspondence data is stale" % gid)
+        if 'data-visualizations="%s"' % gid in fragment:
+            continue
+        opening = '<details class="extra-links" data-extra-links="%s">' % gid
+        start, end = balanced(fragment, opening, "details")
+        indent = start - (fragment.rfind("\n", 0, start) + 1)
+        section = correspondence_visualizations.section_html(gid, visualizations[gid], indent)
+        fragment = fragment[:end] + "\n\n" + section + fragment[end:]
+    return fragment
+
+
 class Family:
-    def __init__(self, section, links, symbols):
+    def __init__(self, section, links, symbols, visualizations):
         self.section = section
         self.hm = re.search(r'id="wallpaper-([^"]+)"', section).group(1)
         # The signature nests <span class="orbifold-star">, so cut it balanced.
@@ -229,9 +267,11 @@ class Family:
             r'<section class="correspondence-entry" id="(g\d+)"[^>]*data-clock-order="(\d+)"',
             section)
         gids = [gid for gid, _order in self.entries]
-        self.tabs_html = add_clockwork_symbols(
-            add_vladimir_rows(cut(section, '<div class="clockwork-tabs"', "div"), gids, links),
-            gids, symbols)
+        self.tabs_html = add_visualizations(
+            add_clockwork_symbols(
+                add_vladimir_rows(cut(section, '<div class="clockwork-tabs"', "div"), gids, links),
+                gids, symbols),
+            gids, visualizations)
         self.tabs = []
         for tab in re.finditer(
                 r'<a class="clockwork-tab" id="tab-(g\d+)"[^>]*>(.*?)</a>', section, re.S):
@@ -270,6 +310,7 @@ class Parts:
         self.dialog = cut(source, '<section class="diagram-symbol-dialog"', "section")
         self.links_meta, self.links = load_links()
         self.symbols = load_clockwork_symbols()
+        self.visualizations = correspondence_visualizations.load()
         atlas = cut(source, '<div class="correspondence-atlas"', "div")
         self.families = []
         i = 0
@@ -278,7 +319,8 @@ class Parts:
                 start, end = balanced(atlas, '<section class="wallpaper-family"', "section", i)
             except ValueError:
                 break
-            self.families.append(Family(atlas[start:end], self.links, self.symbols))
+            self.families.append(
+                Family(atlas[start:end], self.links, self.symbols, self.visualizations))
             i = end
         if len(self.families) != 17:
             raise ValueError("expected 17 wallpaper families, found %d" % len(self.families))
@@ -371,7 +413,10 @@ def family_page(parts, index):
         "Wallpaper group %s (%s): %s over it, each with its cyclic colouring, "
         "clockwork film and polar space group (%s)." % (
             family.hm, family.orbifold_text, family.count_text, family.space_groups_text))
-    head = head_for(parts, title, description)
+    # Only the family pages carry entries, so only they load the Visualizations
+    # stylesheet and the clip player.
+    head = head_for(parts, title, description).replace(
+        "</head>", VISUALIZATIONS_ASSETS + "</head>", 1)
     pager = ['      <nav class="family-pager" aria-label="Neighbouring wallpaper groups">']
     if previous:
         pager.append('        <a class="family-pager-link family-pager-prev" href="%s" rel="prev">'

@@ -99,6 +99,17 @@ The classification is recomputed from scratch in exact rational arithmetic
   `docs/correspondence.html` (the index with one card per wallpaper group)
   and `docs/correspondence-<hm>.html`, one page per wallpaper group (17);
   old `correspondence.html#g244` links are redirected by the index.
+- `correspondence_visualizations.py` — the "Visualizations" section
+  `split_correspondence.py` puts under each entry's Extra links: up to four
+  Showcase clips of that group, chosen from `docs/showcase/data/showcase.json`
+  (featured first, the kinds taking turns, no picture twice), and a card for
+  every explorer, full-screen viewer and tool that draws the group, each with
+  a true count read from the shipped atlases or a short true description;
+  `--json` prints the per-group data.
+- `designer_links.mjs` — the `designer.html#…` deep link of each group in the
+  designer's menu (one ring, one seed), encoded with the designer's own
+  `docs/js/designer/urlstate.js`; writes `docs/data/designer-links.json`,
+  `--check` verifies it is current. Needs a modern node.
 - `sync_crops.py` — copies the MathWorld thumbnails and the book crops for
   the three-colour types from the sibling repo, matching crops by the
   audited labels printed in their highlight boxes (several source files are
