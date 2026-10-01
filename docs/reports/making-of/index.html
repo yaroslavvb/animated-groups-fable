@@ -6,6 +6,7 @@
 <title>The making of animated-groups-fable</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23eb6834'/%3E%3Ccircle cx='8' cy='4.6' r='2' fill='%23f9f9f7'/%3E%3C/svg%3E">
 <meta name="description" content="How a site of 275 clockwork groups and its reaction-diffusion animations was built with AI agents between 9 August and 29 September 2026: human time, agent time, compute time and the artifacts.">
+<link rel="stylesheet" href="assets/katex/katex.min.css">
 <style>
 
 :root {
@@ -146,6 +147,8 @@ h2:hover .hlink, h3:hover .hlink, .hlink:focus { opacity: 1; }
 /* Hyphenate cells (html lang="en-GB"), rather than overflow-wrap:anywhere, which lets an auto-layout
    column shrink to one letter. */
 th, td { overflow-wrap: break-word; -webkit-hyphens: auto; hyphens: auto; }
+/* a short formula in a narrow cell stays on one line instead of breaking after "=" */
+td .katex { white-space: nowrap; }
 th.num { white-space: normal; }
 @media (max-width: 599px) {
   table.stack, .wide table.stack { min-width: 0; }
@@ -305,6 +308,19 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   .phase-list, .gal { grid-template-columns: 1fr; }
   .ask-list li { grid-template-columns: 1fr; gap: 0; }
   .ask-list .ask-t { padding-top: 0; }
+}
+
+/* mathematics: KaTeX, rendered at build time; no script, no CDN, no web fetch */
+.katex { font-size: 1.05em; }
+.math-display { display: block; overflow-x: auto; overflow-y: hidden; max-width: 100%;
+  -webkit-overflow-scrolling: touch; padding: 2px 0; }
+.math-display .katex-display { margin: 0; }
+.math-display .katex { font-size: 1.12em; }
+/* a qualifier that belonged to the end of an equation line stays prose */
+.eq-qual { text-align: center; font-size: 0.9rem; color: var(--ink-2); margin: 6px 0 0; }
+@media (max-width: 599px) {
+  .katex { font-size: 1em; }
+  .math-display .katex { font-size: 1.04em; }
 }
 
 </style>
@@ -500,16 +516,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
 
 
 <!-- ========================================================= §6 animations -->
-<!-- ============================================================================
-     Part II — The animations.
-     Fragment for docs/reports/making-of/index.html.
-     Colours come only from the page tokens --c1..--c5, --c7, --ink, --ink-2,
-     --muted, --grid, --axis, --surface, --page. No hex colours, no CDN, no
-     external fonts. Every figure src is assets/thumbs/<slug>.jpg or
-     assets/clips/<slug>.mp4 with the slugs listed in part2-media.json.
-     Each number carries an HTML comment naming the research file it came from;
-     the full claim-to-evidence map is in part2-sources.md.
-     ============================================================================ -->
+
 
 <style>
 /* Scoped to this part so the fragment renders correctly whatever the shell
@@ -565,7 +572,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
 <section id="animations" class="p2">
   <h2 id="animations-h">6. The animations<a class="hlink" href="#animations" aria-label="link to this section">#</a></h2>
 
-  <!-- (1) ORIENTATION -->
+  
   <p class="p2-lede">
     Every animation in the
     <a href="https://yaroslavvb.github.io/animated-groups-fable/showcase/">Showcase</a>
@@ -576,10 +583,10 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     of a turn about one class of centre and waiting a third of a period reproduces it exactly, about
     another class it is two thirds of a period, and about the third class no wait at all
     (<a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a>).
-    <!-- src: brusselator.md §5 (symbol r33₁3₂, phase profile 0, 1/3, 2/3; p3/333; R3 No. 146) -->
+    
     The concentrations obey the Brusselator equations pointwise, so no frame is drawn or forced; the
     symmetry is a property of one orbit of the flow, and the film loops because the orbit closes.
-    <!-- src: brusselator.md §2–§3 -->
+    
   </p>
 
   <figure>
@@ -587,14 +594,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     <figcaption>
       The g227 orbit, one frame. Six phase singularities per drawn cell, three of charge +1 on the
       3₂ centres and three of charge −1 on the 3₁ centres, with the plain threefold centres pulsing
-      in place between them; period <strong>T = 6.3902</strong> on a triangular cell of side
+      in place between them; period <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> = <strong>6.3902</strong> on a triangular cell of side
       <strong>40</strong>, mesh <strong>36 × 36</strong>, <strong>48</strong> saved frames.
-      <!-- src: brusselator.md §2 (T, L, N, M) and §6 (six singularities, charges, antinodes) -->
+      
       Live at <a href="https://brusselator-p3-spiral.mathornament.workers.dev/">brusselator-p3-spiral.mathornament.workers.dev</a>.
     </figcaption>
   </figure>
 
-  <!-- (2) CHRONOLOGY -->
+  
   <h3 id="animations-chronology">From the question to the orbit</h3>
 
   <h4>28 and 31 August — the question</h4>
@@ -602,13 +609,13 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     The reaction–diffusion arm began as a prerequisite, not a plan. In an email to Vladimir Bulatov
     late on <strong>28 August</strong> the owner asked whether Vladimir's differential-equation
     solver could be modified to produce periodic animations.
-    <!-- src: context.md §1, the 28 Aug 23:49 PDT email thread (paraphrased; subject line not reproduced) -->
+    
     Three days later, on <strong>31 August</strong> at <strong>10:19</strong>, he wrote out the
     research question itself in another email: wallpaper symmetry applied to differential equations
     is familiar, but could it be extended to <em>time</em> symmetry — a looping animation whose right
     half is a mirrored copy of the left, offset in time. The stated destination was a poster for the
     next Gathering for Gardner conference, in San Francisco.
-    <!-- src: context.md §1 message #2 (paraphrased; date and time verified) -->
+    
     Nothing was built for four days.
   </p>
 
@@ -617,14 +624,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     At <strong>13:54</strong> the owner opened a session with that same question pasted in, named
     clockwork symmetry <strong>442</strong> and its six forward-time characters, and attached two
     screenshots of U-skate gliders as the visual target.
-    <!-- src: anim-gs.md §0 (13:54 PDT, 442, g94–g99, U-skate screenshots) -->
+    
     The first two minutes went on algebra rather than code, and it paid: time <em>reversal</em> is
     obstructed for an autonomous isotropic flow, because differentiating the reversal relation forces
     the orbit to be stationary; and a 442 pattern cannot be a rigidly drifting glider lattice,
     because a quarter turn sends the drift velocity to <em>Rc</em> and a common drift needs
     <em>Rc = c</em>. All six characters were shown compatible; the glider picture was excluded at the
     level of the group on day one.
-    <!-- src: anim-gs.md §1 (feasibility, committed as docs/scott-gray-feasibility.md in d9a864f 14:11) -->
+    
   </p>
   <p>
     The first solver was a space–time collocation: Crank–Nicolson defects over <strong>M</strong>
@@ -633,33 +640,33 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     iterations each drove the residual down and held the time symmetry exactly — and every one failed
     independent forward closure. The defect on a coarse frame stack does not control the true
     trajectory.
-    <!-- src: anim-gs.md §2 (six searches, 200 iterations, failed closure); solver.md C1, H2 -->
+    
   </p>
   <p>
     Then the correction that shaped the whole codebase. At <strong>14:40</strong> the owner checked a
     few of the live animations and reported that <q>they don't seem to respect the time symmetry</q>,
     adding that switching between g95 and g96 made no difference.
-    <!-- src: anim-gs.md §3, solver.md H1 (verbatim owner prompt, 14:40:34 PDT) -->
+    
     The diagnosis came two minutes later: the browser integrator had been projecting each step onto
     the instantaneous kernel — the operations with zero time shift — and then drawing the requested
     phase-shift generators on top. For g96 that kernel is trivial and for g95 it is a half turn, so
     the two rendered identically and only the decoration changed. A time-shift character is not a
     state-space constraint and cannot be imposed step by step.
-    <!-- src: solver.md H1 (dynamics.mjs:9 ops.filter(o => o.tau === 0); webgl.mjs:14) -->
+    
   </p>
   <p>
     The fix was to stop constraining the flow and constrain a <em>return</em> instead. Solve
-    <code>Φ(T/m, q₀) = q₀ ∘ g⁻¹</code> for an initial state and a period, with <code>Φ</code> the
+    <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Φ</mi><mo stretchy="false">(</mo><mi>T</mi><mi mathvariant="normal">/</mi><mi>m</mi><mo separator="true">,</mo><mtext> </mtext><msub><mi>q</mi><mn>0</mn></msub><mo stretchy="false">)</mo><mo>=</mo><msub><mi>q</mi><mn>0</mn></msub><mo>∘</mo><msup><mi>g</mi><mrow><mo>−</mo><mn>1</mn></mrow></msup></mrow><annotation encoding="application/x-tex">\Phi(T/m,\ q_0) = q_0 \circ g^{-1}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">Φ</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/</span><span class="mord mathnormal">m</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0085em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span> for an initial state and a period, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Φ</mi></mrow><annotation encoding="application/x-tex">\Phi</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Φ</span></span></span></span> the
     ordinary unprojected evolution, the instantaneous kernel reducing only the unknowns, and an
     analytic Hopf eigenmode as the seed. By <strong>14:48</strong> a rotating g96 wave had an
-    independent return error near <strong>10⁻¹²</strong>; by <strong>14:55</strong> both branches —
+    independent return error near <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>; by <strong>14:55</strong> both branches —
     one standing, one rotating — were in hand, and the six 442 characters were populated by
     translations and reflections of those two.
-    <!-- src: anim-gs.md §4 (14:44/14:48/14:51/14:55, ~1e-12, two branches) -->
+    
     An earlier decision made that verification load-bearing: asked at <strong>14:24</strong> whether
     a working animation meant one tested to move or one verified periodic, the owner chose
     <q>Only verified periodic solutions, even if the list is empty.</q>
-    <!-- src: anim-gs.md §3 (verbatim owner prompt, 14:24 PDT) -->
+    
   </p>
   <p>
     Modal entered at <strong>14:47</strong> with a smoke test for A100 reservations, and the search
@@ -667,16 +674,16 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     <strong>2½</strong> hours from <strong>14:59</strong> to <strong>17:30</strong> that afternoon:
     <strong>2.398</strong> A100-40GB-hours, <strong>$5.64</strong> metered on the day, all of it
     Gray–Scott.
-    <!-- src: modal.md headline + per-day table (2.398 A100-40GB-hours; 09-04 = $5.636; 14:59–17:30 window) -->
+    
     The kernel was FP64 with fused multiply-add disabled so that GPU and CPU agreed bit for bit; on a
     <strong>1,252</strong>-trajectory batched Jacobian it ran <strong>148.9×</strong> and
     <strong>149.6×</strong> faster than the same C++ integrator on one core.
-    <!-- src: anim-gs.md §5.1 (benchmark table, bit-for-bit equality); solver.md C4 -->
+    
     One prototype tried to return <strong>66 MB</strong> of movies from the cloud and stalled after
     the computation had already finished; the redesign returned about <strong>0.5 MB</strong> of
     initial states for <strong>14</strong> orbits and rebuilt the films locally, which also kept the
     reconstruction independent.
-    <!-- src: anim-gs.md §5.2; solver.md H6 -->
+    
   </p>
   <p>
     The triangular 632 extension the same evening cost nothing at all. Because a rotation permutes
@@ -684,13 +691,13 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     blocks; a Fourier-block preconditioned Newton–Krylov solve took <strong>2.3 s</strong> where
     dense Newton on the same grid took <strong>222 s</strong>, and <strong>22</strong> verified
     orbits covering all six 632 characters were computed locally with no cloud jobs.
-    <!-- src: anim-gs.md §7 (222 s → 2.3 s, ~96×, 22 orbits, $0); solver.md C3 -->
+    
     What did not work that evening was variety. At <strong>16:05</strong> the owner reported that
     every setting was producing the same pattern and asked for twelve to twenty per parameter set; the search
     delivered <strong>8</strong> in 442 and <strong>11</strong> in 632 from <strong>309</strong>
     jobs, because the symmetry reductions that made the shooting fast were also funnelling every
     seed into one branch family.
-    <!-- src: anim-gs.md §8 and §8.2 (16:05 prompt, 309 jobs, 8 and 11 delivered) -->
+    
   </p>
 
   <h4>5 September — all seventeen wallpaper groups</h4>
@@ -699,33 +706,33 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     later a commit added <strong>405</strong> files and <strong>100,714</strong> lines: a general
     solver reading canonical affine operations for all <strong>68</strong> forward-time entries,
     <strong>441</strong> bounded CPU jobs, all returned exactly once.
-    <!-- src: anim-gs.md §11 (21:57 prompt, 41f8897 at 22:21, 405 files / 100,714 insertions, 441 jobs) -->
+    
     The raw shooting success rate at the exploratory stage was <strong>77</strong> of
     <strong>328</strong> — <strong>23.5 %</strong> — refinement to a finer grid succeeded
     <strong>76</strong> of <strong>77</strong>, and end-to-end admission was <strong>22.6 %</strong>.
-    <!-- src: solver.md (g), 17-wallpaper table: 23.5 %, 98.7 %, 22.6 % -->
+    
     One character resisted: a p6m mirror needed a dedicated <strong>36</strong>-job campaign and
     yielded <strong>12</strong> convergences of which only <strong>5</strong> cleared the visibility
     floor, because small-amplitude mirror solutions can be mathematically correct and invisible.
-    <!-- src: anim-gs.md §11 (g270, 36 jobs, 12 converged, 5 passed) -->
+    
     The whole day's cloud bill was <strong>$0.125</strong>.
-    <!-- src: modal.md per-day table (2026-09-05, $0.125, CPU only) -->
+    
   </p>
   <p>
     Earlier the same day the work turned outward. Video exports were cut for sharing, the session
     transcript was published on the site, and a research note was written explaining what had been
     done to the equations — nothing, as it turned out: the equations are unchanged and the additions
-    are the two relations <code>q(x, t+T) = q(x, t)</code> and
-    <code>q(gx, t + τ_g T) = q(x, t)</code>, with no extra reaction term, forcing or time reversal.
-    <!-- src: anim-gs.md §9 (transcript 48f751d 08:24; note 4a92b6f 16:00, de-personalised 63a440d 16:06) -->
+    are the two relations <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mtext> </mtext><mi>t</mi><mo>+</mo><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>q</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q(x,\ t+T) = q(x, t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span> and
+    <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo stretchy="false">(</mo><mi>g</mi><mi>x</mi><mo separator="true">,</mo><mtext> </mtext><mi>t</mi><mo>+</mo><msub><mi>τ</mi><mi>g</mi></msub><mi>T</mi><mo stretchy="false">)</mo><mo>=</mo><mi>q</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q(gx,\ t + \tau_g T) = q(x, t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>, with no extra reaction term, forcing or time reversal.
+    
     Vladimir's comments were relayed into the session three times that afternoon and evening. He was
     right about the overlays: they had repeated only three named representatives by integer cell
     translations, which generates the group but under-draws its rotation centres. The audit that
     followed checked <strong>1,500</strong> derived rotation-and-phase operations at
     <strong>3,448</strong> centres on every frame and node of both species, largest error
-    <strong>2.98 × 10⁻⁸</strong>, and separated the group's required centres from extra centres that
+    <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.98</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>8</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.98 \times 10^{-8}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.98</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">8</span></span></span></span></span></span></span></span></span></span></span></span>, and separated the group's required centres from extra centres that
     only this solution has and from approximate near-periods that are never certified.
-    <!-- src: anim-gs.md §10 (1,500 ops / 3,448 centres, max 2.98e-8, white/mint/amber convention) -->
+    
   </p>
 
   <h4>6–7 September — two more equations, and the spiral lattice</h4>
@@ -733,38 +740,38 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     On <strong>6 September</strong> at <strong>16:34</strong> the review session opened on the same
     unsolved complaint — insufficient diversity — with a pointer to Vladimir's Ginzburg–Landau app
     and a request for several equations behind the existing seventeen pages.
-    <!-- src: anim-gs.md §12 / claude-sep.md (6 Sep 16:34 prompt, session b8296a1f); summarised, not quoted -->
+    
     Ginzburg–Landau turned out to be nearly free. The equation is equivariant under a global phase
-    rotation, so a state of the form <code>B(x)·e^{iΩt}</code> is periodic by construction and a
-    spatial <em>phase winding</em> of <code>B</code> <em>is</em> a time shift; the constrained
+    rotation, so a state of the form <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>x</mi><mo stretchy="false">)</mo><mo>⋅</mo><msup><mi>e</mi><mrow><mi>i</mi><mi mathvariant="normal">Ω</mi><mi>t</mi></mrow></msup></mrow><annotation encoding="application/x-tex">B(x)\cdot e^{i\Omega t}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8413em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mord mtight">Ω</span><span class="mord mathnormal mtight">t</span></span></span></span></span></span></span></span></span></span></span></span> is periodic by construction and a
+    spatial <em>phase winding</em> of <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> <em>is</em> a time shift; the constrained
     subspace is flow-invariant, so plain integration inside it plus a Newton–Krylov polish to
-    residual near <strong>10⁻¹³</strong> gives exact spiral lattices. It covered <strong>35</strong>
+    residual near <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>13</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-13}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span></span> gives exact spiral lattices. It covered <strong>35</strong>
     of the <strong>51</strong> entries with a nonzero time shift, and the <strong>16</strong> misses
     are principled: an operation that is a mirror or glide with a half-period shift forces the
     amplitude to vanish along a line, and those line defects are unstable, so the unprojected replay
     rejects them.
-    <!-- src: anim-gs.md §12.2 (35/51, 65 fields, residual ~1e-13, mirror/glide topology); solver.md H5 -->
+    
   </p>
   <p>
     The Brusselator was reached through that result rather than around it. Near its Hopf point the
     Brusselator reduces to a Ginzburg–Landau equation, so the job builds a matched spiral lattice on
     the same mesh with a rescaled cell, lifts it through the Hopf eigenvector of the reaction
-    Jacobian, and closes the loop with Newton–Krylov twisted shooting — <code>S_g·Φ_{T/3}(q) − q = 0</code>
-    on the <em>unprojected</em> flow, with <code>log T</code> among the unknowns.
-    <!-- src: brusselator.md §3 (four stages, Lc = L·√(2μ/max(Du,Dv)), rpo_polish, log T unknown) -->
+    Jacobian, and closes the loop with Newton–Krylov twisted shooting — <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mi>g</mi></msub><mo>⋅</mo><msub><mi mathvariant="normal">Φ</mi><mrow><mi>T</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msub><mo stretchy="false">(</mo><mi>q</mi><mo stretchy="false">)</mo><mo>−</mo><mi>q</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">S_g \cdot \Phi_{T/3}(q) - q = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1052em;vertical-align:-0.3552em;"></span><span class="mord"><span class="mord">Φ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.5198em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.1389em;">T</span><span class="mord mtight">/3</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.3552em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>
+    on the <em>unprojected</em> flow, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>log</mi><mo>⁡</mo><mi>T</mi></mrow><annotation encoding="application/x-tex">\log T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mop">lo<span style="margin-right:0.0139em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> among the unknowns.
+    
     The batch <code>bruss1</code> launched at <strong>11:00:48</strong> on <strong>7 September</strong>:
     <strong>204</strong> CPU jobs, no GPU, <strong>81</strong> candidates and <strong>122</strong>
     failures, <strong>4,654.52 s</strong> of function time in total, and an actual provider charge of
     <strong>$0.2007</strong>.
-    <!-- src: brusselator.md §4 (204 jobs, 81/122/1, 4654.52 s, $0.200731 from _modal_sep0309_hourly.json) -->
+    
     The orbit on this page came back from job <code>g227-bruss-a1b23-L40-s1</code> after
     <strong>53.75 s</strong> of function time, somewhere inside the eleven minutes from
     <strong>11:00:52</strong> to <strong>11:11:56</strong> — Modal records no per-job start time, so
     the moment of discovery is bounded, not pinned. Its share of the bill is about
     <strong>$0.0023</strong>.
-    <!-- src: brusselator.md §1 and §4 (53.750973 s, 11:00:52–11:11:56 bound, ≈$0.0023) -->
+    
     It was published at <strong>12:30</strong> inside the review's single commit.
-    <!-- src: brusselator.md §1 (aba5297, 12:30:31) -->
+    
   </p>
   <p class="p2-note">
     The recorded negative result of the same session is worth as much as the positive one: plain
@@ -772,7 +779,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     tried for the Brusselator and for the Barkley excitable model and does not work for time-shift
     characters. It synchronises to the uniform oscillation or drifts. This is the 4 September bug
     restated as a general statement.
-    <!-- src: anim-gs.md §12.4 (Barkley, kernel projection negative result) -->
+    
   </p>
   <p>
     The afternoon of <strong>7 September</strong> added two things that outlived the era. A handedness
@@ -782,11 +789,11 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     rotation to its inverse while keeping the offset. The catalogue-wide survey then checked
     <strong>927</strong> records and <strong>5,598</strong> operation–record relations with
     <strong>zero</strong> wrong-sign passes: the films had not been running backwards, the arrows had.
-    <!-- src: anim-gs.md §13.2 (927 records, 5,598 checks, 0 failures, camera reflection + conjugation) -->
+    
     And <strong>Ember</strong>, the first standalone viewer, shipped at <strong>15:04</strong>: since
     a Ginzburg–Landau orbit is a relative equilibrium, the entire film is one
     <strong>10,368</strong>-byte texture turned analytically, with no frame stack at all.
-    <!-- src: anim-gs.md §13.5 (1d4fe9e 15:04, field.f32 = first 10,368 bytes, exact continuous rotation) -->
+    
   </p>
 
   <h4>16–21 September — the viewers, the catalogues and the Showcase</h4>
@@ -795,22 +802,21 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     finding orbits but looking at them. The commits from <strong>16</strong> to
     <strong>20 September</strong> — <strong>24</strong> of them — all carry the trailer
     <code>Claude Fable 5.1</code>.
-    <!-- src: git log of animated-groups-fable, 16-20 Sep = 24 commits (7+8+0+6+3), every one
-         trailered Claude Fable 5.1. critic.md R1 says 25; recounted here against the repository. -->
+    
     The first ask, at <strong>10:10</strong> on <strong>16 September</strong>, was only about
     resolution; everything that makes <strong>Plume</strong> Plume arrived as four follow-ups over
     <strong>21</strong> hours — opening it on the phone, one finger to pan, two fingers
     to turn, then Safari.
-    <!-- src: anim-colour.md §1 (prompt table 10:10, 10:47, 10:51, 13:59, 17 Sep 07:38; verbatim fragment from 10:51) -->
+    
     The rewrite at <strong>11:13</strong> blended frames on the CPU into one float texture and
     reconstructed on the GPU with nine bilinear taps instead of the previous per-pixel cost; the
     displayed value differs from the exact band-limited reconstruction of the saved samples by under
     <strong>0.4</strong> of one 8-bit colour level, against up to <strong>9</strong> levels on the
     catalogue page it was made from.
-    <!-- src: anim-colour.md §1 and §6 Plume (fca5119 11:13, nine bilinear taps, 0.4 vs 9 levels) -->
+    
     <strong>Plume Monochrome</strong> was added the same morning as a byte-identical twin that
     differs by one attribute on the canvas.
-    <!-- src: anim-colour.md §6 Plume Monochrome (74ccdd0 10:32, byte-identical app.mjs/renderer.mjs/field.f32) -->
+    
   </p>
   <p class="p2-note">
     Two records disagree about who built Plume Monochrome, and both are given here as they stand: an
@@ -818,50 +824,50 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     <code>gpt-6-astra</code>, while the two commits of that hour carry
     <code>Co-Authored-By: Claude Fable 5.1</code> and no Codex session touched the repository in the
     window.
-    <!-- src: gap-hunt.md §3 (email 16 Sep 11:53 vs trailers on 74ccdd0 and fca5119); critic.md §3 item 4 -->
+    
   </p>
   <p>
     <strong>17 September</strong> produced a whole three-colour family in an afternoon. One prompt at
     <strong>08:08</strong> opened a workflow that fanned out to <strong>55</strong> subagents;
-    <!-- src: critic.md phase 17 / gap-hunt.md §6 (one prompt, 55 subagents) -->
+    
     a request at <strong>10:37</strong> for an animation whose symmetry needs a spatial generator, a
     time shift <em>and</em> a recolouring together produced <strong>Gyre</strong>, and
     <strong>Triskele</strong> alongside it as a control that nobody asked for, to make the contrast
     legible. At <strong>13:36</strong> came the sharper case, a colour permutation that is not
     cyclic, and that is <strong>Trefoil</strong>.
-    <!-- src: anim-colour.md §2 (prompt table 08:08 / 10:37 / 13:36 / 16:15; Triskele not requested) -->
+    
     All three paint the <em>same</em> <strong>3.35 MB</strong> Gray–Scott field, byte for byte; only
     the colour rule differs, and the rule decides the colour group. That is the point of the set, and
     it has a proof behind it: composing two symmetries adds their time shifts, so the time shift is a
     homomorphism to a circle, and a colour group can be totally entangled only when it is cyclic.
-    <!-- src: anim-colour.md §2 (shared field 8fcde9bc1178d93d; the homomorphism argument from docs/colour/index.html) -->
+    
   </p>
   <p>
     <strong>18–19 September</strong> is the densest stretch of the project: two prompts on the evening
     of the 18th, then <strong>Weave Monochrome</strong> at <strong>00:00</strong>, the colour
     catalogue at <strong>02:41</strong>, the finished equation search merged at <strong>04:15</strong>
     — all three committed with nobody in the loop, the next prompt arriving at <strong>07:47</strong>.
-    <!-- src: anim-colour.md §3 and §7 (18 Sep 21:58/22:05 prompts; db0c47b 00:00, 319f108 02:41, 197a700 04:15; next prompt 07:47) -->
+    
     The colour search that produced the catalogue ran <em>locally</em>: <strong>14</strong> workers
     against a four-hour deadline, <strong>3,106</strong> of <strong>8,502</strong> planned jobs,
     <strong>770</strong> admitted records, rebuilt into <strong>423</strong> exact colourings —
     <strong>346</strong> Gyre and <strong>77</strong> Trefoil — over <strong>nine</strong> equations.
-    <!-- src: anim-colour.md §3 (3,106 of 8,502, 770 admitted, 423 colourings, nine equations) -->
+    
     The monochrome search went to the cloud at <strong>08:12</strong>: <strong>2,905</strong> jobs
     submitted and returned, <strong>849</strong> orbits admitted across all <strong>68</strong> film
     groups, actual charge <strong>$3.808</strong> against a self-imposed worst-case reservation of
     <strong>$69.91</strong> the agent wrote into its own ledger.
-    <!-- src: anim-colour.md §3 + modal.md (2,905 jobs, 849 admitted, $3.808 actual vs $69.912634 reserved) -->
+    
     Its lesson is in the split: the relative-equilibrium strategy admitted about
     <strong>40 %</strong>, the Hopf-seeded shooting strategy about <strong>5 %</strong>, and two of
     the zeroes are structural rather than unlucky — Gray–Scott cannot be found by the twisted equation
     at all, because a symmetric steady state satisfies it at every period and Newton drives the period
     to zero, and three of the models simply synchronise to their uniform limit cycle.
-    <!-- src: solver.md (g) monochrome table (48 %/5 %/36 %/0.4 %); anim-colour.md §3 (structural zeroes, T = 5.6e-9) -->
+    
     The biggest disappointment is also recorded: on the square lattice <strong>802</strong> of the
     <strong>849</strong> admitted records are single-Fourier-mode travelling stripe waves. Genuine
     orbits, one motif.
-    <!-- src: anim-colour.md §3 (802 of 849) -->
+    
   </p>
   <p>
     <strong>Crosslet</strong> shipped at <strong>09:21</strong> the same morning, the one viewer with
@@ -869,7 +875,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     single commit of <strong>7,613</strong> files added the Monochrome explorer, the site-wide
     navigation on <strong>88</strong> pages, and the <strong>Showcase</strong>: every precomputed
     animation on one page, <strong>4,138</strong> cards over <strong>2,632</strong> preview clips.
-    <!-- src: anim-colour.md §3 (9c5ecc1 09:21 Crosslet; e9cb59f 14:35, 7,613 files, 4,138 cards / 2,632 clips, 88 pages) -->
+    
     Making that page readable took two more days and two attempts. A clip metric — <strong>36</strong>
     frames at <strong>40 × 40</strong>, blurred and z-scored, difference minimised over cyclic shifts
     in time and both screen axes — folded <strong>2,153</strong> of the <strong>4,138</strong> cards.
@@ -878,7 +884,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     another is close and the metric called them unrelated, while a reader calls them one card six
     times. A second fold by name brought the page to <strong>1,070</strong> distinct-looking cards
     with <strong>3,068</strong> folded.
-    <!-- src: anim-colour.md §4 (look-alikes.py metric, 2,153 folded, then 4d2b564 → 1,070 / 3,068) -->
+    
   </p>
 
   <h4>29 September — two standalone pages, and the question that came back</h4>
@@ -886,16 +892,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     Six prompts between <strong>10:06</strong> and <strong>11:29</strong>, <strong>18.1</strong>
     minutes of agent-busy time, five commits, and the g227 field left untouched: the two Cloudflare
     Workers serve the same <strong>497,664</strong> bytes as the catalogue, byte for byte.
-    <!-- src: anim-colour.md §5 (six prompts, five commits); the session's busy time is 18.1 min in
-         this page's own data layer (session 37ec0485), which the brief rounds to 18.0;
-         brusselator.md §6 (497,664 bytes, identical SHA-256 across three copies) -->
+    
     The colour page went up at <strong>10:08</strong>, the monochrome twin at <strong>10:18</strong>,
     both were then rebuilt on Plume's fullscreen viewer, and the monochrome cut was raised from zero
     to <strong>0.426</strong> — <strong>30.1 %</strong> of the maximum — because at zero the two inks
     trade blob and network roles six times a period, while at this level the white islands neither
     merge nor split, checked at <strong>768</strong> instants. The price is stated on the page: the
     exact half-period colour swap is given up.
-    <!-- src: brusselator.md §7 and anim-colour.md §5 (threshold 0.426 = 30.1 % of max|w|, 768 instants, trade-off) -->
+    
   </p>
   <p>
     At the symmetry meeting that morning Vladimir asked how the periodic solution is actually found,
@@ -903,20 +907,20 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     the period. Another participant asked whether all the frames are computed together and evolved at
     once, in effect in a fifth dimension. Both questions have answers in the record. The eigenvalue
     framing is right for one of the three equations and only partly right for the other two: for
-    Ginzburg–Landau the code really does solve <code>F(B) = iΩB</code> with <code>Ω</code> as the
+    Ginzburg–Landau the code really does solve <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo stretchy="false">(</mo><mi>B</mi><mo stretchy="false">)</mo><mo>=</mo><mi>i</mi><mi mathvariant="normal">Ω</mi><mi>B</mi></mrow><annotation encoding="application/x-tex">F(B) = i\Omega B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">i</span><span class="mord">Ω</span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span></span></span></span> with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">Ω</mi></mrow><annotation encoding="application/x-tex">\Omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord">Ω</span></span></span></span> as the
     unknown frequency, whereas for Gray–Scott and the Brusselator the problem is a fixed point of a
     twisted return map and eigenvalues enter through the seed and the preconditioner.
-    <!-- src: solver.md "Answer to Vladimir" and A3/B3/C3 -->
+    
     And computing all the frames together and relaxing them is exactly what the first solver did on
     4 September — the space–time collocation — which is the one that failed.
-    <!-- src: solver.md, the answer to the second meeting question; anim-gs.md §2, H2 -->
+    
     The owner's own account at the meeting was that his contribution was to specify the problem and
     that he did not know how the looping animations had been found; the answer was promised before
     the next meeting.
-    <!-- src: context.md §2.1 (paraphrased, no verbatim quotation; the meeting date is not published) -->
+    
   </p>
 
-  <!-- (3) WHAT WORKED / WHAT DIDN'T -->
+  
   <h3 id="animations-scorecard">What worked, what didn't</h3>
   <p>
     Every approach that was tried on the animation problem, with its result and the cause. Four
@@ -935,139 +939,140 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
           <td data-label="Cause">Forward shifts commute with an autonomous equivariant flow; only time <em>reversal</em> is obstructed, and a rigid 442 glider lattice needs <em>Rc = c</em>.
-          <!-- src: anim-gs.md §1 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Space–time collocation with L-BFGS on the Crank–Nicolson defect</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
           <td data-label="Cause">Six searches reduced the residual and kept the symmetry exactly, then failed independent forward closure: a coarse frame-stack defect does not control the true trajectory.
-          <!-- src: anim-gs.md §2; solver.md C1, H2 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Kernel projection during forward integration in the browser</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
           <td data-label="Cause">Only zero-shift operations can be projected, so g95 and g96 rendered identically under different glyphs. A time-shift character is not a state-space constraint.
-          <!-- src: solver.md H1; anim-gs.md §3 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Twisted Newton shooting from analytic Hopf modes, dense finite-difference Newton (<code>hybr</code>)</td>
           <td data-label="When" class="p2-when">4–5 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
-          <td data-label="Cause">A quarter-period return equation against the true flow: any root is a genuine orbit. Return errors near <strong>10⁻¹²</strong>; the workhorse for the 441 CPU jobs.
-          <!-- src: anim-gs.md §4; solver.md C2 --></td>
+          <td data-label="Cause">A quarter-period return equation against the true flow: any root is a genuine orbit. Return errors near <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>12</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-12}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">12</span></span></span></span></span></span></span></span></span></span></span></span>; the workhorse for the 441 CPU jobs.
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">GPU batched-Jacobian damped Newton on A100</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
           <td data-label="Cause"><strong>1,252</strong> perturbed trajectories per iteration in one CUDA-graph launch, FP64 with fused multiply-add disabled, bit-for-bit equal to the CPU reference; <strong>148.9×</strong> warm.
-          <!-- src: anim-gs.md §5.1; solver.md C4 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Bulk return of finished movies from the cloud</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
           <td data-label="Cause"><strong>66 MB</strong> in one transfer stalled after the computation completed; fixed by returning <strong>0.5 MB</strong> of initial states and rebuilding locally.
-          <!-- src: anim-gs.md §5.2; solver.md H6 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Fourier-block preconditioned Newton–Krylov (triangular 632)</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
           <td data-label="Cause">A rotation permutes Fourier modes of equal eigenvalue, so the twisted linear flow factorises into 2 × 2 blocks: <strong>222 s → 2.3 s</strong> per fine solve, <strong>22</strong> orbits for <strong>$0</strong>.
-          <!-- src: anim-gs.md §7; solver.md C3 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Diversity search for 12–20 morphologies per parameter set</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-part">partial</span></td>
           <td data-label="Cause"><strong>309</strong> jobs returned <strong>8</strong> patterns in 442 and <strong>11</strong> in 632: the symmetry reductions that make shooting fast steer every seed into one branch family.
-          <!-- src: anim-gs.md §8.2 --></td>
+          </td>
         </tr>
         <tr>
-          <td data-label="Approach">Rotating spatial mode 3 at F = 0.00395</td>
+          <td data-label="Approach">Rotating spatial mode 3 at <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><mn>0.00395</mn></mrow><annotation encoding="application/x-tex">F = 0.00395</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.00395</span></span></span></span></td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
-          <td data-label="Cause">Newton fell from <strong>2.1 × 10⁻²</strong> to <strong>3.5 × 10⁻⁵</strong> in nine iterations and the line search stalled. No impossibility follows.
-          <!-- src: anim-gs.md §5.4; solver.md H4 --></td>
+          <td data-label="Cause">Newton fell from <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>2.1</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>2</mn></mrow></msup></mrow><annotation encoding="application/x-tex">2.1 \times 10^{-2}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2.1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span></span> to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.5</mn><mo>×</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup></mrow><annotation encoding="application/x-tex">3.5 \times 10^{-5}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">3.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span></span> in nine iterations and the line search stalled. No impossibility follows.
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Zero-feed analytic exclusion</td>
           <td data-label="When" class="p2-when">4 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
-          <td data-label="Cause">At exactly F = 0, integrating over one space–time period forces <code>∫∫uv² = 0</code>, so no nonstationary nonnegative periodic solution exists, for the continuum and every supported stencil.
-          <!-- src: anim-gs.md §6; solver.md D5 --></td>
+          <td data-label="Cause">At exactly <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">F = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, integrating over one space–time period forces
+            <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∬</mo><mi>u</mi><msup><mi>v</mi><mn>2</mn></msup><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\iint uv^2 = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.1201em;vertical-align:-0.306em;"></span><span class="mop op-symbol small-op" style="margin-right:0.1945em;position:relative;top:-0.0005em;">∬</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">u</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, so no nonstationary nonnegative periodic solution exists, for the continuum and every supported stencil.
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Ginzburg–Landau relative equilibria</td>
           <td data-label="When" class="p2-when">6 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
-          <td data-label="Cause">Gauge symmetry turns a spatial phase winding into a time shift and the constrained subspace is flow-invariant: relaxation plus a polish to <strong>10⁻¹³</strong>, <strong>35</strong> of <strong>51</strong> entries.
-          <!-- src: anim-gs.md §12.2 --></td>
+          <td data-label="Cause">Gauge symmetry turns a spatial phase winding into a time shift and the constrained subspace is flow-invariant: relaxation plus a polish to <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mrow><mo>−</mo><mn>13</mn></mrow></msup></mrow><annotation encoding="application/x-tex">10^{-13}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">13</span></span></span></span></span></span></span></span></span></span></span></span>, <strong>35</strong> of <strong>51</strong> entries.
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Ginzburg–Landau on mirror or glide half-shift entries</td>
           <td data-label="When" class="p2-when">6 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
           <td data-label="Cause">Such an operation forces the amplitude to vanish along a line; the line defect is dynamically unstable and the unprojected replay rejects it. All <strong>16</strong> misses are of this kind.
-          <!-- src: anim-gs.md §12.2; solver.md H5 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Amplitude-equation lifting for the Brusselator</td>
           <td data-label="When" class="p2-when">7 Sep</td>
           <td data-label="Result"><span class="p2-ok">worked</span></td>
           <td data-label="Cause">A matched Ginzburg–Landau spiral lattice on a rescaled cell, lifted through the Hopf eigenvector, then Newton–Krylov twisted shooting on the unprojected flow; <strong>29</strong> of <strong>51</strong> entries.
-          <!-- src: brusselator.md §3; anim-gs.md §12.3 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Step-by-step kernel projection for the Brusselator and the Barkley model</td>
           <td data-label="When" class="p2-when">6–7 Sep</td>
           <td data-label="Result"><span class="p2-no">failed</span></td>
           <td data-label="Cause">Synchronises to the uniform oscillation or drifts, for the same reason as the 4 September bug. Recorded and not published.
-          <!-- src: anim-gs.md §12.4 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Relative-equilibrium versus Hopf-seeded strategies in the monochrome search</td>
           <td data-label="When" class="p2-when">19 Sep</td>
           <td data-label="Result"><span class="p2-part">split</span></td>
           <td data-label="Cause">Phase-symmetric relative equilibria admitted <strong>≈40 %</strong> of jobs; Hopf-seeded twisted shooting <strong>≈5 %</strong>, its failures dominated by non-convergence and synchronisation to the uniform cycle.
-          <!-- src: solver.md (g) monochrome table; anim-colour.md §3 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Look-alike folding of the Showcase by clip metric</td>
           <td data-label="When" class="p2-when">20 Sep</td>
           <td data-label="Result"><span class="p2-part">partial</span></td>
           <td data-label="Cause">Folded <strong>2,153</strong> of <strong>4,138</strong> cards, but six readings of one wave at six feeds never align loop-on-loop; a second fold by name was needed.
-          <!-- src: anim-colour.md §4 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Deflated Newton, so a search cannot return a root already found</td>
           <td data-label="When" class="p2-when">designed 4 Sep</td>
           <td data-label="Result"><span class="p2-never">never built</span></td>
           <td data-label="Cause">Named in the diversity notes as the right tool for distinct morphologies at fixed parameters, and still listed as the next step.
-          <!-- src: anim-gs.md §8.2, §16; solver.md "What is not used" --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">Floquet stability of the published orbits</td>
           <td data-label="When" class="p2-when">designed</td>
           <td data-label="Result"><span class="p2-never">never built</span></td>
           <td data-label="Cause">No code computes Floquet multipliers; the single stored number belongs to a spatially uniform test fixture. Stability is probed only implicitly, by whether the unprojected replay drifts.
-          <!-- src: solver.md D4 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Approach">A verified periodic U-skate glider orbit — the original visual target</td>
           <td data-label="When" class="p2-when">4–7 Sep</td>
           <td data-label="Result"><span class="p2-no">not achieved</span></td>
           <td data-label="Cause">Never found on any equation in any campaign. The day-one feasibility note says why a rigid 442 glider lattice cannot exist, and every document keeps the disclaimer.
-          <!-- src: anim-gs.md §14 row 26, §16 --></td>
+          </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- (4) HOW HARD WAS IT -->
+  
   <h3 id="animations-difficulty">How hard was it</h3>
   <p>
     Per family, in the units each was measured in. Agent-hours are measured turn intervals summed
@@ -1076,7 +1081,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     ten to twenty times. <em>Corrections</em> counts prompts in which the owner said something was
     wrong or missing, excluding new requests and quota notices. The difficulty rating is the one
     recorded in the research files, on a scale of five.
-    <!-- src: critic.md §2.2 (agent-time method) and modal.md (reservations vs charges) -->
+    
   </p>
   <div class="p2-tablewrap">
     <table class="p2-stack">
@@ -1091,99 +1096,90 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
         <tr>
           <td data-label="Family"><strong>Gray–Scott 442 and 632</strong><br><span class="p2-when">4 Sep</span></td>
           <td data-label="Agent time"><strong>12.2 h</strong> across all Codex threads that day
-          <!-- src: this page's own data layer, agents.totals.by_day 2026-09-04 codex_main = 729.2 min;
-               critic.md §2.2 quotes 720 min from an earlier pass --></td>
+          </td>
           <td data-label="Attempts and success"><strong>6</strong> collocation searches, all failed; <strong>2</strong> shooting
             branches, both converged and covering six characters; <strong>309</strong> diversity jobs
             for <strong>8</strong> + <strong>11</strong> patterns against <strong>12–20</strong> asked
-          <!-- src: anim-gs.md §2, §4, §8.2 --></td>
+          </td>
           <td data-label="Modal"><strong>$5.64</strong>, of which <strong>2.398</strong> A100-hours — the project's only GPU
-          <!-- src: modal.md per-day --></td>
+          </td>
           <td data-label="Corrections"><strong>3</strong>: the time-symmetry bug at 14:40, no diversity at 16:05, the visible-shift
             criterion at 16:34
-          <!-- src: anim-gs.md §3, §8 --></td>
+          </td>
           <td data-label="Difficulty"><strong>5/5</strong> on diversity, <strong>4/5</strong> on finding the orbits: distinct
             morphologies at fixed parameters are distinct roots of one system, which needs deflation
-          <!-- src: anim-gs.md §16 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Family"><strong>All 17 wallpaper groups</strong><br><span class="p2-when">5 Sep</span></td>
           <td data-label="Agent time">part of <strong>8.3 h</strong> of Codex time over 5–7 Sep
-          <!-- src: this page's own data layer, agents.totals.by_day codex_main 293.5 + 3.2 + 202.9
-               = 499.6 min; critic.md §2.2 quotes 378 min, which counts only the threads that
-               started on those days and not the 4 September thread running on into them --></td>
+          </td>
           <td data-label="Attempts and success"><strong>441</strong> jobs: <strong>23.5 %</strong> converged at the exploratory stage,
             <strong>98.7 %</strong> of those refined, <strong>22.6 %</strong> admitted end to end; the
             stubborn mirror character <strong>5</strong> of <strong>36</strong>
-          <!-- src: solver.md (g); anim-gs.md §11 --></td>
+          </td>
           <td data-label="Modal"><strong>$0.125</strong>, CPU only
-          <!-- src: modal.md per-day --></td>
+          </td>
           <td data-label="Corrections"><strong>5</strong>: three rounds of Vladimir's comments on rotation centres, scale and cell
             framing, relayed by the owner, plus two generator regressions at 22:28 and 22:39
-          <!-- src: anim-gs.md §10, §11 --></td>
+          </td>
           <td data-label="Difficulty"><strong>4/5</strong>: generalising two hand-tuned lattices to seventeen families with
             mirrors and glides, automating the kernel reduction, in one evening
-          <!-- src: anim-gs.md §11 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Family"><strong>Ginzburg–Landau and the Brusselator</strong><br><span class="p2-when">6–7 Sep</span></td>
           <td data-label="Agent time"><strong>100.7</strong> min in the main thread plus <strong>433</strong> subagent logs
-          <!-- src: this page's own data layer, session b8296a1f busy 100.7 min with 433 subagent
-               logs under it (claude-sep.md rounds to 100.8; anim-gs.md §12 counts 434) --></td>
+          </td>
           <td data-label="Attempts and success"><strong>1,020</strong> jobs, <strong>341</strong> candidates — <strong>33.4 %</strong>;
             coverage <strong>35/51</strong> and <strong>29/51</strong> of the nonzero-shift entries;
             <strong>116</strong> orbits shipped, <strong>17</strong> rejected at re-admission
-          <!-- src: solver.md (g) equations table; brusselator.md §4 --></td>
+          </td>
           <td data-label="Modal"><strong>$0.92</strong>, CPU only; the g227 orbit itself <strong>$0.0023</strong>
-          <!-- src: modal.md per-day (0.716 + 0.201); brusselator.md §4 --></td>
+          </td>
           <td data-label="Corrections"><strong>0</strong> corrections, <strong>2</strong> resumptions after usage limits
-          <!-- src: anim-gs.md §12; claude-sep.md --></td>
+          </td>
           <td data-label="Difficulty"><strong>4/5</strong>: not the mathematics but holding <strong>99</strong> review findings,
             a three-app-to-one refactor and a <strong>1,020</strong>-job sweep together across three
             interruptions
-          <!-- src: anim-gs.md §12.6 --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Family"><strong>Viewers, colour and monochrome catalogues, Showcase</strong><br><span class="p2-when">16–21 Sep</span></td>
           <td data-label="Agent time"><strong>7.1 h</strong> in the main threads and <strong>65.8 h</strong> of workflow
             subagents on the second Mac, plus <strong>1.9 h</strong> on this one
-          <!-- src: this page's own data layer, agents.totals.by_day over 16–21 Sep: second-Mac main
-               426.6 min, second-Mac subagents 3,948.4 min, this Mac 113.4 min. critic.md §2.2 gives
-               447 min of second-Mac main time before the fork-twin rule, and anim-colour.md §7's
-               165.9 min is the whole 21–23 September session, which runs past this stretch --></td>
+          </td>
           <td data-label="Attempts and success">local colour search <strong>3,106</strong> of <strong>8,502</strong> planned jobs →
             <strong>423</strong> colourings; cloud monochrome search <strong>2,905</strong> jobs →
             <strong>849</strong> orbits, of which <strong>802</strong> are one motif; Showcase folded
             twice, <strong>4,138</strong> → <strong>1,070</strong> cards
-          <!-- src: anim-colour.md §3, §4 --></td>
+          </td>
           <td data-label="Modal"><strong>$3.808</strong>, CPU only, against a <strong>$69.91</strong> self-imposed
             reservation
-          <!-- src: modal.md per-day; anim-colour.md §3 --></td>
+          </td>
           <td data-label="Corrections"><strong>2</strong>: the viewer not turning under Safari's gesture events,
             and duplicate-looking Showcase cards; plus <strong>3</strong> quota interruptions
-          <!-- src: the two corrections inside this stretch are 17 Sep 07:38 (Safari) and 20 Sep
-               07:40 (duplicate cards); the threshold that let the monochrome islands merge belongs
-               to 29 September and is in that row. gap-hunt.md §6, §8; anim-colour.md §4 --></td>
+          </td>
           <td data-label="Difficulty"><strong>High</strong> on interaction and GPU numerics, low on mathematics — the orbits
             already existed; Trefoil is the hardest single item at <strong>2,924</strong> lines of tests
             and a theorem
-          <!-- src: anim-colour.md §1, §6 Trefoil --></td>
+          </td>
         </tr>
         <tr>
           <td data-label="Family"><strong>The two standalone spiral-lattice pages</strong><br><span class="p2-when">29 Sep</span></td>
           <td data-label="Agent time"><strong>18.1</strong> min over five turns
-          <!-- src: this page's own data layer, session 37ec0485 (anim-colour.md §5 rounds to 18.0) --></td>
+          </td>
           <td data-label="Attempts and success"><strong>5</strong> commits from <strong>6</strong> prompts; no solving at all — the field
             is copied byte for byte from the catalogue
-          <!-- src: anim-colour.md §5; brusselator.md §6 --></td>
+          </td>
           <td data-label="Modal"><strong>$0</strong>
-          <!-- src: modal.md per-day (no Modal after 19 Sep) --></td>
+          </td>
           <td data-label="Corrections"><strong>2</strong>: make it like the other viewer, and raise the cut so the islands stop
             merging
-          <!-- src: brusselator.md §7 --></td>
+          </td>
           <td data-label="Difficulty"><strong>1/5</strong> once Plume's viewer existed; the one new result is the threshold
             trade-off
-          <!-- src: brusselator.md §7 --></td>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -1195,17 +1191,17 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     return equation, the GPU afternoon, the seventeen-group generalisation, and the amplitude-equation
     route that let a Ginzburg–Landau spiral seed a Brusselator one. The search was cheap because the
     method was finished; the method took four days.
-    <!-- src: brusselator.md §4 (53.750973 s, ≈$0.0023); anim-gs.md §16 -->
+    
   </p>
 
-  <!-- (5) PER-VIEWER CARDS -->
+  
   <h3 id="animations-viewers">The viewers, one by one</h3>
   <p>
     Eleven standalone pages were built between <strong>7</strong> and
     <strong>29 September</strong>, ten of them from a single orbit each and the eleventh from a
     tiling. The model named in each card is the one in the commit trailers;
     untrailered commits are Codex.
-    <!-- src: critic.md R5 (untrailered = Codex; model census by trailer) -->
+    
   </p>
 
   <div class="p2-cards">
@@ -1214,17 +1210,17 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/ember.jpg" alt="Ember viewer: a warm-palette Ginzburg–Landau spiral field filling the frame." loading="lazy">
       <h4>Ember</h4>
       <p class="p2-card-sub">7 Sep 15:04 · Codex (<code>gpt-6-astra</code>)
-      <!-- src: anim-gs.md §13.5 (1d4fe9e 15:04); critic.md R5 (Sep 7 untrailered = Codex) --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
         <dd>Complex Ginzburg–Landau; g134 = P4₂nm, family p4g, signature ²4*¹2; 36 × 36, two channels.
-        <!-- src: anim-colour.md §6 Ember --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>Nothing, and that is the result: because the orbit is a relative equilibrium, the whole film
           is one <strong>10,368</strong>-byte texture rotated analytically, with no frame stack and no
           interpolation in time. The trick is unavailable for Gray–Scott, which is why Plume needed a
           <strong>2.36 MB</strong> field nine days later.
-        <!-- src: anim-gs.md §13.5; anim-colour.md §6 Ember --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://p4g-ember.pages.dev/">p4g-ember.pages.dev</a></dd>
       </dl>
@@ -1234,23 +1230,23 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/plume.jpg" alt="Plume viewer: a rotating four-fold plume of concentration in the ember palette." loading="lazy">
       <h4>Plume</h4>
       <p class="p2-card-sub">16 Sep 10:26, rewritten 11:13 · Claude Fable 5.1
-      <!-- src: anim-colour.md §1 (cf32407 10:26, fca5119 11:13); trailers per critic.md R1 --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
-        <dd>Gray–Scott F 0.00395, k 0.02; shown on the 2222 page as g6 = P2₁, while the field's own entry
+        <dd>Gray–Scott <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> 0.00395, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 0.02; shown on the 2222 page as g6 = P2₁, while the field's own entry
           is g96 = P4₁ (442, ⁴4⁴4²2); 128 frames × 48 × 48.
-        <!-- src: anim-colour.md §6 Plume --></dd>
+        </dd>
         <dt>Clockwork</dt>
-        <dd>A quarter turn <em>is</em> a quarter period: <code>U(Rx, t + T/4) = U(x, t)</code>, exact on
+        <dd>A quarter turn <em>is</em> a quarter period: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo stretchy="false">(</mo><mi>R</mi><mi>x</mi><mo separator="true">,</mo><mtext> </mtext><mi>t</mi><mo>+</mo><mi>T</mi><mi mathvariant="normal">/</mi><mn>4</mn><mo stretchy="false">)</mo><mo>=</mo><mi>U</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">U(Rx,\ t + T/4) = U(x, t)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0077em;">R</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/4</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>, exact on
           the saved samples.
-        <!-- src: anim-colour.md §6 Plume --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>Interaction and GPU numerics. The first shader cost about four times too much per pixel; the
           exporter built its own renderer and produced the monochrome twin in the wrong palette; the
           shader turned the opposite way from the view model, caught only by a browser test driving a
           simultaneous turn and zoom; Safari reports trackpad pinches as gesture events, not pointers.
           The payoff is a displayed error under <strong>0.4</strong> of one 8-bit level.
-        <!-- src: anim-colour.md §1, §6 Plume --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://plume-wave.pages.dev/">plume-wave.pages.dev</a></dd>
       </dl>
@@ -1261,22 +1257,23 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <h4>Plume Monochrome</h4>
       <p class="p2-card-sub">16 Sep 10:32 · Claude Fable 5.1 by the commit trailers; credited to
         <code>gpt-6-astra</code> in an email the same morning
-      <!-- src: gap-hunt.md §3; anim-colour.md §6 --></p>
+      </p>
       <dl>
         <dt>Rule</dt>
-        <dd><code>sign(U(x,t) − U(−x,t))</code>, zero contour anti-aliased over one device pixel.
-        <!-- src: anim-colour.md §6 Plume Monochrome --></dd>
+        <dd><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi mathvariant="normal">sign</mi><mo>⁡</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">(</mo><mi>U</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mi>U</mi><mo stretchy="false">(</mo><mo>−</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo fence="true" stretchy="true" minsize="1.2em" maxsize="1.2em">)</mo></mrow><annotation encoding="application/x-tex">\operatorname{sign}\bigl(U(x,t) - U(-x,t)\bigr)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mop"><span class="mord mathrm">sign</span></span><span class="mopen"><span class="delimsizing size1">(</span></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.2em;vertical-align:-0.35em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord">−</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mclose"><span class="delimsizing size1">)</span></span></span></span></span>, zero contour anti-aliased over one
+          device pixel.
+        </dd>
         <dt>Colour group</dt>
         <dd>The quarter turn with a quarter-period shift preserves the two colours; the half turn, the
-          half-period shift and the quarter turn with 3T/4 reverse them — a two-colour spacetime group,
+          half-period shift and the quarter turn with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3</mn><mi>T</mi><mi mathvariant="normal">/</mi><mn>4</mn></mrow><annotation encoding="application/x-tex">3T/4</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">3</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/4</span></span></span></span> reverse them — a two-colour spacetime group,
           exact on the samples.
-        <!-- src: anim-colour.md §6 Plume Monochrome --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>Almost nothing: the code, the renderer and the field are byte-identical copies of Plume's and
           only the page differs. The limitation was learned later — a film group hands you one monochrome
           picture per orbit however many half-period involutions it has, which is why the later search
           had to mine free involutions instead.
-        <!-- src: anim-colour.md §6 Plume Monochrome --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://plume-monochrome.pages.dev/">plume-monochrome.pages.dev</a></dd>
       </dl>
@@ -1286,13 +1283,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/weave-monochrome.jpg" alt="Weave Monochrome: an interlaced black-and-white twill of strands." loading="lazy">
       <h4>Weave Monochrome</h4>
       <p class="p2-card-sub">19 Sep 00:00 · Claude Fable 5.1
-      <!-- src: anim-colour.md §3, §6 (db0c47b 00:00) --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
-        <dd>Gray–Scott F 0.00395, k 0.02; “woven rotating wave · (3,1)”, catalogued as g11 = Pc (pg, ××),
-          48 × 48 × 128, square cell L = 256, T = 352.0373, <strong>96 %</strong> of the power in one
+        <dd>Gray–Scott <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> 0.00395, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 0.02; “woven rotating wave · (3,1)”, catalogued as
+          g11 = Pc (pg, ××), 48 × 48 × 128, square cell <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>256</mn></mrow><annotation encoding="application/x-tex">L = 256</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">256</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>352.0373</mn></mrow><annotation encoding="application/x-tex">T = 352.0373</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">352.0373</span></span></span></span>,
+          <strong>96 %</strong> of the power in one
           reciprocal star.
-        <!-- src: anim-colour.md §6 Weave Monochrome --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>Measurement, not code. An exhaustive search finds <strong>32</strong> exact symmetries of the
           samples — mirrors and glides the catalogue's operation list does not mention. Three rules that
@@ -1301,7 +1299,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
           picture is exactly half black by force. Cloudflare will not compress
           <code>application/octet-stream</code>, so the field ships pre-gzipped with a loader that sniffs
           the magic number.
-        <!-- src: anim-colour.md §3, §6 Weave Monochrome --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://weave-monochrome.pages.dev/">weave-monochrome.pages.dev</a></dd>
       </dl>
@@ -1311,24 +1309,25 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/triskele.jpg" alt="Triskele: a three-coloured triangular field with threefold pinwheels." loading="lazy">
       <h4>Triskele</h4>
       <p class="p2-card-sub">17 Sep 14:49 · Claude Fable 5.1 · not requested
-      <!-- src: anim-colour.md §2, §6 (684b6df 14:49) --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
-        <dd>Gray–Scott F 0.00406, k 0.02, on the shared 66 × 66 × 96 triangular field, L = 512,
-          T = 333.9869 so that T/3 is exactly 32 frames; field groups p3 g225 (333, ³3³3³3) and p6 g247
+        <dd>Gray–Scott <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi></mrow><annotation encoding="application/x-tex">F</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">F</span></span></span></span> 0.00406, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span></span></span></span> 0.02, on the shared 66 × 66 × 96 triangular field,
+          <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>512</mn></mrow><annotation encoding="application/x-tex">L = 512</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">512</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>333.9869</mn></mrow><annotation encoding="application/x-tex">T = 333.9869</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">333.9869</span></span></span></span> so that <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">T/3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/3</span></span></span></span> is exactly 32 frames; field groups p3 g225 (333, ³3³3³3) and p6 g247
           (632, ⁶6³3²2).
-        <!-- src: anim-colour.md §6 Triskele --></dd>
+        </dd>
         <dt>Colour group</dt>
-        <dd>ℤ₃, <em>split</em>: the turn alone recolours, the T/3 wait alone recolours, and doing both
+        <dd><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="double-struck">Z</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">\mathbb{Z}_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, <em>split</em>: the turn alone recolours, the <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow><annotation encoding="application/x-tex">T/3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/3</span></span></span></span> wait alone
+          recolours, and doing both
           changes nothing — the control case.
-        <!-- src: anim-colour.md §6 Triskele --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>Little; the rule is the cleanest of the three. An exhaustive search over every point
           operation, translation, saved time shift and both time directions finds exactly the six turns
           of the field and nothing else. Half the download is fetched and discarded to keep the shipped
           file byte-identical to the atlas file, and the frame shutter was later cut to
           <strong>0.3</strong> of a frame for a crisper picture.
-        <!-- src: anim-colour.md §6 Triskele --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://triskele-wave.pages.dev/">triskele-wave.pages.dev</a></dd>
       </dl>
@@ -1338,14 +1337,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/gyre.jpg" alt="Gyre: three interleaved colours turning about an off-centre point." loading="lazy">
       <h4>Gyre</h4>
       <p class="p2-card-sub">17 Sep 14:09 · Claude Fable 5.1
-      <!-- src: anim-colour.md §2, §6 (9b1cb71 14:09) --></p>
+      </p>
       <dl>
         <dt>Rule and group</dt>
-        <dd>The same field as Triskele, byte for byte, coloured by <code>argmax_k U(g^k x, t + kT/3)</code>
+        <dd>The same field as Triskele, byte for byte, coloured by <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mrow><mi mathvariant="normal">argmax</mi><mo>⁡</mo></mrow><mi>k</mi></msub><mi>U</mi><mo stretchy="false">(</mo><msup><mi>g</mi><mi>k</mi></msup><mi>x</mi><mo separator="true">,</mo><mtext> </mtext><mi>t</mi><mo>+</mo><mi>k</mi><mi>T</mi><mi mathvariant="normal">/</mi><mn>3</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">\operatorname{argmax}_k U(g^k x,\ t + kT/3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1.0991em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop"><span class="mord mathrm">argmax</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.242em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0359em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0315em;">k</span></span></span></span></span></span></span></span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0315em;">k</span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/3</span><span class="mclose">)</span></span></span></span>
           about a point that is <em>not</em> a symmetry centre — <strong>0.0962</strong> lattice lengths
           from the nearest threefold centre, chosen so the displacement is exactly 11 of 66 nodes and
-          every claim is integer arithmetic. Colour group ℤ₃, <em>fully entangled</em>.
-        <!-- src: anim-colour.md §6 Gyre --></dd>
+          every claim is integer arithmetic. Colour group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="double-struck">Z</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">\mathbb{Z}_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8389em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, <em>fully entangled</em>.
+        </dd>
         <dt>What was hard</dt>
         <dd>The conceptual centrepiece: <strong>1,616</strong> lines of viewer and <strong>2,043</strong>
           of tests. The two halves of the law reach at best <strong>0.4284</strong> on their own —
@@ -1353,7 +1352,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
           recorded too: because this field carries the threefold screw, the three “different instants”
           collapse to three readings of one frame, and the mining report finds the same collapse for
           <strong>123</strong> of the <strong>200</strong> catalogued Gyre colourings.
-        <!-- src: anim-colour.md §6 Gyre --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://gyre-wave.pages.dev/">gyre-wave.pages.dev</a></dd>
       </dl>
@@ -1363,23 +1362,23 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/trefoil.jpg" alt="Trefoil: three colours arranged with sixfold structure and drawn generator marks." loading="lazy">
       <h4>Trefoil</h4>
       <p class="p2-card-sub">17 Sep 16:03, generator marks 20:28 · Claude Fable 5.1
-      <!-- src: anim-colour.md §2, §6 (e1b73c0 16:03, fc71f30 20:28) --></p>
+      </p>
       <dl>
         <dt>Rule and group</dt>
         <dd>The same field again, read under g247 = P6₅, symbol 6₅3₂2₁, coloured by three <em>positions</em>
           at one instant — a slide by the step between classes of threefold centres, exactly (22, 44)
-          nodes. Colour group <strong>S₃</strong>, not cyclic: a slide cycles the colours with no time
+          nodes. Colour group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">S_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>, not cyclic: a slide cycles the colours with no time
           shift, while a half turn plus half a period swaps two and fixes the third.
-        <!-- src: anim-colour.md §6 Trefoil --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>The hardest of the set: <strong>2,387</strong> lines of viewer, <strong>2,924</strong> of
           tests, and a README containing an original theorem — in any three-coloured polar film with
-          colour group S₃ the 3-cycles are always spatial and the swaps are all-or-nothing. Two
+          colour group <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">S_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> the 3-cycles are always spatial and the swaps are all-or-nothing. Two
           independent exhaustive sweeps over <strong>30,108,672</strong> combinations agree on exactly
           <strong>18</strong> symmetries, and every drawn generator is exact on all
           <strong>418,176</strong> node-frames. No mirror survives anywhere; the square-lattice route to
-          S₃ had already been rejected because the argmax ties along whole lines.
-        <!-- src: anim-colour.md §6 Trefoil --></dd>
+          <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>S</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">S_3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0576em;">S</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> had already been rejected because the argmax ties along whole lines.
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://trefoil-wave.pages.dev/">trefoil-wave.pages.dev</a></dd>
       </dl>
@@ -1389,13 +1388,13 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/crosslet.jpg" alt="Crosslet: three colours in large plus-shaped pieces on a triangular lattice." loading="lazy">
       <h4>Crosslet</h4>
       <p class="p2-card-sub">19 Sep 09:21 · Claude Fable 5.1 · GitHub Pages only
-      <!-- src: anim-colour.md §3, §6 (9c5ecc1 09:21) --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
-        <dd>Complex Ginzburg–Landau, α −0.75, β 0.55, D 1; the catalogue entry
-          <code>colour:gyre:a767fbcc68c0</code> on p3 g225 (333), 36 × 36 × 96, triangular L = 64,
-          T = 11.3164; Gyre's rule about a point a third of the way across the cell.
-        <!-- src: anim-colour.md §6 Crosslet --></dd>
+        <dd>Complex Ginzburg–Landau, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi></mrow><annotation encoding="application/x-tex">\alpha</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span></span></span></span> −0.75, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi></mrow><annotation encoding="application/x-tex">\beta</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span></span></span></span> 0.55, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi></mrow><annotation encoding="application/x-tex">D</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span></span></span></span> 1; the catalogue entry
+          <code>colour:gyre:a767fbcc68c0</code> on p3 g225 (333), 36 × 36 × 96, triangular <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>64</mn></mrow><annotation encoding="application/x-tex">L = 64</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span>,
+          <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>11.3164</mn></mrow><annotation encoding="application/x-tex">T = 11.3164</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">11.3164</span></span></span></span>; Gyre's rule about a point a third of the way across the cell.
+        </dd>
         <dt>What was hard</dt>
         <dd>The near misses are near. The law is exact at all <strong>124,416</strong> node-frames and an
           exhaustive sweep over <strong>8,957,952</strong> combinations finds exactly three symmetries —
@@ -1403,7 +1402,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
           near miss <strong>93.97 %</strong>, so the test has to be exactness and never agreement. Every
           node changes colour exactly three times a period; the boundaries move nearly three times
           faster than Gyre's.
-        <!-- src: anim-colour.md §6 Crosslet --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://yaroslavvb.github.io/animated-groups-fable/scott-gray/crosslet/">…/scott-gray/crosslet/</a></dd>
       </dl>
@@ -1413,18 +1412,18 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <video src="assets/clips/brusselator-p3-spiral.mp4" poster="assets/thumbs/brusselator-p3-spiral.jpg" aria-label="Spiral Lattice: the g227 Brusselator field in ember, filling the screen." muted loop autoplay playsinline preload="metadata"></video>
       <h4>Spiral Lattice</h4>
       <p class="p2-card-sub">29 Sep 10:08, rebuilt 11:32 · Claude Code, then Claude Opus 5.5
-      <!-- src: anim-colour.md §0 and §5 (e5363ff 10:08, 3f98691 11:32; trailers: 2 × Claude Code, 3 × Claude Opus 5.5) --></p>
+      </p>
       <dl>
         <dt>Equation and group</dt>
-        <dd>Brusselator a = 1, b = 2.3, Dᵤ = D_v = 1, triangular six-neighbour stencil, N = 36, M = 48,
-          L = 40, T = 6.3902; g227 = R3 (No. 146), p3 / 333, clockwork symbol r33₁3₂, signature ³3³3¹3.
-        <!-- src: brusselator.md §2, §5 --></dd>
+        <dd>Brusselator <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">a = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>2.3</mn></mrow><annotation encoding="application/x-tex">b = 2.3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.3</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>D</mi><mi>u</mi></msub><mo>=</mo><msub><mi>D</mi><mi>v</mi></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">D_u = D_v = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0278em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">v</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, triangular six-neighbour stencil,
+          <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mo>=</mo><mn>36</mn></mrow><annotation encoding="application/x-tex">N = 36</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">N</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">36</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mo>=</mo><mn>48</mn></mrow><annotation encoding="application/x-tex">M = 48</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">M</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">48</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mo>=</mo><mn>40</mn></mrow><annotation encoding="application/x-tex">L = 40</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">40</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mo>=</mo><mn>6.3902</mn></mrow><annotation encoding="application/x-tex">T = 6.3902</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">6.3902</span></span></span></span>; g227 = R3 (No. 146), p3 / 333, clockwork symbol r33₁3₂, signature ³3³3¹3.
+        </dd>
         <dt>What was hard</dt>
         <dd>Nothing in the mathematics — the field is the catalogue's own bytes — but the viewer had to be
           ported to a triangular lattice: the same fullscreen WebGL renderer with a lattice map, turns
           snapping to sixths, and a threefold centre on screen at <strong>380</strong> pixels per lattice
           length, one period per <strong>8 s</strong>.
-        <!-- src: brusselator.md §7 --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://brusselator-p3-spiral.mathornament.workers.dev/">brusselator-p3-spiral.mathornament.workers.dev</a></dd>
       </dl>
@@ -1434,18 +1433,18 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <video src="assets/clips/brusselator-p3-spiral-mono.mp4" poster="assets/thumbs/brusselator-p3-spiral-mono.jpg" aria-label="Spiral Lattice Monochrome: white islands on black arranged in a honeycomb of spiral cores." muted loop autoplay playsinline preload="metadata"></video>
       <h4>Spiral Lattice Monochrome</h4>
       <p class="p2-card-sub">29 Sep 10:18, threshold raised 10:30 · Claude Code, then Claude Opus 5.5
-      <!-- src: git trailers: 74e614b 10:18 Claude Code; c488a91 10:26 and d3d9df9 10:30 Claude Opus 5.5 --></p>
+      </p>
       <dl>
         <dt>Rule</dt>
-        <dd><code>U(x,t) − U(x, t + T/2) &gt; 0.426</code> — the catalogue's half-period rule, cut at
+        <dd><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mi>t</mi><mo stretchy="false">)</mo><mo>−</mo><mi>U</mi><mo stretchy="false">(</mo><mi>x</mi><mo separator="true">,</mo><mtext> </mtext><mi>t</mi><mo>+</mo><mi>T</mi><mi mathvariant="normal">/</mi><mn>2</mn><mo stretchy="false">)</mo><mo>&gt;</mo><mn>0.426</mn></mrow><annotation encoding="application/x-tex">U(x,t) - U(x,\ t + T/2) &gt; 0.426</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.109em;">U</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace"> </span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="mord">/2</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.426</span></span></span></span> — the catalogue's half-period rule, cut at
           <strong>30.1 %</strong> of the maximum instead of zero.
-        <!-- src: brusselator.md §7; anim-colour.md §5 --></dd>
+        </dd>
         <dt>What was hard</dt>
         <dd>The trade-off, which is the day's one new result. At a cut of zero the two inks trade blob and
           network roles six times a period; at this level the white islands neither merge nor split,
           verified at <strong>768</strong> instants — and the exact half-period colour swap is given up
           to get it. The page says so.
-        <!-- src: brusselator.md §7 --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://brusselator-p3-spiral-mono.mathornament.workers.dev/">brusselator-p3-spiral-mono.mathornament.workers.dev</a></dd>
       </dl>
@@ -1455,14 +1454,14 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
       <img src="assets/thumbs/chair-tiling.jpg" alt="Chair tiling: a marked three-dimensional chair substitution rendered in perspective." loading="lazy">
       <h4>Chair tiling</h4>
       <p class="p2-card-sub">17 Sep 14:09 · Claude Fable 5.1 · not a reaction–diffusion animation
-      <!-- src: anim-colour.md §6 Chair tiling (9b1cb71) --></p>
+      </p>
       <dl>
         <dt>What it is</dt>
         <dd>A WebGL view of the marked three-dimensional chair substitution described at the meeting that
           morning, reconstructed from a sketch and checked by program: substitution consistency at levels
           one to three, exterior self-similarity, and complementarity of the dents and backs. The
           verifier ships with it.
-        <!-- src: anim-colour.md §6 Chair tiling --></dd>
+        </dd>
         <dt>Live</dt>
         <dd><a href="https://chair-tiling.pages.dev/">chair-tiling.pages.dev</a></dd>
       </dl>
@@ -1477,7 +1476,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
         The first temporal harmonic of the g227 field. Its argument winds <strong>+1</strong> about each
         3₂ centre and <strong>−1</strong> about each 3₁ centre, so the cores alternate chirality and the
         charges cancel over the cell; the amplitude is numerically zero at all six.
-        <!-- src: brusselator.md §6 (windings, |Z| = 8.22e-21 at six nodes) -->
+        
       </figcaption>
     </figure>
     <figure>
@@ -1486,7 +1485,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
         The same harmonic's amplitude. It peaks at <strong>0.2968</strong> on the three zero-shift
         centres, which pulse in place, and vanishes on the six screw centres, where the concentrations
         barely move at all.
-        <!-- src: brusselator.md §6 (max |Z| 0.2968 at τ = 0 centres; U spans 1.0002–1.0015 at a core) -->
+        
       </figcaption>
     </figure>
   </div>
@@ -1572,7 +1571,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <li><a href="https://yaroslavvb.github.io/animated-groups-fable/reports/">Reports</a> · <a href="https://github.com/yaroslavvb/animated-groups-fable">the repository</a> · <a href="https://yaroslavvb.github.io/animated-groups/">the predecessor site</a></li>
 </ul>
 
-<p class="note">Page built 2026-09-30 15:27 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
+<p class="note">Page built 2026-09-30 21:54 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
 
 </main>
 
@@ -2544,6 +2543,14 @@ window.CK = (function () {
       return {d: Math.max(24, Math.hypot(a.x - b.x, a.y - b.y)), mid: (a.x + b.x) / 2};
     };
     const beginDrag = (id, x) => { g = {kind: 'drag', id, x0: x, v0: TL.v0, v1: TL.v1}; };
+    /* a touch on a mark pins its tooltip at once; once the touch turns out to be a
+       pan or a pinch, take the tooltip away again */
+    const dropTip = () => {
+      if (!frameTL.tip) return;
+      frameTL.pinned = null; frameTL.tip.style.display = 'none';
+      if (frameTL.active) frameTL.active.classList.remove('ck-active');
+      frameTL.active = null;
+    };
     svg.addEventListener('pointerdown', ev => {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
       pts.set(ev.pointerId, {x: ev.clientX, y: ev.clientY});
@@ -2554,7 +2561,7 @@ window.CK = (function () {
         g = {kind: 'pinch', d0: f.d, t0: TL.v0 + fracAt(f.mid) * (TL.v1 - TL.v0),
              v0: TL.v0, v1: TL.v1};
         for (const id of pts.keys()) { try { svg.setPointerCapture(id); } catch (e) {} }
-        svg.classList.add('dragging');
+        svg.classList.add('dragging'); dropTip();
       }
     });
     svg.addEventListener('pointermove', ev => {
@@ -2574,7 +2581,7 @@ window.CK = (function () {
         if (Math.abs(ev.clientX - g.x0) < PAN_SLOP) return;
         g.kind = 'drag';
         try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
-        svg.classList.add('dragging');
+        svg.classList.add('dragging'); dropTip();
       }
       const dm = (ev.clientX - g.x0) / plotW() * (g.v1 - g.v0);
       setView(g.v0 - dm, g.v1 - dm);
