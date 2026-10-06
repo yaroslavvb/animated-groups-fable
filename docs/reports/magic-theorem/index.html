@@ -360,7 +360,9 @@ th, td { text-align: left; vertical-align: top; }
     any solver is started, these statements say where the picture must be dark, how much phase must
     wind around each dark point, and how the windings must balance — so a seed can be drawn by
     hand, and a converged answer can be checked against a prediction made before it was computed.
-    The tutorial <a href="../clockwork-orbits/">How to find a time-symmetric animation</a> does that, twice.
+    The tutorial <a href="../clockwork-orbits/">How to find a time-symmetric animation</a> walks through the
+    search that found the published g227 animation; the dark points predicted here appear in its
+    seed before a single step of the Brusselator.
     <a href="../making-of/">The making of this site</a> is the timeline.</p>
 </div>
 
@@ -1131,8 +1133,9 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   centres with windings ∓<b>1</b>, maxima at the three <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>τ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\tau = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span> centres, total charge
   <b>0</b>, and the character law to <b>7.0e−16</b>. Lifting it through the oscillatory
   eigenvector of a <b>2</b> × <b>2</b> matrix and handing it to Newton's method on a twisted
-  shooting equation reaches the published orbit in <b>5</b> steps. The construction, the solver
-  and two live searches are in the companion tutorial,
+  shooting equation reaches the published orbit in <b>5</b> steps. The search that actually
+  produced the published orbit — a seed grown from noise in the Ginzburg–Landau equation, then the
+  same Newton solver — is the subject of the companion tutorial,
   <a href="../clockwork-orbits/">How to find a time-symmetric animation</a>.
 </p>
 
@@ -1204,10 +1207,10 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 <div class="footlinks">
   <p class="small"><b>Where to go next</b></p>
   <ul>
-    <li><a href="../clockwork-orbits/">How to find a time-symmetric animation</a> — the constructive
-      companion: the same symbol turned into a seed by hand, Newton on one frame and one number, a
-      fundamental domain glued to its own past, and a walkthrough of the whole method on three
-      coupled cells before any of it touches a mesh.</li>
+    <li><a href="../clockwork-orbits/">How to find a time-symmetric animation</a> — the companion
+      tutorial: how the published g227 animation was actually found, in five steps, from a seed
+      grown out of noise in the Ginzburg–Landau equation to Newton–Krylov on one frame and the
+      period.</li>
     <li><a href="../making-of/">The making of this site</a> — the seven-week timeline, who asked for
       what and when, and what it all cost.</li>
     <li><a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p3.html#g227">correspondence-p3.html#g227</a> — the catalogue entry the worked
