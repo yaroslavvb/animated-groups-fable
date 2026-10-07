@@ -27,15 +27,17 @@ NEWTON_STEPS = [0, 35, 36, 37, 39, 43]
 
 
 def sample(grid, size, cells=2.0):
-    """Values on a size x size view, `cells` lattice lengths across, y up.
+    """Values on a size x size view, `cells` lattice lengths across, centred on lattice
+    point (0, 0), y up: the same view as the published film at the top of the page, so
+    the dark dots fall where its generators α and β are drawn.
 
     Lattice basis a1 = (1, 0), a2 = (-1/2, sqrt3/2); node (i, j) of grid[j, i] sits at
     (i/N, j/N).  Linear on the triangle each pixel falls in, the rhombus being cut along
     its short diagonal, as the site's renderer does."""
     n = grid.shape[-1]
     y, x = np.indices((size, size))
-    X = (x + .5) / size * cells
-    Y = (size - y - .5) / size * cells
+    X = ((x + .5) / size - .5) * cells
+    Y = (.5 - (y + .5) / size) * cells
     v = Y / (np.sqrt(3) / 2)
     u = X + v / 2
     xf, yf = (u * n) % n, (v * n) % n

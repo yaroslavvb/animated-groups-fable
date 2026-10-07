@@ -8,8 +8,9 @@ settings, split into the stages the tutorial describes and instrumented so each
 stage reports what it did:
 
   1. the uniform state and its Hopf oscillation (a 2 x 2 matrix)
-  2. the seed: a complex Ginzburg-Landau field, simulated forward from noise
-     inside the symmetry's character subspace, then polished
+  2. the seed: the Brusselator's slow envelope (its complex Ginzburg-Landau
+     form), simulated forward from noise inside the symmetry's character
+     subspace, then polished; plus a control, the same noise never averaged
   3. the lift: that complex field turned into a Brusselator state
   4. Newton-Krylov on the twisted shooting equation, for one frame and T
   5. the movie, the audit, and a re-solve on a finer mesh
@@ -185,6 +186,26 @@ def main(out: Path):
     if chosen is None:
         sys.exit('the Ginzburg-Landau stage failed')
     sign, Bgl = chosen
+
+    # control: the same noise and the same equation, never averaged.  Does the
+    # pattern form on its own?  share = the part of the field that has the
+    # clockwork symmetry; spread = how unequally the points oscillate (0: all alike).
+    def share_spread(Bc):
+        Pc = CH.project_complex(Bc, sign)
+        return (float(np.sum(abs(Pc) ** 2) / np.sum(abs(Bc) ** 2)),
+                float(abs(Bc).std() / abs(Bc).mean()))
+    rng = np.random.default_rng(int(JOB.get('seed', 0)))
+    Bc = 0.5 * (rng.standard_normal((N, N)) + 1j * rng.standard_normal((N, N)))
+    qc, tc, rows = np.stack([Bc.real, Bc.imag]), 0.0, []
+    while True:
+        share, spread = share_spread(Bc)
+        rows.append(dict(t=tc, symmetricShare=share, spread=spread))
+        if tc >= 600:
+            break
+        qc = rdlab.flow('ginzburg-landau', qc, 50.0, pc, LAT, hc, rdlab.timestep('ginzburg-landau', pc, hc))
+        tc += 50.0
+        Bc = qc[0] + 1j * qc[1]
+    R['control'] = dict(description='step 2 from the same noise with no averaging', history=rows)
 
     # 3 and 4. lift, then Newton-Krylov on the twisted shooting equation ---------
     R['newton'] = []

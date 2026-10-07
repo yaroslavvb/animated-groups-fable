@@ -250,6 +250,76 @@
    }
   ]
  },
+ "control": {
+  "description": "step 2 from the same noise with no averaging",
+  "history": [
+   {
+    "t": 0.0,
+    "symmetricShare": 0.11261200018695113,
+    "spread": 0.513975870655607
+   },
+   {
+    "t": 50.0,
+    "symmetricShare": 3.5359349926317512e-06,
+    "spread": 5.357416872798569e-07
+   },
+   {
+    "t": 100.0,
+    "symmetricShare": 6.273878491548499e-11,
+    "spread": 9.501484879232946e-12
+   },
+   {
+    "t": 150.0,
+    "symmetricShare": 1.114396094940337e-15,
+    "spread": 5.435811382287813e-16
+   },
+   {
+    "t": 200.0,
+    "symmetricShare": 1.9794522767221505e-20,
+    "spread": 1.0972979890546074e-16
+   },
+   {
+    "t": 250.0,
+    "symmetricShare": 3.516003781441712e-25,
+    "spread": 1.0990301100839177e-16
+   },
+   {
+    "t": 300.0,
+    "symmetricShare": 6.284164498388555e-30,
+    "spread": 9.892713182348658e-17
+   },
+   {
+    "t": 350.0,
+    "symmetricShare": 2.3063605657183787e-32,
+    "spread": 0.0
+   },
+   {
+    "t": 400.0,
+    "symmetricShare": 2.4651903448833163e-32,
+    "spread": 2.2204460564865416e-16
+   },
+   {
+    "t": 450.0,
+    "symmetricShare": 2.3063605657183795e-32,
+    "spread": 0.0
+   },
+   {
+    "t": 500.0,
+    "symmetricShare": 4.382560613125894e-32,
+    "spread": 0.0
+   },
+   {
+    "t": 550.0,
+    "symmetricShare": 2.1922313830848926e-32,
+    "spread": 0.0
+   },
+   {
+    "t": 600.0,
+    "symmetricShare": 1.7804152490823944e-32,
+    "spread": 0.0
+   }
+  ]
+ },
  "newton": [
   {
    "amplitude": 0.25,
@@ -520,7 +590,7 @@
    "success": true,
    "rhs": 197005,
    "shoots": 462,
-   "seconds": 44.26585676299874
+   "seconds": 51.55931245600368
   }
  ],
  "audit": {
@@ -542,7 +612,7 @@
    }
   ],
   "rhs": 5760,
-  "seconds": 1.3837069820147008
+  "seconds": 1.48514384200098
  },
  "refine": {
   "N": 48,
@@ -551,9 +621,9 @@
   "iterations": 2,
   "relativePeriodChange": 6.239656423246505e-06,
   "rhs": 23541,
-  "seconds": 7.810728439013474
+  "seconds": 11.39522148299875
  },
- "seconds": 99.50095058401348,
+ "seconds": 132.26810829999886,
  "export": {
   "T": 6.390159918584654,
   "publishedT": 6.390159918584649,

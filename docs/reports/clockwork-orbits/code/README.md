@@ -27,7 +27,7 @@ job called:
 | step on the page | function in `rdlab.py` |
 |---|---|
 | 1. the rest state and its oscillation | `uniform_equilibrium`, `hopf_eigen` |
-| 2. the Ginzburg–Landau seed from noise | `cgl_relative_equilibrium` (written out in the script so it can keep snapshots, then called once more to show the two agree exactly), `cgl_polish` |
+| 2. the seed from noise, in the Brusselator's slow envelope | `cgl_relative_equilibrium` (written out in the script so it can keep snapshots, then called once more to show the two agree exactly), `cgl_polish`; rdlab names the envelope equation by its general form, complex Ginzburg–Landau, hence `cgl_` |
 | 3. the lift to the Brusselator | `seed_from_complex` |
 | 4. Newton–Krylov on one frame and the period | `twisted_residual`, `rpo_polish` |
 | 5. the film, the audit, the finer mesh | `flow`, `audit`, `resample_complex` |
@@ -48,6 +48,9 @@ recorded. Neither changes the arithmetic.
 
 * **Step 2.** The `+` sign is tried first and settles into a rotating wave that runs the clock
   backwards; the audit rejects it (symmetry error 1.73). The `−` sign passes (1.4e−15).
+* **Control.** The same noise through the same envelope equation, never averaged: the part with
+  the clockwork symmetry falls from 11 % of the field to 3.5e−6 by t = 50 and to round-off after,
+  and every point ends up oscillating in unison. The averaging is what puts the symmetry in.
 * **Step 4.** From the seed at amplitude 0.25, Newton–Krylov takes 43 iterations: 35 in which the
   residual stays above 6e−2, then 8 that take it to about 5e−16, at a period of
   6.390159918584616.
