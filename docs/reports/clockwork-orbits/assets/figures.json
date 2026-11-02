@@ -4,7 +4,7 @@
   "file": "final-orbit-ember.mp4",
   "poster": "poster-final-orbit-ember.webp",
   "alt": "Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with a white mirror line through γ and white symbols marking the centres α, β and γ of its symmetry.",
-  "caption": "The published animation: one period of 6.390159918584649 time units in 48 frames, two cells across. Drawn on it are two motions that generate its symmetry r3₂∗3: the mirror μ through γ, which costs nothing, since every frame is symmetric across it, and an anticlockwise third of a turn about β, which gives the film two thirds of a period later. At β, as at every centre between the mirrors, the chemicals barely move; the film turns around them.",
+  "caption": "The published animation: one period of 6.390159918584649 time units in 48 frames, two cells across. Drawn on it are two symmetries that generate its group, r3₂∗3, each marked with its cost as a fraction of the period: the mirror μ through γ, which costs nothing, since every frame is symmetric across it, and an anticlockwise third of a turn about β, which gives the film two thirds of a period later. The same turn costs nothing about γ, where three mirrors cross, and a third about α, the mirror image of β. At β, as at every centre between the mirrors, the chemicals barely move; the film turns around them.",
   "source_experiment": "original"
  },
  {
@@ -12,7 +12,7 @@
   "file": "plain-sim-collapse.mp4",
   "poster": "poster-plain-sim-collapse.webp",
   "alt": "Stroboscopic animation, one frame per period. It begins as a sharp spiral lattice, slowly loses contrast over the first third, and ends as an almost flat field blinking in unison.",
-  "caption": "Why you cannot simply simulate. This starts exactly on the published orbit, disturbed only by single-precision round-off, and simulates forward with the three zero-cost symmetries imposed at every step. One frame per period, 313 periods: the spirals fade, by period 135 none are left, and every point ends up oscillating in unison.",
+  "caption": "Why you cannot simply simulate. This starts exactly on the published orbit, disturbed only by single-precision round-off, and simulates forward with the three zero-cost symmetries of r33₁3₂ imposed at every step. One frame per period, 313 periods: the spirals fade, by period 135 none are left, and every point ends up oscillating in unison.",
   "source_experiment": "plain-sim"
  },
  {

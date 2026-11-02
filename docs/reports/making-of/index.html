@@ -578,12 +578,13 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     <a href="https://yaroslavvb.github.io/animated-groups-fable/showcase/">Showcase</a>
     is a solution of a reaction–diffusion equation that repeats in time and carries a
     <em>clockwork</em> symmetry: a spatial operation composed with a fixed fraction of the period
-    returns the same film. The g227 spiral lattice is the clearest case. Its group is
+    returns the same film. The Brusselator spiral lattice is the clearest case. Its group is
     <strong>p31m</strong> with clockwork symbol <strong>r3₂∗3</strong>: every frame is
-    mirror-symmetric; turning the picture by a third of a turn about a centre between the mirrors
-    and waiting a third or two thirds of a period, depending on the direction of the turn,
-    reproduces it exactly, and about a corner where three mirrors cross no wait at all
+    mirror-symmetric; a third of a turn about a centre between the mirrors, followed by a wait of a
+    third or two thirds of a period depending on the direction of the turn, reproduces it exactly,
+    and about a corner where three mirrors cross the turn needs no wait at all
     (<a href="https://yaroslavvb.github.io/animated-groups-fable/correspondence-p31m.html#g234">correspondence-p31m.html#g234</a>).
+    
     
     The concentrations obey the Brusselator equations pointwise, so no frame is drawn or forced; the
     symmetry is a property of one orbit of the flow, and the film loops because the orbit closes.
@@ -593,19 +594,19 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <p class="p2-note">
     A correction. When this page was first published, on Wed 30 Sep 2026 (week 40), it gave the
     spiral lattice the group its search had imposed: <strong>p3</strong>, clockwork symbol
-    <strong>r33₁3₂</strong>, R3 (No. 146), whose nine symmetries the film has exactly. A check on
-    Sun 1 Nov 2026 (week 44) found nine more that involve a mirror, eighteen in all, which make it
-    r3₂∗3, R3m (No. 160). The page still calls the film g227, the label it was searched under.
+    <strong>r33₁3₂</strong>, R3 (No. 146), whose nine symmetries the film satisfies exactly. A check
+    on Sun 1 Nov 2026 (week 44) found nine more that involve a mirror, eighteen in all, which make it
+    r3₂∗3, R3m (No. 160). This page's timeline keeps the name g227 it was searched under.
     
   </p>
 
   <figure>
-    <video src="assets/clips/brusselator-p3-spiral.mp4" poster="assets/thumbs/brusselator-p3-spiral.jpg" aria-label="Triangular field of alternating-chirality spiral cores in the ember palette, one frame of the g227 Brusselator orbit." muted loop autoplay playsinline preload="metadata"></video>
+    <video src="assets/clips/brusselator-p3-spiral.mp4" poster="assets/thumbs/brusselator-p3-spiral.jpg" aria-label="Triangular field of alternating-chirality spiral cores in the ember palette, one frame of the Brusselator spiral lattice." muted loop autoplay playsinline preload="metadata"></video>
     <figcaption>
-      The g227 orbit, one frame. Six phase singularities per drawn cell, three of charge +1 at the
+      The spiral lattice, one frame. Six phase singularities per drawn cell, three of charge +1 at the
       centres where an anticlockwise third-turn costs two thirds of a period and three of charge −1
-      at their mirror images, where it costs a third, with the plain threefold centres pulsing
-      in place between them; period <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> = <strong>6.3902</strong> on a triangular cell of side
+      at their mirror images, where it costs a third, with the corners where three mirrors cross
+      pulsing in place between them; period <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi></mrow><annotation encoding="application/x-tex">T</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.1389em;">T</span></span></span></span> = <strong>6.3902</strong> on a triangular cell of side
       <strong>40</strong>, mesh <strong>36 × 36</strong>, <strong>48</strong> saved frames.
       
       Live at <a href="https://brusselator-p3-spiral.mathornament.workers.dev/">brusselator-p3-spiral.mathornament.workers.dev</a>.
@@ -1420,7 +1421,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
     </div>
 
     <div class="p2-card">
-      <video src="assets/clips/brusselator-p3-spiral.mp4" poster="assets/thumbs/brusselator-p3-spiral.jpg" aria-label="Spiral Lattice: the g227 Brusselator field in ember, filling the screen." muted loop autoplay playsinline preload="metadata"></video>
+      <video src="assets/clips/brusselator-p3-spiral.mp4" poster="assets/thumbs/brusselator-p3-spiral.jpg" aria-label="Spiral Lattice: the Brusselator field in ember, filling the screen." muted loop autoplay playsinline preload="metadata"></video>
       <h4>Spiral Lattice</h4>
       <p class="p2-card-sub">29 Sep 10:08, rebuilt 11:32 · Claude Code, then Claude Opus 5.5
       </p>
@@ -1482,9 +1483,9 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
 
   <div class="p2-figrow">
     <figure>
-      <img src="assets/thumbs/g227-phase.jpg" alt="Phase map of the first temporal harmonic of the g227 orbit, showing six singular points." loading="lazy">
+      <img src="assets/thumbs/g227-phase.jpg" alt="Phase map of the first temporal harmonic of the spiral lattice, showing six singular points." loading="lazy">
       <figcaption>
-        The first temporal harmonic of the g227 field. Its argument winds <strong>+1</strong> about each
+        The first temporal harmonic of the spiral lattice. Its argument winds <strong>+1</strong> about each
         centre where an anticlockwise third-turn costs two thirds of a period and <strong>−1</strong>
         about each of their mirror images, where it costs a third, so the cores alternate chirality and
         the charges cancel over the cell; the amplitude is numerically zero at all six.
@@ -1583,7 +1584,7 @@ nav.toc-line li + li::before { content: " · "; color: var(--muted); }
   <li><a href="https://yaroslavvb.github.io/animated-groups-fable/reports/">Reports</a> · <a href="https://github.com/yaroslavvb/animated-groups-fable">the repository</a> · <a href="https://yaroslavvb.github.io/animated-groups/">the predecessor site</a></li>
 </ul>
 
-<p class="note">Page built Mon 2 Nov 2026 (week 45), 13:09 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
+<p class="note">Page built Mon 2 Nov 2026 (week 45), 14:53 Pacific. It draws only the data inlined in it; nothing is fetched.</p>
 
 </main>
 
