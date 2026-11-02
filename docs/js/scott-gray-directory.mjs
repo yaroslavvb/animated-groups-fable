@@ -6,7 +6,7 @@ const NAMES = {'gray-scott': 'Gray–Scott', 'ginzburg-landau': 'Ginzburg–Land
 // their saved counts. A failed index request leaves the static links usable.
 async function loadCounts() {
   try {
-    const response = await fetch('scott-gray/data/wallpaper-atlas-index.json?v=20260907-equations');
+    const response = await fetch('scott-gray/data/wallpaper-atlas-index.json?v=20261102-refile');
     if (!response.ok) return;
     const index = await response.json();
     if (!Array.isArray(index.families)) return;

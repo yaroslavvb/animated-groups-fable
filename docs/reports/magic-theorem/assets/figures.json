@@ -3,14 +3,14 @@
     "id": "decorated-orbifold",
     "file": "decorated-orbifold-g227.svg",
     "alt": "Diagram of the 333 orbifold of g227 drawn as a curved triangle with a dashed second face behind it. Each corner carries a coloured rotation marker and a label: 3 with time offset zero, 3 sub 1 with offset one third, 3 sub 2 with offset two thirds, and beside each the winding it forces: 0, minus 1, plus 1. To the right, three short equations for the Conway cost, the temporal residue and the index budget.",
-    "caption": "The clockwork symbol, read as a decorated orbifold. Dividing the plane by g227 gives Conway's 333 turnover; the symbol r33₁3₂ then decorates each cone point with a time offset. Conway's magic theorem balances the geometry — the three costs sum to exactly 2, so the symbol tiles the plane. Applying the offset \\(\\tau\\), which is a homomorphism, to the orbifold relation balances the choreography: \\(0/3 + 1/3 + 2/3 = 1\\), an integer, and the same sum is an integer for all 68 catalogue entries (values 0, 1 and 2). The offsets then force the windings 0, −1 and +1, which sum to zero over one primitive p3 cell when each is weighted by \\(1/3\\). Drawn on the simulation box, which is three p3 cells, that is six pinned vortices, three of each sign.",
+    "caption": "The clockwork symbol, read as a decorated orbifold. Dividing the plane by g227 gives Conway's 333 turnover; the symbol r33₁3₂ then decorates each cone point with a time offset. Conway's magic theorem balances the geometry — the three costs sum to exactly 2, so the symbol tiles the plane. Applying the offset \\(\\tau\\), which is a homomorphism, to the orbifold relation balances the choreography: \\(0/3 + 1/3 + 2/3 = 1\\), an integer, and the same sum is an integer for all 68 catalogue entries (values 0, 1 and 2). The offsets then force the windings 0, −1 and +1, which sum to zero over one primitive p3 cell when each is weighted by \\(1/3\\). Drawn on the simulation box, which is three p3 cells, that is six pinned vortices, three of each sign. The published spiral lattice was searched for under g227; the film also has mirrors, and its own group, r3₂∗3, is worked out under the examples.",
     "source_experiment": "theorem"
   },
   {
     "id": "harmonic-phase-charges",
     "file": "harmonic-phase-charges.webp",
     "alt": "Two panels over several lattice cells. The left shows the phase of the first temporal harmonic as hue with the nine threefold centres marked by circles and up and down triangles, each labelled with a winding of 0, −1 or +1. The right shows the magnitude, dark at the marked screw centres.",
-    "caption": "What the symbol forces, measured on the published orbit. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres — exactly \\(-k \\bmod 3\\) at a centre whose generator carries the offset \\(k/3\\). The magnitude vanishes at the six screw centres and peaks at the three \\(\\tau = 0\\) centres. The charges sum to zero over one cell, as the index budget demands.",
+    "caption": "What the symbol forces, measured on the published orbit, whose group is r3₂∗3. The phase of the first temporal harmonic winds by 0 at the three plain threefold centres, by −1 at the three 3₁ centres and by +1 at the three 3₂ centres of its rotation subgroup r33₁3₂ — exactly \\(-k \\bmod 3\\) at a centre whose generator carries the offset \\(k/3\\). The magnitude vanishes at the six screw centres and peaks at the three \\(\\tau = 0\\) centres. The charges sum to zero over one cell, as the index budget demands. The film's mirrors are not drawn: three cross at every circle, one vertical and two at 30° to the horizontal, and each −1 centre is the mirror image of a +1 centre.",
     "source_experiment": "theorem"
   },
   {
@@ -31,8 +31,8 @@
     "id": "clockwork-with-cores",
     "file": "clockwork-with-cores.mp4",
     "poster": "poster-clockwork-with-cores.webp",
-    "alt": "Looping animation of the g227 spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.",
-    "caption": "One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved.",
+    "alt": "Looping animation of the published spiral lattice over one period, with small white circles and triangles marking the nine threefold centres. The bright pattern rotates and breathes while the markers stay exactly where they are.",
+    "caption": "One period of the published orbit with the forced cores marked: the pattern turns, the cores do not move. Every vortex is pinned to a rotation centre of the group, and the marker at each centre is the winding the symbol predicted before the equation was solved. The orbit's group is r3₂∗3: its mirrors, not drawn, cross three at a time at every circle, and each downward triangle is the mirror image of an upward one.",
     "source_experiment": "theorem"
   },
   {

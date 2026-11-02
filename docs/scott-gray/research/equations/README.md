@@ -163,7 +163,7 @@ Records: 720 over 68 entries; distinct saved fields Gray–Scott 254, Ginzburg�
 | p4g | g132 | 4∗2 (zero offset) | 6 | — | — |
 | p3 | g225 | ³3³3³3 | 16 | 2 | 2 |
 | p3 | g226 | ³3³3³3 | 16 | 2 | 2 |
-| p3 | g227 | ³3³3¹3 | 2 | 2 | 2 |
+| p3 | g227 † | ³3³3¹3 | 2 | 2 | 2 |
 | p3 | g224 | 333 (zero offset) | 12 | — | — |
 | p3m1 | g231 | ∗²3²3²3 | 7 | — | — |
 | p3m1 | g230 | ∗333 (zero offset) | 7 | — | — |
@@ -182,6 +182,16 @@ Records: 720 over 68 entries; distinct saved fields Gray–Scott 254, Ginzburg�
 | p6m | g271 | ∗²6¹3¹2 | 3 | — | — |
 | p6m | g268 | ∗632 (zero offset) | 4 | — | — |
 
+† Only one of these six g227 records is exactly r33₁3₂: the Gray–Scott wave
+`093822675be6367b`, with nine operations on its torus. The other five carry eighteen, the nine
+of r33₁3₂ and nine more that involve a mirror, so every frame is mirror-symmetric: they are
+r3₂∗3 (g234, R3m, ITA No. 160), an index-2 supergroup of r33₁3₂ (a brute force over every
+lattice map and shift and a symdetect `identify` run, Sun 1 Nov 2026 (week 44); symdetect again
+on Mon 2 Nov 2026 (week 45) for the published spiral lattice, `432b2f33` and `093822675be6367b`).
+Since Mon 2 Nov 2026 (week 45) the atlas files two of the five under g234, the published Brusselator
+spiral lattice `e47c12f9` and the Gray–Scott wave `432b2f33`, and leaves out the other three,
+twins of films already filed there; `../wallpaper/refile_atlas.py` holds that table. The data
+files keep the label g227 they were searched under.
 
 The Ginzburg–Landau entries that stay empty are exactly those whose nonzero offsets
 sit on mirrors or glides (line defects, unstable) and the two 632 sixth-turn

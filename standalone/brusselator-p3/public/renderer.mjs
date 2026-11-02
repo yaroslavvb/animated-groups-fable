@@ -1,5 +1,6 @@
 // The saved orbit equation:brusselator:g227:e47c12f9099fb9d2 is a Brusselator
-// oscillatory spiral lattice with p3 symmetry: 48 frames of a 36×36 periodic
+// oscillatory spiral lattice with clockwork symmetry r3₂∗3 (its id keeps the label
+// g227 it was searched under): 48 frames of a 36×36 periodic
 // triangular lattice over one period. Lattice point (u, v) is u·a1 + v·a2 with
 // |a1| = |a2| = 1 and a 120° angle between them. Frames are spectrally doubled
 // to 72×72 on load; playback blends four frames with Catmull–Rom weights and

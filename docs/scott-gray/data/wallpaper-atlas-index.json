@@ -2,12 +2,12 @@
   "schema": "scott-gray-wallpaper-index-v1",
   "models": {
     "gray-scott": 254,
-    "ginzburg-landau": 65,
-    "brusselator": 51
+    "ginzburg-landau": 63,
+    "brusselator": 50
   },
   "wallpaperGroupsSha256": "b29347079a191e4080e9c79d6597a588f05f912a5889b32c49e2c46460cf290f",
-  "uniqueFieldCount": 370,
-  "exampleCount": 720,
+  "uniqueFieldCount": 367,
+  "exampleCount": 717,
   "families": [
     {
       "id": "p1",
@@ -183,17 +183,17 @@
     },
     {
       "id": "p3",
-      "verifiedPatternCount": 58,
-      "verifiedExampleCount": 58,
-      "verifiedParameterCount": 28,
+      "verifiedPatternCount": 53,
+      "verifiedExampleCount": 53,
+      "verifiedParameterCount": 26,
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
       "verifiedNonzeroTimeSymmetryCount": 3,
       "models": {
-        "brusselator": 6,
-        "ginzburg-landau": 6,
-        "gray-scott": 46
+        "brusselator": 4,
+        "ginzburg-landau": 4,
+        "gray-scott": 45
       }
     },
     {
@@ -211,17 +211,17 @@
     },
     {
       "id": "p31m",
-      "verifiedPatternCount": 19,
-      "verifiedExampleCount": 19,
-      "verifiedParameterCount": 16,
+      "verifiedPatternCount": 21,
+      "verifiedExampleCount": 21,
+      "verifiedParameterCount": 17,
       "timeSymmetryCount": 4,
       "populatedSymmetryCount": 4,
       "nonzeroTimeSymmetryCount": 3,
       "verifiedNonzeroTimeSymmetryCount": 3,
       "models": {
-        "brusselator": 2,
+        "brusselator": 3,
         "ginzburg-landau": 4,
-        "gray-scott": 13
+        "gray-scott": 14
       }
     },
     {

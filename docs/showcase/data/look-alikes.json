@@ -10,13 +10,13 @@
   "threshold": "Read off a ladder of sampled pairs by distance band, not chosen to hit a count, and judged on pairs rendered with the metric's own best (dt, dy, dx) applied - so neither phase nor translation can stand in for a difference. Below 0.26 a sampled pair is one picture every time. From 0.30 up it routinely is not: wavy ribbons against straight stripes at 0.354, a diamond checkerboard against rows of bells at 0.350, a lattice of squares against a lattice of rings at 0.323, clean circles against a melted checkerboard at 0.310. 0.40 and then 0.36 were earlier readings and folded that whole band - about 260 of the folds at 0.36 are pairs the reader would have called two pictures. 0.28 is the last line the eye agrees with. `--montages` redraws what it was judged by."
  },
  "threshold": 0.28,
- "fingerprint": "e9a72c1fa03d3de6d6c497106805df5e317550b7710f7fac08f0e3b896839c37",
- "clipsDigest": "33a2d0377255a28fdd5da8cbaaaefbd073ad6a707a2b69259f2476fd067be743",
- "clustersDigest": "da2a1a1480e4e62e5f47b906946d0ac6bb3a695fe6ebe2bfa5f18ee7ace39682",
+ "fingerprint": "da206e43ab184c5676173539062070eba1ab0f0985ef7f92d509d452f2ae2c06",
+ "clipsDigest": "b412e951b800f234e1ced65ef7046b0032617b23155ceadc6871bc74ceb97f8a",
+ "clustersDigest": "d1b6daa5564147d2bc4ddd5ae5592cf08034f1047608d33018555f3df19fcae8",
  "counts": {
-  "clips": 2623,
-  "clusters": 503,
-  "folded": 1324
+  "clips": 2620,
+  "clusters": 502,
+  "folded": 1321
  },
  "clusters": [
   {
@@ -1304,6 +1304,23 @@
    ]
   },
   {
+   "id": "ember:brusselator:0000",
+   "kind": "ember",
+   "equation": "Brusselator",
+   "rep": "previews/ember/e47c12f9099f",
+   "members": [
+    "previews/ember/e47c12f9099f",
+    "previews/ember/daf4fcffba1a",
+    "previews/ember/ee085777aa61"
+   ],
+   "spread": 0.2405,
+   "dists": [
+    0.0228,
+    0.2405,
+    0.2437
+   ]
+  },
+  {
    "id": "ember:gray-scott:0000",
    "kind": "ember",
    "equation": "Gray–Scott",
@@ -2382,20 +2399,6 @@
    "id": "ember:gray-scott:0031",
    "kind": "ember",
    "equation": "Gray–Scott",
-   "rep": "previews/ember/54ee1ba00df4",
-   "members": [
-    "previews/ember/54ee1ba00df4",
-    "previews/ember/b0c5ee80b48d"
-   ],
-   "spread": 0.0447,
-   "dists": [
-    0.0447
-   ]
-  },
-  {
-   "id": "ember:gray-scott:0032",
-   "kind": "ember",
-   "equation": "Gray–Scott",
    "rep": "previews/ember/5a48e1f7324c",
    "members": [
     "previews/ember/5a48e1f7324c",
@@ -2407,7 +2410,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0033",
+   "id": "ember:gray-scott:0032",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/5e693e97a9df",
@@ -2433,7 +2436,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0034",
+   "id": "ember:gray-scott:0033",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/601ebb6af149",
@@ -2447,7 +2450,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0035",
+   "id": "ember:gray-scott:0034",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/603782d9657d",
@@ -2464,7 +2467,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0036",
+   "id": "ember:gray-scott:0035",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/642c4d86cdb2",
@@ -2485,7 +2488,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0037",
+   "id": "ember:gray-scott:0036",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/661f1fd325eb",
@@ -2502,7 +2505,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0038",
+   "id": "ember:gray-scott:0037",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/70e394c717be",
@@ -2516,7 +2519,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0039",
+   "id": "ember:gray-scott:0038",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/714189950b82",
@@ -2530,7 +2533,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0040",
+   "id": "ember:gray-scott:0039",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/75ed3f779072",
@@ -2544,7 +2547,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0041",
+   "id": "ember:gray-scott:0040",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/770de0952aa9",
@@ -2558,7 +2561,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0042",
+   "id": "ember:gray-scott:0041",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/78aa2d7c1c2f",
@@ -2635,7 +2638,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0043",
+   "id": "ember:gray-scott:0042",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/7c083c9b0f9a",
@@ -2649,7 +2652,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0044",
+   "id": "ember:gray-scott:0043",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/8a0d4a8a70a9",
@@ -2663,7 +2666,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0045",
+   "id": "ember:gray-scott:0044",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/8c28314d82d3",
@@ -3052,7 +3055,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0046",
+   "id": "ember:gray-scott:0045",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/8f0fe5684f29",
@@ -3069,7 +3072,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0047",
+   "id": "ember:gray-scott:0046",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/9068c5f6db98",
@@ -3090,7 +3093,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0048",
+   "id": "ember:gray-scott:0047",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/90abf913a4ae",
@@ -3104,7 +3107,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0049",
+   "id": "ember:gray-scott:0048",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/930a15925d3e",
@@ -3121,7 +3124,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0050",
+   "id": "ember:gray-scott:0049",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/9a3a7f8d4a55",
@@ -3138,7 +3141,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0051",
+   "id": "ember:gray-scott:0050",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/b127f7e63ad3",
@@ -3159,7 +3162,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0052",
+   "id": "ember:gray-scott:0051",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/b7b1a3ab9f35",
@@ -3176,7 +3179,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0053",
+   "id": "ember:gray-scott:0052",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/bd6d23057b51",
@@ -3223,7 +3226,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0054",
+   "id": "ember:gray-scott:0053",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/ca998d4e43e2",
@@ -3279,7 +3282,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0055",
+   "id": "ember:gray-scott:0054",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/cb5a43d629cb",
@@ -3305,7 +3308,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0056",
+   "id": "ember:gray-scott:0055",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/d72c51728e1d",
@@ -3382,7 +3385,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0057",
+   "id": "ember:gray-scott:0056",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/ddc01dbe3300",
@@ -3399,28 +3402,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0058",
-   "kind": "ember",
-   "equation": "Gray–Scott",
-   "rep": "previews/ember/e47c12f9099f",
-   "members": [
-    "previews/ember/e47c12f9099f",
-    "previews/ember/daf4fcffba1a",
-    "previews/ember/ee085777aa61",
-    "previews/ember/92242e9a2c38"
-   ],
-   "spread": 0.2435,
-   "dists": [
-    0.0228,
-    0.2405,
-    0.2435,
-    0.2437,
-    0.2467,
-    0.0244
-   ]
-  },
-  {
-   "id": "ember:gray-scott:0059",
+   "id": "ember:gray-scott:0057",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/ed9efea8c174",
@@ -3434,7 +3416,7 @@
    ]
   },
   {
-   "id": "ember:gray-scott:0060",
+   "id": "ember:gray-scott:0058",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/f06ad78d7e91",
@@ -3443,30 +3425,24 @@
     "previews/ember/432b2f331a2d",
     "previews/ember/3a61749e5b72",
     "previews/ember/3d29e0d7c285",
-    "previews/ember/ed501ca19e1a",
-    "previews/ember/7a20a89f0633"
+    "previews/ember/ed501ca19e1a"
    ],
-   "spread": 0.1769,
+   "spread": 0.174,
    "dists": [
     0.0199,
     0.0971,
     0.0979,
     0.174,
-    0.1769,
     0.0971,
     0.0979,
     0.174,
-    0.177,
     0.0969,
     0.1976,
-    0.1998,
-    0.1972,
-    0.2005,
-    0.0229
+    0.1972
    ]
   },
   {
-   "id": "ember:gray-scott:0061",
+   "id": "ember:gray-scott:0059",
    "kind": "ember",
    "equation": "Gray–Scott",
    "rep": "previews/ember/f97ad9fc2a82",

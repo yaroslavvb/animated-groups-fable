@@ -5,7 +5,7 @@ import {renderWallpaperOverlay,wallpaperGeneratorPlacements,wallpaperOperationLa
 import {readViewState,writeViewHash} from './view-state.mjs?v=20260907-generator-direction';
 import {createLocalMotionCatalog,localMotionCentreKey} from './local-motion.mjs?v=20260907-local-motion';
 
-const VERSION = '20260907-equations';
+const VERSION = '20261102-refile';
 const root = new URL('./', import.meta.url);
 const $ = id => document.getElementById(id);
 const familyId = $('family-nav').dataset.family;
@@ -29,7 +29,7 @@ const spec = model => MODELS[model] ?? MODELS['gray-scott'];
 const parameterKey = config => JSON.stringify([config.model ?? 'gray-scott', ...spec(config.model ?? 'gray-scott').parameters.map(name => config.params[name]), config.L ?? config.N * config.params.dx, config.params.stencil]);
 const parameterText = (config, names) => names.map(name => `${EQUATIONS[config.model ?? 'gray-scott'].labels[name] ?? name} ${fixed(config.params[name])}`).join(' · ');
 const patternLabel = record => `${record.patternName ?? record.name ?? 'Periodic wave'} · T ${record.config.period.toFixed(2)} · ${record.config.N}²`;
-let family, groups, manifest, catalog, group, record, player, cellView;
+let family, families = [], groups, manifest, catalog, group, record, player, cellView;
 let motionCatalog = null, motionState = 'loading';
 let selectedId = null, selectedKey = null, generatorName = null, modelId = null, lastBackend = null;
 let phase = 0, playing = false, lastTime = 0, selectionToken = 0, mapGeometry;
@@ -282,6 +282,16 @@ function chooseGroup(id, {user = false, view = null} = {}) {
 
 function restoreUrl() {
   const view = readViewState(location.hash);
+  // The atlas re-files a saved pattern whose film turns out to have more symmetry than the group it
+  // was searched under (research/wallpaper/refile_atlas.py). A link that names it under its old group
+  // opens it where it is filed now: on this page, or on the page of the family that files it.
+  const filed = view.groupId ? catalog.get(view.patternId) : null;
+  if (filed && filed.groupId !== view.groupId) {
+    const home = families.find(item => item.groupIds.includes(filed.groupId));
+    const hash = writeViewHash({...view, groupId: filed.groupId, generator: null});
+    if (home && home.id !== familyId) {location.replace(new URL(`../${home.page}${hash}`, root)); return;}
+    history.replaceState(null, '', hash); view.groupId = filed.groupId; view.generator = null;
+  }
   $('palette').value = view.palette; $('tiles').value = view.tiles; $('framing').value = view.framing;
   $('speed').value = view.speed; $('show-generators').checked = view.overlay;
   chooseGroup(view.groupId, {view});
@@ -314,7 +324,7 @@ try {
   const responses = await Promise.all([fetch(new URL(`wallpaper-groups.json?v=${VERSION}`, root)), fetch(new URL(`data/wallpaper-atlas.json?v=${VERSION}`, root))]);
   if (responses.some(response => !response.ok)) throw Error('The saved wallpaper catalog could not be loaded.');
   const [metadata, data] = await Promise.all(responses.map(response => response.json())); manifest = data;
-  family = metadata.families.find(item => item.id === familyId); if (!family) throw Error('Unknown wallpaper family.');
+  families = metadata.families; family = families.find(item => item.id === familyId); if (!family) throw Error('Unknown wallpaper family.');
   groups = family.groupIds.map(id => metadata.groups.find(item => item.id === id));
   catalog = createWallpaperCatalog(manifest, {groups: metadata.groups, baseUrl: root});
   restoreUrl(); loadLocalMotion(); window.addEventListener('hashchange', restoreUrl); requestAnimationFrame(animate);

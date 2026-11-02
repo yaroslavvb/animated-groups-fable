@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>How to find a time-symmetric animation</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23eb6834'/%3E%3Ccircle cx='8' cy='4.6' r='2' fill='%23f9f9f7'/%3E%3C/svg%3E">
-<meta name="description" content="How the looping spiral-lattice animation with clockwork symmetry r33₁3₂ was actually found, in five steps, with one equation, the Brusselator: its oscillation at one point, a seed grown from noise in its slow envelope, the lift to a full frame, Newton-Krylov on one frame and the period, and an independent check. Re-run for this page; it reproduces the published file bit for bit.">
+<meta name="description" content="How the looping spiral-lattice animation with clockwork symmetry r3₂∗3 was actually found, in five steps, with one equation, the Brusselator: its oscillation at one point, a seed grown from noise in its slow envelope, the lift to a full frame, Newton-Krylov on one frame and the period, and an independent check. Re-run for this page; it reproduces the published file bit for bit.">
 <link rel="stylesheet" href="assets/katex/katex.min.css">
 <style>
 
@@ -225,6 +225,9 @@ figure.fig.hero .stage video { max-width: none; width: 100%; margin: 0; border: 
 .gen-label { fill: #ffffff; stroke: #120927; stroke-width: 4px; stroke-linejoin: round;
   paint-order: stroke fill; font: 700 30px system-ui, -apple-system, "Segoe UI", sans-serif; }
 .gen-label .gen-cost { font-size: 24px; font-weight: 600; }
+/* a mirror that costs nothing: a solid white line, cased like the glyphs */
+.gen-mirror-casing { fill: none; stroke: #120927; stroke-width: 6.5px; vector-effect: non-scaling-stroke; }
+.gen-mirror { fill: none; stroke: #ffffff; stroke-width: 2.5px; vector-effect: non-scaling-stroke; }
 
 /* the five steps, and where the symmetry is put in */
 ol.steps { margin: 0; padding-left: 1.3em; }
@@ -261,7 +264,7 @@ table.iters { max-width: 480px; }
 <h1>How to find a time-symmetric animation</h1>
 
 <p class="byline">
-  How the looping spiral-lattice animation with clockwork symmetry <b>r33₁3₂</b> was actually
+  How the looping spiral-lattice animation with clockwork symmetry <b>r3₂∗3</b> was actually
   found: the five steps of the search that produced it, re-run for this page and reproducing the
   published file bit for bit. One equation throughout, the Brusselator.
 </p>
@@ -284,17 +287,20 @@ table.iters { max-width: 480px; }
 
 <figure class="fig hero" id="fig-final-orbit-ember">
   <div class="stage">
-    <video controls autoplay muted loop playsinline poster="assets/poster-final-orbit-ember.webp" aria-label="Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with three white triangle symbols marking the generators α, β and γ of its symmetry."><source src="assets/final-orbit-ember.mp4" type="video/mp4"><p>Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with three white triangle symbols marking the generators α, β and γ of its symmetry.</p></video>
+    <video controls autoplay muted loop playsinline poster="assets/poster-final-orbit-ember.webp" aria-label="Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with a white mirror line through γ and white symbols marking the centres α, β and γ of its symmetry."><source src="assets/final-orbit-ember.mp4" type="video/mp4"><p>Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with a white mirror line through γ and white symbols marking the centres α, β and γ of its symmetry.</p></video>
 <svg class="gen-overlay" viewBox="0 0 640 640" aria-hidden="true" focusable="false">
+<line class="gen-mirror-casing" x1="0.00" y1="135.25" x2="640.00" y2="504.75"/>
+<line class="gen-mirror" x1="0.00" y1="135.25" x2="640.00" y2="504.75"/>
 <path class="gen-glyph" transform="translate(320.00 320.00) scale(1.25)" d="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z"/>
 <path class="gen-glyph" transform="translate(213.33 320.00) scale(1.25)" d="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z"/>
 <path class="gen-glyph" transform="translate(266.67 227.62) scale(1.25)" d="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z"/>
-<text class="gen-label" x="368.5" y="348.0" text-anchor="middle" dominant-baseline="central">γ<tspan class="gen-cost" dx="5">0</tspan></text>
+<text class="gen-label" x="368.5" y="292.0" text-anchor="middle" dominant-baseline="central">γ<tspan class="gen-cost" dx="5">0</tspan></text>
 <text class="gen-label" x="164.8" y="348.0" text-anchor="middle" dominant-baseline="central">α<tspan class="gen-cost" dx="5">⅓</tspan></text>
 <text class="gen-label" x="266.7" y="171.6" text-anchor="middle" dominant-baseline="central">β<tspan class="gen-cost" dx="5">⅔</tspan></text>
+<text class="gen-label" x="562.0" y="418.1" text-anchor="middle" dominant-baseline="central">μ<tspan class="gen-cost" dx="5">0</tspan></text>
 </svg>
   </div>
-  <figcaption>The published animation: one period of <b>6.390159918584649</b> time units in <b>48</b> frames, two cells across. Drawn on it, as in the correspondence catalogue, are the three generators of its symmetry r33₁3₂. Each is a <b>120</b>° anticlockwise turn about the point it marks, and the number beside it is what the turn costs, as a fraction of the period: about γ it changes nothing, about α it gives the film a third of a period later, about β two thirds later. At α and β the chemicals never move; the film turns around them.</figcaption>
+  <figcaption>The published animation: one period of <b>6.390159918584649</b> time units in <b>48</b> frames, two cells across. Drawn on it are two motions that generate its symmetry r3₂∗3: the mirror μ through γ, which costs nothing, since every frame is symmetric across it, and an anticlockwise third of a turn about β, which gives the film two thirds of a period later. At β, as at every centre between the mirrors, the chemicals barely move; the film turns around them.</figcaption>
 </figure>
 
 <p>
@@ -309,15 +315,22 @@ table.iters { max-width: 480px; }
 <h2 id="symmetry">Its symmetry<a class="hlink" href="#symmetry" aria-label="link to this section">#</a></h2>
 
 <p>
-  In orbifold notation the symmetry group is <b>r33₁3₂</b>. Each 3 is a kind of centre about which
-  the picture can be turned by 120°: plain 3 is γ in the picture above, 3₁ is α and 3₂ is β. The
-  subscript counts the thirds of a period that an anticlockwise turn about that centre costs. So
-  turning the picture about γ changes nothing; about α it shows the film as it will be a third of a
-  period later; about β, two thirds later. The prefix r says that sliding the picture by a third of
-  a cell costs a third of a period as well.
+  In orbifold notation the symmetry group is <b>r3₂∗3</b>. The ∗ stands for mirror lines: every
+  frame is mirror-symmetric across lines like μ, drawn through γ, and the 3 after it says that three
+  such lines cross at γ, so a third of a turn about γ changes nothing. The 3₂ is a centre between
+  the mirrors, β in the picture: an anticlockwise third of a turn about β gives the film as it will
+  be two thirds of a period later, and about its mirror image α, a third later, because a mirror
+  reverses the direction of a turn. The prefix r says that sliding the picture by a third of a cell
+  costs a third of a period as well. On the simulation box that makes 18 symmetries: the nine of
+  r33₁3₂, and nine more that involve a mirror.
 </p>
 <p>
-  Written out, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>=</mo><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q = (u, v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span></span></span></span> the two chemicals and each of the nine symmetries <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> of the
+  This film was found by a search for r33₁3₂, which imposed nine symmetries, and it has more
+  symmetry than that: eighteen, which make it r3₂∗3, and its data file keeps the label g227 it was
+  searched under.
+</p>
+<p>
+  Written out, with <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>=</mo><mo stretchy="false">(</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q = (u, v)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">v</span><span class="mclose">)</span></span></span></span> the two chemicals and each of the eighteen symmetries <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span> of the
   simulation box carrying its cost <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>τ</mi><mi>g</mi></msub><mo>∈</mo><mo stretchy="false">{</mo><mn>0</mn><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>1</mn><mn>3</mn></mfrac></mstyle><mo separator="true">,</mo><mstyle scriptlevel="0" displaystyle="false"><mfrac><mn>2</mn><mn>3</mn></mfrac></mstyle><mo stretchy="false">}</mo></mrow><annotation encoding="application/x-tex">\tau_g \in \{0, \tfrac13, \tfrac23\}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8252em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.0359em;">g</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">3</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose">}</span></span></span></span>:
 </p>
 <div class="eq">
@@ -325,15 +338,16 @@ table.iters { max-width: 480px; }
   <p class="eq-qual">for every symmetry <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>g</mi></mrow><annotation encoding="application/x-tex">g</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0359em;">g</span></span></span></span>, every point <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>, every instant <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi></mrow><annotation encoding="application/x-tex">t</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span>.</p>
 </div>
 <p>
-  Only three of the nine cost nothing: doing nothing, and the two turns about γ. Those are all a
-  single frame shows. The other six relate a frame to the one a third or two thirds of a period
-  later.
+  Six of the eighteen cost nothing: doing nothing, the two turns about γ, and the three mirrors
+  through γ. Those are all a single frame shows. The other twelve relate a frame to the one a third
+  or two thirds of a period later.
 </p>
 <p>
   The <a href="../../correspondence.html">correspondence catalogue</a> lists this group
-  <a href="../../correspondence-p3.html#g227">under ³3³3¹3</a>: the same orbifold, with each centre marked by how many
-  different moments its turns reach (³3 for α and β, ¹3 for γ). Its number there, 227, is only its
-  place in Xu and Wu's list of the 275 spacetime groups.
+  <a href="../../correspondence-p31m.html#g234">under ³3∗¹3</a>: the same orbifold, with each feature marked by how many
+  different moments its turns reach (³3 for β and α, ¹3 for γ). Its number there, 234, is only its
+  place in Xu and Wu's list of the 275 spacetime groups; the film's data file keeps the label g227 it
+  was searched under.
 </p>
 
 
@@ -367,8 +381,8 @@ table.iters { max-width: 480px; }
 </p>
 <ul>
   <li><b>Most of the symmetry is invisible to a simulator.</b> It can impose the three free
-    symmetries at every step, but the other six relate a frame to a <i>later</i> frame, so no single
-    frame can satisfy or violate them.</li>
+    symmetries of r33₁3₂ at every step, but the other six relate a frame to a <i>later</i> frame, so
+    no single frame can satisfy or violate them.</li>
   <li><b>The animation is unstable.</b> Even started exactly on it, a simulation drifts away: a
     disturbance of the right shape grows by a factor of <b>1.16</b> every period, and the
     simulation ends with every point oscillating in unison.</li>
@@ -499,7 +513,7 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
   The dark dots were predicted before any simulation. A turn about α leaves the point α where it
   is, so there the condition reads <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>α</mi><mo stretchy="false">)</mo><mo>=</mo><msup><mi>e</mi><mrow><mo>−</mo><mn>2</mn><mi>π</mi><mi>i</mi><mi mathvariant="normal">/</mi><mn>3</mn></mrow></msup><mi>B</mi><mo stretchy="false">(</mo><mi>α</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">B(\alpha) = e^{-2\pi i/3} B(\alpha)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1.138em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.888em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">2</span><span class="mord mathnormal mtight" style="margin-right:0.0359em;">π</span><span class="mord mathnormal mtight">i</span><span class="mord mtight">/3</span></span></span></span></span></span></span></span></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span></span></span></span>, which forces
   <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mo stretchy="false">(</mo><mi>α</mi><mo stretchy="false">)</mo><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">B(\alpha) = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0502em;">B</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>; the same holds at β. They are the points α and β of the film at the top, where
-  the chemicals never move.
+  the chemicals barely move.
 </p>
 <p>
   By <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>t</mi><mo>=</mo><mn>50</mn></mrow><annotation encoding="application/x-tex">t = 50</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">50</span></span></span></span> the envelope is a rotating wave to 1.9e−8; the finite time step keeps it from
@@ -759,7 +773,9 @@ M834 80h400000v40h-400000z"/></svg></span></span></span><span class="vlist-s">�
 
 <p>
   Does the Brusselator make this symmetric pattern by itself, or does the mesh? Neither. The
-  symmetry is put in on purpose, in two steps, and after that only checked.
+  symmetry is put in on purpose, in two steps, and after that only checked. The averaging puts in
+  the nine symmetries of r33₁3₂; the film the search converged to has nine more, which were not
+  put in.
 </p>
 <div class="table-wrap">
 <table class="where">
@@ -816,7 +832,7 @@ python3 figures.py    # the pictures</code></pre>
   <tbody>
     <tr><td>equation</td><td>Brusselator, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>a</mi><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">a = 1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>b</mi><mo>=</mo><mn>2.3</mn></mrow><annotation encoding="application/x-tex">b = 2.3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2.3</span></span></span></span>, equal diffusion 1</td></tr>
     <tr><td>mesh</td><td>triangular, 36 × 36 nodes, box side 40; RK4, time step at most 0.02</td></tr>
-    <tr><td>symmetry</td><td>r33₁3₂ (³3³3¹3 in the catalogue, entry g227), nine operations on the box</td></tr>
+    <tr><td>symmetry</td><td>r33₁3₂ (³3³3¹3 in the catalogue, entry g227, the label on the data file), nine operations on the box, imposed; the film it found has 18: r3₂∗3 (³3∗¹3, entry g234)</td></tr>
     <tr><td>step 2</td><td>envelope: <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>α</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\alpha = 0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>β</mi><mo>=</mo><mn>0.11</mn></mrow><annotation encoding="application/x-tex">\beta = 0.11</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.0528em;">β</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">0.11</span></span></span></span>, <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mo>=</mo><mn>2</mn></mrow><annotation encoding="application/x-tex">D = 2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.0278em;">D</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>, box 30.98; noise with random seed 1; up to 600 time units; sign <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>+</mo></mrow><annotation encoding="application/x-tex">+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">+</span></span></span></span> tried first, then <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>−</mo></mrow><annotation encoding="application/x-tex">-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">−</span></span></span></span></td></tr>
     <tr><td>step 3</td><td>amplitude 0.25 (0.50 as a fallback), <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>T</mi><mn>0</mn></msub><mo>=</mo><mn>2</mn><mi>π</mi><mi mathvariant="normal">/</mi><mi>ω</mi></mrow><annotation encoding="application/x-tex">T_0 = 2\pi/\omega</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="katex-base"><span class="katex-strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1389em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="katex-sizing reset-size6 size3 mtight"><span class="mord mtight">0</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="katex-base"><span class="katex-strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.0359em;">π</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.0359em;">ω</span></span></span></span></td></tr>
     <tr><td>step 4</td><td>Newton–Krylov, LGMRES with at most 40 inner steps, at most 60 Newton steps, tolerance 1e−11; accepted below 1e−8</td></tr>
@@ -834,9 +850,9 @@ python3 figures.py    # the pictures</code></pre>
       symbol forces before any solver starts: which points must stay dark, and how the phase must
       wind around them. The still points α and β are its first example.</li>
     <li><a href="https://brusselator-p3-spiral.mathornament.workers.dev/">The published animation, full screen</a>, and its
-      <a href="https://brusselator-p3-mono.mathornament.workers.dev/">monochrome twin</a>; the
-      <a href="../../scott-gray/p3/#g227?v=2&amp;pattern=equation%3Abrusselator%3Ag227%3Ae47c12f9099fb9d2&amp;palette=ember&amp;tiles=2&amp;framing=simulation&amp;speed=1&amp;overlay=0&amp;approx=1&amp;phase=0&amp;play=1">r33₁3₂ film in the showcase</a>; its
-      <a href="../../correspondence-p3.html#g227">entry in the correspondence catalogue</a>.</li>
+      <a href="https://brusselator-p3-spiral-mono.mathornament.workers.dev/">monochrome twin</a>;
+      <a href="../../scott-gray/p31m/#g234?v=2&amp;pattern=equation%3Abrusselator%3Ag227%3Ae47c12f9099fb9d2&amp;palette=ember&amp;tiles=2&amp;framing=simulation&amp;speed=1&amp;overlay=0&amp;approx=1&amp;phase=0&amp;play=1">the film in the reaction–diffusion explorer</a>; its
+      <a href="../../correspondence-p31m.html#g234">entry in the correspondence catalogue</a>.</li>
     <li><a href="../making-of/">The making of this site</a> — the timeline: who asked for what,
       when, and what it cost.</li>
     <li>Background reading: Y. Kuramoto, <i>Chemical Oscillations, Waves, and Turbulence</i>,

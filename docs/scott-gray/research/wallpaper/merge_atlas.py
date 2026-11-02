@@ -3,8 +3,9 @@
 
 The Gray–Scott wallpaper records keep their certificates untouched. Legacy p4/p6 fields enter as
 audited-subgroup witnesses of their own canonical actions (research/wallpaper/legacy_subgroups.py);
-equation records enter with their own gate (research/equations/admit.py). Rebuilds the directory
-index afterwards.
+equation records enter with their own gate (research/equations/admit.py). The records whose film
+has more symmetry than the group they were searched under are then re-filed by refile_atlas.py's
+table, so a merge cannot file them back (Mon 2 Nov 2026, week 45). Rebuilds the directory index afterwards.
 """
 import argparse, hashlib, json, os, subprocess, sys
 from collections import Counter
@@ -14,6 +15,7 @@ sys.path.insert(0, str(HERE))
 from build_catalog import encoded, sha
 from audit import attach_forward_bounds
 from build_cells import attach_cells
+from refile_atlas import apply as refile
 CAP = 24
 
 def legacy_entries(subgroups, groups):
@@ -53,6 +55,7 @@ def main():
             equations.append(r)
     orbits = kept + added + equations; ids = [r['id'] for r in orbits]
     if len(set(ids)) != len(ids): raise ValueError('Duplicate record ids after merge')
+    orbits, _ = refile(orbits, groups, {'wallpaper-offline-v1': verifier, **{k: v['verificationCodeSha256'] for k, v in gates.items()}})
     counts = Counter(r['groupId'] for r in orbits); results = [row for row in catalog['searchResults'] if groups[row['groupId']]['family'] not in ('p4', 'p6')]
     legacy_by_group = {res['groupId']: res for res in json.loads(a.legacy.read_text())['results']}
     for g in definitions['groups']:

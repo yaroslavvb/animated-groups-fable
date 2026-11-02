@@ -3,8 +3,8 @@
   "id": "final-orbit-ember",
   "file": "final-orbit-ember.mp4",
   "poster": "poster-final-orbit-ember.webp",
-  "alt": "Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with three white triangle symbols marking the generators α, β and γ of its symmetry.",
-  "caption": "The published animation: one period of 6.390159918584649 time units in 48 frames, two cells across. Drawn on it, as in the correspondence catalogue, are the three generators of its symmetry r33₁3₂. Each is a 120° anticlockwise turn about the point it marks, and the number beside it is what the turn costs, as a fraction of the period: about γ it changes nothing, about α it gives the film a third of a period later, about β two thirds later. At α and β the chemicals never move; the film turns around them.",
+  "alt": "Looping animation of a hexagonal spiral lattice in orange and violet, two cells across, with a white mirror line through γ and white symbols marking the centres α, β and γ of its symmetry.",
+  "caption": "The published animation: one period of 6.390159918584649 time units in 48 frames, two cells across. Drawn on it are two motions that generate its symmetry r3₂∗3: the mirror μ through γ, which costs nothing, since every frame is symmetric across it, and an anticlockwise third of a turn about β, which gives the film two thirds of a period later. At β, as at every centre between the mirrors, the chemicals barely move; the film turns around them.",
   "source_experiment": "original"
  },
  {

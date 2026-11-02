@@ -82,6 +82,13 @@ template by `build_pages.py` (the site header and navigation are copied from
 `build_index.py` counts the merged catalog once and records per-equation counts for
 the directory page.
 
+`refile_atlas.py` (Mon 2 Nov 2026, week 45) re-files the records whose film turned out to have more
+symmetry than the group it was searched under: five of the six g227 records are r3₂∗3 (g234).
+It moves the published Brusselator spiral lattice and one Gray–Scott wave to g234, with g234
+certificates from the same gate code, withdraws three twins of films already filed there, and
+reruns `build_index.py`; `merge_atlas.py` applies the same table after every merge, so a rebuild
+cannot file them back, and `--check` exits 1 unless the atlas says what the table says.
+
 Two presentation fixes landed with the merge: the shared app's "Pattern cells"
 framing had mirrored square-lattice fields vertically relative to the simulation
 framing and the thumbnails (`wallpaper-cell.mjs`), and `build_catalog.py`'s

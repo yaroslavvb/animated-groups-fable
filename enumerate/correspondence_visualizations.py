@@ -47,6 +47,16 @@ chosen posters for all 68 groups (that is how the wave and name guards were
 found); 66 groups get four cards, g233 three and g138 two, because that is
 all the distinct pictures they have.
 
+A Showcase row is filed under the group its field was searched under, and a
+search solves inside that group's fixed points, so a field can carry more
+symmetry than its group.  The entries in MEASURED_ONLY take a black-and-white
+clip only from a field whose measured group is the entry's own: the monochrome
+atlas measures every field's group as the ink-keeping group of its half-period
+reading (``group.keepGroup``), which every symmetry of the field keeps.  Since
+Mon 2 Nov 2026 (week 45) that is g227 alone: 17 of the 18 fields the monochrome atlas
+files under it measure g234 (r3₂∗3, the same turns plus mirrors), so dropping
+the one such clip it showed would only have shown the next.
+
 A row's ``href`` is relative to docs/showcase/, so the leading ``../`` comes
 off to make it relative to docs/ — it opens the explorer with that exact
 picture selected.  A row whose name was generated (``<Equation> <slug> on
@@ -189,6 +199,17 @@ VIEWERS = (
     ("scott-gray/ember/", "Ember", "the spiral lattice, turned analytically",
      "30bfb1de97a806f743ff77061a7bd11844d289ac8853c2f3de12be70b13d77ce", ("g134",)),
 )
+
+#: entries whose black-and-white clips must come from a field whose measured
+#: group (the monochrome atlas's half-period ``keepGroup``) is the entry's own,
+#: and why; see the module docstring
+MEASURED_ONLY = {
+    "g227": "audit of Sun 1 Nov 2026 (week 44) and symdetect, Mon 2 Nov 2026 "
+            "(week 45): every field "
+            "but 093822675be6 filed under g227 is r3₂∗3 (g234), the published "
+            "spiral lattice among them; the black-and-white clip 025a14e28067 "
+            "this entry showed has 18 symmetries",
+}
 
 #: where a viewer's card needs different words on a particular entry, because
 #: the group it is filed under there is the group of something else.  Plume
@@ -540,10 +561,18 @@ def load():
     designer = _read_json("data/designer-links.json")["links"]
 
     index, field, score = _showcase_pools(rows, mono_entries, orbits, colour_entries)
+    # each field's measured group: the ink-keeping group of its half-period reading
+    measured = dict((entry["field"], entry["group"]["keepGroup"][0]) for entry in mono_atlas["entries"]
+                    if entry["rule"]["kind"] == "half-period"
+                    and (entry.get("group") or {}).get("keepGroup"))
     by_group = collections.defaultdict(list)
     for row in rows:
-        if row["groupId"]:
-            by_group[row["groupId"]].append(row)
+        if not row["groupId"]:
+            continue
+        if (row["groupId"] in MEASURED_ONLY and row["kind"] == "mono"
+                and measured.get(field[row["id"]]) != row["groupId"]):
+            continue
+        by_group[row["groupId"]].append(row)
 
     # the reaction-diffusion explorer's group chip
     orbit_counts = collections.Counter(orbit["groupId"] for orbit in orbits.values())
