@@ -1,0 +1,512 @@
+{
+ "p6": {
+  "labels": {
+   "sig": "Colour signature",
+   "type": "SoT type",
+   "pres": "Generators of 632, and what each does to the colours",
+   "flag": "● in the stabiliser",
+   "seatSym": "S(𝒫|M)"
+  },
+  "caption": "Arcs: the three generators chosen for 632, each a turn about one centre; open dot, it moves colours; filled dot, it keeps them all. Red: this turn is in the stabiliser of the ringed copy. Colour chips give its colour cycle. Translations are not drawn.",
+  "typeExt": " this page’s extension: SoT’s tables stop at prime k",
+  "relationsNote": " Read right to left: αβγ means γ first, then β, then α. The Symmetries of Things (p. 171) and Vladimir Bulatov’s catalog read left to right. Any two of the three generate Γ: β = α⁻¹γ.",
+  "explainer": [
+   [
+    "Pattern",
+    "Disjoint congruent copies of one motif, where a symmetry of the whole set can carry any copy to any other (<a class=\"book-ref-link source-value-link\" href=\"http://intel/books/tilings-and-patterns.pdf#page=215\" target=\"_blank\" rel=\"noopener\" data-words=\"“an isometry of the plane that maps P onto itself and Mᵢ onto Mⱼ”\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 204\" data-private=\"1\">T&amp;P p. 204</a>). Generators are not in the definition: they are only one way to write the symmetry group."
+   ],
+   [
+    "Stabiliser",
+    "The symmetries that map one given copy onto itself: T&amp;P’s induced group S(𝒫|M) (<a class=\"book-ref-link source-value-link\" href=\"http://intel/books/tilings-and-patterns.pdf#page=215\" target=\"_blank\" rel=\"noopener\" data-words=\"“sometimes S(P∣M) is called the stabilizer of M in S(P)”\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 204\" data-private=\"1\">p. 204</a>). It belongs to the copy, not to a generator list. Every copy has its own, all conjugate."
+   ],
+   [
+    "Colouring",
+    "Here always perfect: every symmetry permutes the colours (<a class=\"book-ref-link source-value-link\" href=\"https://yaroslavvb.github.io/animated-groups/Grunbaum%20B.%2C%20Shephard%20G%20%281990%29%20Tilings%20and%20Patterns%20%28Color%20Patterns%29.pdf#page=4\" target=\"_blank\" rel=\"noopener\" data-words=\"“every symmetry of P is associated with a color symmetry”\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 404\">T&amp;P p. 404</a>). H is the group keeping one colour (<a class=\"book-ref-link source-value-link\" href=\"http://intel/animated-groups/Conway%20J.%2C%20Goodman-Strauss%20C.%20%282008%29%20The%20Symmetries%20of%20Things.pdf#page=174\" target=\"_blank\" rel=\"noopener\" data-words=\"“This group is called the stabilizer of that color.”\" data-src=\"Conway, Burgiel &amp; Goodman-Strauss, The Symmetries of Things, p. 155\" data-private=\"1\">SoT p. 155</a>), and the colours are its cosets gH."
+   ],
+   [
+    "Placement",
+    "If H is not normal it has conjugates, and each is a different colouring of the same copies. A motif in general position allows all [Γ : N(H)] of them; a motif on a centre allows only those containing its stabiliser. For p6[3]₂, T&amp;P print them in <a class=\"book-ref-link source-value-link\" href=\"https://yaroslavvb.github.io/animated-groups/Grunbaum%20B.%2C%20Shephard%20G%20%281990%29%20Tilings%20and%20Patterns%20%28Color%20Patterns%29.pdf#page=16\" target=\"_blank\" rel=\"noopener\" data-words=\"The card p6[3]₂, PP42[3]₂ of this figure is placement C below.\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 416\">Fig. 8.2.3</a> and <a class=\"book-ref-link source-value-link\" href=\"https://yaroslavvb.github.io/animated-groups/Grunbaum%20B.%2C%20Shephard%20G%20%281990%29%20Tilings%20and%20Patterns%20%28Color%20Patterns%29.pdf#page=20\" target=\"_blank\" rel=\"noopener\" data-words=\"“the patterns differ in the choice of motif that bears color 1”\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 420\">Fig. 8.2.4(b)</a>; the word is Vladimir Bulatov’s."
+   ],
+   [
+    "More",
+    "<a class=\"source-value-link\" href=\"https://spacesheep.dev/@yaroslavvb/patterns-orbits-cosets\" target=\"_blank\" rel=\"noopener\">A friendly tutorial: pattern, stabiliser, orbit, coset ↗</a>. Book references here: hover or tap for the words, click for the PDF at that page. Links into T&amp;P’s chapter 8 open for anyone; links to T&amp;P’s chapter 5 and to SoT open only on Yaroslav’s machines, so other readers get the words."
+   ]
+  ],
+  "explainerMore": [
+   [
+    "Seat",
+    "Where the motif sits among the rotation centres: general, 2-, 3- or 6-fold. It decides the stabiliser. This page’s word; crystallographers say Wyckoff position."
+   ],
+   [
+    "Pattern type",
+    "A classification, not a picture (<a class=\"book-ref-link source-value-link\" href=\"https://yaroslavvb.github.io/animated-groups/Grunbaum%20B.%2C%20Shephard%20G%20%281990%29%20Tilings%20and%20Patterns%20%28Color%20Patterns%29.pdf#page=21\" target=\"_blank\" rel=\"noopener\" data-words=\"“the same stabilizers of their colored motifs”\" data-src=\"Grünbaum &amp; Shephard, Tilings and Patterns, p. 421\">T&amp;P p. 421</a>): same colour group, same stabilisers of coloured motifs, same motif-transitive subgroups. One type can have several different-looking pictures."
+   ]
+  ],
+  "groups": {
+   "c1-p6-1": {
+    "overrides": {
+     "gs": "p6"
+    }
+   },
+   "c2-p6-1": {
+    "catalog": "632/333[2]",
+    "placements": 1
+   },
+   "c3-p6-1": {
+    "catalog": "632/2222[3]",
+    "url": "https://colorsym-catalog.mathornament.workers.dev/632/3/632-2222-3/",
+    "placements": 1,
+    "short": "³6³3¹2",
+    "sotNote": "The highlighted cell is printed ³6²3²2, which no colouring of 632 can have: a swap cubed is still a swap, and β³ = 1. p. 157 of the same book gives ³6³3¹2."
+   },
+   "c3-p6-2": {
+    "catalog": "632/632[3]",
+    "url": "https://colorsym-catalog.mathornament.workers.dev/632/3/632-632-3/",
+    "placements": 3,
+    "short": "²6³3²2",
+    "overrides": {},
+    "sotNote": "The highlighted cell is blank in this copy of the book. p. 157 gives (AB)6(ABC)3(AC)2 = ²6³3²2, type 632//333.",
+    "figure": {
+     "book": "tp",
+     "page": 420,
+     "text": "T&P Fig. 8.2.4(b)",
+     "words": "“the patterns differ in the choice of motif that bears color 1” Left panel: placement A below. Right panel: placement B below.",
+     "src": "Grünbaum & Shephard, Tilings and Patterns, Fig. 8.2.4, p. 420"
+    }
+   },
+   "c4-p6-1": {
+    "catalog": "632/632[4]",
+    "placements": 4
+   },
+   "c6-p6-1": {
+    "catalog": "632/o[6]",
+    "placements": 1
+   },
+   "c6-p6-2": {
+    "catalog": "632/2222[6]#1",
+    "placements": 3
+   },
+   "c6-p6-3": {
+    "catalog": "632/2222[6]#2",
+    "placements": 3,
+    "overrides": {
+     "action": "C₂×A₄",
+     "chaim_type": "632⁶/2222/◦"
+    }
+   },
+   "c6-p6-4": {
+    "catalog": "632/333[6]#1",
+    "placements": 1
+   },
+   "c6-p6-5": {
+    "catalog": "632/333[6]#2",
+    "placements": 2,
+    "overrides": {
+     "action": "C₃×S₃",
+     "chaim_type": "632⁶/333/◦"
+    }
+   }
+  },
+  "types": {
+   "pp42-3-2": {
+    "count": 3,
+    "classes": [
+     "A",
+     "B",
+     "C"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "focus": 0,
+      "label": "A",
+      "name": "A",
+      "head": "A, the plate above",
+      "text": "H contains the half-turn at the motif’s nearest 2-fold centre. Each colour is a net of facing pairs.",
+      "refs": "Catalog .2 · T&P Fig. 8.2.4(b) left"
+     },
+     {
+      "c": [
+       1,
+       2,
+       1,
+       2,
+       1,
+       2
+      ],
+      "focus": 1,
+      "label": "B",
+      "name": "B",
+      "head": "B",
+      "text": "H contains the sixth-turn at the motif’s nearest 6-fold centre. Each colour is a set of rings of six.",
+      "refs": "Catalog .1 · T&P Fig. 8.2.4(b) right"
+     },
+     {
+      "c": [
+       2,
+       1,
+       2,
+       1,
+       2,
+       1
+      ],
+      "focus": 2,
+      "label": "C",
+      "name": "C",
+      "head": "C",
+      "text": "H contains neither. Each colour is a set of three-armed stars.",
+      "refs": "Catalog .3 · T&P Fig. 8.2.3 p. 416"
+     }
+    ],
+    "orbit": {
+     "head": "Not on this page’s list: by H-orbits",
+     "text": "Colour each H-orbit instead. One net, one set of rings, one set of stars. Only H keeps each colour, so 632 does not permute them: not a perfect colouring.",
+     "refs": "Catalog .o"
+    },
+    "plateNote": "T&P draws placement C here; the plate on this page is placement A."
+   },
+   "pp42-4-o1": {
+    "count": 4,
+    "classes": [
+     "A",
+     "B",
+     "C",
+     "D"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ],
+      "focus": 0,
+      "label": "A"
+     },
+     {
+      "c": [
+       1,
+       3,
+       2,
+       1,
+       3,
+       2
+      ],
+      "focus": 1,
+      "label": "B"
+     },
+     {
+      "c": [
+       2,
+       1,
+       3,
+       2,
+       1,
+       3
+      ],
+      "focus": 2,
+      "label": "C"
+     },
+     {
+      "c": [
+       3,
+       2,
+       1,
+       3,
+       2,
+       1
+      ],
+      "focus": 3,
+      "label": "D"
+     }
+    ]
+   },
+   "pp42-6-o2": {
+    "count": 3,
+    "classes": [
+     "AB",
+     "CE",
+     "DF"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       2,
+       3,
+       0,
+       2,
+       3
+      ],
+      "focus": 0,
+      "label": "AB"
+     },
+     {
+      "c": [
+       2,
+       3,
+       0,
+       2,
+       3,
+       0
+      ],
+      "focus": 2,
+      "label": "CE"
+     },
+     {
+      "c": [
+       3,
+       0,
+       2,
+       3,
+       0,
+       2
+      ],
+      "focus": 3,
+      "label": "DF"
+     }
+    ]
+   },
+   "pp42-6-o3": {
+    "count": 3,
+    "classes": [
+     "AB",
+     "CE",
+     "DF"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       2,
+       5,
+       1,
+       4,
+       3
+      ],
+      "focus": 0,
+      "label": "AB"
+     },
+     {
+      "c": [
+       2,
+       5,
+       1,
+       4,
+       3,
+       0
+      ],
+      "focus": 2,
+      "label": "CE"
+     },
+     {
+      "c": [
+       3,
+       0,
+       2,
+       5,
+       1,
+       4
+      ],
+      "focus": 3,
+      "label": "DF"
+     }
+    ]
+   },
+   "pp43-6-o3": {
+    "count": 2,
+    "classes": [
+     "AB",
+     "CE"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       2,
+       5,
+       1,
+       4,
+       3
+      ],
+      "focus": 0,
+      "label": "AB"
+     },
+     {
+      "c": [
+       2,
+       5,
+       1,
+       4,
+       3,
+       0
+      ],
+      "focus": 2,
+      "label": "CE"
+     }
+    ],
+    "lead": "Two of the three conjugates of H contain this half-turn, so this motif allows two colourings. They are mirror images of each other."
+   },
+   "pp42-6-o5": {
+    "count": 2,
+    "classes": [
+     "ABD",
+     "CEF"
+    ],
+    "panels": [
+     {
+      "c": [
+       0,
+       2,
+       1,
+       5,
+       3,
+       4
+      ],
+      "focus": 0,
+      "label": "ABD"
+     },
+     {
+      "c": [
+       2,
+       1,
+       5,
+       3,
+       4,
+       0
+      ],
+      "focus": 2,
+      "label": "CEF"
+     }
+    ]
+   }
+  },
+  "seats": {
+   "pp43": {
+    "admissible": 1,
+    "conjugates": 1,
+    "fixes_all": true,
+    "perm": "1"
+   },
+   "pp44": {
+    "admissible": 1,
+    "conjugates": 1,
+    "fixes_all": true,
+    "perm": "1"
+   },
+   "pp45": {
+    "admissible": 1,
+    "conjugates": 1,
+    "fixes_all": true,
+    "perm": "1"
+   },
+   "pp44-2": {
+    "admissible": 1,
+    "conjugates": 1,
+    "fixes_all": true,
+    "perm": "1"
+   },
+   "pp43-3-1": {
+    "admissible": 1,
+    "conjugates": 1,
+    "fixes_all": true,
+    "perm": "1"
+   },
+   "pp43-3-2": {
+    "admissible": 1,
+    "conjugates": 3,
+    "fixes_all": false,
+    "perm": "(BC)"
+   },
+   "pp45-3-2": {
+    "admissible": 1,
+    "conjugates": 3,
+    "fixes_all": false,
+    "perm": "(BC)"
+   },
+   "pp44-4-o1": {
+    "admissible": 1,
+    "conjugates": 4,
+    "fixes_all": false,
+    "perm": "(BCD)"
+   },
+   "pp45-4-o1": {
+    "admissible": 1,
+    "conjugates": 4,
+    "fixes_all": false,
+    "perm": "(BDC)"
+   },
+   "pp43-6-o2": {
+    "admissible": 1,
+    "conjugates": 3,
+    "fixes_all": false,
+    "perm": "(CE)(DF)"
+   },
+   "pp43-6-o3": {
+    "admissible": 2,
+    "conjugates": 3,
+    "fixes_all": false,
+    "perm": "(DF)"
+   },
+   "pp44-6-o5": {
+    "admissible": 1,
+    "conjugates": 2,
+    "fixes_all": false,
+    "perm": "(CEF)"
+   }
+  },
+  "repo": "https://github.com/vbulatov2011/colorsym-catalog/blob/master/data/632.json",
+  "books": [
+   {
+    "key": "tp",
+    "first": 401,
+    "last": 470,
+    "offset": -400,
+    "url": "https://yaroslavvb.github.io/animated-groups/Grunbaum%20B.%2C%20Shephard%20G%20%281990%29%20Tilings%20and%20Patterns%20%28Color%20Patterns%29.pdf",
+    "title": "Grünbaum & Shephard, Tilings and Patterns"
+   },
+   {
+    "key": "tp",
+    "first": 1,
+    "last": 703,
+    "offset": 11,
+    "url": "http://intel/books/tilings-and-patterns.pdf",
+    "private": true,
+    "title": "Grünbaum & Shephard, Tilings and Patterns"
+   },
+   {
+    "key": "sot",
+    "first": 1,
+    "last": 423,
+    "offset": 19,
+    "url": "http://intel/animated-groups/Conway%20J.%2C%20Goodman-Strauss%20C.%20%282008%29%20The%20Symmetries%20of%20Things.pdf",
+    "private": true,
+    "title": "Conway, Burgiel & Goodman-Strauss, The Symmetries of Things"
+   }
+  ],
+  "sotPages": {
+   "c2-p6-1": 140,
+   "c3-p6-1": 156,
+   "c3-p6-2": 156
+  },
+  "plates": {
+   "pp42-2": 413,
+   "pp44-2": 430,
+   "pp42-3-1": 416,
+   "pp42-3-2": 416,
+   "pp43-3-1": 434,
+   "pp43-3-2": 434,
+   "pp45-3-2": 434
+  }
+ }
+}

@@ -270,3 +270,35 @@ body.tcp footer.site { color: var(--pattern-muted); }
    mirror look like a glide; it now has its own channel, these chips. */
 .gen-cycle-chip { stroke: rgba(255, 253, 247, 0.95); stroke-width: 1px; paint-order: stroke fill; }
 .gen-cycle-loop { fill: none; stroke: var(--pattern-wine); stroke-width: 1.1px; opacity: 0.75; }
+
+/* Family notes (family p6): new selectors only, nothing above changes */
+.family-note { margin: 1rem 0 0; padding: 0.7rem 0.9rem; border: 1px solid var(--pattern-rule); border-radius: 0.6rem; background: #fff; }
+.family-note summary { font-weight: 700; font-size: 0.95rem; cursor: pointer; }
+.family-note dl { margin: 0.6rem 0 0; display: grid; grid-template-columns: 7rem minmax(0, 1fr); gap: 0.35rem 0.8rem; font-size: 0.9rem; line-height: 1.45; }
+.family-note dt { font-weight: 700; color: var(--pattern-ink); }
+.family-note dd { margin: 0; color: #3f4a46; }
+.band-note { margin-top: 0.15rem; }
+.placement-strip { padding: 0 clamp(1rem, 2vw, 1.6rem) clamp(1rem, 2vw, 1.6rem); }
+.placement-strip h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.placement-lead { margin: 0 0 0.6rem; font-size: 0.86rem; color: #3f4a46; }
+.placement-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: 0.9rem; }
+.placement-panel { margin: 0; min-width: 0; }
+.placement-panel svg { display: block; width: 100%; height: auto; aspect-ratio: 12 / 7; border: 1px solid #cdd8d3; background: #f8f7f1; }
+.placement-panel figcaption { font-size: 0.8rem; line-height: 1.4; margin-top: 0.3rem; color: #3f4a46; }
+.family-note-more { margin-top: 0.5rem; }
+.family-note-more summary { font-size: 0.85rem; font-weight: 650; color: var(--pattern-muted); }
+.gen-glyph { display: inline-block; width: 0.85rem; height: 0.85rem; margin-right: 0.3rem; vertical-align: -0.1rem; fill: var(--pattern-wine); }
+.placement-refs { display: block; color: var(--pattern-muted); font-size: 0.74rem; margin-top: 0.15rem; }
+@media (max-width: 520px) { .family-note dl { grid-template-columns: 1fr; gap: 0.1rem; } .family-note dd { margin-bottom: 0.45rem; } }
+#family-p6 .pattern-data .sig { white-space: normal; overflow-wrap: anywhere; }
+#family-p6 .seat-cell { width: auto; }
+#family-p6 .presentation-permutation { white-space: normal; }
+#family-p6 .presentation-heading { flex-wrap: wrap; }
+#family-p6 .action-palette { flex-wrap: wrap; white-space: normal; }
+.family-note .book-ref-link, .family-note dd .source-value-link, .band-meta .book-ref-link { display: inline; font: inherit; font-weight: 600; }
+.book-pop { position: fixed; z-index: 60; width: min(30rem, calc(100vw - 24px)); max-height: calc(100vh - 16px); overflow: auto; padding: 0.65rem 0.8rem; background: #fff; border: 1px solid var(--pattern-rule); border-radius: 0.5rem; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2); color: var(--pattern-ink); }
+.book-pop[hidden] { display: none; }
+.book-pop img { display: block; max-width: 100%; max-height: 50vh; margin: 0 auto 0.45rem; }
+.book-pop-words { margin: 0; font-size: 0.9rem; line-height: 1.4; }
+.book-pop-src { margin: 0.3rem 0 0; font-size: 0.78rem; color: var(--pattern-muted); }
+.book-pop-src a { display: inline-block; padding: 0.35rem 0; }

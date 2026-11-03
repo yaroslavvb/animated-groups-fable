@@ -6,9 +6,10 @@
 (() => {
   "use strict";
 
-  const V = "2";
+  const V = "3";
   const DATA_URL = "data/patterns.json?v=" + V;
   const CROPS_URL = "data/crops.json?v=" + V;
+  const NOTES_URL = "data/patterns-notes.json?v=" + V;
   const SVG_NS = "http://www.w3.org/2000/svg";
   const PALETTE = ["#0072B2", "#E69F00", "#009E73", "#CC79A7", "#56B4E9", "#D55E00"];
   const GREY = "#9aa19e";
@@ -24,7 +25,10 @@
   const SUBD = {0: "₀", 1: "₁", 2: "₂", 3: "₃", 4: "₄", 5: "₅", 6: "₆", 7: "₇", 8: "₈", 9: "₉"};
 
   const state = {data: null, crops: {plates: [], sot: []}, byId: new Map(),
-                 groupById: new Map(), groupsByFamily: new Map()};
+                 groupById: new Map(), groupsByFamily: new Map(), notes: {}};
+  const noteOf = (hm) => state.notes[hm] || null;
+  const groupNote = (g) => { const n = noteOf(g.hm); return n && n.groups ? n.groups[g.id] || null : null; };
+  const labelOf = (hm, key, dflt) => { const n = noteOf(hm); return n && n.labels && n.labels[key] ? n.labels[key] : dflt; };
 
   // ------------------------------------------------------------ helpers
   const el = (tag, cls, text) => {
@@ -211,7 +215,7 @@
   function buildPlate(t, fam, opts = {}) {
     const scale = opts.scale || plateScale(t, fam);
     const w = opts.width || W, h = opts.height || H;
-    const pal = paletteOf(t.k);
+    const pal = opts.pal || paletteOf(t.k);
     const s = svg("svg", {viewBox: `0 0 ${w} ${h}`, role: "img", preserveAspectRatio: "xMidYMid meet"});
     const title = svg("title");
     title.textContent = `${t.label}: ${t.seat.label}`;
@@ -245,7 +249,7 @@
     const minLen = Math.min(Math.hypot(...b1), Math.hypot(...b2));
     const N = Math.ceil(Math.max(w, h) / (scale * minLen)) + 2;
     const placed = new Map();
-    for (const op of t.render.ops) {
+    for (const [opIndex, op] of t.render.ops.entries()) {
       const px = op.m[0] * seed[0] + op.m[1] * seed[1] + op.t[0];
       const py = op.m[2] * seed[0] + op.m[3] * seed[1] + op.t[1];
       const det = op.m[0] * op.m[3] - op.m[1] * op.m[2];
@@ -261,7 +265,7 @@
           const key = `${sx.toFixed(1)}:${sy.toFixed(1)}`;
           if (placed.has(key)) continue;   // same copy via the stabiliser
           placed.set(key, true);
-          const colour = colourAt(op.c, i, j);
+          const colour = opts.colourFn ? opts.colourFn(opIndex, i, j, colourAt) : colourAt(op.c, i, j);
           const use = svg("use", {href: `#m-${t.id}-${opts.tag || "p"}`,
             transform: `translate(${sx.toFixed(2)} ${sy.toFixed(2)}) rotate(${(-ang).toFixed(2)}) scale(1 ${det < 0 ? -1 : 1})`,
             fill: pal[colour], class: "motif"});
@@ -382,6 +386,8 @@
   // ------------------------------------------------------------ text bits
   function seatSentence(t) {
     const s = t.seat;
+    const note = noteOf(t.hm);
+    if (note) return seatSentenceNoted(t, s, note);
     if (s.kind === "interior") {
       return "The motif sits in general position — no symmetry fixes a copy, S(M) = 1, and the type is primitive: it is the colour group itself.";
     }
@@ -394,6 +400,147 @@
       return `Seated at the order-${s.order} corner of ${s.letters.join(" and ")}: S(M) ≅ d${s.order}, all of it colour-preserving on the marked copy.${alt}`;
     }
     return `Seated at the ${s.order}-fold centre of ${s.letters[0]}: S(M) = ⟨${s.letters[0]}⟩ ≅ c${s.order}, which fixes the marked copy and its colour.${alt}`;
+  }
+
+  // family notes: stabiliser language, no "fixes", no "the colour group itself"
+  function seatSentenceNoted(t, s, note) {
+    const sym = note.labels.seatSym;
+    if (s.kind === "interior") {
+      const tn = note.types[t.id];
+      const head = `General position: only the identity maps a copy onto itself, so ${sym} = 1 and the type is primitive (T&P p. 204).`;
+      if (t.k === 1) return head;
+      return tn ? `${head} Primitive does not mean one picture: this uncoloured pattern has ${tn.count} different colourings of this colour group, shown below.`
+                : `${head} This colour group gives one colouring of this uncoloured pattern.`;
+    }
+    const L = s.letters[0], c = note.seats[t.id];
+    const where = `On the ${s.order}-fold centre of ${L}: the stabiliser of the ringed copy is ⟨${L}⟩ ≅ c${s.order}. ` +
+      `${L} is in it only because this pane puts the motif on ${L}’s own centre; every other copy has its own turn, conjugate to ${L}. `;
+    const colour = c.fixes_all ? `That turn keeps every colour.`
+      : `That turn must keep the copy’s colour, called A here, and it moves others, ${spacedCycles(c.perm)}. `
+        + (c.admissible === c.conjugates ? "" : `${c.admissible === 1 ? "One" : c.admissible} of the ${c.conjugates} conjugates of H contain${c.admissible === 1 ? "s" : ""} it. `)
+        + `The letters can differ from another pane of this group: each pane names the motif’s colour A.`;
+    return where + colour;
+  }
+
+  function placementStrip(t, g, fam, tn) {
+    const sec = el("section", "placement-strip");
+    sec.append(el("h4", "", `Same copies, ${tn.count} colourings`));
+    sec.append(el("p", "placement-lead", tn.lead || `Same group, same colour permutation for every motion. Only the conjugate of H changes, which is the same as moving the motif to another of the ${t.k} copies of Γ’s domain inside H’s. One colour is drawn strong so its shape shows.`));
+    const grid = el("div", "placement-grid");
+    const grey = "#dfe3e0";
+    const palFocus = (i) => paletteOf(t.k).map((c, j) => j === i ? c : grey);
+    const scale = 96;
+    const pOpts = (tag, extra) => Object.assign({tag, noOverlay: true, scale, width: 480, height: 280, rmax: 16}, extra);
+    tn.panels.forEach((p, n) => {
+      const copy = Object.assign({}, t, {render: Object.assign({}, t.render,
+        {ops: t.render.ops.map((op, i) => Object.assign({}, op, {c: p.c[i]}))})});
+      const fig = el("figure", "placement-panel");
+      fig.append(buildPlate(copy, fam, pOpts(`pl${n}`, {pal: palFocus(p.focus)})));
+      const cap = el("figcaption");
+      cap.append(el("strong", "", p.head || `Colours ${p.label.split("").join(" ")}`));
+      if (p.text) cap.append(document.createTextNode(" " + p.text));
+      if (p.refs) cap.append(el("span", "placement-refs", p.refs));
+      fig.append(cap);
+      grid.append(fig);
+    });
+    if (tn.orbit) {
+      // colour = right coset of the motion: the colour of g^-1 in this pane's own table
+      const inv = (op) => (6 - op) % 6;
+      const fig = el("figure", "placement-panel");
+      fig.append(buildPlate(t, fam, pOpts("plo", {
+        colourFn: (k, i, j, at) => {
+          const base = at(0, -i, -j);                 // translation part inverted, acting on colour A
+          let c = base;
+          for (let n = 0; n < inv(k); n++) c = alphaPerm(t)[c];  // then the inverse rotation about the origin
+          return c;
+        }})));
+      const cap = el("figcaption");
+      cap.append(el("strong", "", tn.orbit.head), document.createTextNode(" " + tn.orbit.text), el("span", "placement-refs", tn.orbit.refs));
+      fig.append(cap);
+      grid.append(fig);
+    }
+    sec.append(grid);
+    return sec;
+  }
+  function alphaPerm(t) {
+    const letters = "ABCDEF", p = Array.from({length: t.k}, (_, i) => i);
+    (t.cycles["α"].match(/\(([A-F]+)\)/g) || []).forEach(c => {
+      const s = c.slice(1, -1);
+      for (let i = 0; i < s.length; i++) p[letters.indexOf(s[i])] = letters.indexOf(s[(i + 1) % s.length]);
+    });
+    return p;
+  }
+
+  // A book reference in a family with notes: hover or focus shows the words and any crop, a click opens the PDF at that page.
+  // A touch screen has no hover, so its first tap shows them and the popover carries the link (his ask, Mon 2 Nov 2026).
+  function bookRefLink(note, {book, page, words, crop, src}, content) {
+    const row = note.books.find(b => b.key === book && b.first <= page && page <= b.last);
+    const a = el("a", "book-ref-link source-value-link");
+    a.href = `${row.url}#page=${page + row.offset}`;
+    a.target = "_blank";
+    a.rel = "noopener";
+    if (words) a.dataset.words = words;
+    if (crop) a.dataset.crop = crop;
+    if (row.private) a.dataset.private = "1";
+    a.dataset.src = src || `${row.title}, p. ${page}`;
+    a.append(content, el("span", "source-link-mark", "↗"));
+    return a;
+  }
+
+  function bookPopover() {
+    const pop = el("div", "book-pop");
+    pop.hidden = true;
+    pop.setAttribute("role", "tooltip");
+    document.body.append(pop);
+    const hoverable = window.matchMedia("(hover: hover)").matches;
+    let cur = null, timer = 0;
+    const hideNow = () => { clearTimeout(timer); pop.hidden = true; cur = null; };
+    const hide = () => { clearTimeout(timer); timer = setTimeout(hideNow, 220); };
+    const place = (a) => {
+      const r = a.getClientRects()[0] || a.getBoundingClientRect();
+      const w = pop.offsetWidth, h = pop.offsetHeight;
+      pop.style.left = `${Math.max(12, Math.min(r.left, window.innerWidth - w - 12))}px`;
+      pop.style.top = `${r.bottom + 8 + h < window.innerHeight ? r.bottom + 8 : Math.max(8, r.top - h - 8)}px`;
+    };
+    const show = (a) => {
+      clearTimeout(timer);
+      if (cur !== a) {
+        cur = a;
+        pop.replaceChildren();
+        if (a.dataset.crop) {
+          const im = el("img");
+          im.alt = "";
+          im.onload = () => { if (cur === a) place(a); };
+          im.src = a.dataset.crop;
+          pop.append(im);
+        }
+        if (a.dataset.words) pop.append(el("p", "book-pop-words", a.dataset.words));
+        const line = el("p", "book-pop-src", `${a.dataset.src} · `);
+        const open = el("a", "", a.dataset.private ? "open the PDF (Yaroslav’s private copy)" : "open the PDF at this page");
+        open.href = a.href; open.target = "_blank"; open.rel = "noopener";
+        line.append(open);
+        pop.append(line);
+      }
+      pop.hidden = false;
+      place(a);
+    };
+    document.addEventListener("mouseover", (e) => {
+      const a = e.target.closest(".book-ref-link");
+      if (a && hoverable) show(a);
+      else if (pop.contains(e.target)) clearTimeout(timer);
+    });
+    document.addEventListener("mouseout", (e) => {
+      if (e.target.closest(".book-ref-link") || pop.contains(e.target)) hide();
+    });
+    document.addEventListener("focusin", (e) => { const a = e.target.closest(".book-ref-link"); if (a && hoverable) show(a); });
+    document.addEventListener("focusout", (e) => { if (e.target.closest(".book-ref-link")) hide(); });
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest(".book-ref-link");
+      if (a) { if (!hoverable && cur !== a) { e.preventDefault(); show(a); } return; }
+      if (cur && !pop.contains(e.target)) hideNow();
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideNow(); });
+    window.addEventListener("scroll", () => { if (cur && !pop.matches(":hover")) hideNow(); }, {passive: true});
   }
 
   function lightboxLink(href, caption, content) {
@@ -418,14 +565,36 @@
     };
     // Chaim short form (marked signature), with the SoT crop when it exists
     const sig = signatureNode(fam, t, t.seat, {big: true});
+    const gn = groupNote(g);
+    const sotNote = gn && gn.sotNote ? ". " + gn.sotNote : "";
+    const sigLabel = labelOf(fam.hm, "sig", "Chaim short form");
     if (state.crops.sot.includes(g.id)) {
-      row("Chaim short form", lightboxLink(`img/sot/${g.id}.webp`,
-        `${star(g.chaim_type)} — The Symmetries of Things, Table ${t.k === 2 ? "11.1" : "12.1"}`, sig));
+      const famNote = noteOf(fam.hm);
+      const link = famNote && famNote.sotPages && famNote.sotPages[g.id]
+        ? bookRefLink(famNote, {book: "sot", page: famNote.sotPages[g.id], crop: `img/sot/${g.id}.webp`, words: gn && gn.sotNote,
+            src: `${star(g.chaim_type)} — The Symmetries of Things, Table ${t.k === 2 ? "11.1" : "12.1"}, p. ${famNote.sotPages[g.id]}`}, sig)
+        : lightboxLink(`img/sot/${g.id}.webp`,
+          `${star(g.chaim_type)} — The Symmetries of Things, Table ${t.k === 2 ? "11.1" : "12.1"}${sotNote}`, sig);
+      if (gn && gn.short) {
+        const v = el("span");
+        v.append(link, el("span", "source-math-symbol", ` = ${gn.short}`));
+        row(sigLabel, v);
+      } else {
+        row(sigLabel, link);
+      }
     } else {
-      row("Chaim short form", sig);
+      row(sigLabel, sig);
     }
-    row("Chaim colour type", el("span", "source-math-symbol", star(g.chaim_type)
-      + (g.k > 1 ? `  ·  ${g.action}${g.normal ? "" : " (H not normal)"}` : "")));
+    const typeNode = el("span", "source-math-symbol", star(g.chaim_type)
+      + (g.k > 1 ? `  ·  ${g.action}${g.normal ? "" : " (H not normal)"}` : ""));
+    const typeExt = noteOf(fam.hm) && noteOf(fam.hm).typeExt;
+    if (typeExt && (g.k === 4 || g.k === 6)) {
+      const w = el("span");
+      w.append(typeNode, el("span", "syn-note", typeExt));
+      row(labelOf(fam.hm, "type", "Chaim colour type"), w);
+    } else {
+      row(labelOf(fam.hm, "type", "Chaim colour type"), typeNode);
+    }
     // G&S symbols
     const gsym = el("span");
     gsym.append(el("span", "source-math-symbol", star(groupSymbol(g))));
@@ -434,9 +603,15 @@
     const pt = el("span");
     if (state.crops.plates.includes(t.id)) {
       const fig = t.k === 2 ? (t.primitive ? "8.2.2" : "8.3.5") : (t.primitive ? "8.2.3" : "8.3.6");
-      pt.append(lightboxLink(`img/gs-plates/${t.id}.webp`,
-        `${t.label} — Grünbaum & Shephard, Tilings and Patterns, Fig. ${fig}`,
-        el("span", "source-math-symbol", t.label)));
+      const fn = noteOf(fam.hm);
+      const plateNote = fn && fn.types[t.id] && fn.types[t.id].plateNote;
+      pt.append(fn && fn.plates && fn.plates[t.id]
+        ? bookRefLink(fn, {book: "tp", page: fn.plates[t.id], crop: `img/gs-plates/${t.id}.webp`, words: plateNote,
+            src: `${t.label} — Grünbaum & Shephard, Tilings and Patterns, Fig. ${fig}, p. ${fn.plates[t.id]}`},
+            el("span", "source-math-symbol", t.label))
+        : lightboxLink(`img/gs-plates/${t.id}.webp`,
+          `${t.label} — Grünbaum & Shephard, Tilings and Patterns, Fig. ${fig}`,
+          el("span", "source-math-symbol", t.label)));
     } else {
       pt.append(el("span", "source-math-symbol", t.label));
       if (t.k === 3) pt.append(el("span", "beyond-note", " beyond the book — missing from Figs. 8.2.3/8.3.6"));
@@ -444,16 +619,28 @@
     }
     row("G&S pattern type", pt);
     const seat = el("span", "seat-text",
-      `${t.seat.kind === "interior" ? "general position" : t.seat.label} · S(M) ≅ ${t.seat.stype}` +
+      `${t.seat.kind === "interior" ? "general position" : t.seat.label} · ${labelOf(fam.hm, "seatSym", "S(M)")} ≅ ${t.seat.stype}` +
       (t.primitive ? " · primitive" : ""));
     row("Seat", seat);
     return table;
   }
 
+  // rotation centre symbol: lens 2, triangle 3, hexagon 6
+  function genGlyph(order) {
+    const s = svg("svg", {viewBox: "-10 -10 20 20", class: "gen-glyph", "aria-hidden": "true"});
+    if (order === 2) s.append(svg("path", {d: "M-8,0 Q0,-7 8,0 Q0,7 -8,0 Z"}));
+    else {
+      const pts = [];
+      for (let i = 0; i < order; i++) { const a = -Math.PI / 2 + 2 * Math.PI * i / order; pts.push(`${(8.5 * Math.cos(a)).toFixed(2)},${(8.5 * Math.sin(a)).toFixed(2)}`); }
+      s.append(svg("polygon", {points: pts.join(" ")}));
+    }
+    return s;
+  }
+
   function presentation(t, g, fam) {
     const sec = el("section", "group-presentation");
     const head = el("header", "presentation-heading");
-    head.append(el("h4", "", "Presentation"));
+    head.append(el("h4", "", labelOf(fam.hm, "pres", "Presentation")));
     const pal = el("div", "action-palette");
     pal.append(document.createTextNode("cycles over"));
     paletteOf(t.k).forEach((c, i) => {
@@ -469,6 +656,7 @@
       const tr = el("tr", "presentation-generator-row");
       const th = el("th"); th.scope = "row";
       th.append(el("span", "generator-key", gen.name), el("span", "generator-geometry", gen.geometry));
+      if (noteOf(fam.hm) && gen.order) th.prepend(genGlyph(gen.order));
       const td = el("td");
       const cyc = t.cycles[gen.name];
       if (isKernel(cyc)) {
@@ -480,14 +668,14 @@
         td.append(v);
       }
       const td2 = el("td", "seat-cell");
-      if (stabLetters.has(gen.name)) td2.append(el("span", "seat-flag", "● fixes the motif"));
+      if (stabLetters.has(gen.name)) td2.append(el("span", "seat-flag", labelOf(fam.hm, "flag", "● fixes the motif")));
       tr.append(th, td, td2);
       tb.append(tr);
     });
     table.append(tb);
     sec.append(table);
     const rel = el("p", "presentation-relations");
-    rel.append(el("strong", "", "Relations"), el("span", "", `Γ = ⟨${fam.generators.map(x => x.name).join(", ")} | ${fam.relations}⟩`));
+    rel.append(el("strong", "", "Relations"), el("span", "", `Γ = ⟨${fam.generators.map(x => x.name).join(", ")} | ${fam.relations}⟩${(noteOf(fam.hm) && noteOf(fam.hm).relationsNote) || ""}`));
     sec.append(rel);
     sec.append(el("p", "invariant-text", seatSentence(t)));
     return sec;
@@ -505,11 +693,15 @@
       el("span", "cap-swap", "dashed = glide, half arrow = its direction and half-cell length"), document.createTextNode(", "),
       el("span", "cap-fix", "red = fixes the marked motif"),
       document.createTextNode("; colour chips give the colour cycle; the ring marks the seat. Translations are not drawn."));
+    const famNote = noteOf(fam.hm);
+    if (famNote && famNote.caption) cap.replaceChildren(document.createTextNode(famNote.caption));
     fig.append(cap);
     const details = el("div", "pattern-details");
     details.append(dataTable(t, g, fam), presentation(t, g, fam));
     body.append(fig, details);
     pane.append(body);
+    const tn = famNote && famNote.types[t.id];
+    if (tn) pane.append(placementStrip(t, g, fam, tn));
     return pane;
   }
 
@@ -538,6 +730,32 @@
       document.createTextNode(` · ${groups.length} colour groups · ${ntypes} pattern types.`));
     head.append(h2, p);
     sec.append(head);
+    const fnote = noteOf(hm);
+    if (fnote && fnote.explainer) {
+      const box = el("details", "family-note");
+      box.open = true;
+      box.append(el("summary", "", "What a pattern, a stabiliser and a placement are"));
+      const dl = el("dl");
+      fnote.explainer.forEach(([term, html]) => {
+        const dd = el("dd");
+        dd.innerHTML = html;   // our own file, same repo
+        dl.append(el("dt", "", term), dd);
+      });
+      box.append(dl);
+      if (fnote.explainerMore) {
+        const more = el("details", "family-note-more");
+        more.append(el("summary", "", "Seat and pattern type"));
+        const dl2 = el("dl");
+        fnote.explainerMore.forEach(([term, html]) => {
+          const dd = el("dd");
+          dd.innerHTML = html;
+          dl2.append(el("dt", "", term), dd);
+        });
+        more.append(dl2);
+        box.append(more);
+      }
+      sec.append(box);
+    }
 
     const nav = el("nav", "colour-group-tabs");
     nav.setAttribute("role", "tablist");
@@ -601,11 +819,36 @@
     if (g.k > 1) meta.append(document.createTextNode(` · H = ${star(g.sub.orb)} (${g.sub.hm}) · action ${g.action}${g.normal ? "" : " · H not normal, kernel " + star(g.kernel_orb)}`));
     if (state.crops.sot.includes(g.id)) {
       meta.append(document.createTextNode(" · "));
-      meta.append(lightboxLink(`img/sot/${g.id}.webp`,
-        `${star(g.chaim_type)} — The Symmetries of Things, Table ${g.k === 2 ? "11.1" : "12.1"}`,
-        el("span", "", `Table ${g.k === 2 ? "11.1" : "12.1"} row`)));
+      const fn = noteOf(g.hm);
+      const label = el("span", "", `Table ${g.k === 2 ? "11.1" : "12.1"} row`);
+      const gn = groupNote(g);
+      meta.append(fn && fn.sotPages && fn.sotPages[g.id]
+        ? bookRefLink(fn, {book: "sot", page: fn.sotPages[g.id], crop: `img/sot/${g.id}.webp`, words: gn && gn.sotNote,
+            src: `${star(g.chaim_type)} — The Symmetries of Things, Table ${g.k === 2 ? "11.1" : "12.1"}, p. ${fn.sotPages[g.id]}`}, label)
+        : lightboxLink(`img/sot/${g.id}.webp`,
+          `${star(g.chaim_type)} — The Symmetries of Things, Table ${g.k === 2 ? "11.1" : "12.1"}`, label));
     }
-    bh.append(meta);
+    const gnote = groupNote(g);
+    if (gnote && gnote.catalog) {
+      const line = el("p", "band-meta band-note");
+      if (gnote.url) {
+        const a = el("a", "", `Vladimir Bulatov’s catalog ${gnote.catalog} ↗`);
+        a.href = gnote.url; a.target = "_blank"; a.rel = "noopener";
+        line.append(a);
+      } else {
+        const a = el("a", "", `Vladimir Bulatov’s catalog ${gnote.catalog}, no page yet ↗`);
+        a.href = noteOf(g.hm).repo; a.target = "_blank"; a.rel = "noopener";
+        line.append(a);
+      }
+      line.append(document.createTextNode(` · ${gnote.placements} placement${gnote.placements > 1 ? "s" : " (H is normal)"}`));
+      if (gnote.figure) {
+        line.append(document.createTextNode(" · "));
+        line.append(bookRefLink(noteOf(g.hm), gnote.figure, el("span", "", gnote.figure.text)));
+      }
+      bh.append(meta, line);
+    } else {
+      bh.append(meta);
+    }
     panel.append(bh);
     // pattern subtabs
     const ptabs = el("nav", "pattern-tabs");
@@ -733,10 +976,11 @@
   }
 
   async function main() {
-    const [res, cres] = await Promise.all([fetch(DATA_URL), fetch(CROPS_URL)]);
+    const [res, cres, nres] = await Promise.all([fetch(DATA_URL), fetch(CROPS_URL), fetch(NOTES_URL)]);
     if (!res.ok) throw new Error("data " + res.status);
     state.data = await res.json();
     if (cres.ok) state.crops = await cres.json();
+    if (nres.ok) { state.notes = await nres.json(); bookPopover(); }
     const typesByGroup = new Map();
     state.data.types.forEach(t => {
       state.byId.set(t.id, t);
@@ -749,6 +993,10 @@
       if (!state.groupsByFamily.has(g.hm)) state.groupsByFamily.set(g.hm, []);
       state.groupsByFamily.get(g.hm).push(g);
     });
+    // a family's notes may correct a group's printed fields in memory, leaving patterns.json alone
+    Object.values(state.notes).forEach(n => Object.entries(n.groups || {}).forEach(([id, o]) => {
+      if (o.overrides && state.groupById.has(id)) Object.assign(state.groupById.get(id), o.overrides);
+    }));
     const ordinal = (id) => parseInt(id.split("-").pop(), 10);
     state.groupsByFamily.forEach(list => list.sort((a, b) => (a.k - b.k) || (ordinal(a.id) - ordinal(b.id))));
     counts();
