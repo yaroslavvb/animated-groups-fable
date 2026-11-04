@@ -462,6 +462,311 @@ nav a[aria-current="page"] {
   line-height: 0;
 }
 
+.family-card.is-dimmed {
+  opacity: 0.36;
+}
+
+.family-card.has-filter-match {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+}
+
+.family-card-group-item.is-match {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.family-card-group-item.is-dimmed {
+  opacity: 0.35;
+}
+
+/* Filter toolbar and Hasse diagram section on the correspondence index. */
+.correspondence-filters {
+  max-width: 100%;
+  min-width: 0;
+  margin: 0 0 1.15rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgb(35 45 41 / 0.04);
+}
+
+.correspondence-filter-controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  align-items: end;
+  gap: 0.65rem 1rem;
+  min-width: 0;
+}
+
+.correspondence-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.correspondence-filter-label {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 680;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.correspondence-filter-field select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.correspondence-filter-field select:hover,
+.correspondence-filter-field select:focus-visible {
+  border-color: var(--accent);
+}
+
+.correspondence-filter-reset {
+  min-height: 2.25rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--control-line);
+  border-radius: 6px;
+  background: var(--background);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.correspondence-filter-reset:hover,
+.correspondence-filter-reset:focus-visible {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--background));
+}
+
+.correspondence-filter-reset[hidden] {
+  display: none;
+}
+
+.correspondence-filter-status {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.hasse-directory {
+  padding: clamp(2rem, 5vw, 3.2rem) 0 clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--line);
+}
+
+.hasse-directory h2 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.6rem);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hasse-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem 1.25rem;
+  margin: 0 0 0.65rem;
+  color: var(--text);
+  font-size: 0.78rem;
+}
+
+.hasse-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hasse-dot {
+  display: inline-block;
+  width: 0.72rem;
+  height: 0.72rem;
+  border-radius: 50%;
+}
+
+.hasse-dot--low {
+  background: #3175b5;
+}
+
+.hasse-dot--high {
+  background: #8553a2;
+}
+
+.hasse-dot--rolling {
+  background: #fbf7f9;
+  border: 1.5px dashed #74213f;
+}
+
+.hasse-scroll-hint {
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.hasse-diagram-wrap {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 2px 12px rgb(35 45 41 / 0.05);
+}
+
+.hasse-diagram-wrap svg {
+  display: block;
+  max-width: none;
+}
+
+.hasse-diagram-wrap .edge {
+  stroke: #a9b8c9;
+  stroke-width: 1.3;
+  fill: none;
+  transition: opacity 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.hasse-diagram-wrap .edge.is-match {
+  stroke: #286ba6;
+  stroke-width: 1.85;
+}
+
+.hasse-diagram-wrap .edge.is-dimmed {
+  opacity: 0.12;
+}
+
+.hasse-diagram-wrap .node rect {
+  fill: #edf5fc;
+  stroke: #92b9dc;
+  stroke-width: 1.1;
+  transition: fill 120ms ease, stroke 120ms ease, stroke-width 120ms ease;
+}
+
+.hasse-diagram-wrap .node.high rect {
+  fill: #f4eef9;
+  stroke: #bca5ce;
+}
+
+.hasse-diagram-wrap .node.is-rolling-only rect {
+  stroke: #8c4f6e;
+  stroke-dasharray: 3.5 1.8;
+}
+
+.hasse-diagram-wrap .node.is-match rect {
+  fill: #dff0fc;
+  stroke: #1d5f99;
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+.hasse-diagram-wrap .node.high.is-match rect {
+  fill: #eadff6;
+  stroke: #683a88;
+  stroke-width: 2;
+  stroke-dasharray: none;
+}
+
+.hasse-diagram-wrap .node.is-dimmed {
+  opacity: 0.2;
+}
+
+.hasse-diagram-wrap .node text {
+  fill: #173450;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  text-anchor: middle;
+}
+
+.hasse-diagram-wrap .node .chaim-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hasse-diagram-wrap .node .chaim-sup {
+  font-size: 8.2px;
+  font-weight: 700;
+}
+
+.hasse-diagram-wrap .node .number {
+  fill: #58697c;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 9.5px;
+  font-weight: 500;
+}
+
+.hasse-diagram-wrap .node:hover rect,
+.hasse-diagram-wrap .node:focus rect,
+.hasse-diagram-wrap .node.is-neighbor rect {
+  fill: #d4e9fa;
+  stroke: #2267a5;
+  stroke-width: 2.1;
+  stroke-dasharray: none;
+}
+
+.hasse-diagram-wrap .node:hover,
+.hasse-diagram-wrap .node:focus,
+.hasse-diagram-wrap .node.is-neighbor {
+  opacity: 1;
+  outline: none;
+}
+
+.hasse-diagram-wrap:has(.node:hover) .edge,
+.hasse-diagram-wrap:has(.node:focus) .edge {
+  opacity: 0.14;
+}
+
+.hasse-diagram-wrap:has(.node:hover) .edge.active,
+.hasse-diagram-wrap:has(.node:focus) .edge.active {
+  opacity: 1;
+  stroke: #1d5f99;
+  stroke-width: 2.2;
+}
+
+.hasse-empty-text {
+  fill: var(--muted);
+  font-size: 14px;
+}
+
+.hasse-status {
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.hasse-details {
+  max-width: 780px;
+  margin-top: 0.85rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.hasse-details summary {
+  color: var(--text);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.hasse-details p {
+  margin: 0.45rem 0 0;
+}
+
 /* The group pages: breadcrumb, the family's name as the page title, and a
    pager to the neighbouring groups in International Tables order. */
 .family-breadcrumb {

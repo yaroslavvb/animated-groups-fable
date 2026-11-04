@@ -61,6 +61,7 @@
       else if (hash.startsWith("wallpaper-") && families.includes(hash.slice(10))) location.replace(`correspondence-${hash.slice(10)}.html`);
     })();
   </script>
+  <script src="js/polar-inclusions.js?v=hasse-chaim-v1" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#correspondences">Skip to correspondences</a>
@@ -117,116 +118,193 @@
     <section class="directory" aria-labelledby="page-title">
       <h1 id="page-title">Clockwork/<wbr>colouring correspondence</h1>
       <p class="directory-viewer-note">Each group has three corresponding visualizations: a static 2D colouring, a clockwork animation, and an interactive crystal model in the associated polar space group.</p>
-      <p class="directory-viewer-note"><a href="polar-inclusions.html">Explore the polar group inclusion diagram →</a></p>
+      <p class="directory-viewer-note"><a href="#correspondences">Grouped by projected group (17)</a> · <a href="#hasse-diagram">Hasse diagram by inclusion (68)</a> · <a href="polar-inclusions.html">Standalone inclusion diagram →</a></p>
     </section>
 
     <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">
-      <h2 id="family-directory-title">The 17 wallpaper groups</h2>
-      <p class="family-directory-note">One page per wallpaper group, in the order of the <em>International Tables</em>. The badge counts the forward clockwork groups over the group, 68 in all, and the small line names their polar space groups.</p>
-      <nav class="family-grid" aria-label="Wallpaper groups">
-        <a class="family-card" href="correspondence-p1.html" aria-label="◦, p1: 1 forward group (P1)">
+      <h2 id="family-directory-title">Grouped by projected group</h2>
+      <p class="family-directory-note">One page per projected wallpaper group, in the order of the <em>International Tables</em>: forget the clock and keep every spatial operation. The badge counts the forward clockwork groups projecting to that wallpaper group, 68 in all, and the small line names their polar space groups.</p>
+      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 clockwork groups">
+        <div class="correspondence-filter-controls">
+          <label class="correspondence-filter-field">
+            <span class="correspondence-filter-label">Number of colors</span>
+            <select data-filter-colors>
+              <option value="all">All colors (68)</option>
+              <option value="1">1 color — static / monochrome (17)</option>
+              <option value="2">2 colors (36)</option>
+              <option value="3">3 colors (6)</option>
+              <option value="4">4 colors (6)</option>
+              <option value="6">6 colors (3)</option>
+            </select>
+          </label>
+          <label class="correspondence-filter-field">
+            <span class="correspondence-filter-label">Still-frame symmetry</span>
+            <select data-filter-rolling>
+              <option value="all">All 68 animations</option>
+              <option value="rolling-only">Frames lack projected symmetry — rolling only (K ≠ Γ, 45)</option>
+              <option value="pure-rolling">Frames have only translations — no point symmetry (K = ◦, 8)</option>
+              <option value="any-rolling">Any rolling / time-shifted symmetry (N &gt; 1, 51)</option>
+              <option value="frame-keeps">Frames already have projected symmetry type (K ≅ Γ, 23)</option>
+              <option value="static">Full symmetry in every still frame (N = 1, 17)</option>
+            </select>
+          </label>
+          <button class="correspondence-filter-reset" type="button" data-filter-reset hidden>Reset filters</button>
+        </div>
+        <p class="correspondence-filter-status" data-filter-status role="status" aria-live="polite">Showing all 68 groups across 17 projected wallpaper groups · 109 immediate inclusions.</p>
+      </div>
+      <nav class="family-grid" aria-label="Projected wallpaper groups">
+        <a class="family-card" href="correspondence-p1.html" data-family-hm="p1" data-total-count="1" aria-label="◦, p1: 1 forward group (P1)">
           <img src="img/mathworld/p1.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">◦</strong><span class="family-card-hm">p1</span></span>
           <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">P1</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g1">P1</span></span>
         </a>
-        <a class="family-card" href="correspondence-p2.html" aria-label="2222, p2: 3 forward groups (P2₁, C2, P2)">
+        <a class="family-card" href="correspondence-p2.html" data-family-hm="p2" data-total-count="3" aria-label="2222, p2: 3 forward groups (P2₁, C2, P2)">
           <img src="img/mathworld/p2.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">2222</strong><span class="family-card-hm">p2</span></span>
           <span class="family-card-count" aria-hidden="true" title="3 forward groups">3</span>
-          <span class="family-card-groups" aria-hidden="true">P2<sub>1</sub> · C2 · P2</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g6">P2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g7">C2</span> · <span class="family-card-group-item" data-group-id="g5">P2</span></span>
         </a>
-        <a class="family-card" href="correspondence-pm.html" aria-label="∗∗, pm: 1 forward group (Pm)">
+        <a class="family-card" href="correspondence-pm.html" data-family-hm="pm" data-total-count="1" aria-label="∗∗, pm: 1 forward group (Pm)">
           <img src="img/mathworld/pm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span><span class="orbifold-star">∗</span></strong><span class="family-card-hm">pm</span></span>
           <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">Pm</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g10">Pm</span></span>
         </a>
-        <a class="family-card" href="correspondence-pg.html" aria-label="××, pg: 1 forward group (Pc)">
+        <a class="family-card" href="correspondence-pg.html" data-family-hm="pg" data-total-count="1" aria-label="××, pg: 1 forward group (Pc)">
           <img src="img/mathworld/pg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">××</strong><span class="family-card-hm">pg</span></span>
           <span class="family-card-count" aria-hidden="true" title="1 forward group">1</span>
-          <span class="family-card-groups" aria-hidden="true">Pc</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g11">Pc</span></span>
         </a>
-        <a class="family-card" href="correspondence-cm.html" aria-label="∗×, cm: 2 forward groups (Cc, Cm)">
+        <a class="family-card" href="correspondence-cm.html" data-family-hm="cm" data-total-count="2" aria-label="∗×, cm: 2 forward groups (Cc, Cm)">
           <img src="img/mathworld/cm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>×</strong><span class="family-card-hm">cm</span></span>
           <span class="family-card-count" aria-hidden="true" title="2 forward groups">2</span>
-          <span class="family-card-groups" aria-hidden="true">Cc · Cm</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g9">Cc</span> · <span class="family-card-group-item" data-group-id="g8">Cm</span></span>
         </a>
-        <a class="family-card" href="correspondence-pmm.html" aria-label="∗2222, pmm: 6 forward groups (Pcc2, Aem2, Pmc2₁, Fmm2, Amm2, Pmm2)">
+        <a class="family-card" href="correspondence-pmm.html" data-family-hm="pmm" data-total-count="6" aria-label="∗2222, pmm: 6 forward groups (Pcc2, Aem2, Pmc2₁, Fmm2, Amm2, Pmm2)">
           <img src="img/mathworld/pmm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>2222</strong><span class="family-card-hm">pmm</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Pcc2 · Aem2 · Pmc2<sub>1</sub> · Fmm2 · Amm2 · Pmm2</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g55">Pcc2</span> · <span class="family-card-group-item" data-group-id="g65">Aem2</span> · <span class="family-card-group-item" data-group-id="g60">Pmc2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g74">Fmm2</span> · <span class="family-card-group-item" data-group-id="g64">Amm2</span> · <span class="family-card-group-item" data-group-id="g54">Pmm2</span></span>
         </a>
-        <a class="family-card" href="correspondence-pmg.html" aria-label="22∗, pmg: 6 forward groups (Pca2₁, Pmn2₁, Aea2, Pnc2, Ama2, Pma2)">
+        <a class="family-card" href="correspondence-pmg.html" data-family-hm="pmg" data-total-count="6" aria-label="22∗, pmg: 6 forward groups (Pca2₁, Pmn2₁, Aea2, Pnc2, Ama2, Pma2)">
           <img src="img/mathworld/pmg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">22<span class="orbifold-star">∗</span></strong><span class="family-card-hm">pmg</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Pca2<sub>1</sub> · Pmn2<sub>1</sub> · Aea2 · Pnc2 · Ama2 · Pma2</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g61">Pca2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g62">Pmn2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g67">Aea2</span> · <span class="family-card-group-item" data-group-id="g57">Pnc2</span> · <span class="family-card-group-item" data-group-id="g66">Ama2</span> · <span class="family-card-group-item" data-group-id="g56">Pma2</span></span>
         </a>
-        <a class="family-card" href="correspondence-pgg.html" aria-label="22×, pgg: 4 forward groups (Fdd2, Pna2₁, Pnn2, Pba2)">
+        <a class="family-card" href="correspondence-pgg.html" data-family-hm="pgg" data-total-count="4" aria-label="22×, pgg: 4 forward groups (Fdd2, Pna2₁, Pnn2, Pba2)">
           <img src="img/mathworld/pgg.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">22×</strong><span class="family-card-hm">pgg</span></span>
           <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">Fdd2 · Pna2<sub>1</sub> · Pnn2 · Pba2</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g75">Fdd2</span> · <span class="family-card-group-item" data-group-id="g63">Pna2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g59">Pnn2</span> · <span class="family-card-group-item" data-group-id="g58">Pba2</span></span>
         </a>
-        <a class="family-card" href="correspondence-cmm.html" aria-label="2∗22, cmm: 6 forward groups (Iba2, Ccc2, Cmc2₁, Imm2, Ima2, Cmm2)">
+        <a class="family-card" href="correspondence-cmm.html" data-family-hm="cmm" data-total-count="6" aria-label="2∗22, cmm: 6 forward groups (Iba2, Ccc2, Cmc2₁, Imm2, Ima2, Cmm2)">
           <img src="img/mathworld/cmm.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">2<span class="orbifold-star">∗</span>22</strong><span class="family-card-hm">cmm</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">Iba2 · Ccc2 · Cmc2<sub>1</sub> · Imm2 · Ima2 · Cmm2</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g72">Iba2</span> · <span class="family-card-group-item" data-group-id="g69">Ccc2</span> · <span class="family-card-group-item" data-group-id="g70">Cmc2<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g71">Imm2</span> · <span class="family-card-group-item" data-group-id="g73">Ima2</span> · <span class="family-card-group-item" data-group-id="g68">Cmm2</span></span>
         </a>
-        <a class="family-card" href="correspondence-p4.html" aria-label="442, p4: 6 forward groups (P4₁, P4₃, I4₁, P4₂, I4, P4)">
+        <a class="family-card" href="correspondence-p4.html" data-family-hm="p4" data-total-count="6" aria-label="442, p4: 6 forward groups (P4₁, P4₃, I4₁, P4₂, I4, P4)">
           <img src="img/mathworld/p4.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">442</strong><span class="family-card-hm">p4</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P4<sub>1</sub> · P4<sub>3</sub> · I4<sub>1</sub> · P4<sub>2</sub> · I4 · P4</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g96">P4<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g97">P4<sub>3</sub></span> · <span class="family-card-group-item" data-group-id="g99">I4<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g95">P4<sub>2</sub></span> · <span class="family-card-group-item" data-group-id="g98">I4</span> · <span class="family-card-group-item" data-group-id="g94">P4</span></span>
         </a>
-        <a class="family-card" href="correspondence-p4m.html" aria-label="∗442, p4m: 6 forward groups (P4cc, P4₂cm, I4cm, P4₂mc, I4mm, P4mm)">
+        <a class="family-card" href="correspondence-p4m.html" data-family-hm="p4m" data-total-count="6" aria-label="∗442, p4m: 6 forward groups (P4cc, P4₂cm, I4cm, P4₂mc, I4mm, P4mm)">
           <img src="img/mathworld/p4m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>442</strong><span class="family-card-hm">p4m</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P4cc · P4<sub>2</sub>cm · I4cm · P4<sub>2</sub>mc · I4mm · P4mm</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g131">P4cc</span> · <span class="family-card-group-item" data-group-id="g130">P4<sub>2</sub>cm</span> · <span class="family-card-group-item" data-group-id="g138">I4cm</span> · <span class="family-card-group-item" data-group-id="g129">P4<sub>2</sub>mc</span> · <span class="family-card-group-item" data-group-id="g136">I4mm</span> · <span class="family-card-group-item" data-group-id="g128">P4mm</span></span>
         </a>
-        <a class="family-card" href="correspondence-p4g.html" aria-label="4∗2, p4g: 6 forward groups (I4₁cd, P4₂bc, I4₁md, P4₂nm, P4nc, P4bm)">
+        <a class="family-card" href="correspondence-p4g.html" data-family-hm="p4g" data-total-count="6" aria-label="4∗2, p4g: 6 forward groups (I4₁cd, P4₂bc, I4₁md, P4₂nm, P4nc, P4bm)">
           <img src="img/mathworld/p4g.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">4<span class="orbifold-star">∗</span>2</strong><span class="family-card-hm">p4g</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">I4<sub>1</sub>cd · P4<sub>2</sub>bc · I4<sub>1</sub>md · P4<sub>2</sub>nm · P4nc · P4bm</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g139">I4<sub>1</sub>cd</span> · <span class="family-card-group-item" data-group-id="g133">P4<sub>2</sub>bc</span> · <span class="family-card-group-item" data-group-id="g137">I4<sub>1</sub>md</span> · <span class="family-card-group-item" data-group-id="g134">P4<sub>2</sub>nm</span> · <span class="family-card-group-item" data-group-id="g135">P4nc</span> · <span class="family-card-group-item" data-group-id="g132">P4bm</span></span>
         </a>
-        <a class="family-card" href="correspondence-p3.html" aria-label="333, p3: 4 forward groups (P3₂, P3₁, R3, P3)">
+        <a class="family-card" href="correspondence-p3.html" data-family-hm="p3" data-total-count="4" aria-label="333, p3: 4 forward groups (P3₂, P3₁, R3, P3)">
           <img src="img/mathworld/p3.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">333</strong><span class="family-card-hm">p3</span></span>
           <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">P3<sub>2</sub> · P3<sub>1</sub> · R3 · P3</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g225">P3<sub>2</sub></span> · <span class="family-card-group-item" data-group-id="g226">P3<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g227">R3</span> · <span class="family-card-group-item" data-group-id="g224">P3</span></span>
         </a>
-        <a class="family-card" href="correspondence-p3m1.html" aria-label="∗333, p3m1: 2 forward groups (P3c1, P3m1)">
+        <a class="family-card" href="correspondence-p3m1.html" data-family-hm="p3m1" data-total-count="2" aria-label="∗333, p3m1: 2 forward groups (P3c1, P3m1)">
           <img src="img/mathworld/p3m1.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>333</strong><span class="family-card-hm">p3m1</span></span>
           <span class="family-card-count" aria-hidden="true" title="2 forward groups">2</span>
-          <span class="family-card-groups" aria-hidden="true">P3c1 · P3m1</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g231">P3c1</span> · <span class="family-card-group-item" data-group-id="g230">P3m1</span></span>
         </a>
-        <a class="family-card" href="correspondence-p31m.html" aria-label="3∗3, p31m: 4 forward groups (R3c, R3m, P31c, P31m)">
+        <a class="family-card" href="correspondence-p31m.html" data-family-hm="p31m" data-total-count="4" aria-label="3∗3, p31m: 4 forward groups (R3c, R3m, P31c, P31m)">
           <img src="img/mathworld/p31m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">3<span class="orbifold-star">∗</span>3</strong><span class="family-card-hm">p31m</span></span>
           <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">R3c · R3m · P31c · P31m</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g235">R3c</span> · <span class="family-card-group-item" data-group-id="g234">R3m</span> · <span class="family-card-group-item" data-group-id="g233">P31c</span> · <span class="family-card-group-item" data-group-id="g232">P31m</span></span>
         </a>
-        <a class="family-card" href="correspondence-p6.html" aria-label="632, p6: 6 forward groups (P6₅, P6₁, P6₂, P6₄, P6₃, P6)">
+        <a class="family-card" href="correspondence-p6.html" data-family-hm="p6" data-total-count="6" aria-label="632, p6: 6 forward groups (P6₅, P6₁, P6₂, P6₄, P6₃, P6)">
           <img src="img/mathworld/p6.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold">632</strong><span class="family-card-hm">p6</span></span>
           <span class="family-card-count" aria-hidden="true" title="6 forward groups">6</span>
-          <span class="family-card-groups" aria-hidden="true">P6<sub>5</sub> · P6<sub>1</sub> · P6<sub>2</sub> · P6<sub>4</sub> · P6<sub>3</sub> · P6</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g247">P6<sub>5</sub></span> · <span class="family-card-group-item" data-group-id="g248">P6<sub>1</sub></span> · <span class="family-card-group-item" data-group-id="g244">P6<sub>2</sub></span> · <span class="family-card-group-item" data-group-id="g245">P6<sub>4</sub></span> · <span class="family-card-group-item" data-group-id="g246">P6<sub>3</sub></span> · <span class="family-card-group-item" data-group-id="g243">P6</span></span>
         </a>
-        <a class="family-card" href="correspondence-p6m.html" aria-label="∗632, p6m: 4 forward groups (P6cc, P6₃cm, P6₃mc, P6mm)">
+        <a class="family-card" href="correspondence-p6m.html" data-family-hm="p6m" data-total-count="4" aria-label="∗632, p6m: 4 forward groups (P6cc, P6₃cm, P6₃mc, P6mm)">
           <img src="img/mathworld/p6m.webp" width="320" height="240" loading="lazy" decoding="async" alt="">
           <span class="family-card-caption"><strong class="family-card-orbifold"><span class="orbifold-star">∗</span>632</strong><span class="family-card-hm">p6m</span></span>
           <span class="family-card-count" aria-hidden="true" title="4 forward groups">4</span>
-          <span class="family-card-groups" aria-hidden="true">P6cc · P6<sub>3</sub>cm · P6<sub>3</sub>mc · P6mm</span>
+          <span class="family-card-groups" aria-hidden="true"><span class="family-card-group-item" data-group-id="g270">P6cc</span> · <span class="family-card-group-item" data-group-id="g269">P6<sub>3</sub>cm</span> · <span class="family-card-group-item" data-group-id="g271">P6<sub>3</sub>mc</span> · <span class="family-card-group-item" data-group-id="g268">P6mm</span></span>
         </a>
       </nav>
+    </section>
+
+    <section class="hasse-directory" id="hasse-diagram" aria-labelledby="hasse-diagram-title">
+      <h2 id="hasse-diagram-title">Hasse diagram</h2>
+      <p class="family-directory-note">The 68 forward clockwork groups grouped by inclusion of their fixed coordinate representatives on a shared unit lattice, marked in the Chaim short-form notation of <em>The Symmetries of Things</em> (with the polar space group symbol below). Start with pure translations (<strong>◦</strong>, P1) at the top and follow an edge downward to a group with more symmetries. Select any group to open its colouring, clockwork film, and 3D crystal; hover or focus a node to highlight its immediate inclusions.</p>
+      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 clockwork groups">
+        <div class="correspondence-filter-controls">
+          <label class="correspondence-filter-field">
+            <span class="correspondence-filter-label">Number of colors</span>
+            <select data-filter-colors>
+              <option value="all">All colors (68)</option>
+              <option value="1">1 color — static / monochrome (17)</option>
+              <option value="2">2 colors (36)</option>
+              <option value="3">3 colors (6)</option>
+              <option value="4">4 colors (6)</option>
+              <option value="6">6 colors (3)</option>
+            </select>
+          </label>
+          <label class="correspondence-filter-field">
+            <span class="correspondence-filter-label">Still-frame symmetry</span>
+            <select data-filter-rolling>
+              <option value="all">All 68 animations</option>
+              <option value="rolling-only">Frames lack projected symmetry — rolling only (K ≠ Γ, 45)</option>
+              <option value="pure-rolling">Frames have only translations — no point symmetry (K = ◦, 8)</option>
+              <option value="any-rolling">Any rolling / time-shifted symmetry (N &gt; 1, 51)</option>
+              <option value="frame-keeps">Frames already have projected symmetry type (K ≅ Γ, 23)</option>
+              <option value="static">Full symmetry in every still frame (N = 1, 17)</option>
+            </select>
+          </label>
+        <label class="correspondence-filter-field">
+          <span class="correspondence-filter-label">Hasse diagram view</span>
+          <select data-filter-hasse-mode>
+            <option value="highlight">All 68 groups (highlight matches)</option>
+            <option value="induced">Matching only (induced sub-poset)</option>
+          </select>
+        </label>
+          <button class="correspondence-filter-reset" type="button" data-filter-reset hidden>Reset filters</button>
+        </div>
+        <p class="correspondence-filter-status" data-filter-status role="status" aria-live="polite">Showing all 68 groups across 17 projected wallpaper groups · 109 immediate inclusions.</p>
+      </div>
+      <div class="hasse-legend">
+        <span><i class="hasse-dot hasse-dot--low" aria-hidden="true"></i>Fewer symmetries</span>
+        <span><i class="hasse-dot hasse-dot--high" aria-hidden="true"></i>More symmetries</span>
+        <span><i class="hasse-dot hasse-dot--rolling" aria-hidden="true"></i>Rolling-only symmetry (K ≠ Γ)</span>
+        <small class="hasse-scroll-hint">On a narrow screen, scroll the diagram sideways.</small>
+      </div>
+      <div class="hasse-diagram-wrap diagram" role="region" aria-label="Scrollable Hasse inclusion diagram of the 68 clockwork groups" tabindex="0"><svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim short-form notation"></svg></div>
+      <p id="status" class="hasse-status" role="status" aria-live="polite">Loading Hasse diagram…</p>
+      <details class="hasse-details"><summary>How the Hasse diagram and still-frame symmetry selector work</summary><p>Each atlas record lists its operations as a planar matrix, planar displacement, and clock-axis shift τ. The Hasse diagram compares these fixed coordinate representatives modulo integer translations in all three directions: an edge connects an upper group to a lower group when every operation of the upper representative belongs to the lower one and no third displayed representative lies strictly between them.</p><p>In a single frozen frame (τ = 0), only the colour-fixing subgroup <i>K</i> = ker χ is visible; when the animation is rolling, forgetting the clock projects the group to the spatial wallpaper group Γ. In <strong>45</strong> of the 68 groups (<i>K</i> ≇ Γ), the projected wallpaper symmetry is absent from individual frames and only appears when the animation rolls — including <strong>8</strong> pure screw/glide groups (<i>K</i> = ◦) whose frozen frames have no point or mirror symmetry at all. In another <strong>6</strong> centred groups, each frame still has a copy of Γ on a coarser sublattice, while the remaining <strong>17</strong> one-colour groups have their full symmetry in every frame.</p></details>
     </section>
 
     <section class="family-notes" aria-label="Diagram symbols and notation">
