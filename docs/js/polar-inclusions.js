@@ -50,13 +50,12 @@
     });
     const showEdges = id => edgeElements.forEach(({a, b, line}) => line.classList.toggle('active', a === id || b === id));
     for (const g of ordered) {
-      const link = make('a', { href: `correspondence-${g.family}.html#${g.id}`, class: `node${g.level >= layers.length / 2 ? ' high' : ''}`, 'aria-label': `${g.hm.replaceAll('_', ' ')}: space group ${g.number}, open correspondence` });
-      const title = make('title'); title.textContent = `${g.hm.replaceAll('_', '')} · No. ${g.number}`;
+      const link = make('a', { href: `correspondence-${g.family}.html#${g.id}`, class: `node${g.level >= layers.length / 2 ? ' high' : ''}`, 'aria-label': `${g.symbol}, ${g.id}: open correspondence` });
+      const title = make('title'); title.textContent = `${g.symbol} · ${g.id}`;
       const rect = make('rect', { x: g.x - 48, y: g.y, width: 96, height: 37, rx: 8 });
       const label = make('text', { x: g.x, y: g.y + 15 });
-      // Subscript digits in the International Tables symbol.
-      label.textContent = g.hm.replace(/_(\d+)/g, (_, digits) => [...digits].map(d => '₀₁₂₃₄₅₆₇₈₉'[Number(d)]).join(''));
-      const number = make('text', { x: g.x, y: g.y + 29, class: 'number' }); number.textContent = `No. ${g.number}`;
+      label.textContent = g.symbol;
+      const number = make('text', { x: g.x, y: g.y + 29, class: 'number' }); number.textContent = g.id;
       link.append(title, rect, label, number); svg.append(link);
       link.addEventListener('mouseenter', () => showEdges(g.id));
       link.addEventListener('focus', () => showEdges(g.id));

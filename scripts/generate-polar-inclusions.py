@@ -13,5 +13,5 @@ sets = {g['id']: operations(g) for g in groups}
 assert len(sets) == 68 and all(len(s) for s in sets.values())
 assert len(set(sets.values())) == 68
 edges = [(a, b) for a in sets for b in sets if sets[a] < sets[b] and not any(sets[a] < sets[c] < sets[b] for c in sets)]
-result = {'groups': [{'id':g['id'], 'hm': crystals[g['id']]['hm_short'], 'number': crystals[g['id']]['it_number'], 'family':g['parent']['hm'], 'order':len(sets[g['id']])} for g in groups], 'edges': edges}
+result = {'groups': [{'id':g['id'], 'symbol': '◦' if g['id'] == 'g1' else g['symbol'], 'number': crystals[g['id']]['it_number'], 'family':g['parent']['hm'], 'order':len(sets[g['id']])} for g in groups], 'edges': edges}
 (D / 'data/polar-inclusions.json').write_text(json.dumps(result, indent=2) + '\n')
