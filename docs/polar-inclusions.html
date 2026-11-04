@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Polar group inclusions — Spacetime Groups</title>
+  <meta name="description" content="Explore inclusions among 68 polar space group representatives.">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { margin: 0; color: #17263a; background: #f6f8fb; font-family: system-ui, sans-serif; }
+    main { max-width: 1500px; margin: auto; padding: 24px clamp(16px, 3vw, 42px) 60px; }
+    .back { color: #315f9c; font-weight: 650; }
+    h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin: 24px 0 8px; }
+    .intro { max-width: 76ch; line-height: 1.55; }
+    .legend { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin: 22px 0 12px; font-size: .9rem; }
+    .legend span::before { content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #3175b5; margin-right: 7px; }
+    .legend .more::before { background: #8553a2; }
+    .diagram { overflow: auto; background: white; border: 1px solid #dce4ee; border-radius: 14px; box-shadow: 0 4px 18px #2537550c; }
+    .diagram svg { display: block; max-width: none; }
+    .edge { stroke: #a9b8c9; stroke-width: 1.3; fill: none; }
+    .node rect { fill: #edf5fc; stroke: #92b9dc; stroke-width: 1; }
+    .node.high rect { fill: #f4eef9; stroke: #bca5ce; }
+    .node text { fill: #173450; font-size: 12px; text-anchor: middle; font-weight: 650; }
+    .node .number { fill: #65788e; font-size: 10px; font-weight: 400; }
+    .node:hover rect, .node:focus rect { fill: #d4e9fa; stroke: #2267a5; stroke-width: 2; }
+    .node:focus { outline: none; }
+    .diagram:has(.node:hover) .edge, .diagram:has(.node:focus) .edge { opacity: .2; }
+    .diagram:has(.node:hover) .edge.active, .diagram:has(.node:focus) .edge.active { opacity: 1; stroke: #286ba6; stroke-width: 2; }
+    details { margin-top: 22px; max-width: 85ch; line-height: 1.55; }
+    summary { font-weight: 700; cursor: pointer; }
+    .note { color: #526579; font-size: .9rem; }
+  </style>
+  <script src="js/polar-inclusions.js" defer></script>
+</head>
+<body>
+<main>
+  <a class="back" href="correspondence.html">← Clockwork / colouring correspondence</a>
+  <h1>Polar group inclusions</h1>
+  <p class="intro">Start with translations at the top and follow a line down to a group with more symmetries. Select a group to open its colouring, clockwork and crystal. Hover or focus on a group to highlight its immediate connections.</p>
+  <p class="intro note"><strong>Scope:</strong> This diagram compares the atlas’s particular coordinate representatives on a shared unit translation lattice. It shows inclusions between those representatives, not every possible subgroup relationship between space-group types after changing the unit cell or origin. A line means no other displayed representative lies between the two.</p>
+  <div class="legend"><span>Fewer symmetries</span><span class="more">More symmetries</span><small>On a narrow screen, scroll the diagram sideways.</small></div>
+  <div class="diagram" role="region" aria-label="Scrollable polar group inclusion diagram" tabindex="0"><svg id="graph" aria-label="Inclusion diagram of 68 polar group representatives"></svg></div>
+  <p id="status" class="note" role="status">Loading diagram…</p>
+  <details><summary>How the diagram is constructed</summary><p>Each atlas record lists its operations as a planar matrix, planar displacement and clock-axis shift. We compare these operations modulo integer translations in all three directions. An inclusion is drawn when every operation in the upper representative is also in the lower one, and no third displayed representative lies strictly between them. The vertical arrangement follows these inclusions; horizontal position has no mathematical meaning.</p><p>Space groups also have subgroups with different translation lattices, origin choices and embeddings. Those are outside this fixed-setting diagram. For the broader crystallographic subgroup problem, see the <a href="https://www.cryst.ehu.eus/cryst/maxsub.html">Bilbao Crystallographic Server’s maximal-subgroup tool</a>.</p></details>
+</main>
+</body>
+</html>
