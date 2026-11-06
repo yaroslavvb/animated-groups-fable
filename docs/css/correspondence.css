@@ -617,9 +617,278 @@ nav a[aria-current="page"] {
   border: 1.5px dashed #74213f;
 }
 
+.hasse-dot--parent {
+  background: #d8f2e3;
+  border: 1.5px solid #1b7d4e;
+}
+
+.hasse-dot--child {
+  background: #fde8d7;
+  border: 1.5px solid #b85318;
+}
+
 .hasse-scroll-hint {
   color: var(--muted);
   font-size: 0.74rem;
+}
+
+.hasse-inspector {
+  margin: 0.7rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.hasse-inspector-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.65rem;
+}
+
+.hasse-inspector-kicker {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.hasse-inspector-section-label {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 650;
+  margin-right: 0.2rem;
+}
+
+.hasse-step-col {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.45rem;
+}
+
+.hasse-step-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.28rem 0.4rem;
+}
+
+.hasse-step-empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.hasse-diagram-wrap {
+  position: relative;
+}
+
+.hasse-floating-card {
+  position: absolute;
+  z-index: 6;
+  width: min(300px, calc(100vw - 48px));
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #9ab8d7;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.96);
+  box-shadow: 0 6px 18px rgb(20 40 65 / 0.14);
+  pointer-events: none;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #17263a;
+}
+
+.hasse-floating-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.hasse-floating-sig {
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.hasse-floating-tuple {
+  padding: 0.06rem 0.34rem;
+  border-radius: 4px;
+  background: #e6eff8;
+  color: #173b61;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.hasse-floating-cw {
+  color: #526579;
+  font-size: 0.7rem;
+}
+
+.hasse-floating-gens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.4rem;
+  margin-bottom: 0.28rem;
+}
+
+.hasse-floating-gen {
+  padding: 0.08rem 0.34rem;
+  border: 1px solid #d4e0ec;
+  border-radius: 4px;
+  background: #f5f9fc;
+  font-size: 0.7rem;
+}
+
+.hasse-floating-gen code {
+  color: #163d66;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 650;
+}
+
+.hasse-floating-steps {
+  padding-top: 0.22rem;
+  border-top: 1px solid #e6edf5;
+  font-size: 0.7rem;
+}
+
+.hasse-floating-steps--in .hasse-floating-step-label {
+  color: #145936;
+  font-weight: 650;
+}
+
+.hasse-floating-steps--out .hasse-floating-step-label {
+  color: #7d340b;
+  font-weight: 650;
+}
+
+.hasse-floating-step code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 650;
+}
+
+.hasse-inspector-hint {
+  margin: 0;
+  color: var(--muted);
+}
+
+.hasse-inspector-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.7rem;
+  margin-bottom: 0.45rem;
+}
+
+.hasse-inspector-chaim {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.hasse-inspector-cw {
+  padding: 0.08rem 0.38rem;
+  border-radius: 4px;
+  background: #eef3f8;
+  color: #36506b;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.hasse-inspector-gen-tuple {
+  padding: 0.1rem 0.42rem;
+  border-radius: 4px;
+  background: #e6eff8;
+  color: #173b61;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.hasse-inspector-meta {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.hasse-inspector-generators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.45rem;
+  margin-bottom: 0.45rem;
+}
+
+.hasse-gen-pill {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.3rem;
+  padding: 0.16rem 0.48rem;
+  border: 1px solid #cddae8;
+  border-radius: 5px;
+  background: #f6f9fc;
+  font-size: 0.74rem;
+}
+
+.hasse-gen-pill code {
+  color: #163d66;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 650;
+}
+
+.hasse-gen-desc {
+  color: #495d72;
+}
+
+.hasse-inspector-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.hasse-step-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.28rem 0.4rem;
+}
+
+.hasse-step-title {
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 650;
+  margin-right: 0.15rem;
+}
+
+.hasse-step-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25rem;
+  padding: 0.1rem 0.42rem;
+  border-radius: 4px;
+  font-size: 0.73rem;
+}
+
+.hasse-step-chip code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-weight: 650;
+}
+
+.hasse-step-chip--in {
+  border: 1px solid #9bd3b5;
+  background: #ebf9f0;
+  color: #145936;
+}
+
+.hasse-step-chip--out {
+  border: 1px solid #ebb894;
+  background: #fdf2ea;
+  color: #7d340b;
 }
 
 .hasse-diagram-wrap {
@@ -703,38 +972,99 @@ nav a[aria-current="page"] {
 }
 
 .hasse-diagram-wrap .node .number {
-  fill: #58697c;
+  fill: #4e6278;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
-  font-size: 9.5px;
+  font-size: 8.1px;
   font-weight: 500;
 }
 
 .hasse-diagram-wrap .node:hover rect,
 .hasse-diagram-wrap .node:focus rect,
-.hasse-diagram-wrap .node.is-neighbor rect {
-  fill: #d4e9fa;
-  stroke: #2267a5;
+.hasse-diagram-wrap .node.is-active rect {
+  fill: #cfe6fc;
+  stroke: #155799;
+  stroke-width: 2.3;
+  stroke-dasharray: none;
+}
+
+.hasse-diagram-wrap .node.is-parent rect {
+  fill: #dcf5e6;
+  stroke: #1b7d4e;
+  stroke-width: 2.1;
+  stroke-dasharray: none;
+}
+
+.hasse-diagram-wrap .node.is-child rect {
+  fill: #fde9d9;
+  stroke: #b85318;
   stroke-width: 2.1;
   stroke-dasharray: none;
 }
 
 .hasse-diagram-wrap .node:hover,
 .hasse-diagram-wrap .node:focus,
+.hasse-diagram-wrap .node.is-active,
 .hasse-diagram-wrap .node.is-neighbor {
   opacity: 1;
   outline: none;
 }
 
 .hasse-diagram-wrap:has(.node:hover) .edge,
-.hasse-diagram-wrap:has(.node:focus) .edge {
-  opacity: 0.14;
+.hasse-diagram-wrap:has(.node:focus) .edge,
+.hasse-diagram-wrap svg.has-active-node .edge {
+  opacity: 0.12;
 }
 
-.hasse-diagram-wrap:has(.node:hover) .edge.active,
-.hasse-diagram-wrap:has(.node:focus) .edge.active {
+.hasse-diagram-wrap:has(.node:hover) .edge.is-incoming,
+.hasse-diagram-wrap:has(.node:focus) .edge.is-incoming,
+.hasse-diagram-wrap svg.has-active-node .edge.is-incoming {
   opacity: 1;
+  stroke: #1b7d4e;
+  stroke-width: 2.3;
+}
+
+.hasse-diagram-wrap:has(.node:hover) .edge.is-outgoing,
+.hasse-diagram-wrap:has(.node:focus) .edge.is-outgoing,
+.hasse-diagram-wrap svg.has-active-node .edge.is-outgoing {
+  opacity: 1;
+  stroke: #b85318;
+  stroke-width: 2.3;
+}
+
+.hasse-diagram-wrap .edge-badge {
+  pointer-events: none;
+}
+
+.hasse-diagram-wrap .edge-badge rect {
+  fill: #ffffff;
   stroke: #1d5f99;
-  stroke-width: 2.2;
+  stroke-width: 1.2;
+}
+
+.hasse-diagram-wrap .edge-badge--incoming rect {
+  fill: #effbf4;
+  stroke: #1b7d4e;
+}
+
+.hasse-diagram-wrap .edge-badge--outgoing rect {
+  fill: #fff5ed;
+  stroke: #b85318;
+}
+
+.hasse-diagram-wrap .edge-badge text {
+  fill: #173450;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.hasse-diagram-wrap .edge-badge--incoming text {
+  fill: #135835;
+}
+
+.hasse-diagram-wrap .edge-badge--outgoing text {
+  fill: #80350a;
 }
 
 .hasse-empty-text {

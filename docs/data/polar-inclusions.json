@@ -4,885 +4,2333 @@
       "id": "g1",
       "chaim": "◦",
       "symbol": "◦",
-      "hm": "P1",
-      "number": 1,
+      "page": "correspondence-p1.html",
       "family": "p1",
       "projected_orbifold": "◦",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 1
+      "order": 1,
+      "generators_label": "⟨T⟩",
+      "generators_short": "⟨T⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        }
+      ]
     },
     {
       "id": "g5",
       "chaim": "2222",
       "symbol": "2222",
-      "hm": "P2",
-      "number": 3,
+      "page": "correspondence-p2.html",
       "family": "p2",
       "projected_orbifold": "2222",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 2
+      "order": 2,
+      "generators_label": "⟨T, R₂⟩",
+      "generators_short": "⟨T, R₂⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g6",
       "chaim": "²2²2²2²2",
       "symbol": "2₁2₁2₁2₁",
-      "hm": "P2₁",
-      "number": 4,
+      "page": "correspondence-p2.html",
       "family": "p2",
       "projected_orbifold": "2222",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 2,
-      "order": 2
+      "order": 2,
+      "generators_label": "⟨T, R₂^(+½)⟩",
+      "generators_short": "⟨T, R₂½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
     },
     {
       "id": "g7",
       "chaim": "¹2¹2²2²2",
       "symbol": "c222₁2₁",
-      "hm": "C2",
-      "number": 5,
+      "page": "correspondence-p2.html",
       "family": "p2",
       "projected_orbifold": "2222",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, t(0,½)^(+½)⟩",
+      "generators_short": "⟨T, R₂, tᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g8",
       "chaim": "∗×",
       "symbol": "∗×",
-      "hm": "Cm",
-      "number": 8,
+      "page": "correspondence-cm.html",
       "family": "cm",
       "projected_orbifold": "∗×",
-      "kernel_hm": "cm",
       "kernel_orbifold": "∗×",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 2
+      "order": 2,
+      "generators_label": "⟨T, ∗_d⟩",
+      "generators_short": "⟨T, ∗d⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
     },
     {
       "id": "g9",
       "chaim": "∗²×²",
       "symbol": "~∗×½",
-      "hm": "Cc",
-      "number": 9,
+      "page": "correspondence-cm.html",
       "family": "cm",
       "projected_orbifold": "∗×",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 2,
-      "order": 2
+      "order": 2,
+      "generators_label": "⟨T, ∗_d^(+½)⟩",
+      "generators_short": "⟨T, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g10",
       "chaim": "∗∗",
       "symbol": "∗∗",
-      "hm": "Pm",
-      "number": 6,
+      "page": "correspondence-pm.html",
       "family": "pm",
       "projected_orbifold": "∗∗",
-      "kernel_hm": "pm",
       "kernel_orbifold": "∗∗",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 2,
+      "generators_label": "⟨T, ∗ₓ⟩",
+      "generators_short": "⟨T, ∗ₓ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g11",
       "chaim": "××",
       "symbol": "××",
-      "hm": "Pc",
-      "number": 7,
+      "page": "correspondence-pg.html",
       "family": "pg",
       "projected_orbifold": "××",
-      "kernel_hm": "pg",
       "kernel_orbifold": "××",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 2,
+      "generators_label": "⟨T, ×ᵧ⟩",
+      "generators_short": "⟨T, ×ᵧ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
     },
     {
       "id": "g54",
       "chaim": "∗2222",
       "symbol": "∗2222",
-      "hm": "Pmm2",
-      "number": 25,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "pmm",
       "kernel_orbifold": "∗2222",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ∗ₓ⟩",
+      "generators_short": "⟨T, R₂, ∗ₓ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g55",
       "chaim": "∗²2²2²2²2",
       "symbol": "∗~2~2~2~2",
-      "hm": "Pcc2",
-      "number": 27,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ∗ₓ^(+½)⟩",
+      "generators_short": "⟨T, R₂, ∗ₓ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
     },
     {
       "id": "g56",
       "chaim": "22∗",
       "symbol": "22∗",
-      "hm": "Pma2",
-      "number": 28,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "pmg",
       "kernel_orbifold": "22∗",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ×ᵧ⟩",
+      "generators_short": "⟨T, R₂, ×ᵧ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
     },
     {
       "id": "g57",
       "chaim": "¹2¹2∗²",
       "symbol": "22~∗",
-      "hm": "Pnc2",
-      "number": 30,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ×ᵧ^(+½)⟩",
+      "generators_short": "⟨T, R₂, ×ᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g58",
       "chaim": "22×",
       "symbol": "22×",
-      "hm": "Pba2",
-      "number": 32,
+      "page": "correspondence-pgg.html",
       "family": "pgg",
       "projected_orbifold": "22×",
-      "kernel_hm": "pgg",
       "kernel_orbifold": "22×",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ×ₓ′⟩",
+      "generators_short": "⟨T, R₂, ×ₓ′⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
     },
     {
       "id": "g59",
       "chaim": "¹2¹2×²",
       "symbol": "22×½",
-      "hm": "Pnn2",
-      "number": 34,
+      "page": "correspondence-pgg.html",
       "family": "pgg",
       "projected_orbifold": "22×",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂, ×ₓ′^(+½)⟩",
+      "generators_short": "⟨T, R₂, ×ₓ′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g60",
       "chaim": "∗¹2²2¹2²2",
       "symbol": "∗2₁~2₁2₁~2₁",
-      "hm": "Pmc2₁",
-      "number": 26,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "pm",
       "kernel_orbifold": "∗∗",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂^(+½), ∗ₓ⟩",
+      "generators_short": "⟨T, R₂½, ∗ₓ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g61",
       "chaim": "²2²2∗²",
       "symbol": "2₁2₁~∗",
-      "hm": "Pca2₁",
-      "number": 29,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "pg",
       "kernel_orbifold": "××",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂^(+½), ×ᵧ⟩",
+      "generators_short": "⟨T, R₂½, ×ᵧ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
     },
     {
       "id": "g62",
       "chaim": "²2²2∗¹",
       "symbol": "2₁2₁∗",
-      "hm": "Pmn2₁",
-      "number": 31,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "pm",
       "kernel_orbifold": "∗∗",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂^(+½), ×ᵧ^(+½)⟩",
+      "generators_short": "⟨T, R₂½, ×ᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g63",
       "chaim": "²2²2×¹",
       "symbol": "2₁2₁×",
-      "hm": "Pna2₁",
-      "number": 33,
+      "page": "correspondence-pgg.html",
       "family": "pgg",
       "projected_orbifold": "22×",
-      "kernel_hm": "pg",
       "kernel_orbifold": "××",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₂^(+½), ×ₓ′^(+½)⟩",
+      "generators_short": "⟨T, R₂½, ×ₓ′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g64",
       "chaim": "∗¹2¹2¹2²2",
       "symbol": "c∗222₁2₁ᵃ",
-      "hm": "Amm2",
-      "number": 38,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "pmm",
       "kernel_orbifold": "∗2222",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, ∗ₓ, t(0,½)^(+½)⟩",
+      "generators_short": "⟨T,R₂,∗ₓ,tᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g65",
       "chaim": "∗¹2²2²2²2",
       "symbol": "c∗222₁2₁ᵇ",
-      "hm": "Aem2",
-      "number": 39,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "pmg",
       "kernel_orbifold": "22∗",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, ∗ₓ^(+½), t(0,½)^(+½)⟩",
+      "generators_short": "⟨T,R₂,∗ₓ½,tᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g66",
       "chaim": "¹2²2∗¹",
       "symbol": "c22₁∗ᵃ",
-      "hm": "Ama2",
-      "number": 40,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "pmg",
       "kernel_orbifold": "22∗",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, t(0,½)^(+½), ×ₓ′^(+½)⟩",
+      "generators_short": "⟨T,R₂,tᵧ½,×ₓ′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g67",
       "chaim": "¹2²2∗²",
       "symbol": "c22₁∗ᵇ",
-      "hm": "Aea2",
-      "number": 41,
+      "page": "correspondence-pmg.html",
       "family": "pmg",
       "projected_orbifold": "22∗",
-      "kernel_hm": "pgg",
       "kernel_orbifold": "22×",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, t(0,½)^(+½), ×ₓ′⟩",
+      "generators_short": "⟨T,R₂,tᵧ½,×ₓ′⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
     },
     {
       "id": "g68",
       "chaim": "2∗22",
       "symbol": "2∗22",
-      "hm": "Cmm2",
-      "number": 35,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "cmm",
       "kernel_orbifold": "2∗22",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 8
+      "order": 4,
+      "generators_label": "⟨T, R₂, ∗_d⟩",
+      "generators_short": "⟨T, R₂, ∗d⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
     },
     {
       "id": "g69",
       "chaim": "¹2∗²2²2",
       "symbol": "2∗~2~2",
-      "hm": "Ccc2",
-      "number": 37,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 4,
+      "generators_label": "⟨T, R₂, ∗_d^(+½)⟩",
+      "generators_short": "⟨T, R₂, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g70",
       "chaim": "²2∗¹2²2",
       "symbol": "2₁∗2₁~2₁",
-      "hm": "Cmc2₁",
-      "number": 36,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "cm",
       "kernel_orbifold": "∗×",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 4,
+      "generators_label": "⟨T, R₂^(+½), ∗_d^(+½)⟩",
+      "generators_short": "⟨T, R₂½, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g71",
       "chaim": "²2∗¹2¹2",
       "symbol": "c2₁∗22ᵃ",
-      "hm": "Imm2",
-      "number": 44,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "pmm",
       "kernel_orbifold": "∗2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, ∗ₓ, t(½,½)^(+½)⟩",
+      "generators_short": "⟨T,R₂,∗ₓ,c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g72",
       "chaim": "²2∗²2²2",
       "symbol": "c2₁∗22ᵇ",
-      "hm": "Iba2",
-      "number": 45,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "pgg",
       "kernel_orbifold": "22×",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, ∗ₓ^(+½), t(½,½)^(+½)⟩",
+      "generators_short": "⟨T,R₂,∗ₓ½,c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g73",
       "chaim": "¹2∗¹2²2",
       "symbol": "c2∗2₁2₁",
-      "hm": "Ima2",
-      "number": 46,
+      "page": "correspondence-cmm.html",
       "family": "cmm",
       "projected_orbifold": "2∗22",
-      "kernel_hm": "pmg",
       "kernel_orbifold": "22∗",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₂, t(½,½)^(+½), ×ᵧ⟩",
+      "generators_short": "⟨T,R₂,c½,×ᵧ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
     },
     {
       "id": "g74",
       "chaim": "∗¹2¹2²2²2",
       "symbol": "c∗22₁22₁",
-      "hm": "Fmm2",
-      "number": 42,
+      "page": "correspondence-pmm.html",
       "family": "pmm",
       "projected_orbifold": "∗2222",
-      "kernel_hm": "cmm",
       "kernel_orbifold": "2∗22",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₂, ∗ₓ, t(0,½)^(+½), t(½,0)^(+½)⟩",
+      "generators_short": "⟨T,R₂,∗ₓ,tᵧ½,tₓ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
     },
     {
       "id": "g75",
       "chaim": "¹2²2×⁴",
       "symbol": "c22₁×¼",
-      "hm": "Fdd2",
-      "number": 43,
+      "page": "correspondence-pgg.html",
       "family": "pgg",
       "projected_orbifold": "22×",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 4,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₂, ×ₓ(¼,¼)^(+¼)⟩",
+      "generators_short": "⟨T, R₂, ×ₓ′¼⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ(¼,¼)^(+¼)",
+          "short": "×ₓ′¼",
+          "description": "offset horizontal glide + ¼ period",
+          "formula": "(x+¼, -y+¼, t+¼)"
+        }
+      ]
     },
     {
       "id": "g94",
       "chaim": "442",
       "symbol": "442",
-      "hm": "P4",
-      "number": 75,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p4",
       "kernel_orbifold": "442",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₄⟩",
+      "generators_short": "⟨T, R₄⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
     },
     {
       "id": "g95",
       "chaim": "²4²4¹2",
       "symbol": "4₂4₂2",
-      "hm": "P4₂",
-      "number": 77,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₄^(+½)⟩",
+      "generators_short": "⟨T, R₄½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g96",
       "chaim": "⁴4⁴4²2",
       "symbol": "4₁4₁2₁",
-      "hm": "P4₁",
-      "number": 76,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 4,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₄^(+¼)⟩",
+      "generators_short": "⟨T, R₄¼⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+¼)",
+          "short": "R₄¼",
+          "description": "90° quarter-turn + ¼ period",
+          "formula": "(-y, x, t+¼)"
+        }
+      ]
     },
     {
       "id": "g97",
       "chaim": "⁴4⁴4²2",
       "symbol": "4₃4₃2₁",
-      "hm": "P4₃",
-      "number": 78,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 4,
-      "order": 4
+      "order": 4,
+      "generators_label": "⟨T, R₄^(+¾)⟩",
+      "generators_short": "⟨T, R₄¾⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
     },
     {
       "id": "g98",
       "chaim": "¹4²4²2",
       "symbol": "c44₂2₁",
-      "hm": "I4",
-      "number": 79,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p4",
       "kernel_orbifold": "442",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄, t(½,½)^(+½)⟩",
+      "generators_short": "⟨T, R₄, c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g99",
       "chaim": "⁴4⁴4¹2",
       "symbol": "c4₁4₃2",
-      "hm": "I4₁",
-      "number": 80,
+      "page": "correspondence-p4.html",
       "family": "p4",
       "projected_orbifold": "442",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 4,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄^(+¾), t(½,½)^(+½)⟩",
+      "generators_short": "⟨T, R₄¾, c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g128",
       "chaim": "∗442",
       "symbol": "∗442",
-      "hm": "P4mm",
-      "number": 99,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "p4m",
       "kernel_orbifold": "∗442",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄, ∗ₓ⟩",
+      "generators_short": "⟨T, R₄, ∗ₓ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g129",
       "chaim": "∗¹4²4¹2",
       "symbol": "∗4₂~4₂2",
-      "hm": "P4₂mc",
-      "number": 105,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "pmm",
       "kernel_orbifold": "∗2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄^(+½), ∗ₓ⟩",
+      "generators_short": "⟨T, R₄½, ∗ₓ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
     },
     {
       "id": "g130",
       "chaim": "∗²4¹4²2",
       "symbol": "∗~4₂4₂~2",
-      "hm": "P4₂cm",
-      "number": 101,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "cmm",
       "kernel_orbifold": "2∗22",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄^(+½), ∗ₓ^(+½)⟩",
+      "generators_short": "⟨T, R₄½, ∗ₓ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
     },
     {
       "id": "g131",
       "chaim": "∗²4²4²2",
       "symbol": "∗~4~4~2",
-      "hm": "P4cc",
-      "number": 103,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "p4",
       "kernel_orbifold": "442",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄, ∗ₓ^(+½)⟩",
+      "generators_short": "⟨T, R₄, ∗ₓ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
     },
     {
       "id": "g132",
       "chaim": "4∗2",
       "symbol": "4∗2",
-      "hm": "P4bm",
-      "number": 100,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "p4g",
       "kernel_orbifold": "4∗2",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄, ×ₓ′⟩",
+      "generators_short": "⟨T, R₄, ×ₓ′⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
     },
     {
       "id": "g133",
       "chaim": "²4∗²2",
       "symbol": "4₂∗~2",
-      "hm": "P4₂bc",
-      "number": 106,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "pgg",
       "kernel_orbifold": "22×",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄^(+½), ×ₓ′⟩",
+      "generators_short": "⟨T, R₄½, ×ₓ′⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
     },
     {
       "id": "g134",
       "chaim": "²4∗¹2",
       "symbol": "4₂∗2",
-      "hm": "P4₂nm",
-      "number": 102,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "cmm",
       "kernel_orbifold": "2∗22",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄^(+½), ×ₓ′^(+½)⟩",
+      "generators_short": "⟨T, R₄½, ×ₓ′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g135",
       "chaim": "¹4∗²2",
       "symbol": "4∗~2",
-      "hm": "P4nc",
-      "number": 104,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "p4",
       "kernel_orbifold": "442",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 8
+      "order": 8,
+      "generators_label": "⟨T, R₄, ×ₓ′^(+½)⟩",
+      "generators_short": "⟨T, R₄, ×ₓ′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g136",
       "chaim": "∗¹4¹4²2",
       "symbol": "c∗44₂2₁ᵃ",
-      "hm": "I4mm",
-      "number": 107,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "p4m",
       "kernel_orbifold": "∗442",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₄, ∗ₓ, t(½,½)^(+½)⟩",
+      "generators_short": "⟨T,R₄,∗ₓ,c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g137",
       "chaim": "⁴4∗¹2",
       "symbol": "c4₃∗2",
-      "hm": "I4₁md",
-      "number": 109,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "pmm",
       "kernel_orbifold": "∗2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 4,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₄^(+¾), ×ᵧ^(+½)⟩",
+      "generators_short": "⟨T, R₄¾, ×ᵧ½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g138",
       "chaim": "∗¹4²4²2",
       "symbol": "c∗44₂2₁ᵇ",
-      "hm": "I4cm",
-      "number": 108,
+      "page": "correspondence-p4m.html",
       "family": "p4m",
       "projected_orbifold": "∗442",
-      "kernel_hm": "p4g",
       "kernel_orbifold": "4∗2",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₄^(+½), ∗ₓ^(+½), t(½,½)^(+½)⟩",
+      "generators_short": "⟨T,R₄½,∗ₓ½,c½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
     },
     {
       "id": "g139",
       "chaim": "⁴4∗²2",
       "symbol": "c4₁∗2",
-      "hm": "I4₁cd",
-      "number": 110,
+      "page": "correspondence-p4g.html",
       "family": "p4g",
       "projected_orbifold": "4∗2",
-      "kernel_hm": "pgg",
       "kernel_orbifold": "22×",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 4,
-      "order": 16
+      "order": 16,
+      "generators_label": "⟨T, R₄^(+¾), ×ᵧ⟩",
+      "generators_short": "⟨T, R₄¾, ×ᵧ⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
     },
     {
       "id": "g224",
       "chaim": "333",
       "symbol": "333",
-      "hm": "P3",
-      "number": 143,
+      "page": "correspondence-p3.html",
       "family": "p3",
       "projected_orbifold": "333",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 3
+      "order": 3,
+      "generators_label": "⟨T, R₃⟩",
+      "generators_short": "⟨T, R₃⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
     },
     {
       "id": "g225",
       "chaim": "³3³3³3",
       "symbol": "3₂3₂3₂",
-      "hm": "P3₂",
-      "number": 145,
+      "page": "correspondence-p3.html",
       "family": "p3",
       "projected_orbifold": "333",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 3,
-      "order": 3
+      "order": 3,
+      "generators_label": "⟨T, R₃^(+⅔)⟩",
+      "generators_short": "⟨T, R₃⅔⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃^(+⅔)",
+          "short": "R₃⅔",
+          "description": "120° one-third turn + ⅔ period",
+          "formula": "(-y, x-y, t+⅔)"
+        }
+      ]
     },
     {
       "id": "g226",
       "chaim": "³3³3³3",
       "symbol": "3₁3₁3₁",
-      "hm": "P3₁",
-      "number": 144,
+      "page": "correspondence-p3.html",
       "family": "p3",
       "projected_orbifold": "333",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 3,
-      "order": 3
+      "order": 3,
+      "generators_label": "⟨T, R₃^(+⅓)⟩",
+      "generators_short": "⟨T, R₃⅓⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃^(+⅓)",
+          "short": "R₃⅓",
+          "description": "120° one-third turn + ⅓ period",
+          "formula": "(-y, x-y, t+⅓)"
+        }
+      ]
     },
     {
       "id": "g227",
       "chaim": "³3³3¹3",
       "symbol": "r33₁3₂",
-      "hm": "R3",
-      "number": 146,
+      "page": "correspondence-p3.html",
       "family": "p3",
       "projected_orbifold": "333",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 3,
-      "order": 9
+      "order": 9,
+      "generators_label": "⟨T, R₃, t(⅔,⅓)^(+⅓)⟩",
+      "generators_short": "⟨T, R₃, r⅓⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
     },
     {
       "id": "g230",
       "chaim": "∗333",
       "symbol": "∗333",
-      "hm": "P3m1",
-      "number": 156,
+      "page": "correspondence-p3m1.html",
       "family": "p3m1",
       "projected_orbifold": "∗333",
-      "kernel_hm": "p3m1",
       "kernel_orbifold": "∗333",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₃, ∗_d′⟩",
+      "generators_short": "⟨T, R₃, ∗d′⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        }
+      ]
     },
     {
       "id": "g231",
       "chaim": "∗²3²3²3",
       "symbol": "∗~3~3~3",
-      "hm": "P3c1",
-      "number": 158,
+      "page": "correspondence-p3m1.html",
       "family": "p3m1",
       "projected_orbifold": "∗333",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₃, ∗_d′^(+½)⟩",
+      "generators_short": "⟨T, R₃, ∗d′½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        }
+      ]
     },
     {
       "id": "g232",
       "chaim": "3∗3",
       "symbol": "3∗3",
-      "hm": "P31m",
-      "number": 157,
+      "page": "correspondence-p31m.html",
       "family": "p31m",
       "projected_orbifold": "3∗3",
-      "kernel_hm": "p31m",
       "kernel_orbifold": "3∗3",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₃, ∗_d⟩",
+      "generators_short": "⟨T, R₃, ∗d⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
     },
     {
       "id": "g233",
       "chaim": "¹3∗²3",
       "symbol": "3∗~3",
-      "hm": "P31c",
-      "number": 159,
+      "page": "correspondence-p31m.html",
       "family": "p31m",
       "projected_orbifold": "3∗3",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₃, ∗_d^(+½)⟩",
+      "generators_short": "⟨T, R₃, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g234",
       "chaim": "³3∗¹3",
       "symbol": "r3₂∗3",
-      "hm": "R3m",
-      "number": 160,
+      "page": "correspondence-p31m.html",
       "family": "p31m",
       "projected_orbifold": "3∗3",
-      "kernel_hm": "p3m1",
       "kernel_orbifold": "∗333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 3,
-      "order": 18
+      "order": 18,
+      "generators_label": "⟨T, R₃, ∗_d′, t(⅔,⅓)^(+⅓)⟩",
+      "generators_short": "⟨T,R₃,∗d′,r⅓⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
     },
     {
       "id": "g235",
       "chaim": "³3∗²3",
       "symbol": "r3₂∗~3",
-      "hm": "R3c",
-      "number": 161,
+      "page": "correspondence-p31m.html",
       "family": "p31m",
       "projected_orbifold": "3∗3",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 6,
-      "order": 18
+      "order": 18,
+      "generators_label": "⟨T, R₃, ∗_d′^(+½), t(⅔,⅓)^(+⅓)⟩",
+      "generators_short": "⟨T,R₃,∗d′½,r⅓⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
     },
     {
       "id": "g243",
       "chaim": "632",
       "symbol": "632",
-      "hm": "P6",
-      "number": 168,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p6",
       "kernel_orbifold": "632",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆⟩",
+      "generators_short": "⟨T, R₆⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        }
+      ]
     },
     {
       "id": "g244",
       "chaim": "³6³3¹2",
       "symbol": "6₂3₂2",
-      "hm": "P6₂",
-      "number": 171,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 3,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆^(+⅓)⟩",
+      "generators_short": "⟨T, R₆⅓⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+⅓)",
+          "short": "R₆⅓",
+          "description": "60° one-sixth turn + ⅓ period",
+          "formula": "(x-y, x, t+⅓)"
+        }
+      ]
     },
     {
       "id": "g245",
       "chaim": "³6³3¹2",
       "symbol": "6₄3₁2",
-      "hm": "P6₄",
-      "number": 172,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p2",
       "kernel_orbifold": "2222",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 3,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆^(+⅔)⟩",
+      "generators_short": "⟨T, R₆⅔⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+⅔)",
+          "short": "R₆⅔",
+          "description": "60° one-sixth turn + ⅔ period",
+          "formula": "(x-y, x, t+⅔)"
+        }
+      ]
     },
     {
       "id": "g246",
       "chaim": "²6¹3²2",
       "symbol": "6₃32₁",
-      "hm": "P6₃",
-      "number": 173,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p3",
       "kernel_orbifold": "333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆^(+½)⟩",
+      "generators_short": "⟨T, R₆½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g247",
       "chaim": "⁶6³3²2",
       "symbol": "6₅3₂2₁",
-      "hm": "P6₅",
-      "number": 170,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 6,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆^(+⅚)⟩",
+      "generators_short": "⟨T, R₆⅚⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+⅚)",
+          "short": "R₆⅚",
+          "description": "60° one-sixth turn + ⅚ period",
+          "formula": "(x-y, x, t+⅚)"
+        }
+      ]
     },
     {
       "id": "g248",
       "chaim": "⁶6³3²2",
       "symbol": "6₁3₁2₁",
-      "hm": "P6₁",
-      "number": 169,
+      "page": "correspondence-p6.html",
       "family": "p6",
       "projected_orbifold": "632",
-      "kernel_hm": "p1",
       "kernel_orbifold": "◦",
+      "rolling_only": true,
+      "pure_rolling": true,
       "colors": 6,
-      "order": 6
+      "order": 6,
+      "generators_label": "⟨T, R₆^(+⅙)⟩",
+      "generators_short": "⟨T, R₆⅙⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+⅙)",
+          "short": "R₆⅙",
+          "description": "60° one-sixth turn + ⅙ period",
+          "formula": "(x-y, x, t+⅙)"
+        }
+      ]
     },
     {
       "id": "g268",
       "chaim": "∗632",
       "symbol": "∗632",
-      "hm": "P6mm",
-      "number": 183,
+      "page": "correspondence-p6m.html",
       "family": "p6m",
       "projected_orbifold": "∗632",
-      "kernel_hm": "p6m",
       "kernel_orbifold": "∗632",
+      "rolling_only": false,
+      "pure_rolling": false,
       "colors": 1,
-      "order": 12
+      "order": 12,
+      "generators_label": "⟨T, R₆, ∗_d⟩",
+      "generators_short": "⟨T, R₆, ∗d⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
     },
     {
       "id": "g269",
       "chaim": "∗¹6²3²2",
       "symbol": "∗6₃~3~2₁",
-      "hm": "P6₃cm",
-      "number": 185,
+      "page": "correspondence-p6m.html",
       "family": "p6m",
       "projected_orbifold": "∗632",
-      "kernel_hm": "p31m",
       "kernel_orbifold": "3∗3",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 12
+      "order": 12,
+      "generators_label": "⟨T, R₆^(+½), ∗_d⟩",
+      "generators_short": "⟨T, R₆½, ∗d⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
     },
     {
       "id": "g270",
       "chaim": "∗²6²3²2",
       "symbol": "∗~6~3~2",
-      "hm": "P6cc",
-      "number": 184,
+      "page": "correspondence-p6m.html",
       "family": "p6m",
       "projected_orbifold": "∗632",
-      "kernel_hm": "p6",
       "kernel_orbifold": "632",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 12
+      "order": 12,
+      "generators_label": "⟨T, R₆, ∗_d^(+½)⟩",
+      "generators_short": "⟨T, R₆, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     },
     {
       "id": "g271",
       "chaim": "∗²6¹3¹2",
       "symbol": "∗~6₃32₁",
-      "hm": "P6₃mc",
-      "number": 186,
+      "page": "correspondence-p6m.html",
       "family": "p6m",
       "projected_orbifold": "∗632",
-      "kernel_hm": "p3m1",
       "kernel_orbifold": "∗333",
+      "rolling_only": true,
+      "pure_rolling": false,
       "colors": 2,
-      "order": 12
+      "order": 12,
+      "generators_label": "⟨T, R₆^(+½), ∗_d^(+½)⟩",
+      "generators_short": "⟨T, R₆½, ∗d½⟩",
+      "generators": [
+        {
+          "symbol": "T",
+          "short": "T",
+          "description": "lattice translations ⟨t₁, t₂⟩",
+          "formula": "(x+1, y, t), (x, y+1, t)"
+        },
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
     }
   ],
   "edges": [
@@ -904,51 +2352,11 @@
     ],
     [
       "g1",
+      "g10"
+    ],
+    [
+      "g1",
       "g11"
-    ],
-    [
-      "g1",
-      "g56"
-    ],
-    [
-      "g1",
-      "g57"
-    ],
-    [
-      "g1",
-      "g58"
-    ],
-    [
-      "g1",
-      "g59"
-    ],
-    [
-      "g1",
-      "g61"
-    ],
-    [
-      "g1",
-      "g62"
-    ],
-    [
-      "g1",
-      "g63"
-    ],
-    [
-      "g1",
-      "g66"
-    ],
-    [
-      "g1",
-      "g67"
-    ],
-    [
-      "g1",
-      "g75"
-    ],
-    [
-      "g1",
-      "g99"
     ],
     [
       "g1",
@@ -976,7 +2384,27 @@
     ],
     [
       "g5",
-      "g73"
+      "g56"
+    ],
+    [
+      "g5",
+      "g57"
+    ],
+    [
+      "g5",
+      "g58"
+    ],
+    [
+      "g5",
+      "g59"
+    ],
+    [
+      "g5",
+      "g68"
+    ],
+    [
+      "g5",
+      "g69"
     ],
     [
       "g5",
@@ -985,22 +2413,6 @@
     [
       "g5",
       "g95"
-    ],
-    [
-      "g5",
-      "g132"
-    ],
-    [
-      "g5",
-      "g133"
-    ],
-    [
-      "g5",
-      "g134"
-    ],
-    [
-      "g5",
-      "g135"
     ],
     [
       "g5",
@@ -1017,6 +2429,22 @@
     [
       "g6",
       "g60"
+    ],
+    [
+      "g6",
+      "g61"
+    ],
+    [
+      "g6",
+      "g62"
+    ],
+    [
+      "g6",
+      "g63"
+    ],
+    [
+      "g6",
+      "g70"
     ],
     [
       "g6",
@@ -1047,24 +2475,20 @@
       "g65"
     ],
     [
-      "g8",
-      "g10"
+      "g7",
+      "g66"
+    ],
+    [
+      "g7",
+      "g67"
+    ],
+    [
+      "g7",
+      "g75"
     ],
     [
       "g8",
-      "g128"
-    ],
-    [
-      "g8",
-      "g130"
-    ],
-    [
-      "g8",
-      "g132"
-    ],
-    [
-      "g8",
-      "g134"
+      "g68"
     ],
     [
       "g8",
@@ -1072,31 +2496,35 @@
     ],
     [
       "g9",
-      "g129"
+      "g69"
     ],
     [
       "g9",
-      "g131"
-    ],
-    [
-      "g9",
-      "g133"
-    ],
-    [
-      "g9",
-      "g135"
+      "g70"
     ],
     [
       "g9",
       "g233"
     ],
     [
-      "g54",
-      "g64"
+      "g10",
+      "g54"
+    ],
+    [
+      "g10",
+      "g60"
+    ],
+    [
+      "g11",
+      "g56"
+    ],
+    [
+      "g11",
+      "g61"
     ],
     [
       "g54",
-      "g68"
+      "g64"
     ],
     [
       "g54",
@@ -1116,10 +2544,6 @@
     ],
     [
       "g55",
-      "g69"
-    ],
-    [
-      "g55",
       "g72"
     ],
     [
@@ -1131,36 +2555,92 @@
       "g131"
     ],
     [
-      "g58",
-      "g139"
-    ],
-    [
-      "g59",
-      "g137"
-    ],
-    [
-      "g60",
-      "g70"
-    ],
-    [
-      "g61",
+      "g56",
       "g65"
     ],
     [
-      "g62",
+      "g56",
+      "g73"
+    ],
+    [
+      "g57",
       "g64"
     ],
     [
-      "g63",
-      "g74"
+      "g58",
+      "g67"
+    ],
+    [
+      "g58",
+      "g72"
+    ],
+    [
+      "g58",
+      "g132"
+    ],
+    [
+      "g58",
+      "g133"
+    ],
+    [
+      "g59",
+      "g66"
+    ],
+    [
+      "g59",
+      "g71"
+    ],
+    [
+      "g59",
+      "g134"
+    ],
+    [
+      "g59",
+      "g135"
+    ],
+    [
+      "g61",
+      "g139"
+    ],
+    [
+      "g62",
+      "g137"
     ],
     [
       "g64",
       "g74"
     ],
     [
-      "g68",
+      "g67",
       "g74"
+    ],
+    [
+      "g68",
+      "g128"
+    ],
+    [
+      "g68",
+      "g130"
+    ],
+    [
+      "g68",
+      "g268"
+    ],
+    [
+      "g69",
+      "g129"
+    ],
+    [
+      "g69",
+      "g131"
+    ],
+    [
+      "g69",
+      "g270"
+    ],
+    [
+      "g70",
+      "g271"
     ],
     [
       "g71",
@@ -1183,12 +2663,32 @@
       "g131"
     ],
     [
+      "g94",
+      "g132"
+    ],
+    [
+      "g94",
+      "g135"
+    ],
+    [
       "g95",
       "g129"
     ],
     [
       "g95",
       "g130"
+    ],
+    [
+      "g95",
+      "g133"
+    ],
+    [
+      "g95",
+      "g134"
+    ],
+    [
+      "g97",
+      "g99"
     ],
     [
       "g98",
@@ -1199,6 +2699,10 @@
       "g137"
     ],
     [
+      "g99",
+      "g139"
+    ],
+    [
       "g128",
       "g136"
     ],
@@ -1207,11 +2711,11 @@
       "g138"
     ],
     [
-      "g132",
+      "g133",
       "g138"
     ],
     [
-      "g134",
+      "g135",
       "g136"
     ],
     [
@@ -1322,5 +2826,3920 @@
       "g246",
       "g271"
     ]
-  ]
+  ],
+  "transitions": {
+    "g1->g5": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g1->g6": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g1->g7": {
+      "index": 4,
+      "added_label": "+R₂, +t(0,½)^(+½)",
+      "added_short": "+R₂, +tᵧ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g8": {
+      "index": 2,
+      "added_label": "+∗_d",
+      "added_short": "+∗d",
+      "added": [
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g1->g9": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g10": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g1->g11": {
+      "index": 2,
+      "added_label": "+×ᵧ",
+      "added_short": "+×ᵧ",
+      "added": [
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g1->g54": {
+      "index": 4,
+      "added_label": "+R₂, +∗ₓ",
+      "added_short": "+R₂, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g1->g55": {
+      "index": 4,
+      "added_label": "+R₂, +∗ₓ^(+½)",
+      "added_short": "+R₂, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g1->g56": {
+      "index": 4,
+      "added_label": "+R₂, +×ᵧ",
+      "added_short": "+R₂, +×ᵧ",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g1->g57": {
+      "index": 4,
+      "added_label": "+R₂, +×ᵧ^(+½)",
+      "added_short": "+R₂, +×ᵧ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g58": {
+      "index": 4,
+      "added_label": "+R₂, +×ₓ′",
+      "added_short": "+R₂, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g1->g59": {
+      "index": 4,
+      "added_label": "+R₂, +×ₓ′^(+½)",
+      "added_short": "+R₂, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g60": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +∗ₓ",
+      "added_short": "+R₂½, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g1->g61": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +×ᵧ",
+      "added_short": "+R₂½, +×ᵧ",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g1->g62": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +×ᵧ^(+½)",
+      "added_short": "+R₂½, +×ᵧ½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g63": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +×ₓ′^(+½)",
+      "added_short": "+R₂½, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g64": {
+      "index": 8,
+      "added_label": "+R₂, +∗ₓ, +t(0,½)^(+½)",
+      "added_short": "+R₂, +∗ₓ, +tᵧ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g65": {
+      "index": 8,
+      "added_label": "+R₂, +∗ₓ^(+½), +t(0,½)^(+½)",
+      "added_short": "+R₂, +∗ₓ½, +tᵧ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g66": {
+      "index": 8,
+      "added_label": "+R₂, +t(0,½)^(+½), +×ₓ′^(+½)",
+      "added_short": "+R₂, +tᵧ½, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g67": {
+      "index": 8,
+      "added_label": "+R₂, +t(0,½)^(+½), +×ₓ′",
+      "added_short": "+R₂, +tᵧ½, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g1->g68": {
+      "index": 4,
+      "added_label": "+R₂, +∗_d",
+      "added_short": "+R₂, +∗d",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g1->g69": {
+      "index": 4,
+      "added_label": "+R₂, +∗_d^(+½)",
+      "added_short": "+R₂, +∗d½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g70": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +∗_d^(+½)",
+      "added_short": "+R₂½, +∗d½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g71": {
+      "index": 8,
+      "added_label": "+R₂, +∗ₓ, +t(½,½)^(+½)",
+      "added_short": "+R₂, +∗ₓ, +c½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g72": {
+      "index": 8,
+      "added_label": "+R₂, +∗ₓ^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₂, +∗ₓ½, +c½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g73": {
+      "index": 8,
+      "added_label": "+R₂, +t(½,½)^(+½), +×ᵧ",
+      "added_short": "+R₂, +c½, +×ᵧ",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g1->g74": {
+      "index": 16,
+      "added_label": "+R₂, +∗ₓ, +t(0,½)^(+½), +t(½,0)^(+½)",
+      "added_short": "+R₂, +∗ₓ, +tᵧ½, +tₓ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g1->g75": {
+      "index": 16,
+      "added_label": "+R₂, +×ₓ(¼,¼)^(+¼)",
+      "added_short": "+R₂, +×ₓ′¼",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "×ₓ(¼,¼)^(+¼)",
+          "short": "×ₓ′¼",
+          "description": "offset horizontal glide + ¼ period",
+          "formula": "(x+¼, -y+¼, t+¼)"
+        }
+      ]
+    },
+    "g1->g94": {
+      "index": 4,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g1->g95": {
+      "index": 4,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g96": {
+      "index": 4,
+      "added_label": "+R₄^(+¼)",
+      "added_short": "+R₄¼",
+      "added": [
+        {
+          "symbol": "R₄^(+¼)",
+          "short": "R₄¼",
+          "description": "90° quarter-turn + ¼ period",
+          "formula": "(-y, x, t+¼)"
+        }
+      ]
+    },
+    "g1->g97": {
+      "index": 4,
+      "added_label": "+R₄^(+¾)",
+      "added_short": "+R₄¾",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
+    },
+    "g1->g98": {
+      "index": 8,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g99": {
+      "index": 8,
+      "added_label": "+R₄^(+¾), +t(½,½)^(+½)",
+      "added_short": "+R₄¾, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g128": {
+      "index": 8,
+      "added_label": "+R₄, +∗ₓ",
+      "added_short": "+R₄, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g1->g129": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +∗ₓ",
+      "added_short": "+R₄½, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g1->g130": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +∗ₓ^(+½)",
+      "added_short": "+R₄½, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g1->g131": {
+      "index": 8,
+      "added_label": "+R₄, +∗ₓ^(+½)",
+      "added_short": "+R₄, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g1->g132": {
+      "index": 8,
+      "added_label": "+R₄, +×ₓ′",
+      "added_short": "+R₄, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g1->g133": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +×ₓ′",
+      "added_short": "+R₄½, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g1->g134": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +×ₓ′^(+½)",
+      "added_short": "+R₄½, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g135": {
+      "index": 8,
+      "added_label": "+R₄, +×ₓ′^(+½)",
+      "added_short": "+R₄, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g136": {
+      "index": 16,
+      "added_label": "+R₄, +∗ₓ, +t(½,½)^(+½)",
+      "added_short": "+R₄, +∗ₓ, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g137": {
+      "index": 16,
+      "added_label": "+R₄^(+¾), +×ᵧ^(+½)",
+      "added_short": "+R₄¾, +×ᵧ½",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g138": {
+      "index": 16,
+      "added_label": "+R₄^(+½), +∗ₓ^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₄½, +∗ₓ½, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g1->g139": {
+      "index": 16,
+      "added_label": "+R₄^(+¾), +×ᵧ",
+      "added_short": "+R₄¾, +×ᵧ",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g1->g224": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g1->g225": {
+      "index": 3,
+      "added_label": "+R₃^(+⅔)",
+      "added_short": "+R₃⅔",
+      "added": [
+        {
+          "symbol": "R₃^(+⅔)",
+          "short": "R₃⅔",
+          "description": "120° one-third turn + ⅔ period",
+          "formula": "(-y, x-y, t+⅔)"
+        }
+      ]
+    },
+    "g1->g226": {
+      "index": 3,
+      "added_label": "+R₃^(+⅓)",
+      "added_short": "+R₃⅓",
+      "added": [
+        {
+          "symbol": "R₃^(+⅓)",
+          "short": "R₃⅓",
+          "description": "120° one-third turn + ⅓ period",
+          "formula": "(-y, x-y, t+⅓)"
+        }
+      ]
+    },
+    "g1->g227": {
+      "index": 9,
+      "added_label": "+R₃, +t(⅔,⅓)^(+⅓)",
+      "added_short": "+R₃, +r⅓",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g1->g230": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d′",
+      "added_short": "+R₃, +∗d′",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        }
+      ]
+    },
+    "g1->g231": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d′^(+½)",
+      "added_short": "+R₃, +∗d′½",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        }
+      ]
+    },
+    "g1->g232": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d",
+      "added_short": "+R₃, +∗d",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g1->g233": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d^(+½)",
+      "added_short": "+R₃, +∗d½",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g234": {
+      "index": 18,
+      "added_label": "+R₃, +∗_d′, +t(⅔,⅓)^(+⅓)",
+      "added_short": "+R₃, +∗d′, +r⅓",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g1->g235": {
+      "index": 18,
+      "added_label": "+R₃, +∗_d′^(+½), +t(⅔,⅓)^(+⅓)",
+      "added_short": "+R₃, +∗d′½, +r⅓",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g1->g243": {
+      "index": 6,
+      "added_label": "+R₆",
+      "added_short": "+R₆",
+      "added": [
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        }
+      ]
+    },
+    "g1->g244": {
+      "index": 6,
+      "added_label": "+R₆^(+⅓)",
+      "added_short": "+R₆⅓",
+      "added": [
+        {
+          "symbol": "R₆^(+⅓)",
+          "short": "R₆⅓",
+          "description": "60° one-sixth turn + ⅓ period",
+          "formula": "(x-y, x, t+⅓)"
+        }
+      ]
+    },
+    "g1->g245": {
+      "index": 6,
+      "added_label": "+R₆^(+⅔)",
+      "added_short": "+R₆⅔",
+      "added": [
+        {
+          "symbol": "R₆^(+⅔)",
+          "short": "R₆⅔",
+          "description": "60° one-sixth turn + ⅔ period",
+          "formula": "(x-y, x, t+⅔)"
+        }
+      ]
+    },
+    "g1->g246": {
+      "index": 6,
+      "added_label": "+R₆^(+½)",
+      "added_short": "+R₆½",
+      "added": [
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g247": {
+      "index": 6,
+      "added_label": "+R₆^(+⅚)",
+      "added_short": "+R₆⅚",
+      "added": [
+        {
+          "symbol": "R₆^(+⅚)",
+          "short": "R₆⅚",
+          "description": "60° one-sixth turn + ⅚ period",
+          "formula": "(x-y, x, t+⅚)"
+        }
+      ]
+    },
+    "g1->g248": {
+      "index": 6,
+      "added_label": "+R₆^(+⅙)",
+      "added_short": "+R₆⅙",
+      "added": [
+        {
+          "symbol": "R₆^(+⅙)",
+          "short": "R₆⅙",
+          "description": "60° one-sixth turn + ⅙ period",
+          "formula": "(x-y, x, t+⅙)"
+        }
+      ]
+    },
+    "g1->g268": {
+      "index": 12,
+      "added_label": "+R₆, +∗_d",
+      "added_short": "+R₆, +∗d",
+      "added": [
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g1->g269": {
+      "index": 12,
+      "added_label": "+R₆^(+½), +∗_d",
+      "added_short": "+R₆½, +∗d",
+      "added": [
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g1->g270": {
+      "index": 12,
+      "added_label": "+R₆, +∗_d^(+½)",
+      "added_short": "+R₆, +∗d½",
+      "added": [
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g1->g271": {
+      "index": 12,
+      "added_label": "+R₆^(+½), +∗_d^(+½)",
+      "added_short": "+R₆½, +∗d½",
+      "added": [
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g5->g7": {
+      "index": 2,
+      "added_label": "+t(0,½)^(+½)",
+      "added_short": "+tᵧ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g54": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g5->g55": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g5->g56": {
+      "index": 2,
+      "added_label": "+×ᵧ",
+      "added_short": "+×ᵧ",
+      "added": [
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g5->g57": {
+      "index": 2,
+      "added_label": "+×ᵧ^(+½)",
+      "added_short": "+×ᵧ½",
+      "added": [
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g58": {
+      "index": 2,
+      "added_label": "+×ₓ′",
+      "added_short": "+×ₓ′",
+      "added": [
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g5->g59": {
+      "index": 2,
+      "added_label": "+×ₓ′^(+½)",
+      "added_short": "+×ₓ′½",
+      "added": [
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g64": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(0,½)^(+½)",
+      "added_short": "+∗ₓ, +tᵧ½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g65": {
+      "index": 4,
+      "added_label": "+∗ₓ^(+½), +t(0,½)^(+½)",
+      "added_short": "+∗ₓ½, +tᵧ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g66": {
+      "index": 4,
+      "added_label": "+t(0,½)^(+½), +×ₓ′^(+½)",
+      "added_short": "+tᵧ½, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g67": {
+      "index": 4,
+      "added_label": "+t(0,½)^(+½), +×ₓ′",
+      "added_short": "+tᵧ½, +×ₓ′",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g5->g68": {
+      "index": 2,
+      "added_label": "+∗_d",
+      "added_short": "+∗d",
+      "added": [
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g5->g69": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g5->g71": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(½,½)^(+½)",
+      "added_short": "+∗ₓ, +c½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g72": {
+      "index": 4,
+      "added_label": "+∗ₓ^(+½), +t(½,½)^(+½)",
+      "added_short": "+∗ₓ½, +c½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g73": {
+      "index": 4,
+      "added_label": "+t(½,½)^(+½), +×ᵧ",
+      "added_short": "+c½, +×ᵧ",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g5->g74": {
+      "index": 8,
+      "added_label": "+∗ₓ, +t(0,½)^(+½), +t(½,0)^(+½)",
+      "added_short": "+∗ₓ, +tᵧ½, +tₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g5->g75": {
+      "index": 8,
+      "added_label": "+×ₓ(¼,¼)^(+¼)",
+      "added_short": "+×ₓ′¼",
+      "added": [
+        {
+          "symbol": "×ₓ(¼,¼)^(+¼)",
+          "short": "×ₓ′¼",
+          "description": "offset horizontal glide + ¼ period",
+          "formula": "(x+¼, -y+¼, t+¼)"
+        }
+      ]
+    },
+    "g5->g94": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g5->g95": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g5->g98": {
+      "index": 4,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g128": {
+      "index": 4,
+      "added_label": "+R₄, +∗ₓ",
+      "added_short": "+R₄, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g5->g129": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +∗ₓ",
+      "added_short": "+R₄½, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g5->g130": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +∗ₓ^(+½)",
+      "added_short": "+R₄½, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g5->g131": {
+      "index": 4,
+      "added_label": "+R₄, +∗ₓ^(+½)",
+      "added_short": "+R₄, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g5->g132": {
+      "index": 4,
+      "added_label": "+R₄, +×ₓ′",
+      "added_short": "+R₄, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g5->g133": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +×ₓ′",
+      "added_short": "+R₄½, +×ₓ′",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g5->g134": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +×ₓ′^(+½)",
+      "added_short": "+R₄½, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g135": {
+      "index": 4,
+      "added_label": "+R₄, +×ₓ′^(+½)",
+      "added_short": "+R₄, +×ₓ′½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g136": {
+      "index": 8,
+      "added_label": "+R₄, +∗ₓ, +t(½,½)^(+½)",
+      "added_short": "+R₄, +∗ₓ, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g138": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +∗ₓ^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₄½, +∗ₓ½, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g5->g243": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g5->g244": {
+      "index": 3,
+      "added_label": "+R₃^(+⅔)",
+      "added_short": "+R₃⅔",
+      "added": [
+        {
+          "symbol": "R₃^(+⅔)",
+          "short": "R₃⅔",
+          "description": "120° one-third turn + ⅔ period",
+          "formula": "(-y, x-y, t+⅔)"
+        }
+      ]
+    },
+    "g5->g245": {
+      "index": 3,
+      "added_label": "+R₃^(+⅓)",
+      "added_short": "+R₃⅓",
+      "added": [
+        {
+          "symbol": "R₃^(+⅓)",
+          "short": "R₃⅓",
+          "description": "120° one-third turn + ⅓ period",
+          "formula": "(-y, x-y, t+⅓)"
+        }
+      ]
+    },
+    "g5->g268": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d",
+      "added_short": "+R₃, +∗d",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g5->g270": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d^(+½)",
+      "added_short": "+R₃, +∗d½",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g6->g60": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g6->g61": {
+      "index": 2,
+      "added_label": "+×ᵧ",
+      "added_short": "+×ᵧ",
+      "added": [
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g6->g62": {
+      "index": 2,
+      "added_label": "+×ᵧ^(+½)",
+      "added_short": "+×ᵧ½",
+      "added": [
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g6->g63": {
+      "index": 2,
+      "added_label": "+×ₓ′^(+½)",
+      "added_short": "+×ₓ′½",
+      "added": [
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g6->g70": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g6->g96": {
+      "index": 2,
+      "added_label": "+R₄^(+¼)",
+      "added_short": "+R₄¼",
+      "added": [
+        {
+          "symbol": "R₄^(+¼)",
+          "short": "R₄¼",
+          "description": "90° quarter-turn + ¼ period",
+          "formula": "(-y, x, t+¼)"
+        }
+      ]
+    },
+    "g6->g97": {
+      "index": 2,
+      "added_label": "+R₄^(+¾)",
+      "added_short": "+R₄¾",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
+    },
+    "g6->g99": {
+      "index": 4,
+      "added_label": "+R₄^(+¾), +t(½,½)^(+½)",
+      "added_short": "+R₄¾, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g6->g137": {
+      "index": 8,
+      "added_label": "+R₄^(+¾), +×ᵧ^(+½)",
+      "added_short": "+R₄¾, +×ᵧ½",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g6->g139": {
+      "index": 8,
+      "added_label": "+R₄^(+¾), +×ᵧ",
+      "added_short": "+R₄¾, +×ᵧ",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        },
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g6->g246": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g6->g247": {
+      "index": 3,
+      "added_label": "+R₃^(+⅔)",
+      "added_short": "+R₃⅔",
+      "added": [
+        {
+          "symbol": "R₃^(+⅔)",
+          "short": "R₃⅔",
+          "description": "120° one-third turn + ⅔ period",
+          "formula": "(-y, x-y, t+⅔)"
+        }
+      ]
+    },
+    "g6->g248": {
+      "index": 3,
+      "added_label": "+R₃^(+⅓)",
+      "added_short": "+R₃⅓",
+      "added": [
+        {
+          "symbol": "R₃^(+⅓)",
+          "short": "R₃⅓",
+          "description": "120° one-third turn + ⅓ period",
+          "formula": "(-y, x-y, t+⅓)"
+        }
+      ]
+    },
+    "g6->g269": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d",
+      "added_short": "+R₃, +∗d",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g6->g271": {
+      "index": 6,
+      "added_label": "+R₃, +∗_d^(+½)",
+      "added_short": "+R₃, +∗d½",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g7->g64": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g7->g65": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g7->g66": {
+      "index": 2,
+      "added_label": "+×ₓ′^(+½)",
+      "added_short": "+×ₓ′½",
+      "added": [
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g7->g67": {
+      "index": 2,
+      "added_label": "+×ₓ′",
+      "added_short": "+×ₓ′",
+      "added": [
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g7->g74": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(½,0)^(+½)",
+      "added_short": "+∗ₓ, +tₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g7->g75": {
+      "index": 4,
+      "added_label": "+×ₓ(¼,¼)^(+¼)",
+      "added_short": "+×ₓ′¼",
+      "added": [
+        {
+          "symbol": "×ₓ(¼,¼)^(+¼)",
+          "short": "×ₓ′¼",
+          "description": "offset horizontal glide + ¼ period",
+          "formula": "(x+¼, -y+¼, t+¼)"
+        }
+      ]
+    },
+    "g8->g68": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g8->g128": {
+      "index": 4,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g8->g130": {
+      "index": 4,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g8->g136": {
+      "index": 8,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g8->g138": {
+      "index": 8,
+      "added_label": "+R₄^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₄½, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g8->g232": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g8->g268": {
+      "index": 6,
+      "added_label": "+R₆",
+      "added_short": "+R₆",
+      "added": [
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        }
+      ]
+    },
+    "g8->g269": {
+      "index": 6,
+      "added_label": "+R₆^(+½)",
+      "added_short": "+R₆½",
+      "added": [
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        }
+      ]
+    },
+    "g9->g69": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g9->g70": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g9->g129": {
+      "index": 4,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g9->g131": {
+      "index": 4,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g9->g233": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g9->g270": {
+      "index": 6,
+      "added_label": "+R₆",
+      "added_short": "+R₆",
+      "added": [
+        {
+          "symbol": "R₆",
+          "short": "R₆",
+          "description": "60° one-sixth turn",
+          "formula": "(x-y, x, t)"
+        }
+      ]
+    },
+    "g9->g271": {
+      "index": 6,
+      "added_label": "+R₆^(+½)",
+      "added_short": "+R₆½",
+      "added": [
+        {
+          "symbol": "R₆^(+½)",
+          "short": "R₆½",
+          "description": "60° one-sixth turn + ½ period",
+          "formula": "(x-y, x, t+½)"
+        }
+      ]
+    },
+    "g10->g54": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g10->g60": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g10->g64": {
+      "index": 4,
+      "added_label": "+R₂, +t(0,½)^(+½)",
+      "added_short": "+R₂, +tᵧ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g10->g71": {
+      "index": 4,
+      "added_label": "+R₂, +t(½,½)^(+½)",
+      "added_short": "+R₂, +c½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g10->g74": {
+      "index": 8,
+      "added_label": "+R₂, +t(0,½)^(+½), +t(½,0)^(+½)",
+      "added_short": "+R₂, +tᵧ½, +tₓ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g10->g128": {
+      "index": 4,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g10->g129": {
+      "index": 4,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g10->g136": {
+      "index": 8,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g11->g56": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g11->g61": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g11->g65": {
+      "index": 4,
+      "added_label": "+R₂, +∗ₓ^(+½)",
+      "added_short": "+R₂, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g11->g73": {
+      "index": 4,
+      "added_label": "+R₂, +t(½,½)^(+½)",
+      "added_short": "+R₂, +c½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g11->g139": {
+      "index": 8,
+      "added_label": "+R₄^(+¾)",
+      "added_short": "+R₄¾",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
+    },
+    "g54->g64": {
+      "index": 2,
+      "added_label": "+t(0,½)^(+½)",
+      "added_short": "+tᵧ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g54->g71": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g54->g74": {
+      "index": 4,
+      "added_label": "+t(0,½)^(+½), +t(½,0)^(+½)",
+      "added_short": "+tᵧ½, +tₓ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g54->g128": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g54->g129": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g54->g136": {
+      "index": 4,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g55->g65": {
+      "index": 2,
+      "added_label": "+t(0,½)^(+½)",
+      "added_short": "+tᵧ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g55->g72": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g55->g130": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g55->g131": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g55->g138": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₄½, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g56->g65": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g56->g73": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g57->g64": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g57->g74": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(½,0)^(+½)",
+      "added_short": "+∗ₓ, +tₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g58->g67": {
+      "index": 2,
+      "added_label": "+t(0,½)^(+½)",
+      "added_short": "+tᵧ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g58->g72": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g58->g74": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(0,½)^(+½)",
+      "added_short": "+∗ₓ, +tᵧ½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g58->g132": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g58->g133": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g58->g138": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +∗ₓ^(+½)",
+      "added_short": "+R₄½, +∗ₓ½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g59->g66": {
+      "index": 2,
+      "added_label": "+t(0,½)^(+½)",
+      "added_short": "+tᵧ½",
+      "added": [
+        {
+          "symbol": "t(0,½)^(+½)",
+          "short": "tᵧ½",
+          "description": "centering translation (0,½) + ½ period",
+          "formula": "(x, y+½, t+½)"
+        }
+      ]
+    },
+    "g59->g71": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g59->g134": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g59->g135": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g59->g136": {
+      "index": 4,
+      "added_label": "+R₄, +∗ₓ",
+      "added_short": "+R₄, +∗ₓ",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g61->g139": {
+      "index": 4,
+      "added_label": "+R₄^(+¾)",
+      "added_short": "+R₄¾",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
+    },
+    "g62->g137": {
+      "index": 4,
+      "added_label": "+R₄^(+¾)",
+      "added_short": "+R₄¾",
+      "added": [
+        {
+          "symbol": "R₄^(+¾)",
+          "short": "R₄¾",
+          "description": "90° quarter-turn + ¾ period",
+          "formula": "(-y, x, t+¾)"
+        }
+      ]
+    },
+    "g64->g74": {
+      "index": 2,
+      "added_label": "+t(½,0)^(+½)",
+      "added_short": "+tₓ½",
+      "added": [
+        {
+          "symbol": "t(½,0)^(+½)",
+          "short": "tₓ½",
+          "description": "centering translation (½,0) + ½ period",
+          "formula": "(x+½, y, t+½)"
+        }
+      ]
+    },
+    "g67->g74": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g68->g128": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g68->g130": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g68->g136": {
+      "index": 4,
+      "added_label": "+R₄, +t(½,½)^(+½)",
+      "added_short": "+R₄, +c½",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g68->g138": {
+      "index": 4,
+      "added_label": "+R₄^(+½), +t(½,½)^(+½)",
+      "added_short": "+R₄½, +c½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g68->g268": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g69->g129": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g69->g131": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g69->g270": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g70->g271": {
+      "index": 3,
+      "added_label": "+R₃",
+      "added_short": "+R₃",
+      "added": [
+        {
+          "symbol": "R₃",
+          "short": "R₃",
+          "description": "120° one-third turn",
+          "formula": "(-y, x-y, t)"
+        }
+      ]
+    },
+    "g71->g136": {
+      "index": 2,
+      "added_label": "+R₄",
+      "added_short": "+R₄",
+      "added": [
+        {
+          "symbol": "R₄",
+          "short": "R₄",
+          "description": "90° quarter-turn",
+          "formula": "(-y, x, t)"
+        }
+      ]
+    },
+    "g72->g138": {
+      "index": 2,
+      "added_label": "+R₄^(+½)",
+      "added_short": "+R₄½",
+      "added": [
+        {
+          "symbol": "R₄^(+½)",
+          "short": "R₄½",
+          "description": "90° quarter-turn + ½ period",
+          "formula": "(-y, x, t+½)"
+        }
+      ]
+    },
+    "g94->g98": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g94->g128": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g94->g131": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g94->g132": {
+      "index": 2,
+      "added_label": "+×ₓ′",
+      "added_short": "+×ₓ′",
+      "added": [
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g94->g135": {
+      "index": 2,
+      "added_label": "+×ₓ′^(+½)",
+      "added_short": "+×ₓ′½",
+      "added": [
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g94->g136": {
+      "index": 4,
+      "added_label": "+∗ₓ, +t(½,½)^(+½)",
+      "added_short": "+∗ₓ, +c½",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g95->g129": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g95->g130": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g95->g133": {
+      "index": 2,
+      "added_label": "+×ₓ′",
+      "added_short": "+×ₓ′",
+      "added": [
+        {
+          "symbol": "×ₓ′",
+          "short": "×ₓ′",
+          "description": "offset horizontal glide",
+          "formula": "(x+½, -y+½, t)"
+        }
+      ]
+    },
+    "g95->g134": {
+      "index": 2,
+      "added_label": "+×ₓ′^(+½)",
+      "added_short": "+×ₓ′½",
+      "added": [
+        {
+          "symbol": "×ₓ′^(+½)",
+          "short": "×ₓ′½",
+          "description": "offset horizontal glide + ½ period",
+          "formula": "(x+½, -y+½, t+½)"
+        }
+      ]
+    },
+    "g95->g138": {
+      "index": 4,
+      "added_label": "+∗ₓ^(+½), +t(½,½)^(+½)",
+      "added_short": "+∗ₓ½, +c½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        },
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g97->g99": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g97->g137": {
+      "index": 4,
+      "added_label": "+×ᵧ^(+½)",
+      "added_short": "+×ᵧ½",
+      "added": [
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g97->g139": {
+      "index": 4,
+      "added_label": "+×ᵧ",
+      "added_short": "+×ᵧ",
+      "added": [
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g98->g136": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g99->g137": {
+      "index": 2,
+      "added_label": "+×ᵧ^(+½)",
+      "added_short": "+×ᵧ½",
+      "added": [
+        {
+          "symbol": "×ᵧ^(+½)",
+          "short": "×ᵧ½",
+          "description": "vertical glide + ½ period",
+          "formula": "(-x, y+½, t+½)"
+        }
+      ]
+    },
+    "g99->g139": {
+      "index": 2,
+      "added_label": "+×ᵧ",
+      "added_short": "+×ᵧ",
+      "added": [
+        {
+          "symbol": "×ᵧ",
+          "short": "×ᵧ",
+          "description": "vertical glide",
+          "formula": "(-x, y+½, t)"
+        }
+      ]
+    },
+    "g128->g136": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g130->g138": {
+      "index": 2,
+      "added_label": "+t(½,½)^(+½)",
+      "added_short": "+c½",
+      "added": [
+        {
+          "symbol": "t(½,½)^(+½)",
+          "short": "c½",
+          "description": "centering translation (½,½) + ½ period",
+          "formula": "(x+½, y+½, t+½)"
+        }
+      ]
+    },
+    "g133->g138": {
+      "index": 2,
+      "added_label": "+∗ₓ^(+½)",
+      "added_short": "+∗ₓ½",
+      "added": [
+        {
+          "symbol": "∗ₓ^(+½)",
+          "short": "∗ₓ½",
+          "description": "horizontal mirror + ½ period",
+          "formula": "(x, -y, t+½)"
+        }
+      ]
+    },
+    "g135->g136": {
+      "index": 2,
+      "added_label": "+∗ₓ",
+      "added_short": "+∗ₓ",
+      "added": [
+        {
+          "symbol": "∗ₓ",
+          "short": "∗ₓ",
+          "description": "horizontal mirror",
+          "formula": "(x, -y, t)"
+        }
+      ]
+    },
+    "g224->g227": {
+      "index": 3,
+      "added_label": "+t(⅔,⅓)^(+⅓)",
+      "added_short": "+r⅓",
+      "added": [
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g224->g230": {
+      "index": 2,
+      "added_label": "+∗_d′",
+      "added_short": "+∗d′",
+      "added": [
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        }
+      ]
+    },
+    "g224->g231": {
+      "index": 2,
+      "added_label": "+∗_d′^(+½)",
+      "added_short": "+∗d′½",
+      "added": [
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        }
+      ]
+    },
+    "g224->g232": {
+      "index": 2,
+      "added_label": "+∗_d",
+      "added_short": "+∗d",
+      "added": [
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g224->g233": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g224->g234": {
+      "index": 6,
+      "added_label": "+∗_d′, +t(⅔,⅓)^(+⅓)",
+      "added_short": "+∗d′, +r⅓",
+      "added": [
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g224->g235": {
+      "index": 6,
+      "added_label": "+∗_d′^(+½), +t(⅔,⅓)^(+⅓)",
+      "added_short": "+∗d′½, +r⅓",
+      "added": [
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        },
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g224->g243": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g224->g246": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g224->g268": {
+      "index": 4,
+      "added_label": "+R₂, +∗_d",
+      "added_short": "+R₂, +∗d",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g224->g269": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +∗_d",
+      "added_short": "+R₂½, +∗d",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g224->g270": {
+      "index": 4,
+      "added_label": "+R₂, +∗_d^(+½)",
+      "added_short": "+R₂, +∗d½",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g224->g271": {
+      "index": 4,
+      "added_label": "+R₂^(+½), +∗_d^(+½)",
+      "added_short": "+R₂½, +∗d½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        },
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g225->g244": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g225->g247": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g226->g245": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g226->g248": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g227->g234": {
+      "index": 2,
+      "added_label": "+∗_d′",
+      "added_short": "+∗d′",
+      "added": [
+        {
+          "symbol": "∗_d′",
+          "short": "∗d′",
+          "description": "anti-diagonal mirror (x=-y)",
+          "formula": "(-y, -x, t)"
+        }
+      ]
+    },
+    "g227->g235": {
+      "index": 2,
+      "added_label": "+∗_d′^(+½)",
+      "added_short": "+∗d′½",
+      "added": [
+        {
+          "symbol": "∗_d′^(+½)",
+          "short": "∗d′½",
+          "description": "anti-diagonal mirror (x=-y) + ½ period",
+          "formula": "(-y, -x, t+½)"
+        }
+      ]
+    },
+    "g230->g234": {
+      "index": 3,
+      "added_label": "+t(⅔,⅓)^(+⅓)",
+      "added_short": "+r⅓",
+      "added": [
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g230->g268": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g230->g271": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g231->g235": {
+      "index": 3,
+      "added_label": "+t(⅔,⅓)^(+⅓)",
+      "added_short": "+r⅓",
+      "added": [
+        {
+          "symbol": "t(⅔,⅓)^(+⅓)",
+          "short": "r⅓",
+          "description": "centering translation (⅔,⅓) + ⅓ period",
+          "formula": "(x+⅔, y+⅓, t+⅓)"
+        }
+      ]
+    },
+    "g231->g269": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g231->g270": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g232->g268": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g232->g269": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g233->g270": {
+      "index": 2,
+      "added_label": "+R₂",
+      "added_short": "+R₂",
+      "added": [
+        {
+          "symbol": "R₂",
+          "short": "R₂",
+          "description": "180° half-turn",
+          "formula": "(-x, -y, t)"
+        }
+      ]
+    },
+    "g233->g271": {
+      "index": 2,
+      "added_label": "+R₂^(+½)",
+      "added_short": "+R₂½",
+      "added": [
+        {
+          "symbol": "R₂^(+½)",
+          "short": "R₂½",
+          "description": "180° half-turn + ½ period",
+          "formula": "(-x, -y, t+½)"
+        }
+      ]
+    },
+    "g243->g268": {
+      "index": 2,
+      "added_label": "+∗_d",
+      "added_short": "+∗d",
+      "added": [
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g243->g270": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    },
+    "g246->g269": {
+      "index": 2,
+      "added_label": "+∗_d",
+      "added_short": "+∗d",
+      "added": [
+        {
+          "symbol": "∗_d",
+          "short": "∗d",
+          "description": "diagonal mirror (x=y)",
+          "formula": "(y, x, t)"
+        }
+      ]
+    },
+    "g246->g271": {
+      "index": 2,
+      "added_label": "+∗_d^(+½)",
+      "added_short": "+∗d½",
+      "added": [
+        {
+          "symbol": "∗_d^(+½)",
+          "short": "∗d½",
+          "description": "diagonal mirror (x=y) + ½ period",
+          "formula": "(y, x, t+½)"
+        }
+      ]
+    }
+  }
 }

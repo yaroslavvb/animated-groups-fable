@@ -275,9 +275,10 @@ class Family:
         self.tabs = []
         for tab in re.finditer(
                 r'<a class="clockwork-tab" id="tab-(g\d+)"[^>]*>(.*?)</a>', section, re.S):
-            signature = re.search(r'<span class="tab-signature">(.*?)</span>', tab.group(2), re.S)
+            sig_span = cut(tab.group(2), '<span class="tab-signature">', "span")
+            sig_html = sig_span[len('<span class="tab-signature">'):-len("</span>")]
             meta = re.search(r'<span class="tab-meta">(.*?)</span>', tab.group(2), re.S)
-            self.tabs.append((tab.group(1), signature.group(1), meta.group(1)))
+            self.tabs.append((tab.group(1), sig_html, meta.group(1)))
         if len(self.tabs) != len(self.entries):
             raise ValueError("%s: %d tabs for %d entries" % (self.hm, len(self.tabs), len(self.entries)))
 
@@ -299,6 +300,17 @@ class Family:
     @property
     def space_groups_text(self):
         return ", ".join(text_of(meta) for _gid, _sig, meta in self.tabs)
+
+    @property
+    def chaim_signatures_html(self):
+        return " · ".join(
+            '<span class="family-card-group-item" data-group-id="%s">%s</span>' % (gid, sig)
+            for gid, sig, _meta in self.tabs
+        )
+
+    @property
+    def chaim_signatures_text(self):
+        return ", ".join(text_of(sig) for _gid, sig, _meta in self.tabs)
 
 
 class Parts:
@@ -406,7 +418,7 @@ def filter_bar_html(include_hasse_mode=False):
         'Reset filters</button>\n'
         '        </div>\n'
         '        <p class="correspondence-filter-status" data-filter-status role="status" aria-live="polite">'
-        'Showing all 68 groups across 17 projected wallpaper groups · 109 immediate inclusions.</p>\n'
+        'Showing all 68 groups across 17 projected orbifold groups · 123 immediate generator inclusions.</p>\n'
         '      </div>'
     ) % mode_field
 
@@ -414,20 +426,19 @@ def filter_bar_html(include_hasse_mode=False):
 def index_page(parts):
     cards = []
     for family in parts.families:
-        label = "%s, %s: %s (%s)" % (
-            family.orbifold_text, family.hm, family.count_text, family.space_groups_text)
+        label = "%s: %s (%s)" % (
+            family.orbifold_text, family.count_text, family.chaim_signatures_text)
         # The same MathWorld wallpaper thumbnails as patterns.html.
         cards.append(
             '        <a class="family-card" href="%s" data-family-hm="%s" data-total-count="%d" aria-label="%s">\n'
             '          <img src="img/mathworld/%s.webp" width="320" height="240" loading="lazy" decoding="async" alt="">\n'
-            '          <span class="family-card-caption"><strong class="family-card-orbifold">%s</strong>'
-            '<span class="family-card-hm">%s</span></span>\n'
+            '          <span class="family-card-caption"><strong class="family-card-orbifold">%s</strong></span>\n'
             '          <span class="family-card-count" aria-hidden="true" title="%s">%d</span>\n'
             '          <span class="family-card-groups" aria-hidden="true">%s</span>\n'
             '        </a>' % (
                 family.page, family.hm, family.count, attr(label), family.hm,
-                family.orbifold_html, family.hm,
-                attr(family.count_text), family.count, family.space_groups_html))
+                family.orbifold_html,
+                attr(family.count_text), family.count, family.chaim_signatures_html))
     total = sum(family.count for family in parts.families)
     head = parts.head.replace("</head>", redirect_script(parts) + INDEX_ASSETS + "</head>", 1)
     # The index opens on the wallpaper groups and the Hasse diagram; the symbol
@@ -444,44 +455,57 @@ def index_page(parts):
         '    </section>\n\n'
         '    <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">\n'
         '      <h2 id="family-directory-title">Grouped by projected group</h2>\n'
-        '      <p class="family-directory-note">One page per projected wallpaper group, in the order of the '
-        '<em>International Tables</em>: forget the clock and keep every spatial operation. The badge counts '
-        'the forward clockwork groups projecting to that wallpaper group, %d in all, and the small line '
-        'names their polar space groups.</p>\n'
+        '      <p class="family-directory-note">One page per projected orbifold group: forget the clock and keep '
+        'every spatial operation. The badge counts the forward clockwork groups projecting to that orbifold group, '
+        '%d in all, and the small line names their Chaim orbifold signatures.</p>\n'
         '%s\n'
-        '      <nav class="family-grid" aria-label="Projected wallpaper groups">\n'
+        '      <nav class="family-grid" aria-label="Projected orbifold groups">\n'
         '%s\n'
         '      </nav>\n'
         '    </section>\n\n'
         '    <section class="hasse-directory" id="hasse-diagram" aria-labelledby="hasse-diagram-title">\n'
         '      <h2 id="hasse-diagram-title">Hasse diagram</h2>\n'
-        '      <p class="family-directory-note">The 68 forward clockwork groups grouped by inclusion of their '
-        'fixed coordinate representatives on a shared unit lattice, marked in the Chaim short-form notation of '
-        '<em>The Symmetries of Things</em> (with the polar space group symbol below). Start with pure '
-        'translations (<strong>◦</strong>, P1) at the top and follow an edge downward to a group with more '
-        'symmetries. Select any group to open its colouring, clockwork film, and 3D crystal; hover or focus '
-        'a node to highlight its immediate inclusions.</p>\n'
+        '      <p class="family-directory-note">The 68 forward clockwork groups grouped by generator inclusion on a '
+        'shared translation lattice <code>T = ⟨t₁, t₂⟩</code>, marked exclusively in Conway/Chaim orbifold notation '
+        '(with the concise generator tuple below each signature). Start with pure translations '
+        '(<strong>◦</strong>, <code>⟨T⟩</code>) at the top and follow an edge downward to add a point-group or '
+        'colour-permuting symmetry generator. Hover or focus any node to inspect its generators and see which '
+        'symmetry generator is added on each step down; click a node to open its colouring, clockwork film, and '
+        '3D crystal.</p>\n'
         '%s\n'
         '      <div class="hasse-legend">\n'
         '        <span><i class="hasse-dot hasse-dot--low" aria-hidden="true"></i>Fewer symmetries</span>\n'
         '        <span><i class="hasse-dot hasse-dot--high" aria-hidden="true"></i>More symmetries</span>\n'
         '        <span><i class="hasse-dot hasse-dot--rolling" aria-hidden="true"></i>Rolling-only symmetry (K ≠ Γ)</span>\n'
+        '        <span><i class="hasse-dot hasse-dot--parent" aria-hidden="true"></i>↑ Subgroup above</span>\n'
+        '        <span><i class="hasse-dot hasse-dot--child" aria-hidden="true"></i>↓ Supergroup below (+generator)</span>\n'
         '        <small class="hasse-scroll-hint">On a narrow screen, scroll the diagram sideways.</small>\n'
         '      </div>\n'
         '      <div class="hasse-diagram-wrap diagram" role="region" '
         'aria-label="Scrollable Hasse inclusion diagram of the 68 clockwork groups" tabindex="0">'
-        '<svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim short-form notation"></svg>'
+        '<svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim orbifold notation"></svg>'
         '</div>\n'
+        '      <div class="hasse-inspector" data-hasse-inspector aria-live="polite"></div>\n'
         '      <p id="status" class="hasse-status" role="status" aria-live="polite">Loading Hasse diagram…</p>\n'
-        '      <details class="hasse-details"><summary>How the Hasse diagram and still-frame symmetry selector work</summary>'
-        '<p>Each atlas record lists its operations as a planar matrix, planar displacement, and clock-axis shift τ. '
-        'The Hasse diagram compares these fixed coordinate representatives modulo integer translations in all three '
-        'directions: an edge connects an upper group to a lower group when every operation of the upper representative '
-        'belongs to the lower one and no third displayed representative lies strictly between them.</p>'
+        '      <details class="hasse-details"><summary>How the orbifold generator inclusions and still-frame selector work</summary>'
+        '<p>All 68 groups are placed on the shared base translation lattice <code>T = ⟨t₁, t₂⟩</code> with origin '
+        '<code>(0, 0)</code> so that every one of the <strong>123 immediate covering edges</strong> adds a single '
+        'symmetry generator going downward: rotations <code>R₂</code> (180°), <code>R₃</code> (120°), '
+        '<code>R₄</code> (90°), <code>R₆</code> (60°); mirrors <code>∗ₓ</code> (horizontal), <code>∗_d</code> '
+        '(diagonal), <code>∗_d′</code> (anti-diagonal); glides <code>×ᵧ</code> (vertical) and <code>×ₓ′</code> '
+        '(offset horizontal); or centred sublattice translations <code>t(0,½)</code>, <code>t(½,½)</code>, '
+        '<code>t(⅔,⅓)</code>. A superscript <code>^(+1/N)</code> indicates that the generator also advances the '
+        'cyclic colour/clock phase by <code>1/N</code> of a period.</p>'
+        '<p>Among the 17 monochrome orbifold groups, fixing a single origin and unit lattice realises <strong>27</strong> '
+        'direct generator inclusions simultaneously; the remaining 4 abstract same-lattice index-2 pairs '
+        '(<code>22∗ ⊂ ∗2222</code>, <code>×× ⊂ 22×</code>, <code>4∗2 ⊂ ∗442</code>, and the second diagonal mirror '
+        'into <code>∗333</code>) require shifting the origin by a quarter-period or rotating the mirror axis, '
+        'because in a fixed coordinate group two distinct index-2 subgroups on the same lattice generate a unique '
+        'order-4 supergroup (<code>⟨R₂, ∗ₓ⟩ = ∗2222</code> and <code>⟨R₄, ∗_d⟩ = ∗442</code>).</p>'
         '<p>In a single frozen frame (τ = 0), only the colour-fixing subgroup <i>K</i> = ker χ is visible; when the '
-        'animation is rolling, forgetting the clock projects the group to the spatial wallpaper group Γ. In '
-        '<strong>45</strong> of the 68 groups (<i>K</i> ≇ Γ), the projected wallpaper symmetry is absent from '
-        'individual frames and only appears when the animation rolls — including <strong>8</strong> pure screw/glide '
+        'animation is rolling, forgetting the clock projects the group to the spatial orbifold group Γ. In '
+        '<strong>45</strong> of the 68 groups (<i>K</i> ≇ Γ), the projected orbifold symmetry is absent from '
+        'individual frames and only appears when the animation rolls — including <strong>8</strong> pure translation '
         'groups (<i>K</i> = ◦) whose frozen frames have no point or mirror symmetry at all. In another '
         '<strong>6</strong> centred groups, each frame still has a copy of Γ on a coarser sublattice, while the '
         'remaining <strong>17</strong> one-colour groups have their full symmetry in every frame.</p></details>\n'

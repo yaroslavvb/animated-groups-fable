@@ -15,8 +15,20 @@
     .legend { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; margin: 22px 0 12px; font-size: .9rem; }
     .legend span::before { content: ''; display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #3175b5; margin-right: 7px; }
     .legend .more::before { background: #8553a2; }
-    .diagram { overflow: auto; background: white; border: 1px solid #dce4ee; border-radius: 14px; box-shadow: 0 4px 18px #2537550c; }
+    .diagram { position: relative; overflow: auto; background: white; border: 1px solid #dce4ee; border-radius: 14px; box-shadow: 0 4px 18px #2537550c; }
     .diagram svg { display: block; max-width: none; }
+    .hasse-floating-card { position: absolute; z-index: 6; width: min(300px, calc(100vw - 48px)); padding: 9px 11px; border: 1px solid #9ab8d7; border-radius: 8px; background: rgb(255 255 255 / 0.96); box-shadow: 0 6px 18px rgb(20 40 65 / 0.14); pointer-events: none; font-size: .75rem; line-height: 1.4; color: #17263a; }
+    .hasse-floating-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 5px 8px; margin-bottom: 5px; }
+    .hasse-floating-sig { font-size: .96rem; font-weight: 700; }
+    .hasse-floating-tuple { padding: 1px 6px; border-radius: 4px; background: #e6eff8; color: #173b61; font-family: ui-monospace, monospace; font-size: .72rem; font-weight: 650; }
+    .hasse-floating-cw { color: #526579; font-size: .7rem; }
+    .hasse-floating-gens { display: flex; flex-wrap: wrap; gap: 3px 6px; margin-bottom: 5px; }
+    .hasse-floating-gen { padding: 1px 6px; border: 1px solid #d4e0ec; border-radius: 4px; background: #f5f9fc; font-size: .7rem; }
+    .hasse-floating-gen code { color: #163d66; font-family: ui-monospace, monospace; font-weight: 650; }
+    .hasse-floating-steps { padding-top: 4px; border-top: 1px solid #e6edf5; font-size: .7rem; }
+    .hasse-floating-steps--in .hasse-floating-step-label { color: #145936; font-weight: 650; }
+    .hasse-floating-steps--out .hasse-floating-step-label { color: #7d340b; font-weight: 650; }
+    .hasse-floating-step code { font-family: ui-monospace, monospace; font-weight: 650; }
     .edge { stroke: #a9b8c9; stroke-width: 1.3; fill: none; }
     .edge.is-match { stroke: #286ba6; stroke-width: 1.85; }
     .edge.is-dimmed { opacity: .12; }
@@ -28,11 +40,45 @@
     .node.is-dimmed { opacity: .2; }
     .node text { fill: #173450; font-size: 13px; text-anchor: middle; font-weight: 700; }
     .node .chaim-sup { font-size: 8.2px; font-weight: 700; }
-    .node .number { fill: #58697c; font-size: 9.5px; font-weight: 500; font-family: ui-monospace, monospace; }
-    .node:hover rect, .node:focus rect, .node.is-neighbor rect { fill: #d4e9fa; stroke: #2267a5; stroke-width: 2; stroke-dasharray: none; }
-    .node:hover, .node:focus, .node.is-neighbor { opacity: 1; outline: none; }
-    .diagram:has(.node:hover) .edge, .diagram:has(.node:focus) .edge { opacity: .14; }
-    .diagram:has(.node:hover) .edge.active, .diagram:has(.node:focus) .edge.active { opacity: 1; stroke: #286ba6; stroke-width: 2; }
+    .node .number { fill: #4e6278; font-size: 8.1px; font-weight: 500; font-family: ui-monospace, monospace; }
+    .node:hover rect, .node:focus rect, .node.is-active rect { fill: #cfe6fc; stroke: #155799; stroke-width: 2.3; stroke-dasharray: none; }
+    .node.is-parent rect { fill: #dcf5e6; stroke: #1b7d4e; stroke-width: 2.1; stroke-dasharray: none; }
+    .node.is-child rect { fill: #fde9d9; stroke: #b85318; stroke-width: 2.1; stroke-dasharray: none; }
+    .node:hover, .node:focus, .node.is-active, .node.is-neighbor { opacity: 1; outline: none; }
+    .diagram:has(.node:hover) .edge, .diagram:has(.node:focus) .edge, .diagram svg.has-active-node .edge { opacity: .12; }
+    .diagram:has(.node:hover) .edge.is-incoming, .diagram:has(.node:focus) .edge.is-incoming, .diagram svg.has-active-node .edge.is-incoming { opacity: 1; stroke: #1b7d4e; stroke-width: 2.3; }
+    .diagram:has(.node:hover) .edge.is-outgoing, .diagram:has(.node:focus) .edge.is-outgoing, .diagram svg.has-active-node .edge.is-outgoing { opacity: 1; stroke: #b85318; stroke-width: 2.3; }
+    .edge-badge { pointer-events: none; }
+    .edge-badge rect { fill: #ffffff; stroke: #1d5f99; stroke-width: 1.2; }
+    .edge-badge--incoming rect { fill: #effbf4; stroke: #1b7d4e; }
+    .edge-badge--outgoing rect { fill: #fff5ed; stroke: #b85318; }
+    .edge-badge text { fill: #173450; font-family: ui-monospace, monospace; font-size: 9px; font-weight: 700; text-anchor: middle; }
+    .edge-badge--incoming text { fill: #135835; }
+    .edge-badge--outgoing text { fill: #80350a; }
+    .hasse-inspector { margin: 12px 0 0; padding: 10px 14px; border: 1px solid #dce4ee; border-radius: 10px; background: white; font-size: .82rem; line-height: 1.45; }
+    .hasse-inspector-title { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+    .hasse-inspector-kicker { color: #526579; font-size: .72rem; font-weight: 650; text-transform: uppercase; letter-spacing: .03em; }
+    .hasse-inspector-section-label { color: #526579; font-size: .74rem; font-weight: 650; margin-right: 4px; }
+    .hasse-step-col { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 8px; }
+    .hasse-step-list { display: inline-flex; flex-wrap: wrap; gap: 5px 7px; }
+    .hasse-step-empty { color: #526579; font-style: italic; }
+    .hasse-inspector-hint { margin: 0; color: #526579; }
+    .hasse-inspector-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 8px; }
+    .hasse-inspector-chaim { font-size: 1.1rem; font-weight: 700; color: #17263a; }
+    .hasse-inspector-cw { padding: 1px 6px; border-radius: 4px; background: #eef3f8; color: #36506b; font-size: .76rem; font-weight: 600; }
+    .hasse-inspector-gen-tuple { padding: 2px 7px; border-radius: 4px; background: #e6eff8; color: #173b61; font-family: ui-monospace, monospace; font-size: .78rem; font-weight: 600; }
+    .hasse-inspector-meta { color: #526579; font-size: .76rem; }
+    .hasse-inspector-generators { display: flex; flex-wrap: wrap; gap: 6px 8px; margin-bottom: 8px; }
+    .hasse-gen-pill { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 5px; padding: 3px 8px; border: 1px solid #cddae8; border-radius: 5px; background: #f6f9fc; font-size: .76rem; }
+    .hasse-gen-pill code { color: #163d66; font-family: ui-monospace, monospace; font-weight: 650; }
+    .hasse-gen-desc { color: #495d72; }
+    .hasse-inspector-steps { display: flex; flex-direction: column; gap: 5px; padding-top: 6px; border-top: 1px solid #e4ebf3; }
+    .hasse-step-group { display: flex; flex-wrap: wrap; align-items: center; gap: 5px 7px; }
+    .hasse-step-title { color: #526579; font-size: .75rem; font-weight: 650; margin-right: 3px; }
+    .hasse-step-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 7px; border-radius: 4px; font-size: .75rem; }
+    .hasse-step-chip code { font-family: ui-monospace, monospace; font-weight: 650; }
+    .hasse-step-chip--in { border: 1px solid #9bd3b5; background: #ebf9f0; color: #145936; }
+    .hasse-step-chip--out { border: 1px solid #ebb894; background: #fdf2ea; color: #7d340b; }
     .filters { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: flex-end; margin: 18px 0 12px; padding: 12px 14px; background: white; border: 1px solid #dce4ee; border-radius: 10px; }
     .filters label { display: flex; flex-direction: column; gap: 4px; font-size: .78rem; font-weight: 650; color: #526579; }
     .filters select, .filters button { min-height: 36px; padding: 6px 10px; border: 1px solid #b8c6d8; border-radius: 6px; background: #f9fbfd; font: inherit; font-size: .85rem; color: #17263a; }
@@ -45,9 +91,9 @@
 <body>
 <main>
   <a class="back" href="correspondence.html">← Clockwork / colouring correspondence</a>
-  <h1>Hasse diagram — Polar group inclusions</h1>
-  <p class="intro">Start with translations at the top and follow a line down to a group with more symmetries. Groups are marked in the Chaim short-form notation of <em>The Symmetries of Things</em> (with the polar space group symbol below). Select a group to open its colouring, clockwork and crystal. Hover or focus on a group to highlight its immediate connections.</p>
-  <p class="intro note"><strong>Scope:</strong> This diagram compares the atlas’s particular coordinate representatives on a shared unit translation lattice. It shows inclusions between those representatives, not every possible subgroup relationship between space-group types after changing the unit cell or origin. A line means no other displayed representative lies between the two.</p>
+  <h1>Hasse diagram — Orbifold generator inclusions</h1>
+  <p class="intro">Start with pure translations (<strong>◦</strong>, <code>⟨T⟩</code>) at the top and follow an edge down to add a point-group or colour-permuting symmetry generator. Groups are marked exclusively in Conway/Chaim orbifold notation, with the concise generator tuple below each signature. Hover or focus any node to inspect its generators and see which symmetry generator is added on each step down; select a node to open its colouring, clockwork film, and 3D crystal.</p>
+  <p class="intro note"><strong>Scope:</strong> All 68 groups are placed on the shared base translation lattice <code>T = ⟨t₁, t₂⟩</code> with origin <code>(0, 0)</code> so that every one of the 123 covering edges adds a single symmetry generator going downward.</p>
   <div class="filters" role="region" aria-label="Filter the 68 clockwork groups">
     <label>Number of colors
       <select data-filter-colors>
@@ -78,7 +124,8 @@
     <button type="button" data-filter-reset hidden>Reset filters</button>
   </div>
   <div class="legend"><span>Fewer symmetries</span><span class="more">More symmetries</span><small>On a narrow screen, scroll the diagram sideways.</small></div>
-  <div class="diagram" role="region" aria-label="Scrollable polar group inclusion diagram" tabindex="0"><svg id="graph" aria-label="Inclusion diagram of 68 polar group representatives"></svg></div>
+  <div class="diagram" role="region" aria-label="Scrollable orbifold generator inclusion diagram" tabindex="0"><svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim orbifold notation"></svg></div>
+  <div class="hasse-inspector" data-hasse-inspector aria-live="polite"></div>
   <p id="status" class="note" role="status">Loading diagram…</p>
   <details><summary>How the diagram is constructed</summary><p>Each atlas record lists its operations as a planar matrix, planar displacement and clock-axis shift. We compare these operations modulo integer translations in all three directions. An inclusion is drawn when every operation in the upper representative is also in the lower one, and no third displayed representative lies strictly between them. The vertical arrangement follows these inclusions; horizontal position has no mathematical meaning.</p><p>Space groups also have subgroups with different translation lattices, origin choices and embeddings. Those are outside this fixed-setting diagram. For the broader crystallographic subgroup problem, see the <a href="https://www.cryst.ehu.eus/cryst/maxsub.html">Bilbao Crystallographic Server’s maximal-subgroup tool</a>.</p></details>
 </main>
