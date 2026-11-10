@@ -38,6 +38,32 @@
 // `interactive: false` (contract C2; the kaleidoscopes, where nothing is cut): no handle, no drags, no keys, default
 // cursor, and the canvas is a labelled image out of the tab order.
 //
+// The replication (a C2 addition, 10 Nov 2026; the owner's ask "add another step where it actually shows how the
+// tiling and replication is done"; design in qa/rep-judge.md, the pure part in src/replicate.js):
+//   P.setTiling(u, fade = 0)   u in [0, 1]: how far the copies of the tile have been made; 1 = the plane as always
+//                              (nothing of the replication is drawn). fade in [0, 1]: every copy but the tile faded
+//                              out (the start of a replay: the copies fade, then are made again from the tile alone).
+//   P.getTiling()              -> { u, fade }
+//   P.tilingPlan()             -> { duration (s), stops: [{ t, label }] in u, layers, phases: [{ wave, t0, t1, count,
+//                              text }] (t0, t1 in u) } for the tile on screen, built now if need be; null without a scene
+//   P.tilingCaption(u = now)   the words for what acts at u ('' at u = 1): "half-turn about a 2-fold centre", ...; the
+//                              short words ("half-turn", "layer 3 of 6") on a pane whose short side is under CAPTION_SMALL
+//   P.setTilingTiming(t)       replace replicate.js REP_TIMING's values (for experiments; null = the defaults)
+//   options.onTilingPlan(info) called with tilingPlan()'s value whenever a plan is built whose duration or stops differ
+//                              from the last one's (another tile, group or window): the owner's timeline follows it
+//   P.setStepFrame(w | null)   (the final fix, 10 Nov 2026) w = { top, bottom }: the CSS px the step's words and bar take at
+//                              the pane's head and foot while the step shows on a small pane; the window eases to frame
+//                              the tile and its first layer between them, and back on null (applyStepFrame)
+//   P.getStepFrame()           -> { want, mix, frame, s0 }
+// A drag, a nudge or a wave keeps the replication's length (preparePlan, rep.lock), so u keeps its moment.
+// The copies grow out of the tile breadth first in the side pairings domain.edges[i].g (they generate the group:
+// Poincaré's theorem); every copy is h(D) for a group element h and reaches it by the continuous motion of its side
+// pairing (a turn about the centre, a slide, a flip over the mirror line, a half screw along the glide axis). While
+// u < 1 renderTiling draws: where copies have landed, the plane as always (tint, outlines, the pattern's two cached
+// layers, the landed copies' mirror edges); the tile; the moving and settling copies as cards (white paper, the commas
+// they carry, the tile's tint, the seam colours) between the tile's fill and its bold edges; the rotation glyphs as the
+// copies that hold them land; a ring on the centre a first-layer copy turns about, the dashed axis it glides along.
+//
 // Stable seam colours: domain.js numbers the glue classes in boundary order, which renumbers them while the seed
 // moves. setScene therefore gives every cut edge `edge.color` (index into palette CLASS_COLORS; kept as long as that
 // seam exists) and `edge.ticks` (its number of chevrons) — see assignEdgeColors. Whoever draws the same tile elsewhere
@@ -47,6 +73,7 @@ import { elementsNear, symmetryElements, latticeCoords } from './groups.js';
 import { INK, MUTED, FAINT, HAIRLINE, GROUND, ACCENT, ACCENT_SOFT, MIRROR_COLOR, GLIDE_COLOR, MOTIF_COLOR, CLASS_COLORS,
   MOTIF_ALPHA_PLANE, classColor, hexToRgb } from './palette.js';
 import { motifFor } from './motif.js';
+import { replicationPlan, copyState, cardState, planCaption, sidePairingMotion, smooth as smoothRep } from './replicate.js';
 
 const TAU = 2 * Math.PI;
 
@@ -70,6 +97,14 @@ export const MOTIF_FILL = overGround(MOTIF_COLOR, MOTIF_ALPHA_PLANE);
 
 /** Panes whose short side is below this many CSS px count as small (phones): lighter glide axes. */
 export const SMALL_PANE = 300;
+/**
+ * The replication's frame on a small pane (setStepFrame; the final fix of 10 Nov 2026): it eases in and out over
+ * STEP_FRAME_MS; it frames the tile and its first layer's copies at the times STEP_PATH of their motions, STEP_PAD px
+ * inside the free part of the pane; its scale stays within STEP_SCALE of the window's own.
+ */
+export const STEP_FRAME_MS = 420, STEP_PATH = Object.freeze([0.25, 0.5, 0.75, 1]), STEP_PAD = 6, STEP_SCALE = Object.freeze([0.4, 1.8]);
+/** Below this short side (CSS px) the replication's words are the short ones (one line on a phone's plane). */
+export const CAPTION_SMALL = 360;
 /**
  * Small panes zoom in (final fix, 10 Nov 2026: on a 148 px phone plane the 2*22 tile was 49 x 19 px, under its handle,
  * qa/final-verify-fresh-eyes/p375/B6-2s22-t0.png): a tile (sqrt(domainArea)) takes at least zoomShare(m) of the pane's
@@ -477,8 +512,11 @@ export function createPlaneView(canvas, options = {}) {
   const now = () => (win && win.performance && win.performance.now ? win.performance.now()
     : typeof performance !== 'undefined' ? performance.now() : Date.now());
 
-  const view = { W: 300, H: 150, dpr: 1, kx: 1, ky: 1, s: 100, cx: 0, cy: 0 };   // cx, cy: as drawn on screen
+  const view = { W: 300, H: 150, dpr: 1, kx: 1, ky: 1, s: 100, s0: 100, cx: 0, cy: 0 };   // cx, cy, s: as drawn on screen; s0: fit()'s scale
   const pan = { active: false, tx: 0, ty: 0, x0: 0, y0: 0, vx: 0, vy: 0, t0: 0, omega: PAN_OMEGA };   // glide to (tx, ty)
+  // the replication's frame on a small pane (setStepFrame): want = { top, bottom } insets or null; mix 0 (the window as
+  // always) .. 1 (the step's frame), eased from `from` at t0 toward `to`; frame = { s, cx, cy } the step's window
+  const stepF = { want: null, mix: 0, from: 0, to: 0, t0: 0, frame: null, active: false, prev: null, ft0: 0, moving: false };
   let home = [0, 0];         // the focus when the cut was chosen: the seed stays within viewHalf of it
   let scene = null;          // { group, domain, motif, star, interactive }
   let tileP = null;          // derived from the scene and the scale: outline, ring, box, marks, ...
@@ -515,7 +553,8 @@ export function createPlaneView(canvas, options = {}) {
    *  the focus: see moveWindow.) */
   function fit() {
     const g = scene ? scene.group : null, m = Math.min(view.W, view.H);
-    view.s = g ? planeScale(g, m, scene.interactive) : m / 2;
+    view.s = view.s0 = g ? planeScale(g, m, scene.interactive) : m / 2;
+    if (stepF.want) stepF.frame = null;    // (the replication's frame, if it shows, is made again for this scale)
   }
   function resize() {
     const box = cssSize();
@@ -533,6 +572,7 @@ export function createPlaneView(canvas, options = {}) {
     view.W = w; view.H = h; view.dpr = dpr; view.kx = bw / w; view.ky = bh / h;
     fit();
     tileP = null; viewP = null; groupData = null;
+    rep.lockStale = true;                  // another window: the replication may take a length of its own
     if (scene) { const c = keepInside(focusBox(), pan.tx, pan.ty); moveWindow(c[0], c[1], false); }
     render();                              // at once: resizing a canvas clears it
   }
@@ -553,7 +593,9 @@ export function createPlaneView(canvas, options = {}) {
   function moveWindow(tx, ty, glide, omega = PAN_OMEGA) {
     if (glide && canGlide()) {
       const t = now();
-      const st = pan.active ? glideAt(t) : { x: view.cx, y: view.cy, vx: 0, vy: 0 };   // position and speed carry over
+      // position and speed carry over (at rest the window as always is centred on the last target: view.cx may hold
+      // the replication's frame, setStepFrame, blended in)
+      const st = pan.active ? glideAt(t) : { x: pan.tx, y: pan.ty, vx: 0, vy: 0 };
       pan.x0 = st.x; pan.y0 = st.y; pan.vx = st.vx; pan.vy = st.vy; pan.t0 = t; pan.tx = tx; pan.ty = ty; pan.omega = omega;
       pan.active = (Math.hypot(tx - st.x, ty - st.y) + 0.05 * Math.hypot(st.vx, st.vy)) * view.s > 0.05;
       if (pan.active) requestFrame(); else { view.cx = tx; view.cy = ty; }
@@ -616,17 +658,24 @@ export function createPlaneView(canvas, options = {}) {
 
   // ---- per group (window size and region): the symmetry elements ------------------------------------------------
   function viewRadius() { return Math.hypot(view.W, view.H) / (2 * view.s); }
+  /** The scale the region of the symmetry elements (and the replication's plan) is gathered for: the window's, or,
+   *  while the replication's frame shows or eases (setStepFrame), the smaller of the two scales (the larger window),
+   *  so that nothing is gathered again on the way. */
+  function regionScale() {
+    const F = (stepF.want || stepF.mix > 0) ? stepF.frame : null;
+    return F ? Math.min(view.s0, F.s) : view.s;
+  }
   function ensureGroupData() {
-    const g = scene.group;
-    const key = g.id + '|' + view.W + 'x' + view.H;
+    const g = scene.group, sR = regionScale();
+    const key = g.id + '|' + view.W + 'x' + view.H + '|' + sR;
     if (groupData && groupData.key === key && groupData.group === g &&
       Math.abs(view.cx - groupData.gx) <= groupData.E && Math.abs(view.cy - groupData.gy) <= groupData.E) return groupData;
     // gathered for a region around the window's centre that the window can glide in without gathering them again
     const E = 0.6 * g.viewHalf;
-    const R = viewRadius() + E * Math.SQRT2;
+    const R = Math.hypot(view.W, view.H) / (2 * sR) + E * Math.SQRT2;
     const sym = symmetryElements(g, view.cx, view.cy, R * 1.02 + 1e-6);
     const ang = glyphOrientation(g);
-    const hw = view.W / (2 * view.s) + E + 0.1, hh = view.H / (2 * view.s) + E + 0.1;
+    const hw = view.W / (2 * sR) + E + 0.1, hh = view.H / (2 * sR) + E + 0.1;
     const centers = [];
     let dmin = Infinity;
     for (const c of sym.centers) {
@@ -658,8 +707,9 @@ export function createPlaneView(canvas, options = {}) {
     // about 0.15 px of the curve (its tightest radius of curvature is about size / (6 amp)), in steps of 2.2 .. 7 px.
     let step = 1e9;
     if (wavy) {
-      const rc = (0.167 * size * view.s) / warp.amp;
-      step = Math.max(2.2, Math.min(7, Math.sqrt(1.2 * rc))) / view.s;
+      // (at the window's own scale s0: the replication's frame, setStepFrame, leaves the tile's samples as they are)
+      const rc = (0.167 * size * view.s0) / warp.amp;
+      step = Math.max(2.2, Math.min(7, Math.sqrt(1.2 * rc))) / view.s0;
     }
     const outline = domain.outline(step);
     let np = 0;
@@ -691,7 +741,7 @@ export function createPlaneView(canvas, options = {}) {
   /** Everything a frame needs: prepareTile() plus what depends on the window (copies, tint, cones, chevrons). */
   function prepare() {
     const T = prepareTile(), gd = ensureGroupData();
-    if (viewP && viewP.T === T && viewP.gd === gd && viewP.cx === view.cx && viewP.cy === view.cy) return viewP.P;
+    if (viewP && viewP.T === T && viewP.gd === gd && viewP.cx === view.cx && viewP.cy === view.cy && viewP.s === view.s) return viewP.P;
     const { group, domain } = scene;
     const M = metrics();
     // every copy of the tile that can touch the canvas
@@ -737,7 +787,7 @@ export function createPlaneView(canvas, options = {}) {
       chevrons.push({ mark: m, at, edge: m.edge, edgePx, clear, fit });
     }
     const P = Object.assign({}, T, { copies, eps, tinted: tintedCopies(copies, eps), cones, chevrons });
-    viewP = { T, gd, cx: view.cx, cy: view.cy, P };
+    viewP = { T, gd, cx: view.cx, cy: view.cy, s: view.s, P };
     return P;
   }
 
@@ -756,13 +806,14 @@ export function createPlaneView(canvas, options = {}) {
     if (close) c.closePath();
   }
 
-  /** The part of the picture that depends on the group and the window only: motif copies, mirrors, glide axes. */
-  function drawPattern(c) {
+  /** The part of the picture that depends on the group and the window only: motif copies, mirrors, glide axes.
+   *  `parts`: which of them ({ motif, glides, mirrors }, all by default) — the replication draws them apart. */
+  function drawPattern(c, parts = { motif: true, glides: true, mirrors: true }) {
     const { group, motif } = scene;
     const gd = ensureGroupData(), M = metrics();
     const R = viewRadius();
     const hw = view.W / (2 * view.s) + motif.radius, hh = view.H / (2 * view.s) + motif.radius;
-    const els = elementsNear(group, view.cx, view.cy, R + motif.radius, motif.at[0], motif.at[1]);
+    const els = parts.motif ? elementsNear(group, view.cx, view.cy, R + motif.radius, motif.at[0], motif.at[1]) : [];
     const closedOf = (i) => (motif.closed ? !!motif.closed[i] : false);
     // closed outlines: filled, all copies in one path (they are pairwise disjoint)
     c.beginPath();
@@ -782,7 +833,7 @@ export function createPlaneView(canvas, options = {}) {
     // the lines were gathered around (gx, gy); each is drawn far enough both ways to cross the whole window
     const L = 2 * gd.R + 1;
     // glide axes: dashed
-    if (gd.sym.glides.length) {
+    if (parts.glides && gd.sym.glides.length) {
       c.beginPath();
       for (const m of gd.sym.glides) {
         c.moveTo(X(m.px - L * m.ux), Y(m.py - L * m.uy)); c.lineTo(X(m.px + L * m.ux), Y(m.py + L * m.uy));
@@ -792,7 +843,7 @@ export function createPlaneView(canvas, options = {}) {
       c.setLineDash([]);
     }
     // mirrors: solid ink
-    if (gd.sym.mirrors.length) {
+    if (parts.mirrors && gd.sym.mirrors.length) {
       c.beginPath();
       for (const m of gd.sym.mirrors) {
         c.moveTo(X(m.px - L * m.ux), Y(m.py - L * m.uy)); c.lineTo(X(m.px + L * m.ux), Y(m.py + L * m.uy));
@@ -801,11 +852,18 @@ export function createPlaneView(canvas, options = {}) {
     }
   }
 
-  function patternLayer() {
+  // The pattern is cached in two offscreen layers, drawn in this order: 'base' (the motif's fills, the dashed glide
+  // axes) and 'mirrors' (the mirror lines, solid ink): the picture drawPattern draws in one go. The replication
+  // (renderTiling) shows 'base' only where copies of the tile have landed, and the landed copies' mirror edges, merged
+  // into runs, through the offscreen 'scratch' canvas, so that they are rasterised exactly as the 'mirrors' layer is:
+  // once every copy has landed, its picture IS the plane's. 'scratch' is dropped when the replication is complete.
+  const layerCache = { base: null, mirrors: null, scratch: null };
+  function patternLayer(kind = 'base') {
     if (!doc || !doc.createElement) return null;
-    const key = scene.group.id + '|' + canvas.width + 'x' + canvas.height + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy;
-    if (cache && cacheKey === key && cache.motif === scene.motif) return cache.canvas;
-    let cv = cache ? cache.canvas : null;
+    const key = scene.group.id + '|' + canvas.width + 'x' + canvas.height + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy + '|' + view.s;
+    const old = layerCache[kind];
+    if (old && old.key === key && old.motif === scene.motif) return old.canvas;
+    let cv = old ? old.canvas : null;
     if (!cv) { cv = doc.createElement('canvas'); }
     const cc = cv.getContext && cv.getContext('2d');
     if (!cc) return null;
@@ -814,9 +872,29 @@ export function createPlaneView(canvas, options = {}) {
     cc.setTransform(1, 0, 0, 1, 0, 0);
     cc.clearRect(0, 0, cv.width, cv.height);
     cc.setTransform(view.kx, 0, 0, view.ky, 0, 0);
-    drawPattern(cc);
-    cache = { canvas: cv, motif: scene.motif }; cacheKey = key;
+    drawPattern(cc, LAYER_PARTS[kind]);
+    layerCache[kind] = { canvas: cv, motif: scene.motif, key };
     return cv;
+  }
+  const LAYER_PARTS = { base: { motif: true, glides: true }, mirrors: { mirrors: true } };
+  function drawLayer(c, kind) {
+    const layer = patternLayer(kind);
+    if (!layer) { drawPattern(c, LAYER_PARTS[kind]); return; }
+    c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(layer, 0, 0); c.restore();
+  }
+  /** An offscreen canvas the size of the plane's, cleared, with the world-to-css transform: for the replication's mirrors. */
+  function scratchLayer() {
+    if (!doc || !doc.createElement) return null;
+    let cv = layerCache.scratch;
+    if (!cv) { cv = doc.createElement('canvas'); layerCache.scratch = cv; }
+    const cc = cv.getContext && cv.getContext('2d');
+    if (!cc) return null;
+    if (cv.width !== canvas.width) cv.width = canvas.width;
+    if (cv.height !== canvas.height) cv.height = canvas.height;
+    cc.setTransform(1, 0, 0, 1, 0, 0);
+    cc.clearRect(0, 0, cv.width, cv.height);
+    cc.setTransform(view.kx, 0, 0, view.ky, 0, 0);
+    return { cv, cc };
   }
 
   function drawCopies(c, P, M) {
@@ -862,17 +940,20 @@ export function createPlaneView(canvas, options = {}) {
     }
   }
 
-  function drawTile(c, P, M) {
+  /** The current tile. `starAlpha` scales the snowflake patch's outline; `between(c)` draws after the tile's fill and
+   *  before its handle and bold edges (the replication's moving copies: they pass over the tile, under its edges). */
+  function drawTile(c, P, M, { starAlpha = 1, between = null } = {}) {
     const { domain } = scene;
     const { ring, outline } = P;
     c.beginPath(); tracePoly(c, ring, null, true);
     c.fillStyle = ACCENT_SOFT; c.fill();
     // the snowflake patch's outer boundary
-    if (P.starEdges && P.starEdges.length) {
+    if (P.starEdges && P.starEdges.length && starAlpha > 0.004) {
       c.beginPath();
       for (const e of P.starEdges) { c.moveTo(X(e[0]), Y(e[1])); c.lineTo(X(e[2]), Y(e[3])); }
-      c.lineCap = 'round'; c.strokeStyle = rgba(ACCENT, 0.55); c.lineWidth = Math.max(2, 0.62 * M.edge); c.stroke();
+      c.lineCap = 'round'; c.strokeStyle = rgba(ACCENT, +(0.55 * starAlpha).toFixed(4)); c.lineWidth = Math.max(2, 0.62 * M.edge); c.stroke();
     }
+    if (between) between(c);
     // the seed handle lies in the tile, under its bold edges: a seed next to an edge never hides it
     drawHandle(c, P, M);
     c.lineJoin = 'round'; c.lineCap = 'round';
@@ -990,6 +1071,7 @@ export function createPlaneView(canvas, options = {}) {
     if (win && Math.min(3, Math.max(1, win.devicePixelRatio || 1)) !== view.dpr) { resize(); return; }
     const t0 = now();
     advanceGlide(t0);
+    applyStepFrame(t0);
     dirty = false; lastDrawAt = t0;
     const c = ctx;
     c.setTransform(view.kx, 0, 0, view.ky, 0, 0);
@@ -997,14 +1079,420 @@ export function createPlaneView(canvas, options = {}) {
     c.fillStyle = GROUND; c.fillRect(0, 0, view.W, view.H);
     if (!scene) return;
     const P = prepare(), M = metrics();
-    drawCopies(c, P, M);
-    const layer = patternLayer();
-    if (layer) { c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(layer, 0, 0); c.setTransform(view.kx, 0, 0, view.ky, 0, 0); } else drawPattern(c);
-    drawTile(c, P, M);                         // (with the handle, under the tile's bold edges)
-    drawGlyphs(c, P, M);
+    if (tilingActive()) renderTiling(c, P, M);
+    else {                                     // the plane as always
+      drawCopies(c, P, M);
+      drawLayer(c, 'base'); drawLayer(c, 'mirrors');
+      drawTile(c, P, M);                       // (with the handle, under the tile's bold edges)
+      drawGlyphs(c, P, M);
+    }
     drawHint(c);
     stats.ms = now() - t0; stats.copies = P.copies.length;
-    if (pan.active) requestFrame();            // the glide goes on
+    if (pan.active || stepF.active || stepF.moving) requestFrame();            // the glide (or the step's frame) goes on
+  }
+
+  // ---- the replication's frame on a small pane (the final fix, 10 Nov 2026: findings 2 and 6) -------------------
+  // On a phone the plane is about 225 px; the step's words sit at its head and its bar at its foot, right where the
+  // first layer's copies swing (35-49 % of 2222's first half-turn was hidden at 390 x 780, 375 x 667, 360 x 640). While
+  // the owner says the step shows there (setStepFrame({ top, bottom }): the heights the words and the bar take), the
+  // window eases (STEP_FRAME_MS, smootherstep) to frame the tile and the paths of its first layer between the two —
+  // zooming out, or in for a kaleidoscope's small tile, within STEP_SCALE of the scale as always — and back to the
+  // window as always when the owner says it is over. A drag keeps the frame; a cut chosen from outside, a new group or
+  // window makes it again (eased). With prefers-reduced-motion it jumps. At mix 0 the window is exactly as always.
+  /** The step's window for the tile on screen: { s, cx, cy }, or null (no room, no scene). */
+  function stepTarget() {
+    if (!scene || !stepF.want) return null;
+    const T = prepareTile(), ring = T.ring;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const add = (A) => {
+      for (let i = 0; i < ring.length; i += 2) {
+        const x = A.a * ring[i] + A.b * ring[i + 1] + A.tx, y = A.c * ring[i] + A.d * ring[i + 1] + A.ty;
+        if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+      }
+    };
+    add({ a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 });
+    // the first layer: every side pairing's copy, along its path (a turn sweeps beyond where it starts and lands)
+    for (const e of scene.domain.edges) {
+      const m = sidePairingMotion(scene.group, e.g);
+      for (const s of STEP_PATH) add(m.at(s));
+    }
+    const pad = STEP_PAD, W = view.W - 2 * pad, H = view.H - stepF.want.top - stepF.want.bottom - 2 * pad;
+    if (!(W > 24 && H > 24 && x1 > x0 && y1 > y0)) return null;
+    const s = Math.max(STEP_SCALE[0] * view.s0, Math.min(STEP_SCALE[1] * view.s0, Math.min(W / (x1 - x0), H / (y1 - y0))));
+    return { s, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 + (stepF.want.top - stepF.want.bottom) / (2 * s) };
+  }
+  /** The frame a new target eases from: the one in use at time t. */
+  function frameAt(t) {
+    const F = stepF.frame;
+    if (!F || !stepF.prev) return F;
+    const x = (t - stepF.ft0) / STEP_FRAME_MS;
+    if (!(x < 1)) { stepF.prev = null; stepF.moving = false; return F; }
+    const e = x <= 0 ? 0 : x * x * x * (x * (6 * x - 15) + 10), P0 = stepF.prev;
+    return { s: P0.s * Math.pow(F.s / P0.s, e), cx: P0.cx + (F.cx - P0.cx) * e, cy: P0.cy + (F.cy - P0.cy) * e };
+  }
+  /** Make the frame again for the tile on screen (a cut chosen from outside, a new group or size), eased from the old. */
+  function restepFrame() {
+    if (!stepF.want) return;
+    const t = now(), cur = stepF.mix > 0 ? frameAt(t) : null, next = (stepF.frame = null, stepTarget());
+    stepF.frame = next;
+    if (cur && next && canGlide()) { stepF.prev = cur; stepF.ft0 = t; stepF.moving = true; } else { stepF.prev = null; stepF.moving = false; }
+  }
+  /** Bring the step's frame up to time t: view.s, view.cx, view.cy as drawn (after advanceGlide, which set the glide). */
+  function applyStepFrame(t) {
+    const nx = pan.active ? view.cx : pan.tx, ny = pan.active ? view.cy : pan.ty;    // the window as always now
+    if (stepF.active) {
+      const x = (t - stepF.t0) / STEP_FRAME_MS;
+      if (!(x < 1)) { stepF.mix = stepF.to; stepF.active = false; }
+      else { const e = x <= 0 ? 0 : x * x * x * (x * (6 * x - 15) + 10); stepF.mix = stepF.from + (stepF.to - stepF.from) * e; }
+    }
+    if (stepF.want && !stepF.frame) stepF.frame = stepTarget();
+    const F = stepF.mix > 0 ? frameAt(t) : null;
+    if (!F) { view.s = view.s0; view.cx = nx; view.cy = ny; return; }           // exactly the window as always
+    const e = stepF.mix;
+    view.s = view.s0 * Math.pow(F.s / view.s0, e);
+    view.cx = nx + (F.cx - nx) * e; view.cy = ny + (F.cy - ny) * e;
+  }
+
+  // ---- the replication: how the tiling is made (replicate.js) ---------------------------------------------------
+  // rep.u in [0, 1] is the progress (1 = the tiling as always, and then nothing of this runs); rep.fade in [0, 1]
+  // fades every copy but the tile out (a replay starts from the tile alone: the copies fade, then are made again).
+  // The plan (which copy comes out of which, by which side pairing, when) is built for the tile and the region of
+  // the symmetry elements (ensureGroupData), and rebuilt with either.
+  const rep = { u: 1, fade: 0, plan: null, planFor: null, timing: null, lastInfo: '', lock: null, lockStale: true };
+  const onTilingPlan = typeof options.onTilingPlan === 'function' ? options.onTilingPlan : null;
+  function tilingActive() { return !!scene && (rep.u < 1 - 1e-9 || rep.fade > 1e-9); }
+
+  // THE LENGTH IS KEPT while the person changes the cut (the final fix, 10 Nov 2026, finding 5: one 4-px step of a
+  // drag re-timed 333's replication from 5.30 to 5.76 s, so u fell in another moment and the copies jumped). rep.lock
+  // = { group, T } is the length of the last plan made from scratch: a new group, a cut chosen from outside (a preset,
+  // a link, the API), a new window size or timing, or any plan made while nothing of the replication shows (u = 0 or
+  // 1). A drag, a nudge or a wave keeps it (replicate.js opts.total: the first layer as it is, the later layers fill
+  // the rest), so u means the same moment through the gesture.
+  function preparePlan() {
+    if (stepF.want && !stepF.frame) stepF.frame = stepTarget();
+    const T = prepareTile(), gd = ensureGroupData();
+    if (rep.plan && rep.planFor && rep.planFor.T === T && rep.planFor.gd === gd) return rep.plan;
+    const { group, domain } = scene;
+    // the copies of the region the symmetry elements were gathered for (it holds the step's frame too), timed for the
+    // window: the step's frame while it shows (setStepFrame), else the window as always
+    const sR = regionScale(), hw = view.W / (2 * sR), hh = view.H / (2 * sR);
+    const region = { cx: gd.gx, cy: gd.gy, hw: hw + gd.E, hh: hh + gd.E };
+    const F = stepF.want ? stepF.frame : null;
+    const win = F ? { cx: F.cx, cy: F.cy, hw: view.W / (2 * F.s), hh: view.H / (2 * F.s) }
+      : { cx: pan.tx, cy: pan.ty, hw: view.W / (2 * view.s0), hh: view.H / (2 * view.s0) };
+    const fresh = !rep.lock || rep.lock.group !== group || rep.lockStale || !(rep.u > 1e-9 && rep.u < 1 - 1e-9);
+    const plan = replicationPlan(group, domain, { seedA: T.seedA, reach: T.rt, region, window: win, centres: gd.centers,
+      timing: rep.timing || undefined, total: fresh ? undefined : rep.lock.T });
+    if (fresh || !plan.locked) rep.lock = { group, T: plan.T };
+    rep.lockStale = false;
+    // the motif copies that meet the tile (closed outlines, world coordinates): what a moving copy carries
+    const motif = scene.motif, m0 = motif.polylines;
+    let cx = 0, cy = 0;
+    for (let i = 0; i < T.ring.length; i += 2) { cx += T.ring[i]; cy += T.ring[i + 1]; }
+    cx /= T.ring.length / 2; cy /= T.ring.length / 2;
+    let rr = 0;
+    for (let i = 0; i < T.ring.length; i += 2) rr = Math.max(rr, Math.hypot(T.ring[i] - cx, T.ring[i + 1] - cy));
+    const commas = [];
+    for (const g of elementsNear(group, cx, cy, rr + motif.radius + 1e-9, motif.at[0], motif.at[1])) {
+      m0.forEach((pl, i) => {
+        if (motif.closed && !motif.closed[i]) return;
+        const out = new Float64Array(pl.length);
+        for (let k = 0; k < pl.length; k += 2) { out[k] = g.a * pl[k] + g.b * pl[k + 1] + g.tx; out[k + 1] = g.c * pl[k] + g.d * pl[k + 1] + g.ty; }
+        commas.push(out);
+      });
+    }
+    // the tile's mirror edges (they become mirror lines where copies land)
+    const mirrorEdges = T.outline.filter((o) => scene.domain.edges[o.edge].kind === 'mirror').map((o) => o.pts);
+    plan.commas = commas; plan.mirrorEdges = mirrorEdges;
+    rep.plan = plan; rep.planFor = { T, gd };
+    const info = plan.T.toFixed(4) + '|' + plan.stops.map((s) => s.t.toFixed(5)).join(',');
+    if (info !== rep.lastInfo) { rep.lastInfo = info; if (onTilingPlan) { try { onTilingPlan(tilingInfo()); } catch (e) { /* the owner's business */ } } }
+    return plan;
+  }
+  /** What the owner's timeline needs: { duration (s), stops [{ t, label }] in u, layers, phases }. */
+  function tilingInfo() {
+    const plan = rep.plan;
+    if (!plan) return null;
+    return { duration: plan.T, stops: plan.stops.map((s) => ({ ...s })), layers: plan.waves, phases: plan.phases.map((p) => ({ wave: p.wave, t0: p.t0 / plan.T, t1: p.t1 / plan.T, count: p.count, text: p.text })) };
+  }
+
+  /** Trace pts (flat world coordinates) through the affine map A, counter-clockwise when `ccw` (reversed if A turns it over). */
+  function traceAffine(c, pts, A, close, ccw = false) {
+    const n = pts.length >> 1, rev = ccw && A.a * A.d - A.b * A.c < 0;
+    for (let k = 0; k < n; k++) {
+      const i = 2 * (rev ? n - 1 - k : k), x = A.a * pts[i] + A.b * pts[i + 1] + A.tx, y = A.c * pts[i] + A.d * pts[i + 1] + A.ty;
+      if (k === 0) c.moveTo(X(x), Y(y)); else c.lineTo(X(x), Y(y));
+    }
+    if (close) c.closePath();
+  }
+
+  function renderTiling(c, P, M) {
+    const plan = preparePlan();
+    const gd = ensureGroupData();
+    const tau = Math.max(0, Math.min(1, rep.u)) * plan.T;
+    const keep = 1 - Math.max(0, Math.min(1, rep.fade));      // the replay's fade-out of every copy but the tile
+    const hw = view.W / (2 * view.s) + P.rt, hh = view.H / (2 * view.s) + P.rt, sa = P.seedA;
+    const inView = (g) => {
+      const x = g.a * sa[0] + g.b * sa[1] + g.tx, y = g.c * sa[0] + g.d * sa[1] + g.ty;
+      return Math.abs(x - view.cx) <= hw && Math.abs(y - view.cy) <= hh;
+    };
+    // every copy's state; the landed ones in view (plain, or settling: grouped by phase), the moving ones
+    const states = new Array(plan.copies.length);
+    const landed = [], settling = new Map(), moving = [];
+    for (const cp of plan.copies) {
+      const st = copyState(plan, cp, tau);
+      states[cp.index] = st;
+      if (st.phase === 'hidden') continue;
+      if (st.phase === 'moving') { moving.push({ cp, st }); continue; }
+      if (cp.index !== 0 && !inView(cp.g)) continue;
+      if (st.phase === 'landed') { if (cp.index !== 0) landed.push(cp); continue; }
+      let s = settling.get(cp.phase);
+      if (!s) { s = { sigma: st.sigma, list: [] }; settling.set(cp.phase, s); }
+      s.list.push(cp);
+    }
+    const settle = [...settling.values()];
+    const ring = P.ring;
+    const pathOf = (list, ccw = true) => { c.beginPath(); for (const cp of list) traceAffine(c, ring, cp.g, true, ccw); };
+    const k3 = (a) => +Math.max(0, Math.min(1, a)).toFixed(4);
+    // the end of the last settle: the kaleidoscope's patch comes back with it
+    const endK = keep * smoothRep((tau - (plan.T - plan.settle)) / plan.settle);
+
+    // 1. where copies have landed (settling ones too: the paper of their card, fading, covers them), the plane as
+    //    always: the tint of the other hand, the outlines, the motif's fills, the glide axes, the mirror edges. The
+    //    tile and the rest are drawn apart only while the replay fades the rest out.
+    const tile = [plan.copies[0]];
+    const down = landed.concat(settle.flatMap((s) => s.list));
+    const parts = keep >= 1 ? [[tile.concat(down), 1]] : [[tile, 1], [down, keep]];
+    const tinted = (cp) => cp.index !== 0 && cp.det * P.eps < 0;
+    for (const [list, a] of parts) {
+      const l = list.filter(tinted);
+      if (l.length && a > 0.004) { pathOf(l); c.fillStyle = rgba(INK, k3(0.05 * a)); c.fill(); }
+    }
+    if (P.star && endK > 0.004) {
+      c.beginPath();
+      for (const poly of P.star) { poly.forEach((p, i) => { if (i === 0) c.moveTo(X(p[0]), Y(p[1])); else c.lineTo(X(p[0]), Y(p[1])); }); c.closePath(); }
+      c.fillStyle = rgba(ACCENT, k3(0.07 * endK)); c.fill();
+    }
+    c.lineJoin = 'round'; c.lineCap = 'butt'; c.lineWidth = M.outline;
+    for (const [list, a] of parts) {
+      if (!list.length || a <= 0.004) continue;
+      pathOf(list, false); c.strokeStyle = rgba(FAINT, k3(M.outlineAlpha * a)); c.stroke();
+    }
+    for (const [list, a] of parts) {
+      if (!list.length || a <= 0.004) continue;
+      c.save(); pathOf(list); c.clip(); c.globalAlpha = a; drawLayer(c, 'base'); c.restore();
+    }
+    if (plan.mirrorEdges.length) {
+      for (const [list, a] of parts) {
+        if (!list.length || a <= 0.004) continue;
+        const S = scratchLayer(), cc = S ? S.cc : c;           // offscreen, as the plane's own mirrors are drawn
+        cc.beginPath();
+        mirrorRuns(list, plan.mirrorEdges, cc);
+        cc.lineCap = 'butt'; cc.strokeStyle = MIRROR_COLOR; cc.lineWidth = M.mirror;
+        if (!S) { c.globalAlpha = a; c.stroke(); c.globalAlpha = 1; continue; }
+        cc.stroke();
+        c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = a; c.drawImage(S.cv, 0, 0); c.restore();
+      }
+    }
+
+    // 3. the tile; the moving and settling copies pass over its fill, under its bold edges
+    drawTile(c, P, M, {
+      starAlpha: endK,
+      between: (cc) => {
+        // (replicate.js cardState: the opacity, the face that is up — the parent's, turned over by a flip as it passes
+        // edge-on — and the lift of a flip; the settling cards first, in the order of their phases, then the moving)
+        for (const s of settle) for (const cp of s.list) { const cs = cardState(plan, cp, states[cp.index], keep); if (cs) drawCard(cc, P, M, cs.A, cs); }
+        for (const { cp, st } of moving) { const cs = cardState(plan, cp, st, keep); if (cs) drawCard(cc, P, M, cs.A, cs); }
+      },
+    });
+
+    // 4. the rotation centres where a copy that holds them has landed; a soft ring round the centre a copy turns about
+    drawTilingGlyphs(c, P, M, plan, states, keep);
+    drawCues(c, P, M, plan, moving, keep);
+  }
+
+  /**
+   * The mirror edges of the copies in `list` (the tile's mirror edges `edges`, flat world points, carried by each
+   * copy's element), merged along each mirror line into maximal runs and traced into c: once every copy in view has
+   * landed, each mirror line is one segment across the window, rasterised as the plane's own full line is.
+   */
+  function mirrorRuns(list, edges, c) {
+    const lines = new Map(), eps = 1e-7 * Math.sqrt(scene.group.domainArea);
+    for (const cp of list) {
+      const g = cp.g;
+      for (const pts of edges) {
+        const n = pts.length >> 1;
+        const ax = g.a * pts[0] + g.b * pts[1] + g.tx, ay = g.c * pts[0] + g.d * pts[1] + g.ty;
+        const bx = g.a * pts[2 * n - 2] + g.b * pts[2 * n - 1] + g.tx, by = g.c * pts[2 * n - 2] + g.d * pts[2 * n - 1] + g.ty;
+        let ux = bx - ax, uy = by - ay;
+        const l = Math.hypot(ux, uy);
+        if (!(l > 0)) continue;
+        ux /= l; uy /= l;
+        if (ux < -1e-9 || (Math.abs(ux) <= 1e-9 && uy < 0)) { ux = -ux; uy = -uy; }
+        const off = -ax * uy + ay * ux, key = Math.round(Math.atan2(uy, ux) * 1e6) + '|' + Math.round(off * 1e6);
+        let L = lines.get(key);
+        if (!L) { L = { ux, uy, off, iv: [] }; lines.set(key, L); }
+        const ta = ax * ux + ay * uy, tb = bx * ux + by * uy;
+        L.iv.push([Math.min(ta, tb), Math.max(ta, tb)]);
+      }
+    }
+    for (const L of lines.values()) {
+      L.iv.sort((p, q) => p[0] - q[0]);
+      const nx = -L.uy, ny = L.ux, at = (t) => [L.off * nx + t * L.ux, L.off * ny + t * L.uy];
+      let cur = null;
+      const flush = () => { const a = at(cur[0]), b = at(cur[1]); c.moveTo(X(a[0]), Y(a[1])); c.lineTo(X(b[0]), Y(b[1])); };
+      for (const iv of L.iv) {
+        if (cur && iv[0] <= cur[1] + eps) { if (iv[1] > cur[1]) cur[1] = iv[1]; continue; }
+        if (cur) flush();
+        cur = iv.slice();
+      }
+      if (cur) flush();
+    }
+  }
+
+  /**
+   * A copy of the tile on its way: the paper (white), the commas it carries, the tile's tint, its edges in their
+   * colours. `back` in [0, 1]: how much of the paper's back is up (a faint ink tint); `lift` in [0, 1]: how high a
+   * copy that turns over stands out of the plane (sin(π s)): a soft shadow under it. `quiet` (a copy of a later layer,
+   * the final fix of 10 Nov 2026: findings 8 and 10): the card is drawn as the plain tiling draws a tile — the paper,
+   * its commas, a faint teal, its outline in the tiling's grey and its mirror edges in ink — so that the layers after
+   * the first grow calmly; no seam colours, a lighter shadow. A card is quiet or not for its whole life.
+   */
+  function drawCard(c, P, M, A, { k, back, lift = 0, quiet = 0 }) {
+    if (!(k > 0.004)) return;
+    const plan = rep.plan, ring = P.ring;
+    c.save();
+    c.beginPath(); traceAffine(c, ring, A, true, true);
+    if (lift > 0.01) {
+      c.shadowColor = rgba(INK, k3c((quiet ? 0.12 : 0.24) * lift * k));
+      c.shadowBlur = 9 * lift * view.kx; c.shadowOffsetX = 0; c.shadowOffsetY = 4 * lift * view.ky;
+    }
+    c.fillStyle = rgba(GROUND, k3c(k)); c.fill();                // opaque paper: what it passes over is under it
+    c.shadowColor = 'rgba(0,0,0,0)'; c.shadowBlur = 0; c.shadowOffsetY = 0;
+    c.clip();
+    if (plan.commas.length) {
+      c.beginPath();
+      for (const pl of plan.commas) traceAffine(c, pl, A, true, true);
+      c.globalAlpha = k; c.fillStyle = MOTIF_FILL; c.fill(); c.globalAlpha = 1;
+    }
+    c.beginPath(); traceAffine(c, ring, A, true, true);
+    c.fillStyle = rgba(ACCENT, k3c((quiet ? 0.06 : 0.14) * k)); c.fill();
+    if (back > 0.004) { c.fillStyle = rgba(INK, k3c((quiet ? 0.05 : 0.06) * back * k)); c.fill(); }
+    c.restore();
+    c.lineJoin = 'round'; c.lineCap = 'round';
+    if (quiet) {
+      // the plain tiling's look: a thin grey outline (GLIDE_COLOR, a little firmer than the tiling's FAINT: it moves),
+      // mirror edges in ink
+      c.beginPath(); traceAffine(c, ring, A, true);
+      c.strokeStyle = rgba(GLIDE_COLOR, k3c(0.7 * k)); c.lineWidth = Math.max(1.2, M.outline + 0.2); c.stroke();
+      for (const o of P.outline) {
+        if (scene.domain.edges[o.edge].kind !== 'mirror') continue;
+        c.beginPath(); traceAffine(c, o.pts, A, false);
+        c.strokeStyle = MIRROR_COLOR; c.globalAlpha = k; c.lineWidth = M.mirror; c.stroke(); c.globalAlpha = 1;
+      }
+      return;
+    }
+    // the edges: a white casing, then the seam colours (ink for mirrors), a little thinner than the tile's
+    const w = 0.72 * M.edge;
+    c.beginPath(); traceAffine(c, ring, A, true);
+    c.strokeStyle = rgba(GROUND, k3c(0.85 * k)); c.lineWidth = w + 1.6; c.stroke();
+    for (const o of P.outline) {
+      const e = scene.domain.edges[o.edge];
+      c.beginPath(); traceAffine(c, o.pts, A, false);
+      c.strokeStyle = e.kind === 'mirror' ? MIRROR_COLOR : classColor(e.color === undefined ? e.cls : e.color);
+      c.globalAlpha = k; c.lineWidth = w; c.stroke(); c.globalAlpha = 1;
+    }
+  }
+  const k3c = (a) => +Math.max(0, Math.min(1, a)).toFixed(4);
+
+  /** drawGlyphs, with each glyph as strong as the copies that hold it have landed (the tile's own at full strength). */
+  function drawTilingGlyphs(c, P, M, plan, states, keep) {
+    const gd = ensureGroupData();
+    if (!gd.centers.length) return;
+    const r0 = glyphRadius(gd, M);
+    for (const m of P.marks) {                          // the tile's half-turn marks, as always
+      if (m.kind !== 'fold') continue;
+      const x = X(m.x), y = Y(m.y), R = 1.7 * r0 * 1.22;
+      c.beginPath(); c.arc(x, y, R + 0.5 * M.edge + 1, 0, TAU); c.fillStyle = GROUND; c.fill();
+      c.beginPath(); c.arc(x, y, R, 0, TAU); c.fillStyle = GROUND; c.fill();
+      c.strokeStyle = classColor(m.color); c.lineWidth = Math.max(1.6, 0.5 * M.edge); c.stroke();
+    }
+    const cover = plan.cover || [];
+    for (let pass = 0; pass < 2; pass++) {
+      // the glyphs at full strength in one path (casings, then fills: exactly as drawGlyphs), the fading ones one by one
+      const full = [], fading = [];
+      for (let i = 0; i < gd.centers.length; i++) {
+        const g = gd.centers[i];
+        if ((P.cones[i] === 1) !== (pass === 1)) continue;
+        const x = X(g.x), y = Y(g.y);
+        if (x < -12 || y < -12 || x > view.W + 12 || y > view.H + 12) continue;
+        let a = 0;
+        for (const j of cover[i] || []) {
+          const st = states[j];
+          if (!st) continue;
+          const v = j === 0 ? 1 : st.phase === 'landed' ? keep : st.phase === 'settling' ? st.sigma * keep : 0;
+          if (v > a) a = v;
+        }
+        if (a > 0.998) full.push([x, y, g]); else if (a > 0.004) fading.push([x, y, g, a]);
+      }
+      const r = pass === 1 ? r0 * 1.22 : r0;
+      c.lineJoin = 'round';
+      if (full.length) {
+        c.beginPath();
+        for (const [x, y, g] of full) glyphPath(c, x, y, g.order, g.angle, r);
+        c.strokeStyle = GROUND; c.lineWidth = pass === 1 ? 2.8 : 2.2; c.stroke();
+        c.fillStyle = INK; c.fill();
+      }
+      // fading glyphs in batches of one strength (those of one settling copy fade together): a batch is drawn as the
+      // full-strength one is, so a glyph does not change its anti-aliasing when it joins that batch at the end
+      const byAlpha = new Map();
+      for (const [x, y, g, a] of fading) {
+        const q = Math.round(a * 128) / 128;
+        if (!byAlpha.has(q)) byAlpha.set(q, []);
+        byAlpha.get(q).push([x, y, g]);
+      }
+      for (const [a, list] of byAlpha) {
+        c.beginPath();
+        for (const [x, y, g] of list) glyphPath(c, x, y, g.order, g.angle, r);
+        c.globalAlpha = a;
+        c.strokeStyle = GROUND; c.lineWidth = pass === 1 ? 2.8 : 2.2; c.stroke();
+        c.fillStyle = INK; c.fill(); c.globalAlpha = 1;
+      }
+    }
+  }
+
+  /** What the moving copies turn about or slide along: a ring round a rotation's centre, the axis of a glide. Only
+   *  in the first layer(s), where one side pairing acts at a time (later, many at once would flash all over). */
+  function drawCues(c, P, M, plan, moving, keep) {
+    const seen = new Set(), gd = ensureGroupData(), r0 = glyphRadius(gd, M), size = Math.sqrt(scene.group.domainArea);
+    for (const { cp, st } of moving) {
+      if (cp.depth > plan.timing.split) continue;
+      const m = cp.motion, h = plan.copies[cp.parent].g;
+      const bump = smoothRep(st.x / 0.18) * smoothRep((1 - st.x) / 0.25) * keep;
+      if (bump <= 0.01) continue;
+      if (m.kind === 'rotation') {
+        const px = h.a * m.pivot[0] + h.b * m.pivot[1] + h.tx, py = h.c * m.pivot[0] + h.d * m.pivot[1] + h.ty;
+        const key = Math.round(px * 1e4) + ',' + Math.round(py * 1e4);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        c.beginPath(); c.arc(X(px), Y(py), 2.3 * r0 + 3, 0, TAU);
+        c.strokeStyle = rgba(ACCENT, k3c(0.85 * bump)); c.lineWidth = 2; c.stroke();
+      } else if (m.kind === 'glide') {
+        const ax = m.axis, px = h.a * ax.p[0] + h.b * ax.p[1] + h.tx, py = h.c * ax.p[0] + h.d * ax.p[1] + h.ty;
+        const ux = h.a * ax.u[0] + h.b * ax.u[1], uy = h.c * ax.u[0] + h.d * ax.u[1];
+        const key = 'g' + Math.round(px * 1e4) + ',' + Math.round(py * 1e4) + ',' + Math.round(Math.atan2(uy, ux) * 1e3);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        // from the parent's seed to the copy's, along the axis, a little beyond both
+        const s0x = h.a * P.seedA[0] + h.b * P.seedA[1] + h.tx, s0y = h.c * P.seedA[0] + h.d * P.seedA[1] + h.ty;
+        const g = cp.g, s1x = g.a * P.seedA[0] + g.b * P.seedA[1] + g.tx, s1y = g.c * P.seedA[0] + g.d * P.seedA[1] + g.ty;
+        const t0 = (s0x - px) * ux + (s0y - py) * uy, t1 = (s1x - px) * ux + (s1y - py) * uy;
+        const lo = Math.min(t0, t1) - 0.45 * size, hi = Math.max(t0, t1) + 0.45 * size;
+        c.beginPath(); c.moveTo(X(px + lo * ux), Y(py + lo * uy)); c.lineTo(X(px + hi * ux), Y(py + hi * uy));
+        c.setLineDash([6, 4]); c.lineCap = 'butt';
+        c.strokeStyle = rgba(ACCENT, k3c(0.9 * bump)); c.lineWidth = 2; c.stroke(); c.setLineDash([]);
+      }
+    }
   }
 
   function requestFrame() {
@@ -1060,9 +1548,11 @@ export function createPlaneView(canvas, options = {}) {
     syncAttributes();
     if (!sameGroup) {
       groupData = null; lastEmit = null;
+      rep.lockStale = true;                               // (the replication's length: see preparePlan)
       fit();
       home = centreOf(focusBox());
       moveWindow(home[0], home[1], false);                 // another pattern: shown centred at once
+      stepF.frame = null; stepF.prev = null; stepF.moving = false;   // (and the replication's frame, if any, at once)
     } else if (s.domain !== prevDomain || scene.star !== prevStar) {
       const b = focusBox();
       // another cut: the seed jumped, or the metric changed (the presets of o share a seed and differ by the metric;
@@ -1073,6 +1563,8 @@ export function createPlaneView(canvas, options = {}) {
       if (jumped && !byPerson) {                          // a cut chosen from outside: glide to it, centred
         home = centreOf(b);
         moveWindow(home[0], home[1], true);
+        rep.lockStale = true;                             // (a new length for the replication of this cut)
+        if (stepF.want) restepFrame();                     // (and its frame, if it shows, eases to this tile)
       } else {                                            // dragged, nudged or made wavy: follow only as far as needed
         const c = keepInside(b, pan.tx, pan.ty);
         if (c[0] !== pan.tx || c[1] !== pan.ty) moveWindow(c[0], c[1], true, PAN_OMEGA_FOLLOW);
@@ -1240,6 +1732,52 @@ export function createPlaneView(canvas, options = {}) {
 
   return {
     setScene, render, resize, toWorld, toCss, stats,
+    /** The replication's progress u in [0, 1] (1 = the tiling as always) and the replay's fade-out of the copies. */
+    setTiling(u, fade = 0) {
+      const nu = Math.max(0, Math.min(1, Number(u))), nf = Math.max(0, Math.min(1, Number(fade) || 0));
+      if (!Number.isFinite(nu)) return;
+      if (nu === rep.u && nf === rep.fade) return;
+      rep.u = nu; rep.fade = nf;
+      // complete: the plane as always again; the replication's scratch canvas is let go (a few MB on a laptop)
+      if (nu >= 1 && nf <= 0) layerCache.scratch = null;
+      schedule();
+    },
+    getTiling: () => ({ u: rep.u, fade: rep.fade }),
+    /** The plan for the tile on screen (built now if need be): { duration, stops, layers, phases } or null. */
+    tilingPlan() { if (!scene) return null; try { preparePlan(); } catch (e) { return null; } return tilingInfo(); },
+    /** The words for what acts at progress u ('' when nothing does); the short words on a small pane (a phone). */
+    tilingCaption(u = rep.u) {
+      if (!scene) return '';
+      // the plan of the tile on screen, built now if need be (as tilingPlan does): never the words of a previous tile
+      try { preparePlan(); } catch (e) { return ''; }
+      const small = Math.min(view.W, view.H) < CAPTION_SMALL;
+      return planCaption(rep.plan, Math.max(0, Math.min(1, u)) * rep.plan.T, small);
+    },
+    /** For experiments: replace the replication's timing (replicate.js REP_TIMING keys); null = the defaults. */
+    setTilingTiming(t) { rep.timing = t || null; rep.plan = null; rep.planFor = null; rep.lock = null; schedule(); },
+    /**
+     * The replication's frame on a small pane (a C2 addition of the final fix, 10 Nov 2026): want = { top, bottom }, the
+     * CSS px the step's words and bar take at the pane's head and foot, while the step shows; null when it is over. The
+     * window eases to frame the tile and its first layer between the two, and back (see applyStepFrame).
+     */
+    setStepFrame(want) {
+      const w = want && Number.isFinite(Number(want.top)) && Number.isFinite(Number(want.bottom))
+        ? { top: Math.max(0, Number(want.top)), bottom: Math.max(0, Number(want.bottom)) } : null;
+      const was = stepF.want;
+      if (!w && !was) return;
+      if (w && was && Math.abs(w.top - was.top) < 0.5 && Math.abs(w.bottom - was.bottom) < 0.5) return;
+      const t = now();
+      if (w && was) { stepF.want = w; restepFrame(); schedule(); return; }     // other insets: the frame eases over
+      stepF.want = w;
+      if (w) { stepF.frame = null; stepF.prev = null; stepF.moving = false; }
+      // the mix eases from where it is to 1 (on) or 0 (off)
+      stepF.from = stepF.mix; stepF.to = w ? 1 : 0; stepF.t0 = t;
+      stepF.active = canGlide() && Math.abs(stepF.from - stepF.to) > 1e-9;
+      if (!stepF.active) stepF.mix = stepF.to;
+      schedule();
+    },
+    /** { want, mix, frame } of the replication's frame (for tests). */
+    getStepFrame: () => ({ want: stepF.want ? { ...stepF.want } : null, mix: stepF.mix, frame: stepF.frame ? { ...stepF.frame } : null, s0: view.s0 }),
     isDragging: () => !!drag,
     /** What the last prepared frame holds (for tests): copies, marks, tint, chevrons, the window. */
     debug() {
@@ -1259,7 +1797,7 @@ export function createPlaneView(canvas, options = {}) {
       if (ro) ro.disconnect();
       if (win && win.cancelAnimationFrame) { if (rafDraw) win.cancelAnimationFrame(rafDraw); if (rafMove) win.cancelAnimationFrame(rafMove); }
       pan.active = false;
-      cache = null;
+      cache = null; layerCache.base = layerCache.mirrors = layerCache.scratch = null;
     },
   };
 }

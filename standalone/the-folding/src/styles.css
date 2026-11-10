@@ -519,3 +519,48 @@ body {
     .app:not([data-cut="under"]) .stage { --avail: calc(100dvh - 170px); }
   }
 }
+
+/* ---- the replication step (10 Nov 2026, qa/rep-judge.md): how the tiling is made ------------------------------------
+   In the plane pane: the Tile button in the bottom-left corner (the pill construction of .btn-quiet: a 36 px pill in a
+   44 px target), and beside it, while #tile-bar[data-open] (the replication is under way or paused), its scrubber on
+   a white pill across the pane's foot; the words for what acts (#tile-caption) at the top, where the phone's hint
+   sits (src/app.js hides #hint while the bar is open). */
+.tile-bar {
+  position: absolute;
+  left: 2px;                                 /* 4 px transparent borders: the visible pills sit 6 px from the pane */
+  right: 2px;
+  bottom: 2px;
+  display: flex;
+  align-items: center;
+  pointer-events: none;                      /* only the button and the open scrubber take the pointer */
+}
+/* The plane's step, as Fold is the 3D pane's (finding 14 of the final round: a white pill in muted grey read like the
+   hint beside it): the verb in the accent, on an accent ring — the outlined twin of the solid Fold button. */
+.tile-btn { pointer-events: auto; gap: 5px; padding: 0 12px 0 8px; color: var(--accent); font-size: 14px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--accent); }
+.tile-btn > svg { width: 16px; height: 16px; }
+.tile-btn > .ico-play { fill: var(--accent); stroke: none; }
+.tile-btn > .ico-pause { display: none; stroke: var(--accent); stroke-width: 2.2; }
+.tile-btn[data-state="pause"] > .ico-play { display: none; }
+.tile-btn[data-state="pause"] > .ico-pause { display: block; }
+.tile-track {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--tap);
+  margin-left: 2px;
+  padding: 0 7px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.22s ease, visibility 0s linear 0.22s;
+}
+.tile-track::before {                        /* the visible pill: 36 px high, as the buttons' */
+  content: "";
+  position: absolute;
+  inset: 4px 0;
+  border-radius: 8px;
+  background: var(--ground);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.tile-bar[data-open] .tile-track { pointer-events: auto; opacity: 1; visibility: visible; transition: opacity 0.22s ease; }
+.tile-caption { top: 6px; bottom: auto; color: var(--ink); }
+.app[data-fold="snowflake"] .pane-plane > .tile-caption { display: block; }   /* (the kaleidoscopes hide only the cut hint) */

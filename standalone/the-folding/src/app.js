@@ -69,7 +69,7 @@ import { makeWarp, buildDomain } from './domain.js';
 import { buildMesh } from './mesh.js';
 import { createFold, foldMeshOptions, foldOptions } from './folds/index.js';
 import { createRenderer, viewFromAzEl } from './render3d.js';
-import { createPlaneView, assignEdgeColors } from './plane.js';
+import { createPlaneView, assignEdgeColors, CAPTION_SMALL } from './plane.js';
 import { motifFor, motifInTile, motifTintMesh } from './motif.js';
 import { createHassePicker } from './hasse.js';
 import { createTimeline, enhanceRange } from './timeline.js';
@@ -128,8 +128,9 @@ export function resolveGroupId(raw) {
 
 /** The spacesheep viewer takes a hash from the frame only if it matches this (verified 9 Nov 2026). */
 export const WRAPPER_HASH = /^#[A-Za-z0-9_.=%&\/-]*$/;
-/** The keys of the hash, in the order they are written. */
-export const HASH_KEYS = ['g', 'cut', 'seed', 'wavy', 't', 'view'];
+/** The keys of the hash, in the order they are written. `tile` (the replication step, 10 Nov 2026): how far the
+ *  plane's replication has come, 0..1, 3 decimals; absent = 1, the tiling as always. */
+export const HASH_KEYS = ['g', 'cut', 'seed', 'wavy', 'tile', 't', 'view'];
 /** While the state keeps changing the hash is written at most once in this many ms (at once when a gesture ends). */
 export const HASH_THROTTLE_MS = 250;
 /**
@@ -185,7 +186,9 @@ export function encodeHash(u) {
   if (u.cut > 0) parts.push('cut=' + Math.round(u.cut));
   if (u.seed && Number.isFinite(u.seed[0] + u.seed[1])) parts.push('seed=' + fmt(u.seed[0], 4) + '/' + fmt(u.seed[1], 4));
   const w = fmt(clamp01(u.wavy), 2), t = fmt(clamp01(u.t), 3);
+  const k = fmt(u.tile === undefined || u.tile === null ? 1 : clamp01(u.tile), 3);
   if (w !== '0') parts.push('wavy=' + w);
+  if (k !== '1') parts.push('tile=' + k);
   if (t !== '0') parts.push('t=' + t);
   if (u.view) {
     const az = fmtAngle(u.view.az || 0), el = fmt(Math.max(-90, Math.min(90, u.view.el)), 1);
@@ -208,7 +211,7 @@ export function decodeHash(raw) {
   let h = raw == null ? '' : String(raw);
   if (h[0] === '#') h = h.slice(1);
   if (!h.trim()) return null;
-  const base = (g, legacy) => ({ g, legacy, cut: 0, seed: null, wavy: 0, t: 0, view: null, dropped: [] });
+  const base = (g, legacy) => ({ g, legacy, cut: 0, seed: null, wavy: 0, tile: 1, t: 0, view: null, dropped: [] });
   if (!h.includes('=')) {
     const g = resolveGroupId(safeDecode(h));
     return g ? base(g, true) : null;
@@ -234,6 +237,7 @@ export function decodeHash(raw) {
     if (p.length === 2 && Math.abs(x) <= SEED_LIMIT && Math.abs(y) <= SEED_LIMIT) out.seed = [x, y]; else drop('seed');
   }
   if (kv.has('wavy')) { const a = urlNumber(kv.get('wavy')); if (Number.isFinite(a)) out.wavy = clamp01(a); else drop('wavy'); }
+  if (kv.has('tile')) { const a = urlNumber(kv.get('tile')); if (Number.isFinite(a)) out.tile = clamp01(a); else drop('tile'); }
   if (kv.has('t')) { const t = urlNumber(kv.get('t')); if (Number.isFinite(t)) out.t = clamp01(t); else drop('t'); }
   if (kv.has('view')) {
     const p = kv.get('view').split('/').map(urlNumber);
@@ -756,6 +760,13 @@ export function seamGap(scene) {
 
 /** Degrees the 3D view must turn under the person's hand before the "drag to turn" hint goes. */
 export const TURN_MIN_DEG = 2;
+/**
+ * The replication's frame on a phone (the final fix, 10 Nov 2026: findings 2 and 6). While the step's bar is open on
+ * a plane pane whose short side is under CAPTION_SMALL, the plane frames the tile and its first layer between the
+ * words at the pane's head and the bar at its foot (plane.js setStepFrame): STEP_INSETS css px are theirs (the words:
+ * 6 px from the top, 21 px high; the bar: 2 px from the bottom, 44 px high; a few px of air each).
+ */
+export const STEP_INSETS = Object.freeze({ top: 30, bottom: 48 });
 
 function start(doc, win) {
   const $ = (id) => doc.getElementById(id);
@@ -768,8 +779,10 @@ function start(doc, win) {
   const missing = Object.entries(el).filter(([, node]) => !node).map(([k]) => k);
   if (missing.length) throw new Error('The Folding: the page lacks ' + missing.join(', '));
   const turnHint = $('turn-hint');                // the shell's "drag to turn" (SPEC 8 C1); the page works without it
+  // the replication step: the Tile button, its scrubber, the words for what acts; the page works without them
+  const tileEl = { bar: $('tile-bar'), btn: $('tile-btn'), slider: $('tile-slider'), caption: $('tile-caption') };
 
-  const state = { groupId: null, presetIndex: 0, cutIndex: 0, seed: [0, 0], metric: undefined, amp: 0, t: 0, anchor: null };
+  const state = { groupId: null, presetIndex: 0, cutIndex: 0, seed: [0, 0], metric: undefined, amp: 0, t: 0, anchor: null, tile: 1 };
   const errors = [];
   let scene = null;
   let dragged = false;              // the person has moved the cut once: "drag to move the cut" has done its job
@@ -789,7 +802,7 @@ function start(doc, win) {
   // ---- the parts ------------------------------------------------------------------------------------------------
   const R = createRenderer(el.foldCanvas, { labelLayer: el.foldLabels });
   R.setStyle({ fill: MOTIF_FILL_3D });             // tint bit 1: the comma filled into the sheet (motifTintMesh)
-  const P = createPlaneView(el.planeCanvas, { onSeed, hint: false });     // the shell's #hint is the one hint
+  const P = createPlaneView(el.planeCanvas, { onSeed, hint: false, onTilingPlan: (info) => tilePlanChanged(info) });     // the shell's #hint is the one hint
   const later = typeof win.queueMicrotask === 'function' ? (f) => win.queueMicrotask(f) : (f) => Promise.resolve().then(f);
   const timeline = createTimeline({
     slider: el.scrubber, button: el.foldBtn,
@@ -798,6 +811,112 @@ function start(doc, win) {
     onState: (st) => { if (st !== 'pause') later(flushHash); },
   });
   const picker = createHassePicker({ mount: el.pickerMount, groups: GROUPS, onPick: (id) => { setGroup(id); flushHash(); } });
+
+  // ---- the replication step (10 Nov 2026, qa/rep-judge.md; src/replicate.js, plane.js renderTiling) -------------
+  // state.tile = u in [0, 1]: how far the copies of the tile have been made (1 = the tiling as always). It has its own
+  // timeline (the scrubber in the plane's bar, magnets at the end of every layer; Space stays with Fold) and its own
+  // button: Tile plays on from where it is, or, when the tiling is complete, fades the copies out (REPLAY_FADE s) and
+  // makes them again from the tile alone; Pause pauses. The bar shows its scrubber while u < 1 or while it plays,
+  // and folds away BAR_LINGER ms after the end. A group change completes it (u = 1); a cut, a preset or Wavy keep u
+  // (the plane plans the new tile's copies; a drag or a wave also keeps the length, so u keeps its moment: plane.js
+  // preparePlan). The hash carries u as tile=<u> when it is not 1. On a phone's plane (short side under CAPTION_SMALL)
+  // the plane frames the first layer between the words and the bar while the bar is open (syncStepFrame).
+  const REPLAY_FADE = 0.35, BAR_LINGER = 1400;
+  let tileFade = 0, fadeRaf = 0, barTimer = 0;
+  const tileTL = tileEl.slider ? createTimeline({
+    slider: tileEl.slider, button: null, keyTarget: null,
+    onChange: (u) => { state.tile = u; showTile(); scheduleHash(); },
+    onState: (st) => { syncTileBar(); if (st !== 'pause') later(flushHash); },
+  }) : null;
+  if (tileTL) tileTL.set(1);
+  // the magnets: the end of a layer, but never closer than TILE_STOP_GAP of the track to the last one kept or to the
+  // end (a kaleidoscope's 12 layers on a phone's 100 px track would leave no stretch without a detent)
+  const TILE_STOP_GAP = 0.08;
+  function tilePlanChanged(info) {
+    if (!tileTL || !info) return;
+    tileTL.setDuration(info.duration);
+    const kept = [];
+    let last = 0;
+    for (const s of info.stops) if (s.t >= last + TILE_STOP_GAP && s.t <= 1 - TILE_STOP_GAP) { kept.push(s); last = s.t; }
+    tileTL.setStops(kept);                                   // (the timeline adds 0 and 1)
+    syncCaption();
+  }
+  function tileOpen() { return tilePlaying() || state.tile < 1 - 1e-4; }
+  function stopFade() { if (fadeRaf) { win.cancelAnimationFrame(fadeRaf); fadeRaf = 0; } tileFade = 0; }
+  function tilePlaying() { return !!fadeRaf || (tileTL ? tileTL.isPlaying() : false); }
+  function showTile() { P.setTiling(state.tile, tileFade); P.render(); syncTileBar(); }
+  function syncTileButton() {
+    if (!tileEl.btn) return;
+    const playing = tilePlaying();
+    tileEl.btn.dataset.state = playing ? 'pause' : 'play';
+    const label = tileEl.btn.querySelector('[data-label]');
+    const text = playing ? 'Pause' : 'Tile';
+    if (label && label.textContent !== text) label.textContent = text;
+    const aria = playing ? 'Pause the tiling' : state.tile < 1 - 1e-4 ? 'Go on making the tiling' : 'Show how the tiling is made';
+    if (tileEl.btn.getAttribute('aria-label') !== aria) tileEl.btn.setAttribute('aria-label', aria);
+  }
+  function syncCaption() {
+    if (!tileEl.caption) return;
+    const text = tileOpen() ? P.tilingCaption(tileFade > 0 ? 0 : state.tile) : '';
+    if (tileEl.caption.textContent !== text) tileEl.caption.textContent = text;
+    tileEl.caption.hidden = !text;
+  }
+  function syncTileBar() {
+    if (tileEl.bar) {
+      if (tileOpen()) {
+        if (barTimer) { win.clearTimeout(barTimer); barTimer = 0; }
+        if (!tileEl.bar.hasAttribute('data-open')) tileEl.bar.setAttribute('data-open', '');
+      } else if (tileEl.bar.hasAttribute('data-open') && !barTimer) {
+        barTimer = win.setTimeout(() => { barTimer = 0; if (!tileOpen()) { tileEl.bar.removeAttribute('data-open'); syncHint(); syncStepFrame(); } }, BAR_LINGER);
+      }
+    }
+    syncStepFrame();
+    syncCaption();
+    syncHint();
+    syncTileButton();
+  }
+  /** On a phone's plane, while the bar is open, the plane frames the first layer between the words and the bar. */
+  function syncStepFrame() {
+    if (!P.setStepFrame) return;
+    const open = !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
+    const w = el.planeCanvas.clientWidth, h = el.planeCanvas.clientHeight;
+    P.setStepFrame(open && w > 0 && h > 0 && Math.min(w, h) < CAPTION_SMALL ? STEP_INSETS : null);
+  }
+  /** The Tile button: pause; or go on from where it is; or, when the tiling is complete, fade the copies and replay. */
+  function tileToggle() {
+    if (!tileTL) return;
+    if (tilePlaying()) {
+      if (fadeRaf) { stopFade(); state.tile = 1; tileTL.set(1); showTile(); } else tileTL.stop();
+      syncTileBar();
+      return;
+    }
+    if (state.tile < 1 - 1e-4) { tileTL.play(1); syncTileBar(); return; }
+    tilePlanChanged(P.tilingPlan());                         // the plan of the tile on screen: the timeline's duration
+    let still = false;
+    try { still = !!(win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* none */ }
+    const t0 = win.performance.now();
+    const step = () => {
+      const x = still ? 1 : Math.min(1, (win.performance.now() - t0) / (REPLAY_FADE * 1000));
+      // (the thumb goes back with the fade, so it does not snap from the end to 0 when the copies are made again;
+      // finding 14. Silent: u itself stays 1 until the fade is over)
+      if (x < 1) { tileFade = x * x * (3 - 2 * x); tileTL.set(1 - tileFade); P.setTiling(1, tileFade); P.render(); fadeRaf = win.requestAnimationFrame(step); return; }
+      fadeRaf = 0; tileFade = 0;
+      state.tile = 0; tileTL.set(0); P.setTiling(0, 0); P.render();
+      tileTL.play(1);
+      syncTileBar();
+    };
+    tileFade = 1e-4;
+    fadeRaf = win.requestAnimationFrame(step);
+    syncTileBar();
+  }
+  if (tileEl.btn) tileEl.btn.addEventListener('click', tileToggle);
+  /** The replication's state set from outside (a group change, the URL, the test handle): no play, no fade. */
+  function setTileState(u) {
+    stopFade();
+    if (tileTL) { tileTL.stop(); tileTL.set(clamp01(u)); state.tile = tileTL.get(); } else state.tile = 1;
+    P.setTiling(state.tile, 0);
+    syncTileBar();
+  }
 
   // ---- drawing --------------------------------------------------------------------------------------------------
   // A copy of an orbifold point carries its label with a tag of n invisible U+200B (sceneMarkers); labelAlpha maps n
@@ -871,6 +990,7 @@ function start(doc, win) {
     timeline.setDuration(scene.duration);
     drawPlane(true);
     drawFold(immediate, true);
+    if (state.tile < 1) syncCaption();                         // the new tile's copies: their words
     return true;
   }
 
@@ -881,7 +1001,8 @@ function start(doc, win) {
   function syncHint() {
     const h = hintState(BY_ID[state.groupId], dragged);
     if (el.hint.textContent !== h.text) el.hint.textContent = h.text;
-    el.hint.hidden = h.hidden;
+    // the replication's bar and words take the hint's place while they show
+    el.hint.hidden = h.hidden || !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
   }
   function fillShell(group) {
     el.chipSymbol.textContent = group.label;
@@ -915,7 +1036,7 @@ function start(doc, win) {
     return {
       g: state.groupId, cut: state.cutIndex,
       seed: !snow && state.presetIndex < 0 && scene ? [scene.domain.seed[0], scene.domain.seed[1]] : null,
-      wavy: snow ? 0 : state.amp, t: state.t, view: viewToUrl(R.getView ? R.getView() : null),
+      wavy: snow ? 0 : state.amp, tile: state.tile, t: state.t, view: viewToUrl(R.getView ? R.getView() : null),
     };
   }
   /** Write the hash of what is shown (and tell the viewer), now or as soon as hashWriteDelay allows. */
@@ -959,6 +1080,7 @@ function start(doc, win) {
       state.groupId = id;
       usePreset(group, 0);
       state.t = 0;
+      if (changed) setTileState(1);                             // another pattern: shown tiled, as always
       scene = null;                                             // seams of another group lend no colours
       timeline.set(0);
       fillShell(group);
@@ -1043,6 +1165,7 @@ function start(doc, win) {
       turnFrom = null;
       state.t = clamp01(u.t);
       timeline.set(state.t);
+      setTileState(u.tile === undefined || u.tile === null ? 1 : u.tile);
       if (!same) {
         if (changed) { state.groupId = u.g; scene = null; }
         Object.assign(state, want);
@@ -1064,7 +1187,8 @@ function start(doc, win) {
       state.t = timeline.get();
       R.setView(viewFromUrl(u.view || DEFAULT_VIEW));
       drawFold(true);
-      syncPresets(); syncHint();
+      P.render();
+      syncPresets(); syncTileBar();
     } finally { quiet--; }
     return true;
   }
@@ -1124,6 +1248,10 @@ function start(doc, win) {
       frame: scene && scene.frame ? { center: scene.frame.center.slice(), radius: scene.frame.radius } : null,
       mirrored: !!(scene && scene.fold.mirrored === true), surfaceMix: scene ? surfaceMix(scene.fold, state.t) : 0,
       draft: !!(scene && scene.draft),
+      tile: state.tile, tilePlaying: tilePlaying(), tileCaption: tileEl.caption && !tileEl.caption.hidden ? tileEl.caption.textContent : '',
+      tileBarOpen: !!(tileEl.bar && tileEl.bar.hasAttribute('data-open')),
+      // the replication's frame on a phone's plane (plane.js setStepFrame): 0 the window as always .. 1 the step's
+      tileFrame: P.getStepFrame ? P.getStepFrame().mix : 0,
       view: viewAngles(), webgl: R.ok !== false, url, hash: currentHash(),
       pickerOpen: picker.isOpen(), errors: errors.length,
     };
@@ -1197,6 +1325,8 @@ function start(doc, win) {
       const k = lineScale(el.foldCanvas.clientWidth, el.foldCanvas.clientHeight);
       if (k !== k0) { k0 = k; drawFold(true); }
     }).observe(el.foldCanvas);
+    // a phone turned on its side (or a window made larger) while the step shows: its frame on small panes only
+    new win.ResizeObserver(() => syncStepFrame()).observe(el.planeCanvas);
   }
 
   // Without WebGL 2 the 3D pane only shows the renderer's message: nothing to play, scrub or reset there. The plane,
@@ -1216,6 +1346,14 @@ function start(doc, win) {
   });
   const api = {
     setGroup, setPreset, setSeed, setAmp, setT, setView, getState,
+    /** The replication's progress u (0 = the tile alone, 1 = tiled), drawn at once. */
+    setTile(u) { quiet++; try { setTileState(u); P.render(); } finally { quiet--; } scheduleHash(); return getState(); },
+    /** Press the Tile button; resolves when the play has ended. */
+    playTile() {
+      tileToggle();
+      return new Promise((resolve) => { const poll = () => { if (tilePlaying()) win.setTimeout(poll, 30); else resolve(getState()); }; poll(); });
+    },
+    tilePlan: () => P.tilingPlan(),
     ready: null,
     play(target) {
       timeline.play(target);

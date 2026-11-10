@@ -13,6 +13,12 @@
 //   front  share of the front-most layer that is comma (what one sees directly);
 //   seen   every layer weighted by what shows through the layers before it (SURFACE_OPACITY each, as the translucent
 //          surface is drawn): the share of the picture's ink that is comma.
+// The cross-cap (10 Nov 2026, the cross-cap paint fix; notes/crosscap-paint.md). The owner: "crosscap vis is weird, It's
+// like the surface, the painting jumped from one side of the surface to another at one point. Fix that." Its comma now
+// lies where no preset's fold turns the sheet over (tools/motif-place.mjs STILL; test/crosscap-paint.test.js). With
+// round 3's flaps lifting toward +z that sheet was the BOTTOM of the closed shape (front 0, seen 8 %), and this file
+// let 22x off its floors for a while; since the final fix the flaps tuck under (src/folds/crosscap.js FLAPS = 'under')
+// and the same comma is on top (front 53, seen 39 %), so 22x is held to the floors of every shape again (no exception).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GROUPS, BY_ID } from '../src/groups.js';
@@ -91,7 +97,7 @@ function appScene(g) {
   return scene;
 }
 
-test('the comma in view: at t = 1, in the default view, on the laptop and the phone, every shape shows its comma (front >= 20 %, seen >= 22 %; xx and the kaleidoscopes 14 %, 17 %)', (t) => {
+test('the comma in view: at t = 1, in the default view, on the laptop and the phone, every shape shows its comma (front >= 20 %, seen >= 22 %; xx and the kaleidoscopes 14 %, 17 %) — the cross-cap included', (t) => {
   const rows = [];
   for (const g of GROUPS) {
     const scene = appScene(g);

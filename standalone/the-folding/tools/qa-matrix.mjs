@@ -27,6 +27,11 @@
 //   frame            the page inside dev/app-frame.html (a stand-in of the spacesheep viewer: a frame of its own
 //                    origin under a 50 px bar; dist runs there in the strictest, opaque-origin sandbox): the host's
 //                    address follows the state (ss-hash), and that address opened afresh shows the same state
+//   tile             the replication step (10 Nov 2026, qa/rep-judge.md), at 1280 x 720 with the mouse and at 390 x 780
+//                    with touch: Tile fades the copies and replays from the tile alone, Pause (tile= in the address at
+//                    once), Space stays with Fold, the scrubber dragged, a drag of the cut while paused, the end (the
+//                    bar lingers, then folds away; tile= leaves the address), a pasted tile= link, a group change; the
+//                    3D pane is not redrawn by the step; the layout with the bar open; pictures tile-<size>-*.png
 //
 // Beyond the pictures, every shot is measured in the page, so that a blank canvas or a broken layout fails the run
 // without anybody looking:
@@ -786,6 +791,117 @@ try {
         km.hintHidden && km.cutNote && !km.presetsShown && !km.wavyShown && JSON.stringify(k1.seed) === JSON.stringify(k0.seed) && k1.presetIndex === 0 && k1.url === k0.url,
         JSON.stringify({ hint: km.hintHidden, note: km.cutNote, presets: km.presetsShown, wavy: km.wavyShown, seed: [k0.seed, k1.seed] }));
       await tctx.close();
+    }
+
+    // ---- the replication step (Tile): real clicks / taps, keys and drags, laptop and phone (dev/rep-a/check-ui.mjs) ----
+    for (const [size, tag] of [[DESKTOP, 'laptop'], [PHONE, 'phone']]) {
+      const touchy = tag === 'phone';
+      const rctx = await browser.newContext({ viewport: size, deviceScaleFactor: 2, hasTouch: touchy });
+      const rp = await rctx.newPage();
+      rp.on('console', (msg) => { if (msg.type() === 'error') { consoleErrors.push(msg.text()); console.log(`CONSOLE ERROR (tile ${tag}) ` + msg.text()); } });
+      rp.on('pageerror', (e) => { pageErrors.push(e.message); console.log(`PAGE ERROR (tile ${tag}) ` + e.message); });
+      await rp.goto(url + '#g=2222', { waitUntil: 'load' });
+      await rp.waitForFunction(() => window.__folding && window.__folding.ready, null, { timeout: 30000 });
+      await rp.evaluate(() => window.__folding.ready);
+      const rs = () => rp.evaluate(() => window.__folding.getState());
+      const shotT = async (name) => { const f = `tile-${tag}-${name}.png`; await rp.screenshot({ path: path.join(outDir, f) }); pictures.push(f); };
+      const btn = rp.locator('#tile-btn');
+      const press = () => (touchy ? btn.tap() : btn.click());
+      let s = await rs();
+      check(`tile (${tag}): the page opens tiled, the bar closed, no tile= in the address`, s.tile === 1 && !s.tileBarOpen && !s.tileCaption && !/tile=/.test(s.url), JSON.stringify({ tile: s.tile, bar: s.tileBarOpen }));
+      const draws0 = await rp.evaluate(() => ({ draws: window.__folding.counters.draws, t: window.__folding.getState().t }));
+      await press();
+      await rp.waitForTimeout(150);
+      s = await rs();
+      check(`tile (${tag}): Tile starts (the copies fade): playing, the bar open, the button reads Pause`, s.tilePlaying && s.tileBarOpen && (await btn.textContent()).includes('Pause'), JSON.stringify({ tile: s.tile, playing: s.tilePlaying }));
+      await rp.waitForTimeout(1300);
+      s = await rs();
+      check(`tile (${tag}): then the copies are made again from the tile alone, with the words for what acts`, s.tilePlaying && s.tile > 0 && s.tile < 0.5 && s.tileCaption.length > 3, JSON.stringify({ tile: s.tile, caption: s.tileCaption }));
+      await shotT('1-playing');
+      await press();
+      await rp.waitForTimeout(500);
+      s = await rs();
+      const pausedAt = s.tile;
+      check(`tile (${tag}): Pause pauses part-way and the address has tile= at once`, !s.tilePlaying && s.tile > 0 && s.tile < 1 && /[#&]tile=0\.\d+/.test(s.hash) && (await btn.textContent()).includes('Tile'), JSON.stringify({ tile: s.tile, hash: s.hash }));
+      // the final fix (10 Nov 2026, findings 2 and 6): on the phone the plane frames the first layer between the words
+      // and the bar while the bar is open (plane.js setStepFrame); the laptop's plane keeps its window
+      check(`tile (${tag}): ${touchy ? 'the phone\'s plane frames the first layer while the bar is open' : 'the laptop\'s plane keeps its window'}`,
+        touchy ? s.tileFrame === 1 : s.tileFrame === 0, JSON.stringify({ frame: s.tileFrame }));
+      const draws1 = await rp.evaluate(() => ({ draws: window.__folding.counters.draws, t: window.__folding.getState().t }));
+      check(`tile (${tag}): the 3D pane is not redrawn by the step, and t stays`, draws1.draws === draws0.draws && draws1.t === draws0.t, JSON.stringify({ before: draws0, after: draws1 }));
+      const lm = await rp.evaluate(MEASURE);
+      check(`tile (${tag}): with the bar open nothing overlaps, leaves the window or is too small to tap`, lm.issues.length === 0 && lm.hintHidden === true, lm.issues.join('; ') || `hint hidden ${lm.hintHidden}`);
+      await shotT('2-paused');
+      // Space plays the Fold, not the tiling
+      await rp.locator('#fold-canvas').click({ position: { x: 20, y: 20 } }).catch(() => {});
+      await rp.keyboard.press('Space');
+      await rp.waitForTimeout(400);
+      s = await rs();
+      check(`tile (${tag}): Space plays the Fold; the tiling stays paused`, s.playing && !s.tilePlaying && Math.abs(s.tile - pausedAt) < 1e-9, JSON.stringify({ foldPlaying: s.playing, t: s.t, tile: s.tile }));
+      await rp.keyboard.press('Space');
+      await rp.evaluate(() => window.__folding.setT(0));
+      // the scrubber dragged from its thumb to the left: u goes down in steady steps
+      const sbx = await rp.locator('#tile-scrub').boundingBox();
+      const thumbX = sbx.x + 11 + (sbx.width - 22) * pausedAt, ty = sbx.y + sbx.height / 2;
+      const seen = [];
+      await rp.mouse.move(thumbX, ty);
+      await rp.mouse.down();
+      for (let i = 1; i <= 12; i++) { await rp.mouse.move(thumbX - (i / 12) * (sbx.width - 22) * 0.6 * pausedAt, ty); seen.push((await rs()).tile); }
+      await rp.mouse.up();
+      await rp.waitForTimeout(300);
+      s = await rs();
+      const down = seen.every((v, i) => i === 0 || v <= seen[i - 1] + 1e-9);
+      check(`tile (${tag}): the scrubber goes down continuously`, down && s.tile < pausedAt && s.tile > 0, `u ${pausedAt.toFixed(3)} -> ${seen.map((v) => v.toFixed(3)).join(' ')}`);
+      if (!touchy) {
+        const pb = await rp.locator('#plane-canvas').boundingBox();
+        await rp.mouse.move(pb.x + pb.width / 2, pb.y + pb.height / 2);
+        await rp.mouse.down();
+        await rp.mouse.move(pb.x + pb.width / 2 + 25, pb.y + pb.height / 2 - 12, { steps: 8 });
+        await rp.mouse.up();
+        await rp.waitForTimeout(300);
+        s = await rs();
+        check(`tile (${tag}): dragging the cut while paused keeps u and the words`, !s.tilePlaying && Math.abs(s.tile - seen[seen.length - 1]) < 1e-6 && s.presetIndex === -1 && s.tileCaption.length > 3 && s.errors === 0, JSON.stringify({ tile: s.tile, seed: s.seed, caption: s.tileCaption }));
+        // a preset chip and the Wavy slider while paused: u stays, the new tile's copies have their words
+        const u0 = s.tile, chipB = await rp.locator('#presets .chip').nth(1).boundingBox();
+        await rp.mouse.click(chipB.x + chipB.width / 2, chipB.y + chipB.height / 2);
+        await rp.waitForTimeout(250);
+        const sp = await rs();
+        const wv = await rp.locator('#wavy').boundingBox();
+        await rp.mouse.move(wv.x + 10, wv.y + wv.height / 2);
+        await rp.mouse.down();
+        await rp.mouse.move(wv.x + wv.width * 0.6, wv.y + wv.height / 2, { steps: 8 });
+        await rp.mouse.up();
+        await rp.waitForTimeout(250);
+        const sw = await rs();
+        check(`tile (${tag}): a preset chip and the Wavy slider while paused keep u and show the new tile's words`,
+          sp.presetIndex === 1 && Math.abs(sp.tile - u0) < 1e-9 && !sp.tilePlaying && sp.tileCaption.length > 3 && sw.amp > 0.3 && Math.abs(sw.tile - u0) < 1e-9 && !sw.tilePlaying && sw.tileCaption.length > 3 && sw.errors === 0,
+          JSON.stringify({ u0, preset: [sp.presetIndex, sp.tile, sp.tileCaption], wavy: [sw.amp, sw.tile, sw.tileCaption] }));
+        await rp.evaluate(() => window.__folding.setAmp(0));
+      }
+      // on to the end: the bar stays a moment, then folds away, and tile= leaves the address
+      await press();
+      await rp.waitForFunction(() => !window.__folding.getState().tilePlaying, null, { timeout: 15000 });
+      s = await rs();
+      check(`tile (${tag}): it ends at u = 1 with the bar still open`, s.tile === 1 && s.tileBarOpen && !s.tileCaption, JSON.stringify({ tile: s.tile, bar: s.tileBarOpen }));
+      await rp.waitForTimeout(1700);
+      s = await rs();
+      check(`tile (${tag}): the bar folds away; the address has no tile=`, !s.tileBarOpen && !/tile=/.test(s.hash), JSON.stringify({ bar: s.tileBarOpen, hash: s.hash }));
+      await rp.waitForTimeout(600);
+      s = await rs();
+      check(`tile (${tag}): then the plane's window is as always again`, s.tileFrame === 0, JSON.stringify({ frame: s.tileFrame }));
+      // a pasted link opens the replication paused there
+      await rp.evaluate(() => { location.hash = '#g=%2A632&tile=0.25'; });
+      await rp.waitForTimeout(500);
+      s = await rs();
+      check(`tile (${tag}): a link with tile=0.25 opens paused there, with the bar and the words`, s.groupId === '*632' && Math.abs(s.tile - 0.25) < 1e-9 && s.tileBarOpen && s.tileCaption.length > 3 && !s.tilePlaying, JSON.stringify({ g: s.groupId, tile: s.tile, caption: s.tileCaption }));
+      await shotT('3-link-s632-025');
+      // a group change completes it
+      await rp.evaluate(() => window.__folding.setGroup('xx'));
+      await rp.waitForTimeout(200);
+      s = await rs();
+      check(`tile (${tag}): a group change shows the new pattern tiled`, s.groupId === 'xx' && s.tile === 1 && !s.tilePlaying, JSON.stringify({ g: s.groupId, tile: s.tile }));
+      check(`tile (${tag}): nothing caught by the app`, (await rs()).errors === 0);
+      await rctx.close();
     }
     check('no console error and no page error in the frame and touch sessions either', consoleErrors.length === 0 && pageErrors.length === 0, `${consoleErrors.length} / ${pageErrors.length}`);
   }

@@ -231,6 +231,12 @@ Hard requirements, each one a test in your `test/<name>.test.js` (use every pres
 Also required: folding goes **toward +z** (the seam closes on the side facing the viewer); the folded shape stays near where the
 tile was; the result must look *good* — check with `dev/fold-demo.html` (renderer agent) via `tools/shot.mjs`, at several t
 and from two directions, and iterate on proportions, timing and heights until it reads clearly as the named shape.
+**The one exception (10 Nov 2026, the final fix; notes/integrator-final.md § 7): 22x folds toward −z.** Its flaps tuck under
+the sheet that holds still (`src/folds/crosscap.js` FLAPS = 'under': round 3's motion mirrored in z = 0), so that the comma that
+sheet carries — placed where no fold turns it over, after the owner's "the painting jumped from one side of the surface to
+another" — ends ON TOP of the closed shape (front 53 %, seen 39 % in the default view, against 0 / 8 % toward +z), and the outside
+of the cross-cap is the paper's front, as the flat tile is. The mouth that zips shut still faces the default camera. Tests:
+test/folds.test.js `TOWARD`, test/crosscap.test.js `DESIGN_UP`.
 
 ### 5.4 `src/folds/hinge.js` — rigid hinges + puff (2222, 22*, 2*22, 442, 4*2, 333, 3*3, 632)
 
@@ -441,7 +447,8 @@ State: v1 is built, deployed and green (554 tests). A snapshot of it is in `snap
   For the hinge and cross-cap folds the shape at t = 1 must depend only on the anchor, never on the seed: the folded shape stays
   put while the seams slide over it. Construction: let C0 be the kaleidoscope cell containing the (nudged) anchor and walk
   straight from the anchor to the seed, crossing creases l_1, …, l_k in order; the frame A(θ) = Rot(l_1, θ) ∘ … ∘ Rot(l_k, θ)
-  (each rotation about the crease in the flat layout, in the sense that lifts the far side toward +z) multiplies the usual
+  (each rotation about the crease in the flat layout, in the sense that lifts the far side toward +z; for 22x the whole motion
+  is then mirrored in z = 0, § 5.3's exception) multiplies the usual
   root-relative kinematics on the left: f = A(θ) · M_c(θ) · (x, y, −β h). At θ = π this is the reflection chain that carries the
   root cell onto C0, so the result is the same whichever way one walks; for 0 < θ < π it is continuous in the seed except when the
   walk sweeps across a rotation centre of the kaleidoscope. Missing `opts.anchor` means anchor = seed (v1 behaviour).
@@ -456,10 +463,13 @@ State: v1 is built, deployed and green (554 tests). A snapshot of it is in `snap
 - **URL state contract (new, the owner's ask on 9 Nov: "make sure that the state is saved in the URL so that I can select the
   various parameters and when I copy the URL over, the parameters are carried over").** The whole visible state lives in the
   hash, and the address bar of the spacesheep page shows it:
-  - Format (every key optional; defaults omitted): `#g=<id>&cut=<preset index>&seed=<x>/<y>&wavy=<0..1>&t=<0..1>&view=<az>/<el>/<zoom>`.
+  - Format (every key optional; defaults omitted): `#g=<id>&cut=<preset index>&seed=<x>/<y>&wavy=<0..1>&tile=<0..1>&t=<0..1>&view=<az>/<el>/<zoom>`.
     `<id>` is the group id with `*` written `%2A` (`#g=%2A632`); `seed` appears only when the cut was dragged away from the
     preset (then `cut` still names the preset whose metric and anchor apply); numbers rounded (seed 4 decimals, t 3, wavy 2,
-    az/el 1, zoom 2). The legacy form `#<id>` (e.g. `#333`, `#4*2`, `#*632`) still loads.
+    tile 3, az/el 1, zoom 2). The legacy form `#<id>` (e.g. `#333`, `#4*2`, `#*632`) still loads.
+  - `tile` (10 Nov, the replication step, § 9): how far the plane's replication has come; absent = 1 = tiled as always.
+    It is removed when the replication completes and on a group change; while it plays it is written throttled like t, and
+    at once on Pause, at the end and after a scrub. A malformed value is dropped (the tiling as always).
   - The spacesheep wrapper accepts only hashes matching `/^#[A-Za-z0-9_.=%&\/-]*$/` (no `*`, `,`, `:`, `~`, `+`, spaces).
   - On every state change (throttled to one update per ~250 ms, and immediately when a drag, scrub or rotation ends) the app
     1. replaces its own hash with `history.replaceState` (no new history entry), and
@@ -529,10 +539,62 @@ top of the file).
     0.08 of t where the turning piece is seen edge-on from the default camera (az 0, el 55). For *x, `fold.mirrored` is
     "an odd number of mirrors from the anchor's strip", not `params.flip`.
   - *Plane zoom on small panes.* The short side shows 2 viewHalf, except that a tile (√domainArea) takes at least
-    `zoomShare(m)` of a pane m px short: 0.3 up to 240 px, fading to 0 at 400 px. The kaleidoscopes never zoom.
+    `zoomShare(m)` of a pane m px short: 0.3 up to 240 px, fading to 0 at 400 px. The kaleidoscopes never zoom (but for
+    the replication's frame on a phone, § 9 Replication step).
   - *Rim chords.* A wavy mesh's rim stays within 0.25 % (`RIM_SAG`) of the true boundary between its vertices
     (the boundary's own points are inserted into long chords); at a tile corner it takes the true corner.
 - **Big comma** (qa/fill-judge.md, notes/fill.md): one filled comma per tile, about 30% of it; placements come from
   `node tools/motif-place.mjs`, which writes `src/groupdata/motif.js`. The table carries fingerprints of the group data and of
   the folded shapes, so any change to a lattice, a preset, a default tile or a fold's closed shape makes
-  `test/motif.test.js` / `test/motif-view.test.js` fail until the tool is run again.
+  `test/motif.test.js` / `test/motif-view.test.js` fail until the tool is run again. The cross-cap's comma is held to the
+  part of the sheet that no preset's fold turns over (`tools/motif-place.mjs` STILL; 29 % of the tile); with its flaps
+  tucked under (§ 5.3) that sheet ends on top, and 22x is held to the same view floors as every shape.
+- **Replication step** (10 Nov; the owner's ask "add another step where it actually shows how the tiling and replication
+  is done"; design qa/rep-judge.md, port notes/replication.md). The plane shows how the tiling is made out of the tile:
+  - *The construction* (`src/replicate.js`, pure; owner: plane): the side pairings `domain.edges[i].g` generate G
+    (Poincaré), so the copies grow out of D breadth first by word length: the copy across edge i of h(D) is h g_i(D).
+    Each copy reaches its place by the continuous motion h ∘ m_i(s), m_i(0) = id, m_i(1) = g_i exactly: a turn about the
+    centre (a half-turn by +π), a slide, a flip over the mirror line seen from above, a half screw along the glide axis.
+    Layer 1 plays one side pairing at a time (one glue class, or one mirror edge), named in orbifold terms ("half-turn
+    about a 2-fold centre", "rotations by ±2π/3 about a 3-fold centre", "reflection in a mirror", "glide reflections",
+    "translations"), with a ring on the centre or the dashed glide axis; later layers play whole ("layer k · …"). Each
+    copy is a card carrying the tile's seam colours, so edge j lands on the same-coloured edge i; it settles into the
+    plain tiling drawn under it. The copies of the window tile it exactly; at u = 1 the plane is drawn as always.
+  - *Plane API, a C2 addition* (documented at the top of src/plane.js): `P.setTiling(u, fade = 0)`, `P.getTiling()`,
+    `P.tilingPlan()` → `{ duration, stops [{ t, label }] in u, layers, phases }`, `P.tilingCaption(u)` (the short words on a
+    pane under `CAPTION_SMALL` = 360 px), `P.setTilingTiming(t)`, and the option `onTilingPlan(info)`. The pattern is
+    cached in two layers ('base': motif fills and glide axes; 'mirrors').
+  - *DOM* (src/index.template.html): `#tile-caption` (p.hint, top of the plane pane), `#tile-bar` (bottom-left corner;
+    `[data-open]` while u < 1 or playing) holding `#tile-btn` (Tile / Pause, `[data-label]`, `data-state` play | pause) and
+    `#tile-scrub[data-scrub]` with `#tile-slider`.
+  - *App* (src/app.js): `state.tile` with a timeline of its own (`createTimeline({ button: null, keyTarget: null })`: Space
+    stays with Fold; magnets at the ends of layers, at least 0.08 of the track apart). Tile plays on from u < 1; from
+    u = 1 it fades every copy but the tile out (0.35 s) and replays from the tile alone; Pause pauses. The bar lingers
+    1.4 s after the end; `#hint` is hidden while it is open. A group change sets u = 1; a cut, a preset or Wavy keep u.
+    The Fold, its scrubber, t and the 3D pane are untouched by the step. `__folding` gains `setTile(u)`, `playTile()`,
+    `tilePlan()`; `getState()` gains `tile, tilePlaying, tileCaption, tileBarOpen`.
+  - *Tests*: test/replicate.test.js (exactness, the window tiled once, the cards continuous, the URL), test/plane-tiling.test.js
+    (u = 1 draws exactly the plane as always, the plan and its words, every stage draws), test/app-url.test.js (`tile` in
+    HASH_KEYS and its round trips); tools/qa-matrix.mjs `--interact` has a Tile session; dev/ui3-url-loop.mjs carries tile=.
+  - *The final fix (10 Nov 2026; notes/integrator-final.md § 7)*:
+    - the side pairings are taken in an order a drag does not change (`replicate.js edgeKey`: mirrors by their outward
+      normal, seams by their colour `edge.color`), so a paused or playing replication does not swap its turns mid-drag;
+    - **u keeps its moment through a drag, a nudge or a wave**: the plane keeps the replication's length (`rep.lock`;
+      replicate.js `opts.total`: layer 1 as it is, the later layers stretched or squeezed within LOCK_RANGE to fill); a new
+      group, a cut chosen from outside, a resize, or a plan made at u = 0 or 1 takes its own length. Where the tile's side
+      pairings themselves change (an edge shrinks away) the first layer is made of other copies: a new plan;
+    - the later layers are quiet (`cardState.quiet`): plain paper, commas, a faint teal, a thin grey outline, mirror edges
+      in ink; seam colours, rings and dashed axes are layer 1's;
+    - the words end when the last copy has landed (`plan.landed`); the first later layer says what a layer is ("layer 2
+      (words of length 2 in the side pairings) · …");
+    - *the step's frame on a phone* (a C2 addition): `P.setStepFrame({ top, bottom } | null)` — while the app says the step
+      shows on a pane whose short side is under CAPTION_SMALL (app.js `syncStepFrame`, `STEP_INSETS` 30 / 48 px for the words
+      and the bar), the window eases (STEP_FRAME_MS 420, smootherstep) to frame the tile and its first layer's paths between
+      the words and the bar (scale within STEP_SCALE [0.4, 1.8] of the window as always; the kaleidoscopes too), and back when
+      the bar folds away; at mix 0 it is exactly the window as always. `P.getStepFrame()`; `getState().tileFrame` (0..1);
+    - the Tile button is the accent-outlined twin of Fold; a replay's fade takes the thumb back with it;
+    - tests: test/replicate.test.js (the drag order with an edge-index control, the kept length, quiet, the words),
+      test/plane-tiling.test.js (a paused drag through the pointer handlers, quiet layers, the step's frame), and
+      **test/plane-tiling-cover.test.js**: the drawn frames read back and checked against the group (every outline g(D)
+      with g in G once, every card a tile or h ∘ m_i(s), no overlap, the window covered once at the end, the words name
+      the moving cards), with planted defects caught.

@@ -152,3 +152,122 @@ seed (polish: not cheap or not safe).
 9. Polish left: the scrubber's magnets are hard to feel (9 groups have no stop between the ends); xx at t = 1 in the
    default view shows the joined comma as a dark patch; the ** slit seed checks a place, not the old configuration.
 10. Not verified: Safari, Firefox, a real phone, a real GPU; the live spacesheep address bar (no deploy allowed).
+
+## 7. This round (the final fixer, Tue 10 Nov 2026, from 10:09) — the cross-cap paint and the replication step
+
+Read: SPEC.md (all), this file, qa/fill-judge.md, qa/rep-judge.md, notes/crosscap-paint.md, notes/replication.md, the
+14 verifier findings (v4-owner, v4-tests-math, v4-fresh-eyes). Sources before my edits: `dev/v4-fix/pre/` (src, test,
+tools, SPEC.md, the shipped dist as dist-index.html). Scripts: `dev/v4-fix/`, pictures: `qa/v4-fix/`.
+
+### Log (as I go)
+- 10:09 snapshot taken; plan: (1) 22x comma on top (the fixer's option J, FLAPS = 'under'), (2) replication: stable
+  phase order and timing through drags, (3) the step out from under its bar on phones and given a step's weight,
+  (4) lighter later layers, (5) the coverage test, then build and the checks on the built page.
+- 10:15 **22x comma on top (findings 1, 3, 4, 9, 12)**: took the paint fixer's option J. `src/folds/crosscap.js`
+  FLAPS = 'under' (header THE PAINT rewritten: why, and that 22x is SPEC 5.3's one fold toward -z). Tests:
+  test/folds.test.js gains `TOWARD` (+1 every fold, -1 the cross-cap) — the upward check is round 3's, mirrored for a
+  fold toward -z, same RISE 0.5 (not loosened); its control gains the 22x fold squashed flat (caught). test/crosscap.test.js:
+  the self-reported sign `fold.flaps === 'under' ? -1 : 1` replaced by `DESIGN_UP = -1` (a fold that does not report
+  'under' fails), and a NEW test: FLAPS is 'under', its first-generation flaps go below the plane at the start, none
+  above, and round 3's 'over' fails the same check (control). test/crosscap-paint.test.js: the `fo <= 0.02` pin of the
+  hidden comma dropped (it pinned the defect; printed now), the shipped fold must put >= 40 % of the front layer in
+  comma; NEW test: the app's own scenes of all three presets, straight and wavy: 53.2 % front at t = 1.
+  test/motif-view.test.js: the 22x exception (no front floor, seen >= 6 %) removed — 22x is held to FRONT_MIN 20 % /
+  SEEN_MIN 22 % like every shape (it shows 53 / 39). `node tools/motif-place.mjs`: only 22x changed (view key
+  917b92be -> fac32178, at (0.321458, 0.782285) -> (0.321429, 0.781875), seen 8.4 -> 39.3 %, cover 29.0 %); `--check`
+  up to date. Remote (mini): crosscap, crosscap-paint, motif, motif-view, folds: 93 / 93 (`qa/v4-fix/tests-xc-1.log`).
+- 10:35 **replication step (findings 5, 8, 10, 13, 14; 2 and 6 next)**, `src/replicate.js`, `src/plane.js`, `src/app.js`,
+  `src/styles.css`:
+  - *Stable order* (5): `edgeKey` (mirrors by their outward normal, seams by `edge.color`, then the normals); the BFS
+    takes the side pairings in that order and layer 1's phases sort by kind, then by it (was: edge index, which
+    domain.js renumbers as the seed moves). REP_TIMING.order 'edge' keeps the old order for controls.
+  - *Kept length* (5): plane.js `rep.lock` — a drag, a nudge or a wave keeps the replication's length (replicate.js
+    `opts.total`: layer 1 as it is, the later layers stretched or squeezed within LOCK_RANGE [0.45, 2.2] to fill), so u
+    keeps its moment; a new group, a cut chosen from outside, a resize, a timing change or any plan made at u = 0 / 1
+    takes the plan's own length. Where the tile's side pairings themselves change (an edge shrinks away), the first
+    layer is made of other copies: a new plan (10 of 526 drag steps in the test), as the hinge folds hop.
+  - *Quiet later layers* (8, 10): `cardState.quiet` (depth > split); plane.js drawCard draws such a card as the plain
+    tiling draws a tile: paper, commas, a faint teal (0.06), a thin GLIDE_COLOR outline, mirror edges in ink, half the
+    shadow; no seam colours. Layer 1 unchanged.
+  - *Words* (14): planCaption ends at `plan.landed` (the last landing), not after the settle; the first later layer
+    glosses itself: "layer 2 (words of length 2 in the side pairings) · …"; the Tile button is the accent-outlined
+    twin of Fold (accent, 600, 1.5 px ring); a replay's fade takes the thumb back with it (no snap to 0).
+  - Tests: test/replicate.test.js header (13) + 4 new tests (drag order with the edge-index control; the kept length;
+    quiet; the words' end and gloss); test/plane-tiling.test.js + 3 new tests (a paused drag through the plane's own
+    pointer handlers keeps the length and no card moves more than 1.85 px per 1-px step — the edge-index control jumps
+    > 30 px, and a 2222 drag whose own length changes 5.70 -> 6.42 s is held; the later layers draw no seam colour; the
+    step's frame); NEW test/plane-tiling-cover.test.js (11) with test/tiling-frame.lib.js (the tests-math verifier's
+    analyser): 161 cases, 5,345 frames, every outline g(D) with g in G once, every card a tile or h o m_i(s), no
+    overlap, the end covers the window once, the words name the moving cards; 4 planted defects caught.
+- 10:44 **the step's frame on phones (findings 2, 6)**: plane.js `setStepFrame({ top, bottom })` (a C2 addition): while
+  the app says the step shows on a pane under CAPTION_SMALL (app.js `syncStepFrame`, STEP_INSETS = 30 / 48 px for the
+  words and the bar), the window eases (420 ms, smootherstep) to frame the tile and its first layer's copies along their
+  paths between the two (scale within [0.4, 1.8] of the window as always: 2222 0.50, 333 0.62, *632 1.18, xx 0.40), and
+  back when the bar folds away; at mix 0 exactly the window as always (tested: the same view and the same drawing
+  calls). The region of the symmetry elements and the plan cover the larger window, so nothing is gathered again on
+  the way. Remote suite (mini): **725 tests, 723 pass, 0 fail, 2 skipped** (`qa/v4-fix/suite-1.log`).
+
+### Findings and fixes (the 14 verifier findings of this round)
+
+| # | finding | fix | files | test |
+|---|---|---|---|---|
+| 1, 3, 4 | 22x at t = 1 showed almost no comma (front 0, seen 8 %): the still comma lay under the top sheet | the paint fixer's option J shipped: FLAPS = 'under' (22x folds toward -z; SPEC 5.3's one exception, § 7 note, § 9 note); comma table regenerated (22x only: seen 8.4 -> 39.3 %) | src/folds/crosscap.js, src/groupdata/motif.js, tools/motif-place.mjs (comment), SPEC.md | crosscap-paint: the app's scenes, 3 presets x amp 0/1, front 53.2 %; motif-view: 22x back on FRONT_MIN 20 / SEEN_MIN 22 (it shows 53 / 39) |
+| 9 | crosscap-paint pinned the hidden comma (fo <= 0.02) | the pin removed (printed), the shipped fold must have fu >= 0.4 | test/crosscap-paint.test.js | — |
+| 12 | the +z checks took their sign from the fold under test | `DESIGN_UP = -1` (a fold that does not report 'under' fails) + a new test: its first-generation flaps go below at the start, none above; round 3's 'over' fails it (control); folds.test.js `TOWARD` (same RISE 0.5, mirrored) + a squashed-22x control | test/crosscap.test.js, test/folds.test.js | themselves |
+| 5 | a drag during the step made the copies jump to another centre (phase order by edge index; the length re-timed with the layer count) | `edgeKey` order; the kept length (`rep.lock`, `opts.total`) | src/replicate.js, src/plane.js | replicate 'drag keeps the order' (control: edge index reorders), 'kept length'; plane-tiling 'a paused drag' (<= 1.85 px per 1-px step; control > 30 px; a 2222 drag whose own length changes 5.70 -> 6.42 s is held) |
+| 2, 6 | phones: layer 1 ran under the bar and the words (20-49 % of the moving copy hidden) | the step's frame (`setStepFrame`): the first layer framed between the words and the bar while the bar is open, eased in and out | src/plane.js, src/app.js | plane-tiling 'the step's frame' (inside the free area; exact return; smooth ease); qa-matrix 2 new checks; measured on dist (dev/v4-fix/under.mjs): **0 % hidden** at 390, 375, 360 px for 2222, 333, 442, 22x, 4*2 (laptop 2222 1.8 % as before) |
+| 8, 10 | the later layers bloomed: 10-20 coloured cards in flight | quiet cards from layer 2 on (no seam colours, a faint teal, a thin grey outline, ink mirrors, half the shadow) | src/replicate.js, src/plane.js | replicate 'quiet'; plane-tiling 'no seam colour in a later layer' |
+| 11 | no test checked the drawn replication against the group | the verifier's analyser ported | NEW test/plane-tiling-cover.test.js, test/tiling-frame.lib.js | itself: 161 cases, 5,345 frames, 0 problems, 4 planted defects caught |
+| 13 | replicate.test.js header stale | rewritten | test/replicate.test.js | — |
+| 14 | the step did not read as a step; 'layer k' unexplained; words after the last landing; the thumb snapped at a replay | Tile in the accent on an accent ring (the twin of Fold); "layer 2 (words of length 2 in the side pairings) · …" once; words end at plan.landed; the thumb goes back with the replay's fade | src/styles.css, src/replicate.js, src/app.js | replicate 'the words end … gloss' |
+| 7 | a dragged 22x cut can still carry part of the comma over on a flap | not fixed (see below) | — | — |
+
+### Verification (the built page)
+- `node tools/test-all.mjs` (the mini, 5 workers): **725 tests, 723 pass, 0 fail, 2 skipped** (opt-in) —
+  `qa/v4-fix/suite-final.log`. `node tools/motif-place.mjs --check`: up to date.
+- `node build.mjs`: **dist/index.html = 301,472 bytes** (294.4 kB; JS 275.4 kB, CSS 13.9 kB, shell 5.2 kB; 115.4 kB
+  gzipped; sha256 a8375941…), one inline script, no URL but the companion link; rebuilt after the last edit:
+  byte-identical.
+- `node tools/qa-matrix.mjs --interact --out qa/v4-fix/matrix`: 119 pictures, **102 / 102 checks**, 0 console / page
+  errors, 0 problems (`qa/v4-fix/matrix-run.log`).
+- `node dev/ui3-url-loop.mjs --page dist --out qa/v4-fix/url`: **all passed** (`qa/v4-fix/url.log`).
+  `SHELL_LAYOUT=1 SHELL_LAYOUT_PAGE=dist/index.html node --test test/shell-layout.test.js`: pass.
+- The plane as always (u = 1, t = 0) against this round's starting sources (`dev/v4-fix/plane-same.mjs
+  dev/v4-fix/pre/app-demo.html dev/app-demo.html`, laptop and phone): identical for 16 groups; 22x 39 levels in 1,120 px
+  (its comma moved 0.0004 with the regenerated table).
+- Frame times on dist (`dev/v4-fix/frame-times.mjs`, the real Tile button, 2.5 s: the fade, the phone's frame easing
+  in, the first phase): 2222, 333, *632, 22x on phone and laptop: median 16.7 ms, **0 frames over 34 ms**, the frame's mix
+  monotone 0 -> 1 on the phone, 0 on the laptop. Fold pops (`qa-final --only pops`): 22x no spike, no colour pop.
+- LOOKED AT: `qa/v4-fix/final/sheet-{laptop,phone}-fold1.png` (17 shapes at t = 1: 22x now carries its teal comma on top
+  like the others), `qa/v4-fix/final/film-22x.png`, the 22x cuts `qa/v4-fix/xc/film-22x-p{0,1,2}-{default,turned}.png`
+  (the comma holds still on the top sheet in all three cuts and both views; the flap tucks under; no jump), the
+  replication films `qa/v4-fix/rep/film-{333,s632,22x}-{laptop,phone}.png` and the layer-1 films
+  `qa/v4-fix/rep/film-{333,s632,22x,2222,xx}-{laptop,phone}-layer1.png` (layer 1 one side pairing at a time with its
+  words and ring / axis; on the phone framed between the words and the bar; from layer 2 plain cards), stills
+  `qa/v4-fix/still-*.png`, `qa/v4-fix/matrix/tile-*.png`.
+
+### Not done, and why
+- **#7 (a dragged 22x cut)**: unchanged by J (a mirror in z = 0 keeps every normal's z-component, so the measure — and
+  the motion of a flap seen edge-on — is the same; with the flaps under, that part of the comma now passes under the
+  still sheet instead of over it). The verifier's mitigation, a 22x default view at azimuth 20-30°, would make the
+  default view depend on the group, which "the view never resets but by Reset view" rules out. For the owner to decide.
+- Finding 5's remainder: where a drag changes the tile's side pairings themselves (an edge shrinks away and another
+  neighbour takes its place; 10 of 526 one-pixel steps in the test), the first layer is made of other copies — a new
+  plan, as the hinge folds hop when their walk sweeps a centre.
+
+### Still visible in the built page
+1. A dragged 22x cut can still carry part of the comma on a flap through an edge-on moment (13-24 of 49 drags within
+   0.45 tile sizes of a preset turn more than 30 % of it over); now under the still sheet, not over it.
+2. The replication during a drag: where the tile's side pairings change (about 2 % of drag steps), the first layer is
+   re-planned and its copies jump.
+3. Phones: while the step shows, the plane zooms out (2222 0.50, 333 0.62, 22x 0.57, xx / o / ** 0.40 of the window as
+   always; tiles of 25-45 px; about 20 px on a 320 x 568 phone); for xx, o and ** the first layer still reaches a few px
+   into the words' and the bar's strips (the 0.4 floor). The zoom eases in and back (0.42 s): a deliberate camera move.
+4. The later layers are calmer (plain cards) but still many cards fly at once in the large groups (*632: 13 layers on
+   the laptop, 9 on the phone).
+5. From § 6, unchanged: the kaleidoscopes' teal sliver at t = 1; *x and xx commas 21 % and 19.5 % of the tile; rolls
+   dragged far switch sides at 0 < t < 1; a mirrored tile's colour cross-fade shows when turned or on long walks;
+   mirrored hinge tiles dip below the plane during their page turn; edge-on flaps for one frame (333 t ≈ 0.34, *632
+   0.175, *442 0.225); the "2" label on the comma's outline at 442 az 40 el 30 and 2222 az 120 el 20; the *x strip 19 px
+   on a 375 x 548 phone; the scrubber's magnets hard to feel.
+6. Not verified: Safari, Firefox, a real phone, a real GPU; the live spacesheep address bar (no deploy here).

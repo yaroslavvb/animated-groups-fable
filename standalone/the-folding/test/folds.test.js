@@ -64,6 +64,12 @@ const MAX_BEND = { hinge: 0.0016, crosscap: 0.006, torus: 0.0045, cylinder: 0.00
 // is allowed: with any cut but its default one, stage 2 turns the near half of the pillow over, through both sides
 // (notes/crosscap.md); 0.70 is the smallest ratio seen.
 const RISE = { hinge: 1, crosscap: 0.5, torus: 1, cylinder: 1, mobius: 1, klein: 1, snowflake: 1 };
+// Which side each fold goes to: +1 toward +z, the viewer (SPEC 5.3), for every fold but the cross-cap, which goes
+// toward -z BY DESIGN since the final fix of 10 Nov 2026 (src/folds/crosscap.js FLAPS = 'under', SPEC 5.3's exception;
+// notes/integrator-final.md § 7): its flaps tuck under the sheet that holds still, so that the comma that sheet carries
+// ends on top. The check below is the same for both: the motion must reach 0.03 tile sizes to its side, and that side
+// must be at least RISE times the other (for the cross-cap exactly round 3's check, mirrored with the motion).
+const TOWARD = { hinge: 1, crosscap: -1, torus: 1, cylinder: 1, mobius: 1, klein: 1, snowflake: 1 };
 
 function prng(seed) {
   let a = seed >>> 0;
@@ -359,11 +365,15 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
     if (before[0] !== after[0] || before[1] !== after[1] || before[2] !== after[2]) fail('pure', `${label}: at(0.31) gives another point after at(0.83) was asked for`);
   }
 
-  // ---- toward +z, and the folded shape stays near where the tile was
+  // ---- toward +z (the cross-cap: toward -z, TOWARD), and the folded shape stays near where the tile was
   {
-    if (!(zTop > 0.03 * size)) fail('upward', `${label}: the motion never rises above ${zTop / size} tile sizes`);
-    if (!(zTop >= -RISE[group.fold] * zBottom - 1e-9 * size)) fail('upward', `${label}: it reaches ${-zBottom / size} tile sizes below the plane but only ${zTop / size} above`);
-    if (zBottom < -1e-9 * size) { if (!(stats.rise[group.fold] <= zTop / -zBottom)) stats.rise[group.fold] = zTop / -zBottom; }
+    const side = TOWARD[group.fold];
+    if (side !== 1 && side !== -1) fail('upward', `${label}: no direction for the fold type ${group.fold}`);
+    // its own side: zTop for a fold toward +z; for one toward -z the same check with z turned over
+    const zUp = side === -1 ? -zBottom : zTop, zDown = side === -1 ? -zTop : zBottom, word = side === -1 ? 'below' : 'above';
+    if (!(zUp > 0.03 * size)) fail('upward', `${label}: the motion never goes ${word} the plane by more than ${zUp / size} tile sizes`);
+    if (!(zUp >= -RISE[group.fold] * zDown - 1e-9 * size)) fail('upward', `${label}: it reaches ${-zDown / size} tile sizes to the wrong side of the plane but only ${zUp / size} ${word}`);
+    if (zDown < -1e-9 * size) { if (!(stats.rise[group.fold] <= zUp / -zDown)) stats.rise[group.fold] = zUp / -zDown; }
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (let v = 0; v < n; v++) { x0 = Math.min(x0, xy[2 * v]); x1 = Math.max(x1, xy[2 * v]); y0 = Math.min(y0, xy[2 * v + 1]); y1 = Math.max(y1, xy[2 * v + 1]); }
     const diag = Math.hypot(x1 - x0, y1 - y0), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
@@ -604,7 +614,7 @@ test('folds 3b: no jump — cut into 32, no part of the largest steps, the first
 test('folds 3c: even — second differences over 200 steps stay within the fold type\'s bound', () => assert.equal(failures.even.length, 0, show('even')));
 test('folds 4: no NaN / Infinity for any t in [0, 1], including the stops, the inner stage boundaries and 1e-12 either side', () => assert.equal(failures.finite.length, 0, show('finite')));
 test('folds: at(t) of one time is not disturbed by asking for another', () => assert.equal(failures.pure.length, 0, show('pure')));
-test('folds: folding goes toward +z', () => assert.equal(failures.upward.length, 0, show('upward')));
+test('folds: folding goes toward +z (the cross-cap toward -z, by design: TOWARD)', () => assert.equal(failures.upward.length, 0, show('upward')));
 test('folds: the folded shape stays near where the tile was', () => assert.equal(failures.near.length, 0, show('near')));
 test('folds: mesh.locate gives the piece that moves a point with its triangle (the motif is drawn through it)', () => assert.equal(failures.locate.length, 0, show('locate')));
 
@@ -667,6 +677,20 @@ test('control: a planted jump, an open seam, a moved start, a NaN at a stop and 
   // the same motion, downward
   got = run(wrap((t, x, y, cell, out) => { out[2] = -out[2]; }));
   assert.equal(names(got), 'upward');
+  // the cross-cap goes toward -z by design (TOWARD): its real fold passes here, and the same fold squashed flat (it never
+  // reaches 0.03 tile sizes to its side) is noticed. Its flaps' direction itself ('under' against round 3's 'over', which
+  // the closed shape's symmetry in z = 0 hides from this whole-motion check) is test/crosscap.test.js's 'by design' test.
+  {
+    const gx = BY_ID['22x'], cx = { label: 'control 22x', seed: gx.presets[0].seed, metric: gx.presets[0].metric, preset: 0 };
+    const runX = (tamper) => {
+      const gotX = Object.fromEntries(NAMES.map((k) => [k, []]));
+      sink = gotX;
+      try { checkFold(gx, cx, 0, false, tamper); } finally { sink = failures; Object.assign(stats, JSON.parse(before)); }
+      return gotX;
+    };
+    assert.equal(names(runX(null)), '', 'the real 22x fold passes');
+    assert.equal(names(runX(wrap((t, x, y, cell, out) => { out[2] *= 0.01; }))), 'upward', 'a 22x fold that hardly leaves the plane');
+  }
   // a function that shares its state with the next one asked for
   got = run((fold) => { let last = 0; return { ...fold, at: (t) => { last = t; return (x, y, cell, out) => fold.at(last)(x, y, cell, out); } }; });
   assert.ok(got.pure.length, 'shared state: ' + names(got));

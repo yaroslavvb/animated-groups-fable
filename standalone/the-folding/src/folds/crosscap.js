@@ -75,6 +75,21 @@
 // is half of the pillow after 22 %. The middle stop is where the puff lands; its label says what is true of every
 // cut there: the glide seams are open (every other seam is closed).
 //
+// THE PAINT (10 Nov 2026, notes/crosscap-paint.md). The owner: "crosscap vis is weird, It's like the surface, the
+// painting jumped from one side of the surface to another at one point. Fix that." The big comma (src/motif.js) is
+// painted on the sheet; on the Pocket's flap it turned over with it, and the flap's swing plane holds the default
+// camera's line of sight, so the whole comma squashed to a line and came back mirrored on the other side. The comma now
+// lies where no preset's fold turns the sheet over (tools/motif-place.mjs STILL): the far half of the cell C0, which
+// stays put in stage 1 and hardly moves in stage 2. With the flaps folding toward +z that sheet is the BOTTOM of the
+// closed shape, and the comma ended under the top sheet (front 0 %, seen 8 % in the default view: 22x was an empty shell
+// again, against the owner's 9 Nov ask "less empty space ... for all the examples"). So FLAPS = 'under' (the final fix
+// of 10 Nov 2026, the paint fixer's option J): the whole motion is mirrored in the plane z = 0, the flaps tuck under the
+// sheet that holds still, and since the closed cross-cap is symmetric in that plane it is the same shape with its two
+// sheets swapped: the comma on top (front 53 %, seen 39 %) and never turned over, and the outside of the closed shape is
+// the paper's front, as the flat tile is (with 'over' it was the back: the top sheet turned pale). 22x is the one fold
+// that goes toward -z (SPEC 5.3's exception; test/folds.test.js TOWARD); the mouth that zips shut still faces the
+// default camera. opts.flaps = 'over' gives round 3's direction (for comparisons).
+//
 // Exports
 //   default createFold(group, domain, mesh, opts) -> Fold      (SPEC 5.3) plus fold.doubleLine(t), fold.kinematics,
 //                                                              fold.frame, fold.finalMap, fold.anchor, fold.stage2,
@@ -90,6 +105,7 @@
 //   ACTS, ACTS_FREE                                            the windows of the three acts
 //   crosscapMap(design, params)                                the even map by itself (for tests and notes)
 //   anchorCell(group, anchor, metric) -> { iso, point } | null the cell C0 of an anchor (SPEC 7)
+//   FLAPS                                                      'under' (shipped) | 'over': see THE PAINT above
 
 import { inverse, polyArea, clipHalfPlane } from '../geom.js';
 import { buildDomain } from '../domain.js';
@@ -113,6 +129,12 @@ export const HALF_STOP = HALF_END;
 export const MIDDLE_LABEL = 'glide seams open';
 /** The double line is drawn from the moment the sheets that meet along it are this close to meeting (pinch / zip). */
 export const DOUBLE_FROM = 0.97;
+/**
+ * Which way the flaps of stage 1 fold: 'under' (shipped since the final fix of 10 Nov 2026: the whole motion mirrored in
+ * the plane z = 0, so the sheet that holds still, which carries the comma, ends on top; see THE PAINT at the top) or
+ * 'over' (toward +z, the viewer: rounds 1-3). opts.flaps overrides it.
+ */
+export const FLAPS = 'under';
 
 const IDENTITY = (x, y, cell, out) => { out[0] = x; out[1] = y; out[2] = 0; return out; };
 const smooth = (q) => (q <= 0 ? 0 : q >= 1 ? 1 : q * q * (3 - 2 * q));
@@ -664,7 +686,8 @@ export default function createFold(group, domain, mesh, opts = {}) {
    *  DOUBLE_FROM of meeting, then it grows out of the tip (smoothly), the whole line when they meet. */
   const lineShare = (s) => (s >= 1 ? 1 : s * smooth((s - DOUBLE_FROM) / (1 - DOUBLE_FROM)));
 
-  return {
+  const flaps = opts.flaps === 'under' || opts.flaps === 'over' ? opts.flaps : FLAPS;
+  const fold = {
     // the mesh to draw: finer triangles where the surface folds onto the double line, finer outline (as in hinge.js)
     mesh: drawn,
     // the middle stop: the tile is half of the pillow; every seam but the glide seams is closed (a tile without
@@ -728,5 +751,18 @@ export default function createFold(group, domain, mesh, opts = {}) {
     finalMap: map,
     /** The frame of the closed shape: normalised (M, Dp, V) -> world (xc + hx M, yc + hy Dp, hz V); signs of the pillow axes. */
     frame: { xc, yc, hx, hy, hz, sx, sy },
+    /** 'over' or 'under' (FLAPS): with 'under' every position is the mirror image in z = 0 of the 'over' one, at every t. */
+    flaps,
   };
+  if (flaps === 'under') {
+    // the mirror image in the plane z = 0 (the double line, the frame and the closed shape as a set are symmetric in it;
+    // fold.lift, kinematics and finalMap describe the 'over' motion that is mirrored)
+    const mirror = (F) => (x, y, cell, out) => { F(x, y, cell, out); out[2] = -out[2]; return out; };
+    const over = fold.at, overLine = fold.doubleLine;
+    fold.at = (t) => { const F = over(t); return F === IDENTITY ? F : mirror(F); };
+    fold.halfPillow = mirror(fold.halfPillow);
+    // (the double line lies in z = 0 for the default design; 'spec' lifts it)
+    fold.doubleLine = (t) => { const L = overLine(t); for (let i = 2; i < L.length; i += 3) L[i] = -L[i]; return L; };
+  }
+  return fold;
 }

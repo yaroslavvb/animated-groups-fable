@@ -9,7 +9,15 @@ import { apply, inverse, det, compose, classify } from '../src/geom.js';
 import { makeWarp, buildDomain } from '../src/domain.js';
 import { buildMesh } from '../src/mesh.js';
 import createFold, { crosscapSchedule, crosscapMap, actsTiming, anchorCell, ACTS, DESIGN, ROOT_SHIFT, ROOT_MIN, PUFF_START, HINGE_END, HALF_END, ZIP_START, HALF_STOP,
-  crosscapTimes, TIMES_NO_CREASE, WORK, MIDDLE_LABEL, DOUBLE_FROM, ACTS_FREE } from '../src/folds/crosscap.js';
+  crosscapTimes, TIMES_NO_CREASE, WORK, MIDDLE_LABEL, DOUBLE_FROM, ACTS_FREE, FLAPS } from '../src/folds/crosscap.js';
+
+/**
+ * Which way 22x folds, BY DESIGN: -1, toward -z (the final fix of 10 Nov 2026, notes/integrator-final.md § 7; SPEC 5.3's
+ * exception). Its flaps tuck under the sheet that holds still, which carries the comma, so that the comma ends on top
+ * (src/folds/crosscap.js THE PAINT); round 3 folded toward +z ('over') and hid it under the top sheet. Every sign check
+ * of this file is round 3's, multiplied by this constant.
+ */
+const DESIGN_UP = -1;
 
 const group = BY_ID['22x'];
 const SEEDS = Math.max(20, +process.env.CROSSCAP_SEEDS || 20);
@@ -355,10 +363,15 @@ function checkFold(domain, mesh, label, amp, presetIndex) {
   //      the tile is one piece: it only puffs); the half pillow lies on the fixed cell, the fixed sheet below.
   //      Round 3: a tile without a crease to fold (work < 1: the Bowl and its wavy and nudged cuts) puffs from t = 0
   //      on purpose (finding 2: the first frames must move); its flaps, if any, still rise.
+  // BY DESIGN 22x folds toward -z (the final fix of 10 Nov 2026: src/folds/crosscap.js FLAPS = 'under', SPEC 5.3's
+  // exception): the motion is round 3's mirrored in z = 0, so these are round 3's checks turned over with it (DESIGN_UP
+  // = -1), not a sign the fold reports about itself; a fold that does not say 'under' fails here.
+  const up = DESIGN_UP;
+  if (fold.flaps !== 'under') fail('upward', `${label}: the fold reports flaps '${fold.flaps}', not the design's 'under'`);
   if (P > 1) {
     const F = fold.at(0.25 * T_PUFF);
     let top = -Infinity, low = 0;
-    for (let v = 0; v < n; v++) { F(xy[2 * v], xy[2 * v + 1], cell[v], out); top = Math.max(top, out[2]); if (kin.depth[cell[v]] <= 1) low = Math.min(low, out[2]); }
+    for (let v = 0; v < n; v++) { F(xy[2 * v], xy[2 * v + 1], cell[v], out); top = Math.max(top, up * out[2]); if (kin.depth[cell[v]] <= 1) low = Math.min(low, up * out[2]); }
     if (fold.work === 1 && low < -1e-7 * size) fail('upward', `${label}: a first-generation flap dips to z = ${low} at the start`);
     if (!(top > 1e-4 * size)) fail('upward', `${label}: nothing rises at the start`);
   }
@@ -366,7 +379,7 @@ function checkFold(domain, mesh, label, amp, presetIndex) {
     // the puff answers at once: the fixed piece sags from the first instant
     const F = fold.at(0.02);
     let low = 0;
-    for (let v = 0; v < n; v++) { F(xy[2 * v], xy[2 * v + 1], cell[v], out); if (cell[v] === kin.root) low = Math.min(low, out[2]); }
+    for (let v = 0; v < n; v++) { F(xy[2 * v], xy[2 * v + 1], cell[v], out); if (cell[v] === kin.root) low = Math.min(low, up * out[2]); }
     if (!(low < -0.02 * (1 - fold.work) * kin.hMax)) fail('upward', `${label}: work ${fold.work}: the puff has not started at t = 0.02 (z ${low})`);
   }
   // the state between the two stages (fold.halfPillow = stage 1 complete) is half of the pillow; the motion passes
@@ -380,7 +393,7 @@ function checkFold(domain, mesh, label, amp, presetIndex) {
     const gapStop = Math.hypot(out[0] - o2[0], out[1] - o2[1], out[2] - o2[2]) / Math.max(fr.hx, fr.hy);
     stats.maxStopGap = Math.max(stats.maxStopGap, gapStop);
     if (!(gapStop <= 0.015)) { fail('pillow', `${label}: at the middle stop a vertex is ${gapStop} cells from the half pillow`); break; }
-    const xi = (out[0] - fr.xc) / fr.hx, eta = (out[1] - fr.yc) / fr.hy, zeta = out[2] / fr.hz;
+    const xi = (out[0] - fr.xc) / fr.hx, eta = (out[1] - fr.yc) / fr.hy, zeta = (up * out[2]) / fr.hz;
     if (!(Math.abs(xi) <= 1 + 1e-6 && Math.abs(eta) <= 1 + 1e-6 && Math.abs(zeta) <= 1 + 1e-6)) { fail('pillow', `${label}: the half pillow leaves the fixed cell: (${xi}, ${eta}, ${zeta})`); break; }
     if (Math.abs(zeta * zeta - (1 - xi * xi) * (1 - eta * eta)) > 1e-6) { fail('pillow', `${label}: the half pillow is not the pillow: zeta^2 = ${zeta * zeta} at (${xi}, ${eta})`); break; }
     if (Math.abs(zeta) > 0.02 && (zeta > 0) !== !!(kin.depth[cell[v]] & 1)) { fail('pillow', `${label}: vertex ${v} of a depth-${kin.depth[cell[v]]} piece is at zeta = ${zeta}`); break; }
@@ -430,7 +443,36 @@ test('crosscap 3c: no jump of position or velocity at t = 0, the inner times of 
 test('crosscap 4: no NaN / Infinity for any t, including the exact stage boundaries and beyond the ends', () => assert.equal(failures.finite.length, 0, show('finite')));
 test('crosscap: at(1) is invariant under both glides, the half-turn and their products, at random points in and around the tile', () => assert.equal(failures.invariance.length, 0, show('invariance')));
 test('crosscap: the piece index handed over does not matter in stage 2 (the map is a function of the pillow point)', () => assert.equal(failures.pieces.length, 0, show('pieces')));
-test('crosscap: the fold goes toward +z', () => assert.equal(failures.upward.length, 0, show('upward')));
+test('crosscap: by design the fold goes toward -z (DESIGN_UP; the flaps tuck under the sheet that holds still)', () => assert.equal(failures.upward.length, 0, show('upward')));
+
+test('crosscap: the direction is the design\'s, not the fold\'s own say — FLAPS is \'under\', every default fold reports it, its first-generation flaps go below the plane at the start and nothing of them above; round 3\'s direction (\'over\') fails the same check', () => {
+  assert.equal(FLAPS, 'under', 'src/folds/crosscap.js FLAPS');
+  const out = [0, 0, 0];
+  // the extreme heights of the first-generation flaps at a quarter of the way to the puff, on the design's side (up)
+  const flapSides = (fold) => {
+    const kin = fold.kinematics, F = fold.at(0.25 * T_PUFF), M = fold.mesh;
+    let own = 0, other = 0;
+    for (let v = 0; v < M.n; v++) {
+      if (kin.depth[M.cell[v]] !== 1) continue;
+      F(M.xy[2 * v], M.xy[2 * v + 1], M.cell[v], out);
+      own = Math.max(own, DESIGN_UP * out[2]); other = Math.max(other, -DESIGN_UP * out[2]);
+    }
+    return { own, other };
+  };
+  let checked = 0;
+  for (const [i, p] of group.presets.entries()) {
+    const domain = buildDomain(group, { seed: p.seed, metric: p.metric, warp: makeWarp(group, 0) });
+    const mesh = buildMesh(group, domain);
+    const fold = createFold(group, domain, mesh, { anchor: p.seed });
+    assert.equal(fold.flaps, 'under', `${p.name}: the default fold`);
+    if (fold.work < 1) continue;                               // the Bowl: no crease, no flap
+    const d = flapSides(fold), o = flapSides(createFold(group, domain, mesh, { anchor: p.seed, flaps: 'over' }));
+    assert.ok(d.own > 0.05 * size && d.other < 1e-7 * size, `${p.name}: its flaps go ${d.own / size} tile sizes to the design's side and ${d.other / size} to the other`);
+    assert.ok(!(o.own > 0.05 * size && o.other < 1e-7 * size), `${p.name}: control: round 3's flaps ('over') pass the check (${o.own}, ${o.other})`);
+    checked++;
+  }
+  assert.ok(checked >= 2, `${checked} presets with flaps checked`);
+});
 test('crosscap: at the pause the tile is half of the pillow over the fixed cell, the fixed sheet below', () => assert.equal(failures.pillow.length, 0, show('pillow')));
 test('crosscap: the closed shape lies on the far half of the fixed cell, which is the cell of the seed or the one just in front of it', () => assert.equal(failures.near.length, 0, show('near')));
 
@@ -725,7 +767,8 @@ test('the default cut "Pocket": one fold, the far half of the pillow, the mouth 
       const a = tri[3 * k], b = tri[3 * k + 1], c = tri[3 * k + 2], odd = kin.depth[mesh.triCell[k]] & 1;
       const ar = (pos[3 * b] - pos[3 * a]) * (pos[3 * c + 1] - pos[3 * a + 1]) - (pos[3 * b + 1] - pos[3 * a + 1]) * (pos[3 * c] - pos[3 * a]);
       if (odd ? ar > 1e-12 : ar < -1e-12) flipped++;
-      const zc = (pos[3 * a + 2] + pos[3 * b + 2] + pos[3 * c + 2]) / 3;
+      // (by design the whole motion is mirrored in z = 0, DESIGN_UP = -1: the fixed sheet above, the flap below)
+      const zc = (DESIGN_UP * (pos[3 * a + 2] + pos[3 * b + 2] + pos[3 * c + 2])) / 3;
       if (odd ? zc < -1e-9 : zc > 1e-9) wrongSide++;
     }
     assert.equal(flipped, 0, `t = ${t}: ${flipped} triangles are turned over seen from above`);
@@ -1010,6 +1053,7 @@ test('anchor (SPEC 7) 1: at t = 1 a plane point goes to the same place for 30 ra
         if (!inTile(domain, p[0], p[1], q)) continue;
         F1(q[0], q[1], fold.mesh.locate(q[0], q[1]), out);
         refClosed(p[0], p[1], i0, j0, ref);
+        ref[2] *= DESIGN_UP;                                   // by design the mirror image in z = 0 of round 3's shape (FLAPS)
         const d = Math.hypot(out[0] - ref[0], out[1] - ref[1], out[2] - ref[2]);
         worst = Math.max(worst, d / size); compared++;
         assert.ok(d < 1e-7 * size, `${tag}: the plane point (${p}) (in the tile at (${q})) goes to ${out}, not to ${ref} (${d / size} tile sizes)`);

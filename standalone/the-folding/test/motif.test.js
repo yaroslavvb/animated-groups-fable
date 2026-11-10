@@ -24,6 +24,13 @@
 // the judge's 98 %; the gap is measured on the drawn outline and must be FILL_GAP itself (it was 0.95 of it: *x's comma
 // came 0.0694 from its mirror image); the table is also stale when the folded default tile it was seen on has moved
 // (entry.view). That the comma shows in the default 3D view is test/motif-view.test.js.
+// The cross-cap paint fix (10 Nov 2026, notes/crosscap-paint.md). The owner: "crosscap vis is weird, It's like the
+// surface, the painting jumped from one side of the surface to another at one point. Fix that." The round-3 comma lay on
+// the Pocket's flap, which turns over across the default view. tools/motif-place.mjs now holds the cross-cap's comma to
+// the part of the sheet that no preset's fold turns over (STILL, a hard rule before the target); that band is the far
+// half of the cell C0, and the largest comma that fits it covers 29 % of the tile, not 30 %: the cover test below
+// takes 22x as it takes the strips (the least it may cover, STILL_COVER), and checks that the band is what limits it
+// (s = stillFit) and that the table says how far its sheet turns. That it holds still is test/crosscap-paint.test.js.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -36,7 +43,7 @@ import { det } from '../src/geom.js';
 import { motifFor, motifInTile, motifTintMesh, commaOutline, placementKey, fnv1a, placeAcrossSeam, FILL_TARGET, FILL_GAP, FILL_RCAP,
   FILL_STRETCH, SEAM_GROUPS, SEAM_LOBES, SEAM_SCALE, SEAM_STRETCH } from '../src/motif.js';
 import { PLACEMENTS, PLACEMENT_SOURCE } from '../src/groupdata/motif.js';
-import { searchGroup, tableGroups, viewKey, freeDirections, exactShare, SHARE_OK } from '../tools/motif-place.mjs';
+import { searchGroup, tableGroups, viewKey, freeDirections, exactShare, SHARE_OK, STILL } from '../tools/motif-place.mjs';
 
 function rng(seed) {
   let a = seed >>> 0;
@@ -45,6 +52,8 @@ function rng(seed) {
 const lengthOf = (pl) => { let s = 0; for (let i = 2; i < pl.length; i += 2) s += Math.hypot(pl[i] - pl[i - 2], pl[i + 1] - pl[i - 1]); return s; };
 const isIdent = (g) => Math.abs(g.a - 1) < 1e-9 && Math.abs(g.d - 1) < 1e-9 && Math.abs(g.b) < 1e-9 && Math.abs(g.c) < 1e-9 && Math.abs(g.tx) < 1e-9 && Math.abs(g.ty) < 1e-9;
 const STRIPS = { o: 0.27, '**': 0.27, '*x': 0.19, xx: 0.19 };     // the least cover of the strip groups (the judge: 29, 28, 21, 20 %)
+// the least cover of a comma held still (tools/motif-place.mjs STILL: 22x's fills the far half of the cell C0, 29 %)
+const STILL_COVER = { '22x': 0.28 };
 
 /** One-sided Hausdorff distance from the points of A to the points of B (both flat arrays). */
 function hausdorff(A, B) {
@@ -355,13 +364,26 @@ test('the comma slides along its strip without changing size: the free direction
   }
 });
 
-test('the big comma covers FILL_TARGET (30 %) of the tile; the strips the most their gap allows (o, ** >= 27 %, *x, xx >= 19 %)', (t) => {
+test('the big comma covers FILL_TARGET (30 %) of the tile; the strips the most their gap allows (o, ** >= 27 %, *x, xx >= 19 %); the cross-cap the most that holds still (>= 28 %)', (t) => {
   const rows = [];
   for (const g of GROUPS) {
     const m = motifFor(g), cover = Math.abs(areaCentroid(m.polylines[0]).area) / g.domainArea;
     rows.push(`${g.id} ${(100 * cover).toFixed(1)}`);
     assert.ok(cover <= FILL_TARGET + 0.002, `${g.id}: ${(100 * cover).toFixed(2)} % is more than the target`);
     if (g.id in STRIPS) { assert.ok(cover >= STRIPS[g.id], `${g.id}: ${(100 * cover).toFixed(2)} %`); continue; }
+    const e = PLACEMENTS[g.id];
+    assert.equal(STILL.folds.includes(g.fold), g.id in STILL_COVER, `${g.id}: held still by the tool exactly when its fold is in STILL.folds`);
+    if (g.id in STILL_COVER) {
+      // the band where its sheet never turns over is what limits it (not the gap, not the target), and the table says
+      // how far its sheet turns at most (degrees; the band turns by about 80-90 at the pillow's sides, a flap by 180)
+      assert.ok(cover >= STILL_COVER[g.id], `${g.id}: ${(100 * cover).toFixed(2)} %`);
+      assert.equal(e.s, Math.min(e.stillFit, e.fit), `${g.id}: s = min(stillFit, fit)`);
+      assert.ok(e.stillFit < e.fit + 1e-6 && e.s < Math.sqrt((FILL_TARGET * g.domainArea) / (Math.PI / 2)), `${g.id}: the band, not the target or the gap, limits the comma`);
+      assert.ok(e.turn >= 0 && e.turn <= STILL.turn, `${g.id}: its sheet turns by ${e.turn} degrees`);
+      assert.ok(Math.abs(e.cover - cover) < 0.003, `${g.id}: the table says ${e.cover}`);
+      continue;
+    }
+    assert.ok(!('stillFit' in e) && !('turn' in e), `${g.id}: only a comma held still carries stillFit and turn`);
     assert.ok(cover >= FILL_TARGET - 0.002, `${g.id}: ${(100 * cover).toFixed(2)} %, not the target ${FILL_TARGET}`);
     // the table's own number agrees with the outline drawn
     assert.ok(Math.abs(PLACEMENTS[g.id].cover - cover) < 0.003, `${g.id}: the table says ${PLACEMENTS[g.id].cover}`);

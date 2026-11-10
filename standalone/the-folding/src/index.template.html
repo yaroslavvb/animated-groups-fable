@@ -27,6 +27,12 @@
                                       store from its clientWidth/Height (ResizeObserver or window resize)
   hint             p                  "drag to move the cut". APP: hint.hidden = true at the first drag.
                                       At the pane's bottom edge; at its TOP edge on a small (phone) pane
+  tile-caption     p                  (the replication step) APP: the words for what acts now ("half-turn about a
+                                      2-fold centre"); hidden unless the replication shows. Top of the plane pane
+  tile-bar         div                (the replication step) the plane's bottom-left corner: #tile-btn, and the
+                                      scrubber #tile-scrub, shown while [data-open] (APP sets it while u < 1 or playing)
+  tile-btn         button             APP: Tile / Pause ([data-label]; data-state="play" | "pause")
+  tile-slider      input range        TIMELINE (a second createTimeline, keyTarget null): the replication's progress u
   plane-controls   div                the cut controls: #presets and the Wavy field, or #cut-note
   presets          div                APP: one <button type="button" class="chip" aria-pressed="true|false">name</button>
                                       per group.presets entry; aria-pressed="true" on the current one, none while
@@ -81,6 +87,22 @@
     <section class="pane pane-plane" id="pane-plane" data-ss-comments="off" aria-label="Plane: the pattern, its symmetry and the cut">
       <canvas id="plane-canvas"></canvas>
       <p class="hint" id="hint">drag to move the cut</p>
+      <p class="hint tile-caption" id="tile-caption" hidden></p>
+      <div class="tile-bar" id="tile-bar">
+        <button type="button" class="btn-quiet tile-btn" id="tile-btn" data-state="play" aria-label="Show how the tiling is made" title="How the copies of the tile are made">
+          <svg class="ico-play" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6.5 4.6v10.8l8.6-5.4z"/></svg>
+          <svg class="ico-pause" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10"/></svg>
+          <span data-label>Tile</span>
+        </button>
+        <div class="tile-track">
+          <div class="scrub tile-scrub" id="tile-scrub" data-scrub>
+            <span class="scrub-rail"></span>
+            <span class="scrub-fill"></span>
+            <span class="scrub-ticks" data-ticks></span>
+            <input type="range" id="tile-slider" min="0" max="1" step="any" value="1" aria-label="Tiling: how many copies are made">
+          </div>
+        </div>
+      </div>
     </section>
 
     <div class="ctl ctl-plane" id="plane-controls">

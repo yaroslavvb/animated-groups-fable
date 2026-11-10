@@ -3,7 +3,7 @@
 Live: https://spacesheep.dev/@yaroslavvb/the-folding
 
 Pick a wallpaper orbifold from the Hasse diagram (the chip at the top), try cuts on the 2D symmetry plane (drag, presets,
-Wavy), press **Fold** and watch the tile close up into the orbifold: pillows and pouches for the rotation groups, torus,
+Wavy), press **Tile** to watch the tile replicate into the tiling by its own side pairings, press **Fold** and watch the tile close up into the orbifold: pillows and pouches for the rotation groups, torus,
 tube, Möbius band and Klein bottle for the strip groups, a cross-cap for 22×, paper-snowflake folds for the four
 kaleidoscopes. Glued edges share a colour; the whole state (group, cut, Wavy, fold, 3D view) is kept in the URL.
 Companion of [The Unfolding](https://spacesheep.dev/@yaroslavvb/the-unfolding).

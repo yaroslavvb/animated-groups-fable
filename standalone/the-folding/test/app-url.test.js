@@ -52,7 +52,8 @@ function specialPoints(id) {
 // ---- the hash ------------------------------------------------------------------------------------------------------
 
 test('url: the format — g always, every other key only when it is not its default, in the order of SPEC 7, * as %2A', () => {
-  assert.deepEqual(HASH_KEYS, ['g', 'cut', 'seed', 'wavy', 't', 'view']);
+  // (10 Nov 2026, the replication step: `tile` joined the contract between wavy and t; qa/rep-judge.md)
+  assert.deepEqual(HASH_KEYS, ['g', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);
   assert.equal(encodeHash({ g: '333' }), '#g=333');
   assert.equal(encodeHash({ g: '333', cut: 0, seed: null, wavy: 0, t: 0, view: { ...DEFAULT_VIEW } }), '#g=333', 'defaults are left out');
   assert.equal(encodeHash({ g: '*632' }), '#g=%2A632');
@@ -62,19 +63,30 @@ test('url: the format — g always, every other key only when it is not its defa
   assert.equal(encodeHash({ g: '333', seed: [0.123456, -0.5] }), '#g=333&seed=0.1235/-0.5');
   assert.equal(encodeHash({ g: '333', wavy: 0.37 }), '#g=333&wavy=0.37');
   assert.equal(encodeHash({ g: '333', t: 0.5 }), '#g=333&t=0.5');
+  assert.equal(encodeHash({ g: '333', tile: 0.25 }), '#g=333&tile=0.25');
+  assert.equal(encodeHash({ g: '333', tile: 1 }), '#g=333', 'tile 1 (the tiling as always) is the default');
+  assert.equal(encodeHash({ g: '333', tile: 0 }), '#g=333&tile=0', 'tile 0 (the tile alone) is written');
+  assert.equal(encodeHash({ g: '333', tile: null }), '#g=333', 'no tile: 1');
   assert.equal(encodeHash({ g: '333', view: { az: 30, el: 20, zoom: 1.5, roll: 0 } }), '#g=333&view=30/20/1.5');
   assert.equal(encodeHash({ g: '333', view: { az: 0, el: 55, zoom: 1, roll: 12.5 } }), '#g=333&view=0/55/1/12.5', 'roll only when it is not 0');
   assert.equal(encodeHash({ g: '4*2', cut: 1, seed: [0.2, 0.3], wavy: 1, t: 1, view: { az: -40.26, el: 12, zoom: 2.346, roll: -3 } }),
     '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&t=1&view=-40.3/12/2.35/-3', 'all keys, in order');
+  assert.equal(encodeHash({ g: '4*2', cut: 1, seed: [0.2, 0.3], wavy: 1, tile: 0.5, t: 1, view: { az: -40.26, el: 12, zoom: 2.346, roll: -3 } }),
+    '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&tile=0.5&t=1&view=-40.3/12/2.35/-3', 'tile between wavy and t');
   // rounding: seed 4 decimals, t 3, wavy 2, angles 1, zoom 2; nothing written as -0 or with an exponent
   assert.equal(encodeHash({ g: '333', t: 0.12345 }), '#g=333&t=0.123');
   assert.equal(encodeHash({ g: '333', t: 0.9996 }), '#g=333&t=1');
+  assert.equal(encodeHash({ g: '333', tile: 0.12345 }), '#g=333&tile=0.123', 'tile: 3 decimals');
+  assert.equal(encodeHash({ g: '333', tile: 0.9996 }), '#g=333', 'a tile that rounds to 1 is left out');
+  assert.equal(encodeHash({ g: '333', tile: 0.0004 }), '#g=333&tile=0', 'one that rounds to 0 is written as 0');
   assert.equal(encodeHash({ g: '333', t: 0.0004, wavy: 0.004 }), '#g=333', 'what rounds to a default is left out');
   assert.equal(encodeHash({ g: '333', seed: [-0.00001, 1e-7] }), '#g=333&seed=0/0');
   assert.equal(encodeHash({ g: '333', view: { az: 179.96, el: 55, zoom: 1, roll: 0 } }), '#g=333&view=180/55/1');
   assert.equal(encodeHash({ g: '333', view: { az: -180, el: 55, zoom: 1, roll: 0 } }), '#g=333&view=180/55/1', '-180 and 180 are one azimuth');
   assert.equal(encodeHash({ g: '333', view: { az: 360.04, el: 55, zoom: 1.004, roll: -0.04 } }), '#g=333', 'az 360 = 0, zoom 1.004 = 1');
   assert.equal(encodeHash({ g: '333', t: 7, wavy: -1 }), '#g=333&t=1', 'out of range: clamped');
+  assert.equal(encodeHash({ g: '333', tile: -2 }), '#g=333&tile=0', 'tile out of range: clamped');
+  assert.equal(encodeHash({ g: '333', tile: 9 }), '#g=333');
   assert.ok(HASH_THROTTLE_MS >= 150 && HASH_THROTTLE_MS <= 400, 'about 250 ms');
   assert.ok(HASH_BUDGET.calls <= 90 && HASH_BUDGET.ms >= 30000, 'under Safari\'s 100 history calls per 30 s');
 });
@@ -115,9 +127,10 @@ test('url: the write policy — one write per 250 ms while the state changes, at
 /** A random state of a group, as the page would write it (values already at the precision of the hash). */
 function randomState(group, rnd) {
   const snow = group.fold === 'snowflake';
-  const u = { g: group.id, cut: Math.floor(rnd() * group.presets.length), seed: null, wavy: 0, t: 0, view: null };
+  const u = { g: group.id, cut: Math.floor(rnd() * group.presets.length), seed: null, wavy: 0, tile: 1, t: 0, view: null };
   if (!snow && rnd() < 0.6) u.seed = [round(group.center[0] + (2 * rnd() - 1) * group.viewHalf, 4), round(group.center[1] + (2 * rnd() - 1) * group.viewHalf, 4)];
   if (!snow && rnd() < 0.6) u.wavy = round(rnd(), 2);
+  if (rnd() < 0.35) u.tile = Math.min(0.999, round(rnd(), 3));          // the replication paused part-way (1 = tiled)
   if (rnd() < 0.8) u.t = round(rnd(), 3);
   if (rnd() < 0.15) u.t = 1;
   const angle = () => { const a = round(360 * rnd() - 180, 1); return a <= -180 ? a + 360 : a; };   // in (-180, 180]
@@ -140,6 +153,7 @@ test('url: every parameter round-trips — decode(encode(state)) is the state, a
       assert.deepEqual(d.seed, u.seed, `${h}: seed`);
       assert.equal(d.wavy, u.wavy, `${h}: wavy`);
       assert.equal(d.t, u.t, `${h}: t`);
+      assert.equal(d.tile, u.tile, `${h}: tile`);
       const v = u.view && !(u.view.az === 0 && u.view.el === 55 && u.view.zoom === 1 && u.view.roll === 0) ? u.view : null;
       if (v) {
         assert.ok(d.view, `${h}: a view`);
@@ -151,6 +165,9 @@ test('url: every parameter round-trips — decode(encode(state)) is the state, a
     }
   }
   assert.equal(n, 17 * 150);
+  // every value of tile the page can write, 0 to 0.999 in steps of 0.001, comes back as itself
+  for (let i = 0; i < 1000; i++) { const v = i / 1000, h = encodeHash({ g: '22x', tile: v }); assert.equal(decodeHash(h).tile, v, h); assert.match(h, WRAPPER_HASH); }
+  for (const h of ['#g=333', '#333', '#4*2', '#*632', '#g=%2A632&t=0.5']) assert.equal(decodeHash(h).tile, 1, `${h}: no tile = tiled`);
 });
 
 test('url: every group id, in every spelling a person or an old link may use', () => {
@@ -192,19 +209,22 @@ test('url: malformed hashes name nothing; a malformed value is dropped and the r
     ['#g=333&cut=3', 'cut'], ['#g=333&cut=-1', 'cut'], ['#g=333&cut=1.5', 'cut'], ['#g=333&cut=one', 'cut'], ['#g=%2A632&cut=1', 'cut'],
     ['#g=333&seed=0.5', 'seed'], ['#g=333&seed=0.5/0.5/1', 'seed'], ['#g=333&seed=a/b', 'seed'], ['#g=333&seed=1e3/0', 'seed'], ['#g=333&seed=99999/0', 'seed'],
     ['#g=333&seed=/0.5', 'seed'],
+    ['#g=333&tile=abc', 'tile'], ['#g=333&tile=1e-3', 'tile'], ['#g=333&tile=', 'tile'], ['#g=333&tile=0.5/0.5', 'tile'], ['#g=333&tile=+0.5', 'tile'],
     ['#g=333&wavy=lots', 'wavy'], ['#g=333&view=10/20', 'view'], ['#g=333&view=1/2/3/4/5', 'view'], ['#g=333&view=a/20/1', 'view'], ['#g=333&view=10/20/', 'view'],
   ];
   for (const [h, key] of cases) {
     const d = decodeHash(h);
     assert.ok(d && (d.g === '333' || d.g === '*632'), `${h}: still names its group`);
     assert.deepEqual(d.dropped, [key], `${h}: drops ${key}`);
-    const dflt = { cut: 0, seed: null, wavy: 0, t: 0, view: null }[key];
+    const dflt = { cut: 0, seed: null, wavy: 0, tile: 1, t: 0, view: null }[key];
     assert.deepEqual(d[key], dflt, `${h}: ${key} takes its default`);
   }
   // the other keys survive a bad one
   const d1 = decodeHash('#g=2222&cut=1&seed=0.1/0.2&wavy=0.5&t=bad&view=10/20/1.5');
   assert.deepEqual([d1.g, d1.cut, d1.seed, d1.wavy, d1.t, d1.view && d1.view.az, d1.dropped], ['2222', 1, [0.1, 0.2], 0.5, 0, 10, ['t']]);
   // out of range: clamped, not dropped
+  const dt = decodeHash('#g=333&tile=2'), dt2 = decodeHash('#g=333&tile=-0.5&t=0.3');
+  assert.deepEqual([dt.tile, dt.dropped, dt2.tile, dt2.t, dt2.dropped], [1, [], 0, 0.3, []], 'tile out of range: clamped, not dropped');
   const d2 = decodeHash('#g=333&t=2&wavy=1.5&view=370/100/9/-190');
   assert.deepEqual([d2.t, d2.wavy, d2.view.az, d2.view.el, d2.view.zoom, d2.view.roll, d2.dropped], [1, 1, 10, 90, 3.2, 170, []]);
   const d3 = decodeHash('#g=333&t=-0.5&view=0/-120/0.1');
