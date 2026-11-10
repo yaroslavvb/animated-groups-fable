@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hasse picker — demo</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { background: #fff; color: #1a1a1f; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .bar { display: flex; align-items: center; gap: 14px; min-height: 48px; padding: 0 16px; border-bottom: 1px solid #e5e5ea; }
+  .bar strong { font-size: 16px; font-weight: 600; white-space: nowrap; }
+  .chip { -webkit-appearance: none; appearance: none; display: inline-flex; align-items: baseline; gap: 8px; min-height: 44px; margin: 0; padding: 0 12px;
+          border: 1px solid #e5e5ea; border-radius: 8px; background: #fff; color: inherit; font: inherit; cursor: pointer; min-width: 0; }
+  .chip:hover { background: #f7f7f8; }
+  .chip:focus-visible { outline: 2px solid #1a1a1f; outline-offset: 2px; }
+  .chip b { font-size: 20px; font-weight: 600; letter-spacing: 0.02em; }
+  .chip span { color: #52514a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chip i { font-style: normal; color: #52514a; }
+  main { max-width: 620px; padding: 20px 16px; color: #52514a; }
+  main p { margin: 0 0 10px; }
+  code { font: 13px ui-monospace, SFMono-Regular, Menlo, monospace; color: #1a1a1f; }
+</style>
+</head>
+<body>
+<div class="bar">
+  <strong>The Folding</strong>
+  <button id="chip" class="chip" type="button" aria-haspopup="dialog"><b id="chip-label"></b><span id="chip-rest"></span><i aria-hidden="true">▾</i></button>
+</div>
+<main>
+  <p>Dev page for <code>src/hasse.js</code>. The chip opens the picker; picking a node updates the chip.
+     <code>?open=&lt;id&gt;</code> opens it at once with that group current (ids: <code>o 2222 ** xx *x 333 22x 22* *2222 2*22 442 632 3*3 *333 4*2 *442 *632</code>);
+     <code>?closed</code> starts closed; <code>?nodialog</code> uses the fallback overlay.</p>
+  <p id="log">Nothing picked yet.</p>
+</main>
+<script type="module">
+  import { GROUPS, BY_ID } from '../src/groups.js';
+  import { createHassePicker } from '../src/hasse.js';
+
+  // ?open=<id>   open at once with that group current (the default: open with 333 current)
+  // ?closed      start closed — the chip opens the picker
+  // ?nodialog    pretend the browser has no <dialog>.showModal, to exercise the plain-overlay fallback
+  const params = new URLSearchParams(location.search);
+  const asked = params.get('open') ?? (location.hash.startsWith('#open=') ? decodeURIComponent(location.hash.slice(6)) : null);
+  let current = BY_ID[asked] ? asked : (BY_ID[params.get('g')] ? params.get('g') : '333');
+  const picked = [];
+  if (params.has('nodialog')) HTMLDialogElement.prototype.showModal = undefined;
+
+  const chip = document.getElementById('chip');
+  function show() {
+    const g = BY_ID[current];
+    document.getElementById('chip-label').textContent = g.label;
+    document.getElementById('chip-rest').textContent = `${g.hm} · ${g.shape}`;
+    chip.setAttribute('aria-label', `Orbifold ${g.label}, ${g.hm}, ${g.shape}. Change`);
+  }
+  show();
+
+  const picker = createHassePicker({
+    mount: document.body,
+    groups: GROUPS,
+    onPick(id) {
+      current = id;
+      picked.push(id);
+      show();
+      document.getElementById('log').textContent = `Picked ${picked.map((p) => BY_ID[p].label).join(', ')}.`;
+    },
+  });
+  chip.addEventListener('click', () => picker.open(current));
+
+  // helpers for tools/shot.mjs
+  const node = (id) => document.querySelector(`.hasse-node[data-id="${id}"]`);
+  const dialog = () => document.querySelector('.hasse-dialog');
+  window.__hasse = {
+    picker, picked,
+    get current() { return current; },
+    open(id) { if (BY_ID[id]) current = id; show(); picker.open(current); return picker.isOpen(); },
+    centers() {                              // screen centre of every pill
+      const out = {};
+      for (const g of document.querySelectorAll('.hasse-node')) {
+        const r = g.querySelector('.hasse-pill').getBoundingClientRect();
+        out[g.dataset.id] = [Math.round(r.x + r.width / 2), Math.round(r.y + r.height / 2)];
+      }
+      return out;
+    },
+    hits() {                                 // does every 44 px hit area answer for its own node? (centre and the four edge midpoints)
+      const bad = [], sizes = [];
+      for (const g of document.querySelectorAll('.hasse-node')) {
+        const r = g.querySelector('.hasse-hit').getBoundingClientRect();
+        const cx = r.x + r.width / 2, cy = r.y + r.height / 2;
+        sizes.push([r.width, r.height]);
+        for (const [x, y] of [[cx, cy], [r.x + 2, cy], [r.right - 2, cy], [cx, r.y + 2], [cx, r.bottom - 2]]) {
+          const e = document.elementFromPoint(x, y), got = e && e.closest('.hasse-node');
+          if (!got || got.dataset.id !== g.dataset.id) bad.push([g.dataset.id, Math.round(x - cx), Math.round(y - cy), got ? got.dataset.id : e && e.tagName]);
+        }
+      }
+      const card = document.querySelector('.hasse-card').getBoundingClientRect();
+      return {
+        bad, minHitW: Math.min(...sizes.map((s) => s[0])), minHitH: Math.min(...sizes.map((s) => s[1])),
+        card: [card.x, card.y, card.width, card.height].map(Math.round), viewport: [innerWidth, innerHeight],
+        pageScrollW: document.documentElement.scrollWidth,
+        labelPx: parseFloat(getComputedStyle(document.querySelector('.hasse-label')).fontSize),
+      };
+    },
+    hover(id) { node(id).dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' })); return this.state(); },
+    unhover(id) { node(id).dispatchEvent(new PointerEvent('pointerleave', { pointerType: 'mouse' })); return this.state(); },
+    key(...keys) {                           // synthetic key presses on whatever has focus
+      for (const key of keys) {
+        const opts = typeof key === 'string' ? { key } : key;
+        (document.activeElement || dialog()).dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, ...opts }));
+      }
+      return this.state();
+    },
+    state() {
+      const a = document.activeElement, d = dialog();
+      return {
+        open: picker.isOpen(),
+        current,
+        focus: a ? (a.dataset && a.dataset.id) || a.id || a.className.baseVal || a.className || a.tagName : null,
+        active: (document.querySelector('.hasse-node.hasse-active') || { dataset: {} }).dataset.id || null,
+        ring: (document.querySelector('.hasse-node.hasse-focus') || { dataset: {} }).dataset.id || null,
+        lit: document.querySelectorAll('.hasse-edge.hasse-on').length,
+        info: d ? d.querySelector('.hasse-info').textContent : null,
+        scroll: d ? Math.round(d.querySelector('.hasse-body').scrollTop) : 0,
+        picked: picked.slice(),
+      };
+    },
+    a11y() {                                 // what assistive technology is told
+      const d = dialog(), nodes = [...document.querySelectorAll('.hasse-node')];
+      return {
+        tag: d.tagName, role: d.getAttribute('role'), modal: d.getAttribute('aria-modal'), nativeModal: d.matches(':modal'),
+        name: document.getElementById(d.getAttribute('aria-labelledby')).textContent,
+        listbox: d.querySelector('.hasse-svg').getAttribute('role'),
+        options: nodes.filter((n) => n.getAttribute('role') === 'option').length,
+        selected: nodes.filter((n) => n.getAttribute('aria-selected') === 'true').map((n) => n.dataset.id),
+        tabStops: nodes.filter((n) => n.getAttribute('tabindex') === '0').map((n) => n.dataset.id),
+        sample: node('*632').getAttribute('aria-label'),
+        closeLabel: d.querySelector('.hasse-close').getAttribute('aria-label'),
+        styles: document.querySelectorAll('style[data-hasse]').length,
+      };
+    },
+    near() { return [...document.querySelectorAll('.hasse-node.hasse-near')].map((n) => n.dataset.id).sort(); },
+
+    // --- checks, for the step files dev/hasse-steps-*.json: each returns "ok  …" or "FAIL …" -----------------------
+    results: [],
+    check(name, got, want) {
+      const ok = JSON.stringify(got) === JSON.stringify(want);
+      this.results.push({ name, ok });
+      return ok ? `ok    ${name}` : `FAIL  ${name} — got ${JSON.stringify(got)}, want ${JSON.stringify(want)}`;
+    },
+    summary() { return { passed: this.results.filter((r) => r.ok).length, failed: this.results.filter((r) => !r.ok).map((r) => r.name) }; },
+    checkOpen(id, { native = true, font = null, mode = 'pointer' } = {}) {   // the dialog is open with `id` current
+      const a = this.a11y(), h = this.hits(), s = this.state(), g = BY_ID[id], c = this.check.bind(this);
+      return [
+        c(native ? 'a native modal <dialog> with role and aria-modal' : 'fallback overlay with role and aria-modal',
+          [a.tag, a.role, a.modal, a.nativeModal], [native ? 'DIALOG' : 'DIV', 'dialog', 'true', native]),
+        c('labelled by its title; close button labelled', [a.name, a.closeLabel], ['Pick an orbifold', 'Close']),
+        c('a listbox of 17 options; the current one is selected and is the only tab stop', [a.listbox, a.options, a.selected, a.tabStops], ['listbox', 17, [id], [id]]),
+        c('every hit area answers for its own node and is at least 44 px', [h.bad, h.minHitW >= 43.99, h.minHitH >= 43.99], [[], true, true]),
+        c('card inside the window; the page does not scroll sideways',
+          [h.card[0] >= 0, h.card[1] >= 0, h.card[0] + h.card[2] <= innerWidth, h.card[1] + h.card[3] <= innerHeight, h.pageScrollW <= innerWidth], [true, true, true, true, true]),
+        ...(font ? [c(`labels are ${font} px`, h.labelPx, font)] : []),
+        c('focus is on the current node', [s.open, s.focus], [true, id]),
+        mode === 'keyboard'
+          ? c('opened from the keyboard: ring and highlight on the current node', [s.active, s.ring], [id, id])
+          : c('opened by pointer or script: nothing highlighted, no ring', [s.active, s.ring, s.lit], [null, null, 0]),
+        c('info line reads label · hm · shape of the current group', s.info, `${g.label} · ${g.hm} · ${g.shape}`),
+      ];
+    },
+    // open from the chip as a keyboard user would: a key press on the focused chip, then its click
+    keyOpen() {
+      chip.focus();
+      chip.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+      chip.click();
+      return this.state();
+    },
+  };
+
+  if (!params.has('closed')) picker.open(current);
+</script>
+</body>
+</html>

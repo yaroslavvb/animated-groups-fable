@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>render3d demo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; color: #1a1a1f; font: 13px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #stage { position: relative; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
+  body.tall #stage { height: 70vh; }
+  body.tall #filler { height: 160vh; background: repeating-linear-gradient(#f7f7f8 0 40px, #fff 40px 80px); }
+  #c { display: block; width: 100%; height: 100%; outline-offset: -3px; }
+  /* ?inset=1: the canvas no longer fills the label layer (labels must still sit on their markers) */
+  body.inset #c { position: absolute; left: 90px; top: 70px; width: calc(100% - 150px); height: calc(100% - 190px); border: 1px solid #e5e5ea; }
+  body.inset #labels { border: 7px solid transparent; }
+  #labels { position: absolute; inset: 0; overflow: hidden; }
+  #hud { position: absolute; left: 10px; top: 8px; right: 10px; pointer-events: none; color: #52514a; font-variant-numeric: tabular-nums; }
+  #hud b { color: #1a1a1f; font-weight: 600; }
+  #modes { position: absolute; left: 10px; bottom: 8px; display: flex; gap: 4px; flex-wrap: wrap; }
+  #modes a, #modes button { font: inherit; color: #1a1a1f; background: #fff; border: 1px solid #e5e5ea; border-radius: 6px; padding: 10px 12px; min-height: 44px;
+    box-sizing: border-box; text-decoration: none; cursor: pointer; }
+  #modes a[aria-current] { background: #0f766e; border-color: #0f766e; color: #fff; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="labels"></div>
+  <div id="hud"></div>
+  <nav id="modes">
+    <a href="?shape=torus">torus</a><a href="?shape=klein">Klein bottle</a><a href="?shape=flap">stacked flaps</a><a href="?shape=zigzag">zigzag</a><a href="?shape=torus&amp;labels=6&amp;polylines=36">labels</a>
+    <button id="pause" type="button">pause</button><button id="reset" type="button">reset view</button>
+  </nav>
+</div>
+<div id="filler"></div>
+<script type="module">
+// render-demo — exercises src/render3d.js on its own: a breathing torus (default), a figure-8 Klein bottle
+// (?shape=klein: self-intersection) and three nearly coincident sheets (?shape=flap), with bold coloured loops
+// (one dashed), a thin dashed line, markers and labels.
+//   ?shape=torus|klein|flap|zigzag   ?tris=<n> triangle budget   ?flip=1 torus with its front side out
+//   ?paused=1 start frozen    ?tall=1 make the page scrollable (to check that dragging the canvas never scrolls it)
+//   ?inset=1 canvas smaller than the label layer   ?az=&el= initial view   ?crossed=1 (zigzag) misaligned layers
+//   ?fast=1 renderer without the exact three-sheet passes (compare ?shape=flap with and without)
+//   ?labels=N&polylines=K (torus) N more labelled markers and K more polylines of 100 segments (bold, a quarter
+//     thin and dashed): the label placement under load ("labels" in the bar, labels=6&polylines=36: with the torus's
+//     own 4 + 4, 10 labels among 40 polylines, about 4400 segments)
+// window.__demo = { ready, setView(az, el, zoom), setShape(name), pause(on), setTime(t), view(), stats(), perf(tris, frames),
+//   labels() (the visible labels: text, spot 0..7 = E NE N … SE, gliding, box in css px of the canvas), loseContext(), R }
+import { createRenderer } from '../src/render3d.js';
+import { CLASS_COLORS, MIRROR_COLOR, CREASE_COLOR, hexToRgb } from '../src/palette.js';
+
+const params = new URLSearchParams(location.search);
+if (params.get('tall')) document.body.classList.add('tall');
+if (params.get('inset')) document.body.classList.add('inset');
+const canvas = document.getElementById('c'), hud = document.getElementById('hud');
+const R = createRenderer(canvas, { labelLayer: document.getElementById('labels'), fast: !!params.get('fast') });
+const COL = CLASS_COLORS.map(hexToRgb), INK = hexToRgb(MIRROR_COLOR), GREY = hexToRgb(CREASE_COLOR);
+const TAU = 2 * Math.PI;
+
+// ---- shapes: { name, n, indices, tint?, frame, fill(t, pos), lines(t), markers(t) } ----------------------------
+
+function gridIndices(nu, nv, wrapU, wrapV, flip, base = 0, out = null, o = 0) {
+  // vertices are laid out (i * cols + j); cols = nv (+1 when not wrapped)
+  const cols = wrapV ? nv : nv + 1, rows = wrapU ? nu : nu + 1;
+  const tri = out || new Uint32Array(6 * nu * nv);
+  for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) {
+    const i1 = (i + 1) % rows, j1 = (j + 1) % cols;
+    const a = base + i * cols + j, b = base + i1 * cols + j, c = base + i1 * cols + j1, d = base + i * cols + j1;
+    if (flip) { tri[o++] = a; tri[o++] = c; tri[o++] = b; tri[o++] = a; tri[o++] = d; tri[o++] = c; }
+    else { tri[o++] = a; tri[o++] = b; tri[o++] = c; tri[o++] = a; tri[o++] = c; tri[o++] = d; }
+  }
+  return tri;
+}
+function curve(count, fn) {            // fn(s in [0,1), out, offset)
+  const pts = new Float32Array(3 * count);
+  return { pts, fill() { for (let i = 0; i < count; i++) fn(i / count, pts, 3 * i); return pts; } };
+}
+
+function makeTorus(tris, flip) {
+  const nv = Math.max(8, Math.round(Math.sqrt(tris / 2 * 0.75))), nu = Math.max(8, Math.round(tris / 2 / nv));
+  let time = 0;
+  const pt = (u, v, out, o) => {
+    const Rr = 1 + 0.035 * Math.sin(0.8 * time);
+    const r = 0.42 * (1 + 0.07 * Math.sin(1.3 * time) + 0.05 * Math.sin(2 * u - 1.1 * time));
+    const w = Rr + r * Math.cos(v);
+    out[o] = w * Math.cos(u); out[o + 1] = w * Math.sin(u); out[o + 2] = r * Math.sin(v);
+  };
+  const u0 = 5.05, v0 = 1.15;
+  const meridian = curve(96, (s, out, o) => pt(u0, TAU * s, out, o));
+  const parallel = curve(200, (s, out, o) => pt(TAU * s, v0, out, o));
+  const winding = curve(360, (s, out, o) => pt(TAU * s, 2 * TAU * s + 0.4, out, o));
+  const inner = curve(160, (s, out, o) => pt(TAU * s, Math.PI, out, o));
+  const tmp = [0, 0, 0];
+  const at = (u, v) => { pt(u, v, tmp, 0); return tmp.slice(); };
+  // ?polylines=K: K more curves of 101 points (100 segments) on the torus, ?labels=N: N more labelled markers
+  const extraLines = Array.from({ length: Math.max(0, Math.min(200, +params.get('polylines') || 0)) }, (_, j) => {
+    const ua = TAU * j / 7.3, drift = j % 2 ? 1.1 : 0.35, va = 0.9 * j;
+    return { c: curve(101, (s, out, o) => pt(ua + drift * s, va + TAU * 0.8 * s, out, o)), style: j % 4 === 0 ? { color: GREY, width: 1.6, dashed: true } : { color: COL[j % COL.length], width: 4.5 } };
+  });
+  const NAMES = ['∗3', '2', '∗6', '3', '∗2', '4', '∗4', '6', '∗3', '2'];
+  const extraMarks = Array.from({ length: Math.max(0, Math.min(60, +params.get('labels') || 0)) }, (_, k) => ({ u: TAU * (k + 0.5) / 10.7, v: 0.4 + 2.1 * k, k }));
+  return {
+    name: 'torus', n: nu * nv, indices: gridIndices(nu, nv, true, true, !flip), frame: { center: [0, 0, 0], radius: 1.5 },
+    fill(t, pos) { time = t; for (let i = 0; i < nu; i++) for (let j = 0; j < nv; j++) pt(TAU * i / nu, TAU * j / nv, pos, 3 * (i * nv + j)); },
+    lines(t) {
+      time = t;
+      return [
+        { points: inner.fill(), color: GREY, width: 1.6, dashed: true, loop: true },
+        { points: parallel.fill(), color: COL[1], width: 5, loop: true },
+        { points: winding.fill(), color: COL[2], width: 4.5, dashed: true, loop: true },
+        { points: meridian.fill(), color: COL[0], width: 5, loop: true },
+        ...extraLines.map((L) => ({ points: L.c.fill(), ...L.style })),
+      ];
+    },
+    markers(t) {
+      time = t;
+      return [
+        { p: at(u0, v0), color: INK, size: 12, shape: 'dot', label: 'A' },
+        { p: at(u0 - Math.PI, v0), color: INK, size: 13, shape: 'ring', label: 'B' },
+        { p: at(u0, v0 + Math.PI), color: COL[0], size: 12, shape: 'square', label: 'C' },
+        { p: at(0.9, 0.2), color: COL[1], size: 10, shape: 'dot', label: 'D' },
+        ...extraMarks.map((m) => ({ p: at(m.u, m.v), color: INK, size: m.k % 2 ? 11 : 12, shape: m.k % 2 ? 'dot' : 'ring', label: NAMES[m.k % NAMES.length] })),
+      ];
+    },
+  };
+}
+
+// The figure-8 Klein bottle: a figure 8 swept round a circle with a half twist. It crosses itself along the
+// circle v = 0 = pi. Built as an open grid (like a tile: the seams are not welded).
+function makeKlein(tris) {
+  const nv = Math.max(12, Math.round(Math.sqrt(tris / 2 / 2.5))), nu = Math.max(24, Math.round(tris / 2 / nv));
+  let time = 0;
+  const pt = (u, v, out, o) => {
+    const a = 2.25 + 0.1 * Math.sin(0.8 * time), k = 0.5 * (1 + 0.03 * Math.sin(1.3 * time));
+    const cu = Math.cos(u / 2), su = Math.sin(u / 2), sv = Math.sin(v), s2 = Math.sin(2 * v);
+    const w = a + cu * sv - su * s2;
+    out[o] = k * w * Math.cos(u); out[o + 1] = k * w * Math.sin(u); out[o + 2] = 1.15 * k * (su * sv + cu * s2);
+  };
+  const cols = nv + 1;
+  const seam = curve(120, (s, out, o) => pt(0, TAU * s, out, o));
+  const dbl = curve(200, (s, out, o) => pt(TAU * s, 0, out, o));
+  const twice = curve(420, (s, out, o) => pt(2 * TAU * s, Math.PI / 2, out, o));
+  const eight = curve(120, (s, out, o) => pt(2.2, TAU * s, out, o));
+  const tmp = [0, 0, 0];
+  const at = (u, v) => { pt(u, v, tmp, 0); return tmp.slice(); };
+  return {
+    name: 'klein', n: (nu + 1) * cols, indices: gridIndices(nu, nv, false, false, false), frame: { center: [0, 0, 0], radius: 1.85 },
+    fill(t, pos) { time = t; for (let i = 0; i <= nu; i++) for (let j = 0; j <= nv; j++) pt(TAU * i / nu, TAU * j / nv, pos, 3 * (i * cols + j)); },
+    lines(t) {
+      time = t;
+      return [
+        { points: dbl.fill(), color: GREY, width: 1.6, dashed: true, loop: true },
+        { points: twice.fill(), color: COL[1], width: 5, loop: true },
+        { points: eight.fill(), color: COL[2], width: 4.5, dashed: true, loop: true },
+        { points: seam.fill(), color: COL[0], width: 5, loop: true },
+      ];
+    },
+    markers(t) {
+      time = t;
+      return [
+        { p: at(0, 0), color: INK, size: 12, shape: 'dot', label: 'crossing' },
+        { p: at(Math.PI, Math.PI / 2), color: INK, size: 13, shape: 'ring', label: 'B' },
+        { p: at(2.2, 3 * Math.PI / 2), color: COL[2], size: 12, shape: 'square', label: 'C' },
+      ];
+    },
+  };
+}
+
+// A strip folded like a Z: three sheets lying almost on top of each other, each with its own (unaligned)
+// triangulation. The top sheet is tinted (ghost). Tests nearly coincident layers.
+function makeFlap(tris) {
+  const k = Math.sqrt(tris / 7000);
+  const grids = [[36, 36], [31, 41], [43, 29]].map(([a, b]) => [Math.max(4, Math.round(a * k)), Math.max(4, Math.round(b * k))]);
+  let phi = 0.1;
+  // sigma in [0, 6] is the arc length along the strip, y in [-1, 1] across it
+  const pt = (sigma, y, out, o) => {
+    const c = Math.cos(phi), s = Math.sin(phi);
+    let x, z;
+    if (sigma <= 2) { x = -1 + sigma; z = 0; }
+    else if (sigma <= 4) { const q = sigma - 2; x = 1 - q * c; z = q * s; }
+    else { const q = sigma - 4; x = 1 - 2 * c + q * c; z = 2 * s + q * s; }
+    out[o] = x; out[o + 1] = y; out[o + 2] = z - 0.15;
+  };
+  let n = 0, m = 0;
+  for (const [a, b] of grids) { n += (a + 1) * (b + 1); m += 2 * a * b; }
+  const indices = new Uint32Array(3 * m), tint = new Uint8Array(n);
+  let base = 0, o = 0;
+  grids.forEach(([a, b], g) => {
+    gridIndices(a, b, false, false, false, base, indices, o);
+    if (g === 2) tint.fill(1, base, base + (a + 1) * (b + 1));
+    base += (a + 1) * (b + 1); o += 6 * a * b;
+  });
+  const rect = (g) => curve(160, (s, out, o2) => {
+    const q = 4 * s, side = Math.floor(q), f = q - side, lo = 2 * g, hi = 2 * g + 2;
+    if (side === 0) pt(lo + 2 * f, -1, out, o2); else if (side === 1) pt(hi, -1 + 2 * f, out, o2);
+    else if (side === 2) pt(hi - 2 * f, 1, out, o2); else pt(lo, 1 - 2 * f, out, o2);
+  });
+  const outlines = [rect(0), rect(1), rect(2)];
+  const crease = (sig) => curve(2, (s, out, o2) => pt(sig, -1 + 2 * s * 2, out, o2));
+  const creases = [crease(2), crease(4)];
+  const tmp = [0, 0, 0];
+  const at = (sig, y) => { pt(sig, y, tmp, 0); return tmp.slice(); };
+  return {
+    name: 'flap', n, indices, tint, frame: { center: [0, 0, 0], radius: 1.5 },
+    fill(t, pos) {
+      phi = (4 + 10 * (0.5 - 0.5 * Math.cos(0.7 * t))) * Math.PI / 180;
+      let v = 0;
+      grids.forEach(([a, b], g) => { for (let i = 0; i <= a; i++) for (let j = 0; j <= b; j++) { pt(2 * g + 2 * i / a, -1 + 2 * j / b, pos, 3 * v); v++; } });
+    },
+    lines() {
+      return [
+        { points: outlines[0].fill(), color: INK, width: 4, loop: true },
+        { points: outlines[1].fill(), color: COL[0], width: 4, loop: true },
+        { points: outlines[2].fill(), color: COL[1], width: 4, loop: true },
+        { points: creases[0].fill(), color: GREY, width: 1.6, dashed: true },
+        { points: creases[1].fill(), color: GREY, width: 1.6, dashed: true },
+      ];
+    },
+    markers() {
+      return [
+        { p: at(0, -1), color: INK, size: 12, shape: 'dot', label: 'base' },
+        { p: at(3, 0), color: COL[0], size: 12, shape: 'ring', label: 'middle' },
+        { p: at(6, 1), color: COL[1], size: 12, shape: 'square', label: 'top' },
+      ];
+    },
+  };
+}
+
+// Six big square panels (two triangles each, vertices shared across the creases) folded like a concertina:
+// the coarsest possible mesh. Tests creased shading and the sorting of very large triangles in a stack.
+// The diagonals alternate, so that the triangles of the stacked panels lie exactly on top of each other (each
+// panel is the mirror image of its neighbour, as the cells of a kaleidoscope are): that is what makes a stack sort
+// exactly. ?crossed=1 gives every panel the same diagonal instead — the triangles of neighbouring layers then
+// cross, and the layers below the top one can be blended in the wrong order (the renderer's known limit).
+function makeZigzag() {
+  const P = 6, S = 1.5;
+  let phi = 0.3;
+  const pt = (sigma, y, out, o) => {
+    let x = -0.5, z = 0;
+    for (let j = 0; j < P; j++) {
+      const th = j === 0 ? 0 : (j % 2 ? Math.PI - phi : phi), len = Math.min(1, Math.max(0, sigma - j));
+      x += len * Math.cos(th); z += len * Math.sin(th);
+    }
+    out[o] = S * x; out[o + 1] = S * y; out[o + 2] = S * (z - 0.25);
+  };
+  const n = 2 * (P + 1), indices = new Uint32Array(6 * P), tint = new Uint8Array(n);
+  const crossed = !!params.get('crossed');
+  for (let j = 0; j < P; j++) {
+    if (j % 2 === 0 || crossed) indices.set([2 * j, 2 * j + 2, 2 * j + 3, 2 * j, 2 * j + 3, 2 * j + 1], 6 * j);
+    else indices.set([2 * j, 2 * j + 2, 2 * j + 1, 2 * j + 2, 2 * j + 3, 2 * j + 1], 6 * j);
+  }
+  tint[2 * P] = tint[2 * P + 1] = 1;
+  const outline = curve(4 * P + 4, (s, out, o) => {
+    const k = Math.round(s * (4 * P + 4)), half = 2 * P + 2;
+    if (k < half) pt(k / 2, -0.5, out, o); else pt((2 * half - 1 - k) / 2, 0.5, out, o);
+  });
+  const creases = Array.from({ length: P - 1 }, (_, j) => curve(2, (s, out, o) => pt(j + 1, -0.5 + 2 * s, out, o)));
+  const tmp = [0, 0, 0];
+  const at = (sig, y) => { pt(sig, y, tmp, 0); return tmp.slice(); };
+  return {
+    name: 'zigzag', n, indices, tint, frame: { center: [0, 0, 0], radius: 1.45 },
+    fill(t, pos) {
+      phi = (3 + 42 * (0.5 - 0.5 * Math.cos(0.5 * t))) * Math.PI / 180;
+      for (let j = 0; j <= P; j++) { pt(j, -0.5, pos, 6 * j); pt(j, 0.5, pos, 6 * j + 3); }
+    },
+    lines() {
+      return [
+        ...creases.map((c) => ({ points: c.fill(), color: GREY, width: 1.6, dashed: true })),
+        { points: outline.fill(), color: COL[0], width: 4.5, loop: true },
+      ];
+    },
+    markers() {
+      return [
+        { p: at(0, -0.5), color: INK, size: 12, shape: 'dot', label: 'start' },
+        { p: at(P, 0.5), color: COL[1], size: 12, shape: 'square', label: 'end' },
+      ];
+    },
+  };
+}
+
+// ---- scene state -----------------------------------------------------------------------------------------------
+
+const MAKERS = { torus: makeTorus, klein: makeKlein, flap: makeFlap, zigzag: makeZigzag };
+let shape = null, pos = null, time = 0, paused = !!params.get('paused'), last = 0, drawn = 0;
+const smooth = { normals: 0, sort: 0, probe: 0, labels: 0, cpu: 0 };
+
+function setShape(name, tris) {
+  const make = MAKERS[name] || makeTorus;
+  const budget = tris || +params.get('tris') || (name === 'klein' ? 9800 : name === 'flap' ? 7000 : 6100);
+  shape = make(budget, !!params.get('flip'));
+  pos = new Float32Array(3 * shape.n);
+  shape.fill(time, pos);
+  R.setSurface({ positions: pos, indices: shape.indices, tint: shape.tint });
+  R.setFrame(shape.frame, true);
+  R.setLines(shape.lines(time));
+  R.setMarkers(shape.markers(time));
+  R.render();
+  for (const a of document.querySelectorAll('#modes a')) {
+    if (a.getAttribute('href') === '?shape=' + shape.name) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current');
+  }
+  return { shape: shape.name, triangles: shape.indices.length / 3, vertices: shape.n };
+}
+function update() {
+  shape.fill(time, pos);
+  R.updatePositions(pos);
+  R.setLines(shape.lines(time));
+  R.setMarkers(shape.markers(time));
+}
+function showHud() {
+  const s = R.stats;
+  hud.innerHTML = `<b>${shape.name}</b> · ${s.triangles} triangles · ${s.segments} line segments · normals ${smooth.normals.toFixed(2)} ms · sort ${smooth.sort.toFixed(2)} ms · layer probe ${smooth.probe.toFixed(2)} ms · labels ${smooth.labels.toFixed(2)} ms · whole frame (CPU) ${smooth.cpu.toFixed(2)} ms${s.threeSheets ? ' · three-sheet passes on' : ''}${paused ? ' · paused' : ''}`;
+}
+function frame(ts) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.05, (ts - last) / 1000 || 0);
+  last = ts;
+  if (!paused) {
+    time += dt;
+    update();
+    R.render();
+    const s = R.stats;
+    smooth.normals += 0.1 * (s.normalsMs - smooth.normals); smooth.sort += 0.1 * (s.sortMs - smooth.sort);
+    smooth.probe += 0.1 * (s.probeMs - smooth.probe); smooth.labels += 0.1 * (s.labelsMs - smooth.labels); smooth.cpu += 0.1 * (s.cpuMs - smooth.cpu);
+    if (++drawn % 20 === 1) showHud();
+  }   // while paused nothing is rendered from here: the renderer redraws by itself when the camera moves
+}
+
+setShape(params.get('shape') || 'torus');
+if (params.has('az') || params.has('el')) R.setView({ az: +params.get('az') || 0, el: params.has('el') ? +params.get('el') : 55 });
+showHud();
+requestAnimationFrame(frame);
+
+document.getElementById('pause').addEventListener('click', (e) => { paused = !paused; e.target.textContent = paused ? 'play' : 'pause'; showHud(); });
+document.getElementById('reset').addEventListener('click', () => R.resetView());
+
+const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+window.__demo = {
+  R,
+  ready: (async () => { await nextFrame(); await nextFrame(); await nextFrame(); return true; })(),
+  setView(az, el, zoom) { R.setView({ az, el, zoom }); R.render(); return R.getView(); },
+  setShape(name, tris) { const r = setShape(name, tris); showHud(); return r; },
+  pause(on = true) { paused = !!on; document.getElementById('pause').textContent = paused ? 'play' : 'pause'; showHud(); return paused; },
+  setTime(t) { time = +t; update(); R.render(); showHud(); return time; },
+  view() { const v = R.getView(); return { q: v.q.map((x) => +x.toFixed(6)), zoom: +v.zoom.toFixed(6) }; },
+  stats() { return { ...R.stats, shape: shape.name, dpr: window.devicePixelRatio, canvas: [canvas.width, canvas.height], css: [canvas.clientWidth, canvas.clientHeight], glError: (R.render(), R.gl.getError()) }; },
+  // Frame costs on a surface of `tris` triangles: `frames` full frames (new positions, new lines, a new view each time)
+  // drawn back to back; every cost is the renderer's own measurement with performance.now().
+  async perf(tris = 20000, frames = 240) {
+    const keep = { name: shape.name, paused, time, view: R.getView() };
+    paused = true;
+    const info = setShape(keep.name, tris);
+    const acc = { normals: [], sort: [], probe: [], labels: [], cpu: [], total: [], interval: [] };
+    let prev = 0, three = 0;
+    for (let i = 0; i < frames; i++) {
+      const ts = await new Promise((r) => requestAnimationFrame(r));   // one frame per display frame, as in the app
+      if (prev) acc.interval.push(ts - prev);
+      prev = ts;
+      time += 1 / 60;
+      shape.fill(time, pos);
+      const b = performance.now();
+      R.updatePositions(pos);
+      R.setLines(shape.lines(time));
+      R.setMarkers(shape.markers(time));
+      R.setView({ az: i * 1.7, el: 55 + 30 * Math.sin(i / 17) });
+      R.render();
+      const c = performance.now();
+      acc.normals.push(R.stats.normalsMs); acc.sort.push(R.stats.sortMs); acc.probe.push(R.stats.probeMs); acc.labels.push(R.stats.labelsMs); acc.cpu.push(R.stats.cpuMs); acc.total.push(c - b);
+      if (R.stats.threeSheets) three++;
+    }
+    const sum = (v) => { const s = v.slice().sort((x, y) => x - y); return { mean: +(v.reduce((x, y) => x + y, 0) / v.length).toFixed(3), p95: +s[Math.floor(0.95 * (s.length - 1))].toFixed(3), max: +s[s.length - 1].toFixed(3) }; };
+    const out = { ...info, frames, canvas: [canvas.width, canvas.height], framesWithThreeSheetPasses: three, normalsMs: sum(acc.normals), sortMs: sum(acc.sort), probeMs: sum(acc.probe), labelsMs: sum(acc.labels),
+      sortNormalsProbeMs: sum(acc.normals.map((x, i) => x + acc.sort[i] + acc.probe[i])), rendererCpuMs: sum(acc.cpu), setPlusRenderMs: sum(acc.total), frameIntervalMs: sum(acc.interval) };
+    time = keep.time; setShape(keep.name); R.setView(keep.view); paused = keep.paused; showHud();
+    return out;
+  },
+  labels() {
+    const c = canvas.getBoundingClientRect();
+    return [...document.querySelectorAll('#labels .r3d-label')].filter((n) => n.style.display !== 'none').map((n) => {
+      const b = n.getBoundingClientRect();
+      return { text: n.textContent, spot: n._cand, gliding: n._gt >= 0, box: [b.left - c.left, b.top - c.top, b.right - c.left, b.bottom - c.top].map((v) => +v.toFixed(1)) };
+    });
+  },
+  gpu() {
+    const gl = R.gl, ext = gl.getExtension('WEBGL_debug_renderer_info');
+    return { renderer: ext ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER), samples: gl.getParameter(gl.SAMPLES), depthBits: gl.getParameter(gl.DEPTH_BITS) };
+  },
+  async loseContext() {
+    const ext = R.gl.getExtension('WEBGL_lose_context');
+    if (!ext) return 'no WEBGL_lose_context';
+    const lost = new Promise((r) => canvas.addEventListener('webglcontextlost', r, { once: true }));
+    ext.loseContext();
+    await lost;
+    await new Promise((r) => setTimeout(r, 120));
+    const back = new Promise((r) => canvas.addEventListener('webglcontextrestored', r, { once: true }));
+    ext.restoreContext();
+    await back;
+    await nextFrame(); await nextFrame();
+    return { lost: R.gl.isContextLost(), frames: R.stats.frames };
+  },
+};
+</script>
+</body>
+</html>

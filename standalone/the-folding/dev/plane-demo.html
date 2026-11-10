@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>plane demo — the 2D symmetry plane</title>
+<style>
+  :root { --ink: #1a1a1f; --muted: #52514a; --hairline: #e5e5ea; --card: #f7f7f8; --accent: #0f766e; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; color: var(--ink); font: 13px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+  #bar { flex: none; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding: 6px 10px; border-bottom: 1px solid var(--hairline); min-height: 44px; }
+  #bar b { font-size: 15px; }
+  #bar .meta { color: var(--muted); }
+  #bar select, #bar button, #bar input { font: inherit; font-size: 16px; }
+  #bar select { height: 32px; border: 1px solid var(--hairline); border-radius: 8px; background: #fff; padding: 0 6px; }
+  #presets { display: flex; gap: 6px; flex-wrap: wrap; }
+  #presets button { height: 32px; padding: 0 10px; border: 1px solid var(--hairline); border-radius: 16px; background: #fff; color: var(--ink); font-size: 13px; cursor: pointer; }
+  #presets button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #wavy { width: 110px; accent-color: var(--accent); }
+  #readout { color: var(--muted); font-variant-numeric: tabular-nums; margin-left: auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #stage { flex: 1; min-height: 0; padding: 8px; display: flex; align-items: center; justify-content: center; }
+  .pane { position: relative; border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; background: #fff; }
+  .pane > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .pane > canvas.over { pointer-events: none; }
+  #single { width: 100%; height: 100%; }
+  #sheet { display: none; width: 100%; height: 100%; gap: 6px; }
+  .cell { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .cell .cap { flex: none; height: 20px; line-height: 20px; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-size: 12px; }
+  .cell .cap b { color: var(--ink); font-size: 14px; margin-right: 6px; }
+  .cell .pane { flex: 1; min-height: 0; }
+  body.sheet #single { display: none; }
+  body.sheet #sheet { display: grid; }
+  body.sheet #presets, body.sheet #groupsel { display: none; }
+  body.bare #bar { display: none; }
+  body.bare #stage { padding: 0; }
+</style>
+</head>
+<body>
+<header id="bar">
+  <b id="sym"></b><span class="meta" id="meta"></span>
+  <select id="groupsel" aria-label="Group"></select>
+  <div id="presets" role="group" aria-label="Cut"></div>
+  <label>Wavy <input id="wavy" type="range" min="0" max="1" step="0.01" value="0"></label>
+  <span id="readout"></span>
+</header>
+<main id="stage">
+  <div class="pane" id="single"><canvas id="c"></canvas><canvas id="over" class="over"></canvas></div>
+  <div id="sheet"></div>
+</main>
+<script type="module">
+// plane-demo.html — the 2D symmetry plane on its own (plane agent, SPEC 5.9).
+//   ?g=<id>&preset=<i>&amp=<0..1>     one group; drag anywhere to move the seed (the domain is rebuilt on every move)
+//   &seed=x,y                         a custom seed (straight coordinates)
+//   &pane=WxH                         force the pane's CSS size (e.g. 226x226 = the app's plane on a phone)
+//   &pieces=1                         overlay motifInTile(...) (teal) to check the clipping of the motif to the tile
+//   &hint=0                           no hint;   &star=0  no snowflake patch for the kaleidoscopes;   &bare=1  no toolbar
+//   &interactive=1 | 0                every group draggable | none; default as in the app (contract C2): the four
+//                                     kaleidoscopes (fold 'snowflake') are not interactive, every other group is
+//   ?sheet=1[&amp=..][&preset=..]     contact sheet: all 17 groups, each a live view
+//   &groups=333,442[&cols=2]          ... of these groups only (larger panels)
+// window.__demo = { setGroup(id), setPreset(i), setAmp(a), setSeed(x, y), getSeed(), getTile(), show(opts), stats(), ready }
+//   getTile() also reports the window: view { cx, cy, s, home, target, gliding } and the tile's box in canvas CSS px
+import { GROUPS, BY_ID, elementsNear } from '../src/groups.js';
+import { makeWarp, buildDomain } from '../src/domain.js';
+import { createPlaneView } from '../src/plane.js';
+import { motifFor, motifInTile } from '../src/motif.js';
+
+const q = new URLSearchParams(location.search);
+const $ = (id) => document.getElementById(id);
+const num = (v, d) => { const x = parseFloat(v); return Number.isFinite(x) ? x : d; };
+
+const state = {
+  id: BY_ID[q.get('g')] ? q.get('g') : '333',
+  preset: Math.max(0, parseInt(q.get('preset') || '0', 10) || 0),
+  amp: Math.max(0, Math.min(1, num(q.get('amp'), 0))),
+  seed: q.get('seed') ? q.get('seed').split(',').map(Number) : null,      // null = the preset's seed
+  sheet: q.get('sheet') === '1',
+  pieces: q.get('pieces') === '1',
+  star: q.get('star') !== '0',
+  hint: q.get('hint') !== '0',
+  pane: q.get('pane') || '',
+  groups: q.get('groups') ? q.get('groups').split(',') : null,     // sheet of these groups only
+  cols: parseInt(q.get('cols') || '0', 10) || 0,
+  panels: null,                                                    // set through __demo.show({ panels: [...] })
+  interactive: q.get('interactive') === '1' ? true : q.get('interactive') === '0' ? false : null,   // null = as the app
+};
+/** Whether the cut of `group` can be dragged: as in the app (C2), unless the page says otherwise. */
+const interactiveFor = (group) => (state.interactive === null ? group.fold !== 'snowflake' : state.interactive);
+
+/**
+ * The snowflake patch to outline: the fold's own `star` when src/folds/snowflake.js is there and works, else a stand-in
+ * built the same way (the tiles around the tile's corner of highest order, the one nearest the window's centre).
+ */
+let snowflake = null;
+import('../src/folds/snowflake.js').then((m) => {
+  snowflake = m.default;
+  if (state.sheet) cells.forEach((c) => { if (c.group.fold === 'snowflake') c.draw(); }); else if (scene && scene.group.fold === 'snowflake') rebuild();
+}).catch(() => { snowflake = null; });
+function starOf(group, domain) {
+  if (group.fold !== 'snowflake' || !domain.conePoints.length) return null;
+  if (snowflake) {
+    try { const st = snowflake(group, domain, null).star; if (st && st.length) return st; } catch (e) { /* fall through to the stand-in */ }
+  }
+  const dc = (c) => Math.hypot(c.x - group.center[0], c.y - group.center[1]);
+  let top = domain.conePoints[0];
+  for (const c of domain.conePoints) if (c.order > top.order || (c.order === top.order && dc(c) < dc(top) - 1e-9)) top = c;
+  return elementsNear(group, top.x, top.y, 1e-6, top.x, top.y)
+    .map((g) => domain.poly.map((p) => [g.a * p[0] + g.b * p[1] + g.tx, g.c * p[0] + g.d * p[1] + g.ty]));
+}
+
+function build(group, presetIndex, amp, seed) {
+  const p = group.presets[Math.min(presetIndex, group.presets.length - 1)];
+  const t0 = performance.now();
+  const warp = makeWarp(group, amp);
+  const domain = buildDomain(group, { seed: seed || p.seed, metric: p.metric, warp });
+  const ms = performance.now() - t0;
+  return { group, preset: p, domain, ms, star: state.star ? starOf(group, domain) : null };
+}
+
+// ---- single view ---------------------------------------------------------------------------------------------------
+const canvas = $('c'), over = $('over');
+let scene = null, lastPhase = '';
+const view = createPlaneView(canvas, {
+  hint: state.hint,
+  onSeed(x, y, phase) {
+    lastPhase = phase;
+    if (phase === 'start') return;
+    state.seed = [x, y];
+    rebuild();
+  },
+});
+
+function drawPieces() {
+  const r = over.getBoundingClientRect(), dpr = Math.min(3, window.devicePixelRatio || 1);
+  over.width = Math.round(r.width * dpr); over.height = Math.round(r.height * dpr);
+  const c = over.getContext('2d');
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  c.clearRect(0, 0, r.width, r.height);
+  if (!state.pieces || !scene) return 0;
+  const pieces = motifInTile(scene.group, scene.domain, motifFor(scene.group));
+  c.lineWidth = 2.4; c.lineJoin = 'round'; c.lineCap = 'round'; c.strokeStyle = '#0f766e';
+  for (const pl of pieces) {
+    c.beginPath();
+    for (let i = 0; i < pl.length; i += 2) { const p = view.toCss(pl[i], pl[i + 1]); if (i === 0) c.moveTo(p[0], p[1]); else c.lineTo(p[0], p[1]); }
+    c.stroke();
+    for (const i of [0, pl.length - 2]) { const p = view.toCss(pl[i], pl[i + 1]); c.beginPath(); c.arc(p[0], p[1], 2.6, 0, 7); c.fillStyle = '#fff'; c.fill(); c.stroke(); }
+  }
+  return pieces.length;
+}
+
+function rebuild() {
+  const group = BY_ID[state.id];
+  scene = build(group, state.preset, state.amp, state.seed);
+  view.setScene({ group, domain: scene.domain, motif: motifFor(group), star: scene.star, interactive: interactiveFor(group) });
+  view.render();
+  const np = drawPieces();
+  const d = scene.domain;
+  $('sym').textContent = group.label;
+  $('meta').textContent = `${group.hm} · ${group.shape}`;
+  $('readout').textContent = `seed ${d.seed[0].toFixed(3)}, ${d.seed[1].toFixed(3)} · ${d.poly.length} edges, ${d.classes} seams · domain ${scene.ms.toFixed(1)} ms · draw ${view.stats.ms.toFixed(1)} ms` + (state.pieces ? ` · ${np} motif pieces` : '');
+  document.querySelectorAll('#presets button').forEach((b, i) => b.setAttribute('aria-pressed', String(!state.seed && i === state.preset)));
+}
+
+function fillControls() {
+  const sel = $('groupsel');
+  if (!sel.options.length) {
+    for (const g of GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}  ${g.hm}`; sel.appendChild(o); }
+    sel.addEventListener('change', () => api.setGroup(sel.value));
+    $('wavy').addEventListener('input', () => api.setAmp(Number($('wavy').value)));
+  }
+  sel.value = state.id;
+  $('wavy').value = String(state.amp);
+  const box = $('presets');
+  box.textContent = '';
+  BY_ID[state.id].presets.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = p.name;
+    b.addEventListener('click', () => api.setPreset(i));
+    box.appendChild(b);
+  });
+}
+
+function layout() {
+  document.body.classList.toggle('sheet', state.sheet);
+  document.body.classList.toggle('bare', q.get('bare') === '1');
+  const single = $('single');
+  const m = /^(\d+)x(\d+)$/.exec(state.pane);
+  single.style.width = m ? m[1] + 'px' : '100%';
+  single.style.height = m ? m[2] + 'px' : '100%';
+  single.style.flex = m ? 'none' : '';
+}
+
+// ---- contact sheet -------------------------------------------------------------------------------------------------
+const cells = [];
+function buildSheet() {
+  const host = $('sheet');
+  host.textContent = '';
+  for (const c of cells) c.view.destroy();
+  cells.length = 0;
+  const W = host.clientWidth || window.innerWidth, H = host.clientHeight || window.innerHeight;
+  // panels: explicit { g, preset, amp, seed } per panel; else the listed groups (or all 17) at the global preset / amp
+  const list = state.panels ? state.panels.filter((p) => BY_ID[p.g]).map((p) => ({ group: BY_ID[p.g], ...p }))
+    : (state.groups ? state.groups.map((id) => BY_ID[id]).filter(Boolean) : GROUPS).map((group) => ({ group }));
+  const N = list.length;
+  const cols = state.cols || Math.max(1, Math.min(N, Math.ceil(Math.sqrt((N * W) / H) - 0.25)));
+  const rows = Math.ceil(N / cols);
+  host.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+  host.style.gridTemplateRows = `repeat(${rows}, minmax(0, 1fr))`;
+  for (const item of list) {
+    const group = item.group;
+    const cell = document.createElement('div'); cell.className = 'cell';
+    const cap = document.createElement('div'); cap.className = 'cap';
+    const pane = document.createElement('div'); pane.className = 'pane';
+    const cv = document.createElement('canvas');
+    pane.appendChild(cv); cell.appendChild(cap); cell.appendChild(pane); host.appendChild(cell);
+    const entry = { group, seed: item.seed || null, view: null, scene: null };
+    const draw = () => {
+      const amp = item.amp === undefined ? state.amp : item.amp;
+      entry.scene = build(group, item.preset === undefined ? state.preset : item.preset, amp, entry.seed);
+      entry.view.setScene({ group, domain: entry.scene.domain, motif: motifFor(group), star: entry.scene.star,
+        interactive: item.interactive === undefined ? interactiveFor(group) : !!item.interactive });
+      entry.view.render();
+      cap.innerHTML = '';
+      const b = document.createElement('b'); b.textContent = group.label;
+      cap.appendChild(b);
+      cap.appendChild(document.createTextNode(`${group.hm} · ${entry.seed ? 'seed ' + entry.scene.domain.seed.map((v) => v.toFixed(2)).join(', ') : entry.scene.preset.name} · ${entry.scene.domain.poly.length} edges` + (amp ? ` · wavy ${amp}` : '')));
+    };
+    entry.view = createPlaneView(cv, { hint: state.groups || state.panels ? state.hint : false, onSeed(x, y, phase) { if (phase === 'start') return; entry.seed = [x, y]; draw(); } });
+    entry.draw = draw;
+    cells.push(entry);
+  }
+  for (const c of cells) { c.view.resize(); c.draw(); }
+}
+
+// ---- API -----------------------------------------------------------------------------------------------------------
+const api = {
+  ready: false,
+  setGroup(id) { if (!BY_ID[id]) return false; state.id = id; state.preset = 0; state.seed = null; fillControls(); rebuild(); return true; },
+  setPreset(i) { state.preset = Math.max(0, Math.min(BY_ID[state.id].presets.length - 1, i | 0)); state.seed = null; if (state.sheet) cells.forEach((c) => { c.seed = null; c.draw(); }); else rebuild(); return BY_ID[state.id].presets[state.preset].name; },
+  setAmp(a) { state.amp = Math.max(0, Math.min(1, +a || 0)); $('wavy').value = String(state.amp); if (state.sheet) cells.forEach((c) => c.draw()); else rebuild(); return state.amp; },
+  setSeed(x, y) { state.seed = [x, y]; rebuild(); return scene.domain.seed.slice(); },
+  getSeed() { return scene ? scene.domain.seed.slice() : null; },
+  /** What is on screen, as numbers: the proof that a drag changed the tile. */
+  getTile() {
+    if (!scene) return null;
+    const d = scene.domain, r = (v) => Math.round(v * 1e4) / 1e4, r1 = (v) => Math.round(v * 10) / 10;
+    const v = view.getView(), dbg = view.debug(), b = dbg.box;
+    const lo = view.toCss(b[0], b[3]), hi = view.toCss(b[2], b[1]);
+    return {
+      group: state.id, preset: state.seed ? null : scene.preset.name, amp: state.amp, lastPhase,
+      seed: d.seed.map(r), handleCss: view.toCss(d.seedActual[0], d.seedActual[1]).map(r1),
+      poly: d.poly.map((p) => p.map(r)), area: r(d.area),
+      edges: d.edges.map((e) => ({ kind: e.kind, cls: e.cls, color: e.color, ticks: e.ticks, partner: e.partner, half: e.halfTurn })),
+      view: { W: v.W, H: v.H, s: r(v.s), cx: r(v.cx), cy: r(v.cy), home: v.home.map(r), target: v.target.map(r), gliding: v.gliding },
+      tileCss: [lo[0], lo[1], hi[0], hi[1]].map(r1),          // the tile's bounding box in canvas CSS px (left, top, right, bottom)
+      interactive: dbg.interactive,
+    };
+  },
+  /** Switch mode without reloading: show({ sheet: true, amp: 1 }), show({ sheet: false, g: '333', pane: '226x226', pieces: true }). */
+  show(o = {}) {
+    if (o.sheet !== undefined) state.sheet = !!o.sheet;
+    if (o.groups !== undefined) state.groups = o.groups && o.groups.length ? o.groups : null;     // a part of the sheet, larger
+    if (o.cols !== undefined) state.cols = o.cols | 0;
+    if (o.panels !== undefined) state.panels = o.panels && o.panels.length ? o.panels : null;        // [{ g, preset, amp, seed }]
+    if (o.hint !== undefined) state.hint = !!o.hint;
+    if (o.interactive !== undefined) state.interactive = o.interactive === null ? null : !!o.interactive;
+    if (o.pane !== undefined) state.pane = o.pane || '';
+    if (o.pieces !== undefined) state.pieces = !!o.pieces;
+    if (o.amp !== undefined) state.amp = Math.max(0, Math.min(1, +o.amp || 0));
+    if (o.preset !== undefined) { state.preset = o.preset | 0; state.seed = null; }
+    if (o.g !== undefined && BY_ID[o.g]) { state.id = o.g; state.seed = null; if (o.preset === undefined) state.preset = 0; }
+    layout(); fillControls();
+    if (state.sheet) buildSheet(); else { view.resize(); rebuild(); }
+    return { sheet: state.sheet, g: state.id, preset: state.preset, amp: state.amp };
+  },
+  stats() { return state.sheet ? cells.map((c) => ({ id: c.group.id, ms: +c.view.stats.ms.toFixed(2), copies: c.view.stats.copies })) : { ms: +view.stats.ms.toFixed(2), copies: view.stats.copies, glyphs: view.stats.glyphs }; },
+  view,
+};
+window.__demo = api;
+
+let resizeTimer = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => { if (state.sheet) buildSheet(); else { view.resize(); rebuild(); } }, 60);
+});
+
+layout(); fillControls();
+if (state.sheet) buildSheet(); else { view.resize(); rebuild(); }
+api.ready = true;
+</script>
+</body>
+</html>

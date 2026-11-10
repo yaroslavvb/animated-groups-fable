@@ -1,0 +1,133 @@
+<!doctype html>
+<!--
+  The Folding — page shell. OWNER: shell agent (round 3: ui-layout). Notes: notes/shell.md, notes/ui-layout-round3.md.
+  build.mjs strips HTML comments, replaces the two placeholders below
+      /*__INLINE_CSS__*/  with src/styles.css (minified)
+      /*__INLINE_JS__*/   with the bundle of src/app.js (IIFE, minified)
+  and writes ONE self-contained file. dev/app-demo.html loads this body unbundled.
+
+  DOM CONTRACT — stable ids. src/app.js fills / wires them; nothing else in the markup may be relied on.
+
+  id               element            who uses it and how
+  ───────────────  ─────────────────  ────────────────────────────────────────────────────────────────────────────
+  app              div (root grid)    APP sets on every group change (contract C1, SPEC 8):
+                                        data-fold="<group.fold>"   snowflake: the cut controls give way to #cut-note,
+                                                                   and #hint is never shown
+                                        data-features="<subset of: seams mirrors cones corners double>"
+                                                                   which legend items show (#legend [data-feature])
+                                      optional data-cut="under": on phones keep the cut controls UNDER the plane
+                                      (default there: beside a square plane, which gives the fold more room)
+  chip             button             APP: click -> picker.open(groupId). Holds the next two.
+  chip-symbol      span               APP: textContent = group.label                    (big orbifold symbol)
+  chip-meta        span               APP: textContent = group.hm + ' · ' + group.shape  (wraps to 2 lines if it must)
+  caption          p                  APP: textContent = group.topology                 (1 line, 2 when it needs them)
+  stage            main               the two panes and their controls (data-ss-thumb)
+  pane-plane       section            positioned box of the 2D view (data-ss-comments="off")
+  plane-canvas     canvas             APP: createPlaneView(canvas, …). CSS sizes it to the pane; set the backing
+                                      store from its clientWidth/Height (ResizeObserver or window resize)
+  hint             p                  "drag to move the cut". APP: hint.hidden = true at the first drag.
+                                      At the pane's bottom edge; at its TOP edge on a small (phone) pane
+  plane-controls   div                the cut controls: #presets and the Wavy field, or #cut-note
+  presets          div                APP: one <button type="button" class="chip" aria-pressed="true|false">name</button>
+                                      per group.presets entry; aria-pressed="true" on the current one, none while
+                                      the seed is a custom drag. Chips never shrink: a row that cannot hold them
+                                      wraps (rows) or stacks them two to a line (the phone column)
+  wavy             input range 0..1   APP: 'input' event -> amp = Number(value); call enhanceRange(wavy) once
+                                      (src/timeline.js) so the whole 44 px box drags on touch. disabled = true greys it
+  cut-note         p                  static; shown instead of #presets and the Wavy field when data-fold="snowflake"
+  pane-fold        section            positioned box of the 3D view (data-ss-comments="off")
+  fold-canvas      canvas             APP: createRenderer(canvas, { labelLayer: fold-labels }). Sized like plane-canvas
+  fold-labels      div                the renderer's HTML labels; exactly covers fold-canvas, pointer-events: none,
+                                      children are position:absolute at left/top 0 (set left/top or a transform)
+  turn-hint        p                  "drag to turn" (styled like #hint). APP: turnHint.hidden = true after the
+                                      person's first rotation of the 3D view; never shown again in the session
+  fold-controls    div                Fold button, scrubber, reset view
+  fold-btn         button             TIMELINE (createTimeline button): text of its [data-label] child = Fold / Pause / Unfold
+  scrubber         input range        TIMELINE (createTimeline slider). Its wrapper #scrub[data-scrub] gets --p and
+                                      the ticks ([data-ticks]); do not touch its value directly, use timeline.set(t)
+                                      — which is silent: onChange fires for scrubbing and playback only
+  reset-view       button             APP: click -> renderer.resetView()
+  legend           footer             static: one item per feature ([data-feature], shown when #app's data-features
+                                      names it; all but corners and double when #app has no data-features) and the
+                                      companion link
+  picker-mount     div                APP: createHassePicker({ mount, … }). Empty, last in <body>; <body> is the
+                                      positioned box that covers the viewport, so a dialog inside may use
+                                      position:fixed or position:absolute; inset:0
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>The Folding</title>
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="hdr" id="header">
+    <h1 class="title">The Folding</h1>
+    <button type="button" class="orb" id="chip" aria-haspopup="dialog" title="Pick an orbifold">
+      <span class="orb-symbol" id="chip-symbol"></span>
+      <span class="orb-meta" id="chip-meta"></span>
+      <svg class="orb-caret" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M0 0h10L5 6z"/></svg>
+    </button>
+  </header>
+
+  <p class="caption" id="caption" aria-live="polite"></p>
+
+  <main class="stage" id="stage" data-ss-thumb>
+
+    <section class="pane pane-plane" id="pane-plane" data-ss-comments="off" aria-label="Plane: the pattern, its symmetry and the cut">
+      <canvas id="plane-canvas"></canvas>
+      <p class="hint" id="hint">drag to move the cut</p>
+    </section>
+
+    <div class="ctl ctl-plane" id="plane-controls">
+      <div class="presets" id="presets" role="group" aria-label="Cut"></div>
+      <label class="wavy" id="wavy-field">
+        <span class="wavy-label">Wavy</span>
+        <span class="scrub" data-scrub>
+          <span class="scrub-rail"></span>
+          <input type="range" id="wavy" min="0" max="1" step="0.01" value="0">
+        </span>
+      </label>
+      <p class="cut-note" id="cut-note">Every edge is a mirror: Fold folds the plane onto the tile.</p>
+    </div>
+
+    <section class="pane pane-fold" id="pane-fold" data-ss-comments="off" aria-label="Fold: the tile closing up into the orbifold">
+      <canvas id="fold-canvas"></canvas>
+      <div class="labels" id="fold-labels" aria-hidden="true"></div>
+      <p class="hint turn-hint" id="turn-hint">drag to turn</p>
+    </section>
+
+    <div class="ctl ctl-fold" id="fold-controls">
+      <button type="button" class="btn-primary" id="fold-btn"><span data-label>Fold</span></button>
+      <div class="scrub" id="scrub" data-scrub>
+        <span class="scrub-rail"></span>
+        <span class="scrub-fill"></span>
+        <span class="scrub-ticks" id="scrub-ticks" data-ticks></span>
+        <input type="range" id="scrubber" min="0" max="1" step="any" value="0" aria-label="Fold progress">
+      </div>
+      <button type="button" class="btn-quiet" id="reset-view" aria-label="Reset view" title="Reset view">
+        <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 6.8A6.5 6.5 0 1 0 10 3.5"/><path d="M12.7 1 10 3.5l2.7 2.6"/></svg>
+        <span class="btn-text">Reset<span class="btn-text-wide"> view</span></span>
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="legend" id="legend" aria-label="Legend">
+    <span class="lg" data-feature="seams"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-a" d="M1.5 4h9"/><path class="sw-b" d="M13.5 4h9"/></svg><span>coloured = edges sewn together</span></span>
+    <span class="lg" data-feature="mirrors"><svg class="sw" viewBox="0 0 14 8" width="14" height="8" aria-hidden="true" focusable="false"><path class="sw-ink" d="M1.5 4h11"/></svg><span>ink = mirror (becomes the rim)</span></span>
+    <span class="lg" data-feature="cones"><svg class="sw" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true" focusable="false"><circle class="sw-dot" cx="4" cy="4" r="3"/></svg><span>dot <i>n</i> = cone point</span></span>
+    <span class="lg" data-feature="corners"><svg class="sw" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><circle class="sw-ring" cx="5" cy="5" r="3.7"/></svg><span>ring ∗<i>n</i> = mirror corner</span></span>
+    <span class="lg" data-feature="double"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-dash" d="M1.5 4h21"/></svg><span>dashed = self-intersection</span></span>
+    <span class="companion"><span class="companion-k">companion:</span> <a href="https://spacesheep.dev/@yaroslavvb/the-unfolding" target="_blank" rel="noopener">The Unfolding</a></span>
+  </footer>
+
+</div>
+<div id="picker-mount"></div>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>

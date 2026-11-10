@@ -1,0 +1,114 @@
+<!doctype html>
+<!--
+  dev/app-frame.html — a stand-in of the spacesheep viewer around the page (SPEC 6, SPEC 7 URL state contract).
+  OWNER: ui-app (round 3; first written by the integrator).
+
+  What it does, as the viewer does it (spacesheep packages/app/src/pages/viewer.ts and early-frame.ts, read 9 Nov 2026):
+    · the page runs in an iframe under a 50 px bar, from ANOTHER origin than this one (spacesheep serves a space from
+      its own content origin): here the same server under its other loopback name, 127.0.0.1 <-> localhost, with the
+      viewer's sandbox "allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox
+      allow-downloads";
+    · at load the frame gets this page's #hash (ssFrameGo(frame, page + location.hash));
+    · it listens for { type: 'ss-hash', hash } from the frame (origin = the frame's, source = the frame) and, when the
+      hash matches /^#[A-Za-z0-9_.=%&\/-]*$/, rewrites its own address with history.replaceState ("#" alone clears it);
+      a hash that does not match is dropped;
+    · on its own hashchange (a pasted link, an edited address) it forwards the hash into the frame with
+      frame.contentWindow.location.replace(...) — fwdHash, which compares with the URL it last sent the frame;
+    · the content worker injects a small bridge into every space that posts ss-hash on the frame's own hashchange:
+      dev/app-demo.html?bridge plays that part.
+  The bar shows the address's hash as it is now and counts the messages (accepted / dropped / forwarded).
+  window.__host = { log: [...], accepted, dropped, forwarded, frameUrl() } for the scripts.
+
+    dev/app-frame.html                    the unbundled app (dev/app-demo.html?bridge), cross-origin, the viewer's sandbox
+    dev/app-frame.html?page=dist          the built page dist/index.html (node build.mjs) instead
+    dev/app-frame.html?page=<path>        any page of the workspace
+    dev/app-frame.html?opaque             sandbox without allow-same-origin: an opaque origin, no storage — the strictest
+                                          host (only for a self-contained page: dist)
+    dev/app-frame.html?open               a plain iframe, same origin, no sandbox
+    #<hash>                               passed on to the page, as the viewer does
+  tools/qa-matrix.mjs --interact and dev/ui3-url-loop.mjs drive the app inside the frame.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Folding — in a host frame</title>
+<style>
+  html, body { margin: 0; height: 100%; }
+  body { display: flex; flex-direction: column; font: 13px system-ui, sans-serif; color: #52514a; background: #fff; }
+  .bar { flex: none; height: 50px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0 12px;
+    background: #f7f7f8; border-bottom: 1px solid #e5e5ea; min-width: 0; }
+  .addr { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: #1a1a1f; background: #fff; border: 1px solid #e5e5ea;
+    border-radius: 6px; padding: 5px 8px; }
+  .addr .path { color: #8a8a93; }
+  .count { flex: none; font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+  iframe { flex: 1 1 auto; min-height: 0; width: 100%; border: 0; display: block; }
+  @media (max-width: 520px) { .count { display: none; } }
+</style>
+</head>
+<body>
+<div class="bar"><span class="addr" id="addr" title="the address bar of the host page"><span class="path">the-folding</span><span id="addr-hash"></span></span><span class="count" id="count"></span></div>
+<iframe id="content" title="The Folding"></iframe>
+<script>
+(function () {
+  var params = new URLSearchParams(location.search);
+  var pageParam = params.get('page');
+  var page = pageParam === 'dist' ? 'dist/index.html' : pageParam || 'dev/app-demo.html?bridge';
+  var frame = document.getElementById('content');
+  // the content origin: the same server under its other loopback name (a real origin, not this one)
+  var root = new URL('../', location.href);
+  var content = new URL(page, root.href);
+  if (params.has('open')) {
+    /* same origin, no sandbox */
+  } else {
+    if (location.hostname === '127.0.0.1') content.hostname = 'localhost';
+    else if (location.hostname === 'localhost') content.hostname = '127.0.0.1';
+    frame.setAttribute('sandbox', params.has('opaque') ? 'allow-scripts allow-popups'
+      : 'allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads');
+  }
+  var co = params.has('opaque') ? 'null' : content.origin;
+  var LATEST = content.href.split('#')[0];
+
+  var host = window.__host = { log: [], accepted: 0, dropped: 0, forwarded: 0, origin: co, frameUrl: function () { return ssFrameHref(frame); } };
+  function show() {
+    document.getElementById('addr-hash').textContent = location.hash || '';
+    document.getElementById('count').textContent = 'ss-hash ' + host.accepted + ' ok' + (host.dropped ? ' · ' + host.dropped + ' dropped' : '') + ' · ' + host.forwarded + ' sent in';
+  }
+
+  // the viewer's FRAME_GO_JS
+  function ssFrameGo(f, u) {
+    var a = new URL(u, location.href).href;
+    f.__ssHref = a;
+    try { if (f.getAttribute('src') && f.contentWindow) { f.contentWindow.location.replace(a); return; } } catch (e) { /* fall through */ }
+    f.src = a;
+  }
+  function ssFrameHref(f) { return f.__ssHref || f.src; }
+
+  // the viewer: take the frame's hash into the address bar
+  window.addEventListener('message', function (e) {
+    if (e.origin !== co || e.source !== frame.contentWindow || !e.data || e.data.type !== 'ss-hash') return;
+    var hh = String(e.data.hash || '');
+    var ok = /^#[A-Za-z0-9_.=%&/-]*$/.test(hh);
+    host.log.push({ hash: hh, ok: ok, at: Math.round(performance.now()) });
+    if (host.log.length > 400) host.log.shift();
+    if (ok) { host.accepted++; history.replaceState(history.state, '', location.pathname + location.search + (hh === '#' ? '' : hh)); }
+    else host.dropped++;
+    show();
+  });
+  // the viewer: forward the address's hash into the frame, at load and on hashchange
+  function fwdHash() {
+    var cur = ssFrameHref(frame), parts = cur.split('#');
+    if (('#' + (parts[1] || '')) === (location.hash || '#')) return;
+    host.forwarded++;
+    ssFrameGo(frame, parts[0] + (location.hash || ''));
+    show();
+  }
+  ssFrameGo(frame, LATEST + (location.hash || ''));
+  if (location.hash) fwdHash();
+  window.addEventListener('hashchange', function () { fwdHash(); show(); });
+  show();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+/* styles.css — The Folding: the page shell. OWNER: shell agent (round 3: ui-layout). Markup: src/index.template.html.
+   Inlined into the built page by build.mjs; linked as a file by dev/app-demo.html.
+
+   COLOURS mirror src/palette.js. The two files are kept in sync BY HAND: when a colour changes there, change it
+   here too (test/shell.test.js compares them and fails when they drift). Use no colour that is not in this block. */
+:root {
+  --ink: #1a1a1f;                          /* INK            text, mirror lines */
+  --muted: #52514a;                        /* MUTED          secondary text */
+  --faint: #8a8a93;                        /* FAINT          incidental marks, never reading text */
+  --hairline: #e5e5ea;                     /* HAIRLINE       borders, rules */
+  --card: #f7f7f8;                         /* CARD           barely-grey fills */
+  --ground: #ffffff;                       /* GROUND */
+  --accent: #0f766e;                       /* ACCENT         the current tile, the primary button, what is selected */
+  --accent-soft: rgba(15,118,110,0.14);    /* ACCENT_SOFT */
+  --class-0: #0072B2;                      /* CLASS_COLORS[0..7]: glue classes — same colour = sewn together */
+  --class-1: #E69F00;
+  --class-2: #7A5CC7;
+  --class-3: #56B4E9;
+  --class-4: #8C6D1F;
+  --class-5: #B5489C;
+  --class-6: #5C7D12;
+  --class-7: #3D4C8F;
+  --mirror: #1a1a1f;                       /* MIRROR_COLOR */
+  --crease: #9a9aa3;                       /* CREASE_COLOR */
+  --glide: #6b6b74;                        /* GLIDE_COLOR */
+  --motif: #3b3b44;                        /* MOTIF_COLOR */
+
+  --pad: 12px;                             /* page side padding */
+  --gap: 8px;                              /* between the panes */
+  --tap: 44px;                             /* smallest tap target = height of every control row */
+  --thumb: 22px;                           /* slider thumb */
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---- base -----------------------------------------------------------------------------------------------------
+   Element-level rules are scoped to .app, with :where() so they add no specificity: the picker dialog (src/hasse.js)
+   lives outside .app, in #picker-mount, and brings its own styles — nothing here may reach into it.
+   No text of the page is smaller than 13 px. */
+[hidden] { display: none !important; }
+html {
+  height: 100%;
+  background: var(--ground);
+  color-scheme: light;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+body {
+  position: relative;                      /* the containing block of #picker-mount's dialog */
+  margin: 0;
+  height: 100vh;
+  height: 100dvh;                          /* the whole page fits the window: nothing scrolls */
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--ground);
+  color: var(--ink);
+  font: 14px/1.35 var(--font);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+:where(.app), :where(.app) *, :where(.app) *::before, :where(.app) *::after { box-sizing: border-box; }
+:where(.app) button, :where(.app) input { margin: 0; font: inherit; color: inherit; }
+:where(.app) button { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+:where(.app) :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ---- page grid: header / caption / stage / legend ----------------------------------------------------------------- */
+.app {
+  height: 100%;
+  isolation: isolate;                      /* nothing in here can stack above the picker dialog in #picker-mount */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  padding: 0 max(var(--pad), env(safe-area-inset-right, 0px)) 0 max(var(--pad), env(safe-area-inset-left, 0px));
+}
+
+/* ---- header: title · orbifold chip ---------------------------------------------------------------------------- */
+.hdr { display: flex; align-items: center; gap: 8px; height: 48px; min-width: 0; }
+.title { flex: none; margin: 0 2px 0 1px; font-size: 16px; line-height: 1; font-weight: 600; letter-spacing: -0.01em; white-space: nowrap; }
+
+/* Secondary buttons (.orb, .chip, .btn-quiet) share one construction: the element's own box is the 44 px tap target;
+   a 4 px transparent border leaves a 36 px visible pill (background clipped to the padding box, hairline drawn as an
+   inset shadow at the pill's edge). Visible radius = 12 - 4 = 8 px. */
+.orb, .chip, .btn-quiet {
+  height: var(--tap);
+  min-width: var(--tap);
+  border: 4px solid transparent;
+  border-radius: 12px;
+  background: var(--ground) padding-box;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  cursor: pointer;
+}
+@media (hover: hover) {                    /* feedback only — and not on touch screens, where :hover sticks after a tap */
+  .orb:hover, .chip:hover, .btn-quiet:hover { background-color: var(--card); }
+  .btn-primary:hover { opacity: 0.9; }
+}
+.orb:active, .chip:active, .btn-quiet:active { background-color: var(--hairline); }
+.orb:focus-visible, .chip:focus-visible, .btn-quiet:focus-visible { outline-offset: -3px; }
+.orb:disabled, .chip:disabled, .btn-quiet:disabled, .btn-primary:disabled { opacity: 0.45; cursor: default; }
+
+.orb { flex: 0 1 auto; min-width: 0; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 11px; text-align: left; }
+.orb-symbol { flex: none; font-size: 21px; line-height: 1; font-weight: 600; white-space: nowrap; }
+/* "hm · shape": one line when it fits, else two (13 px, inside the 36 px pill) — never an ellipsis inside a word */
+.orb-meta {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--muted);
+}
+.orb-caret { flex: none; width: 9px; height: 5.4px; fill: var(--muted); }
+
+/* ---- caption: the orbifold in words ------------------------------------------------------------------------------ */
+.caption {
+  margin: 0 1px 8px;
+  min-height: 18px;
+  font-size: 14px;
+  line-height: 18px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+/* ---- stage: two panes and their controls ----------------------------------------------------------------------------
+   Default = the window is wider than tall: side by side. The cut controls span rows 2-3 and the fold pane rows 1-2:
+   when the cut controls need a second row (a narrow pane, many presets), only the plane gives way, never the fold.
+   Row 3 is exactly the fold controls (44 px + the 6 px above them). */
+.stage {
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: 0 var(--gap);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr) auto calc(var(--tap) + 6px);
+  grid-template-areas: "plane fold" "pctl fold" "pctl fctl";
+}
+.pane-plane { grid-area: plane; container: plane / size; }   /* its size comes from the grid, never from its content */
+.ctl-plane { grid-area: pctl; margin-top: 6px; }
+.pane-fold { grid-area: fold; }
+.ctl-fold { grid-area: fctl; margin-top: 6px; }
+
+.pane {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--ground);
+}
+/* Canvases fill their pane and are out of flow, so a canvas's backing-store size can never push the layout. */
+.pane > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.pane > canvas:focus-visible { outline-offset: -3px; border-radius: 7px; }
+.labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 600;
+  color: var(--ink);
+  text-shadow: 0 0 2px var(--ground), 0 0 2px var(--ground), 0 0 3px var(--ground);   /* a halo so labels read over the surface */
+}
+.labels > * { position: absolute; left: 0; top: 0; white-space: nowrap; }
+
+/* Hints: "drag to move the cut" (#hint, plane) and "drag to turn" (#turn-hint, fold). A quiet pill, as wide as its
+   words, never wider than the pane (it wraps rather than being cut). The plane's hint sits at the bottom edge, and at
+   the TOP edge on a small pane (a phone), clear of the tile, which the plane keeps in the middle of its window. */
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100% - 16px);
+  margin: 0;
+  padding: 3px 10px 4px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--ground);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 16px;
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+}
+/* "drag to turn": the top-left corner of the 3D pane. The camera frames the shape's bounding sphere, so the corners
+   stay clear of it: over all 17 groups at t = 0, 0.5 and 1, at 375x498, 390x780, 667x375 and 1280x720, the corner
+   pill lies over no part of the shape and no label (dev/uil3-look.mjs); centred on an edge it touched 10 of 204. */
+.turn-hint { left: 6px; top: 6px; bottom: auto; transform: none; max-width: calc(100% - 12px); padding: 1px 7px 2px; }
+/* The kaleidoscopes have nothing to cut: no hint over their plane (contract C1; src/app.js hides it too). */
+.app[data-fold="snowflake"] .pane-plane > .hint { display: none; }
+/* A small plane pane (a phone; finding 11): the hint at the top edge, tighter, so that one line of it fits a 150 px
+   pane. */
+@container plane (max-height: 359px) or (max-width: 359px) {
+  .hint { top: 6px; bottom: auto; max-width: calc(100% - 8px); padding: 1px 6px 2px; }
+}
+@supports not (container-type: size) {
+  @media (max-width: 599px), (max-height: 479px) {
+    .pane-plane > .hint { top: 6px; bottom: auto; max-width: calc(100% - 8px); padding: 1px 6px 2px; }
+  }
+}
+
+/* ---- controls ---------------------------------------------------------------------------------------------------- */
+.ctl { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: var(--tap); }
+.ctl-plane { flex-wrap: wrap; row-gap: 0; container: pctl / inline-size; }
+.ctl-fold { container: fctl / inline-size; }
+
+/* cut presets. A chip never shrinks and never cuts its name: a row too narrow for the chips and the slider first
+   narrows the slider, then sends it to a second row; chips that do not fit one row wrap. */
+.presets {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -4px;                          /* the chips' transparent borders: keep the visible pills flush with the pane */
+}
+.chip { flex: none; padding: 0 12px; font-size: 14px; line-height: 1; white-space: nowrap; }
+.chip[aria-pressed="true"], .chip[aria-checked="true"], .chip.is-on {
+  background-color: var(--accent-soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+/* The kaleidoscopes: nothing to cut. The chips and the Wavy field give way to one quiet line (contract C1). */
+.cut-note { display: none; flex: 1 1 auto; min-width: 0; margin: 0; color: var(--muted); font-size: 13px; line-height: 17px; }
+.app[data-fold="snowflake"] .cut-note { display: block; }
+.app[data-fold="snowflake"] .presets, .app[data-fold="snowflake"] .wavy { display: none; }
+
+/* sliders: a 44 px box [data-scrub] with a rail, an optional fill and ticks, and the real <input type=range> on top.
+   The thumb's centre travels from --thumb/2 to 100% - --thumb/2; rail, fill and ticks use the same insets. */
+.scrub {
+  --rail-shift: 0px;                       /* moves rail and thumb down from the box's middle (stacked "Wavy" label) */
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--tap);
+  display: block;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+.scrub[data-enhanced] { cursor: pointer; }
+.scrub-rail, .scrub-fill {
+  position: absolute;
+  left: calc(var(--thumb) / 2);
+  top: calc(50% + var(--rail-shift) - 1px);
+  height: 2px;
+  border-radius: 1px;
+  pointer-events: none;
+}
+.scrub-rail { right: calc(var(--thumb) / 2); background: var(--faint); opacity: 0.5; }
+.scrub-fill { width: calc((100% - var(--thumb)) * var(--p, 0)); background: var(--accent); }
+.scrub-ticks {
+  position: absolute;
+  left: calc(var(--thumb) / 2);
+  right: calc(var(--thumb) / 2);
+  top: calc(50% + var(--rail-shift) + var(--thumb) / 2 + 2px);
+  height: 6px;
+  pointer-events: none;
+}
+.scrub-ticks > i { position: absolute; top: 0; width: 2px; height: 6px; margin-left: -1px; border-radius: 1px; background: var(--faint); }
+.scrub > input[type="range"] {
+  position: absolute;                      /* the input's box is centred on the rail (its thumb is centred in the box */
+  left: 0;                                 /* in every engine); with --rail-shift it is the lower part of the wrapper, */
+  top: calc(2 * var(--rail-shift));        /* and the wrapper, not the input, is what the pointer works on */
+  width: 100%;
+  height: calc(100% - 2 * var(--rail-shift));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  font-size: 16px;
+  cursor: pointer;
+  touch-action: none;
+}
+.scrub[data-enhanced] > input[type="range"] { pointer-events: none; }   /* timeline.js enhanceRange takes the pointer */
+.scrub > input[type="range"]::-webkit-slider-runnable-track { border: 0; background: transparent; }
+.scrub > input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 2px solid var(--ground);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.scrub > input[type="range"]::-moz-range-track { height: 2px; border: 0; background: transparent; }
+.scrub > input[type="range"]::-moz-range-thumb {
+  box-sizing: border-box;
+  width: var(--thumb);
+  height: var(--thumb);
+  border: 2px solid var(--ground);
+  border-radius: 50%;
+  background: var(--accent);
+}
+.scrub > input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent); outline-offset: 1px; }
+.scrub > input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent); outline-offset: 1px; }
+.scrub > input[type="range"]:disabled { opacity: 0.4; cursor: default; }
+
+/* "Wavy": label beside the slider when there is room, above its left end when there is not */
+.wavy {
+  position: relative;
+  flex: 1 1 140px;                         /* starts at its minimum and takes what the chips leave, up to 250 px */
+  min-width: 140px;                        /* 632's 14 px chips + 140 = 473 px: one row from a 480 px pane up */
+  max-width: 250px;
+  height: var(--tap);
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.wavy-label { flex: none; font-size: 13px; line-height: 1; color: var(--muted); -webkit-user-select: none; user-select: none; }
+.wavy:has(input:disabled) > .wavy-label { opacity: 0.5; }
+/* A narrow cut-control row (a phone on its side, the phone column): 13 px chips with less padding, and the slider,
+   its label above it, gives way first, down to 64 px, before anything wraps. */
+@container pctl (max-width: 479px) {
+  .presets { margin-right: -8px; }         /* 4 px from the last pill to the slider, not 8 */
+  .chip { padding: 0 8px; font-size: 13px; }
+  .wavy { display: block; flex: 1 1 64px; min-width: 64px; max-width: none; }
+  .wavy-label { position: absolute; left: 1px; top: 2px; line-height: 13px; pointer-events: none; }
+  .wavy > .scrub { --rail-shift: 6px; }
+}
+
+/* Fold / Unfold: the same construction with a 2 px margin — a 40 px solid button in a 44 px tap target */
+.btn-primary {
+  flex: none;
+  height: var(--tap);
+  min-width: 92px;
+  padding: 0 16px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: var(--accent) padding-box;
+  color: var(--ground);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:focus-visible { outline-offset: 0; }
+.btn-primary:active { opacity: 0.8; }
+
+/* reset view */
+.btn-quiet { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px 0 8px; color: var(--muted); font-size: 13px; line-height: 1; white-space: nowrap; }
+.btn-quiet > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* no room for "Reset view" beside the scrubber: the arrow over the verb "Reset" (an arrow alone, next to a play
+   button, would read as "replay") */
+@container fctl (max-width: 459px) {
+  .btn-quiet { flex-direction: column; gap: 1px; min-width: 52px; padding: 1px 0 0; }
+  .btn-quiet > svg { width: 15px; height: 15px; }
+  .btn-quiet > .btn-text { line-height: 14px; }
+  .btn-text-wide { display: none; }
+}
+/* Browsers without container queries (Safari < 16): the compact forms by window width instead. */
+@supports not (container-type: inline-size) {
+  @media (max-width: 939px) {
+    .presets { margin-right: -8px; }
+    .chip { padding: 0 8px; font-size: 13px; }
+    .wavy { display: block; flex: 1 1 64px; min-width: 64px; max-width: none; }
+    .wavy-label { position: absolute; left: 1px; top: 2px; line-height: 13px; pointer-events: none; }
+    .wavy > .scrub { --rail-shift: 6px; }
+    .btn-quiet { flex-direction: column; gap: 1px; min-width: 52px; padding: 1px 0 0; }
+    .btn-quiet > svg { width: 15px; height: 15px; }
+    .btn-quiet > .btn-text { line-height: 14px; }
+    .btn-text-wide { display: none; }
+  }
+}
+
+/* ---- legend ------------------------------------------------------------------------------------------------------
+   One item per mark the current group has (contract C1: #app[data-features] names them; without the attribute the
+   first three show), then the companion link at the right. Items wrap as whole items; the lines sit at the bottom of
+   a box at least 44 px high. The link's own box is 44 px high (its padding reaches 22 px up over the line above and
+   6 px down into the legend's padding) while it takes only one line of the layout. */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-end;
+  align-items: center;
+  column-gap: 18px;
+  min-height: var(--tap);
+  padding: 6px 1px max(6px, env(safe-area-inset-bottom, 0px));
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 16px;
+}
+.lg { display: none; align-items: center; white-space: nowrap; }
+.app[data-features~="seams"] .lg[data-feature="seams"],
+.app[data-features~="mirrors"] .lg[data-feature="mirrors"],
+.app[data-features~="cones"] .lg[data-feature="cones"],
+.app[data-features~="corners"] .lg[data-feature="corners"],
+.app[data-features~="double"] .lg[data-feature="double"],
+.app:not([data-features]) .lg:is([data-feature="seams"], [data-feature="mirrors"], [data-feature="cones"]) { display: flex; }
+.sw { flex: none; margin-right: 6px; overflow: visible; }
+.sw path { fill: none; stroke-width: 3; stroke-linecap: round; }
+.sw-a { stroke: var(--class-0); }
+.sw-b { stroke: var(--class-1); }
+.sw-ink { stroke: var(--mirror); stroke-width: 2.2; }
+.sw-dot { fill: var(--ink); }
+.sw-ring { fill: none; stroke: var(--ink); stroke-width: 1.7; }
+.sw .sw-dash { stroke: var(--ink); stroke-width: 2; stroke-linecap: butt; stroke-dasharray: 4 3; }
+.companion { margin-left: auto; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.companion a {
+  display: block;
+  margin: -22px 0 -6px;
+  padding: 22px 1px 6px;                   /* a 44 px high box; the focus tint below fills only the line of text */
+  background-clip: content-box;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+.companion a:focus-visible { outline: none; background-color: var(--accent-soft); text-decoration-thickness: 2px; }
+
+/* ---- stacked: the window is taller than wide ------------------------------------------------------------------------
+   Plane on top, fold below, each with its controls under it. The fold gets the larger share: the plane's window is
+   square, so only its height counts. */
+@media (orientation: portrait) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 4fr) auto minmax(0, 5fr) auto;
+    grid-template-areas: "plane" "pctl" "fold" "fctl";
+  }
+  .ctl-plane { margin: 6px 0 10px; }
+}
+/* …and too narrow for chips and slider in one row: always two rows (never "sometimes", so the stage does not jump) */
+@media (orientation: portrait) and (max-width: 419px) {
+  .presets { flex: 1 0 100%; }
+  .wavy { flex: 1 0 100%; max-width: none; }
+}
+
+/* ---- wide but very low (a phone on its side): the caption moves up beside the header to spare a row ------------------- */
+@media (orientation: landscape) and (max-height: 479px) {
+  .app { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+  .caption { grid-area: 1 / 2; align-self: center; margin: 0 0 0 10px; min-height: 0; font-size: 13px; line-height: 16px; }
+  .stage, .legend { grid-column: 1 / -1; }
+  /* The plane's column is at least as wide as its compact cut-control row (three chips and a 64 px slider: up to
+     314 px; 632's four: 349 px), never more than 60 %, so that row does not wrap on a phone on its side. The fold is
+     limited by the height here (its pane stays wider than tall), so the narrower column costs it nothing. */
+  .stage { grid-template-columns: minmax(min(320px, 60%), 1fr) minmax(0, 1fr); }
+  .app:has(.presets > .chip:nth-child(4)) .stage { grid-template-columns: minmax(min(360px, 60%), 1fr) minmax(0, 1fr); }
+}
+
+/* ---- narrow windows (phones) ---------------------------------------------------------------------------------------- */
+@media (max-width: 539px) {
+  /* one line of caption, two for the captions that need them */
+  .caption { margin-bottom: 6px; min-height: 17px; font-size: 13px; line-height: 17px; }
+}
+@media (max-width: 479px) {
+  .title { font-size: 15px; }
+  .hdr { gap: 6px; }
+  .orb { padding: 0 8px 0 9px; gap: 7px; }
+  .btn-primary { min-width: 84px; padding: 0 12px; }
+  .legend { column-gap: 12px; }
+  .companion-k { display: none; }          /* the link alone: "companion:" would cost the legend a line */
+}
+@media (max-width: 379px) {
+  .title { font-size: 14px; }
+  .orb-symbol { font-size: 20px; }
+}
+
+/* short windows: the header gives up its 2 px margins (the chip is the 44 px row), caption and legend 2 px each */
+@media (max-height: 599px) {
+  .hdr { height: var(--tap); }
+  .legend { padding-top: 4px; }
+}
+@media (orientation: portrait) and (max-height: 599px) {
+  .caption { margin-bottom: 4px; }
+}
+
+/* Phones, unless the window is very tall: the plane is a square and the cut controls stand BESIDE it, which gives
+   the fold about a third more height than stacking the controls under the plane (notes/shell.md has the numbers).
+   data-cut="under" on #app switches this off. --avail = the height the two panes share: 100dvh minus header 44-48,
+   caption 21-40, legend 44 (58-60 for three or four marks), fold controls 44, gaps 12 — 170 px for the usual group.
+   The plane takes 40 % of it, at least 150 px (one line of "drag to move the cut"; the column's two chip rows), at most what
+   leaves the column 132 px. The column holds the chips (two to a line where they fit) and the slider; its row grows
+   rather than cutting a chip, so a column that needs more height than the square takes it from the fold. */
+@media (orientation: portrait) and (max-width: 599px) and (min-aspect-ratio: 9/20) {
+  .app:not([data-cut="under"]) .stage {
+    --avail: calc(100vh - 170px);
+    --plane: clamp(150px, calc(var(--avail) * 0.4), calc(100vw - 164px));
+    gap: 6px var(--gap);
+    grid-template-columns: var(--plane) minmax(0, 1fr);
+    grid-template-rows: minmax(var(--plane), auto) minmax(0, 1fr) auto;
+    grid-template-areas: "plane pctl" "fold fold" "fctl fctl";
+  }
+  .app:not([data-cut="under"]) .ctl-plane { margin: 0; flex-flow: column nowrap; align-items: stretch; gap: 0; }
+  .app:not([data-cut="under"]) .ctl-fold { margin: 0; }
+  .app:not([data-cut="under"]) .presets { flex: 1 1 auto; align-content: flex-start; margin: -4px -4px 0; }
+  /* two to a line at most, equal halves where both fit, never narrower than the name (the shared 44 px min-width
+     would let a chip shrink below its words) */
+  .app:not([data-cut="under"]) .chip { flex: 1 1 40%; min-width: max-content; }
+  .app:not([data-cut="under"]) .wavy { flex: none; max-width: none; margin: 0; }
+  .app:not([data-cut="under"]) .cut-note { flex: none; padding-top: 2px; }
+}
+@supports (height: 100dvh) {
+  @media (orientation: portrait) and (max-width: 599px) and (min-aspect-ratio: 9/20) {
+    .app:not([data-cut="under"]) .stage { --avail: calc(100dvh - 170px); }
+  }
+}

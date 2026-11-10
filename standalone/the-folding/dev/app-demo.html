@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+  dev/app-demo.html — the real app, unbundled. OWNER: integrator (round 3: ui-app).
+  It takes its markup from src/index.template.html at load time, links src/styles.css as a file and runs src/app.js as
+  a module, so a change in any source file shows without a build. Needs http (tools/shot.mjs serves the workspace):
+
+    node tools/shot.mjs --page "dev/app-demo.html#g=22x" --eval "__folding.ready" --out qa/app/22x.png
+    node tools/qa-matrix.mjs --page dev/app-demo.html --out qa/matrix-dev
+
+  ?bridge (inside a frame only): what the spacesheep content worker injects into every space
+  (assets/document/frame-links.ts, frameLinksBridge): on the frame's own hashchange it posts
+  { type: 'ss-hash', hash: location.hash || '#' } to the parent. dev/app-frame.html loads the page this way, so its
+  stand-in of the viewer sees the same messages the real one does: these, and the ones src/app.js posts itself.
+
+  window.__folding is the app's own test handle (see the top of src/app.js). The shipped page is dist/index.html
+  (node build.mjs); tools/qa-matrix.mjs looks at that one by default.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>The Folding — unbundled</title>
+<link rel="stylesheet" href="../src/styles.css">
+</head>
+<body>
+<script type="module">
+  if (window.parent !== window && new URLSearchParams(location.search).has('bridge')) {
+    window.addEventListener('hashchange', () => { window.parent.postMessage({ type: 'ss-hash', hash: location.hash || '#' }, '*'); });
+  }
+  const res = await fetch('../src/index.template.html', { cache: 'no-store' });
+  const page = new DOMParser().parseFromString(await res.text(), 'text/html');
+  for (const attr of page.body.attributes) document.body.setAttribute(attr.name, attr.value);
+  const nodes = [...page.body.childNodes].filter((n) => n.nodeName !== 'SCRIPT').map((n) => document.importNode(n, true));
+  document.body.replaceChildren(...nodes);
+  await import('../src/app.js');
+</script>
+</body>
+</html>

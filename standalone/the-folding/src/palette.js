@@ -1,0 +1,38 @@
+// palette.js — the one place colours are defined. Used by the plane view, the 3D view, the picker and the CSS.
+// White ground, near-black ink, one teal accent; seam colours are a colour-blind-safe categorical set
+// that never includes the accent hue. No red or pink surfaces anywhere.
+
+export const INK = '#1a1a1f';        // primary text, mirror lines
+export const MUTED = '#52514a';      // secondary text (>= 7:1 on white)
+export const FAINT = '#8a8a93';      // incidental marks only (never reading text)
+export const HAIRLINE = '#e5e5ea';   // borders, rules
+export const CARD = '#f7f7f8';       // barely-grey fills
+export const GROUND = '#ffffff';
+export const ACCENT = '#0f766e';     // teal: the current tile, the primary button, the selected node
+export const ACCENT_SOFT = 'rgba(15,118,110,0.14)';
+
+// Glue classes: cut edges that are sewn together share one colour (index = Domain edge .cls, modulo length).
+export const CLASS_COLORS = ['#0072B2', '#E69F00', '#7A5CC7', '#56B4E9', '#8C6D1F', '#B5489C', '#5C7D12', '#3D4C8F'];
+export const MIRROR_COLOR = INK;     // mirror edges of the tile and mirror lines of the pattern
+export const CREASE_COLOR = '#9a9aa3'; // where the tile bends while folding (not a feature of the orbifold)
+export const GLIDE_COLOR = '#6b6b74';
+export const MOTIF_COLOR = '#3b3b44';
+
+// 3D surface (linear-ish 0..1 RGB). Front = the side of the tile you see in the plane.
+export const SURFACE_FRONT = [0.56, 0.80, 0.77];
+export const SURFACE_BACK = [0.80, 0.88, 0.87];
+export const SURFACE_GHOST = [0.86, 0.87, 0.89]; // secondary tiles (the snowflake star)
+export const SURFACE_OPACITY = 0.62;
+// The comma filled in 3D, every fold: the renderer's `fill` colour (tint bit 1 of a mesh from motif.js motifTintMesh).
+// A deep teal, the surface's own hue, so the coloured seams keep their contrast over it and the front and back overlaps
+// stay clean (the fill judge, qa/fill-judge.md: a grey fill at this size turned muddy).
+export const MOTIF_FILL_3D = [0.33, 0.55, 0.55];
+// The commas of the plane: MOTIF_COLOR at this opacity over the white ground (lighter than the 0.54 of the small
+// commas: the big ones are 6 to 10 times larger, and the mirrors, glide axes and centre glyphs stay on top).
+export const MOTIF_ALPHA_PLANE = 0.4;
+
+export function hexToRgb(hex) {
+  const n = parseInt(hex.slice(1), 16);
+  return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+}
+export function classColor(cls) { return CLASS_COLORS[((cls % CLASS_COLORS.length) + CLASS_COLORS.length) % CLASS_COLORS.length]; }

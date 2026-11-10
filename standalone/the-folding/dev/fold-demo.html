@@ -1,0 +1,1015 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>fold demo</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #fff; color: #1a1a1f; font: 13px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  body { display: flex; flex-direction: column; height: 100vh; height: 100dvh; overflow: hidden; }
+  #stage { position: relative; flex: 1 1 0; min-height: 0; overflow: hidden; }
+  #c { position: absolute; inset: 0; display: block; width: 100%; height: 100%; outline-offset: -3px; }
+  #labels { position: absolute; inset: 0; overflow: hidden; }
+  #sheet { position: absolute; inset: 0; display: none; width: 100%; height: 100%; background: #fff; cursor: pointer; }
+  /* the readout is a strip of its own above the picture, so it never covers the shape */
+  #hud { flex: 0 0 auto; box-sizing: border-box; min-height: 64px; padding: 6px 10px 3px; color: #52514a; font-variant-numeric: tabular-nums; }
+  #hud b { color: #1a1a1f; font-weight: 600; }
+  #hud .sym { font-size: 19px; line-height: 1; margin-right: 2px; }
+  #hud .warn { color: #1a1a1f; font-weight: 600; }
+  #hud div { margin-bottom: 1px; }
+  /* the error corner: bottom left of the stage. Grey card, ink text (never a red surface). */
+  #err { position: absolute; left: 10px; bottom: 10px; box-sizing: border-box; max-width: min(680px, calc(100% - 20px)); max-height: 46%; overflow: auto;
+    margin: 0; padding: 8px 10px; background: #f7f7f8; border: 1px solid #e5e5ea; border-left: 1px solid #1a1a1f; border-radius: 6px;
+    font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #1a1a1f; white-space: pre-wrap; overflow-wrap: anywhere; }
+  #err:empty { display: none; }
+  #err::before { content: "fold-demo"; display: block; font: 600 11px/1.4 system-ui, sans-serif; letter-spacing: 0.04em; text-transform: uppercase; color: #52514a; }
+  #bar { flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 4px 10px; border-top: 1px solid #e5e5ea; background: #fff; }
+  body.noui #bar { display: none; }
+  #bar label { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: #52514a; white-space: nowrap; }
+  #bar label.grow { flex: 1 1 220px; }
+  #bar label.grow input { flex: 1 1 auto; min-width: 90px; }
+  #bar select, #bar button { font: inherit; font-size: 16px; color: #1a1a1f; background: #fff; border: 1px solid #e5e5ea; border-radius: 6px; min-height: 44px; padding: 0 10px; box-sizing: border-box; }
+  #bar button { cursor: pointer; }
+  #bar button#play { background: #0f766e; border-color: #0f766e; color: #fff; min-width: 84px; }
+  #bar input[type=range] { accent-color: #0f766e; height: 44px; margin: 0; width: 110px; }
+  #bar output { min-width: 3.3em; color: #1a1a1f; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div id="hud"></div>
+<div id="stage">
+  <canvas id="c"></canvas>
+  <div id="labels"></div>
+  <canvas id="sheet" title="the sheet: click to go back to the live view"></canvas>
+  <pre id="err" role="status"></pre>
+</div>
+<div id="bar">
+  <label>group <select id="selG" aria-label="group"></select></label>
+  <label>cut <select id="selP" aria-label="cut preset"></select></label>
+  <label>wavy <input id="amp" type="range" min="0" max="1" step="0.01" value="0" aria-label="wavy amplitude"><output id="ampOut">0</output></label>
+  <label class="grow">t <input id="t" type="range" min="0" max="1000" step="1" value="0" list="stops" aria-label="fold time"><output id="tOut">0.000</output></label>
+  <datalist id="stops"></datalist>
+  <button id="play" type="button">Fold</button>
+  <button id="reset" type="button">reset view</button>
+  <button id="sheetBtn" type="button" title="several t, two directions, in one picture">sheet</button>
+</div>
+<script type="module">
+// fold-demo — the generic fold preview every fold agent looks at (SPEC 5.8, last bullet; fold interface = SPEC 5.3).
+//
+// It builds the tile (src/domain.js) and its mesh (src/mesh.js) for one group, imports the fold module that belongs to
+// group.fold, and draws with src/render3d.js, everything mapped through fold.at(t):
+//   · the surface (fold.mesh; its `tint` is passed on),
+//   · the tile boundary, one polyline per edge: cut edges in their glue-class colour, mirror edges in ink, 4.5 px,
+//   · creases (fold.mesh.creases): thin, dashed, grey,
+//   · the cone points (domain.conePoints) as markers labelled with their order (a ring and "∗n" for a mirror corner),
+//   · if the fold (or its module) has doubleLine(t) (SPEC 5.6): that polyline, thin dashed ink, drawn as it comes (3D points).
+// Frame = bounding sphere of the current vertex positions. The view keeps its orientation through every change.
+//
+// URL    ?g=<id>        group id (333, 2222, o, **, xx, *x, 22x, 22*, *2222, 2*22, 442, 4*2, *442, 3*3, *333, 632, *632);
+//                       "s" may stand for "*" (2s22, s632, ss, sx), which is kinder to shells and file names
+//        &preset=<i>    index into group.presets (default 0)        &seed=<x>,<y>  a custom seed instead of the preset's
+//        &amp=<0..1>    wavy cut                                    &t=<0..1>      fold time
+//        &az=<deg>&el=<deg>[&zoom=<z>]   the view (az 0, el 55 is the default; el 90 looks straight down, el < 0 from below)
+//        &fold=flat     force dev/fold-flat.js (the tile stays flat) instead of the group's module
+//        &fold=<url>    import this module instead (relative to this page), e.g. fold=./fold-demo.selftest.js
+//        &density=<n>   passed to buildMesh           &ui=0   hide the control bar (more room for the picture)
+//        &opts=<..>     the fourth argument of createFold: JSON, or the shell-friendly key:value,key:value
+//                       (opts=plump:0.7  ·  opts=chirality:-1,spines:false  ·  opts=density:96)
+//        &anchor=<x>,<y>  opts.anchor (SPEC 7): the plane point whose kaleidoscope cell the closed shape sits on
+//                       (straight coordinates). &anchor=preset = what the app passes (contract C3): the chosen
+//                       preset's `anchor` if it has one (a seed on a crease, SPEC 8), else its seed.
+//                       Without it the fold gets no anchor (anchor = seed, the v1 behaviour). With one, the anchor's
+//                       cell is drawn at z = 0 (thin grey outline; &anchorcell=0 hides it) as a fixed reference.
+//                       A tile across a mirror of the group from the anchor (fold.mirrored) is turned over in the
+//                       closed shape: it is drawn with front and back colours swapped (&sides=paper: not swapped).
+//        &seedsheet=<x0>,<y0>;<x1>,<y1>[;...]&n=<k>   show the SEED SHEET at once: k panels (default 8), the seed
+//                       moving along that polyline, at the current t and view, with one camera frame for all panels and
+//                       a small map of the plane in each (kaleidoscope lines: creases grey, mirrors ink; the anchor's
+//                       cell shaded; the tile; the path, the seed, the anchor as a ring). &seeds=<x>,<y>;... lists them.
+//        &sheet=1       show the SHEET at once: the whole motion in one picture — a row of panels at several t (the
+//                       fold's stops and the times in between) for each of two directions. &sheet=0,0.3,1 gives the
+//                       times, &views=0:55,110:18 the directions (az:el). One Read of one PNG instead of ten.
+//
+// Fold modules: hinge -> src/folds/hinge.js, crosscap -> crosscap.js, torus | cylinder | mobius | klein -> roll.js,
+// snowflake -> snowflake.js; each is called as  createFold(group, domain, mesh, opts)  (opts = {} unless given).
+// If the module is missing, does not load, or createFold throws, the page draws the FLAT tile for every t and says
+// why in the corner (bottom left; the same text goes to console.error, which tools/shot.mjs prints, and into
+// state().error). If at(t) or the function it returns throws at some t, that frame is drawn flat and the corner says
+// so; points that come out NaN / Infinity (or are never written into `out`) are drawn at their flat position and counted.
+//
+// The readout (the strip above the picture) also gives the SEAM GAP at the current t: the largest distance between
+// the images of glued boundary points, |at(t)(x) − at(t)(g⁻¹x)|, in units of the tile size sqrt(domainArea). SPEC 5.3,
+// requirement 2, wants it below 1e-6 at t = 1. (The page tests the samples of fold.mesh.boundary, with their cells.)
+//
+// window.__demo — every setter returns a promise that resolves, once the picture is on screen, to state(); so
+//   tools/shot.mjs can step everything in one run:  { "eval": "__demo.setT(0.5)", "out": "qa/x.png" }
+//     ready                      promise: the first picture is drawn (resolves to state())
+//     error                      the text shown in the corner, or null
+//     setT(t)   setView(azDeg, elDeg[, zoom])   setGroup(id[, preset = 0])   setPreset(i)   setAmp(a)
+//     setSeed(x, y)   setFold(null | 'flat' | url)   setOpts({ .. })   play([target])   resetView()
+//     sheet([{ t: [..], views: [[az, el], ..] }])   draw the sheet; resolves to { panels: [{ t, az, el, seamGap, nonFinite }], .. }.
+//                                Any setter, or a click on the sheet, goes back to the live view.
+//     setAnchor(x, y) | setAnchor('preset') | setAnchor(null)     opts.anchor (SPEC 7); keeps t, the view, the seed
+//     seedSheet({ seeds: [[x, y], ..] | path: [[x0, y0], [x1, y1], ..], n = 8, t = current, view: [az, el] = current,
+//                 cols })        the seed sheet (see &seedsheet); resolves to { panels: [{ seed, walk, mirrored, seamGap,
+//                                frameCenter, nonFinite }], frame, .. }. The seed and t are restored afterwards.
+//     profile([steps = 200])     how evenly it moves (SPEC 5.3, requirement 3): the largest vertex displacement per step of t,
+//                                in tile sizes -> { max, median, ratio, maxAtT: [t0, t1], first, last, nonFinite, curve: 20 bins }
+//     state()                    { g, preset, cut, seed, amp, t, stop, foldType, module, flat, stops, duration, triangles,
+//                                  vertices, pieces, seamGap, seamGapEdge, nonFinite, frame, view: { az, el, zoom }, error }
+//     R, scene                   the renderer; the current scene { tile: { group, domain, mesh, preset }, fold, M (the mesh drawn), .. }
+//   setGroup, setPreset, setAmp, setSeed, setFold and setOpts keep t and the view.
+//
+// From the workspace root (one Chrome per run; batch the pictures into one --steps file, see dev/fold-demo.steps.example.json):
+//   node tools/shot.mjs --page "dev/fold-demo.html?g=333&sheet=1" --eval "__demo.ready" --out qa/hinge/333-sheet.png
+//   node tools/shot.mjs --page "dev/fold-demo.html?g=xx&t=0.5&az=110&el=18" --eval "__demo.ready" --out qa/roll/xx-t050-side.png
+//   node tools/shot.mjs --page "dev/fold-demo.html?g=22x" --steps dev/fold-demo.steps.example.json
+// dev/fold-demo.check.mjs (node) checks the facts about domain + mesh this page relies on; dev/fold-demo.selftest.js
+// is a toy fold that exercises the page itself (a closing tube for **, a bowl elsewhere, and failures on demand).
+
+const FOLD_FILE = { hinge: 'hinge.js', crosscap: 'crosscap.js', torus: 'roll.js', cylinder: 'roll.js', mobius: 'roll.js', klein: 'roll.js', snowflake: 'snowflake.js' };
+const EDGE_WIDTH = 4.5, CREASE_WIDTH = 1.6, CREASE_SAMPLES = 13;
+
+const $ = (id) => document.getElementById(id);
+const q = new URLSearchParams(location.search);
+const qnum = (k) => { const v = q.get(k); const x = v === null || v === '' ? NaN : Number(v); return Number.isFinite(x) ? x : null; };
+const clamp01 = (v) => { const x = Number(v); return Number.isFinite(x) ? Math.min(1, Math.max(0, x)) : 0; };
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+if (q.get('ui') === '0') document.body.classList.add('noui');
+
+const state = {
+  g: '333', preset: Math.max(0, Math.round(qnum('preset') || 0)), seed: null,
+  amp: clamp01(qnum('amp') || 0), t: clamp01(qnum('t') || 0),
+  fold: q.get('fold') || null, density: qnum('density'),
+  opts: {},                 // the fourth argument of createFold
+  anchor: null,             // opts.anchor (SPEC 7): [x, y], 'preset' (= preset.anchor ?? preset.seed, C3), or null (none: anchor = seed)
+  anchorCell: q.get('anchorcell') !== '0',
+};
+/** "x,y" -> [x, y] (two finite numbers) or null. */
+const parsePoint = (str) => { const s = String(str).split(',').map(Number); return s.length === 2 && Number.isFinite(s[0] + s[1]) ? s : null; };
+/** "x,y;x,y;..." -> [[x, y], ...] (the malformed ones left out). */
+const parsePoints = (str) => String(str || '').split(';').map(parsePoint).filter(Boolean);
+if (q.get('seed')) state.seed = parsePoint(q.get('seed'));
+if (q.get('anchor')) state.anchor = q.get('anchor') === 'preset' ? 'preset' : parsePoint(q.get('anchor'));
+
+/** &opts= : JSON ({"plump":0.7}) or the shell-friendly  key:value,key:value  (plump:0.7,spines:false). */
+function parseOpts(str) {
+  if (!str) return {};
+  if (str.trim().startsWith('{')) return JSON.parse(str);
+  const o = {};
+  for (const part of str.split(',')) {
+    const i = part.indexOf(':');
+    if (i < 1) throw new Error('expected key:value, got "' + part + '"');
+    const k = part.slice(0, i).trim(), v = part.slice(i + 1).trim();
+    o[k] = v === 'true' ? true : v === 'false' ? false : v === 'null' ? null : v !== '' && Number.isFinite(Number(v)) ? Number(v) : v;
+  }
+  return o;
+}
+
+let core = null;          // the imported modules, once they are there
+let R = null;             // the renderer
+let scene = null;         // { tile, fold, label, fallback, M, n, cellOf, pos, lines, edges, creases, cones, pairs, stops, duration }
+let last = { nonFinite: 0, badLine: 0, seamGap: null, seamGapEdge: -1, frame: null };
+let lineScale = 1;        // < 1 while the small panels of the sheet are drawn
+let sheetInfo = null;     // { times, views } (or { seeds, t } for the seed sheet) while a sheet is shown
+let frameOverride = null; // the camera frame every panel of the seed sheet shares
+let sidesSwapped = false; // front and back colours swapped for a tile that is turned over in the closed shape (fold.mirrored)
+const errs = { fatal: '', group: '', opts: '', build: '', load: '', frame: '' };
+let logged = '';
+
+// ---- errors ---------------------------------------------------------------------------------------------------
+
+/** A readable account of whatever was thrown: "TypeError: message" plus the first lines of the stack, origin stripped. */
+function describe(e) {
+  if (!(e instanceof Error)) return String(e);
+  if (e.plain) return e.message;
+  const head = (e.name && e.name !== 'Error' ? e.name + ': ' : '') + e.message;
+  const lines = String(e.stack || '').split('\n').map((l) => l.trim()).filter((l) => /^at |@/.test(l)).slice(0, 4)
+    .map((l) => '  ' + l.split(location.origin).join(''));
+  return lines.length ? head + '\n' + lines.join('\n') : head;
+}
+function currentError() {
+  const parts = [errs.fatal, errs.group, errs.opts, errs.build, errs.load, errs.frame].filter(Boolean);
+  return parts.length ? parts.join('\n') : null;
+}
+function showError() {
+  const text = currentError() || '';
+  const el = $('err');
+  if (el.textContent !== text) el.textContent = text;
+  if (text && text !== logged) console.error('fold-demo: ' + text);   // tools/shot.mjs prints console errors
+  logged = text;
+}
+
+// ---- small helpers ----------------------------------------------------------------------------------------------
+
+function frames() {      // two animation frames (so the picture is on screen), or 250 ms if frames do not come
+  return new Promise((resolve) => {
+    let done = false;
+    const fin = () => { if (!done) { done = true; resolve(); } };
+    requestAnimationFrame(() => requestAnimationFrame(fin));
+    setTimeout(fin, 250);
+  });
+}
+let queue = Promise.resolve();
+function enqueue(fn) { const p = queue.then(fn); queue = p.catch(() => {}); return p; }
+
+function resolveGroupId(raw, BY_ID) {
+  if (raw == null || raw === '') return '333';
+  const id = String(raw).trim().replace(/[∗＊]/g, '*').replace(/[×✕]/g, 'x').replace(/[○◯]/g, 'o');
+  for (const c of [id, id.replace(/s/g, '*'), id.toLowerCase(), id.toLowerCase().replace(/s/g, '*')]) if (BY_ID[c]) return c;
+  return null;
+}
+function viewAngles() {
+  const v = R.getView(), [x, y, z, w] = v.q, D = 180 / Math.PI;
+  const el = Math.asin(Math.max(-1, Math.min(1, 1 - 2 * (x * x + y * y)))) * D;     // z of the direction toward the eye
+  const az = Math.atan2(2 * (x * y - w * z), 1 - 2 * (y * y + z * z)) * D;          // the camera's right vector is (cos az, sin az, 0)
+  return { az: Math.round(az * 10) / 10 + 0, el: Math.round(el * 10) / 10 + 0, zoom: Math.round(v.zoom * 1000) / 1000 };
+}
+const fmtGap = (v) => v == null ? 'n/a' : Number.isNaN(v) ? 'not finite' : v < 1e-12 ? '0' : v < 1e-3 ? v.toExponential(1) : v.toFixed(4);
+const r4 = (v) => Math.round(v * 1e4) / 1e4;
+
+// ---- the tile and its fold --------------------------------------------------------------------------------------
+
+function buildTile() {
+  const { BY_ID, makeWarp, buildDomain, buildMesh } = core;
+  const group = BY_ID[state.g];
+  const presetIndex = Math.min(group.presets.length - 1, Math.max(0, state.preset));
+  const preset = group.presets[presetIndex];
+  const warp = makeWarp(group, state.amp);
+  const domain = buildDomain(group, { seed: state.seed || preset.seed, metric: preset.metric, warp });
+  const mesh = buildMesh(group, domain, state.density ? { density: state.density } : {});
+  return { group, presetIndex, preset, domain, mesh };
+}
+
+/** The anchor handed to the fold (SPEC 7): state.anchor with 'preset' resolved as the app does (contract C3:
+ *  preset.anchor ?? preset.seed); null for none. */
+function currentAnchor(tile) {
+  if (state.anchor === 'preset') return (tile.preset.anchor || tile.preset.seed).slice();
+  return Array.isArray(state.anchor) ? state.anchor.slice() : null;
+}
+
+const flatFn = (x, y, cell, out) => { out[0] = x; out[1] = y; out[2] = 0; return out; };
+const builtInFlat = (mesh) => ({ mesh, stops: [{ t: 0, label: 'flat' }, { t: 1, label: 'flat' }], duration: 4, at: () => flatFn });
+
+const modules = new Map();     // url -> promise of the module (failures are remembered too: reload the page to retry)
+function importFold(url) {
+  if (!modules.has(url)) {
+    modules.set(url, (async () => {
+      let status = 0;
+      try { status = (await fetch(url, { cache: 'no-store' })).status; } catch (e) { /* let import() say what is wrong */ }
+      if (status === 404) throw Object.assign(new Error('is not there yet (HTTP 404)'), { plain: true });
+      return import(url);
+    })());
+  }
+  return modules.get(url);
+}
+
+/** -> { fold, label, fallback, error }: the group's fold, or the built-in flat one with the reason. Never throws. */
+async function makeFold(tile) {
+  const { group, domain, mesh } = tile;
+  let url, label;
+  if (state.fold === 'flat') { url = new URL('./fold-flat.js', location.href).href; label = 'dev/fold-flat.js'; }
+  else if (state.fold) { url = new URL(state.fold, location.href).href; label = state.fold; }
+  else {
+    const file = FOLD_FILE[group.fold];
+    if (!file) return { fold: builtInFlat(mesh), label: 'none', fallback: true, error: `no fold module is known for fold type "${group.fold}"` };
+    url = new URL('../src/folds/' + file, location.href).href; label = 'src/folds/' + file;
+  }
+  const fail = (why) => ({ fold: builtInFlat(mesh), label, fallback: true, error: `${label} ${why}\n→ drawing the flat tile for every t` });
+  let mod;
+  try { mod = await importFold(url); } catch (e) {
+    const d = describe(e);
+    if (e && e.plain) return fail(d);
+    // a browser does not say where a syntax error in an imported module is; node does
+    return fail('does not load: ' + d + (e instanceof SyntaxError ? '\n  (node --check <file> on the module, or on the one it imports, gives the line)' : ''));
+  }
+  if (!mod || typeof mod.default !== 'function') return fail('has no default export createFold(group, domain, mesh, opts)');
+  let fold;
+  const opts = { ...state.opts }, anchor = currentAnchor(tile);
+  if (anchor) opts.anchor = anchor;
+  try { fold = await mod.default(group, domain, mesh, opts); } catch (e) { return fail(`— createFold threw for ${group.id}: ` + describe(e)); }
+  if (!fold || typeof fold.at !== 'function') return fail(`— createFold returned ${fold === null ? 'null' : typeof fold} without an at(t) function`);
+  // SPEC 5.6: the cross-cap may export doubleLine(t), the polyline of its self-intersection (a field of the fold, or of the module)
+  const doubleLine = typeof fold.doubleLine === 'function' ? (t) => fold.doubleLine(t) : typeof mod.doubleLine === 'function' ? (t) => mod.doubleLine(t) : null;
+  return { fold, label, fallback: false, error: '', doubleLine };
+}
+
+/** Whatever a fold calls a polyline -> [Float32Array(3k), ...]: a flat array of numbers, [[x, y, z], ...], { points }, or a list of those. */
+function toPolylines(v) {
+  if (!v) return [];
+  if (ArrayBuffer.isView(v)) return v.length >= 6 ? [Float32Array.from(v)] : [];
+  if (Array.isArray(v)) {
+    if (!v.length) return [];
+    if (typeof v[0] === 'number') return v.length >= 6 ? [Float32Array.from(v)] : [];
+    if ((Array.isArray(v[0]) || ArrayBuffer.isView(v[0])) && v[0].length === 3 && typeof v[0][0] === 'number') return [Float32Array.from(v.flatMap((p) => [p[0], p[1], p[2]]))];
+    return v.flatMap(toPolylines);
+  }
+  return v.points ? toPolylines(v.points) : [];
+}
+
+function nearestSample(pts, x, y) {
+  let best = 0, bd = Infinity;
+  for (let k = 0, m = pts.length / 2; k < m; k++) { const dx = pts[2 * k] - x, dy = pts[2 * k + 1] - y, d = dx * dx + dy * dy; if (d < bd) { bd = d; best = k; } }
+  return best;
+}
+
+/** Everything that does not depend on t. Throws if fold.mesh cannot be drawn. */
+function prepareScene(tile, made) {
+  const { hexToRgb, classColor, MIRROR_COLOR, CREASE_COLOR, INK, inverse, apply } = core;
+  const { domain } = tile, fold = made.fold;
+  const notes = [];
+  let M = fold.mesh;
+  if (!M) { M = tile.mesh; if (!made.fallback) notes.push('fold.mesh is missing: drawing the mesh that was passed in'); }
+  if (!M.xy || !M.tri || M.tri.length % 3) throw new Error('fold.mesh needs xy: Float32Array(2n) and tri: Uint32Array(3m)');
+  const n = Number.isInteger(M.n) ? M.n : (M.xy.length / 2) | 0;
+  if (M.xy.length < 2 * n) throw new Error(`fold.mesh.xy has ${M.xy.length} numbers for n = ${n} vertices`);
+  let cellOf = M.cell;
+  if (!cellOf || cellOf.length < n) { cellOf = new Uint16Array(n); notes.push('fold.mesh.cell is missing: every vertex is given cell 0'); }
+  if (M.tint && M.tint.length < n) notes.push('fold.mesh.tint is shorter than n: ignored');
+
+  const INK_RGB = hexToRgb(MIRROR_COLOR), GREY = hexToRgb(CREASE_COLOR);
+  const boundary = Array.isArray(M.boundary) ? M.boundary.filter((b) => b && b.pts && b.pts.length >= 2) : [];
+  if (!boundary.length) notes.push('fold.mesh.boundary is empty: no tile outline');
+  else if (boundary.some((b) => !b.cells || b.cells.length < b.pts.length >> 1)) notes.push('a fold.mesh.boundary entry has no `cells`: its points are given cell 0, and the seam gap skips it');
+
+  // boundary: one polyline per edge
+  const edges = boundary.map((b) => {
+    const e = domain.edges[b.edge];
+    const kind = b.kind || (e && e.kind) || 'mirror', cls = b.cls != null ? b.cls : (e ? e.cls : -1);
+    const mirror = kind === 'mirror' || !(cls >= 0);
+    return { b, mirror, line: { points: new Float32Array(3 * (b.pts.length >> 1)), color: mirror ? INK_RGB : hexToRgb(classColor(cls)), width: EDGE_WIDTH } };
+  });
+  // creases: each hinge segment, subdivided (a fold may bend it), as a point of the child piece
+  const creases = (Array.isArray(M.creases) ? M.creases : []).filter((c) => c && c.pts && c.pts.length >= 4).map((c) => {
+    const xy = new Float64Array(2 * CREASE_SAMPLES);
+    for (let k = 0; k < CREASE_SAMPLES; k++) {
+      const u = k / (CREASE_SAMPLES - 1);
+      xy[2 * k] = (1 - u) * c.pts[0] + u * c.pts[2]; xy[2 * k + 1] = (1 - u) * c.pts[1] + u * c.pts[3];
+    }
+    return { xy, cell: c.b != null ? c.b : (c.a != null ? c.a : 0), line: { points: new Float32Array(3 * CREASE_SAMPLES), color: GREY, width: CREASE_WIDTH, dashed: true } };
+  });
+  // cone points: they lie on the tile boundary; each takes the piece of the nearest boundary sample
+  const cones = (domain.conePoints || []).map((c) => {
+    let cell = 0, bd = Infinity;
+    for (const b of boundary) {
+      if (!b.cells) continue;
+      const k = nearestSample(b.pts, c.x, c.y), d = Math.hypot(b.pts[2 * k] - c.x, b.pts[2 * k + 1] - c.y);
+      if (d < bd) { bd = d; cell = b.cells[k]; }
+    }
+    if (bd === Infinity && typeof M.locate === 'function') cell = M.locate(c.x, c.y);
+    return { x: c.x, y: c.y, cell, marker: { p: [c.x, c.y, 0], color: INK, size: c.onMirror ? 12 : 11, shape: c.onMirror ? 'ring' : 'dot', label: (c.onMirror ? '∗' : '') + c.order } };
+  });
+  // glued boundary samples: x on edge i, x' = g_i^-1 x on its partner j, each with the piece its own edge gives it
+  const pairs = [];
+  const byEdge = new Map(boundary.map((b) => [b.edge, b]));
+  const tmp = [0, 0];
+  domain.edges.forEach((e, i) => {
+    if (e.kind !== 'cut' || e.partner < i) return;                 // each glued pair once; a half-turn edge is its own partner
+    const bi = byEdge.get(i), bj = byEdge.get(e.partner);
+    if (!bi || !bj || !bi.cells || !bj.cells || bi.cells.length < bi.pts.length >> 1 || bj.cells.length < bj.pts.length >> 1) return;
+    const m = bi.pts.length >> 1, gi = inverse(e.g);
+    const P = { edge: i, m, a: new Float64Array(2 * m), b: new Float64Array(2 * m), ca: new Uint16Array(m), cb: new Uint16Array(m) };
+    for (let k = 0; k < m; k++) {
+      const x = bi.pts[2 * k], y = bi.pts[2 * k + 1];
+      apply(gi, x, y, tmp);
+      P.a[2 * k] = x; P.a[2 * k + 1] = y; P.ca[k] = bi.cells[k];
+      P.b[2 * k] = tmp[0]; P.b[2 * k + 1] = tmp[1]; P.cb[k] = bj.cells[nearestSample(bj.pts, tmp[0], tmp[1])];
+    }
+    pairs.push(P);
+  });
+
+  // SPEC 7: the cell the closed shape sits on, drawn flat at z = 0 as a fixed reference (when the fold took an anchor)
+  const kin = fold.kinematics, group = tile.group;
+  let anchorLine = null;
+  if (state.anchorCell && kin && kin.anchor && kin.anchorIso && group.kaleido) {
+    const T = group.kaleido.cell, g = kin.anchorIso, pts = new Float32Array(3 * (T.length + 1));
+    for (let k = 0; k <= T.length; k++) {
+      const p = T[k % T.length];
+      pts[3 * k] = g.a * p[0] + g.b * p[1] + g.tx; pts[3 * k + 1] = g.c * p[0] + g.d * p[1] + g.ty; pts[3 * k + 2] = 0;
+    }
+    anchorLine = { points: pts, color: hexToRgb('#9a9aa2'), width: 1.4, xray: 0.5 };
+  }
+
+  let stops = Array.isArray(fold.stops) ? fold.stops.filter((s) => s && Number.isFinite(s.t)).map((s) => ({ t: s.t, label: String(s.label == null ? '' : s.label) })) : [];
+  if (!made.fallback && !(stops.some((s) => s.t === 0) && stops.some((s) => s.t === 1))) notes.push('fold.stops must include t = 0 and t = 1');
+  if (!stops.length) stops = [{ t: 0, label: 'flat' }, { t: 1, label: 'closed' }];
+  let duration = fold.duration;
+  if (!(duration > 0)) { duration = 5; if (!made.fallback) notes.push('fold.duration is missing (seconds for a full play)'); }
+
+  return { tile, fold, label: made.label, fallback: made.fallback, doubleLine: made.doubleLine || null, inkRgb: INK_RGB,
+    M, n, cellOf, cellCount: Array.isArray(M.cells) ? M.cells.length : 0,
+    pos: new Float32Array(3 * n), edges, creases, cones, pairs, stops, duration, notes,
+    anchor: kin && kin.anchor ? kin.anchor.slice() : null, walk: kin && Array.isArray(kin.walk) ? kin.walk.length : null, mirrored: kin ? !!kin.mirrored : null,
+    lines: [...(anchorLine ? [anchorLine] : []), ...creases.map((c) => c.line), ...edges.filter((e) => !e.mirror).map((e) => e.line), ...edges.filter((e) => e.mirror).map((e) => e.line)] };
+}
+
+/** Positions, lines, markers and the seam gap for the map F. Throws only if F throws. */
+function mapScene(s, F) {
+  const out = [0, 0, 0];
+  const xy = s.M.xy, pos = s.pos, cellOf = s.cellOf, n = s.n;
+  let nonFinite = 0, badLine = 0;
+  let x0 = Infinity, y0 = Infinity, z0 = Infinity, x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+  for (let v = 0, j = 0, k = 0; v < n; v++, j += 2, k += 3) {
+    const x = xy[j], y = xy[j + 1];
+    out[0] = out[1] = out[2] = NaN;                 // a component the fold forgets to write shows up as not finite
+    F(x, y, cellOf[v], out);
+    let px = out[0], py = out[1], pz = out[2];
+    if (!Number.isFinite(px + py + pz)) { nonFinite++; px = x; py = y; pz = 0; }
+    pos[k] = px; pos[k + 1] = py; pos[k + 2] = pz;
+    if (px < x0) x0 = px; if (px > x1) x1 = px; if (py < y0) y0 = py; if (py > y1) y1 = py; if (pz < z0) z0 = pz; if (pz > z1) z1 = pz;
+  }
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, cz = (z0 + z1) / 2;
+  let r2 = 0;
+  for (let k = 0; k < 3 * n; k += 3) { const dx = pos[k] - cx, dy = pos[k + 1] - cy, dz = pos[k + 2] - cz, d = dx * dx + dy * dy + dz * dz; if (d > r2) r2 = d; }
+  const frame = n ? { center: [cx, cy, cz], radius: Math.sqrt(r2) || 1 } : null;
+
+  const put = (x, y, cell, arr, o) => {
+    out[0] = out[1] = out[2] = NaN;
+    F(x, y, cell, out);
+    if (!Number.isFinite(out[0] + out[1] + out[2])) badLine++;
+    arr[o] = out[0]; arr[o + 1] = out[1]; arr[o + 2] = out[2];     // the renderer skips points that are not finite
+  };
+  for (const e of s.edges) {
+    const p = e.b.pts, c = e.b.cells, o = e.line.points;
+    for (let k = 0, m = p.length >> 1; k < m; k++) put(p[2 * k], p[2 * k + 1], c && k < c.length ? c[k] : 0, o, 3 * k);
+  }
+  for (const c of s.creases) for (let k = 0; k < CREASE_SAMPLES; k++) put(c.xy[2 * k], c.xy[2 * k + 1], c.cell, c.line.points, 3 * k);
+  for (const c of s.cones) put(c.x, c.y, c.cell, c.marker.p, 0);
+
+  let seamGap = null, seamGapEdge = -1, seamBad = 0;
+  if (s.pairs.length) {
+    seamGap = 0;
+    const o2 = [0, 0, 0];
+    for (const P of s.pairs) {
+      for (let k = 0; k < P.m; k++) {
+        out[0] = out[1] = out[2] = NaN; o2[0] = o2[1] = o2[2] = NaN;
+        F(P.a[2 * k], P.a[2 * k + 1], P.ca[k], out);
+        F(P.b[2 * k], P.b[2 * k + 1], P.cb[k], o2);
+        const d = Math.hypot(out[0] - o2[0], out[1] - o2[1], out[2] - o2[2]);
+        if (!Number.isFinite(d)) seamBad++; else if (d > seamGap) { seamGap = d; seamGapEdge = P.edge; }
+      }
+    }
+    seamGap = seamBad ? NaN : seamGap / s.tile.domain.size;      // no number is better than one from the finite points only
+  }
+  return { nonFinite, badLine, seamGap, seamGapEdge, frame };
+}
+
+/** Draw the scene at state.t. `immediate`: the camera frame jumps (a new scene, a programmatic step) instead of easing. */
+function draw(immediate, fresh = false) {
+  if (!R || !scene) { showError(); updateHud(); return; }
+  const s = scene, tt = String(Math.round(state.t * 1e4) / 1e4);
+  errs.frame = '';
+  let F = flatFn, flatFrame = true;
+  if (!s.fallback) {
+    try {
+      const f = s.fold.at(state.t);
+      if (typeof f !== 'function') throw new Error('at(t) must return a function (x, y, cell, out); it returned ' + (f === null ? 'null' : typeof f));
+      F = f; flatFrame = false;
+    } catch (e) { errs.frame = `${s.label} — at(${tt}) threw: ${describe(e)}\n→ this frame is drawn flat`; }
+  }
+  let res;
+  try { res = mapScene(s, F); } catch (e) {
+    errs.frame = `${s.label} — the function returned by at(${tt}) threw: ${describe(e)}\n→ this frame is drawn flat`;
+    res = mapScene(s, flatFn); flatFrame = true;
+  }
+  let lines = s.lines;
+  if (s.doubleLine && !flatFrame) {
+    try {
+      const extra = toPolylines(s.doubleLine(state.t)).map((points) => ({ points, color: s.inkRgb, width: 2.2, dashed: true, xray: 0.7 }));
+      if (extra.length) lines = lines.concat(extra);
+      res.doubleLine = extra.reduce((k, l) => k + l.points.length / 3, 0);
+    } catch (e) { errs.frame = `${s.label} — doubleLine(${tt}) threw: ${describe(e)}`; }
+  }
+  if (res.nonFinite || res.badLine) {
+    errs.frame = (errs.frame ? errs.frame + '\n' : '') + `${s.label} — at(${tt}): ${res.nonFinite} of ${s.n} vertices` +
+      (res.badLine ? ` and ${res.badLine} boundary / crease / cone points` : '') +
+      ' are not finite (NaN, Infinity, or a component of `out` never written)\n→ those vertices are drawn at their flat position';
+  }
+  last = res;
+  if (fresh) R.setSurface({ positions: s.pos, indices: s.M.tri, tint: s.M.tint && s.M.tint.length >= s.n ? s.M.tint : undefined });
+  else R.updatePositions(s.pos);
+  if (frameOverride) R.setFrame(frameOverride, true);
+  else if (res.frame) R.setFrame(res.frame, immediate);
+  if (lineScale !== 1) lines = lines.map((l) => ({ ...l, width: Math.max(1.1, l.width * lineScale) }));
+  R.setLines(lines);
+  R.setMarkers(s.cones.map((c) => lineScale === 1 ? c.marker : { ...c.marker, size: c.marker.size * Math.max(0.7, lineScale) }));
+  R.render();
+  showError();
+  updateHud();
+}
+
+async function rebuild() {
+  errs.build = errs.load = errs.frame = '';
+  let tile;
+  try { tile = buildTile(); } catch (e) {
+    errs.build = `the tile of ${state.g} cannot be built (src/domain.js, src/mesh.js): ` + describe(e);
+    scene = null;
+    R.setSurface({}); R.setLines([]); R.setMarkers([]); R.render();
+    syncControls(); showError(); updateHud();
+    return;
+  }
+  let made = await makeFold(tile);
+  errs.load = made.error;
+  try { scene = prepareScene(tile, made); } catch (e) {
+    errs.load = `${made.label} — its mesh cannot be drawn: ${describe(e)}\n→ drawing the flat tile for every t`;
+    made = { fold: builtInFlat(tile.mesh), label: made.label, fallback: true, error: errs.load };
+    scene = prepareScene(tile, made);
+  }
+  // SPEC 7: a tile whose paper ends up turned over in the closed shape (fold.mirrored: across a mirror of the group from
+  // the anchor) is drawn with front and back swapped, so the closed shape keeps its colours while the seed crosses the
+  // mirror; the flat tile then shows its back (it is the mirror image). &sides=paper keeps the paper's own sides.
+  const swap = !!(scene.fold && scene.fold.mirrored) && q.get('sides') !== 'paper';
+  if (swap !== sidesSwapped) {
+    sidesSwapped = swap;
+    R.setStyle({ front: swap ? core.palette.SURFACE_BACK : core.palette.SURFACE_FRONT, back: swap ? core.palette.SURFACE_FRONT : core.palette.SURFACE_BACK });
+  }
+  syncControls();
+  draw(true, true);
+}
+
+// ---- readout and controls ---------------------------------------------------------------------------------------
+
+function summary() {
+  const s = scene, stop = s ? s.stops.find((st) => Math.abs(st.t - state.t) < 5e-4) : null;
+  return {
+    g: state.g, preset: s ? s.tile.presetIndex : state.preset, cut: s ? (state.seed ? 'custom seed' : s.tile.preset.name) : null,
+    seed: s ? s.tile.domain.seed.map(r4) : null, amp: state.amp, t: state.t, stop: stop ? stop.label : null,
+    anchor: s && s.anchor ? s.anchor.map(r4) : null, walk: s ? s.walk : null, mirrored: s ? s.mirrored : null,
+    foldType: s ? s.tile.group.fold : null, module: s ? s.label : null, flat: s ? s.fallback : null, opts: state.opts,
+    stops: s ? s.stops : [], duration: s ? s.duration : null,
+    triangles: s ? s.M.tri.length / 3 : 0, vertices: s ? s.n : 0, pieces: s ? s.cellCount : 0,
+    seamGap: Number.isNaN(last.seamGap) ? 'not finite' : last.seamGap, seamGapEdge: last.seamGapEdge, nonFinite: last.nonFinite,
+    frame: last.frame ? { center: last.frame.center.map(r4), radius: r4(last.frame.radius) } : null,
+    view: R && R.ok ? viewAngles() : null, error: currentError(),
+  };
+}
+
+function updateHud() {
+  const hud = $('hud');
+  if (!core) { hud.textContent = ''; return; }
+  const group = core.BY_ID[state.g], s = scene;
+  let html = `<div><b class="sym">${esc(group.label)}</b> <b>${esc(group.hm)}</b> · ${esc(group.shape)}`;
+  if (s) {
+    const P = s.tile.group.presets.length;
+    html += ` · cut <b>${esc(state.seed ? 'custom seed ' + s.tile.domain.seed.map(r4).join(', ') : s.tile.preset.name)}</b>` +
+      (state.seed ? '' : ` (preset ${s.tile.presetIndex} of ${P})`) + ` · wavy ${state.amp}` +
+      (s.anchor ? ` · anchor <b>${esc(s.anchor.map(r4).join(', '))}</b> (walk ${s.walk} line${s.walk === 1 ? '' : 's'}${s.mirrored ? ', folds the other way round' : ''})` :
+        state.anchor ? ' · <span class="warn">the fold ignores the anchor</span>' : '') + `</div>`;
+    const stop = s.stops.find((st) => Math.abs(st.t - state.t) < 5e-4);
+    html += `<div>${sheetOpen && sheetInfo ? (sheetInfo.seeds ? `<b>seed sheet</b>: ${sheetInfo.seeds} seeds at t = ${sheetInfo.t}, one camera frame (click it for the live view)` : `<b>sheet</b>: ${sheetInfo.times} times × ${sheetInfo.views} directions (click it for the live view)`) : `t = <b>${state.t.toFixed(3)}</b>${stop && stop.label ? ' (' + esc(stop.label) + ')' : ''}`} · fold type <b>${esc(group.fold)}</b> · ` +
+      (s.fallback ? `<span class="warn">FLAT stand-in</span> for ${esc(s.label)}` : `<b>${esc(s.label)}</b>`) +
+      (Object.keys(state.opts).length ? ` · opts ${esc(JSON.stringify(state.opts))}` : '') +
+      ` · stops ${s.stops.map((st) => r4(st.t)).join(', ')} · ${r4(s.duration)} s</div>`;
+    const v = R && R.ok ? viewAngles() : null;
+    html += `<div>${s.M.tri.length / 3} triangles, ${s.n} vertices${s.cellCount ? ', ' + s.cellCount + (s.cellCount === 1 ? ' piece' : ' pieces') : ''} · ` +
+      (sheetOpen ? 'seam gap in tile sizes, per panel' : `seam gap <b>${fmtGap(last.seamGap)}</b>${last.seamGap == null ? ' (no glued edges)' : Number.isNaN(last.seamGap) ? '' : ' tile sizes' + (last.seamGap > 1e-6 && last.seamGapEdge >= 0 ? ' (worst: edge ' + last.seamGapEdge + ')' : '')}` +
+      (last.doubleLine ? ` · double line ${last.doubleLine} points` : '') +
+      (v ? ` · view az ${v.az}° el ${v.el}°${v.zoom !== 1 ? ' zoom ' + v.zoom : ''}` : '')) + '</div>';
+    if (s.notes.length) html += `<div class="warn">${s.notes.map(esc).join(' · ')}</div>`;
+  } else html += '</div>';
+  hud.innerHTML = html;
+}
+
+function syncControls() {
+  if (!core) return;
+  const selG = $('selG'), selP = $('selP');
+  if (selG.value !== state.g) selG.value = state.g;
+  const group = core.BY_ID[state.g];
+  const want = group.presets.map((p, i) => i + ' · ' + p.name).concat(state.seed ? ['custom seed'] : []);
+  if (selP.dataset.sig !== state.g + '|' + want.join('|')) {
+    selP.textContent = '';
+    want.forEach((txt, i) => { const o = document.createElement('option'); o.value = i < group.presets.length ? String(i) : 'seed'; o.textContent = txt; selP.appendChild(o); });
+    selP.dataset.sig = state.g + '|' + want.join('|');
+  }
+  selP.value = state.seed ? 'seed' : String(Math.min(group.presets.length - 1, state.preset));
+  $('amp').value = String(state.amp); $('ampOut').textContent = String(Math.round(state.amp * 100) / 100);
+  const stops = scene ? scene.stops : [];
+  const sig = stops.map((s) => s.t).join(',');
+  const dl = $('stops');
+  if (dl.dataset.sig !== sig) {
+    dl.textContent = '';
+    for (const s of stops) { const o = document.createElement('option'); o.value = String(Math.round(s.t * 1000)); dl.appendChild(o); }
+    dl.dataset.sig = sig;
+  }
+  syncT();
+}
+function syncT() {
+  $('t').value = String(Math.round(state.t * 1000));
+  $('tOut').textContent = state.t.toFixed(3);
+  $('play').textContent = playing ? 'Pause' : (state.t >= 0.9995 ? 'Unfold' : 'Fold');
+}
+
+// ---- playing ------------------------------------------------------------------------------------------------------
+
+let playing = null;
+function stopPlay() { if (playing) { const p = playing; playing = null; p.finish(); } }
+function play(target) {
+  stopPlay();
+  if (!scene) return Promise.resolve(summary());
+  const from = state.t;
+  const to = target == null ? (from >= 0.9995 ? 0 : 1) : clamp01(target);
+  const ms = Math.max(1, 1000 * scene.duration * Math.abs(to - from));
+  return new Promise((resolve) => {
+    const me = { finish() { syncT(); resolve(summary()); } };
+    let t0 = 0;
+    const tick = (now) => {
+      if (playing !== me) return;
+      if (!t0) t0 = now;
+      const u = Math.min(1, (now - t0) / ms);
+      state.t = from + (to - from) * u;
+      draw(false);
+      if (u < 1) { syncT(); requestAnimationFrame(tick); } else { playing = null; me.finish(); }
+    };
+    playing = me;
+    syncT();
+    requestAnimationFrame(tick);
+  });
+}
+
+// ---- the sheet: several t and two directions in one picture -------------------------------------------------------
+
+let sheetOpen = false;
+/** The fold's stops, with the widest gaps halved until there are five times. */
+function sheetTimes() {
+  let ts = [...new Set([0, 1, ...(scene ? scene.stops.map((s) => s.t) : [])])].filter((t) => t >= 0 && t <= 1).sort((a, b) => a - b);
+  while (ts.length < 5) {
+    let k = 0;
+    for (let i = 1; i < ts.length - 1; i++) if (ts[i + 1] - ts[i] > ts[k + 1] - ts[k] + 1e-9) k = i;
+    ts.splice(k + 1, 0, (ts[k] + ts[k + 1]) / 2);
+  }
+  if (ts.length > 8) ts = Array.from({ length: 8 }, (_, i) => ts[Math.round(i * (ts.length - 1) / 7)]);
+  return ts;
+}
+function closeSheet() {
+  if (!sheetOpen) return;
+  sheetOpen = false; sheetInfo = null;
+  $('sheet').style.display = 'none';
+  draw(true);
+}
+/** Draw every (view, t) with the one renderer, at panel size, and copy each picture into the sheet canvas. */
+function renderSheet(opts) {
+  if (!R || !R.ok || !scene) return { sheet: false, error: currentError() };
+  stopPlay();
+  if (Array.isArray(opts)) opts = { t: opts };
+  const keep = { view: R.getView(), t: state.t }, a = viewAngles();
+  const ts = opts && Array.isArray(opts.t) && opts.t.length ? opts.t.map(clamp01) : sheetTimes();
+  const views = (opts && Array.isArray(opts.views) && opts.views.length ? opts.views : [[a.az, a.el], [a.az + 110, 18]])
+    .map((v) => [Number(v[0]) || 0, Number.isFinite(Number(v[1])) ? Number(v[1]) : 55]);
+  const stage = $('stage'), gl = $('c'), sheet = $('sheet');
+  const W = stage.clientWidth, H = stage.clientHeight;
+  const across = W >= H;                                   // the times run across a wide stage, down a tall one
+  const cols = across ? ts.length : views.length, rows = across ? views.length : ts.length;
+  const pw = Math.floor(W / cols), ph = Math.floor(H / rows);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  sheet.width = Math.round(W * dpr); sheet.height = Math.round(H * dpr);
+  const ctx = sheet.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  gl.style.width = pw + 'px'; gl.style.height = ph + 'px';
+  R.resize();
+  lineScale = Math.min(1, Math.max(0.55, Math.min(pw, ph) / 520));      // a small panel is a miniature: thinner lines
+  const panels = [], problems = [];
+  const text = (str, x, y, font, color) => {
+    ctx.font = font; ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.strokeText(str, x, y); ctx.fillStyle = color; ctx.fillText(str, x, y);
+  };
+  const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  views.forEach((view, vi) => ts.forEach((t, ti) => {
+    const x = (across ? ti : vi) * pw, y = (across ? vi : ti) * ph;
+    R.setView({ az: view[0], el: view[1], zoom: keep.view.zoom });
+    state.t = t;
+    draw(true);                                            // renders now; the drawing buffer is still there for drawImage
+    ctx.drawImage(gl, x, y, pw, ph);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(x, y, pw, ph); ctx.clip();
+    for (const c of scene.cones) {                          // the labels are HTML in the live view: write them here
+      const pr = R.project(c.marker.p);
+      if (pr[2]) text(c.marker.label, x + pr[0] + 6, y + pr[1] - 5, '600 12px ' + FONT, '#1a1a1f');
+    }
+    const stop = scene.stops.find((st) => Math.abs(st.t - t) < 5e-4);
+    text('t = ' + (Math.round(t * 1000) / 1000) + (stop && stop.label ? ' · ' + stop.label : ''), x + 7, y + 16, '600 12px ' + FONT, '#1a1a1f');
+    text((last.seamGap == null ? '' : 'seam gap ' + fmtGap(last.seamGap)) + (last.nonFinite ? '  ·  ' + last.nonFinite + ' not finite' : '') + (errs.frame && !last.nonFinite ? '  ·  error: see corner' : ''),
+      x + 7, y + 31, '11px ' + FONT, '#52514a');
+    if (ti === 0) {                                         // the direction of this row (top right: the error corner is bottom left)
+      ctx.textAlign = 'right';
+      text(`az ${Math.round(view[0])}° el ${Math.round(view[1])}°`, x + pw - 7, y + 31, '11px ' + FONT, '#52514a');
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+    ctx.strokeStyle = '#e5e5ea'; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, pw - 1, ph - 1);
+    panels.push({ t, az: view[0], el: view[1], seamGap: Number.isNaN(last.seamGap) ? 'not finite' : last.seamGap, nonFinite: last.nonFinite });
+    if (errs.frame) problems.push(errs.frame);
+  }));
+  lineScale = 1;
+  gl.style.width = ''; gl.style.height = '';
+  R.resize();
+  R.setView(keep.view); state.t = keep.t;
+  sheet.style.display = 'block';
+  sheetOpen = true;
+  sheetInfo = { times: ts.length, views: views.length };
+  draw(true);
+  errs.frame = [...new Set(problems)].join('\n');           // what went wrong in any panel stays in the corner
+  showError();
+  return { sheet: true, t: ts, views, panel: [pw, ph], panels, error: currentError() };
+}
+
+// ---- the seed sheet: the seed moving along a path, one panel per seed, at one t, from one direction ------------------
+
+/** n seeds evenly spaced (by arclength) along the polyline pts, both ends included. */
+function pathSeeds(pts, n) {
+  const L = [0];
+  for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const total = L[L.length - 1], out = [];
+  for (let k = 0; k < n; k++) {
+    const s = n === 1 ? 0 : (total * k) / (n - 1);
+    let i = 1;
+    while (i < pts.length - 1 && L[i] < s) i++;
+    const u = L[i] > L[i - 1] ? Math.min(1, Math.max(0, (s - L[i - 1]) / (L[i] - L[i - 1]))) : 0;
+    out.push([pts[i - 1][0] + u * (pts[i][0] - pts[i - 1][0]), pts[i - 1][1] + u * (pts[i][1] - pts[i - 1][1])]);
+  }
+  return out;
+}
+/** A sphere holding all the given spheres (centre: the middle of their bounding box). */
+function unionFrame(frames) {
+  const fs = frames.filter(Boolean);
+  if (!fs.length) return null;
+  const lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+  for (const f of fs) for (let k = 0; k < 3; k++) { lo[k] = Math.min(lo[k], f.center[k] - f.radius); hi[k] = Math.max(hi[k], f.center[k] + f.radius); }
+  const c = lo.map((v, k) => (v + hi[k]) / 2);
+  let r = 0;
+  for (const f of fs) r = Math.max(r, Math.hypot(f.center[0] - c[0], f.center[1] - c[1], f.center[2] - c[2]) + f.radius);
+  return { center: c, radius: r };
+}
+
+/** The small map of the plane in a panel of the seed sheet. */
+function drawSeedMap(ctx, x, y, w, h, map, panel, seeds, k) {
+  const { win } = map, sc = Math.min(w, h) / (2 * win.half);
+  const X = (px) => x + w / 2 + (px - win.cx) * sc, Y = (py) => y + h / 2 - (py - win.cy) * sc;
+  ctx.save();
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
+  ctx.fillStyle = 'rgba(255,255,255,0.94)'; ctx.fillRect(x, y, w, h);
+  if (panel.c0) {                                   // the anchor's cell: where the closed shape sits
+    ctx.beginPath(); panel.c0.forEach((p, i) => (i ? ctx.lineTo(X(p[0]), Y(p[1])) : ctx.moveTo(X(p[0]), Y(p[1])))); ctx.closePath();
+    ctx.fillStyle = map.accentSoft; ctx.fill();
+  }
+  for (const s of map.segs) {                      // the kaleidoscope's lines: creases grey, mirrors of the group ink
+    ctx.beginPath(); ctx.moveTo(X(s[0]), Y(s[1])); ctx.lineTo(X(s[2]), Y(s[3]));
+    ctx.strokeStyle = s[4] ? '#c4c4ca' : '#1a1a1f'; ctx.lineWidth = s[4] ? 1 : 1.6; ctx.stroke();
+  }
+  for (const e of panel.outline) {                 // the tile, its edges in their seam colours
+    ctx.beginPath();
+    for (let j = 0; j < e.pts.length / 2; j++) { const px = X(e.pts[2 * j]), py = Y(e.pts[2 * j + 1]); if (j) ctx.lineTo(px, py); else ctx.moveTo(px, py); }
+    ctx.strokeStyle = e.mirror ? '#1a1a1f' : map.classColor(e.cls); ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
+  }
+  ctx.beginPath(); seeds.forEach((s, i) => (i ? ctx.lineTo(X(s[0]), Y(s[1])) : ctx.moveTo(X(s[0]), Y(s[1]))));
+  ctx.strokeStyle = map.accent; ctx.lineWidth = 1.2; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]);
+  if (panel.anchor) { ctx.beginPath(); ctx.arc(X(panel.anchor[0]), Y(panel.anchor[1]), 4.5, 0, 2 * Math.PI); ctx.strokeStyle = '#1a1a1f'; ctx.lineWidth = 1.6; ctx.stroke(); }
+  const s = seeds[k];
+  ctx.beginPath(); ctx.arc(X(s[0]), Y(s[1]), 4, 0, 2 * Math.PI); ctx.fillStyle = map.accent; ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.restore();
+  ctx.strokeStyle = '#d0d0d6'; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, w - 1, h - 1);
+}
+
+/**
+ * The seed sheet: one panel per seed (the seed moving along a path) at one t and one direction, all with ONE camera
+ * frame (so a shape that stays put stays put on the sheet), each with a small map of the plane. Restores seed and t.
+ */
+async function renderSeedSheet(opts = {}) {
+  if (!R || !R.ok || !scene) return { sheet: false, error: currentError() };
+  stopPlay();
+  let seeds = Array.isArray(opts.seeds) && opts.seeds.length ? opts.seeds : null;
+  if (!seeds && Array.isArray(opts.path) && opts.path.length >= 2) seeds = pathSeeds(opts.path, Math.max(1, Math.round(Number(opts.n) || 8)));
+  if (!seeds) return { sheet: false, error: 'seedSheet: give seeds: [[x, y], ..] or path: [[x0, y0], [x1, y1], ..]' };
+  seeds = seeds.map((s) => [Number(s[0]), Number(s[1])]).filter((s) => Number.isFinite(s[0] + s[1]));
+  const keep = { seed: state.seed, t: state.t, view: R.getView() }, a = viewAngles();
+  const t = opts.t == null ? state.t : clamp01(opts.t);
+  const view = Array.isArray(opts.view) ? [Number(opts.view[0]) || 0, Number.isFinite(Number(opts.view[1])) ? Number(opts.view[1]) : 55] : [a.az, a.el];
+  const { BY_ID, elementsNear, classColor, palette } = core;
+  const group = BY_ID[state.g];
+  // pass 1: every panel's tile and fold, for the common camera frame and the window of the maps
+  const panels = [];
+  for (const s of seeds) {
+    state.seed = s; state.t = t;
+    await rebuild();
+    if (!scene) continue;
+    const dom = scene.tile.domain, kin = scene.fold && scene.fold.kinematics;
+    panels.push({
+      seed: s, frame: last.frame, anchor: scene.anchor, walk: scene.walk, mirrored: scene.mirrored, seamGap: last.seamGap, nonFinite: last.nonFinite,
+      outline: dom.outline(dom.size / 24).map((o) => ({ pts: o.pts, cls: dom.edges[o.edge].cls, mirror: dom.edges[o.edge].kind === 'mirror' })),
+      c0: kin && kin.anchor && kin.anchorIso && group.kaleido ? group.kaleido.cell.map((p) => [kin.anchorIso.a * p[0] + kin.anchorIso.b * p[1] + kin.anchorIso.tx, kin.anchorIso.c * p[0] + kin.anchorIso.d * p[1] + kin.anchorIso.ty]) : null,
+    });
+  }
+  const frame = unionFrame(panels.map((p) => p.frame));
+  // the maps' window: the seeds, the anchor and every tile, as a square with a margin
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const grow = (px, py) => { x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); };
+  for (const p of panels) { grow(p.seed[0], p.seed[1]); if (p.anchor) grow(p.anchor[0], p.anchor[1]); for (const e of p.outline) for (let j = 0; j < e.pts.length; j += 2) grow(e.pts[j], e.pts[j + 1]); }
+  const win = { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, half: 0.54 * Math.max(x1 - x0, y1 - y0) };
+  const segs = [];
+  if (group.kaleido) {
+    const T = group.kaleido.cell, cen = T.reduce((s, p) => [s[0] + p[0] / T.length, s[1] + p[1] / T.length], [0, 0]);
+    for (const g of elementsNear(group.kaleido.group, win.cx, win.cy, 1.5 * win.half + 1, cen[0], cen[1])) {
+      const P = T.map((p) => [g.a * p[0] + g.b * p[1] + g.tx, g.c * p[0] + g.d * p[1] + g.ty]);
+      P.forEach((p, i) => segs.push([p[0], p[1], P[(i + 1) % P.length][0], P[(i + 1) % P.length][1], !!group.kaleido.glued[i]]));
+    }
+  }
+  const map = { win, segs, classColor, accent: palette.ACCENT || '#0f766e', accentSoft: palette.ACCENT_SOFT || 'rgba(15,118,110,0.14)' };
+  // layout: the panels in a grid that suits the stage
+  const stage = $('stage'), gl = $('c'), sheet = $('sheet');
+  const W = stage.clientWidth, H = stage.clientHeight, N = panels.length;
+  let cols = Math.max(1, Math.round(Number(opts.cols) || 0));
+  if (!opts.cols) { let best = 1, bestScore = -Infinity; for (let c = 1; c <= N; c++) { const r = Math.ceil(N / c), side = Math.min(W / c, H / r); if (side > bestScore) { bestScore = side; best = c; } } cols = best; }
+  const rows = Math.ceil(N / cols), pw = Math.floor(W / cols), ph = Math.floor(H / rows);
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  sheet.width = Math.round(W * dpr); sheet.height = Math.round(H * dpr);
+  const ctx = sheet.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, H);
+  gl.style.width = pw + 'px'; gl.style.height = ph + 'px';
+  R.resize();
+  R.setView({ az: view[0], el: view[1], zoom: keep.view.zoom });
+  lineScale = Math.min(1, Math.max(0.55, Math.min(pw, ph) / 520));
+  const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+  const text = (str, px, py, font, color) => { ctx.font = font; ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = '#fff'; ctx.strokeText(str, px, py); ctx.fillStyle = color; ctx.fillText(str, px, py); };
+  const problems = [];
+  frameOverride = frame;
+  try {
+    for (let i = 0; i < panels.length; i++) {
+      const p = panels[i], x = (i % cols) * pw, y = Math.floor(i / cols) * ph;
+      state.seed = p.seed; state.t = t;
+      await rebuild();
+      draw(true);                                        // render now: the drawing buffer is there for drawImage
+      ctx.drawImage(gl, x, y, pw, ph);
+      ctx.save(); ctx.beginPath(); ctx.rect(x, y, pw, ph); ctx.clip();
+      for (const c of scene.cones) { const pr = R.project(c.marker.p); if (pr[2]) text(c.marker.label, x + pr[0] + 6, y + pr[1] - 5, '600 12px ' + FONT, '#1a1a1f'); }
+      text(`seed ${p.seed.map((v) => Math.round(v * 1000) / 1000).join(', ')}`, x + 7, y + 16, '600 12px ' + FONT, '#1a1a1f');
+      text((p.anchor ? `walk ${p.walk}${p.mirrored ? ' · other way round' : ''} · ` : 'no anchor · ') + (last.seamGap == null ? '' : 'seam gap ' + fmtGap(last.seamGap)) + (last.nonFinite ? ' · ' + last.nonFinite + ' not finite' : ''),
+        x + 7, y + 31, '11px ' + FONT, '#52514a');
+      if (i === 0) { ctx.textAlign = 'right'; text(`t = ${Math.round(t * 1000) / 1000} · az ${Math.round(view[0])}° el ${Math.round(view[1])}°`, x + pw - 7, y + 16, '11px ' + FONT, '#52514a'); ctx.textAlign = 'left'; }
+      ctx.restore();
+      const mw = Math.round(Math.min(pw, ph) * 0.34);
+      drawSeedMap(ctx, x + pw - mw - 5, y + ph - mw - 5, mw, mw, map, p, panels.map((q) => q.seed), i);
+      ctx.strokeStyle = '#e5e5ea'; ctx.lineWidth = 1; ctx.strokeRect(x + 0.5, y + 0.5, pw - 1, ph - 1);
+      p.frameCenter = last.frame ? last.frame.center.map(r4) : null;
+      if (errs.frame) problems.push(errs.frame);
+    }
+  } finally {
+    frameOverride = null; lineScale = 1;
+    gl.style.width = ''; gl.style.height = '';
+    R.resize(); R.setView(keep.view);
+    state.seed = keep.seed; state.t = keep.t;
+    await rebuild();
+  }
+  sheet.style.display = 'block';
+  sheetOpen = true; sheetInfo = { seeds: panels.length, t: Math.round(t * 1000) / 1000 };
+  errs.frame = [...new Set(problems)].join('\n');
+  showError(); updateHud();
+  return { sheet: true, t, view, frame: frame ? { center: frame.center.map(r4), radius: r4(frame.radius) } : null, panel: [pw, ph],
+    panels: panels.map((p) => ({ seed: p.seed.map(r4), walk: p.walk, mirrored: p.mirrored, seamGap: Number.isNaN(p.seamGap) ? 'not finite' : p.seamGap, nonFinite: p.nonFinite, frameCenter: p.frameCenter })),
+    error: currentError() };
+}
+
+// ---- the motion profile ---------------------------------------------------------------------------------------------
+
+/**
+ * How evenly the fold moves (SPEC 5.3, requirement 3): the largest displacement of any vertex in each of `steps` equal
+ * steps of t from 0 to 1, in tile sizes. A jump shows as max >> median; `curve` is the same thing in 20 bins.
+ */
+function profile(steps = 200) {
+  const s = scene;
+  if (!s) return { error: currentError() };
+  if (s.fallback) return { error: 'the flat stand-in does not move: ' + (currentError() || '') };
+  steps = Math.max(2, Math.min(2000, Math.round(Number(steps) || 200)));
+  const n = s.n, xy = s.M.xy, cellOf = s.cellOf, size = s.tile.domain.size, out = [0, 0, 0];
+  let prev = new Float64Array(3 * n), cur = new Float64Array(3 * n);
+  const per = [];
+  let nonFinite = 0;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    try {
+      const F = s.fold.at(t);
+      for (let v = 0; v < n; v++) { out[0] = out[1] = out[2] = NaN; F(xy[2 * v], xy[2 * v + 1], cellOf[v], out); cur[3 * v] = out[0]; cur[3 * v + 1] = out[1]; cur[3 * v + 2] = out[2]; }
+    } catch (e) { return { error: `at(${t}) threw: ` + describe(e) }; }
+    if (i) {
+      let m = 0;
+      for (let k = 0; k < 3 * n; k += 3) {
+        const d = Math.hypot(cur[k] - prev[k], cur[k + 1] - prev[k + 1], cur[k + 2] - prev[k + 2]);
+        if (!Number.isFinite(d)) nonFinite++; else if (d > m) m = d;
+      }
+      per.push(m / size);
+    }
+    [prev, cur] = [cur, prev];
+  }
+  const sorted = per.slice().sort((a, b) => a - b), max = sorted[sorted.length - 1], median = sorted[sorted.length >> 1];
+  const at = per.indexOf(max), e3 = (v) => Number(v.toExponential(2));
+  const curve = Array.from({ length: 20 }, (_, b) => e3(Math.max(...per.slice(Math.floor(b * steps / 20), Math.max(Math.floor(b * steps / 20) + 1, Math.floor((b + 1) * steps / 20))))));
+  return { steps, max: e3(max), median: e3(median), ratio: median > 0 ? Math.round(10 * max / median) / 10 : null, maxAtT: [at / steps, (at + 1) / steps],
+    first: e3(per[0]), last: e3(per[per.length - 1]), nonFinite, curve };
+}
+
+// ---- the API ------------------------------------------------------------------------------------------------------
+
+/** Apply a change, then redraw (rebuilding tile, mesh and fold if asked) and resolve to the state. */
+function change(mutate, { rebuilds = false, wait = true } = {}) {
+  return enqueue(async () => {
+    if (!core || !R) return summary();
+    stopPlay();
+    if (sheetOpen) { sheetOpen = false; sheetInfo = null; $('sheet').style.display = 'none'; }
+    mutate();
+    if (rebuilds) await rebuild(); else { syncControls(); draw(true); }
+    if (wait) await frames();
+    return summary();
+  });
+}
+function setGroupState(id, preset = 0) {
+  const g = resolveGroupId(id, core.BY_ID);
+  errs.group = g ? '' : `unknown group "${id}" — known: ${core.GROUPS.map((x) => x.id).join('  ')}`;
+  if (g) { state.g = g; state.preset = Math.max(0, Math.round(Number(preset) || 0)); state.seed = null; }
+}
+
+const demo = window.__demo = {
+  ready: null,
+  get error() { return currentError(); },
+  get R() { return R; },
+  get scene() { return scene; },
+  state: summary,
+  setT(t) { return change(() => { state.t = clamp01(t); }); },
+  setView(azDeg, elDeg, zoom) {
+    return change(() => {
+      const cur = viewAngles();
+      R.setView({ az: Number.isFinite(+azDeg) && azDeg != null ? +azDeg : cur.az, el: Number.isFinite(+elDeg) && elDeg != null ? +elDeg : cur.el, zoom: zoom > 0 ? +zoom : undefined });
+    });
+  },
+  setGroup(id, preset = 0) { return change(() => setGroupState(id, preset), { rebuilds: true }); },
+  setPreset(i) { return change(() => { state.preset = Math.max(0, Math.round(Number(i) || 0)); state.seed = null; }, { rebuilds: true }); },
+  setAmp(a) { return change(() => { state.amp = clamp01(a); }, { rebuilds: true }); },
+  setSeed(x, y) { return change(() => { const sx = Number(x), sy = Number(y); state.seed = x != null && y != null && Number.isFinite(sx + sy) ? [sx, sy] : null; }, { rebuilds: true }); },
+  setAnchor(x, y) {
+    return change(() => {
+      const ax = Number(x), ay = Number(y);
+      state.anchor = x === 'preset' ? 'preset' : x != null && y != null && Number.isFinite(ax + ay) ? [ax, ay] : null;
+    }, { rebuilds: true });
+  },
+  seedSheet(opts) { return enqueue(async () => { if (!core || !R) return summary(); if (sheetOpen) closeSheet(); const r = await renderSeedSheet(opts || {}); await frames(); return r; }); },
+  setFold(name) { return change(() => { state.fold = name || null; }, { rebuilds: true }); },
+  setOpts(o) { return change(() => { errs.opts = ''; state.opts = o && typeof o === 'object' ? { ...o } : {}; }, { rebuilds: true }); },
+  resetView() { return change(() => { R.resetView(true); }); },
+  play(target) { return enqueue(async () => { if (!core || !R) return summary(); closeSheet(); const r = await play(target); await frames(); return r; }); },
+  sheet(opts) { return enqueue(async () => { if (!core || !R) return summary(); const r = renderSheet(opts); await frames(); return r; }); },
+  profile(steps) { return enqueue(() => profile(steps)); },
+};
+
+async function init() {
+  try {
+    const [groups, domain, mesh, render, palette, geom] = await Promise.all([
+      import('../src/groups.js'), import('../src/domain.js'), import('../src/mesh.js'),
+      import('../src/render3d.js'), import('../src/palette.js'), import('../src/geom.js')]);
+    core = { GROUPS: groups.GROUPS, BY_ID: groups.BY_ID, elementsNear: groups.elementsNear, makeWarp: domain.makeWarp, buildDomain: domain.buildDomain, buildMesh: mesh.buildMesh,
+      createRenderer: render.createRenderer, hexToRgb: palette.hexToRgb, classColor: palette.classColor, MIRROR_COLOR: palette.MIRROR_COLOR,
+      CREASE_COLOR: palette.CREASE_COLOR, INK: palette.hexToRgb(palette.INK), inverse: geom.inverse, apply: geom.apply, palette };
+    R = core.createRenderer($('c'), { labelLayer: $('labels') });
+  } catch (e) {
+    core = null; R = null;
+    errs.fatal = 'the page cannot start — a module under src/ does not load: ' + describe(e);
+    showError();
+    return summary();
+  }
+  // controls
+  const selG = $('selG');
+  for (const g of core.GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}   ${g.hm} · ${g.shape}`; selG.appendChild(o); }
+  selG.addEventListener('change', () => change(() => setGroupState(selG.value, 0), { rebuilds: true, wait: false }));
+  $('selP').addEventListener('change', (e) => { const v = e.target.value; if (v !== 'seed') change(() => { state.preset = +v; state.seed = null; }, { rebuilds: true, wait: false }); });
+  $('amp').addEventListener('input', (e) => change(() => { state.amp = clamp01(e.target.value); }, { rebuilds: true, wait: false }));
+  $('t').addEventListener('input', (e) => { stopPlay(); closeSheet(); state.t = clamp01(e.target.value / 1000); syncT(); draw(false); });
+  $('play').addEventListener('click', () => { closeSheet(); if (playing) stopPlay(); else play(); });
+  $('reset').addEventListener('click', () => R.resetView());
+  $('sheetBtn').addEventListener('click', () => { if (sheetOpen) closeSheet(); else renderSheet(); });
+  $('sheet').addEventListener('click', closeSheet);
+  R.onChange(updateHud);
+
+  const urlSeed = state.seed;
+  setGroupState(q.get('g'), state.preset);
+  state.seed = urlSeed;
+  try { state.opts = parseOpts(q.get('opts')); } catch (e) { errs.opts = '&opts= is not understood (' + describe(e).split('\n')[0] + '): no options are passed'; }
+  if (q.has('az') || q.has('el') || q.has('zoom')) {
+    const az = qnum('az'), el = qnum('el'), zoom = qnum('zoom');
+    R.setView({ az: az == null ? 0 : az, el: el == null ? 55 : el, zoom: zoom > 0 ? zoom : undefined });
+  }
+  try {
+    await rebuild();
+    const sh = q.get('sheet');
+    if (sh && sh !== '0') {
+      const nums = (str) => str.split(',').map(Number).filter(Number.isFinite);
+      const vw = (q.get('views') || '').split(',').map((v) => v.split(':').map(Number)).filter((v) => v.length >= 2 && Number.isFinite(v[0] + v[1]));
+      renderSheet({ t: sh === '1' || sh === 'true' ? null : nums(sh), views: vw.length ? vw : null });
+    }
+    const pathPts = parsePoints(q.get('seedsheet')), seedPts = parsePoints(q.get('seeds'));
+    if (pathPts.length >= 2 || seedPts.length) await renderSeedSheet(seedPts.length ? { seeds: seedPts } : { path: pathPts, n: qnum('n') || 8 });
+  } catch (e) { errs.fatal = 'fold-demo itself failed: ' + describe(e); showError(); }
+  await frames();
+  return summary();
+}
+demo.ready = enqueue(init);
+</script>
+</body>
+</html>
