@@ -146,6 +146,9 @@ body {
   font: inherit; font-size: 16px;            /* 16 px: iOS does not zoom the page when the picker opens */
   cursor: pointer;
   -webkit-appearance: none; appearance: none;
+  /* Safari: the select's own text ("Checkerboard", 103 px at 16 px) overflows the 49 px pill of a phone and counts as
+     the page's width (42 px more than the window, measured in WebKit, 13 Nov); Chrome clips it by itself */
+  overflow: hidden;
 }
 .pat:focus-within > .pat-pill { outline: 2px solid var(--accent); outline-offset: 1px; }
 @media (hover: hover) { .pat:hover > .pat-pill { background-color: var(--card); } }

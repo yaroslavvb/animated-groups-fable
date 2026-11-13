@@ -714,6 +714,12 @@ A second reader of the round's diff (nothing blocking, eight small real findings
     and the canvas and its labels' layer end above it — over the picture they covered the lower end of a tall tile.
     The strip is there for the whole fold of a re-cut tile (`#app[data-features~="recut"]`), also at t = 1, so the
     picture keeps its size when the words go. `.pane-fold` is a size container (`fold`) for this.
+  - Safari: the invisible native `<select>` clips its own text (`overflow: hidden`). WebKit counted "Checkerboard" at
+    16 px, 103 px wide in the 49 px pill of a phone, as page width: the page was 42 px wider than its window. Chrome
+    clips it by itself, so only WebKit shows it.
+- **The layout checks run in two engines.** `test/shell-layout.lib.js` holds them (no import; any Playwright page);
+  `test/shell-layout.test.js` runs them in Chrome on the sources, `bash dev/recut/webkit-layout.sh` in WebKit (on the
+  M5) on the built page. Both before a change to the shell ships.
 - **Tests added**: the reviewer's two cuts and a sweep of 360 folds for the runs (`test/recut.test.js`); the home
   tile's creases against the fold module's own (`test/recut.test.js`, `test/folds.test.js`); turned, scaled and shifted
   copies of all 17 groups (`test/pattern.test.js`); in the layout test the selector, the title, the legend's paper

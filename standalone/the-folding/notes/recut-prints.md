@@ -39,6 +39,8 @@ more on phones. All fixed and tested; SPEC 10.1 has the contracts. What is worth
 - **Run the layout test before any change to the header or the legend ships.** The selector took 55 px of a phone's
   header and one legend item a line of its legend; three earlier guarantees broke without a single node test failing
   (the chip's second line at 360 px, the caption of a phone on its side, the 3D pane's 150 px at 320 x 518).
+- **Chrome's layout is not Safari's.** The same checks in WebKit (`bash dev/recut/webkit-layout.sh`, on the M5) found
+  the page 42 px wider than a phone's window: WebKit counts the text of the invisible native select as overflow.
 - **Words over the picture cover the picture on a small pane.** The camera fits the shape's bounding sphere to the
   pane, so a tall tile reaches within 13 px of a 183 px pane's foot; a pill of 25 px there lies on it. On panes under
   450 px the words have their own strip and the canvas is shorter.

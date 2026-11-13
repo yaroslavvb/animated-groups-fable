@@ -324,6 +324,9 @@ test('styles (13 Nov, SPEC 10.1): on a phone — the selector is its swatch, the
   const fallback = block(css, '@supports not (container-type: size)');
   assert.match(fallback, /\.app\[data-features~="recut"\] \.pane-fold > canvas \{ height: calc\(100% - (\d+)px\); \}/, 'without container queries: by window size');
   assert.equal(Number(fallback.match(/\.pane-fold > canvas \{ height: calc\(100% - (\d+)px\); \}/)[1]), hgt);
+  // Safari: the invisible select must clip its own text, or the page is wider than a phone's window
+  assert.match(rule('.pat > select'), /overflow: hidden;/, 'the native select clips its own text');
+  assert.match(rule('.pat > select'), /font-size: 16px/, '16 px: iOS does not zoom when the picker opens');
   // the canvas rule the strip overrides fills the pane otherwise
   assert.match(rule('.pane > canvas'), /inset: 0;[\s\S]*height: 100%/);
 });

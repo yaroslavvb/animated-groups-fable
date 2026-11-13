@@ -33,4 +33,5 @@ change to group data or folds: `node tools/motif-place.mjs`. The browser tools e
 
 Before a change to the header, the legend or a hint ships, run the layout test in a real Chrome (it is opt-in, so the
 plain suite skips it): `SHELL_LAYOUT=1 node --test test/shell-layout.test.js` — 23 window sizes x 17 groups, about
-40 s. Then `node dev/recut/browser-check.mjs` and `node tools/qa-matrix.mjs --interact`.
+40 s — and the same checks in Safari's engine on the built page: `bash dev/recut/webkit-layout.sh` (WebKit on the M5).
+Then `node dev/recut/browser-check.mjs` and `node tools/qa-matrix.mjs --interact`.
