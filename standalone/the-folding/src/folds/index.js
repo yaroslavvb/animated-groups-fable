@@ -5,6 +5,13 @@
 //   foldMeshOptions(group)                 -> options for buildMesh(group, domain, …) that suit the group's fold
 //   foldOptions(opts)                      -> the options handed to the fold module (the anchor checked, see below)
 //   FOLD_TYPES                             the seven values of group.fold
+//   canRecut(group)                        does the group have the motion "re-cut first" (xx, 22x)?
+//
+// Re-cut first (13 Nov 2026; src/folds/recut.js). opts.recut === true asks for the motion "re-cut first" where the
+// group has one — the two shapes that pass through themselves, the Klein bottle and the cross-cap: the tile is first
+// re-cut into the group's default cut (its pieces carried there by elements of the group), which then folds with
+// nothing passing through anything. Every other group, and opts.recut left out, gives the module's own fold (the
+// "direct" fold: what the fold modules' own tests and the 22x lab's "One piece" use). The app asks for it.
 //
 // The anchor (SPEC 7, anchor contract). opts.anchor = [x, y] is a plane point that the app sets when a group or a
 // preset is chosen (the preset's seed, in straight coordinates; no preset seed is moved by clampSeed) and does NOT
@@ -36,6 +43,9 @@ import createHinge from './hinge.js';
 import createRoll, { rollDensity } from './roll.js';
 import createCrosscap from './crosscap.js';
 import createSnowflake from './snowflake.js';
+import createRecut, { canRecut } from './recut.js';
+
+export { canRecut };
 
 const MAKERS = {
   hinge: createHinge,
@@ -79,7 +89,9 @@ export function createFold(group, domain, mesh = null, opts = {}) {
   const make = MAKERS[group.fold];
   if (!make) throw new Error(`folds: no fold module for fold type "${group.fold}" (group ${group.id})`);
   if (!mesh && group.fold !== 'snowflake') mesh = buildMesh(group, domain, foldMeshOptions(group));
-  const fold = make(group, domain, mesh, foldOptions(opts));
+  const o = foldOptions(opts), recut = o.recut === true && canRecut(group);
+  delete o.recut;
+  const fold = recut ? createRecut(group, domain, mesh, o, make, foldMeshOptions(group)) : make(group, domain, mesh, o);
   if (!fold || typeof fold.at !== 'function' || !fold.mesh) throw new Error(`folds: the ${group.fold} module returned no fold for ${group.id}`);
   return fold;
 }

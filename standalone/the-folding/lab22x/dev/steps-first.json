@@ -1,0 +1,5 @@
+[
+  { "w": 1280, "h": 670, "eval": "await new Promise((r) => { const f = () => (window.__lab && window.__lab.ready) || window.__labError ? r(1) : setTimeout(f, 50); f(); }), window.__labError || JSON.stringify(window.__lab.getState())", "wait": 1500, "out": "lab22x/qa/first-t0.png" },
+  { "eval": "window.__lab.setT(0.66), JSON.stringify(window.__lab.getState())", "wait": 700, "out": "lab22x/qa/first-t066.png" },
+  { "eval": "window.__lab.setT(1), JSON.stringify(window.__lab.getState())", "wait": 700, "out": "lab22x/qa/first-t1.png" }
+]

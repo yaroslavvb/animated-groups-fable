@@ -2,12 +2,21 @@
 // interior stay readable, with bold edge lines that shine through it. WebGL2, no libraries.
 //
 //   const R = createRenderer(canvas, { labelLayer });
-//   R.setSurface({ positions: Float32Array(3n), indices: Uint32Array(3m), tint?: Uint8Array(n) })
+//   R.setSurface({ positions: Float32Array(3n), indices: Uint32Array(3m), tint?: Uint8Array(n), uv?: Float32Array(2n) })
 //   R.updatePositions(Float32Array(3n))        same topology, new positions (every animation frame)
 //   R.setLines([{ points: Float32Array(3k), color: [r,g,b], width /*css px*/, alpha = 1, dashed = false, xray = 0.35, loop = false }])
 //   R.setMarkers([{ p: [x,y,z], color: [r,g,b], size /*css px*/, shape: 'dot'|'ring'|'square', label? }])
 //   R.setFrame({ center: [x,y,z], radius }, immediate = false)    what must stay in view; eased
 //   R.setStyle({ front, back, ghost, fill, opacity, background })  colours as [r,g,b] in 0..1 (or '#rrggbb'); background null = transparent
+//   R.setStyle({ print, printFront, printBack, ghostMix, palette })  the print on the paper and the palette: see below
+//
+// The print (13 Nov 2026; src/pattern.js). setSurface's `uv` gives every vertex its point of the PAPER (the plane
+// point it is at t = 0; a re-cut tile's pieces keep theirs). With style.print = printUniforms(print) the shader
+// evaluates the print there, per pixel and anti-aliased (so no mesh is cut for it, and it is crisp at every zoom): the
+// base colour is printFront[0] / [1] (light / dark) on the paper's front and printBack[0] / [1] on its back, instead
+// of front / back. print: null (or mode 0), or a surface without uv: no print. ghostMix in [0, 1] (default 1): how far
+// a ghost tile (tint bit 0) takes the ghost colour; below 1 the print shows through on a star's secondary tiles.
+// style.palette (the 22x lab): [{ front, back }, ...] up to 16; a vertex tint of 4 + i takes colour i of it.
 //
 // The surface's tint (setSurface) is two bits per vertex (constant over each triangle): bit 0 = ghost (a kaleidoscope
 // star's secondary tiles, SPEC 5.7: tint 1), bit 1 = fill (the pattern's comma filled into the sheet, motif.js
@@ -93,7 +102,7 @@
 //   Accessibility. Unless the page set them already, the canvas gets role="application", aria-roledescription="3D view"
 //     and an aria-label that names the keys (arrows turn, + and - zoom, 0 or Home resets) besides the gestures.
 
-import { SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, SURFACE_OPACITY, MOTIF_FILL_3D, GROUND, INK, MUTED, hexToRgb } from './palette.js';
+import { SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, SURFACE_OPACITY, MOTIF_FILL_3D, GROUND, INK, MUTED, PRINT_FRONT, PRINT_BACK, hexToRgb } from './palette.js';
 
 const DEG = Math.PI / 180;
 const FOV_Y = 28 * DEG;            // vertical field of view
@@ -610,16 +619,19 @@ invariant gl_Position;
 layout(location=0) in vec3 aPos;
 layout(location=1) in vec3 aNrm;
 layout(location=2) in float aTint;
+layout(location=3) in vec2 aUV;
 uniform mat4 uProj, uView;
 out vec3 vN;
 out vec3 vV;
 out float vTint;
+out vec2 vUV;
 void main() {
   vec4 mv = uView * vec4(aPos, 1.0);
   float l = length(aNrm);
   vN = mat3(uView) * (l > 0.0 ? aNrm / l : vec3(0.0, 0.0, 1.0));
   vV = -mv.xyz;
   vTint = aTint;
+  vUV = aUV;
   gl_Position = uProj * mv;
 }`;
 
@@ -650,9 +662,36 @@ precision highp float;
 in vec3 vN;
 in vec3 vV;
 in float vTint;
+in vec2 vUV;
 uniform vec3 uFront, uBack, uGhost, uFill;
 uniform float uOpacity;
+// the print (pattern.js): 0 none; 1 the product of three square waves of linear forms; 2 rings round a lattice
+uniform int uPat;
+uniform vec3 uPatL0, uPatL1, uPatL2;      // mode 1: (lx, ly, offset) of each form
+uniform vec4 uPatA, uPatI;                // mode 2: the basis (a, b) and the rows of its inverse
+uniform vec3 uPatO;                       // mode 2: the origin, 1 / the width of a ring
+uniform vec3 uPatF0, uPatF1, uPatB0, uPatB1;   // light and dark, front and back
+uniform float uGhostMix;
+uniform vec3 uPalF[16];
+uniform vec3 uPalB[16];
 out vec4 o;
+// (-1)^floor(c), anti-aliased over the pixel's footprint: +1 / -1 inside a band, the mean (0) when bands are finer
+// than a pixel
+float sqw(float c) {
+  float w = max(fwidth(c), 1e-6);
+  return clamp(sin(3.14159265 * c) / (2.4 * w), -1.0, 1.0);
+}
+float printTone() {                       // 0 light .. 1 dark
+  if (uPat == 1) {
+    float p = sqw(dot(uPatL0.xy, vUV) + uPatL0.z) * sqw(dot(uPatL1.xy, vUV) + uPatL1.z) * sqw(dot(uPatL2.xy, vUV) + uPatL2.z);
+    return 0.5 - 0.5 * p;
+  }
+  vec2 d = vUV - uPatO.xy;
+  vec2 f = fract(vec2(dot(uPatI.xy, d), dot(uPatI.zw, d)));
+  vec2 q = f.x * uPatA.xy + f.y * uPatA.zw;
+  float r = min(min(length(q), length(q - uPatA.xy)), min(length(q - uPatA.zw), length(q - uPatA.xy - uPatA.zw)));
+  return 0.5 - 0.5 * sqw(r * uPatO.z);
+}
 void main() {
   vec3 v = normalize(vV);
   float nl = length(vN);                            // < 1 where the vertex normals of this triangle disagree
@@ -668,8 +707,13 @@ void main() {
   float ndv = clamp(dot(n, v), 0.0, 1.0);
   // tint = ghost + 2 fill (see the top of the file): bit 0 the star's secondary tiles, bit 1 the comma's fill
   float tq = floor(vTint + 0.5);
-  vec3 base = mix(gl_FrontFacing ? uFront : uBack, uGhost, mod(tq, 2.0));
-  base = mix(base, uFill, step(1.5, tq));
+  vec3 base = gl_FrontFacing ? uFront : uBack;
+  if (uPat > 0) { float pt = printTone(); base = gl_FrontFacing ? mix(uPatF0, uPatF1, pt) : mix(uPatB0, uPatB1, pt); }
+  if (tq > 3.5) { int pi = int(tq) - 4; base = gl_FrontFacing ? uPalF[pi] : uPalB[pi]; }   // the palette (the lab)
+  else {
+    base = mix(base, uGhost, mod(tq, 2.0) * uGhostMix);
+    base = mix(base, uFill, step(1.5, tq));
+  }
   const vec3 L = vec3(-0.3665, 0.5864, 0.7224);     // key light, up and to the left of the eye
   float dif = 0.5 + 0.5 * dot(n, L);
   float graze = pow(1.0 - ndv, 2.2);
@@ -901,8 +945,13 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
 
   // ---- state that survives a lost context (everything is re-uploaded from here) ----
   const style = { front: SURFACE_FRONT.slice(), back: SURFACE_BACK.slice(), ghost: SURFACE_GHOST.slice(), fill: MOTIF_FILL_3D.slice(), opacity: SURFACE_OPACITY, background: hexToRgb(GROUND) };
+  // the print (pattern.js printUniforms) and its four colours; how far a ghost tile takes the ghost colour; the palette
+  style.print = null;
+  style.printFront = [hexToRgb(PRINT_FRONT[0]), hexToRgb(PRINT_FRONT[1])]; style.printBack = [hexToRgb(PRINT_BACK[0]), hexToRgb(PRINT_BACK[1])];
+  style.ghostMix = 1;
+  style.palF = new Float32Array(48); style.palB = new Float32Array(48);
   const surf = { n: 0, m: 0, pos: new Float32Array(0), nrm: new Float32Array(0), tri: new Uint32Array(0), sorted: new Uint32Array(0),
-    tint: null, scratch: null, probe: null, posDirty: false, sortDirty: false, topoDirty: false };
+    tint: null, uv: null, scratch: null, probe: null, posDirty: false, sortDirty: false, topoDirty: false };
   const lineState = { data: new Float32Array(0), pts: new Float32Array(0), cum: new Float32Array(1), count: 0, dirty: false };
   const markState = { data: new Float32Array(0), count: 0, dirty: false, list: [] };
   const def = viewFromAzEl();
@@ -941,11 +990,12 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     const g = { surfP, depthP, lineP, markP };
     // surface
     g.surfVao = gl.createVertexArray();
-    g.posBuf = gl.createBuffer(); g.nrmBuf = gl.createBuffer(); g.tintBuf = gl.createBuffer(); g.idxBuf = gl.createBuffer();
+    g.posBuf = gl.createBuffer(); g.nrmBuf = gl.createBuffer(); g.tintBuf = gl.createBuffer(); g.uvBuf = gl.createBuffer(); g.idxBuf = gl.createBuffer();
     gl.bindVertexArray(g.surfVao);
     gl.bindBuffer(gl.ARRAY_BUFFER, g.posBuf); gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, g.nrmBuf); gl.enableVertexAttribArray(1); gl.vertexAttribPointer(1, 3, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ARRAY_BUFFER, g.tintBuf); gl.vertexAttribPointer(2, 1, gl.UNSIGNED_BYTE, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, g.uvBuf); gl.vertexAttribPointer(3, 2, gl.FLOAT, false, 0, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g.idxBuf);
     // lines
     g.cornerBuf = gl.createBuffer();
@@ -1110,6 +1160,9 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
           gl.bindBuffer(gl.ARRAY_BUFFER, G.tintBuf);
           if (surf.tint) { gl.bufferData(gl.ARRAY_BUFFER, surf.tint, gl.STATIC_DRAW); gl.enableVertexAttribArray(2); }
           else { gl.disableVertexAttribArray(2); gl.vertexAttrib1f(2, 0); }
+          gl.bindBuffer(gl.ARRAY_BUFFER, G.uvBuf);
+          if (surf.uv) { gl.bufferData(gl.ARRAY_BUFFER, surf.uv, gl.STATIC_DRAW); gl.enableVertexAttribArray(3); }
+          else { gl.disableVertexAttribArray(3); gl.vertexAttrib2f(3, 0, 0); }
           gl.bindVertexArray(null);
           surf.topoDirty = false;
         }
@@ -1192,6 +1245,18 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
         gl.uniform3fv(u.uFront, style.front); gl.uniform3fv(u.uBack, style.back); gl.uniform3fv(u.uGhost, style.ghost);
         gl.uniform3fv(u.uFill, style.fill);
         gl.uniform1f(u.uOpacity, style.opacity);
+        // the print: only on a surface that brought its paper coordinates
+        const pr = surf.uv && style.print && style.print.mode > 0 ? style.print : null;
+        gl.uniform1i(u.uPat, pr ? pr.mode : 0);
+        if (pr) {
+          gl.uniform3f(u.uPatL0, pr.L[0], pr.L[1], pr.L[2]); gl.uniform3f(u.uPatL1, pr.L[3], pr.L[4], pr.L[5]); gl.uniform3f(u.uPatL2, pr.L[6], pr.L[7], pr.L[8]);
+          gl.uniform4fv(u.uPatA, pr.A); gl.uniform4fv(u.uPatI, pr.I); gl.uniform3fv(u.uPatO, pr.O);
+          gl.uniform3fv(u.uPatF0, style.printFront[0]); gl.uniform3fv(u.uPatF1, style.printFront[1]);
+          gl.uniform3fv(u.uPatB0, style.printBack[0]); gl.uniform3fv(u.uPatB1, style.printBack[1]);
+        }
+        gl.uniform1f(u.uGhostMix, style.ghostMix);
+        if (u['uPalF[0]']) gl.uniform3fv(u['uPalF[0]'], style.palF);
+        if (u['uPalB[0]']) gl.uniform3fv(u['uPalB[0]'], style.palB);
         // B: everything behind the nearest sheet, back to front. B and C split the fragments at "two depth steps
         // behind the nearest sheet" instead of at exact equality with it, so a GPU whose depths are not
         // bit-identical from pass to pass still puts every fragment of the nearest sheet into C and nowhere else.
@@ -1379,7 +1444,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   function setSurface(s) {
     const positions = s && s.positions, indices = s && s.indices;
     const n = positions ? (positions.length / 3) | 0 : 0, m = indices ? (indices.length / 3) | 0 : 0;
-    if (!n || !m) { surf.n = surf.m = 0; surf.tint = null; invalidate(); return; }
+    if (!n || !m) { surf.n = surf.m = 0; surf.tint = null; surf.uv = null; invalidate(); return; }
     if (surf.pos.length !== 3 * n) { surf.pos = new Float32Array(3 * n); surf.nrm = new Float32Array(3 * n); }
     surf.pos.set(positions.length === 3 * n ? positions : positions.subarray(0, 3 * n));
     if (surf.tri.length !== 3 * m) { surf.tri = new Uint32Array(3 * m); surf.sorted = new Uint32Array(3 * m); }
@@ -1389,6 +1454,14 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     if (!surf.scratch || surf.scratch.vdep.length !== n || surf.scratch.tdep.length !== m) surf.scratch = makeSortScratch(n, m);
     if (!surf.probe || surf.probe.gx.length !== n) surf.probe = makeProbeScratch(n);
     surf.tint = s.tint && s.tint.length >= n ? Uint8Array.from(s.tint.length === n ? s.tint : s.tint.subarray(0, n)) : null;
+    // the paper coordinates of the vertices (the print is evaluated there); non-finite ones would poison a triangle
+    surf.uv = null;
+    if (s.uv && s.uv.length >= 2 * n) {
+      const uv = Float32Array.from(s.uv.length === 2 * n ? s.uv : s.uv.subarray(0, 2 * n));
+      let ok = true;
+      for (let i = 0; i < 2 * n; i++) if (!Number.isFinite(uv[i])) { ok = false; break; }
+      if (ok) surf.uv = uv;
+    }
     surf.n = n; surf.m = m;
     surf.topoDirty = surf.posDirty = surf.sortDirty = true;
     invalidate();
@@ -1451,6 +1524,25 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     if (s.ghost !== undefined) style.ghost = toRgb(s.ghost, style.ghost);
     if (s.fill !== undefined) style.fill = toRgb(s.fill, style.fill);
     if (s.opacity !== undefined && Number.isFinite(+s.opacity)) style.opacity = Math.min(1, Math.max(0, +s.opacity));
+    if (s.print !== undefined) {
+      // pattern.js printUniforms(print): { mode, L(9), A(4), I(4), O(3) }; anything else (null, mode 0) is no print
+      const P = s.print;
+      const fine = (a, k) => a && a.length >= k && Array.prototype.every.call(a, Number.isFinite);
+      style.print = P && (P.mode === 1 || P.mode === 2) && fine(P.L, 9) && fine(P.A, 4) && fine(P.I, 4) && fine(P.O, 3)
+        ? { mode: P.mode, L: Float32Array.from(P.L), A: Float32Array.from(P.A), I: Float32Array.from(P.I), O: Float32Array.from(P.O) } : null;
+    }
+    for (const [key, own] of [['printFront', 'printFront'], ['printBack', 'printBack']]) {
+      const v = s[key];
+      if (Array.isArray(v) && v.length >= 2) style[own] = [toRgb(v[0], style[own][0]), toRgb(v[1], style[own][1])];
+    }
+    if (s.ghostMix !== undefined && Number.isFinite(+s.ghostMix)) style.ghostMix = Math.min(1, Math.max(0, +s.ghostMix));
+    if (Array.isArray(s.palette)) {
+      // up to 16 entries { front: [r,g,b], back: [r,g,b] } (or one colour for both sides), for the tints 4, 5, ...
+      for (let i = 0; i < 16 && i < s.palette.length; i++) {
+        const e = s.palette[i] || {}, f = toRgb(e.front || e, [0.8, 0.8, 0.8]), b = toRgb(e.back || e.front || e, f);
+        style.palF.set(f, 3 * i); style.palB.set(b, 3 * i);
+      }
+    }
     if (s.background !== undefined) style.background = s.background === null || s.background === 'transparent' ? null : toRgb(s.background, style.background);
     invalidate();
   }
@@ -1753,7 +1845,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     for (const el of labelEls) el.remove();
     labelEls.length = 0; listeners.clear();
     if (G && !lost) {
-      for (const k of ['posBuf', 'nrmBuf', 'tintBuf', 'idxBuf', 'cornerBuf', 'lineBuf', 'quadBuf', 'markBuf']) gl.deleteBuffer(G[k]);
+      for (const k of ['posBuf', 'nrmBuf', 'tintBuf', 'uvBuf', 'idxBuf', 'cornerBuf', 'lineBuf', 'quadBuf', 'markBuf']) gl.deleteBuffer(G[k]);
       for (const k of ['surfVao', 'lineVao', 'markVao', 'fullVao']) if (G[k]) gl.deleteVertexArray(G[k]);
       for (const k of ['surfP', 'depthP', 'lineP', 'markP', 'fullP']) if (G[k]) gl.deleteProgram(G[k].prog);
     }

@@ -52,8 +52,19 @@ function specialPoints(id) {
 // ---- the hash ------------------------------------------------------------------------------------------------------
 
 test('url: the format — g always, every other key only when it is not its default, in the order of SPEC 7, * as %2A', () => {
-  // (10 Nov 2026, the replication step: `tile` joined the contract between wavy and t; qa/rep-judge.md)
-  assert.deepEqual(HASH_KEYS, ['g', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);
+  // (10 Nov 2026, the replication step: `tile` joined the contract between wavy and t; qa/rep-judge.md.
+  //  13 Nov 2026, the pattern selector: `pat` right after g, written when it is not the default, the checkerboard)
+  assert.deepEqual(HASH_KEYS, ['g', 'pat', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);
+  assert.equal(encodeHash({ g: '333', pat: 'checker' }), '#g=333', 'the checkerboard is the default pattern: not written');
+  assert.equal(encodeHash({ g: '333', pat: 'comma' }), '#g=333&pat=comma');
+  assert.equal(encodeHash({ g: '333', pat: 'rings', cut: 1, t: 0.5 }), '#g=333&pat=rings&cut=1&t=0.5', 'pat right after g');
+  assert.equal(encodeHash({ g: '333', pat: 'Checkerboard' }), '#g=333', 'a label is taken for its key');
+  assert.equal(encodeHash({ g: '333', pat: 'tartan' }), '#g=333', 'an unknown pattern is not written');
+  assert.equal(decodeHash('#g=333').pat, 'checker', 'no pat: the default');
+  assert.equal(decodeHash('#g=333&pat=comma').pat, 'comma');
+  assert.equal(decodeHash('#g=333&pat=RINGS').pat, 'rings', 'case does not matter');
+  assert.deepEqual([decodeHash('#g=333&pat=tartan&t=0.5').pat, decodeHash('#g=333&pat=tartan&t=0.5').dropped, decodeHash('#g=333&pat=tartan&t=0.5').t], ['checker', ['pat'], 0.5], 'an unknown pattern is dropped, the rest counts');
+  assert.match(encodeHash({ g: '*632', pat: 'comma', cut: 0, t: 1 }), WRAPPER_HASH);
   assert.equal(encodeHash({ g: '333' }), '#g=333');
   assert.equal(encodeHash({ g: '333', cut: 0, seed: null, wavy: 0, t: 0, view: { ...DEFAULT_VIEW } }), '#g=333', 'defaults are left out');
   assert.equal(encodeHash({ g: '*632' }), '#g=%2A632');
@@ -396,7 +407,7 @@ test('labels: one label per point of the orbifold — the first copy always, a l
   assert.ok(LABEL_FADE[0] > 0.02 && LABEL_FADE[1] > LABEL_FADE[0] && LABEL_FADE[1] <= 0.6);
   assert.equal(labelFade(LABEL_FADE[0]), 0); assert.equal(labelFade(LABEL_FADE[1]), 1); assert.equal(labelFade(0), 0); assert.equal(labelFade(5), 1);
   const rnd = prng(2929);
-  let copiesSeen = 0, fadesSeen = 0, worstStep = 0;
+  let copiesSeen = 0, fadesSeen = 0, worstStep = 0, worstCarried = 0;
   for (const g of GROUPS) {
     const cuts = g.presets.map((p) => ({ seed: p.seed, metric: p.metric, anchor: p.anchor || p.seed, name: p.name }));
     for (let k = 0; k < 2; k++) cuts.push({ seed: [g.center[0] + (2 * rnd() - 1) * g.viewHalf, g.center[1] + (2 * rnd() - 1) * g.viewHalf], anchor: g.presets[0].seed, name: 'random ' + k });
@@ -431,8 +442,13 @@ test('labels: one label per point of the orbifold — the first copy always, a l
           if (d < LABEL_FADE[0] * size) assert.ok(!tagged, `${label} t = ${t}: copy ${a} is ${d / size} from an earlier one and still labelled`);
           if (d > LABEL_FADE[1] * size) assert.ok(tagged && !(tagged.labelAlpha < 1), `${label} t = ${t}: copy ${a} is ${d / size} away from the others and not labelled in full`);
           // continuity: the opacity follows the distance smoothly
+          // (13 Nov 2026: while a tile of xx or 22x is re-cut first, src/folds/recut.js, a piece is carried to its place
+          // by an element of the group, about a tile's width in a second — the motion the 22x lab showed. A copy's
+          // label then fades in the few frames in which its piece lands next to its partner: continuous, since
+          // labelFade is continuous in the distance and the distance in t, but quick. That stage has its own bound.)
+          const carried = !!scene.fold.recut && t <= scene.fold.foldFrom + 1e-9;
           const al = labelFade(d / size), was = prev.get(a);
-          if (was !== undefined) worstStep = Math.max(worstStep, Math.abs(al - was));
+          if (was !== undefined) { if (carried) worstCarried = Math.max(worstCarried, Math.abs(al - was)); else worstStep = Math.max(worstStep, Math.abs(al - was)); }
           prev.set(a, al);
         }
         if (t === 1) assert.equal(marks.map((m) => m.label).sort().join(' '), specialPoints(g.id).join(' '), `${label}: at t = 1 one labelled marker per point`);
@@ -441,6 +457,7 @@ test('labels: one label per point of the orbifold — the first copy always, a l
   }
   assert.ok(copiesSeen > 1000 && fadesSeen > 100, `${copiesSeen} copies, ${fadesSeen} fading`);
   assert.ok(worstStep < 0.35, `the largest change of a copy's label opacity in 1/200 of t is ${worstStep}`);
+  assert.ok(worstCarried < 0.9, `while a piece of a re-cut tile is carried, the largest change of a copy's label opacity in 1/200 of t is ${worstCarried} (it must fade, not pop)`);
 });
 
 test('labels: the reviewer\'s cases (29) — once the copies have closed up, one visible label per point of the orbifold, well before t = 1', () => {

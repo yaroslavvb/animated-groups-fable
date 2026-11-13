@@ -27,7 +27,8 @@ const USAGE = `node build.mjs [options]
   --css <file>        stylesheet to inline              (default src/styles.css)
   --target <t>        passed to esbuild as --target=<t> (default: none, the code is shipped as written)
   --no-minify         keep JS and CSS readable
-  --allow-url <pfx>   let URLs starting with <pfx> through the self-containment check (repeatable)`;
+  --allow-url <pfx>   let URLs starting with <pfx> through the self-containment check (repeatable)
+  --companion <url>   the one link the page must carry  (default the companion app, The Unfolding)`;
 
 const run = promisify(execFile);
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
@@ -44,7 +45,7 @@ function fail(message) {
 
 function parseArgs(argv) {
   const opt = { entry: 'src/app.js', out: 'dist/index.html', template: 'src/index.template.html', css: 'src/styles.css',
-    minify: true, target: null, allow: [] };
+    minify: true, target: null, allow: [], companion: COMPANION };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     const value = () => {
@@ -57,6 +58,7 @@ function parseArgs(argv) {
     else if (a === '--css') opt.css = value();
     else if (a === '--target') opt.target = value();
     else if (a === '--allow-url') opt.allow.push(value());
+    else if (a === '--companion') opt.companion = value();
     else if (a === '--no-minify') opt.minify = false;
     else if (a === '--help' || a === '-h') { console.log(USAGE); process.exit(0); }
     else fail(`unknown argument ${a}\n${USAGE}`);
@@ -93,8 +95,8 @@ function inlineSafeJs(js) {
 }
 const inlineSafeCss = (css) => css.replace(/<\/style/gi, '<\\/style').replace(/<!--/g, '<\\!--');
 
-function foreignUrls(text, allow) {
-  const ok = [COMPANION, ...NAMESPACES, ...allow];
+function foreignUrls(text, allow, companion = COMPANION) {
+  const ok = [companion, ...NAMESPACES, ...allow];
   const found = text.match(/\b(?:https?|wss?|ftp):\/\/[^\s"'`<>)\\]+/gi) || [];
   return [...new Set(found)].filter((u) => !ok.some((prefix) => u.startsWith(prefix)));
 }
@@ -137,9 +139,9 @@ if (/<link\b/.test(shellLower)) problems.push('the template has a <link>');
 if (/<(?:img|iframe|video|audio|source|object|embed)\b/.test(shellLower)) problems.push('the template embeds an external resource');
 if (/@import\b/i.test(css)) problems.push('the CSS has an @import');
 if (/url\(\s*["']?(?!data:|#)/i.test(css)) problems.push('the CSS has a url() that is not a data: URI');
-const urls = foreignUrls(html, opt.allow);
+const urls = foreignUrls(html, opt.allow, opt.companion);
 if (urls.length) problems.push('URLs besides the companion link (if one is intended, pass --allow-url <prefix>):\n      ' + urls.join('\n      '));
-if (!html.includes(COMPANION)) problems.push('the companion link is missing');
+if (!html.includes(opt.companion)) problems.push('the companion link is missing (' + opt.companion + ')');
 if (problems.length) fail(`${opt.out} was NOT written — the page failed its checks:\n  - ` + problems.join('\n  - '));
 
 fs.mkdirSync(path.dirname(outFile), { recursive: true });

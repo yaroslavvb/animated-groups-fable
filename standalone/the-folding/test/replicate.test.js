@@ -197,7 +197,7 @@ test('the cards are continuous: position, opacity, face and lift never jump, fro
 
 test('the URL carries the replication: tile=<u>, 3 decimals, absent at 1, between wavy and t', async () => {
   const { encodeHash, decodeHash, HASH_KEYS, WRAPPER_HASH } = await import('../src/app.js');
-  assert.deepEqual(HASH_KEYS, ['g', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);
+  assert.deepEqual(HASH_KEYS, ['g', 'pat', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);   // (13 Nov 2026: pat, the pattern, after g)
   assert.equal(encodeHash({ g: '333' }), '#g=333', 'no tile: the tiling as always');
   assert.equal(encodeHash({ g: '333', tile: 1 }), '#g=333');
   assert.equal(encodeHash({ g: '333', tile: 0 }), '#g=333&tile=0');

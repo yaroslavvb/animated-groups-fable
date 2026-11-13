@@ -23,11 +23,29 @@
 // boundary samples, about half the triangles); the full mesh is built when the gesture ends (onSeed 'end', the
 // Wavy slider's change), so a still picture is always the full mesh.
 // fold.mesh is drawn with the pattern's one big comma filled into the sheet (motifTintMesh: tint bit 1, the
-// renderer's `fill` colour MOTIF_FILL_3D), for every fold (qa/fill-judge.md; see the note above CREASE_SAMPLES).
+// renderer's `fill` colour MOTIF_FILL_3D), for every fold (qa/fill-judge.md; see the note above CREASE_SAMPLES) —
+// when the pattern is 'comma'.
+//
+// THE PATTERN (13 Nov 2026; the owner: "use the Checkerboard choice … I want more of the surface to be covered with
+// pattern … Maybe add a selector at the top which allows me to pick different patterns"). state.pattern is a key of
+// pattern.js PATTERNS: 'checker' (the default), 'rings', 'comma'. A print ('checker', 'rings') is a two-tone pattern
+// of the plane that the group leaves as it is: the plane shows it everywhere (setScene({ print })), the 3D sheet
+// carries it as paper does, front teal and back sand, nearly opaque (the renderer evaluates it per pixel at each
+// vertex's paper point: setSurface({ uv }), setStyle({ print })); no comma is drawn then. 'comma' is the picture as it
+// was: one comma per tile on a translucent sheet. The hash carries it as pat=<key> when it is not the default.
+//
+// RE-CUT FIRST (13 Nov 2026; the owner: "for the motion use 'Re-cut first' in the cases where there is a
+// self-intersection of the surface"). The app asks the folds for it (createFold({ recut: true }); src/folds/recut.js):
+// a tile of xx or 22x that is not the group's default cut is first re-cut into it, piece by piece, by elements of the
+// group, and then folds with nothing passing through anything. Such a fold has fold.recut; its mesh has no vertex
+// shared between two pieces, and brings boundaryRuns (the outline cut where the piece changes: drawn instead of
+// boundary, so no line stretches between pieces that are apart) and cuts (where the tile is cut: the home tile's rim,
+// drawn as fold.cutStyle(t) says). The plane shows the home tile dotted and the cuts dashed (setScene({ recut })); the
+// words of #fold-caption say which piece moves by which element (foldCaption).
 //
 // The URL (SPEC 7, URL state contract). The whole visible state lives in the hash:
-//   #g=<id>&cut=<preset>&seed=<x>/<y>&wavy=<0..1>&t=<0..1>&view=<az>/<el>/<zoom>[/<roll>]
-// g always; the others only when they differ from their defaults (cut 0, no seed, wavy 0, t 0, view 0/55/1/0). The id
+//   #g=<id>&pat=<pattern>&cut=<preset>&seed=<x>/<y>&wavy=<0..1>&t=<0..1>&view=<az>/<el>/<zoom>[/<roll>]
+// g always; the others only when they differ from their defaults (pat checker, cut 0, no seed, wavy 0, t 0, view 0/55/1/0). The id
 // has * written %2A (#g=%2A632); seed (straight coordinates, 4 decimals) only when the cut was dragged away from the
 // preset — cut still names the preset whose metric and anchor apply; t 3 decimals, wavy 2, az / el / roll 1, zoom 2.
 // roll (an addition: the trackball turns freely, so az / el alone would lose the view's turn about the line of sight)
@@ -52,6 +70,8 @@
 // window.__folding — for tools/qa-matrix.mjs and tools/shot.mjs. Every setter applies at once, draws both panes
 // before it returns, and returns getState():
 //   setGroup(id)   setPreset(i)   setSeed(x, y)   setAmp(a)   setT(t)   setView(az, el[, zoom])   getState()
+//   setPattern(key)   (getState().pattern, .print: the print's name or null, .recut: null or { home, pieces, movers,
+//                  tau0 }, .foldCaption: the words over the fold pane)
 //                  (getState().anchor = the anchor the folds are given; .cut = the preset whose anchor applies;
 //                  .view = { az, el, zoom, roll, gliding } as shown now, gliding = the zoom is on its way back to 1
 //                  after a group change; .url = the hash this state writes; .hash = the hash the address has now,
@@ -68,12 +88,14 @@ import { apply, inverse } from './geom.js';
 import { makeWarp, buildDomain } from './domain.js';
 import { buildMesh } from './mesh.js';
 import { createFold, foldMeshOptions, foldOptions } from './folds/index.js';
+import { PATTERNS, DEFAULT_PATTERN, resolvePattern, printFor, printUniforms } from './pattern.js';
 import { createRenderer, viewFromAzEl } from './render3d.js';
 import { createPlaneView, assignEdgeColors, CAPTION_SMALL } from './plane.js';
 import { motifFor, motifInTile, motifTintMesh } from './motif.js';
 import { createHassePicker } from './hasse.js';
 import { createTimeline, enhanceRange } from './timeline.js';
-import { classColor, hexToRgb, MIRROR_COLOR, CREASE_COLOR, MOTIF_COLOR, INK, SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, MOTIF_FILL_3D } from './palette.js';
+import { classColor, hexToRgb, MIRROR_COLOR, CREASE_COLOR, MOTIF_COLOR, INK, SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, MOTIF_FILL_3D,
+  SURFACE_OPACITY, PRINT_FRONT, PRINT_BACK, PRINT_OPACITY, RECUT_COLOR } from './palette.js';
 
 // ---------------------------------------------------------------------------------------------------------------
 // Pure half: from a state to what is drawn
@@ -82,7 +104,7 @@ import { classColor, hexToRgb, MIRROR_COLOR, CREASE_COLOR, MOTIF_COLOR, INK, SUR
 export const DEFAULT_GROUP = '333';
 
 /** Line widths in css px at a 520 px pane (they shrink a little on a phone, see lineScale). */
-export const WIDTHS = { edge: 4.5, crease: 1.6, motif: 1.8, axis: 2.2 };
+export const WIDTHS = { edge: 4.5, crease: 1.6, motif: 1.8, axis: 2.2, cut: 1.9 };
 /** Opacity of the motif lines (the commas). */
 export const MOTIF_ALPHA = 0.7;
 /** How strongly the tile's edges show through the surface (the renderer's x-ray share), and a kaleidoscope's outline. */
@@ -108,7 +130,10 @@ const MOTIF_FADE_FROM = 0.45;
 const CREASE_FADE = { hinge: [0.45, 1], crosscap: [0.2, 0.47], snowflake: [0.72, 1] };
 
 const INK_RGB = hexToRgb(MIRROR_COLOR), MARK_RGB = hexToRgb(INK), CREASE_RGB = hexToRgb(CREASE_COLOR);
-const MOTIF_RGB = hexToRgb(MOTIF_COLOR);
+const MOTIF_RGB = hexToRgb(MOTIF_COLOR), CUT_RGB = hexToRgb(RECUT_COLOR);
+const PRINT_FRONT_RGB = PRINT_FRONT.map(hexToRgb), PRINT_BACK_RGB = PRINT_BACK.map(hexToRgb);
+/** How far a kaleidoscope star's secondary tiles take the ghost colour under a print (the print shows through). */
+export const GHOST_PRINT_MIX = 0.3;
 
 const clamp01 = (v) => { const x = Number(v); return x > 0 ? (x < 1 ? x : 1) : 0; };   // NaN -> 0
 const smooth = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
@@ -130,7 +155,7 @@ export function resolveGroupId(raw) {
 export const WRAPPER_HASH = /^#[A-Za-z0-9_.=%&\/-]*$/;
 /** The keys of the hash, in the order they are written. `tile` (the replication step, 10 Nov 2026): how far the
  *  plane's replication has come, 0..1, 3 decimals; absent = 1, the tiling as always. */
-export const HASH_KEYS = ['g', 'cut', 'seed', 'wavy', 'tile', 't', 'view'];
+export const HASH_KEYS = ['g', 'pat', 'cut', 'seed', 'wavy', 'tile', 't', 'view'];
 /** While the state keeps changing the hash is written at most once in this many ms (at once when a gesture ends). */
 export const HASH_THROTTLE_MS = 250;
 /**
@@ -178,11 +203,14 @@ function fmtAngle(a) { return fmt(wrap180(Math.round(a * 10) / 10), 1); }
 export function encodeGroupId(id) { return String(id).replace(/\*/g, '%2A'); }
 
 /**
- * The hash of a state u = { g, cut, seed: [x, y] | null, wavy, t, view: { az, el, zoom, roll } | null }:
- * '#g=<id>' and every other key whose rounded value is not its default. Always matches WRAPPER_HASH.
+ * The hash of a state u = { g, pat, cut, seed: [x, y] | null, wavy, t, view: { az, el, zoom, roll } | null }:
+ * '#g=<id>' and every other key whose rounded value is not its default (pat: a key of pattern.js PATTERNS, written
+ * when it is not DEFAULT_PATTERN; a missing or unknown one is not written). Always matches WRAPPER_HASH.
  */
 export function encodeHash(u) {
   const parts = ['g=' + encodeGroupId(u.g)];
+  const pat = resolvePattern(u.pat);
+  if (pat && pat !== DEFAULT_PATTERN) parts.push('pat=' + pat);
   if (u.cut > 0) parts.push('cut=' + Math.round(u.cut));
   if (u.seed && Number.isFinite(u.seed[0] + u.seed[1])) parts.push('seed=' + fmt(u.seed[0], 4) + '/' + fmt(u.seed[1], 4));
   const w = fmt(clamp01(u.wavy), 2), t = fmt(clamp01(u.t), 3);
@@ -211,7 +239,7 @@ export function decodeHash(raw) {
   let h = raw == null ? '' : String(raw);
   if (h[0] === '#') h = h.slice(1);
   if (!h.trim()) return null;
-  const base = (g, legacy) => ({ g, legacy, cut: 0, seed: null, wavy: 0, tile: 1, t: 0, view: null, dropped: [] });
+  const base = (g, legacy) => ({ g, legacy, pat: DEFAULT_PATTERN, cut: 0, seed: null, wavy: 0, tile: 1, t: 0, view: null, dropped: [] });
   if (!h.includes('=')) {
     const g = resolveGroupId(safeDecode(h));
     return g ? base(g, true) : null;
@@ -228,6 +256,7 @@ export function decodeHash(raw) {
   if (kv.has('g')) { g = resolveGroupId(kv.get('g')); if (!g) return null; }
   const out = base(g, false), group = BY_ID[g];
   const drop = (k) => { out.dropped.push(k); };
+  if (kv.has('pat')) { const k = resolvePattern(kv.get('pat')); if (k) out.pat = k; else drop('pat'); }
   if (kv.has('cut')) {
     const s = kv.get('cut'), c = /^\d{1,3}$/.test(s) ? Number(s) : -1;
     if (c >= 0 && c < group.presets.length) out.cut = c; else drop('cut');
@@ -338,6 +367,35 @@ export function surfaceStyle(fold, t = 1) {
   return { front: mix(SURFACE_FRONT, SURFACE_BACK), back: mix(SURFACE_BACK, SURFACE_FRONT) };
 }
 
+/**
+ * The same for a printed sheet (pattern.js): { printFront: [light, dark], printBack: [light, dark] }, the paper's two
+ * sides blended by surfaceMix(fold, t), so a tile that lies an odd number of mirrors from the anchor shows the closed
+ * shape in the same colours as its neighbour does.
+ */
+export function printStyle(fold, t = 1) {
+  const m = surfaceMix(fold, t);
+  const mix = (a, b) => a.map((c, i) => c * (1 - m) + b[i] * m);
+  return {
+    printFront: [mix(PRINT_FRONT_RGB[0], PRINT_BACK_RGB[0]), mix(PRINT_FRONT_RGB[1], PRINT_BACK_RGB[1])],
+    printBack: [mix(PRINT_BACK_RGB[0], PRINT_FRONT_RGB[0]), mix(PRINT_BACK_RGB[1], PRINT_FRONT_RGB[1])],
+  };
+}
+
+/**
+ * The words over the fold pane at t for a fold that re-cuts first (fold.recut), '' otherwise: on the flat tile what
+ * Fold will do; while a piece moves, which one and by which element of the group; while the home tile folds, why it
+ * was re-cut. `short`: the short words (a phone).
+ */
+export function foldCaption(fold, t, short = false) {
+  const R = fold && fold.recut;
+  if (!R || !(R.movers > 0) || typeof fold.stage !== 'function') return '';
+  const st = fold.stage(clamp01(t)), name = R.home.name;
+  if (st.stage === 'flat') return short ? `re-cut into the ${name} first` : `Fold re-cuts the tile into the ${name} (dotted) first`;
+  if (st.stage === 'recut') return short ? `re-cut ${st.piece}/${st.of}: ${st.text.replace(/^a /, '').replace(/:.*$/, '')}` : `re-cut, piece ${st.piece} of ${st.of}: ${st.text}`;
+  if (st.stage === 'fold') return short ? `the ${name} folds: nothing passes through` : `the ${name} folds: its cut runs along the double line, so no paper passes through paper`;
+  return '';
+}
+
 // ---- one label per point of the orbifold ----------------------------------------------------------------------
 
 /**
@@ -437,23 +495,31 @@ function warpFor(group, amp) {
  *                the triangles, the SAME boundary samples), and a roll fold keeps it (density: false) instead of
  *                building a finer one. scene.draft says so. The still picture is always built without it.
  *   prevDomain   the previous tile of the SAME group, or null: its seams keep their colours (plane.js assignEdgeColors)
+ *   pattern      a key of pattern.js PATTERNS. 'comma' (the default HERE, the picture as it was before the prints, which
+ *                the tests of the pure half were written for): the comma is cut into the mesh and its outline drawn.
+ *                'checker' | 'rings' (the app's default is 'checker'): scene.print is the group's print, no comma.
+ *   recut        true (the default, as the app asks): xx and 22x re-cut first (src/folds/recut.js); false: the fold
+ *                module's own motion for every tile.
  */
-export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false } = {}, prevDomain = null) {
+export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false, pattern = 'comma', recut = true } = {}, prevDomain = null) {
   const domain = buildDomain(group, { seed, metric, warp: warpFor(group, clamp01(amp)) });
   assignEdgeColors(domain, prevDomain && prevDomain.group === group ? prevDomain : null);
   draft = draft === true && group.fold !== 'snowflake';
   const tileMesh = group.fold === 'snowflake' ? null : buildMesh(group, domain, { ...foldMeshOptions(group), draft });
   const foldOpts = foldOptions(draft ? { anchor, density: false } : { anchor });
-  const fold = createFold(group, domain, tileMesh, foldOpts);
-  // the comma filled (tint bit 1, the renderer's `fill`: MOTIF_FILL_3D), every fold
-  fold.mesh = motifTintMesh(group, fold.mesh, motifFor(group)) || fold.mesh;
+  const fold = createFold(group, domain, tileMesh, recut ? { ...foldOpts, recut: true } : foldOpts);
+  const patternKey = resolvePattern(pattern) || 'comma';
+  const print = printFor(group, patternKey);
+  const comma = !print;
+  // the comma filled (tint bit 1, the renderer's `fill`: MOTIF_FILL_3D), every fold — when the pattern is the comma
+  if (comma) fold.mesh = motifTintMesh(group, fold.mesh, motifFor(group)) || fold.mesh;
   const M = fold.mesh;                         // the mesh to draw: NOT always the tile mesh (see src/folds/index.js)
   const n = M.n, cellOf = M.cell;
   const size = domain.size || Math.sqrt(group.domainArea);
 
-  // the boundary, one polyline per edge of the tile
+  // the boundary, one polyline per edge of the tile (a re-cut tile: per run of an edge on one piece)
   const edges = [];
-  for (const b of M.boundary) {
+  for (const b of M.boundaryRuns || M.boundary) {
     if (!b || !b.pts || b.pts.length < 4) continue;
     const e = domain.edges[b.edge];
     const mirror = !e || e.kind === 'mirror';
@@ -480,9 +546,9 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
   // Each entry: copy = the cell it is drawn on (0 = the tile), part = which polyline of the tile's motif it copies,
   // fade = its fade window or null.
   const motif = [];
-  const base = motifInTile(group, domain, motifFor(group));
+  const base = comma ? motifInTile(group, domain, motifFor(group)) : [];
   const pushMotif = (xy, cells, copy, part, fade) => motif.push({ xy, cells, copy, part, fade, out: new Float32Array(3 * (xy.length >> 1)) });
-  if (group.fold === 'snowflake' && Array.isArray(fold.cellMaps)) {
+  if (!comma) { /* a print: no comma */ } else if (group.fold === 'snowflake' && Array.isArray(fold.cellMaps)) {
     const q = [0, 0], fades = motifFades(fold, size);
     fold.cellMaps.forEach((g, i) => {
       base.forEach((pl, part) => {
@@ -498,8 +564,22 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
     base.forEach((pl, part) => {
       const m = pl.length >> 1, cells = new Uint16Array(m);
       if (!one) for (let k = 0; k < m; k++) cells[k] = M.locate(pl[2 * k], pl[2 * k + 1]);
-      pushMotif(pl, cells, 0, part, null);
+      if (!M.recut) { pushMotif(pl, cells, 0, part, null); return; }
+      // a re-cut tile: the outline is cut where it passes from one piece to the next (they come apart on the way)
+      let from = 0;
+      for (let k = 1; k <= m; k++) {
+        if (k < m && M.cells[cells[k]].part === M.cells[cells[from]].part) continue;
+        if (k - from >= 2) pushMotif(pl.subarray(2 * from, 2 * k), cells.subarray(from, k), 0, part, null);
+        from = k;
+      }
     });
+  }
+
+  // where a re-cut tile is cut (the home tile's rim on the pieces: src/folds/recut.js), each point with its piece
+  const cuts = [];
+  for (const c of M.cuts || []) {
+    if (!c || !c.pts || c.pts.length < 4) continue;
+    cuts.push({ pts: c.pts, cells: c.cells, out: new Float32Array(3 * (c.pts.length >> 1)) });
   }
 
   // the cone points: they lie on the boundary; each takes the piece of the nearest boundary sample
@@ -518,6 +598,7 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
 
   return {
     group, domain, tileMesh, fold, M, n, cellOf, size, anchor: foldOpts.anchor || null, draft,
+    pattern: patternKey, print, cuts,
     pos: new Float32Array(3 * n), edges, creases, motif, cones,
     stops: fold.stops, duration: fold.duration, star: fold.star || null,
     axis: [], frame: null, nonFinite: 0, t: -1, pairs: null,
@@ -583,6 +664,10 @@ export function mapScene(scene, t) {
     for (let k = 0, q = p.length >> 1; k < q; k++) put(p[2 * k], p[2 * k + 1], c[k], m.out, 3 * k);
   }
   for (const c of scene.cones) put(c.x, c.y, c.cell, c.p, 0);
+  for (const c of scene.cuts || []) {
+    const p = c.pts, cl = c.cells;
+    for (let k = 0, q = p.length >> 1; k < q; k++) put(p[2 * k], p[2 * k + 1], cl[k], c.out, 3 * k);
+  }
 
   scene.axis = [];
   if (typeof scene.fold.doubleLine === 'function') {
@@ -625,8 +710,14 @@ export function creaseAlpha(foldType, t, fold) {
  */
 export function sceneLines(scene, k = 1) {
   const lines = [], thin = Math.max(k, 0.85);
-  const ca = creaseAlpha(scene.group.fold, scene.t, scene.fold);
+  // (a fold that re-cuts first says itself when its creases show: none before the home tile begins to fold)
+  const ca = typeof scene.fold.creaseAlpha === 'function' ? scene.fold.creaseAlpha(scene.t) : creaseAlpha(scene.group.fold, scene.t, scene.fold);
   if (ca > 0.004) for (const c of scene.creases) lines.push({ points: c.out, color: CREASE_RGB, width: WIDTHS.crease * thin, alpha: ca, dashed: true, xray: 0.5 });
+  // where a re-cut tile is cut: dashed on the flat tile, the pieces' own edges on the way, faint once the fold closes them
+  if (scene.cuts && scene.cuts.length && typeof scene.fold.cutStyle === 'function') {
+    const cs = scene.fold.cutStyle(scene.t);
+    if (cs && cs.alpha > 0.004) for (const c of scene.cuts) lines.push({ points: c.out, color: CUT_RGB, width: WIDTHS.cut * cs.width * thin, alpha: cs.alpha, dashed: !!cs.dashed, xray: 0.45 });
+  }
   for (const m of scene.motif) {
     const a = MOTIF_ALPHA * motifFade(m.fade, scene.t);       // a kaleidoscope's landed copies fade out (motifFades)
     if (a > 0.004) lines.push({ points: m.out, color: MOTIF_RGB, width: WIDTHS.motif * thin, alpha: a, xray: 0.3 });
@@ -681,9 +772,37 @@ export function sceneMarkers(scene, k = 1) {
  */
 export function ghostColor(scene) {
   if (scene.group.fold !== 'snowflake') return SURFACE_GHOST;
-  const stops = scene.stops, from = stops.length > 2 ? stops[stops.length - 2].t : 0.5;
-  const s = smooth((scene.t - from) / (1 - from));
+  const s = ghostEase(scene);
   return SURFACE_GHOST.map((g, i) => g + (SURFACE_FRONT[i] - g) * s);
+}
+/** How far a star's secondary tiles have become the tile itself at the scene's t: 0 until the last fold, 1 at its end. */
+export function ghostEase(scene) {
+  if (scene.group.fold !== 'snowflake') return 0;
+  const stops = scene.stops, from = stops.length > 2 ? stops[stops.length - 2].t : 0.5;
+  return smooth((scene.t - from) / (1 - from));
+}
+/**
+ * What the plane is told of a re-cut (plane.js setScene({ recut })): { name, home: [[x, y], ...] the home tile,
+ * cuts: [Float32Array, ...] where the tile is cut, active }, or null when the fold does not re-cut (no piece moves).
+ * active (with a time t): the piece that is being carried at t, { part, from: its outline on the tile, to: where it
+ * lands in the home tile }, so the plane can show which part of the tile the 3D pane is moving, and where to; null
+ * when no piece moves at t (or no t is given).
+ */
+export function planeRecut(scene, t = null) {
+  const R = scene && scene.fold && scene.fold.recut;
+  if (!R || !(R.movers > 0)) return null;
+  return { name: R.home.name, home: R.home.poly, cuts: (scene.M.cuts || []).map((c) => c.pts), active: t === null ? null : recutActive(scene, t) };
+}
+/** The piece of a re-cut tile that is carried at t: { part, from, to } (plane polygons), or null. */
+export function recutActive(scene, t) {
+  const fold = scene && scene.fold, R = fold && fold.recut;
+  if (!R || !(R.movers > 0) || typeof fold.stage !== 'function') return null;
+  const st = fold.stage(clamp01(t));
+  if (st.stage !== 'recut') return null;
+  const p = R.pieces.find((q) => q.part === st.part);
+  if (!p || !p.poly || p.poly.length < 3) return null;
+  const g = p.element;
+  return { part: p.part, from: p.poly, to: p.poly.map((q) => [g.a * q[0] + g.b * q[1] + g.tx, g.c * q[0] + g.d * q[1] + g.ty]) };
 }
 
 /** Seconds the zoom takes to glide back to 1 after a group change (as long as the renderer's own reset glide). */
@@ -781,8 +900,10 @@ function start(doc, win) {
   const turnHint = $('turn-hint');                // the shell's "drag to turn" (SPEC 8 C1); the page works without it
   // the replication step: the Tile button, its scrubber, the words for what acts; the page works without them
   const tileEl = { bar: $('tile-bar'), btn: $('tile-btn'), slider: $('tile-slider'), caption: $('tile-caption') };
+  // the pattern selector and the words over the fold pane (13 Nov 2026); the page works without them
+  const patEl = { box: $('pattern-box'), select: $('pattern'), label: $('pattern-label') }, foldCap = $('fold-caption');
 
-  const state = { groupId: null, presetIndex: 0, cutIndex: 0, seed: [0, 0], metric: undefined, amp: 0, t: 0, anchor: null, tile: 1 };
+  const state = { groupId: null, presetIndex: 0, cutIndex: 0, seed: [0, 0], metric: undefined, amp: 0, t: 0, anchor: null, tile: 1, pattern: DEFAULT_PATTERN };
   const errors = [];
   let scene = null;
   let dragged = false;              // the person has moved the cut once: "drag to move the cut" has done its job
@@ -940,16 +1061,25 @@ function start(doc, win) {
     counters.draws++;
     try {
       mapScene(scene, state.t);
-      // the surface colours follow t: a tile whose paper turns over swaps front and back while it does (C3)
-      const st = surfaceStyle(scene.fold, state.t), skey = st.front.join();
-      if (skey !== surfaceKey) { surfaceKey = skey; R.setStyle(st); }
+      // the surface colours follow t: a tile whose paper turns over swaps front and back while it does (C3). A print
+      // is paper (two-sided, nearly opaque); the comma's sheet is the translucent one
+      if (scene.print) {
+        const ps = printStyle(scene.fold, state.t), skey = 'print|' + scene.group.id + '|' + scene.pattern + '|' + ps.printFront[0].join();
+        if (skey !== surfaceKey) { surfaceKey = skey; R.setStyle({ print: printUniforms(scene.print), printFront: ps.printFront, printBack: ps.printBack, opacity: PRINT_OPACITY }); }
+      } else {
+        const st = surfaceStyle(scene.fold, state.t), skey = 'plain|' + st.front.join();
+        if (skey !== surfaceKey) { surfaceKey = skey; R.setStyle({ front: st.front, back: st.back, print: null, opacity: SURFACE_OPACITY }); }
+      }
       if (scene.nonFinite) report(`fold ${scene.group.id} at t = ${state.t}`, `${scene.nonFinite} points are not finite (drawn flat)`);
       const k = lineScale(el.foldCanvas.clientWidth, el.foldCanvas.clientHeight);
-      if (fresh) R.setSurface({ positions: scene.pos, indices: scene.M.tri, tint: scene.M.tint && scene.M.tint.length >= scene.n ? scene.M.tint : undefined });
+      // (uv: every vertex's point of the paper, where the print is evaluated)
+      if (fresh) R.setSurface({ positions: scene.pos, indices: scene.M.tri, tint: scene.M.tint && scene.M.tint.length >= scene.n ? scene.M.tint : undefined, uv: scene.M.xy });
       else R.updatePositions(scene.pos);
       if (scene.frame) R.setFrame(scene.frame, immediate);
-      const ghost = ghostColor(scene), gkey = ghost.join();
-      if (gkey !== ghostKey) { ghostKey = gkey; R.setStyle({ ghost }); }
+      // a star's secondary tiles: grey (the comma), or the print seen through a veil of grey, until the last fold
+      const ghost = scene.print ? SURFACE_GHOST : ghostColor(scene), mixG = scene.print ? GHOST_PRINT_MIX * (1 - ghostEase(scene)) : 1;
+      const gkey = ghost.join() + '|' + mixG.toFixed(4);
+      if (gkey !== ghostKey) { ghostKey = gkey; R.setStyle({ ghost, ghostMix: mixG }); }
       R.setLines(sceneLines(scene, k));
       const marks = sceneMarkers(scene, k);
       labelAlpha.clear();
@@ -957,14 +1087,34 @@ function start(doc, win) {
       R.setMarkers(marks);
       R.render();
       applyLabelAlpha();
+      syncFoldCaption();
     } catch (e) { report(`drawing ${scene.group.id} at t = ${state.t}`, e); }
+  }
+
+  /** The words over the fold pane: what a fold that re-cuts first is doing now (foldCaption); nothing otherwise. And
+   *  the plane shows the piece that is being carried, and where it lands (told only when the piece changes). */
+  let shownPart = -1;
+  const recutPartNow = () => { const a = scene ? recutActive(scene, state.t) : null; return a ? a.part : -1; };
+  function syncFoldCaption() {
+    const part = recutPartNow();
+    if (part !== shownPart) {
+      shownPart = part;
+      if (P.setRecutActive) { P.setRecutActive(part < 0 ? null : recutActive(scene, state.t)); P.render(); }
+    }
+    if (!foldCap) return;
+    const w = el.foldCanvas.clientWidth || 0;
+    const text = scene ? foldCaption(scene.fold, state.t, w > 0 && w < 430) : '';
+    if (foldCap.textContent !== text) foldCap.textContent = text;
+    foldCap.hidden = !text;
   }
 
   function drawPlane(now) {
     if (!scene) return;
     try {
       // the kaleidoscopes have nothing to cut: no handle, no drags (SPEC 8 C2)
-      P.setScene({ group: scene.group, domain: scene.domain, motif: motifFor(scene.group), star: scene.star || undefined, interactive: scene.group.fold !== 'snowflake' });
+      P.setScene({ group: scene.group, domain: scene.domain, motif: motifFor(scene.group), star: scene.star || undefined, interactive: scene.group.fold !== 'snowflake',
+        print: scene.print || null, recut: planeRecut(scene, state.t) });
+      shownPart = recutPartNow();
       if (now) P.render();
     } catch (e) { report(`plane ${scene.group.id}`, e); }
   }
@@ -981,10 +1131,11 @@ function start(doc, win) {
     let next;
     try {
       const prev = colourFrom && colourFrom.group === group ? colourFrom : (scene && !recolour ? scene.domain : null);
-      next = buildScene(group, { seed: state.seed, metric: state.metric, amp: state.amp, anchor: state.anchor, draft }, prev);
+      next = buildScene(group, { seed: state.seed, metric: state.metric, amp: state.amp, anchor: state.anchor, draft, pattern: state.pattern }, prev);
     } catch (e) { report(`building ${group.id} for the seed ${state.seed}`, e); return false; }
     scene = next;
     counters.rebuilds++;
+    syncFeatures();
     // (a tile whose paper ends up turned over: the surface colours follow t, see drawFold)
     timeline.setStops(scene.stops);
     timeline.setDuration(scene.duration);
@@ -1004,6 +1155,23 @@ function start(doc, win) {
     // the replication's bar and words take the hint's place while they show
     el.hint.hidden = h.hidden || !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
   }
+  /** #app[data-features]: the group's (SPEC 8 C1), and `recut` while the tile on screen is re-cut first. */
+  function syncFeatures() {
+    const group = BY_ID[state.groupId];
+    if (!group) return;
+    const f = groupFeatures(group);
+    if (scene && scene.group === group && planeRecut(scene)) f.push('recut');
+    const v = f.join(' ');
+    if (el.app.getAttribute('data-features') !== v) el.app.setAttribute('data-features', v);
+  }
+  /** The selector shows the pattern; #app[data-pattern] names it (the legend and the swatch read it). */
+  function syncPattern() {
+    if (el.app.getAttribute('data-pattern') !== state.pattern) el.app.setAttribute('data-pattern', state.pattern);
+    if (patEl.select && patEl.select.value !== state.pattern) patEl.select.value = state.pattern;
+    const P0 = PATTERNS.find((q) => q.key === state.pattern);
+    if (patEl.label && P0 && patEl.label.textContent !== P0.label) patEl.label.textContent = P0.label;
+    if (patEl.box && P0) patEl.box.title = 'Pattern: ' + P0.label + ' — ' + P0.hint;
+  }
   function fillShell(group) {
     el.chipSymbol.textContent = group.label;
     el.chipMeta.textContent = group.hm + ' · ' + group.shape;
@@ -1021,6 +1189,7 @@ function start(doc, win) {
     // what the legend and the cut controls show (SPEC 8 C1: styles.css reads these)
     el.app.setAttribute('data-fold', group.fold);
     el.app.setAttribute('data-features', groupFeatures(group).join(' '));
+    syncPattern();
   }
 
   // ---- the URL (SPEC 7): written at most every HASH_THROTTLE_MS, at once when a gesture ends ------------------------
@@ -1034,7 +1203,7 @@ function start(doc, win) {
   function urlState() {
     const group = BY_ID[state.groupId], snow = group.fold === 'snowflake';
     return {
-      g: state.groupId, cut: state.cutIndex,
+      g: state.groupId, pat: state.pattern, cut: state.cutIndex,
       seed: !snow && state.presetIndex < 0 && scene ? [scene.domain.seed[0], scene.domain.seed[1]] : null,
       wavy: snow ? 0 : state.amp, tile: state.tile, t: state.t, view: viewToUrl(R.getView ? R.getView() : null),
     };
@@ -1102,6 +1271,18 @@ function start(doc, win) {
     return getState();
   }
 
+  /** Another pattern on the same tile, at the same t: the sheet is built again (the comma is cut into it; a print is not). */
+  function setPattern(raw) {
+    const key = resolvePattern(raw);
+    if (!key || key === state.pattern) { syncPattern(); return getState(); }
+    const before = state.pattern;
+    state.pattern = key;
+    quiet++;
+    try { if (scene && !rebuild()) state.pattern = before; syncPattern(); } finally { quiet--; }
+    scheduleHash();
+    return getState();
+  }
+
   function setSeed(x, y) {
     x = Number(x); y = Number(y);
     if (!Number.isFinite(x + y) || !scene || scene.group.fold === 'snowflake') return getState();   // nothing to cut there
@@ -1154,11 +1335,12 @@ function start(doc, win) {
     if (!group) return false;
     const snow = group.fold === 'snowflake', custom = !snow && !!u.seed;
     const p = presetState(group, u.cut);
-    const want = { ...p, presetIndex: custom ? -1 : p.presetIndex, seed: custom ? [u.seed[0], u.seed[1]] : p.seed, amp: snow ? state.amp : clamp01(u.wavy) };
+    const want = { ...p, presetIndex: custom ? -1 : p.presetIndex, seed: custom ? [u.seed[0], u.seed[1]] : p.seed, amp: snow ? state.amp : clamp01(u.wavy),
+      pattern: resolvePattern(u.pat) || DEFAULT_PATTERN };
     const changed = u.g !== state.groupId;
     const before = { ...state, seed: state.seed.slice(), anchor: state.anchor && state.anchor.slice() }, old = scene;
     const same = !changed && !!scene && state.cutIndex === want.cutIndex && state.presetIndex === want.presetIndex &&
-      state.seed[0] === want.seed[0] && state.seed[1] === want.seed[1] && state.amp === want.amp;
+      state.seed[0] === want.seed[0] && state.seed[1] === want.seed[1] && state.amp === want.amp && state.pattern === want.pattern;
     quiet++;
     try {
       stopZoomHome();
@@ -1170,6 +1352,7 @@ function start(doc, win) {
         if (changed) { state.groupId = u.g; scene = null; }
         Object.assign(state, want);
         if (changed) fillShell(group); else if (Number(el.wavy.value) !== state.amp) el.wavy.value = String(state.amp);
+        syncPattern();
         // A dragged cut (seed in the hash): its seams take their colours from the preset's tile, as along the drag
         // that made it (a seam keeps its colour while the cut moves; plane.js assignEdgeColors), so the link shows
         // the colours of the session it was copied from (round-3 check: 89 % of drags from a preset, against 59 %
@@ -1181,6 +1364,7 @@ function start(doc, win) {
         if (!rebuild({ immediate: true, recolour: true, colourFrom })) {
           Object.assign(state, before); scene = old;
           if (state.groupId) { fillShell(BY_ID[state.groupId]); timeline.set(state.t); }
+          syncFeatures();
           return false;
         }
       }
@@ -1248,6 +1432,13 @@ function start(doc, win) {
       frame: scene && scene.frame ? { center: scene.frame.center.slice(), radius: scene.frame.radius } : null,
       mirrored: !!(scene && scene.fold.mirrored === true), surfaceMix: scene ? surfaceMix(scene.fold, state.t) : 0,
       draft: !!(scene && scene.draft),
+      // the pattern (pattern.js): its key, the print's name ('checks', 'triangles', 'hexagons', 'stripes', 'rings') or null
+      pattern: state.pattern, print: scene && scene.print ? scene.print.name : null,
+      // re-cut first (src/folds/recut.js): null, or the home tile's name, the pieces and when the fold itself begins
+      recut: scene && scene.fold.recut && scene.fold.recut.movers > 0
+        ? { home: scene.fold.recut.home.name, pieces: scene.fold.recut.pieces.map((q) => ({ type: q.type, share: q.area / scene.group.domainArea, from: q.from, to: q.to })), movers: scene.fold.recut.movers, tau0: scene.fold.recut.tau0 }
+        : null,
+      foldCaption: foldCap && !foldCap.hidden ? foldCap.textContent : '',
       tile: state.tile, tilePlaying: tilePlaying(), tileCaption: tileEl.caption && !tileEl.caption.hidden ? tileEl.caption.textContent : '',
       tileBarOpen: !!(tileEl.bar && tileEl.bar.hasAttribute('data-open')),
       // the replication's frame on a phone's plane (plane.js setStepFrame): 0 the window as always .. 1 the step's
@@ -1290,6 +1481,12 @@ function start(doc, win) {
     flushHash();
   });
   el.scrubber.addEventListener('change', () => { flushHash(); });
+  if (patEl.select) {
+    if (!patEl.select.options || !patEl.select.options.length) {
+      for (const q of PATTERNS) { const o = doc.createElement('option'); o.value = q.key; o.textContent = q.label; patEl.select.appendChild(o); }
+    }
+    patEl.select.addEventListener('change', () => { setPattern(patEl.select.value); flushHash(); });
+  }
   el.chip.addEventListener('click', () => picker.open(state.groupId));
   el.resetView.addEventListener('click', () => { stopZoomHome(); turnFrom = null; R.resetView(); });
 
@@ -1323,7 +1520,7 @@ function start(doc, win) {
     let k0 = 0;
     new win.ResizeObserver(() => {
       const k = lineScale(el.foldCanvas.clientWidth, el.foldCanvas.clientHeight);
-      if (k !== k0) { k0 = k; drawFold(true); }
+      if (k !== k0) { k0 = k; drawFold(true); } else syncFoldCaption();
     }).observe(el.foldCanvas);
     // a phone turned on its side (or a window made larger) while the step shows: its frame on small panes only
     new win.ResizeObserver(() => syncStepFrame()).observe(el.planeCanvas);
@@ -1345,7 +1542,7 @@ function start(doc, win) {
     win.setTimeout(fin, 300);
   });
   const api = {
-    setGroup, setPreset, setSeed, setAmp, setT, setView, getState,
+    setGroup, setPreset, setSeed, setAmp, setT, setView, getState, setPattern,
     /** The replication's progress u (0 = the tile alone, 1 = tiled), drawn at once. */
     setTile(u) { quiet++; try { setTileState(u); P.render(); } finally { quiet--; } scheduleHash(); return getState(); },
     /** Press the Tile button; resolves when the play has ended. */

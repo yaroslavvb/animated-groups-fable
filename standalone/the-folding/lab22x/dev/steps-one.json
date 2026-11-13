@@ -1,0 +1,12 @@
+[
+  { "w": 1280, "h": 670, "eval": "await new Promise((r) => { const f = () => (window.__lab && window.__lab.ready) || window.__labError ? r(1) : setTimeout(f, 50); f(); }), window.__labError || location.hash || '(no hash)'", "wait": 1500, "out": "lab22x/qa/one-t0.png" },
+  { "eval": "window.__lab.setT(0.45), 1", "wait": 500, "out": "lab22x/qa/one-t045.png" },
+  { "eval": "window.__lab.setT(0.62), 1", "wait": 500, "out": "lab22x/qa/one-t062.png" },
+  { "eval": "window.__lab.setT(0.70), 1", "wait": 500, "out": "lab22x/qa/one-t070.png" },
+  { "eval": "window.__lab.setT(0.82), 1", "wait": 500, "out": "lab22x/qa/one-t082.png" },
+  { "eval": "window.__lab.setT(1), await new Promise(r => setTimeout(r, 600)), JSON.stringify({h: location.hash, s: window.__lab.getState().crossing})", "wait": 500, "out": "lab22x/qa/one-t1.png" },
+  { "eval": "window.__lab.setFocus('xray'), window.__lab.setT(0.70), 1", "wait": 700, "out": "lab22x/qa/one-focus-xray-070.png" },
+  { "eval": "window.__lab.setFocus('ribs'), 1", "wait": 700, "out": "lab22x/qa/one-focus-ribs-070.png" },
+  { "eval": "window.__lab.setFocus('cutaway'), 1", "wait": 700, "out": "lab22x/qa/one-focus-cutaway-070.png" },
+  { "eval": "window.__lab.setFocus('map'), 1", "wait": 700, "out": "lab22x/qa/one-focus-map-070.png" }
+]

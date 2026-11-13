@@ -1,0 +1,10 @@
+[
+  { "w": 1280, "h": 670, "eval": "await new Promise((r) => { const f = () => (window.__lab && window.__lab.ready) || window.__labError ? r(1) : setTimeout(f, 50); f(); }), window.__lab.setCut(1), window.__lab.setT(0.75), window.__labError || 1", "wait": 1500, "out": "lab22x/qa/bowl-one-075.png" },
+  { "eval": "window.__lab.setT(1), 1", "wait": 500, "out": "lab22x/qa/bowl-one-1.png" },
+  { "eval": "window.__lab.setMotion('recut'), window.__lab.setT(0.12), 1", "wait": 900, "out": "lab22x/qa/bowl-recut-012.png" },
+  { "eval": "window.__lab.setT(0.8), 1", "wait": 500, "out": "lab22x/qa/bowl-recut-080.png" },
+  { "eval": "window.__lab.setCut(0), window.__lab.setMotion('acts'), window.__lab.setT(0.8), 1", "wait": 900, "out": "lab22x/qa/pocket-one-080.png" },
+  { "eval": "window.__lab.setT(1), 1", "wait": 500, "out": "lab22x/qa/pocket-one-1.png" },
+  { "eval": "window.__lab.setCut(2), window.__lab.setMotion('twist'), window.__lab.setT(0.72), 1", "wait": 900, "out": "lab22x/qa/hex-twist-072.png" },
+  { "eval": "window.__lab.setT(0.9), JSON.stringify(window.__lab.getState()).slice(0, 200)", "wait": 500, "out": "lab22x/qa/hex-twist-090.png" }
+]

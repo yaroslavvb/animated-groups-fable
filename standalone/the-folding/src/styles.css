@@ -24,6 +24,9 @@
   --crease: #9a9aa3;                       /* CREASE_COLOR */
   --glide: #6b6b74;                        /* GLIDE_COLOR */
   --motif: #3b3b44;                        /* MOTIF_COLOR */
+  --print-light: #9ad5cc;                  /* PRINT_FRONT[0]: the paper's front, light tone (the pattern swatches) */
+  --print-dark: #4fa397;                   /* PRINT_FRONT[1]: its dark tone */
+  --print-back: #d8bd85;                   /* PRINT_BACK[1]: the paper's back, dark tone (the legend) */
 
   --pad: 12px;                             /* page side padding */
   --gap: 8px;                              /* between the panes */
@@ -112,6 +115,45 @@ body {
   color: var(--muted);
 }
 .orb-caret { flex: none; width: 9px; height: 5.4px; fill: var(--muted); }
+
+/* ---- the pattern selector (13 Nov 2026): a pill at the right of the header, under an invisible native <select> ----
+   The pill shows the swatch of the current pattern (#app[data-pattern]), its name and a caret; the <select> covers it
+   (opacity 0), so a tap opens the platform's own picker and the keyboard works as on any select. The pill is the 36 px
+   pill of the other controls inside the label's 44 px box. On a narrow window the name goes: the swatch alone. */
+.pat { position: relative; flex: none; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; height: var(--tap); cursor: pointer; }
+.pat-k { color: var(--muted); font-size: 13px; line-height: 16px; white-space: nowrap; }
+.pat-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 10px 0 9px;
+  border-radius: 8px;
+  background: var(--ground);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  white-space: nowrap;
+}
+.pat-label { font-size: 14px; line-height: 16px; }
+.pat-sw { flex: none; width: 18px; height: 18px; display: none; }
+.app[data-pattern="checker"] .pat-sw-checker, .app[data-pattern="rings"] .pat-sw-rings, .app[data-pattern="comma"] .pat-sw-comma,
+.app:not([data-pattern]) .pat-sw-checker { display: block; }
+.pat-bg { fill: var(--print-light); }
+.pat-fg { fill: var(--print-dark); }
+.pat-ring { fill: none; stroke: var(--print-dark); stroke-width: 2.2; }
+.pat-glass { fill: var(--accent-soft); }
+.pat-ink { fill: var(--motif); }
+.pat > select {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0;
+  opacity: 0;
+  font: inherit; font-size: 16px;            /* 16 px: iOS does not zoom the page when the picker opens */
+  cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.pat:focus-within > .pat-pill { outline: 2px solid var(--accent); outline-offset: 1px; }
+@media (hover: hover) { .pat:hover > .pat-pill { background-color: var(--card); } }
+@media (max-width: 719px) { .pat-k { display: none; } }
+@media (max-width: 559px) {
+  .pat-label { display: none; }
+  .pat-pill { padding: 0 8px; gap: 6px; }
+}
 
 /* ---- caption: the orbifold in words ------------------------------------------------------------------------------ */
 .caption {
@@ -207,6 +249,8 @@ body {
    stay clear of it: over all 17 groups at t = 0, 0.5 and 1, at 375x498, 390x780, 667x375 and 1280x720, the corner
    pill lies over no part of the shape and no label (dev/uil3-look.mjs); centred on an edge it touched 10 of 204. */
 .turn-hint { left: 6px; top: 6px; bottom: auto; transform: none; max-width: calc(100% - 12px); padding: 1px 7px 2px; }
+/* What a fold that re-cuts first is doing (13 Nov 2026): at the foot of the 3D pane, in ink. */
+.fold-caption { bottom: 6px; color: var(--ink); }
 /* The kaleidoscopes have nothing to cut: no hint over their plane (contract C1; src/app.js hides it too). */
 .app[data-fold="snowflake"] .pane-plane > .hint { display: none; }
 /* A small plane pane (a phone; finding 11): the hint at the top edge, tighter, so that one line of it fits a 150 px
@@ -412,6 +456,11 @@ body {
 .app[data-features~="corners"] .lg[data-feature="corners"],
 .app[data-features~="double"] .lg[data-feature="double"],
 .app:not([data-features]) .lg:is([data-feature="seams"], [data-feature="mirrors"], [data-feature="cones"]) { display: flex; }
+/* under a print the paper has two sides: said first (13 Nov 2026) */
+.app[data-pattern="checker"] .lg[data-paper], .app[data-pattern="rings"] .lg[data-paper] { display: flex; }
+.lg-sep { margin: 0 6px; }
+.sw-front { fill: var(--print-dark); }
+.sw-back { fill: var(--print-back); }
 .sw { flex: none; margin-right: 6px; overflow: visible; }
 .sw path { fill: none; stroke-width: 3; stroke-linecap: round; }
 .sw-a { stroke: var(--class-0); }
@@ -473,6 +522,7 @@ body {
   .orb { padding: 0 8px 0 9px; gap: 7px; }
   .btn-primary { min-width: 84px; padding: 0 12px; }
   .legend { column-gap: 12px; }
+  .lg-long { display: none; }              /* "front · back": the two sides of the paper share a line with the seams */
   .companion-k { display: none; }          /* the link alone: "companion:" would cost the legend a line */
 }
 @media (max-width: 379px) {

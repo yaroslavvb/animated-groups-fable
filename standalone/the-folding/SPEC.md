@@ -598,3 +598,79 @@ top of the file).
       **test/plane-tiling-cover.test.js**: the drawn frames read back and checked against the group (every outline g(D)
       with g in G once, every card a tile or h ∘ m_i(s), no overlap, the window covered once at the end, the words name
       the moving cards), with planted defects caught.
+
+## 10. 13 Nov 2026 — the print, the pattern selector, re-cut first
+
+The owner, after the 22× lab (`lab22x/`, the space `@yaroslavvb/the-folding-22x`): *"make the foldings … more
+understandable, consider the-folding-22x and use the 'Checkerboard' choice, and for the motion use 'Re-cut first' in the
+cases where there is a self-intersection of the surface. Also, I want more of the surface to be covered with pattern, for
+instance in \*x, most of the surface is empty, so it's not obvious how the unfolding is happening. Maybe add a selector
+at the top which allows me to pick different patterns."* Notes: `notes/recut-prints.md`.
+
+- **The print** (`src/pattern.js`, pure). A print is a two-tone pattern of the plane that EVERY element of the group
+  leaves as it is, so it is a pattern of the orbifold: the plane shows it everywhere, the tile carries its share, it
+  closes without a break across every seam, and a piece of a re-cut tile, carried by an element of the group, lands in
+  register. (The lab's checkerboard was a square grid on one tile's paper; it broke at every seam.)
+  - `PATTERNS` = `checker` (the default), `rings`, `comma`; `resolvePattern`, `printFor(group, key)` (null for
+    `comma`), `printUniforms(print)`, `fillPrint(c, print, map, box, style)`, `invariantUnder(group, print)`.
+  - kind `linear`: dark ⇔ ⌊c₁⌋ + ⌊c₂⌋ + ⌊c₃⌋ is odd for three linear forms cₖ = lₖ·x + oₖ (an unused form is 0): one
+    form = stripes, two = checks, three with c₃ = c₁ + c₂ = the alternating triangles of a triangular grid, three with
+    half offsets = hexagons and triangles. kind `rings`: dark ⇔ ⌊d / width⌋ is odd, d = the distance to the nearest
+    point of a lattice (a reduced basis with a·b ≤ 0: the nearest point is a corner of the cell).
+  - The checkerboard is FOUND, not tabulated: grids on the group's own lattice vectors (on a hexagonal lattice the
+    triangular grids on it and on its 30° refinement, from the rotation centres), kept when every coset representative
+    and both translations leave the tone unchanged at generic points, scored by the size, squareness and right angle
+    of a mark and by running along the lattice's shortest vectors. Result: checks for the twelve groups without a
+    3-fold centre, triangles for 333, 3\*3, \*333, hexagons and triangles for 632 and \*632 (a half-turn swaps the
+    two kinds of triangle). `rings`: the centres of rotation of the highest order (a lattice); without rotations,
+    bands along the mirrors (\*\*, \*x), the glide axes (xx), a lattice vector (o).
+  - Colours (`palette.js`): the paper has two sides, `PRINT_FRONT` teal and `PRINT_BACK` sand, each [light, dark];
+    `PRINT_OPACITY` 0.96 (paper, not glass); the plane's pale tones `PRINT_PLANE_ALPHA`, `PRINT_PLANE_ALPHA_BACK`.
+- **Renderer, a C4 addition** (`src/render3d.js`): `setSurface({ …, uv })` (each vertex's point of the paper = the
+  mesh's `xy`); `setStyle({ print: printUniforms(print) | null, printFront, printBack, ghostMix, palette })`. The
+  fragment shader evaluates the print per pixel at `uv`, anti-aliased by the pixel's footprint (the product of
+  sin-shaped square waves; a mean tone when the marks are finer than a pixel). No mesh is cut for a print.
+  `ghostMix` < 1 lets the print show through a star's secondary tiles. `palette` + tints ≥ 4: the lab's piece colours
+  (the lab now uses this renderer; its generated fork is gone).
+- **Plane, a C2 addition** (`src/plane.js`): `setScene({ …, print, recut })`. Under a print: its dark tone, pale, on
+  every copy of the tile — teal on the tile's own hand, sand (the paper's back) on the copies of the other hand, which
+  replace the grey tint; the tile itself in the paper's two front tones; a card of the replication carries the tile's
+  print through its motion, in the colour of the face that is up. `recut: { home, cuts }`: the home tile dotted, the
+  cuts dashed, over the tile and under the glyphs.
+- **Re-cut first** (`src/folds/recut.js`; `src/folds/index.js` `createFold(…, { recut: true })`, `canRecut(group)`).
+  For the two shapes that pass through themselves (fold types `klein`, `crosscap`). The group's DEFAULT cut (presets[0]:
+  the Pocket of 22×, the Rectangle of ××) has its own cut along the lines that land on the double line, so it closes
+  with nothing passing through anything. Every other tile is first re-cut into it:
+  - the pieces are the parts of the tile in the copies e⁻¹(P) of the home P; each is carried rigidly to its place by
+    its element (a half-turn swings it about a 2-fold centre, a translation slides it, a glide turns it over its axis
+    while it slides: a glide's piece shows the paper's back from then on), one after another — half-turns,
+    translations, glides, larger pieces first — hopping over the paper; then the home tile folds by the fold module's
+    own motion. At t = 1 the map is the home fold's closed map: the same shape for every cut.
+  - the home copy is the one whose seed is nearest the anchor (SPEC 7; the presets' anchors give P itself), without
+    an anchor nearest the seed; ties go to the identity.
+  - the mesh is the tile's own (the direct fold's, as fine as that fold wants it), cut along the copies of the home's
+    rim, with no vertex shared between two pieces; `cells[tag] = { part, home, g, … }`; `boundary` (per edge) and
+    `boundaryRuns` (cut where the piece changes: what is drawn); `creases` and `cuts` (the home's creases and rim, on
+    the pieces); `locate`. The pieces' areas, order and timing come from the tile's OUTLINE, never from the triangles
+    (the draft mesh of a drag and the full mesh move alike); a piece under `DROP_SHARE` of the tile is left out.
+  - the fold: `recut { home { name, poly, element }, pieces [{ part, type, text, area, from, to, moves }], movers,
+    tau0, seconds, foldSeconds }`, `foldFrom`, `creaseAlpha(t)`, `cutStyle(t)`, `stage(t)`, `doubleLine(t)`,
+    `homeFold`, `base`. `duration` = the home fold's + at most `RECUT_MAX_SECONDS` (so up to 12 s: SPEC 5.3's 4–7 s
+    is the fold proper).
+  - **The claim is tested**: `test/recut.test.js` measures with the lab's detector (`src/selfx.js`) that no paper
+    passes through paper over the whole motion (every preset, random cuts, straight and wavy; the triangles within
+    0.03 tile sizes of a piece's rim left out: a rim that ends ON a sheet touches it), and that the same detector finds
+    the crossing in the one-sheet motion of the same cuts.
+- **App** (`src/app.js`): `state.pattern`; `buildScene(group, { …, pattern = 'comma', recut = true })` (the default
+  pattern of the PURE half stays the comma, which its tests were written for; the page's default is the
+  checkerboard); `scene.print`, `scene.cuts`; `printStyle`, `foldCaption`, `planeRecut`, `ghostEase`,
+  `GHOST_PRINT_MIX`. The hash key **`pat`** right after `g`, written when it is not `checker`. `#app[data-pattern]`;
+  `#app[data-features]` gains `recut` while the tile on screen is re-cut. `__folding.setPattern(key)`;
+  `getState()` gains `pattern, print, recut, foldCaption`.
+- **DOM** (`src/index.template.html`): `#pattern-box` (label), `#pattern` (a native select under a pill: swatch, name,
+  caret), `#pattern-label`; `#fold-caption` (p.hint at the foot of the fold pane: "re-cut, piece 1 of 2: a glide …");
+  the legend's first item under a print, `[data-paper]`: front · back of the paper.
+- **Tests**: `test/pattern.test.js` (every group's checkerboard and rings against hundreds of elements of the group,
+  planted faults, the shader's formula and the canvas paths against the one tone function), `test/recut.test.js`
+  (above, and the SPEC 5.3 contract for the re-cut fold), `test/app-url.test.js` (`pat`), `test/folds.test.js`
+  (a re-cut scene's runs and creases; the anchor and crease-window tests ask for the fold modules' own motion).

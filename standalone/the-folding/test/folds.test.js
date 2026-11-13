@@ -453,7 +453,13 @@ function checkScene(group, c, amp, prevDomain) {
   }
   if (scene.stops !== scene.fold.stops || scene.duration !== scene.fold.duration) fail('scene', `${label}: stops / duration are not the fold's`);
   if ((group.fold === 'snowflake') !== Array.isArray(scene.star)) fail('scene', `${label}: star`);
-  if (scene.edges.length !== scene.domain.edges.length) fail('scene', `${label}: ${scene.edges.length} boundary lines for ${scene.domain.edges.length} edges`);
+  // one bold line per edge of the tile. A tile that is re-cut first (xx, 22x: src/folds/recut.js; 13 Nov 2026) is drawn
+  // in runs, one per stretch of an edge on one piece (the pieces come apart on the way): every run names its edge, and
+  // every edge has at least one
+  const recut = !!scene.M.recut;
+  if (!recut && scene.edges.length !== scene.domain.edges.length) fail('scene', `${label}: ${scene.edges.length} boundary lines for ${scene.domain.edges.length} edges`);
+  if (recut && new Set(scene.edges.map((e) => e.edge)).size !== scene.domain.edges.length) fail('scene', `${label}: the runs of a re-cut tile cover ${new Set(scene.edges.map((e) => e.edge)).size} of ${scene.domain.edges.length} edges`);
+  if (recut !== !!(scene.fold.recut && group.fold !== 'snowflake')) fail('scene', `${label}: fold.recut and mesh.recut disagree`);
   // colours: a mirror in ink, a cut edge in the colour of its seam, the same on both partners
   const byEdge = new Map(scene.edges.map((e) => [e.edge, e]));
   scene.domain.edges.forEach((e, i) => {
@@ -494,7 +500,9 @@ function checkScene(group, c, amp, prevDomain) {
     const edgeLines = lines.filter((l) => l.width === WIDTHS.edge).length;
     if (edgeLines !== scene.edges.length) fail('scene', `${label}: ${edgeLines} bold lines for ${scene.edges.length} edges at t = ${t}`);
     const creaseLines = lines.filter((l) => l.dashed && l.width === WIDTHS.crease).length;
-    if (t < 0.2 && creaseLines !== scene.creases.length) fail('scene', `${label}: ${creaseLines} crease lines for ${scene.creases.length} creases at t = ${t}`);
+    // (a re-cut tile shows the home tile's creases only once the home tile begins to fold: fold.creaseAlpha)
+    if (!recut && t < 0.2 && creaseLines !== scene.creases.length) fail('scene', `${label}: ${creaseLines} crease lines for ${scene.creases.length} creases at t = ${t}`);
+    if (recut && t <= scene.fold.foldFrom && creaseLines !== 0) fail('scene', `${label}: creases are drawn at t = ${t}, before the re-cut tile folds (from ${scene.fold.foldFrom})`);
     if (t === 1 && creaseLines !== 0) fail('scene', `${label}: creases are still drawn at t = 1`);
     if (t === 0) {
       // flat: everything in the plane, the boundary where the tile's outline is, the cone points where the domain has them
@@ -584,8 +592,9 @@ test('app: buildScene hands the anchor to the fold; anchor = seed is the fold wi
       const domain = buildDomain(g, { seed, metric: p0.metric, warp: makeWarp(g, 0) });
       const mesh = g.fold === 'snowflake' ? null : buildMesh(g, domain, foldMeshOptions(g));
       const plain = createFold(g, domain, mesh, {}), anchored = createFold(g, domain, mesh, { anchor: domain.seed.slice() });
-      // the scene of the same cut with that anchor draws that fold
-      const scene = buildScene(g, { seed, metric: p0.metric, amp: 0, anchor: domain.seed.slice() });
+      // the scene of the same cut with that anchor draws that fold (recut: false — the fold module's own motion; a
+      // scene that re-cuts first is compared with createFold({ recut: true }) in test/recut.test.js)
+      const scene = buildScene(g, { seed, metric: p0.metric, amp: 0, anchor: domain.seed.slice(), recut: false });
       const M = plain.mesh, out = [0, 0, 0], ref = [0, 0, 0];
       for (const t of [0.25, 0.5, 0.75, 1]) {
         const F0 = plain.at(t), F1 = anchored.at(t), F2 = scene.fold.at(t);
@@ -982,7 +991,8 @@ test('app: the cross-cap\'s creases fade in a window that follows the fold\'s ow
     for (let k = 0; k < 6; k++) seeds.push([g.center[0] + (2 * rnd() - 1) * 0.8 * g.viewHalf, g.center[1] + (2 * rnd() - 1) * 0.8 * g.viewHalf]);
     let first = null;
     for (const seed of seeds) for (const amp of [0, 1]) {
-      const s = buildScene(g, { seed, metric: p.metric, amp, anchor });
+      // (recut: false: the cross-cap's own fold, every cut as one sheet; re-cut first has fold.creaseAlpha, test/recut.test.js)
+      const s = buildScene(g, { seed, metric: p.metric, amp, anchor, recut: false });
       const T = s.fold.times, w = creaseFade('crosscap', s.fold), label = `${p.name} seed (${seed.map((v) => v.toFixed(3))}) amp ${amp}`;
       assert.deepEqual(w, [0.5 * T.hingeEnd, T.halfEnd], label);
       if (!first) first = w; else assert.deepEqual(w, first, `${label}: the window depends on the anchor alone`);

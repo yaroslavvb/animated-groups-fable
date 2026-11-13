@@ -1,0 +1,9 @@
+[
+  { "w": 1280, "h": 670, "eval": "await new Promise((r) => { const f = () => (window.__lab && window.__lab.ready) || window.__labError ? r(1) : setTimeout(f, 50); f(); }), window.__lab.setMotion('recut'), window.__labError || 1", "wait": 1200, "out": "lab22x/qa/recut-t0.png" },
+  { "eval": "window.__lab.setT(0.07), 1", "wait": 500, "out": "lab22x/qa/recut-t007.png" },
+  { "eval": "window.__lab.setT(0.30), 1", "wait": 500, "out": "lab22x/qa/recut-t030.png" },
+  { "eval": "window.__lab.setT(0.40), 1", "wait": 500, "out": "lab22x/qa/recut-t040.png" },
+  { "eval": "window.__lab.setT(0.62), 1", "wait": 500, "out": "lab22x/qa/recut-t062.png" },
+  { "eval": "window.__lab.setT(0.9), 1", "wait": 500, "out": "lab22x/qa/recut-t090.png" },
+  { "eval": "window.__lab.setT(1), JSON.stringify(window.__lab.getState())", "wait": 500, "out": "lab22x/qa/recut-t1.png" }
+]

@@ -1,0 +1,9 @@
+[
+  { "w": 390, "h": 780, "eval": "await new Promise((r) => { const f = () => (window.__lab && window.__lab.ready) || window.__labError ? r(1) : setTimeout(f, 50); f(); }), window.__labError || 1", "wait": 1500, "out": "lab22x/qa/phone-t0.png" },
+  { "eval": "window.__lab.setT(0.7), 1", "wait": 600, "out": "lab22x/qa/phone-t070.png" },
+  { "eval": "window.__lab.setFocus('cutaway'), 1", "wait": 700, "out": "lab22x/qa/phone-cutaway.png" },
+  { "eval": "window.__lab.setFocus('map'), 1", "wait": 700, "out": "lab22x/qa/phone-map.png" },
+  { "eval": "window.__lab.setFocus('key'), 1", "wait": 700, "out": "lab22x/qa/phone-key.png" },
+  { "w": 375, "h": 548, "eval": "window.__lab.setFocus('xray'), window.__lab.setMotion('recut'), window.__lab.setT(0.25), 1", "wait": 900, "out": "lab22x/qa/phone-short-recut.png" },
+  { "w": 844, "h": 390, "eval": "window.__lab.setMotion('acts'), window.__lab.setT(0.7), 1", "wait": 900, "out": "lab22x/qa/phone-landscape.png" }
+]

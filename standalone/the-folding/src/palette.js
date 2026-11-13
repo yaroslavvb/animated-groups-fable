@@ -31,6 +31,20 @@ export const MOTIF_FILL_3D = [0.33, 0.55, 0.55];
 // commas: the big ones are 6 to 10 times larger, and the mirrors, glide axes and centre glyphs stay on top).
 export const MOTIF_ALPHA_PLANE = 0.4;
 
+// The prints (src/pattern.js: the checkerboard, the rings), 13 Nov 2026. The paper has two sides: its FRONT (the side
+// the plane shows) is teal, its BACK sand; each has a light and a dark tone ([light, dark]), the 22x lab's Checkerboard
+// colours. The seam colours stay readable over both. The plane draws the dark tone at PRINT_PLANE_ALPHA over the white
+// ground everywhere, and the tile itself in the front's two tones, as the flat paper in the 3D pane.
+export const PRINT_FRONT = ['#9ad5cc', '#4fa397'];
+export const PRINT_BACK = ['#f5e6c6', '#d8bd85'];
+export const PRINT_PLANE_ALPHA = 0.2;
+// ... and on the tiles of the other hand the BACK's dark tone at this (they lie face down: plane.js)
+export const PRINT_PLANE_ALPHA_BACK = 0.42;
+// A printed sheet is paper, not glass: nearly opaque (the bold seams still shine through it, render3d.js x-ray).
+export const PRINT_OPACITY = 0.96;
+// The lines of a re-cut (src/folds/recut.js): where the tile is cut into pieces, the rim of the tile it is re-cut into.
+export const RECUT_COLOR = '#52514a';
+
 export function hexToRgb(hex) {
   const n = parseInt(hex.slice(1), 16);
   return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];

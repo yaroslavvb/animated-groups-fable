@@ -365,7 +365,10 @@ test('fill: the surface shader reads the tint as two bits, ghost (bit 0) and fil
   const fs = T.SURF_FS;
   assert.match(fs, /uniform vec3 uFront, uBack, uGhost, uFill;/);
   assert.match(fs, /float tq = floor\(vTint \+ 0\.5\);/, 'the tint is constant over a triangle; read it as an integer');
-  assert.match(fs, /mix\(gl_FrontFacing \? uFront : uBack, uGhost, mod\(tq, 2\.0\)\)/, 'bit 0: the ghost colour');
+  // (13 Nov 2026: the base colour is front / back, or the print's two tones there; the ghost colour is then mixed in by
+  // bit 0 times uGhostMix, 1 by default — the same colour as before for a surface without a print)
+  assert.match(fs, /vec3 base = gl_FrontFacing \? uFront : uBack;/, 'the base colour: the side the eye sees');
+  assert.match(fs, /mix\(base, uGhost, mod\(tq, 2\.0\) \* uGhostMix\)/, 'bit 0: the ghost colour');
   assert.match(fs, /mix\(base, uFill, step\(1\.5, tq\)\)/, 'bit 1: the fill colour, whichever side is seen');
   assert.doesNotMatch(fs, /clamp\(vTint/, 'no longer one bit');
 });

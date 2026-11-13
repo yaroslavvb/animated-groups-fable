@@ -20,6 +20,12 @@
   chip             button             APP: click -> picker.open(groupId). Holds the next two.
   chip-symbol      span               APP: textContent = group.label                    (big orbifold symbol)
   chip-meta        span               APP: textContent = group.hm + ' · ' + group.shape  (wraps to 2 lines if it must)
+  pattern-box      label              (13 Nov 2026) the pattern selector at the right of the header: a pill (swatch, name,
+                                      caret) under an invisible native <select>, so a phone gets its own picker.
+                                      APP sets #app[data-pattern="<key>"] (the swatch shown follows it) and the title
+  pattern          select             APP: one <option> per pattern.js PATTERNS entry (filled if empty); 'change' ->
+                                      setPattern(value). The names: Checkerboard, Rings, Comma
+  pattern-label    span               APP: textContent = the pattern's label (hidden on a narrow window: the swatch alone)
   caption          p                  APP: textContent = group.topology                 (1 line, 2 when it needs them)
   stage            main               the two panes and their controls (data-ss-thumb)
   pane-plane       section            positioned box of the 2D view (data-ss-comments="off")
@@ -47,6 +53,8 @@
                                       children are position:absolute at left/top 0 (set left/top or a transform)
   turn-hint        p                  "drag to turn" (styled like #hint). APP: turnHint.hidden = true after the
                                       person's first rotation of the 3D view; never shown again in the session
+  fold-caption     p                  (13 Nov 2026) what a fold that re-cuts first is doing ("re-cut, piece 1 of 2: a
+                                      glide …"); APP: textContent, hidden when it has nothing to say. Foot of the pane
   fold-controls    div                Fold button, scrubber, reset view
   fold-btn         button             TIMELINE (createTimeline button): text of its [data-label] child = Fold / Pause / Unfold
   scrubber         input range        TIMELINE (createTimeline slider). Its wrapper #scrub[data-scrub] gets --p and
@@ -55,7 +63,8 @@
   reset-view       button             APP: click -> renderer.resetView()
   legend           footer             static: one item per feature ([data-feature], shown when #app's data-features
                                       names it; all but corners and double when #app has no data-features) and the
-                                      companion link
+                                      companion link. First, under a print (#app[data-pattern] checker or rings; 13 Nov
+                                      2026): [data-paper], the paper's two sides, teal front and sand back
   picker-mount     div                APP: createHassePicker({ mount, … }). Empty, last in <body>; <body> is the
                                       positioned box that covers the viewport, so a dialog inside may use
                                       position:fixed or position:absolute; inset:0
@@ -78,6 +87,21 @@
       <span class="orb-meta" id="chip-meta"></span>
       <svg class="orb-caret" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M0 0h10L5 6z"/></svg>
     </button>
+    <label class="pat" id="pattern-box" title="Pattern on the paper">
+      <span class="pat-k">Pattern</span>
+      <span class="pat-pill">
+        <svg class="pat-sw pat-sw-checker" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><path class="pat-fg" d="M0 2.5A2.5 2.5 0 0 1 2.5 0H6v6H0zM12 0h3.5A2.5 2.5 0 0 1 18 2.5V6h-6zM6 6h6v6H6zM0 12h6v6H2.5A2.5 2.5 0 0 1 0 15.5zM12 12h6v3.5a2.5 2.5 0 0 1-2.5 2.5H12z"/></svg>
+        <svg class="pat-sw pat-sw-rings" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><circle class="pat-ring" cx="9" cy="9" r="6.6"/><circle class="pat-ring" cx="9" cy="9" r="2.6"/></svg>
+        <svg class="pat-sw pat-sw-comma" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-glass" width="18" height="18" rx="2.5"/><path class="pat-ink" d="M11.4 3.4a3.5 3.5 0 0 1 3.5 3.5c0 4.6-3.9 7.9-9.4 7.9 2.4-1.2 3.6-2.9 3.5-5.3a3.5 3.5 0 0 1 2.4-6.1z"/></svg>
+        <span class="pat-label" id="pattern-label">Checkerboard</span>
+        <svg class="orb-caret" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M0 0h10L5 6z"/></svg>
+      </span>
+      <select id="pattern" aria-label="Pattern on the paper">
+        <option value="checker">Checkerboard</option>
+        <option value="rings">Rings</option>
+        <option value="comma">Comma</option>
+      </select>
+    </label>
   </header>
 
   <p class="caption" id="caption" aria-live="polite"></p>
@@ -121,6 +145,7 @@
       <canvas id="fold-canvas"></canvas>
       <div class="labels" id="fold-labels" aria-hidden="true"></div>
       <p class="hint turn-hint" id="turn-hint">drag to turn</p>
+      <p class="hint fold-caption" id="fold-caption" aria-live="polite" hidden></p>
     </section>
 
     <div class="ctl ctl-fold" id="fold-controls">
@@ -140,6 +165,7 @@
   </main>
 
   <footer class="legend" id="legend" aria-label="Legend">
+    <span class="lg lg-paper" data-paper><svg class="sw sw-sq" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><rect class="sw-front" width="10" height="10" rx="1.5"/></svg><span>front</span><span class="lg-sep">·</span><svg class="sw sw-sq" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><rect class="sw-back" width="10" height="10" rx="1.5"/></svg><span>back<span class="lg-long"> of the paper</span></span></span>
     <span class="lg" data-feature="seams"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-a" d="M1.5 4h9"/><path class="sw-b" d="M13.5 4h9"/></svg><span>coloured = edges sewn together</span></span>
     <span class="lg" data-feature="mirrors"><svg class="sw" viewBox="0 0 14 8" width="14" height="8" aria-hidden="true" focusable="false"><path class="sw-ink" d="M1.5 4h11"/></svg><span>ink = mirror (becomes the rim)</span></span>
     <span class="lg" data-feature="cones"><svg class="sw" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true" focusable="false"><circle class="sw-dot" cx="4" cy="4" r="3"/></svg><span>dot <i>n</i> = cone point</span></span>

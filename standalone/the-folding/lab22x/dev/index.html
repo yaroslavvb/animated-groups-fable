@@ -1,0 +1,21 @@
+<!doctype html>
+<!-- lab22x/dev/index.html — the lab, unbundled: the markup of ../src/lab.template.html, ../src/lab.css as a file and
+     ../src/main.js as a module, so a change in any source file shows without a build. Needs http (tools/shot.mjs). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>The Folding: 22× lab — unbundled</title>
+<link rel="stylesheet" href="../src/lab.css">
+</head>
+<body>
+<script type="module">
+  const res = await fetch('../src/lab.template.html', { cache: 'no-store' });
+  const page = new DOMParser().parseFromString(await res.text(), 'text/html');
+  const nodes = [...page.body.childNodes].filter((n) => n.nodeName !== 'SCRIPT').map((n) => document.importNode(n, true));
+  document.body.replaceChildren(...nodes);
+  try { await import('../src/main.js'); } catch (e) { console.error('lab failed to start: ' + (e && e.stack || e)); window.__labError = String(e && e.stack || e); }
+</script>
+</body>
+</html>

@@ -25,6 +25,8 @@ const CONTRACT = {
   'cut-note': 'p', 'pane-fold': 'section', 'fold-canvas': 'canvas', 'fold-labels': 'div', 'turn-hint': 'p', 'fold-controls': 'div',
   'fold-btn': 'button', 'scrub': 'div', 'scrub-ticks': 'span', 'scrubber': 'input', 'reset-view': 'button', 'legend': 'footer',
   'picker-mount': 'div',
+  // 13 Nov 2026: the pattern selector in the header, the words over the fold pane
+  'pattern-box': 'label', 'pattern': 'select', 'pattern-label': 'span', 'fold-caption': 'p',
 };
 
 // contract C1: the legend items, in this order, with these words
@@ -147,6 +149,7 @@ test('styles: the CSS variables mirror src/palette.js', () => {
     '--ink': PAL.INK, '--muted': PAL.MUTED, '--faint': PAL.FAINT, '--hairline': PAL.HAIRLINE, '--card': PAL.CARD, '--ground': PAL.GROUND,
     '--accent': PAL.ACCENT, '--accent-soft': PAL.ACCENT_SOFT, '--mirror': PAL.MIRROR_COLOR, '--crease': PAL.CREASE_COLOR,
     '--glide': PAL.GLIDE_COLOR, '--motif': PAL.MOTIF_COLOR,
+    '--print-light': PAL.PRINT_FRONT[0], '--print-dark': PAL.PRINT_FRONT[1], '--print-back': PAL.PRINT_BACK[1],
   };
   PAL.CLASS_COLORS.forEach((c, i) => { expected['--class-' + i] = c; });
   for (const [name, value] of Object.entries(expected)) {

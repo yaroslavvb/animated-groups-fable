@@ -2,7 +2,7 @@
 // tile with its sewn edges, and the draggable seed.  Canvas 2D, no dependencies beyond this workspace.  SPEC 5.9, 8 (C2).
 //
 //   const P = createPlaneView(canvas, { onSeed(x, y, phase), hint });
-//   P.setScene({ group, domain, motif, star, interactive });   // call again with a new domain while the seed is dragged
+//   P.setScene({ group, domain, motif, star, interactive, print, recut });   // call again with a new domain while the seed is dragged
 //   P.render();  P.resize();  P.toWorld(cssX, cssY);  P.toCss(x, y);  P.destroy();
 //
 // Layers, bottom to top:
@@ -17,6 +17,21 @@
 // it on top): a seed next to an edge would otherwise cut the edge.
 // Chevrons scale with their edge: a cluster takes at most CHEVRON_SHARE of the edge and stays clear of the glyphs at its
 // ends; it shrinks rather than losing chevrons, so a seam always shows its own count (or none on a sliver of an edge).
+//
+// The print (13 Nov 2026; src/pattern.js). setScene({ print }): a two-tone pattern of the plane that the group leaves
+// as it is. It takes the motif's place: its dark tone, pale, over every copy of the tile — in the paper's FRONT colour
+// (teal, PRINT_PALE) on the copies of the tile's own hand and in its BACK colour (sand, PRINT_PALE_BACK) on the copies
+// of the other hand, which take the place of the grey tint: a tile carried there by a reflection or a glide lies
+// face down, as a piece of a re-cut tile does in the 3D pane. The tile itself is drawn in the paper's two front tones
+// (palette PRINT_FRONT), as the flat sheet of the 3D pane; a card of the replication carries the pale print of the tile
+// through its own motion (so it lands in register: the print is the group's). The print is drawn afresh in every frame
+// (a few dozen bands in one path); the cached 'base' layer then holds the glide axes alone. print: null (the default)
+// = the comma, as before.
+// The re-cut (src/folds/recut.js). setScene({ recut: { home: [[x, y], ...], cuts: [flat points, ...], active } }): the
+// home tile the fold re-cuts the tile into, dotted, and the lines along which the tile is cut, dashed; drawn over the
+// tile, under the rotation glyphs. active = { from, to } (polygons) or null: the piece the 3D pane is carrying now,
+// outlined on the tile, and its place in the home tile, softly filled; P.setRecutActive(active) changes it alone.
+// recut: null (the default): nothing.
 //
 // Coordinates: world x right, y up. The window's scale is fixed: the canvas's short side shows 2 group.viewHalf, zoomed
 // in on a small pane so that the tile stays big enough to see and drag (planeScale: phones only). Its
@@ -71,8 +86,9 @@
 
 import { elementsNear, symmetryElements, latticeCoords } from './groups.js';
 import { INK, MUTED, FAINT, HAIRLINE, GROUND, ACCENT, ACCENT_SOFT, MIRROR_COLOR, GLIDE_COLOR, MOTIF_COLOR, CLASS_COLORS,
-  MOTIF_ALPHA_PLANE, classColor, hexToRgb } from './palette.js';
+  MOTIF_ALPHA_PLANE, PRINT_FRONT, PRINT_BACK, PRINT_PLANE_ALPHA, PRINT_PLANE_ALPHA_BACK, RECUT_COLOR, classColor, hexToRgb } from './palette.js';
 import { motifFor } from './motif.js';
+import { fillPrint } from './pattern.js';
 import { replicationPlan, copyState, cardState, planCaption, sidePairingMotion, smooth as smoothRep } from './replicate.js';
 
 const TAU = 2 * Math.PI;
@@ -94,6 +110,9 @@ function overGround(hex, alpha) {
  * one was (0.54), so the mirrors, the dashed glide axes and the centre glyphs stay on top of it.
  */
 export const MOTIF_FILL = overGround(MOTIF_COLOR, MOTIF_ALPHA_PLANE);
+/** The print's dark tone over the plane, pale: on the tiles of the tile's own hand (front), of the other hand (back). */
+export const PRINT_PALE = rgba(PRINT_FRONT[1], PRINT_PLANE_ALPHA);
+export const PRINT_PALE_BACK = rgba(PRINT_BACK[1], PRINT_PLANE_ALPHA_BACK);
 
 /** Panes whose short side is below this many CSS px count as small (phones): lighter glide axes. */
 export const SMALL_PANE = 300;
@@ -491,7 +510,8 @@ export const HINT_MIRRORS = 'no cut here: every edge is a mirror';
  *   onSeed(x, y, phase)   the person moved the seed: (x, y) in STRAIGHT coordinates (what buildDomain takes as seed),
  *                         phase 'start' (pointer down / key down, seed unchanged), 'move', 'end'
  *   hint                  true (default): draw the one-line hint until the first drag; false: never; a string: that text
- * P.setScene({ group, domain, motif?, star?, interactive? })
+ * P.setScene({ group, domain, motif?, star?, interactive?, print?, recut? })
+ *                        print: a print of pattern.js (null: the comma); recut: { home, cuts } (see the top of the file)
  *                        motif defaults to motifFor(group); star: list of polygons ([[x, y], ...] or flat arrays)
  *                        outlined faintly (the snowflake patch); interactive (default true): false = no seed handle,
  *                        no drags or keys, default cursor (contract C2)
@@ -792,6 +812,11 @@ export function createPlaneView(canvas, options = {}) {
   }
 
   // ---- drawing ------------------------------------------------------------------------------------------------
+  /** The window in world coordinates: [x0, y0, x1, y1]. */
+  function windowBox() {
+    const hw = view.W / (2 * view.s), hh = view.H / (2 * view.s);
+    return [view.cx - hw, view.cy - hh, view.cx + hw, view.cy + hh];
+  }
   function tracePoly(c, pts, g, close) {
     // pts: flat world coordinates; g: optional isometry
     const n = pts.length;
@@ -813,7 +838,8 @@ export function createPlaneView(canvas, options = {}) {
     const gd = ensureGroupData(), M = metrics();
     const R = viewRadius();
     const hw = view.W / (2 * view.s) + motif.radius, hh = view.H / (2 * view.s) + motif.radius;
-    const els = parts.motif ? elementsNear(group, view.cx, view.cy, R + motif.radius, motif.at[0], motif.at[1]) : [];
+    // (a print takes the commas' place; it is drawn per frame, by the hand of each copy: drawPrintOn)
+    const els = parts.motif && !scene.print ? elementsNear(group, view.cx, view.cy, R + motif.radius, motif.at[0], motif.at[1]) : [];
     const closedOf = (i) => (motif.closed ? !!motif.closed[i] : false);
     // closed outlines: filled, all copies in one path (they are pairwise disjoint)
     c.beginPath();
@@ -862,7 +888,7 @@ export function createPlaneView(canvas, options = {}) {
     if (!doc || !doc.createElement) return null;
     const key = scene.group.id + '|' + canvas.width + 'x' + canvas.height + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy + '|' + view.s;
     const old = layerCache[kind];
-    if (old && old.key === key && old.motif === scene.motif) return old.canvas;
+    if (old && old.key === key && old.motif === scene.motif && old.print === scene.print) return old.canvas;
     let cv = old ? old.canvas : null;
     if (!cv) { cv = doc.createElement('canvas'); }
     const cc = cv.getContext && cv.getContext('2d');
@@ -873,7 +899,7 @@ export function createPlaneView(canvas, options = {}) {
     cc.clearRect(0, 0, cv.width, cv.height);
     cc.setTransform(view.kx, 0, 0, view.ky, 0, 0);
     drawPattern(cc, LAYER_PARTS[kind]);
-    layerCache[kind] = { canvas: cv, motif: scene.motif, key };
+    layerCache[kind] = { canvas: cv, motif: scene.motif, print: scene.print, key };
     return cv;
   }
   const LAYER_PARTS = { base: { motif: true, glides: true }, mirrors: { mirrors: true } };
@@ -899,8 +925,24 @@ export function createPlaneView(canvas, options = {}) {
 
   function drawCopies(c, P, M) {
     const { ring, copies } = P;
-    // tint: the tiles of the other hand (never the current tile: it looks the same on either side of a mirror)
-    if (P.tinted.length) {
+    // tint: the tiles of the other hand (never the current tile: it looks the same on either side of a mirror).
+    // Under a print they show the paper's back instead: the print in sand there, in teal everywhere else.
+    if (scene.print) {
+      c.save();
+      c.beginPath(); c.rect(0, 0, view.W, view.H);
+      for (const g of P.tinted) tracePoly(c, ring, g, true);
+      c.clip('evenodd');
+      fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE);
+      c.restore();
+      if (P.tinted.length) {
+        c.save();
+        c.beginPath();
+        for (const g of P.tinted) tracePoly(c, ring, g, true);
+        c.clip();
+        fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE_BACK);
+        c.restore();
+      }
+    } else if (P.tinted.length) {
       c.beginPath();
       for (const g of P.tinted) tracePoly(c, ring, g, true);
       c.fillStyle = rgba(INK, 0.05); c.fill();
@@ -946,7 +988,15 @@ export function createPlaneView(canvas, options = {}) {
     const { domain } = scene;
     const { ring, outline } = P;
     c.beginPath(); tracePoly(c, ring, null, true);
-    c.fillStyle = ACCENT_SOFT; c.fill();
+    if (scene.print) {
+      // the tile is the paper: its front's two tones, as the flat sheet in the 3D pane
+      c.fillStyle = PRINT_FRONT[0]; c.fill();
+      c.save();
+      c.clip();
+      const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
+      fillPrint(c, scene.print, toCss, [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], PRINT_FRONT[1]);
+      c.restore();
+    } else { c.fillStyle = ACCENT_SOFT; c.fill(); }
     // the snowflake patch's outer boundary
     if (P.starEdges && P.starEdges.length && starAlpha > 0.004) {
       c.beginPath();
@@ -969,6 +1019,43 @@ export function createPlaneView(canvas, options = {}) {
       }
     }
     drawChevrons(c, P);
+  }
+
+  /**
+   * The re-cut (setScene({ recut })): the lines along which the tile is cut, dashed, and the home tile it is re-cut
+   * into, dotted. Over the tile and its bold edges (the home's rim runs along some of them), under the glyphs.
+   */
+  function drawRecut(c, M) {
+    const R = scene.recut;
+    if (!R) return;
+    c.lineJoin = 'round'; c.lineCap = 'butt';
+    if (R.cuts && R.cuts.length) {
+      c.beginPath();
+      for (const pts of R.cuts) tracePoly(c, pts, null, false);
+      c.strokeStyle = rgba(GROUND, 0.75); c.lineWidth = 3.4 * Math.max(0.8, M.k); c.stroke();
+      c.setLineDash([5 * Math.max(0.8, M.k), 3.5 * Math.max(0.8, M.k)]);
+      c.strokeStyle = RECUT_COLOR; c.lineWidth = 1.7 * Math.max(0.8, M.k); c.stroke();
+      c.setLineDash([]);
+    }
+    if (R.active && R.active.from && R.active.to) {
+      // the piece that is being carried: where it lands in the home tile (a soft accent), and the piece itself on the tile
+      const trace = (poly) => { c.beginPath(); poly.forEach((p, i) => { if (i === 0) c.moveTo(X(p[0]), Y(p[1])); else c.lineTo(X(p[0]), Y(p[1])); }); c.closePath(); };
+      trace(R.active.to);
+      c.fillStyle = rgba(ACCENT, 0.26); c.fill();
+      trace(R.active.from);
+      c.strokeStyle = rgba(GROUND, 0.9); c.lineWidth = 4.6 * Math.max(0.8, M.k); c.stroke();
+      c.strokeStyle = INK; c.lineWidth = 2.1 * Math.max(0.8, M.k); c.stroke();
+    }
+    if (R.home && R.home.length >= 3) {
+      c.beginPath();
+      R.home.forEach((p, i) => { if (i === 0) c.moveTo(X(p[0]), Y(p[1])); else c.lineTo(X(p[0]), Y(p[1])); });
+      c.closePath();
+      c.strokeStyle = rgba(GROUND, 0.7); c.lineWidth = 3.2 * Math.max(0.8, M.k); c.stroke();
+      c.setLineDash([1.6 * Math.max(0.8, M.k), 3.2 * Math.max(0.8, M.k)]);
+      c.lineCap = 'round';
+      c.strokeStyle = INK; c.lineWidth = 1.6 * Math.max(0.8, M.k); c.stroke();
+      c.setLineDash([]); c.lineCap = 'butt';
+    }
   }
 
   function glyphPath(c, x, y, order, ang, r) {
@@ -1084,6 +1171,7 @@ export function createPlaneView(canvas, options = {}) {
       drawCopies(c, P, M);
       drawLayer(c, 'base'); drawLayer(c, 'mirrors');
       drawTile(c, P, M);                       // (with the handle, under the tile's bold edges)
+      drawRecut(c, M);
       drawGlyphs(c, P, M);
     }
     drawHint(c);
@@ -1203,7 +1291,7 @@ export function createPlaneView(canvas, options = {}) {
     }
     // the tile's mirror edges (they become mirror lines where copies land)
     const mirrorEdges = T.outline.filter((o) => scene.domain.edges[o.edge].kind === 'mirror').map((o) => o.pts);
-    plan.commas = commas; plan.mirrorEdges = mirrorEdges;
+    plan.commas = scene.print ? [] : commas; plan.mirrorEdges = mirrorEdges; plan.printed = !!scene.print;
     rep.plan = plan; rep.planFor = { T, gd };
     const info = plan.T.toFixed(4) + '|' + plan.stops.map((s) => s.t.toFixed(5)).join(',');
     if (info !== rep.lastInfo) { rep.lastInfo = info; if (onTilingPlan) { try { onTilingPlan(tilingInfo()); } catch (e) { /* the owner's business */ } } }
@@ -1265,8 +1353,19 @@ export function createPlaneView(canvas, options = {}) {
     const parts = keep >= 1 ? [[tile.concat(down), 1]] : [[tile, 1], [down, keep]];
     const tinted = (cp) => cp.index !== 0 && cp.det * P.eps < 0;
     for (const [list, a] of parts) {
+      if (!list.length || a <= 0.004) continue;
+      if (scene.print) {
+        // the print where copies have landed: teal on the tile's own hand, sand on the other (as the plane always is)
+        for (const [sub, style] of [[list.filter((cp) => !tinted(cp)), PRINT_PALE], [list.filter(tinted), PRINT_PALE_BACK]]) {
+          if (!sub.length) continue;
+          c.save(); pathOf(sub); c.clip(); c.globalAlpha = a;
+          fillPrint(c, scene.print, toCss, windowBox(), style);
+          c.restore();
+        }
+        continue;
+      }
       const l = list.filter(tinted);
-      if (l.length && a > 0.004) { pathOf(l); c.fillStyle = rgba(INK, k3(0.05 * a)); c.fill(); }
+      if (l.length) { pathOf(l); c.fillStyle = rgba(INK, k3(0.05 * a)); c.fill(); }
     }
     if (P.star && endK > 0.004) {
       c.beginPath();
@@ -1306,6 +1405,7 @@ export function createPlaneView(canvas, options = {}) {
       },
     });
 
+    drawRecut(c, M);
     // 4. the rotation centres where a copy that holds them has landed; a soft ring round the centre a copy turns about
     drawTilingGlyphs(c, P, M, plan, states, keep);
     drawCues(c, P, M, plan, moving, keep);
@@ -1375,9 +1475,21 @@ export function createPlaneView(canvas, options = {}) {
       for (const pl of plan.commas) traceAffine(c, pl, A, true, true);
       c.globalAlpha = k; c.fillStyle = MOTIF_FILL; c.fill(); c.globalAlpha = 1;
     }
+    if (scene.print) {
+      // the card carries the tile's share of the print through its own motion (the print is the group's: it lands in register)
+      const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
+      c.globalAlpha = k;
+      // (the face that is up: the front's teal, or the back's sand once a flip has passed edge-on — as the tile it
+      // lands on is drawn)
+      fillPrint(c, scene.print, (x, y, out) => { out[0] = X(A.a * x + A.b * y + A.tx); out[1] = Y(A.c * x + A.d * y + A.ty); return out; },
+        [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], (back > 0.5) !== (P.eps < 0) ? PRINT_PALE_BACK : PRINT_PALE);
+      c.globalAlpha = 1;
+    }
     c.beginPath(); traceAffine(c, ring, A, true, true);
-    c.fillStyle = rgba(ACCENT, k3c((quiet ? 0.06 : 0.14) * k)); c.fill();
-    if (back > 0.004) { c.fillStyle = rgba(INK, k3c((quiet ? 0.05 : 0.06) * back * k)); c.fill(); }
+    if (!scene.print) {
+      c.fillStyle = rgba(ACCENT, k3c((quiet ? 0.06 : 0.14) * k)); c.fill();
+      if (back > 0.004) { c.fillStyle = rgba(INK, k3c((quiet ? 0.05 : 0.06) * back * k)); c.fill(); }
+    } else if (!quiet) { c.fillStyle = rgba(ACCENT, k3c(0.06 * k)); c.fill(); }
     c.restore();
     c.lineJoin = 'round'; c.lineCap = 'round';
     if (quiet) {
@@ -1542,7 +1654,9 @@ export function createPlaneView(canvas, options = {}) {
     // a new tile that answers the person's own drag or key (also when the owner rebuilds a moment later)
     const byPerson = !!drag || emitting ||
       (sameGroup && lastEmit !== null && Math.hypot(s.domain.seed[0] - lastEmit[0], s.domain.seed[1] - lastEmit[1]) <= 0.08 * size);
-    scene = { group: s.group, domain: s.domain, motif: s.motif || motifFor(s.group), star: s.star || null, interactive: s.interactive !== false };
+    scene = { group: s.group, domain: s.domain, motif: s.motif || motifFor(s.group), star: s.star || null, interactive: s.interactive !== false,
+      print: s.print || null, recut: s.recut && (s.recut.home || s.recut.cuts) ? s.recut : null };
+    if (rep.plan && !!rep.plan.printed !== !!scene.print) { rep.plan = null; rep.planFor = null; }   // (the cards' commas: for the comma only)
     tileP = null; viewP = null;
     if (!scene.interactive && drag) dropDrag(scene.domain);
     syncAttributes();
@@ -1743,6 +1857,14 @@ export function createPlaneView(canvas, options = {}) {
       schedule();
     },
     getTiling: () => ({ u: rep.u, fade: rep.fade }),
+    /** The piece of a re-cut that is being carried now: { from, to } (polygons), or null. Redrawn on the next frame. */
+    setRecutActive(active) {
+      if (!scene || !scene.recut) return;
+      const a = active && active.from && active.to ? active : null;
+      if (scene.recut.active === a || (!scene.recut.active && !a)) return;
+      scene.recut = { ...scene.recut, active: a };
+      schedule();
+    },
     /** The plan for the tile on screen (built now if need be): { duration, stops, layers, phases } or null. */
     tilingPlan() { if (!scene) return null; try { preparePlan(); } catch (e) { return null; } return tilingInfo(); },
     /** The words for what acts at progress u ('' when nothing does); the short words on a small pane (a phone). */

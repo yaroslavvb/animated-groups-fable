@@ -1,0 +1,45 @@
+<!doctype html>
+<!--
+  The Folding: 22× lab — page shell. The build (../build.mjs with this template) strips HTML comments and replaces
+      /*__INLINE_CSS__*/  with lab.css      /*__INLINE_JS__*/  with the bundle of main.js
+  The cards of the grid are made by main.js (one per look of looks.js, the plane and the key).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="ss-comments" content="off">
+<title>The Folding: 22× lab</title>
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<div class="lab" id="lab">
+  <header class="top">
+    <h1>The Folding <span class="sym">22×</span> lab</h1>
+    <div class="group" role="group" aria-label="Cut">
+      <span class="lbl">Cut</span>
+      <div class="chips" id="cuts"></div>
+    </div>
+    <div class="group" role="group" aria-label="Motion">
+      <span class="lbl">Motion</span>
+      <div class="chips" id="motions"></div>
+    </div>
+    <a class="back" href="https://spacesheep.dev/@yaroslavvb/the-folding#g=22x" target="_blank" rel="noopener">The Folding</a>
+  </header>
+  <p class="caption" id="caption"></p>
+  <div class="looks" id="looks" role="group" aria-label="View"></div>
+  <main class="grid" id="grid" data-ss-thumb></main>
+  <footer class="transport">
+    <button type="button" class="play" id="play"><span data-label>Fold</span></button>
+    <div class="scrub">
+      <input type="range" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Progress of the fold">
+      <canvas id="strip" aria-hidden="true"></canvas>
+    </div>
+    <button type="button" class="quiet" id="reset">Reset view</button>
+  </footer>
+  <p class="readout" id="readout"><span id="stage"></span><span class="x" id="crossing"></span></p>
+</div>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>
