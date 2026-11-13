@@ -154,6 +154,13 @@ body {
   .pat-label { display: none; }
   .pat-pill { padding: 0 8px; gap: 6px; }
 }
+/* (a phone on its side: the swatch alone there too — see "wide but very low" below) */
+/* 360 px and narrower: the selector takes the title's room, so that the chip keeps "hm · shape" whole in its two lines
+   (p3m1 · equilateral triangle lost its last word at 360 px with all three in the row; test/shell-layout.test.js).
+   The title stays in the page for a screen reader; the host's bar and the browser's tab show it. */
+@media (max-width: 369px) {
+  .title { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
+}
 
 /* ---- caption: the orbifold in words ------------------------------------------------------------------------------ */
 .caption {
@@ -183,7 +190,7 @@ body {
 }
 .pane-plane { grid-area: plane; container: plane / size; }   /* its size comes from the grid, never from its content */
 .ctl-plane { grid-area: pctl; margin-top: 6px; }
-.pane-fold { grid-area: fold; }
+.pane-fold { grid-area: fold; container: fold / size; }      /* (as the plane's: sized by the grid; see .fold-caption) */
 .ctl-fold { grid-area: fctl; margin-top: 6px; }
 
 .pane {
@@ -251,6 +258,16 @@ body {
 .turn-hint { left: 6px; top: 6px; bottom: auto; transform: none; max-width: calc(100% - 12px); padding: 1px 7px 2px; }
 /* What a fold that re-cuts first is doing (13 Nov 2026): at the foot of the 3D pane, in ink. */
 .fold-caption { bottom: 6px; color: var(--ink); }
+/* On a small 3D pane (a phone: 183 px high at 375 x 498) the words get a strip of their own at the foot of the pane,
+   and the picture ends above it: over the picture they covered the lower end of a tall tile (the xx tile fills the
+   pane's height; on a pane of 450 px and more the camera's margin keeps the shape clear of them). The strip is there
+   for the whole fold of a tile that is re-cut (#app[data-features~="recut"]), also at t = 1 when the words are gone,
+   so that the picture does not change its size when they go. The labels' layer keeps the canvas's box. */
+@container fold (max-height: 449px) or (max-width: 449px) {
+  .app[data-features~="recut"] .pane-fold > canvas { height: calc(100% - 26px); }
+  .app[data-features~="recut"] .pane-fold > .labels { bottom: 26px; }
+  .fold-caption { bottom: 2px; max-width: calc(100% - 8px); padding: 1px 6px 2px; border-color: transparent; background: none; }
+}
 /* The kaleidoscopes have nothing to cut: no hint over their plane (contract C1; src/app.js hides it too). */
 .app[data-fold="snowflake"] .pane-plane > .hint { display: none; }
 /* A small plane pane (a phone; finding 11): the hint at the top edge, tighter, so that one line of it fits a 150 px
@@ -261,6 +278,10 @@ body {
 @supports not (container-type: size) {
   @media (max-width: 599px), (max-height: 479px) {
     .pane-plane > .hint { top: 6px; bottom: auto; max-width: calc(100% - 8px); padding: 1px 6px 2px; }
+    /* (the strip of a re-cut's words, as @container fold above) */
+    .app[data-features~="recut"] .pane-fold > canvas { height: calc(100% - 26px); }
+    .app[data-features~="recut"] .pane-fold > .labels { bottom: 26px; }
+    .pane-fold > .fold-caption { bottom: 2px; max-width: calc(100% - 8px); padding: 1px 6px 2px; border-color: transparent; background: none; }
   }
 }
 
@@ -458,6 +479,8 @@ body {
 .app:not([data-features]) .lg:is([data-feature="seams"], [data-feature="mirrors"], [data-feature="cones"]) { display: flex; }
 /* under a print the paper has two sides: said first (13 Nov 2026) */
 .app[data-pattern="checker"] .lg[data-paper], .app[data-pattern="rings"] .lg[data-paper] { display: flex; }
+/* ... but not under 360 px: there it would cost the legend a line, and the 3D pane of a 320 x 518 window its 150 px */
+@media (max-width: 359px) { .app[data-pattern] .lg[data-paper] { display: none; } }
 .lg-sep { margin: 0 6px; }
 .sw-front { fill: var(--print-dark); }
 .sw-back { fill: var(--print-back); }
@@ -509,6 +532,9 @@ body {
      limited by the height here (its pane stays wider than tall), so the narrower column costs it nothing. */
   .stage { grid-template-columns: minmax(min(320px, 60%), 1fr) minmax(0, 1fr); }
   .app:has(.presets > .chip:nth-child(4)) .stage { grid-template-columns: minmax(min(360px, 60%), 1fr) minmax(0, 1fr); }
+  /* the caption shares the header's row here, so the pattern selector is its swatch alone, as on a narrow window */
+  .pat-k, .pat-label { display: none; }
+  .pat-pill { padding: 0 8px; gap: 6px; }
 }
 
 /* ---- narrow windows (phones) ---------------------------------------------------------------------------------------- */

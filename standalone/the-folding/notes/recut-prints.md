@@ -30,6 +30,24 @@ different patterns."*
    rims meeting, as the Pocket has; it would make even the default cut re-cut, for no gain the eye can see).
 6. **No motion selector.** The owner named the motion; the lab stays for comparing motions.
 
+## After the review (the same day)
+
+An independent reader of the diff found nothing blocking and eight small real things; the opt-in browser layout test
+(`SHELL_LAYOUT=1 node --test test/shell-layout.test.js`), which this round had not run before shipping, found four
+more on phones. All fixed and tested; SPEC 10.1 has the contracts. What is worth remembering:
+
+- **Run the layout test before any change to the header or the legend ships.** The selector took 55 px of a phone's
+  header and one legend item a line of its legend; three earlier guarantees broke without a single node test failing
+  (the chip's second line at 360 px, the caption of a phone on its side, the 3D pane's 150 px at 320 x 518).
+- **Words over the picture cover the picture on a small pane.** The camera fits the shape's bounding sphere to the
+  pane, so a tall tile reaches within 13 px of a 183 px pane's foot; a pill of 25 px there lies on it. On panes under
+  450 px the words have their own strip and the canvas is shorter.
+- **A sieve at generic points does not prove a print exact.** A grid one hundredth of a mark off its group changes the
+  tone only in slivers along its lines; random points miss them. `exactlyInvariant` probes either side of the lines.
+- **A dropped speck is a pinhole with a rim.** The outline's samples on a speck under `DROP_SHARE` stay on the run of
+  the piece next to it and land a speck's depth (up to 0.005 tile sizes) outside the home tile. That is the only way
+  a sample of a run may land outside; the test tells the two apart by asking which copy of the home holds the sample.
+
 ## Numbers
 
 - Rebuild (a frame of a drag, draft mesh): xx 2.9 ms, 22x 3.5 ms with re-cut (1.6 / 2.1 ms without).

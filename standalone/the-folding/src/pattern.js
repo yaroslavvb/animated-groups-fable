@@ -17,7 +17,10 @@
 //   printFor(group, key)     the print of a group, or null for 'comma' / an unknown key. The same object every time.
 //   printUniforms(print)     what the renderer's shader needs (render3d.js setStyle({ print }))
 //   fillPrint(c, print, map, box, fillStyle)   the DARK tone as canvas paths (even-odd), through any affine map
-//   invariantUnder(group, print, samples?)     does every element of the group keep the print? (the tests)
+//   invariantUnder(group, print, samples?)     does every element of the group keep the print? At generic points:
+//                                              a coarse sieve (it cannot see a print that is off by a hair)
+//   exactlyInvariant(group, print, samples?)   the sharp check: a millionth of a mark either side of the lines where
+//                                              the tone changes, every generator must keep the tone
 //
 // A Print:
 //   key, kind          'linear' | 'rings'
@@ -36,9 +39,11 @@
 //
 // The checkerboard is FOUND, not tabulated: candidates are grids on the group's own lattice vectors (and, on a
 // hexagonal lattice, the triangular grids on it and on its 30-degree refinement, at the group's rotation centres), kept
-// when every coset representative and both lattice translations leave the tone unchanged at a few hundred generic
-// points (invariantUnder), and the one whose marks are nearest the wanted size, squarest and most evenly two-toned
-// wins. So a change of a lattice in src/groupdata needs no table to be regenerated; test/pattern.test.js checks all 17.
+// when every coset representative and both lattice translations leave the tone unchanged — at a few hundred generic
+// points (invariantUnder, a sieve) and then a millionth of a mark either side of the print's own lines
+// (exactlyInvariant: a grid laid a hair off the group's centres passes the sieve, not this) — and the one whose marks
+// are nearest the wanted size, squarest and most evenly two-toned wins. So a change of a lattice in src/groupdata needs
+// no table to be regenerated; test/pattern.test.js checks all 17, and turned, scaled and shifted copies of them.
 
 import { symmetryElements } from './groups.js';
 
@@ -142,6 +147,55 @@ export function invariantUnder(group, print, samples = 240, seed = 7) {
   return done >= samples / 2;
 }
 
+/**
+ * The sharp check (invariantUnder keeps away from the lines where the tone changes, so a print that is off by a
+ * hundredth of a mark passes it): points a millionth of a mark either side of a tone line — a line of one of the
+ * linear forms, away from the others' lines; a circle of the rings, inside its centre's own cell — must keep their
+ * tone under every coset representative and both lattice translations. A print the group keeps exactly passes; one
+ * that is off by more than a millionth of a mark does not.
+ */
+export function exactlyInvariant(group, print, samples = 20, seed = 23) {
+  const rnd = prng(seed), L = Math.max(len(group.e1), len(group.e2)), EPS = 1e-6;
+  const gens = group.reps.slice();
+  gens.push({ a: 1, b: 0, c: 0, d: 1, tx: group.e1[0], ty: group.e1[1] }, { a: 1, b: 0, c: 0, d: 1, tx: group.e2[0], ty: group.e2[1] });
+  const keeps = (x, y) => {
+    const t0 = print.tone(x, y);
+    for (const g of gens) if (print.tone(g.a * x + g.b * y + g.tx, g.c * x + g.d * y + g.ty) !== t0) return false;
+    return true;
+  };
+  if (print.kind === 'linear') {
+    const forms = print.forms.filter((f) => f[0] !== 0 || f[1] !== 0);
+    for (const f of forms) {
+      const l2 = f[0] * f[0] + f[1] * f[1], others = forms.filter((o) => o !== f);
+      let done = 0;
+      for (let i = 0; i < 60 * samples && done < samples; i++) {
+        let x = group.center[0] + (2 * rnd() - 1) * 1.5 * L, y = group.center[1] + (2 * rnd() - 1) * 1.5 * L;
+        const c = f[0] * x + f[1] * y + f[2], m = Math.round(c);
+        x += ((m - c) * f[0]) / l2; y += ((m - c) * f[1]) / l2;          // onto the line c = m
+        if (others.length && linearMargin(others, x, y) < 0.02) continue;   // (a corner of a mark: another line is near)
+        done++;
+        for (const sg of [1, -1]) if (!keeps(x + (sg * EPS * f[0]) / l2, y + (sg * EPS * f[1]) / l2)) return false;
+      }
+      if (done < samples) return false;
+    }
+    return true;
+  }
+  let done = 0;
+  for (let i = 0; i < 80 * samples && done < 2 * samples; i++) {
+    // a circle of the rings round a centre near the window, at a random bearing, where that centre is the nearest one
+    const ci = Math.round((2 * rnd() - 1) * 2), cj = Math.round((2 * rnd() - 1) * 2);
+    const cx = print.origin[0] + ci * print.a[0] + cj * print.b[0], cy = print.origin[1] + ci * print.a[1] + cj * print.b[1];
+    const k = 1 + Math.floor(rnd() * 4), th = 2 * Math.PI * rnd(), r = k * print.width;
+    const x = cx + r * Math.cos(th), y = cy + r * Math.sin(th);
+    if (Math.abs(ringDistance(print, x, y) - r) > 1e-9 * print.width) continue;        // (another centre is nearer)
+    // ... and not at the rim of the cell, where a hair further out another centre takes over
+    if (Math.abs(ringDistance(print, cx + (r + 0.02 * print.width) * Math.cos(th), cy + (r + 0.02 * print.width) * Math.sin(th)) - (r + 0.02 * print.width)) > 1e-9 * print.width) continue;
+    done++;
+    for (const sg of [1, -1]) { const q = r + sg * EPS * print.width; if (!keeps(cx + q * Math.cos(th), cy + q * Math.sin(th))) return false; }
+  }
+  return done >= samples;
+}
+
 // ---------------------------------------------------------------------------------------------------------------
 // The checkerboard: found on the group's own lattice
 // ---------------------------------------------------------------------------------------------------------------
@@ -199,7 +253,7 @@ function findChecker(group) {
   let best = null;
   const offer = (print, score) => {
     if (best && score >= best.score - 1e-9) return;
-    if (!invariantUnder(group, print, 160)) return;
+    if (!invariantUnder(group, print, 160) || !exactlyInvariant(group, print)) return;
     best = { print, score };
   };
 
@@ -306,7 +360,7 @@ function findRings(group) {
       const half = len(a) / 2, k = Math.max(1, Math.round(half / w0));
       const width = Math.abs(half / k - w0) < 0.3 * w0 ? half / k : w0;
       const P = makeRings(O, a, b, width, { order: top, centres: cs.length });
-      if (invariantUnder(group, P, 160)) return P;
+      if (invariantUnder(group, P, 160) && exactlyInvariant(group, P)) return P;
     }
   }
   // no rotations: bands along the mirrors, else along the glide axes, else along the first lattice vector
@@ -315,7 +369,7 @@ function findRings(group) {
   const offer = (forms, cell, score, info) => {
     if (best && score >= best.score) return;
     const P = makeLinear('rings', 'stripes', forms, cell, info);
-    if (invariantUnder(group, P, 160)) best = { print: P, score };
+    if (invariantUnder(group, P, 160) && exactlyInvariant(group, P)) best = { print: P, score };
   };
   if (lines.length) {
     const m = lines[0], nx = -m.uy, ny = m.ux, off = m.px * nx + m.py * ny;

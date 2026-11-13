@@ -18,5 +18,5 @@ test('the lab draws with the app\'s renderer, which has the palette', () => {
   assert.match(s, /uniform vec3 uPalF\[16\];/);
   assert.match(s, /uniform vec3 uPalB\[16\];/);
   assert.match(s, /style\.palF = new Float32Array\(48\)/);
-  assert.match(s, /if \(tq > 3\.5\) \{ int pi = int\(tq\) - 4; base = gl_FrontFacing \? uPalF\[pi\] : uPalB\[pi\]; \}/, 'a tint of 4 + i takes palette colour i');
+  assert.match(s, /if \(tq > 3\.5\) \{ int pi = clamp\(int\(tq\) - 4, 0, 15\); base = gl_FrontFacing \? uPalF\[pi\] : uPalB\[pi\]; \}/, 'a tint of 4 + i takes palette colour i (never beyond the palette)');
 });

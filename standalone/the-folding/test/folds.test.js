@@ -501,8 +501,10 @@ function checkScene(group, c, amp, prevDomain) {
     if (edgeLines !== scene.edges.length) fail('scene', `${label}: ${edgeLines} bold lines for ${scene.edges.length} edges at t = ${t}`);
     const creaseLines = lines.filter((l) => l.dashed && l.width === WIDTHS.crease).length;
     // (a re-cut tile shows the home tile's creases only once the home tile begins to fold: fold.creaseAlpha)
-    if (!recut && t < 0.2 && creaseLines !== scene.creases.length) fail('scene', `${label}: ${creaseLines} crease lines for ${scene.creases.length} creases at t = ${t}`);
-    if (recut && t <= scene.fold.foldFrom && creaseLines !== 0) fail('scene', `${label}: creases are drawn at t = ${t}, before the re-cut tile folds (from ${scene.fold.foldFrom})`);
+    // (... and the home tile itself, of which no piece moves, shows them as the fold module's own fold does)
+    const moving = recut && scene.fold.recut.movers > 0;
+    if (!moving && t < 0.2 && creaseLines !== scene.creases.length) fail('scene', `${label}: ${creaseLines} crease lines for ${scene.creases.length} creases at t = ${t}`);
+    if (moving && t <= scene.fold.foldFrom && creaseLines !== 0) fail('scene', `${label}: creases are drawn at t = ${t}, before the re-cut tile folds (from ${scene.fold.foldFrom})`);
     if (t === 1 && creaseLines !== 0) fail('scene', `${label}: creases are still drawn at t = 1`);
     if (t === 0) {
       // flat: everything in the plane, the boundary where the tile's outline is, the cone points where the domain has them

@@ -709,7 +709,7 @@ void main() {
   float tq = floor(vTint + 0.5);
   vec3 base = gl_FrontFacing ? uFront : uBack;
   if (uPat > 0) { float pt = printTone(); base = gl_FrontFacing ? mix(uPatF0, uPatF1, pt) : mix(uPatB0, uPatB1, pt); }
-  if (tq > 3.5) { int pi = int(tq) - 4; base = gl_FrontFacing ? uPalF[pi] : uPalB[pi]; }   // the palette (the lab)
+  if (tq > 3.5) { int pi = clamp(int(tq) - 4, 0, 15); base = gl_FrontFacing ? uPalF[pi] : uPalB[pi]; }   // the palette (the lab)
   else {
     base = mix(base, uGhost, mod(tq, 2.0) * uGhostMix);
     base = mix(base, uFill, step(1.5, tq));

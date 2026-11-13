@@ -10,7 +10,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GROUPS, BY_ID, elementsNear } from '../src/groups.js';
-import { PATTERNS, DEFAULT_PATTERN, resolvePattern, printFor, printUniforms, fillPrint, invariantUnder, CHECKS_ACROSS, RINGS_ACROSS } from '../src/pattern.js';
+import { PATTERNS, DEFAULT_PATTERN, resolvePattern, printFor, printUniforms, fillPrint, invariantUnder, exactlyInvariant, CHECKS_ACROSS, RINGS_ACROSS } from '../src/pattern.js';
 
 function prng(seed) {
   let a = seed >>> 0;
@@ -57,6 +57,9 @@ test('prints: every group has a checkerboard and rings, and every element of the
       // the finder's own check, wider, from other points
       assert.ok(invariantUnder(g, P, 500, 31), `${label}: the generators keep it`);
       assert.ok(invariantUnder(g, P, 500, 977), `${label}: the generators keep it (other points)`);
+      // the sharp check: a millionth of a mark either side of the print's own lines
+      assert.ok(exactlyInvariant(g, P, 60, 5), `${label}: exactly, at its own lines`);
+      assert.ok(exactlyInvariant(g, P, 60, 4711), `${label}: exactly, at its own lines (other points)`);
       // ... and against the group itself: every element that moves the window's centre within two lattice lengths
       const L = Math.hypot(g.e1[0], g.e1[1]) + Math.hypot(g.e2[0], g.e2[1]);
       const els = elementsNear(g, g.center[0], g.center[1], 2 * L);
@@ -123,6 +126,54 @@ test('prints: control — a print that the group does not keep is noticed (shift
     }
   }
   assert.ok(caught >= tried - 3, `${caught} of ${tried} planted faults caught`);
+});
+
+/** The group carried to another place: x -> s R(th) x + v (reps conjugated, lattice and centre moved). */
+function moved(g, th, sc, v) {
+  const co = sc * Math.cos(th), si = sc * Math.sin(th), A = [co, -si, si, co], d = co * co + si * si, Ai = [co / d, si / d, -si / d, co / d];
+  const mul = (M, p) => [M[0] * p[0] + M[1] * p[1], M[2] * p[0] + M[3] * p[1]];
+  const mm = (M, N) => [M[0] * N[0] + M[1] * N[2], M[0] * N[1] + M[1] * N[3], M[2] * N[0] + M[3] * N[2], M[2] * N[1] + M[3] * N[3]];
+  const reps = g.reps.map((r) => {
+    const L = mm(mm(A, [r.a, r.b, r.c, r.d]), Ai), Lv = mul(L, v), At = mul(A, [r.tx, r.ty]);
+    return { a: L[0], b: L[1], c: L[2], d: L[3], tx: -Lv[0] + At[0] + v[0], ty: -Lv[1] + At[1] + v[1] };
+  });
+  const e1 = mul(A, g.e1), e2 = mul(A, g.e2), cen = mul(A, g.center), cellArea = Math.abs(e1[0] * e2[1] - e1[1] * e2[0]);
+  return { id: g.id, e1, e2, reps, cellArea, domainArea: cellArea / reps.length, center: [cen[0] + v[0], cen[1] + v[1]] };
+}
+
+test('prints: the finder is exact wherever the group sits — turned, scaled and shifted copies of all 17 (the review of 13 Nov: a grid laid from the origin, a hair off the group\'s own centres, had passed the sieve)', () => {
+  const rnd = prng(2026);
+  let n = 0;
+  for (const g of GROUPS) {
+    for (let k = 0; k < 14; k++) {
+      const th = k < 3 ? [0.3, 1, 3.66][k] : rnd() * 2 * Math.PI, sc = k < 2 ? 1 : 0.4 + 2.2 * rnd(), v = k % 3 === 0 ? [0, 0] : [3 * rnd() - 1.5, 3 * rnd() - 1.5];
+      const h = moved(g, th, sc, v), label = `${g.id} turned ${th.toFixed(3)}, scaled ${sc.toFixed(3)}, shifted ${v.map((x) => x.toFixed(3))}`;
+      for (const key of ['checker', 'rings']) {
+        const P = printFor(h, key);
+        assert.ok(P, `${label}: a ${key}`);
+        assert.ok(exactlyInvariant(h, P, 40, 99 + k), `${label}: the ${key} is exact`);
+        // ... and against elements of the group at generic points, with no margin at all: at most a point in a thousand
+        // may sit within rounding of a line
+        const els = elementsNear(h, h.center[0], h.center[1], 3 * Math.sqrt(h.cellArea)), L = Math.sqrt(h.cellArea);
+        let bad = 0;
+        for (let i = 0; i < 400; i++) {
+          const x = h.center[0] + (2 * rnd() - 1) * 2 * L, y = h.center[1] + (2 * rnd() - 1) * 2 * L, e = els[(rnd() * els.length) | 0];
+          if (P.tone(e.a * x + e.b * y + e.tx, e.c * x + e.d * y + e.ty) !== P.tone(x, y)) bad++;
+        }
+        assert.ok(bad <= 1, `${label}: the ${key} changes tone under an element at ${bad} of 400 points`);
+        assert.ok(P.cell > 0.1 * Math.sqrt(h.domainArea) && P.cell < 0.4 * Math.sqrt(h.domainArea), `${label}: a mark of ${(P.cell / Math.sqrt(h.domainArea)).toFixed(3)} tile sizes`);
+        n++;
+      }
+    }
+  }
+  assert.ok(n === 17 * 14 * 2);
+  // control: a print one hundredth of a mark off passes the sieve and is caught by the sharp check
+  const g = BY_ID['*442'], P = printFor(g, 'checker'), f = P.forms.map((q) => q.slice());
+  f[0][2] += 0.01;
+  const used = (k) => f[k][0] !== 0 || f[k][1] !== 0;
+  const off = { key: 'checker', kind: 'linear', forms: f, cell: P.cell, tone: (x, y) => { let k = 0; for (let i = 0; i < 3; i++) if (used(i)) k += Math.floor(f[i][0] * x + f[i][1] * y + f[i][2]); return k & 1; } };
+  assert.equal(invariantUnder(g, off, 300), true, 'the sieve does not see a hundredth of a mark');
+  assert.equal(exactlyInvariant(g, off), false, 'the sharp check does');
 });
 
 test('prints: the shader\'s uniforms carry the same forms; an unused form multiplies by one', () => {

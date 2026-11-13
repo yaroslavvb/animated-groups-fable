@@ -37,6 +37,8 @@
 //   creases                          the home fold's creases, on the pieces: [{ a, b, pts: [x1, y1, x2, y2] }]
 //   cuts                             the home tile's rim, on the pieces (where the tile is cut): [{ part, pts, cells }]
 //                                    (the parts that run along the tile's own boundary are left out)
+//   cutsFlat                         the same lines once each, [{ pts }]: for the flat tile and the plane (a cut is the
+//                                    rim of the piece on either side of it, so `cuts` holds every cut twice)
 //   locate(x, y)                     the tag of a plane point of the tile
 // The fold (SPEC 5.3: mesh, stops, duration, at) also has
 //   recut        { home: { name, poly, element }, pieces: [{ part, type, text, area, from, to, moves, element, poly }],
@@ -220,14 +222,12 @@ export default function createRecut(group, domain, mesh, opts, direct, meshOptio
   const hu = new Float64Array(n0), hv = new Float64Array(n0), sd = new Float64Array(n0);
   const inside = new Uint8Array(n0);
   for (const e of els) {
-    let anyIn = false;
     for (let v = 0; v < n0; v++) {
       const u = e.a * X[2 * v] + e.b * X[2 * v + 1] + e.tx, w = e.c * X[2 * v] + e.d * X[2 * v + 1] + e.ty;
       hu[v] = u; hv[v] = w;
       let s = -Infinity;
       for (let i = 0; i < np; i++) { const d = planes[i][0] * u + planes[i][1] * w - planes[i][2]; if (d > s) s = d; }
       sd[v] = s; inside[v] = s <= tiny ? 1 : 0;
-      if (s < -tiny) anyIn = true;
     }
     const ei = inverse(e);
     // the piece by the outline: too small to see, or none at all -> no piece (its triangles, if any, are left out)
@@ -256,7 +256,7 @@ export default function createRecut(group, domain, mesh, opts, direct, meshOptio
         if (s < -tiny || (sd[a] < -tiny || sd[b] < -tiny || sd[c] < -tiny)) { add(a, b, c, cu, cw, 0.5 * Math.abs(ar2)); ax += 0.5 * Math.abs(ar2) * (X[2 * a] + X[2 * b] + X[2 * c]) / 3; ay += 0.5 * Math.abs(ar2) * (X[2 * a + 1] + X[2 * b + 1] + X[2 * c + 1]) / 3; }
         continue;
       }
-      if (!anyIn) continue;
+      // (no shortcut for a copy that holds no vertex of the mesh: a piece smaller than a triangle lies inside one)
       // beyond one of the home's sides altogether?
       let out = false;
       for (let i = 0; i < np && !out; i++) {
@@ -410,15 +410,23 @@ export default function createRecut(group, domain, mesh, opts, direct, meshOptio
     for (let j = 0; j < m; j++) {
       run.x.push(pts[2 * j], pts[2 * j + 1]); run.c.push(cells[j]);
       if (j + 1 < m && pk[j + 1] !== pk[j]) {
+        // walk from sample j to sample j + 1 through every piece on the way (a third piece's sliver between the two
+        // samples gets a run of its own, however short): at each change, the point where the line leaves the piece
         const a = inward(j), c = inward(j + 1);
-        let lo = 0, hi2 = 1;
-        for (let it = 0; it < 40; it++) { const mid = (lo + hi2) / 2; if (partAt(a[0] + mid * (c[0] - a[0]), a[1] + mid * (c[1] - a[1])) === pk[j]) lo = mid; else hi2 = mid; }
-        const u = (lo + hi2) / 2, qx = pts[2 * j] + u * (pts[2 * j + 2] - pts[2 * j]), qy = pts[2 * j + 1] + u * (pts[2 * j + 3] - pts[2 * j + 1]);
-        const ix = a[0] + u * (c[0] - a[0]), iy = a[1] + u * (c[1] - a[1]);
-        run.x.push(qx, qy); run.c.push(tagAt(ix, iy, pk[j]));
-        flush();
-        // (a sliver of a third piece between the two samples is skipped: it is shorter than a sample step)
-        run.x.push(qx, qy); run.c.push(tagAt(ix, iy, pk[j + 1]));
+        const at = (u) => partAt(a[0] + u * (c[0] - a[0]), a[1] + u * (c[1] - a[1]));
+        let kc = pk[j], u0 = 0;
+        for (let hop = 0; hop < 8 && kc !== pk[j + 1]; hop++) {
+          let lo = u0, hi2 = 1;                      // (the piece at lo is kc; at 1 it is pk[j + 1], another one)
+          for (let it = 0; it < 44; it++) { const mid = (lo + hi2) / 2; if (at(mid) === kc) lo = mid; else hi2 = mid; }
+          const u = (lo + hi2) / 2, qx = pts[2 * j] + u * (pts[2 * j + 2] - pts[2 * j]), qy = pts[2 * j + 1] + u * (pts[2 * j + 3] - pts[2 * j + 1]);
+          const ix = a[0] + u * (c[0] - a[0]), iy = a[1] + u * (c[1] - a[1]);
+          const ub = hi2 + 1e-9, kn = ub >= 1 ? pk[j + 1] : at(ub);
+          run.x.push(qx, qy); run.c.push(tagAt(ix, iy, kc));
+          flush();
+          run.x.push(qx, qy); run.c.push(tagAt(ix, iy, kn));
+          kc = kn; u0 = Math.min(1, ub);
+        }
+        if (kc !== pk[j + 1]) run = { x: [], c: [] };   // (never seen: the walk did not arrive; the next run starts at the sample)
       }
     }
     flush();
@@ -501,10 +509,47 @@ export default function createRecut(group, domain, mesh, opts, direct, meshOptio
     }
   }
 
+  // The cut lines ONCE each, for the flat tile and the plane: a cut through the tile is the rim of the piece on either
+  // side of it, so `cuts` holds it twice, one polyline on the other; two dashed lines that start at different points
+  // fill each other's gaps. Per supporting line, the union of the runs' stretches.
+  const cutsFlat = [];
+  {
+    const lines = new Map(), tol = 1e-5 * size;
+    for (const cu of cuts) {
+      const m = cu.pts.length >> 1;
+      const ax = cu.pts[0], ay = cu.pts[1], bx = cu.pts[2 * m - 2], by = cu.pts[2 * m - 1];
+      let ux = bx - ax, uy = by - ay;
+      const l = Math.hypot(ux, uy);
+      if (!(l > tol)) continue;
+      ux /= l; uy /= l;
+      if (ux < -1e-9 || (Math.abs(ux) <= 1e-9 && uy < 0)) { ux = -ux; uy = -uy; }
+      const off = -ax * uy + ay * ux, key = Math.round(Math.atan2(uy, ux) * 2e4) + '|' + Math.round(off / tol);
+      let L = lines.get(key);
+      if (!L) { L = { ux, uy, off, iv: [] }; lines.set(key, L); }
+      const ta = ax * ux + ay * uy, tb = bx * ux + by * uy;
+      L.iv.push([Math.min(ta, tb), Math.max(ta, tb)]);
+    }
+    for (const L of lines.values()) {
+      L.iv.sort((p, q) => p[0] - q[0]);
+      let cur = null;
+      const flush = () => {
+        const nx = -L.uy, ny = L.ux, k = Math.max(2, Math.ceil((cur[1] - cur[0]) / step) + 1), p = new Float32Array(2 * k);
+        for (let i = 0; i < k; i++) { const t = cur[0] + ((cur[1] - cur[0]) * i) / (k - 1); p[2 * i] = L.off * nx + t * L.ux; p[2 * i + 1] = L.off * ny + t * L.uy; }
+        cutsFlat.push({ pts: p });
+      };
+      for (const iv of L.iv) {
+        if (cur && iv[0] <= cur[1] + tol) { if (iv[1] > cur[1]) cur[1] = iv[1]; continue; }
+        if (cur) flush();
+        cur = iv.slice();
+      }
+      if (cur) flush();
+    }
+  }
+
   const cells = tags;                               // (tagFor may still add tags: `cells` is the same array)
   const M = {
     n, xy: Float32Array.from(xs), cell: Uint16Array.from(cs), tri: Uint32Array.from(tri), m: tc.length, triCell: Uint16Array.from(tc),
-    cells, root: 0, locate, boundary, boundaryRuns, creases, cuts, bbox: B.bbox ? B.bbox.slice() : bb,
+    cells, root: 0, locate, boundary, boundaryRuns, creases, cuts, cutsFlat, bbox: B.bbox ? B.bbox.slice() : bb,
     recut: true,
   };
 
@@ -555,11 +600,17 @@ export default function createRecut(group, domain, mesh, opts, direct, meshOptio
       home: { name: H.name, element: h, poly: P.map((p) => [h.a * p[0] + h.b * p[1] + h.tx, h.c * p[0] + h.d * p[1] + h.ty]) },
       pieces, movers: K, tau0, seconds: recutSeconds, foldSeconds,
     },
-    /** Opacity of the home's creases at t: none before the fold begins, then as the home fold has them. */
+    /**
+     * Opacity of the home's creases at t. A tile that is re-cut: none before the fold begins (they are the home tile's,
+     * not this tile's), then, after a short fade in, as the home fold has them. The home tile itself (no piece moves):
+     * exactly as the fold module's own fold shows them, there from the flat tile on.
+     */
     creaseAlpha(t) {
+      const own = (f) => (cw ? 1 - smooth((f - cw[0]) / (cw[1] - cw[0])) : 1 - smooth((f - 0.2) / 0.27));
+      if (!K) return own(t > 0 ? (t < 1 ? t : 1) : 0);
       if (!(t > tau0)) return 0;
-      const f = tFold(t), fadeIn = smooth(f / 0.03);
-      return cw ? fadeIn * (1 - smooth((f - cw[0]) / (cw[1] - cw[0]))) : fadeIn * (1 - smooth((f - 0.2) / 0.27));
+      const f = tFold(t);
+      return smooth(f / 0.03) * own(f);
     },
     /**
      * How the cut lines are drawn at t: { alpha, width (1 = a thin line), dashed }. On the flat tile: dashed, where it

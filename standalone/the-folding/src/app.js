@@ -384,15 +384,16 @@ export function printStyle(fold, t = 1) {
 /**
  * The words over the fold pane at t for a fold that re-cuts first (fold.recut), '' otherwise: on the flat tile what
  * Fold will do; while a piece moves, which one and by which element of the group; while the home tile folds, why it
- * was re-cut. `short`: the short words (a phone).
+ * was re-cut. `short`: the short words (a phone): each fits one line of a 296 px pane, the 3D pane of a 320 px
+ * window, with room to spare (test/shell-layout.test.js; "the Rectangle folds: nothing passes through" took two).
  */
 export function foldCaption(fold, t, short = false) {
   const R = fold && fold.recut;
   if (!R || !(R.movers > 0) || typeof fold.stage !== 'function') return '';
   const st = fold.stage(clamp01(t)), name = R.home.name;
   if (st.stage === 'flat') return short ? `re-cut into the ${name} first` : `Fold re-cuts the tile into the ${name} (dotted) first`;
-  if (st.stage === 'recut') return short ? `re-cut ${st.piece}/${st.of}: ${st.text.replace(/^a /, '').replace(/:.*$/, '')}` : `re-cut, piece ${st.piece} of ${st.of}: ${st.text}`;
-  if (st.stage === 'fold') return short ? `the ${name} folds: nothing passes through` : `the ${name} folds: its cut runs along the double line, so no paper passes through paper`;
+  if (st.stage === 'recut') return short ? `re-cut ${st.piece}/${st.of}: ${st.text.replace(/^a /, '').replace(/(:| about ).*$/, '')}` : `re-cut, piece ${st.piece} of ${st.of}: ${st.text}`;
+  if (st.stage === 'fold') return short ? `${name} folds: nothing passes through` : `the ${name} folds: its cut runs along the double line, so no paper passes through paper`;
   return '';
 }
 
@@ -581,6 +582,15 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
     if (!c || !c.pts || c.pts.length < 4) continue;
     cuts.push({ pts: c.pts, cells: c.cells, out: new Float32Array(3 * (c.pts.length >> 1)) });
   }
+  // ... and the same lines once each, in the plane of the flat tile (a cut is the rim of the piece on either side of
+  // it: drawn twice, two dashed lines fill each other's gaps): what is drawn at t = 0
+  const cutsFlat = [];
+  for (const c of M.cutsFlat || []) {
+    if (!c || !c.pts || c.pts.length < 4) continue;
+    const k = c.pts.length >> 1, out = new Float32Array(3 * k);
+    for (let i = 0; i < k; i++) { out[3 * i] = c.pts[2 * i]; out[3 * i + 1] = c.pts[2 * i + 1]; }
+    cutsFlat.push({ pts: c.pts, out });
+  }
 
   // the cone points: they lie on the boundary; each takes the piece of the nearest boundary sample
   const cones = (domain.conePoints || []).map((c) => {
@@ -598,7 +608,7 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
 
   return {
     group, domain, tileMesh, fold, M, n, cellOf, size, anchor: foldOpts.anchor || null, draft,
-    pattern: patternKey, print, cuts,
+    pattern: patternKey, print, cuts, cutsFlat,
     pos: new Float32Array(3 * n), edges, creases, motif, cones,
     stops: fold.stops, duration: fold.duration, star: fold.star || null,
     axis: [], frame: null, nonFinite: 0, t: -1, pairs: null,
@@ -716,7 +726,9 @@ export function sceneLines(scene, k = 1) {
   // where a re-cut tile is cut: dashed on the flat tile, the pieces' own edges on the way, faint once the fold closes them
   if (scene.cuts && scene.cuts.length && typeof scene.fold.cutStyle === 'function') {
     const cs = scene.fold.cutStyle(scene.t);
-    if (cs && cs.alpha > 0.004) for (const c of scene.cuts) lines.push({ points: c.out, color: CUT_RGB, width: WIDTHS.cut * cs.width * thin, alpha: cs.alpha, dashed: !!cs.dashed, xray: 0.45 });
+    // (on the flat tile each cut once: scene.cutsFlat; from then on the pieces' own rims)
+    const list = !(scene.t > 0) && scene.cutsFlat && scene.cutsFlat.length ? scene.cutsFlat : scene.cuts;
+    if (cs && cs.alpha > 0.004) for (const c of list) lines.push({ points: c.out, color: CUT_RGB, width: WIDTHS.cut * cs.width * thin, alpha: cs.alpha, dashed: !!cs.dashed, xray: 0.45 });
   }
   for (const m of scene.motif) {
     const a = MOTIF_ALPHA * motifFade(m.fade, scene.t);       // a kaleidoscope's landed copies fade out (motifFades)
@@ -783,7 +795,8 @@ export function ghostEase(scene) {
 }
 /**
  * What the plane is told of a re-cut (plane.js setScene({ recut })): { name, home: [[x, y], ...] the home tile,
- * cuts: [Float32Array, ...] where the tile is cut, active }, or null when the fold does not re-cut (no piece moves).
+ * cuts: [Float32Array, ...] where the tile is cut (each cut once), active }, or null when the fold does not re-cut
+ * (no piece moves).
  * active (with a time t): the piece that is being carried at t, { part, from: its outline on the tile, to: where it
  * lands in the home tile }, so the plane can show which part of the tile the 3D pane is moving, and where to; null
  * when no piece moves at t (or no t is given).
@@ -791,7 +804,7 @@ export function ghostEase(scene) {
 export function planeRecut(scene, t = null) {
   const R = scene && scene.fold && scene.fold.recut;
   if (!R || !(R.movers > 0)) return null;
-  return { name: R.home.name, home: R.home.poly, cuts: (scene.M.cuts || []).map((c) => c.pts), active: t === null ? null : recutActive(scene, t) };
+  return { name: R.home.name, home: R.home.poly, cuts: (scene.M.cutsFlat || scene.M.cuts || []).map((c) => c.pts), active: t === null ? null : recutActive(scene, t) };
 }
 /** The piece of a re-cut tile that is carried at t: { part, from, to } (plane polygons), or null. */
 export function recutActive(scene, t) {
@@ -1094,7 +1107,12 @@ function start(doc, win) {
   /** The words over the fold pane: what a fold that re-cuts first is doing now (foldCaption); nothing otherwise. And
    *  the plane shows the piece that is being carried, and where it lands (told only when the piece changes). */
   let shownPart = -1;
-  const recutPartNow = () => { const a = scene ? recutActive(scene, state.t) : null; return a ? a.part : -1; };
+  const recutPartNow = () => {
+    const f = scene && scene.fold;
+    if (!f || !f.recut || !(f.recut.movers > 0) || typeof f.stage !== 'function') return -1;
+    const st = f.stage(clamp01(state.t));
+    return st.stage === 'recut' ? st.part : -1;
+  };
   function syncFoldCaption() {
     const part = recutPartNow();
     if (part !== shownPart) {

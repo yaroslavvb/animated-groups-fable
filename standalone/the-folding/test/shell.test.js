@@ -301,3 +301,29 @@ test('styles: the layout rules the shell promises', () => {
   assert.match(css, /\[hidden\] \{ display: none !important; \}/, 'the hidden attribute always hides (hint, turn hint, picker)');
   assert.match(css, /\.pane-plane \{[^}]*container: plane \/ size;/, 'the plane pane is the size container the hint asks about');
 });
+
+test('styles (13 Nov, SPEC 10.1): on a phone — the selector is its swatch, the title gives way under 370 px, the legend\'s paper shows from 360 px, a re-cut\'s words have a strip of their own', () => {
+  // the selector: the swatch and the caret alone under 560 px and in a low landscape window (the caption shares the row)
+  assert.match(block(css, '@media (max-width: 559px)'), /\.pat-label \{ display: none; \}/);
+  assert.match(block(css, '@media (orientation: landscape) and (max-height: 479px)'), /\.pat-k, \.pat-label \{ display: none; \}/);
+  // the title: hidden to the eye under 370 px, still in the page (never display: none)
+  const narrow = block(css, '@media (max-width: 369px)');
+  assert.match(narrow, /\.title \{[^}]*position: absolute;[^}]*clip-path: inset\(50%\);/);
+  assert.doesNotMatch(narrow, /display: none/);
+  // the legend's "front · back": from 360 px up
+  assert.match(css, /@media \(max-width: 359px\) \{ \.app\[data-pattern\] \.lg\[data-paper\] \{ display: none; \} \}/);
+  // the words of a re-cut on a small 3D pane: the canvas and its labels' layer end above a strip at the pane's foot,
+  // for the whole fold of a re-cut tile (not only while the words show: the picture keeps its size)
+  assert.match(css, /\.pane-fold \{[^}]*container: fold \/ size;/, 'the fold pane is the size container the strip asks about');
+  const strip = block(css, '@container fold (max-height: 449px) or (max-width: 449px)');
+  const hgt = Number((strip.match(/\.app\[data-features~="recut"\] \.pane-fold > canvas \{ height: calc\(100% - (\d+)px\); \}/) || [])[1]);
+  const bot = Number((strip.match(/\.app\[data-features~="recut"\] \.pane-fold > \.labels \{ bottom: (\d+)px; \}/) || [])[1]);
+  assert.ok(hgt === bot && hgt >= 24 && hgt <= 28, `the canvas and its labels end ${hgt} / ${bot} px above the pane's foot`);
+  const cap = strip.match(/\.fold-caption \{ bottom: (\d+)px;[^}]*padding: (\d+)px \d+px (\d+)px;/);
+  assert.ok(cap && Number(cap[1]) + Number(cap[2]) + 16 + Number(cap[3]) + 2 <= hgt, 'one line of the words (16 px, its padding and border) fits the strip');
+  const fallback = block(css, '@supports not (container-type: size)');
+  assert.match(fallback, /\.app\[data-features~="recut"\] \.pane-fold > canvas \{ height: calc\(100% - (\d+)px\); \}/, 'without container queries: by window size');
+  assert.equal(Number(fallback.match(/\.pane-fold > canvas \{ height: calc\(100% - (\d+)px\); \}/)[1]), hgt);
+  // the canvas rule the strip overrides fills the pane otherwise
+  assert.match(rule('.pane > canvas'), /inset: 0;[\s\S]*height: 100%/);
+});

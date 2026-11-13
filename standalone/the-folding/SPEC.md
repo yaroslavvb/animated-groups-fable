@@ -674,3 +674,47 @@ at the top which allows me to pick different patterns."* Notes: `notes/recut-pri
   planted faults, the shader's formula and the canvas paths against the one tone function), `test/recut.test.js`
   (above, and the SPEC 5.3 contract for the re-cut fold), `test/app-url.test.js` (`pat`), `test/folds.test.js`
   (a re-cut scene's runs and creases; the anchor and crease-window tests ask for the fold modules' own motion).
+
+### 10.1 The same day, after an independent review and the layout test
+
+A second reader of the round's diff (nothing blocking, eight small real findings) and `test/shell-layout.test.js`
+(opt-in: `SHELL_LAYOUT=1`, needs a Chrome), which the round had shipped without running. What they changed:
+
+- **`recut.js`**
+  - `creaseAlpha(t)`: a tile that is re-cut shows no crease before its home tile folds; the HOME TILE ITSELF (no piece
+    moves) shows its creases exactly as the fold module's own fold does, from the flat tile on (the default cut of
+    22× had lost its dashed crease at t = 0).
+  - every piece above `DROP_SHARE` has its triangles: there is no shortcut for a copy of the home that holds no vertex
+    of the mesh (a piece smaller than a triangle lies inside one).
+  - `boundaryRuns`: between two samples of the outline the walk goes through EVERY piece on the way, so a third
+    piece's sliver gets a run of its own (a stub of the next piece's run had lain on it, 0.019 tile sizes off).
+    The only samples that land outside the home tile when their piece carries them are those on the rim of a speck
+    that is left out (below `DROP_SHARE`).
+  - `mesh.cutsFlat` `[{ pts }]`: the cut lines once each (`cuts` holds every cut twice, as the rim of the piece on
+    either side). The flat tile (`sceneLines` at t ≤ 0) and the plane (`planeRecut`) draw these: two dashed lines on
+    each other filled each other's gaps.
+- **`pattern.js`** `exactlyInvariant(group, print)`: the tone a millionth of a mark either side of the print's own
+  lines, under every representative and both translations. The finder asks for it besides the sieve at generic points:
+  for a group that does not sit at the origin (turned, scaled, shifted) a grid a hair off the group's centres had
+  passed the sieve. The 17 groups of `groups.js` were never affected; `test/pattern.test.js` now moves them about.
+- **The plane's two colours are fixed in the plane.** Which copies of the tile are sand is decided by `chamberParity`:
+  the number of mirror lines between the tile's seed and the fixed point where the group's comma sits (`motif.at`),
+  as for the grey tint before (and as the 3D view's `mirroredAt` swaps front and back). The tile itself is always
+  drawn in the front's two tones. So after a drag across a mirror the pale copies of the tile's own hand are the sand
+  ones. Kept: recolouring the whole plane at the moment the seed crosses a mirror flickers during the drag.
+- **The shell on a phone** (the layout test is the gate for any change to the header or the legend):
+  - the pattern selector is its swatch and caret alone under 560 px AND in a low landscape window (the caption
+    shares the header's row there); its name shows from 560 px, the word "Pattern" from 720 px.
+  - the title is visually hidden under 370 px: with title, chip and selector in a 360 px row the chip lost a word
+    (`p3m1 · equilateral…`). It stays in the page for a screen reader.
+  - the legend's "front · back" shows from 360 px up (at 320 px it cost the legend a line and the 3D pane its 150 px).
+  - the words of a re-cut (`foldCaption(fold, t, short)`): the short ones are at most 40 characters (one line of a
+    296 px pane): `re-cut into the Rectangle first`, `re-cut 2/4: half-turn`, `Rectangle folds: nothing passes
+    through`. On a 3D pane under 450 px (either side) they have a strip of their own, 26 px at the foot of the pane,
+    and the canvas and its labels' layer end above it — over the picture they covered the lower end of a tall tile.
+    The strip is there for the whole fold of a re-cut tile (`#app[data-features~="recut"]`), also at t = 1, so the
+    picture keeps its size when the words go. `.pane-fold` is a size container (`fold`) for this.
+- **Tests added**: the reviewer's two cuts and a sweep of 360 folds for the runs (`test/recut.test.js`); the home
+  tile's creases against the fold module's own (`test/recut.test.js`, `test/folds.test.js`); turned, scaled and shifted
+  copies of all 17 groups (`test/pattern.test.js`); in the layout test the selector, the title, the legend's paper
+  item with all three patterns, and the words of a re-cut at seven window sizes.

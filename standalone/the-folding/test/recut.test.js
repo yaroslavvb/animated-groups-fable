@@ -12,7 +12,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GROUPS, BY_ID, contains } from '../src/groups.js';
+import { GROUPS, BY_ID, contains, elementsNear } from '../src/groups.js';
 import { inverse, apply, classify, det } from '../src/geom.js';
 import { makeWarp, buildDomain } from '../src/domain.js';
 import { buildMesh } from '../src/mesh.js';
@@ -154,6 +154,34 @@ test('re-cut: carry(element, s) is the identity at 0, the element at 1, rigid in
   assert.equal(moveText({ type: 'identity' }), 'stays');
 });
 
+/**
+ * The runs of the tile's outline, each sample carried by ITS piece's element: how far outside the home tile it lands.
+ * A stub of a run on the wrong piece lands outside (the review of 13 Nov found one, 0.019 tile sizes long). The one
+ * exception: a speck that is left out (below DROP_SHARE of the tile, a pinhole) — its rim stays on the run of the
+ * piece next to it, a speck's depth outside; such a sample lies in a copy of the home that has no piece.
+ * -> { worst (not on a speck), speck (the deepest on a speck), specks (samples on specks), left (share left out) }, tile sizes
+ */
+function runsOffPiece(group, fold) {
+  const M = fold.mesh, R = fold.recut, tags = M.cells, H = R.home.poly, size = Math.sqrt(group.domainArea);
+  let h2 = 0, cx = 0, cy = 0;
+  for (let i = 0; i < H.length; i++) { const a = H[i], b = H[(i + 1) % H.length]; h2 += a[0] * b[1] - a[1] * b[0]; cx += a[0] / H.length; cy += a[1] / H.length; }
+  const sg = h2 < 0 ? -1 : 1;                        // (a home copy carried by a glide runs clockwise)
+  const outside = (x, y) => { let worst = 0; for (let i = 0; i < H.length; i++) { const a = H[i], b = H[(i + 1) % H.length], l = Math.hypot(b[0] - a[0], b[1] - a[1]); worst = Math.max(worst, (-sg * ((b[0] - a[0]) * (y - a[1]) - (b[1] - a[1]) * (x - a[0]))) / l); } return worst; };
+  const keyOf = (g) => [g.a, g.b, g.c, g.d, g.tx, g.ty].map((v) => Math.round(v * 1e6)).join();
+  const kept = new Set(R.pieces.map((p) => keyOf(p.element)));
+  let others = null, worst = 0, speck = 0, specks = 0;
+  for (const r of M.boundaryRuns) {
+    for (let k = 0; k < r.cells.length; k++) {
+      const px = r.pts[2 * k], py = r.pts[2 * k + 1];
+      const g = tags[r.cells[k]].g, d = outside(g.a * px + g.b * py + g.tx, g.c * px + g.d * py + g.ty);
+      if (d < 2e-5 * size) continue;                 // (float32 samples: a hair off the cut)
+      if (!others) others = elementsNear(group, cx, cy, 6 * size, cx, cy).filter((e) => !kept.has(keyOf(e)));
+      if (others.some((e) => outside(e.a * px + e.b * py + e.tx, e.c * px + e.d * py + e.ty) <= 2e-5 * size)) { speck = Math.max(speck, d); specks++; } else worst = Math.max(worst, d);
+    }
+  }
+  return { worst: worst / size, speck: speck / size, specks, left: 1 - R.pieces.reduce((s, p) => s + p.area, 0) / group.domainArea };
+}
+
 // ---- the sweep: every preset and random cuts, straight and wavy -----------------------------------------------------
 
 const stats = { folds: 0, movers: 0, maxPieces: 0, maxStep: 0, maxCross: 0, seamPairs: 0, maxSeam: 0, types: {} };
@@ -272,6 +300,27 @@ function check(group, c, amp) {
     if (holes > (amp ? 2 : 1) || doubles) fail('pieces', `${label}: of ${probes} points of the home tile, ${holes} lie in no piece and ${doubles} in two`);
   }
 
+  // ---- every piece has its triangles (a piece smaller than a mesh triangle too: the review of 13 Nov found one left
+  //      out), with the area its outline says; and every run of the tile's outline, carried by ITS piece, lies in the
+  //      home tile (a stub of a run on the wrong piece would land outside: the same review)
+  {
+    const meshArea = new Float64Array(R.pieces.length);
+    for (let i = 0; i < tri.length; i += 3) {
+      const a = tri[i], b = tri[i + 1], d = tri[i + 2];
+      meshArea[tags[M.triCell[i / 3]].part] += 0.5 * ((xy[2 * b] - xy[2 * a]) * (xy[2 * d + 1] - xy[2 * a + 1]) - (xy[2 * b + 1] - xy[2 * a + 1]) * (xy[2 * d] - xy[2 * a]));
+    }
+    for (const p of R.pieces) {
+      if (!(meshArea[p.part] > 0)) fail('pieces', `${label}: piece ${p.part} (${(100 * p.area / group.domainArea).toFixed(4)} % of the tile) has no triangle`);
+      else if (Math.abs(meshArea[p.part] - p.area) > (amp ? 2e-3 : 1e-7) * group.domainArea) fail('pieces', `${label}: piece ${p.part}: its triangles have ${meshArea[p.part]} of area, its outline ${p.area}`);
+    }
+    const O = runsOffPiece(group, fold);
+    if (O.worst > 0) fail('mesh', `${label}: a sample of a run, carried by its piece, lands ${O.worst.toExponential(2)} tile sizes outside the home tile`);
+    // the specks that are left out: a few times DROP_SHARE together at most, none deeper than a hundredth of a tile
+    if (O.specks && !(O.left > 1e-9)) fail('mesh', `${label}: ${O.specks} samples lie on a speck that is left out, but the pieces have all of the tile's area`);
+    if (!(O.left < 8 * DROP_SHARE) || !(O.speck < 0.01)) fail('mesh', `${label}: ${(100 * O.left).toFixed(4)} % of the tile is left out; a speck ${O.speck.toExponential(2)} tile sizes deep`);
+    stats.specks = Math.max(stats.specks || 0, O.speck);
+  }
+
   // ---- the pieces: one stays or none, the movers one after another, in the order half-turns, translations, glides
   {
     const P = R.pieces, mv = P.filter((p) => p.moves);
@@ -372,7 +421,31 @@ function check(group, c, amp) {
       }
     }
     if ((R.movers > 0) !== (M.cuts.length > 0)) fail('mesh', `${label}: ${R.movers} movers and ${M.cuts.length} cuts`);
-    if (fold.creaseAlpha(0) !== 0 || fold.creaseAlpha(R.tau0) !== 0 || fold.creaseAlpha(1) > 1e-9) fail('api', `${label}: creaseAlpha`);
+    // the cuts once each (cutsFlat): every cut runs through the tile with a piece on either side, so `cuts` holds it
+    // twice; no two lines of cutsFlat lie on each other, and every sample of `cuts` lies on one of them
+    {
+      const lenOf = (p) => { let L = 0; for (let k = 2; k < p.length; k += 2) L += Math.hypot(p[k] - p[k - 2], p[k + 1] - p[k - 1]); return L; };
+      const onSeg = (c, x, y, tolD) => { const n2 = c.pts.length; const ax = c.pts[0], ay = c.pts[1], bx = c.pts[n2 - 2], by = c.pts[n2 - 1], l = Math.hypot(bx - ax, by - ay), u = ((x - ax) * (bx - ax) + (y - ay) * (by - ay)) / (l * l); return u > -1e-3 && u < 1 + 1e-3 && Math.abs((x - ax) * (by - ay) - (y - ay) * (bx - ax)) / l < tolD; };
+      const two = M.cuts.reduce((s, c) => s + lenOf(c.pts), 0), one = M.cutsFlat.reduce((s, c) => s + lenOf(c.pts), 0);
+      if ((M.cuts.length > 0) !== (M.cutsFlat.length > 0)) fail('mesh', `${label}: ${M.cuts.length} cuts, ${M.cutsFlat.length} flat`);
+      if (one > 0 && Math.abs(two / one - 2) > 0.08) fail('mesh', `${label}: the cuts are ${two.toFixed(4)} long, drawn once ${one.toFixed(4)} (twice that is expected)`);
+      // (two cuts may CROSS, where four copies of the home meet: only a line ALONG another one is one cut drawn twice)
+      const dirOf = (c) => { const n2 = c.pts.length, dx = c.pts[n2 - 2] - c.pts[0], dy = c.pts[n2 - 1] - c.pts[1], l = Math.hypot(dx, dy) || 1; return [dx / l, dy / l]; };
+      for (const c of M.cutsFlat) {
+        const n2 = c.pts.length, d = dirOf(c);
+        if (!onSeg(c, (c.pts[0] + c.pts[n2 - 2]) / 2, (c.pts[1] + c.pts[n2 - 1]) / 2, 1e-4 * size)) fail('mesh', `${label}: a flat cut line is not straight`);
+        for (const o of M.cutsFlat) {
+          if (o === c) continue;
+          const e = dirOf(o);
+          if (Math.abs(d[0] * e[1] - d[1] * e[0]) > 1e-3) continue;
+          for (const u of [0.25, 0.5, 0.75]) if (onSeg(o, c.pts[0] + u * (c.pts[n2 - 2] - c.pts[0]), c.pts[1] + u * (c.pts[n2 - 1] - c.pts[1]), 1e-4 * size)) { fail('mesh', `${label}: two flat cut lines lie on each other`); break; }
+        }
+      }
+      for (const c of M.cuts) for (let k = 0; k < c.cells.length; k += 3) if (!M.cutsFlat.some((o) => onSeg(o, c.pts[2 * k], c.pts[2 * k + 1], 1e-4 * size))) { fail('mesh', `${label}: a cut is missing from the flat cuts`); break; }
+    }
+    // the creases: a re-cut tile has none before the home tile folds; the home tile itself has its own from the flat tile on
+    if (R.movers ? (fold.creaseAlpha(0) !== 0 || fold.creaseAlpha(R.tau0) !== 0) : fold.creaseAlpha(0) !== 1) fail('api', `${label}: creaseAlpha at the start: ${fold.creaseAlpha(0)}`);
+    if (fold.creaseAlpha(1) > 1e-9) fail('api', `${label}: creaseAlpha at the end`);
     const c0 = fold.cutStyle(0), c1 = fold.cutStyle(1);
     if (!c0.dashed || !(c0.alpha > 0.5) || !(c1.alpha > 0.1 && c1.alpha < c0.alpha)) fail('api', `${label}: cutStyle`);
     const s0 = fold.stage(0), s1 = fold.stage(1), sm = fold.stage(R.tau0 + 0.5 * (1 - R.tau0));
@@ -518,6 +591,59 @@ test('re-cut: the pieces and their timing do not depend on the mesh — the draf
   }
 });
 
+test('re-cut: every line of the outline rides on its own piece, and every piece has its line — the cuts the review of 13 Nov named, and random ones, draft and full', () => {
+  const one = (id, seed, amp, anchor, draft) => {
+    const g = BY_ID[id];
+    const F = build(g, { seed, metric: undefined, anchor }, amp, { draft }).fold;
+    return { g, F, O: runsOffPiece(g, F) };
+  };
+  // xx, wavy, the Hexagon's anchor: a third piece's sliver (0.02 % of the tile) lay between two samples of the outline,
+  // and the next piece's run had started with a stub on it, 0.019 tile sizes off its piece
+  for (const draft of [true, false]) {
+    const { g, F, O } = one('xx', [0.03759, -0.15272], 0.65, BY_ID.xx.presets[1].seed, draft);
+    assert.equal(F.recut.pieces.length, 5, 'five pieces, one of them a sliver');
+    const sliver = F.recut.pieces.find((p) => p.area < 1e-3 * g.domainArea);
+    assert.ok(sliver && sliver.area > DROP_SHARE * g.domainArea, 'the sliver is a piece');
+    assert.ok(F.mesh.boundaryRuns.some((r) => r.part === sliver.part), `draft ${draft}: the sliver has a run of its own`);
+    assert.equal(O.worst, 0, `draft ${draft}: no stub on the wrong piece`);
+    assert.equal(O.specks, 0);
+  }
+  // 22x, straight: a corner of the tile, 0.004 % of it, lies across a cut: left out (below DROP_SHARE), and the three
+  // samples on its rim are the only ones that land outside the home tile
+  {
+    const { O } = one('22x', [0.98201, 1.90749], 0, BY_ID['22x'].presets[0].seed, false);
+    assert.equal(O.worst, 0);
+    assert.ok(O.specks >= 1 && O.specks <= 6 && O.left > 1e-5 && O.left < DROP_SHARE && O.speck < 0.006, `the speck: ${O.specks} samples, ${O.left.toExponential(2)} of the tile, ${O.speck.toExponential(2)} deep`);
+  }
+  // random cuts: no stub anywhere; every piece (two or more: each reaches the outline) has a run
+  let folds = 0, slivers = 0, deepest = 0;
+  for (const id of ['xx', '22x']) {
+    const g = BY_ID[id], rnd = prng(4242 + id.length);
+    for (let k = 0; k < 90; k++) {
+      const seed = [g.center[0] + (2 * rnd() - 1) * 0.8 * g.viewHalf, g.center[1] + (2 * rnd() - 1) * 0.8 * g.viewHalf];
+      const amp = [0, 0.65, 1][k % 3], pi = k % (g.presets.length + 1), anchor = pi < g.presets.length ? g.presets[pi].seed : undefined;
+      for (const draft of [true, false]) {
+        const { F, O } = one(id, seed, amp, anchor, draft), label = `${id} (${seed[0].toFixed(5)}, ${seed[1].toFixed(5)}) amp ${amp} anchor ${anchor ? pi : 'none'}${draft ? ' draft' : ''}`;
+        folds++;
+        assert.equal(O.worst, 0, `${label}: a sample of a run lands outside the home tile, not on a speck`);
+        assert.ok(O.speck < 0.01 && O.left < 8 * DROP_SHARE, `${label}: left out ${O.left.toExponential(2)}, a speck ${O.speck.toExponential(2)} deep`);
+        deepest = Math.max(deepest, O.speck);
+        const R = F.recut;
+        if (R.pieces.length > 1) for (const p of R.pieces) {
+          if (p.area < 1e-3 * g.domainArea) slivers++;
+          assert.ok(F.mesh.boundaryRuns.some((r) => r.part === p.part), `${label}: piece ${p.part} (${(100 * p.area / g.domainArea).toFixed(4)} % of the tile) has no line of the outline`);
+        }
+        // the runs are the outline: the same length, sample for sample (the cut points come twice)
+        const len = (L) => L.reduce((s, r) => { for (let i = 2; i < r.pts.length; i += 2) s += Math.hypot(r.pts[i] - r.pts[i - 2], r.pts[i + 1] - r.pts[i - 1]); return s; }, 0);
+        assert.ok(Math.abs(len(F.mesh.boundaryRuns) - len(F.mesh.boundary)) < 1e-5 * Math.sqrt(g.domainArea), `${label}: the runs are as long as the outline`);
+      }
+    }
+  }
+  assert.equal(folds, 360);
+  assert.ok(slivers >= 8, `the sweep met slivers (${slivers})`);
+  assert.ok(deepest < 0.01);
+});
+
 test('app: a scene re-cuts first by default; its lines, the plane\'s overlay and the words over the fold pane', () => {
   for (const id of IDS) {
     const g = BY_ID[id], size = Math.sqrt(g.domainArea);
@@ -552,15 +678,27 @@ test('app: a scene re-cuts first by default; its lines, the plane\'s overlay and
       const moving = fold.recut.movers > 0;
       assert.equal(!!planeRecut(scene), moving, `${id} ${p.name}: the plane's overlay only when a piece moves`);
       assert.equal(i === 0, !moving, `${id} ${p.name}: the default cut is the home tile`);
-      if (!moving) { assert.equal(scene.cuts.length, 0); assert.equal(foldCaption(scene.fold, 0), ''); continue; }
+      if (!moving) {
+        assert.equal(scene.cuts.length, 0); assert.equal(scene.cutsFlat.length, 0); assert.equal(foldCaption(scene.fold, 0), '');
+        // the home tile shows its creases as the fold module's own fold does: there on the flat tile (the review of 13 Nov:
+        // the default cut of 22x had lost its dashed crease at t = 0)
+        const direct = buildScene(g, { seed: p.seed, metric: p.metric, anchor, pattern: 'checker', recut: false });
+        for (const t of [0, 0.005, 0.02, 0.2, 0.4, 0.6, 1]) {
+          mapScene(scene, t); mapScene(direct, t);
+          const cr = (sc) => sceneLines(sc, 1).filter((l) => l.dashed && l.width === WIDTHS.crease).map((l) => l.alpha.toFixed(6)).join();
+          assert.equal(cr(scene), cr(direct), `${id} ${p.name} t = ${t}: the creases of the home tile, as the fold module's own`);
+        }
+        if (id === '22x') { mapScene(scene, 0); assert.ok(sceneLines(scene, 1).some((l) => l.dashed && l.width === WIDTHS.crease && l.alpha === 1), 'the Pocket shows its crease on the flat tile'); }
+        continue;
+      }
       const PR = planeRecut(scene);
       assert.equal(PR.name, g.presets[0].name);
-      assert.ok(PR.home.length >= 4 && PR.cuts.length === scene.cuts.length && PR.cuts.length > 0);
+      assert.ok(PR.home.length >= 4 && PR.cuts.length === scene.cutsFlat.length && PR.cuts.length > 0 && scene.cuts.length > scene.cutsFlat.length, 'the plane is told each cut once');
       // the cut lines: dashed on the flat tile, in the plane; there while the pieces move; fainter when all is closed
       const cutsAt = (t) => { mapScene(scene, t); return sceneLines(scene, 1).filter((l) => Math.abs(l.width / Math.max(1, 0.85) - WIDTHS.cut * scene.fold.cutStyle(t).width) < 1e-9 && l.points.length >= 6 && l.color.join() !== '0,0,0'); };
       mapScene(scene, 0);
       const flat = sceneLines(scene, 1).filter((l) => l.dashed && Math.abs(l.width - WIDTHS.cut) < 1e-9);
-      assert.equal(flat.length, scene.cuts.length, `${id} ${p.name}: the cuts are drawn dashed on the flat tile`);
+      assert.equal(flat.length, scene.cutsFlat.length, `${id} ${p.name}: the cuts are drawn dashed on the flat tile, each once`);
       for (const l of flat) for (let k = 2; k < l.points.length; k += 3) assert.equal(l.points[k], 0);
       assert.ok(cutsAt(0.5 * fold.recut.tau0).length >= scene.cuts.length);
       // the piece that is being carried, for the plane: its outline on the tile (its share of the tile's area), and where
@@ -583,7 +721,15 @@ test('app: a scene re-cuts first by default; its lines, the plane\'s overlay and
       assert.match(foldCaption(scene.fold, 0.5 * fold.recut.tau0, true), /^re-cut \d\/\d: /);
       assert.match(foldCaption(scene.fold, 0.8), /no paper passes through paper/);
       assert.equal(foldCaption(scene.fold, 1), '');
-      assert.ok(foldCaption(scene.fold, 0.8, true).length <= 48, 'the short words fit a phone');
+      // the short words (a phone): one line of the 3D pane of a 320 px window at every moment — 40 characters at most
+      // (39 measured 266 px of its 284; the 43 of "the Rectangle folds: nothing passes through" took two lines)
+      for (let i = 0; i <= 200; i++) {
+        const w = foldCaption(scene.fold, i / 200, true);
+        assert.ok(w.length <= 40 && !/ about /.test(w), `${id} ${p.name} t = ${i / 200}: the short words "${w}" (${w.length} characters)`);
+        assert.equal(w === '', foldCaption(scene.fold, i / 200) === '', 'short and long words show at the same moments');
+      }
+      assert.match(foldCaption(scene.fold, 0.8, true), new RegExp(`^${PR.name} folds: nothing passes through$`));
+      assert.match(foldCaption(scene.fold, 0, true), new RegExp(`^re-cut into the ${PR.name} first$`));
       // the comma, too, rides on the pieces: its outline is cut where the piece changes
       const comma = buildScene(g, { seed: p.seed, metric: p.metric, anchor, pattern: 'comma' });
       assert.ok(comma.M.motifTint && comma.M.motifCut.bad === 0, `${id} ${p.name}: the comma is cut into the re-cut mesh`);
