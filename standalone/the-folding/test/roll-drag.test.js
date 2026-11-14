@@ -322,7 +322,7 @@ function sheetNormal(F, x, y, h) {
 
 test('drag 5b: *x — a tile an odd number of mirrors from the anchor\'s strip is mirrored, and its colours are swapped by fold.mirroredAt(t): 0 at t = 0, 1 from the end of the flap on, monotone, no jump; edge-on when its segment turns over; so the band keeps its colours when the cut is dragged across a mirror (final fix, 10 Nov: qa/final-verify-owner-asks/crossing-sx-largest.png)', () => {
   const g = BY_ID['*x'], S = mirrorsOf(g), a = anchorOf(g), ka = stripOf(S, a[0], a[1]);
-  const fl = 0.6;   // TUNE.mobius.flap
+  const fl = fold(g, a, { density: 6 }).fold.params.flap;   // TUNE.mobius.flap (0.7 on the 2 : 1 strip since 13 Nov 2026, 0.6 before)
   let turned = 0, slid = 0, plain = 0, crossings = 0;
   for (const seed of [...FILMED['*x'], [0.8, -0.15], [2.4, -0.15], [0.8, 0.45], [2.4, 0.45], ...windowSeeds(g, 40, 7)]) {
     const { domain, fold: f, size } = fold(g, seed, { density: 8 });

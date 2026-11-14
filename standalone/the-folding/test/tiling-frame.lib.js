@@ -8,7 +8,7 @@
 // the group itself (groups.js contains / elementsNear), not against replicate.js's own plan.
 //
 // From one frame's calls:
-//   ring     the tile as drawn (drawTile's ACCENT_SOFT fill: the first one of the frame), css -> world
+//   ring     the tile as drawn (drawTile's ACCENT_SOFT fill: the first one of the frame that is not a card's tint), css -> world
 //   copies   every subpath of the copies' outline strokes (FAINT): each must be A(ring) for ONE affine A (residual), and
 //            A must be an isometry, an element of the group (contains) and one of the window's tiles (tileCopies =
 //            elementsNear around the window); no element twice
@@ -244,7 +244,17 @@ export function analyseFrame(calls, view, ctx) {
   const { group, domain } = ctx, size = Math.sqrt(group.domainArea);
   const W2 = (p) => [view.cx + (p[0] - view.W / 2) / view.s, view.cy - (p[1] - view.H / 2) / view.s];
   const out = { problems: [], copies: 0, cards: 0, cardsOnTile: 0, cardsMoving: 0, cover: null, keys: [] };
-  const tileCall = calls.find((c) => c.op === 'fill' && STYLE.tile.test(c.fillStyle.replace(/\s/g, '')));
+  // the tile: drawTile's ACCENT_SOFT fill. A card's tint is the same colour at full strength, and since 13 Nov 2026 the
+  // cards that turn over are drawn before the tile (they pass under the paper); each card's tint follows its paper fill
+  // on the same path, so the tile is the first such fill whose path no paper fill has drawn
+  const papers = new Set();
+  let tileCall = null;
+  for (const c of calls) {
+    if (c.op !== 'fill') continue;
+    const st = c.fillStyle.replace(/\s/g, '');
+    if (STYLE.paper.test(st)) { for (const sp of c.sub) papers.add(JSON.stringify(sp)); continue; }
+    if (STYLE.tile.test(st) && !(c.sub.length === 1 && papers.has(JSON.stringify(c.sub[0])))) { tileCall = c; break; }
+  }
   if (!tileCall || tileCall.sub.length !== 1) { out.problems.push('no tile fill'); return out; }
   const ring = tileCall.sub[0].map(W2);
   const idx = spread(ring);

@@ -51,7 +51,7 @@ function rng(seed) {
 }
 const lengthOf = (pl) => { let s = 0; for (let i = 2; i < pl.length; i += 2) s += Math.hypot(pl[i] - pl[i - 2], pl[i + 1] - pl[i - 1]); return s; };
 const isIdent = (g) => Math.abs(g.a - 1) < 1e-9 && Math.abs(g.d - 1) < 1e-9 && Math.abs(g.b) < 1e-9 && Math.abs(g.c) < 1e-9 && Math.abs(g.tx) < 1e-9 && Math.abs(g.ty) < 1e-9;
-const STRIPS = { o: 0.27, '**': 0.27, '*x': 0.19, xx: 0.19 };     // the least cover of the strip groups (the judge: 29, 28, 21, 20 %)
+const STRIPS = { o: 0.27, '**': 0.27, xx: 0.19 };     // the least cover of the strip groups (the judge: 29, 28, 20 %; *x reaches the target on its 2 : 1 strip since 13 Nov 2026)
 // the least cover of a comma held still (tools/motif-place.mjs STILL: 22x's fills the far half of the cell C0, 29 %)
 const STILL_COVER = { '22x': 0.28 };
 
@@ -218,7 +218,7 @@ test('motifFor: copies keep FILL_GAP apart (outline to outline), so no comma mee
 
 // Rewritten for the owner's ask of 9-10 Nov 2026 (see the top): most of the comma, not all of it, clear handle or not.
 // Measured exactly since the fix-up (10 Nov): the judge's bar, 98 %.
-test('motifFor: the default tile holds at least 98 % of the comma (exactly) for the 13 groups that are not strips, and the table says so', (t) => {
+test('motifFor: the default tile holds at least 98 % of the comma (exactly) for the 13 groups that are not strips and *x, and the table says so', (t) => {
   let held = 0;
   const rows = [];
   assert.equal(SHARE_OK, 0.98);
@@ -236,14 +236,15 @@ test('motifFor: the default tile holds at least 98 % of the comma (exactly) for 
       assert.ok(Math.abs(curve - e.inTile) <= 6e-5, `${g.id}: the curve lies ${curve.toFixed(5)} in the tile, the table says ${e.inTile}`);
       assert.ok(Math.abs(share - curve) < 5e-4, `${g.id}: the drawn polygon ${share.toFixed(5)}, the curve ${curve.toFixed(5)}`);
     }
-    // the strips: o, ** and *x cannot reach the target (their caps or gaps come first; where they sit along the strip is
-    // chosen for the 3D view, test/motif-view.test.js), xx straddles its glide seam on purpose
+    // the strips: o and ** cannot reach the target (their caps or gaps come first; where they sit along the strip is
+    // chosen for the 3D view, test/motif-view.test.js), xx straddles its glide seam on purpose; *x reaches it on its
+    // 2 : 1 strip (13 Nov 2026) and is held to the share like the rest
     if (g.id in STRIPS) { t.diagnostic(`${g.id}: ${(100 * share).toFixed(1)} % in the default tile (a strip${m.seam ? ', across its glide seam' : ''})`); continue; }
     assert.ok(curve >= SHARE_OK, `${g.id}: only ${(100 * curve).toFixed(4)} % of the comma's curve in the default tile`);
     assert.ok(share >= SHARE_OK - 5e-4, `${g.id}: only ${(100 * share).toFixed(3)} % of the drawn comma in the default tile`);
     held++;
   }
-  assert.equal(held, 13);
+  assert.equal(held, 14);
   t.diagnostic('in the default tile, %: ' + rows.join(', '));
 });
 
@@ -364,7 +365,7 @@ test('the comma slides along its strip without changing size: the free direction
   }
 });
 
-test('the big comma covers FILL_TARGET (30 %) of the tile; the strips the most their gap allows (o, ** >= 27 %, *x, xx >= 19 %); the cross-cap the most that holds still (>= 28 %)', (t) => {
+test('the big comma covers FILL_TARGET (30 %) of the tile (*x too, on its 2 : 1 strip); the strips the most their gap allows (o, ** >= 27 %, xx >= 19 %); the cross-cap the most that holds still (>= 28 %)', (t) => {
   const rows = [];
   for (const g of GROUPS) {
     const m = motifFor(g), cover = Math.abs(areaCentroid(m.polylines[0]).area) / g.domainArea;
@@ -389,7 +390,7 @@ test('the big comma covers FILL_TARGET (30 %) of the tile; the strips the most t
     assert.ok(Math.abs(PLACEMENTS[g.id].cover - cover) < 0.003, `${g.id}: the table says ${PLACEMENTS[g.id].cover}`);
   }
   // the strips are as big as their gap or their cap allows: the table's `fit` is their scale
-  for (const id of ['o', '**', '*x']) assert.equal(PLACEMENTS[id].s, PLACEMENTS[id].fit, id);
+  for (const id of ['o', '**']) assert.equal(PLACEMENTS[id].s, PLACEMENTS[id].fit, id);
   t.diagnostic('cover, % of the tile: ' + rows.join(', '));
 });
 

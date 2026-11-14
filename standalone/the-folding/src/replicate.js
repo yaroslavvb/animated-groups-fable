@@ -15,13 +15,18 @@
 //   reflection    turns over its mirror: a half-turn of space about the mirror line, seen from above (the copy narrows
 //                 to the line and opens on the other side, mirrored)
 //   glide         both at once: a half screw about the axis (turns over the axis while sliding s·dist along it)
+// A copy that turns over (reflection, glide) turns UNDER the paper (cardState.under; the owner's comments of 13 Nov
+// 2026 on ** and 22*: "tiling should appear from below (away from camera) side to give the impression of yellow side
+// being the reverse side"): it leaves its parent downward, hidden by it, passes edge-on below the mirror and comes up
+// on the other side with its back up — the sand side, which is the reverse of the paper. Rotations and translations
+// stay in the plane and pass over it.
 // So h ∘ m_i(s) h⁻¹ is the same kind of motion about h's image of the centre / mirror / axis: the half-turn about a
 // 2-fold centre of the parent copy, the reflection in its mirror edge, and so on.
 //
 //   sidePairingMotion(group, g)                    -> { kind, key, order, angle, at(s) -> affine, pivot, axis, ... }
 //   replicationPlan(group, domain, opts)           -> Plan (see the function)
 //   copyState(plan, copy, tau)                     -> { phase: 'hidden'|'moving'|'settling'|'landed', A, x, s, sigma }
-//   cardState(plan, copy, state, keep)             -> how its card is drawn: { A, k, back, lift, quiet } or null
+//   cardState(plan, copy, state, keep)             -> how its card is drawn: { A, k, back, lift, under, quiet } or null
 //   planCaption(plan, tau, short)                  -> the words for what acts at tau ('' when nothing does)
 //   edgeKey(edges, i)                              -> the order of the side pairings that a drag does not change
 // Affine maps are { a, b, c, d, tx, ty } as geom.js's isometries (compose works for them; inverse does not).
@@ -412,7 +417,11 @@ export function copyState(plan, c, tau) {
  *                             it moves on, and fades out (1 − sigma) while it settles into the plain tiling under it;
  *                          back: how much of the paper's back is up (0 front, 1 back): the parent's face, turned over by
  *                             a flip (reflection, glide) as it passes edge-on;
- *                          lift: how high a flip stands out of the plane (sin π s): plane.js draws a soft shadow;
+ *                          lift: how far a flip stands out of the plane (sin π s), on the side `under` says;
+ *                          under: 1 while a flip (reflection, glide) moves: it turns under the paper, so plane.js draws
+ *                             it before the paper (the tile and the landed copies hide it) with the paper's shade on
+ *                             it, deeper as lift grows; 0 for a rotation or a translation (over the paper, no lift) and
+ *                             for every settling card (in the plane, over the tiling it fades into);
  *                          quiet: 1 for a copy of a later layer (deeper than the split), 0 in the first: a quiet card is
  *                             plain paper (no seam colours) — fixed for the card's whole life, so it never switches.
  * Every value is continuous in tau, also from phase to phase (test/replicate.test.js).
@@ -425,9 +434,9 @@ export function cardState(plan, c, st, keep = 1) {
     const flip = c.motion.kind === 'reflection' || c.motion.kind === 'glide';
     const par = plan.copies[c.parent];
     const turned = flip ? (1 - Math.cos(Math.PI * st.s)) / 2 : 0;
-    return { A: st.A, k, back: par.det < 0 ? 1 - turned : turned, lift: flip ? Math.sin(Math.PI * st.s) : 0, quiet };
+    return { A: st.A, k, back: par.det < 0 ? 1 - turned : turned, lift: flip ? Math.sin(Math.PI * st.s) : 0, under: flip ? 1 : 0, quiet };
   }
-  if (st.phase === 'settling') return { A: c.g, k: (1 - st.sigma) * keep, back: c.det < 0 ? 1 : 0, lift: 0, quiet };
+  if (st.phase === 'settling') return { A: c.g, k: (1 - st.sigma) * keep, back: c.det < 0 ? 1 : 0, lift: 0, under: 0, quiet };
   return null;
 }
 

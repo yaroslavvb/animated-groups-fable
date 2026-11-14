@@ -22,7 +22,8 @@
 // examples"; the judge's decision, qa/fill-judge.md). Until then the comma covered 1 to 6 % of the tile and was only an
 // outline in 3D. Now:
 //   * it covers FILL_TARGET (30 %) of the tile. The strip groups cannot reach that with their copies kept apart: o and
-//     ** get the largest comma that can (about 29 and 28 %), *x about 21 % (stretched, below), xx about 20 % (below);
+//     ** get the largest comma that can (about 29 and 28 %), xx about 20 % (below). (*x reaches it since its strip is
+//     2 : 1, 13 Nov 2026; on the 5.3 : 1 strip before, stretched 2 x along its axis, it had about 21 %);
 //   * its copies stay at least FILL_GAP x sqrt(domainArea) apart, outline to outline (the commas never fuse into
 //     yin-yang discs, which would lose the hand), and its bounding radius is at most FILL_RCAP x viewHalf;
 //   * among the placements that reach the target, one that lies at least 98 % inside the tile of the default preset
@@ -31,7 +32,6 @@
 //     view at t = 1 shows most (the fix-up of 10 Nov 2026: before, the grid's first tie was kept, and whether the
 //     comma then lay on the near face or the far one was luck). Found by an offline search: tools/motif-place.mjs
 //     writes the table groupdata/motif.js (centre, turn, scale per group);
-//   * *x (a thin strip between mirrors) has its comma stretched FILL_STRETCH = 2 x along its head -> tail axis;
 //   * xx keeps its seam comma (SEAM_GROUPS, the Klein bottle story, below), two lobes wide;
 //   * in 3D the comma is FILLED, for every fold (motifTintMesh: tint bit 1, the renderer's `fill` colour); its outline
 //     stays. The plane draws the copies filled in soft ink (plane.js).
@@ -72,8 +72,9 @@ export const FILL_TARGET = 0.3;
 export const FILL_GAP = 0.07;
 /** Largest bounding radius of a table comma, in units of group.viewHalf. */
 export const FILL_RCAP = 0.34;
-/** The comma stretched along its head -> tail axis, per group (1 elsewhere): the *x strip only. */
-export const FILL_STRETCH = Object.freeze({ '*x': 2 });
+/** The comma stretched along its head -> tail axis, per group (1 elsewhere). None since *x's strip is 2 : 1 (13 Nov 2026;
+ *  its thin strip had { '*x': 2 }). */
+export const FILL_STRETCH = Object.freeze({});
 /** The outline the placement search tests overlaps with while it searches (a coarser sampling of commaOutline). */
 export const SEARCH_OUTLINE = Object.freeze({ nBack: 28, nHollow: 14, nHead: 14 });
 /** The outline that is drawn (commaOutline's defaults): the table's gap and in-tile share are measured on it. */

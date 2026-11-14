@@ -12,7 +12,7 @@
 // The cross-cap (22x) holds still (tools/motif-place.mjs STILL): its comma lies where no preset's fold turns the sheet
 // over; stillFit = the largest s that does there, turn = how far (degrees) its sheet's normal turns at most.
 // The seam groups (xx) are placed by rule in src/motif.js.
-export const PLACEMENT_SOURCE = 'ad3045aa';
+export const PLACEMENT_SOURCE = '179d2f54';
 export const PLACEMENTS = {
   "333": {"key":"9af8e13c","view":"c17f3cb9","at":[0.300195,-0.119702],"angle":1.513139,"s":0.234803,"stretch":1,"fit":0.265228,"cover":0.3,"coverFit":0.3828,"inTile":0.9802,"seen":0.4429,"radius":0.234803},
   "442": {"key":"be8fd1d4","view":"9d0b7fbf","at":[0.179036,0.2125],"angle":0.117728,"s":0.218509,"stretch":1,"fit":0.263379,"cover":0.3,"coverFit":0.4359,"inTile":0.9967,"seen":0.4992,"radius":0.218509},
@@ -20,7 +20,7 @@ export const PLACEMENTS = {
   "2222": {"key":"1b77fdf8","view":"83e63f12","at":[0.274953,0.098547],"angle":6.109457,"s":0.352336,"stretch":1,"fit":0.359553,"cover":0.3,"coverFit":0.3124,"inTile":0.98,"seen":0.4391,"radius":0.352336},
   "o": {"key":"37e638b5","view":"f9134358","at":[0.146783,0.403],"angle":3.860641,"s":0.459,"stretch":1,"fit":0.459,"cover":0.2946,"coverFit":0.2946,"inTile":0.2366,"seen":0.4796,"radius":0.459},
   "**": {"key":"7e0637a1","view":"5f653c4f","at":[0.18875,0.2375],"angle":0.105456,"s":0.355518,"stretch":1,"fit":0.355518,"cover":0.2757,"coverFit":0.2757,"inTile":0.8305,"seen":0.5054,"radius":0.355518},
-  "*x": {"key":"b76426fc","view":"18bdf29a","at":[0.928125,0.09],"angle":1.721377,"s":0.179355,"stretch":2,"fit":0.179355,"cover":0.2105,"coverFit":0.2105,"inTile":1,"seen":0.2886,"radius":0.35871},
+  "*x": {"key":"52371f17","view":"f689ebfd","at":[0.639375,0.1975],"angle":1.847547,"s":0.370823,"stretch":1,"fit":0.372815,"cover":0.3,"coverFit":0.3032,"inTile":1,"seen":0.3953,"radius":0.370823},
   "22x": {"key":"bf408070","view":"fac32178","at":[0.321429,0.781875],"angle":5.004991,"s":0.328393,"stretch":1,"fit":0.329149,"cover":0.2896,"coverFit":0.2909,"inTile":1,"seen":0.3931,"radius":0.328393,"stillFit":0.328393,"turn":89.6},
   "22*": {"key":"3db85978","view":"5b2828be","at":[0.302572,0.742396],"angle":5.378771,"s":0.315139,"stretch":1,"fit":0.317159,"cover":0.3,"coverFit":0.3039,"inTile":0.9887,"seen":0.3509,"radius":0.315139},
   "*2222": {"key":"31bcc429","view":null,"at":[0.281667,0.15],"angle":1.700796,"s":0.249139,"stretch":1,"fit":0.261708,"cover":0.3,"coverFit":0.331,"inTile":1,"seen":0,"radius":0.249139},

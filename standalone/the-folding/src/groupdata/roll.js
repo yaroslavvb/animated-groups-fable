@@ -22,7 +22,11 @@
 //     kept), sigma = sqrt(wanted ratio / the lattice's own ratio); the wanted ratios are in TUNE in src/folds/roll.js.
 //       o   tube radius L / 2 pi, ring length h2:                        R = 2.6 tube radii with sigma = 1.10
 //       **  radius b / 2 pi, length w:                                   1.6 diameters long, isometric
-//       *x  half-width w / 2, ring length T:                             R = 2.3 half-widths with sigma = 1.16
+//       *x  half-width w / 2, ring length T:                             R = 1.5 half-widths with sigma = 1.53
+//           (the owner's comment of 13 Nov 2026, "*x visualizaiton is too narrow, I want the segment to be more balanced
+//           between x repeats and y repeats": the tile is T x w = 1.2 x 0.6, 2 : 1 as **'s, no longer 1.6 x 0.3; the
+//           plane shows about 2 tiles across and 4 up. A band from a strip this wide needs the stretch to keep R above
+//           its half-width: the lattice alone gives R = 0.64 half-widths)
 //       xx  the 8 has length b (half-length 0.187 b), ring length A:     R = 2.1 half-lengths with sigma = 1.14
 //   * Every preset's seed is also its anchor (SPEC 7, 8 C3): presets with one seed (o, the two of *x: the anchor's foot
 //     on the strip's centre line is the same) close onto the same shape, so choosing another cut while folded only
@@ -53,7 +57,7 @@ const oSeed = [(oE1[0] + oE2[0]) / 2, (oE1[1] + oE2[1]) / 2];
 const ssB = 1.2, ssW = 0.6;
 
 // *x: strip of width w between the mirrors y = k w; glide translation T along x
-const sxT = 1.6, sxW = 0.3;
+const sxT = 1.2, sxW = 0.6;
 
 // xx: glide (x, y) -> (-x, y + A); translation (b, 0) across the glide axes
 const xxB = 0.9, xxA = 1.7;
@@ -106,10 +110,11 @@ export default [
     viewHalf: 1.15, center: [sxT / 2, sxW / 2],
     presets: [
       { name: 'Strip', seed: [sxT / 2, sxW / 2] },        // seed on the glide axis: a rectangle
-      // seed half way to the mirror, distances measured with q22 / q11 = 8 (diagonal: invariant under the point group,
-      // so the cut stays a fundamental domain): an isosceles trapezoid whose glued sides lean 37 degrees (finding 45:
-      // with the plain metric no Dirichlet tile of cm leans more than 8 degrees)
-      { name: 'Trapezoid', seed: [sxT / 2, sxW / 4], metric: [1, 0, 8] },
+      // seed half way to the mirror, distances measured with q22 / q11 = 1.5 T / w (diagonal: invariant under the point
+      // group, so the cut stays a fundamental domain): an isosceles trapezoid whose glued sides lean 37 degrees,
+      // tan = q22 w / 2 T = 0.75 (finding 45: with the plain metric the glued sides lean little; from this seed 14
+      // degrees, 5 on the thin strip before 13 Nov)
+      { name: 'Trapezoid', seed: [sxT / 2, sxW / 4], metric: [1, 0, (1.5 * sxT) / sxW] },
     ],
   },
 ];

@@ -724,3 +724,55 @@ A second reader of the round's diff (nothing blocking, eight small real findings
   tile's creases against the fold module's own (`test/recut.test.js`, `test/folds.test.js`); turned, scaled and shifted
   copies of all 17 groups (`test/pattern.test.js`); in the layout test the selector, the title, the legend's paper
   item with all three patterns, and the words of a re-cut at seven window sizes.
+
+### 10.2 The owner's page comments of 13 Nov 2026 (evening)
+
+Four comments on the live page, https://spacesheep.dev/@yaroslavvb/the-folding (comment ids `bea4b3d5`, `88289462`,
+`3c3de578`, `78a51a6f`, each answered in its thread). Three are done here; the second belongs to the pattern round that
+is under way.
+
+| comment (his words) | what changed |
+|---|---|
+| "*x visualizaiton is too narrow, I want the segment to be more balanced between x repeats and y repeats" | *x's tile is **T × w = 1.2 × 0.6** (2 : 1, as **'s), no longer 1.6 × 0.3 (5.3 : 1): the plane shows about 2 tiles across and 4 up, not 1.6 and 7.7. |
+| "tiling of ** for checkerboard vis looks a bit weird, I think maybe tiling should appear from below (away from camera) side to give the impression of yellow side being the reverse side" | In the Tile step a copy that turns over (a reflection, a glide) turns **under the paper** and comes up on the far side of its mirror, sand side up. |
+| "also the green vs yellow side unfolding comment applies to 22* reverse side of the unfolding should look like it's coming from the reverse side" | The same rule, for every group with a mirror or a glide. |
+| "I want to reuse the two different shades from "checkerboard" pattern for all patterns" | Left to the pattern round (the Comma as a print in the checkerboard's tones). Rings already uses them. |
+
+- **The *x strip** (`src/groupdata/roll.js`):
+  - The Trapezoid keeps its 37 degree lean: metric `[1, 0, 1.5 T / w]`, so `[1, 0, 3]` here (the lean's tangent is
+    q22 w / 2T).
+  - The Möbius band needs R above its half-width, and the lattice alone gives 0.64. `TUNE.mobius` therefore has
+    `ratio` 1.5 (R = 1.5 half-widths: a hole of half a half-width where the segment lies flat) and `maxStretch` 1.6
+    (sigma 1.53; the checks on the band are about 2.4 times longer than wide).
+  - `flap` is 0.7: with 0.6 the anchored drag's second difference was 0.00216 against the bound of 0.002
+    (`dev/sx-balance/drag-sweep.mjs`); 0.7 gives 0.00170.
+  - The comma needs no stretch: `FILL_STRETCH` is empty, where it was `{ '*x': 2 }`. *x reaches FILL_TARGET (30 %),
+    wholly inside its tile, like the 13 groups that are not strips.
+- **The flip under the paper** (`src/replicate.js` `cardState.under`, `src/plane.js` `renderTiling` and `drawCard`):
+  - A flip's card is drawn first (the deepest first).
+  - The paper hides it. The tile is opaque already. The landed copies get a white ground under their print, only while
+    a card is under them, so u = 1 and every frame without such a card draw as before.
+  - The card leaves its parent downward, hidden by it, passes edge-on below the mirror line, and rises on the other
+    side with its back up. A glide's card also slides along its axis while it does this, so its ends show past the
+    parent's.
+  - While it is below, the paper's shade lies on it: INK at 0.14 × lift, or 0.08 for a quiet card. No card casts a
+    drop shadow any more.
+  - A rotation or a translation stays in the plane and passes over the tile, as before.
+  - Settling cards are drawn over the tiling, as before.
+- **The cards' colours under a print**:
+  - A card of the first layer is now the paper itself, in its two full tones: teal front, or sand back once past
+    edge-on, as in the 3D view. It fades into the pale tiling while it settles.
+  - Before, the pale card that lay on the tile at the start of a translation or a turn washed the tile out until the
+    card had left it (`**`: the whole tile for half of the translations' phase).
+  - Quiet cards (the later layers) keep the plane's pale print on white.
+- **Tests**:
+  - `test/plane-flip-under.test.js`: `under` exactly for flips. In the plane: the flip's card is drawn before the
+    tile's paper, under the white ground and with the shade on it; a turn or a slide is drawn after the tile; there
+    is no ground without a card under it; the first layer's cards are in the full tones and the quiet ones pale.
+  - `test/tiling-frame.lib.js` finds the tile's fill as the first ACCENT_SOFT fill that is not a card's tint (cards
+    drawn before the tile have the same colour).
+  - The *x numbers in `test/motif.test.js`, `test/motif-view.test.js` (the strip's period is read from the group),
+    `test/roll.test.js` (the stretch bound for the band) and `test/roll-drag.test.js` (the flap is read from the
+    fold).
+- **Tools**: `dev/flip-under/tile-film.mjs` films the Tile step (frames of the plane pane over a range of u), as
+  `tools/filmstrip.mjs` films the fold.

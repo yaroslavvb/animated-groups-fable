@@ -34,7 +34,7 @@
 //          the far half of the cell C0 (29 %). The owner's complaint of 10 Nov 2026 and the measurements:
 //          notes/crosscap-paint.md, and the comment at STILL;
 //       1. size, up to the goal: the target scale sT (the comma that covers FILL_TARGET of the tile; with GOAL_MARGIN,
-//          so the drawn outline keeps it) or, for the strips whose cap comes first (o, **, *x: they cannot reach the
+//          so the drawn outline keeps it) or, for the strips whose cap comes first (o, **: they cannot reach the
 //          target), the largest the cap and the gap allow;
 //       2. (groups that reach the target) the share of the comma inside the default tile, up to SHARE_OK (98 %, the
 //          judge's bar), measured EXACTLY: the comma's curve (FINE_UNIT) clipped by the tile's edges (it was an 18 x 18

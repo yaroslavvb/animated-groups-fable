@@ -446,7 +446,8 @@ function checkFold(group, domain, mesh, label, amp, isPreset, rnd) {
   if (type === 'torus' && !(P.ringRadius / P.tubeRadius > 2.2 && P.ringRadius / P.tubeRadius < 3.2)) fail('proportions', `${label}: ring / tube = ${P.ringRadius / P.tubeRadius}`);
   if (type === 'mobius' && !(P.ringRadius / P.halfWidth >= 1.3 && P.ringRadius / P.halfWidth < 2.6)) fail('proportions', `${label}: ring / half-width = ${P.ringRadius / P.halfWidth}`);
   if (type === 'klein' && !(P.ringRadius / P.reach > 1.7 && P.ringRadius / P.reach < 2.8)) fail('proportions', `${label}: ring / reach = ${P.ringRadius / P.reach}`);
-  if (P.stretch !== undefined && !(P.stretch >= 1 && P.stretch <= 1.2)) fail('proportions', `${label}: stretch ${P.stretch}`);
+  // (*x's band is made from a 2 : 1 strip since 13 Nov 2026, the owner's "more balanced" *x: it needs 1.53, TUNE.mobius)
+  if (P.stretch !== undefined && !(P.stretch >= 1 && P.stretch <= (type === 'mobius' ? 1.6 : 1.2))) fail('proportions', `${label}: stretch ${P.stretch}`);
 }
 
 // ---------------------------------------------------------------------------------------------------------------

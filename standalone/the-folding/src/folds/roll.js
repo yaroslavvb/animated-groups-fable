@@ -14,7 +14,8 @@
 //             where D(w) = (sigma A / 2) g(pi w), g(a) = (1 - sinc a) / a, slides the ring so that it ends up centred on
 //             the roll's centre. At w = 1 this is the circle of radius R = sigma A / (2 pi), exactly periodic in y with
 //             period A. sigma = 1 + (sigma_f - 1) w is a gentle area-preserving change of proportions (longer by sigma,
-//             thinner by sigma): it makes the ring sigma_f^2 times slimmer than the lattice alone would (sigma_f 1.10-1.16).
+//             thinner by sigma): it makes the ring sigma_f^2 times slimmer than the lattice alone would (sigma_f 1.10-1.14;
+//             *x's band, from a 2 : 1 strip since 13 Nov 2026, 1.53).
 //   figure 8  the curve whose tangent angle is z cos(tau), tau = 2 pi s / b (s = arclength). Its drift over one period
 //             is b J0(z): the straight line at z = 0, a wave that steepens and overhangs in between, and a CLOSED
 //             figure 8 exactly when z is the first zero j01 of the Bessel function J0. By Jacobi-Anger
@@ -171,12 +172,15 @@ const TUNE = {
   torus: { duration: 6, t1: 0.45, brake: 0.13, overlap: 0.06, accel: 0.13, ratio: 2.6, maxStretch: 1.2, side: 1, density: 88 },
   // flap: the share of the fold over which a tile an odd number of mirrors from the anchor turns over (THE ANCHOR).
   cylinder: { duration: 4, density: 60, flap: 0.5 },
-  // ratio: wanted ring radius / half-width of the band. twist: +1 / -1, the sense of the half twist.
+  // ratio: wanted ring radius / half-width of the band. twist: +1 / -1, the sense of the half twist. (13 Nov 2026: the
+  // strip is 2 : 1, so the lattice alone gives 0.64; ratio 1.5 needs sigma 1.53, within maxStretch 1.6, and leaves a
+  // hole of half a half-width where the segment lies flat; before, the 5.3 : 1 strip had ratio 2.3 with sigma 1.16.)
   // flap: the share of the fold over which an anchored tile crosses to the anchor's strip and, when a glide or a mirror
   // image of the anchor is the nearest, turns its segment over (THE ANCHOR); flipEps rounds the lift while it turns,
   // in step with its speed (liftShare: second differences 0.0101 -> 0.0016 tile sizes per 1/200 with flap 0.6, no
-  // flipped tile above the unflipped ones' 0.0015; dev/roll5/sweep.mjs).
-  mobius: { duration: 5.5, ratio: 2.3, maxStretch: 1.2, twist: 1, side: 1, density: 80, flap: 0.6, flipEps: 0.4 },
+  // flipped tile above the unflipped ones' 0.0015; dev/roll5/sweep.mjs). On the 2 : 1 strip (13 Nov 2026) flap 0.6 gave
+  // 0.00216, flipEps 0.6 0.00206, flap 0.7 0.00170 (dev/sx-balance/drag-sweep.mjs; test/roll-drag.test.js: 0.002).
+  mobius: { duration: 5.5, ratio: 1.5, maxStretch: 1.6, twist: 1, side: 1, density: 80, flap: 0.7, flipEps: 0.4 },
   // ratio: wanted ring radius / half-length of the 8. twist: the sense in which the 8 turns along the ring.
   // phase (designer A, 9 Nov 2026), in half turns: an extra turn of the 8 about its crossing that grows with the
   // ring stage, the same all along the tube: with 0.5 the end of the tile at +A/2 keeps its 8 as the tube had it

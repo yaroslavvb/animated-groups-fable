@@ -126,8 +126,9 @@ test('the comma in view: the table\'s `seen` is what the app draws (the tool mea
 });
 
 // The guard is not idle: slid along their strips (same size, same distance to every copy: the tool's ties), the strips'
-// commas go out of view in places, and the table's place is the best of the slides, or nearly.
-test('the comma in view: slid along its strip (a tie for size), o\'s, **\'s and *x\'s comma can leave the view; the table\'s place is about the best', (t) => {
+// commas go out of view in places, and the table's place is the best of the slides, or nearly. (*x's comma, on the fat
+// band of its 2 : 1 strip since 13 Nov 2026, stays in view all along it: there only the second half holds.)
+test('the comma in view: slid along its strip (a tie for size), o\'s and **\'s comma can leave the view; the table\'s place is about the best (o, **, *x)', (t) => {
   const unit = commaOutline();
   for (const id of ['o', '**', '*x']) {
     const g = BY_ID[id], m = motifFor(g), p = g.presets[0];
@@ -150,12 +151,12 @@ test('the comma in view: slid along its strip (a tie for size), o\'s, **\'s and 
     };
     const here = at(m.at[0], m.at[1]);
     const u = freeDirections(g)[0];             // o: x, across the tube (its underside); **: y; *x: x — along their strips
-    const period = id === '*x' ? 3.2 : id === '**' ? 1.2 : 0.72;
+    const period = id === '*x' ? g.e1[0] + g.e2[0] : id === '**' ? g.e2[1] : g.e1[0];       // the translation along the strip
     const slides = [];
     for (let k = 1; k < 12; k++) slides.push(at(m.at[0] + (period * k / 12) * u[0], m.at[1] + (period * k / 12) * u[1]));
     const lo = Math.min(...slides), hi = Math.max(here, ...slides);
     t.diagnostic(`${id}: seen ${(100 * here).toFixed(1)} % at the table's place; ${(100 * lo).toFixed(1)} .. ${(100 * hi).toFixed(1)} % slid along the strip`);
-    assert.ok(lo < SEEN_MIN, `${id}: some slide of the comma would fail the guard (${(100 * lo).toFixed(1)} %)`);
+    if (id !== '*x') assert.ok(lo < SEEN_MIN, `${id}: some slide of the comma would fail the guard (${(100 * lo).toFixed(1)} %)`);
     assert.ok(here >= 0.95 * hi, `${id}: the table's place (${(100 * here).toFixed(1)} %) is about the best of the slides (${(100 * hi).toFixed(1)} %)`);
   }
 });

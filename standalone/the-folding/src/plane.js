@@ -74,10 +74,13 @@
 // The copies grow out of the tile breadth first in the side pairings domain.edges[i].g (they generate the group:
 // Poincaré's theorem); every copy is h(D) for a group element h and reaches it by the continuous motion of its side
 // pairing (a turn about the centre, a slide, a flip over the mirror line, a half screw along the glide axis). While
-// u < 1 renderTiling draws: where copies have landed, the plane as always (tint, outlines, the pattern's two cached
-// layers, the landed copies' mirror edges); the tile; the moving and settling copies as cards (white paper, the commas
-// they carry, the tile's tint, the seam colours) between the tile's fill and its bold edges; the rotation glyphs as the
-// copies that hold them land; a ring on the centre a first-layer copy turns about, the dashed axis it glides along.
+// u < 1 renderTiling draws: first the copies that turn over (a reflection, a glide), which turn UNDER the paper (the
+// owner's comments of 13 Nov 2026: the sand side comes from the reverse side; replicate.js cardState.under); where
+// copies have landed, the plane as always (tint, outlines, the pattern's two cached layers, the landed copies' mirror
+// edges), on an opaque ground while a card is under them; the tile; the copies that turn or slide in the plane and the
+// settling ones as cards (white paper, the commas or the print they carry, the tile's tint, the seam colours) between
+// the tile's fill and its bold edges; the rotation glyphs as the copies that hold them land; a ring on the centre a
+// first-layer copy turns about, the dashed axis it glides along.
 //
 // Stable seam colours: domain.js numbers the glue classes in boundary order, which renumbers them while the seed
 // moves. setScene therefore gives every cut edge `edge.color` (index into palette CLASS_COLORS; kept as long as that
@@ -1345,6 +1348,18 @@ export function createPlaneView(canvas, options = {}) {
     // the end of the last settle: the kaleidoscope's patch comes back with it
     const endK = keep * smoothRep((tau - (plan.T - plan.settle)) / plan.settle);
 
+    // 0. the copies that turn over (a reflection, a glide: replicate.js cardState.under) turn UNDER the paper (the
+    //    owner's comments of 13 Nov 2026 on ** and 22*: the sand side comes from the reverse side): they are drawn first,
+    //    the deepest first, and the paper hides them — the tile, and the landed copies, which get an opaque ground
+    //    below their print while a card is under them (only then: u = 1 and every frame without one draw as before)
+    const over = [], under = [];
+    for (const { cp, st } of moving) {
+      const cs = cardState(plan, cp, st, keep);
+      if (cs) (cs.under ? under : over).push(cs);
+    }
+    under.sort((p, q) => q.lift - p.lift);
+    for (const cs of under) drawCard(c, P, M, cs.A, cs);
+
     // 1. where copies have landed (settling ones too: the paper of their card, fading, covers them), the plane as
     //    always: the tint of the other hand, the outlines, the motif's fills, the glide axes, the mirror edges. The
     //    tile and the rest are drawn apart only while the replay fades the rest out.
@@ -1354,6 +1369,7 @@ export function createPlaneView(canvas, options = {}) {
     const tinted = (cp) => cp.index !== 0 && cp.det * P.eps < 0;
     for (const [list, a] of parts) {
       if (!list.length || a <= 0.004) continue;
+      if (under.length) { pathOf(list); c.globalAlpha = a; c.fillStyle = GROUND; c.fill(); c.globalAlpha = 1; }   // the paper over the cards under it
       if (scene.print) {
         // the print where copies have landed: teal on the tile's own hand, sand on the other (as the plane always is)
         for (const [sub, style] of [[list.filter((cp) => !tinted(cp)), PRINT_PALE], [list.filter(tinted), PRINT_PALE_BACK]]) {
@@ -1394,14 +1410,15 @@ export function createPlaneView(canvas, options = {}) {
       }
     }
 
-    // 3. the tile; the moving and settling copies pass over its fill, under its bold edges
+    // 3. the tile; the copies that move in the plane (a turn, a slide) and the settling ones pass over its fill, under
+    //    its bold edges
     drawTile(c, P, M, {
       starAlpha: endK,
       between: (cc) => {
         // (replicate.js cardState: the opacity, the face that is up — the parent's, turned over by a flip as it passes
-        // edge-on — and the lift of a flip; the settling cards first, in the order of their phases, then the moving)
+        // edge-on; the settling cards first, in the order of their phases, then the moving ones over the paper)
         for (const s of settle) for (const cp of s.list) { const cs = cardState(plan, cp, states[cp.index], keep); if (cs) drawCard(cc, P, M, cs.A, cs); }
-        for (const { cp, st } of moving) { const cs = cardState(plan, cp, st, keep); if (cs) drawCard(cc, P, M, cs.A, cs); }
+        for (const cs of over) drawCard(cc, P, M, cs.A, cs);
       },
     });
 
@@ -1451,24 +1468,26 @@ export function createPlaneView(canvas, options = {}) {
   }
 
   /**
-   * A copy of the tile on its way: the paper (white), the commas it carries, the tile's tint, its edges in their
-   * colours. `back` in [0, 1]: how much of the paper's back is up (a faint ink tint); `lift` in [0, 1]: how high a
-   * copy that turns over stands out of the plane (sin(π s)): a soft shadow under it. `quiet` (a copy of a later layer,
-   * the final fix of 10 Nov 2026: findings 8 and 10): the card is drawn as the plain tiling draws a tile — the paper,
-   * its commas, a faint teal, its outline in the tiling's grey and its mirror edges in ink — so that the layers after
-   * the first grow calmly; no seam colours, a lighter shadow. A card is quiet or not for its whole life.
+   * A copy of the tile on its way: the paper, the commas it carries, the tile's tint, its edges in their colours.
+   * `back` in [0, 1]: how much of the paper's back is up; the face that is up is the hand of the tile the card lands on.
+   * Under a print a card of the first layer is the paper itself, in its two full tones: the tile's front (teal), or the
+   * back (sand, as the 3D view shows it) once a flip has passed edge-on (the owner's comments of 13 Nov 2026: a pale
+   * card lying on the tile washed the tile out while it left; the paper keeps the tile's colours, and the card fades
+   * into the pale tiling while it settles). `lift` in [0, 1]: how far a copy that turns over stands out of the plane
+   * (sin(π s)); it does so under the paper (under = 1), and the paper's shade lies on it, deeper as it sinks
+   * (UNDER_SHADE x lift). `quiet` (a copy of a later layer, the final fix of 10 Nov 2026: findings 8 and 10): the card is
+   * drawn as the plain tiling draws a tile — the paper in the plane's pale print or with its commas, a faint teal, its
+   * outline in the tiling's grey and its mirror edges in ink — so that the layers after the first grow calmly; no seam
+   * colours, a lighter shade. A card is quiet or not for its whole life.
    */
-  function drawCard(c, P, M, A, { k, back, lift = 0, quiet = 0 }) {
+  function drawCard(c, P, M, A, { k, back, lift = 0, under = 0, quiet = 0 }) {
     if (!(k > 0.004)) return;
     const plan = rep.plan, ring = P.ring;
+    const backUp = (back > 0.5) !== (P.eps < 0);
+    const paper = scene.print && !quiet ? (backUp ? PRINT_BACK : PRINT_FRONT) : null;
     c.save();
     c.beginPath(); traceAffine(c, ring, A, true, true);
-    if (lift > 0.01) {
-      c.shadowColor = rgba(INK, k3c((quiet ? 0.12 : 0.24) * lift * k));
-      c.shadowBlur = 9 * lift * view.kx; c.shadowOffsetX = 0; c.shadowOffsetY = 4 * lift * view.ky;
-    }
-    c.fillStyle = rgba(GROUND, k3c(k)); c.fill();                // opaque paper: what it passes over is under it
-    c.shadowColor = 'rgba(0,0,0,0)'; c.shadowBlur = 0; c.shadowOffsetY = 0;
+    c.fillStyle = rgba(paper ? paper[0] : GROUND, k3c(k)); c.fill();    // opaque paper: what it passes over is under it
     c.clip();
     if (plan.commas.length) {
       c.beginPath();
@@ -1479,17 +1498,16 @@ export function createPlaneView(canvas, options = {}) {
       // the card carries the tile's share of the print through its own motion (the print is the group's: it lands in register)
       const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
       c.globalAlpha = k;
-      // (the face that is up: the front's teal, or the back's sand once a flip has passed edge-on — as the tile it
-      // lands on is drawn)
       fillPrint(c, scene.print, (x, y, out) => { out[0] = X(A.a * x + A.b * y + A.tx); out[1] = Y(A.c * x + A.d * y + A.ty); return out; },
-        [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], (back > 0.5) !== (P.eps < 0) ? PRINT_PALE_BACK : PRINT_PALE);
+        [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], paper ? paper[1] : backUp ? PRINT_PALE_BACK : PRINT_PALE);
       c.globalAlpha = 1;
     }
     c.beginPath(); traceAffine(c, ring, A, true, true);
     if (!scene.print) {
       c.fillStyle = rgba(ACCENT, k3c((quiet ? 0.06 : 0.14) * k)); c.fill();
       if (back > 0.004) { c.fillStyle = rgba(INK, k3c((quiet ? 0.05 : 0.06) * back * k)); c.fill(); }
-    } else if (!quiet) { c.fillStyle = rgba(ACCENT, k3c(0.06 * k)); c.fill(); }
+    }
+    if (under && lift > 0.004) { c.fillStyle = rgba(INK, k3c(UNDER_SHADE[quiet ? 1 : 0] * lift * k)); c.fill(); }
     c.restore();
     c.lineJoin = 'round'; c.lineCap = 'round';
     if (quiet) {
@@ -1516,6 +1534,8 @@ export function createPlaneView(canvas, options = {}) {
     }
   }
   const k3c = (a) => +Math.max(0, Math.min(1, a)).toFixed(4);
+  /** The paper's shade on a card under it, at the deepest (lift 1): a card of the first layer, a quiet one. */
+  const UNDER_SHADE = [0.14, 0.08];
 
   /** drawGlyphs, with each glyph as strong as the copies that hold it have landed (the tile's own at full strength). */
   function drawTilingGlyphs(c, P, M, plan, states, keep) {
