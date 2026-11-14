@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subgroups, Cosets &amp; Perfect Colourings: D₃ and 442 (p4) — Spacetime Groups</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
+<link rel="stylesheet" href="css/subgroups-d3-442.css?v=1">
+<script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+<script defer src="js/subgroups-d3-442.js?v=1"></script>
+</head>
+<body>
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="index.html">Tutorial</a>
+        <a href="notation.html">Notation</a>
+        <a href="colourings-tutorial.html">Colourings</a>
+        <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="subgroups-d3-442.html" class="here">D₃ &amp; 442</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+        <a href="hierarchy.html">Hierarchy</a>
+        <a href="history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="showcase/">Showcase</a>
+        <a href="catalog.html">275 spacetime</a>
+        <a href="wallpaper.html">275 spacetime (grouped)</a>
+        <a href="correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="patterns.html">609 patterns</a>
+        <a href="escher.html">107 Escher</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colourings</span>
+        <a href="colour/">Entangled colourings</a>
+        <a href="colour/gyre/">Gyre</a>
+        <a href="colour/trefoil/">Trefoil</a>
+        <a href="monochrome/">Monochrome</a>
+        <a href="shubnikov/">Shubnikov</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="reports/">Reports</a>
+        <a href="motifs.html">Motifs</a>
+        <a href="designer.html">Designer</a>
+        <a href="billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<main class="sg-page">
+  <section class="sg-hero">
+    <p class="sg-eyebrow">De Las Peñas (Bridges 2001) · Subgroups → Cosets → Wallpaper Groups</p>
+    <h1>Subgroups, Cosets &amp; Perfect Colourings: D₃ and 442 (p4)</h1>
+    <p class="sg-lede">
+      Why do <strong>left cosets gS</strong> always give a <em>perfect</em> colour symmetry, while
+      <strong>S-orbits (right cosets Sg)</strong> break whenever S is non-normal? Explore every
+      subgroup of the triangle group <strong>D₃</strong> (order 6), then watch the exact same
+      mechanism expand into the infinite planar rotation group <strong>442 (p4)</strong> through
+      Gaussian integer ideals and all 135 subgroups up to index 10.
+    </p>
+    <div class="sg-links-row">
+      <span>Companion reading: <a href="colourings-tutorial.html">Colourings Tutorial</a></span>
+      <span>·</span>
+      <span><a href="subgroups-vs-colourings.html">Subgroups vs. Colourings (Orbit / Normaliser Theorem)</a></span>
+      <span>·</span>
+      <span><a href="patterns.html">609 Wallpaper Colourings</a></span>
+    </div>
+  </section>
+
+  <nav class="sg-tabs" role="tablist" aria-label="Explorer sections">
+    <button type="button" class="sg-tab" role="tab" data-tab="d3" aria-selected="true">1. D₃ Rosette Lab (Order 6)</button>
+    <button type="button" class="sg-tab" role="tab" data-tab="p4" aria-selected="false">2. 442 (p4) Planar Explorer (k = 1..10)</button>
+    <button type="button" class="sg-tab" role="tab" data-tab="bridge" aria-selected="false">3. Dictionary &amp; G / K Bridge</button>
+  </nav>
+
+  <!-- ==================== TAB 1: D3 ==================== -->
+  <section class="sg-panel" data-panel="d3">
+    <div class="sg-callout">
+      <strong>Core mechanism (left rigid action):</strong> Label the 6 right-triangle wedges of an
+      equilateral triangle by the elements of <strong>D₃</strong> acting on the <em>left</em>
+      (<span class="sg-mono">h · x = hx</span>, where <span class="sg-mono">a</span> is 120° CCW and
+      <span class="sg-mono">b</span> is horizontal mirror). Pick any subgroup <span class="sg-mono">S ≤ D₃</span>:
+      left cosets <span class="sg-mono">gS</span> stay invariant as blocks under every <span class="sg-mono">h ∈ D₃</span>,
+      whereas S-orbits <span class="sg-mono">Sg</span> are mapped to orbits of the conjugate subgroup
+      <span class="sg-mono">hSh⁻¹</span> — so <span class="sg-mono">Sg</span> holds only for <span class="sg-mono">h ∈ N(S)</span>.
+    </div>
+
+    <div class="sg-split">
+      <div class="sg-card">
+        <div class="sg-card-head">
+          <h2>Subgroup Lattice of D₃</h2>
+          <span class="sg-badge">6 subgroups · 4 conjugacy classes</span>
+        </div>
+        <p class="sg-sub">
+          Click any subgroup node S. Notice the 3 conjugate reflections
+          (<span class="sg-mono">⟨b⟩, ⟨ab⟩, ⟨a²b⟩</span>) sit in one orange conjugacy box.
+        </p>
+        <div class="sg-hasse-wrap">
+          <svg id="d3-hasse-svg" class="sg-hasse-svg" viewBox="0 0 340 218" aria-label="D3 subgroup Hasse diagram"></svg>
+        </div>
+        <dl class="sg-facts" id="d3-sub-facts"></dl>
+      </div>
+
+      <div class="sg-card">
+        <div class="sg-card-head">
+          <h2>Left Cosets gS vs. Orbits Sg</h2>
+          <span class="sg-badge ok">Click wedges or motions</span>
+        </div>
+        <p class="sg-sub">
+          Apply any motion <span class="sg-mono">h ∈ D₃</span> to both colourings at once, or click any
+          wedge to highlight its block across both rosettes.
+        </p>
+        <div class="sg-btn-row" id="d3-motion-row" style="margin-bottom:0.75rem;"></div>
+
+        <div class="sg-dual">
+          <div class="sg-canvas-box">
+            <h3 class="sg-canvas-title">Left cosets gS (always perfect)</h3>
+            <svg id="d3-left-svg" class="sg-rosette-svg" viewBox="0 0 260 244" aria-label="Left cosets gS rosette"></svg>
+            <div class="sg-status" id="d3-left-status" data-kind="fixes"></div>
+          </div>
+          <div class="sg-canvas-box">
+            <h3 class="sg-canvas-title">S-orbits / Right cosets Sg</h3>
+            <svg id="d3-right-svg" class="sg-rosette-svg" viewBox="0 0 260 244" aria-label="Right cosets Sg rosette"></svg>
+            <div class="sg-status" id="d3-right-status" data-kind="fixes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sg-split" style="margin-top:1.1rem;">
+      <div class="sg-card">
+        <div class="sg-card-head">
+          <h2>Left × Right Block Overlap Table (gᵢS ∩ Sfⱼ)</h2>
+          <span class="sg-badge">Interactive matrix</span>
+        </div>
+        <p class="sg-sub">
+          Rows are left cosets <span class="sg-mono">gᵢS</span> (colour blocks of gS); columns are
+          right cosets <span class="sg-mono">Sfⱼ</span> (colour blocks of Sg). For normal subgroups every
+          cell holds an entire block; for non-normal <span class="sg-mono">⟨b⟩</span>, row 2 and row 3 split
+          1-and-1 across columns. Click any row, column, or cell to highlight it on the rosettes above.
+        </p>
+        <div class="sg-table-wrap" id="d3-dc-wrap"></div>
+        <p class="sg-sub sg-mono" id="d3-dc-hint" style="margin-bottom:0;margin-top:0.55rem;">Click any header or intersection cell to highlight those pieces above.</p>
+      </div>
+
+      <div class="sg-card">
+        <div class="sg-card-head">
+          <h2>Free-Paint &amp; Bridges Table 2 Sandbox</h2>
+          <span class="sg-badge warn">Test any partition P</span>
+        </div>
+        <p class="sg-sub" id="d3-sandbox-note"></p>
+        <div class="sg-dual" style="align-items:center;">
+          <div class="sg-canvas-box">
+            <svg id="d3-sandbox-svg" class="sg-rosette-svg large" viewBox="0 0 260 244" aria-label="Interactive free-paint D3 rosette"></svg>
+          </div>
+          <div class="sg-stack">
+            <div>
+              <strong style="font-size:0.84rem;">Brush colour (click a wedge to paint):</strong>
+              <div class="sg-palette-bar" id="d3-sandbox-palette" style="margin-top:0.35rem;"></div>
+            </div>
+            <div>
+              <strong style="font-size:0.84rem;">Bridges Table 2 presets (C1–C8) &amp; Random:</strong>
+              <div class="sg-btn-row" id="d3-sandbox-presets" style="margin-top:0.35rem;"></div>
+            </div>
+            <div>
+              <strong style="font-size:0.84rem;">Action of each element (click tile to preview):</strong>
+              <div class="sg-el-grid" id="d3-sandbox-el-grid"></div>
+            </div>
+          </div>
+        </div>
+        <div id="d3-sandbox-analysis" style="margin-top:0.75rem;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 2: 442 (p4) ==================== -->
+  <section class="sg-panel" data-panel="p4" hidden>
+    <div class="sg-callout">
+      <strong>From D₃ to the infinite wallpaper group 442 (p4):</strong> Each square tile in
+      ℤ² is divided into 4 right-triangle fundamental domains <span class="sg-mono">q = 0, 1, 2, 3</span>
+      (one chiral mark inside each triangle removes mirror symmetries). Every finite-index subgroup
+      has the canonical form <span class="sg-mono">S = (P_S, L, u)</span>: a point group
+      <span class="sg-mono">P_S ∈ {C₄, C₂, {e}}</span> of index <span class="sg-mono">b ∈ {1, 2, 4}</span>,
+      a <span class="sg-mono">P_S</span>-invariant sublattice <span class="sg-mono">L ≤ ℤ²</span> of index
+      <span class="sg-mono">a = k / b</span>, and a rotation cocycle <span class="sg-mono">u ∈ ℤ² / L</span>
+      fixing where S's rotation centres sit.
+    </div>
+
+    <div class="sg-card" style="margin-bottom:1.1rem;">
+      <div class="sg-card-head">
+        <h2>Index Selector k = [442 : S] (1 to 10 colours)</h2>
+        <span class="sg-badge">135 total subgroups · 0 at k=3, 7</span>
+      </div>
+      <div class="sg-index-bar" id="p4-index-bar" role="group" aria-label="Subgroup index k"></div>
+      <div id="p4-empty-box" class="sg-gaussian-box" hidden></div>
+    </div>
+
+    <div id="p4-catalog-body">
+      <div class="sg-split">
+        <div class="sg-card">
+          <div class="sg-card-head">
+            <h2>Colour Groups, Conjugacy Classes &amp; Placements</h2>
+            <span class="sg-badge">Aut(442) vs. 442-conjugacy</span>
+          </div>
+          <p class="sg-sub">
+            Outer symmetries <span class="sg-mono">τ = t(½, ½)</span> and
+            <span class="sg-mono">σ : (x,y) ↦ (x,-y)</span> merge conjugacy classes into
+            <strong>Aut(442) colour groups</strong>. At <span class="sg-mono">k = 5</span> and
+            <span class="sg-mono">k = 10</span> (Gaussian norms 2²+1² and 3²+1²), mirror
+            <span class="sg-mono">σ</span> pairs enantiomorphic <strong>chiral colourings</strong>.
+          </p>
+          <div id="p4-aut-wrap"></div>
+        </div>
+
+        <div class="sg-card">
+          <div class="sg-card-head">
+            <h2>Live 442 Planar Tiling</h2>
+            <div class="sg-btn-row">
+              <button type="button" class="sg-btn sm" data-p4-mode="coset" aria-pressed="false">Left cosets gS</button>
+              <button type="button" class="sg-btn sm" data-p4-mode="orbit" aria-pressed="false">Orbits Sg</button>
+              <button type="button" class="sg-btn sm" data-p4-mode="sidebyside" aria-pressed="true">Side-by-side</button>
+            </div>
+          </div>
+
+          <div class="sg-btn-row" style="margin-bottom:0.4rem;">
+            <button type="button" class="sg-btn motion sm" data-p4-motion="r">r (90° CCW)</button>
+            <button type="button" class="sg-btn motion sm" data-p4-motion="ri">r' (90° CW)</button>
+            <button type="button" class="sg-btn motion sm" data-p4-motion="r2">r² (180°)</button>
+            <button type="button" class="sg-btn motion sm" data-p4-motion="tx">tₓ (+1 →)</button>
+            <button type="button" class="sg-btn motion sm" data-p4-motion="ty">tᵧ (+1 ↑)</button>
+            <button type="button" class="sg-btn sm" data-p4-motion="reset">Reset h = e</button>
+          </div>
+
+          <div class="sg-checks">
+            <label><input type="checkbox" data-p4-overlay="chiral" checked> Chiral marks (break p4m mirrors)</label>
+            <label><input type="checkbox" data-p4-overlay="lCell" checked> L-cell (dashed)</label>
+            <label><input type="checkbox" data-p4-overlay="kCell"> Kernel L_K-cell (gold)</label>
+            <label><input type="checkbox" data-p4-overlay="centers" checked> Surviving S centres (◆ 4-fold, ● 2-fold)</label>
+          </div>
+
+          <p class="sg-sub" id="p4-mode-note" style="margin-top:0.2rem;"></p>
+
+          <div id="p4-stage-single" hidden>
+            <div class="sg-canvas-box">
+              <svg id="p4-main-svg" class="sg-planar-svg" viewBox="-2.6 -2.6 5.2 5.2" aria-label="442 wallpaper colouring"></svg>
+              <div class="sg-status" id="p4-verdict-main" data-kind="fixes"></div>
+            </div>
+          </div>
+
+          <div id="p4-stage-dual" class="sg-dual sg-planar-dual">
+            <div class="sg-canvas-box">
+              <h3 class="sg-canvas-title">Left cosets gS (always perfect)</h3>
+              <svg id="p4-dual-coset-svg" class="sg-planar-svg" viewBox="-2.6 -2.6 5.2 5.2" aria-label="442 left cosets gS"></svg>
+              <div class="sg-status" id="p4-verdict-dual-coset" data-kind="fixes"></div>
+            </div>
+            <div class="sg-canvas-box">
+              <h3 class="sg-canvas-title">Orbits / Right cosets Sg</h3>
+              <svg id="p4-dual-orbit-svg" class="sg-planar-svg" viewBox="-2.6 -2.6 5.2 5.2" aria-label="442 orbits Sg"></svg>
+              <div class="sg-status" id="p4-verdict-dual-orbit" data-kind="fixes"></div>
+            </div>
+          </div>
+
+          <dl class="sg-facts" id="p4-facts"></dl>
+        </div>
+      </div>
+
+      <div class="sg-card" style="margin-top:1.1rem;">
+        <div class="sg-card-head">
+          <h2>442 Subgroup Builder &amp; C₄-Invariance Tester</h2>
+          <span class="sg-badge">Construct custom (P_S, L, u)</span>
+        </div>
+        <p class="sg-sub">
+          Dial any HNF sublattice <span class="sg-mono">L = ⟨(d₁, 0), (c, d₂)⟩</span> and cocycle
+          <span class="sg-mono">u = (uₓ, uᵧ)</span>. Watch why <span class="sg-mono">P_S = C₄</span>
+          rejects lattices whose index <span class="sg-mono">a = d₁d₂</span> is not a sum of two squares
+          <span class="sg-mono">u² + v²</span>, while <span class="sg-mono">C₂</span> preserves <em>every</em>
+          sublattice of ℤ².
+        </p>
+        <div class="sg-builder-grid">
+          <div class="sg-field">
+            <label for="b-ps">Point group P_S</label>
+            <select id="b-ps">
+              <option value="1">C₄ ({e, r, r², r³}, b = 1)</option>
+              <option value="2">C₂ ({e, r²}, b = 2)</option>
+              <option value="0">{e} (trivial, b = 4)</option>
+            </select>
+          </div>
+          <div class="sg-field">
+            <label for="b-d1">HNF d₁ (1..12)</label>
+            <input id="b-d1" type="number" min="1" max="12" value="5">
+          </div>
+          <div class="sg-field">
+            <label for="b-c">HNF shear c (0..d₁−1)</label>
+            <input id="b-c" type="number" min="0" max="11" value="2">
+          </div>
+          <div class="sg-field">
+            <label for="b-d2">HNF d₂ (1..12)</label>
+            <input id="b-d2" type="number" min="1" max="12" value="1">
+          </div>
+          <div class="sg-field">
+            <label for="b-ux">Cocycle uₓ (0..d₁−1)</label>
+            <input id="b-ux" type="number" min="0" max="11" value="0">
+          </div>
+          <div class="sg-field">
+            <label for="b-uy">Cocycle uᵧ (0..d₂−1)</label>
+            <input id="b-uy" type="number" min="0" max="11" value="0">
+          </div>
+        </div>
+        <div class="sg-gaussian-box" id="b-status"></div>
+        <div class="sg-btn-row" style="margin-top:0.65rem;">
+          <button type="button" class="sg-btn" id="b-load">Load in Tiling Visualizer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TAB 3: BRIDGE ==================== -->
+  <section class="sg-panel" data-panel="bridge" hidden>
+    <div class="sg-card" style="margin-bottom:1.1rem;">
+      <h2>1. The Two-Sentence Proof: Left Cosets vs. Orbits</h2>
+      <p>
+        Suppose symmetry group <span class="sg-mono">G</span> acts rigidly on tiles from the
+        <strong>left</strong> (<span class="sg-mono">x ↦ gx</span>), so a single base tile carries label
+        <span class="sg-mono">e</span> and every other tile carries a unique label
+        <span class="sg-mono">g ∈ G</span>. Pick any subgroup <span class="sg-mono">S ≤ G</span> of index
+        <span class="sg-mono">k = [G : S]</span>:
+      </p>
+      <table class="sg-dict">
+        <thead>
+          <tr>
+            <th>Partition of G</th>
+            <th>Definition</th>
+            <th>Action of h ∈ G from the left</th>
+            <th>When does h preserve the colours?</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Left cosets gS</strong></td>
+            <td class="sg-mono">x ~ y ⇔ x⁻¹y ∈ S</td>
+            <td class="sg-mono">h · (gS) = (hg)S</td>
+            <td><strong>Always (all h ∈ G)</strong> → every gS colouring is <em>perfect</em>!</td>
+          </tr>
+          <tr>
+            <td><strong>S-orbits / Right cosets Sg</strong></td>
+            <td class="sg-mono">x ~ y ⇔ y ∈ Sx</td>
+            <td class="sg-mono">h · (Sg) = (hSh⁻¹)(hg)</td>
+            <td>Only when <span class="sg-mono">hSh⁻¹ = S</span>, i.e. <strong>h ∈ N_G(S)</strong> (breaks outside normaliser unless S ◁ G).</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="sg-callout warm" style="margin-bottom:0;">
+        <strong>Why non-normal subgroups matter:</strong> In <strong>D₃</strong>, the 3 conjugates
+        <span class="sg-mono">⟨b⟩, ⟨ab⟩, ⟨a²b⟩</span> produce <strong>3 distinct left-coset colourings</strong>
+        (Table 2's C8, C7, C6 — rotated copies of one pattern) and <strong>1 orbit class</strong>.
+        In <strong>442</strong>, at index <span class="sg-mono">k = 4</span>, a non-normal C₄ placement
+        has <span class="sg-mono">4</span> left cosets that stay perfect under every 90° turn and
+        translation, whereas its <span class="sg-mono">C₄</span>-orbits collapse to another conjugate's
+        orbits as soon as you translate by <span class="sg-mono">tₓ</span>.
+      </div>
+    </div>
+
+    <div class="sg-card" style="margin-bottom:1.1rem;">
+      <h2>2. Resolving the Notation: Bridges 2001 vs. Spacetime Groups Catalogue</h2>
+      <p>
+        Two complementary traditions use the letter <span class="sg-mono">H</span> for two different groups:
+      </p>
+      <table class="sg-dict">
+        <thead>
+          <tr>
+            <th>Role in a k-colouring P</th>
+            <th>De Las Peñas (Bridges 2001)</th>
+            <th>This visualizer / Spacetime Groups</th>
+            <th>Group-theoretic meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Subgroup permuting all colours of P</td>
+            <td class="sg-mono">H</td>
+            <td class="sg-mono">H_P</td>
+            <td>Full symmetry group of P iff <span class="sg-mono">H_P = G</span> (perfect colouring).</td>
+          </tr>
+          <tr>
+            <td>Subgroup fixing <em>every</em> colour individually</td>
+            <td class="sg-mono">K</td>
+            <td class="sg-mono">K_P = core_{H_P}(S)</td>
+            <td>Normal kernel <span class="sg-mono">⋂_{h ∈ H_P} hSh⁻¹</span> of the permutation action on colours.</td>
+          </tr>
+          <tr>
+            <td>Stabiliser of colour #1</td>
+            <td class="sg-mono">J₁ (often H when H = G)</td>
+            <td class="sg-mono">S (or H in G/H[n])</td>
+            <td>Index-<span class="sg-mono">k</span> subgroup whose cosets give the k colours when P is transitive.</td>
+          </tr>
+          <tr>
+            <td>Induced permutation group on k colours</td>
+            <td class="sg-mono">H / K ↪ S_k</td>
+            <td class="sg-mono">Q = G / K_P</td>
+            <td>Quotient acting faithfully on the k colours (Chaim / Macdonald colour group).</td>
+          </tr>
+          <tr>
+            <td>Action handedness on paper vs. screen</td>
+            <td>Paper writes right-cosets <span class="sg-mono">Hg</span> (right action)</td>
+            <td>Screen applies rigid motions <span class="sg-mono">x ↦ gx</span> (left action)</td>
+            <td>Inversion <span class="sg-mono">g ↔ g⁻¹</span> maps left cosets <span class="sg-mono">gS</span> onto right cosets <span class="sg-mono">Sg⁻¹</span>; both classifications are isomorphic.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="sg-card">
+      <h2>3. Quick Jump Examples Across D₃ and 442</h2>
+      <p class="sg-sub">Jump directly into the key mathematical regimes in either tab:</p>
+      <div class="sg-btn-row">
+        <button type="button" class="sg-btn" data-jump-tab="d3" data-jump-d3="b">D₃: Non-normal ⟨b⟩ (k=3, gS vs Sg)</button>
+        <button type="button" class="sg-btn" data-jump-tab="d3" data-jump-d3="C3">D₃: Normal ⟨a⟩ (k=2, gS = Sg)</button>
+        <button type="button" class="sg-btn" data-jump-tab="p4" data-jump-k="2">442 k=2: Outer τ = t(½,½) merges 2 conjugates</button>
+        <button type="button" class="sg-btn" data-jump-tab="p4" data-jump-k="3">442 k=3: Why 0 colourings exist (Fermat)</button>
+        <button type="button" class="sg-btn" data-jump-tab="p4" data-jump-k="4">442 k=4: Non-normal C₄ vs C₂ vs ℤ²</button>
+        <button type="button" class="sg-btn" data-jump-tab="p4" data-jump-k="5">442 k=5: Chiral (2±i)ℤ[i] Gaussian pair</button>
+        <button type="button" class="sg-btn" data-jump-tab="p4" data-jump-k="10">442 k=10: Chiral (3±i) + achiral C₂ lattices</button>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
