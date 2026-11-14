@@ -22,18 +22,20 @@
 //
 // Which module folds what:
 //   hinge                              src/folds/hinge.js      2222, 22*, 2*22, 442, 4*2, 333, 3*3, 632
-//   torus | cylinder | mobius | klein  src/folds/roll.js       o, **, *x, xx
+//   torus | cylinder | mobius          src/folds/roll.js       o, **, *x
+//   klein                              src/folds/bottle.js     xx   (the classic bottle, 14 Nov 2026; roll.js still holds
+//                                                               the figure-8 bottle it replaced, used by no group)
 //   crosscap                           src/folds/crosscap.js   22x
 //   snowflake                          src/folds/snowflake.js  *2222, *442, *333, *632
 //
 // The Fold that comes back is the module's own object (SPEC 5.3: mesh, stops, duration, at(t), and whatever extras the
-// module documents: doubleLine(t) for klein and crosscap, star / cellMaps for snowflake, kinematics for hinge and
-// crosscap). **Draw from fold.mesh, never from the mesh passed in**: the hinge and cross-cap folds hand back a mesh
+// module documents: doubleLine(t) and stage(t) for klein, doubleLine(t) for crosscap, star / cellMaps for snowflake,
+// kinematics for hinge and crosscap). **Draw from fold.mesh, never from the mesh passed in**: the hinge and cross-cap folds hand back a mesh
 // with a finer outline (the cross-cap also with more triangles), the snowflake fold its own star of 2n cells, and a
 // roll fold a finer mesh when the one it was given is too coarse for a round tube.
 //
-// The mesh density. A rolled tube of 25 flat facets looks faceted and the lobes of the figure 8 are tight, so the
-// roll folds ask for a finer grid than the default of mesh.js (rollDensity: o 88, ** 60, *x 80, xx 104 steps across
+// The mesh density. A rolled tube of 25 flat facets looks faceted (and the bottle's neck is narrow), so the roll
+// folds and the bottle ask for a finer grid than the default of mesh.js (rollDensity: o 88, ** 60, *x 80, xx 104 steps across
 // the tile's longer side). foldMeshOptions hands that to buildMesh, so nothing is built twice. The snowflake fold
 // never looks at the tile mesh (the tile is the kaleidoscope's cell; it meshes its star itself), so none is built
 // for it here.
@@ -41,6 +43,7 @@
 import { buildMesh } from '../mesh.js';
 import createHinge from './hinge.js';
 import createRoll, { rollDensity } from './roll.js';
+import createBottle from './bottle.js';
 import createCrosscap from './crosscap.js';
 import createSnowflake from './snowflake.js';
 import createRecut, { canRecut } from './recut.js';
@@ -49,7 +52,8 @@ export { canRecut };
 
 const MAKERS = {
   hinge: createHinge,
-  torus: createRoll, cylinder: createRoll, mobius: createRoll, klein: createRoll,
+  torus: createRoll, cylinder: createRoll, mobius: createRoll,
+  klein: createBottle,           // the classic bottle (folds/bottle.js); roll.js keeps the figure-8 one, used by no group
   crosscap: createCrosscap,
   snowflake: createSnowflake,
 };

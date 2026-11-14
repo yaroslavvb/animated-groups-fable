@@ -51,7 +51,7 @@ function rng(seed) {
 }
 const lengthOf = (pl) => { let s = 0; for (let i = 2; i < pl.length; i += 2) s += Math.hypot(pl[i] - pl[i - 2], pl[i + 1] - pl[i - 1]); return s; };
 const isIdent = (g) => Math.abs(g.a - 1) < 1e-9 && Math.abs(g.d - 1) < 1e-9 && Math.abs(g.b) < 1e-9 && Math.abs(g.c) < 1e-9 && Math.abs(g.tx) < 1e-9 && Math.abs(g.ty) < 1e-9;
-const STRIPS = { o: 0.27, '**': 0.27, xx: 0.19 };     // the least cover of the strip groups (the judge: 29, 28, 20 %; *x reaches the target on its 2 : 1 strip since 13 Nov 2026)
+const STRIPS = { o: 0.27, '**': 0.27, xx: 0.19 };     // the least cover of the strip groups (29, 28 and, for xx, 22 % from the table since 14 Nov 2026; *x reaches the target on its 2 : 1 strip since 13 Nov 2026)
 // the least cover of a comma held still (tools/motif-place.mjs STILL: 22x's fills the far half of the cell C0, 29 %)
 const STILL_COVER = { '22x': 0.28 };
 
@@ -174,9 +174,9 @@ test('motifFor: one closed glyph per group, the same object every time, inside i
     const [sx, sy] = m.scale;
     assert.ok(sx > 0 && sy >= sx, g.id + ': stretched along its head -> tail axis, never squeezed');
     assert.equal(m.radius, Math.max(sx, sy), g.id + ': the disc that holds the unit comma so scaled');
-    const stretch = g.id === 'xx' ? SEAM_STRETCH : FILL_STRETCH[g.id] || 1;
+    const stretch = m.seam ? SEAM_STRETCH : FILL_STRETCH[g.id] || 1;
     assert.ok(Math.abs(sy / sx - stretch) < 1e-9, `${g.id}: stretched ${sy / sx}, the rule says ${stretch}`);
-    // the table's commas: radius at most FILL_RCAP viewHalf; xx's seam comma is two lobes wide (its own rule, below)
+    // the table's commas: radius at most FILL_RCAP viewHalf (a seam comma, were there one, has its own rule)
     if (!m.seam) assert.ok(m.radius <= FILL_RCAP * g.viewHalf + 1e-9, `${g.id}: radius ${(m.radius / g.viewHalf).toFixed(3)} viewHalf`);
     // big: on a phone, where the plane is about 226 px square (113 px per viewHalf), at least 15 px across... in radius
     assert.ok((m.radius * 113) / g.viewHalf >= 15, `${g.id}: radius ${((m.radius * 113) / g.viewHalf).toFixed(1)} px on a phone`);
@@ -394,40 +394,24 @@ test('the big comma covers FILL_TARGET (30 %) of the tile (*x too, on its 2 : 1 
   t.diagnostic('cover, % of the tile: ' + rows.join(', '));
 });
 
-test('xx: the seam comma is two lobes wide — across the glide seam, astride the middle glide axis, between the axes on either side, 2.6 x 1.4 the one-lobe comma', () => {
-  const XX = BY_ID.xx, m = motifFor(XX), size = Math.sqrt(XX.domainArea);
-  assert.ok(SEAM_GROUPS.has('xx') && m.seam && m.info.seam && m.info.tier === 3 && m.info.lobes === SEAM_LOBES && SEAM_LOBES === 2);
-  // the rule: the one-lobe comma placed in the two-lobe room, SEAM_SCALE across and SEAM_STRETCH more along
-  const base = placeAcrossSeam(XX, commaOutline(), 2).radius;
-  assert.ok(Math.abs(m.scale[0] - SEAM_SCALE * base) < 1e-12 && Math.abs(m.scale[1] - SEAM_SCALE * SEAM_STRETCH * base) < 1e-12, `scale ${m.scale}`);
+test('xx: its comma comes from the table since the classic bottle (14 Nov 2026); the seam rule is kept, and no group uses it', () => {
+  const XX = BY_ID.xx, m = motifFor(XX);
+  assert.equal(SEAM_GROUPS.size, 0, 'no seam group');
+  for (const g of GROUPS) assert.equal(!!motifFor(g).seam, false, g.id);
+  assert.equal(m.info.source, 'table');
+  const e = PLACEMENTS.xx;
+  assert.ok(e && e.view !== null, 'placed where the default view shows it');
+  assert.ok(e.seen >= 0.3, `the default view at t = 1 is ${(100 * e.seen).toFixed(1)} % comma (across the glide seam it was 3 %: under the neck and inside the body)`);
+  // a strip: as large as the cap on its radius allows, so the default tile may cut it (here the blue seam does: the
+  // top of the tube, where the camera looks)
+  assert.equal(e.s, e.fit);
+  assert.ok(Math.abs(m.radius - FILL_RCAP * XX.viewHalf) < 1e-6, `radius ${m.radius}`);
+  // the rule itself still places a comma across xx's glide seam (two lobes: astride the middle glide axis)
+  const p = placeAcrossSeam(XX, commaOutline(), SEAM_LOBES);
+  assert.ok(p && p.radius > 0 && p.info.seam === true && p.info.lobes === 2);
+  const d = buildDomain(XX, { seed: XX.presets[0].seed, warp: makeWarp(XX, 0) });
+  assert.ok(d.edges[p.info.edge].kind === 'cut' && det(d.edges[p.info.edge].g) < 0, 'the seam it finds is the glide-sewn edge');
   assert.equal(SEAM_SCALE, 2.6); assert.equal(SEAM_STRETCH, 1.4);
-  // the default tile and its seam: the cut edge glued by the glide, the axis through its middle
-  const p0 = XX.presets[0], d = buildDomain(XX, { seed: p0.seed, warp: makeWarp(XX, 0) });
-  const seam = d.edges.findIndex((e, i) => e.kind === 'cut' && det(e.g) < 0 && i === m.info.edge);
-  assert.ok(seam >= 0, 'the seam is a glide-sewn cut edge');
-  const A = d.poly[seam], B = d.poly[(seam + 1) % d.poly.length], mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2;
-  const axes = symmetryElements(XX, mx, my, 2 * size).glides;
-  const off = (gl, x, y) => (x - gl.px) * -gl.uy + (y - gl.py) * gl.ux;
-  const mid = axes.reduce((a, b) => (Math.abs(off(b, mx, my)) < Math.abs(off(a, mx, my)) ? b : a));
-  assert.ok(Math.abs(off(mid, mx, my)) < 1e-9, 'a glide axis runs through the middle of the seam');
-  const P = m.polylines[0];
-  let lo = Infinity, hi = -Infinity;
-  for (let i = 0; i < P.length; i += 2) { const w = off(mid, P[i], P[i + 1]); lo = Math.min(lo, w); hi = Math.max(hi, w); }
-  assert.ok(lo < 0 && hi > 0, `the comma straddles the middle glide axis (${lo.toFixed(3)} .. ${hi.toFixed(3)})`);
-  // every other axis parallel to it leaves the comma on one side: it spans the two lobes round the middle axis, no more
-  for (const gl of axes) {
-    if (gl === mid) continue;
-    const s0 = Math.sign(off(gl, P[0], P[1]));
-    for (let i = 0; i < P.length; i += 2) assert.equal(Math.sign(off(gl, P[i], P[i + 1])), s0, 'outline inside the two lobes');
-  }
-  // the seam crosses it: the default tile holds a piece at the seam and the glide image of the rest at its partner
-  const pieces = motifInTile(XX, d, m);
-  assert.equal(pieces.length, 2, 'two pieces');
-  const onEdge = (x, y) => d.edges.findIndex((e) => Math.abs(e.nx * x + e.ny * y - e.c) < 1e-6);
-  const ends = pieces.map((pl) => [onEdge(pl[0], pl[1]), onEdge(pl[pl.length - 2], pl[pl.length - 1])]);
-  assert.deepEqual(ends.map((e) => e[0]).sort((a, b) => a - b), [seam, d.edges[seam].partner].sort((a, b) => a - b), 'one piece on the seam, one on its partner');
-  for (const [a, b] of ends) assert.equal(a, b, 'each piece ends twice on one edge');
-  // its cover (19.5 % with today's lattice) and its distance to its copies are tested with every group's, above
 });
 
 test('a stale table: motifFor keeps the place and turn but shrinks the comma until its copies keep FILL_GAP; a missing entry falls back to the small comma', () => {

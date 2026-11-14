@@ -492,12 +492,24 @@ test('re-cut: NO PAPER PASSES THROUGH PAPER — the whole motion, every preset a
 
 test('re-cut: control — the detector finds the crossing in the fold modules\' own one-sheet motion of the same cuts', () => {
   // (what the re-cut is for: dev/recut/probe-direct.mjs prints these for every cut)
-  for (const [id, preset] of [['22x', 1], ['22x', 2], ['xx', 1]]) {
+  for (const [id, preset] of [['22x', 1], ['22x', 2]]) {
     const g = BY_ID[id], p = g.presets[preset], size = Math.sqrt(g.domainArea);
     const { fold } = build(g, { seed: p.seed, metric: p.metric, anchor: p.anchor || p.seed }, 0, { recut: false });
     assert.equal(!!fold.recut, false);
     const X = crossing(fold, size, 60);
     assert.ok(X.max > 0.2, `${id} ${p.name}, folded as one sheet: the sheet passes through itself along ${X.max.toFixed(3)} tile widths (the detector must see it)`);
+  }
+  // xx, the classic bottle (14 Nov 2026): the surface passes through itself only where the neck goes through the wall,
+  // which is where the lines half a glide from the anchor land. A cut dragged a quarter of the glide along the axes holds
+  // a band of paper beyond that line, and folded as one sheet the band goes through the wall, all the way round the
+  // neck. (The Hexagon preset holds only two thin gables beyond it, most of them within the rim the measure leaves
+  // out: 0.06 tile widths. It is re-cut all the same.)
+  {
+    const g = BY_ID.xx, p = g.presets[0], size = Math.sqrt(g.domainArea), A = Math.abs(g.reps[1].ty);
+    const { fold } = build(g, { seed: [p.seed[0], p.seed[1] + A / 4], anchor: p.seed }, 0, { recut: false });
+    assert.equal(!!fold.recut, false);
+    const X = crossing(fold, size, 60);
+    assert.ok(X.max > 0.2, `xx, the Rectangle moved a quarter of the glide along, folded as one sheet: the sheet passes through itself along ${X.max.toFixed(3)} tile widths (the detector must see it)`);
   }
   // and the two home tiles, folded as they are, cross nowhere: nothing to re-cut
   for (const id of IDS) {
@@ -505,7 +517,9 @@ test('re-cut: control — the detector finds the crossing in the fold modules\' 
     const { fold } = build(g, { seed: p.seed, metric: p.metric, anchor: p.anchor || p.seed }, 0);
     assert.equal(fold.recut.movers, 0, `${id} ${p.name}: no piece moves`);
     assert.equal(fold.recut.tau0, 0);
-    assert.equal(foldCaption(fold, 0.3), '', 'nothing to say');
+    // nothing to say about a re-cut; the Klein bottle names its three moves instead (test/bottle.test.js)
+    if (id === 'xx') assert.match(foldCaption(fold, 0.1), /folds over/); else assert.equal(foldCaption(fold, 0.3), '', 'nothing to say');
+    assert.equal(foldCaption(fold, 0), '');
     assert.ok(crossing(fold, size, 60).max < NONE, `${id} ${p.name}: the home tile folds with nothing passing through`);
   }
 });

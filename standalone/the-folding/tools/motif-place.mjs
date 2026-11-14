@@ -16,8 +16,9 @@
 // order, so the same inputs give the same file byte for byte.
 //
 // THE SEARCH (the fill judge's dev/fill-judge/tools/bigcomma.mjs, qa/fill-judge.md, ported; exact shares and the view
-// tie-break added by the fix-up of 10 Nov 2026, notes/fill.md). For every group except the seam groups (xx: src/motif.js
-// places its comma across the glide seam by rule), with sigma = FILL_STRETCH[id]:
+// tie-break added by the fix-up of 10 Nov 2026, notes/fill.md). For every group except the seam groups (src/motif.js
+// SEAM_GROUPS: a comma placed across a glide seam by rule; none since 14 Nov 2026, when xx's classic bottle put that
+// seam out of view), with sigma = FILL_STRETCH[id]:
 //   * the comma at centre (x, y), turned by `angle`, scaled by s across and s * sigma along its head -> tail axis, must
 //     stay FILL_GAP * sqrt(domainArea) away from every copy of itself under the group, outline to outline
 //     (commaApart in src/motif.js; while searching on the outline SEARCH_OUTLINE, a little coarser than the one drawn,
@@ -603,7 +604,7 @@ export function renderTable(table) {
     '// of the folded default tile it was seen on (null: a kaleidoscope); PLACEMENT_SOURCE = fnv1a of tools/motif-place.mjs.',
     '// The cross-cap (22x) holds still (tools/motif-place.mjs STILL): its comma lies where no preset\'s fold turns the sheet',
     '// over; stillFit = the largest s that does there, turn = how far (degrees) its sheet\'s normal turns at most.',
-    '// The seam groups (xx) are placed by rule in src/motif.js.',
+    '// The seam groups (src/motif.js SEAM_GROUPS; none today) are placed by rule in src/motif.js.',
     `export const PLACEMENT_SOURCE = '${fnv1a(src)}';`,
     'export const PLACEMENTS = {',
     ...Object.keys(table).map((id) => `  ${JSON.stringify(id)}: ${JSON.stringify(table[id])},`),

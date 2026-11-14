@@ -272,7 +272,8 @@ Conventions per group are in `src/groupdata/roll.js` (you own it; lattice sizes 
   c = x − w/2, φ = 2π(y − y0)/(b/2): final position (R + c·cos(φ/2))·(cos φ, sin φ) + ẑ·c·sin(φ/2) (ring in the horizontal
   plane), invariant under (c, φ) → (−c, φ + 2π). Bend with curvature 0 → final while the twist grows in proportion; stretch the
   length a little if needed so the band is not too fat (R ≥ 1.3 × half-width).
-- **klein (`xx`)**: translation e2 = (0, b), glide (x, y) → (x + a/2, −y). Stage 1: bend the y-direction into a
+- **klein (`xx`)** *(the figure-8 bottle: since 14 Nov 2026 no group uses it; xx folds into the classic bottle, §10.3)*:
+  translation e2 = (0, b), glide (x, y) → (x + a/2, −y). Stage 1: bend the y-direction into a
   **figure-8 cross-section** by a regular homotopy: take the arclength-parametrised figure-8 (lemniscate of Gerono scaled to
   length b, parameter origin at the crossing… any symmetric choice with γ(−s) = −γ(s)) with tangent angle ψ8(s); the curve at
   stage parameter u is γ_u(s) = ∫ (cos(uψ8), sin(uψ8)) ds — straight at u = 0, an S in between, the closed 8 at u = 1.
@@ -776,3 +777,53 @@ is under way.
     fold).
 - **Tools**: `dev/flip-under/tile-film.mjs` films the Tile step (frames of the plane pane over a range of u), as
   `tools/filmstrip.mjs` films the fold.
+
+### 10.3 14 Nov 2026 — xx closes into the classic Klein bottle
+
+The owner, looking at `#g=xx&t=1`: *"I expected to see a Klein bottle and only one surface; however, if I look through
+it, I see two surfaces, so this visualization is confusing to me."* The figure-8 bottle is one surface, but its two lobes
+read as two tori fused along a circle. `notes/bottle.md` has the reasons; the contracts:
+
+- **The fold.** The fold type `klein` is `src/folds/bottle.js` (`src/folds/index.js`); `src/folds/roll.js` keeps the
+  figure-8 fold and its tests, used by no group. The Fold has `type: 'klein'`, `stops` flat / folded over / tube in a
+  tube / Klein bottle (0, `TUNE.tF`, `TUNE.tR`, 1), `duration` 7, `times`, `schedule(t)` → `{ f, a, h }`, `stage(t)` →
+  `{ stage: 'flat' | 'flap' | 'roll' | 'hook' | 'closed', text }`, `doubleLine(t)`, `params` (radii, stretch, `wall`:
+  the closed body's axis and radius).
+- **The shape.** One tube: body, shoulder, neck, a hook to the side, in through the body's side wall, back to the axis
+  inside and down to the base, where the wall turns in (a round rim) and becomes that inner neck. Proportions in units
+  of b in `SHAPE`; `bottleShape(b, A)` solves the pieces so that the keel closes, and refuses a tile that does not fit.
+  With today's lattice: body radius 0.18, neck 0.085, the paper stretched 1.26 across on the body and squeezed to 0.59 on
+  the neck, 1.14 along.
+- **The default cut is the home, and it folds with no paper passing through paper.** The Rectangle's two glide-sewn
+  edges are the two sides of the curve where the neck goes through the wall: at t = 1 both rims lie ON the wall, point
+  for point (the rows near a rim are sheared along the neck onto the saddle), one from outside, one from inside.
+  `test/bottle.test.js` and `test/recut.test.js` measure it with the lab's detector (the rims within 0.03 tile sizes of
+  the outline left out, as for every re-cut: a rim that ends on a sheet touches it). Every other cut is re-cut into the
+  Rectangle first (§10), unchanged.
+- **The motion**, three moves, each a bend with growing curvature, overlapping by `TUNE.ov`:
+  1. *flap*: the end that becomes the inner neck folds up and over, about the line that becomes the base's rim. An
+     isometry; the rest of the sheet lies still.
+  2. *roll*: the sheet, doubled where the flap lies, rolls up about an axis that comes down from far above (a wedge of
+     a surface of revolution), into a tube with a tube inside it; the far part narrows into the neck. The translation
+     seam closes at `TUNE.tR` and stays closed. The stretch along the tube comes with this move.
+  3. *hook*: the neck curls round to the wall; inside, the inner neck leans over to the same place. The glide seam
+     closes at t = 1.
+  The closed shape rests on the plane, centred on the anchor, the hook toward +across; it shows the paper's back (as
+  the torus does: the sheet curls up, so the front is inside).
+- **Other cuts, folded as one sheet** (`recut: false`; tests and comparisons only): the tile is pulled back next to the
+  anchor by the nearest element of the group, rolled about its own middle (the closed tube then rolls over to the keel
+  line, at most half a turn about its core), rows beyond a rim follow the straight neck and are drawn over to the other
+  end of the tube as the rims close (they pass through the wall there). At t = 1 every plane point goes where the
+  anchor puts it (SPEC 7).
+- **Words over the fold pane.** `foldCaption` also speaks for a tile that needs no re-cut when its fold names its moves
+  (`moveCaption`: only this fold): one line per move, a short one for a phone, and at t = 1 "the two ends are sewn
+  through the wall (dashed)". A tile that is re-cut keeps the re-cut's words.
+- **The comma** (`src/motif.js`, `tools/motif-place.mjs`): `SEAM_GROUPS` is empty. The comma across xx's glide seam
+  would lie under the neck and inside the body (3 % of the default view); xx's comma now comes from the table like
+  every other strip's: as large as its cap allows (22 % of the tile), where the default view at t = 1 shows most of it
+  (on top of the body: front 56 %, seen 44 %). The seam rule stays in the file, unused.
+- **Bounds** (`test/folds.test.js`): `MAX_STEP.klein` 0.046 and `MAX_BEND.klein` 0.0029, set anew by that file's own
+  rule (the largest seen over dragged, wavy cuts, 0.031 and 0.0019, and half as much again). The default cut moves
+  0.022 and 0.0012 per 1/200; `test/bottle.test.js` holds it to 0.025 and 0.0014.
+- **Not changed**: xx's lattice (0.9 × 1.7), its presets, the print, the plane, the URL (`g=xx` links open the new
+  shape at the same t).

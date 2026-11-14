@@ -1,4 +1,7 @@
-// test/klein.test.js — xx (pg), the Klein bottle, made to show what the glide does: the judge's decision of 9 Nov 2026
+// test/klein.test.js — the FIGURE-8 Klein bottle of src/folds/roll.js. Since 14 Nov 2026 the app folds xx into the
+// classic bottle (src/folds/bottle.js, test/bottle.test.js) and no group uses this fold or the seam comma made for it;
+// both are kept, and this file keeps testing the fold through roll.js's own createFold. What follows is its history.
+// xx (pg), the Klein bottle, made to show what the glide does: the judge's decision of 9 Nov 2026
 // (qa/klein-judge.md, design A, "the seam-crossing comma"; notes/klein.md), kept through round 4 (notes/roll-round4.md)
 // and the big filled comma (qa/fill-judge.md, ported into src/motif.js):
 //   src/motif.js       SEAM_GROUPS: xx's comma straddles the tile's glide-sewn edge, so the tile holds a piece of it at
@@ -70,30 +73,19 @@ const dist3 = (u, w) => Math.hypot(u[0] - w[0], u[1] - w[1], u[2] - w[2]);
 // the comma across the seam (plane): what the fold relies on (test/motif.test.js tests the placement itself)
 // ---------------------------------------------------------------------------------------------------------------
 
-test('xx glyph: only xx straddles a seam; in the default tile one piece ends on the glide-sewn edge at +A/2 (the end of the tube that holds its 8) and the glide image of the rest on its partner at -A/2', () => {
-  assert.deepEqual([...SEAM_GROUPS], ['xx']);
-  for (const g of GROUPS) assert.equal(!!motifFor(g).seam, g.id === 'xx', g.id);
+test('xx glyph: no comma straddles a glide seam by rule any more (it did while xx closed into this figure 8); xx\'s comes from the table', () => {
+  // (the seam comma of designer A showed the half turn of the 8 joining its two pieces; on the classic bottle the app
+  // folds xx into since 14 Nov 2026, src/folds/bottle.js, that seam lies where the neck goes through the wall)
+  assert.equal(SEAM_GROUPS.size, 0);
+  for (const g of GROUPS) assert.equal(!!motifFor(g).seam, false, g.id);
   const m = motifFor(XX);
-  const { domain: d, fold } = build(CASES[0], 0), P = fold.params;
+  assert.equal(m.info.source, 'table');
+  // the default tile still holds the whole comma, in pieces that end on its boundary
+  const { domain: d } = build(CASES[0], 0);
   const pieces = motifInTile(XX, d, m);
-  assert.equal(pieces.length, 2, 'two pieces');
-  // which edge each piece ends on; the two edges are partners, sewn by an orientation-reversing element
+  assert.ok(pieces.length >= 1);
   const onEdge = (x, y) => d.edges.findIndex((e) => Math.abs(e.nx * x + e.ny * y - e.c) < 1e-6);
-  const ends = pieces.map((pl) => { const k = pl.length / 2; return [onEdge(pl[0], pl[1]), onEdge(pl[2 * k - 2], pl[2 * k - 1])]; });
-  for (const [a, b] of ends) { assert.ok(a >= 0 && a === b, 'each piece ends twice on one edge'); assert.ok(det(d.edges[a].g) < 0, 'that edge is sewn by a glide'); }
-  assert.equal(d.edges[ends[0][0]].partner, ends[1][0], 'the two pieces end on the two edges of one seam');
-  // the glide carries the end points of one piece onto those of the other
-  const e = d.edges[ends[0][0]], gi = inverse(e.g), q = [0, 0];
-  const A = pieces[0], B = pieces[1], kA = A.length / 2, kB = B.length / 2;
-  for (const i of [0, kA - 1]) {
-    apply(gi, A[2 * i], A[2 * i + 1], q);
-    const dmin = Math.min(Math.hypot(q[0] - B[0], q[1] - B[1]), Math.hypot(q[0] - B[2 * kB - 2], q[1] - B[2 * kB - 1]));
-    assert.ok(dmin < 1e-6 * SIZE, `an end point of one piece is glued to one of the other (${dmin})`);
-  }
-  // the comma's centre lies beyond the tile's +A/2 edge, along the fold's tube axis from the seed: the head (the part
-  // inside, at that edge) rides on the end that holds its 8, the rest (its glide image, at -A/2) on the end that turns
-  const along = (m.at[0] - P.center[0]) * P.axis[0] + (m.at[1] - P.center[1]) * P.axis[1];
-  assert.ok(along > P.glide / 2 && along < P.glide / 2 + m.radius, `the comma's centre is ${along} along the tube from the seed (A/2 = ${P.glide / 2})`);
+  if (pieces.length > 1) for (const pl of pieces) { const k = pl.length / 2; assert.ok(onEdge(pl[0], pl[1]) >= 0 && onEdge(pl[2 * k - 2], pl[2 * k - 1]) >= 0, 'a piece ends on the tile\'s boundary'); }
 });
 
 // ---------------------------------------------------------------------------------------------------------------

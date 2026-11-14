@@ -54,7 +54,10 @@
   turn-hint        p                  "drag to turn" (styled like #hint). APP: turnHint.hidden = true after the
                                       person's first rotation of the 3D view; never shown again in the session
   fold-caption     p                  (13 Nov 2026) what a fold that re-cuts first is doing ("re-cut, piece 1 of 2: a
-                                      glide …"); APP: textContent, hidden when it has nothing to say. Foot of the pane
+                                      glide …"), or (14 Nov 2026) the move a fold that names its moves is making (xx:
+                                      "one end folds over …"; APP sets #app[data-words] for such a fold, and small 3D
+                                      panes then keep a strip for the words, as for a re-cut); APP: textContent,
+                                      hidden when it has nothing to say. Foot of the pane
   fold-controls    div                Fold button, scrubber, reset view
   fold-btn         button             TIMELINE (createTimeline button): text of its [data-label] child = Fold / Pause / Unfold
   scrubber         input range        TIMELINE (createTimeline slider). Its wrapper #scrub[data-scrub] gets --p and

@@ -24,7 +24,7 @@ through paper. The lab that tried the looks and motions for 22× is in `lab22x/`
 | `test/` | node:test suite |
 | `tools/` | `shot.mjs`, `filmstrip.mjs`, `qa-matrix.mjs` (headless Chrome), `motif-place.mjs` (comma placement table), `test-all.mjs` (runs the suite on a lab box or the mini), `browser.mjs` + `remote/` (Chrome pool on the mini) |
 | `SPEC.md` | the design contract the build followed, round by round |
-| `notes/`, `qa/*.md` | development log and the design decisions (Klein bottle, filling the orbifold, review triage) |
+| `notes/`, `qa/*.md` | development log and the design decisions (Klein bottle: `notes/bottle.md` for the classic bottle of 14 Nov 2026; filling the orbifold; review triage) |
 | `dev/` | demo pages used by the tools; `dev/recut/` the probes of the 13 Nov round (self-crossing of a motion, the prints found, a real-browser check) |
 | `lab22x/` | the 22× lab: several looks and motions of the cross-cap side by side (its own page, `lab22x/dist/index.html` as deployed) |
 

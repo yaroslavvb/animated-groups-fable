@@ -259,7 +259,8 @@ body {
    stay clear of it: over all 17 groups at t = 0, 0.5 and 1, at 375x498, 390x780, 667x375 and 1280x720, the corner
    pill lies over no part of the shape and no label (dev/uil3-look.mjs); centred on an edge it touched 10 of 204. */
 .turn-hint { left: 6px; top: 6px; bottom: auto; transform: none; max-width: calc(100% - 12px); padding: 1px 7px 2px; }
-/* What a fold that re-cuts first is doing (13 Nov 2026): at the foot of the 3D pane, in ink. */
+/* What a fold that re-cuts first is doing (13 Nov 2026), or what move a fold that names its moves is making (the
+   Klein bottle, 14 Nov 2026): at the foot of the 3D pane, in ink. */
 .fold-caption { bottom: 6px; color: var(--ink); }
 /* On a small 3D pane (a phone: 183 px high at 375 x 498) the words get a strip of their own at the foot of the pane,
    and the picture ends above it: over the picture they covered the lower end of a tall tile (the xx tile fills the
@@ -269,6 +270,9 @@ body {
 @container fold (max-height: 449px) or (max-width: 449px) {
   .app[data-features~="recut"] .pane-fold > canvas { height: calc(100% - 26px); }
   .app[data-features~="recut"] .pane-fold > .labels { bottom: 26px; }
+  /* (14 Nov 2026) the same strip for a fold that names its own moves, #app[data-words]: the Klein bottle's default cut */
+  .app[data-words] .pane-fold > canvas { height: calc(100% - 26px); }
+  .app[data-words] .pane-fold > .labels { bottom: 26px; }
   .fold-caption { bottom: 2px; max-width: calc(100% - 8px); padding: 1px 6px 2px; border-color: transparent; background: none; }
 }
 /* The kaleidoscopes have nothing to cut: no hint over their plane (contract C1; src/app.js hides it too). */
@@ -284,6 +288,8 @@ body {
     /* (the strip of a re-cut's words, as @container fold above) */
     .app[data-features~="recut"] .pane-fold > canvas { height: calc(100% - 26px); }
     .app[data-features~="recut"] .pane-fold > .labels { bottom: 26px; }
+    .app[data-words] .pane-fold > canvas { height: calc(100% - 26px); }
+    .app[data-words] .pane-fold > .labels { bottom: 26px; }
     .pane-fold > .fold-caption { bottom: 2px; max-width: calc(100% - 8px); padding: 1px 6px 2px; border-color: transparent; background: none; }
   }
 }

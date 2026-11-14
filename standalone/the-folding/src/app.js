@@ -389,12 +389,38 @@ export function printStyle(fold, t = 1) {
  */
 export function foldCaption(fold, t, short = false) {
   const R = fold && fold.recut;
-  if (!R || !(R.movers > 0) || typeof fold.stage !== 'function') return '';
+  if (!R || !(R.movers > 0) || typeof fold.stage !== 'function') return moveCaption(fold, t, short);
   const st = fold.stage(clamp01(t)), name = R.home.name;
   if (st.stage === 'flat') return short ? `re-cut into the ${name} first` : `Fold re-cuts the tile into the ${name} (dotted) first`;
   if (st.stage === 'recut') return short ? `re-cut ${st.piece}/${st.of}: ${st.text.replace(/^a /, '').replace(/(:| about ).*$/, '')}` : `re-cut, piece ${st.piece} of ${st.of}: ${st.text}`;
   if (st.stage === 'fold') return short ? `${name} folds: nothing passes through` : `the ${name} folds: its cut runs along the double line, so no paper passes through paper`;
   return '';
+}
+
+/**
+ * The words for a fold that is made of several different moves and names them (fold.stage(t) -> { stage, text }: the
+ * Klein bottle of src/folds/bottle.js, three moves; 14 Nov 2026, the owner found its closed shape confusing), for a
+ * tile that needs no re-cut. '' on the flat tile and for every other fold. `short`: a phone's line (as foldCaption).
+ */
+const MOVE_WORDS = {
+  flap: ['one end folds over: it will be the neck inside', 'one end folds over'],
+  roll: ['the doubled sheet rolls up: a tube inside a tube', 'rolls up: a tube in a tube'],
+  hook: ['the neck hooks round to its other end, behind the wall', 'the neck hooks round to the wall'],
+  closed: ['the two ends are sewn through the wall (dashed)', 'sewn through the wall'],
+};
+/** The fold that names its moves (the tile's own, or the home fold of a tile with nothing to re-cut), or null. */
+function speakingFold(fold) {
+  if (!fold || (fold.recut && fold.recut.movers > 0)) return null;
+  const f = fold.homeFold || fold;
+  return f.type === 'klein' && typeof f.stage === 'function' && f.times ? f : null;
+}
+/** Does this fold have words of its own while it folds (so the page keeps a strip for them under a small 3D pane)? */
+export function foldSpeaks(fold) { return !!speakingFold(fold); }
+function moveCaption(fold, t, short) {
+  const f = speakingFold(fold);
+  if (!f) return '';
+  const st = f.stage(clamp01(t)), w = st && MOVE_WORDS[st.stage];
+  return w ? w[short ? 1 : 0] : '';
 }
 
 // ---- one label per point of the orbifold ----------------------------------------------------------------------
@@ -739,8 +765,8 @@ export function sceneLines(scene, k = 1) {
   // far edge) must not turn a side grey for a moment (finding 5; notes/snowflake-round3.md)
   const mx = scene.group.fold === 'snowflake' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
   for (const e of scene.edges) if (e.mirror) lines.push({ points: e.out, color: e.color, width: WIDTHS.edge * k, xray: mx });
-  // the cross-cap's double line (it is what tells a cross-cap from a pillow) and the Klein bottle's glide axes, which
-  // become its double circle
+  // the cross-cap's double line (it is what tells a cross-cap from a pillow) and the Klein bottle's two rims, which
+  // become the curve where its neck goes through its wall
   for (const p of scene.axis) lines.push({ points: p, color: INK_RGB, width: WIDTHS.axis * thin, dashed: true, xray: 0.7 });
   return lines;
 }
@@ -1173,14 +1199,18 @@ function start(doc, win) {
     // the replication's bar and words take the hint's place while they show
     el.hint.hidden = h.hidden || !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
   }
-  /** #app[data-features]: the group's (SPEC 8 C1), and `recut` while the tile on screen is re-cut first. */
+  /** #app[data-features]: the group's (SPEC 8 C1), and `recut` while the tile on screen is re-cut first; #app[data-words]. */
   function syncFeatures() {
     const group = BY_ID[state.groupId];
     if (!group) return;
     const f = groupFeatures(group);
-    if (scene && scene.group === group && planeRecut(scene)) f.push('recut');
+    const own = !!scene && scene.group === group;
+    if (own && planeRecut(scene)) f.push('recut');
     const v = f.join(' ');
     if (el.app.getAttribute('data-features') !== v) el.app.setAttribute('data-features', v);
+    // #app[data-words]: the fold on screen names its moves (the Klein bottle's default cut): the same strip as a re-cut's
+    const speaks = own && !f.includes('recut') && foldSpeaks(scene.fold);
+    if (el.app.hasAttribute('data-words') !== speaks) el.app.toggleAttribute('data-words', speaks);
   }
   /** The selector shows the pattern; #app[data-pattern] names it (the legend and the swatch read it). */
   function syncPattern() {

@@ -49,15 +49,23 @@ const PARTS = 32;      // the watched steps are cut into this many parts for the
 //   cross-cap          0.047                     0.0057       its flap takes 0.36 of the time; round 3's timing
 //   torus              0.037                     0.0023       (the long tile of the cut "Slanted")
 //   cylinder           0.0077                    0.000095
-//   klein              0.018                     0.0011       round 4's design (the 8 lies down, the ring spins)
+//   klein              0.031                     0.0019       the classic bottle of 14 Nov 2026 (src/folds/bottle.js): three
+//                                                             moves in the time of two. These are a dragged, wavy cut's
+//                                                             (rows beyond a rim are drawn over to the other end of the
+//                                                             tube); the default cut, which is all the app shows of this
+//                                                             fold (every other cut is re-cut into it), moves 0.022 and
+//                                                             0.0012 (test/bottle.test.js holds it to 0.025 and 0.0014).
+//                                                             The figure-8 bottle of round 4 (folds/roll.js, used by no
+//                                                             group now) had 0.018 and 0.0011 under 0.025 and 0.0012
 //   mobius             0.012                     0.00019
 //   snowflake          0.16                      0.013        the patch is the star of 2n tiles, and its far corner
 //                                                             swings through half a turn in a quarter of the time
-// The cross-cap's and the Klein bottle's second differences now sit 5 % and 8 % under their bounds (v1's maxima were
-// 0.0038 and 0.00070): rounds 3 and 4 redesigned those motions and the bounds were kept, not raised. Their maxima do not
-// grow with more seeds, so the margin is a fixed case's, not luck's; a change to either motion has no room left here.
-const MAX_STEP = { hinge: 0.05, crosscap: 0.08, torus: 0.065, cylinder: 0.015, mobius: 0.02, klein: 0.025, snowflake: 0.24 };
-const MAX_BEND = { hinge: 0.0016, crosscap: 0.006, torus: 0.0045, cylinder: 0.0003, mobius: 0.0005, klein: 0.0012, snowflake: 0.02 };
+// The cross-cap's second differences sit 5 % under their bound (v1's maximum was 0.0038): round 3 redesigned that motion
+// and the bound was kept, not raised. Its maximum does not grow with more seeds, so the margin is a fixed case's, not
+// luck's; a change to that motion has no room left here. The Klein bottle's bounds were set anew on 14 Nov 2026, by the
+// rule above (the largest seen and half as much again), when the classic bottle replaced the figure 8.
+const MAX_STEP = { hinge: 0.05, crosscap: 0.08, torus: 0.065, cylinder: 0.015, mobius: 0.02, klein: 0.046, snowflake: 0.24 };
+const MAX_BEND = { hinge: 0.0016, crosscap: 0.006, torus: 0.0045, cylinder: 0.0003, mobius: 0.0005, klein: 0.0029, snowflake: 0.02 };
 // "Toward +z": how high the motion must rise above the plane of the tile, as a multiple of how far it dips below it.
 // The hinge folds puff their fixed sheet downward (the -z side is the outside of the pillow) and rise 1.8 times as
 // far or more; the rolls and the snowflake hardly go below the plane at all. The cross-cap is the exception that

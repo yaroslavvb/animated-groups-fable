@@ -32,7 +32,7 @@
 //     view at t = 1 shows most (the fix-up of 10 Nov 2026: before, the grid's first tie was kept, and whether the
 //     comma then lay on the near face or the far one was luck). Found by an offline search: tools/motif-place.mjs
 //     writes the table groupdata/motif.js (centre, turn, scale per group);
-//   * xx keeps its seam comma (SEAM_GROUPS, the Klein bottle story, below), two lobes wide;
+//   * (until 14 Nov 2026 xx kept a seam comma, SEAM_GROUPS, below; on the classic bottle it comes from the table);
 //   * in 3D the comma is FILLED, for every fold (motifTintMesh: tint bit 1, the renderer's `fill` colour); its outline
 //     stays. The plane draws the copies filled in soft ink (plane.js).
 //
@@ -46,8 +46,12 @@
 // nothing to correct (the comma is right, only perhaps less in view). A group missing from the table gets the old
 // small comma (`place`).
 //
-// The seam comma (xx; designer A of the Klein bottle work, 9 Nov 2026, widened by the fill judge). For the groups in
-// SEAM_GROUPS the glyph does not sit inside the default tile: it sits ACROSS the tile's seam that a glide sews (a cut
+// The seam comma. NO GROUP USES IT since 14 Nov 2026: it was made for xx's figure-8 bottle (designer A of the Klein
+// bottle work, 9 Nov 2026, widened by the fill judge), where the glide seam closed in view. On the classic bottle
+// (src/folds/bottle.js) that seam is where the neck goes through the wall, and a comma across it lies under the neck and
+// inside the body (3 % of the default view), so xx's comma is placed by the table like every other group's: as large
+// as its copies allow, where the default view shows most of it. The rule is kept for a group that would want it. For
+// the groups in SEAM_GROUPS the glyph does not sit inside the default tile: it sits ACROSS the tile's seam that a glide sews (a cut
 // edge glued by an orientation-reversing element). The tile then holds one piece of it at that edge and, at the
 // partner edge, the glide-reflected rest: part of a comma here, its mirror image's other part over there. Folded, the
 // two pieces join into one comma only after the sheet has been turned over (xx: the figure 8 makes half a turn round
@@ -95,8 +99,8 @@ export const K_CLEAR = 0.68;
 export const K_GLIDE = 1;
 /** Glyph tilt (radians): generic with respect to the mirror directions of all 17 groups (multiples of 30 and 45 degrees). */
 export const TILT = -0.33;
-/** Groups whose glyph straddles the glide seam of the default tile. */
-export const SEAM_GROUPS = new Set(['xx']);
+/** Groups whose glyph straddles the glide seam of the default tile: none since 14 Nov 2026 (it was xx; see the top). */
+export const SEAM_GROUPS = new Set();
 /** The glyph spans at most this fraction of the room between the two glide axes on either side of it. */
 export const K_SEAM_GLIDE = 0.78;
 /** Largest bounding radius of a one-lobe seam glyph, in units of group.viewHalf: the cap of every v1 glyph. */

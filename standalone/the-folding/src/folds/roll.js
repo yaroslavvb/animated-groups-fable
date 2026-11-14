@@ -1,6 +1,9 @@
 // folds/roll.js — the four folds that roll, bend and twist the tile shut instead of folding it flat (SPEC 5.3, 5.5, 7):
 //   'torus' (o)   'cylinder' (**)   'mobius' (*x)   'klein' (xx)
 // One module; the default export dispatches on group.fold.
+// (14 Nov 2026: the app folds xx into the classic bottle, src/folds/bottle.js, chosen by src/folds/index.js. The klein
+// fold here, the figure-8 bottle, is kept with its tests and used by no group; this module's own createFold still
+// gives it for a group whose fold is 'klein'.)
 //
 // Every map here is "bend with growing curvature". Three building blocks, each analytic in its parameters and equal
 // to the flat plane when they are 0 (sinc-type functions carry the limit, there is no division by a curvature):

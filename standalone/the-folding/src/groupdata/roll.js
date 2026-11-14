@@ -1,5 +1,6 @@
 // groupdata/roll.js — the four groups whose tile is rolled, bent or twisted shut rather than folded flat:
-// o (torus), ** (annulus, shown as a tube), *x (Moebius band), xx (Klein bottle, figure-8 immersion).
+// o (torus), ** (annulus, shown as a tube), *x (Moebius band), xx (Klein bottle: the classic bottle since 14 Nov 2026,
+// src/folds/bottle.js; what is said of xx's figure 8 below describes the fold it had before, still in src/folds/roll.js).
 // OWNER: the roll-fold agent. The lattice sizes set the 3D proportions; the orientation of each group in the plane
 // sets what the default 3D view (from the -y side, 55 degrees up) shows.
 //

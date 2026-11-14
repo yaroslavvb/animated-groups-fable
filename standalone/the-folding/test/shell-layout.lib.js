@@ -207,8 +207,21 @@ export async function sweep(page, cases) {
       await page.evaluate(() => { const F = window.__folding; F.setT(0); F.setPreset(0); });
       await page.waitForTimeout(60);
       if (await page.evaluate(() => { const c = document.querySelector('#fold-caption'); return !!c && !c.hidden && getComputedStyle(c).display !== 'none'; })) failures.push(`${s.name} ${id}: the home tile shows a re-cut's words`);
-      // the home tile has no strip: its picture fills the pane
-      if (await page.evaluate(() => { const c = document.querySelector('#fold-canvas').getBoundingClientRect(), p = document.querySelector('#pane-fold').getBoundingClientRect(); return p.bottom - c.bottom > 2; })) failures.push(`${s.name} ${id}: the home tile's picture does not fill its pane`);
+      const stripOf = () => { const c = document.querySelector('#fold-canvas').getBoundingClientRect(), p = document.querySelector('#pane-fold').getBoundingClientRect(); return p.bottom - c.bottom; };
+      if (id === 'xx') {
+        // (14 Nov 2026) the Klein bottle's default cut names its three moves, and what the closed shape shows: the
+        // same words' place and strip as a re-cut's, also on the flat tile and at t = 1 (the picture keeps its size)
+        const flat = await page.evaluate(boxOf);
+        for (const [t, want] of [[0.1, '^one end folds over'], [0.45, '^(the doubled sheet )?rolls up: a tube in'], [0.8, '^the neck hooks round to'], [1, '^(the two ends are )?sewn through the wall']]) {
+          await page.evaluate((t) => window.__folding.setT(t), t);
+          await page.waitForTimeout(60);
+          for (const b of await page.evaluate(WORDS, want)) failures.push(`${s.name} ${id} home, t = ${(+t).toFixed(2)}: ${b}`);
+          const now = await page.evaluate(boxOf);
+          if (now !== flat) failures.push(`${s.name} ${id} home: the picture is ${flat} on the flat tile and ${now} at t = ${t}`);
+        }
+        await page.evaluate(() => window.__folding.setT(0));
+        await page.waitForTimeout(60);
+      } else if (await page.evaluate(stripOf) > 2) failures.push(`${s.name} ${id}: the home tile's picture does not fill the pane`);
     }
   }
   return { failures, foldAt375 };

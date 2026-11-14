@@ -36,10 +36,10 @@ import { freeDirections } from '../tools/motif-place.mjs';
  *  a comma on the far side or underneath (8 to 18 % seen, 0 to 8 % front, among the tool's ties) and below the least
  *  of today's (*x 29 %, 3*3 28 %). Regenerating the table fixes a failure here. */
 const SEEN_MIN = 0.22, FRONT_MIN = 0.2;
-/** ... and for the shapes whose comma is not placed by the view: xx (by rule, across its glide seam; its two-lobe
- *  comma wraps the tube: 18 to 26 % front, 21 to 25 % seen from every azimuth, dev/fill-fix/az-sweep.mjs, so a new
- *  spin of the bottle cannot take it out of view) and the kaleidoscopes (folded, every layer's comma lies on the
- *  tile's: 26 to 29 %). Lower, so a fold that turns these shapes does not trip them; still far above an empty shell. */
+/** ... and for the shapes whose comma is not placed by the view: the kaleidoscopes (folded, every layer's comma lies
+ *  on the tile's: 26 to 29 %). Lower, so a fold that turns these shapes does not trip them; still far above an empty
+ *  shell. (Until 14 Nov 2026 xx was one of them: its comma lay across its glide seam by rule. On the classic bottle it
+ *  is placed by the view like the others, on top of the body: front 56 %, seen 44 %.) */
 const SEEN_MIN_FIXED = 0.17, FRONT_MIN_FIXED = 0.14;
 const PANES = { laptop: [622, 550], phone: [364, 356] };
 const LAYERS = 4;
@@ -97,7 +97,7 @@ function appScene(g) {
   return scene;
 }
 
-test('the comma in view: at t = 1, in the default view, on the laptop and the phone, every shape shows its comma (front >= 20 %, seen >= 22 %; xx and the kaleidoscopes 14 %, 17 %) — the cross-cap included', (t) => {
+test('the comma in view: at t = 1, in the default view, on the laptop and the phone, every shape shows its comma (front >= 20 %, seen >= 22 %; the kaleidoscopes 14 %, 17 %) — the cross-cap and the Klein bottle included', (t) => {
   const rows = [];
   for (const g of GROUPS) {
     const scene = appScene(g);
@@ -119,7 +119,7 @@ test('the comma in view: at t = 1, in the default view, on the laptop and the ph
 test('the comma in view: the table\'s `seen` is what the app draws (the tool measured the default view right, and on today\'s folds)', () => {
   for (const g of GROUPS) {
     const e = PLACEMENTS[g.id];
-    if (!e || e.view === null) continue;                      // xx: placed by rule; the kaleidoscopes: no view term
+    if (!e || e.view === null) continue;                      // the kaleidoscopes: no view term
     const r = commaInView(appScene(g), PANES.laptop);
     assert.ok(Math.abs(r.seen - e.seen) <= 0.02, `${g.id}: the table says ${(100 * e.seen).toFixed(1)} % seen, the drawn scene ${(100 * r.seen).toFixed(1)} % — run node tools/motif-place.mjs`);
   }
