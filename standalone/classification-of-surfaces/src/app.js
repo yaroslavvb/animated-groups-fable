@@ -66,6 +66,8 @@ $('tabs').addEventListener('keydown', (e) => {
 });
 
 $('reset-view').addEventListener('click', () => stage.R.resetView());
+// "Next" under each tab: the chapter's order
+for (const a of document.querySelectorAll('[data-go]')) a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.go, a.dataset.k ? { k: a.dataset.k } : undefined); window.scrollTo({ top: 0 }); });
 $('view').addEventListener('pointerdown', () => { turnHint.hidden = true; }, { once: true });
 
 // ---- the hash: #<tab>&k=<state>

@@ -77,7 +77,13 @@ a { color: var(--accent); text-underline-offset: 2px; }
   position: relative; width: 100%; aspect-ratio: 4 / 3; max-height: 68vh; min-height: 280px;
   border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); overflow: hidden;
 }
-@media (max-width: 859px) { .pane { aspect-ratio: 1 / 1; max-height: 58vh; } }
+@media (max-width: 859px) {
+  .pane { aspect-ratio: 1 / 1; max-height: 58vh; }
+  /* on a phone the line that says what just happened stays under the stage, above the controls (tabs 2 and 3) */
+  .pane { order: 1; } .side { order: 2; } .playbar { order: 3; } .caption { order: 4; }
+  .app[data-tab="tidy"] .caption, .app[data-tab="prove"] .caption { order: 2; min-height: 0; }
+  .app[data-tab="tidy"] .side, .app[data-tab="prove"] .side { order: 3; }
+}
 .pane > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; outline-offset: -3px; border-radius: 7px; }
 .labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; -webkit-user-select: none; user-select: none; font-size: 13px; line-height: 1; font-weight: 600; color: var(--ink); text-shadow: 0 0 2px var(--ground), 0 0 2px var(--ground), 0 0 3px var(--ground); }
 .labels > * { position: absolute; left: 0; top: 0; white-space: nowrap; }
@@ -86,6 +92,8 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .badge:empty { display: none; }
 .badge-sym { font-size: 30px; line-height: 1.1; }
 .badge-name { font-size: 14px; color: var(--muted); font-weight: 600; }
+.badge-line { display: flex; flex-direction: column; gap: 2px; }
+.badge-sym:empty { display: none; }
 
 /* the symbol: MathJax glyphs, a little air between them */
 .sym { display: inline-flex; align-items: center; gap: 0.12em; white-space: nowrap; }
@@ -174,6 +182,11 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .fold > summary::before { content: ""; width: 7px; height: 7px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(-45deg); transition: transform 0.15s; }
 .fold[open] > summary::before { transform: rotate(45deg); }
 .fold p { margin: 0 0 10px; font-size: 15px; }
+.argument { margin: 0 0 10px; padding-left: 1.3em; display: grid; gap: 6px; font-size: 15px; }
+.caption a[data-go], .argument a[data-go] { font-weight: 600; white-space: nowrap; }
+.next { margin: 14px 0 0; }
+.next a { display: inline-flex; align-items: center; min-height: var(--tap); font-weight: 600; text-decoration: none; }
+.next a::after { content: ""; width: 7px; height: 7px; margin-left: 8px; border-right: 2px solid currentColor; border-top: 2px solid currentColor; transform: rotate(45deg); }
 
 /* book citations: the words on hover or first tap, the page on click */
 .bk { white-space: nowrap; font-size: 0.86em; font-weight: 600; color: var(--muted); text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; }

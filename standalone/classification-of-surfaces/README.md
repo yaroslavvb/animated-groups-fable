@@ -72,4 +72,9 @@ that step is a cut, not a motion ("we can just push the holes around", p. 96).
 - `node tools/check_quotes.mjs`: 33 citations, each at most 15 words and on its page.
 - Looked at in headless Chrome at 1280 and 390 px wide, light and dark, with reduced motion; a real tap on an arrow,
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
-  Not tried on a real phone or in Safari.
+  And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.
+  Not tried on a real phone.
+- A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
+  symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied
+  (which way the arrows run is now always said "round the rim"; the trade of a cross-handle for two crosscaps links
+  to Figure 8.10 in tab 3; the pinwheel is explained; the symbol is worked out from the three numbers).

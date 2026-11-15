@@ -59,7 +59,7 @@
         <!-- 1 Zippers -->
         <div class="panel" data-tab-only="zip">
           <table class="grid2" role="presentation">
-            <thead><tr><td></td><th scope="col">arrows<br>opposite</th><th scope="col">arrows<br>the same</th></tr></thead>
+            <thead><tr><td></td><th scope="col">arrows run<br>opposite ways<br>round the rim</th><th scope="col">arrows run<br>the same way<br>round the rim</th></tr></thead>
             <tbody>
               <tr><th scope="row">one<br>hole</th>
                 <td><button type="button" class="pick" data-kind="cap" aria-pressed="true"><span class="pick-n">Cap</span><span class="pick-s">nothing</span></button></td>
@@ -74,14 +74,14 @@
         <!-- 2 Tidy surfaces -->
         <div class="panel" data-tab-only="tidy">
           <div class="steppers" id="steppers">
-            <div class="stepper" data-f="star"><span class="st-sym">\(\ast\)</span><span class="st-name">holes <small>\(\chi - 1\)</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one hole fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more hole">+</button></div>
-            <div class="stepper" data-f="o"><span class="st-sym">\(\circ\)</span><span class="st-name">handles <small>\(\chi - 2\)</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more handle">+</button></div>
-            <div class="stepper" data-f="x"><span class="st-sym">\(\times\)</span><span class="st-name">crosscaps <small>\(\chi - 1\)</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one crosscap fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more crosscap">+</button></div>
-            <div class="stepper" data-f="X"><span class="st-sym">\(\otimes\)</span><span class="st-name">cross-handles <small>\(\chi - 2\)</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one cross-handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more cross-handle">+</button></div>
+            <div class="stepper" data-f="star"><span class="st-sym">\(\ast\)</span><span class="st-name">holes <small>each lowers \(\chi\) by 1</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one hole fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more hole">+</button></div>
+            <div class="stepper" data-f="o"><span class="st-sym">\(\circ\)</span><span class="st-name">handles <small>by 2</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more handle">+</button></div>
+            <div class="stepper" data-f="x"><span class="st-sym">\(\times\)</span><span class="st-name">crosscaps <small>by 1</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one crosscap fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more crosscap">+</button></div>
+            <div class="stepper" data-f="X"><span class="st-sym">\(\otimes\)</span><span class="st-name">cross-handles <small>by 2</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one cross-handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more cross-handle">+</button></div>
           </div>
           <div class="trades" id="trades">
             <button type="button" class="chip" id="trade-X" hidden>Trade \(\otimes \to \times\times\)</button>
-            <button type="button" class="chip" id="trade-o" hidden>Walk a hole through the crosscap</button>
+            <button type="button" class="chip" id="trade-o" hidden>Walk one end of the handle through the crosscap</button>
           </div>
           <dl class="facts" id="facts">
             <div><dt>Euler characteristic</dt><dd id="fact-chi"></dd></div>
@@ -97,7 +97,7 @@
         <!-- 3 Zip it up -->
         <div class="panel" data-tab-only="prove">
           <div class="chips" id="prove-presets" role="group" aria-label="What to zip"></div>
-          <p class="side-k" id="prove-zips-k">Zip a pair: tap an arrow, or one of these</p>
+          <p class="side-k" id="prove-zips-k">The pairs left to zip</p>
           <div class="chips" id="prove-zips" role="group" aria-labelledby="prove-zips-k"></div>
           <div class="row">
             <button type="button" class="chip" id="prove-undo" disabled>Unzip the last</button>
@@ -135,27 +135,31 @@
       </div>
 
       <div class="caption" id="caption" aria-live="polite">
-        <p data-when="zip:cap">The two halves of the rim are mirror images, so the hole just closes. A cap adds nothing. <a class="bk" data-p="94" data-q="zipping this up just seals the hole, so we can ignore it">p. 94</a></p>
-        <p data-when="zip:crosscap">Each rim point is glued to the one opposite. The sheet has to pass through itself. <a class="bk" data-p="94" data-q="letting the surface cross itself along a line">p. 94</a></p>
-        <p data-when="zip:handle">Two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
-        <p data-when="zip:crosshandle">One tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
+        <p data-when="zip:cap">One arrow runs clockwise round the rim, its mate counter-clockwise: the two halves are mirror images, so the hole just closes. A cap adds nothing. <a class="bk" data-p="94" data-q="zipping this up just seals the hole, so we can ignore it">p. 94</a></p>
+        <p data-when="zip:crosscap">Both arrows run the same way round, so each rim point is glued to the one opposite. The sheet has to pass through itself, and through that line you come out on its back: one side. <a class="bk" data-p="94" data-q="letting the surface cross itself along a line">p. 94</a></p>
+        <p data-when="zip:handle">One rim is zipped clockwise, the other counter-clockwise: two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
+        <p data-when="zip:crosshandle">Both rims are zipped the same way round: one tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
         <p data-when="prove:any" id="prove-cap"></p>
-        <p data-when="tidy:any">Add pieces with the + buttons. Where a piece sits does not matter: push it anywhere and it is the same surface. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
-        <p data-when="tidy:X">A cross-handle is two crosscaps: \(\otimes = \times\times\). <a class="bk" data-p="101" data-q="a cross-handle may be replaced by two cross-caps">p. 101</a></p>
-        <p data-when="tidy:ox">Beside a crosscap a handle is a cross-handle: take one of its holes for a walk through the crosscap and it comes back reversed. So \(\circ\times = \otimes\times = \times\times\times\). <a class="bk" data-p="102" data-q="so that it returns with the reversed orientation">p. 102</a></p>
-        <p data-when="tidy:done">Nothing left to trade: every surface is \(\circ^{a}\ast^{b}\) or \(\ast^{b}\times^{c}\). <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></p>
+        <p data-when="tidy:any">Press + to add a hole, a handle, a crosscap or a cross-handle. Where each sits does not matter. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
+        <p data-when="tidy:X">A cross-handle is two crosscaps, \(\otimes = \times\times\): one square zips up to either. <a href="#prove&amp;k=fig810" data-go="prove" data-k="fig810">Zip it both ways</a> <a class="bk" data-p="101" data-q="a cross-handle may be replaced by two cross-caps">p. 101</a></p>
+        <p data-when="tidy:ox">Next to a crosscap a handle can be made a cross-handle: unzip it, walk one of its two holes through the crosscap, and that hole’s arrow comes back reversed. So \(\circ\times = \otimes\times = \times\times\times\). <a class="bk" data-p="102" data-q="so that it returns with the reversed orientation">p. 102</a></p>
+        <p data-when="tidy:done">Nothing to trade. Trading always ends at handles and holes, \(\circ\cdots\circ\,\ast\cdots\ast\), or at holes and crosscaps, \(\ast\cdots\ast\,\times\cdots\times\). <a href="#prove" data-go="prove">Tab 3</a> shows that every surface is tidy to begin with. <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></p>
       </div>
 
     </div>
 
     <details class="fold" data-tab-only="zip">
       <summary>Why only four</summary>
-      <p>A zipper pairs two arrows. They sit on one rim or on two, and they run opposite ways round or the same way. That is two choices twice. The colours show the paper's two sides: where teal meets sand along a seam, the surface has become one-sided.</p>
+      <p>A zipper pairs two arrows. They sit on one rim or on two. Go once round the rim: one arrow points with you and its mate against you, or both point with you. That is two choices twice.</p>
+    </details>
+    <details class="fold" data-tab-only="zip">
+      <summary>The two colours</summary>
+      <p>Teal is the front of the paper, sand its back. On a one-sided surface you can get from teal to sand without crossing an edge: through a crosscap's line, or along a cross-handle past its seam.</p>
     </details>
     <details class="fold" data-tab-only="tidy">
       <summary>The three numbers</summary>
       <p>Draw any map on a surface: its Euler characteristic \(\chi\) is vertices minus edges plus faces, whatever the map. A sphere has \(\chi = 2\). A hole or a crosscap lowers \(\chi\) by 1, a handle or a cross-handle by 2: \(\chi = 2 - 2a - b - c - 2d\) for \(a\) handles, \(b\) holes, \(c\) crosscaps, \(d\) cross-handles. <a class="bk" data-p="103" data-q="adding a handle (◦) decreases the Euler characteristic by 2">p. 103</a></p>
-      <p>After the trades, \(\circ^{a}\ast^{b}\) is two-sided with \(\chi = 2 - 2a - b\), and \(\ast^{b}\times^{c}\) is one-sided with \(\chi = 2 - b - c\). Two different symbols differ in sides, boundaries or \(\chi\), so they are different surfaces. <a class="bk" data-p="102" data-q="all these surfaces are topologically distinct">p. 102</a></p>
+      <p>After the trades, \(\circ^{a}\ast^{b}\) is two-sided with \(\chi = 2 - 2a - b\), and \(\ast^{b}\times^{c}\) with at least one crosscap is one-sided with \(\chi = 2 - b - c\). Two different symbols differ in sides, boundaries or \(\chi\), so they are different surfaces. <a class="bk" data-p="102" data-q="all these surfaces are topologically distinct">p. 102</a></p>
     </details>
     <details class="fold" data-tab-only="tidy">
       <summary>Why the book needs this</summary>
@@ -163,10 +167,25 @@
     </details>
     <details class="fold" data-tab-only="prove">
       <summary>What you are doing</summary>
-      <p>A polygon is a disc, and a disc is a sphere with a hole. That is where every piece starts: tidy. <a class="bk" data-p="97" data-q="a triangle is just a sphere with a hole">p. 97</a></p>
-      <p>A zip joins two rims, or two stretches of one rim, and its two arrows run opposite ways round or the same way. Whatever rim is not zipped stays a hole: the book calls that case gaping, and the case with nothing left snug. <a class="bk" data-p="97" data-q="the same surfaces as the snug ones, with an extra boundary or two">p. 97</a></p>
+      <p>The book takes a surface as finitely many triangles with zippers on their edges; polygons do as well. <a class="bk" data-p="97" data-q="a collection of triangles that have zips indicating how they should be pieced together">p. 97</a></p>
+      <p>A polygon is a disc, and a disc is a sphere with a hole. That is where every piece starts: tidy. The edge of a hole is its rim: a boundary of the surface. <a class="bk" data-p="97" data-q="a triangle is just a sphere with a hole">p. 97</a></p>
+      <p>A zip joins two rims, or two stretches of one rim. Go once round: one arrow points with you and its mate against you (opposite ways), or both with you (the same way). Whatever rim is not zipped stays a hole: the book calls that case gaping, and the case with nothing left snug. <a class="bk" data-p="97" data-q="the same surfaces as the snug ones, with an extra boundary or two">p. 97</a></p>
       <p>After each zip the picture is redrawn with every piece in a place of its own. Nothing is lost by that. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
     </details>
+
+    <details class="fold">
+      <summary>The chapter in four steps</summary>
+      <ol class="argument">
+        <li>A surface is polygons with zippers on their edges.</li>
+        <li>Zip one pair at a time. Each zip joins two pieces or makes a cap, a crosscap, a handle or a cross-handle, and may leave holes. So every surface is tidy. <a href="#prove" data-go="prove">Tab 3</a> <a class="bk" data-p="96" data-q="Every surface is topologically equivalent to a “tidy” one">p. 96</a></li>
+        <li>A cross-handle is two crosscaps, and next to a crosscap a handle is two more. So every surface is handles and holes, or holes and crosscaps. <a href="#tidy" data-go="tidy">Tab 2</a> <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></li>
+        <li>No two of these are the same surface: they differ in sides, in boundaries or in Euler characteristic. <a href="#name" data-go="name">Tab 4</a> counts them. <a class="bk" data-p="102" data-q="so that the numbers a, b, and c are invariants">p. 102</a></li>
+      </ol>
+    </details>
+
+    <p class="next" data-tab-only="zip"><a href="#tidy" data-go="tidy">Next: 2 Tidy surfaces</a></p>
+    <p class="next" data-tab-only="tidy"><a href="#prove" data-go="prove">Next: 3 Zip it up</a></p>
+    <p class="next" data-tab-only="prove"><a href="#name" data-go="name">Next: 4 Examples</a></p>
 
   </main>
 

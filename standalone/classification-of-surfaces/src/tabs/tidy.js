@@ -75,7 +75,7 @@ export function createTidyTab(ctx) {
       else if (f.type === 'x') addCrosscapFeature(scene, L, s, { progress: prog, open, color: ZIP_COLORS[0], axis: 0.6 });
       else addTube(scene, L, f.sites[0], f.sites[1], { cross: f.type === 'X', progress: prog, open, color: ZIP_COLORS[0], arrowB: () => (f.walking ? 0 : 1) });
     }
-    stage.setScene(scene, L.frame, false);
+    stage.setScene(scene, { center: L.frame.center, radius: 1.6 * (L.R || 1) }, false);      // room round the ball: handles stay clear of the badge
   }
   /** Turn the view to face the middle of the pieces (a little from above), unless the person is turning it. */
   function lookAtPieces(seconds = 0.7) {
@@ -95,7 +95,7 @@ export function createTidyTab(ctx) {
       st.querySelector('[data-d="-1"]').disabled = c[k] === 0;
       st.querySelector('[data-d="1"]').disabled = free() < NEED[k];
     }
-    badge.innerHTML = `<span class="badge-sym">${symbol(c)}</span><span class="badge-name">${describe(c)}</span>`;
+    badge.innerHTML = `${features.length ? `<span class="badge-sym">${symbol(c)}</span>` : ''}<span class="badge-name">${describe(c)}</span>`;
     document.getElementById('fact-chi').innerHTML = `${M('chi')} ${M('eq')} ${num(chiOf(c))}`;
     document.getElementById('fact-b').innerHTML = num(c.star);
     document.getElementById('fact-sides').textContent = c.x + c.X > 0 ? 'one' : 'two';

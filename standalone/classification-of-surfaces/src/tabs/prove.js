@@ -6,15 +6,17 @@
 import { fromWords, zip, zips, isDone, countsOf, normalForm, copyState } from '../zipper/engine.js';
 import { buildScene, nextLooks, polyLook, PALETTE, cssColor, rimKeys, makeNeighbours, fits } from '../zipper/view.js';
 import { playZip, dryRun } from '../zipper/moves.js';
-import { symbol, symbolText, M } from '../mathbank.js';
+import { symbol, M } from '../mathbank.js';
+import { describe } from './tidy.js';
 import { bookLink } from '../bookref.js';
 
 const PRESETS = [
   { key: 'pillow', label: 'Two triangles', words: ['a b c', 'c- b- a-'] },
   { key: 'square', label: 'A square', words: ['a b a- b-'] },
-  { key: 'fig810', label: 'Figure 8.10', words: ['a b a- b'], note: 'Zip blue first. Then start over and zip orange first.' },
+  { key: 'fig810', label: 'Figure 8.10', html: () => `Fig. 8.10: why ${M('tradeX')}`, words: ['a b a- b'],
+    note: () => `One square, two orders. Blue first: a cross-handle ${M('sym:X')}. Start over, orange first: two crosscaps ${M('sym:x')}${M('sym:x')}. The same square, so ${M('tradeX')}.` },
   { key: 'band', label: 'A twisted band', words: ['a b! a c!'] },
-  { key: 'punched', label: 'Punched Möbius band', words: ['r p q! s t! r- u!', 'p v! s- w!'], pieces: ['the ring', 'the strap'] },
+  { key: 'punched', label: 'The figure-eight hole', words: ['r p q! s t! r- u!', 'p v! s- w!'], pieces: ['the ring', 'the strap'] },
   { key: 'strange', label: 'The strange surface', words: ['r i f! j g! k h! r- u!', 'l m! n o! p q!', 'i s! l t!', 'j v! n w!', 'k x! p y!'], pieces: ['the ring', 'the middle', 'a band', 'a band', 'a band'] },
   { key: 'deal', label: 'Deal four triangles', words: null },
 ];
@@ -43,18 +45,18 @@ function dealTriangles(seed) {
 
 function sayStep(info) {
   const one = info.kind === 'join' ? 'Two pieces become one.'
-    : info.kind === 'cap' ? 'One rim, arrows opposite: a cap.'
-    : info.kind === 'crosscap' ? `One rim, arrows the same way: a crosscap ${M('sym:x')}.`
-    : info.kind === 'handle' ? `Two rims, arrows opposite: a handle ${M('sym:o')}.`
-    : `Two rims, arrows the same way: a cross-handle ${M('sym:X')}.`;
-  const left = info.newRims.length;
-  const two = info.kind === 'join' ? (left ? 'What was left of their two rims is one rim.' : 'Their two holes are gone.')
-    : !info.gaping ? (info.kind === 'cap' ? 'The hole is gone.' : 'No hole is left.')
-    : info.kind === 'cap' ? (left === 2 ? 'The two gaps stay open: two holes.' : 'The gap stays open: one hole.')
-    : info.kind === 'crosscap' ? 'A hole with a half-twisted strap across it is a crosscap beside a hole.'
-    : 'What was left of the two rims is one hole.';
+    : info.kind === 'cap' ? 'One rim, the two arrows opposite ways round it: a cap.'
+    : info.kind === 'crosscap' ? `One rim, both arrows the same way round it: a crosscap ${M('sym:x')}.`
+    : info.kind === 'handle' ? `Two rims, their arrows opposite ways round: a handle ${M('sym:o')}.`
+    : `Two rims, both arrows the same way round: a cross-handle ${M('sym:X')}.`;
+  const left = info.newRims.length, star = M('sym:*');
+  const two = info.kind === 'join' ? (left ? 'What was left of their two rims is one rim' : 'Their two holes are gone')
+    : !info.gaping ? (info.kind === 'cap' ? 'The hole is gone' : 'No hole is left')
+    : info.kind === 'cap' ? (left === 2 ? `The two stretches not zipped stay open: two holes, ${star}${star}` : `The stretch not zipped stays open: one hole, ${star}`)
+    : info.kind === 'crosscap' ? `The flaps meet with a half twist: that is the crosscap, and what was left of the rim is one hole ${star} beside it`
+    : `What was left of the two rims is one hole, ${star}`;
   const [page, words] = FIGS[info.fig];
-  return `${one} ${two} ${bookLink(page, words, 'Fig. ' + info.fig)}`;
+  return `${one} ${two} (${bookLink(page, words, 'Fig. ' + info.fig)}).`;
 }
 const SHORT = { join: 'joined', cap: 'cap', crosscap: 'crosscap', handle: 'handle', crosshandle: 'cross-handle' };
 
@@ -73,7 +75,7 @@ export function createProveTab(ctx) {
     if (p.key === 'deal') { if (!keepSeed) seed = (seed * 31 + 11) % 9973; words = dealTriangles(seed); } else words = p.words;
     state = fromWords(words);
     looks = state.comps.map(() => polyLook());
-    history = []; log = []; lastSay = p.note || '';
+    history = []; log = []; lastSay = p.note ? p.note() : '';
     colors = new Map();
     let k = 0;
     for (const c of state.comps) for (const e of c.rims[0]) if (e.s && !colors.has(e.id)) colors.set(e.id, PALETTE[k++ % PALETTE.length]);
@@ -86,7 +88,13 @@ export function createProveTab(ctx) {
     picks = built.picks;
     // before the first zip, the pieces of a surface taken from the book carry their names
     const names = preset.pieces && history.length === 0 ? preset.pieces : null;
-    stage.extraMarkers = names ? () => built.slotList.map((sl, i) => ({ p: [sl.center[0], sl.center[1] - 1.5 * sl.R, 0], color: [0.5, 0.5, 0.55], size: 1, alpha: 0, shape: 'dot', label: names[i] })) : null;
+    // and every arrow carries its zip's letter (the chips at the side carry the same letters): seven colours are too
+    // many to tell apart by eye alone
+    stage.extraMarkers = () => {
+      const out = picks.map((pk) => ({ p: pk.at(), color: colorOf(pk.id), size: 1, alpha: 0, shape: 'dot', label: pk.id }));
+      if (names) built.slotList.forEach((sl, i) => out.push({ p: [sl.center[0], sl.center[1] - 1.5 * sl.R, 0], color: [0.5, 0.5, 0.55], size: 1, alpha: 0, shape: 'dot', label: names[i] }));
+      return out;
+    };
     // polygons lie flat and small: bring the view a little closer while there is no ball
     const flat = looks.every((l) => l.kind === 'poly');
     stage.setScene(built.scene, flat ? { center: built.frame.center, radius: built.frame.radius * 0.8 } : built.frame, reframe);
@@ -115,17 +123,20 @@ export function createProveTab(ctx) {
       el.log.append(li);
     }
     // the badge: what each piece is now
-    const parts = state.comps.map((c) => (looks[state.comps.indexOf(c)].kind === 'poly' ? null : symbol(countsOf(c))));
-    const shown = parts.filter(Boolean);
-    const polys = parts.length - shown.length;
-    badge.innerHTML = shown.length ? `<span class="badge-sym">${shown.join('<span class="badge-plus"> , </span>')}</span>${polys ? `<span class="badge-name">and ${polys} polygon${polys > 1 ? 's' : ''}</span>` : ''}` : '';
+    // the badge: every ball by its symbol and in words (a bare sphere needs no symbol)
+    const line = (c) => { const k = countsOf(c), bare = !(k.o + k.star + k.x + k.X); return `<span class="badge-line">${bare ? '' : `<span class="badge-sym">${symbol(k)}</span>`}<span class="badge-name">${describe(k)}</span></span>`; };
+    const balls = state.comps.filter((c, i) => looks[i].kind !== 'poly'), polys = state.comps.length - balls.length;
+    badge.innerHTML = balls.length ? balls.map(line).join('') + (polys ? `<span class="badge-name">and ${polys} polygon${polys > 1 ? 's' : ''}</span>` : '') : '';
     let say = lastSay;
     if (isDone(state)) {
-      const done = state.comps.map((c) => { const raw = countsOf(c), nf = normalForm(raw), name = nameOfCounts(nf); const traded = raw.X > 0 || (raw.o > 0 && raw.x > 0); return `${name ? name + ', ' : ''}<span class="nb">${symbol(raw)}${traded ? ` ${M('eq')} ${symbol(nf)}` : ''}</span>`; });
+      const done = state.comps.map((c) => {
+        const raw = countsOf(c), nf = normalForm(raw), name = nameOfCounts(nf), traded = raw.X > 0 || (raw.o > 0 && raw.x > 0), bare = !(raw.o + raw.star + raw.x + raw.X);
+        const sym = bare ? '' : `<span class="nb">${symbol(raw)}${traded ? ` ${M('eq')} ${symbol(nf)}` : ''}</span>`;
+        return name ? name + (sym ? ', ' + sym : '') : sym;
+      });
       say = `${lastSay ? lastSay + ' ' : ''}<b>Nothing left to zip.</b> It is ${done.join(' and ')}.`;
-      badge.innerHTML = `<span class="badge-sym">${state.comps.map((c) => symbol(countsOf(c))).join('<span class="badge-plus"> , </span>')}</span>`;
     }
-    el.cap.innerHTML = say || 'Tap an arrow: it is zipped to the other arrow of its colour.';
+    el.cap.innerHTML = say || 'Tap an arrow: it is zipped to the other arrow of its colour, tail to tail and head to head.';
     ctx.changed();
   }
 
@@ -148,7 +159,7 @@ export function createProveTab(ctx) {
       looks0[where[0].c] = l;
     }
     const { state: after, info } = zip(before, id);
-    if (!fits(after.comps[info.to])) { lastSay = 'That makes more pieces than this ball has room for. Try another pair first.'; panel(); return; }
+    if (!fits(after.comps[info.to])) { lastSay = 'That makes more holes and handles than this ball has room for. Try another pair first.'; panel(); return; }
     const looksAfter = nextLooks(looks0, before, info, after);
     history.push({ state: copyState(before), looks: looksBefore, log: log.slice(), lastSay });
     const commit = () => {
@@ -196,7 +207,8 @@ export function createProveTab(ctx) {
 
   for (const p of PRESETS) {
     const b = document.createElement('button');
-    b.type = 'button'; b.className = 'chip'; b.dataset.key = p.key; b.textContent = p.label; b.setAttribute('aria-pressed', 'false');
+    b.type = 'button'; b.className = 'chip'; b.dataset.key = p.key; b.setAttribute('aria-pressed', 'false');
+    if (p.html) { b.innerHTML = p.html(); b.setAttribute('aria-label', p.label + ': why a cross-handle is two crosscaps'); } else b.textContent = p.label;
     b.addEventListener('click', () => start(p));
     el.presets.append(b);
   }

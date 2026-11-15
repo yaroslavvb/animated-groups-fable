@@ -15,6 +15,7 @@ import { Scene } from '../geo/scene.js';
 import { ZIP_COLORS } from '../geo/features.js';
 import { THEME } from '../theme.js';
 import { M, num, symbol } from '../mathbank.js';
+import { bookLink } from '../bookref.js';
 import { SURFACES, ORDER, measure } from '../examples/surfaces.js';
 import { buildMesh, edgeLine, loopLine } from '../examples/mesh.js';
 import { loopPath, pinwheelAt, pathLine } from '../examples/pinwheel.js';
@@ -29,7 +30,7 @@ const CAPTIONS = {
   torus: ['No boundary, two sides: a sphere with one handle.', 105, 'The torus has Euler characteristic 0, is orientable, and has no boundary'],
   mobius: ['One side, so somewhere the teal has to meet the sand. A crosscap with a hole punched in it.', 105, 'is non-orientable, and has one boundary; it is ∗×, a punched crosscap'],
   klein: ['One side and no boundary: a pair of crosscaps. Teal meets sand round the base, where the tube comes back to itself from inside.', 106, 'is non-orientable, and has no boundary; it is ××, a pair of crosscaps'],
-  punched: ['A half twist in the strip between the holes: one side (teal meets sand where the strip ends), and the figure-eight is a single boundary. A Möbius band with one more hole.', 106, 'This strange-looking surface is just a punched Möbius band'],
+  punched: ['A half twist in the strap between the holes: one side (teal meets sand where the strap ends), and the figure-eight is a single boundary. A Möbius band with one more hole.', 106, 'This strange-looking surface is just a punched Möbius band'],
   strange: ['Three half twists, yet two sides: any round trip passes an even number of them. A torus with two holes.', 105, 'not visible at a glance but can only be ○∗∗'],
 };
 
@@ -72,7 +73,16 @@ export function createNameTab(ctx) {
     a.className = 'bk'; a.dataset.p = String(page); a.dataset.q = quote; a.textContent = 'p. ' + page;   // bookref.js wires it at start-up
     s.append(a); cap.append(s);
   }
-  panel.append(tidyRow, cap);
+  // how the three numbers give the symbol (Theorem 8.2), and what the pinwheel is for
+  const how = document.createElement('p');
+  how.className = 'name-cap'; how.id = 'name-how';
+  how.style.cssText = 'margin:0;font-size:14px;line-height:1.5;color:var(--muted)';
+  document.getElementById('name-facts').after(how);
+  const sidesNote = document.createElement('p');
+  sidesNote.className = 'name-cap'; sidesNote.id = 'name-sides-note'; sidesNote.hidden = true;
+  sidesNote.style.cssText = 'margin:0;font-size:15px;line-height:1.4;color:var(--muted)';
+  sidesNote.innerHTML = 'Slide a pinwheel round a loop. If some loop brings it back mirrored, the surface has one side (it is non-orientable); if no loop does, two (orientable). ' + bookLink(101, 'it always returns in the same orientation; the torus is orientable');
+  panel.append(tidyRow, sidesNote, cap);
 
   // ---- state
   let key = ORDER[0], active = false, cur = null;
@@ -148,7 +158,12 @@ export function createNameTab(ctx) {
       : `${M('chi')} ${M('eq')} ${num(m.chi)}`;
     const dots = probes.rims ? m.boundaries.map((_, i) => `<span aria-hidden="true" style="display:inline-block;width:10px;height:10px;margin-right:5px;border-radius:50%;background:${css(ZIP_COLORS[i % ZIP_COLORS.length])}"></span>`).join('') : '';
     $('name-b').innerHTML = m.b ? dots + num(m.b) : 'none';
-    const back = probes.sides ? ` <span style="${NOTE}">· comes back ${cur.path.turned < 0 ? 'mirrored' : 'the same'}</span>` : '';
+    const back = probes.sides ? ` <span style="${NOTE}">· the pinwheel comes back ${cur.path.turned < 0 ? 'mirrored' : 'the same'}</span>` : '';
+    sidesNote.hidden = !probes.sides;
+    const k = m.counts;
+    how.innerHTML = m.orientable
+      ? `Two sides, so ${M('formO')}: ${M('a')} handles, ${M('b')} holes. Here ${M('b')} ${M('eq')} ${num(k.star)}, and ${M('chiO')} gives ${M('a')} ${M('eq')} ${num(k.o)}.`
+      : `One side, so ${M('formX')}: ${M('b')} holes, ${M('c')} crosscaps. Here ${M('b')} ${M('eq')} ${num(k.star)}, and ${M('chiX')} gives ${M('c')} ${M('eq')} ${num(k.x)}.`;
     $('name-sides').innerHTML = (m.orientable ? 'two' : 'one') + back;
     $('name-sym').innerHTML = `${symbol(m.counts)} <span style="${NOTE}">${m.def.name}</span>`;
     for (const b of chips) b.setAttribute('aria-pressed', String(b.dataset.k === key));
