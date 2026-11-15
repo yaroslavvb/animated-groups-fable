@@ -1,6 +1,7 @@
 // dev/recut/browser-check.mjs — the pattern selector and the re-cut, in a real Chrome, on the built page (or any page):
 // the selector through the native <select>, the URL (pat=), a reload, a pasted link, the words over the fold pane, a
-// play to the end, the colours that reach the screen, a phone.
+// play to the end, the colours that reach the screen, the idle making of the other groups' prints (made after the load,
+// held back while Fold plays and while the page is hidden; 15 Nov 2026), a phone.
 //   node dev/recut/browser-check.mjs [--page dist/index.html] [--out <dir for pictures>]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,9 +48,11 @@ try {
   await page.goto(B.url(pagePath) + '#g=2222', { waitUntil: 'load' });
   await ready();
   let s = await state();
-  check(s.pattern === 'checker' && s.print === 'checks', 'a fresh page shows the checkerboard', JSON.stringify([s.pattern, s.print]));
-  check(await page.evaluate(() => document.getElementById('app').getAttribute('data-pattern') === 'checker' && document.getElementById('pattern').value === 'checker' && document.getElementById('pattern-label').textContent === 'Checkerboard'), 'the selector shows it');
+  // (since the pattern round of 14 Nov 2026 the default is Paisley; it was the checkerboard)
+  check(s.pattern === 'paisley' && s.print === 'paisley', 'a fresh page shows Paisley', JSON.stringify([s.pattern, s.print]));
+  check(await page.evaluate(() => document.getElementById('app').getAttribute('data-pattern') === 'paisley' && document.getElementById('app').getAttribute('data-print') === 'shapes' && document.getElementById('pattern').value === 'paisley' && document.getElementById('pattern-label').textContent === 'Paisley'), 'the selector shows it');
   check(!/pat=/.test(s.url), 'the default pattern is not in the URL', s.url);
+  check(await page.evaluate(() => [...document.querySelectorAll('#pattern option')].map((o) => o.value).join() === 'paisley,soft,tomoe,checker,rings,comma'), 'the selector lists the six in order');
   // the flat paper: both tones of the front on screen (the shader's print, lit: looser match), none of the back
   await page.evaluate(() => window.__folding.setView(0, 89.5));
   await page.waitForTimeout(250);
@@ -71,13 +74,37 @@ try {
   await page.selectOption('#pattern', 'comma');
   await page.waitForTimeout(350);
   s = await state();
-  check(s.pattern === 'comma' && s.print === null && /pat=comma/.test(s.hash), 'Comma: no print, pat=comma', s.hash);
+  // the Comma is a print since 14 Nov 2026 (the owner's page comment 88289462: the checkerboard's two shades for all)
+  check(s.pattern === 'comma' && s.print === 'comma' && /pat=comma/.test(s.hash), 'Comma: a print in the paper\'s two shades, pat=comma', JSON.stringify([s.print, s.hash]));
+  c = await colours([[154, 213, 204], [79, 163, 151], [245, 230, 198], [216, 189, 133]], 48);
+  check(c[2] + c[3] > 0.03, 'the Comma on the folded pillow: the paper\'s back (sand)', c.map((v) => v.toFixed(3)).join(' '));
   await shot('check-2222-comma');
+  // the three new patterns through the select, and an old name in a link
+  for (const [key, label] of [['soft', 'Soft commas'], ['tomoe', 'Tomoe'], ['paisley', 'Paisley']]) {
+    await page.selectOption('#pattern', key);
+    await page.waitForTimeout(300);
+    s = await state();
+    const shown = await page.evaluate(() => [document.getElementById('pattern-label').textContent, document.getElementById('app').getAttribute('data-print')]);
+    check(s.pattern === key && s.print === key && shown[0] === label && shown[1] === 'shapes', `${label}: a shape print, its name in the pill`, JSON.stringify([s.pattern, s.print, shown]));
+  }
+  await page.selectOption('#pattern', 'comma');
+  await page.waitForTimeout(300);
   // a reload keeps the pattern
   await page.reload({ waitUntil: 'load' });
   await ready();
   s = await state();
   check(s.pattern === 'comma' && s.g === '2222' && s.t === 1, 'a reload brings the pattern back', JSON.stringify([s.g, s.pattern, s.t]));
+  // a link of the pattern round that names Soft commas by its design folder; a link of the checkerboard
+  for (const [h, want] of [['#g=333&pat=blobs', 'soft'], ['#g=333&pat=checker', 'checker'], ['#g=333&pat=nosuch', 'paisley']]) {
+    await page.goto(B.url(pagePath) + h, { waitUntil: 'load' });
+    await page.reload({ waitUntil: 'load' });
+    await ready();
+    s = await state();
+    check(s.pattern === want && s.g === '333', `the link ${h} opens ${want}`, JSON.stringify([s.g, s.pattern, s.hash]));
+  }
+  await page.goto(B.url(pagePath) + '#g=2222&pat=comma&t=1', { waitUntil: 'load' });
+  await page.reload({ waitUntil: 'load' });
+  await ready();
   // the keyboard: the select is a real control in the tab order, and the pill shows where the focus is
   await page.focus('#pattern');
   const foc = await page.evaluate(() => ({ active: document.activeElement && document.activeElement.id, tab: document.getElementById('pattern').tabIndex,
@@ -126,6 +153,58 @@ try {
   await page.waitForTimeout(300);
   s = await state();
   check(s.errors === 0 && s.recut && s.recut.movers >= 1, 'dragging the cut of a re-cut tile rebuilds it without an error', JSON.stringify([s.errors, s.recut && s.recut.movers]));
+
+  // the idle making of the other groups' prints (src/patterns/warm.js; the review of 15 Nov 2026: nothing tested the
+  // page's wiring of it — a rebuild that never told the warmer, frames that never poked it, kept every test green)
+  await page.goto(B.url(pagePath) + '#g=2222', { waitUntil: 'load' });
+  await page.reload({ waitUntil: 'load' });
+  await ready();
+  const warm = () => page.evaluate(() => window.__folding.getState().warm);
+  // (polled every 100 ms: Playwright's default polls on every animation frame, and a page that draws frames gets no
+  // idle slot long enough for a print — the warmer would wait out the whole poll)
+  const warmDone = (key) => page.waitForFunction((k) => { const w = window.__folding.getState().warm; return w.key === k && w.left === 0; }, key, { timeout: 30000, polling: 100 }).then(warm, warm);
+  let w = await warmDone('paisley');
+  check(w.key === 'paisley' && w.left === 0 && w.made === 16 && w.errors.length === 0, 'after the load the 16 other groups\' Paisley prints are made while the page is idle, one per slot', JSON.stringify(w));
+  // a play draws a frame after another: every frame pokes the warmer, so nothing is made while it plays; the rest after
+  await page.evaluate(() => { window.__folding.setT(0); window.__folding.setPattern('soft'); window.__folding.play(); });
+  await page.waitForTimeout(1300);
+  const during = await page.evaluate(() => ({ playing: window.__folding.getState().playing, warm: window.__folding.getState().warm }));
+  check(during.playing && during.warm.key === 'soft' && during.warm.made === w.made && during.warm.left === 16, 'while Fold plays (1.3 s in), no print is made: the frames keep the warmer back', JSON.stringify(during));
+  await page.waitForFunction(() => !window.__folding.getState().playing, null, { timeout: 30000, polling: 100 });
+  const w2 = await warmDone('soft');
+  check(w2.made === w.made + 16 && w2.errors.length === 0, 'once the play is over, the 16 other groups\' Soft commas prints are made', JSON.stringify(w2));
+  // a frame drawn now and then with idle time between (the fold drawn again at the same t every 250 ms, no input; a
+  // play's frames come too fast for an idle slot anyway): each frame pokes the warmer — drawFold does, and the renderer's
+  // change listener does when it draws (each pokes once per redraw: either alone holds the warmer back) — so it waits
+  // out QUIET_MS again every time
+  const framed = await page.evaluate(() => new Promise((resolve) => {
+    const F = window.__folding;
+    F.setT(0.5);
+    F.setPattern('comma');
+    const m0 = F.getState().warm.made, d0 = F.counters.draws;
+    let k = 0;
+    const id = setInterval(() => { F.setT(0.5); if (++k === 8) { clearInterval(id); resolve({ m0, draws: F.counters.draws - d0, w: F.getState().warm }); } }, 250);
+  }));
+  check(framed.w.key === 'comma' && framed.draws >= 8 && framed.w.made === framed.m0 && framed.w.left === 16, 'a frame drawn every 250 ms for 2 s (no input, nothing moving): no print is made — every drawn frame pokes the warmer', JSON.stringify(framed));
+  const wc = await warmDone('comma');
+  check(wc.made === framed.m0 + 16 && wc.errors.length === 0, '... and the Comma\'s 16 are made once the frames stop', JSON.stringify(wc));
+  // a hidden page (another tab in front) makes nothing; shown again, it goes on (the review of 15 Nov 2026)
+  await page.evaluate(() => {
+    window.__setHidden = (h) => {
+      Object.defineProperty(document, 'hidden', { value: h, configurable: true });
+      Object.defineProperty(document, 'visibilityState', { value: h ? 'hidden' : 'visible', configurable: true });
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+    window.__setHidden(true);
+    window.__folding.setPattern('tomoe');
+  });
+  await page.waitForTimeout(1500);
+  const hiddenW = await warm();
+  check(hiddenW.key === 'tomoe' && hiddenW.made === wc.made && hiddenW.left === 16, 'hidden: the Tomoe prints of the other groups wait (1.5 s, nothing made)', JSON.stringify(hiddenW));
+  await page.evaluate(() => window.__setHidden(false));
+  const w3 = await warmDone('tomoe');
+  check(w3.made === wc.made + 16 && w3.errors.length === 0, 'shown again: they are made', JSON.stringify(w3));
+  console.log(`  (the warmer's longest slot in this page: ${w3.maxMs} ms; ${w3.slots} slots used, ${w3.passed} passed over)`);
   check(errors === 0, 'no console error, no page error', String(errors));
 
   // a phone: the header holds the selector, nothing overflows, the tap target is 44 px

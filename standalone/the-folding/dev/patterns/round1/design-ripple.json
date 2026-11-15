@@ -1,0 +1,66 @@
+{
+ "key": "ripple",
+ "label": "Ripples",
+ "status": "ok",
+ "idea": "One comma per tile with the bands at equal distance from its outline: a light moat (0.36 comma radii), a dark ring (0.135), and further bands only where the comma's cell is deep. The cell is the comma's Voronoi cell among its copies, so neighbours meet band to band; a 0.05 light channel on the cell border keeps copies apart and a light pool lies where cells meet. find() is a rule with no per-group table: (1) the default tile, or without presets the Dirichlet tile of the point farthest from its copies; (2) a linear map the point group allows that makes the tile at most 1.25 times longer than wide (cap 2.4), so strips get a stretched comma and stretched bands; (3) a small linear program fits the largest comma over 72 turns and three stretches, on three candidate seats (the tile; a half-ringed strip for *x; the roomiest place of the tile with the comma kept inside it); (4) exact distances on a grid in the comma's own frame, an opening of radius 0.02, marching squares. Verified: all 17 on the mini's sheet (dark 0.516-0.583, bare 0.208-0.430, solid 0.250-0.339, overlap 0, 497-618 vertices, 13-52 ms); src/shapes.js validateShapes passes all 17 with presets and carried; copies keep 0.050 apart; a turned, scaled, shifted group without presets gets the turned motif to 2e-12 tile sizes; 69 off-page lattices give no error and no overlap (one has bare 0.464). The sand side reads. Not verified: the real page (3D fold, 60 px tiles, phone), since nothing is integrated.",
+ "hint": "a comma and its echoes: bands at equal distance from it, out to the next comma",
+ "rounds": 4,
+ "selfScore": {
+  "big": 8,
+  "clean": 7,
+  "commaLike": 7,
+  "fills": 9,
+  "helpsFold": 8
+ },
+ "worst": {
+  "coverageMin": 0.516,
+  "coverageMax": 0.583,
+  "emptyDiscMax": 0.43,
+  "darkDiscMax": 0.339,
+  "overlapMax": 0,
+  "vertsMax": 618,
+  "msMax": 52
+ },
+ "brokenRules": [],
+ "weakGroups": [
+  "*632",
+  "*442",
+  "3*3",
+  "*x",
+  "632",
+  "*333",
+  "4*2"
+ ],
+ "weaknesses": [
+  "No hard rule is broken and no target of (b) is missed on the sheet, but bare reaches 0.43 against the 0.45 target (*632 0.430, *333 and 4*2 0.429); without presets it is 0.436.",
+  "The comma itself is smaller than the page's: 10-17 % of the tile against 30 %, 0.57-0.97 tile sizes long. What fills the tile is the comma with its ring, and the light moat is what the eye reads first.",
+  "Six cells are not the default tile (333, 22*, 442, 632, 3*3, 4*2). The tile holds the whole comma and moat, but the ring is cut by the tile edge and slices of neighbours' rings lie in the tile.",
+  "In o, **, xx, 22*, 2*22 and *x the bands are at equal distance only in a stretched metric: comma and bands are stretched 1.8 to 2.9 times, and a band is up to 2.4 times wider along the tile than across it.",
+  "In *x the ring is open on the side of the comma's back: the strip is 0.43 wide and a full ring left a comma 0.19 across.",
+  "Thin corners are busier than the rest: 12 petals plus an arc band round the 6-fold corner of *632, 8 petals at the 4-fold corners of *442, 6 small petals (0.036 tile areas each) at the 6-fold centres of 632.",
+  "Corners of one cell can differ in kind (*333: petals at two corners, a swollen ring and pool at the third). The kinds and the seat flip at thresholds, so a small lattice change can change the picture.",
+  "Without presets the motif is a different one wherever the default tile is not the group's roomiest tile (22x, 22*, 2*22, 632, 3*3, 4*2 most visibly). Both versions pass every check.",
+  "Band-to-band meeting across a channel is exact for moat and ring. For deep-corner bands it holds at rotation centres and mirror corners only; two different corners meeting at a generic vertex are not reconciled.",
+  "The sheet's dark number for *442 (0.583) is the kit's lattice-aligned sampling running along the channels; by polygon area it is 0.563.",
+  "The ring's neck is 0.055 at its thinnest, and round corners (radius 0.02) have only three or four vertices each.",
+  "The msMax of 52 is from the final sheet run; other runs of the same code on the mini reached 68 ms for o. In node on the Intel it is 35-100 ms.",
+  "My own lab/check.mjs reported a false self-crossing on collinear channel edges in *333; I fixed the checker, and the production validator never flagged it."
+ ],
+ "files": [
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/design.js",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/NOTES.md",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/sheet.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/zoom.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/back.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/rows.json",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/small.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/ripple/bare.png",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/check.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/prod.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/turned.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/stress.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/preview.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/raster.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/ripple/lab/debug.mjs"
+ ]
+}

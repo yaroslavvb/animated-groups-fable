@@ -1,0 +1,8 @@
+node polish/psearch.mjs --id '22*' --init polish/init-q22s-0.json --iters 200 --step 0.35 --seed 11 --cgap 0.038
+node polish/psearch.mjs --id '22*' --init polish/init-q22s-1.json --iters 200 --step 0.35 --seed 12 --cgap 0.038
+node polish/psearch.mjs --id '22*' --init polish/init-q22s-2.json --iters 200 --step 0.35 --seed 13 --cgap 0.038
+node polish/psearch.mjs --id '22*' --init polish/init-q22s-3.json --iters 200 --step 0.35 --seed 14 --cgap 0.038
+node polish/psearch.mjs --id '2*22' --init polish/init-q2s22-0.json --iters 200 --step 0.35 --seed 11 --cgap 0.038
+node polish/psearch.mjs --id '2*22' --init polish/init-q2s22-1.json --iters 200 --step 0.35 --seed 12 --cgap 0.038
+node polish/psearch.mjs --id '2*22' --init polish/init-q2s22-2.json --iters 200 --step 0.35 --seed 13 --cgap 0.038
+node polish/psearch.mjs --id '2*22' --init polish/init-q2s22-3.json --iters 200 --step 0.35 --seed 14 --cgap 0.038

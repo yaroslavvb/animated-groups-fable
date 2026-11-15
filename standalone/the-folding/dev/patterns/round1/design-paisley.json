@@ -1,0 +1,55 @@
+{
+ "key": "paisley",
+ "label": "Paisley",
+ "status": "ok",
+ "idea": "A fundamental domain carries a family of commas, as on a paisley cloth: one big comma, the largest the page's default tile holds whole, then two to four smaller ones dropped one after another into the largest bare disc that remains, each turned and curled to fit the room it finds. A comma is a round head and a tail tapering along a curling spine, with one knob that uncurls it: half a turn round the head in a round room (the page's own comma, a little fatter), an even arc of 70 degrees in a long room or a thin corner. Every comma of the motif has the same hand and none has a symmetry of its own, so a copy that curls the other way is always the work of a mirror or a glide. One rule for all 17 groups, no table per group; it also works when presets are missing (the big comma then sits in the Dirichlet cell of the group's deepest hole).",
+ "hint": "a big comma and smaller ones nestled around it, as on a paisley cloth",
+ "rounds": 4,
+ "selfScore": {
+  "commaLike": 8,
+  "fills": 8,
+  "big": 7,
+  "helpsFold": 8,
+  "clean": 7
+ },
+ "worst": {
+  "coverageMin": 0.437,
+  "coverageMax": 0.604,
+  "emptyDiscMax": 0.416,
+  "darkDiscMax": 0.5,
+  "overlapMax": 0,
+  "vertsMax": 644,
+  "msMax": 28
+ },
+ "brokenRules": [],
+ "weakGroups": [
+  "*x",
+  "*2222",
+  "*632",
+  "*333",
+  "3*3",
+  "632",
+  "*442"
+ ],
+ "weaknesses": [
+  "No hard rule is broken, but two targets of (c) are missed. First: small filler commas. Mirror corners and the strip need them: 0.16-0.17 tile sizes long in *2222, *333 and *632 (head 0.07-0.08 across), 0.20-0.25 long in five more groups. Their tails are thinner than 0.04 for most of their length. Raising the floor to 0.17 leaves bare discs of 0.53 (*2222) and 0.63 (*632), so I kept them.",
+  "Second missed target of (c): five marks per fundamental domain in *x, *2222, 2*22, 442, *442 and *632, against the brief's one to four.",
+  "Bare discs of 0.40-0.42 remain in 3*3 (0.416), 632 and *333 (0.407) and *442 (0.40). All are under the 0.45 target, but close to it.",
+  "*x is the thinnest result: dark 0.44, five marks in the strip, the main mark 0.93 long but only 0.27 across. A comma cannot be wider than the strip between two mirrors less the two margins.",
+  "Channels are not uniform: 0.06-0.08 where two marks run side by side (smallest measured gap 0.059), with wide bare triangles beside long tails.",
+  "The placement is greedy and its outcome jumps: a small change of a knob or a lattice can give a different family for a group (632 was a rosette of long commas in one setting and a field of medium ones in another). Up to three starts and a flaw count hide most of this. All 17 groups pass, with presets and without, and at 51 + 85 turned, scaled, shifted placements; there is no proof for arbitrary other lattices.",
+  "Time: 6-28 ms per group in Chrome on the mini (up to 38 ms for the first group called in earlier runs). In node on this loaded Intel Mac it is 10-70 ms, and one fuzz run reached about 145 ms when all three starts were tried.",
+  "The long commas (curl knob at 1) are an even 70 degree arc: the hand is readable but subtler than on the fully curled ones.",
+  "Without presets the big comma sits in the cell of the deepest hole, not in the page's tile, which it cannot know.",
+  "Not run: the project's test suite (nothing in test/ reads a design). Checked instead with my own scripts in lab/ and with validateShapes of src/shapes.js, which finds no problem in any group."
+ ],
+ "files": [
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/paisley/design.js",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/paisley/NOTES.md",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/paisley/lab",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/paisley/sheet.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/paisley/zoom.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/paisley/back.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/paisley/rows.json"
+ ]
+}

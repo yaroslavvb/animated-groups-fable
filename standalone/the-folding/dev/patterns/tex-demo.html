@@ -1,0 +1,615 @@
+<!doctype html>
+<!--
+  dev/patterns/tex-demo.html — the proof, on a real GPU, of the renderer's third print mode (src/render3d.js, mode 3:
+  a shape print handed over as a signed-distance texture of one lattice cell).
+
+  A flat square sheet [-1, 1]^2 (uv = xy; two triangles, or a grid) carries a SYNTHETIC shape print whose exact signed
+  distance is known: per cell of a SKEW lattice a disc, a ring, a thin bar and a small disc, placed so that the ring
+  crosses a border of the cell, the bar another, and the small disc lies over a corner. The texture is computed here from
+  that formula. The page then reads the canvas back and compares every pixel with the analytic print:
+    tone      from three pictures of the same view (the print; all light; all dark): the pixel's colour is exactly
+              mix(light, dark, tone) whatever the lighting, so tone = (C - A0).(A1 - A0) / |A1 - A0|^2
+    paper     the paper point under a pixel, and the paper under one pixel step: from the camera's matrices
+    expected  sdfTone(sd, sdfFootprint(...), range) of render3d.js on the ANALYTIC sd and gradient (the JS twin)
+  Driven by dev/patterns/tex-demo.mjs (numbers as JSON, pictures as PNG). By hand: open it and drag.
+    tex-demo.html[?size=256][&range=4][&how=exact|baked|raster][&mesh=grid|two|roll][&az=0][&el=90][&z=0.75][&side=back][&px=600]
+      size   texels a side          range  where the texture saturates, in texels of the e1 direction
+      how    the texture: the exact formula; the same shapes as polygons baked by src/sdf.js; a control from a 0/1 raster
+      z      css px per texel in the middle of the picture (1: one texel is one css px)
+  window.__tex = { ready, error, info, focus, place(view), measure(), seamShift(view), tiny(), meshes(view), lose(view),
+                   picture(view, opts), contact(), setTex(size, range, how), setMesh(kind), stats(), R }
+    measure    one view against the analytic print: far pixels, the ramp across an outline, the JS twin, the cells' borders
+    seamShift  the same view from a texture whose cell begins half a cell further on: the two pictures must be the same
+    tiny       the sheet small on the screen, turning: its mean tone and its flicker against the ideal and an unfiltered picture
+    meshes     two triangles against the grid;  lose: WEBGL_lose_context and back;  picture / contact: PNGs to look at
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>shape print: the texture mode on a GPU</title>
+<style>
+  body { margin: 10px; font: 12px/1.35 system-ui, sans-serif; background: #fff; color: #1a1a1f; }
+  h1 { font-size: 14px; margin: 0 0 6px; font-weight: 600; }
+  h1 small { font-weight: 400; color: #52514a; }
+  #stage { position: relative; width: 600px; height: 600px; border: 1px solid #e5e5ea; }
+  #c { display: block; width: 100%; height: 100%; }
+  #labels { position: absolute; inset: 0; }
+  #sheet { display: block; margin-top: 10px; }
+  #shot { display: none; }
+  pre { margin: 6px 0 0; color: #52514a; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1 id="title">shape print <small>· a signed-distance texture of one lattice cell · src/render3d.js mode 3</small></h1>
+<div id="stage"><canvas id="c"></canvas><div id="labels"></div></div>
+<pre id="note"></pre>
+<canvas id="sheet" width="10" height="10"></canvas>
+<canvas id="shot"></canvas>
+<script type="module">
+  import { createRenderer, sdfTone, sdfFootprint, sdfRead, __test as T } from '../../src/render3d.js';
+  import { PRINT_FRONT, PRINT_BACK, PRINT_OPACITY, hexToRgb } from '../../src/palette.js';
+
+  const q = new URLSearchParams(location.search);
+  const num = (k, d) => (q.has(k) && Number.isFinite(+q.get(k)) ? +q.get(k) : d);
+  const out = (window.__tex = { ready: false, error: null, info: {} });
+  // the baker of the round (another agent's module): used for one row of the proof when it is there
+  let bakeSDF = null;
+  try { ({ bakeSDF } = await import('../../src/sdf.js')); out.info.sdfjs = typeof bakeSDF === 'function' ? 'ok' : 'no bakeSDF'; } catch (e) { out.info.sdfjs = String(e && e.message || e); }
+  const stage = document.getElementById('stage'), canvas = document.getElementById('c');
+  const CSS = num('px', 600);
+  stage.style.width = stage.style.height = CSS + 'px';
+
+  // ---- the analytic print -----------------------------------------------------------------------------------------
+  // a skew lattice; everything below in WORLD (paper) units
+  const SC = 0.8;
+  const e1 = [1.0 * SC, 0.0], e2 = [0.35 * SC, 0.8 * SC], origin = [0.104, -0.056];
+  const det = e1[0] * e2[1] - e1[1] * e2[0];
+  const INV = [e2[1] / det, -e2[0] / det, -e1[1] / det, e1[0] / det];        // rows of [e1 e2]^-1
+  const at = (s, t) => [s * e1[0] + t * e2[0], s * e1[1] + t * e2[1]];       // lattice -> world, relative to the origin
+  const TH = 20 * Math.PI / 180;
+  // kind 0 disc (r), 1 ring (mid radius rm, half thickness hw), 2 bar (half length hl, half width hw, turned by TH)
+  const SHAPES = [
+    { name: 'disc', kind: 0, c: at(0.40, 0.33), r: 0.16 * SC },
+    { name: 'ring', kind: 1, c: at(0.95, 0.60), rm: 0.135 * SC, hw: 0.045 * SC },           // crosses the border s = 1
+    { name: 'bar', kind: 2, c: at(0.52, 0.03), hl: 0.17 * SC, hw: 0.02 * SC, cos: Math.cos(TH), sin: Math.sin(TH) },   // crosses t = 0
+    { name: 'dot', kind: 0, c: at(0.04, 0.96), r: 0.07 * SC },                               // lies over the corner (0, 1)
+  ];
+  // every shape with its eight neighbours' copies: [kind, cx, cy, p1, p2, cos, sin] x 36
+  const ITEMS = [];
+  for (const S of SHAPES) for (let m = -1; m <= 1; m++) for (let n = -1; n <= 1; n++) {
+    ITEMS.push(S.kind, S.c[0] + m * e1[0] + n * e2[0], S.c[1] + m * e1[1] + n * e2[1], S.kind === 0 ? S.r : S.kind === 1 ? S.rm : S.hl, S.hw || 0, S.cos || 1, S.sin || 0);
+  }
+  const ITEM = Float64Array.from(ITEMS), NI = ITEM.length / 7;
+  /** The signed distance to the print's outlines at the world point (x, y): negative inside the dark shapes. Exact
+   *  within about 0.08 of an outline (the nearest copy of a shape is then among the nine round the point's cell). */
+  function sdAt(x, y) {
+    const dx = x - origin[0], dy = y - origin[1];
+    let s = INV[0] * dx + INV[1] * dy, t = INV[2] * dx + INV[3] * dy;
+    s -= Math.floor(s); t -= Math.floor(t);
+    const qx = s * e1[0] + t * e2[0], qy = s * e1[1] + t * e2[1];
+    let best = Infinity;
+    for (let k = 0, o = 0; k < NI; k++, o += 7) {
+      const ux = qx - ITEM[o + 1], uy = qy - ITEM[o + 2], kind = ITEM[o];
+      let d;
+      if (kind === 0) d = Math.sqrt(ux * ux + uy * uy) - ITEM[o + 3];
+      else if (kind === 1) d = Math.abs(Math.sqrt(ux * ux + uy * uy) - ITEM[o + 3]) - ITEM[o + 4];
+      else {
+        const c = ITEM[o + 5], sn = ITEM[o + 6];
+        const ax = Math.abs(ux * c + uy * sn) - ITEM[o + 3], ay = Math.abs(-ux * sn + uy * c) - ITEM[o + 4];
+        d = ax > 0 || ay > 0 ? Math.hypot(Math.max(ax, 0), Math.max(ay, 0)) : Math.max(ax, ay);
+      }
+      if (d < best) best = d;
+    }
+    return best;
+  }
+  // the corners of the bar (the only sharp corners of the print), every copy round the cell: [x, y] x 36, relative to the origin
+  const CORNERS = [];
+  { const S = SHAPES[2]; for (let m = -1; m <= 1; m++) for (let n = -1; n <= 1; n++) for (const [u, v] of [[-S.hl, -S.hw], [S.hl, -S.hw], [S.hl, S.hw], [-S.hl, S.hw]]) CORNERS.push(S.c[0] + m * e1[0] + n * e2[0] + u * S.cos - v * S.sin, S.c[1] + m * e1[1] + n * e2[1] + u * S.sin + v * S.cos); }
+  /** The distance from the world point (x, y) to the nearest corner of a bar. */
+  function cornerDist(x, y) {
+    const dx = x - origin[0], dy = y - origin[1];
+    let s = INV[0] * dx + INV[1] * dy, t = INV[2] * dx + INV[3] * dy;
+    s -= Math.floor(s); t -= Math.floor(t);
+    const qx = s * e1[0] + t * e2[0], qy = s * e1[1] + t * e2[1];
+    let best = Infinity;
+    for (let k = 0; k < CORNERS.length; k += 2) { const d = Math.hypot(qx - CORNERS[k], qy - CORNERS[k + 1]); if (d < best) best = d; }
+    return best;
+  }
+  /**
+   * The texture of the contract: texel (i, j) at the lattice coordinates ((i + 0.5) / size, (j + 0.5) / size) of the
+   * cell that begins at `org` (any point: the print is the same, only the cell's borders run elsewhere).
+   * how 'exact': the true distance at every texel centre. how 'baked': the same shapes as polygons (circles of 4096
+   * points), baked by src/sdf.js bakeSDF — the production baker of the round, so the two halves are seen together.
+   * how 'raster' (a control, the easy way to make such a texture and a poor one): the print as dark / light texels,
+   * then for every texel the distance to the nearest texel centre of the other tone less half a texel — good to half
+   * a texel only.
+   */
+  function makeTex(size, range, org = origin, how = 'exact') {
+    if (how === 'baked') {
+      if (!bakeSDF) throw new Error('src/sdf.js bakeSDF is not there: ' + out.info.sdfjs);
+      const NG = 4096, polys = [];
+      const circle = (cx, cy, r) => { const p = new Float64Array(2 * NG); for (let k = 0; k < NG; k++) { const a = 2 * Math.PI * k / NG; p[2 * k] = cx + r * Math.cos(a); p[2 * k + 1] = cy + r * Math.sin(a); } return p; };
+      for (const S of SHAPES) for (let m = -3; m <= 3; m++) for (let n = -3; n <= 3; n++) {
+        const cx = origin[0] + S.c[0] + m * e1[0] + n * e2[0], cy = origin[1] + S.c[1] + m * e1[1] + n * e2[1];
+        if (S.kind === 0) polys.push({ pts: circle(cx, cy, S.r), hole: false });
+        else if (S.kind === 1) polys.push({ pts: circle(cx, cy, S.rm + S.hw), hole: false }, { pts: circle(cx, cy, S.rm - S.hw), hole: true });
+        else polys.push({ pts: [[-S.hl, -S.hw], [S.hl, -S.hw], [S.hl, S.hw], [-S.hl, S.hw]].map(([u, v]) => [cx + u * S.cos - v * S.sin, cy + u * S.sin + v * S.cos]), hole: false });
+      }
+      return { size, data: bakeSDF({ origin: org, e1, e2, size, range, polys }), range };
+    }
+    const data = new Uint8Array(size * size);
+    const put = (k, sd) => { data[k] = Math.round(128 + 127 * Math.max(-1, Math.min(1, sd / range))); };
+    if (how !== 'raster') {
+      for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+        const s = (i + 0.5) / size, t = (j + 0.5) / size;
+        put(j * size + i, sdAt(org[0] + s * e1[0] + t * e2[0], org[1] + s * e1[1] + t * e2[1]));
+      }
+      return { size, data, range };
+    }
+    const dark = new Uint8Array(size * size);
+    for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+      const s = (i + 0.5) / size, t = (j + 0.5) / size;
+      dark[j * size + i] = sdAt(org[0] + s * e1[0] + t * e2[0], org[1] + s * e1[1] + t * e2[1]) < 0 ? 1 : 0;
+    }
+    const ux = e1[0] / size, uy = e1[1] / size, vx = e2[0] / size, vy = e2[1] / size, step = Math.hypot(ux, uy), area = Math.abs(det) / (size * size);
+    const K = Math.ceil(range / Math.min(area / step, area / Math.hypot(vx, vy))) + 2, wrap = (k) => ((k % size) + size) % size;
+    for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+      const me = dark[j * size + i];
+      let best = Infinity;
+      for (let n = -K; n <= K; n++) for (let m = -K; m <= K; m++) {
+        if (dark[wrap(j + n) * size + wrap(i + m)] === me) continue;
+        const d = Math.hypot(m * ux + n * vx, m * uy + n * vy);
+        if (d < best) best = d;
+      }
+      put(j * size + i, (me ? -1 : 1) * (best - 0.5 * step));
+    }
+    return { size, data, range };
+  }
+  const printOf = (tex, org = origin) => ({ mode: 3, L: new Float32Array(9), A: Float32Array.of(e1[0], e1[1], e2[0], e2[1]), I: Float32Array.from(INV), O: Float32Array.of(org[0], org[1], tex.range), tex });
+
+  // ---- the scene ----------------------------------------------------------------------------------------------------
+  const PAPER = { printFront: PRINT_FRONT.map(hexToRgb), printBack: PRINT_BACK.map(hexToRgb), opacity: PRINT_OPACITY };
+  // measuring colours: far apart, and never bright enough for the highlight to clip (the colour must stay affine in the tone)
+  const MEAS = { printFront: [[0.78, 0.78, 0.78], [0.10, 0.10, 0.10]], printBack: [[0.78, 0.62, 0.40], [0.30, 0.14, 0.06]], opacity: 1 };
+  let R = null, gl = null, tex = null, tex2 = null, texelWorld = 0, W = 0, H = 0, dpr = 1;
+  let cam = null, pv = null, bufC = null, buf0 = null, buf1 = null, bufD = null, styleCalls = 0;
+  const HALF = [origin[0] + 0.5 * (e1[0] + e2[0]), origin[1] + 0.5 * (e1[1] + e2[1])];      // half a cell further on
+  const here = { az: 0, el: 90, center: [0, 0, 0], radius: 1 };
+
+  /** The sheet: 'two' triangles, a 'grid' of 24 x 24 squares (flat, uv = xy), or the same paper rolled up ('roll': an
+   *  arc of 230 degrees about an axis along y, bent without stretching, so uv is still the paper's xy; pictures only). */
+  function setMesh(kind) {
+    const n = kind === 'two' ? 1 : kind === 'roll' ? 64 : 24, pos = [], uv = [], idx = [], rr = 0.5;
+    for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) {
+      const x = -1 + 2 * i / n, y = -1 + 2 * j / n;
+      if (kind === 'roll') pos.push(rr * Math.sin(x / rr), y, rr * Math.cos(x / rr) - rr); else pos.push(x, y, 0);
+      uv.push(x, y);
+    }
+    for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, c = a + n + 1, d = c + 1; idx.push(a, b, d, a, d, c); }
+    R.setSurface({ positions: Float32Array.from(pos), indices: Uint32Array.from(idx), uv: Float32Array.from(uv) });
+    out.info.mesh = kind === 'two' ? 'two triangles' : kind === 'roll' ? 'rolled up' : `grid ${n} x ${n}`;
+  }
+  function setTex(size, rangeTexels, how = 'exact') {
+    texelWorld = Math.hypot(e1[0], e1[1]) / size;
+    tex = makeTex(size, rangeTexels * texelWorld, origin, how);
+    tex2 = null;
+    R.setStyle({ print: printOf(tex) });
+    Object.assign(out.info, { size, rangeTexels, range: tex.range, texelWorld, e1, e2, origin, how });
+    let sum = 0; for (let i = 0; i < tex.data.length; i++) sum += (tex.data[i] - 128) / 127;
+    out.info.meanTone = 0.5 - 0.5 * sum / tex.data.length;                    // what the coarsest mip level says: the calm mean
+  }
+
+  /** Put the camera: az, el (degrees); either z = css px per texel in the middle of a face-on picture, or sheetPx = the
+   *  sheet's side in DEVICE px; focus = the world point in the middle. */
+  function place({ az = 0, el = 90, z = 1, sheetPx = 0, focus = [0, 0] } = {}) {
+    const cssPerWorld = sheetPx > 0 ? sheetPx / dpr / 2 : z / texelWorld;
+    const h = T.FOV_Y / 2;
+    const radius = (CSS * Math.cos(h)) / (2 * T.FIT_MARGIN * cssPerWorld);
+    here.az = az; here.el = el; here.center = [focus[0], focus[1], 0]; here.radius = radius;
+    R.setFrame({ center: here.center, radius }, true);
+    R.setView({ az, el, zoom: 1 });
+    const v = R.getView();
+    cam = T.cameraMatrices(v.q, v.zoom, here.center, radius, 1, T.makeCamera());
+    pv = cam.pv;
+    return { az, el, radius, cssPerWorld };
+  }
+  /** The world point of the plane z = 0 under the device pixel position (X, Y), measured from the BOTTOM left. */
+  function unproj(X, Y, o) {
+    const nx = (X / W) * 2 - 1, ny = (Y / H) * 2 - 1;
+    const a11 = pv[0] - nx * pv[3], a12 = pv[4] - nx * pv[7], b1 = nx * pv[15] - pv[12];
+    const a21 = pv[1] - ny * pv[3], a22 = pv[5] - ny * pv[7], b2 = ny * pv[15] - pv[13];
+    const d = a11 * a22 - a12 * a21;
+    o[0] = (b1 * a22 - a12 * b2) / d; o[1] = (a11 * b2 - a21 * b1) / d;
+    return o;
+  }
+  function grab(buf) { R.render(); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, buf); return buf; }
+  /** Three pictures of the view as it is placed: the print, all light, all dark (only `side`'s colours are changed). */
+  function grab3(side) {
+    const key = side === 'back' ? 'printBack' : 'printFront', [c0, c1] = MEAS[key];
+    // as the app does on every colour change of a fold: the print's uniforms built afresh round the SAME tex, and the colours
+    const set = (o) => { styleCalls++; R.setStyle({ print: printOf(tex), printFront: MEAS.printFront, printBack: MEAS.printBack, opacity: MEAS.opacity, ...o }); };
+    set({}); grab(bufC);
+    set({ [key]: [c0, c0] }); grab(buf0);
+    set({ [key]: [c1, c1] }); grab(buf1);
+    set({});
+  }
+  // one pixel, evaluated: E = { ok, dim, tone, den, x, y, ax, ay, bx, by, iso }; dim: on the sheet, but the two
+  // reference pictures are the same there (the colours that were changed are not this side's)
+  const E = { ok: false, dim: false, tone: 0, den: 0, x: 0, y: 0, ax: 0, ay: 0, bx: 0, by: 0, iso: 0 };
+  const P0 = [0, 0], P1 = [0, 0];
+  function pixel(i, j, margin = 3) {
+    E.ok = false; E.dim = false;
+    unproj(i + 0.5, j + 0.5, P0);
+    const x = P0[0], y = P0[1];
+    if (!(Math.abs(x) < 1 && Math.abs(y) < 1)) return false;
+    unproj(i + 1, j + 0.5, P1); let ax = P1[0], ay = P1[1]; unproj(i, j + 0.5, P1); ax -= P1[0]; ay -= P1[1];
+    unproj(i + 0.5, j + 1, P1); let bx = P1[0], by = P1[1]; unproj(i + 0.5, j, P1); bx -= P1[0]; by -= P1[1];
+    const iso = Math.sqrt(0.5 * (ax * ax + ay * ay + bx * bx + by * by));
+    const far = margin * Math.sqrt(ax * ax + ay * ay + bx * bx + by * by);      // margin px, however the pixel lies
+    if (!(Math.abs(x) < 1 - far && Math.abs(y) < 1 - far)) return false;       // keep off the sheet's own rim
+    const o = 4 * (j * W + i);
+    const d0 = buf1[o] - buf0[o], d1 = buf1[o + 1] - buf0[o + 1], d2 = buf1[o + 2] - buf0[o + 2];
+    const den = d0 * d0 + d1 * d1 + d2 * d2;
+    E.den = den; E.x = x; E.y = y; E.ax = ax; E.ay = ay; E.bx = bx; E.by = by; E.iso = iso;
+    if (den < 900) { E.dim = true; return false; }                             // the two reference pictures must differ here
+    E.tone = ((bufC[o] - buf0[o]) * d0 + (bufC[o + 1] - buf0[o + 1]) * d1 + (bufC[o + 2] - buf0[o + 2]) * d2) / den;
+    E.ok = true;
+    return true;
+  }
+  function prng(seed) { let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const r4 = (v) => (Number.isFinite(v) ? Math.round(v * 1e4) / 1e4 : null);
+  const median = (a) => { if (!a.length) return null; const s = Float64Array.from(a).sort(); return s[s.length >> 1]; };
+
+  /**
+   * Measure the view as it is placed. Returns
+   *   far     pixels more than 2 px from every outline: n, and the share whose tone is the analytic one (within 0.05; by
+   *           sign); missN: how many are not, missCornerTexels: how far the farthest of those is from a corner of a bar
+   *   sample  the same on `sample` such pixels drawn at random
+   *   edge    the mean tone against the distance from the outline in px, over the pixels beside a single straight-ish
+   *           outline: width = (the distance from tone 0.1 to tone 0.9) / 0.8 (1 for a ramp one pixel wide), offsetPx =
+   *           where the tone is 0.5 (0: the outline is where it should be), offsetTexel the same in texels; and pixel
+   *           by pixel, on the ramp (tone 0.15 .. 0.85): where the tone puts the outline against where it is, in px
+   *           (posRms, posMax, posMean; posRmsTexel in texels) — the wobble of the outline
+   *   twin    tone - sdfTone(analytic sd, analytic footprint, range): rms, 99th percentile, max, over the pixels within
+   *           2 px of an outline; rmsTex: the same against the twin fed with sdfRead(tex), the texture read in
+   *           JavaScript (what the GPU should give when the texture is magnified); rmsIso, rmsTexIso: against the
+   *           two twins with a footprint that ignores the outline's direction (a control: on a tilted sheet they must
+   *           be the worse fit)
+   *   seam    the pixels within 0.75 px of a border of a lattice cell: on the plateaus their worst |tone - analytic|,
+   *           beside outlines their rms against the twin (to compare with twin.rms)
+   */
+  function measure({ side = 'front', sample = 2000, seed = 7 } = {}) {
+    grab3(side);
+    const R_ = tex.range;
+    const NB = 70, binW = 0.1, binLo = -3.5, sum = new Float64Array(NB), cnt = new Float64Array(NB);
+    let farN = 0, farOk = 0, farSign = 0, farWorst = 0, valid = 0, dim = 0, missN = 0, missCorner = 0, seTexIso = 0;
+    let bandN = 0, se = 0, seTex = 0, seIso = 0, maxE = 0, cleanN = 0, posN = 0, posS = 0, posS2 = 0, posMax = 0;
+    const errs = [], isoList = [];
+    let seamPlateauN = 0, seamPlateauMax = 0, seamBandN = 0, seamSe = 0, seamMean = 0;
+    const worst = [];
+    const gradient = (x, y, o) => { const h = 1e-5; o[0] = (sdAt(x + h, y) - sdAt(x - h, y)) / (2 * h); o[1] = (sdAt(x, y + h) - sdAt(x, y - h)) / (2 * h); return o; };
+    const g = [0, 0];
+    const lenS = Math.hypot(INV[0], INV[1]), lenT = Math.hypot(INV[2], INV[3]);
+    // classify one evaluated pixel: 1 far (more than 2 px from every outline: a plateau), 2 beside an outline; sets C.*
+    const C = { sd: 0, sdTex: 0, sdPx: 0, w: 0, exp: 0, expTex: 0, clean: false, border: false };
+    function classify() {
+      const sd = sdAt(E.x, E.y);
+      C.sd = sd;
+      // the border of a lattice cell: the distance to the nearest line s = k or t = k, in px across that line
+      const dx = E.x - origin[0], dy = E.y - origin[1];
+      const s = INV[0] * dx + INV[1] * dy, t = INV[2] * dx + INV[3] * dy;
+      const ds = Math.abs(s - Math.round(s)) / lenS, dt = Math.abs(t - Math.round(t)) / lenT;
+      const ws = sdfFootprint(E.ax, E.ay, E.bx, E.by, INV[0] / lenS, INV[1] / lenS), wt = sdfFootprint(E.ax, E.ay, E.bx, E.by, INV[2] / lenT, INV[3] / lenT);
+      C.border = ds / ws < 0.75 || dt / wt < 0.75;
+      C.clean = false;
+      if (Math.abs(sd) > 3.6 * E.iso * Math.SQRT2) { C.sdPx = sd / E.iso; C.w = E.iso; C.exp = sd < 0 ? 1 : 0; return 1; }
+      gradient(E.x, E.y, g);
+      const gl_ = Math.hypot(g[0], g[1]) || 1;
+      g[0] /= gl_; g[1] /= gl_;
+      const w = sdfFootprint(E.ax, E.ay, E.bx, E.by, g[0], g[1]);
+      C.w = w; C.sdPx = sd / w;
+      // a single straight-ish outline within 3 px either way? (no other outline, no tight bend, no spine of a thin mark)
+      const dl = 3 * w, sp = sdAt(E.x + dl * g[0], E.y + dl * g[1]), sm = sdAt(E.x - dl * g[0], E.y - dl * g[1]);
+      C.clean = Math.abs(sp - sd - dl) < 0.12 * dl && Math.abs(sd - sm - dl) < 0.12 * dl;
+      if (Math.abs(C.sdPx) > 2) { C.exp = sd < 0 ? 1 : 0; return 1; }
+      C.exp = sdfTone(sd, w, R_);
+      C.sdTex = sdfRead(tex, s, t);
+      C.expTex = sdfTone(C.sdTex, w, R_);
+      return 2;
+    }
+    const toProfile = () => { const b = Math.floor((C.sdPx - binLo) / binW); if (b >= 0 && b < NB) { sum[b] += E.tone; cnt[b]++; } };
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      if (!pixel(i, j)) { if (E.dim) dim++; continue; }
+      valid++;
+      if ((valid & 1023) === 0) isoList.push(E.iso);
+      const k = classify(), err = E.tone - C.exp, ae = Math.abs(err);
+      if (k === 1) {
+        farN++;
+        if (ae < 0.05) farOk++; else { missN++; const cd = cornerDist(E.x, E.y) / texelWorld; if (cd > missCorner) missCorner = cd; }
+        if ((E.tone > 0.5) === (C.sd < 0)) farSign++;
+        if (ae > farWorst) farWorst = ae;
+        if (C.border) { seamPlateauN++; if (ae > seamPlateauMax) seamPlateauMax = ae; }
+        if (C.clean) toProfile();
+      } else {
+        bandN++; se += err * err; if (ae > maxE) maxE = ae;
+        const et = E.tone - C.expTex; seTex += et * et;
+        const ei = E.tone - sdfTone(C.sd, E.iso, R_); seIso += ei * ei;
+        const eti = E.tone - sdfTone(C.sdTex, E.iso, R_); seTexIso += eti * eti;
+        // where the outline IS, read off a pixel on the ramp: the tone 0.5 - d says the outline is d px away
+        if (C.clean && E.tone > 0.15 && E.tone < 0.85) { const pe = (0.5 - E.tone) - C.sdPx; posN++; posS += pe; posS2 += pe * pe; if (Math.abs(pe) > posMax) posMax = Math.abs(pe); }
+        if ((bandN & 7) === 0) errs.push(ae);
+        if (C.border) { seamBandN++; seamSe += err * err; seamMean += err; }
+        if (C.clean) { cleanN++; toProfile(); }
+        if (ae > 0.25 && worst.length < 400) worst.push([ae, i, j, r4(E.tone), r4(C.exp), r4(C.sdPx), r4(C.w / texelWorld), C.clean ? 1 : 0]);
+      }
+    }
+    // the random sample of far pixels
+    const rnd = prng(seed);
+    let sN = 0, sOk = 0, sSign = 0, tries = 0;
+    while (sN < sample && tries < 400 * sample) {
+      tries++;
+      const i = Math.floor(rnd() * W), j = Math.floor(rnd() * H);
+      if (!pixel(i, j)) continue;
+      if (classify() !== 1) continue;
+      sN++;
+      if (Math.abs(E.tone - C.exp) < 0.05) sOk++;
+      if ((E.tone > 0.5) === (C.sd < 0)) sSign++;
+    }
+    // the profile: where the mean tone crosses 0.9, 0.5 and 0.1 (the tone falls as sdPx rises)
+    const prof = [];
+    for (let b = 0; b < NB; b++) if (cnt[b] >= 5) prof.push([binLo + (b + 0.5) * binW, sum[b] / cnt[b]]);
+    const cross = (lvl) => { for (let k = 0; k + 1 < prof.length; k++) { const [x0, y0] = prof[k], [x1, y1] = prof[k + 1]; if (y0 >= lvl && y1 < lvl) return x0 + (y0 - lvl) / (y0 - y1) * (x1 - x0); } return NaN; };
+    const x9 = cross(0.9), x5 = cross(0.5), x1 = cross(0.1);
+    errs.sort((a, b) => a - b);
+    worst.sort((a, b) => b[0] - a[0]);
+    const isoMed = median(isoList);
+    return {
+      view: { az: here.az, el: here.el, side, dpr, W, H, pxPerTexel: r4(texelWorld / isoMed), footprintOverRange: r4(isoMed / R_) },
+      valid, dim,
+      far: { n: farN, pct: r4(100 * farOk / Math.max(1, farN)), signPct: r4(100 * farSign / Math.max(1, farN)), worst: r4(farWorst), missN, missCornerTexels: r4(missCorner) },
+      sample: { n: sN, pct: r4(100 * sOk / Math.max(1, sN)), signPct: r4(100 * sSign / Math.max(1, sN)) },
+      edge: { n: cleanN, width: r4((x1 - x9) / 0.8), w1090: r4(x1 - x9), offsetPx: r4(x5), offsetTexel: r4(x5 * isoMed / texelWorld),
+        posN, posRms: r4(Math.sqrt(posS2 / Math.max(1, posN))), posMean: r4(posS / Math.max(1, posN)), posMax: r4(posMax), posRmsTexel: r4(Math.sqrt(posS2 / Math.max(1, posN)) * isoMed / texelWorld) },
+      twin: { n: bandN, rms: r4(Math.sqrt(se / Math.max(1, bandN))), p99: r4(errs[Math.floor(0.99 * (errs.length - 1))] || 0), max: r4(maxE), rmsTex: r4(Math.sqrt(seTex / Math.max(1, bandN))), rmsIso: r4(Math.sqrt(seIso / Math.max(1, bandN))), rmsTexIso: r4(Math.sqrt(seTexIso / Math.max(1, bandN))) },
+      seam: { plateauN: seamPlateauN, plateauMax: r4(seamPlateauMax), bandN: seamBandN, bandRms: r4(Math.sqrt(seamSe / Math.max(1, seamBandN))), bandMean: r4(seamMean / Math.max(1, seamBandN)) },
+      profile: prof.filter((p, k) => k % 5 === 2).map(([x, y]) => [r4(x), r4(y)]),
+      worst: worst.slice(0, 6),
+    };
+  }
+
+  /**
+   * The print small on the screen, while the view turns: `frames` pictures, `stepDeg` apart in azimuth, of a sheet
+   * `sheetPx` device px across. For every pixel inside the sheet: the tone the GPU drew (T), and from the analytic print,
+   * over the pixel's own patch of paper (6 x 6 points): the true share of dark (ideal), the same of the saturating ramp
+   * 0.5 - 0.5 clamp(sd / range, -1, 1) (soft: what the mean of the texture is), and the print at the pixel's centre alone
+   * (point: what a renderer without filtering draws; it sparkles). Returns for each of the four
+   *   mean     the mean tone over the sheet, per frame: its mean and its spread (max - min) over the frames
+   *   flicker  the mean over pixels and frames of |T(k-1) - 2 T(k) + T(k+1)|: what a pixel does that a steady drift does not
+   *   contrast the spread of the tone inside a frame (rms about the frame's mean), averaged
+   * and rmsVsSoft / rmsVsIdeal: how far the GPU's picture is from each.
+   */
+  function tiny({ sheetPx = 40, frames = 13, stepDeg = 1, el = 55, az0 = 10, side = 'front' } = {}) {
+    const names = ['gpu', 'ideal', 'soft', 'point'], series = { gpu: [], ideal: [], soft: [], point: [] };
+    const R_ = tex.range, SS = 6;
+    let box = null;
+    for (let k = 0; k < frames; k++) {
+      place({ az: az0 + k * stepDeg, el, sheetPx });
+      grab3(side);
+      if (!box) {
+        // the sheet's box on the screen (the same for all frames: a margin for the turning)
+        const pr = [[-1, -1], [1, -1], [1, 1], [-1, 1]].map((c) => R.project([c[0], c[1], 0]));
+        const xs = pr.map((p) => p[0] * dpr), ys = pr.map((p) => H - p[1] * dpr), pad = 0.35 * sheetPx;
+        box = [Math.max(0, Math.floor(Math.min(...xs) - pad)), Math.max(0, Math.floor(Math.min(...ys) - pad)), Math.min(W, Math.ceil(Math.max(...xs) + pad)), Math.min(H, Math.ceil(Math.max(...ys) + pad))];
+      }
+      const bw = box[2] - box[0], bh = box[3] - box[1];
+      const f = { gpu: new Float32Array(bw * bh).fill(NaN), ideal: new Float32Array(bw * bh).fill(NaN), soft: new Float32Array(bw * bh).fill(NaN), point: new Float32Array(bw * bh).fill(NaN) };
+      for (let j = box[1]; j < box[3]; j++) for (let i = box[0]; i < box[2]; i++) {
+        if (!pixel(i, j, 1.5)) continue;
+        const o = (j - box[1]) * bw + (i - box[0]);
+        f.gpu[o] = E.tone;
+        let dark = 0, soft = 0;
+        for (let v = 0; v < SS; v++) for (let u = 0; u < SS; u++) {
+          const fu = (u + 0.5) / SS - 0.5, fv = (v + 0.5) / SS - 0.5;
+          const sd = sdAt(E.x + fu * E.ax + fv * E.bx, E.y + fu * E.ay + fv * E.by);
+          if (sd < 0) dark++;
+          soft += 0.5 - 0.5 * Math.max(-1, Math.min(1, sd / R_));
+        }
+        f.ideal[o] = dark / (SS * SS); f.soft[o] = soft / (SS * SS); f.point[o] = sdAt(E.x, E.y) < 0 ? 1 : 0;
+      }
+      for (const nm of names) series[nm].push(f[nm]);
+    }
+    const res = { sheetPx, frames, stepDeg, el, dpr, footprintOverRange: r4(2 / sheetPx / R_), box };
+    for (const nm of names) {
+      const S = series[nm], means = [];
+      let fl = 0, fn = 0, con = 0;
+      for (let k = 0; k < frames; k++) {
+        let s = 0, n = 0, s2 = 0;
+        for (let o = 0; o < S[k].length; o++) { const v = S[k][o]; if (v === v) { s += v; s2 += v * v; n++; } }
+        means.push(s / n); con += Math.sqrt(Math.max(0, s2 / n - (s / n) * (s / n)));
+        if (k > 0 && k + 1 < frames) for (let o = 0; o < S[k].length; o++) { const a = S[k - 1][o], b = S[k][o], c = S[k + 1][o]; if (a === a && b === b && c === c) { fl += Math.abs(a - 2 * b + c); fn++; } }
+      }
+      res[nm] = { mean: r4(means.reduce((a, b) => a + b, 0) / frames), meanSpread: r4(Math.max(...means) - Math.min(...means)), flicker: r4(fl / Math.max(1, fn)), contrast: r4(con / frames) };
+    }
+    for (const ref of ['soft', 'ideal']) {
+      let s = 0, n = 0;
+      for (let k = 0; k < frames; k++) for (let o = 0; o < series.gpu[k].length; o++) { const a = series.gpu[k][o], b = series[ref][k][o]; if (a === a && b === b) { s += (a - b) * (a - b); n++; } }
+      res['rmsVs' + ref[0].toUpperCase() + ref.slice(1)] = r4(Math.sqrt(s / Math.max(1, n)));
+    }
+    res.pixelsPerFrame = series.gpu[0].reduce((a, v) => a + (v === v ? 1 : 0), 0);
+    return res;
+  }
+
+  /**
+   * No seam, the sharp way: the same print from a second texture whose cell begins half a cell further on, so that the
+   * borders of ITS cells run through other parts of the picture. With a power-of-two size the two textures hold the
+   * same numbers, moved round by half a side, on every mip level; so if nothing special happens along a border (the
+   * wrap, the mip level, the filter) the two pictures are the same. Returns the difference of the tone, pixel by pixel:
+   * the largest and the rms over the whole sheet, and over the pixels within 1 px of a border of either texture.
+   */
+  function seamShift(view, { side = 'front', margin = 3 } = {}) {
+    place(view);
+    if (!tex2) tex2 = makeTex(tex.size, tex.range, HALF, out.info.how);
+    grab3(side);
+    R.setStyle({ print: printOf(tex2, HALF) });
+    grab(bufD);
+    R.setStyle({ print: printOf(tex) });
+    const lenS = Math.hypot(INV[0], INV[1]), lenT = Math.hypot(INV[2], INV[3]);
+    let n = 0, worst = 0, se = 0, bn = 0, bWorst = 0, bse = 0, lv = 0;
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      if (!pixel(i, j, margin)) continue;
+      lv += Math.sqrt(E.den);
+      const o = 4 * (j * W + i), d0 = buf1[o] - buf0[o], d1 = buf1[o + 1] - buf0[o + 1], d2 = buf1[o + 2] - buf0[o + 2];
+      const tone2 = ((bufD[o] - buf0[o]) * d0 + (bufD[o + 1] - buf0[o + 1]) * d1 + (bufD[o + 2] - buf0[o + 2]) * d2) / E.den;
+      const d = Math.abs(E.tone - tone2);
+      n++; se += d * d; if (d > worst) worst = d;
+      // on a border of either lattice: s or t a multiple of one half
+      const dx = E.x - origin[0], dy = E.y - origin[1], s = 2 * (INV[0] * dx + INV[1] * dy), t = 2 * (INV[2] * dx + INV[3] * dy);
+      const ws = sdfFootprint(E.ax, E.ay, E.bx, E.by, INV[0] / lenS, INV[1] / lenS), wt = sdfFootprint(E.ax, E.ay, E.bx, E.by, INV[2] / lenT, INV[3] / lenT);
+      if (Math.abs(s - Math.round(s)) / (2 * lenS) < ws || Math.abs(t - Math.round(t)) / (2 * lenT) < wt) { bn++; bse += d * d; if (d > bWorst) bWorst = d; }
+    }
+    return { n, max: r4(worst), rms: r4(Math.sqrt(se / Math.max(1, n))), borderN: bn, borderMax: r4(bWorst), borderRms: r4(Math.sqrt(bse / Math.max(1, bn))), levels: r4(lv / Math.max(1, n)) };
+  }
+
+  /**
+   * What it costs to hand over ANOTHER field of size x size texels: the first frame with it (the upload and its mip
+   * levels; a pixel is read back so that the GPU has really done it) less a frame without an upload, in ms; the median
+   * of `times` fields. (The field is noise: its content does not matter here.)
+   */
+  function uploadCost(size, times = 5) {
+    place({ az: 30, el: 35, z: 1 });
+    const one = new Uint8Array(4), costs = [];
+    const frame = () => { const t = performance.now(); R.render(); gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, one); return performance.now() - t; };
+    for (let k = 0; k < times; k++) {
+      const data = new Uint8Array(size * size);
+      for (let i = 0; i < data.length; i++) data[i] = (i * 2654435761 + k * 97) >>> 24;
+      const before = R.stats.printUploads;
+      R.setStyle({ print: printOf({ size, data, range: tex.range }) });
+      const first = frame(), second = frame(), third = frame();
+      if (R.stats.printUploads !== before + 1) return { size, error: 'no upload' };
+      costs.push(first - Math.min(second, third));
+    }
+    R.setStyle({ print: printOf(tex) });
+    R.render();
+    costs.sort((a, b) => a - b);
+    return { size, ms: r4(costs[costs.length >> 1]), worst: r4(costs[costs.length - 1]), bytes: size * size };
+  }
+
+  /**
+   * The same view with the sheet as two triangles and as a grid: the largest difference of any colour channel (0..255)
+   * over the pixels inside the sheet, 3 px off its rim (worst), and over the whole canvas (worstAll: along the rim the
+   * multisample coverage of the two meshes may differ by a sample in a pixel here and there — one long edge against
+   * 24 short ones — which is the rasteriser's business, not the print's).
+   */
+  function meshes(view) {
+    place(view);
+    R.setStyle(MEAS);
+    setMesh('two'); const a = grab(bufC).slice();
+    setMesh('grid'); const b = grab(bufC).slice();
+    buf0.fill(0); buf1.fill(255);                             // pixel() wants two reference pictures that differ
+    let worst = 0, n = 0, inside = 0, worstAll = 0;
+    for (let j = 0; j < H; j++) for (let i = 0; i < W; i++) {
+      const o = 4 * (j * W + i), d = Math.max(Math.abs(a[o] - b[o]), Math.abs(a[o + 1] - b[o + 1]), Math.abs(a[o + 2] - b[o + 2]));
+      if (d > worstAll) worstAll = d;
+      if (!pixel(i, j)) continue;
+      inside++; if (d > worst) worst = d; if (d > 2) n++;
+    }
+    return { worst, over2: n, inside, worstAll };
+  }
+
+  /** Lose the WebGL context and have it restored; the picture before and after, and the uploads the restore cost. */
+  async function lose(view) {
+    place(view);
+    R.setStyle(MEAS);
+    const before = grab(bufC).slice(), up0 = R.stats.printUploads;
+    const ext = gl.getExtension('WEBGL_lose_context');
+    if (!ext) return { error: 'no WEBGL_lose_context' };
+    const wait = (type) => new Promise((res) => canvas.addEventListener(type, () => setTimeout(res, 0), { once: true }));
+    let p = wait('webglcontextlost');
+    ext.loseContext();
+    await p;
+    const lostFlag = R.lost, noteShown = !!stage.querySelector('.r3d-message');
+    R.render();                                               // a no-op while lost
+    p = wait('webglcontextrestored');
+    ext.restoreContext();
+    await p;
+    const restored = !R.lost;
+    const after = grab(buf0);
+    let worst = 0, n = 0, ink = 0;
+    for (let i = 0; i < before.length; i += 4) {
+      const d = Math.max(Math.abs(before[i] - after[i]), Math.abs(before[i + 1] - after[i + 1]), Math.abs(before[i + 2] - after[i + 2]));
+      if (d > worst) worst = d; if (d > 2) n++;
+      if (before[i] < 100) ink++;
+    }
+    return { lostFlag, noteShown, restored, uploadsBefore: up0, uploadsAfter: R.stats.printUploads, worstDiff: worst, pixelsOver2: n, darkPixelsBefore: ink, pixels: before.length / 4 };
+  }
+
+  /** A picture of a view in the paper's own colours, as a PNG data URL of the canvas's device pixels (or a crop, blown
+   *  up `scale` times without smoothing). Also drawn into the contact sheet when `tile` is given. */
+  const shot = document.getElementById('shot'), sheetCv = document.getElementById('sheet');
+  const tiles = [];
+  function picture(view, { crop = null, scale = 1, label = '', tile = true, meas = false } = {}) {
+    place(view);
+    R.setStyle(meas ? MEAS : PAPER);
+    R.render();
+    const c = crop || [0, 0, W, H];                                       // x, y from the TOP left, w, h, device px
+    shot.width = Math.round(c[2] * scale); shot.height = Math.round(c[3] * scale);
+    const s = shot.getContext('2d');
+    s.imageSmoothingEnabled = false;
+    s.drawImage(canvas, c[0], c[1], c[2], c[3], 0, 0, shot.width, shot.height);
+    if (tile) { const t = document.createElement('canvas'); t.width = shot.width; t.height = shot.height; t.getContext('2d').drawImage(shot, 0, 0); tiles.push({ t, label }); }
+    return shot.toDataURL('image/png');
+  }
+  /** Lay the pictures taken so far out as one sheet with their labels (`cols` a row, each `px` css px wide). */
+  function contact({ cols = 4, px = 300 } = {}) {
+    const rows = Math.ceil(tiles.length / cols), cap = 30, k = 2;
+    sheetCv.width = cols * (px + 8) * k; sheetCv.height = rows * (px + cap + 8) * k;
+    sheetCv.style.width = cols * (px + 8) + 'px'; sheetCv.style.height = rows * (px + cap + 8) + 'px';
+    const c = sheetCv.getContext('2d');
+    c.scale(k, k); c.fillStyle = '#fff'; c.fillRect(0, 0, sheetCv.width, sheetCv.height);
+    tiles.forEach(({ t, label }, i) => {
+      const x = (i % cols) * (px + 8) + 4, y = Math.floor(i / cols) * (px + cap + 8) + 4;
+      c.imageSmoothingEnabled = t.width > px * k;
+      c.drawImage(t, x, y, px, px * t.height / t.width);
+      c.strokeStyle = '#e5e5ea'; c.strokeRect(x + 0.5, y + 0.5, px - 1, px - 1);
+      c.fillStyle = '#1a1a1f'; c.font = '11px system-ui, sans-serif';
+      label.split('\n').forEach((ln, r) => c.fillText(ln, x + 2, y + px + 12 + 13 * r));
+    });
+    return { tiles: tiles.length, w: sheetCv.width, h: sheetCv.height };
+  }
+
+  try {
+    R = createRenderer(canvas, { labelLayer: document.getElementById('labels'), reducedMotion: true });
+    if (!R.ok) throw new Error('no WebGL2');
+    gl = R.gl;
+    R.setStyle({ background: '#ffffff', ...PAPER });
+    setMesh(['two', 'roll'].includes(q.get('mesh')) ? q.get('mesh') : 'grid');
+    setTex(num('size', 256), num('range', 4), ['baked', 'raster'].includes(q.get('how')) ? q.get('how') : 'exact');
+    W = canvas.width; H = canvas.height; dpr = W / CSS;
+    bufC = new Uint8Array(4 * W * H); buf0 = new Uint8Array(4 * W * H); buf1 = new Uint8Array(4 * W * H); bufD = new Uint8Array(4 * W * H);
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info'), an = gl.getExtension('EXT_texture_filter_anisotropic');
+    Object.assign(out.info, {
+      W, H, dpr, css: CSS, gpu: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER), vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
+      version: gl.getParameter(gl.VERSION), maxTextureSize: gl.getParameter(gl.MAX_TEXTURE_SIZE), samples: gl.getParameter(gl.SAMPLES),
+      anisotropic: an ? gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 0, anisoUsed: an ? Math.min(T.MAX_ANISO, gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT)) : 0,
+      userAgent: navigator.userAgent,
+    });
+    // where the close views look: between the disc and the bar, where a border of the cell (t = 0) runs through the bar
+    const bar = SHAPES[2], disc = SHAPES[0];
+    out.focus = [origin[0] + 0.5 * (bar.c[0] + disc.c[0]) - 0.02, origin[1] + bar.c[1] + 0.035];
+    out.shapes = SHAPES.map((S) => ({ name: S.name, at: [origin[0] + S.c[0], origin[1] + S.c[1]] }));
+    place({ az: num('az', 0), el: num('el', q.get('side') === 'back' ? -90 : 90), z: num('z', 0.75) });
+    R.render();
+    // the camera of this page against the renderer's own projection
+    let worstProj = 0;
+    for (const p of [[0, 0], [0.5, -0.3], [-0.9, 0.9], [0.31, 0.77]]) {
+      const a = R.project([p[0], p[1], 0]), o = unproj(a[0] * dpr, H - a[1] * dpr, [0, 0]);
+      worstProj = Math.max(worstProj, Math.hypot(o[0] - p[0], o[1] - p[1]));
+    }
+    out.info.unprojectError = worstProj;
+    Object.assign(out, { place, measure, tiny, meshes, seamShift, uploadCost, lose, picture, contact, setTex, setMesh, sdAt, stats: () => ({ ...R.stats, styleCalls }), R });
+    document.getElementById('note').textContent = `${out.info.gpu} · texture ${out.info.size} x ${out.info.size}, range ${out.info.rangeTexels} texels · ${out.info.mesh} · dpr ${dpr} · anisotropic x${out.info.anisoUsed}`;
+  } catch (e) { out.error = String(e && e.stack || e); document.getElementById('note').textContent = 'ERROR ' + out.error; }
+  out.ready = true;
+</script>
+</body>
+</html>

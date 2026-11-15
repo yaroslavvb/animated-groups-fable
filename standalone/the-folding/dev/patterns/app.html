@@ -1,0 +1,77 @@
+<!doctype html>
+<!--
+  dev/patterns/app.html — the real app, unbundled (as dev/app-demo.html: the markup of src/index.template.html, src/styles.css
+  as a file, src/app.js as a module), with pattern DESIGNS of the round of 13 Nov 2026 registered first, so that a design is
+  seen where it will live: in the plane, on the folding paper, on the cards of the Tile step.
+
+    app.html?design=designs/<key>/design.js      registers that module (a path relative to dev/patterns/) under its own
+                                                 meta.key and ALSO under the key 'dev', and opens the page with 'dev'
+    app.html?designs=a,b,c                       registers dev/patterns/designs/<a>/design.js … under their own keys
+    app.html?…#g=xx&pat=<key>&t=0.6              the page's own URL state works as ever (pat=<key> of a registered design)
+
+  BUILT IN since 14 Nov 2026 (src/patterns/; SPEC 11): Paisley, Soft commas and Tomoe ship with the page, so their keys
+  ('paisley', 'soft' — the design folder blobs —, 'tomoe') and the Comma's are taken. A design whose key is built in is
+  registered under 'dev' alone (?design=designs/paisley/design.js: the design folder's copy beside the shipped one), and
+  in ?designs=… it is left out — the page has it already — and named in __designs.builtIn, not as an error.
+
+  A design module:  export const meta = { key, label, hint };  export function find(group) -> { shapes, info? }
+  (dev/patterns/kit.js states the rules). It is registered with src/pattern.js registerPattern(meta, find).
+
+  window.__designs = { ready, registered: [{ key, label, hint, path }], builtIn: [{ key, path }], errors: [string] }
+      what was registered, what is built in already, and what went wrong (a module that does not load, a key that is
+      malformed or taken by another design); errors are also console.error'ed
+  window.__folding  the app's own test handle (the top of src/app.js): __folding.setPattern('<key>') shows a design,
+      __folding.getState() -> { pattern, print, printKind ('shapes'), errors, … }
+
+  The pill's swatch: the six patterns of the selector have theirs (src/index.template.html); a registered design ('dev',
+  or a key of its own) has none, so its pill is the bare caret on a phone. The legend's "front · back" follows
+  #app[data-print] for every print (src/styles.css).
+
+  Needs http. tools/browser.mjs serves the workspace; the designers' window is dev/patterns/app-sheet.mjs.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>The Folding — pattern designs</title>
+<link rel="stylesheet" href="../../src/styles.css">
+</head>
+<body>
+<script type="module">
+  const q = new URLSearchParams(location.search);
+  const D = (window.__designs = { ready: false, registered: [], builtIn: [], errors: [] });
+  const fail = (text) => { D.errors.push(text); console.error('designs: ' + text); };
+  const { registerPattern, resolvePattern, PATTERNS } = await import('../../src/pattern.js');
+  const jobs = [];
+  if (q.get('design')) jobs.push({ path: q.get('design'), dev: true });
+  for (const k of (q.get('designs') || '').split(',').map((s) => s.trim()).filter(Boolean)) jobs.push({ path: `designs/${k}/design.js`, dev: false });
+  let first = null;
+  for (const job of jobs) {
+    let mod;
+    try { mod = await import('./' + job.path); } catch (e) { fail(`${job.path} does not load: ${String((e && e.message) || e).split('\n')[0]}`); continue; }
+    const meta = mod.meta || {};
+    if (typeof mod.find !== 'function') { fail(`${job.path} exports no find(group)`); continue; }
+    const add = (m) => {
+      try { const p = registerPattern(m, mod.find); D.registered.push({ ...p, path: job.path }); return p.key; }
+      catch (e) { fail(`${job.path}: ${String((e && e.message) || e).split('\n')[0]}`); return null; }
+    };
+    // a design that ships with the page (its key is one of PATTERNS): not again under its key
+    const known = typeof meta.key === 'string' ? resolvePattern(meta.key) : null, shipped = known !== null && PATTERNS.some((p) => p.key === known);
+    if (shipped) D.builtIn.push({ key: known, path: job.path });
+    const own = shipped ? null : add({ key: meta.key, label: meta.label, hint: meta.hint });
+    const dev = job.dev ? add({ key: 'dev', label: 'dev: ' + (meta.label || meta.key || job.path), hint: meta.hint }) : null;
+    if (!first) first = dev || own;
+  }
+  const res = await fetch('../../src/index.template.html', { cache: 'no-store' });
+  const page = new DOMParser().parseFromString(await res.text(), 'text/html');
+  for (const attr of page.body.attributes) document.body.setAttribute(attr.name, attr.value);
+  const nodes = [...page.body.childNodes].filter((n) => n.nodeName !== 'SCRIPT').map((n) => document.importNode(n, true));
+  document.body.replaceChildren(...nodes);
+  await import('../../src/app.js');
+  // ?design=… opens with that design, unless the address names a pattern itself
+  if (q.get('design') && first && window.__folding && !/(^|[#&])pat=/i.test(location.hash)) window.__folding.setPattern(first);
+  D.ready = true;
+</script>
+</body>
+</html>

@@ -20,6 +20,7 @@ import { createFold, foldMeshOptions, canRecut } from '../src/folds/index.js';
 import createRecut, { RECUT_FOLDS, recutHome, carry, moveText, MOVE_SECONDS, RECUT_MAX_SECONDS, DROP_SHARE, HOP } from '../src/folds/recut.js';
 import { createSelfX, jitterPlane, rimTriangles } from '../src/selfx.js';
 import { buildScene, mapScene, sceneLines, foldCaption, planeRecut, recutActive, WIDTHS } from '../src/app.js';
+import { SHEET_PATTERN } from '../src/pattern.js';
 
 const SEEDS = Math.max(3, +process.env.RECUT_SEEDS || 3);
 const IDS = ['22x', 'xx'];
@@ -744,8 +745,9 @@ test('app: a scene re-cuts first by default; its lines, the plane\'s overlay and
       }
       assert.match(foldCaption(scene.fold, 0.8, true), new RegExp(`^${PR.name} folds: nothing passes through$`));
       assert.match(foldCaption(scene.fold, 0, true), new RegExp(`^re-cut into the ${PR.name} first$`));
-      // the comma, too, rides on the pieces: its outline is cut where the piece changes
-      const comma = buildScene(g, { seed: p.seed, metric: p.metric, anchor, pattern: 'comma' });
+      // the comma on the sheet, too, rides on the pieces: its outline is cut where the piece changes (14 Nov 2026: the
+      // Comma of the selector is a print; the sheet is what a pattern without a print shows, and buildScene's default)
+      const comma = buildScene(g, { seed: p.seed, metric: p.metric, anchor, pattern: SHEET_PATTERN });
       assert.ok(comma.M.motifTint && comma.M.motifCut.bad === 0, `${id} ${p.name}: the comma is cut into the re-cut mesh`);
       for (const m of comma.motif) assert.equal(new Set([...m.cells].map((tg) => comma.M.cells[tg].part)).size, 1, `${id} ${p.name}: a piece of the comma's outline rides on one piece`);
     }

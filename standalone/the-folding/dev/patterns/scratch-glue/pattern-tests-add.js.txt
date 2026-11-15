@@ -1,0 +1,355 @@
+
+// ====================================================================================================================
+// Shape patterns (13 Nov 2026, the pattern round): the registry, and a registered pattern against everything above
+// ====================================================================================================================
+// A shape pattern is registered at run time (registerPattern); its print is the orbit of a motif under the group
+// (src/shapes.js). The test's own pattern is a comma at a generic place found by a rule that speaks only of the
+// group's lattice, centre and elements — so it exists, carried along, for a group that was moved about.
+
+/** The distance from the point to its nearest image under the group that is another point. */
+function roomAt(group, x, y) {
+  let D = Infinity;
+  for (const g of elementsNear(group, x, y, 1.01 * Math.max(Math.hypot(group.e1[0], group.e1[1]), Math.hypot(group.e2[0], group.e2[1])), x, y)) {
+    const d = Math.hypot(g.a * x + g.b * y + g.tx - x, g.c * x + g.d * y + g.ty - y);
+    if (d > 1e-7 * Math.sqrt(group.domainArea) && d < D) D = d;
+  }
+  return D;
+}
+const UNIT_COMMA = commaOutline();
+/** find(group) of the test's pattern: of the 49 places centre + a e1 + b e2 the roomiest, and there a comma as big as its room. */
+function testCommaFind(group) {
+  let best = null;
+  for (let i = 0; i < 7; i++) for (let j = 0; j < 7; j++) {
+    const a = (i + 0.37) / 7 - 0.5, b = (j + 0.61) / 7 - 0.5;
+    const x = group.center[0] + a * group.e1[0] + b * group.e2[0], y = group.center[1] + a * group.e1[1] + b * group.e2[1], D = roomAt(group, x, y);
+    if (!best || D > best.D * (1 + 1e-6)) best = { x, y, D };
+  }
+  // the unit comma lies in the unit disc: scaled by s it stays within s of its place, and the places are D apart
+  const s = 0.5 * (best.D - 0.04 * Math.sqrt(group.domainArea)), th = Math.atan2(group.e1[1], group.e1[0]) + 0.7, co = s * Math.cos(th), si = s * Math.sin(th), pts = [];
+  for (let i = 0; i + 2 < UNIT_COMMA.length; i += 2) pts.push([best.x + co * UNIT_COMMA[i] - si * UNIT_COMMA[i + 1], best.y + si * UNIT_COMMA[i] + co * UNIT_COMMA[i + 1]]);
+  return { shapes: [{ pts }], info: { at: [best.x, best.y], scale: s } };
+}
+/** A second one, for the fill rule: a ring ON the rotation centre nearest the window's centre, so k copies lie on each other. */
+function testRingFind(group) {
+  const L = Math.hypot(group.e1[0], group.e1[1]) + Math.hypot(group.e2[0], group.e2[1]), cs = symmetryElements(group, group.center[0], group.center[1], L).centers;
+  if (!cs.length) throw new Error('testring: the group has no rotation centre');
+  const c = cs.slice().sort((p, q) => Math.hypot(p.x - group.center[0], p.y - group.center[1]) - Math.hypot(q.x - group.center[0], q.y - group.center[1]))[0];
+  const r = 0.4 * roomAt(group, c.x, c.y), circle = (rad, n) => Array.from({ length: n }, (_, i) => [c.x + rad * Math.cos((2 * Math.PI * i) / n), c.y + rad * Math.sin((2 * Math.PI * i) / n)]);
+  return { shapes: [{ pts: circle(r, 144) }, { pts: circle(0.5 * r, 72), hole: true }], info: { at: [c.x, c.y], order: c.order } };
+}
+
+const before = allPatterns().length;
+const TEST = registerPattern({ key: 'testcomma', label: 'Test comma', hint: 'a comma at a generic place' }, testCommaFind);
+const RING = registerPattern({ key: 'testring' }, testRingFind);
+
+test('shape patterns: the registry — registerPattern adds to allPatterns(), refuses a key that is taken; PATTERNS stays the three; names resolve', () => {
+  assert.equal(before, 3);
+  assert.deepEqual(TEST, { key: 'testcomma', label: 'Test comma', hint: 'a comma at a generic place' });
+  assert.deepEqual(RING, { key: 'testring', label: 'testring', hint: '' }, 'the label defaults to the key');
+  assert.ok(Object.isFrozen(TEST) && Object.isFrozen(RING));
+  const all = allPatterns();
+  assert.deepEqual(all.map((p) => p.key), ['checker', 'rings', 'comma', 'testcomma', 'testring'], 'the built-in ones, then the registered ones in the order they came');
+  PATTERNS.forEach((p, i) => assert.equal(all[i], p));
+  assert.equal(all[3], TEST);
+  assert.notEqual(allPatterns(), all, 'a new array each time');
+  assert.deepEqual(PATTERNS.map((p) => p.key), ['checker', 'rings', 'comma'], 'PATTERNS itself is the frozen list of three');
+  assert.ok(Object.isFrozen(PATTERNS));
+  assert.equal(DEFAULT_PATTERN, 'checker');
+  // names
+  assert.equal(resolvePattern('testcomma'), 'testcomma');
+  assert.equal(resolvePattern('  TestComma '), 'testcomma', 'case and blanks do not matter');
+  assert.equal(resolvePattern('Test comma'), 'testcomma', 'a label is taken for its key');
+  assert.equal(resolvePattern('testring'), 'testring');
+  assert.equal(resolvePattern('tartan'), null);
+  // a key that is taken: a pattern's own, a label, an alias that resolvePattern knows
+  for (const key of ['checker', 'rings', 'comma', 'testcomma', 'testring', 'checkerboard', 'checks', 'check', 'ring', 'bands', 'commas', 'motif']) {
+    assert.throws(() => registerPattern({ key, label: 'Another' }, testCommaFind), /is taken/, `the key '${key}'`);
+  }
+  // a key that is no key: it must be lower case (resolvePattern lowers what it is given) and fit the URL hash
+  for (const key of ['', 'Paisley', '9lives', 'two words', 'a*b', 'ä', 'x'.repeat(25), null, undefined, 7, {}]) {
+    assert.throws(() => registerPattern({ key, label: 'Bad' }, testCommaFind), /a key is lower-case/, `the key ${JSON.stringify(key)}`);
+  }
+  assert.throws(() => registerPattern(null, testCommaFind), /a key is lower-case/);
+  assert.throws(() => registerPattern({ key: 'nofind', label: 'No find' }), TypeError);
+  assert.throws(() => registerPattern({ key: 'nofind', label: 'No find' }, { shapes: [] }), TypeError);
+  assert.deepEqual(allPatterns().map((p) => p.key), ['checker', 'rings', 'comma', 'testcomma', 'testring'], 'a refusal adds nothing');
+  // a key of 24 characters with digits, - and _ is one
+  const long = registerPattern({ key: 'a-1_' + 'z'.repeat(20), label: '  Long  ', hint: 7 }, testCommaFind);
+  assert.deepEqual([long.key.length, long.label, long.hint], [24, 'Long', '']);
+  assert.equal(resolvePattern(long.key), long.key);
+  assert.equal(allPatterns().length, 6);
+  // the print: a shape print, the same object every time, under its key and under its label
+  const g = BY_ID['333'], P = printFor(g, 'testcomma');
+  assert.ok(P && Object.isFrozen(P));
+  assert.deepEqual([P.kind, P.key, P.name], ['shapes', 'testcomma', 'testcomma']);
+  assert.equal(printFor(g, 'Test comma'), P, 'the same object every time');
+  assert.equal(printFor(g, 'TESTCOMMA'), P);
+  assert.deepEqual(P.info.at.length, 2, 'find\'s info is kept');
+  assert.notEqual(printFor(BY_ID['442'], 'testcomma'), P, 'a print of its own for every group');
+  assert.equal(printFor(g, 'checker').kind, 'linear', 'the built-in prints are what they were');
+  assert.equal(printFor(g, 'comma'), null);
+});
+
+test('shape patterns: a find that throws, or a motif that cannot be used, gives no print and ONE warning (the app then shows the comma)', () => {
+  const calls = { n: 0 };
+  registerPattern({ key: 'testthrows', label: 'Throws' }, (group) => { calls.n++; if (group.id !== '442') throw new Error('no spec for ' + group.id); return testCommaFind(group); });
+  registerPattern({ key: 'testempty', label: 'Empty' }, () => ({ shapes: [] }));
+  registerPattern({ key: 'testnothing', label: 'Nothing' }, () => undefined);
+  registerPattern({ key: 'testnan', label: 'NaN' }, (group) => ({ shapes: [{ pts: [[0, 0], [1, NaN], [0, 1]] }] }));
+  const said = [], warn = console.warn;
+  console.warn = (...a) => { said.push(a.join(' ')); };
+  try {
+    const g = BY_ID['2222'];
+    assert.equal(printFor(g, 'testthrows'), null);
+    assert.equal(said.length, 1, 'one warning');
+    assert.match(said[0], /testthrows/); assert.match(said[0], /2222/); assert.match(said[0], /no spec for 2222/); assert.match(said[0], /comma/);
+    assert.equal(printFor(g, 'testthrows'), null);
+    assert.equal(printFor(g, 'Throws'), null);
+    assert.deepEqual([said.length, calls.n], [1, 1], 'asked again: no second warning, find is not called again');
+    // another group: its own answer (and its own warning, if it has none either)
+    assert.equal(printFor(BY_ID['442'], 'testthrows').kind, 'shapes', 'the group it has a motif for');
+    assert.equal(printFor(BY_ID['*x'], 'testthrows'), null);
+    assert.equal(said.length, 2);
+    // motifs that cannot be used
+    assert.equal(printFor(g, 'testempty'), null); assert.match(said[2], /testempty.*no polygon/);
+    assert.equal(printFor(g, 'testnothing'), null); assert.match(said[3], /testnothing.*no \{ shapes \}/);
+    assert.equal(printFor(g, 'testnan'), null); assert.match(said[4], /testnan.*not a finite number/);
+    assert.equal(said.length, 5);
+    for (const k of ['testempty', 'testnothing', 'testnan']) assert.equal(printFor(g, k), null);
+    assert.equal(said.length, 5, 'each said once');
+    // the others are not disturbed
+    assert.equal(printFor(g, 'testcomma').kind, 'shapes');
+    assert.equal(printFor(g, 'checker').kind, 'linear');
+    // testring has no motif for a group without rotation centres: no print there, a print elsewhere
+    assert.equal(printFor(BY_ID.o, 'testring'), null); assert.match(said[5], /no rotation centre/);
+    assert.equal(printFor(BY_ID['632'], 'testring').kind, 'shapes');
+  } finally { console.warn = warn; }
+});
+
+test('shape prints: a registered pattern\'s print is the group\'s in every group — the generators, the sharp check on its outlines, hundreds of elements; it keeps the rules', (t) => {
+  let checked = 0;
+  const rows = [];
+  for (const g of GROUPS) {
+    const P = printFor(g, 'testcomma'), label = `${g.id} testcomma`, size = Math.sqrt(g.domainArea);
+    assert.ok(P, `${label}: there is one`);
+    assert.deepEqual([P.kind, P.key], ['shapes', 'testcomma']);
+    const V = validateShapes(P);
+    assert.deepEqual(V.problems, [], `${label}: the motif keeps the rules`);
+    assert.equal(V.stabilizer, 1, label);
+    assert.ok(invariantUnder(g, P, 500, 31), `${label}: the generators keep it`);
+    assert.ok(invariantUnder(g, P, 500, 977), `${label}: the generators keep it (other points)`);
+    assert.ok(exactlyInvariant(g, P, 60, 5), `${label}: exactly, at its own outlines`);
+    assert.ok(exactlyInvariant(g, P, 60, 4711), `${label}: exactly, at its own outlines (other points)`);
+    const L = Math.hypot(g.e1[0], g.e1[1]) + Math.hypot(g.e2[0], g.e2[1]);
+    const els = elementsNear(g, g.center[0], g.center[1], 2 * L);
+    assert.ok(els.length >= 9, `${label}: ${els.length} elements`);
+    const rnd = prng(301 + GROUPS.indexOf(g)), d = 0.02 * P.cell;
+    let pts = 0, darkPts = 0;
+    for (let i = 0; i < 4000 && pts < 60; i++) {
+      const x = g.center[0] + (2 * rnd() - 1) * L, y = g.center[1] + (2 * rnd() - 1) * L;
+      if (!steady(P, x, y, d)) continue;
+      pts++;
+      const tone = P.tone(x, y);
+      assert.ok(tone === 0 || tone === 1, `${label}: tone ${tone}`);
+      darkPts += tone;
+      for (const e of els) {
+        const u = e.a * x + e.b * y + e.tx, v = e.c * x + e.d * y + e.ty;
+        if (!steady(P, u, v, 0.5 * d)) continue;
+        assert.equal(P.tone(u, v), tone, `${label}: the element ${JSON.stringify(e)} changes the tone at (${x}, ${y})`);
+        checked++;
+      }
+    }
+    assert.ok(pts >= 60, `${label}: ${pts} points`);
+    // two tones, both there: the share of dark over a lattice cell is the motif's area in the tile's
+    let dark = 0, n = 0;
+    for (let i = 0; i < 160; i++) for (let j = 0; j < 160; j++) { const s = (i + 0.37) / 160, u = (j + 0.61) / 160; dark += P.tone(s * g.e1[0] + u * g.e2[0], s * g.e1[1] + u * g.e2[1]); n++; }
+    const share = dark / n, exact = P.netArea / g.domainArea;
+    assert.ok(Math.abs(share - exact) < 0.012, `${label}: ${(100 * share).toFixed(1)} % dark, the motif's area is ${(100 * exact).toFixed(1)} % of the tile`);
+    assert.ok(share > 0.04 && share < 0.6, `${label}: ${(100 * share).toFixed(1)} % dark`);
+    assert.ok(P.cell > 0.1 * size && P.cell < 0.8 * size, `${label}: a mark is ${(P.cell / size).toFixed(3)} tile sizes`);
+    rows.push(`${g.id.padEnd(6)} testcomma  mark ${(P.cell / size).toFixed(3)}  dark ${(100 * share).toFixed(0)} %  gap ${V.gap.toFixed(3)}`);
+  }
+  assert.ok(checked > 17 * 300, `${checked} element checks`);
+  for (const r of rows) t.diagnostic(r);
+});
+
+/** A shape print carried along with its group: the pattern's own find, asked for the moved group. */
+const carriedPrint = (g, th, sc, v) => { const h = moved(g, th, sc, v); return { h, P: printFor(h, 'testcomma') }; };
+/** The move that turns by th and scales by sc about the point c. */
+const about = (c, th, sc) => [c[0] - sc * (Math.cos(th) * c[0] - Math.sin(th) * c[1]), c[1] - sc * (Math.sin(th) * c[0] + Math.cos(th) * c[1])];
+
+test('shape prints: control — a print that the group does not keep is noticed (the print of the group shifted, turned, scaled; by a hair: the sharp check)', () => {
+  let caught = 0, tried = 0;
+  for (const id of ['2222', '22x', 'xx', '*x', '442', '333', '*632']) {
+    const g = BY_ID[id], P = printFor(g, 'testcomma');
+    assert.ok(invariantUnder(g, P, 300) && exactlyInvariant(g, P), `${id}: the print as found passes`);
+    // the print of the same group laid elsewhere is a shape print too, with a tone and a margin of its own — but not this group's
+    const faults = [
+      ['shifted by a third of a mark', carriedPrint(g, 0, 1, [0.6 * 0.31 * P.cell, 0.8 * 0.31 * P.cell]).P],
+      ['turned by 7 degrees', carriedPrint(g, 0.12, 1, about(g.center, 0.12, 1)).P],
+      ['3 % larger', carriedPrint(g, 0, 1.03, about(g.center, 0, 1.03)).P],
+    ];
+    for (const [name, bad] of faults) {
+      tried++;
+      assert.equal(bad.kind, 'shapes');
+      if (!invariantUnder(g, bad, 300)) caught++;
+      assert.equal(exactlyInvariant(g, bad), false, `${id}: a print ${name} passes the sharp check`);
+    }
+    // off by a thousandth of a mark: the sieve at generic points does not see it, the sharp check does
+    const hair = carriedPrint(g, 0, 1, [0.6e-3 * P.cell, 0.8e-3 * P.cell]).P;
+    assert.equal(invariantUnder(g, hair, 300), true, `${id}: the sieve does not see a thousandth of a mark`);
+    assert.equal(exactlyInvariant(g, hair), false, `${id}: the sharp check does`);
+    assert.equal(exactlyInvariant(g, hair, 40, 811), false, `${id}: from other points too`);
+  }
+  assert.equal(caught, tried, `${caught} of ${tried} gross faults caught by the sieve`);
+});
+
+test('shape prints: a registered pattern exists wherever the group sits — turned, scaled and shifted copies of all 17, each the print of its own group', () => {
+  const rnd = prng(4026);
+  let n = 0;
+  for (const g of GROUPS) {
+    const P0 = printFor(g, 'testcomma');
+    for (let k = 0; k < 8; k++) {
+      const th = k < 3 ? [0.3, 1, 3.66][k] : rnd() * 2 * Math.PI, sc = k < 2 ? 1 : 0.4 + 2.2 * rnd(), v = k % 3 === 0 ? [0, 0] : [3 * rnd() - 1.5, 3 * rnd() - 1.5];
+      const { h, P } = carriedPrint(g, th, sc, v), label = `${g.id} turned ${th.toFixed(3)}, scaled ${sc.toFixed(3)}, shifted ${v.map((x) => x.toFixed(3))}`;
+      assert.ok(P && P.kind === 'shapes', `${label}: a print`);
+      assert.deepEqual(validateShapes(P).problems, [], `${label}: the motif keeps the rules`);
+      // the same motif, carried along: the same share of the tile, the same number of points
+      assert.ok(Math.abs(P.netArea / h.domainArea - P0.netArea / g.domainArea) < 1e-6, `${label}: the motif's share of the tile is ${P.netArea / h.domainArea}, at home ${P0.netArea / g.domainArea}`);
+      assert.equal(P.verts, P0.verts, label);
+      assert.ok(exactlyInvariant(h, P, 40, 99 + k), `${label}: exact`);
+      assert.ok(invariantUnder(h, P, 120, 5 + k), `${label}: the generators keep it`);
+      const els = elementsNear(h, h.center[0], h.center[1], 3 * Math.sqrt(h.cellArea)), L = Math.sqrt(h.cellArea);
+      let bad = 0;
+      for (let i = 0; i < 400; i++) {
+        const x = h.center[0] + (2 * rnd() - 1) * 2 * L, y = h.center[1] + (2 * rnd() - 1) * 2 * L, e = els[(rnd() * els.length) | 0];
+        if (P.tone(e.a * x + e.b * y + e.tx, e.c * x + e.d * y + e.ty) !== P.tone(x, y)) bad++;
+      }
+      assert.ok(bad <= 1, `${label}: the print changes tone under an element at ${bad} of 400 points`);
+      // ... and its texture is the moved print's: read as the shader reads it
+      if (k < 2) {
+        const T = printUniforms(P).tex, diag = Math.max(Math.hypot(T.e1[0] + T.e2[0], T.e1[1] + T.e2[1]), Math.hypot(T.e1[0] - T.e2[0], T.e1[1] - T.e2[1])) / T.size;
+        const d = T.e1[0] * T.e2[1] - T.e1[1] * T.e2[0];
+        for (let i = 0; i < 300; i++) {
+          const x = h.center[0] + (2 * rnd() - 1) * 2 * L, y = h.center[1] + (2 * rnd() - 1) * 2 * L;
+          if (P.margin(x, y) <= diag) continue;
+          const qx = x - T.origin[0], qy = y - T.origin[1];
+          assert.equal(sdfSample(T.data, T.size, (qx * T.e2[1] - qy * T.e2[0]) / d, (T.e1[0] * qy - T.e1[1] * qx) / d) < 128 ? 1 : 0, P.tone(x, y), `${label}: the texture at (${x}, ${y})`);
+        }
+      }
+      n++;
+    }
+  }
+  assert.equal(n, 17 * 8);
+});
+
+test('shape prints: the shader\'s uniforms — mode 3, the texture baked once, its cell and origin; the tone the renderer draws from them is the print\'s', (t) => {
+  let compared = 0, worst = 0;
+  for (const g of GROUPS) {
+    const P = printFor(g, 'testcomma'), U = printUniforms(P), label = `${g.id} testcomma`;
+    assert.equal(U.mode, 3, label);
+    assert.ok(U.L instanceof Float32Array && U.L.length === 9 && U.A instanceof Float32Array && U.A.length === 4 && U.I instanceof Float32Array && U.I.length === 4 && U.O instanceof Float32Array && U.O.length === 3, label);
+    const T = U.tex;
+    assert.equal(T, bakeShapes(P), `${label}: the print's own texture`);
+    assert.equal(printUniforms(P).tex, T, `${label}: baked once — the same object at every call (the renderer uploads only another one)`);
+    assert.equal(printUniforms(P).tex.data, T.data);
+    // what render3d.js setStyle asks of a shape print (notes/patterns-renderer.md)
+    assert.ok(Number.isInteger(T.size) && T.size >= 1 && (T.size & (T.size - 1)) === 0, `${label}: a size of ${T.size}`);
+    assert.ok(T.data instanceof Uint8Array && T.data.length === T.size * T.size && T.range > 0 && Number.isFinite(T.range), label);
+    for (const a of [U.L, U.A, U.I, U.O]) for (const v of a) assert.ok(Number.isFinite(v), label);
+    // A = the texture's cell, I = the rows of its inverse, O = (origin, range)
+    const f = Math.fround, near = (a, b) => Math.abs(a - b) <= 1e-6 * (1 + Math.abs(b));
+    assert.deepEqual(Array.from(U.A), [T.e1[0], T.e1[1], T.e2[0], T.e2[1]].map(f), `${label}: A`);
+    assert.deepEqual(Array.from(U.O), [T.origin[0], T.origin[1], T.range].map(f), `${label}: O`);
+    assert.ok(near(U.I[0] * T.e1[0] + U.I[1] * T.e1[1], 1) && near(U.I[2] * T.e1[0] + U.I[3] * T.e1[1], 0) && near(U.I[0] * T.e2[0] + U.I[1] * T.e2[1], 0) && near(U.I[2] * T.e2[0] + U.I[3] * T.e2[1], 1), `${label}: I is the inverse of the cell`);
+    // the cell of the texture is a cell of the group's lattice
+    const dd = g.e1[0] * g.e2[1] - g.e1[1] * g.e2[0];
+    for (const w of [T.e1, T.e2]) for (const c of [(w[0] * g.e2[1] - w[1] * g.e2[0]) / dd, (g.e1[0] * w[1] - g.e1[1] * w[0]) / dd]) assert.ok(Math.abs(c - Math.round(c)) < 1e-9, `${label}: the texture's cell is on the lattice`);
+    assert.ok(Math.abs(Math.abs(T.e1[0] * T.e2[1] - T.e1[1] * T.e2[0]) - g.cellArea) < 1e-9 * g.cellArea, `${label}: one cell`);
+    // the shader's arithmetic in JavaScript, on the uniforms as it gets them (single precision), with the renderer's
+    // own twins: lattice coordinates, one read, the ramp. Where the outline is more than a texel away the tone is the print's.
+    const rnd = prng(700 + GROUPS.indexOf(g)), L = Math.hypot(g.e1[0], g.e1[1]) + Math.hypot(g.e2[0], g.e2[1]);
+    const diag = Math.max(Math.hypot(T.e1[0] + T.e2[0], T.e1[1] + T.e2[1]), Math.hypot(T.e1[0] - T.e2[0], T.e1[1] - T.e2[1])) / T.size;
+    let n = 0;
+    for (let i = 0; i < 1500; i++) {
+      const x = f(g.center[0] + (2 * rnd() - 1) * L), y = f(g.center[1] + (2 * rnd() - 1) * L);      // (a vertex's paper point is single precision too)
+      const qx = f(x - U.O[0]), qy = f(y - U.O[1]), s = f(f(U.I[0] * qx) + f(U.I[1] * qy)), u = f(f(U.I[2] * qx) + f(U.I[3] * qy));
+      const sd = sdfRead(U.tex, s, u), m = P.margin(x, y), tone = P.tone(x, y);
+      assert.ok(Math.abs(sd - sdfDistance(sdfSample(T.data, T.size, s, u), T.range)) < 1e-12, `${label}: the renderer's read is src/sdf.js's`);
+      if (m < T.range - diag) worst = Math.max(worst, Math.abs(sd - (tone ? -m : m)) / T.pitch);
+      if (m <= diag + 0.1 * T.pitch) continue;
+      n++; compared++;
+      // a pixel a tenth of a texel across (magnified), one texel across, and four (the print small on the screen: no hard edge left, the right side of grey)
+      assert.equal(sdfTone(sd, 0.1 * T.pitch, U.O[2]), tone, `${label}: the tone drawn at (${x}, ${y}), ${(m / T.pitch).toFixed(2)} texels from an outline`);
+      if (m > diag + 0.6 * T.pitch) assert.equal(sdfTone(sd, T.pitch, U.O[2]), tone, `${label}: at a pixel a texel across`);
+      assert.equal(sdfTone(sd, 4 * T.pitch, U.O[2]) > 0.5 ? 1 : 0, tone, `${label}: at a pixel four texels across`);
+    }
+    assert.ok(n > 900, `${label}: ${n} points`);
+  }
+  assert.ok(compared > 17 * 900);
+  t.diagnostic(`${compared} points; the distance the shader reads is off by ${worst.toFixed(3)} texels at most (the texture's bilinear read near a corner)`);
+  // the built-in prints and no print are what they were
+  assert.equal(printUniforms(null).mode, 0);
+  assert.equal(printUniforms(printFor(BY_ID['333'], 'checker')).mode, 1);
+  assert.equal(printUniforms(printFor(BY_ID['333'], 'checker')).tex, undefined);
+});
+
+/** The winding number of the recorded subpaths round a point: what the NONZERO rule asks. */
+function windingOf(subs, x, y) {
+  let w = 0;
+  for (const p of subs) for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
+    const a = p[j], b = p[i];
+    if ((a[1] > y) !== (b[1] > y) && x < ((b[0] - a[0]) * (y - a[1])) / (b[1] - a[1]) + a[0]) w += b[1] > a[1] ? 1 : -1;
+  }
+  return w;
+}
+/** Is the point filled by a recorded fill? By the rule the fill was made with, inside every clip. */
+const filledBy = (f, x, y) => f.clips.every((cl) => cl.some((poly) => inPoly(poly, x, y))) && (f.rule === 'evenodd' ? evenOdd(f.path, x, y) : windingOf(f.path, x, y) !== 0);
+
+test('shape prints: fillPrint draws exactly the dark tone of a shape print — one path, the nonzero rule; through the plane\'s window and through a card\'s turn and flip', () => {
+  const maps = [
+    { name: 'the window', A: { a: 90, b: 0, c: 0, d: -90, tx: 300, ty: 280 } },                       // y up -> y down
+    { name: 'a card turned 40 degrees and flipped', A: { a: 70 * Math.cos(0.7), b: 70 * Math.sin(0.7), c: 70 * Math.sin(0.7), d: -70 * Math.cos(0.7), tx: 210, ty: 190 } },
+    { name: 'a card seen edge-on (squeezed to a third)', A: { a: 30, b: 0, c: 0, d: -90, tx: 150, ty: 140 } },
+    { name: 'a card that is not flipped, turned 100 degrees', A: { a: 60 * Math.cos(1.75), b: -60 * Math.sin(1.75), c: 60 * Math.sin(1.75), d: 60 * Math.cos(1.75), tx: 100, ty: 120 } },
+  ];
+  let compared = 0, rings = 0, wrongRule = 0;
+  for (const g of GROUPS) {
+    for (const key of ['testcomma', 'testring']) {
+      const P = printFor(g, key);
+      if (!P) { assert.ok(key === 'testring' && ['o', '**', 'xx', '*x'].includes(g.id), `${g.id} ${key}: no print`); continue; }
+      const box = [g.center[0] - 0.9, g.center[1] - 0.8, g.center[0] + 0.9, g.center[1] + 0.8];
+      for (const M of maps) {
+        const c = recorder(), A = M.A;
+        fillPrint(c, P, (x, y, out) => { out[0] = A.a * x + A.b * y + A.tx; out[1] = A.c * x + A.d * y + A.ty; return out; }, box, '#123456');
+        assert.equal(c.fills.length, 1, `${g.id} ${key}: ONE path for all the copies`);
+        assert.equal(c.fills[0].rule, 'nonzero', `${g.id} ${key}: the nonzero rule`);
+        assert.equal(c.fills[0].style, '#123456');
+        assert.equal(c.fills[0].clips.length, 0, 'fillPrint clips nothing for a shape print: the caller does');
+        const rnd = prng(177 + GROUPS.indexOf(g));
+        let n = 0;
+        for (let i = 0; i < 3000 && n < 150; i++) {
+          const x = box[0] + rnd() * (box[2] - box[0]), y = box[1] + rnd() * (box[3] - box[1]);
+          if (P.margin(x, y) < 1e-6 * P.size) continue;                  // (on an outline: either tone)
+          n++;
+          const px = A.a * x + A.b * y + A.tx, py = A.c * x + A.d * y + A.ty, tone = P.tone(x, y);
+          assert.equal(filledBy(c.fills[0], px, py) ? 1 : 0, tone, `${g.id} ${key}, ${M.name}: the canvas and the tone differ at (${x.toFixed(4)}, ${y.toFixed(4)})`);
+          // the ring lies k times on itself (k = the order of its centre): the even-odd rule would leave it bare for an even k
+          if (key === 'testring' && tone && !evenOdd(c.fills[0].path, px, py)) wrongRule++;
+          compared++;
+        }
+        assert.ok(n >= 150, `${g.id} ${key}: ${n} points`);
+      }
+      if (key === 'testring') rings++;
+    }
+  }
+  assert.equal(rings, 13, 'the thirteen groups with rotation centres');
+  assert.ok(compared === (17 + 13) * 4 * 150, `${compared} points compared`);
+  assert.ok(wrongRule > 300, `the rule matters: by the even-odd rule ${wrongRule} dark points of the rings would be bare`);
+  // no print: nothing is drawn; the built-in prints still go by the even-odd rule
+  const c = recorder();
+  fillPrint(c, null, (x, y, out) => out, [0, 0, 1, 1], '#000');
+  assert.equal(c.fills.length, 0);
+  fillPrint(c, printFor(BY_ID['442'], 'checker'), (x, y, out) => { out[0] = x; out[1] = y; return out; }, [0, 0, 1, 1], '#000');
+  assert.equal(c.fills[0].rule, 'evenodd');
+});

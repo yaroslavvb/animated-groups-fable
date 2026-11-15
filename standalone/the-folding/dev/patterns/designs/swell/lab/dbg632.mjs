@@ -1,0 +1,18 @@
+import { BY_ID } from '../../../../../src/groups.js';
+import { seatTile, seatStroke } from '../design.js';
+const id = process.argv[2] || '632', g = BY_ID[id], u = Math.sqrt(g.domainArea);
+const T = { s: 1.37, c: Math.cos(0.83), n: Math.sin(0.83), tx: 3.21, ty: -1.77 };
+const conj = (r) => { const { s, c, n, tx, ty } = T, A = [[c * r.a - n * r.c, c * r.b - n * r.d], [n * r.a + c * r.c, n * r.b + c * r.d]];
+  const L = [[A[0][0] * c - A[0][1] * n, A[0][0] * n + A[0][1] * c], [A[1][0] * c - A[1][1] * n, A[1][0] * n + A[1][1] * c]];
+  const px = s * (c * r.tx - n * r.ty) + tx, py = s * (n * r.tx + c * r.ty) + ty;
+  return { a: L[0][0], b: L[0][1], c: L[1][0], d: L[1][1], tx: px - (L[0][0] * tx + L[0][1] * ty), ty: py - (L[1][0] * tx + L[1][1] * ty) }; };
+const lin = (p) => [T.s * (T.c * p[0] - T.n * p[1]), T.s * (T.n * p[0] + T.c * p[1])], ap = (p) => { const q = lin(p); return [q[0] + T.tx, q[1] + T.ty]; };
+const inv = (p) => { const x = (p[0] - T.tx) / T.s, y = (p[1] - T.ty) / T.s; return [T.c * x + T.n * y, -T.n * x + T.c * y]; };
+const e1 = lin(g.e1), e2 = lin(g.e2), cellArea = Math.abs(e1[0] * e2[1] - e1[1] * e2[0]);
+const m = { id: g.id, e1, e2, reps: g.reps.map(conj), cellArea, domainArea: cellArea / g.reps.length, center: ap(g.center) };
+const T1 = seatTile(g), T2 = seatTile(m);
+console.log('tile ', T1.map((p) => p.map((v) => v.toFixed(4)).join(',')).join(' | '));
+console.log('moved', T2.map((p) => inv(p).map((v) => v.toExponential(3)).join(',')).join(' | '));
+const s1 = seatStroke(g, T1), s2 = seatStroke(m, T2);
+const show = (s, f, k) => console.log(k, 'tip', f([s.ex, s.ey]).map((v) => v.toFixed(4)).join(','), 'len', (s.len / (k === 'moved' ? T.s : 1) / u).toFixed(4), 'turn', s.turn.toFixed(4), 'hook', s.hook, 'taper', s.taper, 'chin', s.chin, 'r0', (s.r0 / (k === 'moved' ? T.s : 1) / u).toFixed(4), 'score', s.score.toFixed(9));
+show(s1, (p) => p, 'orig '); show(s2, inv, 'moved');

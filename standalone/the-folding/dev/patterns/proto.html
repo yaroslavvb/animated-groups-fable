@@ -1,0 +1,120 @@
+<!doctype html>
+<!--
+  dev/patterns/proto.html — a contact sheet of one pattern DESIGN (dev/patterns/kit.js) on all 17 groups, drawn the way
+  the plane pane draws a print: white ground, the print pale everywhere (teal on the copies of the tile's own hand,
+  sand on the copies of the other hand), the page's default tile in the paper's two full front tones, mirrors in ink.
+  Under each: the numbers of kit.measure (lengths in tile sizes).
+
+    proto.html?design=designs/<key>/design.js[&ids=333,*x][&px=330][&cols=4][&side=back][&zoom=1][&measure=0]
+
+  side=back draws the tile in the paper's BACK tones (sand). zoom > 1 shows less of the plane (a closer look).
+  window.__proto = { ready, error, rows: [{ id, ms, coverage, emptyDisc, darkDisc, overlap, verts, info }] }
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pattern design sheet</title>
+<style>
+  body { margin: 10px; font: 12px/1.3 system-ui, sans-serif; background: #fff; color: #1a1a1f; }
+  h1 { font-size: 14px; margin: 0 0 8px; font-weight: 600; }
+  h1 small { font-weight: 400; color: #52514a; }
+  .g { display: grid; gap: 8px; }
+  figure { margin: 0; border: 1px solid #e5e5ea; }
+  canvas { display: block; }
+  figcaption { padding: 2px 6px 3px; color: #52514a; font-variant-numeric: tabular-nums; }
+  figcaption b { color: #1a1a1f; }
+  .bad { color: #b45309; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1 id="title">…</h1>
+<div class="g" id="grid"></div>
+<script type="module">
+  import { GROUPS, BY_ID, elementsNear, symmetryElements } from '../../src/groups.js';
+  import { PRINT_FRONT, PRINT_BACK, PRINT_PLANE_ALPHA, PRINT_PLANE_ALPHA_BACK, INK, ACCENT } from '../../src/palette.js';
+  import { normalize, fillOrbit, measure, tileOf, GAP_MIN, MAX_VERTS } from './kit.js';
+
+  const q = new URLSearchParams(location.search);
+  const px = +q.get('px') || 330, cols = +q.get('cols') || 4, zoom = +q.get('zoom') || 1, back = q.get('side') === 'back';
+  const doMeasure = q.get('measure') !== '0';
+  const out = (window.__proto = { ready: false, error: null, rows: [] });
+  const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+  try {
+    const mod = await import('./' + (q.get('design') || 'designs/demo/design.js'));
+    const meta = mod.meta || {};
+    document.getElementById('title').innerHTML = `${meta.label || meta.key || '?'} <small>· ${meta.key || ''} · ${meta.hint || ''}${back ? ' · the BACK of the paper' : ''}</small>`;
+    const ids = q.get('ids') ? q.get('ids').split(',') : GROUPS.map((g) => g.id);
+    const grid = document.getElementById('grid');
+    grid.style.gridTemplateColumns = `repeat(${cols}, ${px}px)`;
+    const dpr = 2;
+    for (const id of ids) {
+      const group = BY_ID[id];
+      const fig = document.createElement('figure'), cv = document.createElement('canvas'), cap = document.createElement('figcaption');
+      cv.width = cv.height = px * dpr; cv.style.width = cv.style.height = px + 'px';
+      fig.append(cv, cap); grid.append(fig);
+      const row = { id };
+      try {
+        const t0 = performance.now();
+        const res = mod.find(group);
+        const N = normalize(res.shapes);
+        row.ms = Math.round(performance.now() - t0);
+        row.info = res.info || null;
+        const c = cv.getContext('2d');
+        c.scale(dpr, dpr);
+        const half = group.viewHalf / zoom, cx = group.center[0], cy = group.center[1], s = px / (2 * half);
+        const tile = tileOf(group);
+        const fx = zoom > 1 ? tile.seed[0] : cx, fy = zoom > 1 ? tile.seed[1] : cy;
+        const map = (x, y, o) => { o[0] = (x - fx) * s + px / 2; o[1] = px / 2 - (y - fy) * s; return o; };
+        const box = [fx - half, fy - half, fx + half, fy + half];
+        const o = [0, 0];
+        c.fillStyle = '#fff'; c.fillRect(0, 0, px, px);
+        // the copies of the tile, by hand
+        const els = elementsNear(group, fx, fy, half * 1.5 + 2 * Math.sqrt(group.domainArea), tile.seed[0], tile.seed[1]);
+        const tilePath = (g) => { tile.poly.forEach((p, k) => { map(g.a * p[0] + g.b * p[1] + g.tx, g.c * p[0] + g.d * p[1] + g.ty, o); if (k) c.lineTo(o[0], o[1]); else c.moveTo(o[0], o[1]); }); c.closePath(); };
+        for (const [sign, style] of [[1, rgba(PRINT_FRONT[1], PRINT_PLANE_ALPHA)], [-1, rgba(PRINT_BACK[1], PRINT_PLANE_ALPHA_BACK)]]) {
+          const list = els.filter((g) => (g.a * g.d - g.b * g.c) * sign > 0);
+          if (!list.length) continue;
+          c.save(); c.beginPath(); for (const g of list) tilePath(g); c.clip();
+          fillOrbit(c, group, N, map, box, style);
+          c.restore();
+        }
+        // faint outlines of the copies
+        c.strokeStyle = 'rgba(26,26,31,0.10)'; c.lineWidth = 0.6;
+        c.beginPath(); for (const g of els) tilePath(g); c.stroke();
+        // the tile itself: the paper's two tones
+        const tones = back ? PRINT_BACK : PRINT_FRONT, I = { a: 1, b: 0, c: 0, d: 1, tx: 0, ty: 0 };
+        c.save(); c.beginPath(); tilePath(I); c.clip();
+        c.fillStyle = tones[0]; c.fillRect(0, 0, px, px);
+        fillOrbit(c, group, N, map, box, tones[1]);
+        c.restore();
+        // mirrors and rotation centres
+        const sym = symmetryElements(group, fx, fy, half * 1.6);
+        c.strokeStyle = INK; c.lineWidth = 1.3; c.beginPath();
+        for (const m of sym.mirrors) { map(m.px - 9 * m.ux, m.py - 9 * m.uy, o); c.moveTo(o[0], o[1]); map(m.px + 9 * m.ux, m.py + 9 * m.uy, o); c.lineTo(o[0], o[1]); }
+        c.stroke();
+        c.strokeStyle = 'rgba(26,26,31,0.35)'; c.lineWidth = 0.8; c.setLineDash([4, 3]); c.beginPath();
+        for (const m of sym.glides) { map(m.px - 9 * m.ux, m.py - 9 * m.uy, o); c.moveTo(o[0], o[1]); map(m.px + 9 * m.ux, m.py + 9 * m.uy, o); c.lineTo(o[0], o[1]); }
+        c.stroke(); c.setLineDash([]);
+        c.fillStyle = INK;
+        for (const p of sym.centers) { map(p.x, p.y, o); c.beginPath(); c.arc(o[0], o[1], 1.2 + 0.45 * p.order, 0, 6.2832); c.fill(); }
+        c.strokeStyle = ACCENT; c.lineWidth = 2.2; c.beginPath(); tilePath(I); c.stroke();
+        if (doMeasure) Object.assign(row, measure(group, N));
+        const pc = (v) => (v == null ? '–' : Math.round(100 * v) + '%');
+        const warn = [];
+        if (row.overlap > 0.004) warn.push('copies overlap ' + pc(row.overlap));
+        if (N.verts > MAX_VERTS) warn.push(N.verts + ' vertices');
+        if (row.ms > 100) warn.push(row.ms + ' ms');
+        cap.innerHTML = `<b>${group.label}</b> ${group.hm} · dark ${pc(row.coverage)} · bare ⌀ ${row.emptyDisc ?? '–'} · solid ⌀ ${row.darkDisc ?? '–'} · ${N.verts} pts · ${row.ms} ms` +
+          (warn.length ? ` <span class="bad">${warn.join(', ')}</span>` : '');
+      } catch (e) {
+        row.error = String(e && e.stack || e);
+        cap.innerHTML = `<b>${id}</b> <span class="bad">${String(e && e.message || e)}</span>`;
+      }
+      out.rows.push(row);
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  } catch (e) { out.error = String(e && e.stack || e); document.getElementById('title').textContent = 'ERROR ' + out.error; }
+  out.ready = true;
+</script>
+</body>
+</html>

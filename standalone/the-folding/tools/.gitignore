@@ -1,0 +1,2 @@
+# the live Chrome pool of the mini (tools/remote/start-pool.sh writes it: a pid and the pool's CDP endpoints); never committed
+.mini-pool.json

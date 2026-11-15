@@ -68,6 +68,7 @@ Things he asked for in the earlier session (binding):
 | `src/hasse.js`, `dev/hasse-demo.html` | hasse agent | the picker dialog |
 | `src/timeline.js`, `src/index.template.html`, `src/styles.css`, `build.mjs`, `dev/shell-demo.html` | shell agent | layout, scrubber, bundling |
 | `src/folds/index.js`, `src/app.js`, `tools/qa-matrix.mjs`, `test/folds.test.js`, `dist/` | integrator | wiring, generic fold tests, build |
+| `src/pattern.js`, `src/shapes.js`, `src/sdf.js`, `src/patterns/` (+ tests) | integrator (the pattern round, §10–11) | the prints, the shipped shape patterns, their idle making |
 
 ## 4. Existing API (read the files for details)
 
@@ -827,3 +828,209 @@ read as two tori fused along a circle. `notes/bottle.md` has the reasons; the co
   0.022 and 0.0012 per 1/200; `test/bottle.test.js` holds it to 0.025 and 0.0014.
 - **Not changed**: xx's lattice (0.9 × 1.7), its presets, the print, the plane, the URL (`g=xx` links open the new
   shape at the same t).
+
+## 11. 13–14 Nov 2026 — the pattern round: shape prints, Paisley the default, every pattern on the paper
+
+The owner, 13 Nov (dictated; "hints" and "tensors" are tints): *"augment the-folding with more patterns … The tiling one,
+I kind of don't like that it's too small, and the comma leaves too much empty space. Come up with some patterns which are
+more like a comma but they fill more of the space. And they reuse the idea of the checkerboard by giving different
+tensors to … the two sides."* And his page comment **88289462** (13 Nov, 22:10, on
+https://spacesheep.dev/@yaroslavvb/the-folding; §10.2 left it to this round): *"I want to reuse the two different shades
+from "checkerboard" pattern for all patterns"* — the complaint the two-shade Comma answers (below). The record of the
+round (the eleven designs, the judges, what shipped and why): `notes/patterns-round.md`. The machinery:
+`notes/patterns-foundation.md`, `notes/patterns-renderer.md`.
+
+- **Shape prints** (`src/shapes.js`, `src/sdf.js`; the contracts in `notes/patterns-foundation.md`). The third kind of
+  print (kind `shapes`, beside `linear` and `rings`): the dark tone is the union of g(motif) over EVERY element g of the
+  group (W(x) = Σ ±[x ∈ g(P)] > 0, the nonzero rule), so it is a pattern of the orbifold by construction, whatever the
+  motif. A motif is a few closed polygons `{ pts, hole? }`.
+  - The rules (`validateShapes`): two copies coincide or are `GAP_MIN` (0.02 tile sizes) apart; polygons of a motif do
+    not touch; none touches itself; at most `MAX_VERTS` (2400). `printable(print)` is the same with the gap the 3D texture
+    holds (`TEXELS_APART` = 2 texels): what the page asks before it shows a print. `thinParts(print, w)` measures what
+    is thinner than w (the 3D texture holds nothing under about 1.5 texels); `measureShapes` the dark share and the
+    largest bare and solid discs; `texelPitch({ e1, e2 })` the texel of a print's texture from the lattice alone.
+  - 3D: the renderer's print mode 3, one read per pixel of an R8 signed-distance texture of one lattice cell
+    (`bakeShapes`: `BAKE_SIZE` 1024 a side, baked once per print, the last `BAKE_KEEP` 6 kept). The plane fills a shape
+    print once per window into three cached layers; a card of the Tile step fills one world-space `Path2D` of the tile's
+    share.
+- **The patterns** (`src/pattern.js`). `PATTERNS`, frozen, is the selector's six in its order, each `{ key, label,
+  hint }`: **`paisley`** Paisley, **`soft`** Soft commas, **`tomoe`** Tomoe, `checker` Checkerboard, `rings` Rings,
+  **`comma`** Comma. The four shape patterns are the modules of `src/patterns/` (`index.js` `SHAPE_PATTERNS`: `{ meta,
+  find }`; `find(group) → { shapes, info }`, pure). Every pattern of the selector is a print now, on the checkerboard's
+  two-sided paper.
+  - `DEFAULT_PATTERN` = `'paisley'` (it was `'checker'`).
+  - `SHEET_PATTERN` = `'sheet'`: the picture before the prints, one comma per tile cut into a translucent sheet. Not in
+    the selector or the address (`resolvePattern` does not know it, `registerPattern` refuses it). It is the default of
+    the pure `buildScene` (its tests were written for it) and what a pattern without a print for a group falls back to:
+    `printFor` gives null and one `console.warn`, the app shows the sheet there, `#app[data-print]` is absent — so a
+    design that fails in some browser is seen (the layout gate, `app-sheet.mjs`).
+  - `resolvePattern` takes the old names: `blobs` (Soft commas' design folder), `soft commas`; `printFor(group, key)` is
+    cached per group; `printCached(group, key)` says whether it was asked already.
+  - `registerPattern` stays for the dev pages; the keys of the six, their aliases and `sheet` are taken.
+    `dev/patterns/app.html` registers a design whose key is built in under `dev` alone (`?design=designs/paisley/
+    design.js` shows the design folder's copy beside the page's own) and leaves it out of `?designs=` (it is in
+    `__designs.builtIn`, not an error). `app-sheet.mjs --pat <key>` takes any of the six.
+- **The three new patterns** (the designs of `dev/patterns/designs/` as they were judged and polished, copied unchanged
+  but for their imports; `test/patterns-shipped.test.js` holds each to its design file's motif in all 17 groups):
+  - **Paisley** (`src/patterns/paisley.js`): a big comma and smaller ones nestled round it; every comma of one hand, so
+    the other hand is the work of a mirror or a glide. Dark 0.48–0.59 of the paper, no bare disc over 0.43 tile sizes,
+    2 to 4 marks a tile — in every engine (below: "The same pattern in every browser"). Its 17 default tiles DRAW the
+    marks its search grew (`GROWN`, beside the table of winning starts `WINNERS`; 15 Nov): find well under a millisecond;
+    a group without presets runs the full search.
+  - **Soft commas** (`src/patterns/soft.js`, designed as `blobs`): the level set of a sum, over the group, of comma-shaped
+    bumps: one big soft comma with a light eye per tile, exactly half the paper dark; in the narrow kaleidoscope
+    chambers a big comma and one or two small ones.
+  - **Tomoe** (`src/patterns/tomoe.js`): every tile (a bent copy of the default tile, so no channel runs along its rim)
+    split by an S into a dark and a light comma, each with an eye: no background.
+- **The same pattern in every browser** (15 Nov 2026, the fixer, after the WebKit review of the round). Playwright's
+  WebKit 26.5 (Safari's engine) on the M5 showed ANOTHER Paisley than Chrome in all 17 groups: a mark of 4*2 0.28 tile
+  sizes away, *632 another arrangement, dark 0.466 and a bare disc of 0.447 there (outside the bounds above). Paisley's
+  search is greedy: it compares sizes, distances and flaws, and WebKit's libm gives another last bit than V8's for 4 to
+  38 % of `Math.cos`, `sin`, `hypot`, `acos`, `atan`, `tan`; one bit tips one comparison and every round after it goes
+  elsewhere (V8 is not one engine either: Chrome 157 grows a small mark of *333 elsewhere than node, which grows the
+  same marks on arm64 and x86). So the 17 default tiles draw `GROWN`: per mark its place, turn, size, curl, cut and tip,
+  exactly as the search left them in node on the mini (`dev/patterns/designs/paisley/lab/r3/grown.mjs make`; `check`:
+  the same motif as growing, point for point, on the machine that made it), drawn as the search draws a mark (the
+  comma's outline, thinned at its size, placed) with no search in between; `KNOBS.pinned` turns it off for the lab.
+  - `test/patterns-engines.test.js`: (1) **ulp chaos** — with the last bit of `Math.cos`, `sin`, `hypot`, `acos`,
+    `atan`, `atan2`, `asin`, `tan`, `cbrt`, `exp` and `pow` moved for a third of their arguments, the find of every
+    shipped shape pattern gives the same outlines in all 17 groups (to 1e-9 tile sizes; within 1e-4 where an outline
+    was thinned to other points): Paisley moved in 17 of 17 before `GROWN`, none now; Soft commas, Tomoe and the Comma
+    in none either way; (2) a **fingerprint** — every outline's area and centroid (tile sizes, 6 decimals) in
+    `test/patterns-fingerprint.json`, to 3e-6: a run on another CPU or engine, or a change that moves a motif, fails
+    (`FOLDING_FINGERPRINT=write` after a deliberate one). A knob of Paisley changed needs `winners.mjs make` and
+    `grown.mjs make` again.
+  - The Checkerboard and Rings are found by searches too, but over a handful of exact candidates: the review found the
+    same checks in every engine, and the rings on an equivalent lattice basis in 5 groups (the same picture).
+- **The new default and why.** All five judges of the round asked to replace the checkerboard. Paisley has the best mean
+  score (76.4 of 100; Tomoe 71.6, Soft commas 70.2), is in all five ship sets, and is the only design that stays
+  commas in the kaleidoscopes (every one-mark design turned into bones, crosses or rosettes there). Two judges named it
+  the default, two Tomoe, one Soft commas. A link without `pat=` opens with Paisley, so a link of the checkerboard made
+  before 14 Nov now shows Paisley; a link of the checkerboard says `pat=checker` from now on.
+- **The Comma on the paper** (`src/patterns/comma.js`; comment 88289462). The selector's Comma is the page's own comma
+  (`motifFor(group)`: the table's centre, turn and scale) printed front teal and back sand. The print's copy of the
+  outline keeps the tail at least `TIP_TEXELS` = 2 texels thick to a round end (`bluntComma(w)`: each point of the
+  hollow is moved toward the comma's centre until it lies (t⁴ + w⁴)^¼ inside the back's circle, t its own distance; a
+  half circle of diameter w closes it): motif.js's tail is a needle that the 3D texture cut short (under 1.5 texels for
+  26–57 texels of outline). Read as the shader reads the texture, along the tail's middle line, motif.js's needle loses
+  its last 8 to 22 texels in every group, the round end none (`test/patterns-shipped.test.js`). Nothing moves by more
+  than w (0.003–0.007 tile sizes); the copies keep at least 0.07 tile sizes apart, as motif.js's. Under no print (the
+  sheet) the plane and the sheet draw motif.js's comma as before. The comma's PLACE is motif.js's: on xx's classic
+  bottle it lies over the body, so the closed bottle shows a dark band of sand rather than a comma's outline. In 3D the
+  Comma reads fainter than the outlined comma of the sheet did (dark sand on light sand where the closed shape shows the
+  back, no ink outline): what comment 88289462 asked for, but the owner should see
+  `~/drive.unsynced/artifacts/the-folding-patterns/review-chrome/oldnew/comma-old-new.png` before judging it.
+  - Motif.js's table places the comma for the page's 17 groups only. A turned, scaled, shifted or mirrored COPY of one
+    (the same id; its lattice and centre carried by a similarity) gets that group's comma carried along (`pageCopy`,
+    `info.from`; 15 Nov: motifFor threw for such a copy without presets, and shrank the comma of one that kept them);
+    any other group is motif.js's to place (one without presets has no place: printFor shows the sheet, with a warning).
+    Its hint no longer speaks of the page's history: "one big comma per tile, on the paper: front teal, back sand".
+- **A group change does not wait for the print** (`src/patterns/warm.js`; `src/app.js`). A shape print's find,
+  `makeShapePrint` and `printable` run when a group first shows it. Once the page is idle the current pattern's prints
+  of the other 16 groups are made, ONE group per idle slot (`requestIdleCallback`; Safari has none: a chain of
+  `IDLE_FALLBACK` timeouts), never within `QUIET_MS` (400 ms) of an input or a drawn frame (every input, frame and
+  rebuild pokes it), never in a slot with under `MIN_SLOT_MS` (30 ms) left, the groups after the shown one first. A
+  pattern change drops the queue (and its pending slot) at once; the texture is not made ahead (`BAKE_KEEP`).
+  - Since the reviews of 15 Nov: a slot must also hold the longest print of the pattern so far (a 35 ms print had
+    started with 31 ms left), but never more than 0.9 of the longest slot the scheduler gives (`longest`: 50 ms for
+    `requestIdleCallback`, `IDLE_FALLBACK.slot` 40 ms for Safari's chain), so a print longer than any slot takes a
+    whole idle period and never waits for ever. Safari's chain says a slot is empty when its timer came more than
+    `IDLE_FALLBACK.late` (15 ms) after it was due: the main thread was busy, its only sign of that. A HIDDEN page
+    (another tab in front: `document.hidden`) makes nothing and asks for no slot; on `visibilitychange` back to visible
+    the page calls `warm` and the queue goes on.
+  - `createWarmer({ ids, prepare, ready, idle, cancel, now, quiet, minSlot, longest, hidden })` → `{ warm(key,
+    shownId), poke(), stop(), state() }`; `idleScheduler(win)` → `{ idle, cancel, native, longest }`.
+    `getState().warm` = `{ key, left, made, skipped, ms, maxMs, slots, passed, errors }`; `__folding.warmer`: `stop()`
+    holds only until the next group or pattern change, which starts it again — to time a change with nothing made
+    ahead, stop it after EVERY change (the integrator's table of 14 Nov stopped it once, and the warmer made 5 to 11 of
+    the 16 groups ahead between its changes; the review of 15 Nov).
+  - Measured in Chrome on the mini: see the table at the end of this section.
+- **App** (`src/app.js`): `state.pattern` starts as Paisley; `buildScene({ pattern = SHEET_PATTERN })`; the hash
+  writes `pat=` when the pattern is not Paisley; `#app[data-print]` is set under every print of the selector (the
+  shell's swatch and the legend's "front · back" follow it).
+- **Shell** (the shell agent; `src/index.template.html`, `src/styles.css`): the six options in order; one swatch per key
+  (`svg.pat-sw.pat-sw-<key>`, 18 × 18, the print's two tones); before the script runs the pill shows Paisley; the
+  legend's paper item is one rule, `.app[data-print] .lg[data-paper]`, hidden under 360 px as before.
+- **Tests**: `test/patterns-shipped.test.js` (each of the three in all 17 groups: printable, `GAP_MIN`, exactly the
+  group's, 0.40–0.62 dark, no bare disc over 0.5, no part thinner than 1.5 texels, find pure and quick and equal to its
+  design file; a turned, scaled and shifted copy of every group without presets; the Comma print: no thin part where
+  motif.js's comma has one, the 3D texture holding its tail to the end, its outline motif.js's but for the tail's end;
+  the template's options and swatches against `PATTERNS`); `test/patterns-warm.test.js` (a fake scheduler and clock;
+  then the real prints in printFor's cache). Changed on purpose: `test/pattern.test.js` (six
+  patterns, Paisley the default, the comma a print, the taken keys), `test/app-url.test.js` (no `pat=` for Paisley,
+  `pat=checker` written, the old names, an unknown `pat` falls back to Paisley, the sheet), `test/recut.test.js` (the
+  comma that rides on the re-cut pieces is the sheet's). The layout gate (`test/shell-layout.*`, opt-in) checks every
+  pattern at every size in Chrome; `dev/recut/webkit-layout.sh` the same in WebKit on the built page;
+  `dev/recut/browser-check.mjs` the selector, the address and the Comma's colours on the built page.
+  - Added 15 Nov, after the three reviews: `test/patterns-engines.test.js` (ulp chaos and the fingerprint, above);
+    `test/patterns-symmetry.test.js` (no shipped shape print has an isometry its group lacks: the print rasterised on
+    the torus at 120 × 120, every lattice-preserving linear part outside the point group and every translation at once
+    by FFT, a candidate over the raster's level for an exact symmetry checked with the exact tone; the nearest is
+    Paisley's ** at 0.84 of its dark, an exact one reads over 0.96; the control finds 2222's half-turns when the print
+    is looked at as one of its translations alone — the review had found no test that asked);
+    `test/pattern.test.js` "the sharp check reads BOTH sides of an outline, and passes nothing it could not read" (a
+    print dark in a thin band round the outside of the motif's copy one step along e1, and one light in a band round its
+    inside; a print whose tone was moved off its outlines — the review's planted faults P7, P7b and P7c, and P7c's
+    mirror that reads the light side only, all fail it); `test/patterns-warm.test.js` (a hidden page; a slot that must
+    hold the longest print; Safari's late timer); `test/patterns-shipped.test.js` (the Comma of a turned, scaled,
+    shifted or mirrored copy of every group); the layout gate wants a shape print of the Comma in every group (it took
+    the Comma with no print at all); `dev/recut/browser-check.mjs` checks the page's wiring of the warmer: the 16 other
+    groups made after the load, nothing made while Fold plays or while a frame is drawn every 250 ms, nothing while the
+    page is hidden and all of it once it shows (planted in a copy of the sources, each of "rebuild never tells the
+    warmer", "no drawn frame pokes it", "the warmer never hears the page is hidden" and "no visibilitychange listener"
+    fails it; drawFold's poke alone taken away is no fault: the renderer's change listener pokes once per redraw too).
+- **The time of a group change** (measured again 15 Nov, after `GROWN` and the warmer's changes: Chrome on the mini,
+  1280 × 720, the BUILT page; a fresh page per pattern and mode, each group once per page, the median of three pages,
+  the warmer stopped after EVERY change for "nothing made ahead"; the print's own first ask on the sources, in one loop;
+  `dev/patterns/scratch-review-chrome/perf.mjs`, `dev/patterns/scratch-integrator/print-time.mjs`; JSON in
+  `~/drive.unsynced/artifacts/the-folding-patterns/fixer3/perf-dist.json`, `print-time.json`):
+
+  | pattern | its print, first ask (median / max) | the warmer's idle slots (mean / max) | setGroup, nothing made ahead (median / max) | setGroup, made ahead while idle (median / max) | a fresh page: its first scene drawn |
+  |---|---|---|---|---|---|
+  | Paisley | 1.0 / 5.1 ms | 4.5 / 7.7 ms | 24.8 / 48.8 ms | 22.7 / 48.7 ms | 56 ms |
+  | Soft commas | 5.8 / 15.8 | 12.9 / 20.2 | 34.5 / 51.4 | 23.6 / 48.7 | 58 |
+  | Tomoe | 3.8 / 8.3 | 11.8 / 17.7 | 31.2 / 47.5 | 23.2 / 48.8 | 58 |
+  | Checkerboard | — | 8.5 / 15.3 | 19.1 / 45.8 | 11.6 / 43.5 | 43 |
+  | Rings | — | 2.8 / 5.1 | 16.4 / 44.3 | 14.3 / 44.5 | 43 |
+  | Comma | 0.7 / 2.2 | 3.0 / 3.9 | 19.7 / 47.3 | 18.1 / 46.9 | 46 |
+
+  Paisley drawn from `GROWN` costs a millisecond where its grown start cost 8 (22.7 at most): its group change with
+  nothing made ahead fell from 36.6 to 24.8 ms (the review's measure of 15 Nov, the warmer stopped after every change),
+  and a fresh page draws its first scene 14 ms after the Checkerboard's, not 32. What the warmer still takes away is
+  Soft commas' and Tomoe's print: 8 to 11 ms of a median group change. The rest of a group change (the tile, its mesh
+  and fold, the plane's layers, the 3D texture: 5 to 12 ms of it is baking and uploading the print's texture, which the
+  warmer leaves alone) is 15 to 45 ms either way, xx and 22x the most (their re-cut and the bottle). In every page the
+  warmer made all 16 groups, one per slot, with no error. The integrator's table of 14 Nov had a "nothing made ahead"
+  column with 5 to 11 of the 16 prints made ahead (its pages stopped the warmer once).
+  - A phone, roughly (390 × 780, dpr 3, touch, Chrome's CPU slowed 4×; `phone-perf.mjs`): the first scene is drawn
+    212 ms after the response under Paisley (188 under the Checkerboard; 270 before `GROWN`); the warmer's longest
+    slot is Paisley 10.6 ms (48.9 before), Tomoe 21.6, the Comma 7.8, the Checkerboard 47.6 and Soft commas 64.6: a
+    Soft commas print is longer than any idle slot there, so it takes a whole idle period (45 ms or more left), and a
+    tap that comes during it waits up to that long, once per group, in the first second or so after a change.
+  - Safari: WebKit has no `requestIdleCallback`; on the M5 the review measured the chain's slots at 32 to 38 ms before
+    `GROWN` (Paisley 24 ms a group on average), all 16 groups made per pattern, no error; a group change there took 15 ms
+    median (Paisley) and 13 (Soft commas) with nothing made ahead.
+- **The build and the gates** (15 Nov 2026, 00:02–00:19): `node build.mjs` — the page is 453 362 bytes (442.7 kB, 175.4
+  kB gzipped; it was 355 625 bytes: the four motifs and the warmer). The suite on the mini (`dev/patterns/suite.sh`):
+  903 tests, 901 pass, 2 skipped (opt-in), 0 fail. The layout gate in Chrome: on the sources (210 s) and on the build
+  (`SHELL_LAYOUT_PAGE=dist/index.html`, 226 s), every pattern at all 23 sizes for all 17 groups, the page opening with
+  Paisley, no problem; the 3D pane at 375 × 498 is 183 px for 333 and at least 152 px for every group. In WebKit 26.5 on
+  the M5, on the build: "all passed", "opened with paisley" (161 s). `dev/recut/browser-check.mjs` on the build: 33
+  passed, 0 failed. The built page's sheets at t = 0.6, all 17 groups, of Paisley, Soft commas, Tomoe, the Checkerboard
+  and the Comma: `integrate/dist-<pattern>-t06.png`.
+  - Again after the fixes (15 Nov 2026, 01:24–01:53): the page is 459 446 bytes (178.6 kB gzipped; `GROWN` is most of
+    the 6 kB more). The suite on the mini: 912 tests, 910 pass, 2 skipped (opt-in), 0 fail. The layout gate in Chrome,
+    the Comma now held to a shape print in every group: on the sources (212 s) and on the build (211 s), the page opening
+    with Paisley, no problem. `dev/recut/browser-check.mjs` on the build: 40 passed, 0 failed; the review's fast
+    switching (`dev/patterns/scratch-review-chrome/fast.mjs`): 11 passed. Node (x86, the sources) and Chrome (the
+    build) give every Paisley motif to 2e-16 in all 17 groups (`fixer3/fp/`). The built page's sheets:
+    `fixer3/<pattern>-t06.png` for Paisley, Soft commas and Tomoe, and `fixer3/paisley-t0-close.png`. NOT re-run: the
+    WebKit gate — the M5 was off the tailnet from 01:30 on. Before a deploy: `bash dev/recut/webkit-layout.sh`, and
+    `bash dev/patterns/scratch-fixer3/wk-fp.sh` (every print's motif and the warmer in WebKit, to `fixer3/fp/`), then
+    `node dev/patterns/scratch-fixer3/fp-compare.mjs` (Paisley should now be WebKit's too, to rounding).
+- **Not done, not seen**: a real phone, and Safari itself (only Playwright's WebKit); the rest of a group change (15–45
+  ms, with about 10 ms of noise between pages) is untouched, and so is the texture's bake on a group change (5–12 ms);
+  Soft commas' print is longer than any idle slot on a phone-speed CPU (65 ms at 4×: see above); a group without
+  presets that is no copy of a page group still has no Comma, and Paisley still searches for one (only the tests make
+  such groups). (The Comma of a moved copy of a page group, `dev/patterns/README.md` and
+  `notes/patterns-foundation.md` were done on 15 Nov.)

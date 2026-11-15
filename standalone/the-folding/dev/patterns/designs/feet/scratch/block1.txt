@@ -1,0 +1,122 @@
+  // --- the sole: the frame behind the toes. Each toe keeps the sole behind a line across the way from the toe to the
+  // middle of the foot, so the front of the sole follows the row of toes
+  const mid = lerp(fr.c, heelRef, 0.3);
+  let S = F;
+  for (const t of oval) {
+    const mm = unit(sub(mid, t.c));
+    S = clipLab(S, -mm[0], -mm[1], -(dot(mm, t.c) + t.b + gapSole), -2);
+    if (S.pts.length < 3) return null;
+  }
+  const W0 = 2 * inCircle(S.pts).r;
+  // a heel on an edge: narrower than the ball
+  const taper = o.taper ?? 1;
+  if (heel.length > 1 && taper > 0) {
+    const k = S.lab.indexOf(heel[0]);
+    if (k >= 0) {
+      const m = S.pts.length, A0 = S.pts[k], A1 = S.pts[(k + 1) % m];           // outer end, inner end of the heel edge
+      if (dist(A0, A1) > 0.62 * W0) {
+        const keep = inCircle(S.pts).c;
+        let fi = -1, fo = -1;
+        for (let j = 0; j < m; j++) { if (S.lab[j] === -2 && S.lab[(j - 1 + m) % m] !== -2) fi = j; if (S.lab[j] !== -2 && S.lab[(j - 1 + m) % m] === -2) fo = j; }
+        if (fi >= 0 && fo >= 0) {
+          const Fin = S.pts[fi], Fout = S.pts[fo], e = unit(sub(A0, A1));
+          S = clipLine(S, add(A1, mul(e, taper * K.taperIn * W0)), Fin, keep, -3);
+          S = clipLine(S, add(A0, mul(e, -taper * K.taperOut * W0)), lerp(A0, Fout, 0.6), keep, -4);
+        }
+      }
+    }
+  }
+  const sp = S.pts, m = sp.length;
+  if (m < 3) return null;
+  const W = 2 * inCircle(sp).r;
+
+  // --- its corners: which are the heel's, how round each is
+  const isHeel = new Array(m).fill(false);
+  if (heel.length > 1) {
+    const k = S.lab.indexOf(heel[0]);
+    if (k >= 0) { isHeel[k] = true; isHeel[(k + 1) % m] = true; }
+  } else {
+    for (let k = 0; k < m; k++) if (S.lab[k] === heel[0] && S.lab[(k - 1 + m) % m] === (heel[0] - 1 + n) % n) isHeel[k] = true;
+  }
+  if (!isHeel.includes(true)) { let b = 0; for (let k = 1; k < m; k++) if (dist(sp[k], toes.c[2]) > dist(sp[b], toes.c[2])) b = k; isHeel[b] = true; }
+  const turn = [], rr = [], bareMax = o.bare ?? K.bare;
+  for (let k = 0; k < m; k++) {
+    const d0 = unit(sub(sp[k], sp[(k - 1 + m) % m])), d1 = unit(sub(sp[(k + 1) % m], sp[k]));
+    turn.push(Math.max(1e-6, Math.atan2(crs(d0, d1), dot(d0, d1))));
+    const sh = Math.sin((Math.PI - turn[k]) / 2);                       // sin of half the interior angle
+    const bare = sh < 0.999 ? ((isHeel[k] ? bareMax : K.bare) - delta / sh) / (1 / sh - 1) : Infinity;
+    const want = isHeel[k] ? (heel.length > 1 ? W : K.rApex * W) : (K.rSide + 0.08 * lean) * W;
+    rr.push(Math.max(K.rMin, Math.min(want, bare)));
+  }
+  for (let pass = 0; pass < 16; pass++) {
+    let changed = false;
+    for (let k = 0; k < m; k++) {
+      const j = (k + 1) % m, L = dist(sp[k], sp[j]) * 0.999;
+      const tk = rr[k] * Math.tan(turn[k] / 2), tj = rr[j] * Math.tan(turn[j] / 2);
+      if (tk + tj > L) { const f = L / (tk + tj); rr[k] *= f; rr[j] *= f; changed = true; }
+    }
+    if (!changed) break;
+  }
+
+  // --- the control points of the outline: on the arcs of the corners and on the straight sides between them
+  const ctrl = [], arcAt = [];                                           // arcAt[k] = [first, last] index of corner k's arc
+  for (let k = 0; k < m; k++) {
+    const p = sp[k], d0 = unit(sub(p, sp[(k - 1 + m) % m])), d1 = unit(sub(sp[(k + 1) % m], p));
+    const r = rr[k], t = r * Math.tan(turn[k] / 2), Tin = sub(p, mul(d0, t)), O = add(Tin, mul([-d0[1], d0[0]], r));
+    const a0 = Math.atan2(Tin[1] - O[1], Tin[0] - O[0]), steps = Math.max(3, Math.ceil((r * turn[k]) / K.hc));
+    const first = ctrl.length;
+    for (let j = 0; j <= steps; j++) { const a = a0 + (turn[k] * j) / steps, cs = Math.cos(a), sn = Math.sin(a); ctrl.push({ p: [O[0] + r * cs, O[1] + r * sn], n: [-cs, -sn] }); }
+    arcAt.push([first, ctrl.length - 1]);
+    const j1 = (k + 1) % m, A = add(p, mul(d1, t)), B = sub(sp[j1], mul(d1, rr[j1] * Math.tan(turn[j1] / 2)));
+    const cnt = Math.floor(dist(A, B) / K.hl);
+    for (let j = 1; j <= cnt; j++) ctrl.push({ p: lerp(A, B, j / (cnt + 1)), n: [-d1[1], d1[0]] });
+  }
+  // --- the arch: the inner side, from the heel to the ball, is drawn in (a broad hollow, deepest nearer the heel)
+  let notchDepth = 0;
+  {
+    let kh = 0;
+    while (!(isHeel[kh] && !isHeel[(kh + 1) % m]) && kh < m) kh++;        // the heel's last corner, counter-clockwise
+    kh %= m;
+    let kf = kh;
+    for (let guard = 0; guard < m && S.lab[kf] !== -2; guard++) kf = (kf + 1) % m;   // the first corner of the front
+    const N = ctrl.length;
+    const ia = Math.round(arcAt[kh][0] + (heel.length > 1 ? 0.6 : 1) * (arcAt[kh][1] - arcAt[kh][0]));
+    const ib = Math.round(arcAt[kf][0] + 0.3 * (arcAt[kf][1] - arcAt[kf][0]));
+    const idx = [];
+    for (let i = ia; idx.length <= N; i = (i + 1) % N) { idx.push(i); if (i === ib) break; }
+    if (kf !== kh && idx.length > 4 && idx.length <= N) {
+      const s = [0];
+      for (let j = 1; j < idx.length; j++) s.push(s[j - 1] + dist(ctrl[idx[j]].p, ctrl[idx[j - 1]].p));
+      const total = s[s.length - 1], kappa = (0.5 - K.notchPeak) / (K.notchPeak * (1 - K.notchPeak));
+      let jp = 0;
+      for (let j = 0; j < idx.length; j++) if (Math.abs(s[j] / total - K.notchPeak) < Math.abs(s[jp] / total - K.notchPeak)) jp = j;
+      const peak = ctrl[idx[jp]];
+      const across = reach(sp, add(peak.p, mul(peak.n, 1e-6)), peak.n);
+      const depth = Math.min((o.notch ?? 1) * (1 + 0.6 * lean) * K.notch, (1 + 0.4 * lean) * K.notchRel * across, 0.2 * total);
+      if (depth > 0.012) {
+        notchDepth = depth;
+        for (let j = 0; j < idx.length; j++) {
+          const uu = s[j] / total, w = uu + kappa * uu * (1 - uu), b = Math.sin(Math.PI * w) ** 2, c = ctrl[idx[j]];
+          c.p = add(c.p, mul(c.n, depth * b));
+        }
+      }
+    }
+  }
+  // --- the outline: the closed cubic B-spline of the control points (it stays inside their hull, so inside the frame)
+  const C = [];
+  for (const c of ctrl) if (!C.length || dist(c.p, C[C.length - 1]) > 1e-6) C.push(c.p);
+  if (C.length > 3 && dist(C[0], C[C.length - 1]) < 1e-6) C.pop();
+  const outline = [];
+  for (let i = 0, N = C.length; i < N; i++) {
+    const p0 = C[(i - 1 + N) % N], p1 = C[i], p2 = C[(i + 1) % N], p3 = C[(i + 2) % N];
+    const q = clamp(Math.ceil(dist(p1, p2) / K.h), 1, 8);
+    for (let j = 0; j < q; j++) {
+      const t = j / q, t2 = t * t, t3 = t2 * t;
+      const b0 = (1 - 3 * t + 3 * t2 - t3) / 6, b1 = (3 * t3 - 6 * t2 + 4) / 6, b2 = (-3 * t3 + 3 * t2 + 3 * t + 1) / 6, b3 = t3 / 6;
+      const pt = [b0 * p0[0] + b1 * p1[0] + b2 * p2[0] + b3 * p3[0], b0 * p0[1] + b1 * p1[1] + b2 * p2[1] + b3 * p3[1]];
+      const L = outline.length;
+      // a point on a straight run is dropped
+      if (L > 1 && Math.abs(crs(sub(outline[L - 1], outline[L - 2]), sub(pt, outline[L - 1]))) < 1e-9 * (1 + dist(pt, outline[L - 2])) && dot(sub(outline[L - 1], outline[L - 2]), sub(pt, outline[L - 1])) > 0) outline[L - 1] = pt;
+      else outline.push(pt);
+    }
+  }

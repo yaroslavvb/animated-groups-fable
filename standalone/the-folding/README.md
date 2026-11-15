@@ -8,10 +8,16 @@ tube, Möbius band and Klein bottle for the strip groups, a cross-cap for 22×, 
 kaleidoscopes. Glued edges share a colour; the whole state (group, pattern, cut, Wavy, fold, 3D view) is kept in the URL.
 Companion of [The Unfolding](https://spacesheep.dev/@yaroslavvb/the-unfolding).
 
-**Pattern** (the selector at the top right, 13 Nov 2026): the paper carries a print that the group leaves as it is — a
-**Checkerboard** (the default: checks, or triangles and hexagons on the hexagonal lattices) or **Rings** round the cone
-points — front teal, back sand, so the whole surface is covered and one sees which side is up; **Comma** is the
-earlier picture, one comma on a translucent sheet. The two shapes that pass through themselves, the Klein bottle (××)
+**Pattern** (the selector at the top right): the paper carries a print that the group leaves as it is, front teal and
+back sand, two tones each, so the whole surface is covered and one sees which side is up. Since 14 Nov 2026 (the pattern
+round, `notes/patterns-round.md`) there are six: **Paisley** (the default: a big comma and smaller ones nestled round
+it), **Soft commas** (one big soft comma with an eye per tile, half the paper dark), **Tomoe** (every tile split by an S
+into a dark and a light comma), the **Checkerboard** (checks, or triangles and hexagons on the hexagonal lattices),
+**Rings** round the cone points, and the **Comma**, the page's own comma, now on the same paper. The first three and the
+comma are shape prints (`src/shapes.js`, the motifs in `src/patterns/`): the union of every copy of a motif under the
+group. While the page is idle it makes the current pattern's prints of the other groups, so a group change does not wait
+for them. Every browser shows the same patterns: Paisley's page groups draw a table of the marks its search grew, since
+the search itself follows the last bit of the browser's Math (`test/patterns-engines.test.js`). The two shapes that pass through themselves, the Klein bottle (××)
 and the cross-cap (22×), fold **re-cut first**: a tile that is not the default cut is cut into pieces, each carried by
 an element of the group into the default cut (the Rectangle, the Pocket), which then folds with no paper passing
 through paper. The lab that tried the looks and motions for 22× is in `lab22x/`
@@ -20,18 +26,19 @@ through paper. The lab that tried the looks and motions for 22× is in `lab22x/`
 | path | what |
 |---|---|
 | `dist/index.html` | the built page, one self-contained file (what is deployed) |
-| `src/` | ES modules: groups and kaleidoscopes, tiles (`domain.js`), meshes, the folds (`folds/`, with `recut.js`: re-cut first), the prints (`pattern.js`), plane view, WebGL renderer, picker, app |
+| `src/` | ES modules: groups and kaleidoscopes, tiles (`domain.js`), meshes, the folds (`folds/`, with `recut.js`: re-cut first), the prints (`pattern.js`; shape prints `shapes.js`, `sdf.js`; the shipped motifs and their idle making `patterns/`), plane view, WebGL renderer, picker, app |
 | `test/` | node:test suite |
 | `tools/` | `shot.mjs`, `filmstrip.mjs`, `qa-matrix.mjs` (headless Chrome), `motif-place.mjs` (comma placement table), `test-all.mjs` (runs the suite on a lab box or the mini), `browser.mjs` + `remote/` (Chrome pool on the mini) |
 | `SPEC.md` | the design contract the build followed, round by round |
 | `notes/`, `qa/*.md` | development log and the design decisions (Klein bottle: `notes/bottle.md` for the classic bottle of 14 Nov 2026; filling the orbifold; review triage) |
-| `dev/` | demo pages used by the tools; `dev/recut/` the probes of the 13 Nov round (self-crossing of a motion, the prints found, a real-browser check) |
+| `dev/` | demo pages used by the tools; `dev/recut/` the probes of the 13 Nov round (self-crossing of a motion, the prints found, a real-browser check); `dev/patterns/` the pattern round's designs, kit and tools (`README.md`) |
 | `lab22x/` | the 22× lab: several looks and motions of the cross-cap side by side (its own page, `lab22x/dist/index.html` as deployed) |
 
 Build: `node build.mjs` (bundles with `npx esbuild`). Tests: `node --test 'test/**/*.test.js'` (and `lab22x/test/*.test.js`). Comma table after any
 change to group data or folds: `node tools/motif-place.mjs`. The browser tools expect Google Chrome and Playwright 1.62.1.
 
 Before a change to the header, the legend or a hint ships, run the layout test in a real Chrome (it is opt-in, so the
-plain suite skips it): `SHELL_LAYOUT=1 node --test test/shell-layout.test.js` — 23 window sizes x 17 groups, about
-40 s — and the same checks in Safari's engine on the built page: `bash dev/recut/webkit-layout.sh` (WebKit on the M5).
+plain suite skips it): `SHELL_LAYOUT=1 node --test test/shell-layout.test.js` — 23 window sizes x 17 groups x the six
+patterns, about four minutes (`SHELL_LAYOUT_PAGE=dist/index.html` for the built page) — and the same checks in Safari's
+engine on the built page: `bash dev/recut/webkit-layout.sh` (WebKit on the M5).
 Then `node dev/recut/browser-check.mjs` and `node tools/qa-matrix.mjs --interact`.

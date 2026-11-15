@@ -1,0 +1,67 @@
+{
+ "key": "glyph",
+ "label": "Letter F",
+ "status": "ok",
+ "idea": "One bold letter F per tile, with a full stop. The F is built from the tile rather than stamped into it: stem along one side, top arm along the next, the far sides cut the rest, so a rectangle carries an upright F, a parallelogram an italic one and a right triangle an F whose hull is the triangle. One stroke weight (0.225 tile sizes where the tile allows), about half the tile dark. Bare patches are measured on the whole pattern and closed with a full stop at the F's foot, or a lower, longer or bolder F. Long tiles get a row of F's that ends with the full stop (*x three, 22* and 2*22 two). A leaning F whose arm would equal its stem (a chevron) has the arm cut short, with the rest left as a chip in the far corner (*333, 3*3). F only: I ruled out R, G, P, J and 7 by their shape and did not draw them.",
+ "hint": "a bold F in every tile: it turns about the centres and reads backwards across a mirror or a glide",
+ "rounds": 4,
+ "brokenRules": [
+  "No hard rule of find(group) is broken, as far as I checked: all 17 pass validateShapes of src/shapes.js at home and when turned, scaled and shifted without presets; copies stay 0.068 tile sizes apart (0.075 in 333); overlap 0; at most 204 vertices; at most 20 ms in Chrome on the mini.",
+  "Process rule (shell): two Bash calls carried a multi-line script inline as a heredoc instead of a file, and two calls looped 3 to 4 short node runs (a few seconds in total). Nothing was held and nothing ran long.",
+  "Not run: dev/patterns/suite.sh. I changed nothing under src/ or test/; the design has its own checks (check.mjs, validate.mjs)."
+ ],
+ "weaknesses": [
+  "Mirror groups read as bands at small sizes: in *442, *632, 4*2, 3*3 and *333 the stems of mirrored F's lie back to back along the mirrors with a 0.068 channel. The F is clear in the highlighted tile, but in the pale field at 330 px the eye sees a lattice of bands before letters.",
+  "Rows of small F's: *x holds three lying F's, 22* and 2*22 two. They are 0.70 to 0.83 long but only 0.36 to 0.54 across and look like chairs; *x has the thinnest stroke (0.147). The F's of a row are identical; only the full stop at the end tells them apart.",
+  "*333 and 3*3 lean 30 degrees and need the chip, a wedge about 0.2 wide in the far corner. An upright F fills only half an equilateral triangle (bare 0.66) and a full-length arm gives a chevron.",
+  "The full stop is not always at the foot: 333, 442 and *632 have it in the bare patch; *632's is small (about 0.17).",
+  "The home tile's F is not always upright: tilted about 38 degrees in 2222, lying in *2222 and in the rows, turned in the triangle tiles.",
+  "About thirty knobs and a discrete search: a changed lattice still gets a valid F, but which corner and which extra it gets can jump.",
+  "Without presets, 13 groups give the identical pattern; 333, 3*3, *333 and *632 give one that differs by a symmetry of the tile (as good, not the same).",
+  "Two bare numbers sit at the target: ** 0.442 and *333 0.447 (target 0.45).",
+  "Not verified: the page itself and the 3D fold (only the kit's sheet, front and back), WebKit, and the distance texture at the chip's 0.02 tip."
+ ],
+ "weakGroups": [
+  "*x",
+  "22*",
+  "2*22",
+  "*333",
+  "3*3",
+  "*442",
+  "4*2",
+  "*632"
+ ],
+ "files": [
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/design.js",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/NOTES.md",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/check.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/validate.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/where.mjs",
+  "/Users/yaroslavvb/git/animated-groups-fable/standalone/the-folding/dev/patterns/designs/glyph/explain.mjs",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/sheet.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/zoom.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/back.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/rows.json",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/close.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/r1-sheet.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/r4-close.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/r5-varA.png",
+  "/Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/glyph/r5-varB.png"
+ ],
+ "selfScore": {
+  "commaLike": 7,
+  "fills": 8,
+  "big": 7,
+  "helpsFold": 6,
+  "clean": 7
+ },
+ "worst": {
+  "coverageMin": 0.488,
+  "coverageMax": 0.6,
+  "emptyDiscMax": 0.447,
+  "darkDiscMax": 0.337,
+  "overlapMax": 0,
+  "vertsMax": 204,
+  "msMax": 20
+ }
+}

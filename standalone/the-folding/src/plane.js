@@ -24,9 +24,11 @@
 // of the other hand, which take the place of the grey tint: a tile carried there by a reflection or a glide lies
 // face down, as a piece of a re-cut tile does in the 3D pane. The tile itself is drawn in the paper's two front tones
 // (palette PRINT_FRONT), as the flat sheet of the 3D pane; a card of the replication carries the pale print of the tile
-// through its own motion (so it lands in register: the print is the group's). The print is drawn afresh in every frame
-// (a few dozen bands in one path); the cached 'base' layer then holds the glide axes alone. print: null (the default)
-// = the comma, as before.
+// through its own motion (so it lands in register: the print is the group's). A linear print or the rings is drawn
+// afresh in every frame (a few dozen bands in one path); a SHAPE print (src/shapes.js: hundreds of vertices on every copy
+// of its motif) is filled once per window into three cached layers and drawn from them (printLayers), its outline
+// simplified to within PRINT_TOL device pixels; the cached 'base' layer then holds the glide axes alone. print: null
+// (the default) = the comma, as before.
 // The re-cut (src/folds/recut.js). setScene({ recut: { home: [[x, y], ...], cuts: [flat points, ...], active } }): the
 // home tile the fold re-cuts the tile into, dotted, and the lines along which the tile is cut, dashed; drawn over the
 // tile, under the rotation glyphs. active = { from, to } (polygons) or null: the piece the 3D pane is carrying now,
@@ -116,6 +118,8 @@ export const MOTIF_FILL = overGround(MOTIF_COLOR, MOTIF_ALPHA_PLANE);
 /** The print's dark tone over the plane, pale: on the tiles of the tile's own hand (front), of the other hand (back). */
 export const PRINT_PALE = rgba(PRINT_FRONT[1], PRINT_PLANE_ALPHA);
 export const PRINT_PALE_BACK = rgba(PRINT_BACK[1], PRINT_PLANE_ALPHA_BACK);
+/** A shape print's outline is drawn simplified to within this many DEVICE pixels (src/shapes.js fillShapes' tol). */
+export const PRINT_TOL = 0.25;
 
 /** Panes whose short side is below this many CSS px count as small (phones): lighter glide axes. */
 export const SMALL_PANE = 300;
@@ -523,7 +527,8 @@ export const HINT_MIRRORS = 'no cut here: every edge is a mirror';
  * P.toWorld(cssX, cssY)  canvas CSS pixels (origin: the canvas's top left corner) -> world;  P.toCss(x, y) the inverse;
  *                        both exact for the frame on screen (the window may glide: see the top of this file)
  * P.destroy()            remove every listener
- * P.isDragging(), P.hideHint(), P.stats ({ ms: cost of the last draw, copies, glyphs }),
+ * P.isDragging(), P.hideHint(), P.stats ({ ms: cost of the last draw, copies, glyphs, printMs, printBuilds: the last
+ *                        filling of a shape print's layers and how many there were }),
  * P.getView()            { W, H, s, cx, cy, ..., home, target, gliding }
  */
 export function createPlaneView(canvas, options = {}) {
@@ -554,7 +559,8 @@ export function createPlaneView(canvas, options = {}) {
   let attrsFor = null;       // { group, interactive } the canvas's attributes were last written for
   let hintLive = hintOpt !== false;
   let rafDraw = 0, rafMove = 0, destroyed = false, dirty = false, lastDrawAt = -Infinity;
-  const stats = { ms: 0, copies: 0, glyphs: 0 };
+  // printMs, printBuilds: the time the last filling of a shape print's layers took, and how many there were (printLayers)
+  const stats = { ms: 0, copies: 0, glyphs: 0, printMs: 0, printBuilds: 0 };
   const tmp = [0, 0];
 
   // ---- geometry of the window ---------------------------------------------------------------------------------
@@ -926,23 +932,102 @@ export function createPlaneView(canvas, options = {}) {
     return { cv, cc };
   }
 
+  // ---- a shape print's layers (13 Nov 2026, the pattern round; src/shapes.js) -----------------------------------
+  // A linear print or the rings is a few dozen bands in one path, drawn afresh in every frame. A shape print is the
+  // motif's hundreds of vertices (up to 2400) on every copy in the window, 20 to 90 copies: filled afresh two to four
+  // times a frame it cost 14 to 70 ms a draw on an M4 (the reviews of the round; dev/patterns/scratch-fixer/perf.mjs).
+  // So its dark tone over the whole window is filled ONCE per window (the view, the canvas, the print) into an
+  // offscreen canvas in the tile's opaque front tone ('dark'), and from that, by compositing ('source-in'), the same
+  // shape in the plane's pale teal and pale sand ('pale', 'paleBack'): what fillPrint draws over the window in those
+  // three styles, to a rounding. A frame draws them under the clips it already has, as the 'base' layer is drawn: a drag
+  // of the cut, the Wavy slider and the Tile step keep the window, so they cost a few image draws. (The cards of the
+  // Tile step move: they fill the tile's share of the print, cardPath below.) Without a document (node): fillPrint, as
+  // before.
+  const printLayer = { key: '', print: null, dark: null, pale: null, paleBack: null };
+  /** PRINT_TOL in world units at the window's scale: a shape print's outline is drawn this close (fillPrint's tol). */
+  const printTol = () => PRINT_TOL / (view.s * Math.max(view.kx, view.ky));
+
+  /** The layers of the scene's print for the window on screen, made now if need be; null: draw it with fillPrint. */
+  function printLayers() {
+    const print = scene.print;
+    if (!print || print.kind !== 'shapes' || !doc || !doc.createElement) return null;
+    const L = printLayer, w = canvas.width, h = canvas.height;
+    const key = w + 'x' + h + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy + '|' + view.s;
+    if (L.print === print && L.key === key && L.dark) return L;
+    const t0 = now();
+    const ctxOf = (name) => {
+      let cv = L[name];
+      if (!cv) { cv = doc.createElement('canvas'); L[name] = cv; }
+      const cc = cv.getContext && cv.getContext('2d');
+      if (!cc) return null;
+      if (cv.width !== w) cv.width = w;
+      if (cv.height !== h) cv.height = h;
+      cc.setTransform(1, 0, 0, 1, 0, 0);
+      cc.globalAlpha = 1; cc.globalCompositeOperation = 'source-over';
+      cc.clearRect(0, 0, w, h);
+      return cc;
+    };
+    const cd = ctxOf('dark');
+    if (!cd) return null;
+    cd.setTransform(view.kx, 0, 0, view.ky, 0, 0);
+    fillPrint(cd, print, toCss, windowBox(), PRINT_FRONT[1], printTol());
+    for (const [name, style] of [['pale', PRINT_PALE], ['paleBack', PRINT_PALE_BACK]]) {
+      const cc = ctxOf(name);
+      if (!cc) return null;
+      cc.drawImage(L.dark, 0, 0);
+      cc.globalCompositeOperation = 'source-in';                // the colour of `style`, where (and as much as) the dark is
+      cc.fillStyle = style; cc.fillRect(0, 0, w, h);
+      cc.globalCompositeOperation = 'source-over';
+    }
+    L.key = key; L.print = print;
+    stats.printMs = now() - t0; stats.printBuilds++;
+    return L;
+  }
+  // The cards of the Tile step move, so they cannot take the layers: each draws the tile's share of the print through
+  // its own motion. Under a shape print that share is one Path2D in WORLD coordinates (the copies of the motif near the
+  // tile, at PRINT_TOL), made once per tile, print and scale and filled under each card's own transform: no path is built
+  // per card and frame. Without Path2D (node), fillPrint through the card's map, as before.
+  const cardShare = { print: null, T: null, tol: 0, path: null };
+  function cardPath(T) {
+    const print = scene.print, Ctor = (win && win.Path2D) || (typeof Path2D !== 'undefined' ? Path2D : null);
+    if (!print || print.kind !== 'shapes' || !Ctor) return null;
+    const tol = printTol();
+    if (cardShare.path && cardShare.print === print && cardShare.T === T && cardShare.tol === tol) return cardShare.path;
+    const path = new Ctor(), b = T.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
+    // (fillPrint's calls, into the path: its own moveTo, lineTo and closePath; nothing is filled)
+    const into = { beginPath() {}, fill() {}, moveTo: (x, y) => path.moveTo(x, y), lineTo: (x, y) => path.lineTo(x, y), closePath: () => path.closePath() };
+    fillPrint(into, print, (x, y, out) => { out[0] = x; out[1] = y; return out; }, [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], null, tol);
+    Object.assign(cardShare, { print, T, tol, path });
+    return path;
+  }
+  /** A layer the size of the canvas onto c, pixel for pixel, under c's clip and globalAlpha. */
+  function blit(c, cv) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(cv, 0, 0); c.restore(); }
+  /** No shape print on screen: give the layers' memory back (three canvases the size of the plane's). */
+  function dropPrintLayers() {
+    const L = printLayer;
+    if (!L.dark) return;
+    for (const name of ['dark', 'pale', 'paleBack']) { const cv = L[name]; if (cv) { cv.width = 0; cv.height = 0; } L[name] = null; }
+    L.key = ''; L.print = null;
+  }
+
   function drawCopies(c, P, M) {
     const { ring, copies } = P;
     // tint: the tiles of the other hand (never the current tile: it looks the same on either side of a mirror).
     // Under a print they show the paper's back instead: the print in sand there, in teal everywhere else.
     if (scene.print) {
+      const L = printLayers();
       c.save();
       c.beginPath(); c.rect(0, 0, view.W, view.H);
       for (const g of P.tinted) tracePoly(c, ring, g, true);
       c.clip('evenodd');
-      fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE);
+      if (L) blit(c, L.pale); else fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE, printTol());
       c.restore();
       if (P.tinted.length) {
         c.save();
         c.beginPath();
         for (const g of P.tinted) tracePoly(c, ring, g, true);
         c.clip();
-        fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE_BACK);
+        if (L) blit(c, L.paleBack); else fillPrint(c, scene.print, toCss, windowBox(), PRINT_PALE_BACK, printTol());
         c.restore();
       }
     } else if (P.tinted.length) {
@@ -996,8 +1081,12 @@ export function createPlaneView(canvas, options = {}) {
       c.fillStyle = PRINT_FRONT[0]; c.fill();
       c.save();
       c.clip();
-      const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
-      fillPrint(c, scene.print, toCss, [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], PRINT_FRONT[1]);
+      const L = printLayers();
+      if (L) blit(c, L.dark);
+      else {
+        const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
+        fillPrint(c, scene.print, toCss, [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], PRINT_FRONT[1], printTol());
+      }
       c.restore();
     } else { c.fillStyle = ACCENT_SOFT; c.fill(); }
     // the snowflake patch's outer boundary
@@ -1168,6 +1257,7 @@ export function createPlaneView(canvas, options = {}) {
     c.globalAlpha = 1;
     c.fillStyle = GROUND; c.fillRect(0, 0, view.W, view.H);
     if (!scene) return;
+    if (!scene.print || scene.print.kind !== 'shapes') dropPrintLayers();
     const P = prepare(), M = metrics();
     if (tilingActive()) renderTiling(c, P, M);
     else {                                     // the plane as always
@@ -1372,10 +1462,11 @@ export function createPlaneView(canvas, options = {}) {
       if (under.length) { pathOf(list); c.globalAlpha = a; c.fillStyle = GROUND; c.fill(); c.globalAlpha = 1; }   // the paper over the cards under it
       if (scene.print) {
         // the print where copies have landed: teal on the tile's own hand, sand on the other (as the plane always is)
-        for (const [sub, style] of [[list.filter((cp) => !tinted(cp)), PRINT_PALE], [list.filter(tinted), PRINT_PALE_BACK]]) {
+        const L = printLayers();
+        for (const [sub, style, layer] of [[list.filter((cp) => !tinted(cp)), PRINT_PALE, L && L.pale], [list.filter(tinted), PRINT_PALE_BACK, L && L.paleBack]]) {
           if (!sub.length) continue;
           c.save(); pathOf(sub); c.clip(); c.globalAlpha = a;
-          fillPrint(c, scene.print, toCss, windowBox(), style);
+          if (layer) blit(c, layer); else fillPrint(c, scene.print, toCss, windowBox(), style, printTol());
           c.restore();
         }
         continue;
@@ -1498,8 +1589,22 @@ export function createPlaneView(canvas, options = {}) {
       // the card carries the tile's share of the print through its own motion (the print is the group's: it lands in register)
       const b = P.box, pad = 0.02 * (b[2] - b[0] + b[3] - b[1]);
       c.globalAlpha = k;
-      fillPrint(c, scene.print, (x, y, out) => { out[0] = X(A.a * x + A.b * y + A.tx); out[1] = Y(A.c * x + A.d * y + A.ty); return out; },
-        [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], paper ? paper[1] : backUp ? PRINT_PALE_BACK : PRINT_PALE);
+      // (the face that is up: on a card of the first layer the paper's own dark tone, front teal or back sand once a
+      // flip has passed edge-on; on a quiet card the plane's pale tones — as the tile it lands on is drawn. The tones:
+      // the owner's comments of 13 Nov; the cached path of a shape print: the pattern round's fixer, 13 Nov)
+      const style = paper ? paper[1] : backUp ? PRINT_PALE_BACK : PRINT_PALE, share = cardPath(prepareTile());
+      if (share) {
+        // world -> the card's place (A) -> the window (css px) -> device px, in the canvas's order
+        const s = view.s, kx = view.kx, ky = view.ky;
+        c.fillStyle = style;
+        c.save();
+        c.setTransform(kx * s * A.a, -ky * s * A.c, kx * s * A.b, -ky * s * A.d, kx * (view.W / 2 + s * (A.tx - view.cx)), ky * (view.H / 2 - s * (A.ty - view.cy)));
+        c.fill(share, 'nonzero');
+        c.restore();
+      } else {
+        fillPrint(c, scene.print, (x, y, out) => { out[0] = X(A.a * x + A.b * y + A.tx); out[1] = Y(A.c * x + A.d * y + A.ty); return out; },
+          [b[0] - pad, b[1] - pad, b[2] + pad, b[3] + pad], style, printTol());
+      }
       c.globalAlpha = 1;
     }
     c.beginPath(); traceAffine(c, ring, A, true, true);

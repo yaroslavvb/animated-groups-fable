@@ -1,0 +1,53 @@
+<!doctype html>
+<!-- scratch: the renderer as it was before the texture mode (render3d-before.js, a copy) against the renderer now, on
+     the same scenes of modes 0, 1, 2, the ghost / fill tints and the lab's palette: the pictures must be the same.
+     window.__cmp = { ready, error, rows: [{ name, worst, differing, pixels }] }; driven by compare.mjs -->
+<html><head><meta charset="utf-8"><title>renderer: before and now</title>
+<style>body { margin: 8px; font: 12px system-ui, sans-serif; } .p { position: relative; display: inline-block; width: 420px; height: 420px; border: 1px solid #ddd; } canvas { width: 100%; height: 100%; display: block; } .l { position: absolute; inset: 0; }</style></head>
+<body><div class="p"><canvas id="a"></canvas><div class="l" id="la"></div></div> <div class="p"><canvas id="b"></canvas><div class="l" id="lb"></div></div><pre id="o"></pre>
+<script type="module">
+  import { createRenderer as before } from './render3d-before.js';
+  import { createRenderer as now } from '../../../src/render3d.js';
+  import { printFor, printUniforms } from '../../../src/pattern.js';
+  import { BY_ID } from '../../../src/groups.js';
+  import { PRINT_FRONT, PRINT_BACK, PRINT_OPACITY, hexToRgb } from '../../../src/palette.js';
+  const out = (window.__cmp = { ready: false, error: null, rows: [] });
+  try {
+    const A = before(document.getElementById('a'), { labelLayer: document.getElementById('la'), reducedMotion: true });
+    const B = now(document.getElementById('b'), { labelLayer: document.getElementById('lb'), reducedMotion: true });
+    const both = (f) => { f(A); f(B); };
+    const W = A.canvas.width, H = A.canvas.height;
+    const pa = new Uint8Array(4 * W * H), pb = new Uint8Array(4 * W * H);
+    const grab = (R, buf) => { R.render(); R.gl.readPixels(0, 0, W, H, R.gl.RGBA, R.gl.UNSIGNED_BYTE, buf); };
+    function sheet(group, tintOf) {                              // a square of paper round the group's centre, 20 x 20
+      const n = 20, c = group.center, h = 0.75 * group.viewHalf, pos = [], uv = [], idx = [], tint = [];
+      for (let j = 0; j <= n; j++) for (let i = 0; i <= n; i++) { const x = c[0] - h + 2 * h * i / n, y = c[1] - h + 2 * h * j / n; pos.push(x, y, 0.15 * h * Math.sin(3 * i / n) * Math.cos(2 * j / n)); uv.push(x, y); tint.push(tintOf ? tintOf(i, j) : 0); }
+      for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const a = j * (n + 1) + i, b = a + 1, d = a + n + 2, e = a + n + 1; idx.push(a, b, d, a, d, e); }
+      return { surface: { positions: Float32Array.from(pos), indices: Uint32Array.from(idx), uv: Float32Array.from(uv), tint: Uint8Array.from(tint) }, frame: { center: [c[0], c[1], 0], radius: 1.2 * h } };
+    }
+    const paper = { printFront: PRINT_FRONT.map(hexToRgb), printBack: PRINT_BACK.map(hexToRgb), opacity: PRINT_OPACITY, background: '#ffffff' };
+    const cases = [];
+    for (const id of ['*442', '333', '632', '*x', '2222']) for (const key of ['checker', 'rings']) for (const view of [{ az: 0, el: 90 }, { az: 35, el: 30 }, { az: 200, el: -40 }, { az: 10, el: 8 }]) {
+      cases.push({ name: `${id} ${key} az ${view.az} el ${view.el}`, group: BY_ID[id], style: { ...paper, print: printUniforms(printFor(BY_ID[id], key)), ghostMix: 1 }, view });
+    }
+    // the tints under a print: ghost (1), fill (2), both (3), with the ghost half let through
+    cases.push({ name: '*333 checker, ghost and fill tints, ghostMix 0.5', group: BY_ID['*333'], style: { ...paper, print: printUniforms(printFor(BY_ID['*333'], 'checker')), ghostMix: 0.5 }, view: { az: 30, el: 40 }, tintOf: (i, j) => (i >> 2) % 4 });
+    // no print: the translucent sheet, plain and with tints; the lab's palette
+    cases.push({ name: 'no print, translucent, tints 0..3', group: BY_ID['442'], style: { print: null, opacity: 0.62, background: '#ffffff', ghostMix: 1 }, view: { az: 30, el: 40 }, tintOf: (i, j) => (j >> 2) % 4 });
+    cases.push({ name: 'palette (tints 4..11), no print', group: BY_ID['22x'], style: { print: null, opacity: 1, background: '#ffffff', palette: Array.from({ length: 8 }, (_, k) => ({ front: [0.2 + 0.1 * k, 0.5, 0.9 - 0.1 * k], back: [0.9 - 0.1 * k, 0.6, 0.2 + 0.1 * k] })) }, view: { az: 30, el: 40 }, tintOf: (i, j) => 4 + ((i >> 1) + (j >> 1)) % 8 });
+    cases.push({ name: 'palette over a print', group: BY_ID['22x'], style: { ...paper, print: printUniforms(printFor(BY_ID['22x'], 'checker')), palette: Array.from({ length: 8 }, (_, k) => ({ front: [0.2 + 0.1 * k, 0.5, 0.9 - 0.1 * k], back: [0.9 - 0.1 * k, 0.6, 0.2 + 0.1 * k] })) }, view: { az: 215, el: -35 }, tintOf: (i, j) => (i > 10 ? 4 + (j >> 2) % 8 : 0) });
+    for (const c of cases) {
+      const S = sheet(c.group, c.tintOf);
+      both((R) => { R.setSurface(S.surface); R.setFrame(S.frame, true); R.setStyle(c.style); R.setView({ ...c.view, zoom: 1 }); });
+      grab(A, pa); grab(B, pb);
+      let worst = 0, differing = 0, ink = 0;
+      for (let i = 0; i < pa.length; i++) { const d = Math.abs(pa[i] - pb[i]); if (d) { differing++; if (d > worst) worst = d; } }
+      for (let i = 0; i < pa.length; i += 4) if (pa[i] < 250 || pa[i + 1] < 250 || pa[i + 2] < 250) ink++;
+      out.rows.push({ name: c.name, worst, differing, pixels: W * H, ink });
+    }
+    out.gpu = (() => { const g = B.gl, e = g.getExtension('WEBGL_debug_renderer_info'); return e ? g.getParameter(e.UNMASKED_RENDERER_WEBGL) : g.getParameter(g.RENDERER); })();
+    out.size = [W, H];
+    document.getElementById('o').textContent = out.rows.map((r) => `${r.worst} ${r.differing} ${r.name}`).join('\n');
+  } catch (e) { out.error = String(e && e.stack || e); document.getElementById('o').textContent = out.error; }
+  out.ready = true;
+</script></body></html>

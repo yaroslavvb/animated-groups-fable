@@ -119,7 +119,10 @@ body {
 /* ---- the pattern selector (13 Nov 2026): a pill at the right of the header, under an invisible native <select> ----
    The pill shows the swatch of the current pattern (#app[data-pattern]), its name and a caret; the <select> covers it
    (opacity 0), so a tap opens the platform's own picker and the keyboard works as on any select. The pill is the 36 px
-   pill of the other controls inside the label's 44 px box. On a narrow window the name goes: the swatch alone. */
+   pill of the other controls inside the label's 44 px box. On a narrow window the name goes: the swatch alone, so
+   every pattern has a swatch of its own (14 Nov 2026: paisley, soft, tomoe joined; paisley is the default, shown
+   before the script has set #app[data-pattern]). A swatch is the print in small: a rounded square in the light tone,
+   the marks in the dark one. */
 .pat { position: relative; flex: none; margin-left: auto; display: inline-flex; align-items: center; gap: 8px; height: var(--tap); cursor: pointer; }
 .pat-k { color: var(--muted); font-size: 13px; line-height: 16px; white-space: nowrap; }
 .pat-pill {
@@ -132,13 +135,19 @@ body {
 }
 .pat-label { font-size: 14px; line-height: 16px; }
 .pat-sw { flex: none; width: 18px; height: 18px; display: none; }
+.app[data-pattern="paisley"] .pat-sw-paisley, .app[data-pattern="soft"] .pat-sw-soft, .app[data-pattern="tomoe"] .pat-sw-tomoe,
 .app[data-pattern="checker"] .pat-sw-checker, .app[data-pattern="rings"] .pat-sw-rings, .app[data-pattern="comma"] .pat-sw-comma,
-.app:not([data-pattern]) .pat-sw-checker { display: block; }
+.app:not([data-pattern]) .pat-sw-paisley { display: block; }
 .pat-bg { fill: var(--print-light); }
 .pat-fg { fill: var(--print-dark); }
 .pat-ring { fill: none; stroke: var(--print-dark); stroke-width: 2.2; }
 .pat-glass { fill: var(--accent-soft); }
 .pat-ink { fill: var(--motif); }
+/* the comma on the paper's two tones (the owner, 13 Nov 2026: "I want to reuse the two different shades from
+   "checkerboard" pattern for all patterns"): once the comma is a print, #app[data-print] is set under it and its swatch
+   takes the print's tones */
+.app[data-print] .pat-sw-comma .pat-glass { fill: var(--print-light); }
+.app[data-print] .pat-sw-comma .pat-ink { fill: var(--print-dark); }
 .pat > select {
   position: absolute; inset: 0; width: 100%; height: 100%;
   margin: 0; padding: 0; border: 0;
@@ -486,9 +495,11 @@ body {
 .app[data-features~="corners"] .lg[data-feature="corners"],
 .app[data-features~="double"] .lg[data-feature="double"],
 .app:not([data-features]) .lg:is([data-feature="seams"], [data-feature="mirrors"], [data-feature="cones"]) { display: flex; }
-/* under a print the paper has two sides: said first (13 Nov 2026) */
-.app[data-pattern="checker"] .lg[data-paper], .app[data-pattern="rings"] .lg[data-paper] { display: flex; }
-/* ... but not under 360 px: there it would cost the legend a line, and the 3D pane of a 320 x 518 window its 150 px */
+/* under a print the paper has two sides: said first (13 Nov 2026). Every print (14 Nov 2026): #app[data-print] is the
+   kind of the print on screen (src/app.js: linear, rings, shapes), absent when the paper has none */
+.app[data-print] .lg[data-paper] { display: flex; }
+/* ... but not under 360 px: there it would cost the legend a line, and the 3D pane of a 320 x 518 window its 150 px
+   (this rule comes after the one above, with the same weight: it wins) */
 @media (max-width: 359px) { .app[data-pattern] .lg[data-paper] { display: none; } }
 .lg-sep { margin: 0 6px; }
 .sw-front { fill: var(--print-dark); }

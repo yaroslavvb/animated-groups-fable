@@ -1,0 +1,505 @@
+// dev/patterns/designs/paisley/design.js — "Paisley": a FAMILY of commas per fundamental domain, as on a paisley cloth.
+// The big comma first (the largest one the default tile holds whole), then smaller commas dropped, one after another,
+// into the largest bare disc that remains, each turned and stretched to fit the room it finds, down to a floor.
+// Every comma is the same glyph with the same hand (a round head, a tail that curls to a point): similar copies,
+// stretched along head -> tail by at most STRETCH_MAX. The motif never holds a mirrored comma, so in the plane every
+// comma of the other hand is the work of a mirror or a glide of the group.
+//
+// How it stays a pattern of the orbifold and never overlaps:
+//   * the motif is a list of commas; the print is the union of all their copies under the group (kit.js);
+//   * a comma born at the point p lives inside the Dirichlet cell of p (all points nearer p than any copy of p),
+//     shrunk by half a channel: its own copies lie in the neighbouring cells, a channel away. The big comma's cell is
+//     the page's default tile when the group has presets (so that tile holds it whole), else the cell of the group's
+//     deepest hole (the point farthest from its own copies);
+//   * against the commas already there it keeps the channel by an exact polygon distance.
+// Everything is computed in a frame of the group itself (origin group.center, x along e1, unit sqrt(domainArea)), so
+// a turned, scaled or shifted group gets the turned, scaled, shifted pattern.
+
+import { elementsNear } from '../../../../src/groups.js';
+import { buildDomain } from '../../../../src/domain.js';
+
+export const meta = { key: 'paisley', label: 'Paisley', hint: 'a big comma and smaller ones nestled around it, as on a paisley cloth' };
+
+/** The knobs; every length is in tile sizes (sqrt(domainArea)). */
+export const KNOBS = {
+  glyph: { b: 0.52, a: 0.58, tip: 95, rt: 0.03 },   // head radius, hollow radius, where the tip sits on the back's circle (degrees), tip rounding
+  channel: 0.055,          // bare channel between two marks (a mark and its mirror image: the same, half on each side)
+  stretchMax: 2.2,         // a comma is at most this much longer (head -> tail) than the round glyph
+  stretchBias: 0.9,        // area counts as s^2 * stretch^bias when two fits are compared: stretch only where it pays
+  solidMax: 0.62,          // the head's inscribed disc (diameter) is at most this
+  ratioNext: 0.82,         // every later comma is at most this times the big one (scale)
+  floor: 0.13,             // no comma with a bounding width under this
+  bareGoal: 0.36,          // stop when no bare disc is larger than this (diameter) ...
+  coverGoal: 0.46,         // ... and the dark share has reached this
+  maxMarks: 8,
+  grid: 64,                // cells per tile size of the distance grid
+  pad: 0.8,                // the grid reaches this far beyond the tile
+  seg: 0.016,              // outline segments are at most this long ...
+  segAngle: 7.5,           // ... and turn at most this many degrees
+};
+
+const TAU = 2 * Math.PI;
+
+// ---------------------------------------------------------------------------------------------------------------
+// The glyph: four arcs in the unit disc. Back = the unit circle from the bottom up to the tip; tip = a small circle;
+// hollow = a circle through the tip that touches the head from outside; head = a circle touching the back at the bottom.
+// ---------------------------------------------------------------------------------------------------------------
+function circleCircle(c1, r1, c2, r2, left) {
+  const dx = c2[0] - c1[0], dy = c2[1] - c1[1], d = Math.hypot(dx, dy);
+  const x = (d * d + r1 * r1 - r2 * r2) / (2 * d), y = Math.sqrt(Math.max(0, r1 * r1 - x * x)) * (left ? 1 : -1);
+  return [c1[0] + (x * dx - y * dy) / d, c1[1] + (x * dy + y * dx) / d];
+}
+
+let GLYPH = null;
+function glyph() {
+  if (GLYPH) return GLYPH;
+  const { b, a, tip, rt } = KNOBS.glyph;
+  const th = (tip * Math.PI) / 180, H = [0, -1 + b], T = [Math.cos(th), Math.sin(th)], O = [0, 0];
+  const Q = circleCircle(H, a + b, T, a, true), Ct = circleCircle(O, 1 - rt, Q, a + rt, false);
+  const ang = (p, c) => Math.atan2(p[1] - c[1], p[0] - c[0]);
+  const ccw = (a0, a1) => { while (a1 < a0) a1 += TAU; return a1; }, cw = (a0, a1) => { while (a1 > a0) a1 -= TAU; return a1; };
+  const fb = ang(Ct, O);
+  const arcs = [
+    { c: O, r: 1, a0: -Math.PI / 2, a1: ccw(-Math.PI / 2, fb), fine: 1 },
+    { c: Ct, r: rt, a0: fb, a1: ccw(fb, ang(Q, Ct)), fine: 0 },
+    { c: Q, r: a, a0: ang(Ct, Q), a1: cw(ang(Ct, Q), ang(H, Q)), fine: 1 },
+    { c: H, r: b, a0: ang(Q, H), a1: ccw(ang(Q, H), 1.5 * Math.PI), fine: 1 },
+  ];
+  // discs inside the glyph, from the head along the tail (each touches the back and the hollow): centres and radii
+  const discs = [];
+  for (const f of [1, 0.78, 0.56, 0.36, 0.2]) { const r = b * f, p = f === 1 ? H : circleCircle(O, 1 - r, Q, a + r, false); discs.push([p[0], p[1], r]); }
+  GLYPH = { arcs, discs, coarse: sampleGlyph(arcs, 0.13, 20, 1), area: 0 };
+  const p = sampleGlyph(arcs, 0.01, 2, 1);
+  let A = 0;
+  for (let i = 0, n = p.length / 2; i < n; i++) { const j = (i + 1) % n; A += p[2 * i] * p[2 * j + 1] - p[2 * j] * p[2 * i + 1]; }
+  GLYPH.area = A / 2;
+  return GLYPH;
+}
+
+/** The unit outline, counter-clockwise: segments at most `step` long (measured after scaling by `scale`) and `deg` degrees. */
+function sampleGlyph(arcs, step, deg, scale) {
+  const out = [];
+  for (const A of arcs) {
+    const sweep = A.a1 - A.a0, len = Math.abs(sweep) * A.r * scale;
+    const n = A.fine ? Math.max(2, Math.ceil(Math.max(len / step, (Math.abs(sweep) * 180) / Math.PI / deg))) : Math.max(3, Math.ceil(len / (0.5 * step)));
+    for (let i = 0; i < n; i++) { const f = A.a0 + (sweep * i) / n; out.push(A.c[0] + A.r * Math.cos(f), A.c[1] + A.r * Math.sin(f)); }
+  }
+  return Float64Array.from(out);
+}
+
+/** The unit points placed: scaled by s (s * sg along head -> tail), turned by al, centred at (cx, cy). */
+function place(unit, cx, cy, al, sg, s, out) {
+  const ca = Math.cos(al) * s, sa = Math.sin(al) * s, n = unit.length;
+  out = out || new Float64Array(n);
+  for (let i = 0; i < n; i += 2) { const x = unit[i], y = sg * unit[i + 1]; out[i] = cx + ca * x - sa * y; out[i + 1] = cy + sa * x + ca * y; }
+  return out;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Convex polygons: Dirichlet cells and their half-planes
+// ---------------------------------------------------------------------------------------------------------------
+function clip(poly, nx, ny, c) {                               // keep n.x <= c
+  const out = [], n = poly.length;
+  for (let i = 0; i < n; i++) {
+    const p = poly[i], q = poly[(i + 1) % n], sp = nx * p[0] + ny * p[1] - c, sq = nx * q[0] + ny * q[1] - c;
+    if (sp <= 0) out.push(p);
+    if ((sp <= 0) !== (sq <= 0)) { const t = sp / (sp - sq); out.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])]); }
+  }
+  return out;
+}
+/** The Dirichlet cell of the point (px, py): nearer to it than to any of its copies g(p), g in els (flat 6 per element). */
+function dirichlet(px, py, els, reach) {
+  const B = reach;
+  let P = [[px - B, py - B], [px + B, py - B], [px + B, py + B], [px - B, py + B]];
+  for (let k = 0; k < els.length; k += 6) {
+    const qx = els[k] * px + els[k + 1] * py + els[k + 4], qy = els[k + 2] * px + els[k + 3] * py + els[k + 5];
+    const dx = qx - px, dy = qy - py, d = Math.hypot(dx, dy);
+    if (d < 1e-9 || d > 2.9 * B) continue;
+    P = clip(P, dx / d, dy / d, ((px + qx) * dx + (py + qy) * dy) / (2 * d));
+    if (P.length < 3) break;
+  }
+  return P;
+}
+/** Outward half-planes [nx, ny, c] (n.x <= c inside) of a convex polygon, moved inward by `margin`. Short sides dropped. */
+function halfPlanes(poly, margin) {
+  let A = 0;
+  const n = poly.length;
+  for (let i = 0; i < n; i++) { const p = poly[i], q = poly[(i + 1) % n]; A += p[0] * q[1] - q[0] * p[1]; }
+  const sgn = A >= 0 ? 1 : -1, out = [];
+  for (let i = 0; i < n; i++) {
+    const p = poly[i], q = poly[(i + 1) % n], dx = q[0] - p[0], dy = q[1] - p[1], l = Math.hypot(dx, dy);
+    if (l < 1e-7) continue;
+    const nx = (sgn * dy) / l, ny = (-sgn * dx) / l;
+    out.push(nx, ny, nx * p[0] + ny * p[1] - margin);
+  }
+  return Float64Array.from(out);
+}
+/** min over g != 1 of |g(p) - p|. */
+function selfDistance(px, py, els) {
+  let best = Infinity;
+  for (let k = 0; k < els.length; k += 6) {
+    const dx = els[k] * px + els[k + 1] * py + els[k + 4] - px, dy = els[k + 2] * px + els[k + 3] * py + els[k + 5] - py, d = dx * dx + dy * dy;
+    if (d > 1e-18 && d < best) best = d;
+  }
+  return Math.sqrt(best);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The largest comma in a convex region: for a given turn and stretch a linear program in (x, y, s)
+// ---------------------------------------------------------------------------------------------------------------
+function inscribe(hp, unit, al, sg, sCap) {
+  const m = hp.length / 3, ca = Math.cos(al), sa = Math.sin(al), nu = unit.length;
+  const A = new Float64Array(3 * (m + 1)), B = new Float64Array(m + 1);
+  for (let j = 0; j < m; j++) {
+    const nx = hp[3 * j], ny = hp[3 * j + 1], ux = nx * ca + ny * sa, uy = (-nx * sa + ny * ca) * sg;   // n . R(al) diag(1, sg) p
+    let h = -Infinity;
+    for (let i = 0; i < nu; i += 2) { const v = ux * unit[i] + uy * unit[i + 1]; if (v > h) h = v; }
+    A[3 * j] = nx; A[3 * j + 1] = ny; A[3 * j + 2] = h; B[j] = hp[3 * j + 2];
+  }
+  A[3 * m + 2] = 1; B[m] = sCap;
+  let best = -1, bx = 0, by = 0, cnt = 0;
+  const M = m + 1;
+  for (let i = 0; i < M; i++) for (let j = i + 1; j < M; j++) for (let k = j + 1; k < M; k++) {
+    const a1 = A[3 * i], b1 = A[3 * i + 1], c1 = A[3 * i + 2], a2 = A[3 * j], b2 = A[3 * j + 1], c2 = A[3 * j + 2], a3 = A[3 * k], b3 = A[3 * k + 1], c3 = A[3 * k + 2];
+    const det = a1 * (b2 * c3 - b3 * c2) - b1 * (a2 * c3 - a3 * c2) + c1 * (a2 * b3 - a3 * b2);
+    if (Math.abs(det) < 1e-12) continue;
+    const d1 = B[i], d2 = B[j], d3 = B[k];
+    const x = (d1 * (b2 * c3 - b3 * c2) - b1 * (d2 * c3 - d3 * c2) + c1 * (d2 * b3 - d3 * b2)) / det;
+    const y = (a1 * (d2 * c3 - d3 * c2) - d1 * (a2 * c3 - a3 * c2) + c1 * (a2 * d3 - a3 * d2)) / det;
+    const s = (a1 * (b2 * d3 - b3 * d2) - b1 * (a2 * d3 - a3 * d2) + d1 * (a2 * b3 - a3 * b2)) / det;
+    if (s <= 0 || s < best - 1e-7) continue;
+    let ok = true;
+    for (let q = 0; q < M && ok; q++) if (A[3 * q] * x + A[3 * q + 1] * y + A[3 * q + 2] * s > B[q] + 1e-9) ok = false;
+    if (!ok) continue;
+    if (s > best + 1e-7) { best = s; bx = x; by = y; cnt = 1; } else { bx += x; by += y; cnt++; if (s > best) best = s; }
+  }
+  return best > 0 ? { s: best, x: bx / cnt, y: by / cnt } : null;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The distance grid
+// ---------------------------------------------------------------------------------------------------------------
+function edt(dark, w, h, out) {                                // exact Euclidean distance to the nearest dark cell, in cells
+  const INF = 1e12, n = Math.max(w, h), f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
+  const pass = (len) => {
+    let k = 0; v[0] = 0; z[0] = -INF; z[1] = INF;
+    for (let q = 1; q < len; q++) {
+      let s;
+      for (;;) { const p = v[k]; s = (f[q] + q * q - (f[p] + p * p)) / (2 * q - 2 * p); if (s <= z[k] && k > 0) k--; else break; }
+      if (s <= z[k]) { v[k] = q; z[k] = -INF; z[k + 1] = INF; } else { k++; v[k] = q; z[k] = s; z[k + 1] = INF; }
+    }
+    k = 0;
+    for (let q = 0; q < len; q++) { while (z[k + 1] < q) k++; const p = v[k]; d[q] = (q - p) * (q - p) + f[p]; }
+  };
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) f[y] = dark[y * w + x] ? 0 : INF;
+    pass(h);
+    for (let y = 0; y < h; y++) out[y * w + x] = d[y];
+  }
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) f[x] = out[y * w + x];
+    pass(w);
+    for (let x = 0; x < w; x++) out[y * w + x] = Math.sqrt(d[x]);
+  }
+  return out;
+}
+
+/** Mark the cells whose centre lies in the polygon (flat points, grid coordinates in cells). */
+function stamp(dark, w, h, p) {
+  const n = p.length / 2;
+  let y0 = Infinity, y1 = -Infinity;
+  for (let i = 0; i < n; i++) { const y = p[2 * i + 1]; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  const r0 = Math.max(0, Math.ceil(y0 - 0.5)), r1 = Math.min(h - 1, Math.floor(y1 - 0.5));
+  const xs = [];
+  for (let r = r0; r <= r1; r++) {
+    const y = r + 0.5;
+    xs.length = 0;
+    for (let i = 0, j = n - 1; i < n; j = i++) {
+      const yi = p[2 * i + 1], yj = p[2 * j + 1];
+      if ((yi > y) !== (yj > y)) xs.push(p[2 * i] + ((y - yi) * (p[2 * j] - p[2 * i])) / (yj - yi));
+    }
+    xs.sort((u, q) => u - q);
+    for (let k = 0; k + 1 < xs.length; k += 2) {
+      const c0 = Math.max(0, Math.ceil(xs[k] - 0.5)), c1 = Math.min(w - 1, Math.floor(xs[k + 1] - 0.5));
+      for (let c = c0; c <= c1; c++) dark[r * w + c] = 1;
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// Exact distances between outlines
+// ---------------------------------------------------------------------------------------------------------------
+function pointIn(p, x, y) {
+  let inn = false;
+  for (let i = 0, n = p.length / 2, j = n - 1; i < n; j = i++) {
+    const yi = p[2 * i + 1], yj = p[2 * j + 1];
+    if ((yi > y) !== (yj > y) && x < p[2 * i] + ((y - yi) * (p[2 * j] - p[2 * i])) / (yj - yi)) inn = !inn;
+  }
+  return inn;
+}
+/** Smallest distance from the vertices of P to the outline Q, looked at only where it can be under `lim`. */
+function vertsToOutline(P, Q, qcx, qcy, qr, lim) {
+  let best = lim * lim;
+  const nq = Q.length / 2, np = P.length / 2;
+  for (let i = 0; i < np; i++) {
+    const x = P[2 * i], y = P[2 * i + 1];
+    if (Math.hypot(x - qcx, y - qcy) > qr + lim) continue;
+    for (let k = 0, l = nq - 1; k < nq; l = k++) {
+      const ax = Q[2 * l], ay = Q[2 * l + 1], ex = Q[2 * k] - ax, ey = Q[2 * k + 1] - ay, l2 = ex * ex + ey * ey;
+      let t = l2 > 0 ? ((x - ax) * ex + (y - ay) * ey) / l2 : 0;
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      const dx = ax + t * ex - x, dy = ay + t * ey - y, d = dx * dx + dy * dy;
+      if (d < best) best = d;
+    }
+  }
+  return Math.sqrt(best);
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// find
+// ---------------------------------------------------------------------------------------------------------------
+export function find(group) {
+  const K = KNOBS, G = glyph(), c = K.channel;
+  const u = Math.sqrt(group.domainArea), l1 = Math.hypot(group.e1[0], group.e1[1]);
+  const ex = group.e1[0] / l1, ey = group.e1[1] / l1, Ox = group.center[0], Oy = group.center[1];
+  const toLocal = (x, y) => [((x - Ox) * ex + (y - Oy) * ey) / u, (-(x - Ox) * ey + (y - Oy) * ex) / u];
+  const localEls = (wx, wy, radius) => {                        // the elements g with |g(w) - w| <= radius, in the local frame
+    const list = elementsNear(group, wx, wy, radius, wx, wy), out = new Float64Array(6 * list.length);
+    let k = 0;
+    for (const g of list) {
+      // x_world = O + u R xi  =>  xi' = R^T L R xi + R^T (L O + t - O) / u,  R = [ex -ey; ey ex]
+      const a = g.a * ex + g.b * ey, b2 = -g.a * ey + g.b * ex, c2 = g.c * ex + g.d * ey, d = -g.c * ey + g.d * ex;   // L R
+      const tx = g.a * Ox + g.b * Oy + g.tx - Ox, ty = g.c * Ox + g.d * Oy + g.ty - Oy;
+      const la = ex * a + ey * c2, lb = ex * b2 + ey * d, lc = -ey * a + ex * c2, ld = -ey * b2 + ex * d;
+      const ltx = (ex * tx + ey * ty) / u, lty = (-ey * tx + ex * ty) / u;
+      if (Math.abs(la - 1) < 1e-9 && Math.abs(ld - 1) < 1e-9 && Math.abs(lb) < 1e-9 && Math.abs(lc) < 1e-9 && Math.abs(ltx) < 1e-9 && Math.abs(lty) < 1e-9) continue;
+      out[k++] = la; out[k++] = lb; out[k++] = lc; out[k++] = ld; out[k++] = ltx; out[k++] = lty;
+    }
+    return out.subarray(0, k);
+  };
+
+  // ---- the tile of the big comma --------------------------------------------------------------------------------
+  let tile = null, seated = 'tile';
+  if (group.presets && group.presets[0] && group.presets[0].seed) {
+    try { tile = buildDomain(group, { seed: group.presets[0].seed, metric: group.presets[0].metric }).poly.map((p) => toLocal(p[0], p[1])); } catch (e) { tile = null; }
+  }
+  if (!tile || tile.length < 3) {
+    seated = 'hole';
+    const L = (l1 + Math.hypot(group.e2[0], group.e2[1])) / u;
+    const els0 = localEls(Ox, Oy, (2.2 * L + 1) * u);
+    const lat = (s, t) => toLocal(Ox + s * group.e1[0] + t * group.e2[0], Oy + s * group.e1[1] + t * group.e2[1]);
+    let q = null, qs = -1;
+    for (const [s, t] of [[0.137, 0.291], [0.31, 0.12], [-0.21, 0.37], [0.43, -0.17], [-0.33, -0.29], [0.07, 0.45]]) {
+      const p = lat(s, t), v = selfDistance(p[0], p[1], els0);
+      if (v > qs + 1e-9) { qs = v; q = p; }
+    }
+    const T0 = dirichlet(q[0], q[1], els0, 1.6 * L + 1);
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, mx = 0, my = 0;
+    for (const p of T0) { x0 = Math.min(x0, p[0]); y0 = Math.min(y0, p[1]); x1 = Math.max(x1, p[0]); y1 = Math.max(y1, p[1]); mx += p[0] / T0.length; my += p[1] / T0.length; }
+    const hp0 = halfPlanes(T0, 0), inT0 = (x, y) => { for (let j = 0; j < hp0.length; j += 3) if (hp0[j] * x + hp0[j + 1] * y > hp0[j + 2] + 1e-9) return false; return true; };
+    let best = -1, bp = q;
+    const score = (x, y) => selfDistance(x, y, els0) - 0.004 * Math.hypot(x - mx, y - my);
+    for (let j = 0; j <= 28; j++) for (let i = 0; i <= 28; i++) {
+      const x = x0 + ((x1 - x0) * i) / 28, y = y0 + ((y1 - y0) * j) / 28;
+      if (!inT0(x, y)) continue;
+      const v = score(x, y);
+      if (v > best + 1e-9) { best = v; bp = [x, y]; }
+    }
+    for (let step = Math.max(x1 - x0, y1 - y0) / 28, it = 0; it < 40 && step > 1e-5; it++) {       // climb to the top of the hole
+      let moved = false;
+      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1], [0.7, 0.7], [-0.7, 0.7], [0.7, -0.7], [-0.7, -0.7]]) {
+        const v = score(bp[0] + dx * step, bp[1] + dy * step);
+        if (v > best + 1e-10) { best = v; bp = [bp[0] + dx * step, bp[1] + dy * step]; moved = true; }
+      }
+      if (!moved) step /= 2;
+    }
+    tile = dirichlet(bp[0], bp[1], els0, 1.6 * L + 1);
+  }
+  let tcx = 0, tcy = 0, rT = 0, bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+  for (const p of tile) { tcx += p[0] / tile.length; tcy += p[1] / tile.length; bx0 = Math.min(bx0, p[0]); by0 = Math.min(by0, p[1]); bx1 = Math.max(bx1, p[0]); by1 = Math.max(by1, p[1]); }
+  for (const p of tile) rT = Math.max(rT, Math.hypot(p[0] - tcx, p[1] - tcy));
+  const els = localEls(Ox + u * (tcx * ex - tcy * ey), Oy + u * (tcx * ey + tcy * ex), (2 * rT + 3.2) * u);
+  const tileHP = halfPlanes(tile, 0);
+
+  // ---- the big comma: the largest the tile holds, over turns and stretches -----------------------------------------
+  const marks = [];
+  const sCapBig = K.solidMax / (2 * K.glyph.b);
+  {
+    const hp = halfPlanes(tile, c / 2);
+    let best = null;
+    const tryFit = (al, sg) => {
+      const r = inscribe(hp, G.coarse, al, sg, sCapBig);
+      if (!r) return null;
+      r.al = al; r.sg = sg; r.obj = r.s * r.s * Math.pow(sg, K.stretchBias);
+      if (!best || r.obj > best.obj * (1 + 1e-6)) best = r;
+      return r;
+    };
+    const NS = 7;
+    for (let k = 0; k < NS; k++) { const sg = 1 + ((K.stretchMax - 1) * k) / (NS - 1); for (let i = 0; i < 72; i++) tryFit((i * TAU) / 72, sg); }
+    if (best) for (let da = TAU / 144, ds = (K.stretchMax - 1) / (2 * (NS - 1)), it = 0; it < 6; it++, da /= 2, ds /= 2) {
+      const b0 = best;
+      tryFit(b0.al + da, b0.sg); tryFit(b0.al - da, b0.sg);
+      if (b0.sg + ds <= K.stretchMax) tryFit(best.al, b0.sg + ds);
+      if (b0.sg - ds >= 1) tryFit(best.al, b0.sg - ds);
+    }
+    if (best) marks.push({ x: best.x, y: best.y, al: best.al, sg: best.sg, s: best.s });
+  }
+  if (!marks.length) return { shapes: [], info: { error: 'no room for a comma' } };
+
+  // ---- the grid: distance to the nearest dark point, over the tile and a margin ------------------------------------
+  const h = 1 / K.grid, gx0 = bx0 - K.pad, gy0 = by0 - K.pad, gw = Math.ceil((bx1 - bx0 + 2 * K.pad) / h), gh = Math.ceil((by1 - by0 + 2 * K.pad) / h);
+  const dark = new Uint8Array(gw * gh), D = new Float64Array(gw * gh);
+  for (let i = 0; i < gw; i++) { dark[i] = 1; dark[(gh - 1) * gw + i] = 1; }           // beyond the grid nothing is known: a dark frame
+  for (let j = 0; j < gh; j++) { dark[j * gw] = 1; dark[j * gw + gw - 1] = 1; }
+  const wcx = gx0 + (gw * h) / 2, wcy = gy0 + (gh * h) / 2, wr = Math.hypot(gw * h, gh * h) / 2;
+  // the cells of the tile, and how far each is from its own copies
+  const cells = [];
+  for (let j = 1; j < gh - 1; j++) for (let i = 1; i < gw - 1; i++) {
+    const x = gx0 + (i + 0.5) * h, y = gy0 + (j + 0.5) * h;
+    let inside = true;
+    for (let q = 0; q < tileHP.length && inside; q += 3) if (tileHP[q] * x + tileHP[q + 1] * y > tileHP[q + 2] + 1e-9) inside = false;
+    if (inside) cells.push(j * gw + i);
+  }
+  const selfD = new Float64Array(cells.length);
+  for (let k = 0; k < cells.length; k++) { const i = cells[k] % gw, j = (cells[k] - i) / gw; selfD[k] = selfDistance(gx0 + (i + 0.5) * h, gy0 + (j + 0.5) * h, els); }
+
+  const copies = [];                                           // every copy of every mark that reaches the grid: fine outlines
+  const tmp = new Float64Array(2 * 1200);
+  const addMark = (mk) => {
+    const unit = sampleGlyph(G.arcs, K.seg, K.segAngle, mk.s * Math.max(1, mk.sg * 0.8));
+    mk.pts = place(unit, mk.x, mk.y, mk.al, mk.sg, mk.s);
+    const n = mk.pts.length;
+    let mx = 0, my = 0, mr = 0;
+    for (let i = 0; i < n; i += 2) { mx += mk.pts[i]; my += mk.pts[i + 1]; }
+    mx /= n / 2; my /= n / 2;
+    for (let i = 0; i < n; i += 2) mr = Math.max(mr, Math.hypot(mk.pts[i] - mx, mk.pts[i + 1] - my));
+    for (let g = -6; g < els.length; g += 6) {                 // g = -6: the identity (it is not in `els`)
+      const id = g < 0;
+      const cx = id ? mx : els[g] * mx + els[g + 1] * my + els[g + 4], cy = id ? my : els[g + 2] * mx + els[g + 3] * my + els[g + 5];
+      if (Math.hypot(cx - wcx, cy - wcy) > wr + mr) continue;
+      const P = id ? mk.pts : new Float64Array(n);
+      for (let i = 0; i < n; i += 2) {
+        if (!id) { const x = mk.pts[i], y = mk.pts[i + 1]; P[i] = els[g] * x + els[g + 1] * y + els[g + 4]; P[i + 1] = els[g + 2] * x + els[g + 3] * y + els[g + 5]; }
+        tmp[i] = (P[i] - gx0) / h; tmp[i + 1] = (P[i + 1] - gy0) / h;
+      }
+      stamp(dark, gw, gh, tmp.subarray(0, n));
+      copies.push({ pts: P, cx, cy, r: mr });
+    }
+  };
+  const dAt = (x, y) => {                                       // bilinear; 0 beyond the grid
+    const fx = (x - gx0) / h - 0.5, fy = (y - gy0) / h - 0.5, i = Math.floor(fx), j = Math.floor(fy);
+    if (i < 0 || j < 0 || i >= gw - 1 || j >= gh - 1) return 0;
+    const ax = fx - i, ay = fy - j, o = j * gw + i;
+    return ((1 - ax) * D[o] + ax * D[o + 1]) * (1 - ay) + ((1 - ax) * D[o + gw] + ax * D[o + gw + 1]) * ay;
+  };
+  addMark(marks[0]);
+
+  // ---- the smaller commas, one after another, each in the largest bare disc that remains ----------------------------
+  const cu = G.coarse, ncu = cu.length, discs = G.discs;
+  const need = c + 0.5 * h;                                     // the grid measures to cell centres: half a cell of slack; the exact check follows
+  let khp = null;
+  const feasible = (x0, y0, al, sg, s) => {
+    const ca = Math.cos(al) * s, sa = Math.sin(al) * s;
+    for (const d of discs) {                                    // the discs inside the comma: quick, and they see a mark swallowed whole
+      const x = x0 + ca * d[0] - sa * sg * d[1], y = y0 + sa * d[0] + ca * sg * d[1];
+      if (dAt(x, y) * h < need + s * d[2]) return false;
+    }
+    for (let i = 0; i < ncu; i += 2) {
+      const px = cu[i], py = sg * cu[i + 1], x = x0 + ca * px - sa * py, y = y0 + sa * px + ca * py;
+      for (let q = 0; q < khp.length; q += 3) if (khp[q] * x + khp[q + 1] * y > khp[q + 2]) return false;
+      if (dAt(x, y) * h < need) return false;
+    }
+    return true;
+  };
+  const sMaxNext = K.ratioNext * marks[0].s;
+  let bare = 0, cover = 0, stop = '';
+  const log = [];
+  for (let round = 0; round < K.maxMarks - 1; round++) {
+    edt(dark, gw, gh, D);
+    let bestE = -1, bi = -1, bareR = 0, nd = 0;
+    for (let k = 0; k < cells.length; k++) {
+      const o = cells[k], d = D[o] * h;
+      if (dark[o]) { nd++; continue; }
+      if (d > bareR) bareR = d;
+      const i = o % gw, j = (o - i) / gw;
+      const e = Math.min(d - c, (selfD[k] - c) / 2) - 1e-4 * Math.hypot(gx0 + (i + 0.5) * h - tcx, gy0 + (j + 0.5) * h - tcy);
+      if (e > bestE + 1e-9) { bestE = e; bi = k; }
+    }
+    bare = 2 * bareR; cover = nd / cells.length;
+    if (bare <= K.bareGoal && cover >= K.coverGoal) { stop = 'goals'; break; }
+    if (bi < 0 || 2 * bestE < K.floor * 0.8) { stop = 'floor'; break; }
+    const o = cells[bi], i0 = o % gw, j0 = (o - i0) / gw, px = gx0 + (i0 + 0.5) * h, py = gy0 + (j0 + 0.5) * h, r0 = bestE;
+    khp = halfPlanes(dirichlet(px, py, els, 3), c / 2);
+    // candidates: where, which way, how long; each grown as far as it goes
+    let best = null;
+    const grow = (x0, y0, al, sg) => {
+      const cap = Math.min(sMaxNext, K.solidMax / (2 * K.glyph.b));
+      let lo = best ? Math.sqrt(best.obj / Math.pow(sg, K.stretchBias)) * 1.003 : 0.25 * r0;
+      if (lo > cap || !feasible(x0, y0, al, sg, lo)) return;
+      let hi = lo;
+      for (;;) { hi = Math.min(cap, lo * 1.3); if (hi <= lo || !feasible(x0, y0, al, sg, hi)) break; lo = hi; if (hi >= cap) break; }
+      if (hi > lo) for (let it = 0; it < 6; it++) { const mid = (lo + hi) / 2; if (feasible(x0, y0, al, sg, mid)) lo = mid; else hi = mid; }
+      best = { x: x0, y: y0, al, sg, s: lo, obj: lo * lo * Math.pow(sg, K.stretchBias) };
+    };
+    const SG = [1, 1.35, 1.8];
+    for (let cI = 0; cI < 9; cI++) {
+      const x0 = cI ? px + 0.5 * r0 * Math.cos((cI * TAU) / 8) : px, y0 = cI ? py + 0.5 * r0 * Math.sin((cI * TAU) / 8) : py;
+      for (const sg of SG) for (let a = 0; a < 16; a++) grow(x0, y0, (a * TAU) / 16, sg);
+    }
+    if (!best) { stop = 'no fit'; break; }
+    for (let dp = 0.25 * r0, da = TAU / 32, ds = 0.2, it = 0; it < 5; it++, dp /= 2, da /= 2, ds /= 2) {
+      for (let rep = 0; rep < 2; rep++) {
+        const b0 = best;
+        grow(b0.x + dp, b0.y, b0.al, b0.sg); grow(b0.x - dp, b0.y, b0.al, b0.sg); grow(b0.x, b0.y + dp, b0.al, b0.sg); grow(b0.x, b0.y - dp, b0.al, b0.sg);
+        grow(best.x, best.y, best.al + da, best.sg); grow(best.x, best.y, best.al - da, best.sg);
+        if (best.sg + ds <= K.stretchMax) grow(best.x, best.y, best.al, best.sg + ds);
+        if (best.sg - ds >= 1) grow(best.x, best.y, best.al, best.sg - ds);
+        if (best === b0) break;
+      }
+    }
+    // the exact check against every outline near: shrink until the channel is there
+    const mk = { x: best.x, y: best.y, al: best.al, sg: best.sg, s: best.s };
+    const fineU = sampleGlyph(G.arcs, 0.03, 12, mk.s * mk.sg);
+    let gap = 0;
+    for (let it = 0; it < 10; it++) {
+      const P = place(fineU, mk.x, mk.y, mk.al, mk.sg, mk.s);
+      let mx = 0, my = 0, mr = 0;
+      for (let i = 0; i < P.length; i += 2) { mx += P[i]; my += P[i + 1]; }
+      mx /= P.length / 2; my /= P.length / 2;
+      for (let i = 0; i < P.length; i += 2) mr = Math.max(mr, Math.hypot(P[i] - mx, P[i + 1] - my));
+      gap = c + 0.02;
+      for (const C of copies) {
+        if (Math.hypot(C.cx - mx, C.cy - my) > C.r + mr + gap) continue;
+        gap = Math.min(gap, vertsToOutline(P, C.pts, C.cx, C.cy, C.r, gap), vertsToOutline(C.pts, P, mx, my, mr, gap));
+        if (pointIn(C.pts, P[0], P[1]) || pointIn(P, C.pts[0], C.pts[1])) gap = 0;
+      }
+      if (gap >= c - 5e-4) break;
+      mk.s *= gap > 0 ? Math.max(0.9, 1 - (1.15 * (c - gap)) / (mk.s * mk.sg)) : 0.85;
+    }
+    if (gap < c - 5e-4 || 2 * mk.s < K.floor) { stop = 'floor'; break; }
+    marks.push(mk);
+    log.push({ r0: +r0.toFixed(3), s: +mk.s.toFixed(3), sg: +mk.sg.toFixed(2) });
+    addMark(mk);
+  }
+  if (!stop) {
+    stop = 'max';
+    edt(dark, gw, gh, D);
+    let bareR = 0, nd = 0;
+    for (let k = 0; k < cells.length; k++) { const o = cells[k]; if (dark[o]) nd++; else if (D[o] * h > bareR) bareR = D[o] * h; }
+    bare = 2 * bareR; cover = nd / cells.length;
+  }
+
+  // ---- out: world coordinates --------------------------------------------------------------------------------------
+  const shapes = marks.map((mk) => {
+    const pts = [];
+    for (let i = 0; i < mk.pts.length; i += 2) pts.push([Ox + u * (mk.pts[i] * ex - mk.pts[i + 1] * ey), Oy + u * (mk.pts[i] * ey + mk.pts[i + 1] * ex)]);
+    return { pts, hole: false };
+  });
+  return {
+    shapes,
+    info: {
+      seated, stop, marks: marks.length, cover: +cover.toFixed(3), bare: +bare.toFixed(3),
+      sizes: marks.map((m) => +(2 * m.s).toFixed(3)), stretch: marks.map((m) => +m.sg.toFixed(2)), grid: [gw, gh], els: els.length / 6,
+    },
+  };
+}

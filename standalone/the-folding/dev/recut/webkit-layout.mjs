@@ -1,6 +1,8 @@
 // dev/recut/webkit-layout.mjs — the layout checks of test/shell-layout.lib.js in Playwright's WebKit, Safari's engine,
 // on the BUILT page (dist/index.html, from a file). Chrome cannot see what Safari lays out differently: on 13 Nov 2026
-// the invisible native select's own text counted as page width on a phone, in WebKit only.
+// the invisible native select's own text counted as page width on a phone, in WebKit only. Since 14 Nov 2026 every
+// pattern of the selector at every size (a few minutes; WEBKIT_QUICK=1 in front of this file run by hand: the patterns
+// other than the default at 4 sizes), and the page must open with the selector's first pattern (Paisley).
 // WebKit is on the M5, not on the mini. From the mini:
 //     bash dev/recut/webkit-layout.sh        (copies the page, the checks and this file to the M5, runs it, cleans up)
 // On a machine with WebKit and this folder:   node dev/recut/webkit-layout.mjs [<dir with index.html, shell-layout.lib.js, cases.json>]
@@ -11,7 +13,7 @@ import { pathToFileURL } from 'node:url';
 const dir = path.resolve(process.argv[2] || path.dirname(new URL(import.meta.url).pathname));
 const PW = process.env.PLAYWRIGHT_MJS || process.env.HOME + '/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright/index.mjs';
 const { webkit } = await import(PW);
-const { sweep } = await import(pathToFileURL(path.join(dir, 'shell-layout.lib.js')).href);
+const { sweep, PATTERNS } = await import(pathToFileURL(path.join(dir, 'shell-layout.lib.js')).href);
 const cases = JSON.parse(fs.readFileSync(path.join(dir, 'cases.json'), 'utf8'));
 let failed = 1, browser;
 try {
@@ -22,12 +24,15 @@ try {
   await page.goto(pathToFileURL(path.join(dir, 'index.html')).href + '#g=333', { waitUntil: 'load' });
   await page.waitForFunction(() => window.__folding && window.__folding.ready, null, { timeout: 30000 });
   const t0 = Date.now();
-  const { failures, foldAt375 } = await sweep(page, cases);
-  console.log(`WebKit ${browser.version()}: ${cases.length} groups, ${((Date.now() - t0) / 1000).toFixed(0)} s`);
+  // every pattern of the selector at every size (14 Nov 2026); WEBKIT_QUICK=1: the patterns other than the default at 4
+  const { failures, foldAt375, opened } = await sweep(page, cases, { quick: process.env.WEBKIT_QUICK === '1' });
+  if (opened !== PATTERNS[0].key) failures.push(`- - the page opens with "${opened}", not ${PATTERNS[0].key} (the selector's first pattern)`);
+  console.log(`WebKit ${browser.version()}: ${cases.length} groups, ${PATTERNS.length} patterns, ${((Date.now() - t0) / 1000).toFixed(0)} s; opened with "${opened}"`);
   console.log('fold pane height at 375 x 498: ' + JSON.stringify(foldAt375));
-  // the same problem at many sizes and groups: once, with its count
+  // the same problem at many sizes and groups (and patterns): once, with its count
+  const keys = PATTERNS.map((p) => p.key).join('|');
   const kinds = new Map();
-  for (const f of failures) { const k = f.replace(/^\S+ \S+( (rings|comma))?( t = [\d.]+)?: /, ''); kinds.set(k, (kinds.get(k) || []).concat(f)); }
+  for (const f of failures) { const k = f.replace(new RegExp(`^\\S+ \\S+( (${keys}))?( t = [\\d.]+)?: `), ''); kinds.set(k, (kinds.get(k) || []).concat(f)); }
   for (const [k, v] of kinds) console.log(`  ${String(v.length).padStart(4)} x  ${k}    e.g. ${v[0].slice(0, 60)}`);
   for (const e of errors.slice(0, 5)) console.log('  page error: ' + e);
   failed = failures.length + errors.length;

@@ -31,7 +31,8 @@ try {
   await page.goto(BASE, { waitUntil: 'load' });
   const f = await appFrame(page);
   let s = pick(await f.evaluate(() => window.__folding.getState()));
-  check(s.pattern === 'checker' && !!s.print && s.errors === 0, 'the live page opens on the checkerboard', JSON.stringify(s));
+  // (since the pattern round of 14 Nov 2026 the page opens with Paisley; a build before it opened on the checkerboard)
+  check(s.pattern === 'paisley' && s.print === 'paisley' && s.errors === 0, 'the live page opens on Paisley', JSON.stringify(s));
   check(await f.evaluate(() => !!document.getElementById('pattern') && !!document.getElementById('fold-caption')), 'it is the new build (the selector and the fold caption are there)');
   check(await f.evaluate(() => getComputedStyle(document.getElementById('pane-fold')).containerName === 'fold'), 'it is the build with the phone fixes (the 3D pane is a size container)');
   await f.evaluate(() => { const F = window.__folding; F.setGroup('22x'); F.setPreset(2); F.setPattern('rings'); F.setT(0.15); F.flushHash(); });

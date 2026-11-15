@@ -22,9 +22,14 @@
   chip-meta        span               APP: textContent = group.hm + ' · ' + group.shape  (wraps to 2 lines if it must)
   pattern-box      label              (13 Nov 2026) the pattern selector at the right of the header: a pill (swatch, name,
                                       caret) under an invisible native <select>, so a phone gets its own picker.
-                                      APP sets #app[data-pattern="<key>"] (the swatch shown follows it) and the title
+                                      APP sets #app[data-pattern="<key>"] (the swatch shown follows it) and the title.
+                                      One swatch per pattern in the pill, svg.pat-sw.pat-sw-<key> (18 x 18, the print's
+                                      two tones); a pattern without one has a bare caret on a phone (the layout test
+                                      fails it). Before the script runs: Paisley's swatch and name (the default)
   pattern          select             APP: one <option> per pattern.js PATTERNS entry (filled if empty); 'change' ->
-                                      setPattern(value). The names: Checkerboard, Rings, Comma
+                                      setPattern(value). In the selector's order (14 Nov 2026): Paisley (paisley),
+                                      Soft commas (soft), Tomoe (tomoe), Checkerboard (checker), Rings (rings), Comma
+                                      (comma)
   pattern-label    span               APP: textContent = the pattern's label (hidden on a narrow window: the swatch alone)
   caption          p                  APP: textContent = group.topology                 (1 line, 2 when it needs them)
   stage            main               the two panes and their controls (data-ss-thumb)
@@ -66,8 +71,9 @@
   reset-view       button             APP: click -> renderer.resetView()
   legend           footer             static: one item per feature ([data-feature], shown when #app's data-features
                                       names it; all but corners and double when #app has no data-features) and the
-                                      companion link. First, under a print (#app[data-pattern] checker or rings; 13 Nov
-                                      2026): [data-paper], the paper's two sides, teal front and sand back
+                                      companion link. First, under any print (#app[data-print], which APP sets to the
+                                      print's kind; 13 Nov 2026, every print since 14 Nov): [data-paper], the paper's two
+                                      sides, teal front and sand back
   picker-mount     div                APP: createHassePicker({ mount, … }). Empty, last in <body>; <body> is the
                                       positioned box that covers the viewport, so a dialog inside may use
                                       position:fixed or position:absolute; inset:0
@@ -93,13 +99,19 @@
     <label class="pat" id="pattern-box" title="Pattern on the paper">
       <span class="pat-k">Pattern</span>
       <span class="pat-pill">
+        <svg class="pat-sw pat-sw-paisley" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><path class="pat-fg" d="M6.83 17.11A3.36 3.36 0 0 1 8.57 10.62A5.04 5.04 0 0 0 11.17 .89A8.4 8.4 0 0 1 6.83 17.11z"/><path class="pat-fg" d="M9.09 8.65A1.68 1.68 0 0 1 9.96 5.41A1.32 1.32 0 0 0 10.65 2.86A3 3 0 0 1 9.09 8.65z"/></svg>
+        <svg class="pat-sw pat-sw-soft" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><path class="pat-fg" d="M13.2 1.73A5.21 5.21 0 0 1 7.99 10.75A3.19 3.19 0 0 0 4.8 16.27A8.4 8.4 0 0 1 13.2 1.73z"/></svg>
+        <svg class="pat-sw pat-sw-tomoe" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><path class="pat-fg" d="M9 0H2.5A2.5 2.5 0 0 0 0 2.5v13A2.5 2.5 0 0 0 2.5 18H9a4.5 4.5 0 0 1 0-9 4.5 4.5 0 0 0 0-9z"/><circle class="pat-bg" cx="9" cy="4.5" r="2"/><circle class="pat-fg" cx="9" cy="13.5" r="2"/></svg>
         <svg class="pat-sw pat-sw-checker" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><path class="pat-fg" d="M0 2.5A2.5 2.5 0 0 1 2.5 0H6v6H0zM12 0h3.5A2.5 2.5 0 0 1 18 2.5V6h-6zM6 6h6v6H6zM0 12h6v6H2.5A2.5 2.5 0 0 1 0 15.5zM12 12h6v3.5a2.5 2.5 0 0 1-2.5 2.5H12z"/></svg>
         <svg class="pat-sw pat-sw-rings" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-bg" width="18" height="18" rx="2.5"/><circle class="pat-ring" cx="9" cy="9" r="6.6"/><circle class="pat-ring" cx="9" cy="9" r="2.6"/></svg>
         <svg class="pat-sw pat-sw-comma" viewBox="0 0 18 18" aria-hidden="true" focusable="false"><rect class="pat-glass" width="18" height="18" rx="2.5"/><path class="pat-ink" d="M11.4 3.4a3.5 3.5 0 0 1 3.5 3.5c0 4.6-3.9 7.9-9.4 7.9 2.4-1.2 3.6-2.9 3.5-5.3a3.5 3.5 0 0 1 2.4-6.1z"/></svg>
-        <span class="pat-label" id="pattern-label">Checkerboard</span>
+        <span class="pat-label" id="pattern-label">Paisley</span>
         <svg class="orb-caret" viewBox="0 0 10 6" aria-hidden="true" focusable="false"><path d="M0 0h10L5 6z"/></svg>
       </span>
       <select id="pattern" aria-label="Pattern on the paper">
+        <option value="paisley">Paisley</option>
+        <option value="soft">Soft commas</option>
+        <option value="tomoe">Tomoe</option>
         <option value="checker">Checkerboard</option>
         <option value="rings">Rings</option>
         <option value="comma">Comma</option>

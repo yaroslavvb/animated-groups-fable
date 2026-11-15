@@ -44,7 +44,8 @@ try {
     check(want.test(c), `t = ${t}: the words of the move`, c);
     if (outDir) await page.screenshot({ path: path.join(outDir, `live-xx-t${Math.round(100 * t)}.png`) });
   }
-  // the translucent Comma: the neck inside shows through the wall; the address bar carries it
+  // the Comma: the address bar carries it (until 14 Nov 2026 it was the translucent sheet, the neck inside showing
+  // through the wall; since the pattern round it is a print on the opaque paper like the others)
   await f.evaluate(() => { window.__folding.setT(1); window.__folding.setPattern('comma'); window.__folding.flushHash(); });
   await page.waitForTimeout(900);
   check(/g=xx/.test(page.url()) && /pat=comma/.test(page.url()) && /t=1/.test(page.url()), 'the address bar follows', page.url());

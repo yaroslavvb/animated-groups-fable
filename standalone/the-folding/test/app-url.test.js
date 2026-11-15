@@ -18,6 +18,8 @@ import { GROUPS, BY_ID } from '../src/groups.js';
 import { makeWarp, buildDomain } from '../src/domain.js';
 import { viewFromAzEl } from '../src/render3d.js';
 import { SURFACE_FRONT, SURFACE_BACK } from '../src/palette.js';
+import { registerPattern, printFor, DEFAULT_PATTERN, SHEET_PATTERN } from '../src/pattern.js';
+import { motifFor } from '../src/motif.js';
 import {
   encodeHash, decodeHash, encodeGroupId, WRAPPER_HASH, HASH_KEYS, HASH_THROTTLE_MS, HASH_BUDGET, hashInterval, hashWriteDelay, DEFAULT_VIEW, DEFAULT_GROUP,
   viewToUrl, viewFromUrl, viewAngle, presetState, groupFeatures, FEATURES, surfaceStyle, hintState, HINT_TEXT,
@@ -53,17 +55,28 @@ function specialPoints(id) {
 
 test('url: the format — g always, every other key only when it is not its default, in the order of SPEC 7, * as %2A', () => {
   // (10 Nov 2026, the replication step: `tile` joined the contract between wavy and t; qa/rep-judge.md.
-  //  13 Nov 2026, the pattern selector: `pat` right after g, written when it is not the default, the checkerboard)
+  //  13 Nov 2026, the pattern selector: `pat` right after g, written when it is not the default.
+  //  14 Nov 2026, the pattern round: the default is Paisley, no longer the checkerboard — so a link of the checkerboard
+  //  now says pat=checker, and an old link without pat= opens with Paisley; changed on purpose, SPEC 11)
   assert.deepEqual(HASH_KEYS, ['g', 'pat', 'cut', 'seed', 'wavy', 'tile', 't', 'view']);
-  assert.equal(encodeHash({ g: '333', pat: 'checker' }), '#g=333', 'the checkerboard is the default pattern: not written');
+  assert.equal(DEFAULT_PATTERN, 'paisley');
+  assert.equal(encodeHash({ g: '333', pat: 'paisley' }), '#g=333', 'Paisley is the default pattern: not written');
+  assert.equal(encodeHash({ g: '333', pat: 'checker' }), '#g=333&pat=checker', 'the checkerboard is written now');
   assert.equal(encodeHash({ g: '333', pat: 'comma' }), '#g=333&pat=comma');
+  for (const k of ['soft', 'tomoe']) assert.equal(encodeHash({ g: '333', pat: k }), '#g=333&pat=' + k);
   assert.equal(encodeHash({ g: '333', pat: 'rings', cut: 1, t: 0.5 }), '#g=333&pat=rings&cut=1&t=0.5', 'pat right after g');
-  assert.equal(encodeHash({ g: '333', pat: 'Checkerboard' }), '#g=333', 'a label is taken for its key');
+  assert.equal(encodeHash({ g: '333', pat: 'Checkerboard' }), '#g=333&pat=checker', 'a label is taken for its key');
+  assert.equal(encodeHash({ g: '333', pat: 'Paisley' }), '#g=333');
   assert.equal(encodeHash({ g: '333', pat: 'tartan' }), '#g=333', 'an unknown pattern is not written');
-  assert.equal(decodeHash('#g=333').pat, 'checker', 'no pat: the default');
+  assert.equal(encodeHash({ g: '333', pat: 'sheet' }), '#g=333', 'the sheet is no pattern of the address');
+  assert.equal(decodeHash('#g=333').pat, 'paisley', 'no pat: the default');
   assert.equal(decodeHash('#g=333&pat=comma').pat, 'comma');
+  assert.equal(decodeHash('#g=333&pat=checker').pat, 'checker');
   assert.equal(decodeHash('#g=333&pat=RINGS').pat, 'rings', 'case does not matter');
-  assert.deepEqual([decodeHash('#g=333&pat=tartan&t=0.5').pat, decodeHash('#g=333&pat=tartan&t=0.5').dropped, decodeHash('#g=333&pat=tartan&t=0.5').t], ['checker', ['pat'], 0.5], 'an unknown pattern is dropped, the rest counts');
+  // the old names of the round: the design folder of Soft commas, its label
+  for (const raw of ['blobs', 'soft', 'Soft%20commas', 'SOFT%20COMMAS']) assert.equal(decodeHash('#g=333&pat=' + raw).pat, 'soft', raw);
+  assert.deepEqual([decodeHash('#g=333&pat=tartan&t=0.5').pat, decodeHash('#g=333&pat=tartan&t=0.5').dropped, decodeHash('#g=333&pat=tartan&t=0.5').t], ['paisley', ['pat'], 0.5], 'an unknown pattern is dropped (Paisley), the rest counts');
+  assert.deepEqual([decodeHash('#g=333&pat=sheet').pat, decodeHash('#g=333&pat=sheet').dropped], ['paisley', ['pat']], 'pat=sheet names no pattern');
   assert.match(encodeHash({ g: '*632', pat: 'comma', cut: 0, t: 1 }), WRAPPER_HASH);
   assert.equal(encodeHash({ g: '333' }), '#g=333');
   assert.equal(encodeHash({ g: '333', cut: 0, seed: null, wavy: 0, t: 0, view: { ...DEFAULT_VIEW } }), '#g=333', 'defaults are left out');
@@ -249,6 +262,63 @@ test('url: malformed hashes name nothing; a malformed value is dropped and the r
 });
 
 // ---- the view ------------------------------------------------------------------------------------------------------
+
+// A shape pattern registered at run time (src/pattern.js registerPattern; the pattern round of 13 Nov 2026): the page's
+// own comma as a motif, and one whose find has no motif for some groups.
+const commaFind = (group) => ({ shapes: motifFor(group).polylines.map((p) => ({ pts: Array.from(p) })) });
+const URLP = registerPattern({ key: 'urlcomma', label: 'Url comma' }, commaFind).key;
+const HALF = registerPattern({ key: 'urlhalf' }, (group) => { if (group.fold === 'snowflake') throw new Error('no motif for ' + group.id); return commaFind(group); }).key;
+
+test('url: a registered pattern rides in the hash as pat=<key> — it round-trips, any spelling resolves, an unknown key is dropped (the address would lose a pattern registered after the page started: register before src/app.js runs)', () => {
+  assert.equal(encodeHash({ g: '333', pat: URLP }), '#g=333&pat=urlcomma');
+  assert.equal(encodeHash({ g: '*632', pat: 'URLCOMMA', t: 0.5 }), '#g=%2A632&pat=urlcomma&t=0.5', 'pat right after g; resolved to its key');
+  for (const id of ['o', '22x', '*632']) {
+    const u = { g: id, pat: URLP, cut: 0, seed: null, wavy: 0.25, tile: 1, t: 0.6, view: null };
+    const h = encodeHash(u);
+    assert.match(h, WRAPPER_HASH, `${id}: the spacesheep viewer passes it`);
+    const d = decodeHash(h);
+    assert.equal(d.pat, URLP, id); assert.deepEqual(d.dropped, [], id);
+    assert.equal(encodeHash(d), h, `${id}: encoding again gives the same text`);
+  }
+  // any case, the label, blanks
+  for (const raw of ['urlcomma', 'URLCOMMA', 'UrlComma', 'Url%20comma', '%20urlcomma%20']) {
+    const d = decodeHash('#g=333&pat=' + raw);
+    assert.equal(d.pat, URLP, raw); assert.deepEqual(d.dropped, [], raw);
+  }
+  // an unknown key: dropped (and named), the rest of the hash still counts; nothing is written for it
+  const d = decodeHash('#g=333&pat=nosuch&t=0.4');
+  assert.deepEqual([d.g, d.pat, d.t, d.dropped], ['333', DEFAULT_PATTERN, 0.4, ['pat']]);
+  assert.equal(encodeHash({ g: '333', pat: 'nosuch' }), '#g=333');
+  // the default is never written; the built-in ones as before
+  assert.equal(encodeHash({ g: '333', pat: DEFAULT_PATTERN }), '#g=333');
+  assert.equal(decodeHash('#g=333&pat=rings').pat, 'rings');
+});
+
+test('scene: a registered pattern is the scene\'s print (a shape print, no comma cut into the mesh); a group its find has no motif for gets the comma on the sheet, as SHEET_PATTERN draws it', () => {
+  for (const id of ['333', '22x', '*442']) {
+    const g = BY_ID[id], p = g.presets[0];
+    const opts = { seed: p.seed, anchor: (p.anchor || p.seed).slice() };
+    const S = buildScene(g, { ...opts, pattern: URLP });
+    assert.equal(S.pattern, URLP, id);
+    assert.equal(S.print, printFor(g, URLP), `${id}: the pattern's print, the same object`);
+    assert.equal(S.print.kind, 'shapes', id);
+    assert.equal(S.motif.length, 0, `${id}: no comma under a print`);
+    // (14 Nov 2026: the comma of the selector is a print; the picture before the prints is the sheet, buildScene's own default)
+    const C = buildScene(g, { ...opts, pattern: SHEET_PATTERN }), H = buildScene(g, { ...opts, pattern: HALF });
+    assert.equal(C.pattern, SHEET_PATTERN); assert.equal(C.print, null);
+    assert.ok(C.motif.length > 0, id);
+    assert.equal(buildScene(g, opts).pattern, SHEET_PATTERN, `${id}: buildScene's default is the sheet`);
+    const K = buildScene(g, { ...opts, pattern: 'comma' });
+    assert.equal(K.print, printFor(g, 'comma'), `${id}: the Comma is a print`);
+    assert.deepEqual([K.print.kind, K.motif.length, !!K.M.motifTint], ['shapes', 0, false], `${id}: printed, not cut into the mesh`);
+    assert.ok(C.M.motifTint, `${id}: the sheet's comma is cut into the mesh`);
+    if (g.fold === 'snowflake') {
+      assert.equal(H.print, null, `${id}: no motif here: no print`);
+      assert.equal(H.motif.length, C.motif.length, `${id}: ... and the comma on the sheet`);
+      assert.equal(H.pattern, HALF, `${id}: the pattern stays the one asked for`);
+    } else assert.equal(H.print.kind, 'shapes', id);
+  }
+});
 
 test('url view: az / el are where the eye is (as R.setView takes them); roll is the turn about the line of sight; the inverse is exact', () => {
   for (let az = -180; az <= 180; az += 15) {

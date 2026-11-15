@@ -734,3 +734,226 @@ test('elastic zoom limit', () => {
   for (let x = lo; x > lo - 3; x -= 0.01) { const y = T.softLimit(x, lo, hi, over); assert.ok(y <= prev && y >= lo - over); prev = y; }
   assert.ok(near(T.softLimit(hi + 1e-6, lo, hi, over), hi + 1e-6, 1e-9), 'continuous, slope 1 at the limit');
 });
+
+// ---- the shape print (mode 3: a signed-distance texture of one lattice cell; 13 Nov 2026) ----
+// What the surface shader does with the texture, without a GPU: its two formulas are run here from the shader's own
+// text, against their twins in JavaScript. (On a GPU: dev/patterns/tex-demo.mjs, notes/patterns-renderer.md.)
+import { sdfTone, sdfFootprint, sdfRead } from '../src/render3d.js';
+
+/** A float function of SURF_FS as a JavaScript function: the GLSL text itself, with its declarations turned into consts. */
+function glslFunction(src, name) {
+  const m = src.match(new RegExp(`float ${name}\\(([^)]*)\\) \\{([\\s\\S]*?)\\n\\}`));
+  assert.ok(m, `the surface shader has a function ${name}`);
+  const params = m[1].split(',').map((p) => p.trim().split(/\s+/).pop());
+  const body = m[2].replace(/\/\/[^\n]*/g, '').replace(/\b(?:float|vec2)\s+(\w+)\s*=/g, 'const $1 =');
+  const lib = {
+    clamp: (x, lo, hi) => Math.min(Math.max(x, lo), hi), max: Math.max, min: Math.min, abs: Math.abs, sqrt: Math.sqrt,
+    vec2: (x, y) => ({ x, y }), dot: (a, b) => a.x * b.x + a.y * b.y, length: (a) => Math.hypot(a.x, a.y), mix: (a, b, t) => a + (b - a) * t,
+    smoothstep: (lo, hi, x) => { const u = Math.min(1, Math.max(0, (x - lo) / (hi - lo))); return u * u * (3 - 2 * u); },
+  };
+  return { params, fn: new Function(...Object.keys(lib), ...params, body).bind(null, ...Object.values(lib)) };
+}
+
+test('shape print: the tone is a ramp one footprint wide across an outline, and linear in the texture from a footprint of 2 range on', () => {
+  const R = 0.025;
+  for (const w of [1e-5, 0.002, 0.01, 0.025, 0.0499]) {            // footprints below 2 range: the ramp is the footprint
+    assert.equal(sdfTone(0, w, R), 0.5, 'half on the outline');
+    assert.equal(sdfTone(-w / 2, w, R), 1); assert.equal(sdfTone(w / 2, w, R), 0);
+    assert.ok(near(sdfTone(-w / 4, w, R), 0.75, 1e-12) && near(sdfTone(w / 4, w, R), 0.25, 1e-12), 'linear in between');
+    assert.equal(sdfTone(-3 * w, w, R), 1, 'dark inside'); assert.equal(sdfTone(3 * w, w, R), 0, 'light outside');
+    // one pixel wide: the tone goes from 0.9 to 0.1 over 0.8 footprints
+    assert.ok(near(sdfTone(-0.4 * w, w, R), 0.9, 1e-12) && near(sdfTone(0.4 * w, w, R), 0.1, 1e-12));
+  }
+  for (const w of [0.05, 0.0501, 0.1, 1, 1e6, Infinity]) {          // from 2 range on: 0.5 - sd / (2 range), whatever the footprint
+    for (const sd of [-R, -0.7 * R, -0.1 * R, 0, 0.3 * R, R]) assert.ok(near(sdfTone(sd, w, R), 0.5 - sd / (2 * R), 1e-12), `linear at footprint ${w}`);
+    assert.equal(sdfTone(-R, w, R), 1, 'the texture\'s darkest value is the dark tone');
+    assert.equal(sdfTone(R, w, R), 0, '... and its lightest the light tone');
+  }
+  // so the mean of the tone over a patch is the tone of the mean distance: what a mip level holds is what is drawn
+  const rand = rng(77);
+  for (let k = 0; k < 50; k++) {
+    const sds = Array.from({ length: 16 }, () => (2 * rand() - 1) * R), mean = sds.reduce((a, b) => a + b, 0) / 16;
+    assert.ok(near(sds.reduce((a, sd) => a + sdfTone(sd, 3 * R, R), 0) / 16, sdfTone(mean, 3 * R, R), 1e-12));
+  }
+  // monotone in sd, continuous in the footprint (also at 2 range), never NaN
+  for (let k = 0; k < 400; k++) {
+    const w = Math.exp(8 * rand() - 6) * R, a = (2 * rand() - 1) * 3 * R, b = (2 * rand() - 1) * 3 * R;
+    assert.ok((sdfTone(Math.min(a, b), w, R) >= sdfTone(Math.max(a, b), w, R)), 'darker inside');
+    assert.ok(Math.abs(sdfTone(a, w, R) - sdfTone(a, w * 1.0001, R)) < 1e-3 * (1 + Math.abs(a) / w), 'continuous in the footprint');
+  }
+  assert.ok(Math.abs(sdfTone(0.3 * R, 2 * R * (1 - 1e-9), R) - sdfTone(0.3 * R, 2 * R * (1 + 1e-9), R)) < 1e-8, 'no step at 2 range');
+  for (const w of [0, -1, NaN, undefined]) {                        // no footprint at all: a hard step, not NaN
+    assert.equal(sdfTone(-1e-3, w, R), 1); assert.equal(sdfTone(1e-3, w, R), 0); assert.equal(sdfTone(0, w, R), 0.5);
+  }
+});
+
+test('shape print: the footprint is taken across the outline — the pixel itself face-on, its short side for an outline that runs away on a tilted sheet', () => {
+  const rand = rng(78);
+  for (let k = 0; k < 300; k++) {
+    // the paper under a pixel: a rotation times diag(s1, s2) times a rotation (s1 >= s2: a sheet tilted by acos(s2 / s1))
+    const s1 = Math.exp(4 * rand() - 6), s2 = s1 * (0.05 + 0.95 * rand()), th = 6.2832 * rand(), ph = 6.2832 * rand();
+    const u = [Math.cos(th), Math.sin(th)], v = [-Math.sin(th), Math.cos(th)];          // the paper directions of the long and the short side
+    const ax = s1 * u[0] * Math.cos(ph) - s2 * v[0] * Math.sin(ph), ay = s1 * u[1] * Math.cos(ph) - s2 * v[1] * Math.sin(ph);
+    const bx = s1 * u[0] * Math.sin(ph) + s2 * v[0] * Math.cos(ph), by = s1 * u[1] * Math.sin(ph) + s2 * v[1] * Math.cos(ph);
+    const al = 6.2832 * rand(), g = [Math.cos(al), Math.sin(al)];
+    const w = sdfFootprint(ax, ay, bx, by, g[0], g[1]);
+    assert.ok(w >= s2 * (1 - 1e-9) && w <= s1 * (1 + 1e-9), `between the short and the long side: ${s2} <= ${w} <= ${s1}`);
+    // an outline whose normal is the long direction (it lies ACROSS the line of sight) takes the long side, and the other way round
+    assert.ok(near(sdfFootprint(ax, ay, bx, by, u[0], u[1]), s1, 1e-9 * s1) && near(sdfFootprint(ax, ay, bx, by, v[0], v[1]), s2, 1e-9 * s1));
+    // exactly: sqrt((s1 g.u)^2 + (s2 g.v)^2)
+    assert.ok(near(w, Math.hypot(s1 * (g[0] * u[0] + g[1] * u[1]), s2 * (g[0] * v[0] + g[1] * v[1])), 1e-9 * s1));
+    // only the direction of the gradient counts while the field is not flat ...
+    for (const len of [0.6, 0.8, 1, 1.3]) assert.ok(near(sdfFootprint(ax, ay, bx, by, len * g[0], len * g[1]), w, 1e-9 * s1), `a gradient of length ${len}`);
+    // ... and where it is flat, the root mean square over all directions, with a smooth change between
+    const iso = Math.sqrt((s1 * s1 + s2 * s2) / 2);
+    for (const len of [0, 1e-9, 0.1, 0.2]) assert.ok(near(sdfFootprint(ax, ay, bx, by, len * g[0], len * g[1]), iso, 1e-9 * s1), `a flat field (${len})`);
+    const mid = sdfFootprint(ax, ay, bx, by, 0.4 * g[0], 0.4 * g[1]);
+    assert.ok(near(mid, (iso + w) / 2, 1e-9 * s1), 'half way at 0.4');
+    // face-on (s1 = s2) the footprint is the pixel, whatever the outline does
+    const fx = s1 * Math.cos(ph), fy = s1 * Math.sin(ph);
+    assert.ok(near(sdfFootprint(fx, fy, -fy, fx, g[0], g[1]), s1, 1e-9 * s1));
+  }
+  assert.equal(sdfFootprint(0, 0, 0, 0, 1, 0), 0, 'no pixel, no footprint (sdfTone then draws a hard step)');
+});
+
+test('shape print: the shader\'s own text — its ramp and its footprint are the JavaScript twins; continuous lattice coordinates; modes 1 and 2 untouched', () => {
+  const fs = T.SURF_FS;
+  // 1. the two formulas of mode 3, run from the GLSL text
+  const tone = glslFunction(fs, 'sdfTone'), foot = glslFunction(fs, 'sdfFootprint');
+  assert.deepEqual(tone.params, ['sd', 'w', 'range']); assert.deepEqual(foot.params, ['a', 'b', 'gs']);
+  const rand = rng(79);
+  for (let k = 0; k < 2000; k++) {
+    const R = Math.exp(4 * rand() - 5), w = k % 7 === 0 ? 0 : Math.exp(10 * rand() - 8) * R, sd = (2 * rand() - 1) * 2.5 * R;
+    assert.ok(near(tone.fn(sd, w, R), sdfTone(sd, w, R), 1e-12), `sdfTone(${sd}, ${w}, ${R})`);
+    // the shader is handed the SCREEN derivatives of sd, gs = J^T g (J = [a b]: the paper under a pixel step right / up)
+    const a = { x: (2 * rand() - 1) * 1e-2, y: (2 * rand() - 1) * 1e-2 }, b = { x: (2 * rand() - 1) * 1e-2, y: (2 * rand() - 1) * 1e-2 };
+    if (Math.abs(a.x * b.y - a.y * b.x) < 1e-7) continue;
+    const gl = k % 5 === 0 ? 0.7 * rand() : 0.6 + rand(), al = 6.2832 * rand(), g = { x: gl * Math.cos(al), y: gl * Math.sin(al) };
+    const gs = { x: a.x * g.x + a.y * g.y, y: b.x * g.x + b.y * g.y };
+    const want = sdfFootprint(a.x, a.y, b.x, b.y, g.x, g.y), got = foot.fn(a, b, gs);
+    assert.ok(Math.abs(got - want) <= 1e-9 * Math.hypot(a.x, a.y, b.x, b.y), `sdfFootprint: ${got} against ${want}`);
+  }
+  // a degenerate pixel (no paper under it, or a flat field) is no NaN
+  for (const [a, b, gs] of [[{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 0 }], [{ x: 1e-3, y: 0 }, { x: 2e-3, y: 0 }, { x: 1e-3, y: 2e-3 }], [{ x: 1e-3, y: 0 }, { x: 0, y: 1e-3 }, { x: 0, y: 0 }]]) {
+    assert.ok(Number.isFinite(foot.fn(a, b, gs)), 'finite');
+  }
+  // 2. mode 3 itself: one texture read at the continuous lattice coordinates (never fract(): the mip level must not jump
+  //    at the borders of the cells), decoded as the contract says, the footprint from the paper's and sd's screen derivatives
+  assert.match(fs, /uniform highp sampler2D uPatT;/, 'a highp sampler: the interpolated distance needs more than a byte');
+  const branch = fs.match(/\n  if \(uPat == 3\) \{([\s\S]*?)\n  \}/);
+  assert.ok(branch, 'mode 3 has its own branch of printTone');
+  assert.doesNotMatch(branch[1].replace(/\/\/[^\n]*/g, ''), /fract\s*\(/, 'no fract in mode 3');
+  assert.match(branch[1], /vec2 q = vUV - uPatO\.xy;/);
+  assert.match(branch[1], /float sd = \(texture\(uPatT, vec2\(dot\(uPatI\.xy, q\), dot\(uPatI\.zw, q\)\)\)\.r \* 255\.0 - 128\.0\) \* \(uPatO\.z \/ 127\.0\);/, 'sd = (v - 128) / 127 * range');
+  assert.match(branch[1], /return sdfTone\(sd, sdfFootprint\(dFdx\(vUV\), dFdy\(vUV\), vec2\(dFdx\(sd\), dFdy\(sd\)\)\), uPatO\.z\);/);
+  assert.equal((fs.match(/texture\(/g) || []).length, 1, 'one texture read a pixel');
+  // 3. the other modes are the text they were, and every mode's tone is turned into colour by the one line
+  assert.ok(fs.includes(`  if (uPat == 1) {
+    float p = sqw(dot(uPatL0.xy, vUV) + uPatL0.z) * sqw(dot(uPatL1.xy, vUV) + uPatL1.z) * sqw(dot(uPatL2.xy, vUV) + uPatL2.z);
+    return 0.5 - 0.5 * p;
+  }`), 'mode 1 as it was');
+  assert.ok(fs.includes(`  vec2 d = vUV - uPatO.xy;
+  vec2 f = fract(vec2(dot(uPatI.xy, d), dot(uPatI.zw, d)));
+  vec2 q = f.x * uPatA.xy + f.y * uPatA.zw;
+  float r = min(min(length(q), length(q - uPatA.xy)), min(length(q - uPatA.zw), length(q - uPatA.xy - uPatA.zw)));
+  return 0.5 - 0.5 * sqw(r * uPatO.z);
+}`), 'mode 2 as it was');
+  assert.ok(fs.includes(`float sqw(float c) {
+  float w = max(fwidth(c), 1e-6);
+  return clamp(sin(3.14159265 * c) / (2.4 * w), -1.0, 1.0);
+}`), 'the square wave of modes 1 and 2 as it was');
+  assert.match(fs, /if \(uPat > 0\) \{ float pt = printTone\(\); base = gl_FrontFacing \? mix\(uPatF0, uPatF1, pt\) : mix\(uPatB0, uPatB1, pt\); \}/, 'front and back, light and dark: one line for all modes');
+  assert.ok(fs.indexOf('if (uPat > 0)') < fs.indexOf('if (tq > 3.5)'), 'the palette (the lab) still overrides the print');
+});
+
+/** A texture as the contract lays it out, from a signed distance sd(x, y) on the lattice (e1, e2) at `origin`. */
+function fieldTexture(sd, e1, e2, origin, size, range) {
+  const data = new Uint8Array(size * size);
+  for (let j = 0; j < size; j++) for (let i = 0; i < size; i++) {
+    const s = (i + 0.5) / size, t = (j + 0.5) / size;
+    data[j * size + i] = Math.round(128 + 127 * Math.max(-1, Math.min(1, sd(origin[0] + s * e1[0] + t * e2[0], origin[1] + s * e1[1] + t * e2[1]) / range)));
+  }
+  return { size, data, range };
+}
+
+test('shape print: sdfRead reads the texture as the contract lays it out — texel centres, rows, sign, range, repeating', () => {
+  // a hand-made 4 x 4 texture with no symmetry
+  const data = Uint8Array.from([1, 40, 80, 120, 128, 150, 170, 190, 200, 210, 220, 230, 240, 250, 255, 128]), tex = { size: 4, data, range: 0.5 };
+  const val = (v) => (v - 128) / 127 * 0.5;
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) {
+    assert.ok(near(sdfRead(tex, (i + 0.5) / 4, (j + 0.5) / 4), val(data[j * 4 + i]), 1e-12), `texel (${i}, ${j}) sits at ((i + 0.5) / size, (j + 0.5) / size); index j * size + i`);
+  }
+  assert.ok(near(sdfRead(tex, 0.125, 0.125), -0.5, 1e-12), 'v = 1: `range` inside the dark tone (negative)');
+  assert.ok(near(sdfRead(tex, 0.625, 0.875), 0.5, 1e-12), 'v = 255: `range` outside');
+  assert.ok(near(sdfRead(tex, 0.875, 0.125), val(120), 1e-12) && near(sdfRead(tex, 0.125, 0.875), val(240), 1e-12), 's runs along a row, t from row to row (not transposed, not flipped)');
+  assert.equal(sdfRead(tex, 0.125, 0.375), 0, 'v = 128: on the outline');
+  // half way between two texel centres: their mean (bilinear), along s and along t
+  assert.ok(near(sdfRead(tex, 0.25, 0.125), val((1 + 40) / 2), 1e-12)); assert.ok(near(sdfRead(tex, 0.125, 0.25), val((1 + 128) / 2), 1e-12));
+  assert.ok(near(sdfRead(tex, 0.25, 0.25), val((1 + 40 + 128 + 150) / 4), 1e-12));
+  // repeating: across the border the neighbours are the other side's texels, and whole cells away it is the same
+  assert.ok(near(sdfRead(tex, 0, 0.125), val((120 + 1) / 2), 1e-12), 'the border s = 0 lies half way between the last and the first column');
+  assert.ok(near(sdfRead(tex, 0.125, 1), val((240 + 1) / 2), 1e-12), '... and t = 1 between the last and the first row');
+  const rand = rng(80);
+  for (let k = 0; k < 200; k++) {
+    const s = rand(), t = rand(), m = Math.floor(9 * rand()) - 4, n = Math.floor(9 * rand()) - 4;
+    assert.ok(near(sdfRead(tex, s + m, t + n), sdfRead(tex, s, t), 1e-9), 'periodic in s and t');
+  }
+  // a real field: discs on a skew lattice. The texture read back is the distance, to the 8 bits and the curvature
+  const e1 = [0.8, 0], e2 = [0.28, 0.64], origin = [0.1, -0.05], det = e1[0] * e2[1] - e1[1] * e2[0];
+  const inv = [e2[1] / det, -e2[0] / det, -e1[1] / det, e1[0] / det], c = [0.33, 0.41], r0 = 0.17;
+  const sd = (x, y) => {                                              // distance to the nearest disc of radius r0 round origin + (c + lattice)
+    let best = Infinity;
+    const dx = x - origin[0], dy = y - origin[1], s = inv[0] * dx + inv[1] * dy, t = inv[2] * dx + inv[3] * dy;
+    for (let m = -2; m <= 2; m++) for (let n = -2; n <= 2; n++) {
+      const px = (Math.floor(s) + m + c[0]) * e1[0] + (Math.floor(t) + n + c[1]) * e2[0], py = (Math.floor(s) + m + c[0]) * e1[1] + (Math.floor(t) + n + c[1]) * e2[1];
+      best = Math.min(best, Math.hypot(dx - px, dy - py) - r0);
+    }
+    return best;
+  };
+  const size = 128, texel = 0.8 / size, range = 4 * texel, T2 = fieldTexture(sd, e1, e2, origin, size, range);
+  let worst = 0, tones = 0;
+  for (let k = 0; k < 4000; k++) {
+    const x = 3 * rand() - 1.5, y = 3 * rand() - 1.5, d = sd(x, y);
+    const s = inv[0] * (x - origin[0]) + inv[1] * (y - origin[1]), t = inv[2] * (x - origin[0]) + inv[3] * (y - origin[1]);
+    const got = sdfRead(T2, s, t);
+    if (Math.abs(d) < range - 1.5 * texel) worst = Math.max(worst, Math.abs(got - d));
+    else assert.ok(Math.sign(got) === Math.sign(d) && Math.abs(got) > range - 3 * texel, 'saturated on the right side');
+    // the tone the shader draws at a magnification of 4 px a texel: the print itself wherever a pixel is clear of the outline
+    const w = texel / 4, tone = sdfTone(got, w, range);
+    if (Math.abs(d) > 0.5 * w + 0.03 * texel) { assert.equal(tone, d < 0 ? 1 : 0, `the tone at (${x}, ${y}), ${d / texel} texels from the outline`); tones++; }
+  }
+  assert.ok(worst < range / 254 + 0.012 * texel, `the distance, read back: off by at most ${worst / texel} texels (8 bits: ${range / 254 / texel})`);
+  assert.ok(tones > 3000);
+});
+
+test('shape print: setStyle\'s check keeps the texture by reference, copies the rest, and says what is wrong', () => {
+  const data = new Uint8Array(64 * 64).fill(200);
+  const P = { mode: 3, L: new Float32Array(9), A: Float32Array.of(0.8, 0, 0.28, 0.64), I: Float32Array.of(1.25, -0.546875, 0, 1.5625), O: Float32Array.of(0.1, -0.05, 0.02), tex: { size: 64, data, range: 0.02 } };
+  const sp = T.shapePrint(P);
+  assert.equal(typeof sp, 'object');
+  assert.equal(sp.mode, 3);
+  assert.equal(sp.tex.data, data, 'the data array itself: never copied (it is megabytes, and handed over on every colour change)');
+  assert.equal(sp.tex.size, 64); assert.equal(sp.tex.range, 0.02);
+  assert.ok(sp.I !== P.I && sp.O !== P.O && sp.A !== P.A, 'the small arrays are copied');
+  assert.deepEqual(Array.from(sp.I), Array.from(P.I)); assert.deepEqual(Array.from(sp.A), Array.from(P.A));
+  assert.ok(near(sp.O[0], 0.1, 1e-7) && near(sp.O[1], -0.05, 1e-7) && near(sp.O[2], 0.02, 1e-8), 'O = (origin, range)');
+  // the range is the texture's; O[2] stands in where the tex has none
+  assert.ok(near(T.shapePrint({ ...P, O: Float32Array.of(0.1, -0.05, 0.5) }).O[2], 0.02, 1e-8), 'tex.range decodes the texture');
+  assert.ok(near(T.shapePrint({ ...P, tex: { size: 64, data } }).O[2], 0.02, 1e-8), 'O[2] where the tex has no range');
+  // L is not looked at; plain arrays do for the small ones; a longer data array, a Uint8ClampedArray
+  assert.equal(typeof T.shapePrint({ mode: 3, A: [0.8, 0, 0.28, 0.64], I: [1.25, -0.55, 0, 1.56], O: [0, 0, 0.02], tex: { size: 8, data } }), 'object');
+  assert.equal(T.shapePrint({ ...P, tex: { size: 64, data: new Uint8ClampedArray(64 * 64), range: 0.02 } }).tex.size, 64);
+  // what is wrong
+  const bad = (over, why) => { const r = T.shapePrint({ ...P, ...over }); assert.equal(typeof r, 'string', why); return r; };
+  assert.match(bad({ tex: undefined }, 'no tex'), /no tex/);
+  assert.match(bad({ tex: { size: 0, data, range: 0.02 } }, 'size 0'), /tex\.size/);
+  assert.match(bad({ tex: { size: 12.5, data, range: 0.02 } }, 'a fraction of a texel'), /tex\.size/);
+  assert.match(bad({ tex: { size: 65, data, range: 0.02 } }, 'too little data'), /holds 4096 texels.*needs 4225/);
+  assert.match(bad({ tex: { size: 64, data: new Float32Array(64 * 64), range: 0.02 } }, 'floats'), /Uint8Array/);
+  assert.match(bad({ tex: { size: 64, data: Array.from(data), range: 0.02 } }, 'a plain array'), /Uint8Array/);
+  assert.match(bad({ tex: { size: 64, data, range: 0 }, O: Float32Array.of(0, 0, 0) }, 'no range'), /range/);
+  assert.match(bad({ tex: { size: 64, data, range: -1 }, O: Float32Array.of(0, 0, -1) }, 'a negative range'), /range/);
+  assert.match(bad({ I: Float32Array.of(1, NaN, 0, 1) }, 'NaN in I'), /finite/);
+  assert.match(bad({ O: Float32Array.of(0, Infinity, 0.02) }, 'an infinite origin'), /finite/);
+  assert.match(bad({ A: [1, 0, 0] }, 'A too short'), /finite/);
+});

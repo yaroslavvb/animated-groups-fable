@@ -1,0 +1,4 @@
+# scratch that is not part of the record (a copy of the old source tree; copies of built pages)
+scratch-review-gpu/
+scratch-review-webkit/gate/
+scratch-review-webkit/stage/

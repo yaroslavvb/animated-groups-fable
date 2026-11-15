@@ -1,17 +1,42 @@
 // test/shell-layout.lib.js — the layout checks of the page shell, for any Playwright page that shows the app: Chrome
 // (test/shell-layout.test.js, the gate) and WebKit, Safari's engine (dev/recut/webkit-layout.mjs, run on the M5). No
 // import: the WebKit runner copies this one file next to the built page.
-//   sweep(page, cases) -> { failures: [text], foldAt375: { id: px } }      cases: [{ id, features }] for the 17 groups
-//                                                                           (features = groupFeatures(group).join(' '))
+//   sweep(page, cases, { quick }?) -> { failures: [text], foldAt375: { id: px }, opened: key, seconds }
+//       cases: [{ id, features }] for the 17 groups (features = groupFeatures(group).join(' '))
+//       opened: the pattern the page showed at load (its default)
+//       quick: the patterns other than the default at 4 sizes only (as before 14 Nov), not at all 23
+//   NOSCRIPT(want) -> [text]   in a page of the template and the stylesheet with no script: the pill shows the default
 // The page must already show the app (window.__folding.ready). A size written fWxH is "in the 50 px host frame": the
 // page gets W x (H - 50), exactly what the spacesheep viewer's iframe gives it.
+//
+// 14 Nov 2026 (the pattern round: Paisley, Soft commas, Tomoe): EVERY pattern of the selector at every size, for every
+// group — the page's default first (the full check, as before), then each other pattern. Per pattern: #app[data-pattern],
+// the select and the pill's name say it; exactly one swatch shows, ITS swatch (.pat-sw-<key>, 18 x 18 in the pill),
+// in the print's two tones under a print; the name fits its pill uncut and shows from 560 px (not in a low landscape
+// window), the word "Pattern" from 720 px; the print is of the kind the pattern has (a design that fails for a group
+// shows the comma instead: caught); #app[data-print] is that kind; the legend's "front · back" shows under every
+// print from 360 px and under no print. The selector lists PATTERNS in order, each with a swatch.
 
 export const SIZES = ['f375x548', 'f390x664', 'f390x780', 'f360x584', 'f412x785', 'f320x568', '320x568', '360x640', '360x820', '390x780',
   '414x896', '667x375', 'f667x375', '640x360', '740x360', '844x390', 'f844x390', '768x1024', '960x540', '1024x768', '1280x720', '1440x900', '1920x1080'];
 export const parse = (s) => { const f = s.startsWith('f'); const [w, h] = s.replace(/^f/, '').split('x').map(Number); return { name: s, w, h: f ? h - 50 : h }; };
 
-// runs in the page: everything this test asserts about the layout as it stands
-export const CHECK = ([expectFeatures, print]) => {
+// The selector's patterns, in its order (14 Nov 2026), with the kinds of print each may show (src/app.js sets
+// #app[data-print] to it). Rings: rings round the centres of rotation, stripes (linear) for a group without rotations.
+// The Comma is a shape print since 14 Nov (src/patterns/comma.js; the owner, 13 Nov: "reuse the two different shades
+// from "checkerboard" pattern for all patterns"): a group where it falls back to the sheet is a failure, as for the
+// other three (the review of 15 Nov: the gate took the Comma with no print at all).
+export const PATTERNS = Object.freeze([
+  { key: 'paisley', label: 'Paisley', kinds: ['shapes'] },
+  { key: 'soft', label: 'Soft commas', kinds: ['shapes'] },
+  { key: 'tomoe', label: 'Tomoe', kinds: ['shapes'] },
+  { key: 'checker', label: 'Checkerboard', kinds: ['linear'] },
+  { key: 'rings', label: 'Rings', kinds: ['rings', 'linear'] },
+  { key: 'comma', label: 'Comma', kinds: ['shapes'] },
+].map((p) => Object.freeze(p)));
+
+// runs in the page: everything this test asserts about the layout as it stands. want = { pattern, label, kinds }
+export const CHECK = ([expectFeatures, want]) => {
   const q = (s) => document.querySelector(s), qa = (s) => [...document.querySelectorAll(s)];
   const B = (el) => el.getBoundingClientRect();
   const r1 = (v) => Math.round(v * 10) / 10;
@@ -36,23 +61,51 @@ export const CHECK = ([expectFeatures, print]) => {
     if (overlap(B(blocks[i][1]), B(blocks[j][1]))) bad.push(`${blocks[i][0]} overlaps ${blocks[j][0]}`);
   }
   if (overlap(B(q('#caption')), B(q('#chip'))) || overlap(B(q('#caption')), B(q('.title')))) bad.push('the caption runs into the header');
-  // the pattern selector: at the right of the header, clear of the chip and of the caption; one swatch; the native
-  // select covers it all (so a tap anywhere on it opens the platform's picker)
+  // the pattern on screen and its print (14 Nov 2026): the page's state, the select and #app agree; the print is of a
+  // kind the pattern has (a design that fails for a group gives no print: the comma is shown instead)
+  const st = window.__folding.getState(), kind = st.printKind || null, sel = q('#pattern');
+  if (app.getAttribute('data-pattern') !== want.pattern) bad.push(`#app data-pattern is "${app.getAttribute('data-pattern')}", the pattern is ${want.pattern}`);
+  if (st.pattern !== want.pattern) bad.push(`the app's pattern is "${st.pattern}", not ${want.pattern}`);
+  if (sel.value !== want.pattern) bad.push(`the select says "${sel.value}" for the pattern ${want.pattern}`);
+  if (want.kinds && !want.kinds.includes(kind)) bad.push(`${want.pattern}: ${kind ? `a print of the kind "${kind}"` : 'no print (the comma is shown instead)'}, not ${want.kinds.join(' or ')}`);
+  if ((app.getAttribute('data-print') || null) !== kind) bad.push(`#app data-print is "${app.getAttribute('data-print')}", the print on screen ${kind ? 'is ' + kind : 'is none'}`);
+  // the pattern selector: at the right of the header, clear of the chip and of the caption; one swatch, the pattern's
+  // own; the native select covers it all (so a tap anywhere on it opens the platform's picker)
   const pat = q('#pattern-box'), pill = q('#pattern-box .pat-pill');
   if (!shown(pat) || !shown(pill)) bad.push('no pattern selector');
   else {
-    const pb = B(pat), sb = B(q('#pattern'));
+    const pb = B(pat), sb = B(sel), lb = B(pill);
     if (!within(pb, win) || !within(pb, B(q('#header')), 1)) bad.push('the pattern selector leaves the header');
     if (overlap(pb, B(q('#chip')))) bad.push('the pattern selector lies over the chip');
-    if (overlap(B(pill), B(q('#caption')))) bad.push('the pattern selector lies over the caption');
-    if (B(pill).height < 35.5) bad.push(`the selector's pill is ${r1(B(pill).height)} px high`);
+    if (overlap(lb, B(q('#caption')))) bad.push('the pattern selector lies over the caption');
+    if (!within(lb, pb, 0.5)) bad.push('the pill leaves the selector\'s box');
+    if (lb.height < 35.5) bad.push(`the selector's pill is ${r1(lb.height)} px high`);
     const sw = qa('#pattern-box .pat-sw').filter(shown);
-    if (sw.length !== 1) bad.push(`${sw.length} swatches in the selector`);
-    const lab = q('#pattern-label');
-    if (shown(lab) && (lab.scrollWidth > lab.clientWidth + 0.5 || !lab.textContent.trim())) bad.push('the pattern\'s name is cut');
-    if (shown(lab) !== (vw >= 560 && !(vw > vh && vh < 480))) bad.push(`the pattern's name is ${shown(lab) ? 'shown' : 'hidden'} at ${vw} x ${vh}`);
+    if (sw.length !== 1) bad.push(`${sw.length} swatches in the selector (${want.pattern})`);
+    else {
+      const s0 = sw[0], b0 = B(s0);
+      if (!s0.classList.contains('pat-sw-' + want.pattern)) bad.push(`the swatch of ${want.pattern} is "${s0.getAttribute('class')}"`);
+      if (Math.abs(b0.width - 18) > 0.5 || Math.abs(b0.height - 18) > 0.5) bad.push(`the swatch of ${want.pattern} is ${r1(b0.width)}x${r1(b0.height)}`);
+      if (!within(b0, lb, 0.5)) bad.push(`the swatch of ${want.pattern} leaves its pill`);
+      // under a print: drawn in the paper's two front tones (the light ground, the dark marks), as the print is
+      if (kind) {
+        const rgb = (hex) => { const h = hex.trim().replace('#', ''); return `rgb(${parseInt(h.slice(0, 2), 16)}, ${parseInt(h.slice(2, 4), 16)}, ${parseInt(h.slice(4, 6), 16)})`; };
+        const root = getComputedStyle(document.documentElement), tones = [rgb(root.getPropertyValue('--print-light')), rgb(root.getPropertyValue('--print-dark'))];
+        const paints = [...s0.querySelectorAll('rect, path, circle, ellipse, polygon')].flatMap((e) => { const cs = getComputedStyle(e); return [cs.fill, cs.stroke]; });
+        const off = [...new Set(paints.filter((p) => p !== 'none' && !tones.includes(p)))];
+        if (off.length) bad.push(`the swatch of ${want.pattern} has ${off.join(', ')} under a print (the print's tones: ${tones.join(', ')})`);
+      }
+    }
+    // the name: shown from 560 px, not in a low landscape window (the caption shares the row); the pattern's own name,
+    // whole, inside the pill. The word "Pattern" from 720 px, likewise
+    const lab = q('#pattern-label'), low = vw > vh && vh < 480;
+    if (lab.textContent.trim() !== want.label) bad.push(`the pill names "${lab.textContent.trim()}", the pattern is ${want.label}`);
+    if (shown(lab) && (lab.scrollWidth > lab.clientWidth + 0.5 || !within(B(lab), lb, 0.5))) bad.push(`the pattern's name "${lab.textContent.trim()}" is cut`);
+    if (shown(lab) !== (vw >= 560 && !low)) bad.push(`the pattern's name is ${shown(lab) ? 'shown' : 'hidden'} at ${vw} x ${vh}`);
+    const word = q('#pattern-box .pat-k');
+    if (word && shown(word) !== (vw >= 720 && !low)) bad.push(`the word "Pattern" is ${shown(word) ? 'shown' : 'hidden'} at ${vw} x ${vh}`);
     if (Math.abs(sb.width - pb.width) > 1 || Math.abs(sb.height - pb.height) > 1) bad.push('the native select does not cover the selector');
-    if (parseFloat(getComputedStyle(q('#pattern')).fontSize) < 16) bad.push('the select is under 16 px: iOS zooms the page');
+    if (parseFloat(getComputedStyle(sel).fontSize) < 16) bad.push('the select is under 16 px: iOS zooms the page');
   }
   // the title: there from 370 px up; below, the selector has its room (it stays in the page for a screen reader)
   { const tb = B(q('.title')); if ((tb.width > 2) !== (vw >= 370)) bad.push(`the title is ${tb.width > 2 ? 'shown' : 'hidden'} at ${vw} px`); }
@@ -94,14 +147,14 @@ export const CHECK = ([expectFeatures, print]) => {
   }
   for (const s of ['#caption', '#chip-meta']) { const e = q(s); if (e.scrollHeight > e.clientHeight + 1 || e.scrollWidth > e.clientWidth + 1) bad.push(`${s} "${e.textContent}" is cut`); }
   // legend (contract C1)
-  // (the paper's two sides come first, with a print and from 360 px up: one line of the legend is all a 320 px phone has)
+  // (the paper's two sides come first, under every print and from 360 px up: one line of the legend is all a 320 px
+  // phone has; under no print there is no paper to explain)
   const allItems = qa('#legend .lg').filter(shown), paper = allItems.filter((e) => e.hasAttribute('data-paper'));
   const items = allItems.filter((e) => !e.hasAttribute('data-paper'));
   const got = items.map((e) => e.getAttribute('data-feature')).join(' ');
   if (got !== expectFeatures) bad.push(`legend shows "${got}", the group has "${expectFeatures}" (#app data-features "${app.getAttribute('data-features')}")`);
-  if (paper.length !== (print && vw >= 360 ? 1 : 0)) bad.push(`legend: ${paper.length} "front · back" items (pattern ${app.getAttribute('data-pattern')}, ${vw} px)`);
+  if (paper.length !== (kind && vw >= 360 ? 1 : 0)) bad.push(`legend: ${paper.length} "front · back" items (pattern ${want.pattern}, print ${kind || 'none'}, ${vw} px)`);
   if (paper.length && allItems[0] !== paper[0]) bad.push('legend: the paper is not the first item');
-  if (app.getAttribute('data-pattern') !== (print ? print : 'comma')) bad.push(`#app data-pattern is "${app.getAttribute('data-pattern')}"`);
   const lgBox = B(q('#legend'));
   const rects = allItems.map((e) => [e.getAttribute('data-feature') || 'paper', B(e)]);
   { const rg = document.createRange(); rg.selectNodeContents(q('.companion a')); rects.push(['link', rg.getBoundingClientRect()]); }
@@ -154,34 +207,62 @@ export const WORDS = (want) => {
   return bad;
 };
 
-/** Every check, at every size: -> { failures, foldAt375 }. */
-export async function sweep(page, cases) {
-  const failures = [], foldAt375 = {};
+// runs in a page of the template and the stylesheet with NO script (before the bundle runs): the pill shows the
+// default pattern's swatch and name, the select has it selected. want = { pattern, label }
+export const NOSCRIPT = (want) => {
+  const q = (s) => document.querySelector(s), bad = [];
+  const shown = (el) => { for (let e = el; e && e.nodeType === 1; e = e.parentElement) if (getComputedStyle(e).display === 'none') return false; return el.getBoundingClientRect().width > 0; };
+  const app = q('#app');
+  if (app.hasAttribute('data-pattern') || app.hasAttribute('data-print')) bad.push('the template sets #app[data-pattern] or [data-print] itself');
+  const sw = [...document.querySelectorAll('#pattern-box .pat-sw')].filter(shown).map((e) => e.getAttribute('class'));
+  if (sw.length !== 1 || !sw[0].split(' ').includes('pat-sw-' + want.pattern)) bad.push(`before the script: the swatches shown are [${sw.join(' | ')}], not ${want.pattern}'s`);
+  if (q('#pattern-label').textContent.trim() !== want.label) bad.push(`before the script: the pill names "${q('#pattern-label').textContent.trim()}", not ${want.label}`);
+  if (q('#pattern').value !== want.pattern) bad.push(`before the script: the select says "${q('#pattern').value}", not ${want.pattern}`);
+  if (q('#legend [data-paper]') && shown(q('#legend [data-paper]'))) bad.push('before the script: the legend shows "front · back" (no print yet)');
+  return bad;
+};
+
+/** Every check, at every size: -> { failures, foldAt375, opened, seconds }. */
+export async function sweep(page, cases, { quick = false } = {}) {
+  const failures = [], foldAt375 = {}, t0 = Date.now();
+  // the selector: PATTERNS, in this order, each with its swatch in the pill; the pattern the page opened with
+  const { options, opened } = await page.evaluate(() => ({
+    options: [...document.querySelectorAll('#pattern option')].map((o) => ({ key: o.value, label: o.textContent.trim(), swatch: !!document.querySelector(`#pattern-box .pat-sw-${CSS.escape(o.value)}`) })),
+    opened: window.__folding.getState().pattern,
+  }));
+  const listed = (a) => a.map((o) => `${o.key} (${o.label})`).join(', ');
+  if (listed(options) !== listed(PATTERNS)) failures.push(`the selector lists ${listed(options)}; it should list ${listed(PATTERNS)}`);
+  for (const o of options) if (!o.swatch) failures.push(`no swatch in the pill for the pattern ${o.key} (svg.pat-sw.pat-sw-${o.key}): a bare caret on a phone`);
+  const want = (key) => { const p = PATTERNS.find((q) => q.key === key) || { key, label: (options.find((o) => o.key === key) || {}).label || key, kinds: null }; return { pattern: p.key, label: p.label, kinds: p.kinds }; };
+  const first = want(opened), others = PATTERNS.filter((p) => p.key !== opened).map((p) => want(p.key));
+  // the page as it opens, with its default pattern: every check at every size, for every group
   for (const s of SIZES.map(parse)) {
     await page.setViewportSize({ width: s.w, height: s.h });
     await page.waitForTimeout(150);
     for (const g of cases) {
-      await page.evaluate((id) => { window.__folding.setGroup(id); window.__folding.setT(0); }, g.id);
+      await page.evaluate(([id, p]) => { const F = window.__folding; F.setGroup(id); F.setPattern(p); F.setT(0); }, [g.id, first.pattern]);
       await page.waitForTimeout(40);
-      const r = await page.evaluate(CHECK, [g.features, 'checker']);
+      const r = await page.evaluate(CHECK, [g.features, first]);
       for (const b of r.bad) failures.push(`${s.name} ${g.id}: ${b}`);
       if (s.name === 'f375x548') foldAt375[g.id] = r.fold[1];
     }
   }
-  // the other patterns, at a phone, a phone on its side and a laptop: Rings is a print too; the Comma has no paper
-  // to explain (no "front · back"), and nothing else moves
-  for (const s of ['f360x584', 'f320x568', '667x375', '1280x720'].map(parse)) {
+  // every other pattern of the selector (14 Nov 2026: Paisley, Soft commas, Tomoe joined), at every size (quick: at a
+  // phone, a phone on its side and a laptop), for every group: its own swatch and name, its print and the legend's
+  // paper, and nothing else moves — a longer name must not cut the chip's words, a print must not cost a line
+  for (const s of (quick ? ['f360x584', 'f320x568', '667x375', '1280x720'] : SIZES).map(parse)) {
     await page.setViewportSize({ width: s.w, height: s.h });
     await page.waitForTimeout(150);
-    for (const pattern of ['rings', 'comma']) {
-      for (const g of cases) {
-        await page.evaluate(([id, p]) => { window.__folding.setGroup(id); window.__folding.setPattern(p); window.__folding.setT(0); }, [g.id, pattern]);
+    for (const g of cases) {
+      await page.evaluate((id) => { window.__folding.setGroup(id); window.__folding.setT(0); }, g.id);
+      for (const w of others) {
+        await page.evaluate((p) => { window.__folding.setPattern(p); window.__folding.setT(0); }, w.pattern);
         await page.waitForTimeout(40);
-        const r = await page.evaluate(CHECK, [g.features, pattern === 'comma' ? '' : pattern]);
-        for (const b of r.bad) failures.push(`${s.name} ${g.id} ${pattern}: ${b}`);
+        const r = await page.evaluate(CHECK, [g.features, w]);
+        for (const b of r.bad) failures.push(`${s.name} ${g.id} ${w.pattern}: ${b}`);
       }
     }
-    await page.evaluate(() => window.__folding.setPattern('checker'));
+    await page.evaluate((p) => window.__folding.setPattern(p), first.pattern);
   }
   // the words of a re-cut; none for the home tile itself
   for (const s of ['f375x548', 'f360x584', 'f320x568', '667x375', '844x390', '768x1024', '1280x720'].map(parse)) {
@@ -224,5 +305,5 @@ export async function sweep(page, cases) {
       } else if (await page.evaluate(stripOf) > 2) failures.push(`${s.name} ${id}: the home tile's picture does not fill the pane`);
     }
   }
-  return { failures, foldAt375 };
+  return { failures, foldAt375, opened, seconds: Math.round((Date.now() - t0) / 1000) };
 }

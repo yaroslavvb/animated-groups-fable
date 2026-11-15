@@ -1,0 +1,115 @@
+<!doctype html>
+<!--
+  scratch (core-shapes): src/shapes.js in a real canvas. For every group, three motifs (the page's comma; a blob with a
+  hole and an island; a rosette on the rotation centre with the largest stabiliser, or an egg on a mirror), drawn the way
+  the plane draws a print: fillShapes pale over the plane, and in the paper's two front tones inside the default tile.
+  THE CHECK: the same path filled black on a hidden canvas, read back, and compared with print.tone() on a grid of
+  points that are at least 1.5 px from every outline (print.margin). A mismatch is a red dot; the counts are in
+  window.__sheet.rows. sheet.html?side=back draws the tile in the back's tones; ?design=designs/<key>/design.js adds a
+  fourth column with a design of the round (whatever it is at this moment).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>shapes.js sheet</title>
+<style>
+  body { margin: 10px; font: 11px/1.3 system-ui, sans-serif; background: #fff; color: #1a1a1f; }
+  h1 { font-size: 13px; margin: 0 0 8px; font-weight: 600; }
+  .g { display: grid; gap: 6px; }
+  figure { margin: 0; border: 1px solid #e5e5ea; }
+  canvas { display: block; }
+  figcaption { padding: 2px 5px 3px; color: #52514a; font-variant-numeric: tabular-nums; }
+  figcaption b { color: #1a1a1f; }
+  .bad { color: #b45309; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1 id="title">src/shapes.js: fillShapes in a canvas against tone()</h1>
+<div class="g" id="grid"></div>
+<script type="module">
+  import { GROUPS, BY_ID, symmetryElements } from '../../../src/groups.js';
+  import { buildDomain } from '../../../src/domain.js';
+  import { PRINT_FRONT, PRINT_BACK, PRINT_PLANE_ALPHA, INK, ACCENT } from '../../../src/palette.js';
+  import { makeShapePrint, fillShapes, validateShapes, shapeElements } from '../../../src/shapes.js';
+  import { commaShapes, blobShapes, symmetricShapes } from './motifs.js';
+
+  const q = new URLSearchParams(location.search);
+  const px = +q.get('px') || 232, cols = +q.get('cols') || 6, back = q.get('side') === 'back';
+  const out = (window.__sheet = { ready: false, error: null, rows: [] });
+  const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a})`; };
+  try {
+    const design = q.get('design') ? await import('../' + q.get('design')) : null;
+    const ids = q.get('ids') ? q.get('ids').split(',') : GROUPS.map((g) => g.id);
+    const grid = document.getElementById('grid');
+    grid.style.gridTemplateColumns = `repeat(${cols}, ${px}px)`;
+    const dpr = 2;
+    for (const id of ids) {
+      const group = BY_ID[id];
+      const motifs = [['comma', { shapes: commaShapes(group) }], ['blob', blobShapes(group)], ['centre', symmetricShapes(group, 'centre')], ['mirror', symmetricShapes(group, 'mirror')]];
+      const list = [motifs[0], motifs[1], motifs[2][1] ? motifs[2] : motifs[3][1] ? motifs[3] : null].filter(Boolean);
+      if (design) { try { list.push([design.meta.key, design.find(group)]); } catch (e) { list.push([design.meta && design.meta.key || 'design', null, String(e.message || e)]); } }
+      while (list.length < (design ? 4 : 3)) list.push(null);
+      for (const item of list) {
+        const fig = document.createElement('figure'), cv = document.createElement('canvas'), cap = document.createElement('figcaption');
+        cv.width = cv.height = px * dpr; cv.style.width = cv.style.height = px + 'px';
+        fig.append(cv, cap); grid.append(fig);
+        if (!item) { cap.innerHTML = `<b>${group.label}</b> no rotation centre, no mirror`; continue; }
+        const row = { id, motif: item[0] };
+        try {
+          if (!item[1]) throw new Error(item[2] || 'no motif');
+          const P = makeShapePrint(group, { key: item[0], shapes: item[1].shapes });
+          const V = validateShapes(P);
+          const c = cv.getContext('2d');
+          c.scale(dpr, dpr);
+          const half = group.viewHalf, cx = group.center[0], cy = group.center[1], s = px / (2 * half);
+          const map = (x, y, o) => { o[0] = (x - cx) * s + px / 2; o[1] = px / 2 - (y - cy) * s; return o; };
+          const box = [cx - half, cy - half, cx + half, cy + half], o = [0, 0];
+          const domain = buildDomain(group, { seed: group.presets[0].seed, metric: group.presets[0].metric });
+          const tilePath = () => { c.beginPath(); domain.poly.forEach((p, k) => { map(p[0], p[1], o); if (k) c.lineTo(o[0], o[1]); else c.moveTo(o[0], o[1]); }); c.closePath(); };
+          c.fillStyle = '#fff'; c.fillRect(0, 0, px, px);
+          row.copies = fillShapes(c, P, map, box, rgba(PRINT_FRONT[1], PRINT_PLANE_ALPHA));
+          const tones = back ? PRINT_BACK : PRINT_FRONT;
+          c.save(); tilePath(); c.clip();
+          c.fillStyle = tones[0]; c.fillRect(0, 0, px, px);
+          fillShapes(c, P, map, box, tones[1]);
+          c.restore();
+          const sym = symmetryElements(group, cx, cy, half * 1.6);
+          c.strokeStyle = INK; c.lineWidth = 1; c.beginPath();
+          for (const m of sym.mirrors) { map(m.px - 9 * m.ux, m.py - 9 * m.uy, o); c.moveTo(o[0], o[1]); map(m.px + 9 * m.ux, m.py + 9 * m.uy, o); c.lineTo(o[0], o[1]); }
+          c.stroke();
+          c.fillStyle = INK;
+          for (const p of sym.centers) { map(p.x, p.y, o); c.beginPath(); c.arc(o[0], o[1], 1 + 0.4 * p.order, 0, 6.2832); c.fill(); }
+          c.strokeStyle = ACCENT; c.lineWidth = 1.8; tilePath(); c.stroke();
+          // the check: black on white, read back
+          const hid = document.createElement('canvas'); hid.width = hid.height = px * dpr;
+          const hc = hid.getContext('2d', { willReadFrequently: true });
+          hc.scale(dpr, dpr); hc.fillStyle = '#fff'; hc.fillRect(0, 0, px, px);
+          fillShapes(hc, P, map, box, '#000');
+          const img = hc.getImageData(0, 0, px * dpr, px * dpr).data;
+          let n = 0, bad = 0, dark = 0;
+          c.fillStyle = '#e11d48';
+          for (let j = 2; j < px * dpr; j += 5) for (let i = 2; i < px * dpr; i += 5) {
+            // the centre of device pixel (i, j)
+            const X = (i + 0.5) / dpr, Y = (j + 0.5) / dpr, x = cx + (X - px / 2) / s, y = cy - (Y - px / 2) / s;
+            if (P.margin(x, y) < 1.5 / (s * dpr)) continue;
+            n++;
+            const isDark = img[4 * (j * px * dpr + i)] < 128, tone = P.tone(x, y);
+            dark += tone;
+            if ((isDark ? 1 : 0) !== tone) { bad++; c.beginPath(); c.arc(X, Y, 2.5, 0, 6.2832); c.fill(); }
+          }
+          Object.assign(row, { verts: P.verts, ok: V.ok, problems: V.problems, gap: V.gap, stabilizer: V.stabilizer, samples: n, mismatches: bad, dark: dark / n });
+          cap.innerHTML = `<b>${group.label}</b> ${item[0]} · ${P.verts} pts · W ${V.stabilizer} · gap ${V.gap.toFixed(3)} · ${row.copies} copies · ` +
+            (bad ? `<span class="bad">${bad} of ${n} points differ</span>` : `${n} points agree`) + (V.ok ? '' : ` <span class="bad">${V.problems.length} problem(s): ${V.problems[0]}</span>`);
+        } catch (e) {
+          row.error = String(e && e.stack || e);
+          cap.innerHTML = `<b>${id}</b> ${item[0]} <span class="bad">${String(e && e.message || e)}</span>`;
+        }
+        out.rows.push(row);
+      }
+      await new Promise((r) => setTimeout(r, 0));
+    }
+  } catch (e) { out.error = String(e && e.stack || e); document.getElementById('title').textContent = 'ERROR ' + out.error; }
+  out.ready = true;
+</script>
+</body>
+</html>

@@ -10,20 +10,42 @@
 // Checkerboard was a square grid on the paper of one tile; here the grid is fitted to the group, so the pieces of a
 // re-cut tile (src/folds/recut.js), which are carried by elements of the group, keep the print in register.
 //
-//   PATTERNS                 [{ key, label, hint }]: 'checker' (the default), 'rings', 'comma' (the one big comma of
-//                            src/motif.js on a translucent sheet: no print)
-//   DEFAULT_PATTERN          'checker'
-//   resolvePattern(raw)      a key of PATTERNS, or null
-//   printFor(group, key)     the print of a group, or null for 'comma' / an unknown key. The same object every time.
+//   PATTERNS                 [{ key, label, hint }], the selector's six in its order (14 Nov 2026, the pattern round):
+//                            'paisley' (the default), 'soft' (Soft commas), 'tomoe', 'checker', 'rings', 'comma'. The
+//                            first three and the comma are SHAPE prints (src/shapes.js) of the motifs of src/patterns/;
+//                            the comma is the page's own (src/motif.js) on the paper since then (the owner's page comment
+//                            88289462: "reuse the two different shades from "checkerboard" pattern for all patterns").
+//                            Frozen.
+//   DEFAULT_PATTERN          'paisley': the five judges of the round all asked for a new default, and Paisley had their
+//                            best mean score (notes/patterns-round.md)
+//   SHEET_PATTERN            'sheet': the picture before the prints, one comma per tile cut into a translucent sheet. Not
+//                            a pattern of the selector or of the address (resolvePattern does not know it): it is the
+//                            default of app.js buildScene, whose tests were written for it, and what the app shows for a
+//                            pattern that has no print for a group (printFor: null)
+//   registerPattern({ key, label, hint }, find)   a SHAPE pattern joins (13 Nov 2026, the pattern round; src/shapes.js):
+//                            find(group) -> { shapes, info? }, the motif whose orbit under the group is the print.
+//                            Throws for a key that is taken. Returns the frozen { key, label, hint }. (The dev pages,
+//                            dev/patterns/app.html: a design whose key is built in now is registered as 'dev' alone.)
+//   allPatterns()            PATTERNS, then the registered ones in the order they came: what a selector lists
+//   resolvePattern(raw)      a key of allPatterns(), or null; old names too ('blobs': Soft commas)
+//   printFor(group, key)     the print of a group, or null for an unknown key / a shape pattern whose find threw, gave
+//                            a motif that cannot be used, or one that breaks the rules of a shape print (src/shapes.js
+//                            printable: it would be drawn wrong) — console.warn says so once, naming the problem; the
+//                            app then shows the comma on the sheet (SHEET_PATTERN). The same object every time.
+//   printCached(group, key)  has printFor(group, key) been asked already (its answer is kept)? The page's idle time
+//                            makes the prints of the other groups (src/patterns/warm.js)
 //   printUniforms(print)     what the renderer's shader needs (render3d.js setStyle({ print }))
-//   fillPrint(c, print, map, box, fillStyle)   the DARK tone as canvas paths (even-odd), through any affine map
+//   fillPrint(c, print, map, box, fillStyle, tol?)   the DARK tone as canvas paths (even-odd; a shape print: ONE path,
+//                                              the nonzero rule, its outline simplified to within tol world units when
+//                                              tol > 0), through any affine map
 //   invariantUnder(group, print, samples?)     does every element of the group keep the print? At generic points:
 //                                              a coarse sieve (it cannot see a print that is off by a hair)
 //   exactlyInvariant(group, print, samples?)   the sharp check: a millionth of a mark either side of the lines where
 //                                              the tone changes, every generator must keep the tone
 //
 // A Print:
-//   key, kind          'linear' | 'rings'
+//   key, kind          'linear' | 'rings' | 'shapes' (the Print of src/shapes.js: tone, winding, margin, polys, cell, …;
+//                      its name is the pattern's key)
 //   tone(x, y)         0 (light) | 1 (dark) at the plane point (actual coordinates; the print does not move with Wavy)
 //   forms              kind 'linear': three linear forms [lx, ly, o]; with c_k = lx x + ly y + o,
 //                          dark  <=>  floor(c_1) + floor(c_2) + floor(c_3) is odd
@@ -46,15 +68,62 @@
 // no table to be regenerated; test/pattern.test.js checks all 17, and turned, scaled and shifted copies of them.
 
 import { symmetryElements } from './groups.js';
+import { makeShapePrint, fillShapes, bakeShapes, printable } from './shapes.js';
+import { SHAPE_PATTERNS } from './patterns/index.js';
+
+/** The shape patterns built in (src/patterns/), by key: { meta, find }. */
+const BUILT_IN = new Map(SHAPE_PATTERNS.map((p) => [p.meta.key, p]));
+const builtIn = (key) => BUILT_IN.get(key).meta;
 
 export const PATTERNS = Object.freeze([
+  builtIn('paisley'), builtIn('soft'), builtIn('tomoe'),
   Object.freeze({ key: 'checker', label: 'Checkerboard', hint: 'a print that covers the paper: front teal, back sand' }),
   Object.freeze({ key: 'rings', label: 'Rings', hint: 'bands at equal distance from the cone points, the mirrors or the glide axes' }),
-  Object.freeze({ key: 'comma', label: 'Comma', hint: 'one comma per tile on a translucent sheet' }),
+  builtIn('comma'),
 ]);
-export const DEFAULT_PATTERN = 'checker';
+export const DEFAULT_PATTERN = 'paisley';
+export const SHEET_PATTERN = 'sheet';
 
-/** The key of a pattern from whatever a URL or a person may hold ("Checkerboard", "CHECKER", "rings"); null if none. */
+// ---------------------------------------------------------------------------------------------------------------
+// The registry: shape patterns (src/shapes.js), added at run time
+// ---------------------------------------------------------------------------------------------------------------
+
+/** A registered pattern's key: lower case (resolvePattern lowers what it is given), fit for the URL hash (pat=<key>). */
+const KEY_RE = /^[a-z][a-z0-9_-]{0,23}$/;
+const registered = [];                 // [{ meta: { key, label, hint }, find }], in the order they were registered
+
+/**
+ * A shape pattern joins the patterns: the print of a group is the orbit of the motif find(group) under the group
+ * (src/shapes.js makeShapePrint), printed like the checkerboard — opaque paper, front teal, back sand.
+ *   meta   { key, label?, hint? }   key: lower-case letters, digits, - and _, a letter first, at most 24 characters
+ *                                   (it is written into the URL hash); label: the selector's word (default: the key)
+ *   find   (group) -> { shapes: [{ pts: [[x, y], ...], hole? }], info? }   pure and deterministic; it may throw for a
+ *                                   group it has no motif for (printFor then gives null)
+ * Throws for a key that is taken — a pattern's key, or any name resolvePattern already knows (a label, 'checks', …),
+ * or SHEET_PATTERN — so a key always resolves to itself. Returns the frozen { key, label, hint } that allPatterns() lists.
+ * The patterns of src/patterns/ are built in since 14 Nov 2026: their keys are taken ('paisley', 'soft', 'blobs', …).
+ */
+export function registerPattern(meta, find) {
+  const key = meta && meta.key;
+  if (typeof key !== 'string' || !KEY_RE.test(key)) throw new Error(`registerPattern: a key is lower-case letters, digits, - and _, a letter first, at most 24 characters (got ${JSON.stringify(key)})`);
+  if (typeof find !== 'function') throw new TypeError(`registerPattern: the pattern '${key}' needs find(group) -> { shapes, info }`);
+  if (resolvePattern(key) !== null || key === SHEET_PATTERN) throw new Error(`registerPattern: the key '${key}' is taken`);
+  const label = typeof meta.label === 'string' && meta.label.trim() ? meta.label.trim() : key;
+  const p = Object.freeze({ key, label, hint: typeof meta.hint === 'string' ? meta.hint : '' });
+  registered.push({ meta: p, find });
+  return p;
+}
+
+/** Every pattern there is: the built-in PATTERNS, then the registered ones in the order they came. A new array each time. */
+export function allPatterns() {
+  return PATTERNS.concat(registered.map((r) => r.meta));
+}
+
+/**
+ * The key of a pattern from whatever a URL or a person may hold ("Checkerboard", "CHECKER", "rings", "Soft commas",
+ * "blobs": the design folder of Soft commas, as a link of the pattern round named it); null if none. Never
+ * SHEET_PATTERN: the sheet is no pattern one can choose.
+ */
 export function resolvePattern(raw) {
   if (raw == null) return null;
   const s = String(raw).trim().toLowerCase();
@@ -63,6 +132,9 @@ export function resolvePattern(raw) {
   if (s === 'checkerboard' || s === 'checks' || s === 'check') return 'checker';
   if (s === 'ring' || s === 'bands') return 'rings';
   if (s === 'commas' || s === 'motif') return 'comma';
+  if (s === 'blobs' || s === 'blob' || s === 'soft-commas' || s === 'softcommas') return 'soft';
+  for (const r of registered) if (r.meta.key === s) return s;
+  for (const r of registered) if (r.meta.label.toLowerCase() === s) return r.meta.key;
   return null;
 }
 
@@ -121,14 +193,20 @@ function ringDistance(P, x, y) {
     Math.hypot(qx - P.a[0] - P.b[0], qy - P.a[1] - P.b[1]));
 }
 
+/** The size of one mark of a shape print, the unit its margins are counted in (the tile's size for a motif without area). */
+const shapeMark = (print) => (print.cell > 0 ? print.cell : print.size);
+
 /**
  * Does every element of the group leave the print as it is? Checked on `samples` generic points (kept away from the
  * lines where the tone changes, so rounding decides nothing), for every coset representative and both lattice
- * translations: these generate the group.
+ * translations: these generate the group. (A shape print is the group's by construction; for it this checks the
+ * print's own tone function, and a print that was made for another group.)
  */
 export function invariantUnder(group, print, samples = 240, seed = 7) {
   const rnd = prng(seed), L = Math.max(len(group.e1), len(group.e2));
+  const mark = print.kind === 'shapes' ? shapeMark(print) : 1;
   const margin = print.kind === 'linear' ? (x, y) => linearMargin(print.forms, x, y)
+    : print.kind === 'shapes' ? (x, y) => print.margin(x, y) / mark          // the distance to the nearest outline, in marks
     : (x, y) => { const c = ringDistance(print, x, y) / print.width; return Math.abs(c - Math.round(c)); };
   const gens = group.reps.slice();
   gens.push({ a: 1, b: 0, c: 0, d: 1, tx: group.e1[0], ty: group.e1[1] }, { a: 1, b: 0, c: 0, d: 1, tx: group.e2[0], ty: group.e2[1] });
@@ -150,9 +228,9 @@ export function invariantUnder(group, print, samples = 240, seed = 7) {
 /**
  * The sharp check (invariantUnder keeps away from the lines where the tone changes, so a print that is off by a
  * hundredth of a mark passes it): points a millionth of a mark either side of a tone line — a line of one of the
- * linear forms, away from the others' lines; a circle of the rings, inside its centre's own cell — must keep their
- * tone under every coset representative and both lattice translations. A print the group keeps exactly passes; one
- * that is off by more than a millionth of a mark does not.
+ * linear forms, away from the others' lines; a circle of the rings, inside its centre's own cell; an outline of a
+ * shape print's motif, away from its corners — must keep their tone under every coset representative and both lattice
+ * translations. A print the group keeps exactly passes; one that is off by more than a millionth of a mark does not.
  */
 export function exactlyInvariant(group, print, samples = 20, seed = 23) {
   const rnd = prng(seed), L = Math.max(len(group.e1), len(group.e2)), EPS = 1e-6;
@@ -163,6 +241,27 @@ export function exactlyInvariant(group, print, samples = 20, seed = 23) {
     for (const g of gens) if (print.tone(g.a * x + g.b * y + g.tx, g.c * x + g.d * y + g.ty) !== t0) return false;
     return true;
   };
+  if (print.kind === 'shapes') {
+    // the outlines of the motif itself (every outline of the print is a copy of one of them): a point of an edge, away
+    // from its ends, and the two points a millionth of a mark off it along the normal
+    const eps = EPS * shapeMark(print), polys = print.polys;
+    let verts = 0, done = 0;
+    for (const P of polys) verts += P.pts.length >> 1;
+    for (let i = 0; i < 80 * samples && done < 2 * samples; i++) {
+      let k = Math.floor(rnd() * verts), P = polys[0];
+      for (const Q of polys) { const n = Q.pts.length >> 1; P = Q; if (k < n) break; k -= n; }
+      const p = P.pts, n = p.length >> 1, j = k + 1 === n ? 0 : k + 1, u = 0.25 + 0.5 * rnd();
+      const ex = p[2 * j] - p[2 * k], ey = p[2 * j + 1] - p[2 * k + 1], l = Math.hypot(ex, ey);
+      if (!(l > 40 * eps)) continue;                                       // (an edge as short as the step: its ends are too near)
+      const x = p[2 * k] + u * ex, y = p[2 * k + 1] + u * ey, nx = (-ey / l) * eps, ny = (ex / l) * eps;
+      // either side of ONE outline: the two tones differ, and no other outline (a corner, a copy that touches) is nearer
+      if (print.tone(x + nx, y + ny) === print.tone(x - nx, y - ny)) continue;
+      if (print.margin(x + nx, y + ny) < 0.9 * eps || print.margin(x - nx, y - ny) < 0.9 * eps) continue;
+      done++;
+      if (!keeps(x + nx, y + ny) || !keeps(x - nx, y - ny)) return false;
+    }
+    return done >= samples;
+  }
   if (print.kind === 'linear') {
     const forms = print.forms.filter((f) => f[0] !== 0 || f[1] !== 0);
     for (const f of forms) {
@@ -400,21 +499,65 @@ function findRings(group) {
 
 // ---------------------------------------------------------------------------------------------------------------
 
+const warned = new Set();
+/**
+ * The print of a shape pattern (one of src/patterns/, or a registered one): the orbit of the motif its find gives; null
+ * (and one warning) when there is none — find threw, the motif cannot be read, or it breaks the rules (src/shapes.js
+ * printable; a design that is not finished: its copies cross or lie in each other, a polygon touches itself, ... —
+ * shown, it would have hairlines in 3D).
+ */
+function findShapes(group, key) {
+  const r = BUILT_IN.get(key) || registered.find((q) => q.meta.key === key);
+  if (!r) return null;
+  try {
+    const res = r.find(group);
+    if (!res || res.shapes == null) throw new Error('find(group) gave no { shapes }');
+    const print = makeShapePrint(group, { key, name: key, shapes: res.shapes, info: res.info });
+    const v = printable(print);
+    if (!v.ok) throw new Error(`the motif breaks the rules of a shape print: ${v.problems.slice(0, 2).join('; ')}${v.problems.length > 2 ? ` (and ${v.problems.length - 2} more)` : ''}`);
+    return print;
+  } catch (e) {
+    const why = String((e && e.message) || e).split('\n')[0];
+    const msg = `pattern.js: the pattern '${key}' has no print for the group ${group.id != null ? group.id : '(no id)'}: ${why}. The comma is shown instead, on the sheet.`;
+    if (!warned.has(msg)) { warned.add(msg); if (typeof console !== 'undefined' && console.warn) console.warn(msg); }
+    return null;
+  }
+}
+
 const cache = new WeakMap();
-/** The print `key` of a group ('checker' | 'rings'); null for 'comma' or an unknown key. Cached per group. */
+/**
+ * The print `key` of a group: the checkerboard, the rings, or a shape pattern's (Paisley, Soft commas, Tomoe, the
+ * Comma: src/patterns/; or a registered one); null for an unknown key (SHEET_PATTERN too) and for a shape pattern whose
+ * find threw, gave a motif that cannot be used (makeShapePrint throws: no polygon, a point that is no number) or one
+ * that breaks the rules of a shape print (src/shapes.js printable: validateShapes with the gap the 3D texture holds;
+ * GAP_MIN, the wider gap of a finished design, is the kit's) — console.warn says so, once. Cached per group: the same
+ * object every time. The first ask for a shape print runs its find, makeShapePrint and printable (1 to 16 ms in Chrome
+ * on the mini, Soft commas' the most; Paisley draws a table since 15 Nov): the page asks for the other groups' while it
+ * is idle (src/patterns/warm.js).
+ */
 export function printFor(group, key) {
   const k = resolvePattern(key);
-  if (!group || !k || k === 'comma') return null;
+  if (!group || !k) return null;
   let m = cache.get(group);
-  if (!m) { m = {}; cache.set(group, m); }
-  if (!(k in m)) m[k] = (k === 'checker' ? findChecker(group) : findRings(group)) || null;
-  return m[k];
+  if (!m) { m = new Map(); cache.set(group, m); }
+  if (!m.has(k)) m.set(k, (k === 'checker' ? findChecker(group) : k === 'rings' ? findRings(group) : findShapes(group, k)) || null);
+  return m.get(k);
+}
+
+/** Has printFor(group, key) been asked already, so that asking again costs nothing? (an unknown key: true, it is null) */
+export function printCached(group, key) {
+  const k = resolvePattern(key);
+  if (!group || !k) return true;
+  const m = cache.get(group);
+  return !!m && m.has(k);
 }
 
 /**
- * What the renderer's fragment shader needs (render3d.js): { mode: 1 | 2, L: Float32Array(9), A: Float32Array(4),
+ * What the renderer's fragment shader needs (render3d.js): { mode: 1 | 2 | 3, L: Float32Array(9), A: Float32Array(4),
  * I: Float32Array(4), O: Float32Array(3) }. mode 1: L holds the three forms (a form that is not used is [0, 0, 0.5]: its
- * factor is then 1). mode 2: A = (a, b), I = the rows of [a b]^-1, O = (origin, 1 / width).
+ * factor is then 1). mode 2: A = (a, b), I = the rows of [a b]^-1, O = (origin, 1 / width). mode 3 (a shape print):
+ * tex = the print's distance texture (src/shapes.js bakeShapes: baked at the first call, the SAME object after that, so
+ * the renderer uploads it once), A = the texture's cell (e1, e2), I = the rows of [e1 e2]^-1, O = (origin, range).
  */
 export function printUniforms(print) {
   const L = new Float32Array(9), A = new Float32Array(4), I = new Float32Array(4), O = new Float32Array(3);
@@ -422,6 +565,13 @@ export function printUniforms(print) {
   if (print.kind === 'linear') {
     print.forms.forEach((f, k) => { const used = f[0] !== 0 || f[1] !== 0; L[3 * k] = f[0]; L[3 * k + 1] = f[1]; L[3 * k + 2] = used ? f[2] : 0.5; });
     return { mode: 1, L, A, I, O };
+  }
+  if (print.kind === 'shapes') {
+    const tex = bakeShapes(print), e1 = tex.e1, e2 = tex.e2, d = e1[0] * e2[1] - e1[1] * e2[0];
+    A.set([e1[0], e1[1], e2[0], e2[1]]);
+    I.set([e2[1] / d, -e2[0] / d, -e1[1] / d, e1[0] / d]);
+    O.set([tex.origin[0], tex.origin[1], tex.range]);
+    return { mode: 3, L, A, I, O, tex };
   }
   A.set([print.a[0], print.a[1], print.b[0], print.b[1]]); I.set(print.inv);
   O.set([print.origin[0], print.origin[1], 1 / print.width]);
@@ -440,10 +590,14 @@ const RING_SEGMENTS = 56;
  *                           on its way, which also turns and flips), so the box is given in the print's own coordinates
  * The caller clips (to the pane, to a tile). Linear prints: every band of every family in one path, filled by the
  * even-odd rule (a point is dark when it lies in an odd number of bands). Rings: the rings of each centre, clipped to
- * that centre's own cell of the plane (the points nearer to it than to any other centre).
+ * that centre's own cell of the plane (the points nearer to it than to any other centre). Shape prints: every copy of
+ * the motif that can touch the box in ONE path, filled by the NONZERO rule (src/shapes.js fillShapes); tol > 0: the
+ * motif's outline simplified to within tol world units (the plane: a quarter of a device pixel). Linear prints and rings
+ * ignore tol.
  */
-export function fillPrint(c, print, map, box, fillStyle) {
+export function fillPrint(c, print, map, box, fillStyle, tol = 0) {
   if (!print) return;
+  if (print.kind === 'shapes') { fillShapes(c, print, map, box, fillStyle, tol); return; }
   const o = [0, 0];
   const moveTo = (x, y) => { map(x, y, o); c.moveTo(o[0], o[1]); }, lineTo = (x, y) => { map(x, y, o); c.lineTo(o[0], o[1]); };
   const [x0, y0, x1, y1] = box, R = Math.hypot(x1 - x0, y1 - y0) + 1e-9, mx = (x0 + x1) / 2, my = (y0 + y1) / 2;

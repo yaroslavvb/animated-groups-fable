@@ -24,15 +24,29 @@
 // Wavy slider's change), so a still picture is always the full mesh.
 // fold.mesh is drawn with the pattern's one big comma filled into the sheet (motifTintMesh: tint bit 1, the
 // renderer's `fill` colour MOTIF_FILL_3D), for every fold (qa/fill-judge.md; see the note above CREASE_SAMPLES) —
-// when the pattern is 'comma'.
+// on the sheet (pattern.js SHEET_PATTERN: no print; since 14 Nov 2026 the Comma of the selector is a print).
 //
 // THE PATTERN (13 Nov 2026; the owner: "use the Checkerboard choice … I want more of the surface to be covered with
 // pattern … Maybe add a selector at the top which allows me to pick different patterns"). state.pattern is a key of
-// pattern.js PATTERNS: 'checker' (the default), 'rings', 'comma'. A print ('checker', 'rings') is a two-tone pattern
-// of the plane that the group leaves as it is: the plane shows it everywhere (setScene({ print })), the 3D sheet
-// carries it as paper does, front teal and back sand, nearly opaque (the renderer evaluates it per pixel at each
-// vertex's paper point: setSurface({ uv }), setStyle({ print })); no comma is drawn then. 'comma' is the picture as it
-// was: one comma per tile on a translucent sheet. The hash carries it as pat=<key> when it is not the default.
+// pattern.js allPatterns(): since 14 Nov 2026 (the pattern round, SPEC 11) 'paisley' (the default), 'soft', 'tomoe',
+// 'checker', 'rings', 'comma', and any shape pattern a dev page registered (pattern.js registerPattern). Every one of
+// them is a PRINT: a two-tone pattern of the plane that the group leaves as it is: the plane shows it everywhere
+// (setScene({ print })), the 3D sheet carries it as paper does, front teal and back sand, nearly opaque (the renderer
+// evaluates it per pixel at each vertex's paper point: setSurface({ uv }), setStyle({ print }); a shape print — Paisley,
+// Soft commas, Tomoe and the Comma — through its distance texture, which printUniforms bakes once); no comma is cut into
+// the sheet then. The Comma is the page's own comma printed on the paper (src/patterns/comma.js; the owner's page comment
+// 88289462 of 13 Nov: "reuse the two different shades from "checkerboard" pattern for all patterns"). The picture before
+// the prints — one comma per tile cut into a translucent sheet — is pattern.js SHEET_PATTERN: buildScene's own default
+// (its tests were written for it), and what a pattern without a print for a group shows there (printFor: null, with a
+// warning), so a design that fails is seen. The hash carries the pattern as pat=<key> when it is not the default.
+// #app[data-pattern] is the key; #app[data-print] the kind of the print on screen ('linear', 'rings', 'shapes'), absent
+// under the sheet. A group change finds the shape print of the new group made already: once the page is idle, the
+// current pattern's prints of the other groups are made one group per idle slot (src/patterns/warm.js; never in the
+// middle of a gesture, dropped at once when the pattern changes, nothing while the page is hidden).
+// A shape pattern of a dev page is registered BEFORE this module runs (it starts itself when it is imported, and reads
+// the address then): the page's entry imports the module that registers the designs first, as dev/patterns/app.html
+// does. A pat= that names no pattern at the start is dropped and the address rewritten; a pattern registered later
+// joins the select at the next syncPattern (a group, a cut or a pattern chosen).
 //
 // RE-CUT FIRST (13 Nov 2026; the owner: "for the motion use 'Re-cut first' in the cases where there is a
 // self-intersection of the surface"). The app asks the folds for it (createFold({ recut: true }); src/folds/recut.js):
@@ -45,7 +59,7 @@
 //
 // The URL (SPEC 7, URL state contract). The whole visible state lives in the hash:
 //   #g=<id>&pat=<pattern>&cut=<preset>&seed=<x>/<y>&wavy=<0..1>&t=<0..1>&view=<az>/<el>/<zoom>[/<roll>]
-// g always; the others only when they differ from their defaults (pat checker, cut 0, no seed, wavy 0, t 0, view 0/55/1/0). The id
+// g always; the others only when they differ from their defaults (pat paisley, cut 0, no seed, wavy 0, t 0, view 0/55/1/0). The id
 // has * written %2A (#g=%2A632); seed (straight coordinates, 4 decimals) only when the cut was dragged away from the
 // preset — cut still names the preset whose metric and anchor apply; t 3 decimals, wavy 2, az / el / roll 1, zoom 2.
 // roll (an addition: the trackball turns freely, so az / el alone would lose the view's turn about the line of sight)
@@ -70,8 +84,9 @@
 // window.__folding — for tools/qa-matrix.mjs and tools/shot.mjs. Every setter applies at once, draws both panes
 // before it returns, and returns getState():
 //   setGroup(id)   setPreset(i)   setSeed(x, y)   setAmp(a)   setT(t)   setView(az, el[, zoom])   getState()
-//   setPattern(key)   (getState().pattern, .print: the print's name or null, .recut: null or { home, pieces, movers,
-//                  tau0 }, .foldCaption: the words over the fold pane)
+//   setPattern(key)   (getState().pattern, .print: the print's name or null, .printKind, .recut: null or { home,
+//                  pieces, movers, tau0 }, .foldCaption: the words over the fold pane, .warm: the idle making of the
+//                  other groups' prints, src/patterns/warm.js state())
 //                  (getState().anchor = the anchor the folds are given; .cut = the preset whose anchor applies;
 //                  .view = { az, el, zoom, roll, gliding } as shown now, gliding = the zoom is on its way back to 1
 //                  after a group change; .url = the hash this state writes; .hash = the hash the address has now,
@@ -88,7 +103,8 @@ import { apply, inverse } from './geom.js';
 import { makeWarp, buildDomain } from './domain.js';
 import { buildMesh } from './mesh.js';
 import { createFold, foldMeshOptions, foldOptions } from './folds/index.js';
-import { PATTERNS, DEFAULT_PATTERN, resolvePattern, printFor, printUniforms } from './pattern.js';
+import { allPatterns, DEFAULT_PATTERN, SHEET_PATTERN, resolvePattern, printFor, printCached, printUniforms } from './pattern.js';
+import { createWarmer, idleScheduler } from './patterns/warm.js';
 import { createRenderer, viewFromAzEl } from './render3d.js';
 import { createPlaneView, assignEdgeColors, CAPTION_SMALL } from './plane.js';
 import { motifFor, motifInTile, motifTintMesh } from './motif.js';
@@ -204,7 +220,7 @@ export function encodeGroupId(id) { return String(id).replace(/\*/g, '%2A'); }
 
 /**
  * The hash of a state u = { g, pat, cut, seed: [x, y] | null, wavy, t, view: { az, el, zoom, roll } | null }:
- * '#g=<id>' and every other key whose rounded value is not its default (pat: a key of pattern.js PATTERNS, written
+ * '#g=<id>' and every other key whose rounded value is not its default (pat: a key of pattern.js allPatterns(), written
  * when it is not DEFAULT_PATTERN; a missing or unknown one is not written). Always matches WRAPPER_HASH.
  */
 export function encodeHash(u) {
@@ -522,23 +538,26 @@ function warpFor(group, amp) {
  *                the triangles, the SAME boundary samples), and a roll fold keeps it (density: false) instead of
  *                building a finer one. scene.draft says so. The still picture is always built without it.
  *   prevDomain   the previous tile of the SAME group, or null: its seams keep their colours (plane.js assignEdgeColors)
- *   pattern      a key of pattern.js PATTERNS. 'comma' (the default HERE, the picture as it was before the prints, which
- *                the tests of the pure half were written for): the comma is cut into the mesh and its outline drawn.
- *                'checker' | 'rings' (the app's default is 'checker'): scene.print is the group's print, no comma.
+ *   pattern      a key of pattern.js allPatterns() — 'paisley' (the app's default), 'soft', 'tomoe', 'checker', 'rings',
+ *                'comma', a registered shape pattern: scene.print is the group's print, no comma is cut into the mesh —
+ *                or pattern.js SHEET_PATTERN, 'sheet' (the default HERE: the picture as it was before the prints, which
+ *                the tests of the pure half were written for): the comma of motif.js is cut into the mesh and its
+ *                outline drawn. A pattern without a print for this group, and a key that names none: the sheet too
+ *                (scene.pattern stays the key asked for when it is one).
  *   recut        true (the default, as the app asks): xx and 22x re-cut first (src/folds/recut.js); false: the fold
  *                module's own motion for every tile.
  */
-export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false, pattern = 'comma', recut = true } = {}, prevDomain = null) {
+export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false, pattern = SHEET_PATTERN, recut = true } = {}, prevDomain = null) {
   const domain = buildDomain(group, { seed, metric, warp: warpFor(group, clamp01(amp)) });
   assignEdgeColors(domain, prevDomain && prevDomain.group === group ? prevDomain : null);
   draft = draft === true && group.fold !== 'snowflake';
   const tileMesh = group.fold === 'snowflake' ? null : buildMesh(group, domain, { ...foldMeshOptions(group), draft });
   const foldOpts = foldOptions(draft ? { anchor, density: false } : { anchor });
   const fold = createFold(group, domain, tileMesh, recut ? { ...foldOpts, recut: true } : foldOpts);
-  const patternKey = resolvePattern(pattern) || 'comma';
-  const print = printFor(group, patternKey);
+  const patternKey = (pattern !== SHEET_PATTERN && resolvePattern(pattern)) || SHEET_PATTERN;
+  const print = patternKey === SHEET_PATTERN ? null : printFor(group, patternKey);
   const comma = !print;
-  // the comma filled (tint bit 1, the renderer's `fill`: MOTIF_FILL_3D), every fold — when the pattern is the comma
+  // the comma filled (tint bit 1, the renderer's `fill`: MOTIF_FILL_3D), every fold — on the sheet (no print)
   if (comma) fold.mesh = motifTintMesh(group, fold.mesh, motifFor(group)) || fold.mesh;
   const M = fold.mesh;                         // the mesh to draw: NOT always the tile mesh (see src/folds/index.js)
   const n = M.n, cellOf = M.cell;
@@ -972,6 +991,24 @@ function start(doc, win) {
   });
   const picker = createHassePicker({ mount: el.pickerMount, groups: GROUPS, onPick: (id) => { setGroup(id); flushHash(); } });
 
+  // ---- the prints of the other groups, made while the page is idle (14 Nov 2026; src/patterns/warm.js) -------------
+  // A shape print's find runs when a group first shows it (1 to 16 ms in Chrome); once the page is idle the current
+  // pattern's prints of the other 16 groups are made, one group per idle slot (requestIdleCallback; Safari: a chain of
+  // short timeouts), never within QUIET_MS of an input or a frame, never in a slot shorter than the pattern's longest
+  // print so far; another pattern drops the queue at once. rebuild() tells the warmer what is shown; every input and
+  // every drawn frame pokes it. A hidden page (another tab in front) makes nothing; shown again, it goes on (15 Nov).
+  const idleSlots = idleScheduler(win);
+  const warmer = createWarmer({
+    ids: GROUPS.map((g) => g.id),
+    prepare: (id, key) => { printFor(BY_ID[id], key); },
+    ready: (id, key) => printCached(BY_ID[id], key),
+    idle: idleSlots.idle, cancel: idleSlots.cancel, now: () => win.performance.now(), longest: idleSlots.longest,
+    hidden: () => doc.hidden === true,
+  });
+  const poke = () => warmer.poke();
+  for (const type of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart']) doc.addEventListener(type, poke, { capture: true, passive: true });
+  doc.addEventListener('visibilitychange', () => { if (doc.hidden !== true && state.groupId) warmer.warm(state.pattern, state.groupId); });
+
   // ---- the replication step (10 Nov 2026, qa/rep-judge.md; src/replicate.js, plane.js renderTiling) -------------
   // state.tile = u in [0, 1]: how far the copies of the tile have been made (1 = the tiling as always). It has its own
   // timeline (the scrubber in the plane's bar, magnets at the end of every layer; Space stays with Fold) and its own
@@ -1004,7 +1041,7 @@ function start(doc, win) {
   function tileOpen() { return tilePlaying() || state.tile < 1 - 1e-4; }
   function stopFade() { if (fadeRaf) { win.cancelAnimationFrame(fadeRaf); fadeRaf = 0; } tileFade = 0; }
   function tilePlaying() { return !!fadeRaf || (tileTL ? tileTL.isPlaying() : false); }
-  function showTile() { P.setTiling(state.tile, tileFade); P.render(); syncTileBar(); }
+  function showTile() { poke(); P.setTiling(state.tile, tileFade); P.render(); syncTileBar(); }
   function syncTileButton() {
     if (!tileEl.btn) return;
     const playing = tilePlaying();
@@ -1098,6 +1135,7 @@ function start(doc, win) {
   function drawFold(immediate, fresh = false) {
     if (!scene) return;
     counters.draws++;
+    poke();                                                     // (a frame: the idle making of prints waits)
     try {
       mapScene(scene, state.t);
       // the surface colours follow t: a tile whose paper turns over swaps front and back while it does (C3). A print
@@ -1179,7 +1217,10 @@ function start(doc, win) {
     } catch (e) { report(`building ${group.id} for the seed ${state.seed}`, e); return false; }
     scene = next;
     counters.rebuilds++;
+    poke();
+    warmer.warm(state.pattern, state.groupId);                 // (the other groups' prints of this pattern, when idle)
     syncFeatures();
+    syncPattern();                                             // (#app[data-print]: the new scene's print, or none)
     // (a tile whose paper ends up turned over: the surface colours follow t, see drawFold)
     timeline.setStops(scene.stops);
     timeline.setDuration(scene.duration);
@@ -1212,13 +1253,26 @@ function start(doc, win) {
     const speaks = own && !f.includes('recut') && foldSpeaks(scene.fold);
     if (el.app.hasAttribute('data-words') !== speaks) el.app.toggleAttribute('data-words', speaks);
   }
-  /** The selector shows the pattern; #app[data-pattern] names it (the legend and the swatch read it). */
+  /** The selector lists every pattern (pattern.js allPatterns(): the page's own and the registered ones, also one
+   *  that was registered after the page started) and shows the current one; #app[data-pattern] names it (the legend
+   *  and the swatch read it), #app[data-print] says what kind of print the scene has (absent: the comma). */
   function syncPattern() {
     if (el.app.getAttribute('data-pattern') !== state.pattern) el.app.setAttribute('data-pattern', state.pattern);
-    if (patEl.select && patEl.select.value !== state.pattern) patEl.select.value = state.pattern;
-    const P0 = PATTERNS.find((q) => q.key === state.pattern);
+    const all = allPatterns();
+    if (patEl.select) {
+      const opts = patEl.select.options;
+      if (!opts || opts.length !== all.length) {
+        const have = new Set(Array.from(opts || [], (o) => o.value));
+        for (const q of all) if (!have.has(q.key)) { const o = doc.createElement('option'); o.value = q.key; o.textContent = q.label; patEl.select.appendChild(o); }
+      }
+      if (patEl.select.value !== state.pattern) patEl.select.value = state.pattern;
+    }
+    const P0 = all.find((q) => q.key === state.pattern);
     if (patEl.label && P0 && patEl.label.textContent !== P0.label) patEl.label.textContent = P0.label;
-    if (patEl.box && P0) patEl.box.title = 'Pattern: ' + P0.label + ' — ' + P0.hint;
+    if (patEl.box && P0) patEl.box.title = 'Pattern: ' + P0.label + (P0.hint ? ' — ' + P0.hint : '');
+    const kind = scene && scene.print ? scene.print.kind : null;
+    if (kind === null) { if (el.app.hasAttribute('data-print')) el.app.removeAttribute('data-print'); }
+    else if (el.app.getAttribute('data-print') !== kind) el.app.setAttribute('data-print', kind);
   }
   function fillShell(group) {
     el.chipSymbol.textContent = group.label;
@@ -1480,8 +1534,9 @@ function start(doc, win) {
       frame: scene && scene.frame ? { center: scene.frame.center.slice(), radius: scene.frame.radius } : null,
       mirrored: !!(scene && scene.fold.mirrored === true), surfaceMix: scene ? surfaceMix(scene.fold, state.t) : 0,
       draft: !!(scene && scene.draft),
-      // the pattern (pattern.js): its key, the print's name ('checks', 'triangles', 'hexagons', 'stripes', 'rings') or null
-      pattern: state.pattern, print: scene && scene.print ? scene.print.name : null,
+      // the pattern (pattern.js): its key, the print's name ('checks', 'triangles', 'hexagons', 'stripes', 'rings'; a
+      // shape pattern's key) or null, and the print's kind ('linear', 'rings', 'shapes') or null
+      pattern: state.pattern, print: scene && scene.print ? scene.print.name : null, printKind: scene && scene.print ? scene.print.kind : null,
       // re-cut first (src/folds/recut.js): null, or the home tile's name, the pieces and when the fold itself begins
       recut: scene && scene.fold.recut && scene.fold.recut.movers > 0
         ? { home: scene.fold.recut.home.name, pieces: scene.fold.recut.pieces.map((q) => ({ type: q.type, share: q.area / scene.group.domainArea, from: q.from, to: q.to })), movers: scene.fold.recut.movers, tau0: scene.fold.recut.tau0 }
@@ -1493,6 +1548,8 @@ function start(doc, win) {
       tileFrame: P.getStepFrame ? P.getStepFrame().mix : 0,
       view: viewAngles(), webgl: R.ok !== false, url, hash: currentHash(),
       pickerOpen: picker.isOpen(), errors: errors.length,
+      // the idle making of the other groups' prints of this pattern (src/patterns/warm.js): { key, left, made, ms, maxMs, … }
+      warm: warmer.state(),
     };
   }
 
@@ -1529,12 +1586,8 @@ function start(doc, win) {
     flushHash();
   });
   el.scrubber.addEventListener('change', () => { flushHash(); });
-  if (patEl.select) {
-    if (!patEl.select.options || !patEl.select.options.length) {
-      for (const q of PATTERNS) { const o = doc.createElement('option'); o.value = q.key; o.textContent = q.label; patEl.select.appendChild(o); }
-    }
-    patEl.select.addEventListener('change', () => { setPattern(patEl.select.value); flushHash(); });
-  }
+  // (the select's options: syncPattern — the shell's own three, and one for every pattern that was registered)
+  if (patEl.select) patEl.select.addEventListener('change', () => { setPattern(patEl.select.value); flushHash(); });
   el.chip.addEventListener('click', () => picker.open(state.groupId));
   el.resetView.addEventListener('click', () => { stopZoomHome(); turnFrom = null; R.resetView(); });
 
@@ -1545,6 +1598,7 @@ function start(doc, win) {
   el.foldCanvas.addEventListener('keydown', handOn, { capture: true, passive: true });
   for (const type of ['pointerup', 'pointercancel']) el.foldCanvas.addEventListener(type, () => { flushHash(); });
   R.onChange(() => {
+    poke();
     if (!turned && turnFrom && viewAngle(R.getView().q, turnFrom) > TURN_MIN_DEG) {
       turned = true; turnFrom = null;
       if (turnHint) turnHint.hidden = true;
@@ -1612,6 +1666,10 @@ function start(doc, win) {
     closePicker() { picker.close(); return picker.isOpen(); },
     flushHash() { lastPosted = null; writeHashNow(true); return getState(); },
     errors, counters, renderer: R, plane: P, timeline, picker,
+    /** The idle making of prints (src/patterns/warm.js). warmer.stop() holds only until the next group or pattern change,
+     *  or the page shown again after it was hidden (each starts it again): to time a change with nothing made ahead,
+     *  stop it after every change. */
+    warmer,
     scene: () => scene,
   };
   win.__folding = api;

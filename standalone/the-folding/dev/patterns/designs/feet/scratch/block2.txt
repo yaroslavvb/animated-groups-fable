@@ -1,0 +1,31 @@
+  const cap = Math.min(o.toeCap ?? K.toeCap, K.toeCapRel * 2 * fr.r);
+  let gap = K.gapToe, toes = place(cap, gap);
+  const most = (f, lo, hi) => {                  // the largest value in [lo, hi] at which the row still fits (it fits at lo)
+    let best = f(lo);
+    for (let it = 0; it < 28; it++) { const mid = (lo + hi) / 2, t = f(mid); if (t) { lo = mid; best = t; } else hi = mid; }
+    return [best, lo];
+  };
+  if (!toes) {                                   // the largest toes that fit
+    if (!place(0.02, gap)) return null;
+    [toes] = most((d) => place(d, gap), 0.02, cap);
+  } else if (!place(cap, K.gapToeWide)) {        // the capped toes leave a little room: spread them
+    [toes, gap] = most((g) => place(cap, g), gap, K.gapToeWide);
+  } else {                                       // a long front: wider gaps, and then bigger toes, until the row spans it
+    gap = K.gapToeWide;
+    const capHard = (o.toeCapHard ?? K.toeCapHard);
+    if (place(capHard, gap)) [toes, gap] = most((g) => place(capHard, g), gap, K.gapToeMax);
+    else [toes] = most((d) => place(d, gap), cap, capHard);
+  }
+  // each toe is an oval, longer across the front than along it; it grows toward the sole as far as the channel allows
+  const hp = [];
+  for (let i = 0; i < n; i++) { const p = frame[i], e = unit(sub(frame[(i + 1) % n], p)); hp.push({ e, nn: [e[1], -e[0]], c: e[1] * p[0] - e[0] * p[1] - delta }); }
+  const oval = toes.c.map((c, i) => {
+    const r = toes.r[i];
+    let k = toeLab[0], bd = Infinity;
+    for (const l of toeLab) { const d = Math.abs(hp[l].c - dot(hp[l].nn, c) - r); if (d < bd) { bd = d; k = l; } }
+    const ax = hp[k].nn, across = hp[k].e;
+    const fits = (b) => { const q = sub(c, mul(ax, b - r)); return hp.every((H) => dot(H.nn, q) + Math.hypot(r * dot(H.nn, across), b * dot(H.nn, ax)) - H.c < 1e-9); };
+    let b = r * K.toeLong[i];
+    if (!fits(b)) { let lo = r, hi = b; for (let it = 0; it < 12; it++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; } b = lo; }
+    return { c: sub(c, mul(ax, b - r)), r, b, ax, across };
+  });

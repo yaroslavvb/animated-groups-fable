@@ -1,0 +1,1076 @@
+[
+ [
+  "judge:design",
+  {
+   "lens": "Graphic design. I asked whether each print is bold and calm, and whether it stays one family across all 17 groups. I looked for even colour with clean channels, and for kinks, slivers or loose specks. Each print had to read at about 120 px a tile (sheet, phone) and at 600 px (zoom 3). The test was whether it looks deliberate beside a precise diagram on a white page with a teal accent, or like a programmer's test pattern. Scored from what I saw. For every design I read the sheet, zoom, app-t06 and app-t1 pictures. For the leading designs I also read the back, phone, tile and re-cut pictures. I made seven renders of my own on the mini, all in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-design/: close-ups of paisley, blobs, swell and ripple; tomoe with the third cut (cut 2), plane only; and fresh renders of hook and spiral from their current design.js.",
+   "scores": [
+    {
+     "key": "paisley",
+     "commaLike": 9,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 8,
+     "twoSides": 9,
+     "clean": 8,
+     "allGroups": 8,
+     "total": 84,
+     "best": "The only print that stays one family in all 17 groups. Every mark is a true comma, large and small, turned with the flow, so even *333, *442 and *632 read as handed commas rather than lace. Outlines are smooth at zoom 3, both sides read, and the closed *2222 pillow shows one big paisley.",
+     "worst": "*632 leaves a white pool at the 6-fold centre (bare 0.497). The smallest curls and their hooked tips shrink to specks on a phone. With 2-4 marks a tile it is busier than a single comma.",
+     "mustFix": [
+      "*632: fill the bare 6-fold centre (grow the commas at the centre or add one there)",
+      "find() took 108 ms for *632 and 90 ms for 4*2 in my proto run on the mini (proto flagged the 108). Bring it well under the kit's 100 ms, or cache it, before it becomes the default."
+     ]
+    },
+    {
+     "key": "blobs",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 8,
+     "allGroups": 6,
+     "total": 77,
+     "best": "In o, xx, 2222, 22x, 333 and 442 it is the most beautiful print of the round: big soft commas, exactly half dark, calm like a printed cloth. The level-set outlines are smooth, with no teeth at zoom 3. It reads well at phone size.",
+     "worst": "The kaleidoscopes turn into ornament: knobbed bones in *333, crosses in *442, radiating daggers in *632. In 632, six needle tails meet at the 6-fold centre in a starburst.",
+     "mustFix": [
+      "*333, *442, *632 and 3*3: one mark per chamber reads as bones and daggers. Blunt or shorten the tails, or fill the chamber with two smaller commas as paisley does.",
+      "632 and *632: keep the tail tips off the 6-fold centre"
+     ]
+    },
+    {
+     "key": "bigcomma",
+     "commaLike": 9,
+     "fills": 6,
+     "big": 8,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 72,
+     "best": "The magatama with a light eye, each tail nested in the next comma's hollow (2222, xx, 22x, *2222, 442). It is the most iconic single mark of the round, and the eye is a landmark that survives every fold, on the pillows and on the triangles.",
+     "worst": "Loose dark dots and bubbles of several sizes make a polka layer that fights the commas: two in **, rows in 22* and 2*22, froth in every kaleidoscope, plus a white eye in every head. *x is long thin wedges, and *2222 has a 0.53 bare patch.",
+     "mustFix": [
+      "Drop the loose dark dots, or make them one size and at most one per tile",
+      "*x: the long thin wedges do not read as commas",
+      "*2222: bare patch 0.53"
+     ]
+    },
+    {
+     "key": "tomoe",
+     "commaLike": 8,
+     "fills": 8,
+     "big": 9,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 6,
+     "total": 70,
+     "best": "Inside the default tile it is a perfect yin-yang with eyes (**, xx, 22x, *2222, 2*22). Folded, the pillows show one whole yin-yang, the clearest landmark of the round in 3D.",
+     "worst": "On the open plane the marks are tile-shaped halves with straight edges, keyholes and floating dots. The white grout redraws the default tiling, so any other cut shows two grids at once. The kaleidoscopes become a triangle mesh of keyholes, and *x is two slugs.",
+     "mustFix": [
+      "The white channel runs along the default tile's rim, so with another cut or a dragged seed the plane shows a second tiling. I checked o with Hexagon and 442 with Pentagon (judge-design/tomoe-cut2-plane.png). Take the channel off the tile's edges, or drop it where dark meets light.",
+      "Kaleidoscopes and *x: keyholes and slugs, no comma reads"
+     ]
+    },
+    {
+     "key": "mosaic",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 9,
+     "helpsFold": 6,
+     "twoSides": 6,
+     "clean": 7,
+     "allGroups": 8,
+     "total": 66,
+     "best": "One classic comma, whole, in every tile of all 17 groups, kaleidoscopes included. It is the steadiest group-reading of the round, and as clean as glazed tile.",
+     "worst": "It is a tile floor. The dark slabs take the default tile's shape, with white grout between them, and the comma is a light hole. So the print draws the default tiling, the closed shapes show a pale stretched blob, and the sand side is low in contrast.",
+     "mustFix": [
+      "The grout follows the default tile's rim, so any other cut shows a second tiling",
+      "The comma is a hole, so the dark tone reads as a frame rather than as the mark"
+     ]
+    },
+    {
+     "key": "ripple",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 6,
+     "allGroups": 6,
+     "total": 58,
+     "best": "A consistent koru family. Every mark is a comma with its echo band, so the whole plane carries the hand: the asymmetric cousin of the page's Rings.",
+     "worst": "Three contours a mark (comma, groove, band) make it twice as busy as a plain comma. At zoom 3 the band rims meet the cell borders in straight facets and spikes (333, 632). *x, 22* and 2*22 are rows of eye shapes, and in 3D the bands swamp the comma.",
+     "mustFix": [
+      "Round the band rims where they meet the cell borders, or end them at a channel (facets and spikes in 333 and 632)",
+      "In the fold the echo bands swamp the comma: use fewer or narrower bands"
+     ]
+    },
+    {
+     "key": "spiral",
+     "commaLike": 5,
+     "fills": 9,
+     "big": 6,
+     "helpsFold": 5,
+     "twoSides": 7,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 52,
+     "best": "The most even colour of the round: 49-58 % dark, no bare patch over 0.43, solid at most 0.32. Nobody can miss the hand.",
+     "worst": "A carved tile floor, not a comma. The slabs take the default tile's shape, with a pale groove that tapers to a hairline. The square groups (2222, *2222, 442) show square meanders, *x shows bars, and the grout makes a starburst at 632's 6-fold centre.",
+     "mustFix": [
+      "Give the arm a head, so it reads as a comma that winds rather than a groove in a slab",
+      "The grout redraws the default tiling",
+      "*x is bars"
+     ]
+    },
+    {
+     "key": "glyph",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 4,
+     "total": 50,
+     "best": "In o, **, xx, 22x and 442 there is a bold F one reads at once, turned or mirrored. It is the crystallographer's own motif, and it survives a phone.",
+     "worst": "In the mirror groups the F's pair into T, Y and H figures, and the field becomes a Greek-key fret or a maze. A loose square block beside each F (two in 2222) reads as a stray pixel. Being rectilinear, it clashes with the page's round shapes: dots, rings, commas.",
+     "mustFix": [
+      "The mirror groups (3*3, *333, 4*2, *442, *632, *x, 22*, 2*22, *2222) read as fret or combs, not letters",
+      "Attach or drop the loose square blocks"
+     ]
+    },
+    {
+     "key": "hook",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 4,
+     "total": 47,
+     "best": "In o, 2222 and 333, fat round-capped hooks nest like chevrons with even channels, bold and calm.",
+     "worst": "*x is plain stripes and 22* is brickwork. The kaleidoscopes are triangle rims inside triangles. ** is a U beside a loose dot that reads 'Ui'. The trimmed bends of xx, 22x and 442 leave accidental lumps (confirmed from the current design.js).",
+     "mustFix": [
+      "*x stripes and 22* bricks",
+      "Kaleidoscopes: rims along the chamber, not hooks",
+      "Lumpy trimmed bends in xx, 22x and 442",
+      "**: the loose dot"
+     ]
+    },
+    {
+     "key": "feet",
+     "commaLike": 6,
+     "fills": 6,
+     "big": 5,
+     "helpsFold": 7,
+     "twoSides": 7,
+     "clean": 4,
+     "allGroups": 4,
+     "total": 44,
+     "best": "In o, **, xx and 22x it is the textbook glide picture: a footprint everyone reads as left or right without thinking.",
+     "worst": "Big solid soles (solid disc up to 0.67) next to trails of toe specks give spotty, uneven colour. 2222 and 333 show paws, and the kaleidoscopes show wedge soles with toe ladders. It looks whimsical next to a precise diagram.",
+     "mustFix": [
+      "The toes are specks on a phone (the smallest is about 0.05 tile): use fewer, bigger toes",
+      "The sole is too big a solid (0.67)",
+      "Kaleidoscopes: wedges with toe ladders"
+     ]
+    },
+    {
+     "key": "swell",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 3,
+     "allGroups": 4,
+     "total": 42,
+     "best": "In 333, 442 and 632, fat running whirls with white rivers between them make a lively field.",
+     "worst": "The outlines are ragged from the contour extraction, confirmed at zoom 3: teeth along 3*3's mirror, bumps on 22*'s rims, a drip in **. It has two channel weights. ** is potatoes, *x is stripes, and *2222, 2*22 and the kaleidoscopes are amoeba camouflage.",
+     "mustFix": [
+      "Smooth the extracted outlines: the teeth, bumps and drips show at 600 px",
+      "Use one channel width across all groups",
+      "**, *x and the kaleidoscopes: no comma reads"
+     ]
+    }
+   ],
+   "ranking": [
+    "paisley",
+    "blobs",
+    "bigcomma",
+    "tomoe",
+    "mosaic",
+    "ripple",
+    "spiral",
+    "glyph",
+    "hook",
+    "feet",
+    "swell"
+   ],
+   "shipSet": [
+    "paisley",
+    "blobs",
+    "tomoe"
+   ],
+   "shipWhy": "Three different characters rather than three takes on one look.\n- Paisley is the comma cloth: several commas a tile, every one handed. It is the only print whose worst group still reads as commas, so it is the safe answer to the ask and the right default.\n- Soft commas (blobs) is one bold, calm comma per tile. It is the most beautiful print in the rotation and glide groups, and much quieter than paisley, for a viewer who wants big marks.\n- Tomoe is the interlocking taijitu with eyes, with no background. Its folded pillows show one whole yin-yang, the best landmark for following the tile into 3D.\nbigcomma is the strongest single mark of the round, but beside paisley and blobs it would be a third version of \"teal commas on white\". Mosaic shares tomoe's grout flaw without its interlock. Ripple would be the only reason to grow the set to four, as an asymmetric Rings, but it is weak in the fold. Blobs ships only with its kaleidoscope fix, and tomoe only with its grout fix.",
+   "newDefault": "paisley",
+   "notes": "1. Recurring flaw: some prints draw a tiling. Tomoe, mosaic and spiral, and ripple's cells more softly, run a white channel along the default tile's rim, so the plane prints the default tiling. With any other cut, or a dragged seed, the plane shows two grids, and the grout competes with the cut lines on a page whose whole point is choosing the cut. Seen in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-design/tomoe-cut2-plane.png (o Hexagon, 2222, 442 Pentagon) and in the xx Hexagon and 22x Bowl re-cut pictures of tomoe and mosaic. The checkerboard avoids this because its marks are small and sit on the group's lattice.\n\n2. The kaleidoscopes (*333, *442, *632, 3*3, 4*2) are the shared weak spot. With one mark per chamber, every design becomes lace, bones, frets, rims or froth there. Paisley's several commas per chamber is the only approach that keeps commas. Worth merging into blobs or bigcomma for those groups.\n\n3. Loose small pieces read as noise wherever they occur: bigcomma's dots and bubbles, glyph's square blocks, hook's dot in **, feet's toe specks, tomoe's floating dots. A kit rule would lift several designs at once, for example no free piece under about 0.1 tile, and at most one a tile.\n\n4. Merge worth trying: bigcomma's light eye in the head of paisley's or blobs' big comma. In the folded shapes the eye was the best landmark of the round.\n\n5. Edge quality checked at zoom 3 (judge-design/*-close.png). Swell's outlines are ragged: teeth along 3*3's mirror, bumps in 22*, a drip in **. Blobs' level sets are smooth. Ripple's band rims have straight facets and spikes where they meet the cell borders. Paisley's outlines are smooth.\n\n6. Timing: in my proto run, paisley's find() took 108 ms for *632 and 90 ms for 4*2 on the mini, and proto flagged the 108. Its own report gives a maximum of 92 ms. Fix this before it becomes the default.\n\n7. Freshness: the design.js of spiral, swell, blobs and hook is 1-2 minutes newer than their pictures. My renders from the current files of hook (xx, 22x, 442, **), spiral (o, *x, 632, *442), blobs and swell match the stored pictures, with the same vertex counts where shown. No picture was missing.\n\n8. No tool failed or misled me: proto.mjs and app-sheet.mjs ran first time on every call. I changed no file of any design or of W. My renders are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-design/ and my working notes are in /Users/yaroslavvb/.ctmp/claude-501/-Users-yaroslavvb-git-animated-groups-fable/cc3b1316-130e-516c-9006-dc6da49f820b/scratchpad/judge-notes.txt"
+  }
+ ],
+ [
+  "judge:owner",
+  {
+   "lens": "The owner, read literally: a mathematician who wants a mark like the comma (big, with a direction and a hand) that fills the paper, printed teal on the front and sand on the back, and that lets him follow the tile into its fold. A mark that is not a comma, or paper left bare, both miss what he asked for.",
+   "scores": [
+    {
+     "key": "blobs",
+     "commaLike": 8,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 8,
+     "allGroups": 6,
+     "total": 80,
+     "best": "o, xx, 22x, 2222, 442, 333: one big soft comma per tile, exactly half the paper dark. The hand and the glide's flip show at a glance, it is calm, and it has the fewest points and no thin parts. It is the page's comma, swollen.",
+     "worst": "*632, *442, *333, 3*3: the comma fuses with its mirror images into spikes, birds and propellers, which read as ornament rather than commas. 2*22 and 4*2 keep bare bands of 0.5.",
+     "mustFix": []
+    },
+    {
+     "key": "paisley",
+     "commaLike": 8,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 8,
+     "twoSides": 7,
+     "clean": 6,
+     "allGroups": 7,
+     "total": 76,
+     "best": "The only design that stays commas in the kaleidoscopes: every chamber of *333, *442 and *632 holds a big comma and smaller ones, each with its own curl. The extra marks give the tile's corners landmarks on the closed pillow and torus.",
+     "worst": "Busy: a paisley cloth, not a quiet page. *632 is 43 % dark with a bare 6-fold point (0.497), and two to four commas per tile break the 'one comma = one tile' reading.",
+     "mustFix": []
+    },
+    {
+     "key": "tomoe",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 70,
+     "best": "o, 2222, xx, 22x, 333, 442: a whole taijitu in the default tile, with no background. The eyes are landmarks you find again on the closed cross-cap, on 632 and on *442.",
+     "worst": "*333, *442, *632, 3*3: the dark comma is the chamber itself, a dark triangle with a light keyhole, so the kaleidoscopes look like a checkerboard of triangles again. *x is two slugs.",
+     "mustFix": [
+      "The straight white channels on the rim of its Dirichlet tile (o, 2222, 333, 442, 632) draw the default tile on the paper. They stay put when the cut is dragged and read as a second cut, so bend or close them."
+     ]
+    },
+    {
+     "key": "bigcomma",
+     "commaLike": 7,
+     "fills": 6,
+     "big": 7,
+     "helpsFold": 7,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 5,
+     "total": 64,
+     "best": "2222, **, xx, 22x: one big comma with a light eye, its tail nested in the next one's hollow with an even channel. It is the taijitu half, and the eye is a landmark in 3D.",
+     "worst": "In the mirror groups it is drops with eyes plus loose round bubbles (dots have no hand) scattered in about ten groups. *2222 is still bare at 0.53 and *x is a needle comet.",
+     "mustFix": [
+      "Needle tails: THIN in all 17 groups (10.3 to 11.1 texels). Round the tips to 1.5 texels.",
+      "Remove the loose bubbles, or make them small commas."
+     ]
+    },
+    {
+     "key": "mosaic",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 4,
+     "twoSides": 7,
+     "clean": 7,
+     "allGroups": 6,
+     "total": 55,
+     "best": "Flat, it is the clearest classic comma of the round: one big light comma inlaid in every tile of all 17 groups, visibly turning, gliding and mirroring.",
+     "worst": "It is a tiled floor, which is what he called 'the tiling one'. The dark slabs and the grout between them are the default tile, so the print draws a cut that stays when the cut is dragged. The grout doubles the seams of the closed torus and pillow, and the fold shows one pale blob on dark paper.",
+     "mustFix": [
+      "The dark ground must not be the default tile: as it is, the grout draws one particular cut on the paper.",
+      "More than one mark per tile on the closed shapes."
+     ]
+    },
+    {
+     "key": "swell",
+     "commaLike": 6,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 4,
+     "allGroups": 4,
+     "total": 50,
+     "best": "3*3, 333, 2222: fat interlocking commas whirl round the centres with white channels between them.",
+     "worst": "*333, *442, *632 are busy lace with wobbly marching-squares outlines and no single comma. *x is long slugs, and the family uses two channel weights.",
+     "mustFix": [
+      "The kaleidoscopes need a comma, not lace.",
+      "Smooth the wobble out of the outlines."
+     ]
+    },
+    {
+     "key": "ripple",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 5,
+     "helpsFold": 4,
+     "twoSides": 6,
+     "clean": 4,
+     "allGroups": 6,
+     "total": 47,
+     "best": "*442, *333, *2222: a comma with one echo band fills each chamber, so even the kaleidoscopes keep a handed mark.",
+     "worst": "Everywhere it reads as contour lines. In 3D the echo bands take over (the torus, pillow and cross-cap are striped), and *x is a chain of rings.",
+     "mustFix": [
+      "THIN in all 17 groups, 18 to 49 texels, as bad as today's comma: its bands and necks break up in the 3D texture. Its critic finished before this check existed."
+     ]
+    },
+    {
+     "key": "glyph",
+     "commaLike": 5,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 3,
+     "total": 42,
+     "best": "o, xx, 22x, 442: one bold F per tile that reads backwards across a glide. It is the crystallographer's own motif and unmistakable.",
+     "worst": "In nine mirror groups no letter can be read: *632, *442, *333, 3*3 and 4*2 are a Greek-key fret, and *x, 22* and 2*22 are rows of combs. And it is not a comma.",
+     "mustFix": [
+      "The mirror groups must show a letter, not fret."
+     ]
+    },
+    {
+     "key": "feet",
+     "commaLike": 5,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 5,
+     "twoSides": 7,
+     "clean": 4,
+     "allGroups": 3,
+     "total": 38,
+     "best": "**, xx, *x: left and right footprints, the textbook picture of a mirror and a glide.",
+     "worst": "The triangle groups are wedges with ladders of toe dots along the mirrors, and 2222, 333, 442 and *2222 are paws. About a third of the selector shows no foot, and it is not a comma.",
+     "mustFix": [
+      "Feet in *333, *442, *632, 3*3 and 4*2, or leave the design out."
+     ]
+    },
+    {
+     "key": "spiral",
+     "commaLike": 4,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 4,
+     "twoSides": 6,
+     "clean": 5,
+     "allGroups": 4,
+     "total": 33,
+     "best": "2222, 442: one fiddlehead per tile with an unmistakable hand.",
+     "worst": "Tile-shaped slabs with a pale spiral groove: a carved floor that draws the default tile, a meander in *2222, a bar with a tiny curl in *x and starbursts in 632 and 3*3. The head is no bigger than the arm.",
+     "mustFix": [
+      "A comma's head and a silhouette that is not a slab (its critique's findings 1 and 2, not done).",
+      "THIN in 5 groups (333, 442, *333, 4*2, *442; 7 to 11 texels)."
+     ]
+    },
+    {
+     "key": "hook",
+     "commaLike": 4,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 5,
+     "twoSides": 7,
+     "clean": 4,
+     "allGroups": 3,
+     "total": 30,
+     "best": "333, 442, 2222: bold J's in pinwheels, with a direction and a hand.",
+     "worst": "*333, *442 and *632 are triangles within triangles, *x is stripes, 22* is brickwork and *2222 is frames: a fret, not a comma.",
+     "mustFix": [
+      "The kaleidoscopes, *x and 22* need a mark, not a rim."
+     ]
+    }
+   ],
+   "ranking": [
+    "blobs",
+    "paisley",
+    "tomoe",
+    "bigcomma",
+    "mosaic",
+    "swell",
+    "ripple",
+    "glyph",
+    "feet",
+    "spiral",
+    "hook"
+   ],
+   "shipSet": [
+    "blobs",
+    "paisley",
+    "tomoe"
+   ],
+   "shipWhy": "These are three different answers to the one thing he asked for, a comma that fills the space.\n- Soft commas (blobs) is the comma itself swollen to half the paper, one per tile: calm and the closest to the page's comma, so it should be the default.\n- Paisley fills the gaps with smaller commas and is the only design that is still made of commas in the kaleidoscopes, so it covers blobs' weak groups.\n- Tomoe leaves no background at all: a dark and a light comma per tile, with eyes he can find again on the closed shape. It ships after its straight rim channels are bent (its mustFix).\n\nNone of the other eight both reads as a comma and fills in most groups. The F, the feet, the hooks and the spirals stop reading as a mark in the mirror groups. Bigcomma, mosaic, swell and ripple are weaker versions of these three, each with a defect still to fix.",
+   "newDefault": "blobs",
+   "notes": "1. Thin parts (THIN) were never checked for most designs. The THIN check (src/shapes.js thinParts at 1.5 texels of the 3D texture) arrived at 23:49, after the critics of ripple, bigcomma, paisley, glyph, spiral, feet, blobs and mosaic had finished. I ran it on all 11 designs in all 17 groups in node with /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-owner/thin-census.mjs; its numbers match app-sheet.mjs exactly (bigcomma o 10.8, ripple *442 35.5).\n- ripple: 17 of 17 groups, 18 to 49 texels, as bad as the page's comma.\n- bigcomma: 17 of 17, 10.3 to 11.1 texels (the tail tips).\n- spiral: 5 of 17, 7 to 11 texels.\n- The other eight: none.\nThe verdicts of ripple and bigcomma ('no validateShapes problem') never saw this check.\n\n2. Three prints draw the default tile: mosaic (grout around every tile), spiral (tile-shaped slabs) and tomoe (straight channels along the rim of its Dirichlet tile). The lines stay in the plane when the cut is dragged and look like a second cut; on the closed shapes they double the seams. Blobs, paisley, bigcomma, swell, ripple, glyph and feet do not do this.\n\n3. The common failure is the kaleidoscopes *333, *442 and *632 (and 3*3): one mark per chamber fuses with its mirror images into a rosette. Only paisley, with several commas per chamber, stays commas there. A merge worth trying later: blobs as it is, plus paisley's smaller second comma only in those four groups.\n\n4. Bigcomma sits between blobs and tomoe (blobs plus an eye), so do not ship it beside them. If an eye is wanted, add tomoe's or bigcomma's eye to blobs.\n\n5. Paisley's find() is near the time budget: 92 to 98 ms for *632 and *x in its own sheets, and 130 ms for *x in a render on the mini at 00:21, which proto flagged in orange. The kit asks for well under 100 ms. The owner will not see it, but it should be watched.\n\n6. Six design files (bigcomma, blobs, glyph, hook, spiral, swell) were edited 1 to 5 minutes after their pictures were taken. My renders today give the same vertex counts as their sheets (swell: the same maxima as its verdict), so the pictures are current.\n\n7. The default should be blobs. Keep the Checkerboard and Rings in the selector: their fine grids still show stretching better than any comma print.\n\n8. My pictures are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-owner/:\n- <key>-hard.png: the hardest groups (*x, 2*22 or *2222, 3*3, *333, *442, *632) of all 11 designs, flat. The blobs, bigcomma and paisley ones are from the earlier judge run at 00:20.\n- <key>-fold-t1.png: the closed fold of o, xx, 22x, 2222, 632 and *442, at full scale, for blobs, paisley, tomoe, bigcomma, mosaic, ripple and swell.\nI changed no file of any design."
+  }
+ ],
+ [
+  "judge:fold",
+  {
+   "lens": "The fold, judged by looking. One harness (judge-fold/compare.mjs) rendered all 11 designs in the real app, side by side, with the same group, t and view for each design: closed shapes of o, 22x, *x, 2222, 632, **, 333, 442 and 22*; half folds of *x, 22x, xx, 2222 and all seven mirror groups; the phone (22x, *632, 333); the re-cut (xx, 22x); the Tile step (333); close views of the thin parts and of the seams. I also read each design's sheet, its standard app pictures and its 3D pictures. The questions: can one tell which side is up, follow where each part of the tile went, see the sheet bend and the seams close? Does it survive curvature, thin parts and the phone? Do the coloured seams and the labels still lead?",
+   "scores": [
+    {
+     "key": "paisley",
+     "commaLike": 8,
+     "fills": 7,
+     "big": 6,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 7,
+     "total": 76,
+     "best": "It stays a recognisable comma on almost every folded shape (the *x band, the closed 333 pillow, the 22* case, the 2*22 pocket, the 22x cross-cap). The two to four sizes give each part of the tile its own landmark, and the commas cross the seams.",
+     "worst": "It is busier than the one-mark designs: the small commas and the stout rosettes of 4*2 and the kaleidoscopes add clutter. *632 is the barest of the set (43 % dark, a 0.50 bare patch at the 6-fold point).",
+     "mustFix": []
+    },
+    {
+     "key": "bigcomma",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 6,
+     "total": 74,
+     "best": "The light eye in each comma's head is the best 3D landmark of the round. On the closed cross-cap, the 632 cone, the ** tube and the thin 3*3 pouch one can still say where the head went, and the commas cross the seams.",
+     "worst": "In *x and the kaleidoscopes it falls back to comets and drops with loose bubbles that read as spots. *2222 keeps a 0.53 bare patch.",
+     "mustFix": [
+      "Mirror groups (*x, 3*3, *333, 4*2, *442, *632): use the eyed, nested comma of the rotation groups instead of drops, comets and loose bubbles",
+      "Re-render OUT/bigcomma: design.js (23:19) is newer than its pictures (23:14-23:16)"
+     ]
+    },
+    {
+     "key": "tomoe",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 7,
+     "allGroups": 7,
+     "total": 72,
+     "best": "Each default tile holds one whole yin-yang with two eyes. The eyes are clear landmarks on the cross-cap, the 632 cone and the 3*3 pouch, and the re-cut visibly puts the yin-yang back together.",
+     "worst": "Its light channel follows the default tile's rim, so every default seam closes on a pale strip that no mark crosses (seen on the nearly closed torus and cross-cap). The print frames the seams instead of showing them close. *x is two slugs.",
+     "mustFix": [
+      "Take the S-split from a tile whose rim is not the default cut (another seed than presets[0]'s), so that marks cross the default seams"
+     ]
+    },
+    {
+     "key": "blobs",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 7,
+     "allGroups": 5,
+     "total": 68,
+     "best": "It gives the clearest whole comma of the round on the closed cross-cap, the Moebius band and the 22* case. It is soft and calm, and its marks cross every seam.",
+     "worst": "In *333, *442 and *632, and in the spiky 3*3 and 632, the lumps are ornament with no head or tail to follow in 3D. On the closed pillows (2222, 333, 442) only one big blob shows.",
+     "mustFix": [
+      "*333, *442, *632 and 3*3: one comma per chamber that keeps its head and tail"
+     ]
+    },
+    {
+     "key": "mosaic",
+     "commaLike": 8,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 7,
+     "allGroups": 8,
+     "total": 66,
+     "best": "It is the boldest mark in the kaleidoscopes and on the phone: one light comma per tile that one can follow through every mirror fold of *632, *442, *333 and 4*2.",
+     "worst": "The grout lies on the default seams, so they close on grout (seen on the torus, the cross-cap and the 2222 pillow). On the closed shapes the light comma becomes one pale, stretched blob on a dark ground.",
+     "mustFix": [
+      "Move the grout off the default cut, so that marks cross the default seams"
+     ]
+    },
+    {
+     "key": "ripple",
+     "commaLike": 7,
+     "fills": 8,
+     "big": 5,
+     "helpsFold": 6,
+     "twoSides": 6,
+     "clean": 5,
+     "allGroups": 8,
+     "total": 60,
+     "best": "The echo bands work as contour lines on the paper: on the ** tube, the 2222 pillow and the kaleidoscopes they show better than any other design how the sheet bends. The family is the same in all 17 groups.",
+     "worst": "On the sand side and on the closed shapes the broad bands bury the comma, so one follows bands rather than the tile. It has a dark tip thinner than the 3D texture holds in every group, along 18 to 49 texels of outline.",
+     "mustFix": [
+      "Round or thicken the thin dark tip that thinParts flags in every group (up to 49 texels; the page's comma has 26-57). At zoom 1.9 I saw no specks, but it is the thinnest design of the round"
+     ]
+    },
+    {
+     "key": "glyph",
+     "commaLike": 6,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 5,
+     "total": 57,
+     "best": "Where a whole F survives it is the most unmistakable landmark: in the xx and 22x re-cuts, on the *442 flap and on the 22* case one sees at once which way the tile turned or flipped.",
+     "worst": "On the cross-cap the F breaks into two near-mirror blocks, so the closed 22x looks symmetric. In the rows and the kaleidoscopes it is a comb or a fret, angular and busy.",
+     "mustFix": [
+      "Rows (*x, 22*, 2*22) and kaleidoscopes: an F that still reads as an F, not combs and a fret",
+      "Re-render OUT/glyph: design.js (23:10) is newer than its pictures (23:07)"
+     ]
+    },
+    {
+     "key": "spiral",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 6,
+     "total": 56,
+     "best": "The spiral's centre is an unmistakable, handed landmark, and its arms trace the bending on the cones and the pillows.",
+     "worst": "Each tile is a carved slab whose channel lies on the default seams, so they close on pale strips. *x is bars with a small curl, 632 is a starburst, and the winding makes it busy. Its dark part is thinner than the 3D texture holds in 333, 442, *333, 4*2 and *442 (7-11 texels).",
+     "mustFix": [
+      "Move the slab channels off the default cut",
+      "*x and 632: a real curl instead of bars and a starburst"
+     ]
+    },
+    {
+     "key": "feet",
+     "commaLike": 6,
+     "fills": 7,
+     "big": 6,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 52,
+     "best": "Where the foot is whole it is the plainest hand of the round: the toes on the sand side of the half-folded cross-cap, and along the Moebius band, show which way the paper went.",
+     "worst": "On the closed shapes the sole becomes one dark mass (442, 333, the ** tube), and the closed torus looks almost bare. The toe ladders of the kaleidoscopes are small spots, and 2222, 333, 442 and *2222 read as paws.",
+     "mustFix": [
+      "Kaleidoscopes and 4*2: feet instead of wedges with toe ladders",
+      "2222, 333, 442 and *2222: feet instead of paws"
+     ]
+    },
+    {
+     "key": "hook",
+     "commaLike": 5,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 4,
+     "twoSides": 6,
+     "clean": 4,
+     "allGroups": 3,
+     "total": 44,
+     "best": "In o, 2222, 333, 22x and 442 a bold hook shows direction and hand, and the print is calm.",
+     "worst": "In 3D it gives large dark masses with little to follow: *x closes into concentric stripes, 22* is brickwork, the kaleidoscopes are triangles within triangles, and the 442 hooks have lumpy outlines.",
+     "mustFix": [
+      "*x stripes, 22* brickwork and the kaleidoscopes' triangles must become hooks",
+      "Smooth the lumps in 442",
+      "Re-render OUT/hook: design.js (00:02) is newer than its pictures (00:00-00:02)"
+     ]
+    },
+    {
+     "key": "swell",
+     "commaLike": 5,
+     "fills": 6,
+     "big": 7,
+     "helpsFold": 4,
+     "twoSides": 6,
+     "clean": 4,
+     "allGroups": 3,
+     "total": 42,
+     "best": "In 333, 442, 632 and 2222 the fat, interlocking whirls are big commas that cross the seams.",
+     "worst": "** closes into an almost uniform dark tube (62 % dark, a 0.53 bare patch), *x into a stripe, and the kaleidoscopes into lumpy lace with nothing to follow. The outlines are irregular, and two channel weights split the family.",
+     "mustFix": [
+      "One fat comma per mirror chamber instead of lace",
+      "** and *x: break the dark tube and the stripe into commas",
+      "Smooth the lumpy outlines and use one channel weight"
+     ]
+    }
+   ],
+   "ranking": [
+    "paisley",
+    "bigcomma",
+    "tomoe",
+    "blobs",
+    "mosaic",
+    "ripple",
+    "glyph",
+    "spiral",
+    "feet",
+    "hook",
+    "swell"
+   ],
+   "shipSet": [
+    "paisley",
+    "tomoe",
+    "mosaic",
+    "ripple"
+   ],
+   "shipWhy": "Four different looks, each helping the fold in its own way. Paisley (commas on a ground) stays a comma on nearly every closed shape, and its sizes give each region a landmark. Tomoe (the plane all commas, no background) carries one whole eyed yin-yang per tile, which the re-cut visibly reassembles. Mosaic (a light comma inlaid in each cell) is the boldest mark in the kaleidoscopes and on the phone, exactly where the comma-on-ground prints are weakest. Ripple (comma echo bands) shows best how the sheet bends and is the same in all 17 groups. Bigcomma and blobs rank above mosaic and ripple on their own, but each is a second \"comma on a ground\", the same look as paisley. Tomoe and mosaic should first move their channel or grout off the default seams.",
+   "newDefault": "paisley",
+   "notes": "1. Stale pictures. design.js is newer than its OUT pictures for bigcomma (23:19 vs 23:14-23:16), swell (00:01 vs 23:58-00:00), spiral (23:45 vs 23:43), glyph (23:10 vs 23:07), blobs (23:39 vs 23:37-23:38) and hook (00:02 vs 00:00-00:02). Re-render these before anything ships. My side-by-side renders load the current files.\n2. A recurring fold flaw. Tomoe, spiral and mosaic each put a light channel (or grout) exactly on the default tile's rim. At the default cut every seam closes on a pale strip that no mark crosses, so the print frames the seams instead of demonstrating that it closes without a break. Seen on the nearly closed torus and cross-cap (judge-fold/seams-o.png, seams-22x.png). A dragged cut does not have it; the cure is to build the cells from a seed other than presets[0]'s.\n3. Merge. Bigcomma's light eye in the head is the best 3D landmark of the round (cross-cap, 632 cone, ** tube, 3*3 pouch). Paisley's big comma, and blobs', could carry it.\n4. Verified in the real app on the mini's Chrome (judge-fold/thin.mjs, one page with all designs registered): all 11 designs take in all 17 groups, with 0 validateShapes problems and no page errors. thinParts at 1.5 texels flags ripple in every group (18-49 texels; today's comma reads 26-57), bigcomma in every group (10-11, the tail tip) and spiral in 333, 442, *333, 4*2 and *442 (7-11). At view zoom 1.9 on 2222 and 333 I saw no specks.\n5. Geometry, not design. Thin tubes (o and xx at t = 0.6) turn every design into bands, and the cones compress all marks near the apex.\n6. Hook's 442 hooks have lumpy outlines. At the size I rendered (520 px), hook's and glyph's 4*2 read as a Greek-key meander, not as hooked crosses.\n7. Not verified: a retina screen (--dpr 2), Safari, a real phone (only the 390 x 780 window). I did not read the designs' NOTES.md or CRITIQUE.md; every score comes from pictures.\n8. Process slip: one multi-line python3 -c ran inline instead of from a file (it only read my thin.json).\n9. My renders and tools are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-fold/: compare.mjs (all designs side by side per group: --ids, --t, --view, --phone, --preset, --tile, --clip), thin.mjs and thin.json, and the pictures t1-*.png, t06-*.png, phone-*.png, recut-*.png, seams-*.png, tile-333.png, thinzoom-*.png and hook-442.png. I changed no file of the workspace."
+  }
+ ],
+ [
+  "judge:worst",
+  {
+   "lens": "Each design is judged by its worst group and worst moment. I looked at the strips (**, xx, *x), the kaleidoscopes, the 30-degree corner of *632, the sand side, the phone, the re-cut, and a cut other than the default. Evidence: the designers' pictures; my own close-ups of *x, *632, *333 and ** (2.4x) for all 11 designs; a fresh app run of all 17 groups per design (prints, RULES, THIN); a second-cut fold for mosaic, spiral and tomoe; and judge-math's near-symmetry numbers, read only.",
+   "scores": [
+    {
+     "key": "paisley",
+     "commaLike": 9,
+     "fills": 7,
+     "big": 6,
+     "helpsFold": 7,
+     "twoSides": 7,
+     "clean": 6,
+     "allGroups": 8,
+     "total": 70,
+     "best": "The only design that is commas in all 17 groups. *x carries three commas of three sizes per tile, and each kaleidoscope chamber a big comma with its small ones. Its nearest extra symmetry is the second lowest of the round (0.62).",
+     "worst": "*632 is 43 % dark with a 0.50 bare disc at the 6-fold point. find() takes 92-127 ms in *x and 89-96 ms in *632 on the mini, over the kit's 100 ms, so more on a phone. The commas at the 0.14 floor are specks on a phone.",
+     "mustFix": [
+      "find() well under 100 ms in every group: *x, *632, 2*22 and *442 take 72-127 ms on the mini",
+      "*632: bare disc at most 0.45 and dark at least 0.45 (now 0.50 and 0.43)",
+      "raise the floor of the smallest commas for the phone, or drop the fourth size"
+     ]
+    },
+    {
+     "key": "tomoe",
+     "commaLike": 8,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 8,
+     "twoSides": 8,
+     "clean": 7,
+     "allGroups": 6,
+     "total": 66,
+     "best": "o, 2222, xx, 22x, 333, 442, 632: one whole yin-yang in the default tile, with eyes that mark the way through the fold and the re-cut. It has the strongest hand of the round (nearest extra symmetry 0.57, every mark's mirror-likeness at most 0.83) and runs in 2-6 ms.",
+     "worst": "In *333, *442, *632, 3*3 and 4*2 the dark comma fills the chamber, so the plane reads as a grid of dark triangles with light keyholes. *x is two long slugs (bare 0.47). The default tile's rim shows as straight white lines, and they stay after the cut is changed (the old hexagons in 333 'In between').",
+     "mustFix": [
+      "kaleidoscopes: an S-split whose dark half does not fill the chamber to its rim, so the mark reads as a comma and not as the chamber",
+      "*x: give the slugs heads (bare 0.47 down to 0.45 or less)",
+      "curve or remove the straight channel along the default tile's rim: it prints the default cut"
+     ]
+    },
+    {
+     "key": "blobs",
+     "commaLike": 7,
+     "fills": 6,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 8,
+     "allGroups": 5,
+     "total": 60,
+     "best": "13 groups of smooth, calm tadpole commas at exactly 50 % dark, with two real commas per tile in *x. It runs in 2-13 ms with at most 358 points and reads on both sides.",
+     "worst": "In *333, *442, *632 and 3*3 the mirrored pairs read as crosses and stars, with needle tails meeting at the 6-fold point. Five groups have a bare disc over 0.45, up to 0.51 (2*22) and 0.50 (4*2).",
+     "mustFix": [
+      "kaleidoscopes: a comma whose pair with its mirror image does not read as a cross or a star",
+      "bare disc at most 0.45 in 2*22, 4*2, 22*, *2222 and ** (now 0.46-0.51)"
+     ]
+    },
+    {
+     "key": "bigcomma",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 6,
+     "helpsFold": 7,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 5,
+     "total": 55,
+     "best": "o, 2222, xx, 333, 442, 632: one big nested yin-yang comma with an eye per tile, 57 % dark, the tail of one in the hollow of the next.",
+     "worst": "*x is a 2.2-long tapering wedge with a 0.07 eye and two 0.07 dots, which are specks on a phone. In *333, *632 and 4*2 the drops are nearly mirror-symmetric (0.89-0.94) and carry loose bubbles. *2222 has a 0.53 bare disc.",
+     "mustFix": [
+      "*x: a real comma head (a 0.18 head is lost in a 2.2 wedge), or two commas per tile",
+      "kaleidoscopes: a handed shape instead of a near-symmetric drop, and no loose bubble dots",
+      "*2222: bare disc from 0.53 down to 0.45 or less",
+      "eyes and dots at least 0.1 tile sizes, or none (0.066-0.074 in *x)",
+      "round the tail tips: app-sheet reports THIN in all 17 groups (about 11 texels each)"
+     ]
+    },
+    {
+     "key": "ripple",
+     "commaLike": 6,
+     "fills": 9,
+     "big": 5,
+     "helpsFold": 4,
+     "twoSides": 5,
+     "clean": 5,
+     "allGroups": 5,
+     "total": 46,
+     "best": "Fills every group (bare at most 0.43, solid at most 0.34) with comma-shaped bands. In 333, 442 and *333 the marks read as curls in a field.",
+     "worst": "*x and 2*22 show oval rings round an S; the ring marks are mirror-symmetric (0.96-0.99) and carry no hand. In the fold, on the sand side and on a phone the echo bands read as contour lines and the comma is lost. THIN slivers in all 17 groups (18-49 texels).",
+     "mustFix": [
+      "one echo band, not two or three, so the comma leads in 3D and on a phone",
+      "*x and 2*22: an asymmetric mark instead of oval rings",
+      "round the band ends (THIN in all 17 groups)"
+     ]
+    },
+    {
+     "key": "feet",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 6,
+     "allGroups": 4,
+     "total": 45,
+     "best": "*x, **, xx, 22x: left and right footprints walking, the textbook picture of a glide, read without thinking.",
+     "worst": "*333, *442, *632 and 4*2 are wedge soles with a ladder of toe dots along the mirror; 2222, 333 and 442 are paws. The sole alone is nearly mirror-symmetric (0.90-0.97), so wherever the 0.04 toes vanish (on a phone, in 3D) the hand vanishes with them.",
+     "mustFix": [
+      "the sole must carry the hand by itself (a deeper arch, an offset heel)",
+      "toes at least 0.08 tile sizes, or fused into one toe band",
+      "a foot shape, not a wedge, in the triangle groups"
+     ]
+    },
+    {
+     "key": "mosaic",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 4,
+     "twoSides": 6,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 43,
+     "best": "Flat, one big classic light comma inlaid in each tile in all 17 groups, the kaleidoscopes included; 3-22 ms.",
+     "worst": "The grout is the default cut. With another cut it folds into fake seams: 2222 Book gives a white X across the pillow. In 3D each tile shows one pale blob on dark. *x nearly has a half-translation (0.89, the highest near-symmetry of the round).",
+     "mustFix": [
+      "the slab outline must not be the default tile (bend the cells or add a second orbit, as the brief asked)",
+      "*x: break the near half-translation (0.89)",
+      "more than one mark per tile, so the fold shows more than one pale blob"
+     ]
+    },
+    {
+     "key": "glyph",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 3,
+     "total": 38,
+     "best": "o, **, xx, 22x, 442: one bold F per tile that visibly turns, glides and flips, the crystallographer's own motif.",
+     "worst": "*x, 22* and 2*22 are combs; *333, *632, 3*3 and 4*2 are a Greek-key fret with no readable F; 632 shows a starburst of thin white rays. 22* nearly has a half-translation (0.82).",
+     "mustFix": [
+      "the nine mirror groups need a readable F per tile, not a fret or a comb",
+      "22*: break the near half-translation (0.82)",
+      "no starburst at the 6-fold centre of 632"
+     ]
+    },
+    {
+     "key": "spiral",
+     "commaLike": 5,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 5,
+     "allGroups": 3,
+     "total": 34,
+     "best": "2222, 333, 442, *2222: one spiral per tile with an unmistakable hand; 2-11 ms.",
+     "worst": "*x is plain stripes (the curl falls outside what the strip shows). 632 and 3*3 show a starburst of thin white rays at the 6-fold point. Each slab is the default tile, so another cut (2222 Book) folds into a pillow crossed by a white X of fake seams.",
+     "mustFix": [
+      "free the outline from the default tile: no tile-shaped slabs",
+      "*x: a curl inside the strip, not bars",
+      "no starburst at the 6-fold centre",
+      "a fat head larger than the arm: it now reads as a carved groove, not a comma"
+     ]
+    },
+    {
+     "key": "hook",
+     "commaLike": 5,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 6,
+     "allGroups": 3,
+     "total": 34,
+     "best": "o, 2222, 333, 442, 22x: bold hooks whose long stroke points and short stroke turns, in even channels, with at most 143 points.",
+     "worst": "*x is two plain stripes per tile (near half-turn 0.80). In *333, *632 and *442 the hook bends along the chamber rim and reads as triangles within triangles. 22* is brickwork.",
+     "mustFix": [
+      "*x: a hook with a visible bend inside the strip",
+      "kaleidoscopes: a hook that does not follow the chamber rim",
+      "22*: hooks instead of bricks"
+     ]
+    },
+    {
+     "key": "swell",
+     "commaLike": 4,
+     "fills": 6,
+     "big": 8,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 4,
+     "allGroups": 2,
+     "total": 30,
+     "best": "o, 22x, 333, 442: fat interlocking commas filling 56 % with even white channels.",
+     "worst": "** is 62 % dark potato blobs with a 0.53 bare disc and no hand (mirror-likeness 0.91). *x is plain bars and the four kaleidoscopes lumpy lace. The outlines carry small nibs, and it takes up to 84 ms.",
+     "mustFix": [
+      "** and *x: real commas, not potatoes and bars",
+      "kaleidoscopes: one readable comma per chamber instead of lace",
+      "**: dark at most 0.6 and bare at most 0.45 (now 0.62 and 0.53)",
+      "smooth the marching-squares nibs and use one channel width"
+     ]
+    }
+   ],
+   "ranking": [
+    "paisley",
+    "tomoe",
+    "blobs",
+    "bigcomma",
+    "ripple",
+    "feet",
+    "mosaic",
+    "glyph",
+    "spiral",
+    "hook",
+    "swell"
+   ],
+   "shipSet": [
+    "paisley",
+    "tomoe",
+    "blobs"
+   ],
+   "shipWhy": "Judged by their worst group, only these three still show handed commas in *x, the strip the owner named, and stay within the numbers in all 17 groups. They also look different from each other:\n- tomoe has no background: it is the checkerboard's two-tone split, made handed (a whole yin-yang per tile, the fastest design and the strongest hand).\n- blobs is one calm comma per tile, two in *x.\n- paisley is an ornate family that stays commas even in *x and the kaleidoscopes.\n\nWhy not the others:\n- bigcomma is the same look as blobs with more failures: *x wedges, bubbles, and THIN tails in all 17 groups.\n- ripple, feet and mosaic each fail at one moment. Ripple loses the comma in the fold; feet's only hand is toes that vanish on a phone; mosaic prints fake seams once the cut changes.\n\nNone of the three is clean in the kaleidoscopes, which is the gap of the whole round. Paisley's speed and its *632 must be fixed before it ships.\n\nnewDefault is tomoe: it never fails worse than the checkerboard and has bigger, handed marks that survive a phone. It runs in 2-6 ms. Its yin-yang sits whole in the default tile, with eyes that mark the way through the fold. Paisley is richer but too slow (127 ms in *x) and too fine on a phone to be the first thing shown.",
+   "newDefault": "tomoe",
+   "notes": "1. Every pattern took in my re-run. I ran all 11 designs in the real app with app-sheet --t 1, all 17 groups each: no RULES lines, no page errors. Six design.js files are newer than their pictures (bigcomma, swell, spiral, glyph, blobs, hook). Their vertex counts in all 17 groups equal rows.json, so the pictures are current.\n\n2. THIN parts, from app-sheet:\n   - bigcomma 17/17 (tail tips of about 11 texels);\n   - ripple 17/17 (18-49 texels, near-zero width, at the band ends);\n   - spiral 5/17;\n   - none elsewhere.\n   All are within the page comma's own 26-57 texels. A 2.2x flat 3D view of ripple in 2222, 333 and 442 showed no specks, but the windows may have missed the thin spots.\n\n3. Speed of find() on the mini:\n   - paisley: 92-127 ms in *x and 89-96 ms in *632 (its rows against my run), over the kit's 100 ms;\n   - swell: 44-84 ms;\n   - bigcomma: up to 64 ms;\n   - every other design: 22 ms or less.\n\n4. Designs built on the default tile print the default cut. With preset 1, mosaic and spiral fold the 2222 Book pillow with a white X of seams that are not there, and tomoe draws the old hexagons in the 333 plane. A page about cuts should not print one cut.\n\n5. Two flaws recur across designs:\n   - The kaleidoscopes (*333, *442, *632, 3*3, 4*2) are weak in every design. One mark per chamber, next to its mirror image, reads as a symmetric ornament. Paisley (several commas per chamber) and mosaic (flat, a light comma inlaid per chamber) cope best.\n   - A starburst of thin white rays at the 6-fold centre of 632 in glyph, blobs, spiral, feet and hook.\n\n6. *x, the group the owner named, separates the designs most. Paisley, blobs, feet and mosaic carry real marks there. Tomoe (slugs) and bigcomma (wedges) are weak. Ripple shows chain links. Spiral, hook, swell and glyph show stripes or combs.\n\n7. From judge-math's sym/summary.txt (read, not recomputed): no design has an exact extra symmetry. The nearest extra symmetry runs from tomoe 0.57 and paisley 0.62 (the best) up to mosaic 0.89 (*x), glyph 0.82 (22*) and hook 0.80 (*x). The baseline comma is 0.69. Feet's sole has mirror-likeness 0.90-0.97, so its hand lives only in the toes.\n\n8. A possible merge: paisley's filler commas would fix the bare patches of blobs (2*22 0.51, 4*2 0.50) and bigcomma (*2222 0.53), and blobs' smooth comma could serve as paisley's big comma.\n\n9. No tool failed and none lied. Paisley's 127 ms came from my own proto run while other judges shared the pool, so timings vary by about 30 %.\n\n10. My renders are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-worst/:\n   - hard-<key>.png: *x, *632, *333 and ** at 2.4x, for all 11 designs;\n   - othercut-mosaic.png, othercut-spiral.png, othercut-tomoe.png;\n   - <key>-t1.png and <key>-t1.json: the fresh app runs with the THIN report;\n   - ripple-3d-zoom.png;\n   - rows-table.mjs and stale.mjs."
+  }
+ ],
+ [
+  "judge:math",
+  {
+   "lens": "Mathematics on show: is the print's symmetry exactly the group in all 17 groups (no unintended mirrors, half-translations or extra rotations, no orbits lining up)? Do cone points read as pinwheels of the right order, mirrors as mirror pairs and glides as alternating hands? Does the mark carry a hand on both sides of the paper? Does the print explain the orbifold's cone points and mirror rim? Judged from the pictures, from four close renders, and from a measurement: an FFT search over every lattice isometry for extra symmetries and near-symmetries on the torus, plus each mark's overlap with its own mirror image.",
+   "scores": [
+    {
+     "key": "tomoe",
+     "commaLike": 8,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 9,
+     "twoSides": 8,
+     "clean": 7,
+     "allGroups": 7,
+     "total": 80,
+     "best": "The most exact print of the round: its worst near-symmetry is k 0.57, below the old comma's 0.69. Each tile holds one dark and one light comma with eyes, so every closed pillow shows a whole yin-yang and the eyes are landmarks through the fold, on teal and on sand alike.",
+     "worst": "In the kaleidoscopes the dark mark is the whole chamber and the hand rests on a light tadpole, which in 3*3 is a near-symmetric keyhole. In o, 2222, 333, 442 and 632 the white channels redraw the default cut (333 reads as tumbling blocks). *x is two slugs.",
+     "mustFix": []
+    },
+    {
+     "key": "paisley",
+     "commaLike": 8,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 8,
+     "total": 76,
+     "best": "The only design whose every mark in all 17 groups is a true comma with the same hand, kaleidoscopes included (each mark's mirror overlap is 0.78 to 0.89; the classic comma's is 0.82). No near-symmetry exceeds k 0.62, and 333, 442 and 632 read as pinwheels.",
+     "worst": "Two to four orbits of commas per tile, so no single mark stands for the tile. *632 leaves a bare white asterisk at each 6-fold corner (bare 0.497). The mirror corners of 4*2 and *442 are busy rosettes.",
+     "mustFix": []
+    },
+    {
+     "key": "bigcomma",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 8,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 70,
+     "best": "In o, 2222, xx, 22x, 333, 442 and 632 it is the clearest single comma of the round: one nested comma with an eye per tile, and true 3-, 4- and 6-fold pinwheels round the cone points. Near-symmetry stays at k 0.68 or below.",
+     "worst": "In *333, 4*2, *442, 3*3 and *632 the mark degenerates to a symmetric teardrop (mirror overlap 0.94) plus round bubbles, so a mirror shows two drops rather than two hands. *x is long wedges.",
+     "mustFix": [
+      "In *333, 4*2, *442, 3*3 and *632, give the chamber's mark a hand (it is now a 94 % mirror-symmetric teardrop) and drop the round bubbles; paisley's handed small commas show how."
+     ]
+    },
+    {
+     "key": "blobs",
+     "commaLike": 7,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 7,
+     "twoSides": 8,
+     "clean": 7,
+     "allGroups": 5,
+     "total": 66,
+     "best": "Soft but truly handed commas (mark mirror overlap 0.72 to 0.87) at exactly 50 % dark. 333, 442 and 632 have triskelions and pinwheels, and 22x's 6/9 pairs show the glide at a glance.",
+     "worst": "*x holds two commas per tile that are near-translates by half the glide step (overlap 0.888), so the band reads at half its period. 3*3, *333 and *632 read as tripods and needles.",
+     "mustFix": [
+      "*x: put one comma in each tile, or make the two differ, so the print stops reading at half its period (0.888 overlap under half the glide step)."
+     ]
+    },
+    {
+     "key": "spiral",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 6,
+     "twoSides": 6,
+     "clean": 6,
+     "allGroups": 6,
+     "total": 62,
+     "best": "The winding direction is a hand nobody misreads, in 16 groups. Mirrors show as reversed windings and glides as alternating ones. Near-symmetry is low (median k 0.39), and a whole spiral rides each closed pillow.",
+     "worst": "The dark arm fills the default tile, so the print is a carved floor that draws the default cut. *x is bars with a snail at one end (0.88 overlap with a half-turn), and 632 and 3*3 are starbursts.",
+     "mustFix": []
+    },
+    {
+     "key": "ripple",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 6,
+     "helpsFold": 5,
+     "twoSides": 5,
+     "clean": 6,
+     "allGroups": 5,
+     "total": 58,
+     "best": "A comma inside a comma-shaped echo ring. It carries a hand in the rotation and glide groups and swirls round the 3-, 4- and 6-fold centres, at 52 to 60 % dark.",
+     "worst": "In *x the marks become eye-shaped rings (96 to 99 % mirror-symmetric). *333 nearly reads as *632 (0.894 overlap under a half-turn). On the sand side of the fold the echo bands read as stripes and the comma is hard to find.",
+     "mustFix": [
+      "*x: the rings are nearly mirror-symmetric (0.96 to 0.99), so neither hand nor glide shows.",
+      "*333: 0.894 overlap with a half-turn, so the print reads as *632."
+     ]
+    },
+    {
+     "key": "feet",
+     "commaLike": 6,
+     "fills": 7,
+     "big": 6,
+     "helpsFold": 6,
+     "twoSides": 6,
+     "clean": 5,
+     "allGroups": 4,
+     "total": 57,
+     "best": "In xx, **, 22x and o, alternating left and right feet are the textbook picture of a glide and a mirror. The group is exact and near-symmetry is modest (k 0.71 at most).",
+     "worst": "The sole is nearly symmetric (mirror overlap 0.82 to 0.97), so the hand rests on small toe dots. 2222, 333, 442 and *2222 read as paws, and the kaleidoscopes as wedges with toe ladders zipped along the mirrors.",
+     "mustFix": [
+      "Kaleidoscopes and 2222, 333, 442: the sole itself must carry the hand (an arch or a curve), not only the toe dots."
+     ]
+    },
+    {
+     "key": "mosaic",
+     "commaLike": 6,
+     "fills": 8,
+     "big": 8,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 8,
+     "allGroups": 4,
+     "total": 55,
+     "best": "Flat, it inlays a large, classic light comma in every tile, calm and easy to read in 16 groups.",
+     "worst": "The dark tone is the default tile's frame, so near-symmetries of k 0.58 to 0.69 run through almost every group and grout redraws the default seams. In *x two identical teardrops lie on the glide axis: the glide vanishes (0.945 under its own translation) and the band reads as a pm frieze at half the period.",
+     "mustFix": [
+      "*x: curl the teardrops off the glide axis and keep one per tile; as drawn, the glide that makes the Moebius band is invisible (0.945)."
+     ]
+    },
+    {
+     "key": "swell",
+     "commaLike": 6,
+     "fills": 7,
+     "big": 7,
+     "helpsFold": 6,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 4,
+     "total": 55,
+     "best": "The best whirls of the round: in 333, 442, 632, 3*3 and 4*2, fat commas swirl round each cone point, so the order of rotation reads at a glance.",
+     "worst": "** is near-symmetric potatoes (mark mirror overlap 0.91) and *x is stripes (0.876 under a half-turn). *2222, *333, *442 and *632 are two-mark lace with no single comma.",
+     "mustFix": [
+      "In **, *x and the four kaleidoscopes, use one handed comma per chamber instead of potatoes, stripes and lace."
+     ]
+    },
+    {
+     "key": "glyph",
+     "commaLike": 5,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 7,
+     "twoSides": 7,
+     "clean": 5,
+     "allGroups": 3,
+     "total": 50,
+     "best": "The crystallographer's own motif: an F is read as F or as its mirror image at once, so the rotations and glides of o, xx, 22x, 333, 442 and 632 are unmistakable, and an F shows on the closed pillows.",
+     "worst": "Marks line up. 22* and 2*22 hold two lying F's per tile that differ only by a small square (0.924 and 0.869 overlap under half a translation), and *x holds three (0.846). Eight groups reach k 0.70 or more, the most of the round. The kaleidoscopes are frets and combs.",
+     "mustFix": [
+      "22* and 2*22: one F per tile (the two F's differ only by the dot: 0.92 and 0.87 overlap under half a translation).",
+      "*x: the three F's in each tile line up (0.846 overlap under a third of the glide step).",
+      "3*3, *333, 4*2, *442 and *632: the F becomes a fret or a comb."
+     ]
+    },
+    {
+     "key": "hook",
+     "commaLike": 5,
+     "fills": 8,
+     "big": 7,
+     "helpsFold": 5,
+     "twoSides": 6,
+     "clean": 4,
+     "allGroups": 3,
+     "total": 47,
+     "best": "In o, 2222, xx, 22x and 333 a bold hook gives a clear hand and direction; *2222's G and 4*2's Greek key also read (checked at 520 px: no swastika form).",
+     "worst": "*x is stripes (0.912 under a half-turn), and 22*, *2222, 2*22 and *333 sit at 0.87 to 0.90 near-symmetry. In the kaleidoscopes the hook traces the chamber's rim (triangles within triangles, no hand), and the trims leave lumps in 442.",
+     "mustFix": [
+      "*x: stripes.",
+      "Kaleidoscopes: the hook outlines the chamber, so no hand shows at a glance.",
+      "22*, *2222, 2*22: near-symmetries of 0.87 to 0.90."
+     ]
+    }
+   ],
+   "ranking": [
+    "tomoe",
+    "paisley",
+    "bigcomma",
+    "blobs",
+    "spiral",
+    "ripple",
+    "feet",
+    "mosaic",
+    "swell",
+    "glyph",
+    "hook"
+   ],
+   "shipSet": [
+    "tomoe",
+    "paisley",
+    "bigcomma",
+    "spiral"
+   ],
+   "shipWhy": "These are four different looks. Each shows the group exactly and carries a hand in nearly every group.\n- tomoe: S-split tiles with eyes. It is the most exact print and the best for following a tile into the fold.\n- paisley: commas of several sizes, with a hand in all 17 groups, kaleidoscopes included.\n- bigcomma: one nested comma with an eye, giving the best single-mark pinwheels round the cone points. It ships only after its kaleidoscope teardrops get a hand; without that fix, ship the other three.\n- spiral: a winding direction nobody misreads, with mirrors and glides shown as reversed and alternating windings.\n\nLeft out:\n- glyph and hook: marks that line up, or near-symmetries in 5 to 8 groups.\n- mosaic: it hides *x's glide.\n- blobs: a near twin of bigcomma.\n- ripple, swell and feet: strong in the rotation groups, weak in the strip and mirror groups.",
+   "newDefault": "tomoe",
+   "notes": "Measured, not only seen. The tool is /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-math/tools/symcheck.mjs, run on aifoundry1 through remote-sym.sh; reports and a table are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-math/sym/ (summary.txt).\n- Exactness: for all 11 designs and all 17 groups, the group keeps the print exactly, and no print has an exact extra symmetry. The highest overlaps are mosaic *x at 0.945 and glyph 22* at 0.924, each under its exactness level (0.971 and 0.975).\n- Near-symmetries. k is the overlap above chance; the old comma reaches 0.69. Tomoe peaks at 0.57, paisley at 0.62, bigcomma at 0.68. Swell, feet, ripple, spiral and blobs each have one group at 0.71 to 0.78. Hook has five groups at 0.72 or more, glyph eight.\n\nRecurring flaws:\n1. *x, the thin strip, is where most designs fail. Mosaic hides the glide: its two identical teardrops sit on the glide axis (0.945). Blobs and glyph line up two or three marks per tile (0.888 and 0.846). Hook, spiral and swell become stripes or bars (0.88 to 0.91 under a half-turn).\n2. Two marks per tile that are near-translates of each other: glyph 22* (0.924) and 2*22 (0.869), blobs *x, mosaic *x.\n3. In *442 and 4*2, glyph, ripple, hook, bigcomma, blobs, mosaic and paisley nearly keep the half-diagonal translation (0.80 to 0.88), so the two different 4-fold corners look alike. Tomoe, feet and spiral stay under 0.70.\n4. Tomoe, spiral and mosaic build the default tile's rim into the print, so the default cut stays visible after a re-cut.\n\nMerge suggestion: bigcomma's single comma with an eye wins the rotation groups, and paisley's handed small commas win the kaleidoscopes, where bigcomma's mark is a 94 % mirror-symmetric teardrop. Swell's whirls are the best 3-, 4- and 6-fold pinwheels and could serve either.\n\nCaveat on the measure: k reads the dark tone only. Mosaic's hand lives in its light holes, so k overstates mosaic's problem everywhere except *x, where it is real.\n\nPictures:\n- All pictures exist for all 11 designs.\n- Six design.js files (bigcomma, glyph, blobs, spiral, swell, hook) are 1 to 3 minutes newer than their pictures. Their dark shares agree with rows.json within 0.025, the same spread as for tomoe and mosaic, whose pictures came after their last edit. So the pictures are current.\n- Close renders are in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/judge-math/: hook-442-4s2.png, mosaic-sx-22s.png, glyph-22s-2s22.png, tomoe-333-632-3s3.png.\n\nProcess: no file of W was changed. Four browser runs went through the mini pool, one at a time, and the heavy computation ran on aifoundry1."
+  }
+ ]
+]

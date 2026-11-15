@@ -1,9 +1,11 @@
 // dev/recut/probe-speed.mjs — how long a rebuild takes (the frames of a drag use the draft mesh): node dev/recut/probe-speed.mjs
+// Two patterns: a print ('checker'; the shape prints alike: no mesh is cut) and the comma cut into the mesh ('sheet',
+// pattern.js SHEET_PATTERN: until 14 Nov 2026 that was the selector's 'comma', which is a print since).
 import { GROUPS, BY_ID } from '../../src/groups.js';
 import { buildScene, mapScene } from '../../src/app.js';
 for (const id of ['xx', '22x', '333', 'o', '*x']) {
   const g = BY_ID[id];
-  for (const pattern of ['checker', 'comma']) for (const draft of [true, false]) for (const recut of [true, false]) {
+  for (const pattern of ['checker', 'sheet']) for (const draft of [true, false]) for (const recut of [true, false]) {
     if (!recut && !['xx', '22x'].includes(id)) continue;
     const p = g.presets[g.presets.length - 1], anchor = (p.anchor || p.seed).slice();
     let best = Infinity, map = Infinity, tris = 0;

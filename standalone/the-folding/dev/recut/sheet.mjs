@@ -1,5 +1,7 @@
 // dev/recut/sheet.mjs — one picture of all 17 groups: the stage (plane and fold) of each at one t, one pattern.
-//   node dev/recut/sheet.mjs --t 0.55 --pat checker --out <png> [--page dev/app-demo.html] [--w 760 --h 470] [--cols 3] [--ids a,b,c]
+//   node dev/recut/sheet.mjs --t 0.55 --pat paisley --out <png> [--page dev/app-demo.html] [--w 760 --h 470] [--cols 3] [--ids a,b,c]
+//   --pat: a key of the selector (paisley, soft, tomoe, checker, rings, comma); without it the page's own default
+//   (Paisley since 14 Nov 2026). The caption of a shot names the print it showed ("sheet": none, the comma on the sheet).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -10,26 +12,29 @@ for (let i = 0; i < args.length; i++) if (args[i].startsWith('--')) opt[args[i].
 const here = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(here, '../..');
 const W = +opt.w || 760, H = +opt.h || 470, cols = +opt.cols || 3, t = opt.t === undefined ? 0.55 : +opt.t;
 const B = await openBrowser({ root });
+let errors = 0;
 try {
   const page = await (await B.browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: 1 })).newPage();
-  let errors = 0;
-  page.on('console', (m) => { if (m.type() === 'error') { errors++; console.log('CONSOLE ERROR', m.text()); } });
+  page.on('console', (m) => { if (m.type() === 'error' || m.type() === 'warning') { if (m.type() === 'error') errors++; console.log(`CONSOLE ${m.type().toUpperCase()}`, m.text()); } });
   page.on('pageerror', (e) => { errors++; console.log('PAGE ERROR', e.message); });
   await page.goto(B.url(opt.page || 'dev/app-demo.html'), { waitUntil: 'load' });
   await page.waitForFunction(() => window.__folding && window.__folding.ready, null, { timeout: 20000 });
   const ids = opt.ids ? opt.ids.split(',') : await page.evaluate(() => ['o', '2222', '**', 'xx', '*x', '333', '22x', '22*', '*2222', '2*22', '442', '632', '3*3', '*333', '4*2', '*442', '*632']);
   const shots = [];
   for (const id of ids) {
-    const st = await page.evaluate(([g, pat, tt, preset]) => { const F = window.__folding; F.setGroup(g); if (preset) F.setPreset(+preset); F.setPattern(pat); F.setT(tt); const s = F.getState(); return { print: s.print, errors: s.errors, recut: s.recut && s.recut.movers }; }, [id, opt.pat || 'checker', t, opt.preset || 0]);
+    const st = await page.evaluate(([g, pat, tt, preset]) => { const F = window.__folding; F.setGroup(g); if (preset) F.setPreset(+preset); if (pat) F.setPattern(pat); F.setT(tt); const s = F.getState(); return { pattern: s.pattern, print: s.print, kind: s.printKind, errors: s.errors, recut: s.recut && s.recut.movers }; }, [id, opt.pat || null, t, opt.preset || 0]);
     await page.waitForTimeout(260);
     const buf = await page.screenshot({ fullPage: false });
     shots.push({ id, b64: buf.toString('base64'), st });
+    if (opt.pat && st.pattern !== opt.pat) { errors++; console.log(`FAILED ${id}: the pattern is '${st.pattern}', not '${opt.pat}'`); }
+    if (st.errors) { errors++; console.log(`ERRORS ${id}: ${st.errors}`); }
   }
   const sheet = await B.browser.newPage({ viewport: { width: cols * (W / 2 + 8) + 24, height: 900 } });
-  await sheet.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:10px;font:12px system-ui;background:#fff}.g{display:grid;grid-template-columns:repeat(${cols},${W / 2}px);gap:8px}figure{margin:0;border:1px solid #ddd}img{display:block;width:100%}figcaption{padding:1px 5px;color:#555}</style><div class="g">${shots.map((s) => `<figure><img src="data:image/png;base64,${s.b64}"><figcaption>${s.id} · ${s.st.print || 'comma'} · t = ${t}${s.st.recut ? ' · re-cut ' + s.st.recut : ''}${s.st.errors ? ' · ERRORS ' + s.st.errors : ''}</figcaption></figure>`).join('')}</div>`);
+  await sheet.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:10px;font:12px system-ui;background:#fff}.g{display:grid;grid-template-columns:repeat(${cols},${W / 2}px);gap:8px}figure{margin:0;border:1px solid #ddd}img{display:block;width:100%}figcaption{padding:1px 5px;color:#555}</style><div class="g">${shots.map((s) => `<figure><img src="data:image/png;base64,${s.b64}"><figcaption>${s.id} · ${s.st.pattern}: ${s.st.print || 'sheet'} · t = ${t}${s.st.recut ? ' · re-cut ' + s.st.recut : ''}${s.st.errors ? ' · ERRORS ' + s.st.errors : ''}</figcaption></figure>`).join('')}</div>`);
   await sheet.waitForTimeout(200);
   const out = path.resolve(opt.out || 'sheet.png');
   fs.mkdirSync(path.dirname(out), { recursive: true });
   await sheet.screenshot({ path: out, fullPage: true });
   console.log('WROTE ' + out + (errors ? ` (${errors} errors)` : ''));
 } finally { await B.close(); }
+process.exit(errors ? 1 : 0);

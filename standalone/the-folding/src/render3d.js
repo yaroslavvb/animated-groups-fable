@@ -18,6 +18,32 @@
 // a ghost tile (tint bit 0) takes the ghost colour; below 1 the print shows through on a star's secondary tiles.
 // style.palette (the 22x lab): [{ front, back }, ...] up to 16; a vertex tint of 4 + i takes colour i of it.
 //
+// A SHAPE print (the pattern round of 13 Nov 2026): any two-tone pattern of a lattice, handed over as a signed-distance
+// TEXTURE of one lattice cell. style.print = { mode: 3, A, I, O, tex } with
+//   I    Float32Array(4), the rows of [e1 e2]^-1 (as mode 2's): the lattice coordinates of a paper point p are
+//        (s, t) = (I.xy . (p - origin), I.zw . (p - origin))
+//   O    Float32Array(3): (origin.x, origin.y, range)          A    Float32Array(4): (e1, e2); checked, the shader does
+//        not need it. L is not looked at.
+//   tex  { size, data: Uint8Array(size * size), range }: one channel; texel (i, j) (index j * size + i) has its centre
+//        at the lattice coordinates ((i + 0.5) / size, (j + 0.5) / size). Its value v is the signed distance
+//        sd = (v - 128) / 127 * range, in paper units, to the nearest outline, NEGATIVE inside the DARK tone (255: `range`
+//        or more outside, 1: `range` or more inside). The pattern repeats in s and t. range = tex.range (O[2] where the
+//        tex has none). size: a power of two is safest (the coarser levels of another size do not repeat exactly).
+// The texture is kept BY REFERENCE, never copied, and uploaded only when tex.data (the array itself) or tex.size is
+// another one than last time, so the same tex can be handed over on every colour change of a fold at no cost; do not
+// write into a data array after handing it over (a lost context is restored from it). The old texture is deleted, and
+// so is the last one when the print is no longer a shape print. R.stats.printUploads counts the uploads.
+// What the shader does with it (sdfTone, sdfFootprint and sdfRead below are its twins in JavaScript): it samples sd
+// at the continuous lattice coordinates (REPEAT; trilinear, anisotropic where the GPU can) and draws
+//     tone = clamp(0.5 - sd / clamp(w, 1e-6 range, 2 range), 0, 1)          0 light .. 1 dark
+// where w is the pixel's footprint ACROSS the outline in paper units: |J^T g| for the paper under the pixel
+// J = [dFdx(uv) dFdy(uv)] and the unit gradient g of sd (its direction read off the screen derivatives of sd, its
+// length never trusted). So an outline is a ramp one pixel wide at every zoom, on a tilted sheet too (w is small for an
+// outline that runs away from the eye, large for one that lies across); and where the footprint reaches 2 range (the
+// tile is small on screen) the tone is 0.5 - sd / (2 range), LINEAR in the texture, i.e. the plain mip-mapped mean of
+// the print: calm, nothing to sparkle. Corners are rounded off at the scale of a texel, and a mark thinner than about
+// two texels cannot be held faithfully. Measured on a GPU: dev/patterns/tex-demo.mjs, notes/patterns-renderer.md.
+//
 // The surface's tint (setSurface) is two bits per vertex (constant over each triangle): bit 0 = ghost (a kaleidoscope
 // star's secondary tiles, SPEC 5.7: tint 1), bit 1 = fill (the pattern's comma filled into the sheet, motif.js
 // motifTintMesh: tint 2, or 3 on a ghost tile). The colour of a triangle is front / back (by the side the eye sees),
@@ -35,7 +61,8 @@
 // and a zoom factor (1 = the frame sphere just fits; 0.5 … 3.2). Nothing but resetView() / setView() and the person's
 // own dragging changes them: setSurface, updatePositions, setFrame and resize never touch the orientation.
 //
-// Calling pattern. The data setters copy what they are given (the arrays can be reused at once) and never draw;
+// Calling pattern. The data setters copy what they are given (the arrays can be reused at once; the one exception is
+// the data array of a shape print's texture, kept by reference: see above) and never draw;
 // call R.render() after them — once per animation frame. If nobody does, the renderer draws by itself on the next
 // frame, and it always redraws by itself while the camera moves (drag, momentum, zoom, eased frame, reset glide).
 // The canvas is sized from its CSS box (a ResizeObserver watches it). devicePixelRatio is capped at 2, and a
@@ -81,9 +108,9 @@
 //     frame, always inside the canvas; it keeps its spot until another is clearly better (hysteresis) and glides to
 //     the new one in 0.16 s. (See chooseLabelSpots. Cost per frame: about 0.1 ms for the app's scenes, about 1 ms
 //     for 10 labels crowded by 40 polylines of 100 segments each; R.stats.labelsMs has the last frame's.)
-//   R.stats = { triangles, vertices, segments, normalsMs, sortMs, probeMs, labelsMs, cpuMs, frames, threeSheets }
+//   R.stats = { triangles, vertices, segments, normalsMs, sortMs, probeMs, labelsMs, cpuMs, frames, threeSheets, printUploads }
 //     the last drawn frame: its CPU costs in ms (normals, sort, layer probe, labels, everything), and whether the
-//     passes for three overlapping sheets ran
+//     passes for three overlapping sheets ran; printUploads: how often a shape print's texture went to the GPU so far
 //   R.ok (false when WebGL2 is unavailable: every method is then a harmless no-op), R.canvas, R.gl
 //   createRenderer(canvas, { labelLayer, fast: true })   never run the passes for three sheets (3 passes over the
 //     surface instead of 5 while three sheets are in view): a knob for a GPU that cannot keep up
@@ -98,7 +125,8 @@
 //     overrides the media query; R.reducedMotion says which applies.
 //   Lost WebGL context. While the browser has taken the context away, the marker labels are hidden and a one-line
 //     message (role="status", class "r3d-message") lies over the canvas, in the canvas's parent element; when the
-//     context comes back, everything is uploaded again and drawn, the message goes and the labels return. R.lost.
+//     context comes back, everything is uploaded again (a shape print's texture too) and drawn, the message goes and
+//     the labels return. R.lost.
 //   Accessibility. Unless the page set them already, the canvas gets role="application", aria-roledescription="3D view"
 //     and an aria-label that names the keys (arrows turn, + and - zoom, 0 or Home resets) besides the gestures.
 
@@ -120,6 +148,7 @@ const LINE_STRIDE = 22;            // floats per line segment instance
 const MARKER_STRIDE = 10;          // floats per marker instance
 const DASH_PERIOD = 0.055;         // default dash period, in units of the reference frame radius
 const MARKER_XRAY = 0.45;
+const MAX_ANISO = 16;              // a shape print's texture: anisotropic filtering up to this (where the GPU has it)
 const ARIA_LABEL = 'Fold in 3D. Drag or arrow keys to turn; scroll, pinch, + or − to zoom; double-tap, 0 or Home to reset.';
 const LOST_TEXT = 'The 3D view paused: the browser reset its graphics.';
 
@@ -311,6 +340,77 @@ function softLimit(x, lo, hi, over) {
   if (x < lo) return lo - over * (1 - Math.exp(-(lo - x) / over));
   return x;
 }
+
+// ---- the shape print (mode 3): what the surface shader does with a signed-distance texture, in JavaScript ----
+// (pure; exported, so that a test can ask "what tone does the shader give here?" without a GPU)
+
+/**
+ * The tone (0 light .. 1 dark) of a pixel whose centre is the signed distance sd from an outline of a shape print
+ * (negative inside the dark tone): a ramp one pixel wide across sd = 0. footprint: the pixel's size ACROSS the outline
+ * (sdfFootprint); range: where the print's texture saturates. All three in paper units.
+ * Up to a footprint of 2 range the ramp is as wide as the footprint; from there on (the print is small on the screen)
+ * the tone is 0.5 - sd / (2 range): linear in the texture's value, so the mean of the print under the pixel.
+ * The twin of the GLSL function of the same name in SURF_FS.
+ */
+export function sdfTone(sd, footprint, range) {
+  const lo = 1e-6 * range, hi = 2 * range;
+  const w = footprint > lo ? (footprint < hi ? footprint : hi) : lo;
+  return Math.min(1, Math.max(0, 0.5 - sd / w));
+}
+
+/**
+ * The footprint of a pixel ACROSS an outline, in paper units. (ax, ay), (bx, by): the paper under one pixel step to
+ * the right and one pixel step up (the shader's dFdx and dFdy of the paper coordinates); (gx, gy): the gradient of sd
+ * on the paper there (of length 1 beside an outline of a true distance field). It is |J^T g| / |g| with J = [a b]:
+ * only the gradient's direction counts, and the result lies between the pixel's smallest and largest extent on the
+ * paper. Where the field is flat (|g| under 0.6, fading out to 0.2: a plateau, the spine of a thin mark, a coarse
+ * mip level) the direction means little, and the footprint goes over to its root mean square over all directions.
+ * The twin of SURF_FS's sdfFootprint, which is handed J^T g (the screen derivatives of sd) instead of g.
+ */
+export function sdfFootprint(ax, ay, bx, by, gx, gy) {
+  const iso = Math.sqrt(0.5 * (ax * ax + ay * ay + bx * bx + by * by)), gm = Math.hypot(gx, gy);
+  if (!(gm > 0)) return iso;
+  const across = Math.hypot(ax * gx + ay * gy, bx * gx + by * gy) / gm;
+  const u = Math.min(1, Math.max(0, (gm - 0.2) / 0.4));
+  return iso + (across - iso) * u * u * (3 - 2 * u);
+}
+
+/**
+ * The signed distance (paper units) that a shape print's texture gives at the lattice coordinates (s, t), read as
+ * the GPU reads it when the texture is magnified: bilinear between the four nearest texel centres, repeating.
+ * tex = { size, data, range } (see the top of the file). (The same number as src/sdf.js gives:
+ * sdfDistance(sdfSample(tex.data, tex.size, s, t), tex.range); this file imports nothing but the palette.)
+ */
+export function sdfRead(tex, s, t) {
+  const n = tex.size, d = tex.data;
+  const x = s * n - 0.5, y = t * n - 0.5, i = Math.floor(x), j = Math.floor(y), fx = x - i, fy = y - j;
+  const wrap = (k) => ((k % n) + n) % n;
+  const i0 = wrap(i), i1 = wrap(i + 1), r0 = wrap(j) * n, r1 = wrap(j + 1) * n;
+  const v = (d[r0 + i0] * (1 - fx) + d[r0 + i1] * fx) * (1 - fy) + (d[r1 + i0] * (1 - fx) + d[r1 + i1] * fx) * fy;
+  return (v - 128) / 127 * tex.range;
+}
+
+/**
+ * setStyle's check of a shape print: the print as the renderer keeps it — { mode: 3, L, A, I, O, tex: { size, data,
+ * range } }, the small arrays copied, the texture's data array NOT (see the top of the file), O[2] = the range — or a
+ * string that says what is wrong with it.
+ */
+function shapePrint(P) {
+  const fine = (a, k) => !!a && a.length >= k && Array.prototype.every.call(a, Number.isFinite);
+  if (!fine(P.A, 4) || !fine(P.I, 4) || !fine(P.O, 3)) return 'A (4 numbers), I (4) and O (3) must be finite';
+  const T = P.tex;
+  if (!T || typeof T !== 'object') return 'no tex';
+  const size = T.size, data = T.data;
+  if (!Number.isInteger(size) || size < 1) return 'tex.size must be a whole number of texels, at least 1';
+  if (!(data instanceof Uint8Array || data instanceof Uint8ClampedArray)) return 'tex.data must be a Uint8Array';
+  if (data.length < size * size) return `tex.data holds ${data.length} texels; a tex.size of ${size} needs ${size * size}`;
+  const range = Number.isFinite(T.range) && T.range > 0 ? +T.range : +P.O[2];
+  if (!(range > 0)) return 'the range (tex.range, or O[2]) must be a positive length';
+  const O = Float32Array.of(P.O[0], P.O[1], range);
+  return { mode: 3, L: fine(P.L, 9) ? Float32Array.from(P.L) : new Float32Array(9), A: Float32Array.from(P.A), I: Float32Array.from(P.I), O, tex: { size, data, range } };
+}
+const warned = new Set();
+function warnOnce(msg) { if (!warned.has(msg)) { warned.add(msg); console.warn(msg); } }
 
 /**
  * Pack polylines into per-segment instances: prev(3) a(3) b(3) next(3) rgba(4) [width, xray, sA, sB] [dashOn, dashPeriod].
@@ -665,11 +765,13 @@ in float vTint;
 in vec2 vUV;
 uniform vec3 uFront, uBack, uGhost, uFill;
 uniform float uOpacity;
-// the print (pattern.js): 0 none; 1 the product of three square waves of linear forms; 2 rings round a lattice
+// the print (pattern.js): 0 none; 1 the product of three square waves of linear forms; 2 rings round a lattice;
+// 3 a shape print: the signed distance to its outlines, one lattice cell of it in a texture
 uniform int uPat;
 uniform vec3 uPatL0, uPatL1, uPatL2;      // mode 1: (lx, ly, offset) of each form
-uniform vec4 uPatA, uPatI;                // mode 2: the basis (a, b) and the rows of its inverse
-uniform vec3 uPatO;                       // mode 2: the origin, 1 / the width of a ring
+uniform vec4 uPatA, uPatI;                // mode 2: the basis (a, b) and the rows of its inverse; mode 3: uPatI alike
+uniform vec3 uPatO;                       // mode 2: the origin, 1 / the width of a ring; mode 3: the origin, the range
+uniform highp sampler2D uPatT;            // mode 3: R8, repeating; v -> sd = (255 v - 128) / 127 * range, < 0 in the dark tone
 uniform vec3 uPatF0, uPatF1, uPatB0, uPatB1;   // light and dark, front and back
 uniform float uGhostMix;
 uniform vec3 uPalF[16];
@@ -681,10 +783,34 @@ float sqw(float c) {
   float w = max(fwidth(c), 1e-6);
   return clamp(sin(3.14159265 * c) / (2.4 * w), -1.0, 1.0);
 }
+// Mode 3. The tone at the signed distance sd from an outline: a ramp one pixel wide, w being the pixel's footprint
+// across the outline (all in paper units). From w = 2 range on it is 0.5 - sd / (2 range): linear in the texture, the
+// mean of the print under the pixel. (sdfTone in JavaScript is its twin; test/render3d.test.js runs this very text.)
+float sdfTone(float sd, float w, float range) {
+  return clamp(0.5 - sd / clamp(w, 1e-6 * range, 2.0 * range), 0.0, 1.0);
+}
+// The pixel's footprint across the outline. a, b: the paper under one pixel step right / up; gs: what sd changes by
+// over those steps, = J^T grad sd with J = [a b]. The gradient's direction is taken from gs, its length is not (a
+// texture's field is flatter than a true distance near a thin mark and in the coarse mip levels): |J^T g| / |g|.
+// Where the field is flat the direction means little: the root mean square over all directions instead.
+float sdfFootprint(vec2 a, vec2 b, vec2 gs) {
+  float det = a.x * b.y - a.y * b.x;
+  vec2 gp = vec2(b.y * gs.x - a.y * gs.y, a.x * gs.y - b.x * gs.x);     // det * grad sd, on the paper
+  float gm = length(gp) / max(abs(det), 1e-30);                          // |grad sd|: 1 beside an outline
+  float iso = sqrt(0.5 * (dot(a, a) + dot(b, b)));
+  return mix(iso, length(gs) / max(gm, 1e-6), smoothstep(0.2, 0.6, gm));
+}
 float printTone() {                       // 0 light .. 1 dark
   if (uPat == 1) {
     float p = sqw(dot(uPatL0.xy, vUV) + uPatL0.z) * sqw(dot(uPatL1.xy, vUV) + uPatL1.z) * sqw(dot(uPatL2.xy, vUV) + uPatL2.z);
     return 0.5 - 0.5 * p;
+  }
+  if (uPat == 3) {
+    // the lattice coordinates stay continuous (REPEAT wraps them): fract() would make their derivatives, and with
+    // them the mip level, jump along the borders of the cells
+    vec2 q = vUV - uPatO.xy;
+    float sd = (texture(uPatT, vec2(dot(uPatI.xy, q), dot(uPatI.zw, q))).r * 255.0 - 128.0) * (uPatO.z / 127.0);
+    return sdfTone(sd, sdfFootprint(dFdx(vUV), dFdy(vUV), vec2(dFdx(sd), dFdy(sd))), uPatO.z);
   }
   vec2 d = vUV - uPatO.xy;
   vec2 f = fract(vec2(dot(uPatI.xy, d), dot(uPatI.zw, d)));
@@ -923,7 +1049,7 @@ function stubRenderer(canvas, labelLayer) {
   const view = viewFromAzEl();
   const nop = () => {};
   return {
-    ok: false, canvas, gl: null, stats: { triangles: 0, vertices: 0, segments: 0, normalsMs: 0, sortMs: 0, probeMs: 0, labelsMs: 0, cpuMs: 0, frames: 0, threeSheets: false },
+    ok: false, canvas, gl: null, stats: { triangles: 0, vertices: 0, segments: 0, normalsMs: 0, sortMs: 0, probeMs: 0, labelsMs: 0, cpuMs: 0, frames: 0, threeSheets: false, printUploads: 0 },
     setSurface: nop, updatePositions: nop, setLines: nop, setMarkers: nop, setFrame: nop, setStyle: nop, render: nop,
     onChange: () => nop, project: () => [0, 0, false], getView: () => ({ q: view.q.slice(), zoom: view.zoom }),
     setView: nop, resetView: nop, resize: nop, dispose: nop, reducedMotion: false, lost: false,
@@ -968,7 +1094,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   let cssW = 0, cssH = 0, dpr = 1, layerDX = 0, layerDY = 0;
   let camVersion = 1, emittedVersion = 0, matVersion = 0;
   const listeners = new Set();
-  const stats = { triangles: 0, vertices: 0, segments: 0, normalsMs: 0, sortMs: 0, probeMs: 0, labelsMs: 0, cpuMs: 0, frames: 0, threeSheets: false };
+  const stats = { triangles: 0, vertices: 0, segments: 0, normalsMs: 0, sortMs: 0, probeMs: 0, labelsMs: 0, cpuMs: 0, frames: 0, threeSheets: false, printUploads: 0 };
   let lost = false, disposed = false, inDraw = false;
   let rafId = 0, lastUserRender = -1e9, lastTick = -1e9, needsDraw = false, lastAdvance = 0;
   let threeHold = 0;                       // > 0 while the passes for three overlapping sheets are switched on
@@ -1026,10 +1152,53 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     gl.bindVertexArray(null);
     g.stencil = !fast && gl.getParameter(gl.STENCIL_BITS) >= 8;
     if (g.stencil) { g.fullP = makeProgram(gl, FULL_VS, DEPTH_FS); g.fullVao = gl.createVertexArray(); }
+    // The print's texture (mode 3), on unit 0. While there is none a 1 x 1 stand-in is bound, so the surface shader's
+    // sampler always has a complete texture (the modes that never read it draw without a browser's warning).
+    // patTex is the texture of the field patData (the array itself) of patSize texels a side: printTexture().
+    g.blankTex = gl.createTexture();
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, g.blankTex);
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, 1, 1, 0, gl.RED, gl.UNSIGNED_BYTE, new Uint8Array([255]));
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+    g.patTex = null; g.patData = null; g.patSize = 0;
+    g.maxTex = +gl.getParameter(gl.MAX_TEXTURE_SIZE) || 0;
+    const an = gl.getExtension('EXT_texture_filter_anisotropic');
+    const anMax = an ? +gl.getParameter(an.MAX_TEXTURE_MAX_ANISOTROPY_EXT) : 0;
+    g.aniso = an && anMax > 1 ? [an.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(MAX_ANISO, anMax)] : null;
     G = g;
-    // everything has to be uploaded again
+    // everything has to be uploaded again (the print's texture too: a new G has none)
     surf.topoDirty = surf.n > 0; surf.posDirty = surf.n > 0; surf.sortDirty = surf.n > 0;
     lineState.dirty = true; markState.dirty = true;
+  }
+  /**
+   * The GL texture of a shape print's field (tex = { size, data, range }, see the top of the file), uploaded when the
+   * data array or the size is another one than last time; the texture before it is deleted. null: this GPU cannot
+   * hold it. Leaves the texture bound to unit 0.
+   */
+  function printTexture(tex) {
+    if (G.patTex && G.patData === tex.data && G.patSize === tex.size) return G.patTex;
+    dropPrintTexture();
+    if (G.maxTex > 0 && tex.size > G.maxTex) {
+      warnOnce(`render3d: a shape print's texture of ${tex.size} x ${tex.size} texels is more than this GPU takes (${G.maxTex}): the sheet is drawn without its print`);
+      return null;
+    }
+    const t = gl.createTexture();
+    if (!t) return null;                               // the context has just gone (its event is still on its way)
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t);
+    // one byte a texel, rows of any length, in the order given: row j is the lattice coordinate t = (j + 0.5) / size
+    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R8, tex.size, tex.size, 0, gl.RED, gl.UNSIGNED_BYTE, tex.data);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    if (G.aniso) gl.texParameterf(gl.TEXTURE_2D, G.aniso[0], G.aniso[1]);
+    gl.generateMipmap(gl.TEXTURE_2D);
+    G.patTex = t; G.patData = tex.data; G.patSize = tex.size;
+    stats.printUploads++;
+    return t;
+  }
+  function dropPrintTexture() {
+    if (G.patTex) gl.deleteTexture(G.patTex);
+    G.patTex = null; G.patData = null; G.patSize = 0;
   }
 
   // ---- camera ----
@@ -1192,6 +1361,11 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       }
       if (lineState.dirty) { if (lineState.count) upload(gl.ARRAY_BUFFER, G.lineBuf, lineState.data, lineState.count * LINE_STRIDE); lineState.dirty = false; }
       if (markState.dirty) { if (markState.count) upload(gl.ARRAY_BUFFER, G.markBuf, markState.data, markState.count * MARKER_STRIDE); markState.dirty = false; }
+      // The print: only on a surface that brought its paper coordinates. A shape print's texture goes to the GPU here,
+      // when it is another one than last time; it is let go once the style holds no shape print any more.
+      const pr = m && surf.uv && style.print && style.print.mode > 0 ? style.print : null;
+      const sdfTex = pr && pr.mode === 3 ? printTexture(pr.tex) : null;
+      if (G.patTex && !(style.print && style.print.mode === 3)) dropPrintTexture();
 
       const W = canvas.width, H = canvas.height, bg = style.background;
       gl.viewport(0, 0, W, H);
@@ -1245,9 +1419,9 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
         gl.uniform3fv(u.uFront, style.front); gl.uniform3fv(u.uBack, style.back); gl.uniform3fv(u.uGhost, style.ghost);
         gl.uniform3fv(u.uFill, style.fill);
         gl.uniform1f(u.uOpacity, style.opacity);
-        // the print: only on a surface that brought its paper coordinates
-        const pr = surf.uv && style.print && style.print.mode > 0 ? style.print : null;
-        gl.uniform1i(u.uPat, pr ? pr.mode : 0);
+        // the print (pr, above); a shape print whose texture this GPU cannot hold is no print
+        gl.uniform1i(u.uPat, pr && !(pr.mode === 3 && !sdfTex) ? pr.mode : 0);
+        gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, sdfTex || G.blankTex); gl.uniform1i(u.uPatT, 0);
         if (pr) {
           gl.uniform3f(u.uPatL0, pr.L[0], pr.L[1], pr.L[2]); gl.uniform3f(u.uPatL1, pr.L[3], pr.L[4], pr.L[5]); gl.uniform3f(u.uPatL2, pr.L[6], pr.L[7], pr.L[8]);
           gl.uniform4fv(u.uPatA, pr.A); gl.uniform4fv(u.uPatI, pr.I); gl.uniform3fv(u.uPatO, pr.O);
@@ -1525,10 +1699,15 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     if (s.fill !== undefined) style.fill = toRgb(s.fill, style.fill);
     if (s.opacity !== undefined && Number.isFinite(+s.opacity)) style.opacity = Math.min(1, Math.max(0, +s.opacity));
     if (s.print !== undefined) {
-      // pattern.js printUniforms(print): { mode, L(9), A(4), I(4), O(3) }; anything else (null, mode 0) is no print
+      // pattern.js printUniforms(print): { mode, L(9), A(4), I(4), O(3) }, and tex for a shape print (mode 3, see the top
+      // of the file and shapePrint); anything else (null, mode 0, a malformed print) is no print
       const P = s.print;
       const fine = (a, k) => a && a.length >= k && Array.prototype.every.call(a, Number.isFinite);
-      style.print = P && (P.mode === 1 || P.mode === 2) && fine(P.L, 9) && fine(P.A, 4) && fine(P.I, 4) && fine(P.O, 3)
+      if (P && P.mode === 3) {
+        const sp = shapePrint(P);
+        if (typeof sp === 'string') warnOnce('render3d.setStyle: a shape print (mode 3) is left out: ' + sp);
+        style.print = typeof sp === 'string' ? null : sp;
+      } else style.print = P && (P.mode === 1 || P.mode === 2) && fine(P.L, 9) && fine(P.A, 4) && fine(P.I, 4) && fine(P.O, 3)
         ? { mode: P.mode, L: Float32Array.from(P.L), A: Float32Array.from(P.A), I: Float32Array.from(P.I), O: Float32Array.from(P.O) } : null;
     }
     for (const [key, own] of [['printFront', 'printFront'], ['printBack', 'printBack']]) {
@@ -1848,6 +2027,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       for (const k of ['posBuf', 'nrmBuf', 'tintBuf', 'uvBuf', 'idxBuf', 'cornerBuf', 'lineBuf', 'quadBuf', 'markBuf']) gl.deleteBuffer(G[k]);
       for (const k of ['surfVao', 'lineVao', 'markVao', 'fullVao']) if (G[k]) gl.deleteVertexArray(G[k]);
       for (const k of ['surfP', 'depthP', 'lineP', 'markP', 'fullP']) if (G[k]) gl.deleteProgram(G[k].prog);
+      for (const k of ['blankTex', 'patTex']) if (G[k]) gl.deleteTexture(G[k]);
     }
     G = null;
   }
@@ -1872,7 +2052,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
 }
 
 export const __test = { qMul, qAxisAngle, qNormalize, qSlerp, qToMat3, cameraMatrices, makeCamera, accumulateNormals, makeSortScratch,
-  makeProbeScratch, probeSheets, PROBE, LINE_VS, LINE_FS, SURF_VS, SURF_FS,
+  makeProbeScratch, probeSheets, PROBE, LINE_VS, LINE_FS, SURF_VS, SURF_FS, shapePrint, MAX_ANISO,
   sortTriangles, softLimit, packLines, LINE_STRIDE, FOV_Y, FIT_MARGIN, ZOOM_MIN, ZOOM_MAX,
   labelBox, clipLength, lineCover, projectSegments, chooseLabelSpots, makeLabelScratch, LABEL_GAP, LABEL_PAD, LABEL_CLEAR, LABEL_MARGIN, LABEL_W, LABEL_SPOTS, LABEL_WAIT,
   LABEL_STYLE };

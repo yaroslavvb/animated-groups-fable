@@ -1,0 +1,266 @@
+
+== dpr 1: 600 x 600 device px · ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version) · texture 256^2, range 4 texels = 0.0125 · anisotropic x16 (GPU max 16) · MSAA 4 · grid 24 x 24
+   the page's camera against R.project: 2.2e-16 world units; mean tone of the texture 0.2332
+
+   far: pixels more than 2 px from every outline, the share whose tone is the analytic one within 0.05 (and the largest miss); edge: the ramp across an outline, its width (1 = one pixel),
+   where it sits (offset) and how far single pixels put the outline from where it is (rms, px); twin: tone - sdfTone(...) within 2 px of an outline, on the analytic field, on the
+   texture read in JS (tex), and with the footprint NOT taken across the outline (iso: the control); seam: the pixels on the borders of the lattice cells, on plateaus and beside outlines
+   (misses: the far pixels that are off, and how many texels the farthest of them is from a corner of the bar; tex-iso: the texture twin with the direction ignored)
+   view      zoom  px/texel  footpr/range |  far px   agree%  worst  misses (texels)  (sample of 2000) |  width  offset   pos rms px |  twin rms  p99    max    tex     iso    tex-iso |  seam px  worst   band rms
+   face-on   0.125 0.125     2            | 2591     100     0      0      (0)       (100    of 2000)  | 1.8086 -0.0007  0.1521     | 0.0782   0.1965 0.2832 0.0771  0.0782 0.0771  | 184      0       0.0876 
+   face-on   0.25  0.25      1            | 16239    100     0      0      (0)       (100    of 2000)  | 1.0916 -0.0104  0.0206     | 0.0171   0.0541 0.2697 0.0162  0.0171 0.0162  | 542      0       0.0141 
+   face-on   0.5   0.5       0.5          | 82440    100     0      0      (0)       (100    of 2000)  | 1.001  -0.0014  0.0079     | 0.0076   0.0167 0.2068 0.006   0.0076 0.006   | 1870     0       0.004  
+   face-on   1     1         0.25         | 332240   100     0      0      (0)       (100    of 2000)  | 1.0002 0.0013   0.007      | 0.0049   0.0146 0.1425 0.0014  0.0049 0.0014  | 4598     0       0.0036 
+   face-on   2     2         0.125        | 345018   100     0      0      (0)       (100    of 2000)  | 1.0005 -0.0002  0.0137     | 0.0095   0.0266 0.5082 0.002   0.0095 0.002   | 1777     0       0.006  
+   face-on   4     4         0.0625       | 352864   100     0      0      (0)       (100    of 2000)  | 1.0084 -0.0014  0.0291     | 0.0271   0.0544 1      0.0026  0.0271 0.0026  | 577      0       0.0178 
+   face-on   8     8         0.0313       | 352023   99.9997 0.5145 1      (0.4222)  (100    of 2000)  | 1.0189 -0.0101  0.0694     | 0.0485   0.108  1      0.004   0.0485 0.004   | 1153     0       0.0305 
+   tilted    0.125 0.0864    2.8935       | 983      100     0.0059 0      (0)       (100    of 2000)  | 1.7562 -0.0224  0.1067     | 0.0929   0.3254 0.3653 0.0921  0.0929 0.092   | 92       0       0.1123 
+   tilted    0.25  0.1752    1.427        | 7732     100     0      0      (0)       (100    of 2000)  | 1.1502 -0.0217  0.0317     | 0.0285   0.1078 0.2814 0.0282  0.0383 0.0381  | 448      0       0.0337 
+   tilted    0.5   0.3594    0.6956       | 43980    100     0      0      (0)       (100    of 2000)  | 0.9997 -0.0019  0.0087     | 0.0081   0.0238 0.2258 0.0074  0.0269 0.0267  | 1540     0       0.0056 
+   tilted    1     0.7797    0.3207       | 198004   100     0      0      (0)       (100    of 2000)  | 0.9996 0.0002   0.0058     | 0.0059   0.0138 0.2604 0.0042  0.0268 0.0264  | 3660     0       0.0027 
+   tilted    2     1.4131    0.1769       | 313883   100     0      0      (0)       (100    of 2000)  | 0.9988 -0.0007  0.01       | 0.0077   0.021  0.3837 0.0036  0.0318 0.0311  | 3424     0       0.004  
+   tilted    4     2.7983    0.0893       | 347688   100     0      0      (0)       (100    of 2000)  | 0.9968 0.0008   0.0177     | 0.0158   0.0373 0.7381 0.0026  0.0352 0.0319  | 2031     0       0.0094 
+   tilted    8     5.5966    0.0447       | 350364   100     0      0      (0)       (100    of 2000)  | 1.0018 -0.0041  0.0342     | 0.017    0.0668 0.0944 0.0028  0.0314 0.0266  | 987      0       0.0233 
+   grazing   0.125 null      0            | 76       100     0      0      (0)       (100    of 171 )  | null   null     0.1752     | 0.2044   0.562  0.7664 0.204   0.2044 0.204   | 17       0       0.2648 
+   grazing   0.25  0.0717    3.4872       | 1173     100     0.0073 0      (0)       (100    of 2000)  | 1.317  -0.0689  0.1911     | 0.1085   0.3504 0.4925 0.1076  0.107  0.106   | 153      0.0073  0.136  
+   grazing   0.5   0.1498    1.6689       | 10752    99.9907 0.1439 1      (6.2375)  (100    of 2000)  | 1.0601 -0.0278  0.0718     | 0.0513   0.1792 0.4143 0.0507  0.0733 0.0731  | 804      0       0.0659 
+   grazing   1     0.3414    0.7322       | 63947    99.9984 0.0752 1      (4.6494)  (100    of 2000)  | 0.9754 -0.0032  0.0214     | 0.0205   0.0914 0.4789 0.02    0.0529 0.0528  | 2459     0       0.0269 
+   grazing   2     1.0399    0.2404       | 198640   100     0      0      (0)       (100    of 2000)  | 0.989  -0.0015  0.0137     | 0.0126   0.0539 0.8841 0.0102  0.0531 0.0527  | 3380     0       0.0127 
+   grazing   4     2.036     0.1228       | 235477   100     0      0      (0)       (100    of 2000)  | 0.9965 0.0018   0.0155     | 0.0102   0.0381 0.3406 0.0066  0.0483 0.0479  | 2305     0       0.0082 
+   grazing   8     4.0721    0.0614       | 241398   100     0      0      (0)       (100    of 2000)  | 0.9944 0.0352   0.0168     | 0.0085   0.0295 0.1322 0.0037  0.0426 0.0423  | 1021     0       0.0083 
+
+   the BACK of the sheet (only the back's two colours are changed between the three pictures):
+   back face-on  z 1   far 332240 px agree 100 % (sample 100 % of 2000); edge width 1.0003 px, offset 0.0009 px; twin rms 0.0048; pixels where the back's colours changed nothing: 0  ok
+   back face-on  z 4   far 352864 px agree 100 % (sample 100 % of 2000); edge width 1.0091 px, offset -0.0021 px; twin rms 0.0272; pixels where the back's colours changed nothing: 0  ok
+   back tilted   z 1   far 198004 px agree 100 % (sample 100 % of 2000); edge width 1 px, offset 0.0004 px; twin rms 0.006; pixels where the back's colours changed nothing: 0  ok
+   back tilted   z 4   far 347688 px agree 100 % (sample 100 % of 2000); edge width 0.9982 px, offset -0.0004 px; twin rms 0.0158; pixels where the back's colours changed nothing: 0  ok
+   control, the FRONT with only the back's colours changed: 0 pixels react, 221069 do not  ok
+
+   the same tex handed over 104 times so far (setStyle with the print and new colours): 0 uploads after the first  ok
+
+   two triangles against a 24 x 24 grid, same view (tilted z 1; face-on z 4): largest difference of a colour channel inside the sheet 1 of 255 over 221069 px; 0 of 255 over 360000 px (on the whole canvas, the sheet's multisampled rim included: 57; 0)  ok
+
+   no seam: the picture from a second texture whose cells begin half a cell further on (its borders run elsewhere) against the first; the difference of the tone, pixel by pixel
+   view                     |  pixels    largest  rms     |  on a border of either: pixels  largest  rms    (one colour level = 1 / levels of tone)
+   face-on z 0.125          |  5184      0.0058   0.0003  |  1393                          0.0058   0.0002 (299.6448)
+   face-on z 0.25           |  23104     0.0058   0.0001  |  3287                          0        0      (299.6448)
+   face-on z 0.5            |  97344     0.0058   0       |  6951                          0        0      (299.8104)
+   face-on z 1              |  360000    0.0058   0       |  13241                         0        0      (300.1913)
+   face-on z 2              |  360000    0.0116   0.0001  |  6634                          0        0      (300.1914)
+   face-on z 4              |  360000    0        0       |  2508                          0        0      (300.1914)
+   face-on z 8              |  360000    0        0       |  2508                          0        0      (300.1913)
+   tilted z 0.125           |  2650      0.006    0.0002  |  1035                          0        0      (291.0094)
+   tilted z 0.25            |  12632     0.0059   0.0001  |  2734                          0        0      (291.0953)
+   tilted z 0.5             |  55749     0.006    0       |  6096                          0        0      (291.4356)
+   tilted z 1               |  221069    0.0061   0       |  11315                         0        0      (292.7846)
+   tilted z 2               |  332204    0.0116   0       |  10471                         0        0      (289.0441)
+   tilted z 4               |  360000    0.0064   0       |  5446                          0        0      (288.4031)
+   tilted z 8               |  360000    0.0237   0       |  3379                          0        0      (288.4031)
+   grazing z 0.125          |  534       0        0       |  457                           0        0      (237.6834)
+   grazing z 0.25           |  3579      0        0       |  1764                          0        0      (237.8964)
+   grazing z 0.5            |  18227     0.0072   0.0001  |  4608                          0.0072   0.0001 (238.4156)
+   grazing z 1              |  82275     0.0073   0       |  10185                         0.0073   0.0001 (240.6936)
+   grazing z 2              |  216997    0.0068   0       |  11483                         0.0068   0.0001 (248.737)
+   grazing z 4              |  252000    0.0201   0.0001  |  7961                          0.0075   0.0001 (247.5542)
+   grazing z 8              |  252000    0.0071   0       |  4012                          0        0      (247.5542)
+   sheet 80 px, el 55       |  4643      0        0       |  1450                          0        0      (306.4835)
+   sheet 40 px, el 55       |  1018      0        0       |  545                           0        0      (306.573)
+   sheet 20 px, el 55       |  191       0        0       |  167                           0        0      (306.573)
+   sheet 12 px, el 55       |  44        0        0       |  44                            0        0      (306.573)
+
+   the texture baked by src/sdf.js bakeSDF from the same shapes as polygons (circles of 4096 points), against the analytic print:
+   face-on z 1       far 332240   px agree 100     % (sample 100 % of 2000); edge width 1.0002 px, offset 0.0013  px, outline rms 0.007  px; twin rms 0.0049 (texture 0.0014)  ok
+   face-on z 4       far 352864   px agree 100     % (sample 100 % of 2000); edge width 1.0084 px, offset -0.0014 px, outline rms 0.0291 px; twin rms 0.0271 (texture 0.0026)  ok
+   tilted z 2        far 313883   px agree 100     % (sample 100 % of 2000); edge width 0.9988 px, offset -0.0007 px, outline rms 0.01   px; twin rms 0.0077 (texture 0.0036)  ok
+   face-on z 0.25    far 16239    px agree 100     % (sample 100 % of 2000); edge width 1.0916 px, offset -0.0104 px, outline rms 0.0206 px; twin rms 0.0171 (texture 0.0162)  ok
+   back, tilted z 1  far 198004   px agree 100     % (sample 100 % of 2000); edge width 1      px, offset 0.0004  px, outline rms 0.0059 px; twin rms 0.006  (texture 0.0042)  ok
+   its half-cell-shifted twin (baked for the other cell): largest difference of the tone 0.0058 (z 1), 0 (sheet 40 px)  ok
+
+   small on the screen, turning 1 degree a frame (13 frames). flicker = mean |T(k-1) - 2 T(k) + T(k+1)| per pixel;
+   ideal = the true share of dark under the pixel, soft = the mean of the saturating ramp (what the texture holds), point = no filtering (the control)
+   sheet px  el  footpr/range |  mean tone gpu (spread)  ideal  (spread)  soft   |  flicker gpu  ideal   soft   point |  contrast gpu  ideal  soft |  rms gpu-soft  gpu-ideal
+   160       55  1            |  0.2293 (0.0003)        0.2296 (0.0004) 0.2307 |  0.0643       0.0674  0.0454 0.1008|  0.4018        0.4035 0.3854|  0.05          0.0119 
+   80        55  2            |  0.2337 (0.0009)        0.2324 (0.0012) 0.2335 |  0.0307       0.0437  0.0355 0.0983|  0.363         0.3874 0.3758|  0.0269        0.0527 
+   40        55  4            |  0.2316 (0.0024)        0.2299 (0.0034) 0.2309 |  0.0157       0.0248  0.0173 0.0844|  0.3213        0.3533 0.3475|  0.048         0.0586 
+   20        55  8            |  0.2273 (0.0078)        0.2244 (0.0093) 0.2265 |  0.0066       0.0297  0.0089 0.079 |  0.2399        0.2806 0.2781|  0.0629        0.068  
+   12        55  13.3333      |  0.2451 (0.0198)        0.2418 (0.0278) 0.2427 |  0.004        0.0244  0.0051 0.0454|  0.182         0.2445 0.2422|  0.0764        0.0803 
+   160       90  1            |  0.2311 (0.0002)        0.2313 (0.0002) 0.2324 |  0.0684       0.071   0.0464 0.1016|  0.4053        0.4067 0.3874|  0.0565        0.0108 
+   80        90  2            |  0.2346 (0.001 )        0.2329 (0.0011) 0.234  |  0.034        0.0481  0.0384 0.0999|  0.3667        0.3918 0.3792|  0.0285        0.0563 
+   40        90  4            |  0.2336 (0.0025)        0.2318 (0.0025) 0.2327 |  0.0189       0.0269  0.0205 0.0856|  0.3286        0.362  0.3551|  0.0519        0.0634 
+   20        90  8            |  0.2269 (0.01  )        0.2217 (0.0054) 0.2232 |  0.0077       0.0257  0.0096 0.0761|  0.2506        0.29   0.2875|  0.0705        0.0754 
+   12        90  13.3333      |  0.2397 (0.0083)        0.2374 (0.019 ) 0.2389 |  0.0043       0.0316  0.0059 0.0721|  0.1859        0.2503 0.2482|  0.0856        0.0907 
+
+   WEBGL_lose_context: lost true (message shown true), restored true; texture uploads 55 -> 56; the picture after against before: largest difference 0 of 255 (0 pixels over 2), 50654 dark pixels in it  ok
+
+   pictures: 26 PNG in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/renderer (contact sheet of 25: tex-dpr1-contact.png)
+   texture uploads over the whole run at dpr 1: 56 (every other texture of the sweeps and of the seam test is one; 752 setStyle calls with a print)
+
+== dpr 2: 1200 x 1200 device px · ANGLE (Apple, ANGLE Metal Renderer: Apple M4, Unspecified Version) · texture 256^2, range 4 texels = 0.0125 · anisotropic x16 (GPU max 16) · MSAA 4 · grid 24 x 24
+   the page's camera against R.project: 2.2e-16 world units; mean tone of the texture 0.2332
+
+   far: pixels more than 2 px from every outline, the share whose tone is the analytic one within 0.05 (and the largest miss); edge: the ramp across an outline, its width (1 = one pixel),
+   where it sits (offset) and how far single pixels put the outline from where it is (rms, px); twin: tone - sdfTone(...) within 2 px of an outline, on the analytic field, on the
+   texture read in JS (tex), and with the footprint NOT taken across the outline (iso: the control); seam: the pixels on the borders of the lattice cells, on plateaus and beside outlines
+   (misses: the far pixels that are off, and how many texels the farthest of them is from a corner of the bar; tex-iso: the texture twin with the direction ignored)
+   view      zoom  px/texel  footpr/range |  far px   agree%  worst  misses (texels)  (sample of 2000) |  width  offset   pos rms px |  twin rms  p99    max    tex     iso    tex-iso |  seam px  worst   band rms
+   face-on   0.125 0.25      1            | 16239    100     0      0      (0)       (100    of 2000)  | 1.0914 -0.0104  0.0205     | 0.0171   0.0541 0.2697 0.0162  0.0171 0.0162  | 542      0       0.0141 
+   face-on   0.25  0.5       0.5          | 82440    100     0      0      (0)       (100    of 2000)  | 1.0002 -0.0012  0.0077     | 0.0075   0.0162 0.2108 0.0059  0.0075 0.0059  | 1870     0       0.0038 
+   face-on   0.5   1         0.25         | 368781   100     0      0      (0)       (100    of 2000)  | 0.9991 0.0018   0.0071     | 0.0049   0.0138 0.1425 0.0014  0.0049 0.0014  | 4954     0       0.0036 
+   face-on   1     2         0.125        | 1384536  100     0      0      (0)       (100    of 2000)  | 0.9987 -0.0018  0.0142     | 0.011    0.0284 0.5144 0.0019  0.011  0.0019  | 9878     0       0.0063 
+   face-on   2     4         0.0625       | 1409960  100     0      0      (0)       (100    of 2000)  | 1.0074 -0.0028  0.0281     | 0.0179   0.0556 1      0.0029  0.0179 0.0029  | 3677     0       0.0129 
+   face-on   4     8         0.0313       | 1425728  99.9999 0.5145 1      (0.4222)  (100    of 2000)  | 1.0191 -0.0112  0.071      | 0.0479   0.1055 1      0.0048  0.0479 0.0048  | 2353     0       0.0296 
+   face-on   8     16        0.0156       | 1424060  99.9984 1      23     (0.6103)  (100    of 2000)  | 1.063  -0.0139  0.1454     | 0.0773   0.2091 1      0.0053  0.0773 0.0053  | 1178     0       0.0652 
+   tilted    0.125 0.1753    1.4264       | 7676     100     0      0      (0)       (100    of 2000)  | 1.143  -0.0221  0.0343     | 0.0287   0.119  0.275  0.0285  0.0385 0.0384  | 446      0       0.0346 
+   tilted    0.25  0.3538    0.7066       | 42982    100     0      0      (0)       (100    of 2000)  | 0.9969 -0.0049  0.0086     | 0.0093   0.0193 0.2603 0.0084  0.0276 0.0273  | 1529     0       0.0054 
+   tilted    0.5   0.7195    0.3475       | 206688   100     0      0      (0)       (100    of 2000)  | 0.9992 -0.0023  0.0054     | 0.006    0.0122 0.3494 0.0042  0.0266 0.0263  | 3952     0       0.0029 
+   tilted    1     1.5609    0.1602       | 848122   100     0      0      (0)       (100    of 2000)  | 0.9989 -0.0018  0.0107     | 0.0086   0.0234 0.5057 0.0025  0.0274 0.0262  | 8191     0       0.0048 
+   tilted    2     2.8316    0.0883       | 1297203  100     0      0      (0)       (100    of 2000)  | 1.0006 -0.0017  0.0194     | 0.0136   0.045  0.7712 0.0031  0.0335 0.031   | 7334     0       0.0071 
+   tilted    4     5.6015    0.0446       | 1415334  99.9999 0.4226 1      (0.4335)  (100    of 2000)  | 1.0031 -0.007   0.0394     | 0.0285   0.0724 1      0.0035  0.0419 0.0317  | 4187     0       0.0177 
+   tilted    8     11.203    0.0223       | 1420749  100     0      0      (0)       (100    of 2000)  | 1.0115 -0.0069  0.0683     | 0.0336   0.1316 0.1884 0.0051  0.0433 0.0278  | 2034     0       0.0414 
+   grazing   0.125 0.0716    3.494        | 1151     100     0      0      (0)       (100    of 629 )  | 1.4744 -0.0417  0.183      | 0.1111   0.4565 0.5424 0.1101  0.1091 0.1079  | 153      0       0.1437 
+   grazing   0.25  0.1447    1.7283       | 10254    99.9902 0.1971 1      (6.6146)  (100    of 2000)  | 0.9946 -0.0275  0.0673     | 0.0502   0.1929 0.5024 0.0496  0.0728 0.0727  | 757      0.1971  0.0623 
+   grazing   0.5   0.2984    0.8379       | 61123    100     0.0296 0      (0)       (100    of 2000)  | 0.9703 -0.005   0.0223     | 0.0193   0.0828 0.5056 0.0189  0.054  0.0539  | 2637     0       0.021  
+   grazing   1     0.6842    0.3654       | 299014   99.9997 0.0519 1      (2.4487)  (100    of 2000)  | 0.9877 -0.0029  0.0099     | 0.0091   0.0246 0.413  0.0082  0.0531 0.053   | 6318     0       0.006  
+   grazing   2     2.0934    0.1194       | 839924   99.9999 0.3467 1      (0.4678)  (100    of 2000)  | 1.0015 -0.0015  0.0149     | 0.0109   0.0372 0.62   0.0052  0.055  0.0543  | 7838     0       0.0058 
+   grazing   4     4.0956    0.061        | 974075   100     0      0      (0)       (100    of 2000)  | 0.9734 -0.0014  0.0301     | 0.0183   0.0618 0.8768 0.008   0.0527 0.0505  | 5129     0       0.0087 
+   grazing   8     8.1912    0.0305       | 986770   100     0      0      (0)       (100    of 2000)  | 0.9952 0.002    0.0328     | 0.0154   0.0536 0.2817 0.0033  0.048  0.0467  | 2239     0       0.0148 
+
+   the BACK of the sheet (only the back's two colours are changed between the three pictures):
+   back face-on  z 1   far 1384536 px agree 100 % (sample 100 % of 2000); edge width 0.9991 px, offset -0.0022 px; twin rms 0.011; pixels where the back's colours changed nothing: 0  ok
+   back face-on  z 4   far 1425728 px agree 99.9999 % (sample 100 % of 2000); edge width 1.0202 px, offset -0.012 px; twin rms 0.0479; pixels where the back's colours changed nothing: 0  ok
+   back tilted   z 1   far 848122 px agree 100 % (sample 100 % of 2000); edge width 0.9991 px, offset -0.0019 px; twin rms 0.0086; pixels where the back's colours changed nothing: 0  ok
+   back tilted   z 4   far 1415334 px agree 99.9999 % (sample 100 % of 2000); edge width 1.0041 px, offset -0.0075 px; twin rms 0.0285; pixels where the back's colours changed nothing: 0  ok
+   control, the FRONT with only the back's colours changed: 0 pixels react, 894847 do not  ok
+
+   the same tex handed over 104 times so far (setStyle with the print and new colours): 0 uploads after the first  ok
+
+   two triangles against a 24 x 24 grid, same view (tilted z 1; face-on z 4): largest difference of a colour channel inside the sheet 3 of 255 over 894847 px; 1 of 255 over 1440000 px (on the whole canvas, the sheet's multisampled rim included: 57; 1)  ok
+
+   no seam: the picture from a second texture whose cells begin half a cell further on (its borders run elsewhere) against the first; the difference of the tone, pixel by pixel
+   view                     |  pixels    largest  rms     |  on a border of either: pixels  largest  rms    (one colour level = 1 / levels of tone)
+   face-on z 0.125          |  23104     0.0058   0.0001  |  3287                          0.0058   0.0001 (299.6448)
+   face-on z 0.25           |  97344     0.0058   0       |  6951                          0        0      (299.6448)
+   face-on z 0.5            |  399424    0.0058   0       |  14289                         0.0058   0.0001 (299.8172)
+   face-on z 1              |  1440000   0.0116   0       |  26604                         0.0058   0      (300.1914)
+   face-on z 2              |  1440000   0.0173   0       |  13299                         0.0115   0.0001 (300.1914)
+   face-on z 4              |  1440000   0        0       |  5021                          0        0      (300.1914)
+   face-on z 8              |  1440000   0        0       |  5021                          0        0      (300.1914)
+   tilted z 0.125           |  12574     0.006    0.0001  |  2736                          0.006    0.0002 (291.0231)
+   tilted z 0.25            |  54723     0.006    0       |  6036                          0        0      (291.0939)
+   tilted z 0.5             |  231730    0.006    0       |  12632                         0.0058   0.0001 (291.4276)
+   tilted z 1               |  894847    0.0115   0       |  23001                         0.0059   0      (292.7616)
+   tilted z 2               |  1333927   0.0173   0       |  21082                         0.0063   0      (289.0225)
+   tilted z 4               |  1440000   0.0191   0       |  10921                         0        0      (288.4032)
+   tilted z 8               |  1440000   0.0468   0.0001  |  6764                          0        0      (288.4032)
+   grazing z 0.125          |  3549      0        0       |  1766                          0        0      (237.7961)
+   grazing z 0.25           |  17710     0        0       |  4655                          0        0      (237.8965)
+   grazing z 0.5            |  80329     0.0072   0       |  10971                         0        0      (238.4195)
+   grazing z 1              |  338865    0.0072   0.0001  |  21190                         0.0072   0      (240.699)
+   grazing z 2              |  878040    0.0201   0       |  23461                         0.0071   0.0001 (248.716)
+   grazing z 4              |  1008000   0.0195   0       |  15994                         0        0      (247.555)
+   grazing z 8              |  1008000   0.0387   0.0001  |  8073                          0        0      (247.555)
+   sheet 80 px, el 55       |  4638      0.0056   0.0001  |  1446                          0.0056   0.0001 (306.573)
+   sheet 40 px, el 55       |  1020      0        0       |  547                           0        0      (306.573)
+   sheet 20 px, el 55       |  191       0        0       |  167                           0        0      (306.573)
+   sheet 12 px, el 55       |  44        0        0       |  44                            0        0      (306.573)
+
+   the texture baked by src/sdf.js bakeSDF from the same shapes as polygons (circles of 4096 points), against the analytic print:
+   face-on z 1       far 1384536  px agree 100     % (sample 100 % of 2000); edge width 0.9987 px, offset -0.0018 px, outline rms 0.0142 px; twin rms 0.011  (texture 0.0019)  ok
+   face-on z 4       far 1425728  px agree 99.9999 % (sample 100 % of 2000); edge width 1.0191 px, offset -0.0112 px, outline rms 0.071  px; twin rms 0.0479 (texture 0.0048)  ok
+   tilted z 2        far 1297203  px agree 100     % (sample 100 % of 2000); edge width 1.0006 px, offset -0.0017 px, outline rms 0.0194 px; twin rms 0.0136 (texture 0.0031)  ok
+   face-on z 0.25    far 82440    px agree 100     % (sample 100 % of 2000); edge width 1.0002 px, offset -0.0012 px, outline rms 0.0077 px; twin rms 0.0075 (texture 0.0059)  ok
+   back, tilted z 1  far 848122   px agree 100     % (sample 100 % of 2000); edge width 0.9991 px, offset -0.0019 px, outline rms 0.0108 px; twin rms 0.0086 (texture 0.0025)  ok
+   its half-cell-shifted twin (baked for the other cell): largest difference of the tone 0.0116 (z 1), 0 (sheet 40 px)  ok
+
+   the RANGE (in texels; the texture is 256 a side): the outline is stored to range / 254, and the ramp gives way to the plain mean at a footprint of 2 range
+   range  view            px/texel  footpr/range |  far agree%  worst |  width   pos rms px  pos max px (rms in texels) |  twin rms
+   1      face-on z 8     16        0.0625       |  99.9985     1     |  1.0183  0.0836      1.6646    (0.0052)         |  0.0559
+   1      tilted z 4      5.6015    0.1785       |  99.9999     0.381 |  1.0036  0.0247      0.7216    (0.0044)         |  0.0236
+   1      face-on z 1     2         0.5          |  100         0     |  1.0065  0.0091      0.0568    (0.0046)         |  0.0096
+   1      face-on z 0.25  0.5       2            |  100         0     |  1.6965  0.1246      0.3521    (0.2491)         |  0.0671
+   1      tilted z 0.25   0.3538    2.8263       |  100         0.006 |  1.4489  0.0705      0.2727    (0.1992)         |  0.075 
+   1      face-on z 0.125 0.25      4            |  100         0     |  1.577   0.1106      0.3231    (0.4424)         |  0.1076
+   1.5    face-on z 8     16        0.0417       |  99.9984     1     |  1.0162  0.0885      1.6646    (0.0055)         |  0.0576
+   1.5    tilted z 4      5.6015    0.119        |  99.9999     0.3869 |  1.0002  0.0236      0.6861    (0.0042)         |  0.0235
+   1.5    face-on z 1     2         0.3333       |  100         0     |  0.999   0.0074      0.0272    (0.0037)         |  0.009 
+   1.5    face-on z 0.25  0.5       1.3333       |  100         0     |  1.1716  0.0399      0.1307    (0.0798)         |  0.0251
+   1.5    tilted z 0.25   0.3538    1.8842       |  100         0     |  1.3815  0.0701      0.3339    (0.1981)         |  0.0495
+   1.5    face-on z 0.125 0.25      2.6667       |  100         0     |  1.6581  0.119       0.3289    (0.4761)         |  0.0865
+   2      face-on z 8     16        0.0313       |  99.9984     1     |  1.0239  0.0942      1.6877    (0.0059)         |  0.0596
+   2      tilted z 4      5.6015    0.0893       |  99.9999     0.3988 |  1.0012  0.0253      0.692     (0.0045)         |  0.0239
+   2      face-on z 1     2         0.25         |  100         0     |  0.9994  0.0084      0.0273    (0.0042)         |  0.0092
+   2      face-on z 0.25  0.5       1            |  100         0     |  1.0474  0.0146      0.0564    (0.0292)         |  0.0113
+   2      tilted z 0.25   0.3538    1.4132       |  100         0     |  1.1089  0.0262      0.1315    (0.0741)         |  0.0232
+   2      face-on z 0.125 0.25      2            |  100         0     |  1.7496  0.1341      0.3405    (0.5363)         |  0.0704
+   3      face-on z 8     16        0.0208       |  99.9987     1     |  1.0251  0.1105      2.0976    (0.0069)         |  0.0616
+   3      tilted z 4      5.6015    0.0595       |  99.9999     0.3571 |  1.0016  0.0315      0.7749    (0.0056)         |  0.0247
+   3      face-on z 1     2         0.1667       |  100         0     |  1.0002  0.0106      0.0371    (0.0053)         |  0.0096
+   3      face-on z 0.25  0.5       0.6667       |  100         0     |  1.0002  0.0075      0.0219    (0.0151)         |  0.0075
+   3      tilted z 0.25   0.3538    0.9421       |  100         0     |  1.0006  0.0101      0.0415    (0.0284)         |  0.0107
+   3      face-on z 0.125 0.25      1.3333       |  100         0     |  1.2312  0.0437      0.15      (0.1747)         |  0.0291
+   4      face-on z 8     16        0.0156       |  99.9984     1     |  1.063   0.1454      1.8785    (0.0091)         |  0.0773
+   4      tilted z 4      5.6015    0.0446       |  99.9999     0.4226 |  1.0031  0.0394      0.7571    (0.007 )         |  0.0285
+   4      face-on z 1     2         0.125        |  100         0     |  0.9987  0.0142      0.0424    (0.0071)         |  0.011 
+   4      face-on z 0.25  0.5       0.5          |  100         0     |  1.0002  0.0077      0.0229    (0.0153)         |  0.0075
+   4      tilted z 0.25   0.3538    0.7066       |  100         0     |  0.9969  0.0086      0.0345    (0.0242)         |  0.0093
+   4      face-on z 0.125 0.25      1            |  100         0     |  1.0914  0.0205      0.0713    (0.0822)         |  0.0171
+   6      face-on z 8     16        0.0104       |  99.9986     1     |  1.1049  0.1606      1.6842    (0.01  )         |  0.0851
+   6      tilted z 4      5.6015    0.0298       |  99.9999     0.3571 |  1.0065  0.0491      0.7579    (0.0088)         |  0.0317
+   6      face-on z 1     2         0.0833       |  100         0     |  1.0001  0.019       0.0534    (0.0095)         |  0.0125
+   6      face-on z 0.25  0.5       0.3333       |  100         0     |  1.0018  0.0088      0.028     (0.0176)         |  0.0076
+   6      tilted z 0.25   0.3538    0.4711       |  100         0     |  1.0041  0.0087      0.0348    (0.0244)         |  0.009 
+   6      face-on z 0.125 0.25      0.6667       |  100         0     |  1.0238  0.0154      0.043     (0.0615)         |  0.0143
+   8      face-on z 8     16        0.0078       |  99.9985     1     |  1.1694  0.217       1.9357    (0.0136)         |  0.1068
+   8      tilted z 4      5.6015    0.0223       |  99.9999     0.3333 |  1.0091  0.0639      0.7749    (0.0114)         |  0.0368
+   8      face-on z 1     2         0.0625       |  100         0     |  1.0006  0.025       0.0706    (0.0125)         |  0.0148
+   8      face-on z 0.25  0.5       0.25         |  100         0     |  1.0036  0.0095      0.0306    (0.019 )         |  0.0079
+   8      tilted z 0.25   0.3538    0.3533       |  100         0     |  1.005   0.0088      0.0392    (0.0248)         |  0.0091
+   8      face-on z 0.125 0.25      0.5          |  100         0     |  1.0174  0.0154      0.0441    (0.0616)         |  0.0143
+   16     face-on z 8     16        0.0039       |  99.9986     1     |  1.6626  0.421       1.9993    (0.0263)         |  0.1912
+   16     tilted z 4      5.6015    0.0112       |  99.9999     0.2738 |  1.0615  0.1255      0.698     (0.0224)         |  0.064 
+   16     face-on z 1     2         0.0313       |  100         0     |  1.0113  0.0499      0.1343    (0.0249)         |  0.026 
+   16     face-on z 0.25  0.5       0.125        |  100         0     |  1.011   0.0146      0.0472    (0.0291)         |  0.0095
+   16     tilted z 0.25   0.3538    0.1766       |  100         0     |  1.01    0.0105      0.0425    (0.0295)         |  0.0093
+   16     face-on z 0.125 0.25      0.25         |  100         0     |  1.0256  0.0169      0.0464    (0.0675)         |  0.0147
+
+   the SIZE of the texture (range 4 texels each), the picture kept the same: a cell of the lattice is 256 css px across (near), or 1024 (close)
+   size   view    px/texel |  far agree%  worst |  width   pos rms px  pos max px |  twin rms   max
+   64     near    8        |  99.9986     0.8161 |  1.0433  0.1185      1.2735    |  0.0748     1    
+   64     close   32       |  99.9731     1     |  1.4069  0.34        2.0933    |  0.1926     1    
+   128    near    4        |  100         0     |  1.0024  0.0334      0.2892    |  0.0277     0.9761
+   128    close   16       |  99.9969     1     |  1.0885  0.1883      2.1321    |  0.0992     1    
+   256    near    2        |  100         0     |  0.9987  0.0142      0.0424    |  0.011      0.5144
+   256    close   8        |  99.9999     0.5145 |  1.0191  0.071       0.9894    |  0.0479     1    
+   512    near    1        |  100         0     |  0.9985  0.0069      0.0203    |  0.0048     0.1952
+   512    close   4        |  100         0     |  1.0045  0.0283      0.2375    |  0.0236     0.8902
+   1024   near    0.5      |  100         0     |  1.0042  0.0044      0.0153    |  0.0042     0.1921
+   1024   close   2        |  100         0     |  1.002   0.0137      0.035     |  0.0085     0.3256
+   handing over ANOTHER field (upload and mip levels, the frame it happens in less a frame without): 256^2: 0.3 ms (worst of 5: 1);  512^2: 0.3 ms (worst of 5: 0.4);  1024^2: 0.5 ms (worst of 5: 1.4);  2048^2: 1.8 ms (worst of 5: 2.2)
+   other textures, against the 256 one (range 4 texels): the picture from the half-cell-shifted texture (largest difference of the tone), and the outline in the close view
+   256 (a power of two)   shifted texture: 0.0116 / 0.0058 / 0.006 / 0 / 0 (z 1 / z 0.25 / tilted z 0.125 / sheet 40 px / sheet 16 px)   close view: far agree 99.9999 %, width 1.0191 px, outline rms 0.071 px (max 0.9894), twin rms 0.0479
+   200                    shifted texture: 0 / 0.0058 / 0 / 0.0565 / 0.0226 (z 1 / z 0.25 / tilted z 0.125 / sheet 40 px / sheet 16 px)   close view: far agree 99.9987 %, width 1.0259 px, outline rms 0.1201 px (max 1.9422), twin rms 0.0723
+   243 (odd)              shifted texture: 0.3526 / 0.2197 / 0.0299 / 0.1525 / 0.3785 (z 1 / z 0.25 / tilted z 0.125 / sheet 40 px / sheet 16 px)   close view: far agree 99.9998 %, width 1.0219 px, outline rms 0.0816 px (max 1.1183), twin rms 0.0503
+   256 from a 0/1 raster  shifted texture: 0.0116 / 0.0058 / 0.006 / 0 / 0 (z 1 / z 0.25 / tilted z 0.125 / sheet 40 px / sheet 16 px)   close view: far agree 99.9675 %, width 4.5761 px, outline rms 1.0562 px (max 2.3278), twin rms 0.4363
+
+   small on the screen, turning 1 degree a frame (13 frames). flicker = mean |T(k-1) - 2 T(k) + T(k+1)| per pixel;
+   ideal = the true share of dark under the pixel, soft = the mean of the saturating ramp (what the texture holds), point = no filtering (the control)
+   sheet px  el  footpr/range |  mean tone gpu (spread)  ideal  (spread)  soft   |  flicker gpu  ideal   soft   point |  contrast gpu  ideal  soft |  rms gpu-soft  gpu-ideal
+   160       55  1            |  0.2304 (0.0004)        0.2306 (0.0004) 0.2316 |  0.0643       0.0675  0.0455 0.1012|  0.4026        0.4043 0.386 |  0.0503        0.0117 
+   80        55  2            |  0.2345 (0.0008)        0.2329 (0.0008) 0.234  |  0.0307       0.0439  0.0355 0.0977|  0.3635        0.3877 0.3762|  0.027         0.0529 
+   40        55  4            |  0.2317 (0.002 )        0.23   (0.0028) 0.2309 |  0.0157       0.0251  0.0174 0.0845|  0.3213        0.3533 0.3475|  0.0482        0.059  
+   20        55  8            |  0.2274 (0.0079)        0.2245 (0.0096) 0.2266 |  0.0067       0.0301  0.0089 0.0786|  0.2398        0.2803 0.2781|  0.063         0.068  
+   12        55  13.3333      |  0.245  (0.0194)        0.2419 (0.029 ) 0.2427 |  0.0041       0.0245  0.0051 0.0454|  0.1819        0.2448 0.2423|  0.0767        0.0809 
+   160       90  1            |  0.2311 (0.0002)        0.2313 (0.0002) 0.2324 |  0.0684       0.071   0.0464 0.1016|  0.4053        0.4067 0.3874|  0.0565        0.0108 
+   80        90  2            |  0.2346 (0.001 )        0.2329 (0.0011) 0.234  |  0.034        0.0481  0.0384 0.0999|  0.3667        0.3918 0.3792|  0.0285        0.0563 
+   40        90  4            |  0.2336 (0.0025)        0.2318 (0.0025) 0.2327 |  0.0189       0.0269  0.0205 0.0856|  0.3286        0.362  0.3551|  0.0519        0.0634 
+   20        90  8            |  0.2269 (0.01  )        0.2217 (0.0054) 0.2232 |  0.0077       0.0257  0.0096 0.0761|  0.2506        0.29   0.2875|  0.0705        0.0753 
+   12        90  13.3333      |  0.2397 (0.0083)        0.2374 (0.019 ) 0.2389 |  0.0043       0.0316  0.0059 0.0721|  0.1859        0.2503 0.2482|  0.0856        0.0907 
+
+   WEBGL_lose_context: lost true (message shown true), restored true; texture uploads 137 -> 138; the picture after against before: largest difference 0 of 255 (0 pixels over 2), 203421 dark pixels in it  ok
+
+   pictures: 26 PNG in /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/renderer (contact sheet of 25: tex-dpr2-contact.png)
+   texture uploads over the whole run at dpr 2: 138 (every other texture of the sweeps and of the seam test is one; 1080 setStyle calls with a print)
+
+every bound of the brief is met
+
+WROTE /Users/yaroslavvb/drive.unsynced/artifacts/the-folding-patterns/renderer/tex-demo.json and .txt (mini)
