@@ -49,6 +49,10 @@
         <div class="labels" id="labels"></div>
         <div class="badge" id="badge" aria-live="polite"></div>
         <p class="hint" id="turn-hint">drag to turn</p>
+        <label class="turnsel" title="How a drag turns the view">
+          <span class="turnsel-k">Turning</span>
+          <select id="turning" aria-label="How a drag turns the view"></select>
+        </label>
         <button type="button" class="btn-quiet pane-reset" id="reset-view" title="Reset the 3D view" aria-label="Reset the 3D view">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
         </button>
@@ -173,6 +177,15 @@
       <p>After each zip the picture is redrawn with every piece in a place of its own. Nothing is lost by that. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
     </details>
 
+    <details class="fold">
+      <summary>Four ways to turn the view</summary>
+      <ul class="argument">
+        <li><b>Turntable.</b> Left and right turn it about the vertical, up and down tilt it. Up stays up, and any loop of the pointer comes home.</li>
+        <li><b>Arcball.</b> You take hold of an unseen ball that fills the pane. Any loop comes home; a drag round the edge twists the view.</li>
+        <li><b>Grab.</b> The same ball at half the speed: the point you took stays under your finger.</li>
+        <li><b>Rolling ball.</b> Each stroke rolls the surface the way your hand moves, and it keeps a little momentum. Circling twists it: once round a circle 100 pixels in radius leaves it 70° askew.</li>
+      </ul>
+    </details>
     <details class="fold">
       <summary>The chapter in four steps</summary>
       <ol class="argument">

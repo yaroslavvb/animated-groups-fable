@@ -156,6 +156,12 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .btn-quiet { flex: none; height: var(--tap); min-width: var(--tap); display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px 0 8px; border: 4px solid transparent; border-radius: 12px; background: var(--ground) padding-box; box-shadow: inset 0 0 0 1px var(--hairline); color: var(--muted); font-size: 13px; line-height: 1; white-space: nowrap; cursor: pointer; }
 .btn-quiet > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .pane-reset { position: absolute; right: 4px; top: 4px; padding: 0; background: transparent; box-shadow: none; }
+/* how a drag turns the view: a quiet native select beside the reset button */
+.turnsel { position: absolute; right: 48px; top: 4px; height: var(--tap); display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+.turnsel-k { text-shadow: 0 0 3px var(--ground), 0 0 3px var(--ground); }
+.turnsel select { height: 32px; max-width: 132px; padding: 0 6px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); color: var(--ink); font-size: 14px; }
+@media (max-width: 480px) { .turnsel-k { display: none; } }
+ul.argument { list-style: disc; }
 .scrub { --rail-shift: 0px; position: relative; flex: 1 1 auto; min-width: 0; height: var(--tap); display: block; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .scrub[data-enhanced] { cursor: pointer; }
 .scrub-rail, .scrub-fill { position: absolute; left: calc(var(--thumb) / 2); top: calc(50% - 1px); height: 2px; border-radius: 1px; pointer-events: none; }

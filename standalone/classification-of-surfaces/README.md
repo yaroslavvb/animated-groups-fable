@@ -56,6 +56,27 @@ Tab 3's pictures are honest where the book's are: gaping zips leave eyelets (Fig
 a half-twisted strap across the hole (a punched Möbius band, Fig. 8.7). After each zip the picture is redrawn tidy;
 that step is a cut, not a motion ("we can just push the holes around", p. 96).
 
+## Turning the view
+
+His note on the first version (Sun 15 Nov 2026): *"interactive Rotation is a little weird. If I do it in a circle,
+there is a drift."* The renderer's own control is a rolling ball: each step of the pointer turns the picture about the
+screen axis square to it, such steps do not commute, and a closed loop of the pointer leaves a twist of (the loop's
+area) x (sensitivity squared). Measured with real drags in the 755 x 566 pane: once round a circle of 100 px radius
+leaves the view 70 degrees off (19 degrees for 50 px; on a phone-sized pane 45 degrees for 50 px).
+
+`src/turning.js` adds three other ways and a chooser in the corner of the pane (kept in `localStorage`); the default
+is now the turntable. It does not change the renderer: its listeners sit on the canvas's parent, run after the
+renderer's, and set the view they want.
+
+| way | a drag | once round a circle | "up" |
+|---|---|---|---|
+| Turntable (default) | left-right turns about the vertical, up-down tilts, to straight above or below | comes home exactly | stays up |
+| Arcball | takes hold of a ball filling the pane, at double speed; a drag round the edge twists | comes home exactly | free |
+| Grab | the same ball at single speed: the point taken stays under the pointer | comes home exactly | free |
+| Rolling ball | the renderer's own, with its momentum | 70 degrees off (100 px circle) | free |
+
+The Folding and The Unfolding have the rolling ball still; nothing of theirs was changed.
+
 ## What is not there
 
 - A join that involves a ball (not two polygons) changes the picture without motion: the two arrows stand out, then the
