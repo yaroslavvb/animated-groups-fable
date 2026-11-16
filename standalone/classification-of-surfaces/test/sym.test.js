@@ -147,7 +147,10 @@ test('a signature as text and as data', async () => {
   for (const t of ALL) assert.equal(C.textOf(C.parse(t)), t, t);
   assert.deepEqual(C.parse('o23*45*x'), { o: 0, cones: [2, 3], stars: [[4, 5], []], x: 3 }, 'a ring beside a cross is read as two more crosses');
   assert.equal(C.textOf(C.parse('oo23*45*x')), '23*45*xxxxx');
-  assert.equal(C.parse(''), null); assert.equal(C.parse('7*1'), null); assert.equal(C.parse('x*'), null); assert.equal(C.parse('ooooooo'), null, 'more than the ball holds');
+  assert.deepEqual(C.parse(''), { o: 0, cones: [], stars: [], x: 0 }, 'nothing is a signature too');
+  assert.deepEqual(C.parse('1'), C.parse(''), 'and the book writes it 1');
+  assert.equal(C.linkOf(C.parse('')), '1'); assert.equal(C.textOf(C.parse('1')), ''); assert.ok(C.isEmpty(C.parse('1')) && !C.isEmpty(C.parse('x')));
+  assert.equal(C.parse('7*1'), null); assert.equal(C.parse('x*'), null); assert.equal(C.parse('11'), null); assert.equal(C.parse('ooooooo'), null, 'more than the ball holds');
   assert.deepEqual(C.tokensOf(C.parse('3*3')).map((k) => k.t + (k.v || '') + ':' + k.ref.kind), ['d3:cone', '*:star', 'd3:corner']);
   const cost = C.costOf(C.parse('*632'));
   assert.deepEqual([cost.n, cost.d], [2, 1]);
@@ -168,10 +171,10 @@ test('adding, removing and stepping', async () => {
   r = C.addTo(C.parse('*23*4'), 'corner', { kind: 'corner', s: 0, i: 0 });
   assert.equal(T(r.sig), '*223*4'); assert.deepEqual(r.ref, { kind: 'corner', s: 0, i: 1 });
   assert.equal(T(C.addTo(C.parse('*23*4'), 'corner').sig), '*23*42', 'with nothing chosen: on the last mirror');
-  assert.equal(T(C.addTo(C.parse('*23*4'), 'corner', { kind: 'star', s: 0 }).sig), '*232*4');
+  assert.equal(T(C.addTo(C.parse('*23*4'), 'corner', { kind: 'star', s: 0 }).sig), '*223*4', 'with the cursor on the star: its first corner');
   assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'star', s: 0 })), '2x', 'a mirror goes with its corners');
   assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'corner', s: 0, i: 0 })), '2*3x');
-  assert.equal(C.removeAt(C.parse('x'), { kind: 'x', i: 0 }), null, 'something has to stay');
+  assert.ok(C.isEmpty(C.removeAt(C.parse('x'), { kind: 'x', i: 0 })), 'the last character may go too');
   assert.equal(T(C.stepAt(C.parse('*532'), { kind: 'corner', s: 0, i: 0 }, 1)), '*632');
   assert.equal(C.stepAt(C.parse('*932'), { kind: 'corner', s: 0, i: 0 }, 1), null);
   assert.equal(T(C.stepAt(C.parse('55'), { kind: 'cone', i: 1 }, 1)), '66', 'the two cone points of NN go together');
@@ -200,7 +203,7 @@ test('no pattern: the signatures under $2 that are not among the fourteen spheri
   };
   grow('', 4);
   assert.ok(seen > 150, 'tried ' + seen);
-  assert.deepEqual([...sphere].sort(), ['*', '*22', '*222', '*223', '*225', '*232', '*233', '*235', '*252', '*253', '*322', '*323', '*325', '*332', '*352', '*33', '*522', '*523', '*532', '*55', '2*', '2*2', '2*3', '2*5', '22', '222', '223', '225', '232', '233', '235', '252', '253', '2x', '3*', '3*2', '322', '323', '325', '33', '332', '352', '3x', '5*', '522', '523', '532', '55', '5x', 'x'].sort());
+  assert.deepEqual([...sphere].sort(), ['', '*', '*22', '*222', '*223', '*225', '*232', '*233', '*235', '*252', '*253', '*322', '*323', '*325', '*332', '*352', '*33', '*522', '*523', '*532', '*55', '2*', '2*2', '2*3', '2*5', '22', '222', '223', '225', '232', '233', '235', '252', '253', '2x', '3*', '3*2', '322', '323', '325', '33', '332', '352', '3x', '5*', '522', '523', '532', '55', '5x', 'x'].sort());
 });
 
 test('any signature: the general tile folds up to exactly what was asked for', async () => {
@@ -216,6 +219,7 @@ test('any signature: the general tile folds up to exactly what was asked for', a
     if (!back) continue;
     const D = C.domainOf(sig);
     if (!D) { assert.ok(fval(C.costOf(sig)) < 2, text); continue; }
+    if (!D.n) continue;                                                 // the empty signature: the whole sphere, nothing to fold
     made++; kinds[D.G.kind]++;
     if (!fromText(text)) general++;
     const A = analyse(D), G = D.G, tokens = C.tokensOf(sig);
@@ -239,4 +243,73 @@ test('any signature: the general tile folds up to exactly what was asked for', a
     assert.ok(P.length < 2 || min > 2 * D.clear - 1e-6, `${text}: two motifs ${min} apart, each has ${D.clear} of room`);
   }
   assert.ok(general > 250 && kinds.H > 300, `general tiles: ${general}; ${JSON.stringify(kinds)}`);
+});
+
+test('typing a signature as it is read, and deleting it again', async () => {
+  const C = await import('../src/sym/catalog.js');
+  const type = (keys, from = C.EMPTY) => {
+    let sig = from, at = null;
+    const seen = [];
+    for (const ch of keys) {
+      const r = ch === '*' ? C.addTo(sig, 'star', at) : ch === 'x' || ch === 'o' ? C.addTo(sig, ch, at) : C.addTo(sig, 'digit', at, Number(ch));
+      assert.ok(r, 'cannot type ' + ch + ' after ' + C.textOf(sig));
+      sig = r.sig; at = r.ref; seen.push(C.textOf(sig) + (C.domainOf(sig) ? '' : '?'));
+    }
+    return seen;
+  };
+  // a ? marks a signature no pattern has: on the way to *632 one passes two of them
+  assert.deepEqual(type('*632'), ['*', '*6?', '*63?', '*632']);
+  assert.deepEqual(type('3*3'), ['3?', '3*', '3*3']);
+  assert.deepEqual(type('22*'), ['2?', '22', '22*']);
+  assert.deepEqual(type('2*22'), ['2?', '2*', '2*2', '2*22']);
+  assert.deepEqual(type('22x'), ['2?', '22', '22x']);
+  assert.deepEqual(type('oo'), ['o', 'oo']);
+  assert.deepEqual(type('*3*').slice(-1), ['*3*']);
+  assert.deepEqual(type('o2*3x').slice(-1), ['2*3xxx'], 'the cross trades the ring');
+  // the cursor: a digit typed at the start is a cone point, on a star its first corner, at the end a corner of the last star
+  const T = (r) => C.textOf(r.sig);
+  assert.equal(T(C.addTo(C.parse('*632'), 'digit', 'start', 4)), '4*632');
+  assert.equal(T(C.addTo(C.parse('*632'), 'digit', { kind: 'star', s: 0 }, 4)), '*4632');
+  assert.equal(T(C.addTo(C.parse('*632'), 'digit', { kind: 'corner', s: 0, i: 0 }, 4)), '*6432');
+  assert.equal(T(C.addTo(C.parse('*632'), 'digit', null, 4)), '*6324');
+  assert.equal(T(C.addTo(C.parse('3*3'), 'digit', { kind: 'cone', i: 0 }, 2)), '32*3');
+  assert.equal(T(C.addTo(C.parse('o*'), 'digit', { kind: 'o', i: 0 }, 5)), 'o5*');
+  assert.equal(T(C.addTo(C.parse('*2*3'), 'star', { kind: 'star', s: 0 })), '*2**3', 'a star typed inside a mirror starts a new one after it');
+  assert.equal(C.addTo(C.parse('*632'), 'digit', null, 1), null); assert.equal(C.addTo(C.parse('*632'), 'digit', null, 10), null);
+  // deleting from the end, one character at a time, reaches the empty signature: the bare sphere
+  let sig = C.parse('2*632*3x');
+  const down = [];
+  while (!C.isEmpty(sig)) { const tokens = C.tokensOf(sig); sig = C.removeAt(sig, tokens[tokens.length - 1].ref); down.push(C.textOf(sig)); }
+  assert.deepEqual(down, ['2*632*3', '2*632*', '2*632', '2*63', '2*6', '2*', '2', '']);
+  const D = C.domainOf(sig), A = analyse(D);
+  assert.equal(D.n, 0); assert.equal(D.G.kind, 'S'); assert.equal(tiles(D, A).length, 1, 'one tile: no symmetry but leaving it alone');
+  assert.deepEqual([A.cost.n, A.chi.n, A.chi.d], [0, 2, 1]);
+  assert.deepEqual(bind(C.tokensOf(sig), A), []);
+});
+
+test('the six designs: every mark lies inside its tile, for every example and some signatures of one\'s own', async () => {
+  const C = await import('../src/sym/catalog.js'), Mo = await import('../src/sym/motifs.js');
+  assert.deepEqual(Mo.PATTERNS.map((p) => p.label), ['Paisley', 'Soft commas', 'Tomoe', 'Checkerboard', 'Rings', 'Comma'], 'the names and order of The Folding\'s selector');
+  assert.equal(Mo.DEFAULT_PATTERN, 'paisley');
+  let shapes = 0;
+  for (const t of [...ALL, '1', '*632x', '2*23', 'o2*', '23*45*6', 'xxxxx', 'ooo', '2*632*3x', '*22*', '3xx']) {
+    const D = C.domainOf(C.parse(t)), G = D.G, normals = D.verts.map((v, i) => { const F = G.frame(v, D.verts[(i + 1) % D.n]); return [F[1], F[4], F[7]]; });
+    for (const { key } of Mo.PATTERNS) {
+      const des = Mo.design(D, key);
+      assert.ok(des.dark.length >= 1, `${t}/${key}: nothing dark`);
+      if (D.cells && D.cells.length === 2 && ['paisley', 'soft', 'comma'].includes(key)) assert.ok(des.dark.length >= 2, `${t}/${key}: the second half of the tile is bare`);
+      for (const sh of des.dark.concat(des.light)) {
+        shapes++;
+        assert.ok(sh.pts.length >= 3, `${t}/${key}: a shape of ${sh.pts.length} points`);
+        for (const p of sh.pts) {
+          assert.ok(p.every(Number.isFinite), `${t}/${key}: not a number`);
+          normals.forEach((nrm, i) => {
+            const side = G.kind === 'E' ? (p[0] - D.verts[i][0]) * nrm[0] + (p[1] - D.verts[i][1]) * nrm[1] : G.form(p, nrm);
+            assert.ok(side > -1e-7, `${t}/${key}: a mark is ${-side} outside edge ${i}`);
+          });
+        }
+      }
+    }
+  }
+  assert.ok(shapes > 1000, 'shapes checked: ' + shapes);
 });

@@ -11,6 +11,8 @@
 //   at      a point well inside, moved by every symmetry: where the motif is drawn
 //   face    (optional, on the sphere) the point that faces the eye at first, when that should not be `at`
 //   clear   its distance to the nearest edge
+//   cells   (optional) the tile cut into convex pieces [{ verts, at, twin? }], each with a middle point of its own:
+//           where a design (motifs.js) puts its marks. Without it the tile is its own one cell
 //
 // Almost every domain here is built the same way (half()): a polygon P with angles pi / d round an inscribed circle,
 // each edge a MIRROR or a SEAM. All mirrors: P is the tile, the group is the kaleidoscope. Otherwise the tile is P
@@ -29,7 +31,7 @@ export function makeDomain(G, verts, edges, extra = {}) {
     verts.forEach((v, i) => { const w = 1 + 0.31 * Math.sin(1 + 2.3 * i); s[0] += w * v[0]; s[1] += w * v[1]; s[2] += w * v[2]; });
     D.at = G.norm(s);
   }
-  D.clear = Math.min(...verts.map((v, i) => G.lineDist(D.at, v, verts[(i + 1) % n])));
+  D.clear = n ? Math.min(...verts.map((v, i) => G.lineDist(D.at, v, verts[(i + 1) % n]))) : Math.PI / 2;      // no edges: the room is a hemisphere
   return D;
 }
 
@@ -65,10 +67,12 @@ export function inscribed(divs) {
 export function half(divs, labels) {
   const P = inscribed(divs), G = P.G, V = P.verts, n = V.length;
   const k = labels.findIndex((l) => l !== 'm');
-  const extra = { at: G.polar(0.0001, 0.3), base: { verts: V, r: P.r } };
+  const extra = { at: G.polar(0.0001, 0.3), cells: [{ verts: V, at: G.polar(0.0001, 0.3) }] };
   if (k < 0) return makeDomain(G, V, labels.map(() => ({ mirror: true })), extra);
   const at = (j) => V[((j % n) + n) % n], lab = (j) => labels[((j % n) + n) % n];
   const rho = G.reflect(at(k), at(k + 1));
+  // the tile is two halves, each a convex cell of its own (the second one runs clockwise): the designs fill both
+  extra.cells.push({ verts: V.map((v) => apply(rho, v)).reverse(), at: apply(rho, extra.at), twin: true });
   const verts = [], edges = [];
   for (let q = 0; q <= n - 1; q++) verts.push(at(k + 1 + q));                 // P's corners, from the far end of the seam round to its near end
   for (let q = 1; q <= n - 2; q++) verts.push(apply(rho, at(k - q)));         // and back along the mirror image
@@ -158,6 +162,12 @@ export function spindle(N) {
   const G = geometry('S'), Q = Math.PI / 2;
   const verts = [G.polar(0, 0), G.polar(Q, 0), G.polar(Math.PI, 0), G.polar(Q, TAU / N)];
   return makeDomain(G, verts, [{ to: 3, rev: false }, { to: 2, rev: false }, { to: 1, rev: false }, { to: 0, rev: false }], { at: G.polar(Q - 0.42, 0.8 * (Math.PI / N)) });
+}
+
+/** No symmetry at all (the empty signature): the whole sphere is the one tile. It has no corners and no edges. */
+export function trivial() {
+  const G = geometry('S');
+  return makeDomain(G, [], [], { at: G.polar(0.0001, 0.3) });
 }
 
 /** One mirror on the sphere: the northern hemisphere, the equator a mirror. */

@@ -8,7 +8,7 @@
 
 import { createRenderer, viewFromAzEl } from './vendor/the-folding/render3d.js';
 import { THEME, setDark } from './theme.js';
-import { createTurning, eyeOf } from './turning.js';
+import { createTurning } from './turning.js';
 
 export function createStage(canvas, labelLayer) {
   const R = createRenderer(canvas, { labelLayer });
@@ -82,9 +82,8 @@ export function createStage(canvas, labelLayer) {
     glide = () => { stop = true; cancelAnimationFrame(id); };
   };
   canvas.addEventListener('pointerdown', () => { if (glide) { glide(); glide = null; } });
-  // how a drag turns the view (turning.js); a view twisted by the rolling ball is set level when the turntable takes over
+  // how a drag turns the view: a turntable (turning.js)
   stage.turning = createTurning(R, canvas.parentElement, canvas);
-  stage.turning.onMode((m) => { if (m === 'turntable') { const v = R.getView(); if (v && v.q) stage.lookFrom(eyeOf(v.q), 0.35); } });
   stage.stopAll = () => { for (const a of anims) { a.stop = true; cancelAnimationFrame(a.id); } anims = new Set(); };
   if (mq) { const on = () => { applyTheme(); stage.refresh(); }; if (mq.addEventListener) mq.addEventListener('change', on); else if (mq.addListener) mq.addListener(on); }
   applyTheme();

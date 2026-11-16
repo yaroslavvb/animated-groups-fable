@@ -26,6 +26,8 @@ export const PRICE = { o: () => frac(2), star: () => frac(1), x: () => frac(1), 
 
 export function analyse(D) {
   const { G, verts, edges, n } = D;
+  // no edges: the whole sphere, nothing glued, nothing on it
+  if (!n) return { angles: [], maps: [], classes: [], cls: [], stars: [], surface: { o: 0, star: 0, x: 0, X: 0 }, cones: [], cost: frac(0), chi: frac(2), word: '', pairs: [], glides: [], letter: [] };
   const next = (i) => (i + 1) % n, prev = (i) => (i + n - 1) % n;
   const angles = verts.map((v, i) => G.angle(v, verts[prev(i)], verts[next(i)]));
   const maps = edges.map((e, i) => {

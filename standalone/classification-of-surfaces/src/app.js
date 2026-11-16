@@ -8,7 +8,6 @@
 import { createStage } from './stage.js';
 import { createTimeline } from './vendor/the-folding/timeline.js';
 import { initBookRefs } from './bookref.js';
-import { MODES } from './turning.js';
 import { createZipTab } from './tabs/zip.js';
 import { createTidyTab } from './tabs/tidy.js';
 import { createProveTab } from './tabs/prove.js';
@@ -70,14 +69,6 @@ $('tabs').addEventListener('keydown', (e) => {
 });
 
 $('reset-view').addEventListener('click', () => stage.R.resetView());
-// how a drag turns the view: the chooser in the corner of the pane (kept between visits where the browser allows)
-{
-  const sel = $('turning');
-  for (const m of MODES) { const o = document.createElement('option'); o.value = m.key; o.textContent = m.label; sel.append(o); }
-  sel.value = stage.turning.mode;
-  sel.addEventListener('change', () => stage.turning.setMode(sel.value));
-  stage.turning.onMode((m) => { sel.value = m; });
-}
 // "Next" under each tab: the chapter's order
 for (const a of document.querySelectorAll('[data-go]')) a.addEventListener('click', (e) => { e.preventDefault(); show(a.dataset.go, a.dataset.k ? { k: a.dataset.k } : undefined); window.scrollTo({ top: 0 }); });
 $('view').addEventListener('pointerdown', () => { turnHint.hidden = true; }, { once: true });

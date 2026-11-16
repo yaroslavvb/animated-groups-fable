@@ -9,7 +9,9 @@
 // What is drawn, tile by tile (orbifold.js tiles()):
 //   the tile itself     teal where the symmetry keeps the pattern's sense, sand where it is a mirror image (the two
 //                       sides of the paper of the 3D pane: folding the pattern up turns every sand tile over)
-//   a comma             the motif: it has no symmetry of its own, so the pattern has exactly the tile's
+//   a design            what is printed on the tile (motifs.js: Paisley, Soft commas, Tomoe, Checkerboard, Rings,
+//                       Comma), in the darker tone of the tile's side. None has a symmetry of its own, so the
+//                       pattern has exactly the tile's
 //   red lines           mirrors (one colour of the book's signature: what reflects)        dashed: a glide's axis
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
@@ -19,35 +21,26 @@
 //   const P = createPattern(canvas);
 //   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
 //   P.select(i | null)                  bring out what the i-th character of the signature stands for
+//   P.setPattern(key)                   another design (motifs.js PATTERNS)
 //   P.resetView()   P.draw()   P.state()   for the tests
 
 import { mul, apply, I3 } from './geom.js';
 import { tiles as makeTiles } from './orbifold.js';
+import { design, DEFAULT_PATTERN, isPattern } from './motifs.js';
+import { PRINT_FRONT, PRINT_BACK, hexToRgb } from '../vendor/the-folding/palette.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
-const DARK = [0.08, 0.09, 0.12], FRONT = [0.5, 0.79, 0.75], BACK = [0.93, 0.85, 0.63];
+const DARK = [0.08, 0.09, 0.12];
+// the paper of The Folding's prints: its front teal, its back sand, a light and a dark tone each
+const FRONT = hexToRgb(PRINT_FRONT[0]), BACK = hexToRgb(PRINT_BACK[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]), BACK_INK = hexToRgb(PRINT_BACK[1]);
 const css = (c, a = 1) => `rgba(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)},${a})`;
-
-/** The comma, in units of the room the tile leaves round its point: an outline that curls counter-clockwise from its head. */
-function comma(n) {
-  const rho = 0.42, a0 = 2.3, sweep = 3.5, w0 = 0.22, outer = [], inner = [];
-  for (let i = 0; i <= n; i++) {
-    const t = i / n, a = a0 + sweep * t, w = 0.03 + (w0 - 0.03) * Math.pow(1 - t, 0.85);
-    outer.push([(rho + w) * Math.cos(a), (rho + w) * Math.sin(a)]);
-    inner.push([(rho - w) * Math.cos(a), (rho - w) * Math.sin(a)]);
-  }
-  const head = [], k = Math.max(2, Math.round(n / 3)), c = [rho * Math.cos(a0), rho * Math.sin(a0)], rad = [Math.cos(a0), Math.sin(a0)], back = [Math.sin(a0), -Math.cos(a0)];
-  for (let i = 1; i < k; i++) { const b = Math.PI * (1 - i / k); head.push([c[0] + w0 * (Math.cos(b) * rad[0] + Math.sin(b) * back[0]), c[1] + w0 * (Math.cos(b) * rad[1] + Math.sin(b) * back[1])]); }
-  return outer.concat(inner.reverse(), head);
-}
-const COMMA = [comma(12), comma(5)];
 
 export function createPattern(canvas) {
   const ctx = canvas.getContext('2d');
   let W = 0, H = 0, dpr = 1;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
-  let budget = 1500, cache = new Map(), motif = [[], []], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = 1500, cache = new Map(), patternKey = DEFAULT_PATTERN, des = { dark: [], light: [], evenodd: false }, reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
 
   function size() {
@@ -192,7 +185,14 @@ export function createPattern(canvas) {
     // which corner class, star, glide the selected character stands for
     const pick = sel !== null && binding[sel] ? binding[sel] : null;
     const dim = pick ? 0.38 : 1;
-    const fill = [new Path2D(), new Path2D()], edge = [0, 1, 2].map(() => new Path2D()), commas = new Path2D();
+    const fill = [new Path2D(), new Path2D()], edge = [0, 1, 2].map(() => new Path2D());
+    const ink = [new Path2D(), new Path2D()], eyes = [new Path2D(), new Path2D()];       // the design: dark tone, then light on top; [front, back]
+    // a shape of the design, carried to a tile; on a small tile a curve keeps every second or third of its points
+    const print = (path, sh, M, b, flip) => {
+      const skip = b && (kind !== 'E' || sh.curve) ? Math.min(2 * b + 1, Math.max(1, Math.floor(sh.pts.length / 8))) : 1, pts = [];
+      for (let i = 0; i < sh.pts.length; i += skip) pts.push(apply(M, sh.pts[i]));
+      if (sh.convex) closed(path, pts, flip); else blob(path, pts);
+    };
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
     const marks = A.classes.map(() => new Path2D());
     const starOf = new Array(n).fill(-1);
@@ -223,11 +223,15 @@ export function createPattern(canvas) {
         pts.push(a);
         for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st));
       }
-      closed(fill[t.flip ? 1 : 0], pts, t.flip);
-      closed(edge[b], pts, t.flip);
+      if (n) { closed(fill[t.flip ? 1 : 0], pts, t.flip); closed(edge[b], pts, t.flip); }
+      else fill[0].arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
       for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
       A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); } });
-      if (px >= 2.4) { const src = motif[px >= 9 ? 0 : 1]; blob(commas, src.map((m) => apply(M, m))); }
+      if (px >= 1.2) {
+        const side = t.flip ? 1 : 0;
+        for (const sh of des.dark) if (px >= sh.min) print(ink[side], sh, M, b, t.flip);
+        for (const sh of des.light) if (px >= sh.min) print(eyes[side], sh, M, b, t.flip);
+      }
       if (px >= 4.5) for (const mk of marked) {
         const p = P[mk.v];
         if (kind === 'S' && p[2] < 0.05) continue;
@@ -243,9 +247,13 @@ export function createPattern(canvas) {
 
     ctx.fillStyle = css(FRONT); ctx.fill(fill[0]);
     ctx.fillStyle = css(BACK); ctx.fill(fill[1]);
+    const rule = des.evenodd ? 'evenodd' : 'nonzero';
+    ctx.fillStyle = css(FRONT_INK); ctx.fill(ink[0], rule);
+    ctx.fillStyle = css(BACK_INK); ctx.fill(ink[1], rule);
+    ctx.fillStyle = css(FRONT); ctx.fill(eyes[0]);
+    ctx.fillStyle = css(BACK); ctx.fill(eyes[1]);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
-    ctx.fillStyle = css(DARK, 0.6); ctx.fill(commas);
     // mirrors and glide axes: red
     const widths = [2.1, 1.4, 0.8];
     A.stars.forEach((s, k) => {
@@ -274,7 +282,7 @@ export function createPattern(canvas) {
       const M = mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       const visible = kind !== 'S' || c[2] > -0.2;
-      if (visible && px > 3) {
+      if (n && visible && px > 3) {
         const flip = M[0] * (M[4] * M[8] - M[5] * M[7]) - M[1] * (M[3] * M[8] - M[5] * M[6]) + M[2] * (M[3] * M[7] - M[4] * M[6]) < 0;
         const pts = [];
         for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
@@ -390,17 +398,17 @@ export function createPattern(canvas) {
       if (!m) { model = null; G = null; sel = null; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       model = m; G = m.D.G; sel = null; quick = false;
       cache = new Map();
-      reach = Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at)));
-      area = Math.abs(G.area(m.D.verts)) || 1;
-      const T = G.translate(G.origin, m.D.at);
-      const room = Math.min(m.D.clear, G.kind === 'E' ? Infinity : 0.8);          // a comma of a size one can take in, even in a very large tile
-      motif = COMMA.map((pts) => pts.map(([x, y]) => apply(T, G.polar(room * Math.hypot(x, y), Math.atan2(y, x)))));
+      reach = m.D.n ? Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at))) : 0;
+      area = m.D.n ? Math.abs(G.area(m.D.verts)) || 1 : 1;
+      des = design(m.D, patternKey);
       size(); firstView(); draw();
     },
     select(i) { sel = i; schedule(); },
+    setPattern(key) { if (!isPattern(key) || key === patternKey) return; patternKey = key; if (model) { des = design(model.D, key); schedule(); } },
+    get pattern() { return patternKey; },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
     draw, redraw: schedule,
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel }),
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length }),
   };
   return api;
 }

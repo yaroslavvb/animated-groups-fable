@@ -1,7 +1,7 @@
 // catalog.js — signatures, and the tile each one is built from.
 //
 // A SIGNATURE is data: { o, cones: [n, ...], stars: [[corner, ...], ...], x } (handles, cone points, boundaries each
-// with its corners in order, crosscaps). As plain text it is "*632", "3*3", "22x", "oo2*3*x" (* for the star, x for
+// with its corners in order, crosscaps); all empty is a signature too (no symmetry: the whole sphere is one tile). As plain text it is "*632", "3*3", "22x", "oo2*3*x" (* for the star, x for
 // the cross, o for the ring): parse() and textOf(). tokensOf() lists its characters:
 //   { t: 'o' | '*' | 'x', ref }       a wonder-ring, a kaleidoscope's star, a miracle's cross
 //   { t: 'd', v, ref }                a digit; ref says which cone point or which corner of which star it is
@@ -14,7 +14,7 @@
 // The signature is never trusted: bind() compares the characters with what orbifold.js reads off the tile's glued
 // edges and says which corner class, boundary, handle or crosscap each character stands for.
 
-import { half, regular, mirrorAndMiracle, crossSphere, hemisphere, spindle, canonical } from './domains.js';
+import { half, regular, mirrorAndMiracle, crossSphere, hemisphere, spindle, canonical, trivial } from './domains.js';
 import { frac, fadd, fval, PRICE } from './orbifold.js';
 
 const TAU = 2 * Math.PI;
@@ -86,19 +86,26 @@ const clone = (sig) => ({ o: sig.o, cones: sig.cones.slice(), stars: sig.stars.m
 /** How many places it takes on the ball of the 3D pane (a handle takes two). */
 export const room = (sig) => 2 * sig.o + sig.x + sig.cones.length + sig.stars.length;
 const length = (sig) => sig.o + sig.x + sig.cones.length + sig.stars.reduce((s, c) => s + 1 + c.length, 0);
-/** What the page can show: something, at most twelve places on the ball, at most six corners on a mirror, fourteen characters. */
-const fits = (sig) => length(sig) >= 1 && length(sig) <= 14 && room(sig) <= 12 && sig.stars.every((c) => c.length <= 6);
+/** What the page can show: at most twelve places on the ball, at most six corners on a mirror, fourteen characters. Nothing at all is fine. */
+const fits = (sig) => length(sig) <= 14 && room(sig) <= 12 && sig.stars.every((c) => c.length <= 6);
+export const EMPTY = Object.freeze({ o: 0, cones: Object.freeze([]), stars: Object.freeze([]), x: 0 });
+export const isEmpty = (sig) => length(sig) === 0;
 
-/** A signature from plain text ("22*3x"), or null. A ring next to a cross is read as two more crosses (o x = x x x). */
+/**
+ * A signature from plain text ("22*3x"), or null. A ring next to a cross is read as two more crosses (o x = x x x).
+ * "1" is the empty signature, as the book writes it (a pattern with no symmetry but leaving it alone); so is "".
+ */
 export function parse(text) {
-  const s = String(text || '').trim().replace(/[∗＊]/g, '*').replace(/[×✕]/g, 'x').replace(/[○◦∘]/g, 'o');
+  const s = String(text == null ? '' : text).trim().replace(/[∗＊]/g, '*').replace(/[×✕]/g, 'x').replace(/[○◦∘]/g, 'o').replace(/^1$/, '');
   const m = /^(o*)([2-9]*)((?:\*[2-9]*)*)(x*)$/.exec(s);
-  if (!m || !s) return null;
+  if (!m) return null;
   const sig = { o: m[1].length, cones: [...m[2]].map(Number), stars: m[3] ? m[3].split('*').slice(1).map((d) => [...d].map(Number)) : [], x: m[4].length };
   if (sig.o && sig.x) { sig.x += 2 * sig.o; sig.o = 0; }
   return fits(sig) ? sig : null;
 }
 export const textOf = (sig) => 'o'.repeat(sig.o) + sig.cones.join('') + sig.stars.map((c) => '*' + c.join('')).join('') + 'x'.repeat(sig.x);
+/** The same for an address: the empty signature is written 1. */
+export const linkOf = (sig) => textOf(sig) || '1';
 export function tokensOf(sig) {
   const out = [];
   for (let i = 0; i < sig.o; i++) out.push({ t: 'o', ref: { kind: 'o', i } });
@@ -116,6 +123,7 @@ export function costOf(sig) {
 }
 /** The tile of a pattern with this signature, or null where no pattern has it. */
 export function domainOf(sig) {
+  if (isEmpty(sig)) return trivial();
   const ex = fromText(textOf(sig));
   if (ex) return FAMILIES[ex.family].make(ex.params);
   if (fval(costOf(sig)) < 2) return null;          // under $2 and not one of the fourteen spherical types
@@ -128,33 +136,50 @@ export function structure(tokens) {
 }
 
 /**
- * The signature with one more thing: kind 'o' | 'x' | 'cone' | 'star' | 'corner'. A corner goes on the star `at`
- * points into (after the corner it points at), else on the last star. A crosscap next to handles turns each handle
- * into two crosscaps, and a handle next to a crosscap arrives as two crosscaps (the trade of tab 2, o x = x x x):
- * `traded` says so. Returns { sig, ref, traded } with ref the new character, or null where it cannot be added.
+ * The signature with one more thing, put in AFTER the character `at` (a ref; null: at the end; 'start': before
+ * everything), as a typed character goes in after the cursor. kind:
+ *   'o' | 'x'      a handle, a crosscap (their places in a signature are fixed: rings first, crosses last)
+ *   'star'         a mirror: after the mirror the cursor is in, else last
+ *   'cone'         a cone point of order `value`: after the cone point the cursor is on, else last (first at 'start')
+ *   'corner'       a corner of order `value` on the mirror the cursor is in (after the corner it is on, first if it
+ *                  is on the star itself), else at the end of the last mirror; null if there is no mirror
+ *   'digit'        what a typed digit means where the cursor is: a corner if the cursor is in a mirror, a cone
+ *                  point if it is among the rings and cone points or at the start; at the end (or on a cross) a
+ *                  corner of the last mirror if there is one, else a cone point. So signatures can be typed as read.
+ * A crosscap next to handles turns each handle into two crosscaps, and a handle next to a crosscap arrives as two
+ * crosscaps (the trade of tab 2, o x = x x x): `traded` says so. Returns { sig, ref, traded } with ref the new
+ * character, or null where it cannot be added.
  */
-export function addTo(sig, kind, at = null) {
-  const s = clone(sig);
+export function addTo(sig, kind, at = null, value = 2) {
+  const s = clone(sig), on = at && at !== 'start' ? at : null;
   let ref, traded = false;
+  if (!(value >= 2 && value <= 9)) return null;
+  if (kind === 'digit') kind = at === 'start' || (on && (on.kind === 'o' || on.kind === 'cone')) ? 'cone' : on && (on.kind === 'star' || on.kind === 'corner') ? 'corner' : s.stars.length ? 'corner' : 'cone';
   if (kind === 'o') { if (s.x) { s.x += 2; traded = true; ref = { kind: 'x', i: s.x - 1 }; } else { s.o++; ref = { kind: 'o', i: s.o - 1 }; } }
   else if (kind === 'x') { if (s.o) { s.x += 2 * s.o; s.o = 0; traded = true; } s.x++; ref = { kind: 'x', i: s.x - 1 }; }
-  else if (kind === 'cone') { s.cones.push(2); ref = { kind: 'cone', i: s.cones.length - 1 }; }
-  else if (kind === 'star') { s.stars.push([]); ref = { kind: 'star', s: s.stars.length - 1 }; }
-  else if (kind === 'corner') {
+  else if (kind === 'cone') {
+    const pos = at === 'start' || (on && on.kind === 'o') ? 0 : on && on.kind === 'cone' ? on.i + 1 : s.cones.length;
+    s.cones.splice(pos, 0, value);
+    ref = { kind: 'cone', i: pos };
+  } else if (kind === 'star') {
+    const pos = at === 'start' ? 0 : on && (on.kind === 'star' || on.kind === 'corner') ? on.s + 1 : s.stars.length;
+    s.stars.splice(pos, 0, []);
+    ref = { kind: 'star', s: pos };
+  } else if (kind === 'corner') {
     if (!s.stars.length) return null;
-    const st = at && (at.kind === 'star' || at.kind === 'corner') ? at.s : s.stars.length - 1;
-    const pos = at && at.kind === 'corner' && at.s === st ? at.i + 1 : s.stars[st].length;
-    s.stars[st].splice(pos, 0, 2);
+    const st = on && (on.kind === 'star' || on.kind === 'corner') ? on.s : s.stars.length - 1;
+    const pos = on && on.kind === 'corner' ? on.i + 1 : on && on.kind === 'star' ? 0 : s.stars[st].length;
+    s.stars[st].splice(pos, 0, value);
     ref = { kind: 'corner', s: st, i: pos };
   } else return null;
   return fits(s) ? { sig: s, ref, traded } : null;
 }
-/** The signature without the character `ref` (a star goes with its corners), or null if nothing would be left. */
+/** The signature without the character `ref` (a star goes with its corners). The last one may go too: the empty signature. */
 export function removeAt(sig, ref) {
   const s = clone(sig);
   if (ref.kind === 'o') s.o--; else if (ref.kind === 'x') s.x--; else if (ref.kind === 'cone') s.cones.splice(ref.i, 1);
   else if (ref.kind === 'star') s.stars.splice(ref.s, 1); else s.stars[ref.s].splice(ref.i, 1);
-  return length(s) >= 1 ? s : null;
+  return s;
 }
 /**
  * The signature with the digit `ref` one more or one less (2 .. 9), or null. In NN and *NN the two digits go

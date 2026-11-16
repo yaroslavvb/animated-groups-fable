@@ -17,7 +17,7 @@ four tabs, in the book's order, and a fifth for what the chapter is for:
 | 2 Tidy surfaces | 96, 101–103 | add holes, handles, crosscaps, cross-handles to a sphere; a hole walks through a crosscap (Fig. 8.11); the trade ⊗ = ××; χ, boundaries, sides |
 | 3 Zip it up | 96–100, Fig. 8.1–8.10 | the Tidying Lemma by hand: tap an arrow, the pair is zipped, what you hold is tidy again |
 | 4 Examples | 104–106 | the book's seven surfaces; count a map, the boundaries, the sides; the symbol follows |
-| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can write (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; tap a character, step a digit, add or remove a character |
+| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can type (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it; six designs), the surface it folds up to; type, delete, step a digit |
 
 The way in: every surface is polygons and zippers; zipping one pair at a time keeps it a sphere with holes, handles,
 crosscaps and cross-handles; two trades remove the cross-handles and the mixed case. Tab 3 lets you do that to the
@@ -32,7 +32,7 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `src/geo/` | the surface kit: sites and their charts, cells with holes, tubes, the crosscap collar, the flat patch, the twelve-site ball |
 | `src/zipper/` | tab 3: `engine.js` (the lemma's bookkeeping, pure), `view.js` (how a state is drawn), `parts.js` and `moves.js` (the motion of each zip) |
 | `src/examples/` | tab 4: the seven surfaces as cell complexes, their counts computed, the pinwheel |
-| `src/sym/` | tab 5: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (the examples), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
+| `src/sym/` | tab 5: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the six designs printed on a tile), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
 | `src/formulas.mjs` | the LaTeX the page composes while it runs; MathJax typesets everything at build time |
 | `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of tab 5 against its own tile |
@@ -67,18 +67,11 @@ screen axis square to it, such steps do not commute, and a closed loop of the po
 area) x (sensitivity squared). Measured with real drags in the 755 x 566 pane: once round a circle of 100 px radius
 leaves the view 70 degrees off (19 degrees for 50 px; on a phone-sized pane 45 degrees for 50 px).
 
-`src/turning.js` adds three other ways and a chooser in the corner of the pane (kept in `localStorage`); the default
-is now the turntable. It does not change the renderer: its listeners sit on the canvas's parent, run after the
-renderer's, and set the view they want.
-
-| way | a drag | once round a circle | "up" |
-|---|---|---|---|
-| Turntable (default) | left-right turns about the vertical, up-down tilts, to straight above or below | comes home exactly | stays up |
-| Arcball | takes hold of a ball filling the pane, at double speed; a drag round the edge twists | comes home exactly | free |
-| Grab | the same ball at single speed: the point taken stays under the pointer | comes home exactly | free |
-| Rolling ball | the renderer's own, with its momentum | 70 degrees off (100 px circle) | free |
-
-The Folding and The Unfolding have the rolling ball still; nothing of theirs was changed.
+Four ways of turning were then offered behind a chooser (turntable, arcball, grab, the rolling ball). His choice the
+same evening: *"make Turnable the default and get rid of chooser"*. So `src/turning.js` is a turntable and nothing
+else: left-right turns about the vertical, up-down tilts to straight above or below, "up" stays up, and any loop of
+the pointer comes home exactly. It does not change the renderer: its listeners sit on the canvas's parent, run after
+the renderer's, and set the view they want. The Folding and The Unfolding have the rolling ball still.
 
 ## Tab 5, Symmetries
 
@@ -133,6 +126,32 @@ character; a signature is data, `{ o, cones, stars, x }` (`src/sym/catalog.js` `
   an empty pattern pane and says so.
 - In `NN` and `*NN` the two digits step together, so stepping never leaves the fourteen types by accident.
 
+**Typing it** (his next ask, later that evening: *"it should be more interactive. I want to be able to press Delete
+and keep deleting until I get an empty bar. And then interactive really built up from there. Maybe using 2 to add
+the cone point of order 2"*). The signature sits in a bar with a caret and is typed like a line of text, wherever
+the focus is on the tab: `o`, `2` to `9`, `*` and `x` put a character in after the cursor, Delete (or Backspace)
+takes out the character the cursor is on and steps back, or the last one, down to an empty bar; in the bar itself
+the arrows move the cursor, up and down step a digit, Home and End jump. A typed digit means what it would mean
+where it stands: a cone point among the rings and cone points or at the start, a corner inside a mirror, and at the
+end a corner of the last mirror if there is one. So `* 6 3 2` types `*632` (passing `*6` and `*63`, which no pattern
+has, and the page says so on the way). The row under the bar does the same for a finger, with a delete button.
+The empty signature is the bare sphere with no symmetry (one tile, one mark; `#sym&k=1`, as the book writes it).
+
+**Six patterns** (the same ask: *"give me a chooser to choose between patterns, maybe reuse the patterns from
+https://spacesheep.dev/@yaroslavvb/the-folding#g=333"*). A chooser in the pattern pane's corner, with the names and
+order of The Folding's selector: Paisley (the default), Soft commas, Tomoe, Checkerboard, Rings, Comma; kept in the
+address (`&p=tomoe`) and between visits. The Folding's own prints are fitted by hand and by search to each of the 17
+plane groups (a table of knobs per group in its `src/patterns/`), so they cannot be carried to a sphere, a hyperbolic
+tiling or a signature typed a moment ago. Taken from it: the six ideas and names, its unit comma (`motif.js`
+`commaOutline`, copied) and the paper's two tones a side (`palette.js` `PRINT_FRONT` / `PRINT_BACK`). In
+`src/sym/motifs.js` each design is drawn on ONE tile from that tile's corners alone, and the symmetries carry it:
+a family of commas (a big one a cell, a small one in every corner with room); a fat comma with an eye; the tile
+split by an S into a dark and a light comma, the dark tail running into the farthest corner; triangles from a hub
+to the corners and the middles of the sides, every other one dark; the tile's outline shrunk again and again
+toward a point; one comma a cell. None has a symmetry of its own (the hub, the rings' point and the S sit off the
+middle; a tile of two mirror halves gets the same hand twice, not a mirror image), so every design has exactly the
+signature shown. Tested: every mark of every design lies inside its tile, for all examples.
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
@@ -148,7 +167,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 70 tests. The zipping's bookkeeping against an independent count of the glued surface (400 random
+- `node --test`: 72 tests (the last two: typing and deleting a signature character by character; the six designs inside
+  their tiles). The zipping's bookkeeping against an independent count of the glued surface (400 random
   gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
   1,345 more signatures (every `*pqr` and `pqr` with digits 2 to 9, every family over its numbers) each folded up
   from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping;
@@ -156,7 +176,7 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   four characters over `o 2 3 5 * x` either has a tile in the right geometry or is one of the ones without a
   pattern, and the spherical ones among them are exactly the fourteen types; adding, removing, stepping, the trade.
 - Every zip of every preset and of 40 random deals, in three orders, stepped through all its phases in a browser: no error.
-- `node tools/check_quotes.mjs`: 71 citations, each at most 15 words and on its page.
+- `node tools/check_quotes.mjs`: 72 citations, each at most 15 words and on its page.
 - Looked at in headless Chrome at 1280 and 390 px wide, light and dark, with reduced motion; a real tap on an arrow,
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
   And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.
@@ -169,6 +189,12 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   remove the mirror of `3*3` (no pattern, and the page says so), a deep link to `o2*3x`. In WebKit on the M5: all
   47 examples at both widths, the add row and remove with real taps, fifteen signatures of one's own, a touch drag
   on the ball and on the disc, no error. Dark theme looked at.
+  Typing with a real keyboard in headless Chrome, at 1280 and 390 px: Delete four times from `*632` to an empty bar,
+  `2 2 *` typed back (no pattern, a sphere, the plane), the cursor keys, a digit typed in the middle, the chooser
+  and its place in the address, a reload; the 3D view once round a circle comes home. The six designs looked at on
+  eleven signatures in all three geometries. In WebKit on the M5 (it did not answer over ssh at first, about
+  22:00 PST, and did a quarter of an hour later): the same Delete and typing with real key presses at both widths,
+  the six designs, the 47 examples and fifteen signatures of one's own, the drags; no error.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied
