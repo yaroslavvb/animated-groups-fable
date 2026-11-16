@@ -571,3 +571,20 @@ test('labels: the reviewer\'s cases (29) — once the copies have closed up, one
     }
   }
 });
+
+test('url view (15 Nov 2026, the turntable): the renderer\'s own az / el are written as they are — straight down and up too, where the eye\'s place says nothing of az — and never a roll; an old link\'s roll is read and then dropped', () => {
+  for (const [az, el] of [[30, 90], [-150, -90], [12.3, 45.6], [-179.9, 0], [0, 55]]) {
+    const v = viewToUrl({ ...viewFromAzEl(az, el), az, el, zoom: 2 });
+    assert.ok(Math.abs(v.az - az) < 1e-12 && v.el === el && v.zoom === 2 && v.roll === 0, `${az} / ${el}: ${JSON.stringify(v)}`);
+  }
+  assert.equal(encodeHash({ g: '333', view: viewToUrl({ ...viewFromAzEl(30, 90), az: 30, el: 90, zoom: 1 }) }), '#g=333&view=30/90/1', 'straight down, turned 30 degrees: no roll in the address');
+  // (from q alone the same view reads az 0 and a roll: the turntable's own numbers are what the page writes)
+  assert.equal(viewToUrl({ ...viewFromAzEl(30, 90), zoom: 1 }).az, 0);
+  assert.deepEqual(viewToUrl({ q: [0, 0, 0, 1], zoom: 1, az: 200, el: 95 }), { az: -160, el: 90, zoom: 1, roll: 0 }, 'wrapped and held; az / el win over q');
+  assert.deepEqual(viewToUrl({ az: 10, el: 40 }), { az: 10, el: 40, zoom: 1, roll: 0 }, 'no q needed');
+  // a link made before the turntable, with a roll: still read (nothing is dropped as malformed) ...
+  const d = decodeHash('#g=333&view=10/40/1.5/25');
+  assert.deepEqual([d.view.az, d.view.el, d.view.zoom, d.view.roll, d.dropped], [10, 40, 1.5, 25, []]);
+  // ... the page gives the renderer az, el and zoom, and writes back what it shows: the roll is gone from the address
+  assert.equal(encodeHash({ g: '333', view: viewToUrl({ az: d.view.az, el: d.view.el, zoom: d.view.zoom }) }), '#g=333&view=10/40/1.5');
+});

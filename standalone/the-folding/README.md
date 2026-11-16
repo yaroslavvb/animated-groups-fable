@@ -41,7 +41,7 @@ through paper. The lab that tried the looks and motions for 22× is in `lab22x/`
 | `tools/` | `shot.mjs`, `filmstrip.mjs`, `qa-matrix.mjs` (headless Chrome), `motif-place.mjs` (comma placement table), `test-all.mjs` (runs the suite on a lab box or the mini), `browser.mjs` + `remote/` (Chrome pool on the mini) |
 | `SPEC.md` | the design contract the build followed, round by round |
 | `notes/`, `qa/*.md` | development log and the design decisions (Klein bottle: `notes/bottle.md` for the classic bottle of 14 Nov 2026; filling the orbifold; review triage) |
-| `dev/` | demo pages used by the tools; `dev/recut/` the probes of the 13 Nov round (self-crossing of a motion, the prints found, a real-browser check); `dev/patterns/` the pattern round's designs, kit and tools (`README.md`); `dev/unify/` the journey's film, its transport check and the live check of 15 Nov |
+| `dev/` | demo pages used by the tools; `dev/recut/` the probes of the 13 Nov round (self-crossing of a motion, the prints found, a real-browser check); `dev/patterns/` the pattern round's designs, kit and tools (`README.md`); `dev/turntable/` the 3D view's turntable in Chrome and WebKit; `dev/unify/` the journey's film, its transport check and the live check of 15 Nov |
 | `lab22x/` | the 22× lab: several looks and motions of the cross-cap side by side (its own page, `lab22x/dist/index.html` as deployed) |
 
 Build: `node build.mjs` (bundles with `npx esbuild`). Tests: `node --test 'test/**/*.test.js'` (and `lab22x/test/*.test.js`). Comma table after any

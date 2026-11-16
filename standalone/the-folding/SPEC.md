@@ -329,7 +329,7 @@ R.resize(); R.dispose()
 - **Bold edges that shine through**: first a depth-only pass of the surface; lines are screen-space quads with round caps
   (distance-to-segment in the fragment shader, anti-aliased), drawn twice: where hidden (depth test GREATER) with alpha × `xray`,
   where visible with full alpha. Markers likewise; labels are HTML elements in `labelLayer`, positioned with `project`.
-- **Trackball**: drag rotates (free trackball about the frame centre, y-up initially), with momentum that decays in ~0.4 s;
+- **Trackball** (replaced by a turntable on 15 Nov 2026: § 13): drag rotates (free trackball about the frame centre, y-up initially), with momentum that decays in ~0.4 s;
   wheel / pinch zooms with soft limits and a slight elastic overshoot; double-tap/double-click = resetView; arrow keys rotate
   when focused. `touch-action: none`; never scrolls the page. Default view: looking down at the plane from elevation ≈ 55°,
   plane's +y pointing up-screen, perspective FOV ≈ 28°. devicePixelRatio capped at 2. Handles context loss gracefully.
@@ -1183,3 +1183,39 @@ the left end, named "tile = surface"), the pattern at its right end. A button at
   Fold, Unfold and Tile with the viewer's address, no crystallographic name for any group (text, tooltips, labels, the
   picker), every caption's link, a click on `*x`'s opening the Möbius band of the Classification of Surfaces page, and
   a phone. `dev/recut/ss-live.mjs` and `dev/recut/webkit-live.mjs` know the new chip and the new row.
+
+## 13. 15 Nov 2026 — a turntable for the 3D view
+
+The owner: *"use a fixed turntable mode for rotation UI"*. The free trackball let a diagonal drag tilt the picture
+about the line of sight; after a few turns the paper's normal pointed anywhere on the screen, and a closed loop of the
+hand did not bring the view back. Now the 3D view is a turntable, always (there is no mode to switch):
+
+- **The model** (`src/render3d.js`). The paper lies on a table that turns about its normal, the z axis; the eye sits at
+  azimuth `az` and elevation `el`, as `viewFromAzEl` has always defined them, `el` from −90 (straight below) to 90
+  (straight above), held there — never over the top. The z axis always points up-screen (straight down or up, a turn
+  of the table is a turn of the picture): the view never rolls. `q` is `viewFromAzEl(az, el).q`, kept in step.
+- **The hand.** A horizontal drag turns the table (the near side follows the finger: `az −= dx · s`), a vertical drag
+  tilts it (down raises the eye: `el += dy · s`); `s` is the sensitivity of before. A flick coasts on (~0.4 s): the turn
+  freely, the tilt until its limit, where it stops dead. Two fingers: pinch zooms, twist turns the table (the picture
+  follows the fingers, seen from above or from below). Safari's trackpad pinch and rotate likewise, at the same time.
+  Keys: ← → turn the table 9°, ↑ ↓ tilt it 9° (↓ as a drag down). Double-tap, 0 or Home: home, gliding along the table
+  (the shorter way round) and the tilt.
+- **The interface.** `R.getView()` gives `{ q, zoom, az, el }`; `R.setView` takes `{ az, el, zoom }` (they win over a
+  `q` beside them) or a `q` alone, which is set upright: its eye's place is kept, or, straight down or up, the azimuth
+  of its screen's x axis (there a roll IS a turn of the table, and nothing is lost). The 22× lab passes its views from
+  card to card as `q` and `zoom`: unchanged.
+- **The address** (`src/app.js`). `view=<az>/<el>/<zoom>` is written from the renderer's own `az` and `el` — exact
+  also straight down, where the eye's place says nothing of `az`. A link from before with a roll
+  (`view=<az>/<el>/<zoom>/<roll>`) is still read, shown upright (same eye) and rewritten without the roll.
+  `getState().view.roll` is always 0.
+- **Fixed on the way.** When a coast came to rest its last speck of speed was kept and added to the next key or flick
+  (an arrow key moved 0.14° too far, the other way round too). Now nothing is left over.
+- **Tests.** `test/render3d-dom.test.js` (real pointer, key and gesture sequences on the stand-in canvas: 160 random
+  actions never roll; a closed loop of the hand comes back exactly, and the free trackball's same loop is shown to
+  roll; across and down each alone; the limits, the coast; twists from above and below; Safari's gestures; keys;
+  `getView` / `setView`; the glide home); `test/render3d.test.js` (`turntableQ`, `turntableOf` at and near the poles, a
+  rolled view set upright); `test/app-url.test.js` (the turntable's az / el in the address; an old link's roll).
+  In a real browser: `dev/turntable/check.mjs` (Chrome: mouse drags in every direction, a closed loop, straight down
+  and its address, a flick, the keys, an old link, a phone's twist and drag from the browser's own touch input;
+  `--live <url>` runs it on the deployed page) and `bash dev/turntable/webkit.sh` (WebKit on the M5: drags and
+  Safari's own gesture events).

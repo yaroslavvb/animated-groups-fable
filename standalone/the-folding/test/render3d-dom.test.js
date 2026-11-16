@@ -622,3 +622,293 @@ test('shape print: a field the GPU cannot hold, a malformed print, a sheet witho
   R.setSurface({ ...quad, uv: Float32Array.of(-1, -1, 1, NaN, 1, 1, -1, 1) }); R.render();
   assert.equal(last().pat, 0);
 });
+
+// ---- the turntable (15 Nov 2026, the owner: "use a fixed turntable mode for rotation UI") -----------------------
+// The paper lies on a table that turns about its normal (z); the eye has an azimuth and an elevation, and the view
+// never rolls: the screen's x axis stays level, z up-screen. Here: real pointer, key and gesture sequences on the
+// stand-in canvas (600 x 500 css px).
+
+/** The view as a turntable: az, el (degrees); level = |z of the screen's x axis| (0 when upright); up = z of the
+ *  screen's y axis (>= 0: z never points down-screen); inStep = degrees between q and viewFromAzEl(az, el). */
+function upright(R) {
+  const v = R.getView(), M = T.qToMat3(v.q, new Array(9));
+  return { az: v.az, el: v.el, zoom: v.zoom, level: Math.abs(M[2]), up: M[5], inStep: angleDeg(v.q, viewFromAzEl(v.az, v.el).q) };
+}
+/** A drag along pts (client px) with one pointer, a move every dt ms; released still (no flick) unless flick. */
+function drag(canvas, pts, { id = 1, type = 'mouse', dt = 16, flick: thrown = false } = {}) {
+  canvas.fire('pointerdown', { pointerId: id, pointerType: type, button: 0, clientX: pts[0][0], clientY: pts[0][1] });
+  for (let i = 1; i < pts.length; i++) { clock += dt; canvas.fire('pointermove', { pointerId: id, clientX: pts[i][0], clientY: pts[i][1] }); }
+  clock += thrown ? 4 : 200;
+  canvas.fire('pointerup', { pointerId: id, clientX: pts[pts.length - 1][0], clientY: pts[pts.length - 1][1] });
+}
+/** A straight drag by (dx, dy) in n moves. */
+const line = (x0, y0, dx, dy, n = 10) => Array.from({ length: n + 1 }, (_, i) => [x0 + (dx * i) / n, y0 + (dy * i) / n]);
+/** Two fingers: the second turns about the first by `deg` (clockwise on screen > 0: client y points down), in n moves. */
+function twist(canvas, deg, n = 6) {
+  const a = [300, 250], r = 100;
+  canvas.fire('pointerdown', { pointerId: 1, pointerType: 'touch', clientX: a[0], clientY: a[1] });
+  canvas.fire('pointerdown', { pointerId: 2, pointerType: 'touch', clientX: a[0] + r, clientY: a[1] });
+  for (let i = 1; i <= n; i++) {
+    const th = (deg * i / n) * Math.PI / 180;
+    clock += 16;
+    canvas.fire('pointermove', { pointerId: 2, clientX: a[0] + r * Math.cos(th), clientY: a[1] + r * Math.sin(th) });
+  }
+  clock += 200;
+  canvas.fire('pointerup', { pointerId: 2, clientX: a[0] + r * Math.cos(deg * Math.PI / 180), clientY: a[1] + r * Math.sin(deg * Math.PI / 180) });
+  canvas.fire('pointerup', { pointerId: 1, clientX: a[0], clientY: a[1] });
+}
+/** The screen angle (degrees, client y down: clockwise > 0) of the projected segment from world point a to b. */
+function screenAngle(R, a, b) { const p = R.project(a), q = R.project(b); return Math.atan2(q[1] - p[1], q[0] - p[0]) * 180 / Math.PI; }
+const turnDiff = (a, b) => { let d = b - a; d -= 360 * Math.round(d / 360); return d; };
+
+test('turntable: whatever the hand does — drags in every direction, flicks and their coasting, twists, keys, resets — the view never rolls', () => {
+  installGlobals({ reduce: false });
+  const { R, canvas } = makeScene();
+  let s = 1;
+  const rnd = () => { s = (s * 16807) % 2147483647; return s / 2147483647; };
+  let checks = 0, worst = { level: 0, inStep: 0, up: 1 };
+  const check = (what) => {
+    const u = upright(R);
+    worst.level = Math.max(worst.level, u.level); worst.inStep = Math.max(worst.inStep, u.inStep); worst.up = Math.min(worst.up, u.up);
+    assert.ok(u.level < 1e-9 && u.up >= -1e-12 && u.inStep < 1e-6 && u.el >= -90 && u.el <= 90 && u.az > -180 - 1e-9 && u.az <= 180 + 1e-9,
+      `${what}: ${JSON.stringify(u)}`);
+    checks++;
+  };
+  for (let k = 0; k < 160; k++) {
+    const a = rnd(), x = 100 + 400 * rnd(), y = 100 + 300 * rnd(), ang = 2 * Math.PI * rnd(), len = 30 + 600 * rnd();
+    if (a < 0.4) drag(canvas, line(x, y, len * Math.cos(ang), len * Math.sin(ang), 12));
+    else if (a < 0.6) { drag(canvas, line(x, y, 0.3 * len * Math.cos(ang), 0.3 * len * Math.sin(ang), 8), { dt: 8, flick: true }); for (let i = 0; i < 12; i++) { step(); check(`coasting after flick ${k}`); } }
+    else if (a < 0.75) twist(canvas, 120 * rnd() - 60);
+    else if (a < 0.85) {
+      canvas.fire('gesturestart', {}); canvas.fire('gesturechange', { scale: 1, rotation: 90 * rnd() - 45 }); canvas.fire('gestureend', {});
+    } else if (a < 0.97) { canvas.fire('keydown', { key: ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'][Math.floor(4 * rnd())] }); for (let i = 0; i < 8; i++) { step(); check(`key ${k}`); } }
+    else { R.resetView(); for (let i = 0; i < 6; i++) { step(); check(`reset glide ${k}`); } }
+    check(`action ${k}`);
+    steps(3);
+  }
+  assert.ok(checks > 400, `${checks} checks`);
+  assert.ok(worst.level < 1e-12, 'the screen\'s x axis stays level: ' + worst.level);
+});
+
+test('turntable: a closed path of the hand brings the view back exactly (a free trackball does not: it rolls)', () => {
+  installGlobals({ reduce: true });                  // (no momentum: the view is what the hand did)
+  const { R, canvas } = makeScene();
+  const s = Math.PI / (0.85 * 500);                  // the renderer's sensitivity on this canvas (rad / css px)
+  // the loops stay inside the tilt limits (el 55 ± 25 degrees here)
+  const loops = [
+    [[80, 0], [0, 50], [-80, 0], [0, -50]],          // a square: right, down, left, up
+    [[60, 40], [-30, 20], [-90, -10], [60, -50]],    // a quadrilateral
+    [[150, -30], [-40, 60], [-110, -30]],            // a triangle
+  ];
+  for (const sides of loops) {
+    R.resetView(true);
+    const q0 = R.getView().q;
+    let x = 300, y = 250;
+    let free = viewFromAzEl().q.slice();             // the old free trackball, side by side: q <- (dy s, dx s, 0) o q
+    for (const [dx, dy] of sides) {
+      drag(canvas, line(x, y, dx, dy, 20));
+      for (let i = 1; i <= 20; i++) { const ex = dx / 20, ey = dy / 20, a = Math.hypot(ey * s, ex * s); free = T.qNormalize(T.qMul(T.qAxisAngle(ey * s, ex * s, 0, a), free)); }
+      x += dx; y += dy;
+    }
+    assert.ok(angleDeg(q0, R.getView().q) < 1e-9, `the turntable is back where it was: ${angleDeg(q0, R.getView().q)}`);
+    assert.ok(angleDeg(viewFromAzEl().q, free) > 1, `(control: the free trackball is ${angleDeg(viewFromAzEl().q, free).toFixed(2)} degrees off after the same loop)`);
+  }
+});
+
+test('turntable: a drag across turns the table (the near side goes with the finger), a drag down raises the eye; each alone', () => {
+  installGlobals({ reduce: true });
+  const { R, canvas } = makeScene();
+  const s = Math.PI / (0.85 * 500), near = [0, -1, 0];
+  const n0 = R.project(near);
+  drag(canvas, line(200, 250, 100, 0));
+  let u = upright(R);
+  assert.ok(Math.abs(u.el - 55) < 1e-9, `across: the tilt is untouched (${u.el})`);
+  assert.ok(Math.abs(u.az - (-100 * s * 180 / Math.PI)) < 1e-9, `across: the table turned by 100 px of sensitivity, the near side to the right (${u.az})`);
+  const n1 = R.project(near);
+  assert.ok(n1[0] > n0[0] + 20, `the near side went right with the finger: ${n0[0].toFixed(1)} -> ${n1[0].toFixed(1)}`);
+  drag(canvas, line(300, 200, 0, 50));
+  const v = upright(R);
+  assert.ok(Math.abs(v.az - u.az) < 1e-9, 'down: the turn is untouched');
+  assert.ok(Math.abs(v.el - (55 + 50 * s * 180 / Math.PI)) < 1e-9, `down: the eye rose (${v.el})`);
+  assert.ok(R.project(near)[1] > n1[1] + 5, 'the near side went down with the finger');
+  // a drag up lowers the eye, also below the paper
+  drag(canvas, line(300, 400, 0, -300));
+  u = upright(R);
+  assert.ok(u.el < 0 && Math.abs(u.az - v.az) < 1e-9, `up: the eye went below the paper (${u.el})`);
+  // seen from below, the near side still goes with the finger across
+  const b0 = R.project(near);
+  drag(canvas, line(200, 250, 60, 0));
+  assert.ok(R.project(near)[0] > b0[0] + 10, 'from below too');
+});
+
+test('turntable: the tilt stops at straight down and straight up — never over the top; a flick against the limit coasts round, not over', () => {
+  installGlobals({ reduce: false });
+  const { R, canvas } = makeScene();
+  drag(canvas, line(300, 10, 0, 1500, 30));
+  let u = upright(R);
+  assert.equal(u.el, 90, 'held at straight down');
+  assert.ok(Math.abs(u.az) < 1e-9, 'a vertical drag never turns the table');
+  const q90 = R.getView().q;
+  drag(canvas, line(300, 100, 0, 300));
+  assert.ok(angleDeg(q90, R.getView().q) < 1e-12, 'dragging on past the limit does nothing');
+  // looking straight down, a drag across turns the picture about the line of sight (the table turns under the eye)
+  const a0 = screenAngle(R, [0, 0, 0], [1, 0, 0]);
+  drag(canvas, line(200, 250, 100, 0));
+  u = upright(R);
+  assert.equal(u.el, 90);
+  assert.ok(Math.abs(Math.abs(turnDiff(a0, screenAngle(R, [0, 0, 0], [1, 0, 0]))) - 100 * Math.PI / (0.85 * 500) * 180 / Math.PI) < 1e-4, 'the picture turned by the table\'s turn (float32 projection)');
+  // a vertical flick coasts in the tilt too (an early build stopped the tilt's coast after one frame), and stops
+  // dead at the limit
+  R.setView({ az: 0, el: 0 });
+  drag(canvas, line(300, 200, 0, 48, 6), { dt: 8, flick: true });
+  const fl = upright(R);
+  steps(4);
+  const fl4 = upright(R);
+  assert.ok(fl4.el > fl.el + 2 && Math.abs(fl4.az) < 1e-12, `the tilt coasts on after a vertical flick: ${fl.el.toFixed(2)} -> ${fl4.el.toFixed(2)}`);
+  steps(4);
+  assert.ok(upright(R).el > fl4.el, '... and on');
+  steps(60);
+  const rest = upright(R).el;
+  steps(10);
+  assert.ok(rest > fl4.el && upright(R).el === rest, 'then rests');
+  drag(canvas, line(300, 100, 0, 1500, 30));
+  // a diagonal flick into the limit: the tilt stays at the limit, the turn coasts on after the release
+  drag(canvas, line(200, 200, 160, 120, 8), { dt: 8, flick: true });
+  const atRelease = upright(R);
+  steps(30);
+  u = upright(R);
+  assert.equal(u.el, 90, 'still at the limit after the coast');
+  assert.ok(Math.abs(turnDiff(atRelease.az, u.az)) > 3, `the turn coasted on: ${atRelease.az.toFixed(2)} -> ${u.az.toFixed(2)}`);
+  drag(canvas, line(300, 490, 0, -3000, 40));
+  u = upright(R);
+  assert.equal(u.el, -90, 'held at straight up from below');
+  assert.ok(u.level < 1e-12);
+});
+
+test('turntable: two fingers twist the table, the picture following the fingers — from above and from below; the tilt and the zoom are left alone', () => {
+  installGlobals({ reduce: true });
+  const { R, canvas } = makeScene();
+  twist(canvas, 30);
+  let u = upright(R);
+  assert.ok(Math.abs(u.el - 55) < 1e-9 && Math.abs(u.zoom - 1) < 1e-9, 'a twist neither tilts nor zooms');
+  assert.ok(Math.abs(u.az - 30) < 1e-6, `a clockwise twist of 30 degrees turns the table 30 degrees (${u.az})`);
+  assert.ok(u.level < 1e-12, 'and does not roll');
+  for (const el of [90, -90]) {
+    R.setView({ az: 0, el });
+    const a0 = screenAngle(R, [0, 0, 0], [1, 0, 0]);
+    twist(canvas, 30);
+    const d = turnDiff(a0, screenAngle(R, [0, 0, 0], [1, 0, 0]));
+    // (the projection is float32: a micro-degree)
+    assert.ok(Math.abs(d - 30) < 1e-4, `looking straight ${el > 0 ? 'down' : 'up'}, the picture turns with the fingers: ${d}`);
+    twist(canvas, -45);
+    assert.ok(Math.abs(turnDiff(a0, screenAngle(R, [0, 0, 0], [1, 0, 0])) + 15) < 1e-4, '... back the other way');
+    // (the table itself, exactly: seen from below, a clockwise twist turns it the other way round its axis)
+    assert.ok(Math.abs(turnDiff(0, upright(R).az) - (el > 0 ? -15 : 15)) < 1e-9, `the table itself: ${upright(R).az}`);
+  }
+});
+
+test('turntable: Safari\'s trackpad rotation turns the table and its pinch zooms, at the same time; nothing rolls', () => {
+  installGlobals({ reduce: true });
+  const { R, canvas } = makeScene();
+  canvas.fire('gesturestart', {});
+  canvas.fire('gesturechange', { scale: 1, rotation: 12 });
+  canvas.fire('gesturechange', { scale: 1.5, rotation: 20 });
+  canvas.fire('gestureend', {});
+  const u = upright(R);
+  assert.ok(Math.abs(u.az - 20) < 1e-6 && Math.abs(u.el - 55) < 1e-9, `turned 20 degrees, not tilted: ${JSON.stringify(u)}`);
+  assert.ok(Math.abs(u.zoom - 1.5) < 1e-6, 'zoomed 1.5x');
+  assert.ok(u.level < 1e-12);
+});
+
+test('turntable: the arrow keys turn the table and tilt it by 9 degrees; the tilt is held at its limits; a key with momentum totals its step', () => {
+  installGlobals({ reduce: true });
+  const { R, canvas } = makeScene();
+  const key = (k) => canvas.fire('keydown', { key: k });
+  key('ArrowLeft');
+  assert.ok(Math.abs(upright(R).az - 9) < 1e-9 && Math.abs(upright(R).el - 55) < 1e-9, 'left: the near side to the left (az + 9)');
+  key('ArrowRight'); key('ArrowRight');
+  assert.ok(Math.abs(upright(R).az + 9) < 1e-9, 'right: back and on');
+  key('ArrowDown');
+  assert.ok(Math.abs(upright(R).el - 64) < 1e-9 && Math.abs(upright(R).az + 9) < 1e-9, 'down: the eye rises (as a drag down)');
+  key('ArrowUp'); key('ArrowUp');
+  assert.ok(Math.abs(upright(R).el - 46) < 1e-9, 'up: it sinks');
+  R.setView({ az: 0, el: 85 });
+  key('ArrowDown');
+  assert.equal(upright(R).el, 90, 'held at straight down');
+  key('ArrowDown');
+  assert.equal(upright(R).el, 90);
+  R.setView({ az: 0, el: -85 });
+  key('ArrowUp');
+  assert.equal(upright(R).el, -90, 'held at straight up');
+  // with momentum: the turn glides in and totals the step
+  const query = installGlobals({ reduce: false });
+  const m = makeScene();
+  m.canvas.fire('keydown', { key: 'ArrowLeft' });
+  steps(60);
+  assert.ok(Math.abs(upright(m.R).az - 9) < 1e-6 && Math.abs(upright(m.R).el - 55) < 1e-9, `glided 9 degrees: ${JSON.stringify(upright(m.R))}`);
+  // a second key after the first has come to rest moves by its own step only (the glide that ended leaves nothing
+  // behind: an early build re-applied the last speck of the first glide, 0.14 degrees, found in a real Chrome)
+  m.canvas.fire('keydown', { key: 'ArrowDown' });
+  steps(60);
+  assert.ok(Math.abs(upright(m.R).az - 9) < 1e-9 && Math.abs(upright(m.R).el - 64) < 1e-6, `then down: only the tilt moved: ${JSON.stringify(upright(m.R))}`);
+  m.R.setView({ az: 0, el: 86 });
+  m.canvas.fire('keydown', { key: 'ArrowDown' });
+  steps(60);
+  assert.equal(upright(m.R).el, 90, 'the gliding tilt stops at the limit');
+  assert.ok(query.ls.size >= 1);
+});
+
+test('turntable: getView gives az / el; setView takes them, wrapped and held, over a q beside them; a q alone is set upright, keeping its eye; straight down keeps its turn', () => {
+  installGlobals({ reduce: true });
+  const { R } = makeScene();
+  R.setView({ az: 30, el: 90 });
+  assert.deepEqual([R.getView().az, R.getView().el].map((x) => Math.round(x * 1e9) / 1e9), [30, 90], 'looking straight down, the turn is kept as az (no roll)');
+  R.setView({ az: -200, el: 120, zoom: 2 });
+  let u = upright(R);
+  assert.ok(Math.abs(u.az - 160) < 1e-9 && u.el === 90 && Math.abs(u.zoom - 2) < 1e-9, `wrapped and held: ${JSON.stringify(u)}`);
+  R.setView({ zoom: 1.3 });
+  assert.ok(Math.abs(upright(R).az - 160) < 1e-9 && Math.abs(upright(R).zoom - 1.3) < 1e-9, 'a zoom alone leaves the turntable where it is');
+  // a q that rolled (the free trackball's, an old link's): the eye's place is kept, the roll dropped
+  const h = 25 * Math.PI / 360, rolled = T.qMul([0, 0, Math.sin(h), Math.cos(h)], viewFromAzEl(40, 20).q);
+  R.setView({ q: rolled });
+  u = upright(R);
+  assert.ok(Math.abs(u.az - 40) < 1e-9 && Math.abs(u.el - 20) < 1e-9 && u.level < 1e-12, `upright, the eye kept: ${JSON.stringify(u)}`);
+  // straight down / up, from a q: the turn is read off the screen's x axis
+  for (const [az, el] of [[123, 90], [-60, -90], [10, 89.99999], [-170, -89.9999999]]) {
+    R.setView({ q: viewFromAzEl(az, el).q });
+    u = upright(R);
+    assert.ok(Math.abs(turnDiff(az, u.az)) < 1e-6 && Math.abs(u.el - el) < 1e-6, `${az} / ${el}: ${JSON.stringify(u)}`);
+  }
+  R.setView({ q: viewFromAzEl(10, 10).q, az: 50, el: 30 });
+  assert.ok(Math.abs(upright(R).az - 50) < 1e-9 && Math.abs(upright(R).el - 30) < 1e-9, 'az / el win over a q beside them');
+  // what getView gives, setView takes back exactly (the 22x lab passes views from card to card)
+  R.setView({ az: 77.7, el: -33.3, zoom: 2.2 });
+  const v = R.getView();
+  R.resetView(true);
+  R.setView(v);
+  assert.ok(angleDeg(v.q, R.getView().q) < 1e-12 && Math.abs(R.getView().zoom - 2.2) < 1e-12, 'getView -> setView: the same view');
+  R.resetView(true);
+  R.setView({ q: v.q, zoom: v.zoom });
+  assert.ok(angleDeg(v.q, R.getView().q) < 1e-9, '... and from its q alone');
+});
+
+test('turntable: reset glides home along the table and the tilt, never through a roll, and lands exactly', () => {
+  installGlobals({ reduce: false });
+  const { R } = makeScene();
+  R.setView({ az: 170, el: -70, zoom: 2 });
+  R.resetView();
+  let prev = upright(R);
+  for (let i = 0; i < 40; i++) {
+    step();
+    const u = upright(R);
+    assert.ok(u.level < 1e-12 && u.inStep < 1e-6, 'upright all the way');
+    assert.ok(u.az <= prev.az + 1e-9 && u.az >= -1e-9 && u.el >= prev.el - 1e-9 && u.el <= 55 + 1e-9, `monotone, the shorter way round (170 -> 0): ${prev.az.toFixed(2)} -> ${u.az.toFixed(2)}, ${prev.el.toFixed(2)} -> ${u.el.toFixed(2)}`);
+    prev = u;
+  }
+  assert.ok(angleDeg(R.getView().q, viewFromAzEl().q) < 1e-9 && Math.abs(R.getView().zoom - 1) < 1e-9, 'home');
+  // from the other side the table turns the other way
+  R.setView({ az: -150, el: 10 });
+  R.resetView();
+  step(); step();
+  assert.ok(upright(R).az > -150 && upright(R).az < 0, 'up from -150');
+});

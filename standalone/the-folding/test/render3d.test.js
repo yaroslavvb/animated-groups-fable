@@ -42,6 +42,41 @@ test('viewFromAzEl: plan view, azimuth and elevation', () => {
   }
 });
 
+test('turntable (15 Nov 2026): turntableQ is Rx(el - 90) o Rz(-az) written out; turntableOf reads az and el back, also straight down and up, and sets a rolled view upright', () => {
+  const rand = rng(1115), D = Math.PI / 180;
+  const angle = (a, b) => { const r = T.qMul([-a[0], -a[1], -a[2], a[3]], b); return 2 * Math.atan2(Math.hypot(r[0], r[1], r[2]), Math.abs(r[3])) / D; };
+  assert.deepEqual([T.EL_MIN, T.EL_MAX], [-90, 90], 'from straight below to straight above');
+  const els = [90, -90, 89.9999999, -89.9999999, 89.95, -89.95, 0, 55];
+  for (let k = 0; k < 400; k++) {
+    const az = k < els.length ? 360 * rand() - 180 : 360 * rand() - 180, el = k < els.length ? els[k] : 180 * rand() - 90;
+    const q = T.turntableQ(az * D, el * D);
+    const ref = T.qNormalize(T.qMul(T.qAxisAngle(1, 0, 0, (el - 90) * D), T.qAxisAngle(0, 0, 1, -az * D)));
+    assert.ok(angle(q, ref) < 1e-12 && near(Math.hypot(...q), 1, 1e-15), `${az} / ${el}: the product written out`);
+    const back = T.turntableOf(q);
+    let dAz = back.az / D - az; dAz -= 360 * Math.round(dAz / 360);
+    assert.ok(Math.abs(dAz) < 1e-9 && Math.abs(back.el / D - el) < 1e-9, `${az} / ${el}: read back as ${back.az / D} / ${back.el / D}`);
+    assert.ok(back.az > -Math.PI && back.az <= Math.PI, 'az in (-180, 180]');
+  }
+  // a view that rolled: the eye's place is kept (el, and az where the eye is not straight above or below)
+  for (let k = 0; k < 200; k++) {
+    const az = 360 * rand() - 180, el = 178 * rand() - 89, roll = 360 * rand() - 180, h = roll * D / 2;
+    const q = T.qMul([0, 0, Math.sin(h), Math.cos(h)], T.turntableQ(az * D, el * D));
+    const t = T.turntableOf(q), m0 = T.qToMat3(q, new Float64Array(9)), m1 = T.qToMat3(T.turntableQ(t.az, t.el), new Float64Array(9));
+    assert.ok(Math.hypot(m0[6] - m1[6], m0[7] - m1[7], m0[8] - m1[8]) < 1e-9, `rolled ${roll}: the same eye`);
+    assert.ok(Math.abs(m1[2]) < 1e-15, 'upright');
+  }
+  // straight down (or up), a roll IS a turn of the table: nothing is lost, the very same view comes back
+  for (const el of [90, -90]) {
+    for (let k = 0; k < 50; k++) {
+      const az = 360 * rand() - 180, roll = 360 * rand() - 180, h = roll * D / 2;
+      const q = T.qMul([0, 0, Math.sin(h), Math.cos(h)], T.turntableQ(az * D, el * D));
+      const t = T.turntableOf(q);
+      assert.ok(angle(q, T.turntableQ(t.az, t.el)) < 1e-9, `el ${el}, rolled ${roll}: the same view`);
+    }
+  }
+  assert.deepEqual([T.wrapPi(Math.PI), T.wrapPi(-Math.PI), T.wrapPi(3 * Math.PI)].map((x) => near(x, Math.PI, 1e-12)), [true, true, true], 'wrapPi: into (-pi, pi]');
+});
+
 test('quaternions: product = composition, slerp hits its ends and stays on the sphere', () => {
   const rand = rng(11);
   for (let k = 0; k < 40; k++) {

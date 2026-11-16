@@ -69,8 +69,11 @@
 // g always; the others only when they differ from their defaults (pat paisley, cut 0, no seed, wavy 0, t 0, view 0/55/1/0). The id
 // has * written %2A (#g=%2A632); seed (straight coordinates, 4 decimals) only when the cut was dragged away from the
 // preset — cut still names the preset whose metric and anchor apply; t 3 decimals, wavy 2, az / el / roll 1, zoom 2.
-// roll (an addition: the trackball turns freely, so az / el alone would lose the view's turn about the line of sight)
-// appears only when it is not 0. The kaleidoscopes write no seed and no wavy (nothing to cut). Legacy links #<id>
+// The 3D view is a turntable since 15 Nov 2026 (render3d.js): az and el say all of it, and the view is written from
+// the renderer's own az / el (exact also looking straight down, where the eye's place says nothing of az). roll, the
+// turn about the line of sight that the free trackball of before could make, is still read from an old link
+// (view=<az>/<el>/<zoom>/<roll>) but not shown: such a view is set upright, and the address is rewritten without it.
+// encodeHash writes a roll only when it is given one that is not 0, which the page never does now. The kaleidoscopes write no seed and no wavy (nothing to cut). Legacy links #<id>
 // (#333, #4*2, #*632, #s632, …) still load. encodeHash / decodeHash are pure and tested in node (test/app-url.test.js).
 // Every state change writes the hash (history.replaceState: no history entry) at most every HASH_THROTTLE_MS, at once
 // when a drag, a scrub, a play or a turn of the 3D view ends, and posts parent.postMessage({ type: 'ss-hash', hash },
@@ -95,7 +98,8 @@
 //                  pieces, movers, tau0 }, .foldCaption: the words over the fold pane, .warm: the idle making of the
 //                  other groups' prints, src/patterns/warm.js state())
 //                  (getState().anchor = the anchor the folds are given; .cut = the preset whose anchor applies;
-//                  .view = { az, el, zoom, roll, gliding } as shown now, gliding = the zoom is on its way back to 1
+//                  .view = { az, el, zoom, roll, gliding } as shown now (roll is always 0: the turntable never
+//                  rolls), gliding = the zoom is on its way back to 1
 //                  after a group change; .url = the hash this state writes; .hash = the hash the address has now,
 //                  which follows within HASH_THROTTLE_MS)
 //   ready          promise: the first picture is on screen (resolves to getState())
@@ -334,12 +338,16 @@ export function viewAngle(a, b) {
 }
 
 /**
- * A renderer view { q, zoom } (q: world -> camera, render3d.js) as the hash writes it: { az, el, zoom, roll } with
- * q = Rz(roll) ∘ viewFromAzEl(az, el).q, Rz a turn about the line of sight. az and el say where the eye is (as
- * R.setView({ az, el }) takes them); roll is what a free trackball adds. Looking straight down or up, az is 0.
+ * A renderer view as the hash writes it: { az, el, zoom, roll }. The turntable's own { az, el } (R.getView() gives
+ * them) are taken as they are, roll 0 — exact also looking straight down or up. A view given by q alone (q: world ->
+ * camera, render3d.js) is read as q = Rz(roll) ∘ viewFromAzEl(az, el).q, Rz a turn about the line of sight: az and el
+ * say where the eye is (as R.setView({ az, el }) takes them), roll is what the free trackball of before could add.
+ * Looking straight down or up from q alone, az is 0 and roll holds the turn.
  */
 export function viewToUrl(v) {
-  if (!v || !v.q || v.q.length !== 4) return { ...DEFAULT_VIEW };
+  if (!v) return { ...DEFAULT_VIEW };
+  if (Number.isFinite(v.az) && Number.isFinite(v.el)) return { az: wrap180(v.az), el: Math.max(-90, Math.min(90, v.el)), zoom: v.zoom > 0 ? v.zoom : 1, roll: 0 };
+  if (!v.q || v.q.length !== 4) return { ...DEFAULT_VIEW };
   let [x, y, z, w] = v.q;
   const n = Math.hypot(x, y, z, w);
   if (!(n > 0) || !Number.isFinite(n)) return { ...DEFAULT_VIEW };
@@ -352,7 +360,8 @@ export function viewToUrl(v) {
   const roll = 2 * Math.atan2(r[2], r[3]) * DEG;
   return { az: wrap180(az), el, zoom: v.zoom > 0 ? v.zoom : 1, roll: wrap180(roll) };
 }
-/** The inverse of viewToUrl: { az, el, zoom, roll } -> { q, zoom } for R.setView. */
+/** The inverse of viewToUrl: { az, el, zoom, roll } -> { q, zoom }. (The page gives the renderer az, el and zoom:
+ *  a roll is not shown; this is the exact orientation such a view had.) */
 export function viewFromUrl(u) {
   const qa = viewFromAzEl(u.az || 0, Number.isFinite(u.el) ? u.el : 55).q, h = ((u.roll || 0) / DEG) / 2;
   const q = qMul([0, 0, Math.sin(h), Math.cos(h)], qa);
@@ -1591,7 +1600,9 @@ function start(doc, win) {
         }
       }
       setJourneyState(wantJ.t, wantJ.tile);
-      R.setView(viewFromUrl(u.view || DEFAULT_VIEW));
+      // the turntable: az, el and zoom (an old link's roll is dropped: the view is set upright)
+      const uv = u.view || DEFAULT_VIEW;
+      R.setView({ az: uv.az, el: uv.el, zoom: uv.zoom });
       drawFold(true);
       P.render();
       syncPresets(); syncTiling();

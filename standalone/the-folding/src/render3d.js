@@ -52,14 +52,23 @@
 //   R.render()                                 draw now
 //   R.onChange(cb)                             cb() after the camera moved (once per drawn frame); returns an unsubscribe function
 //   R.project([x,y,z]) -> [cssX, cssY, visible]   css px from the canvas's top left; visible = in front of the eye and inside the canvas
-//   R.getView() -> { q: [x,y,z,w], zoom }      R.setView(v)      R.resetView()
+//   R.getView() -> { q: [x,y,z,w], zoom, az, el }      R.setView(v)      R.resetView()
 //   R.resize()                                 R.dispose()
 //
 // Conventions. World: the plane is z = 0, x right, y up, +z toward the viewer. The triangles of the surface are
 // counter-clockwise seen from +z in the flat tile; that side is the FRONT (style.front), the other the BACK.
-// The view is an orientation quaternion q (world -> camera space; camera space has x right, y up, z toward the eye)
-// and a zoom factor (1 = the frame sphere just fits; 0.5 … 3.2). Nothing but resetView() / setView() and the person's
-// own dragging changes them: setSurface, updatePositions, setFrame and resize never touch the orientation.
+// The view is a TURNTABLE (15 Nov 2026, the owner: "use a fixed turntable mode for rotation UI"): the paper lies on a
+// table that turns about its normal, the z axis, and the eye sits at azimuth az and elevation el (degrees; see
+// viewFromAzEl), el from -90 (straight below) to 90 (straight above). The z axis always points up-screen (looking
+// straight down or up, the table's turn is a turn of the picture): the view never rolls, whatever the hand does.
+// q (world -> camera space; camera space has x right, y up, z toward the eye) is viewFromAzEl(az, el).q, kept in
+// step; zoom is a factor (1 = the frame sphere just fits; 0.5 … 3.2). Nothing but resetView() / setView() and the
+// person's own hand changes them: setSurface, updatePositions, setFrame and resize never touch the orientation.
+//   the hand        a horizontal drag turns the table (the near side follows the finger), a vertical drag tilts it
+//                   (dragging down raises the eye), and the tilt stops at straight down / up: never over the top;
+//                   a flick coasts on (~0.4 s), the turn freely, the tilt until its limit. Two fingers: pinch zooms,
+//                   twist turns the table (the picture follows the fingers, seen from above or from below). Safari's
+//                   trackpad pinch and rotate likewise. Arrow keys: left / right turn the table 9°, up / down tilt it.
 //
 // Calling pattern. The data setters copy what they are given (the arrays can be reused at once; the one exception is
 // the data array of a shape print's texture, kept by reference: see above) and never draw;
@@ -93,11 +102,13 @@
 // does not turn bold and grey segment by segment.
 //
 // Additions to the SPEC (all optional):
-//   viewFromAzEl(azDeg, elDeg, zoom = 1) -> view;  R.setView also takes { az, el, zoom? } in degrees.
+//   viewFromAzEl(azDeg, elDeg, zoom = 1) -> view;  R.setView also takes { az, el, zoom? } in degrees (they win over a
+//     q given beside them; a q alone is taken to the turntable view nearest it: its eye's place, or looking straight
+//     down or up, its screen's x axis — a view that rolled is set upright). R.getView() gives az, el besides q.
 //     az = 0, el = 55 is the default view; el = 90 looks straight down the z axis with +y up-screen;
 //     the camera sits at azimuth az, measured from the -y direction, counter-clockwise seen from +z.
-//   R.resetView(immediate = false)   glides (0.35 s) unless immediate.  Keys on the focused canvas: arrows turn,
-//     + / - zoom, Home or 0 resets. Two fingers: pinch zooms, twist rolls about the line of sight.
+//   R.resetView(immediate = false)   glides (0.35 s, az the shorter way round) unless immediate.  Keys on the focused
+//     canvas: arrows turn and tilt, + / - zoom, Home or 0 resets.
 //   line.dash = [on, off] in WORLD units overrides the default dash pattern. Dashes are painted on the surface:
 //     their length is a world length (period = 0.055 x the frame radius given by the first or the last immediate
 //     setFrame, i.e. about 2.5 % of the smaller canvas side at zoom 1); it does not crawl while the camera or the
@@ -135,6 +146,7 @@ import { SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, SURFACE_OPACITY, MOTIF_FILL
 const DEG = Math.PI / 180;
 const FOV_Y = 28 * DEG;            // vertical field of view
 const DEFAULT_AZ = 0, DEFAULT_EL = 55;
+const EL_MIN = -90, EL_MAX = 90;   // the turntable's tilt (degrees): from straight below to straight above, never over
 const FIT_MARGIN = 1.1;            // the frame sphere fills 1/1.1 of the smaller canvas dimension at zoom 1
 const ZOOM_MIN = 0.5, ZOOM_MAX = 3.2;
 const ZOOM_OVER = Math.log(1.05);  // how far past a zoom limit the picture can be pushed before it springs back
@@ -198,14 +210,40 @@ function qToMat3(q, out) {
 }
 
 /**
+ * The orientation of the turntable view at azimuth az and elevation el (RADIANS) into out: Rx(el − π/2) ∘ Rz(−az),
+ * written out (the product of the two half-angle quaternions; unit by construction).
+ */
+function turntableQ(az, el, out = [0, 0, 0, 1]) {
+  const hz = -az / 2, hx = (el - Math.PI / 2) / 2;
+  const sz = Math.sin(hz), cz = Math.cos(hz), sx = Math.sin(hx), cx = Math.cos(hx);
+  out[0] = sx * cz; out[1] = -sx * sz; out[2] = cx * sz; out[3] = cx * cz;
+  return out;
+}
+/**
+ * The turntable view nearest the orientation q: { az, el } in RADIANS, az in (−π, π]. el is the eye's height; az the
+ * eye's azimuth — or, looking (nearly) straight down or up, where that is ill-posed, the azimuth of the screen's x
+ * axis, which a turntable keeps level (both agree on every turntable view; for a view that rolled, the first keeps
+ * the side of the shape that is seen and drops the roll).
+ */
+function turntableOf(q) {
+  const R = qToMat3(qNormalize([+q[0], +q[1], +q[2], +q[3]]), new Array(9));
+  const ex = R[6], ey = R[7], ez = R[8];            // the eye's direction in the world (the camera's z axis)
+  const h = Math.hypot(ex, ey);
+  const el = Math.atan2(ez, h);                     // (not asin(ez): that loses el a hair from straight down)
+  let az = h > 1e-3 ? Math.atan2(ex, -ey) : Math.atan2(R[1], R[0]);
+  if (az <= -Math.PI) az += 2 * Math.PI;
+  return { az, el };
+}
+/** An angle in radians, into (−π, π]. */
+function wrapPi(a) { let r = a - 2 * Math.PI * Math.round(a / (2 * Math.PI)); if (r <= -Math.PI) r += 2 * Math.PI; return r; }
+
+/**
  * The view that looks at the scene from azimuth az and elevation el (degrees): the eye sits in the direction
  * (sin az · cos el, −cos az · cos el, sin el) from the frame centre, with the z axis up-screen.
  * az = 0, el = 55 is the default; el = 90 is the plan view (+x right, +y up).
  */
 export function viewFromAzEl(azDeg = DEFAULT_AZ, elDeg = DEFAULT_EL, zoom = 1) {
-  const qz = qAxisAngle(0, 0, 1, -azDeg * DEG);
-  const qx = qAxisAngle(1, 0, 0, (elDeg - 90) * DEG);
-  return { q: qNormalize(qMul(qx, qz)), zoom };
+  return { q: turntableQ(azDeg * DEG, elDeg * DEG), zoom };
 }
 
 /**
@@ -1051,7 +1089,7 @@ function stubRenderer(canvas, labelLayer) {
   return {
     ok: false, canvas, gl: null, stats: { triangles: 0, vertices: 0, segments: 0, normalsMs: 0, sortMs: 0, probeMs: 0, labelsMs: 0, cpuMs: 0, frames: 0, threeSheets: false, printUploads: 0 },
     setSurface: nop, updatePositions: nop, setLines: nop, setMarkers: nop, setFrame: nop, setStyle: nop, render: nop,
-    onChange: () => nop, project: () => [0, 0, false], getView: () => ({ q: view.q.slice(), zoom: view.zoom }),
+    onChange: () => nop, project: () => [0, 0, false], getView: () => ({ q: view.q.slice(), zoom: view.zoom, az: DEFAULT_AZ, el: DEFAULT_EL }),
     setView: nop, resetView: nop, resize: nop, dispose: nop, reducedMotion: false, lost: false,
   };
 }
@@ -1082,12 +1120,13 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   const markState = { data: new Float32Array(0), count: 0, dirty: false, list: [] };
   const def = viewFromAzEl();
   const cam = {
-    q: def.q.slice(),
+    az: DEFAULT_AZ * DEG, el: DEFAULT_EL * DEG,   // the turntable (radians): where the eye is; z stays up-screen
+    q: def.q.slice(),                      // = turntableQ(az, el), kept in step (turnTo)
     zl: 0, zlVel: 0, zlRaw: 0,             // log zoom: shown, its velocity, the (unclamped) target
     wheelAt: -1e9,                         // time of the last wheel / gesture input (the elastic limit releases after it)
-    omega: [0, 0, 0], spinning: false,     // rotation momentum (rad/s, camera space)
+    omega: [0, 0], spinning: false,        // momentum of the turn and of the tilt (rad/s)
     center: [0, 0, 0], radius: 1, tCenter: [0, 0, 0], tRadius: 1, framed: false, easing: false,
-    glide: null,                           // resetView animation {q0, q1, z0, z1, t}
+    glide: null,                           // resetView animation {az0, el0, az1, el1, z0, z1, t}
   };
   let dashUnit = 0;                        // reference frame radius for default dashes (first / immediate setFrame)
   const M = makeCamera();
@@ -1209,12 +1248,26 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     const aspect = cssW > 0 && cssH > 0 ? cssW / cssH : 1;
     cameraMatrices(cam.q, Math.exp(cam.zl), cam.center, Math.max(cam.radius, 1e-9), aspect, M);
   }
-  function rotateBy(rx, ry, rz) {            // rotation vector (axis * angle) in camera space
-    const ang = Math.hypot(rx, ry, rz);
-    if (!(ang > 0)) return;
-    qNormalize(qMul(qAxisAngle(rx, ry, rz, ang), cam.q, cam.q));
+  /**
+   * Put the turntable at azimuth az, elevation el (radians; el is held to its limits, az wrapped). Returns true when
+   * the tilt asked for lay beyond a limit (it was held there).
+   */
+  function turnTo(az, el) {
+    const lo = EL_MIN * DEG, hi = EL_MAX * DEG;
+    cam.az = wrapPi(az);
+    cam.el = Math.min(hi, Math.max(lo, el));
+    turntableQ(cam.az, cam.el, cam.q);
     touchCamera();
+    return el < lo || el > hi;
   }
+  /** Turn the table by dAz and tilt it by dEl (radians). Returns { tilt: the tilt made (less at a limit), held }. */
+  function turnBy(dAz, dEl) {
+    if (!(dAz || dEl)) return { tilt: 0, held: false };
+    const el0 = cam.el, held = turnTo(cam.az + dAz, cam.el + dEl);
+    return { tilt: cam.el - el0, held };
+  }
+  /** The sense of the table's turn that follows a twist of the fingers (clockwise on screen > 0): from above or below. */
+  function twistSense() { return cam.el >= 0 ? 1 : -1; }
   function zoomTarget() { return softLimit(cam.zlRaw, ZL_MIN, ZL_MAX, ZOOM_OVER); }
   function isAnimating() {
     return !!cam.glide || cam.spinning || cam.easing || Math.abs(cam.zl - zoomTarget()) > 1e-5 || Math.abs(cam.zlVel) > 1e-4 ||
@@ -1223,8 +1276,8 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   /** Reduced motion: whatever is moving by itself (reset glide, momentum, zoom spring, eased frame, a gliding label) is put at its end. */
   function settleMotion() {
     const g = cam.glide;
-    if (g) { cam.q = g.q1.slice(); cam.zlRaw = g.z1; cam.glide = null; }
-    cam.spinning = false; cam.omega[0] = cam.omega[1] = cam.omega[2] = 0;
+    if (g) { turnTo(g.az1, g.el1); cam.zlRaw = g.z1; cam.glide = null; }
+    cam.spinning = false; cam.omega[0] = cam.omega[1] = 0;
     cam.zlRaw = Math.min(ZL_MAX, Math.max(ZL_MIN, cam.zlRaw)); cam.zl = cam.zlRaw; cam.zlVel = 0;
     if (cam.easing) { cam.center = cam.tCenter.slice(); cam.radius = cam.tRadius; cam.easing = false; }
     for (const el of labelEls) if (el._gt >= 0) { el._gt = -1; el._ang = el._g1; }
@@ -1247,7 +1300,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       const g = cam.glide;
       g.t = Math.min(1, g.t + dt / RESET_DUR);
       const u = g.t * g.t * (3 - 2 * g.t);
-      qSlerp(g.q0, g.q1, u, cam.q);
+      turnTo(g.az0 + wrapPi(g.az1 - g.az0) * u, g.el0 + (g.el1 - g.el0) * u);   // the table the shorter way round
       cam.zl = cam.zlRaw = g.z0 + (g.z1 - g.z0) * u; cam.zlVel = 0;
       if (g.t >= 1) cam.glide = null;
       moved = true;
@@ -1255,9 +1308,10 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       if (cam.spinning && !input.dragging) {
         const o = cam.omega, k = Math.exp(-dt / SPIN_TAU);
         let step = SPIN_TAU * (1 - k);              // exact integral of the decaying spin: the same glide at any frame rate
-        if (Math.hypot(o[0], o[1], o[2]) * k < 0.02) { step = SPIN_TAU; cam.spinning = false; }   // the (invisible) rest at once
-        rotateBy(o[0] * step, o[1] * step, o[2] * step);
-        o[0] *= k; o[1] *= k; o[2] *= k;
+        if (Math.hypot(o[0], o[1]) * k < 0.02) { step = SPIN_TAU; cam.spinning = false; }   // the (invisible) rest at once
+        if (turnBy(o[0] * step, o[1] * step).held) o[1] = 0;   // the tilt stops at its limit; the turn coasts on
+        // (at rest the whole remaining glide has just been made: nothing is left over for the next key or flick)
+        if (cam.spinning) { o[0] *= k; o[1] *= k; } else { o[0] = o[1] = 0; }
         moved = true;
       }
       // the elastic zoom limit lets go once the wheel / pinch has stopped
@@ -1727,22 +1781,26 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   }
 
   // ---- view ----
-  function stopMotion() { cam.glide = null; cam.spinning = false; cam.omega[0] = cam.omega[1] = cam.omega[2] = 0; }
-  function getView() { return { q: cam.q.slice(), zoom: Math.exp(Math.min(ZL_MAX, Math.max(ZL_MIN, cam.zlRaw))) }; }
+  function stopMotion() { cam.glide = null; cam.spinning = false; cam.omega[0] = cam.omega[1] = 0; }
+  function getView() {
+    return { q: cam.q.slice(), zoom: Math.exp(Math.min(ZL_MAX, Math.max(ZL_MIN, cam.zlRaw))), az: cam.az / DEG, el: cam.el / DEG };
+  }
   function setView(v) {
     if (!v) return;
     stopMotion();
-    let q = null;
-    if (v.q && v.q.length === 4 && Number.isFinite(v.q[0] + v.q[1] + v.q[2] + v.q[3])) q = [+v.q[0], +v.q[1], +v.q[2], +v.q[3]];
-    else if (Number.isFinite(v.az) || Number.isFinite(v.el)) q = viewFromAzEl(Number.isFinite(v.az) ? v.az : DEFAULT_AZ, Number.isFinite(v.el) ? v.el : DEFAULT_EL).q;
-    if (q) cam.q = qNormalize(q);
+    if (Number.isFinite(v.az) || Number.isFinite(v.el)) {
+      turnTo((Number.isFinite(v.az) ? +v.az : DEFAULT_AZ) * DEG, (Number.isFinite(v.el) ? +v.el : DEFAULT_EL) * DEG);
+    } else if (v.q && v.q.length === 4 && Number.isFinite(v.q[0] + v.q[1] + v.q[2] + v.q[3])) {
+      const t = turntableOf(v.q);                    // a q alone: the turntable view nearest it (upright)
+      turnTo(t.az, t.el);
+    }
     if (v.zoom > 0 && Number.isFinite(+v.zoom)) { cam.zl = cam.zlRaw = Math.min(ZL_MAX, Math.max(ZL_MIN, lz(+v.zoom))); cam.zlVel = 0; }
     touchCamera(); invalidate();
   }
   function resetView(immediate = false) {
     stopMotion();
-    if (immediate || still) { cam.q = def.q.slice(); cam.zl = cam.zlRaw = 0; cam.zlVel = 0; touchCamera(); invalidate(); return; }
-    cam.glide = { q0: cam.q.slice(), q1: def.q.slice(), z0: cam.zl, z1: 0, t: 0 };
+    if (immediate || still) { turnTo(DEFAULT_AZ * DEG, DEFAULT_EL * DEG); cam.zl = cam.zlRaw = 0; cam.zlVel = 0; touchCamera(); invalidate(); return; }
+    cam.glide = { az0: cam.az, el0: cam.el, az1: DEFAULT_AZ * DEG, el1: DEFAULT_EL * DEG, z0: cam.zl, z1: 0, t: 0 };
     lastAdvance = performance.now();
     invalidate();
   }
@@ -1778,22 +1836,22 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     const s = Math.PI / (0.85 * Math.max(1, Math.min(cssW, cssH)));
     return Math.min(0.011, Math.max(0.0045, s));       // radians per css px
   }
-  function pushHist(t, rx, ry, rz) {
+  function pushHist(t, dAz, dEl) {         // what the hand turned and tilted (as made: a tilt at its limit is 0)
     const h = input.hist;
-    h.push([t, rx, ry, rz]);
+    h.push([t, dAz, dEl]);
     while (h.length > 16 || (h.length > 1 && t - h[0][0] > 110)) h.shift();
   }
   function releaseSpin(t) {
     const h = input.hist;
     if (still || h.length < 2 || t - h[h.length - 1][0] > 70) return;     // reduced motion: the view stops with the hand
-    let sx = 0, sy = 0, sz = 0;
-    for (let i = 1; i < h.length; i++) { sx += h[i][1]; sy += h[i][2]; sz += h[i][3]; }
+    let sa = 0, se = 0;
+    for (let i = 1; i < h.length; i++) { sa += h[i][1]; se += h[i][2]; }
     const dt = Math.max(h[h.length - 1][0] - h[0][0], 8) / 1000;
-    let ox = sx / dt, oy = sy / dt, oz = sz / dt;
-    const sp = Math.hypot(ox, oy, oz);
+    let oa = sa / dt, oe = se / dt;
+    const sp = Math.hypot(oa, oe);
     if (sp < 0.25) return;
-    if (sp > 14) { const k = 14 / sp; ox *= k; oy *= k; oz *= k; }
-    cam.omega[0] = ox; cam.omega[1] = oy; cam.omega[2] = oz; cam.spinning = true;
+    if (sp > 14) { const k = 14 / sp; oa *= k; oe *= k; }
+    cam.omega[0] = oa; cam.omega[1] = oe; cam.spinning = true;
     lastAdvance = performance.now();
     schedule();
   }
@@ -1848,9 +1906,10 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       const tap = input.tap;
       if (tap && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > (tap.type === 'mouse' ? 4 : 10)) tap.moved = true;
       if (dx || dy) {
-        const s = sensitivity(), rx = dy * s, ry = dx * s;
-        rotateBy(rx, ry, 0);
-        pushHist(now, rx, ry, 0);
+        // a turntable: across turns the table about the plane's normal (the near side follows the finger), down
+        // raises the eye; nothing else, so the view can never roll
+        const s = sensitivity(), dAz = -dx * s;
+        pushHist(now, dAz, turnBy(dAz, dy * s).tilt);
         invalidate();
       }
     } else if (input.pointers.size === 2 && input.pinch) {
@@ -1862,7 +1921,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
       cur.vel = 0.6 * prev.vel + 0.4 * (dl / dt);
       input.pinch = cur;
       zoomBy(dl, now);
-      if (da) { rotateBy(0, 0, -da); pushHist(now, 0, 0, -da); }   // twist turns the picture about the line of sight
+      if (da) { const dAz = twistSense() * da; turnBy(dAz, 0); pushHist(now, dAz, 0); }   // a twist turns the table
       cam.zl = zoomTarget(); cam.zlVel = 0; touchCamera();
     }
     e.preventDefault();
@@ -1901,20 +1960,21 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   function onKeyDown(e) {
     if (e.altKey || e.ctrlKey || e.metaKey) return;
     const step = 9 * DEG;
-    let rx = 0, ry = 0;
-    if (e.key === 'ArrowLeft') ry = -step; else if (e.key === 'ArrowRight') ry = step;
-    else if (e.key === 'ArrowUp') rx = -step; else if (e.key === 'ArrowDown') rx = step;
+    // left / right turn the table (the near side goes that way), up / down tilt it (down raises the eye, as a drag)
+    let da = 0, de = 0;
+    if (e.key === 'ArrowLeft') da = step; else if (e.key === 'ArrowRight') da = -step;
+    else if (e.key === 'ArrowUp') de = -step; else if (e.key === 'ArrowDown') de = step;
     else if (e.key === '+' || e.key === '=') { zoomBy(Math.log(1.2), performance.now() - 200); e.preventDefault(); return; }
     else if (e.key === '-' || e.key === '_') { zoomBy(-Math.log(1.2), performance.now() - 200); e.preventDefault(); return; }
     else if (e.key === 'Home' || e.key === '0') { resetView(); e.preventDefault(); return; }
     else return;
     e.preventDefault();
     cam.glide = null;
-    if (still) { rotateBy(rx, ry, 0); invalidate(); return; }     // reduced motion: the whole step at once
-    // an impulse of momentum: the turn glides in and totals `step`
-    cam.omega[0] += rx / SPIN_TAU; cam.omega[1] += ry / SPIN_TAU;
-    const sp = Math.hypot(cam.omega[0], cam.omega[1], cam.omega[2]);
-    if (sp > 9) { const k = 9 / sp; cam.omega[0] *= k; cam.omega[1] *= k; cam.omega[2] *= k; }
+    if (still) { turnBy(da, de); invalidate(); return; }     // reduced motion: the whole step at once
+    // an impulse of momentum: the turn glides in and totals `step` (a tilt, unless it meets its limit first)
+    cam.omega[0] += da / SPIN_TAU; cam.omega[1] += de / SPIN_TAU;
+    const sp = Math.hypot(cam.omega[0], cam.omega[1]);
+    if (sp > 9) { const k = 9 / sp; cam.omega[0] *= k; cam.omega[1] *= k; }
     cam.spinning = true;
     if (!rafId) lastAdvance = performance.now();
     schedule();
@@ -1928,7 +1988,8 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
     const g = input.gesture || (input.gesture = { scale: 1, rot: 0 });
     const now = performance.now();
     if (e.scale > 0 && e.scale !== 1) { zoomBy(Math.log(e.scale / g.scale), now); g.scale = e.scale; }
-    if (Number.isFinite(e.rotation) && e.rotation !== 0) { rotateBy(0, 0, -(e.rotation - g.rot) * DEG); g.rot = e.rotation; invalidate(); }
+    // (rotation: degrees, clockwise > 0, since the gesture began) — the table turns with the fingers
+    if (Number.isFinite(e.rotation) && e.rotation !== 0) { turnBy(twistSense() * (e.rotation - g.rot) * DEG, 0); g.rot = e.rotation; invalidate(); }
   }
   function onGestureEnd(e) { e.preventDefault(); input.gesture = null; cam.wheelAt = performance.now() - 200; schedule(); }
   function onTouchMove(e) { if (e.cancelable) e.preventDefault(); }      // belt and braces: a drag never scrolls the page
@@ -2051,7 +2112,7 @@ export function createRenderer(canvas, { labelLayer = null, fast = false, reduce
   };
 }
 
-export const __test = { qMul, qAxisAngle, qNormalize, qSlerp, qToMat3, cameraMatrices, makeCamera, accumulateNormals, makeSortScratch,
+export const __test = { qMul, qAxisAngle, qNormalize, qSlerp, qToMat3, turntableQ, turntableOf, wrapPi, EL_MIN, EL_MAX, cameraMatrices, makeCamera, accumulateNormals, makeSortScratch,
   makeProbeScratch, probeSheets, PROBE, LINE_VS, LINE_FS, SURF_VS, SURF_FS, shapePrint, MAX_ANISO,
   sortTriangles, softLimit, packLines, LINE_STRIDE, FOV_Y, FIT_MARGIN, ZOOM_MIN, ZOOM_MAX,
   labelBox, clipLength, lineCover, projectSegments, chooseLabelSpots, makeLabelScratch, LABEL_GAP, LABEL_PAD, LABEL_CLEAR, LABEL_MARGIN, LABEL_W, LABEL_SPOTS, LABEL_WAIT,
