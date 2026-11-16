@@ -4,6 +4,7 @@
 //   num(-3)               an integer in MathJax digits (a proper minus sign)
 //   symbol({ o, star, x, X })   a surface's symbol, e.g. ○○∗∗× (a sphere is the word "sphere")
 //   symbolText(counts)    the same as plain text, for aria-labels
+//   mixed({ n, d })       a price: 2, 5/12 or 1 59/60, the fraction set upright
 
 import { MATH } from './gen/math.js';
 
@@ -17,6 +18,16 @@ export function num(v) {
   const s = String(Math.abs(Math.trunc(v)));
   let out = v < 0 ? M('minus') : '';
   for (const ch of s) out += M('d' + ch);
+  return `<span class="mnum">${out}</span>`;
+}
+
+const digits = (v) => { let out = ''; for (const ch of String(v)) out += M('d' + ch); return out; };
+/** A fraction { n, d } as a whole number, a fraction or a mixed number in MathJax digits: 2, 5/12, 1 59/60. */
+export function mixed(f) {
+  const n = Math.abs(f.n), whole = Math.floor(n / f.d), rest = n - whole * f.d;
+  let out = f.n < 0 ? M('minus') : '';
+  if (whole || !rest) out += digits(whole);
+  if (rest) out += `<span class="fr"><span class="fr-n">${digits(rest)}</span><span class="fr-d">${digits(f.d)}</span></span>`;
   return `<span class="mnum">${out}</span>`;
 }
 

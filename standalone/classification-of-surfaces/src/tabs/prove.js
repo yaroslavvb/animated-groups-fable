@@ -19,6 +19,7 @@ const PRESETS = [
   { key: 'punched', label: 'The figure-eight hole', words: ['r p q! s t! r- u!', 'p v! s- w!'], pieces: ['the ring', 'the strap'] },
   { key: 'strange', label: 'The strange surface', words: ['r i f! j g! k h! r- u!', 'l m! n o! p q!', 'i s! l t!', 'j v! n w!', 'k x! p y!'], pieces: ['the ring', 'the middle', 'a band', 'a band', 'a band'] },
   { key: 'deal', label: 'Deal four triangles', words: null },
+  { key: 'tile', label: 'A tile from tab 5', words: null, hidden: true },      // filled in by tile()
 ];
 
 const NAMES = { 'o0*0x0': 'a sphere', 'o1*0x0': 'a torus', 'o0*0x1': 'a projective plane', 'o0*0x2': 'a Klein bottle', 'o0*1x0': 'a disk', 'o0*2x0': 'an annulus', 'o0*1x1': 'a Möbius band', 'o1*2x0': 'a twice-punched torus', 'o0*2x1': 'a punched Möbius band' };
@@ -72,7 +73,7 @@ export function createProveTab(ctx) {
   function start(p = preset, keepSeed = false) {
     stopMove();
     preset = p;
-    if (p.key === 'deal') { if (!keepSeed) seed = (seed * 31 + 11) % 9973; words = dealTriangles(seed); } else words = p.words;
+    if (p.key === 'deal') { if (!keepSeed) seed = (seed * 31 + 11) % 9973; words = dealTriangles(seed); } else words = p.words || PRESETS[1].words;
     state = fromWords(words);
     looks = state.comps.map(() => polyLook());
     history = []; log = []; lastSay = p.note ? p.note() : '';
@@ -209,8 +210,18 @@ export function createProveTab(ctx) {
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'chip'; b.dataset.key = p.key; b.setAttribute('aria-pressed', 'false');
     if (p.html) { b.innerHTML = p.html(); b.setAttribute('aria-label', p.label + ': why a cross-handle is two crosscaps'); } else b.textContent = p.label;
+    if (p.hidden) b.hidden = true;
     b.addEventListener('click', () => start(p));
     el.presets.append(b);
+  }
+  // the tile of a pattern (tab 5): one polygon; its mirror edges are free edges, its glued edges zips
+  function tile(w, label) {
+    const p = PRESETS.find((x) => x.key === 'tile');
+    p.words = w; p.label = label ? 'The tile of ' + label : 'A tile from tab 5';
+    p.note = () => `The outlined tile of ${label || 'the pattern'}. Its mirror edges stay open: they end as the rim of a hole. Its lettered edges are zipped. (Cone points and corners do not show here: only the surface.)`;
+    const b = [...el.presets.children].find((c) => c.dataset.key === 'tile');
+    if (b) { b.hidden = false; b.textContent = p.label; }
+    start(p);
   }
   el.undo.addEventListener('click', undo);
   el.reset.addEventListener('click', () => start(preset, true));
@@ -219,8 +230,14 @@ export function createProveTab(ctx) {
     enter() { active = true; stage.R.setView({ az: 0, el: 55, zoom: 1 }); if (!state) start(preset, true); else render(true); },
     leave() { active = false; stopMove(); canvas.style.cursor = ''; hot = null; },
     when() { return 'prove:any'; },
-    get() { return { k: preset.key, s: preset.key === 'deal' ? seed : undefined }; },
-    set(s) { const p = PRESETS.find((x) => x.key === s.k); if (p) { preset = p; if (s.s) seed = Number(s.s) || seed; state = null; if (active) start(p, true); } },
+    get() { return { k: preset.key, s: preset.key === 'deal' ? seed : undefined, w: preset.key === 'tile' && preset.words ? preset.words.join('|') : undefined }; },
+    set(s) {
+      const p = PRESETS.find((x) => x.key === s.k);
+      if (!p) return;
+      if (p.key === 'tile') { if (!s.w && !p.words) return; if (s.w) { try { fromWords(String(s.w).split('|')); p.words = String(s.w).split('|'); } catch (e) { return; } const b = [...el.presets.children].find((c) => c.dataset.key === 'tile'); if (b) b.hidden = false; } }
+      preset = p; if (s.s) seed = Number(s.s) || seed; state = null; if (active) start(p, true);
+    },
+    tile,
     start: (key, s) => { if (s !== undefined) seed = s; start(PRESETS.find((x) => x.key === key) || preset, s !== undefined); }, doZip, undo, dry: (id) => doZip(id, true), words: () => words,
     state: () => state, looks: () => looks.map((l) => (l.kind === 'poly' ? 'poly' : { rims: [...l.rims], tubes: l.tubes, caps: l.caps })), picks: () => picks, isBusy: () => !!busy, finish: () => { if (busy) busy.finish(); },
   };

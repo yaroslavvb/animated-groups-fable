@@ -1,8 +1,8 @@
 // app.js — Classification of Surfaces: one 3D stage (The Folding's renderer), four tabs after Chapter 8 of
-// The Symmetries of Things. Each tab is a small module with enter() / leave() / when(); this file owns the shell:
+// The Symmetries of Things and a fifth for what the chapter is for (patterns and their orbifolds). Each tab is a small module with enter() / leave() / when(); this file owns the shell:
 // the tab bar, what text shows for the current tab and state, the play bar, the hash, the book citations.
 //
-//   #zip  #tidy  #prove  #name     deep links to the tabs (with &k=<state> where a tab has one)
+//   #zip  #tidy  #prove  #name  #sym     deep links to the tabs (with &k=<state> where a tab has one: #sym&k=*732)
 //   window.__surfaces               { show(tab), tabs, stage } for the tools and tests
 
 import { createStage } from './stage.js';
@@ -13,6 +13,7 @@ import { createZipTab } from './tabs/zip.js';
 import { createTidyTab } from './tabs/tidy.js';
 import { createProveTab } from './tabs/prove.js';
 import { createNameTab } from './tabs/name.js';
+import { createSymTab } from './tabs/sym.js';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -33,8 +34,10 @@ const ctx = {
   goTidy(counts) { show('tidy'); tabs.tidy.setAll(counts); },
   // zip a surface up from its pieces: tab 3 with that preset
   goProve(key) { show('prove'); tabs.prove.start(key); },
+  // zip one polygon up: tab 3 with the tile of a pattern (tab 5)
+  goProveWords(words, label) { show('prove'); tabs.prove.tile(words, label); window.scrollTo({ top: 0 }); },
 };
-const tabs = { zip: createZipTab(ctx), tidy: createTidyTab(ctx), prove: createProveTab(ctx), name: createNameTab(ctx) };
+const tabs = { zip: createZipTab(ctx), tidy: createTidyTab(ctx), prove: createProveTab(ctx), name: createNameTab(ctx), sym: createSymTab(ctx) };
 
 // what shows: [data-tab-only] by tab, [data-when] by "tab:state" (a tab may name several states at once)
 function syncText() {
