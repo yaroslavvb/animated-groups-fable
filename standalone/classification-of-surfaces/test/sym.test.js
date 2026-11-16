@@ -313,3 +313,29 @@ test('the six designs: every mark lies inside its tile, for every example and so
   }
   assert.ok(shapes > 1000, 'shapes checked: ' + shapes);
 });
+
+test('many handles, many crosscaps: the tile search ends, and finds every tile once', async () => {
+  // His report, Sun 15 Nov 2026: "If I type 4 handles in a row, the whole thing freezes." Sixteen tiles meet at each
+  // corner of that tile; going round one, rounding moved a tile's point by a billionth of its size, the search took
+  // it for a new tile, and the copies bred until the matrices were garbage and the loop never ended.
+  const C = await import('../src/sym/catalog.js');
+  for (const t of ['ooo', 'oooo', 'ooooo', 'oooooo', 'xxxxxxxx', 'xxxxxxxxxxxx', 'oooo*', 'oo2*3', '2222222', '*732']) {
+    const sig = C.parse(t);
+    assert.ok(sig, t + ' does not parse');
+    const D = C.domainOf(sig), A = analyse(D), G = D.G, reach = Math.max(...D.verts.map((v) => G.dist(v, D.at)));
+    const t0 = performance.now(), T = tiles(D, A, { radius: 5 + 2 * reach, max: 1500 }), took = performance.now() - t0;
+    assert.ok(took < 1500, `${t}: the search took ${Math.round(took)} ms`);
+    assert.ok(T.length >= 500, `${t}: only ${T.length} tiles`);
+    const P = T.map((x) => apply(x.M, D.at));
+    let min = Infinity;
+    for (let a = 0; a < P.length; a++) for (let b = a + 1; b < P.length; b++) min = Math.min(min, G.dist(P[a], P[b]));
+    assert.ok(min > 2 * D.clear - 1e-4, `${t}: two tiles ${min} apart, each has ${D.clear} of room: one tile was found twice`);
+    // as many tiles as the disc they lie in has room for (the farthest tile's ring is only partly taken)
+    const far = T[T.length - 1].d, fit = (TAU * (Math.cosh(far) - 1)) / Math.abs(G.area(D.verts));
+    assert.ok(T.length > 0.55 * fit && T.length < 1.6 * fit, `${t}: ${T.length} tiles out to ${far.toFixed(2)}, where about ${Math.round(fit)} fit`);
+    // every tile's point is still a point of the hyperbolic plane, to a hundred-millionth of its size (a determinant
+    // would say nothing: for entries of 100 000 its own rounding is larger than 1)
+    for (const q of P) assert.ok(Math.abs(q[0] * q[0] + q[1] * q[1] - q[2] * q[2] + 1) < 1e-8 * (1 + q[2] * q[2]), t + ': a tile has left the plane');
+  }
+  assert.equal(C.parse('ooooooo'), null, 'a seventh handle has no place on the ball: it is refused, not tried');
+});

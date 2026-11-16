@@ -152,6 +152,21 @@ toward a point; one comma a cell. None has a symmetry of its own (the hub, the r
 middle; a tile of two mirror halves gets the same hand twice, not a mirror image), so every design has exactly the
 signature shown. Tested: every mark of every design lies inside its tile, for all examples.
 
+**Four handles froze the page** (his report, the same night: *"If I type 4 handles in a row, the whole thing
+freezes."*). The tile of `oooo` is a 16-gon and sixteen tiles meet at each of its corners. Going round such a
+corner, eight big matrices that nearly undo one another leave a tile's point about a billionth of its size off;
+the search for tiles (`src/sym/orbifold.js` `tiles`) asked "have we met this tile?" with a tolerance just under that,
+took the tile for a new one, the copy bred copies, their matrices fell off the group, one of them claimed to be at
+distance 0, and filing a point with coordinates of 10^8 never ended. Three handles and eight crosscaps happened to
+stay under the tolerance. Now two points are one tile when they are within a thousandth of a tile's room of each
+other in the geometry's own distance (two tiles are at least twice that room apart), a hyperbolic point is filed by
+how far out it is and in which direction (both stay put when it moves a little, however far out), a point that has
+left the plane is dropped, and the walk gives up after 1.5 s with what it has. Putting each matrix back onto the
+group as it was made (`geom.js` `fix`) was tried and taken out: far out it subtracts numbers of the size e^distance
+and cost a thousand times the accuracy. `oooo` now takes 114 ms from key to picture, six handles 171 ms, twelve
+crosscaps 110 ms (headless Chrome on the Intel); `test/sym.test.js` holds it: for 3 to 6 handles, 8 and 12
+crosscaps and four more, the search ends, finds every tile once and as many as the disc has room for.
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
@@ -167,8 +182,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 72 tests (the last two: typing and deleting a signature character by character; the six designs inside
-  their tiles). The zipping's bookkeeping against an independent count of the glued surface (400 random
+- `node --test`: 73 tests (the last three: typing and deleting a signature character by character; the six designs
+  inside their tiles; many handles and crosscaps: the tile search ends and finds every tile once). The zipping's bookkeeping against an independent count of the glued surface (400 random
   gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
   1,345 more signatures (every `*pqr` and `pqr` with digits 2 to 9, every family over its numbers) each folded up
   from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping;
@@ -194,7 +209,9 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   and its place in the address, a reload; the 3D view once round a circle comes home. The six designs looked at on
   eleven signatures in all three geometries. In WebKit on the M5 (it did not answer over ssh at first, about
   22:00 PST, and did a quarter of an hour later): the same Delete and typing with real key presses at both widths,
-  the six designs, the 47 examples and fifteen signatures of one's own, the drags; no error.
+  the six designs, the 47 examples and nineteen signatures of one's own (four, five and six handles and twelve
+  crosscaps among them), the drags; no error. And with real keys in Chrome: `o` seven times (the seventh refused),
+  `x` thirteen times, Delete twelve times, three long drags across the disc of `oooo`.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

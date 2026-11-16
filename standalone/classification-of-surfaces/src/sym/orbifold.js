@@ -142,22 +142,52 @@ export function signatureOf(A) {
  * The tiles of the pattern: the symmetries g (as matrices) with g(at) within `radius` of `at`, the NEAREST ones first,
  * at most `max` of them. Found by walking from tile to neighbouring tile, always going on from the nearest tile
  * not yet looked at (a plain walk by number of steps would run out of its `max` long before it had gone round a
- * corner where twelve tiles meet). { M, flip }: flip = g turns the plane over (a mirror image of the tile).
+ * corner where twelve tiles meet). { M, flip, d }: flip = g turns the plane over (a mirror image of the tile).
+ *
+ * "Have we met this tile?" is asked of the tile's point g(at), and has to survive rounding. Round a corner where
+ * sixteen tiles meet (four handles) eight steps of big matrices that nearly undo one another leave a point about
+ * 1e-9 of its coordinates off; a test tighter than that took the tile for a new one, the copy bred copies, their
+ * matrices fell off the group altogether, and the page froze (his report, Sun 15 Nov 2026: "If I type 4 handles in
+ * a row, the whole thing freezes"). So now:
+ *   - two points are one tile when they are within `tau` of each other in the geometry's own distance; tau is a
+ *     thousandth of the room a tile's point has, and two tiles' points are at least twice that room apart;
+ *   - on the hyperbolic plane a point is filed by how far out it is and in which direction, which both stay put
+ *     when the point moves a little however far out it is (its coordinates do not: they grow like e^distance);
+ *   - a tile whose point has left the geometry (rounding gone wild: not a number, or off the hyperboloid by more
+ *     than a millionth of its size) is dropped; and the walk gives up after `ms` milliseconds with what it has,
+ *     so nothing here can hang the page again.
+ * (The matrices are NOT put back onto the group with geom.js fix as they are made: far out that step subtracts
+ * numbers of the size e^distance and costs a thousand times the accuracy it is meant to save. Tried, measured,
+ * taken out.)
  */
-export function tiles(D, A, { radius = Infinity, max = 6000 } = {}) {
-  const G = D.G, n = D.n;
-  // have we met this tile? Points are filed in a grid; one near a cell wall is filed in the cells beyond it too.
-  const grid = new Map(), Q = 64, EPS = 1e-9;        // two computations of one tile agree to about 1e-12 of its coordinates; two tiles never come this close
-  const near = (p, q) => Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]) + Math.abs(q[2] - p[2]) < EPS * (1 + Math.abs(p[2]));
+export function tiles(D, A, { radius = Infinity, max = 6000, ms = 1500 } = {}) {
+  const G = D.G, n = D.n, hyper = G.kind === 'H';
+  const tau = 1e-3 * Math.min(1, D.clear || 1);
+  const grid = new Map();
+  /** The cells a point is filed in (or looked up in, with margin 0): keys. */
+  const cells = (p, flip, wide) => {
+    const out = [], tag = flip ? 'f' : 'd';
+    if (hyper) {
+      // rings 1/16 wide, each cut into sectors about 0.4 long: a cell holds a tile or two at most
+      const d = Math.acosh(Math.max(1, p[2])), th = Math.atan2(p[1], p[0]), e = wide ? 3 * tau + 1e-6 : 0;
+      for (let id = Math.floor((d - e) * 16); id <= Math.floor((d + e) * 16); id++) {
+        if (id < 0) continue;
+        const N = Math.max(1, Math.min(1 << 20, Math.round(16 * Math.sinh((id + 0.5) / 16)))), k = N / (2 * Math.PI), et = e / Math.max(0.05, Math.sinh(d));
+        const lo = Math.floor((th - et) * k), hi = Math.min(lo + N - 1, Math.floor((th + et) * k));
+        for (let it = lo; it <= hi; it++) out.push(tag + id + ':' + (((it % N) + N) % N));
+      }
+      return out;
+    }
+    const Q = 64, e = wide ? 3 * tau : 0, c = [0, 1, 2].map((k) => [Math.floor((p[k] - e) * Q), Math.floor((p[k] + e) * Q)]);
+    for (let x = c[0][0]; x <= c[0][1]; x++) for (let y = c[1][0]; y <= c[1][1]; y++) for (let z = c[2][0]; z <= c[2][1]; z++) out.push(tag + x + ',' + y + ',' + z);
+    return out;
+  };
   const known = (p, flip) => {
-    const list = grid.get((flip ? 'f' : 'd') + Math.floor(p[0] * Q) + ',' + Math.floor(p[1] * Q) + ',' + Math.floor(p[2] * Q));
-    if (list) for (const q of list) if (near(p, q)) return true;
+    const list = grid.get(cells(p, flip, false)[0]);
+    if (list) for (const q of list) if (G.dist(p, q) < tau) return true;
     return false;
   };
-  const put = (p, flip) => {
-    const e = 2 * EPS * (1 + Math.abs(p[2])), c = [0, 1, 2].map((k) => { const lo = Math.floor((p[k] - e) * Q), hi = Math.floor((p[k] + e) * Q), r = []; for (let q = lo; q <= hi; q++) r.push(q); return r; });
-    for (const x of c[0]) for (const y of c[1]) for (const z of c[2]) { const key = (flip ? 'f' : 'd') + x + ',' + y + ',' + z; const l = grid.get(key); if (l) l.push(p); else grid.set(key, [p]); }
-  };
+  const put = (p, flip) => { for (const key of cells(p, flip, true)) { const l = grid.get(key); if (l) l.push(p); else grid.set(key, [p]); } };
   // the tiles found and not yet gone on from, the nearest on top (a binary heap)
   const heap = [];
   const push = (t) => {
@@ -173,13 +203,17 @@ export function tiles(D, A, { radius = Infinity, max = 6000 } = {}) {
     return top;
   };
   const turns = D.edges.map((e) => !!(e.mirror || e.rev)), out = [];
+  const t0 = typeof performance !== 'undefined' ? performance.now() : 0;
   put(D.at, false); push({ M: I3.slice(), flip: false, d: 0 });
   while (heap.length && out.length < max) {
     const t = pop();
     out.push(t);
+    if ((out.length & 63) === 0 && typeof performance !== 'undefined' && performance.now() - t0 > ms) break;
     for (let i = 0; i < n; i++) {
       const M = mul(t.M, A.maps[i]), p = apply(M, D.at), flip = t.flip !== turns[i], d = G.dist(p, D.at);
-      if (d > radius || known(p, flip)) continue;
+      if (!(d <= radius)) continue;                                                                    // too far, or not a number
+      if (hyper && !(Math.abs(p[0] * p[0] + p[1] * p[1] - p[2] * p[2] + 1) <= 1e-6 * (1 + p[2] * p[2]))) continue;   // rounding has carried it off the plane
+      if (known(p, flip)) continue;
       put(p, flip); push({ M, flip, d });
     }
   }

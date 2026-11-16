@@ -304,3 +304,4 @@ ul.argument { list-style: disc; }
   .symstep .st-btn { width: 40px; }
   .symcells { min-width: 96px; padding: 2px 5px; }
 }
+.symprice[data-far] .cost-zones span:first-child { visibility: hidden; }

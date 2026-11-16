@@ -131,6 +131,7 @@ export function createSymTab(ctx) {
       el.bar.append(s);
     });
     el.bar.closest('.symprice').style.setProperty('--two', (2 / span) * 100 + '%');
+    el.bar.closest('.symprice').toggleAttribute('data-far', span > 6);          // a long ruler: no room left of the mark for its label
     el.total.style.left = Math.min(100, (fval(cost) / span) * 100) + '%';
     el.total.innerHTML = `<span>$${mixed(cost)}</span>`;
     el.total.dataset.side = fval(cost) / span > 0.8 ? 'left' : 'right';
