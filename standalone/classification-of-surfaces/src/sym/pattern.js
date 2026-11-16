@@ -7,8 +7,10 @@
 //                     the pattern along a hyperbolic line, so every tile can be brought to the middle
 //
 // What is drawn, tile by tile (orbifold.js tiles()):
-//   the tile itself     teal where the symmetry keeps the pattern's sense, sand where it is a mirror image (the two
-//                       sides of the paper of the 3D pane: folding the pattern up turns every sand tile over)
+//   the tile itself     teal where it is a copy of the OUTLINED tile, sand where it is a mirror image of it. The
+//                       tone belongs to the tile, whichever tile the list of tiles happens to be centred on: his
+//                       note, Mon 16 Nov 2026, "when I ... drag it around, colors flip which is distracting" (every
+//                       tone swapped each time a drag carried the middle of the view across a mirror)
 //   a design            what is printed on the tile (motifs.js: Paisley, Soft commas, Tomoe, Checkerboard, Rings,
 //                       Comma), in the darker tone of the tile's side. None has a symmetry of its own, so the
 //                       pattern has exactly the tile's
@@ -16,15 +18,17 @@
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
 // One tile is outlined: the one the surface in the other pane is folded from. Its glued edges carry arrows and
-// letters (the same letters tab 3 uses when it zips this tile up).
+// letters (the same letters tab 3 uses when it zips this tile up). A pointer on one of them (or a tap) brings out the
+// two edges of that letter and says what the letter means, in opts.tip: his note the same day, "I don't understand
+// what a,b mean in the leftmost diagram".
 //
-//   const P = createPattern(canvas);
+//   const P = createPattern(canvas, { tip });   tip: an element inside the canvas's pane, for the note on a glued edge
 //   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
 //   P.select(i | null)                  bring out what the i-th character of the signature stands for
 //   P.setPattern(key)                   another design (motifs.js PATTERNS)
 //   P.resetView()   P.draw()   P.state()   for the tests
 
-import { mul, apply, I3 } from './geom.js';
+import { mul, apply, det, I3 } from './geom.js';
 import { tiles as makeTiles } from './orbifold.js';
 import { design, DEFAULT_PATTERN, isPattern } from './motifs.js';
 import { PRINT_FRONT, PRINT_BACK, hexToRgb } from '../vendor/the-folding/palette.js';
@@ -36,12 +40,13 @@ const DARK = [0.08, 0.09, 0.12];
 const FRONT = hexToRgb(PRINT_FRONT[0]), BACK = hexToRgb(PRINT_BACK[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]), BACK_INK = hexToRgb(PRINT_BACK[1]);
 const css = (c, a = 1) => `rgba(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)},${a})`;
 
-export function createPattern(canvas) {
-  const ctx = canvas.getContext('2d');
+export function createPattern(canvas, opts = {}) {
+  const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
   let W = 0, H = 0, dpr = 1;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
   let budget = 1500, cache = new Map(), patternKey = DEFAULT_PATTERN, des = { dark: [], light: [], evenodd: false }, reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
+  let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the letter a pointer is on, the tile's middle
 
   function size() {
     const r = canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);      // 2 is sharp enough, and a 3x phone fills 2.25 times fewer pixels
@@ -111,6 +116,9 @@ export function createPattern(canvas) {
     size();
     const { D, A, binding } = model, kind = G.kind, L = lay(), { cx, cy, R } = L;
     const n = D.n, list = tileList();
+    // the list is centred on the tile nearest the middle of the view (recentre). When that tile is a mirror image of
+    // the outlined one, base turns the plane over, and "mirror image of the list's tile" means a copy of the outlined one
+    const turned = det(base) < 0;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.save();
@@ -215,7 +223,7 @@ export function createPattern(canvas) {
       // too far out to show: by where the tile's NEAREST point is (a large tile far away still reaches in from the rim)
       if (kind === 'H') { const near = Math.acosh(Math.max(1, c[2])) - reach; if (near > 5 || (px < 0.35 && near > 4)) continue; }
       drawn++;
-      const b = px >= 20 ? 0 : px >= 7 ? 1 : 2;
+      const b = px >= 20 ? 0 : px >= 7 ? 1 : 2, side = t.flip !== turned ? 1 : 0;      // 0: a copy of the outlined tile (teal), 1: its mirror image (sand)
       // the outline, edge by edge
       const pts = [];
       for (let i = 0; i < n; i++) {
@@ -223,12 +231,11 @@ export function createPattern(canvas) {
         pts.push(a);
         for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st));
       }
-      if (n) { closed(fill[t.flip ? 1 : 0], pts, t.flip); closed(edge[b], pts, t.flip); }
+      if (n) { closed(fill[side], pts, t.flip); closed(edge[b], pts, t.flip); }
       else fill[0].arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
       for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
       A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); } });
       if (px >= 1.2) {
-        const side = t.flip ? 1 : 0;
         for (const sh of des.dark) if (px >= sh.min) print(ink[side], sh, M, b, t.flip);
         for (const sh of des.light) if (px >= sh.min) print(eyes[side], sh, M, b, t.flip);
       }
@@ -278,11 +285,14 @@ export function createPattern(canvas) {
     }
 
     // ---- the tile the surface is folded from
+    const found = [];
+    home = null;
     {
       const M = mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       const visible = kind !== 'S' || c[2] > -0.2;
       if (n && visible && px > 3) {
+        home = [X(c), Y(c), px];          // its middle on the screen, and its room there in px
         const flip = M[0] * (M[4] * M[8] - M[5] * M[7]) - M[1] * (M[3] * M[8] - M[5] * M[6]) + M[2] * (M[3] * M[7] - M[4] * M[6]) < 0;
         const pts = [];
         for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
@@ -306,6 +316,14 @@ export function createPattern(canvas) {
           dx /= l; dy /= l;
           const along = e.to > i || e.rev ? 1 : -1;        // a ... a^-1: the second arrow runs against the outline
           const tx = dx * along, ty = dy * along, s = Math.min(8, lenPx / 4), x = X(mid), y = Y(mid);
+          if (hot === A.letter[i]) {
+            // the pointer is on this letter: both of its edges stand out
+            const p = new Path2D(); line(p, a, q, stepsFor(a, q));
+            ctx.lineWidth = 9; ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.stroke(p);
+            ctx.lineWidth = 4.6; ctx.strokeStyle = css(DARK, 1); ctx.stroke(p);
+          }
+          const spot = { letter: A.letter[i], x, y, lx: x, ly: y };
+          found.push(spot);
           ctx.beginPath(); ctx.moveTo(x - tx * s - ty * s * 0.75, y - ty * s + tx * s * 0.75); ctx.lineTo(x + tx * s * 0.7, y + ty * s * 0.7); ctx.lineTo(x - tx * s + ty * s * 0.75, y - ty * s - tx * s * 0.75);
           ctx.lineWidth = 2.4; ctx.strokeStyle = css(DARK, 1); ctx.stroke();
           if (lenPx >= 30) {
@@ -313,6 +331,7 @@ export function createPattern(canvas) {
             let ix = X(c) - x, iy = Y(c) - y; const il = Math.hypot(ix, iy) || 1; ix /= il; iy /= il;
             let nx = -dy, ny = dx; if (nx * ix + ny * iy < 0) { nx = -nx; ny = -ny; }
             const lx = x + nx * 13, ly = y + ny * 13;
+            spot.lx = lx; spot.ly = ly;
             ctx.lineWidth = 3.5; ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.strokeText(A.letter[i], lx, ly);
             ctx.fillStyle = css(DARK, 1); ctx.fillText(A.letter[i], lx, ly);
           }
@@ -331,6 +350,9 @@ export function createPattern(canvas) {
       }
     }
     ctx.restore();
+    hots = found;
+    placeTip();
+
     // the edge of the world: the ball's limb, the disc's rim
     if (kind !== 'E') {
       if (kind === 'S') {
@@ -345,6 +367,31 @@ export function createPattern(canvas) {
   }
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
 
+  // ---- the note on a glued edge of the outlined tile
+  /** The glued edge whose arrow or letter is within r px of a point of the canvas, or null. */
+  function spotAt(x, y, r) {
+    let best = null, bd = r;
+    for (const h of hots) { const d = Math.min(Math.hypot(h.x - x, h.y - y), Math.hypot(h.lx - x, h.ly - y)); if (d < bd) { bd = d; best = h; } }
+    return best;
+  }
+  function placeTip() {
+    if (!tipEl) return;
+    const all = hot === null ? [] : hots.filter((h) => h.letter === hot);
+    if (!all.length) { tipEl.hidden = true; if (hot !== null && !hots.some((h) => h.letter === hot)) hot = null; return; }
+    const h = all.reduce((a, b) => (b.ly < a.ly ? b : a));              // the upper of its edges: the note sits above it
+    tipEl.textContent = all.length > 1 ? `The two edges marked ${hot} are glued to each other, arrow onto arrow, when the pattern folds up.` : `This edge is glued to the other one marked ${hot}, arrow onto arrow, when the pattern folds up.`;
+    tipEl.hidden = false;
+    const half = Math.min(118, W / 2 - 6), below = h.ly < 96;
+    tipEl.style.left = canvas.offsetLeft + Math.max(half + 6, Math.min(W - half - 6, h.lx)) + 'px';
+    tipEl.style.top = canvas.offsetTop + h.ly + 'px';
+    tipEl.toggleAttribute('data-below', below);
+  }
+  function setHot(letter) {
+    if (letter === hot) return;
+    hot = letter;
+    schedule();
+  }
+
   // ---- sliding the pattern about
   let drag = null, lastTap = 0, settle = 0;
   const local = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
@@ -355,10 +402,16 @@ export function createPattern(canvas) {
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* a synthetic pointer: no capture, the drag still works */ }
   });
   canvas.addEventListener('pointermove', (e) => {
-    if (!drag || drag.id !== e.pointerId) return;
+    if (!drag) {
+      // a mouse resting on an arrow or a letter of the outlined tile: say what it is
+      if (model && e.pointerType === 'mouse') { const [hx, hy] = local(e), h = spotAt(hx, hy, 16); setHot(h ? h.letter : null); }
+      return;
+    }
+    if (drag.id !== e.pointerId) return;
     const [x, y] = local(e);
     if (Math.hypot(x - drag.x, y - drag.y) > 3) drag.moved = true;
     if (!drag.moved) return;
+    setHot(null);
     const p = unproject(x, y);
     V = G.fix(mul(G.translate(drag.p0, p), drag.V0));
     drag.V0 = recentre(drag.V0);
@@ -372,6 +425,9 @@ export function createPattern(canvas) {
     const was = drag;
     drag = null;
     if (!was.moved) {
+      // a tap on an arrow or a letter: its note, and off again on the next tap
+      const h = spotAt(was.x, was.y, 24);
+      if (e.pointerType !== 'mouse') setHot(h && h.letter !== hot ? h.letter : null);
       const now = performance.now();
       if (now - lastTap < 320) { api.resetView(); lastTap = 0; } else lastTap = now;
       return;
@@ -380,6 +436,7 @@ export function createPattern(canvas) {
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
+  canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) setHot(null); });
   canvas.addEventListener('keydown', (e) => {
     if (!model) return;
     const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[e.key];
@@ -395,6 +452,7 @@ export function createPattern(canvas) {
 
   const api = {
     set(m) {
+      hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
       if (!m) { model = null; G = null; sel = null; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       model = m; G = m.D.G; sel = null; quick = false;
       cache = new Map();
@@ -408,7 +466,9 @@ export function createPattern(canvas) {
     get pattern() { return patternKey; },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
     draw, redraw: schedule,
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length }),
+    /** For the tests: bring out the edges of a letter as a pointer on them does (null: none). */
+    point(letter) { setHot(letter); if (model) draw(); },
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y) })) }),
   };
   return api;
 }

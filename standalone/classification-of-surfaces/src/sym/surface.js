@@ -137,6 +137,7 @@ function buildDisc(parts) {
   let cx = 0, cy = 0, far = 0;
   for (const p of outline) { cx += p[0] / m; cy += p[1] / m; }
   for (const p of outline) far = Math.max(far, Math.hypot(p[0] - cx, p[1] - cy));
+  scene.sameBothSides = true;          // a plate has nothing to show underneath: seen from below it keeps its colour (stage.js)
   return { scene, frame: { center: [cx, cy, 0.12], radius: Math.max(1.05, far * 1.12) }, anchors, view: { az: 0, el: 52 } };
 }
 

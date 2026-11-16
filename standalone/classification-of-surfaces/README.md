@@ -193,6 +193,27 @@ canonical result) somewhere"*). Two things were mixed up on the page, and it sai
 What is not the same and is not offered as such: `*4` and `4*`; `*234*567` and `*234*765` (two mirrors, one read
 backwards: another orbifold, unless a × is there).
 
+**Colours flipped under a drag; a and b unexplained** (his note, Mon 16 Nov 2026, week 47, later that morning: *"when I take
+…#sym&k=\*4 and drag it around, colors flip which is distracting. alos I don't understand what a,b mean in the
+leftmost diagram there. Maybe add explanations/tooltips somewhere or delete it"*). Three things were behind it.
+
+- *Every tile's tone swapped when a drag crossed a mirror*, on the plane and the hyperbolic plane: a bug since tab 5
+  was made. The list of tiles is kept centred on the tile nearest the middle of the view (`pattern.js` `recentre`),
+  and a tile was painted teal or sand by whether it is a mirror image of THAT tile. Each time the middle moved onto
+  a mirror-image neighbour, all the tones swapped. A tile is now teal when it is a copy of the OUTLINED tile and
+  sand when it is its mirror image (`side = t.flip !== (det(base) < 0)`), so the tone belongs to the tile. The
+  sphere was never affected: nothing is re-centred there.
+- *A flat plate turned from teal to sand when tipped over* (`*4`'s teardrop, and every one-hole orbifold that
+  `surface.js` `buildDisc` draws). A plate has nothing to show underneath, so it has one colour on both sides now
+  (`scene.sameBothSides`, read by `stage.js`). A band (`**`) keeps its sand inside, and tabs 1 to 4 are as before.
+- *a, b* are the zips of the outlined tile: two edges with the same letter are glued to each other, arrow onto
+  arrow, when the pattern folds up into the surface. The page said so only inside a fold. Now a key sits right
+  under the two pictures and names only what is in them (the outlined tile; a, b; a copy of the tile; its mirror
+  image), and a mouse resting on an arrow or a letter, or a finger tapping one, makes the two edges of that letter
+  stand out and says the same beside them (`pattern.js` `spotAt` / `placeTip`; the note is `#pat-tip`). The footer
+  legend's teal and sand entries moved into the key. He offered deleting the letters instead; they stay because
+  they are what ties the pattern to the surface and to tab 3, and go if the key does not do it.
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
@@ -244,6 +265,13 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   says why and offers 4∗ and ∗44, a tap on 4∗ draws it; `*43`, `4`, `45`; `*236` reads "the same as ∗632" with that
   example lit, the chip and Enter both write it; `*252` is ∗225 "as the book lists it"; `* 2 3 6` typed key by key;
   the panes stay put side by side. In WebKit on the M5 at both widths: the same, and the 47 examples, no error.
+  Tones, the plate, the key and the note (Mon 16 Nov 2026), in headless Chrome at 1280 and 390 px: six patterns with
+  mirrors or glides (`*632`, `*442`, `22*`, `*x`, `*732`, `23x`) dragged in four strokes each, the outlined tile's own
+  pixel read at every step: teal each time (before the fix it was sand after the first mirror crossed); `*4`'s plate
+  seen from 51° below is teal; `**` still shows sand inside; the key's entries for `4*`, `*632`, `632`, `*4` and the
+  empty bar; a mouse on an arrow shows the note inside the pane, and moving off or starting a drag hides it. In
+  WebKit on the M5 at both widths: 33 looks of 33 teal on each of four patterns, the note by a finger's tap (and
+  off again) and by a mouse. The published copy inside spacesheep's viewer: 33 of 33 teal on `*632`, the key, the note.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

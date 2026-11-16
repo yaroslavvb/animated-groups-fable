@@ -320,3 +320,9 @@ ul.argument { list-style: disc; }
 #sym-bad .tries { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
 #sym-bad .tries-k { color: var(--muted); font-size: 14px; margin-right: 2px; }
 @media (max-width: 480px) { .pat-none { top: calc(50% + 20px); padding: 10px 12px 12px; } #sym-bad { margin-top: 6px; } #sym-bad .tries { margin-top: 8px; } }      /* clear of the pane's tag and chooser */
+/* the key under tab 5's two pictures (only what is in them), and the note on a glued edge of the outlined tile */
+.caption .symkey { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; max-width: none; margin: 0 0 8px; color: var(--muted); font-size: 14px; }
+.sw-tile { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }
+.keyab { min-width: 14px; color: var(--ink); font-weight: 650; text-align: center; }
+.pane-tip { position: absolute; z-index: 3; width: max-content; max-width: 236px; margin: 0; padding: 6px 10px 7px; border-radius: 8px; background: var(--ink); color: var(--ground); font-size: 13px; line-height: 1.35; pointer-events: none; transform: translate(-50%, calc(-100% - 22px)); }
+.pane-tip[data-below] { transform: translate(-50%, 22px); }

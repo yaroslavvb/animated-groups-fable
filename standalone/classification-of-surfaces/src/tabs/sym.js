@@ -32,8 +32,8 @@ const STORE = 'classification-of-surfaces.pattern';
 export function createSymTab(ctx) {
   const { stage, badge } = ctx;
   const $ = (id) => document.getElementById(id);
-  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad') };
-  const pattern = createPattern($('pattern'));
+  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyBack: $('key-back') };
+  const pattern = createPattern($('pattern'), { tip: $('pat-tip') });
   // sel is the cursor: null = at the end, nothing chosen; i >= 0 = on the i-th character (just after it); -1 = before everything
   let sig = parse('*632'), model = null, sel = null, built = null, active = false, where = [], note = '';
 
@@ -135,6 +135,10 @@ export function createSymTab(ctx) {
     el.total.style.left = Math.min(100, (fval(cost) / span) * 100) + '%';
     el.total.innerHTML = `<span>$${mixed(cost)}</span>`;
     el.total.dataset.side = fval(cost) / span > 0.8 ? 'left' : 'right';
+    // the key under the two pictures names only what is in them: an outlined tile, glued edges, mirror images
+    el.key.hidden = !D || !D.n;
+    el.keyGlue.hidden = !D || !D.edges.some((e) => !e.mirror);
+    el.keyBack.hidden = !D || !D.edges.some((e) => e.mirror || e.rev);
     // the same signature under another spelling: the book's, one tap away; the examples know it under any spelling
     const text = textOf(sig), name = spelled(sig);
     el.same.hidden = !model.D;                           // a signature no pattern has gets its reason instead (bad())

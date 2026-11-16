@@ -82,6 +82,7 @@
           <span class="panesel-k">Pattern</span>
           <select id="pat-select" aria-label="The pattern printed on the tiles"></select>
         </label>
+        <p class="pane-tip" id="pat-tip" role="status" hidden></p>
         <p class="hint" id="pat-hint">drag to slide the pattern</p>
         <button type="button" class="btn-quiet pane-reset" id="pat-reset" title="Put the pattern back" aria-label="Put the pattern back">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
@@ -190,6 +191,12 @@
         <p data-when="zip:handle">One rim is zipped clockwise, the other counter-clockwise: two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
         <p data-when="zip:crosshandle">Both rims are zipped the same way round: one tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
         <p data-when="prove:any" id="prove-cap"></p>
+        <div data-tab-only="sym"><p class="symkey" id="sym-key">
+          <span class="lg"><i class="sw sw-tile"></i>outlined: one tile, the one that folds up into the surface</span>
+          <span class="lg" id="key-glue"><b class="keyab">a, b</b>edges with the same letter are glued to each other, arrow onto arrow</span>
+          <span class="lg"><i class="sw sw-front"></i>a copy of that tile</span>
+          <span class="lg" id="key-back"><i class="sw sw-back"></i>its mirror image</span>
+        </p></div>
         <p data-when="sym:none">The signature is a line you can type: o, 2 to 9, ∗ and x add a character, Delete takes one away (all the way to nothing), the arrows move the cursor, Enter puts it in its usual order. The row under it does the same for a finger. Tap a character and what it stands for lights up in the pattern and on the surface.</p>
         <p class="cap-more" data-when="sym:empty">Nothing in the signature: a pattern with no symmetry but leaving it alone. Its surface is the bare sphere, where every signature starts. <a class="bk" data-p="53" data-q="with the convention that digits 1 can be omitted">p. 53</a></p>
         <p id="sym-say" data-tab-only="sym"></p>
@@ -296,8 +303,6 @@
   <footer class="legend">
     <span class="lg" data-tab-only="zip tidy prove name"><i class="sw sw-front"></i>front</span>
     <span class="lg" data-tab-only="zip tidy prove name"><i class="sw sw-back"></i>back</span>
-    <span class="lg" data-tab-only="sym"><i class="sw sw-front"></i>a copy of the tile (the paper's front)</span>
-    <span class="lg" data-tab-only="sym"><i class="sw sw-back"></i>its mirror image (the back)</span>
     <span class="lg" data-tab-only="zip tidy prove"><i class="sw sw-zip"></i>one zipper: same colour, glue along the arrows</span>
     <span class="lg" data-tab-only="sym"><i class="sw sw-blue"></i>keeps the pattern's sense: turns, wonders</span>
     <span class="lg" data-tab-only="sym"><i class="sw sw-red"></i>reflects: mirrors, miracles</span>

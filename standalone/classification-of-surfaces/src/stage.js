@@ -15,9 +15,12 @@ export function createStage(canvas, labelLayer) {
   const mq = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   const stage = { R, scene: null, extraLines: null, extraMarkers: null };
   const still = () => !!R.reducedMotion;
+  // A scene may ask for one colour on both of its sides (scene.sameBothSides: tab 5's flat plates, which otherwise turn
+  // from teal to sand as a drag tips them over; his note, Mon 16 Nov 2026: "colors flip which is distracting").
+  const sides = () => ({ front: THEME.front, back: stage.scene && stage.scene.sameBothSides ? THEME.front : THEME.back });
   function applyTheme() {
     setDark(!!(mq && mq.matches));
-    R.setStyle({ front: THEME.front, back: THEME.back, opacity: THEME.opacity, background: null });
+    R.setStyle({ ...sides(), opacity: THEME.opacity, background: null });
   }
   stage.decorate = () => {
     if (!stage.scene) return;
@@ -28,6 +31,7 @@ export function createStage(canvas, labelLayer) {
   };
   stage.setScene = (scene, frame, immediate = true) => {
     stage.scene = scene;
+    R.setStyle(sides());
     const { positions, indices } = scene.finish();
     R.setSurface({ positions, indices, tint: scene.tint ? scene.tint() : undefined });
     if (frame) R.setFrame(frame, immediate);
