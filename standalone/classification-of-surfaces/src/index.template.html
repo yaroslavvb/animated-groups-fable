@@ -66,6 +66,7 @@
         <div class="symprice">
           <div class="cost-rail"><div class="cost-bar" id="sym-bar"></div><i class="cost-two"></i><div class="cost-total" id="sym-total"></div></div>
           <div class="cost-zones" aria-hidden="true"><span>under $2: a sphere</span><span>$2: the plane</span><span>over $2: hyperbolic</span></div>
+          <p class="symsame" id="sym-same" data-show="0" hidden>the same as <button type="button" class="chip symchip samechip" id="sym-canon" title="Its usual spelling. Tap, or press Enter, to write it this way"></button> <span id="sym-usual">its usual spelling</span> <a class="bk" data-p="31" data-q="we can tell at a glance which patterns have the same type">p. 31</a></p>
           <p class="symwhere" id="sym-where" aria-live="polite"></p>
         </div>
       </div>
@@ -73,7 +74,10 @@
       <section class="pane pane2" id="pane2" data-tab-only="sym" data-ss-comments="off" aria-label="The pattern">
         <canvas id="pattern" tabindex="0" aria-label="The pattern. Drag to slide it; the arrow keys slide it too, and 0 puts it back."></canvas>
         <p class="pane-tag" id="pat-tag"></p>
-        <p class="pat-none" id="pat-none" hidden>No pattern has this signature.</p>
+        <div class="pat-none" id="pat-none" hidden>
+          <p class="pat-none-head">No pattern has this signature.</p>
+          <p id="sym-bad" aria-live="polite"></p>
+        </div>
         <label class="panesel" title="What is printed on the tiles">
           <span class="panesel-k">Pattern</span>
           <select id="pat-select" aria-label="The pattern printed on the tiles"></select>
@@ -186,10 +190,10 @@
         <p data-when="zip:handle">One rim is zipped clockwise, the other counter-clockwise: two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
         <p data-when="zip:crosshandle">Both rims are zipped the same way round: one tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
         <p data-when="prove:any" id="prove-cap"></p>
-        <p data-when="sym:none">The signature is a line you can type: o, 2 to 9, ∗ and x add a character, Delete takes one away (all the way to nothing), the arrows move the cursor. The row under it does the same for a finger. Tap a character and what it stands for lights up in the pattern and on the surface.</p>
+        <p data-when="sym:none">The signature is a line you can type: o, 2 to 9, ∗ and x add a character, Delete takes one away (all the way to nothing), the arrows move the cursor, Enter puts it in its usual order. The row under it does the same for a finger. Tap a character and what it stands for lights up in the pattern and on the surface.</p>
         <p class="cap-more" data-when="sym:empty">Nothing in the signature: a pattern with no symmetry but leaving it alone. Its surface is the bare sphere, where every signature starts. <a class="bk" data-p="53" data-q="with the convention that digits 1 can be omitted">p. 53</a></p>
         <p id="sym-say" data-tab-only="sym"></p>
-        <p class="cap-more" data-when="sym:bad">Under $2 a pattern has to live on a sphere, and there the choice is narrow. Two cone points must have the same order, and so must the two corners of one mirror; one alone will not do. The surface on the right still exists: it just is not what any pattern folds up to. <a class="bk" data-p="53" data-q="but it turns out that there is a proviso">p. 53</a></p>
+        <p class="cap-more" data-when="sym:bad">The surface on the right still exists; it is just not what any pattern folds up to. Only four kinds of signature fail, all under $2: N, MN, ∗N and ∗MN, with M and N different. <a class="bk" data-p="53" data-q="but it turns out that there is a proviso">p. 53</a> <a class="bk" data-p="57" data-q="by the reflections in the sides of a two-sided polygon">p. 57</a></p>
         <p class="cap-more" data-when="sym:cone">A number before the star is a gyration point: the pattern turns about it and no mirror passes through it. Folded up, the tiles round it roll into a cone. <a class="bk" data-p="112" data-q="A gyration point is rolled into a cone">p. 112</a></p>
         <p class="cap-more" data-when="sym:star">A star is a kaleidoscope: mirror lines, and the points where they cross. Folding along a mirror leaves an edge, so the surface gets a boundary. <a class="bk" data-p="20" data-q="designating the presence of a kaleidoscope separates the digit representing the gyration point">p. 20</a></p>
         <p class="cap-more" data-when="sym:corner">A number after a star is a point where that many mirrors cross. Folded up, it is a corner of the boundary. <a class="bk" data-p="112" data-q="A kaleidoscopic corner is folded up into just that">p. 112</a></p>
@@ -264,6 +268,7 @@
         <li>Over $2: a pattern on the hyperbolic plane. Every such signature has one. <a class="bk" data-p="237" data-q="every signature with negative characteristic really does correspond to a group">p. 237</a></li>
       </ul>
       <p>Any signature you can write has a price, and with the row under the signature you can write any: only a handful under $2 have no pattern. <a class="bk" data-p="237" data-q="there were “bad” signatures">p. 237</a></p>
+      <p>Where a number stands matters: before the star it is a turn (blue), after a star a crossing of that many mirrors (red). So 4∗ and ∗4 are different things, and only the first has a pattern. What does not matter: the order of the blue numbers, which number of a star comes first, reading every star backwards, and the order of the stars. Type any of these and the page shows the usual spelling. <a class="bk" data-p="231" data-q="freely permute the digits">p. 231</a></p>
       <p>The price is what each thing takes off the Euler characteristic of <a href="#tidy" data-go="tidy">tab 2</a>: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
     </details>
     <details class="fold" data-tab-only="sym">

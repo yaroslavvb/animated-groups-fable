@@ -305,3 +305,18 @@ ul.argument { list-style: disc; }
   .symcells { min-width: 96px; padding: 2px 5px; }
 }
 .symprice[data-far] .cost-zones span:first-child { visibility: hidden; }
+/* the same signature in its usual spelling; and, where no pattern has the one typed, why, and the nearest that do */
+/* the chip looks 26 px tall inside a 21 px line and still takes a 44 px tap: its transparent border is the rest */
+.symsame { margin: 2px 0 0; font-size: 14px; line-height: 21px; color: var(--muted); text-align: center; }
+.symsame[data-show="0"] { display: none; }
+@media (min-width: 860px) { .symsame[data-show="0"]:not([hidden]) { display: block; visibility: hidden; } }      /* its line stays, so the panes below do not jump as the spelling changes */
+.samechip { min-width: 52px; margin: -12px 0; padding: 0 6px; border-width: 9px 4px; font-size: 16px; vertical-align: middle; }
+.pat-none { max-width: min(calc(100% - 24px), 460px); padding: 12px 16px 14px; }
+.pat-none p { margin: 0; }
+.pat-none-head { font-weight: 600; color: var(--ink); }
+#sym-bad:empty { display: none; }
+#sym-bad { margin-top: 8px; color: var(--ink); line-height: 1.5; }
+#sym-bad .why { display: block; text-align: left; }
+#sym-bad .tries { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
+#sym-bad .tries-k { color: var(--muted); font-size: 14px; margin-right: 2px; }
+@media (max-width: 480px) { .pat-none { top: calc(50% + 20px); padding: 10px 12px 12px; } #sym-bad { margin-top: 6px; } #sym-bad .tries { margin-top: 8px; } }      /* clear of the pane's tag and chooser */

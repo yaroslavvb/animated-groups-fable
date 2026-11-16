@@ -121,14 +121,60 @@ export function costOf(sig) {
   for (const st of sig.stars) for (const n of st) c = fadd(c, PRICE.corner(n));
   return c;
 }
+// ---- one signature, many spellings (the book, pp. 231-232, "Which signatures are really the same?"): the digits
+// before the star may be written in any order; a star's digits may be read from any of them, and backwards (all
+// stars at once if there is no cross to turn one over alone); the stars may come in any order. canon() picks one
+// spelling: larger numbers first, as the book writes its plane types ("using *632 rather than *236", p. 30).
+const larger = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { if (a[i] === undefined) return 1; if (b[i] === undefined) return -1; if (a[i] !== b[i]) return b[i] - a[i]; } return 0; };   // sorts the larger reading first
+const round = (c) => (c.length ? c.map((_, r) => c.slice(r).concat(c.slice(0, r))).sort(larger)[0] : []);                  // a ring of digits, read from where it reads largest
+const lists = (a, b) => { for (let i = 0; i < a.length; i++) { const d = larger(a[i], b[i]); if (d) return d; } return 0; };
+export function canon(sig) {
+  const flip = (c) => c.slice().reverse(), sorted = (stars) => stars.slice().sort(larger);
+  const fwd = sorted(sig.stars.map(round)), back = sorted(sig.stars.map((c) => round(flip(c))));
+  const each = sorted(sig.stars.map((c) => [round(c), round(flip(c))].sort(larger)[0]));
+  const stars = sig.x > 0 || sig.stars.length <= 1 ? each : lists(fwd, back) <= 0 ? fwd : back;
+  return { o: sig.o, cones: sig.cones.slice().sort((a, b) => b - a), stars, x: sig.x };
+}
+/** Are two signatures the same, written differently? */
+export const sameAs = (a, b) => textOf(canon(a)) === textOf(canon(b));
+let BOOK = null;
+/** How the page writes a signature: as the book's own list has it where it is there (*225, not *522), else larger numbers first. */
+export function spelled(sig) {
+  if (!BOOK) { BOOK = new Map(); for (const t of ALL) BOOK.set(textOf(canon(parse(t))), t); }
+  const c = textOf(canon(sig));
+  return BOOK.get(c) || c;
+}
+
 /** The tile of a pattern with this signature, or null where no pattern has it. */
 export function domainOf(sig) {
   if (isEmpty(sig)) return trivial();
-  const ex = fromText(textOf(sig));
+  // a hand-made tile, looked for under every spelling (the characters shown are tied to it by bind(), whatever their order)
+  const ex = fromText(textOf(sig)) || fromText(spelled(sig)) || fromText(textOf(canon(sig)));
   if (ex) return FAMILIES[ex.family].make(ex.params);
   if (fval(costOf(sig)) < 2) return null;          // under $2 and not one of the fourteen spherical types
   return canonical(sig);
 }
+/**
+ * For a signature no pattern has: why, and the nearest ones that do have one. Under $2 only four shapes fail (the
+ * book's proviso, pp. 53 and 57): one cone point, two of different orders, and the same two for the corners of one
+ * mirror. Returns { kind: 'cone' | 'cones' | 'corner' | 'corners', m, n, tries: [{ text, how }] }, how = 'order'
+ * (the same characters, a digit moved across the star), 'equal' (one digit changed) or 'more' (one character added).
+ */
+export function whyNot(sig) {
+  if (domainOf(sig)) return null;
+  const tries = [], seen = new Set([textOf(sig)]);
+  const offer = (s, how) => { if (!s || !fits(s)) return; const t = spelled(s); if (seen.has(t) || !domainOf(s)) return; seen.add(t); tries.push({ text: t, how }); };
+  const digits = sig.cones.concat(...sig.stars), mk = (cones, stars) => ({ o: sig.o, cones, stars, x: sig.x });
+  // the same characters in another order: each digit before the star or after it
+  if (sig.stars.length === 1 && digits.length <= 4) {
+    for (let mask = 0; mask < 1 << digits.length; mask++) offer(mk(digits.filter((_, i) => mask & (1 << i)), [digits.filter((_, i) => !(mask & (1 << i)))]), 'order');
+  }
+  const star = sig.stars.length === 1, list = star ? sig.stars[0] : sig.cones, put = (l) => (star ? mk(sig.cones, [l]) : mk(l, sig.stars));
+  if (list.length === 2) { offer(put([list[0], list[0]]), 'equal'); offer(put([list[1], list[1]]), 'equal'); offer(put([list[0], list[1], 2]), 'more'); }
+  if (list.length === 1) { offer(put([list[0], list[0]]), 'more'); if (!star) { offer(mk(sig.cones, [[]]), 'more'); offer({ ...mk(sig.cones, []), x: 1 }, 'more'); } }
+  return { kind: star ? (list.length === 1 ? 'corner' : 'corners') : list.length === 1 ? 'cone' : 'cones', m: list[0], n: list[1], tries };
+}
+
 /** What each character is, from the signature alone (for one that has no tile to compare with): as bind() answers, without the classes. */
 export function structure(tokens) {
   return tokens.map((k) => (k.t === 'o' ? { t: 'o', k: k.ref.i } : k.t === 'x' ? { t: 'x', k: k.ref.i } : k.t === '*' ? { t: '*', star: k.ref.s }

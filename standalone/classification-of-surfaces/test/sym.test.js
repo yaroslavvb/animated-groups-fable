@@ -339,3 +339,51 @@ test('many handles, many crosscaps: the tile search ends, and finds every tile o
   }
   assert.equal(C.parse('ooooooo'), null, 'a seventh handle has no place on the ball: it is refused, not tried');
 });
+
+test('one signature, many spellings: the book\'s is found, and a tile under any of them', async () => {
+  // His question, Mon 16 Nov 2026: "I'm confused why *4 fails but 4* works, maybe allow the entry of unordered tuples
+  // (but automatically canonicalize and show the canonical result)". What is unordered in a signature is taken in any
+  // order; what a digit IS (a turn before the star, a crossing of mirrors after it) is not.
+  const C = await import('../src/sym/catalog.js');
+  const sp = (t) => C.spelled(C.parse(t));
+  assert.deepEqual(['*236', '*362', '*326', '*623', '*263', '*632'].map(sp), new Array(6).fill('*632'), 'a star\'s digits from any start, either way round');
+  assert.deepEqual(['236', '362', '623', '263', '326'].map(sp), new Array(5).fill('632'), 'the digits before the star in any order');
+  assert.equal(sp('*252'), '*225', 'as the book\'s list has it, where it is there'); assert.equal(sp('*3222'), '*2223'); assert.equal(sp('522'), '225');
+  assert.equal(sp('**3'), '*3*'); assert.equal(sp('23*'), '32*'); assert.equal(sp('*23*45'), '*54*32');
+  assert.equal(sp('4*'), '4*'); assert.equal(sp('*4'), '*4', 'a digit never crosses the star: 4* and *4 are different signatures');
+  assert.ok(!C.sameAs(C.parse('4*'), C.parse('*4'))); assert.ok(C.sameAs(C.parse('*236'), C.parse('*632')));
+  // two mirrors each with a hand: one cannot be turned over alone, unless a cross is there to do it
+  assert.ok(!C.sameAs(C.parse('*234*567'), C.parse('*234*765')), 'two stars, one reversed: another orbifold');
+  assert.ok(C.sameAs(C.parse('*234*567'), C.parse('*432*765')), 'both reversed: the mirror image');
+  assert.ok(C.sameAs(C.parse('*234*567x'), C.parse('*234*765x')), 'with a cross either may be reversed');
+  // every spelling of every example gets the example's own hand-made tile, and its characters are tied to it
+  const perms = (a) => (a.length <= 1 ? [a] : a.flatMap((x, i) => perms(a.slice(0, i).concat(a.slice(i + 1))).map((p) => [x, ...p])));
+  let spellings = 0;
+  for (const t of ALL) {
+    const s0 = C.parse(t), D0 = C.domainOf(s0);
+    for (const cones of perms(s0.cones).slice(0, 24)) {
+      for (let r = 0; r < Math.max(1, (s0.stars[0] || []).length); r++) for (const rev of [false, true]) {
+        if (rev && s0.stars.length > 1) continue;
+        const stars = s0.stars.map((c, k) => { if (k) return c; const turned = c.slice(r).concat(c.slice(0, r)); return rev ? turned.reverse() : turned; });
+        const sig = { o: s0.o, cones, stars: stars.slice().reverse(), x: s0.x }, D = C.domainOf(sig);
+        spellings++;
+        assert.equal(C.spelled(sig), t, `${C.textOf(sig)} is ${t}`);
+        assert.ok(D && D.n === D0.n && D.G.kind === D0.G.kind, `${C.textOf(sig)}: not the tile of ${t}`);
+        bind(C.tokensOf(sig), analyse(D));
+      }
+    }
+  }
+  assert.ok(spellings > 250, 'spellings tried: ' + spellings);
+});
+
+test('a signature with no pattern: why, and the nearest ones that have one', async () => {
+  const C = await import('../src/sym/catalog.js');
+  const w = (t) => { const r = C.whyNot(C.parse(t)); return r && r.kind + ': ' + r.tries.map((x) => x.text).join(' '); };
+  assert.equal(w('*4'), 'corner: 4* *44', 'his case: the 4 in front of the star, or a second corner');
+  assert.equal(w('*43'), 'corners: 4*3 3*4 43* *44 *33 *432');
+  assert.equal(w('4'), 'cone: 44 4* 4x');
+  assert.equal(w('45'), 'cones: 44 55 542');
+  assert.equal(w('4*'), null); assert.equal(w('*44'), null); assert.equal(w('1'), null); assert.equal(w('*632'), null);
+  // whatever is offered has a pattern, and differs from what was typed
+  for (const t of ['2', '9', '23', '95', '*2', '*9', '*23', '*45', '*92']) for (const x of C.whyNot(C.parse(t)).tries) { assert.ok(C.domainOf(C.parse(x.text)), `${t} -> ${x.text} has no pattern`); assert.notEqual(x.text, t); }
+});

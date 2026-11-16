@@ -16,7 +16,7 @@
 // bind() fails loudly if it is not the one shown.
 
 import { analyse, fval, PRICE, frac, fsub } from '../sym/orbifold.js';
-import { PRESETS, ALL, parse, textOf, linkOf, tokensOf, costOf, domainOf, structure, bind, addTo, removeAt, stepAt, tokenAt, toPretty, isEmpty } from '../sym/catalog.js';
+import { PRESETS, ALL, parse, textOf, linkOf, tokensOf, costOf, domainOf, structure, bind, addTo, removeAt, stepAt, tokenAt, toPretty, isEmpty, spelled, canon, whyNot } from '../sym/catalog.js';
 import { createPattern, BLUE, RED } from '../sym/pattern.js';
 import { PATTERNS, DEFAULT_PATTERN, isPattern } from '../sym/motifs.js';
 import { buildSurface } from '../sym/surface.js';
@@ -32,7 +32,7 @@ const STORE = 'classification-of-surfaces.pattern';
 export function createSymTab(ctx) {
   const { stage, badge } = ctx;
   const $ = (id) => document.getElementById(id);
-  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select') };
+  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad') };
   const pattern = createPattern($('pattern'));
   // sel is the cursor: null = at the end, nothing chosen; i >= 0 = on the i-th character (just after it); -1 = before everything
   let sig = parse('*632'), model = null, sel = null, built = null, active = false, where = [], note = '';
@@ -135,10 +135,27 @@ export function createSymTab(ctx) {
     el.total.style.left = Math.min(100, (fval(cost) / span) * 100) + '%';
     el.total.innerHTML = `<span>$${mixed(cost)}</span>`;
     el.total.dataset.side = fval(cost) / span > 0.8 ? 'left' : 'right';
-    const text = textOf(sig);
-    for (const b of el.presets.querySelectorAll('.chip')) b.setAttribute('aria-pressed', String(b.dataset.k === text));
-    const i0 = ALL.indexOf(text);
+    // the same signature under another spelling: the book's, one tap away; the examples know it under any spelling
+    const text = textOf(sig), name = spelled(sig);
+    el.same.hidden = !model.D;                           // a signature no pattern has gets its reason instead (bad())
+    el.same.dataset.show = name === text ? '0' : '1';     // side by side its line is kept, empty, so the panes stay put (styles.css)
+    if (name !== text) { el.canon.textContent = toPretty(tokensOf(parse(name))); el.canon.dataset.k = name; el.usual.textContent = name === textOf(canon(sig)) ? 'larger numbers first' : 'as the book lists it'; }
+    for (const b of el.presets.querySelectorAll('.chip')) b.setAttribute('aria-pressed', String(b.dataset.k === name));
+    const i0 = ALL.indexOf(name);
     el.prev.disabled = i0 === 0; el.next.disabled = i0 === ALL.length - 1;
+  }
+
+  // a signature no pattern has: why, in its own numbers, and the nearest ones that do have one
+  function bad() {
+    const w = model.D || isEmpty(sig) ? null : whyNot(sig);
+    if (!w) { el.bad.textContent = ''; return; }
+    const { m, n } = w, P = (t) => toPretty(tokensOf(parse(t)));
+    const R = (d) => `<b class="is-red">${d}</b>`, U = (d) => `<b class="is-blue">${d}</b>`;       // a corner's number is red, a turn's blue, as in the signature
+    const why = w.kind === 'corner' ? `After the star, ${R(m)} is a corner where ${WORDS[m]} mirrors cross. On a sphere they cross again at the opposite point, so a mirror never has one corner alone: it takes two alike. Before the star, ${U(m)} is a turn with no mirror through it, and that pattern exists.`
+      : w.kind === 'corners' ? `A mirror with two corners is a slice between two mirror lines, and they cross at the same angle at both ends: ${R(m)} and ${R(n)} would have to be equal. A third corner frees them. Before the star a number is a turn, not a corner.`
+        : w.kind === 'cone' ? `One gyration point, ${U(m)}, alone. On a sphere a turn about a point is a turn about the opposite point too, so it takes two alike, or a mirror or a miracle to carry one onto the other.`
+          : `Two gyration points and nothing else are the two ends of one axis, and an axis turns alike at both ends: ${U(m)} and ${U(n)} would have to be equal. A third point frees them.`;
+    el.bad.innerHTML = `<span class="why">${why}</span>${w.tries.length ? `<span class="tries"><span class="tries-k">These have one:</span>${w.tries.map((x) => `<button type="button" class="chip symchip trychip" data-k="${x.text}">${P(x.text)}</button>`).join('')}</span>` : ''}`;
   }
 
   // what the chosen character stands for, in this signature's own numbers
@@ -174,10 +191,12 @@ export function createSymTab(ctx) {
     sel = keep === 'start' ? (tokens.length ? -1 : null) : at >= 0 ? at : null;
     pattern.set(D ? model : null);
     if (D) pattern.select(on());
-    surface(); head(); say();
+    surface(); head(); say(); bad();
     ctx.changed();
   }
   const go = (text) => { const s = parse(text); if (s) load(s); return !!s; };
+  /** Write the signature its usual way (larger numbers first, or as the book lists it), where it is written another. */
+  const usual = () => { const t = spelled(sig); return !!model.D && t !== textOf(sig) && go(t); };
   const nope = () => { el.cells.classList.remove('nope'); void el.cells.offsetWidth; el.cells.classList.add('nope'); return false; };
 
   // ---- editing: one character in after the cursor; the character before the cursor out; a digit one up or down
@@ -207,9 +226,10 @@ export function createSymTab(ctx) {
     select(to - 1);
   }
   /** A key of the signature's own: true if it was taken. */
-  function key(e, inBar) {
+  function key(e, inBar, loose = inBar) {
     if (e.metaKey || e.ctrlKey || e.altKey) return false;
     const k = e.key;
+    if (k === 'Enter' && loose) return usual();          // not on a button, where Enter presses it
     if (k >= '2' && k <= '9' && k.length === 1) return add('digit', Number(k)) || true;
     if (k === 'o' || k === 'O') return add('o') || true;
     if (k === 'x' || k === 'X') return add('x') || true;
@@ -230,7 +250,7 @@ export function createSymTab(ctx) {
     const t = e.target, tag = t && t.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (t && t.isContentEditable)) return;
     const inBar = !!(t && t.closest && t.closest('#sym-cells'));
-    if (key(e, inBar)) e.preventDefault();
+    if (key(e, inBar, inBar || t === document.body || t === document.documentElement)) e.preventDefault();
   });
 
   // ---- controls
@@ -246,7 +266,9 @@ export function createSymTab(ctx) {
     }
     el.presets.append(h, row);
   }
-  const hop = (d) => { const i = ALL.indexOf(textOf(sig)), j = i < 0 ? 0 : i + d; if (j >= 0 && j < ALL.length) go(ALL[j]); };
+  const hop = (d) => { const i = ALL.indexOf(spelled(sig)), j = i < 0 ? 0 : i + d; if (j >= 0 && j < ALL.length) go(ALL[j]); };
+  el.canon.addEventListener('click', () => usual());
+  el.bad.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('.trychip'); if (b) go(b.dataset.k); });
   el.prev.addEventListener('click', () => hop(-1));
   el.next.addEventListener('click', () => hop(1));
   el.minus.addEventListener('click', () => bump(-1));
@@ -276,7 +298,7 @@ export function createSymTab(ctx) {
     when() {
       if (!model) return ['sym:none'];
       const out = [on() === null ? 'sym:none' : 'sym:' + kindOf(sel)];
-      if (isEmpty(sig)) out.push('sym:empty'); else if (!model.D) out.push('sym:bad'); else if (on() === null) out.push('symex:' + textOf(sig));
+      if (isEmpty(sig)) out.push('sym:empty'); else if (!model.D) out.push('sym:bad'); else if (on() === null) out.push('symex:' + spelled(sig));
       return out;
     },
     get() { return { k: linkOf(sig), p: pattern.pattern === DEFAULT_PATTERN ? undefined : pattern.pattern }; },
@@ -286,6 +308,6 @@ export function createSymTab(ctx) {
       if (n) { sig = n; sel = null; if (active) load(n); }
     },
     // for the tests
-    go, select, hop, bump, add, remove, move, key: (k, inBar = true) => key({ key: k }, inBar), setPattern, pattern, text: () => textOf(sig), example: () => ({ text: textOf(sig) }), model: () => model, selected: () => sel, built: () => built,
+    go, usual, select, hop, bump, add, remove, move, key: (k, inBar = true) => key({ key: k }, inBar), setPattern, pattern, text: () => textOf(sig), example: () => ({ text: textOf(sig) }), model: () => model, selected: () => sel, built: () => built,
   };
 }

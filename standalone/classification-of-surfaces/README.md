@@ -167,6 +167,32 @@ and cost a thousand times the accuracy. `oooo` now takes 114 ms from key to pict
 crosscaps 110 ms (headless Chrome on the Intel); `test/sym.test.js` holds it: for 3 to 6 handles, 8 and 12
 crosscaps and four more, the search ends, finds every tile once and as many as the disc has room for.
 
+**∗4 fails, 4∗ works; any order of what has no order** (his question, Mon 16 Nov 2026, week 47: *"I'm confused why
+\*4 fails but 4\* works, maybe allow the entry of unordered tuples (but automatically canonicalize and show the
+canonical result) somewhere"*). Two things were mixed up on the page, and it said nothing about either.
+
+- *Where a digit stands is what it is.* Before the star it is a gyration point (a turn, no mirror through it); after
+  a star it is a corner where that many mirrors cross. So `4*` and `*4` are two signatures, not two spellings. `4*`
+  is a four-fold turn with one mirror across its axis. `*4` asks for a mirror with a single corner where four
+  mirrors cross: under $2 it would live on a sphere, and there four mirrors through a point cross again at the
+  opposite point, so the corner comes twice (`*44`). The book's four kinds without a pattern (pp. 53, 57): `N`,
+  `MN`, `*N`, `*MN` with M and N different. The page used to say only "no pattern has this signature". Now the
+  empty pattern pane gives the reason in that signature's own numbers (`catalog.js` `whyNot`, the wording in
+  `tabs/sym.js` `bad`) and offers the nearest signatures that have one as chips: the same characters with a digit
+  on the other side of the star (`*4` → `4*`), the two numbers made equal, one more number.
+- *What has no order is taken in any order.* The book, pp. 231–232: the digits before the star may be permuted
+  freely, a star's digits turned round, all stars read backwards at once (one alone only beside a ×), the stars
+  permuted. `catalog.js` `canon` picks one spelling among these (larger numbers first, p. 31), `spelled` prefers the
+  book's own where an example has it (`*225`, not `*522`), `sameAs` compares two. `domainOf` looks for a hand-made
+  tile under the spelling typed, then under those two, so `*236` gets the tile of `*632` and its characters are
+  tied to it by `bind` as before. The bar keeps what was typed (rewriting characters under the cursor would undo
+  the typing), and beside the price a line reads "the same as ∗632": tap the chip, or press Enter, to write it that
+  way. The example's chip lights up and previous/next go from it, whatever the spelling. Side by side, the line's
+  height is kept when it is empty, so the panes do not jump as characters go in.
+
+What is not the same and is not offered as such: `*4` and `4*`; `*234*567` and `*234*765` (two mirrors, one read
+backwards: another orbifold, unless a × is there).
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
@@ -182,8 +208,10 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 73 tests (the last three: typing and deleting a signature character by character; the six designs
-  inside their tiles; many handles and crosscaps: the tile search ends and finds every tile once). The zipping's bookkeeping against an independent count of the glued surface (400 random
+- `node --test`: 75 tests (the last five: typing and deleting a signature character by character; the six designs
+  inside their tiles; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
+  of the 47 examples each found as its example, with the example's tile; the four kinds without a pattern and what
+  is offered for them, each offer having a pattern). The zipping's bookkeeping against an independent count of the glued surface (400 random
   gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
   1,345 more signatures (every `*pqr` and `pqr` with digits 2 to 9, every family over its numbers) each folded up
   from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping;
@@ -191,7 +219,7 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   four characters over `o 2 3 5 * x` either has a tile in the right geometry or is one of the ones without a
   pattern, and the spherical ones among them are exactly the fourteen types; adding, removing, stepping, the trade.
 - Every zip of every preset and of 40 random deals, in three orders, stepped through all its phases in a browser: no error.
-- `node tools/check_quotes.mjs`: 72 citations, each at most 15 words and on its page.
+- `node tools/check_quotes.mjs`: 75 citations, each at most 15 words and on its page.
 - Looked at in headless Chrome at 1280 and 390 px wide, light and dark, with reduced motion; a real tap on an arrow,
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
   And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.
@@ -212,6 +240,10 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   the six designs, the 47 examples and nineteen signatures of one's own (four, five and six handles and twelve
   crosscaps among them), the drags; no error. And with real keys in Chrome: `o` seven times (the seventh refused),
   `x` thirteen times, Delete twelve times, three long drags across the disc of `oooo`.
+  Spellings and reasons (Mon 16 Nov 2026), with real clicks and keys in headless Chrome at 1280 and 390 px: `*4`
+  says why and offers 4∗ and ∗44, a tap on 4∗ draws it; `*43`, `4`, `45`; `*236` reads "the same as ∗632" with that
+  example lit, the chip and Enter both write it; `*252` is ∗225 "as the book lists it"; `* 2 3 6` typed key by key;
+  the panes stay put side by side. In WebKit on the M5 at both widths: the same, and the 47 examples, no error.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied
