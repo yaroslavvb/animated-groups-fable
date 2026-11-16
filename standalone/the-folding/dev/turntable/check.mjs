@@ -111,14 +111,16 @@ try {
   await page.keyboard.press('ArrowDown'); await page.waitForTimeout(700);
   v = await viewOf(f);
   check(Math.abs(v.az - 9) < 1e-6 && Math.abs(v.el - 64) < 1e-6, 'ArrowDown tilts it 9 degrees (the eye rises)', `${v.az} / ${v.el}`);
-  // an old link with a roll is shown upright, and the address loses the roll
-  const old = await open(ctx, '#g=2222&t=1&view=10/40/1.5/25');
+  // an old link with a roll is shown upright, and the address loses the roll (in a context of its own: the
+  // spacesheep viewer brings back what a context showed last, over a link opened in it)
+  const octx = await B.browser.newContext({ viewport: { width: 1280, height: 760 } });
+  const old = await open(octx, '#g=2222&t=1&view=10/40/1.5/25');
   v = await viewOf(old.f);
   check(Math.abs(v.az - 10) < 1e-9 && Math.abs(v.el - 40) < 1e-9 && Math.abs(v.zoom - 1.5) < 1e-9 && v.level < 1e-12, 'an old link with a roll: the same eye, upright', JSON.stringify([v.az, v.el, v.zoom]));
   await old.f.evaluate(() => window.__folding.flushHash());
   v = await viewOf(old.f);
   check(v.hashView === '10/40/1.5', 'its address is written without the roll', v.hashView);
-  await old.page.close();
+  await octx.close();
   const errs = (await viewOf(f)).errors;
   check(errs === 0, 'no error in the app', String(errs));
   await page.close();
