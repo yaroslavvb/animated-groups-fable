@@ -17,10 +17,11 @@
 //   red lines           mirrors (one colour of the book's signature: what reflects)        dashed: a glide's axis
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
-// One tile is outlined: the one the surface in the other pane is folded from. Its glued edges carry arrows and
-// letters (the same letters tab 3 uses when it zips this tile up). A pointer on one of them (or a tap) brings out the
-// two edges of that letter and says what the letter means, in opts.tip: his note the same day, "I don't understand
-// what a,b mean in the leftmost diagram".
+// One tile is outlined: the one the surface in the other pane is folded from. The two edges of each glued pair are
+// drawn alike: one colour and one number of arrowheads a pair (pairs.js; tab 3 zips the tile up in the same colours).
+// They carried letters at first; his notes, Mon 16 Nov 2026: "I don't understand what a,b mean in the leftmost
+// diagram", then "instead of using letters a,b, use colors or edge styling to indicate edges which are matched up".
+// A pointer on a glued edge (or a tap) brings out the pair and says what it is, in opts.tip.
 //
 //   const P = createPattern(canvas, { tip });   tip: an element inside the canvas's pane, for the note on a glued edge
 //   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
@@ -32,6 +33,7 @@ import { mul, apply, det, I3 } from './geom.js';
 import { tiles as makeTiles } from './orbifold.js';
 import { design, DEFAULT_PATTERN, isPattern } from './motifs.js';
 import { PRINT_FRONT, PRINT_BACK, hexToRgb } from '../vendor/the-folding/palette.js';
+import { pairStyle } from './pairs.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
@@ -46,7 +48,7 @@ export function createPattern(canvas, opts = {}) {
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
   let budget = 1500, cache = new Map(), patternKey = DEFAULT_PATTERN, des = { dark: [], light: [], evenodd: false }, reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
-  let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the letter a pointer is on, the tile's middle
+  let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
   function size() {
     const r = canvas.getBoundingClientRect(), d = Math.min(2, window.devicePixelRatio || 1);      // 2 is sharp enough, and a 3x phone fills 2.25 times fewer pixels
@@ -275,14 +277,17 @@ export function createPattern(canvas, opts = {}) {
       glides[k].forEach((p, b) => { ctx.lineWidth = widths[b] * (on ? 1.7 : 1); ctx.setLineDash([widths[b] * 3.2, widths[b] * 3]); ctx.stroke(p); });
       ctx.setLineDash([]);
     });
-    // the marked points: blue inside the surface (gyrations), red on a mirror
-    for (const mk of marked) {
-      const on = pick && pick.t === 'd' && pick.cls === mk.c.id, col = mk.c.kind === 'cone' ? BLUE : RED;
-      ctx.fillStyle = css(col, on || !pick ? 1 : dim);
-      ctx.fill(marks[mk.c.id]);
-      ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${on || !pick ? 0.95 : 0.5})`;
-      ctx.stroke(marks[mk.c.id]);
-    }
+    // the marked points: blue inside the surface (gyrations), red on a mirror. Drawn last, over the outlined tile,
+    // whose coloured edges would otherwise cover the marks at its corners
+    const drawMarks = () => {
+      for (const mk of marked) {
+        const on = pick && pick.t === 'd' && pick.cls === mk.c.id, col = mk.c.kind === 'cone' ? BLUE : RED;
+        ctx.fillStyle = css(col, on || !pick ? 1 : dim);
+        ctx.fill(marks[mk.c.id]);
+        ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${on || !pick ? 0.95 : 0.5})`;
+        ctx.stroke(marks[mk.c.id]);
+      }
+    };
 
     // ---- the tile the surface is folded from
     const found = [];
@@ -302,40 +307,36 @@ export function createPattern(canvas, opts = {}) {
         ctx.lineWidth = 2.6; ctx.strokeStyle = css(DARK, 0.95); ctx.stroke(out);
         // mirrors of the tile on top of its outline, in red
         for (let i = 0; i < n; i++) if (starOf[i] >= 0) { const p = new Path2D(); line(p, Q[i], Q[(i + 1) % n], stepsFor(Q[i], Q[(i + 1) % n])); const on = pick && pick.t === '*' && pick.star === starOf[i]; ctx.strokeStyle = css(RED, on || !pick ? 1 : 0.6); ctx.lineWidth = on ? 4.4 : 3; ctx.stroke(p); }
-        // glued edges: an arrow in the middle, and the zip's letter beside it
-        ctx.font = '600 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        // glued edges: the two of a pair alike, in the pair's colour and with its number of arrowheads (pairs.js)
+        const glued = [];
         for (let i = 0; i < n; i++) {
           const e = D.edges[i];
           if (e.mirror) continue;
-          const a = Q[i], q = Q[(i + 1) % n], mid = lerp(a, q, 0.5), m2 = lerp(a, q, 0.56);
-          if (kind === 'S' && mid[2] < 0.02) continue;
-          const lenPx = Math.hypot(X(a) - X(q), Y(a) - Y(q));
-          if (lenPx < 16) continue;
-          let dx = X(m2) - X(mid), dy = Y(m2) - Y(mid);
-          const l = Math.hypot(dx, dy) || 1;
-          dx /= l; dy /= l;
-          const along = e.to > i || e.rev ? 1 : -1;        // a ... a^-1: the second arrow runs against the outline
-          const tx = dx * along, ty = dy * along, s = Math.min(8, lenPx / 4), x = X(mid), y = Y(mid);
-          if (hot === A.letter[i]) {
-            // the pointer is on this letter: both of its edges stand out
-            const p = new Path2D(); line(p, a, q, stepsFor(a, q));
-            ctx.lineWidth = 9; ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.stroke(p);
-            ctx.lineWidth = 4.6; ctx.strokeStyle = css(DARK, 1); ctx.stroke(p);
+          const a = Q[i], q = Q[(i + 1) % n], mid = lerp(a, q, 0.5), m2 = lerp(a, q, 0.56), st = stepsFor(a, q);
+          const path = new Path2D(), poly = [];
+          line(path, a, q, st);
+          for (let j = 0; j <= st; j++) { const p = j === 0 ? a : j === st ? q : lerp(a, q, j / st); if (kind !== 'S' || p[2] >= 0) poly.push([X(p), Y(p)]); }
+          if (poly.length < 2) continue;                                      // the whole edge is behind the ball
+          const style = pairStyle(A.letter[i].charCodeAt(0) - 97), g = { key: A.letter[i], path, color: style.color, on: hot === A.letter[i], heads: [] };
+          const lenPx = Math.hypot(X(a) - X(q), Y(a) - Y(q)), x = X(mid), y = Y(mid), facing = kind !== 'S' || mid[2] >= 0.02;
+          if (facing && lenPx >= 16) {
+            let dx = X(m2) - x, dy = Y(m2) - y;
+            const l = Math.hypot(dx, dy) || 1;
+            dx /= l; dy /= l;
+            const along = e.to > i || e.rev ? 1 : -1;        // a ... a^-1: the second arrow runs against the outline
+            const tx = dx * along, ty = dy * along, s = Math.min(8, lenPx / (2.6 + 1.4 * style.heads));
+            if (s >= 2.4) for (let h = 0; h < style.heads; h++) { const off = (h - (style.heads - 1) / 2) * s * 1.3; g.heads.push([x + tx * off, y + ty * off, tx, ty, s]); }
           }
-          const spot = { letter: A.letter[i], x, y, lx: x, ly: y };
-          found.push(spot);
-          ctx.beginPath(); ctx.moveTo(x - tx * s - ty * s * 0.75, y - ty * s + tx * s * 0.75); ctx.lineTo(x + tx * s * 0.7, y + ty * s * 0.7); ctx.lineTo(x - tx * s + ty * s * 0.75, y - ty * s - tx * s * 0.75);
-          ctx.lineWidth = 2.4; ctx.strokeStyle = css(DARK, 1); ctx.stroke();
-          if (lenPx >= 30) {
-            // the letter sits inside the tile: toward the tile's own middle
-            let ix = X(c) - x, iy = Y(c) - y; const il = Math.hypot(ix, iy) || 1; ix /= il; iy /= il;
-            let nx = -dy, ny = dx; if (nx * ix + ny * iy < 0) { nx = -nx; ny = -ny; }
-            const lx = x + nx * 13, ly = y + ny * 13;
-            spot.lx = lx; spot.ly = ly;
-            ctx.lineWidth = 3.5; ctx.strokeStyle = 'rgba(255,255,255,0.85)'; ctx.strokeText(A.letter[i], lx, ly);
-            ctx.fillStyle = css(DARK, 1); ctx.fillText(A.letter[i], lx, ly);
-          }
+          glued.push(g);
+          found.push({ letter: g.key, x: facing ? x : poly[0][0], y: facing ? y : poly[0][1], poly, color: style.color, heads: g.heads.length });
         }
+        const chevron = (h) => { const [x, y, tx, ty, s] = h; ctx.beginPath(); ctx.moveTo(x - tx * s - ty * s * 0.75, y - ty * s + tx * s * 0.75); ctx.lineTo(x + tx * s * 0.7, y + ty * s * 0.7); ctx.lineTo(x - tx * s + ty * s * 0.75, y - ty * s - tx * s * 0.75); ctx.stroke(); };
+        // white under every coloured stroke, so that a colour reads the same on a teal tile, a sand one and the print
+        ctx.strokeStyle = 'rgba(255,255,255,0.92)';
+        for (const g of glued) { ctx.lineWidth = g.on ? 10 : 6.6; ctx.stroke(g.path); }
+        ctx.lineWidth = 5.4;
+        for (const g of glued) g.heads.forEach(chevron);
+        for (const g of glued) { ctx.strokeStyle = css(g.color, 1); ctx.lineWidth = g.on ? 5.8 : 3.4; ctx.stroke(g.path); ctx.lineWidth = 2.6; g.heads.forEach(chevron); }
         // a wonder-ring chosen: its two wanderings, out of the tile across one glued edge and across the other
         if (pick && pick.t === 'o') {
           const turns = A.pairs.filter((p) => !p.rev).slice(2 * pick.k, 2 * pick.k + 2);
@@ -349,6 +350,7 @@ export function createPattern(canvas, opts = {}) {
         }
       }
     }
+    drawMarks();
     ctx.restore();
     hots = found;
     placeTip();
@@ -368,22 +370,26 @@ export function createPattern(canvas, opts = {}) {
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
 
   // ---- the note on a glued edge of the outlined tile
-  /** The glued edge whose arrow or letter is within r px of a point of the canvas, or null. */
+  /** The glued edge that passes within r px of a point of the canvas, or null. */
   function spotAt(x, y, r) {
     let best = null, bd = r;
-    for (const h of hots) { const d = Math.min(Math.hypot(h.x - x, h.y - y), Math.hypot(h.lx - x, h.ly - y)); if (d < bd) { bd = d; best = h; } }
+    for (const h of hots) for (let i = 0; i + 1 < h.poly.length; i++) {
+      const p = h.poly[i], q = h.poly[i + 1], vx = q[0] - p[0], vy = q[1] - p[1], t = Math.max(0, Math.min(1, ((x - p[0]) * vx + (y - p[1]) * vy) / (vx * vx + vy * vy || 1)));
+      const d = Math.hypot(x - p[0] - t * vx, y - p[1] - t * vy);
+      if (d < bd) { bd = d; best = h; }
+    }
     return best;
   }
   function placeTip() {
     if (!tipEl) return;
     const all = hot === null ? [] : hots.filter((h) => h.letter === hot);
     if (!all.length) { tipEl.hidden = true; if (hot !== null && !hots.some((h) => h.letter === hot)) hot = null; return; }
-    const h = all.reduce((a, b) => (b.ly < a.ly ? b : a));              // the upper of its edges: the note sits above it
-    tipEl.textContent = all.length > 1 ? `The two edges marked ${hot} are glued to each other, arrow onto arrow, when the pattern folds up.` : `This edge is glued to the other one marked ${hot}, arrow onto arrow, when the pattern folds up.`;
+    const h = all.reduce((a, b) => (b.y < a.y ? b : a));                // the upper of its edges: the note sits above it
+    tipEl.textContent = all.length > 1 ? 'These two edges are glued to each other, arrow onto arrow, when the pattern folds up.' : 'This edge is glued to the other one of its colour, arrow onto arrow, when the pattern folds up.';
     tipEl.hidden = false;
-    const half = Math.min(118, W / 2 - 6), below = h.ly < 96;
-    tipEl.style.left = canvas.offsetLeft + Math.max(half + 6, Math.min(W - half - 6, h.lx)) + 'px';
-    tipEl.style.top = canvas.offsetTop + h.ly + 'px';
+    const half = Math.min(118, W / 2 - 6), below = h.y < 96;
+    tipEl.style.left = canvas.offsetLeft + Math.max(half + 6, Math.min(W - half - 6, h.x)) + 'px';
+    tipEl.style.top = canvas.offsetTop + h.y + 'px';
     tipEl.toggleAttribute('data-below', below);
   }
   function setHot(letter) {
@@ -403,8 +409,8 @@ export function createPattern(canvas, opts = {}) {
   });
   canvas.addEventListener('pointermove', (e) => {
     if (!drag) {
-      // a mouse resting on an arrow or a letter of the outlined tile: say what it is
-      if (model && e.pointerType === 'mouse') { const [hx, hy] = local(e), h = spotAt(hx, hy, 16); setHot(h ? h.letter : null); }
+      // a mouse resting on a glued edge of the outlined tile: say what it is
+      if (model && e.pointerType === 'mouse') { const [hx, hy] = local(e), h = spotAt(hx, hy, 9); setHot(h ? h.letter : null); }
       return;
     }
     if (drag.id !== e.pointerId) return;
@@ -425,8 +431,8 @@ export function createPattern(canvas, opts = {}) {
     const was = drag;
     drag = null;
     if (!was.moved) {
-      // a tap on an arrow or a letter: its note, and off again on the next tap
-      const h = spotAt(was.x, was.y, 24);
+      // a tap on a glued edge: its note, and off again on the next tap
+      const h = spotAt(was.x, was.y, 20);
       if (e.pointerType !== 'mouse') setHot(h && h.letter !== hot ? h.letter : null);
       const now = performance.now();
       if (now - lastTap < 320) { api.resetView(); lastTap = 0; } else lastTap = now;
@@ -466,9 +472,9 @@ export function createPattern(canvas, opts = {}) {
     get pattern() { return patternKey; },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
     draw, redraw: schedule,
-    /** For the tests: bring out the edges of a letter as a pointer on them does (null: none). */
+    /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y) })) }),
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }

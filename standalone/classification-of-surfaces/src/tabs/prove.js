@@ -5,6 +5,7 @@
 
 import { fromWords, zip, zips, isDone, countsOf, normalForm, copyState } from '../zipper/engine.js';
 import { buildScene, nextLooks, polyLook, PALETTE, cssColor, rimKeys, makeNeighbours, fits } from '../zipper/view.js';
+import { PAIR_COLORS } from '../sym/pairs.js';
 import { playZip, dryRun } from '../zipper/moves.js';
 import { symbol, M } from '../mathbank.js';
 import { describe } from './tidy.js';
@@ -79,7 +80,8 @@ export function createProveTab(ctx) {
     history = []; log = []; lastSay = p.note ? p.note() : '';
     colors = new Map();
     let k = 0;
-    for (const c of state.comps) for (const e of c.rims[0]) if (e.s && !colors.has(e.id)) colors.set(e.id, PALETTE[k++ % PALETTE.length]);
+    const pal = p.key === 'tile' ? PAIR_COLORS : PALETTE;          // a tile from tab 5: the colours its glued pairs have there, in the same order
+    for (const c of state.comps) for (const e of c.rims[0]) if (e.s && !colors.has(e.id)) colors.set(e.id, pal[k++ % pal.length]);
     for (const b of el.presets.children) b.setAttribute('aria-pressed', String(b.dataset.key === preset.key));
     render(true);
   }
@@ -218,7 +220,7 @@ export function createProveTab(ctx) {
   function tile(w, label) {
     const p = PRESETS.find((x) => x.key === 'tile');
     p.words = w; p.label = label ? 'The tile of ' + label : 'A tile from tab 5';
-    p.note = () => `The outlined tile of ${label || 'the pattern'}. Its mirror edges stay open: they end as the rim of a hole. Its lettered edges are zipped. (Cone points and corners do not show here: only the surface.)`;
+    p.note = () => `The outlined tile of ${label || 'the pattern'}. Its mirror edges stay open: they end as the rim of a hole. Its coloured edges are zipped, the two of one colour together, as tab 5 colours them. (Cone points and corners do not show here: only the surface.)`;
     const b = [...el.presets.children].find((c) => c.dataset.key === 'tile');
     if (b) { b.hidden = false; b.textContent = p.label; }
     start(p);

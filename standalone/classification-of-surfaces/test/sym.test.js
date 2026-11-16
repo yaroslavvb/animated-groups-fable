@@ -387,3 +387,30 @@ test('a signature with no pattern: why, and the nearest ones that have one', asy
   // whatever is offered has a pattern, and differs from what was typed
   for (const t of ['2', '9', '23', '95', '*2', '*9', '*23', '*45', '*92']) for (const x of C.whyNot(C.parse(t)).tries) { assert.ok(C.domainOf(C.parse(x.text)), `${t} -> ${x.text} has no pattern`); assert.notEqual(x.text, t); }
 });
+
+test('glued pairs: each on exactly two edges, and a colour and a number of arrowheads of its own', async () => {
+  // His ask, Mon 16 Nov 2026: "instead of using letters a,b, use colors or edge styling to indicate edges which are
+  // matched up". The outlined tile's pairs are numbered in the order they are met going round it; pairs.js gives the
+  // k-th its look, and tab 3 colours the same tile in the same order.
+  const C = await import('../src/sym/catalog.js');
+  const { pairStyle, PAIR_COLORS } = await import('../src/sym/pairs.js');
+  const looks = Array.from({ length: 15 }, (_, k) => pairStyle(k).color.join() + '/' + pairStyle(k).heads);
+  assert.equal(new Set(looks).size, 15, 'fifteen pairs, fifteen looks');
+  for (let k = 0; k < 15; k++) assert.ok(pairStyle(k).heads >= 1 && pairStyle(k).heads <= 3);
+  // none is the pattern's own red (mirrors) or blue (gyration points), nor too pale for a white page
+  const far = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  for (const c of PAIR_COLORS) { assert.ok(far(c, [0.835, 0.369, 0]) > 0.25 && far(c, [0, 0.447, 0.698]) > 0.25, 'too near red or blue: ' + c); assert.ok(0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2] < 0.6, 'too pale: ' + c); }
+  let tiles = 0, most = 0;
+  for (const t of [...ALL, 'oooo', 'oooooo', 'xxxxxxxxxxxx', '2*632*3x', 'o2*3x', '23*45*6', '2222x']) {
+    const D = C.domainOf(C.parse(t));
+    if (!D || !D.n) continue;
+    const A = analyse(D), count = {};
+    A.letter.forEach((l, i) => { if (D.edges[i].mirror) assert.equal(l, null, `${t}: a mirror edge with a pair`); else count[l] = (count[l] || 0) + 1; });
+    const names = Object.keys(count).sort();
+    for (const l of names) assert.equal(count[l], 2, `${t}: pair ${l} on ${count[l]} edges`);
+    assert.equal(names.join(''), 'abcdefghijklmnopqrstuvwxyz'.slice(0, A.pairs.length), `${t}: pairs are not numbered from the first`);
+    for (const p of A.pairs) assert.equal(A.letter[p.i], A.letter[p.j], `${t}: the two edges of a pair differ`);
+    tiles++; most = Math.max(most, names.length);
+  }
+  assert.ok(tiles > 45 && most >= 12 && most <= 15, `tiles ${tiles}, most pairs on one ${most}`);
+});

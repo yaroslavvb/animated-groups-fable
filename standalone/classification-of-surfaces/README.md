@@ -211,8 +211,21 @@ leftmost diagram there. Maybe add explanations/tooltips somewhere or delete it"*
   under the two pictures and names only what is in them (the outlined tile; a, b; a copy of the tile; its mirror
   image), and a mouse resting on an arrow or a letter, or a finger tapping one, makes the two edges of that letter
   stand out and says the same beside them (`pattern.js` `spotAt` / `placeTip`; the note is `#pat-tip`). The footer
-  legend's teal and sand entries moved into the key. He offered deleting the letters instead; they stay because
-  they are what ties the pattern to the surface and to tab 3, and go if the key does not do it.
+  legend's teal and sand entries moved into the key. The letters themselves went soon after: next paragraph.
+
+**Colours and arrowheads instead of letters** (his next note, the same morning: *"instead of using letters a,b, use
+colors or edge styling to indicate edges which are. matched up"*). The outlined tile no longer carries letters. The
+two edges of a glued pair are drawn alike and unlike every other pair: one colour, and one number of arrowheads
+(one, two or three, as on a textbook's polygon), so that pairs can be told apart without colour too
+(`src/sym/pairs.js` `pairStyle(k)`, k = the order in which the pairs are met going round the tile). Five colours
+(violet, gold, magenta, green, grey) times three counts give fifteen looks before one repeats, and no tile the page
+allows has more than fifteen pairs. The colours keep clear of what the pattern already uses (teal and sand tiles, red
+mirrors, blue gyration points) and each stroke has white under it, so a colour reads the same on a teal tile, a sand
+one and the print. The arrowheads still say which way the two edges go together. The key under the pictures shows a
+swatch for each pair on the screen; a pointer anywhere along a glued edge (or a tap) brings out its pair with the
+note. Tab 3 keeps letters, because there they name the buttons that zip a pair, and draws a tile handed over from
+tab 5 in tab 5's colours, pair for pair (`tabs/prove.js`: the `tile` preset takes `PAIR_COLORS`). The blue and red
+marks at the tile's corners are drawn after its edges now, which would otherwise cover them.
 
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
@@ -229,7 +242,9 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 75 tests (the last five: typing and deleting a signature character by character; the six designs
+- `node --test`: 76 tests (the newest: on every example's tile and seven tiles of one's own each glued pair sits on
+  exactly two edges and the pairs are numbered from the first, and fifteen pairs get fifteen different looks, none
+  of them near the pattern's red or blue; the five before it: typing and deleting a signature character by character; the six designs
   inside their tiles; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
   of the 47 examples each found as its example, with the example's tile; the four kinds without a pattern and what
   is offered for them, each offer having a pattern). The zipping's bookkeeping against an independent count of the glued surface (400 random
@@ -272,6 +287,11 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   empty bar; a mouse on an arrow shows the note inside the pane, and moving off or starting a drag hides it. In
   WebKit on the M5 at both widths: 33 looks of 33 teal on each of four patterns, the note by a finger's tap (and
   off again) and by a mouse. The published copy inside spacesheep's viewer: 33 of 33 teal on `*632`, the key, the note.
+  Colours for letters (Mon 16 Nov 2026): twenty signatures looked at in Chrome (one to eight pairs, all three
+  geometries); at 1280 and 390 px `632`'s four glued edges are two looks, the canvas shows each edge in its own
+  colour at its middle, the key shows the same two swatches, a mouse on an edge brings its note, and tab 3 opens
+  the tile with its two zips in those two colours. In WebKit on the M5 the same at both widths, the note by a
+  finger; the published copy inside spacesheep's viewer likewise.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

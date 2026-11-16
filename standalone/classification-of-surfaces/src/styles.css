@@ -323,6 +323,8 @@ ul.argument { list-style: disc; }
 /* the key under tab 5's two pictures (only what is in them), and the note on a glued edge of the outlined tile */
 .caption .symkey { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; max-width: none; margin: 0 0 8px; color: var(--muted); font-size: 14px; }
 .sw-tile { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }
-.keyab { min-width: 14px; color: var(--ink); font-weight: 650; text-align: center; }
+.keypairs { display: inline-flex; align-items: center; gap: 3px; }
+.keypairs:empty { display: none; }
+.sw-pair { width: 16px; height: 4px; border-radius: 2px; }
 .pane-tip { position: absolute; z-index: 3; width: max-content; max-width: 236px; margin: 0; padding: 6px 10px 7px; border-radius: 8px; background: var(--ink); color: var(--ground); font-size: 13px; line-height: 1.35; pointer-events: none; transform: translate(-50%, calc(-100% - 22px)); }
 .pane-tip[data-below] { transform: translate(-50%, 22px); }

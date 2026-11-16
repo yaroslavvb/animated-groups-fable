@@ -18,6 +18,7 @@
 import { analyse, fval, PRICE, frac, fsub } from '../sym/orbifold.js';
 import { PRESETS, ALL, parse, textOf, linkOf, tokensOf, costOf, domainOf, structure, bind, addTo, removeAt, stepAt, tokenAt, toPretty, isEmpty, spelled, canon, whyNot } from '../sym/catalog.js';
 import { createPattern, BLUE, RED } from '../sym/pattern.js';
+import { pairCss } from '../sym/pairs.js';
 import { PATTERNS, DEFAULT_PATTERN, isPattern } from '../sym/motifs.js';
 import { buildSurface } from '../sym/surface.js';
 import { M, mixed } from '../mathbank.js';
@@ -32,7 +33,7 @@ const STORE = 'classification-of-surfaces.pattern';
 export function createSymTab(ctx) {
   const { stage, badge } = ctx;
   const $ = (id) => document.getElementById(id);
-  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyBack: $('key-back') };
+  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyPairs: $('key-pairs'), keyBack: $('key-back') };
   const pattern = createPattern($('pattern'), { tip: $('pat-tip') });
   // sel is the cursor: null = at the end, nothing chosen; i >= 0 = on the i-th character (just after it); -1 = before everything
   let sig = parse('*632'), model = null, sel = null, built = null, active = false, where = [], note = '';
@@ -137,7 +138,9 @@ export function createSymTab(ctx) {
     el.total.dataset.side = fval(cost) / span > 0.8 ? 'left' : 'right';
     // the key under the two pictures names only what is in them: an outlined tile, glued edges, mirror images
     el.key.hidden = !D || !D.n;
-    el.keyGlue.hidden = !D || !D.edges.some((e) => !e.mirror);
+    const pairs = D ? model.A.pairs.length : 0;          // one swatch a glued pair, in the pair's colour (five at most: then the colours come round again)
+    el.keyGlue.hidden = !pairs;
+    el.keyPairs.innerHTML = Array.from({ length: Math.min(pairs, 5) }, (_, k) => `<i class="sw sw-pair" style="background:${pairCss(k)}"></i>`).join('');
     el.keyBack.hidden = !D || !D.edges.some((e) => e.mirror || e.rev);
     // the same signature under another spelling: the book's, one tap away; the examples know it under any spelling
     const text = textOf(sig), name = spelled(sig);
