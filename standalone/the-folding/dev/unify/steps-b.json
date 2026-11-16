@@ -1,0 +1,13 @@
+[
+  {"wait": 1500},
+  {"eval": "(() => { const F = window.__folding; const s = F.getState(); return [s.groupId, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors, s.triangles]; })()", "wait": 500, "out": "qa/u/b-333-open.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('2*22'); return F.getState().errors; })()", "wait": 700, "out": "qa/u/b-2s22-open.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('22x'); return F.getState().errors; })()", "wait": 700, "out": "qa/u/b-22x-open.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('o'); return F.getState().errors; })()", "wait": 700, "out": "qa/u/b-o-open.png"},
+  {"w": 390, "h": 780, "eval": "(() => { const F = window.__folding; F.setGroup('333'); return F.getState().errors; })()", "wait": 900, "out": "qa/u/b-phone-333-open.png"},
+  {"eval": "(() => { const F = window.__folding; F.setT(1); return F.getState().errors; })()", "wait": 700, "out": "qa/u/b-phone-333-surface.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0.3); return F.getState().tileCaption; })()", "wait": 900, "out": "qa/u/b-phone-333-tiling.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('*632'); return F.getState().errors; })()", "wait": 900, "out": "qa/u/b-phone-s632-open.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0); return F.getState().errors; })()", "wait": 900, "out": "qa/u/b-phone-s632-tile.png"},
+  {"w": 320, "h": 560, "eval": "(() => { const F = window.__folding; F.setGroup('2*22'); return F.getState().errors; })()", "wait": 900, "out": "qa/u/b-320-2s22-open.png"}
+]

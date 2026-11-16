@@ -49,7 +49,8 @@
 //     where the default camera sees most of it: of what one sees (seen), o 24 -> 48 %, ** 37 -> 51 %, *x 20 -> 29 %,
 //     2222 27 -> 44 %, 22x 25 -> 47 %, 2*22 20 -> 36 %, 442 36 -> 49 %, 632 28 -> 36 % (none less than before).
 //     (22x has since gone to 8 %: item 0 holds its comma to the sheet that stays put, which ends underneath.)
-//     The kaleidoscopes (snowflake) have no item 3: folded, every layer's comma lies on the tile's.
+//     The kaleidoscopes (fold type 'disc': the tile is the surface and stays flat) have no item 3: every place in the
+//     tile is seen alike.
 //   * the ties: the grid candidates as good as the best in items 1 and 2, the best grid candidate and the STARTS (12)
 //     best grid candidates that are not neighbours, each refined by a pattern search on items 1 and 2 (a group whose
 //     grid has no candidate at the in-tile bar, like 22*, still gets several places to choose from), and the refined
@@ -160,7 +161,7 @@ const viewCache = new Map();
 export function viewOf(G) {
   if (viewCache.has(G.id)) return viewCache.get(G.id);
   let V = null;
-  if (G.fold !== 'snowflake') {
+  if (G.fold !== 'disc') {
     const p0 = G.presets[0];
     const D = buildDomain(G, { seed: p0.seed, metric: p0.metric, warp: makeWarp(G, 0) });
     const tile = buildMesh(G, D, foldMeshOptions(G));

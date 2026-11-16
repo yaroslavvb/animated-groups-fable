@@ -53,6 +53,7 @@ try {
     if (s.seed) F.setSeed(s.seed[0], s.seed[1]);
     if (s.amp !== null) F.setAmp(s.amp);
     if (s.az !== null || s.el !== null) F.setView(s.az === null ? 0 : s.az, s.el === null ? 55 : s.el);
+    F.setTile(0);                 // the tile alone: this film is of the FOLD (dev/unify/journey-film.mjs films the whole journey)
   }, setup);
   const shots = [];
   for (let i = 0; i < frames; i++) {

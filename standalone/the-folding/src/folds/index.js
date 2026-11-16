@@ -26,26 +26,29 @@
 //   klein                              src/folds/bottle.js     xx   (the classic bottle, 14 Nov 2026; roll.js still holds
 //                                                               the figure-8 bottle it replaced, used by no group)
 //   crosscap                           src/folds/crosscap.js   22x
-//   snowflake                          src/folds/snowflake.js  *2222, *442, *333, *632
+//   disc                               src/folds/disc.js       *2222, *442, *333, *632   (15 Nov 2026: the tile of a
+//                                                               kaleidoscope has no zipper, so it IS the surface and
+//                                                               nothing folds; the paper-snowflake fold of a star of
+//                                                               tiles, src/folds/snowflake.js, stays in the tree, used
+//                                                               by no group: those tiles are the tiling's, journey.js)
 //
 // The Fold that comes back is the module's own object (SPEC 5.3: mesh, stops, duration, at(t), and whatever extras the
-// module documents: doubleLine(t) and stage(t) for klein, doubleLine(t) for crosscap, star / cellMaps for snowflake,
+// module documents: doubleLine(t) and stage(t) for klein, doubleLine(t) for crosscap, still for disc,
 // kinematics for hinge and crosscap). **Draw from fold.mesh, never from the mesh passed in**: the hinge and cross-cap folds hand back a mesh
-// with a finer outline (the cross-cap also with more triangles), the snowflake fold its own star of 2n cells, and a
+// with a finer outline (the cross-cap also with more triangles), and a
 // roll fold a finer mesh when the one it was given is too coarse for a round tube.
 //
 // The mesh density. A rolled tube of 25 flat facets looks faceted (and the bottle's neck is narrow), so the roll
 // folds and the bottle ask for a finer grid than the default of mesh.js (rollDensity: o 88, ** 60, *x 80, xx 104 steps across
-// the tile's longer side). foldMeshOptions hands that to buildMesh, so nothing is built twice. The snowflake fold
-// never looks at the tile mesh (the tile is the kaleidoscope's cell; it meshes its star itself), so none is built
-// for it here.
+// the tile's longer side). foldMeshOptions hands that to buildMesh, so nothing is built twice. A kaleidoscope's tile
+// stays flat: a coarse mesh is all it needs (DISC_DENSITY).
 
 import { buildMesh } from '../mesh.js';
 import createHinge from './hinge.js';
 import createRoll, { rollDensity } from './roll.js';
 import createBottle from './bottle.js';
 import createCrosscap from './crosscap.js';
-import createSnowflake from './snowflake.js';
+import createDisc from './disc.js';
 import createRecut, { canRecut } from './recut.js';
 
 export { canRecut };
@@ -55,8 +58,10 @@ const MAKERS = {
   torus: createRoll, cylinder: createRoll, mobius: createRoll,
   klein: createBottle,           // the classic bottle (folds/bottle.js); roll.js keeps the figure-8 one, used by no group
   crosscap: createCrosscap,
-  snowflake: createSnowflake,
+  disc: createDisc,
 };
+/** A kaleidoscope's tile is drawn flat: this many steps of mesh.js's fine triangulation are plenty. */
+export const DISC_DENSITY = 6;
 const ROLLS = new Set(['torus', 'cylinder', 'mobius', 'klein']);
 
 /** The values group.fold can take. */
@@ -64,6 +69,7 @@ export const FOLD_TYPES = Object.keys(MAKERS);
 
 /** Options for buildMesh(group, domain, options) that suit this group's fold ({} = the defaults of mesh.js). */
 export function foldMeshOptions(group) {
+  if (group.fold === 'disc') return { density: DISC_DENSITY };
   return ROLLS.has(group.fold) ? { density: rollDensity(group) } : {};
 }
 
@@ -86,13 +92,13 @@ export function foldOptions(opts) {
 /**
  * The fold of `group` for the tile `domain`.
  *   mesh   the tile mesh, if the caller has one (buildMesh(group, domain, foldMeshOptions(group))); otherwise it is
- *          built here. Not needed, and not built, for the snowflake fold.
+ *          built here.
  *   opts   passed on to the fold module through foldOptions (see each module). The app passes { anchor }.
  */
 export function createFold(group, domain, mesh = null, opts = {}) {
   const make = MAKERS[group.fold];
   if (!make) throw new Error(`folds: no fold module for fold type "${group.fold}" (group ${group.id})`);
-  if (!mesh && group.fold !== 'snowflake') mesh = buildMesh(group, domain, foldMeshOptions(group));
+  if (!mesh) mesh = buildMesh(group, domain, foldMeshOptions(group));
   const o = foldOptions(opts), recut = o.recut === true && canRecut(group);
   delete o.recut;
   const fold = recut ? createRecut(group, domain, mesh, o, make, foldMeshOptions(group)) : make(group, domain, mesh, o);

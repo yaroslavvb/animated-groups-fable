@@ -1540,7 +1540,7 @@ test('robust locate speed: boundary samples and cone points are located without 
   const rows = [], slowList = [];
   let nPoints = 0, nSlow = 0;
   for (const group of THE_GROUPS) {
-    if (!group.kaleido || group.fold === 'snowflake') continue;
+    if (!group.kaleido || group.fold === 'disc') continue;
     let gPts = 0, gSlow = 0, gWorst = 0, gInterior = 0, gScan = 0;
     for (const [pi, p] of group.presets.entries()) {
       for (const amp of [0, 1]) {

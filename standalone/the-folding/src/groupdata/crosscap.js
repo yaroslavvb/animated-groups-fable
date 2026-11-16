@@ -34,8 +34,8 @@ const a = 1.3, b = 1.8;
 
 export default [
   {
-    id: '22x', label: '22×', hm: 'pgg',
-    shape: 'cross-cap', topology: 'projective plane with two cone points of order 2',
+    id: '22x', label: '22×',
+    shape: 'cross-cap', surface: 'projective plane', topology: 'a sphere with a crosscap and two cone points of order 2',
     e1: [a, 0], e2: [0, b],
     // half-turn at the origin; glide along y = b/4 by a/2; glide along x = a/4 by b/2
     reps: [{ ...IDENT }, rot(PI), glide(0, b / 4, 0, a / 2), glide(a / 4, 0, PI / 2, b / 2)],

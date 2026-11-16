@@ -35,6 +35,7 @@ try {
   check(s.pattern === 'paisley' && s.print === 'paisley' && s.errors === 0, 'the live page opens on Paisley', JSON.stringify(s));
   check(await f.evaluate(() => !!document.getElementById('pattern') && !!document.getElementById('fold-caption')), 'it is the new build (the selector and the fold caption are there)');
   check(await f.evaluate(() => getComputedStyle(document.getElementById('pane-fold')).containerName === 'fold'), 'it is the build with the phone fixes (the 3D pane is a size container)');
+  check(await f.evaluate(() => !!document.getElementById('next-btn') && !document.getElementById('tile-btn')), 'it is the build of 15 Nov (one transport: Fold, the scrubber, Unfold / Tile; dev/unify/live-check.mjs checks it)');
   await f.evaluate(() => { const F = window.__folding; F.setGroup('22x'); F.setPreset(2); F.setPattern('rings'); F.setT(0.15); F.flushHash(); });
   await page.waitForTimeout(2500);
   s = pick(await f.evaluate(() => window.__folding.getState()));
@@ -63,13 +64,13 @@ try {
   const strip = await f3.evaluate(() => { const c = document.getElementById('fold-canvas').getBoundingClientRect(), w = document.getElementById('fold-caption').getBoundingClientRect(), p = document.getElementById('pane-fold').getBoundingClientRect(); return [Math.round(c.bottom), Math.round(w.top), Math.round(p.width), Math.round(p.height)]; });
   check(strip[0] <= strip[1], 'phone: the picture ends above the words (they have a strip of their own)', JSON.stringify(strip));
   if (outDir) await pp.screenshot({ path: path.join(outDir, 'live-phone-xx.png') });
-  // a narrow phone: the chip keeps "hm · shape" whole (the title gives way under 370 px)
+  // a narrow phone: the chip names the surface, whole (15 Nov 2026: no crystallographic name; before, "hm · shape")
   const pn = await (await B.browser.newContext({ viewport: { width: 360, height: 740 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true })).newPage();
   await pn.goto(BASE + '#g=%2A333', { waitUntil: 'load' });
   const f4 = await appFrame(pn);
   await pn.waitForTimeout(1200);
   const chip = await f4.evaluate(() => { const m = document.getElementById('chip-meta'); return { g: window.__folding.getState().groupId, text: m.textContent, cut: m.scrollHeight > m.clientHeight + 1 || m.scrollWidth > m.clientWidth + 1, w: innerWidth }; });
-  check(chip.g === '*333' && chip.text === 'p3m1 · equilateral triangle' && !chip.cut, 'narrow phone: the chip shows the whole name of *333', JSON.stringify(chip));
+  check(chip.g === '*333' && chip.text === 'disk' && !chip.cut, 'narrow phone: the chip names the surface of *333, whole', JSON.stringify(chip));
   if (outDir) await pn.screenshot({ path: path.join(outDir, 'live-phone-360-s333.png') });
 } finally { await B.close(); }
 console.log(failed ? `${failed} FAILED` : 'all passed');

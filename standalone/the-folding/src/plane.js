@@ -61,6 +61,9 @@
 //                              (nothing of the replication is drawn). fade in [0, 1]: every copy but the tile faded
 //                              out (the start of a replay: the copies fade, then are made again from the tile alone).
 //   P.getTiling()              -> { u, fade }
+//   P.getPlan()                -> (15 Nov 2026) the replication plan itself for the tile on screen (replicate.js
+//                              replicationPlan: copies, phases, T, settle, ...), built now if need be; null without a
+//                              scene. Read only: the 3D pane draws the same copies at the same moments (src/tiling3d.js)
 //   P.tilingPlan()             -> { duration (s), stops: [{ t, label }] in u, layers, phases: [{ wave, t0, t1, count,
 //                              text }] (t0, t1 in u) } for the tile on screen, built now if need be; null without a scene
 //   P.tilingCaption(u = now)   the words for what acts at u ('' at u = 1): "half-turn about a 2-fold centre", ...; the
@@ -129,6 +132,12 @@ export const SMALL_PANE = 300;
  * inside the free part of the pane; its scale stays within STEP_SCALE of the window's own.
  */
 export const STEP_FRAME_MS = 420, STEP_PATH = Object.freeze([0.25, 0.5, 0.75, 1]), STEP_PAD = 6, STEP_SCALE = Object.freeze([0.4, 1.8]);
+/**
+ * The pale map under the lone tile (15 Nov 2026, the journey of src/journey.js): while only the tile is laid (u = 0:
+ * the journey's tile stop, and all through the fold) the plane keeps the pattern under it at this strength, so a cut
+ * can still be chosen by eye; it fades as the first copies are made and is gone at `until` of u.
+ */
+export const GHOST = Object.freeze({ alpha: 0.4, until: 0.07 });
 /** Below this short side (CSS px) the replication's words are the short ones (one line on a phone's plane). */
 export const CAPTION_SMALL = 360;
 /**
@@ -892,7 +901,7 @@ export function createPlaneView(canvas, options = {}) {
   // (renderTiling) shows 'base' only where copies of the tile have landed, and the landed copies' mirror edges, merged
   // into runs, through the offscreen 'scratch' canvas, so that they are rasterised exactly as the 'mirrors' layer is:
   // once every copy has landed, its picture IS the plane's. 'scratch' is dropped when the replication is complete.
-  const layerCache = { base: null, mirrors: null, scratch: null };
+  const layerCache = { base: null, mirrors: null, scratch: null, ghost: null };
   function patternLayer(kind = 'base') {
     if (!doc || !doc.createElement) return null;
     const key = scene.group.id + '|' + canvas.width + 'x' + canvas.height + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy + '|' + view.s;
@@ -916,6 +925,29 @@ export function createPlaneView(canvas, options = {}) {
     const layer = patternLayer(kind);
     if (!layer) { drawPattern(c, LAYER_PARTS[kind]); return; }
     c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(layer, 0, 0); c.restore();
+  }
+  /**
+   * The plane as always, without the tile — the copies' print and outlines, the motif, the glide axes, the mirror
+   * lines — in one offscreen canvas: the pale map under the lone tile (renderTiling draws it at GHOST.alpha). Made
+   * again when the tile, the window or the pattern changes; null without a document (node: no map).
+   */
+  function ghostLayer(P, M) {
+    if (!doc || !doc.createElement) return null;
+    const key = scene.group.id + '|' + canvas.width + 'x' + canvas.height + '|' + view.W + 'x' + view.H + '|' + view.cx + ',' + view.cy + '|' + view.s;
+    const old = layerCache.ghost;
+    if (old && old.key === key && old.P === P && old.motif === scene.motif && old.print === scene.print) return old.canvas;
+    const cv = old ? old.canvas : doc.createElement('canvas');
+    const cc = cv.getContext && cv.getContext('2d');
+    if (!cc) return null;
+    if (cv.width !== canvas.width) cv.width = canvas.width;
+    if (cv.height !== canvas.height) cv.height = canvas.height;
+    cc.setTransform(1, 0, 0, 1, 0, 0);
+    cc.clearRect(0, 0, cv.width, cv.height);
+    cc.setTransform(view.kx, 0, 0, view.ky, 0, 0);
+    cc.globalAlpha = 1;
+    drawCopies(cc, P, M); drawLayer(cc, 'base'); drawLayer(cc, 'mirrors');
+    layerCache.ghost = { canvas: cv, key, P, motif: scene.motif, print: scene.print };
+    return cv;
   }
   /** An offscreen canvas the size of the plane's, cleared, with the world-to-css transform: for the replication's mirrors. */
   function scratchLayer() {
@@ -1340,6 +1372,7 @@ export function createPlaneView(canvas, options = {}) {
   // The plan (which copy comes out of which, by which side pairing, when) is built for the tile and the region of
   // the symmetry elements (ensureGroupData), and rebuilt with either.
   const rep = { u: 1, fade: 0, plan: null, planFor: null, timing: null, lastInfo: '', lock: null, lockStale: true };
+
   const onTilingPlan = typeof options.onTilingPlan === 'function' ? options.onTilingPlan : null;
   function tilingActive() { return !!scene && (rep.u < 1 - 1e-9 || rep.fade > 1e-9); }
 
@@ -1437,6 +1470,15 @@ export function createPlaneView(canvas, options = {}) {
     const k3 = (a) => +Math.max(0, Math.min(1, a)).toFixed(4);
     // the end of the last settle: the kaleidoscope's patch comes back with it
     const endK = keep * smoothRep((tau - (plan.T - plan.settle)) / plan.settle);
+
+    // the pale map (15 Nov 2026, the journey of src/journey.js): while only the tile is laid — u = 0: the journey's
+    // tile stop, and all through the fold — the plane keeps the pattern under it as a ghost, so a cut can still be
+    // chosen by eye. It fades as the first copies are made (gone at GHOST.until of u): they land on plain ground.
+    const ghost = keep * GHOST.alpha * (1 - smoothRep(rep.u / GHOST.until));
+    if (ghost > 0.004) {
+      const G = ghostLayer(P, M);                               // (one image; none without a document)
+      if (G) { c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = ghost; c.drawImage(G, 0, 0); c.restore(); }
+    }
 
     // 0. the copies that turn over (a reflection, a glide: replicate.js cardState.under) turn UNDER the paper (the
     //    owner's comments of 13 Nov 2026 on ** and 22*: the sand side comes from the reverse side): they are drawn first,
@@ -1753,7 +1795,7 @@ export function createPlaneView(canvas, options = {}) {
     if (!canvas.setAttribute) return;
     if (attrsFor && attrsFor.group === scene.group && attrsFor.interactive === scene.interactive) return;
     attrsFor = { group: scene.group, interactive: scene.interactive };
-    const g = scene.group, name = `${g.label || g.id} (${g.hm || ''})`;
+    const g = scene.group, name = g.surface ? `${g.label || g.id} (${g.surface})` : `${g.label || g.id}`;
     if (scene.interactive) {
       canvas.setAttribute('tabindex', tabindex0);
       canvas.setAttribute('role', role0);
@@ -1977,8 +2019,9 @@ export function createPlaneView(canvas, options = {}) {
       if (!Number.isFinite(nu)) return;
       if (nu === rep.u && nf === rep.fade) return;
       rep.u = nu; rep.fade = nf;
-      // complete: the plane as always again; the replication's scratch canvas is let go (a few MB on a laptop)
-      if (nu >= 1 && nf <= 0) layerCache.scratch = null;
+      // complete: the plane as always again; the replication's scratch canvas and the pale map are let go (a few MB
+      // each on a laptop)
+      if (nu >= 1 && nf <= 0) { layerCache.scratch = null; layerCache.ghost = null; }
       schedule();
     },
     getTiling: () => ({ u: rep.u, fade: rep.fade }),
@@ -1992,6 +2035,8 @@ export function createPlaneView(canvas, options = {}) {
     },
     /** The plan for the tile on screen (built now if need be): { duration, stops, layers, phases } or null. */
     tilingPlan() { if (!scene) return null; try { preparePlan(); } catch (e) { return null; } return tilingInfo(); },
+    /** The replication plan itself (replicate.js), built now if need be; null without a scene. Read only. */
+    getPlan() { if (!scene) return null; try { return preparePlan(); } catch (e) { return null; } },
     /** The words for what acts at progress u ('' when nothing does); the short words on a small pane (a phone). */
     tilingCaption(u = rep.u) {
       if (!scene) return '';

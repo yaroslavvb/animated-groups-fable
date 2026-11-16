@@ -48,14 +48,28 @@ try {
     await f.evaluate(() => { window.__folding.setGroup('333'); window.__folding.setPattern('rings'); window.__folding.setT(0.6); });
     await page.waitForTimeout(600);
     await page.screenshot({ path: `${out}/webkit-${name}-333-rings.png` });
-    await f.evaluate(() => { window.__folding.setGroup('*x'); window.__folding.setPattern('checker'); window.__folding.setT(1); window.__folding.setTile(0.4); });
+    // (15 Nov 2026: a tile that is not flat has no copies — the copies of *x part-way, in the plane and in the 3D pane)
+    await f.evaluate(() => { window.__folding.setGroup('*x'); window.__folding.setPattern('checker'); window.__folding.setTile(0.4); });
     await page.waitForTimeout(600);
     await page.screenshot({ path: `${out}/webkit-${name}-sx-tile.png` });
-    const s2 = await f.evaluate(() => { const st = window.__folding.getState(); return { g: st.groupId, print: st.print, errors: st.errors, appErrors: window.__folding.errors.slice(0, 3), tile: st.tile, url: st.url }; });
-    console.log(name + ' ' + JSON.stringify(s2) + ' page errors: ' + JSON.stringify(errs.slice(0, 5)) + ' top: ' + page.url());
+    const s2 = await f.evaluate(() => { const st = window.__folding.getState(); return { g: st.groupId, print: st.print, errors: st.errors, appErrors: window.__folding.errors.slice(0, 3), t: st.t, tile: st.tile, journey: st.journey, url: st.url }; });
+    console.log(`${s2.t === 0 && Math.abs(s2.tile - 0.4) < 1e-6 && s2.errors === 0 ? 'PASS' : 'FAIL'} ${name}: the copies part-way (t 0, tile 0.4), no error  ` + JSON.stringify(s2) + ' page errors: ' + JSON.stringify(errs.slice(0, 5)) + ' top: ' + page.url());
+    // the journey's row: Fold, the scrubber, the Unfold / Tile button, in one row; a kaleidoscope's Fold gathers its pattern
+    const row = await f.evaluate(async () => {
+      const F = window.__folding; F.setGroup('*632'); F.setJourney(1);
+      const r = (x) => { const b = document.getElementById(x).getBoundingClientRect(); return [Math.round(b.left), Math.round(b.top), Math.round(b.right), Math.round(b.bottom)]; };
+      const before = { fold: r('fold-btn'), scrub: r('scrub'), next: r('next-btn'), nextText: document.getElementById('next-btn').textContent.trim(), chip: document.getElementById('chip-meta').textContent };
+      document.getElementById('fold-btn').click();
+      for (let i = 0; i < 120; i++) { await new Promise((res) => setTimeout(res, 100)); const s = F.getState(); if (!s.playing && !s.going) break; }
+      const s = F.getState();
+      return { ...before, stop: s.journeyStop, journey: s.journey, foldDisabled: document.getElementById('fold-btn').disabled, errors: s.errors };
+    });
+    const oneRow = row.fold[2] <= row.scrub[0] && row.scrub[2] <= row.next[0] && Math.abs(row.fold[1] - row.next[1]) <= 2;
+    console.log(`${oneRow && row.nextText === 'Tile' && row.chip === 'disk' && row.stop === 'tile' && row.journey === 0 && row.foldDisabled && row.errors === 0 ? 'PASS' : 'FAIL'} ${name}: *632 — one row, Fold gathers the pattern onto the tile (the surface)  ${JSON.stringify(row)}`);
+    await page.screenshot({ path: `${out}/webkit-${name}-s632-tile.png` });
     await ctx.close();
   }
-  // a narrow phone (360 px): the title gives way, the chip keeps the whole name of *333; the legend has "front · back"
+  // a narrow phone (360 px): the title gives way, the chip names the surface of *333 whole; the legend has "front · back"
   {
     const ctx = await browser.newContext({ viewport: { width: 360, height: 740 }, deviceScaleFactor: 2 });
     const page = await ctx.newPage();
@@ -66,7 +80,7 @@ try {
       const m = document.getElementById('chip-meta'), t = document.querySelector('.title').getBoundingClientRect(), paper = document.querySelector('#legend .lg[data-paper]');
       return { g: window.__folding.getState().groupId, w: innerWidth, text: m.textContent, cut: m.scrollHeight > m.clientHeight + 1 || m.scrollWidth > m.clientWidth + 1, title: Math.round(t.width), paper: getComputedStyle(paper).display, scroll: document.documentElement.scrollWidth };
     });
-    const ok = N.g === '*333' && !N.cut && N.title <= 2 && N.paper !== 'none' && N.scroll <= N.w;
+    const ok = N.g === '*333' && N.text === 'disk' && !N.cut && N.title <= 2 && N.paper !== 'none' && N.scroll <= N.w;
     console.log(`${ok ? 'PASS' : 'FAIL'} narrow phone: ${JSON.stringify(N)}`);
     await page.screenshot({ path: `${out}/webkit-360-s333.png` });
     await ctx.close();

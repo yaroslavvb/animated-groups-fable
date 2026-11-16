@@ -27,11 +27,11 @@ import { GROUPS, BY_ID, symmetryElements } from '../src/groups.js';
 import { apply, inverse } from '../src/geom.js';
 import { makeWarp, buildDomain } from '../src/domain.js';
 import { buildMesh } from '../src/mesh.js';
-import createFoldDefault, { createFold, buildFold, foldMeshOptions, foldOptions, FOLD_TYPES } from '../src/folds/index.js';
+import createFoldDefault, { createFold, buildFold, foldMeshOptions, foldOptions, FOLD_TYPES, DISC_DENSITY } from '../src/folds/index.js';
 import { FOLD_END, PUFF_START } from '../src/folds/hinge.js';
 import { HINGE_END, PUFF_START as CC_PUFF_START, HALF_END, ZIP_START, HALF_STOP } from '../src/folds/crosscap.js';
 import { STAGE, rollDensity } from '../src/folds/roll.js';
-import { buildScene, mapScene, sceneLines, sceneMarkers, seamGap, resolveGroupId, creaseAlpha, creaseFade, ghostColor, lineScale, DEFAULT_GROUP, WIDTHS, MOTIF_ALPHA, motifFade,
+import { buildScene, mapScene, sceneLines, sceneMarkers, seamGap, resolveGroupId, creaseAlpha, creaseFade, lineScale, DEFAULT_GROUP, WIDTHS, MOTIF_ALPHA,
   zoomBetween, ZOOM_HOME_SECONDS, hintState, HINT_TEXT, surfaceStyle, surfaceMix } from '../src/app.js';
 import { SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, MOTIF_FILL_3D, MIRROR_COLOR, classColor, hexToRgb } from '../src/palette.js';
 
@@ -58,26 +58,28 @@ const PARTS = 32;      // the watched steps are cut into this many parts for the
 //                                                             The figure-8 bottle of round 4 (folds/roll.js, used by no
 //                                                             group now) had 0.018 and 0.0011 under 0.025 and 0.0012
 //   mobius             0.012                     0.00019
-//   snowflake          0.16                      0.013        the patch is the star of 2n tiles, and its far corner
-//                                                             swings through half a turn in a quarter of the time
+//   disc               0                         0            a kaleidoscope's tile is its surface: nothing moves
+//                                                             (15 Nov 2026; its star of 2n tiles, the snowflake fold,
+//                                                             had 0.16 and 0.013 and is used by no group now)
 // The cross-cap's second differences sit 5 % under their bound (v1's maximum was 0.0038): round 3 redesigned that motion
 // and the bound was kept, not raised. Its maximum does not grow with more seeds, so the margin is a fixed case's, not
 // luck's; a change to that motion has no room left here. The Klein bottle's bounds were set anew on 14 Nov 2026, by the
 // rule above (the largest seen and half as much again), when the classic bottle replaced the figure 8.
-const MAX_STEP = { hinge: 0.05, crosscap: 0.08, torus: 0.065, cylinder: 0.015, mobius: 0.02, klein: 0.046, snowflake: 0.24 };
-const MAX_BEND = { hinge: 0.0016, crosscap: 0.006, torus: 0.0045, cylinder: 0.0003, mobius: 0.0005, klein: 0.0029, snowflake: 0.02 };
+const MAX_STEP = { hinge: 0.05, crosscap: 0.08, torus: 0.065, cylinder: 0.015, mobius: 0.02, klein: 0.046, disc: 0 };
+const MAX_BEND = { hinge: 0.0016, crosscap: 0.006, torus: 0.0045, cylinder: 0.0003, mobius: 0.0005, klein: 0.0029, disc: 0 };
 // "Toward +z": how high the motion must rise above the plane of the tile, as a multiple of how far it dips below it.
 // The hinge folds puff their fixed sheet downward (the -z side is the outside of the pillow) and rise 1.8 times as
-// far or more; the rolls and the snowflake hardly go below the plane at all. The cross-cap is the exception that
+// far or more; the rolls hardly go below the plane at all. The cross-cap is the exception that
 // is allowed: with any cut but its default one, stage 2 turns the near half of the pillow over, through both sides
 // (notes/crosscap.md); 0.70 is the smallest ratio seen.
-const RISE = { hinge: 1, crosscap: 0.5, torus: 1, cylinder: 1, mobius: 1, klein: 1, snowflake: 1 };
+const RISE = { hinge: 1, crosscap: 0.5, torus: 1, cylinder: 1, mobius: 1, klein: 1, disc: 1 };
 // Which side each fold goes to: +1 toward +z, the viewer (SPEC 5.3), for every fold but the cross-cap, which goes
 // toward -z BY DESIGN since the final fix of 10 Nov 2026 (src/folds/crosscap.js FLAPS = 'under', SPEC 5.3's exception;
 // notes/integrator-final.md § 7): its flaps tuck under the sheet that holds still, so that the comma that sheet carries
 // ends on top. The check below is the same for both: the motion must reach 0.03 tile sizes to its side, and that side
 // must be at least RISE times the other (for the cross-cap exactly round 3's check, mirrored with the motion).
-const TOWARD = { hinge: 1, crosscap: -1, torus: 1, cylinder: 1, mobius: 1, klein: 1, snowflake: 1 };
+// (disc: 0 — a kaleidoscope's tile stays in the plane: fold.still, and nothing to check)
+const TOWARD = { hinge: 1, crosscap: -1, torus: 1, cylinder: 1, mobius: 1, klein: 1, disc: 0 };
 
 function prng(seed) {
   let a = seed >>> 0;
@@ -148,7 +150,7 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
   let mesh = null, fold;
   if (viaIndex) fold = buildFold(group, domain, {});
   else {
-    mesh = group.fold === 'snowflake' ? null : buildMesh(group, domain, foldMeshOptions(group));
+    mesh = buildMesh(group, domain, foldMeshOptions(group));
     fold = createFold(group, domain, mesh, {});
   }
   if (tamper) fold = tamper(fold, size);       // (the control test: a fold with a planted fault)
@@ -201,7 +203,9 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
       if (i && !(stops[i].t > stops[i - 1].t + 0.02)) fail('api', `${label}: stops ${i - 1} and ${i} are not increasing (${stops[i - 1].t}, ${stops[i].t})`);
     }
   }
-  if (!(fold.duration >= 4 && fold.duration <= 7)) fail('api', `${label}: duration ${fold.duration} s (SPEC: 4-7)`);
+  // (a kaleidoscope's tile is its surface: fold.still, nothing to play, duration 0 — src/folds/disc.js)
+  if (fold.still === true ? !(group.fold === 'disc' && fold.duration === 0) : !(fold.duration >= 4 && fold.duration <= 7)) fail('api', `${label}: duration ${fold.duration} s (SPEC: 4-7)`);
+  if ((fold.still === true) !== (group.fold === 'disc')) fail('api', `${label}: still = ${fold.still} for the fold type ${group.fold}`);
   for (const t of [0, 0.37, 1]) if (typeof fold.at(t) !== 'function') { fail('api', `${label}: at(${t}) is not a function`); return; }
 
   const out = [0, 0, 0], o2 = [0, 0, 0];
@@ -376,12 +380,15 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
   // ---- toward +z (the cross-cap: toward -z, TOWARD), and the folded shape stays near where the tile was
   {
     const side = TOWARD[group.fold];
-    if (side !== 1 && side !== -1) fail('upward', `${label}: no direction for the fold type ${group.fold}`);
+    if (side !== 1 && side !== -1 && !(side === 0 && fold.still === true)) fail('upward', `${label}: no direction for the fold type ${group.fold}`);
     // its own side: zTop for a fold toward +z; for one toward -z the same check with z turned over
     const zUp = side === -1 ? -zBottom : zTop, zDown = side === -1 ? -zTop : zBottom, word = side === -1 ? 'below' : 'above';
-    if (!(zUp > 0.03 * size)) fail('upward', `${label}: the motion never goes ${word} the plane by more than ${zUp / size} tile sizes`);
-    if (!(zUp >= -RISE[group.fold] * zDown - 1e-9 * size)) fail('upward', `${label}: it reaches ${-zDown / size} tile sizes to the wrong side of the plane but only ${zUp / size} ${word}`);
-    if (zDown < -1e-9 * size) { if (!(stats.rise[group.fold] <= zUp / -zDown)) stats.rise[group.fold] = zUp / -zDown; }
+    if (side === 0) { if (zTop !== 0 || zBottom !== 0) fail('upward', `${label}: a fold that is still leaves the plane (${zBottom / size} .. ${zTop / size} tile sizes)`); }
+    else {
+      if (!(zUp > 0.03 * size)) fail('upward', `${label}: the motion never goes ${word} the plane by more than ${zUp / size} tile sizes`);
+      if (!(zUp >= -RISE[group.fold] * zDown - 1e-9 * size)) fail('upward', `${label}: it reaches ${-zDown / size} tile sizes to the wrong side of the plane but only ${zUp / size} ${word}`);
+      if (zDown < -1e-9 * size) { if (!(stats.rise[group.fold] <= zUp / -zDown)) stats.rise[group.fold] = zUp / -zDown; }
+    }
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (let v = 0; v < n; v++) { x0 = Math.min(x0, xy[2 * v]); x1 = Math.max(x1, xy[2 * v]); y0 = Math.min(y0, xy[2 * v + 1]); y1 = Math.max(y1, xy[2 * v + 1]); }
     const diag = Math.hypot(x1 - x0, y1 - y0), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
@@ -396,7 +403,7 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
   }
 
   // ---- locate: the piece it returns for a point of the mesh moves that point with its triangle
-  if (group.fold !== 'snowflake') {
+  {
     const rnd = prng(31 + stats.folds), F = fold.at(0.6), m = tri.length / 3, acc = [0, 0, 0];
     let bad = 0, worst = 0;
     for (let k = 0; k < 40; k++) {
@@ -412,15 +419,6 @@ function checkFold(group, c, amp, viaIndex, tamper = null) {
       if (dd > worst) worst = dd;
     }
     if (bad) fail('locate', `${label}: ${bad} of 40 centroids are moved away from their triangle with the piece of locate (worst ${worst / size} tile sizes)`);
-  } else {
-    // the star: a point of the base tile gets the lid, any other point its cell
-    const base = M.cells[0].poly;
-    const cxy = [(base[0][0] + base[1][0] + base[2][0]) / 3, (base[0][1] + base[1][1] + base[2][1]) / 3];
-    if (M.locate(cxy[0], cxy[1]) !== M.lid) fail('locate', `${label}: a point of the base tile is not given the lid`);
-    for (let i = 1; i < M.cells.length; i++) {
-      const p = M.cells[i].poly, x = (p[0][0] + p[1][0] + p[2][0]) / 3, y = (p[0][1] + p[1][1] + p[2][1]) / 3;
-      if (M.locate(x, y) !== i) { fail('locate', `${label}: the centre of cell ${i} is located in piece ${M.locate(x, y)}`); break; }
-    }
   }
   return { domain, fold };
 }
@@ -460,14 +458,14 @@ function checkScene(group, c, amp, prevDomain) {
     }
   }
   if (scene.stops !== scene.fold.stops || scene.duration !== scene.fold.duration) fail('scene', `${label}: stops / duration are not the fold's`);
-  if ((group.fold === 'snowflake') !== Array.isArray(scene.star)) fail('scene', `${label}: star`);
+  if ('star' in scene) fail('scene', `${label}: a star (no group folds a star of tiles since 15 Nov 2026: the copies are the tiling's)`);
   // one bold line per edge of the tile. A tile that is re-cut first (xx, 22x: src/folds/recut.js; 13 Nov 2026) is drawn
   // in runs, one per stretch of an edge on one piece (the pieces come apart on the way): every run names its edge, and
   // every edge has at least one
   const recut = !!scene.M.recut;
   if (!recut && scene.edges.length !== scene.domain.edges.length) fail('scene', `${label}: ${scene.edges.length} boundary lines for ${scene.domain.edges.length} edges`);
   if (recut && new Set(scene.edges.map((e) => e.edge)).size !== scene.domain.edges.length) fail('scene', `${label}: the runs of a re-cut tile cover ${new Set(scene.edges.map((e) => e.edge)).size} of ${scene.domain.edges.length} edges`);
-  if (recut !== !!(scene.fold.recut && group.fold !== 'snowflake')) fail('scene', `${label}: fold.recut and mesh.recut disagree`);
+  if (recut !== !!(scene.fold.recut && group.fold !== 'disc')) fail('scene', `${label}: fold.recut and mesh.recut disagree`);
   // colours: a mirror in ink, a cut edge in the colour of its seam, the same on both partners
   const byEdge = new Map(scene.edges.map((e) => [e.edge, e]));
   scene.domain.edges.forEach((e, i) => {
@@ -559,7 +557,8 @@ test('folds: every group has a fold module, and the index refuses a fold type it
   const g = BY_ID['333'], domain = buildDomain(g, { seed: g.presets[0].seed });
   assert.throws(() => createFold({ ...g, fold: 'origami' }, domain), /no fold module/);
   for (const id of ['o', '**', '*x', 'xx']) assert.deepEqual(foldMeshOptions(BY_ID[id]), { density: rollDensity(BY_ID[id]) }, `${id}: the roll fold's own density`);
-  for (const id of ['333', '22x', '*632']) assert.deepEqual(foldMeshOptions(BY_ID[id]), {}, `${id}: the default mesh`);
+  for (const id of ['333', '22x']) assert.deepEqual(foldMeshOptions(BY_ID[id]), {}, `${id}: the default mesh`);
+  for (const id of ['*2222', '*442', '*333', '*632']) assert.deepEqual(foldMeshOptions(BY_ID[id]), { density: DISC_DENSITY }, `${id}: a kaleidoscope's tile stays flat: a coarse mesh`);
 });
 
 test('folds: the anchor (SPEC 7) — foldOptions passes two finite numbers on as a fresh [x, y], drops anything else, keeps the other options', () => {
@@ -577,9 +576,14 @@ test('folds: the anchor (SPEC 7) — foldOptions passes two finite numbers on as
   }
   assert.deepEqual(foldOptions(null), {});
   assert.deepEqual(foldOptions(undefined), {});
-  // createFold hands the module these options (the snowflake fold shows its chirality option on the fold)
-  const g = BY_ID['*632'], domain = buildDomain(g, { seed: g.presets[0].seed });
-  for (const chi of [1, -1]) assert.equal(createFold(g, domain, null, { chirality: chi, anchor: [NaN, 0] }).chirality, chi, `chirality ${chi} reaches the module`);
+  // createFold hands the module these options: a roll fold reports the anchor it was given (none when it was malformed)
+  const g = BY_ID.o, domain = buildDomain(g, { seed: g.presets[0].seed, metric: g.presets[0].metric });
+  assert.deepEqual(createFold(g, domain, null, { anchor: g.presets[0].seed.slice() }).anchor, g.presets[0].seed, 'the anchor reaches the module');
+  assert.equal(createFold(g, domain, null, { anchor: [NaN, 0] }).anchor, null, 'a malformed anchor does not');
+  // a kaleidoscope's fold moves nothing, whatever it is handed
+  const k = BY_ID['*632'], kd = buildDomain(k, { seed: k.presets[0].seed }), kf = createFold(k, kd, null, { anchor: [0.1, 0.2] });
+  assert.ok(kf.still === true && kf.type === 'disc' && kf.duration === 0);
+  for (const t of [0, 0.5, 1]) assert.deepEqual(kf.at(t)(0.3, -0.2, 0, [9, 9, 9]), [0.3, -0.2, 0], `the disc fold at t = ${t} is the identity`);
 });
 
 test('app: buildScene hands the anchor to the fold; anchor = seed is the fold without an anchor (SPEC 7: a missing anchor means anchor = seed)', () => {
@@ -600,7 +604,7 @@ test('app: buildScene hands the anchor to the fold; anchor = seed is the fold wi
         if (m.some((l) => Math.abs((seed[0] - l.px) * l.uy - (seed[1] - l.py) * l.ux) < 1e-3 * size)) continue;
       }
       const domain = buildDomain(g, { seed, metric: p0.metric, warp: makeWarp(g, 0) });
-      const mesh = g.fold === 'snowflake' ? null : buildMesh(g, domain, foldMeshOptions(g));
+      const mesh = buildMesh(g, domain, foldMeshOptions(g));
       const plain = createFold(g, domain, mesh, {}), anchored = createFold(g, domain, mesh, { anchor: domain.seed.slice() });
       // the scene of the same cut with that anchor draws that fold (recut: false — the fold module's own motion; a
       // scene that re-cuts first is compared with createFold({ recut: true }) in test/recut.test.js)
@@ -771,78 +775,24 @@ test('app: a drag session — the seed wanders over mirrors, rotation centres an
   t.diagnostic(`${steps} steps over 17 groups; ${kept} seams carried over with their colour, ${born} new ones; worst seam gap ${worstGap.toExponential(1)}`);
   // printed, not asserted here: every fold honours the anchor now, and that its closed shape stays put over a drag is
   // asserted where each fold is tested (test/hinge.test.js and test/crosscap.test.js 'anchor (SPEC 7) 1',
-  // test/roll-anchor.test.js 'anchor 1'); this line shows how far the drawn shape wanders over this walk (the
-  // snowflake's 8 is its star re-based to the seed's tile, by design)
+  // test/roll-anchor.test.js 'anchor 1'); this line shows how far the drawn shape wanders over this walk
   t.diagnostic('folded shape (t = 1) wandering over the walk with one anchor, tile sizes: ' + Object.entries(drift).map(([k, v]) => `${k} ${v.toPrecision(2)}`).join(', '));
 });
 
-test('app: a folded kaleidoscope shows one comma per pile — each copy of the motif fades as its flap lands, smoothly; at t = 1 only the tile\'s own copy is drawn', () => {
-  const rnd = prng(632);
-  let piles = 0, stopsSeen = 0;
+test('app: every comma of the sheet is drawn at full strength, all the time (no fold lays a pile of copies on the tile: a kaleidoscope\'s tile is its surface)', () => {
   for (const g of GROUPS) {
     const p0 = g.presets[0];
-    if (g.fold !== 'snowflake') {
-      // the other groups: every comma at full strength, all the time
-      for (const amp of [0, 1]) {
-        const scene = buildScene(g, { seed: p0.seed, metric: p0.metric, amp, anchor: p0.seed });
-        for (const t of [0, 0.5, 1]) {
-          mapScene(scene, t);
-          const ls = sceneLines(scene, 1).filter((l) => l.width === WIDTHS.motif);
-          assert.equal(ls.length, scene.motif.length, `${g.id} amp ${amp} t = ${t}: every comma is drawn`);
-          assert.ok(ls.every((l) => l.alpha === MOTIF_ALPHA), `${g.id}: at full strength`);
-        }
-      }
-      continue;
-    }
-    const seeds = [p0.seed];
-    for (let k = 0; k < 3; k++) seeds.push([g.center[0] + (2 * rnd() - 1) * 0.6 * g.viewHalf, g.center[1] + (2 * rnd() - 1) * 0.6 * g.viewHalf]);
-    for (const seed of seeds) for (const amp of [0, 1]) {
-      const scene = buildScene(g, { seed, metric: p0.metric, amp, anchor: p0.seed });
-      const label = `${g.id} seed (${seed.map((v) => v.toFixed(3))}) amp ${amp}`, size = scene.size;
-      const stops = scene.stops.map((s) => s.t), cells = scene.fold.mesh.cells.length;
-      // every cell but the tile has its copies, each fading in the second part of one stage between two stops
-      assert.equal(new Set(scene.motif.map((m) => m.copy)).size, cells, `${label}: a copy of the motif on every cell of the star`);
-      for (const m of scene.motif) {
-        if (m.copy === 0) { assert.equal(m.fade, null, `${label}: the tile's own copy never fades`); continue; }
-        assert.ok(Array.isArray(m.fade) && stops.includes(m.fade[1]) && m.fade[0] > 0 && m.fade[0] < m.fade[1], `${label}: copy ${m.copy} fades in [${m.fade}] (stops ${stops})`);
-        const k = stops.indexOf(m.fade[1]);
-        assert.ok(Math.abs(m.fade[0] - (stops[k - 1] + 0.45 * (stops[k] - stops[k - 1]))) < 1e-12, `${label}: copy ${m.copy} starts to fade as its flap comes down`);
-      }
-      // continuous and never coming back: over 400 steps no copy changes its opacity by more than 0.04 at once
-      for (const m of scene.motif) {
-        let prev = MOTIF_ALPHA * motifFade(m.fade, 0);
-        assert.equal(prev, MOTIF_ALPHA, `${label}: copy ${m.copy} is drawn in full at t = 0`);
-        for (let i = 1; i <= 400; i++) {
-          const a = MOTIF_ALPHA * motifFade(m.fade, i / 400);
-          assert.ok(a <= prev + 1e-12 && prev - a < 0.04 && a >= 0, `${label}: copy ${m.copy} at t = ${i / 400}: opacity ${prev} -> ${a}`);
-          prev = a;
-        }
-      }
-      // at every stop: no two drawn copies on top of each other (no ribbon), and every faded copy lies (in the plane)
-      // exactly under a drawn one (folding along mirrors maps the pattern onto itself: nothing leaves the picture)
-      const onTop = (a, b) => {
-        if (a.part !== b.part || a.out.length !== b.out.length) return false;
-        let d = 0;
-        for (let i = 0; i < a.out.length; i += 3) d = Math.max(d, Math.hypot(a.out[i] - b.out[i], a.out[i + 1] - b.out[i + 1]));
-        return d < 1e-6 * size;
-      };
-      for (const t of stops) {
+    for (const amp of [0, 1]) {
+      const scene = buildScene(g, { seed: p0.seed, metric: p0.metric, amp, anchor: p0.seed });
+      assert.ok(scene.motif.length > 0 && scene.motif.every((m) => m.copy === 0 && !('fade' in m)), `${g.id} amp ${amp}: the tile's own comma, nothing that fades`);
+      for (const t of [0, 0.5, 1]) {
         mapScene(scene, t);
-        stopsSeen++;
-        const lines = sceneLines(scene, 1).filter((l) => l.width === WIDTHS.motif);
-        const drawn = scene.motif.filter((m) => motifFade(m.fade, t) > 0.999), faded = scene.motif.filter((m) => motifFade(m.fade, t) < 0.001);
-        assert.equal(drawn.length + faded.length, scene.motif.length, `${label}: at the stop t = ${t} every copy is either drawn or gone`);
-        assert.equal(lines.length, drawn.length, `${label}: t = ${t}: the faded copies are not handed to the renderer`);
-        for (let i = 0; i < drawn.length; i++) for (let j = i + 1; j < drawn.length; j++) {
-          if (onTop(drawn[i], drawn[j])) { piles++; assert.fail(`${label}: t = ${t}: copies ${drawn[i].copy} and ${drawn[j].copy} are both drawn on the same spot`); }
-        }
-        for (const f of faded) assert.ok(drawn.some((d) => onTop(d, f)), `${label}: t = ${t}: copy ${f.copy} is gone and no drawn copy lies at its place`);
-        if (t === 1) assert.ok(drawn.length > 0 && drawn.every((m) => m.copy === 0) && lines.every((l) => l.alpha === MOTIF_ALPHA), `${label}: folded, only the tile's own copy is drawn, in full`);
+        const ls = sceneLines(scene, 1).filter((l) => l.width === WIDTHS.motif);
+        assert.equal(ls.length, scene.motif.length, `${g.id} amp ${amp} t = ${t}: every comma is drawn`);
+        assert.ok(ls.every((l) => l.alpha === MOTIF_ALPHA), `${g.id}: at full strength`);
       }
     }
   }
-  assert.equal(piles, 0);
-  assert.ok(stopsSeen >= 4 * 4 * 2 * 3, `${stopsSeen} stops looked at`);
 });
 
 test('app: after a group change the zoom glides back to 1 — exact ends, steady in log zoom, eased, never past either end', () => {
@@ -871,7 +821,7 @@ test('app: after a group change the zoom glides back to 1 — exact ends, steady
 
 test('app: the hint over the plane — the cut hint until the first drag; none for the kaleidoscopes (SPEC 8 C1: nothing to cut)', () => {
   for (const g of GROUPS) {
-    const kal = g.fold === 'snowflake';
+    const kal = g.fold === 'disc';
     for (const dragged of [false, true]) {
       const h = hintState(g, dragged);
       assert.equal(h.text, HINT_TEXT, `${g.id}: the words`);
@@ -904,29 +854,18 @@ test('app: creases fade out as the fold completes; line widths follow the pane',
       prev = a;
     }
   }
-  for (const type of ['hinge', 'crosscap', 'snowflake']) assert.equal(creaseAlpha(type, 1), 0, type);
-  // the star of a kaleidoscope: grey mirror images until the last fold begins, the tile's own colour when it is done.
+  for (const type of ['hinge', 'crosscap']) assert.equal(creaseAlpha(type, 1), 0, type);
   // Every fold carries the comma filled in (motifTintMesh: tint bit 1, drawn in the renderer's `fill`, MOTIF_FILL_3D;
-  // the owner's ask of 9-10 Nov 2026, qa/fill-judge.md), so the ghost colour (tint bit 0) is the star's alone again:
-  // until 10 Nov xx's filled comma was drawn in the ghost colour (MOTIF_FILL_3D) and this test said so.
+  // the owner's ask of 9-10 Nov 2026, qa/fill-judge.md). The ghost colour (tint bit 0) is no fold's: it was the
+  // kaleidoscope star's until 15 Nov 2026 (its tile is its surface now) and is the copies' in the 3D pane's pattern
+  // (src/tiling3d.js).
   assert.deepEqual(MOTIF_FILL_3D, [0.33, 0.55, 0.55], 'the fill: a deep teal, the surface\'s own hue');
   for (const g of GROUPS) {
     const scene = buildScene(g, { seed: g.presets[0].seed, metric: g.presets[0].metric, amp: 0 });
     assert.ok(scene.M.motifTint === true && scene.M.tint.length === scene.n, `${g.id}: the comma is filled into the mesh`);
     const bits = new Set(scene.M.tint);
     assert.ok(bits.has(2) || bits.has(3), `${g.id}: some of the sheet is the comma (tint bit 1)`);
-    assert.equal(bits.has(1) || bits.has(3), g.fold === 'snowflake', `${g.id}: tint bit 0 (ghost) only on a star`);
-    const last = scene.stops[scene.stops.length - 2].t;
-    let prev = null;
-    for (let i = 0; i <= 50; i++) {
-      mapScene(scene, i / 50);
-      const c = ghostColor(scene);
-      if (g.fold !== 'snowflake') assert.deepEqual(c, SURFACE_GHOST, `${g.id} at ${i / 50}`);
-      else if (i / 50 <= last) assert.deepEqual(c, SURFACE_GHOST, `${g.id} at ${i / 50}`);
-      if (prev) for (let k = 0; k < 3; k++) assert.ok(Math.abs(c[k] - prev[k]) < 0.05, `${g.id}: the ghost colour has no jump at ${i / 50}`);
-      prev = c;
-    }
-    if (g.fold === 'snowflake') { assert.ok(last > 0.3 && last < 0.9, `${g.id}: the last fold starts at ${last}`); assert.deepEqual(prev, SURFACE_FRONT, `${g.id} at t = 1`); }
+    assert.equal(bits.has(1) || bits.has(3), false, `${g.id}: tint bit 0 (ghost) on no fold's mesh`);
   }
   assert.equal(lineScale(520, 900), 1);
   assert.equal(lineScale(366, 358), 0.72, 'a phone pane: thinner, but not below 0.72');
@@ -1032,7 +971,7 @@ test('app: the frames of a drag use the draft mesh (notes/core-round3.md #12) �
   let scenes = 0, worst = 0, ratio = 0;
   for (const g of GROUPS) {
     const p = g.presets[0], anchor = (p.anchor || p.seed).slice();
-    if (g.fold === 'snowflake') {
+    if (g.fold === 'disc') {
       const s = buildScene(g, { seed: p.seed, metric: p.metric, anchor, draft: true });
       assert.equal(s.draft, false, `${g.id}: a kaleidoscope takes no drags, so no draft`);
       continue;

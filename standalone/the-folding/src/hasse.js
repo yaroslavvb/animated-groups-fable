@@ -563,7 +563,7 @@ let instances = 0;
 /**
  * createHassePicker({ mount, groups, onPick(id) }) -> { open(currentId), close(), isOpen() }
  *   mount   element the dialog is appended to (default: document.body)
- *   groups  the Group objects of groups.js (id, label, hm, shape are read); a node whose id is missing is shown but cannot be picked
+ *   groups  the Group objects of groups.js (id, label, surface, topology are read); a node whose id is missing is shown but cannot be picked
  *   onPick  called with the id after the dialog has closed and focus is back on the opener — not called when the
  *           node picked is the current one (nothing changes, the dialog just closes)
  */
@@ -573,7 +573,7 @@ export function createHassePicker({ mount, groups, onPick } = {}) {
   const uid = ++instances;
 
   const meta = new Map();
-  for (const g of groups || []) if (g && g.id != null) meta.set(g.id, { label: g.label || g.id, hm: g.hm || '', shape: g.shape || '' });
+  for (const g of groups || []) if (g && g.id != null) meta.set(g.id, { label: g.label || g.id, surface: g.surface || '', topology: g.topology || '' });
   const labels = {};
   for (const n of HASSE_NODES) labels[n.id] = meta.has(n.id) ? meta.get(n.id).label : n.id;
 
@@ -669,7 +669,7 @@ export function createHassePicker({ mount, groups, onPick } = {}) {
     for (const n of HASSE_NODES) {
       const id = n.id, m = meta.get(id);
       const g = s('g', { class: m ? 'hasse-node' : 'hasse-node hasse-off', role: 'option', tabindex: '-1', 'data-id': id, 'aria-selected': 'false' }, nodesG);
-      g.setAttribute('aria-label', m ? [spoken(m.label), m.hm, m.shape].filter(Boolean).join(', ') : spoken(id));
+      g.setAttribute('aria-label', m ? [spoken(m.label), m.surface].filter(Boolean).join(', ') : spoken(id));
       if (!m) g.setAttribute('aria-disabled', 'true');
       const hit = s('rect', { class: 'hasse-hit' }, g);
       const halo = s('rect', { class: 'hasse-halo' }, g);
@@ -841,7 +841,8 @@ export function createHassePicker({ mount, groups, onPick } = {}) {
     const shown = activeId || currentId;
     const m = shown ? meta.get(shown) : null;
     infoLabel.textContent = m ? m.label : (shown ? labels[shown] : '');
-    infoRest.textContent = m ? [m.hm, m.shape].filter(Boolean).join(' · ') : '';
+    // (the surface by its plain name, then in the words of Conway's chapter 8: "disk · a punched sphere; its rim …")
+    infoRest.textContent = m ? [m.surface, m.topology].filter(Boolean).join(' · ') : '';
     infoSep.hidden = !infoRest.textContent;
   }
 

@@ -101,7 +101,8 @@ body {
 
 .orb { flex: 0 1 auto; min-width: 0; display: inline-flex; align-items: center; gap: 8px; padding: 0 10px 0 11px; text-align: left; }
 .orb-symbol { flex: none; font-size: 21px; line-height: 1; font-weight: 600; white-space: nowrap; }
-/* "hm · shape": one line when it fits, else two (13 px, inside the 36 px pill) — never an ellipsis inside a word */
+/* the surface's name ("disk", "projective plane"; until 15 Nov 2026 "hm · shape"): one line when it fits, else two
+   (13 px, inside the 36 px pill) — never an ellipsis inside a word */
 .orb-meta {
   flex: 0 1 auto;
   min-width: 0;
@@ -167,8 +168,10 @@ body {
   .pat-pill { padding: 0 8px; gap: 6px; }
 }
 /* (a phone on its side: the swatch alone there too — see "wide but very low" below) */
-/* 360 px and narrower: the selector takes the title's room, so that the chip keeps "hm · shape" whole in its two lines
-   (p3m1 · equilateral triangle lost its last word at 360 px with all three in the row; test/shell-layout.test.js).
+/* 360 px and narrower: the selector takes the title's room. Decided on 13 Nov 2026 so that the chip kept
+   "hm · shape" whole in its two lines (p3m1 · equilateral triangle lost its last word at 360 px with all three in the
+   row; test/shell-layout.test.js). Since 15 Nov the chip holds the surface's name alone and is shorter; the rule is
+   kept as it was tested (notes/unify.md, "Left as it was").
    The title stays in the page for a screen reader; the host's bar and the browser's tab show it. */
 @media (max-width: 369px) {
   .title { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); }
@@ -186,6 +189,11 @@ body {
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
+/* The surface's name in the words of Conway's chapter 8 ("a punched crosscap") is a link to the Classification of
+   Surfaces page (15 Nov 2026): the caption's ink, a dotted underline. */
+.cap-link { color: inherit; text-decoration: underline dotted; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.cap-link:focus-visible { outline: none; background-color: var(--accent-soft); text-decoration-style: solid; }
+@media (hover: hover) { .cap-link:hover { text-decoration-style: solid; } }
 
 /* ---- stage: two panes and their controls ----------------------------------------------------------------------------
    Default = the window is wider than tall: side by side. The cut controls span rows 2-3 and the fold pane rows 1-2:
@@ -285,7 +293,7 @@ body {
   .fold-caption { bottom: 2px; max-width: calc(100% - 8px); padding: 1px 6px 2px; border-color: transparent; background: none; }
 }
 /* The kaleidoscopes have nothing to cut: no hint over their plane (contract C1; src/app.js hides it too). */
-.app[data-fold="snowflake"] .pane-plane > .hint { display: none; }
+.app[data-fold="disc"] .pane-plane > .hint { display: none; }
 /* A small plane pane (a phone; finding 11): the hint at the top edge, tighter, so that one line of it fits a 150 px
    pane. */
 @container plane (max-height: 359px) or (max-width: 359px) {
@@ -325,8 +333,8 @@ body {
 
 /* The kaleidoscopes: nothing to cut. The chips and the Wavy field give way to one quiet line (contract C1). */
 .cut-note { display: none; flex: 1 1 auto; min-width: 0; margin: 0; color: var(--muted); font-size: 13px; line-height: 17px; }
-.app[data-fold="snowflake"] .cut-note { display: block; }
-.app[data-fold="snowflake"] .presets, .app[data-fold="snowflake"] .wavy { display: none; }
+.app[data-fold="disc"] .cut-note { display: block; }
+.app[data-fold="disc"] .presets, .app[data-fold="disc"] .wavy { display: none; }
 
 /* sliders: a 44 px box [data-scrub] with a rail, an optional fill and ticks, and the real <input type=range> on top.
    The thumb's centre travels from --thumb/2 to 100% - --thumb/2; rail, fill and ticks use the same insets. */
@@ -403,6 +411,36 @@ body {
 .scrub > input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent); outline-offset: 1px; }
 .scrub > input[type="range"]:disabled { opacity: 0.4; cursor: default; }
 
+/* THE JOURNEY's scrubber (15 Nov 2026; src/journey.js): the surface at the left end, the flat tile at --a of the track,
+   the pattern at the right end. The fill runs from the tile to the thumb, either way: how far the tile is zipped up
+   (leftward) or how far the plane is tiled (rightward). The three main stops ([data-main] ticks, timeline.js) carry
+   their names above the rail, clear of the thumb: the ends' names start and end with the track. */
+.scrub-journey { --a: 0.5; --rail-shift: 5px; }   /* the rail 5 px below the middle: the names fit above the thumb */
+.scrub-journey > .scrub-ticks { height: 4px; }    /* (shorter ticks: they end with the 44 px box) */
+.scrub-journey > .scrub-ticks > i { height: 4px; }
+.scrub-journey > .scrub-fill {
+  left: calc(var(--thumb) / 2 + (100% - var(--thumb)) * min(var(--p, 1), var(--a)));
+  width: calc((100% - var(--thumb)) * max(var(--p, 1) - var(--a), var(--a) - var(--p, 1)));
+}
+.scrub-journey > .scrub-ticks > i[data-main] { background: var(--muted); }
+.scrub-journey > .scrub-ticks > i[data-main]::after {
+  content: attr(data-label);
+  position: absolute;
+  bottom: calc(var(--thumb) + 8px);          /* its foot 2 px above the thumb's top edge, its head 1 px inside the box */
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 13px;
+  font-style: normal;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.scrub-journey > .scrub-ticks > i[data-main="start"]::after { left: calc(var(--thumb) / -2 + 1px); transform: none; }
+.scrub-journey > .scrub-ticks > i[data-main="end"]::after { left: auto; right: calc(var(--thumb) / -2 + 1px); transform: none; }
+/* (How the transport gives way in a narrow row — a phone, or half of a phone on its side — is with the buttons,
+   below: "the journey's transport by the width of its row".) */
+
 /* "Wavy": label beside the slider when there is room, above its left end when there is not */
 .wavy {
   position: relative;
@@ -427,12 +465,14 @@ body {
   .wavy > .scrub { --rail-shift: 6px; }
 }
 
-/* Fold / Unfold: the same construction with a 2 px margin — a 40 px solid button in a 44 px tap target */
+/* Fold, and Unfold / Tile: the same construction with a 2 px margin — a 40 px solid button in a 44 px tap target, one at
+   either end of the journey's scrubber. The one a person would press next is solid; the other ([data-quiet], src/app.js)
+   is its outlined twin. */
 .btn-primary {
   flex: none;
   height: var(--tap);
-  min-width: 92px;
-  padding: 0 16px;
+  min-width: 86px;
+  padding: 0 14px;
   border: 2px solid transparent;
   border-radius: 10px;
   background: var(--accent) padding-box;
@@ -444,6 +484,34 @@ body {
 }
 .btn-primary:focus-visible { outline-offset: 0; }
 .btn-primary:active { opacity: 0.8; }
+.btn-primary[data-quiet] { background: var(--ground) padding-box; color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.btn-primary:disabled { opacity: 0.35; cursor: default; }
+/* The journey's transport by the width of its row (the container fctl: the 3D pane's width — a laptop's 600 px, a
+   phone's 296 to 390, half a phone on its side: 250 to 330). The scrubber keeps at least 84 px; the names of its
+   stops show while they have room (three need about 131 px of track, the two ends 101, a kaleidoscope's
+   "tile = surface" and "pattern" 143):
+     460 px and more   Fold | surface · tile · pattern | Tile | Reset view         buttons 86 px
+     352 .. 459        the buttons 70 px, "Reset" under its arrow (below)          (a kaleidoscope under 372: "surface")
+     318 .. 351        the two ends alone keep their names
+     272 .. 317        the buttons as narrow as their words: Fold 48, Unfold 56, Reset 46
+     under 272         no names (the buttons say which way each goes)                                            */
+@container fctl (max-width: 459px) {
+  .ctl-fold > .btn-primary { min-width: 70px; padding: 0 8px; font-size: 15px; }
+}
+@container fctl (max-width: 371px) {
+  .app[data-fold="disc"] .scrub-journey > .scrub-ticks > i[data-main="start"]::after { content: "surface"; }
+}
+@container fctl (max-width: 351px) {
+  .scrub-journey > .scrub-ticks > i[data-main="mid"]::after { content: none; }
+}
+@container fctl (max-width: 317px) {
+  .ctl-fold > .btn-primary { min-width: 48px; padding: 0 4px; font-size: 14px; }
+  .ctl-fold > #next-btn { min-width: 56px; }
+  .ctl-fold > .btn-quiet { min-width: 46px; }
+}
+@container fctl (max-width: 271px) {
+  .scrub-journey > .scrub-ticks > i[data-main]::after, .app[data-fold="disc"] .scrub-journey > .scrub-ticks > i[data-main="start"]::after { content: none; }
+}
 
 /* reset view */
 .btn-quiet { flex: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px 0 8px; color: var(--muted); font-size: 13px; line-height: 1; white-space: nowrap; }
@@ -468,6 +536,15 @@ body {
     .btn-quiet > svg { width: 15px; height: 15px; }
     .btn-quiet > .btn-text { line-height: 14px; }
     .btn-text-wide { display: none; }
+    /* (the journey's transport: its narrow form, and the two ends' names alone) */
+    .ctl-fold > .btn-primary { min-width: 48px; padding: 0 4px; font-size: 14px; }
+    .ctl-fold > #next-btn { min-width: 56px; }
+    .ctl-fold > .btn-quiet { min-width: 46px; }
+    .scrub-journey > .scrub-ticks > i[data-main="mid"]::after { content: none; }
+    .app[data-fold="disc"] .scrub-journey > .scrub-ticks > i[data-main="start"]::after { content: "surface"; }
+  }
+  @media (max-width: 559px) {
+    .scrub-journey > .scrub-ticks > i[data-main]::after, .app[data-fold="disc"] .scrub-journey > .scrub-ticks > i[data-main="start"]::after { content: none; }
   }
 }
 
@@ -566,7 +643,6 @@ body {
   .title { font-size: 15px; }
   .hdr { gap: 6px; }
   .orb { padding: 0 8px 0 9px; gap: 7px; }
-  .btn-primary { min-width: 84px; padding: 0 12px; }
   .legend { column-gap: 12px; }
   .lg-long { display: none; }              /* "front · back": the two sides of the paper share a line with the seams */
   .companion-k { display: none; }          /* the link alone: "companion:" would cost the legend a line */
@@ -616,47 +692,10 @@ body {
   }
 }
 
-/* ---- the replication step (10 Nov 2026, qa/rep-judge.md): how the tiling is made ------------------------------------
-   In the plane pane: the Tile button in the bottom-left corner (the pill construction of .btn-quiet: a 36 px pill in a
-   44 px target), and beside it, while #tile-bar[data-open] (the replication is under way or paused), its scrubber on
-   a white pill across the pane's foot; the words for what acts (#tile-caption) at the top, where the phone's hint
-   sits (src/app.js hides #hint while the bar is open). */
-.tile-bar {
-  position: absolute;
-  left: 2px;                                 /* 4 px transparent borders: the visible pills sit 6 px from the pane */
-  right: 2px;
-  bottom: 2px;
-  display: flex;
-  align-items: center;
-  pointer-events: none;                      /* only the button and the open scrubber take the pointer */
-}
-/* The plane's step, as Fold is the 3D pane's (finding 14 of the final round: a white pill in muted grey read like the
-   hint beside it): the verb in the accent, on an accent ring — the outlined twin of the solid Fold button. */
-.tile-btn { pointer-events: auto; gap: 5px; padding: 0 12px 0 8px; color: var(--accent); font-size: 14px; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--accent); }
-.tile-btn > svg { width: 16px; height: 16px; }
-.tile-btn > .ico-play { fill: var(--accent); stroke: none; }
-.tile-btn > .ico-pause { display: none; stroke: var(--accent); stroke-width: 2.2; }
-.tile-btn[data-state="pause"] > .ico-play { display: none; }
-.tile-btn[data-state="pause"] > .ico-pause { display: block; }
-.tile-track {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
-  height: var(--tap);
-  margin-left: 2px;
-  padding: 0 7px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.22s ease, visibility 0s linear 0.22s;
-}
-.tile-track::before {                        /* the visible pill: 36 px high, as the buttons' */
-  content: "";
-  position: absolute;
-  inset: 4px 0;
-  border-radius: 8px;
-  background: var(--ground);
-  box-shadow: inset 0 0 0 1px var(--hairline);
-}
-.tile-bar[data-open] .tile-track { pointer-events: auto; opacity: 1; visibility: visible; transition: opacity 0.22s ease; }
+/* ---- the tiling (10 Nov 2026, qa/rep-judge.md; one journey with the fold since 15 Nov 2026) --------------------------
+   The words for what acts (#tile-caption) sit at the top of the plane pane, where the phone's hint sits (src/app.js
+   hides #hint while they show). The Tile button and its scrubber left the plane pane on 15 Nov 2026: the journey's
+   one scrubber under the 3D pane carries the tiling's half (the owner: "the Unfold and Tile buttons should be in the
+   same place"). */
 .tile-caption { top: 6px; bottom: auto; color: var(--ink); }
-.app[data-fold="snowflake"] .pane-plane > .tile-caption { display: block; }   /* (the kaleidoscopes hide only the cut hint) */
+.app[data-fold="disc"] .pane-plane > .tile-caption { display: block; }   /* (the kaleidoscopes hide only the cut hint) */

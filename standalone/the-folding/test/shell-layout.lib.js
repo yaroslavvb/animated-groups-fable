@@ -114,7 +114,7 @@ export const CHECK = ([expectFeatures, want]) => {
   if (pf.width < 149.5 || pf.height < 149.5) bad.push(`fold pane ${r1(pf.width)}x${r1(pf.height)}`);
   // the cut controls
   const presets = q('#presets'), wavy = q('#wavy-field'), note = q('#cut-note');
-  if (fold === 'snowflake') {
+  if (fold === 'disc') {
     if (shown(presets) || shown(wavy)) bad.push('a kaleidoscope shows chips or the Wavy slider');
     if (!shown(note)) bad.push('a kaleidoscope without the cut note');
     else if (note.scrollHeight > note.clientHeight + 1 || note.scrollWidth > note.clientWidth + 1 || !within(B(note), B(q('#plane-controls')))) bad.push('the cut note is cut');
@@ -133,10 +133,67 @@ export const CHECK = ([expectFeatures, want]) => {
   }
   // tap targets
   const taps = [['the orbifold chip', q('#chip')], ['the pattern selector', q('#pattern-box')], ...qa('#presets .chip').map((c) => [`chip "${c.textContent}"`, c]), ['Fold', q('#fold-btn')],
+    ['Unfold / Tile', q('#next-btn')],
     ['reset view', q('#reset-view')], ['scrubber', q('#scrub')], ['Wavy', q('#wavy-field .scrub')], ['companion link', q('.companion a')]].filter(([, e]) => shown(e));
   for (const [n, e] of taps) { const b = B(e); if (b.width < 43.5 || b.height < 43.5) bad.push(`tap target ${n} ${r1(b.width)}x${r1(b.height)}`); if (!within(b, win)) bad.push(`tap target ${n} leaves the window`); }
+  // The caption's first words are a link to the Classification of Surfaces page (15 Nov 2026): a link in a sentence,
+  // so its height is the line's (WCAG 2.5.8, the exception "Inline"). It is all in view (every piece of it inside the
+  // caption's box: the clamp cuts nothing of it), at least 44 px wide and a line high.
+  const capLink = q('#caption a.cap-link');
+  if (!shown(capLink)) bad.push('the caption has no link to the Classification of Surfaces page');
+  else {
+    const cb = B(capLink), cap = B(q('#caption')), parts = [...capLink.getClientRects()];
+    if (cb.width < 43.5 || parts.some((r) => r.height < 14.5)) bad.push(`the caption's link is ${r1(cb.width)}x${r1(parts[0].height)}`);
+    if (parts.some((r) => r.left < cap.left - 0.5 || r.right > cap.right + 0.5 || r.top < cap.top - 1.5 || r.bottom > cap.bottom + 1.5)) bad.push(`the caption's link is not all in view (${parts.length} piece${parts.length === 1 ? '' : 's'})`);
+    if (!within(cb, win)) bad.push("the caption's link leaves the window");
+  }
   const link = B(q('.companion a'));
-  for (const s of ['#fold-btn', '#reset-view', '#scrub', '#wavy-field .scrub', '#presets']) { const e = q(s); if (shown(e) && overlap(link, B(e))) bad.push(`the companion link's box lies over ${s}`); }
+  for (const s of ['#fold-btn', '#next-btn', '#reset-view', '#scrub', '#wavy-field .scrub', '#presets']) { const e = q(s); if (shown(e) && overlap(link, B(e))) bad.push(`the companion link's box lies over ${s}`); }
+  // THE JOURNEY's transport (15 Nov 2026; src/journey.js): Fold, the scrubber, Unfold / Tile, reset view — in a row,
+  // nothing cut; the scrubber wide enough to take hold of; the names of its stops (::after of the main ticks) inside
+  // its box, clear of each other, 13 px. Which names show goes by the width of the transport's row (styles.css, "the
+  // journey's transport by the width of its row"): 'surface', 'tile', 'pattern' from 352 px; the two ends alone from
+  // 272; none below; a kaleidoscope: 'tile = surface' and 'pattern' from 372 px, 'surface' and 'pattern' from 272.
+  // And no Tile bar in the plane
+  {
+    const fb = q('#fold-btn'), nb = q('#next-btn'), sc = q('#scrub'), rv = q('#reset-view');
+    if (q('#tile-bar') || q('#tile-btn')) bad.push('the plane pane still holds a Tile bar');
+    if (!nb || !shown(nb) || !shown(fb) || !shown(sc)) bad.push('the transport is not all there (Fold, scrubber, Unfold / Tile)');
+    else {
+      const a = B(fb), sb2 = B(sc), n = B(nb), r = B(rv);
+      if (!(a.right <= sb2.left + 0.5 && sb2.right <= n.left + 0.5 && n.right <= r.left + 0.5)) bad.push('the transport is not Fold, scrubber, Unfold / Tile, reset view in a row');
+      if (Math.abs(a.top - n.top) > 0.5 || Math.abs(a.height - n.height) > 0.5) bad.push('the two buttons of the transport are not level');
+      for (const [name, b] of [['Fold', fb], ['Unfold / Tile', nb]]) {
+        const l = b.querySelector('[data-label]'), lb2 = B(l), bb = B(b);
+        if (b.scrollWidth > b.clientWidth + 0.5 || lb2.left < bb.left + 2 || lb2.right > bb.right - 2) bad.push(`the word "${l.textContent}" of the ${name} button is cut`);
+        if (parseFloat(getComputedStyle(b).fontSize) < 13) bad.push(`the ${name} button's word is ${getComputedStyle(b).fontSize}`);
+      }
+      // (the longest word the second button shows is "Unfold": it must fit as "Tile" does — measured with its font)
+      { const m = document.createElement('canvas').getContext('2d'), cs = getComputedStyle(nb); m.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; const need = Math.max(m.measureText('Unfold').width, m.measureText('Pause').width); if (need > n.width - 8) bad.push(`"Unfold" needs ${r1(need)} px, the button has ${r1(n.width)}`); }
+      // (the narrowest row of the 23 sizes is 248 px: a 640 x 360 phone on its side with a three-chip group, whose
+      // plane column is the widest; its scrubber is 74 px, a 52 px track between two buttons that do the same job)
+      if (sb2.width < 72) bad.push(`the scrubber is ${r1(sb2.width)} px wide`);
+      const names = [], meter = document.createElement('canvas').getContext('2d');
+      for (const t of qa('#scrub .scrub-ticks > i[data-main]')) {
+        const cs = getComputedStyle(t, '::after');
+        let text = cs.content;
+        if (!text || text === 'none' || text === 'normal') continue;
+        text = /^attr\(/.test(text) ? t.getAttribute('data-label') : text.replace(/^["'](.*)["']$/, '$1');
+        meter.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+        const w = meter.measureText(text).width, tb = B(t), kind = t.getAttribute('data-main');
+        const left = kind === 'start' ? sb2.left + 1 : kind === 'end' ? sb2.right - 1 - w : tb.left + tb.width / 2 - w / 2;
+        names.push({ text, left, right: left + w, px: parseFloat(cs.fontSize) });
+      }
+      const rowW = B(q('#fold-controls')).width;
+      const wantNames = rowW < 272 ? [] : fold === 'disc' ? [rowW < 372 ? 'surface' : 'tile = surface', 'pattern'] : rowW < 352 ? ['surface', 'pattern'] : ['surface', 'tile', 'pattern'];
+      if (names.map((x) => x.text).join(' | ') !== wantNames.join(' | ')) bad.push(`the scrubber's stops are named "${names.map((x) => x.text).join(' | ')}", not "${wantNames.join(' | ')}" in a row of ${r1(rowW)} px`);
+      names.forEach((x, i) => {
+        if (x.px < 13) bad.push(`the stop's name "${x.text}" is ${x.px} px`);
+        if (x.left < sb2.left - 0.5 || x.right > sb2.right + 0.5) bad.push(`the stop's name "${x.text}" leaves the scrubber's box`);
+        if (i && x.left - names[i - 1].right < 4) bad.push(`the stops' names "${names[i - 1].text}" and "${x.text}" are ${r1(x.left - names[i - 1].right)} px apart`);
+      });
+    }
+  }
   // text
   const walker = document.createTreeWalker(app, NodeFilter.SHOW_TEXT);
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {

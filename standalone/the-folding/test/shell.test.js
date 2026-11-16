@@ -25,19 +25,23 @@ const CONTRACT = {
   'cut-note': 'p', 'pane-fold': 'section', 'fold-canvas': 'canvas', 'fold-labels': 'div', 'turn-hint': 'p', 'fold-controls': 'div',
   'fold-btn': 'button', 'scrub': 'div', 'scrub-ticks': 'span', 'scrubber': 'input', 'reset-view': 'button', 'legend': 'footer',
   'picker-mount': 'div',
+  // 15 Nov 2026: the journey's second button (Unfold, then Tile), at the other end of the scrubber
+  'next-btn': 'button',
   // 13 Nov 2026: the pattern selector in the header, the words over the fold pane
   'pattern-box': 'label', 'pattern': 'select', 'pattern-label': 'span', 'fold-caption': 'p',
 };
 
 // contract C1: the legend items, in this order, with these words
+// (15 Nov 2026: the words of Conway's chapter 8 and of the Classification of Surfaces page — a zipper, the rim of a
+// hole, a corner point, a surface that crosses itself)
 const LEGEND = [
-  ['seams', 'coloured = edges sewn together'],
-  ['mirrors', 'ink = mirror (becomes the rim)'],
+  ['seams', 'same colour = a zipper: two edges zipped together'],
+  ['mirrors', 'ink = mirror: the rim of a hole (∗)'],
   ['cones', 'dot n = cone point'],
-  ['corners', 'ring ∗n = mirror corner'],
-  ['double', 'dashed = self-intersection'],
+  ['corners', 'ring ∗n = corner point'],
+  ['double', 'dashed = the surface crosses itself (×)'],
 ];
-const CUT_NOTE = 'Every edge is a mirror: Fold folds the plane onto the tile.';
+const CUT_NOTE = 'Every edge is a mirror: no zipper, so the tile is the surface. Fold folds the pattern along its mirrors onto it.';
 
 /** The body of the CSS block that starts at `head` (an at-rule or a selector), braces matched. */
 function block(text, head, from = 0) {
@@ -68,13 +72,17 @@ test('template: every id of the DOM contract exists once, on the right kind of e
   }
   const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]);
   assert.equal(new Set(ids).size, ids.length, 'no duplicate ids');
-  for (const id of ['chip', 'fold-btn', 'reset-view']) assert.match(tagWithId(id).text, /type="button"/, `#${id} is type=button`);
+  for (const id of ['chip', 'fold-btn', 'next-btn', 'reset-view']) assert.match(tagWithId(id).text, /type="button"/, `#${id} is type=button`);
+  for (const id of ['tile-bar', 'tile-btn', 'tile-slider', 'tile-scrub']) assert.equal(count(html, `id="${id}"`), 0, `#${id}: the Tile bar left the plane pane (15 Nov 2026: one scrubber for the journey)`);
   for (const id of ['wavy', 'scrubber']) assert.match(tagWithId(id).text, /type="range"/, `#${id} is a range input`);
   assert.match(tagWithId('wavy').text, /min="0"[^>]*max="1"/, 'the Wavy slider runs 0..1');
 });
 
 test('template: what the timeline and the app look for inside the contract elements', () => {
   assert.match(inside('fold-btn', '</button>'), /<span data-label>Fold<\/span>/, 'the Fold button holds a [data-label] span');
+  assert.match(inside('next-btn', '</button>'), /<span data-label>Tile<\/span>/, 'the Unfold / Tile button holds a [data-label] span (the page opens at the pattern: Tile)');
+  assert.match(tagWithId('scrub').text, /class="scrub scrub-journey"/, 'the journey\'s scrubber');
+  assert.match(tagWithId('scrubber').text, /value="1"/, 'the page opens at the pattern, the right end of the track');
   const scrub = inside('scrub', '</div>');
   assert.match(tagWithId('scrub').text, /data-scrub/, '#scrub is the [data-scrub] wrapper');
   assert.match(scrub, /id="scrub-ticks" data-ticks/, 'ticks container inside the wrapper');
@@ -88,7 +96,7 @@ test('template: what the timeline and the app look for inside the contract eleme
   assert.match(inside('plane-controls', '</p>'), /id="presets"[\s\S]*id="wavy-field"[\s\S]*id="cut-note"/,
     'the kaleidoscope note sits in the cut controls, where the chips and the slider are (C1)');
   // reading and tab order: chip, plane, cut controls, fold, fold controls, legend, picker
-  const order = ['chip', 'caption', 'pane-plane', 'presets', 'wavy', 'cut-note', 'pane-fold', 'fold-btn', 'scrubber', 'reset-view', 'legend', 'picker-mount'].map((id) => html.indexOf(`id="${id}"`));
+  const order = ['chip', 'caption', 'pane-plane', 'presets', 'wavy', 'cut-note', 'pane-fold', 'fold-btn', 'scrubber', 'next-btn', 'reset-view', 'legend', 'picker-mount'].map((id) => html.indexOf(`id="${id}"`));
   assert.deepEqual([...order].sort((a, b) => a - b), order, 'document order');
   assert.ok(html.indexOf('id="picker-mount"') > html.lastIndexOf('</footer>'), 'the picker mount is outside the app grid');
 });
@@ -125,7 +133,7 @@ test('template: the legend has one item per feature of contract C1, in order, wi
     assert.match(m[2], /<\/svg><span>/, `the words of "${m[1]}" are one span (no loose text in the flex item: the spaces around <i>n</i> stay)`);
   });
   assert.match(items[2][2], /dot <i>n<\/i> = cone point/, 'n is a variable: italic');
-  assert.match(items[3][2], /ring ∗<i>n<\/i> = mirror corner/, 'the corner label is ∗n, as the 3D draws it');
+  assert.match(items[3][2], /ring ∗<i>n<\/i> = corner point/, 'the corner label is ∗n, as the 3D draws it');
   assert.match(items[3][2], /class="sw-ring"/, 'corners: a ring, like the 3D marker');
   assert.match(items[4][2], /class="sw-dash"/, 'double: a dashed line');
   assert.ok(html.indexOf('class="companion"') > html.indexOf('data-feature="double"'), 'the companion link comes after the items');
@@ -229,9 +237,9 @@ test('styles: legend items show only for the features #app names (contract C1, f
 
 test('styles: the kaleidoscopes have nothing to cut — a note replaces chips and slider, and the plane shows no hint (C1, findings 6, 30, 36, 48, 49)', () => {
   assert.match(rule('.cut-note'), /display: none/, 'the note is hidden for the groups with a cut');
-  assert.match(rule('.app[data-fold="snowflake"] .cut-note'), /display: block/);
-  assert.match(rule('.app[data-fold="snowflake"] .presets, .app[data-fold="snowflake"] .wavy'), /display: none/, 'chips and Wavy give way');
-  assert.match(rule('.app[data-fold="snowflake"] .pane-plane > .hint'), /display: none/, 'no hint over the kaleidoscope\'s plane');
+  assert.match(rule('.app[data-fold="disc"] .cut-note'), /display: block/);
+  assert.match(rule('.app[data-fold="disc"] .presets, .app[data-fold="disc"] .wavy'), /display: none/, 'chips and Wavy give way');
+  assert.match(rule('.app[data-fold="disc"] .pane-plane > .hint'), /display: none/, 'no hint over the kaleidoscope\'s plane');
   assert.match(rule('.cut-note'), /font-size: 13px/);
 });
 
@@ -285,11 +293,33 @@ test('styles: the phone column holds every chip — two to a line where they fit
 });
 
 test('styles: the reset button reads "Reset" when it is narrow, at 13 px (finding 54)', () => {
-  const narrow = block(css, '@container fctl (max-width: 459px)');
+  // (15 Nov 2026: the journey's buttons have a block for the same width before this one — the first one after the
+  // words "reset view" is the reset button's)
+  const narrow = block(css, '@container fctl (max-width: 459px)', css.indexOf('/* reset view */'));
   assert.match(narrow, /\.btn-text-wide \{ display: none; \}/, '" view" goes, "Reset" stays');
   assert.match(narrow, /min-width: 52px/, 'room for the word inside the pill');
   assert.doesNotMatch(narrow, /font-size/, 'the word keeps the button\'s 13 px');
   assert.match(rule('.btn-quiet'), /font-size: 13px/);
+});
+
+test('styles (15 Nov, SPEC 12.3): the journey\'s transport narrows with its own row — the buttons first, then the stops\' names; the way already gone is an outlined button', () => {
+  assert.match(rule('.ctl-fold'), /container: fctl \/ inline-size/, 'the row is a container: half a phone on its side is 250 px wide in a 640 px window');
+  // (the first block for 459 px is the transport's; the reset button's comes after the words "reset view")
+  assert.match(block(css, '@container fctl (max-width: 459px)'), /\.ctl-fold > \.btn-primary \{ min-width: 70px; padding: 0 8px; font-size: 15px; \}/);
+  const narrow = block(css, '@container fctl (max-width: 317px)');
+  assert.match(narrow, /\.ctl-fold > \.btn-primary \{ min-width: 48px; padding: 0 4px; font-size: 14px; \}/, 'as narrow as the word Fold');
+  assert.match(narrow, /\.ctl-fold > #next-btn \{ min-width: 56px; \}/, 'room for the word Unfold');
+  assert.match(block(css, '@container fctl (max-width: 371px)'), /\.app\[data-fold="disc"\] \.scrub-journey > \.scrub-ticks > i\[data-main="start"\]::after \{ content: "surface"; \}/, 'a kaleidoscope: "tile = surface" becomes "surface"');
+  assert.match(block(css, '@container fctl (max-width: 351px)'), /i\[data-main="mid"\]::after \{ content: none; \}/, 'the middle name goes first');
+  assert.match(block(css, '@container fctl (max-width: 271px)'), /i\[data-main\]::after, [^{]*\{ content: none; \}/, 'then every name');
+  const names = rule('.scrub-journey > .scrub-ticks > i[data-main]::after');
+  assert.match(names, /content: attr\(data-label\)/, 'a main stop is named from its data-label');
+  assert.match(names, /font-size: 13px/, 'at 13 px, the page\'s smallest');
+  assert.match(rule('.btn-primary[data-quiet]'), /box-shadow: inset 0 0 0 1\.5px var\(--accent\)/, 'outlined: the plain inset line follows the rounded corner');
+  assert.match(rule('.btn-primary:disabled'), /opacity: 0\.35/);
+  // browsers without container queries get the narrow form by window width
+  const old = block(css, '@supports not (container-type: inline-size)');
+  assert.match(old, /\.ctl-fold > \.btn-primary \{ min-width: 48px; padding: 0 4px; font-size: 14px; \}/);
 });
 
 test('styles: the layout rules the shell promises', () => {

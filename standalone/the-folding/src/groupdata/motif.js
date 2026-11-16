@@ -12,7 +12,7 @@
 // The cross-cap (22x) holds still (tools/motif-place.mjs STILL): its comma lies where no preset's fold turns the sheet
 // over; stillFit = the largest s that does there, turn = how far (degrees) its sheet's normal turns at most.
 // The seam groups (src/motif.js SEAM_GROUPS; none today) are placed by rule in src/motif.js.
-export const PLACEMENT_SOURCE = '4cb8ff72';
+export const PLACEMENT_SOURCE = '43d6e80b';
 export const PLACEMENTS = {
   "333": {"key":"9af8e13c","view":"c17f3cb9","at":[0.300195,-0.119702],"angle":1.513139,"s":0.234803,"stretch":1,"fit":0.265228,"cover":0.3,"coverFit":0.3828,"inTile":0.9802,"seen":0.4429,"radius":0.234803},
   "442": {"key":"be8fd1d4","view":"9d0b7fbf","at":[0.179036,0.2125],"angle":0.117728,"s":0.218509,"stretch":1,"fit":0.263379,"cover":0.3,"coverFit":0.4359,"inTile":0.9967,"seen":0.4992,"radius":0.218509},

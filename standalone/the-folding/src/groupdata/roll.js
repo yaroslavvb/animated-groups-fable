@@ -65,8 +65,8 @@ const xxB = 0.9, xxA = 1.7;
 
 export default [
   {
-    id: 'o', label: '○', hm: 'p1',
-    shape: 'torus', topology: 'torus; no cone points, no mirrors',
+    id: 'o', label: '○',
+    shape: 'torus', surface: 'torus', topology: 'a sphere with a handle; no cone points, no mirrors',
     e1: oE1, e2: oE2,
     reps: [{ ...IDENT }],
     fold: 'torus', kaleido: null,
@@ -79,8 +79,8 @@ export default [
     ],
   },
   {
-    id: '**', label: '∗∗', hm: 'pm',
-    shape: 'tube', topology: 'annulus; both rims are mirrors',
+    id: '**', label: '∗∗',
+    shape: 'tube', surface: 'annulus', topology: 'a twice-punched sphere; both rims are mirrors',
     e1: [2 * ssW, 0], e2: [0, ssB],
     reps: [{ ...IDENT }, iso(-1, 0, 0, 1, 0, 0)],            // the mirror x = 0
     fold: 'cylinder', kaleido: null,
@@ -90,8 +90,8 @@ export default [
     ],
   },
   {
-    id: 'xx', label: '××', hm: 'pg',
-    shape: 'Klein bottle', topology: 'Klein bottle; non-orientable, no cone points, no mirrors',
+    id: 'xx', label: '××',
+    shape: 'Klein bottle', surface: 'Klein bottle', topology: 'a pair of crosscaps; no cone points, no mirrors',
     e1: [xxB, 0], e2: [0, 2 * xxA],
     reps: [{ ...IDENT }, iso(-1, 0, 0, 1, 0, xxA)],          // the glide (x, y) -> (-x, y + A)
     fold: 'klein', kaleido: null,
@@ -102,8 +102,8 @@ export default [
     ],
   },
   {
-    id: '*x', label: '∗×', hm: 'cm',
-    shape: 'Möbius band', topology: 'Möbius band; non-orientable, its rim is a mirror',
+    id: '*x', label: '∗×',
+    shape: 'Möbius band', surface: 'Möbius band', topology: 'a punched crosscap; its rim is a mirror',
     // centred cell 2T x 2w: mirrors y = k w, glide axes y = w / 2 + k w
     e1: [sxT, -sxW], e2: [sxT, sxW],
     reps: [{ ...IDENT }, iso(1, 0, 0, -1, 0, 0)],            // the mirror y = 0

@@ -11,15 +11,17 @@
   id               element            who uses it and how
   ───────────────  ─────────────────  ────────────────────────────────────────────────────────────────────────────
   app              div (root grid)    APP sets on every group change (contract C1, SPEC 8):
-                                        data-fold="<group.fold>"   snowflake: the cut controls give way to #cut-note,
-                                                                   and #hint is never shown
+                                        data-fold="<group.fold>"   disc (a kaleidoscope: its tile is the surface): the
+                                                                   cut controls give way to #cut-note, and #hint is
+                                                                   never shown
                                         data-features="<subset of: seams mirrors cones corners double>"
                                                                    which legend items show (#legend [data-feature])
                                       optional data-cut="under": on phones keep the cut controls UNDER the plane
                                       (default there: beside a square plane, which gives the fold more room)
   chip             button             APP: click -> picker.open(groupId). Holds the next two.
   chip-symbol      span               APP: textContent = group.label                    (big orbifold symbol)
-  chip-meta        span               APP: textContent = group.hm + ' · ' + group.shape  (wraps to 2 lines if it must)
+  chip-meta        span               APP: textContent = group.surface: the orbifold's surface by its plain name
+                                      ('disk', 'Möbius band'). No crystallographic name (the owner, 15 Nov 2026)
   pattern-box      label              (13 Nov 2026) the pattern selector at the right of the header: a pill (swatch, name,
                                       caret) under an invisible native <select>, so a phone gets its own picker.
                                       APP sets #app[data-pattern="<key>"] (the swatch shown follows it) and the title.
@@ -31,19 +33,17 @@
                                       Soft commas (soft), Tomoe (tomoe), Checkerboard (checker), Rings (rings), Comma
                                       (comma)
   pattern-label    span               APP: textContent = the pattern's label (hidden on a narrow window: the swatch alone)
-  caption          p                  APP: textContent = group.topology                 (1 line, 2 when it needs them)
+  caption          p                  APP: the surface in the words of Conway's chapter 8, its first words a link
+                                      (a.cap-link) to the Classification of Surfaces page; textContent = group.topology
+                                      (1 line, 2 when it needs them)
   stage            main               the two panes and their controls (data-ss-thumb)
   pane-plane       section            positioned box of the 2D view (data-ss-comments="off")
   plane-canvas     canvas             APP: createPlaneView(canvas, …). CSS sizes it to the pane; set the backing
                                       store from its clientWidth/Height (ResizeObserver or window resize)
   hint             p                  "drag to move the cut". APP: hint.hidden = true at the first drag.
                                       At the pane's bottom edge; at its TOP edge on a small (phone) pane
-  tile-caption     p                  (the replication step) APP: the words for what acts now ("half-turn about a
-                                      2-fold centre"); hidden unless the replication shows. Top of the plane pane
-  tile-bar         div                (the replication step) the plane's bottom-left corner: #tile-btn, and the
-                                      scrubber #tile-scrub, shown while [data-open] (APP sets it while u < 1 or playing)
-  tile-btn         button             APP: Tile / Pause ([data-label]; data-state="play" | "pause")
-  tile-slider      input range        TIMELINE (a second createTimeline, keyTarget null): the replication's progress u
+  tile-caption     p                  (the tiling) APP: the words for what acts now ("half-turn about a 2-fold
+                                      centre"); hidden unless the copies are being made or gathered. Top of the plane pane
   plane-controls   div                the cut controls: #presets and the Wavy field, or #cut-note
   presets          div                APP: one <button type="button" class="chip" aria-pressed="true|false">name</button>
                                       per group.presets entry; aria-pressed="true" on the current one, none while
@@ -51,7 +51,7 @@
                                       wraps (rows) or stacks them two to a line (the phone column)
   wavy             input range 0..1   APP: 'input' event -> amp = Number(value); call enhanceRange(wavy) once
                                       (src/timeline.js) so the whole 44 px box drags on touch. disabled = true greys it
-  cut-note         p                  static; shown instead of #presets and the Wavy field when data-fold="snowflake"
+  cut-note         p                  static; shown instead of #presets and the Wavy field when data-fold="disc"
   pane-fold        section            positioned box of the 3D view (data-ss-comments="off")
   fold-canvas      canvas             APP: createRenderer(canvas, { labelLayer: fold-labels }). Sized like plane-canvas
   fold-labels      div                the renderer's HTML labels; exactly covers fold-canvas, pointer-events: none,
@@ -63,11 +63,22 @@
                                       "one end folds over …"; APP sets #app[data-words] for such a fold, and small 3D
                                       panes then keep a strip for the words, as for a re-cut); APP: textContent,
                                       hidden when it has nothing to say. Foot of the pane
-  fold-controls    div                Fold button, scrubber, reset view
-  fold-btn         button             TIMELINE (createTimeline button): text of its [data-label] child = Fold / Pause / Unfold
-  scrubber         input range        TIMELINE (createTimeline slider). Its wrapper #scrub[data-scrub] gets --p and
-                                      the ticks ([data-ticks]); do not touch its value directly, use timeline.set(t)
-                                      — which is silent: onChange fires for scrubbing and playback only
+  fold-controls    div                THE JOURNEY (15 Nov 2026; src/journey.js): one scrubber from the surface (left)
+                                      through the flat tile (middle) to the pattern (right), a button at either end of
+                                      it, reset view. APP sets data-lead="surface" | "pattern": the button a person
+                                      would press next is solid, the other outlined
+  fold-btn         button             APP: Fold / Pause ([data-label]): plays toward the surface — from the pattern the
+                                      copies are gathered onto the tile first, then the tile's zippers close; disabled
+                                      at the surface
+  next-btn         button             APP: Unfold / Tile / Pause ([data-label]): plays toward the pattern, one stop at
+                                      a time — Unfold to the flat tile, then Tile to the pattern (the owner: "the
+                                      Unfold and Tile buttons should be in the same place so I can first unfold and
+                                      then tile"); at the pattern, Tile makes the copies again from the tile alone
+  scrubber         input range        TIMELINE (createTimeline slider): the journey j. Its wrapper #scrub[data-scrub]
+                                      gets --p, --a (where the tile sits on the track; APP) and the ticks ([data-ticks];
+                                      the three main stops carry [data-main] and show their label); do not touch its
+                                      value directly, use timeline.set(j) — which is silent: onChange fires for
+                                      scrubbing and playback only
   reset-view       button             APP: click -> renderer.resetView()
   legend           footer             static: one item per feature ([data-feature], shown when #app's data-features
                                       names it; all but corners and double when #app has no data-features) and the
@@ -127,21 +138,6 @@
       <canvas id="plane-canvas"></canvas>
       <p class="hint" id="hint">drag to move the cut</p>
       <p class="hint tile-caption" id="tile-caption" hidden></p>
-      <div class="tile-bar" id="tile-bar">
-        <button type="button" class="btn-quiet tile-btn" id="tile-btn" data-state="play" aria-label="Show how the tiling is made" title="How the copies of the tile are made">
-          <svg class="ico-play" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M6.5 4.6v10.8l8.6-5.4z"/></svg>
-          <svg class="ico-pause" viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7 5v10M13 5v10"/></svg>
-          <span data-label>Tile</span>
-        </button>
-        <div class="tile-track">
-          <div class="scrub tile-scrub" id="tile-scrub" data-scrub>
-            <span class="scrub-rail"></span>
-            <span class="scrub-fill"></span>
-            <span class="scrub-ticks" data-ticks></span>
-            <input type="range" id="tile-slider" min="0" max="1" step="any" value="1" aria-label="Tiling: how many copies are made">
-          </div>
-        </div>
-      </div>
     </section>
 
     <div class="ctl ctl-plane" id="plane-controls">
@@ -153,10 +149,10 @@
           <input type="range" id="wavy" min="0" max="1" step="0.01" value="0">
         </span>
       </label>
-      <p class="cut-note" id="cut-note">Every edge is a mirror: Fold folds the plane onto the tile.</p>
+      <p class="cut-note" id="cut-note">Every edge is a mirror: no zipper, so the tile is the surface. Fold folds the pattern along its mirrors onto it.</p>
     </div>
 
-    <section class="pane pane-fold" id="pane-fold" data-ss-comments="off" aria-label="Fold: the tile closing up into the orbifold">
+    <section class="pane pane-fold" id="pane-fold" data-ss-comments="off" aria-label="The paper: the pattern, the tile, and the tile zipped up into the orbifold's surface">
       <canvas id="fold-canvas"></canvas>
       <div class="labels" id="fold-labels" aria-hidden="true"></div>
       <p class="hint turn-hint" id="turn-hint">drag to turn</p>
@@ -164,13 +160,14 @@
     </section>
 
     <div class="ctl ctl-fold" id="fold-controls">
-      <button type="button" class="btn-primary" id="fold-btn"><span data-label>Fold</span></button>
-      <div class="scrub" id="scrub" data-scrub>
+      <button type="button" class="btn-primary" id="fold-btn" title="Fold the pattern up into its surface"><span data-label>Fold</span></button>
+      <div class="scrub scrub-journey" id="scrub" data-scrub>
         <span class="scrub-rail"></span>
         <span class="scrub-fill"></span>
         <span class="scrub-ticks" id="scrub-ticks" data-ticks></span>
-        <input type="range" id="scrubber" min="0" max="1" step="any" value="0" aria-label="Fold progress">
+        <input type="range" id="scrubber" min="0" max="1" step="any" value="1" aria-label="From the surface, through the flat tile, to the pattern">
       </div>
+      <button type="button" class="btn-primary" id="next-btn" title="Unfold the surface into the tile, then tile the plane with it"><span data-label>Tile</span></button>
       <button type="button" class="btn-quiet" id="reset-view" aria-label="Reset view" title="Reset view">
         <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 6.8A6.5 6.5 0 1 0 10 3.5"/><path d="M12.7 1 10 3.5l2.7 2.6"/></svg>
         <span class="btn-text">Reset<span class="btn-text-wide"> view</span></span>
@@ -181,11 +178,11 @@
 
   <footer class="legend" id="legend" aria-label="Legend">
     <span class="lg lg-paper" data-paper><svg class="sw sw-sq" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><rect class="sw-front" width="10" height="10" rx="1.5"/></svg><span>front</span><span class="lg-sep">·</span><svg class="sw sw-sq" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><rect class="sw-back" width="10" height="10" rx="1.5"/></svg><span>back<span class="lg-long"> of the paper</span></span></span>
-    <span class="lg" data-feature="seams"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-a" d="M1.5 4h9"/><path class="sw-b" d="M13.5 4h9"/></svg><span>coloured = edges sewn together</span></span>
-    <span class="lg" data-feature="mirrors"><svg class="sw" viewBox="0 0 14 8" width="14" height="8" aria-hidden="true" focusable="false"><path class="sw-ink" d="M1.5 4h11"/></svg><span>ink = mirror (becomes the rim)</span></span>
+    <span class="lg" data-feature="seams"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-a" d="M1.5 4h9"/><path class="sw-b" d="M13.5 4h9"/></svg><span>same colour = a zipper<span class="lg-long">: two edges zipped together</span></span></span>
+    <span class="lg" data-feature="mirrors"><svg class="sw" viewBox="0 0 14 8" width="14" height="8" aria-hidden="true" focusable="false"><path class="sw-ink" d="M1.5 4h11"/></svg><span>ink = mirror<span class="lg-long">: the rim of a hole (∗)</span></span></span>
     <span class="lg" data-feature="cones"><svg class="sw" viewBox="0 0 8 8" width="8" height="8" aria-hidden="true" focusable="false"><circle class="sw-dot" cx="4" cy="4" r="3"/></svg><span>dot <i>n</i> = cone point</span></span>
-    <span class="lg" data-feature="corners"><svg class="sw" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><circle class="sw-ring" cx="5" cy="5" r="3.7"/></svg><span>ring ∗<i>n</i> = mirror corner</span></span>
-    <span class="lg" data-feature="double"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-dash" d="M1.5 4h21"/></svg><span>dashed = self-intersection</span></span>
+    <span class="lg" data-feature="corners"><svg class="sw" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true" focusable="false"><circle class="sw-ring" cx="5" cy="5" r="3.7"/></svg><span>ring ∗<i>n</i> = corner point</span></span>
+    <span class="lg" data-feature="double"><svg class="sw" viewBox="0 0 24 8" width="24" height="8" aria-hidden="true" focusable="false"><path class="sw-dash" d="M1.5 4h21"/></svg><span>dashed = the surface crosses itself<span class="lg-long"> (×)</span></span></span>
     <span class="companion"><span class="companion-k">companion:</span> <a href="https://spacesheep.dev/@yaroslavvb/the-unfolding" target="_blank" rel="noopener">The Unfolding</a></span>
   </footer>
 

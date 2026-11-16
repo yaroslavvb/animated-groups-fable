@@ -319,7 +319,7 @@ test('the placement table is fresh: every entry was computed from today\'s group
     // the place along a strip, and among the places wholly in the tile, was chosen for the default 3D view at t = 1:
     // the table is stale too when the fold puts the default tile elsewhere (src/folds/*.js) or the view changed
     assert.equal(e.view, viewKey(g), `${id}: the folded default tile (src/folds, src/mesh.js) or the default view changed — ${how}`);
-    assert.equal(e.view === null, g.fold === 'snowflake', `${id}: only a kaleidoscope has no view term`);
+    assert.equal(e.view === null, g.fold === 'disc', `${id}: only a kaleidoscope has no view term`);
     assert.equal(m.info.source, 'table', id);
     assert.equal(m.info.fresh, true, id);
     // motifFor draws exactly the table's comma
@@ -456,7 +456,7 @@ test('motifTintMesh, every group: area kept, no triangle of mixed tint, fill bit
     for (const c of seeds) for (const amp of [0, 1]) {
       const tag = `${g.id} seed ${c.seed.map((v) => v.toFixed(3))} amp ${amp}`;
       const d = buildDomain(g, { seed: c.seed, metric: c.metric, warp: makeWarp(g, amp) });
-      const tile = g.fold === 'snowflake' ? null : buildMesh(g, d, foldMeshOptions(g));
+      const tile = buildMesh(g, d, foldMeshOptions(g));
       const fold = createFold(g, d, tile, foldOptions({ anchor: g.presets[0].anchor || g.presets[0].seed }));
       const M = fold.mesh, T = motifTintMesh(g, M, m);
       assert.ok(T && T.motifTint === true, `${tag}: the mesh holds the comma`);
@@ -484,7 +484,7 @@ test('motifTintMesh, every group: area kept, no triangle of mixed tint, fill bit
         if (T.tint[a] & 2) filled += ar;
       }
       assert.ok(Math.abs(a1 - a0) <= 1e-7 * Math.abs(a0), `${tag}: area ${a1} vs ${a0}`);
-      const cells = g.fold === 'snowflake' ? fold.cellMaps.length : 1;     // a star holds one comma per cell
+      const cells = 1;                                             // (one tile, one comma: no fold has a star since 15 Nov 2026)
       worstArea = Math.max(worstArea, Math.abs(filled / 2 - cells * comma) / (cells * comma));
       assert.ok(Math.abs(filled / 2 - cells * comma) <= 0.02 * cells * comma, `${tag}: filled ${filled / 2} vs ${cells} x ${comma}`);
       // each of the mesh's own vertices has the fill bit exactly when it lies inside a copy (checked apart from

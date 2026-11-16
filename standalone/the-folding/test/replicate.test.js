@@ -45,7 +45,7 @@ test('the replication plan is exact for every group, preset, wave and a few drag
       const p = group.presets[pi];
       for (const amp of [0, 1]) {
         const seeds = [null];
-        if (group.fold !== 'snowflake') for (let k = 0; k < 3; k++) seeds.push([p.seed[0] + (rnd() - 0.5) * 0.6 * size, p.seed[1] + (rnd() - 0.5) * 0.6 * size]);
+        if (group.fold !== 'disc') for (let k = 0; k < 3; k++) seeds.push([p.seed[0] + (rnd() - 0.5) * 0.6 * size, p.seed[1] + (rnd() - 0.5) * 0.6 * size]);
         for (const s of seeds) {
           const { D, seedA, rt, win, plan } = setup(group, p, amp, s);
           const where = `${group.id} preset ${pi} amp ${amp} seed ${s ? s.map((v) => v.toFixed(3)) : 'preset'}`;
@@ -135,7 +135,7 @@ test('the cards are continuous: position, opacity, face and lift never jump, fro
       const p = group.presets[pi];
       for (const amp of [0, 1]) {
         const seeds = [null];
-        if (group.fold !== 'snowflake') seeds.push([p.seed[0] + (rnd() - 0.5) * 0.6 * size, p.seed[1] + (rnd() - 0.5) * 0.6 * size]);
+        if (group.fold !== 'disc') seeds.push([p.seed[0] + (rnd() - 0.5) * 0.6 * size, p.seed[1] + (rnd() - 0.5) * 0.6 * size]);
         for (const s of seeds) {
           const { D, plan } = setup(group, p, amp, s);
           const where = `${group.id} preset ${pi} amp ${amp} seed ${s ? s.map((v) => v.toFixed(3)) : 'preset'}`;
@@ -203,7 +203,10 @@ test('the URL carries the replication: tile=<u>, 3 decimals, absent at 1, betwee
   assert.equal(encodeHash({ g: '333', tile: 0 }), '#g=333&tile=0');
   assert.equal(encodeHash({ g: '333', tile: 0.123456 }), '#g=333&tile=0.123');
   assert.equal(encodeHash({ g: '333', tile: 0.9996 }), '#g=333', 'rounds to 1: left out');
-  assert.equal(encodeHash({ g: '4*2', cut: 1, wavy: 0.5, tile: 0.25, t: 0.5 }), '#g=4%2A2&cut=1&wavy=0.5&tile=0.25&t=0.5');
+  assert.equal(encodeHash({ g: '4*2', cut: 1, wavy: 0.5, tile: 0.25 }), '#g=4%2A2&cut=1&wavy=0.5&tile=0.25');
+  // (the journey, 15 Nov 2026: a tile that is not flat has no copies — beside t > 0, tile is 0 and is not written)
+  assert.equal(encodeHash({ g: '4*2', cut: 1, wavy: 0.5, tile: 0.25, t: 0.5 }), '#g=4%2A2&cut=1&wavy=0.5&t=0.5');
+  assert.equal(encodeHash({ g: '4*2', tile: 0, t: 1 }), '#g=4%2A2&t=1');
   assert.match(encodeHash({ g: '*632', tile: 0.4 }), WRAPPER_HASH);
   assert.equal(decodeHash('#g=333').tile, 1);
   assert.equal(decodeHash('#333').tile, 1, 'legacy links: tiled');
@@ -236,7 +239,7 @@ test('finding 5: a drag keeps the order of the side pairings — the first layer
   let steps = 0, renumbered = 0, compared = 0;
   const rnd2 = (() => { let s = 777; return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; })();
   for (const group of GROUPS) {
-    if (group.fold === 'snowflake') continue;
+    if (group.fold === 'disc') continue;
     const size = Math.sqrt(group.domainArea);
     for (const [pi, p] of group.presets.entries()) {
       for (const amp of [0, 1]) {
@@ -279,7 +282,7 @@ test('finding 5: a drag keeps the order of the side pairings — the first layer
 test('finding 5: a kept length (opts.total) — the first layer keeps its timing exactly, the later layers fill the rest, every copy still lands by the end; outside LOCK_RANGE the plan takes its own length', () => {
   let kept = 0, refused = 0;
   for (const group of GROUPS) {
-    if (group.fold === 'snowflake') continue;
+    if (group.fold === 'disc') continue;
     const size = Math.sqrt(group.domainArea);
     for (const p of group.presets) {
       const D0 = buildDomain(group, { seed: p.seed, metric: p.metric, warp: makeWarp(group, 0) });

@@ -104,7 +104,7 @@
         if (row.overlap > 0.004) warn.push('copies overlap ' + pc(row.overlap));
         if (N.verts > MAX_VERTS) warn.push(N.verts + ' vertices');
         if (row.ms > 100) warn.push(row.ms + ' ms');
-        cap.innerHTML = `<b>${group.label}</b> ${group.hm} · dark ${pc(row.coverage)} · bare ⌀ ${row.emptyDisc ?? '–'} · solid ⌀ ${row.darkDisc ?? '–'} · ${N.verts} pts · ${row.ms} ms` +
+        cap.innerHTML = `<b>${group.label}</b> ${group.surface} · dark ${pc(row.coverage)} · bare ⌀ ${row.emptyDisc ?? '–'} · solid ⌀ ${row.darkDisc ?? '–'} · ${N.verts} pts · ${row.ms} ms` +
           (warn.length ? ` <span class="bad">${warn.join(', ')}</span>` : '');
       } catch (e) {
         row.error = String(e && e.stack || e);

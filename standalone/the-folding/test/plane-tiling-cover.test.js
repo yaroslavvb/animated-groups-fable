@@ -30,7 +30,7 @@ const SIZES = [[620, 580, null], [226, 226, PHONE_FRAME]];
 
 /** One case: every frame of the replication of one scene in one pane. Returns { frames, problems: [..], ... }. */
 function runCase(g, sc, [W, H, frame], label, controls) {
-  const snow = g.fold === 'snowflake', sides = sidePairings(sc.domain), out = { frames: 0, problems: [], words: 0, cards: 0, moving: 0 };
+  const snow = g.fold === 'disc', sides = sidePairings(sc.domain), out = { frames: 0, problems: [], words: 0, cards: 0, moving: 0 };
   const { canvas, rec } = recordingCanvas(W, H);
   const P = createPlaneView(canvas, { hint: false });
   P.setScene({ group: g, domain: sc.domain, motif: motifFor(g), star: sc.star || undefined, interactive: !snow });
@@ -104,7 +104,7 @@ test('the drawn replication is the group\'s tiling: every outline g(D) with g in
   let frames = 0, cases = 0, cards = 0, moving = 0, words = 0;
   const problems = [], controls = {};
   for (const g of GROUPS) {
-    const snow = g.fold === 'snowflake', rnd = prng(4242 + g.id.length * 977 + g.id.charCodeAt(0) * 31);
+    const snow = g.fold === 'disc', rnd = prng(4242 + g.id.length * 977 + g.id.charCodeAt(0) * 31);
     for (let pi = 0; pi < g.presets.length; pi++) {
       const st = presetState(g, pi);
       for (const amp of snow ? [0] : [0, 1]) {

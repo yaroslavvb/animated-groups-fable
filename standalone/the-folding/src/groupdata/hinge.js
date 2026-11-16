@@ -31,8 +31,8 @@ const M0 = refl(0, 0, 0);
 
 export default [
   {
-    id: '2222', label: '2222', hm: 'p2',
-    shape: 'pillow', topology: 'sphere with four cone points of order 2',
+    id: '2222', label: '2222',
+    shape: 'pillow', surface: 'sphere', topology: 'a sphere with four cone points of order 2',
     e1: [1.3, 0], e2: [0, 1.0],
     reps: [{ ...IDENT }, rot(PI)],
     fold: 'hinge', kaleido: kRect(1.3, 1.0),
@@ -44,8 +44,8 @@ export default [
     ],
   },
   {
-    id: '22*', label: '22∗', hm: 'pmg',
-    shape: 'pillowcase', topology: 'disc with two cone points of order 2; its rim is a mirror',
+    id: '22*', label: '22∗',
+    shape: 'pillowcase', surface: 'disk', topology: 'a punched sphere with two cone points of order 2; its rim is a mirror without corners',
     e1: [1.3, 0], e2: [0, 1.6],
     // half-turn at the origin, mirror y = 0.4, glide along x = 0
     reps: [{ ...IDENT }, rot(PI), refl(0, 0.4, 0), glide(0, 0, PI / 2, 0.8)],
@@ -61,8 +61,8 @@ export default [
     ],
   },
   {
-    id: '2*22', label: '2∗22', hm: 'cmm',
-    shape: 'corner pocket', topology: 'disc with a cone point of order 2 and two mirror corners of order 2',
+    id: '2*22', label: '2∗22',
+    shape: 'corner pocket', surface: 'disk', topology: 'a punched sphere with a cone point of order 2; its rim is a mirror with two corners of order 2',
     e1: [0.8, 0.6], e2: [-0.8, 0.6], // centred rectangular cell 1.6 x 1.2
     reps: [{ ...IDENT }, rot(PI), refl(0, 0, PI / 2), refl(0, 0, 0)],
     fold: 'hinge', kaleido: kRect(0.8, 0.6),
@@ -75,8 +75,8 @@ export default [
     ],
   },
   {
-    id: '442', label: '442', hm: 'p4',
-    shape: 'triangular pillow', topology: 'sphere with cone points of order 4, 4, 2',
+    id: '442', label: '442',
+    shape: 'triangular pillow', surface: 'sphere', topology: 'a sphere with cone points of order 4, 4, 2',
     e1: [1, 0], e2: [0, 1],
     reps: R4,
     fold: 'hinge', kaleido: k442(),
@@ -89,8 +89,8 @@ export default [
     ],
   },
   {
-    id: '4*2', label: '4∗2', hm: 'p4g',
-    shape: 'cone pouch', topology: 'disc with a cone point of order 4 and a mirror corner of order 2',
+    id: '4*2', label: '4∗2',
+    shape: 'cone pouch', surface: 'disk', topology: 'a punched sphere with a cone point of order 4; its rim is a mirror with a corner of order 2',
     e1: [1, 0], e2: [0, 1],
     reps: R4.concat(R4.map((r) => compose(Md, r))),
     fold: 'hinge', kaleido: k442small(),
@@ -107,8 +107,8 @@ export default [
     ],
   },
   {
-    id: '333', label: '333', hm: 'p3',
-    shape: 'triangular pillow', topology: 'sphere with three cone points of order 3',
+    id: '333', label: '333',
+    shape: 'triangular pillow', surface: 'sphere', topology: 'a sphere with three cone points of order 3',
     e1: [1, 0], e2: [0.5, S3 / 2],
     reps: R3,
     fold: 'hinge', kaleido: k333(),
@@ -121,8 +121,8 @@ export default [
     ],
   },
   {
-    id: '3*3', label: '3∗3', hm: 'p31m',
-    shape: 'cone pouch', topology: 'disc with a cone point of order 3 and a mirror corner of order 3',
+    id: '3*3', label: '3∗3',
+    shape: 'cone pouch', surface: 'disk', topology: 'a punched sphere with a cone point of order 3; its rim is a mirror with a corner of order 3',
     e1: [1, 0], e2: [0.5, S3 / 2],
     reps: R3.concat(R3.map((r) => compose(M0, r))),
     fold: 'hinge', kaleido: k632(),
@@ -135,8 +135,8 @@ export default [
     ],
   },
   {
-    id: '632', label: '632', hm: 'p6',
-    shape: 'triangular pillow', topology: 'sphere with cone points of order 6, 3, 2',
+    id: '632', label: '632',
+    shape: 'triangular pillow', surface: 'sphere', topology: 'a sphere with cone points of order 6, 3, 2',
     e1: [1, 0], e2: [0.5, S3 / 2],
     reps: cyclic(6),
     fold: 'hinge', kaleido: k632(),

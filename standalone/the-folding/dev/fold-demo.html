@@ -91,7 +91,9 @@
 //                       times, &views=0:55,110:18 the directions (az:el). One Read of one PNG instead of ten.
 //
 // Fold modules: hinge -> src/folds/hinge.js, crosscap -> crosscap.js, torus | cylinder | mobius | klein -> roll.js,
-// snowflake -> snowflake.js; each is called as  createFold(group, domain, mesh, opts)  (opts = {} unless given).
+// disc -> disc.js (the kaleidoscopes: nothing folds); src/folds/snowflake.js, the star of tiles, is used by no group
+// since 15 Nov 2026 (&fold=../src/folds/snowflake.js still plays it); each is called as
+// createFold(group, domain, mesh, opts)  (opts = {} unless given).
 // If the module is missing, does not load, or createFold throws, the page draws the FLAT tile for every t and says
 // why in the corner (bottom left; the same text goes to console.error, which tools/shot.mjs prints, and into
 // state().error). If at(t) or the function it returns throws at some t, that frame is drawn flat and the corner says
@@ -127,7 +129,7 @@
 // dev/fold-demo.check.mjs (node) checks the facts about domain + mesh this page relies on; dev/fold-demo.selftest.js
 // is a toy fold that exercises the page itself (a closing tube for **, a bowl elsewhere, and failures on demand).
 
-const FOLD_FILE = { hinge: 'hinge.js', crosscap: 'crosscap.js', torus: 'roll.js', cylinder: 'roll.js', mobius: 'roll.js', klein: 'roll.js', snowflake: 'snowflake.js' };
+const FOLD_FILE = { hinge: 'hinge.js', crosscap: 'crosscap.js', torus: 'roll.js', cylinder: 'roll.js', mobius: 'roll.js', klein: 'roll.js', disc: 'disc.js', snowflake: 'snowflake.js' };
 const EDGE_WIDTH = 4.5, CREASE_WIDTH = 1.6, CREASE_SAMPLES = 13;
 
 const $ = (id) => document.getElementById(id);
@@ -548,7 +550,7 @@ function updateHud() {
   const hud = $('hud');
   if (!core) { hud.textContent = ''; return; }
   const group = core.BY_ID[state.g], s = scene;
-  let html = `<div><b class="sym">${esc(group.label)}</b> <b>${esc(group.hm)}</b> · ${esc(group.shape)}`;
+  let html = `<div><b class="sym">${esc(group.label)}</b> <b>${esc(group.surface)}</b> · ${esc(group.shape)}`;
   if (s) {
     const P = s.tile.group.presets.length;
     html += ` · cut <b>${esc(state.seed ? 'custom seed ' + s.tile.domain.seed.map(r4).join(', ') : s.tile.preset.name)}</b>` +
@@ -976,7 +978,7 @@ async function init() {
   }
   // controls
   const selG = $('selG');
-  for (const g of core.GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}   ${g.hm} · ${g.shape}`; selG.appendChild(o); }
+  for (const g of core.GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}   ${g.surface} · ${g.shape}`; selG.appendChild(o); }
   selG.addEventListener('change', () => change(() => setGroupState(selG.value, 0), { rebuilds: true, wait: false }));
   $('selP').addEventListener('change', (e) => { const v = e.target.value; if (v !== 'seed') change(() => { state.preset = +v; state.seed = null; }, { rebuilds: true, wait: false }); });
   $('amp').addEventListener('input', (e) => change(() => { state.amp = clamp01(e.target.value); }, { rebuilds: true, wait: false }));

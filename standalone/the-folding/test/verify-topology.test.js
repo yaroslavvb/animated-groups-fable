@@ -45,7 +45,7 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { GROUPS, BY_ID } from '../src/groups.js';
+import { GROUPS, BY_ID, surfaceFacts } from '../src/groups.js';
 import { makeWarp, buildDomain } from '../src/domain.js';
 import { buildMesh } from '../src/mesh.js';
 
@@ -61,23 +61,23 @@ const BISECTIONS = Math.max(5, +process.env.VERIFY_BISECTIONS || 5);
 // ---------------------------------------------------------------------------------------------------------------
 
 const EXPECT = {
-  'o':     { hm: 'p1',   surface: 'torus',            chi: 0, orientable: true,  rims: 0, cones: [],           corners: [] },
-  '2222':  { hm: 'p2',   surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [2, 2, 2, 2], corners: [] },
-  '**':    { hm: 'pm',   surface: 'annulus',          chi: 0, orientable: true,  rims: 2, cones: [],           corners: [] },
-  'xx':    { hm: 'pg',   surface: 'Klein bottle',     chi: 0, orientable: false, rims: 0, cones: [],           corners: [] },
-  '*x':    { hm: 'cm',   surface: 'Möbius band',      chi: 0, orientable: false, rims: 1, cones: [],           corners: [] },
-  '333':   { hm: 'p3',   surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [3, 3, 3],    corners: [] },
-  '22x':   { hm: 'pgg',  surface: 'projective plane', chi: 1, orientable: false, rims: 0, cones: [2, 2],       corners: [] },
-  '22*':   { hm: 'pmg',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [2, 2],       corners: [] },
-  '*2222': { hm: 'pmm',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [2, 2, 2, 2] },
-  '2*22':  { hm: 'cmm',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [2],          corners: [2, 2] },
-  '442':   { hm: 'p4',   surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [4, 4, 2],    corners: [] },
-  '632':   { hm: 'p6',   surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [6, 3, 2],    corners: [] },
-  '3*3':   { hm: 'p31m', surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [3],          corners: [3] },
-  '*333':  { hm: 'p3m1', surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [3, 3, 3] },
-  '4*2':   { hm: 'p4g',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [4],          corners: [2] },
-  '*442':  { hm: 'p4m',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [4, 4, 2] },
-  '*632':  { hm: 'p6m',  surface: 'disc',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [6, 3, 2] },
+  'o':     { surface: 'torus',            chi: 0, orientable: true,  rims: 0, cones: [],           corners: [] },
+  '2222':  { surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [2, 2, 2, 2], corners: [] },
+  '**':    { surface: 'annulus',          chi: 0, orientable: true,  rims: 2, cones: [],           corners: [] },
+  'xx':    { surface: 'Klein bottle',     chi: 0, orientable: false, rims: 0, cones: [],           corners: [] },
+  '*x':    { surface: 'Möbius band',      chi: 0, orientable: false, rims: 1, cones: [],           corners: [] },
+  '333':   { surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [3, 3, 3],    corners: [] },
+  '22x':   { surface: 'projective plane', chi: 1, orientable: false, rims: 0, cones: [2, 2],       corners: [] },
+  '22*':   { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [2, 2],       corners: [] },
+  '*2222': { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [2, 2, 2, 2] },
+  '2*22':  { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [2],          corners: [2, 2] },
+  '442':   { surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [4, 4, 2],    corners: [] },
+  '632':   { surface: 'sphere',           chi: 2, orientable: true,  rims: 0, cones: [6, 3, 2],    corners: [] },
+  '3*3':   { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [3],          corners: [3] },
+  '*333':  { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [3, 3, 3] },
+  '4*2':   { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [4],          corners: [2] },
+  '*442':  { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [4, 4, 2] },
+  '*632':  { surface: 'disk',             chi: 1, orientable: true,  rims: 1, cones: [],           corners: [6, 3, 2] },
 };
 
 /** The same data read mechanically off the symbol (a second derivation of the table above). */
@@ -655,9 +655,13 @@ test('expected values: the hand-written table agrees with the orbifold symbols, 
     // and back: the symbol composed from the measured quantities is the id
     const rimCorners = id.split('*').slice(1).map((part) => [...part].filter((ch) => ch >= '2' && ch <= '9').map(Number));
     assert.equal(symbolOf({ chi: want.chi, orientable: want.orientable, rimCorners, cones: want.cones }), id);
-    // the crystallographic name and the caption the page shows belong to the same orbifold
-    assert.equal(BY_ID[id].hm, want.hm, `${id}: Hermann-Mauguin name`);
-    assert.ok(BY_ID[id].topology.startsWith(want.surface), `${id}: caption "${BY_ID[id].topology}" should start with "${want.surface}"`);
+    // the surface the page names (the chip) belongs to the same orbifold, and so do the three numbers the page counts
+    // it by (groups.js surfaceFacts: chapter 8's Euler characteristic, boundaries, sides). No crystallographic name:
+    // the owner, 15 Nov 2026, "get rid of crystallographic notation"
+    assert.equal(BY_ID[id].surface, want.surface, `${id}: the surface's name`);
+    assert.equal('hm' in BY_ID[id], false, `${id}: no crystallographic name`);
+    const f = surfaceFacts(id);
+    assert.deepEqual([f.chi, f.boundaries, f.sides === 2, f.cones, f.corners], [want.chi, want.rims, want.orientable, want.cones, want.corners], `${id}: surfaceFacts`);
   }
 });
 
@@ -1266,7 +1270,7 @@ test('mesh: a disc whose rim is the tile boundary, cut into discs that form a tr
         meshStats.maxPieces = Math.max(meshStats.maxPieces, res.pieces);
         if (res.pieces > 1) meshStats.multi++;
         if (!group.kaleido && res.pieces !== 1) res.out.push(`${res.pieces} pieces in a group without a kaleidoscope`);
-        if (group.fold === 'snowflake' && res.pieces !== 1) res.out.push(`${res.pieces} pieces in a kaleidoscope's own tile`);
+        if (group.fold === 'disc' && res.pieces !== 1) res.out.push(`${res.pieces} pieces in a kaleidoscope's own tile`);
         for (const msg of res.out) lines.push(`${where}: ${msg}${how}`);
       }
     }
@@ -1354,7 +1358,7 @@ test('hinge groups: two copies of the kaleidoscope cell joined along the glued s
     assert.ok(Math.abs(group.domainArea - (group.fold === 'crosscap' ? 1 : 2) * cellArea) < 1e-12, `${group.id}: tile area ${group.domainArea}, cell area ${cellArea}`);
   }
   for (const group of GROUPS) {
-    if (group.fold !== 'snowflake') continue;
+    if (group.fold !== 'disc') continue;
     assert.ok(group.kaleido.glued.every((g) => !g), `${group.id}: a kaleidoscope glues nothing`);
     assert.ok(Math.abs(group.domainArea - group.kaleido.group.domainArea) < 1e-12, group.id);
   }

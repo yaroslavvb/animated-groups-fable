@@ -7,7 +7,8 @@
 //        /*__INLINE_CSS__*/   (inside <style>)        /*__INLINE_JS__*/   (inside <script>)
 //    escaping "</script", "</style" and "<!--" so the inlined text cannot end its element early.
 // 4. checks the result: one file, one inline <script>, no external script / stylesheet / @import / url(), and no URL
-//    at all except the companion link. (XML namespace names such as http://www.w3.org/2000/svg are names, never
+//    at all except the companion link and the Classification of Surfaces page (15 Nov 2026: the caption's first words
+//    link into it). (XML namespace names such as http://www.w3.org/2000/svg are names, never
 //    fetched, and are let through; anything else needs --allow-url.)
 // Relative paths are resolved against this file's directory (the workspace root), not the shell's cwd.
 // Prints the sizes. Exit code 1 on any failure; nothing is written unless every check passes.
@@ -35,6 +36,8 @@ const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const CSS_SLOT = '/*__INLINE_CSS__*/';
 const JS_SLOT = '/*__INLINE_JS__*/';
 const COMPANION = 'https://spacesheep.dev/@yaroslavvb/the-unfolding';
+// the page that makes Conway's chapter 8 playable: the caption links into it (src/app.js SURFACES_URL)
+const SURFACES = 'https://spacesheep.dev/@yaroslavvb/classification-of-surfaces';
 const NAMESPACES = ['http://www.w3.org/2000/svg', 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/1999/xlink',
   'http://www.w3.org/1998/Math/MathML', 'http://www.w3.org/XML/1998/namespace', 'http://www.w3.org/2000/xmlns/'];
 
@@ -96,7 +99,7 @@ function inlineSafeJs(js) {
 const inlineSafeCss = (css) => css.replace(/<\/style/gi, '<\\/style').replace(/<!--/g, '<\\!--');
 
 function foreignUrls(text, allow, companion = COMPANION) {
-  const ok = [companion, ...NAMESPACES, ...allow];
+  const ok = [companion, SURFACES, ...NAMESPACES, ...allow];
   const found = text.match(/\b(?:https?|wss?|ftp):\/\/[^\s"'`<>)\\]+/gi) || [];
   return [...new Set(found)].filter((u) => !ok.some((prefix) => u.startsWith(prefix)));
 }
@@ -152,4 +155,4 @@ console.log(`  html shell ${kb(Buffer.byteLength(shell)).padStart(9)}`);
 console.log(`  css        ${kb(Buffer.byteLength(css)).padStart(9)}   from ${kb(fs.statSync(cssFile).size)} of source`);
 console.log(`  js bundle  ${kb(Buffer.byteLength(js)).padStart(9)}`);
 console.log(`  total      ${kb(bytes).padStart(9)}   = ${bytes} bytes, ${kb(zlib.gzipSync(html, { level: 9 }).length)} gzipped`);
-console.log('  self-contained: one file, one inline <script>, no URL except the companion link');
+console.log('  self-contained: one file, one inline <script>, no URL except the companion link and the surfaces page');

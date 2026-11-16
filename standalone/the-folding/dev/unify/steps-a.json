@@ -1,0 +1,12 @@
+[
+  {"wait": 1500},
+  {"eval": "(() => { const F = window.__folding; const s = F.getState(); return [s.groupId, s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors]; })()", "wait": 400, "out": "qa/u/a-333-pattern.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0); const s = F.getState(); return [s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors]; })()", "wait": 500, "out": "qa/u/a-333-tile.png"},
+  {"eval": "(() => { const F = window.__folding; F.setT(0.5); const s = F.getState(); return [s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors]; })()", "wait": 500, "out": "qa/u/a-333-half.png"},
+  {"eval": "(() => { const F = window.__folding; F.setT(1); const s = F.getState(); return [s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors]; })()", "wait": 500, "out": "qa/u/a-333-surface.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0.3); const s = F.getState(); return [s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.tileCaption, s.errors]; })()", "wait": 500, "out": "qa/u/a-333-tiling.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('*632'); const s = F.getState(); return [s.groupId, s.t, s.tile, s.journey, s.journeyStop, s.journeyTile, s.button, s.nextButton, s.lead, s.errors, s.foldType]; })()", "wait": 600, "out": "qa/u/a-s632-pattern.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0); const s = F.getState(); return [s.t, s.tile, s.journey, s.journeyStop, s.button, s.nextButton, s.lead, s.errors]; })()", "wait": 500, "out": "qa/u/a-s632-tile.png"},
+  {"eval": "(() => { const F = window.__folding; F.setTile(0.12); const s = F.getState(); return [s.t, s.tile, s.journey, s.tileCaption, s.errors]; })()", "wait": 500, "out": "qa/u/a-s632-tiling.png"},
+  {"eval": "(() => { const F = window.__folding; F.setGroup('*x'); F.setT(1); const s = F.getState(); return [s.groupId, s.t, s.tile, s.journey, s.errors]; })()", "wait": 600, "out": "qa/u/a-sx-surface.png"}
+]

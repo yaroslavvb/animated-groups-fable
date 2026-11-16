@@ -65,7 +65,7 @@ function planeOf(id) {
   const g = BY_ID[id], p = g.presets[0];
   const { canvas, rec } = recordingCanvas(620, 580);
   const P = createPlaneView(canvas, { hint: false });
-  P.setScene({ group: g, domain: buildDomain(g, { seed: p.seed, metric: p.metric, warp: makeWarp(g, 0) }), interactive: g.fold !== 'snowflake', print: printFor(g, 'checker') });
+  P.setScene({ group: g, domain: buildDomain(g, { seed: p.seed, metric: p.metric, warp: makeWarp(g, 0) }), interactive: g.fold !== 'disc', print: printFor(g, 'checker') });
   const frame = (u) => { P.setTiling(u); rec.calls.length = 0; P.render(); return rec.calls.filter((c) => c.op === 'fill').map((c) => ({ ...c, st: c.fillStyle.replace(/\s/g, '') })); };
   return { g, P, frame };
 }

@@ -677,7 +677,7 @@ test('mesh: the rim follows a wavy boundary within 0.6 % of the tile size, draft
     worst = Math.max(worst, gap); n++;
   }
   for (const g of GROUPS) {
-    if (g.fold === 'snowflake') continue;
+    if (g.fold === 'disc') continue;
     for (let k = 0; k < 12; k++) {
       const seed = seedOf(g, 11, k), d = buildDomain(g, { seed, metric: g.presets[k % g.presets.length].metric, warp: makeWarp(g, 1) });
       for (const draft of [true, false]) {

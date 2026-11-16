@@ -143,7 +143,7 @@ function draw(scene, x, y, w, h, cx, cy, half, opts = {}) {
 
 function caption(scene) {
   const { group, mesh, domain, preset, ms } = scene;
-  return `${group.label}  ${group.hm} · ${preset.name} · ${domain.poly.length} edges, ${domain.classes} classes · ${mesh.m} tri, ${mesh.cells.length} piece${mesh.cells.length === 1 ? '' : 's'} · ${ms.toFixed(1)} ms`;
+  return `${group.label}  ${group.surface} · ${preset.name} · ${domain.poly.length} edges, ${domain.classes} classes · ${mesh.m} tri, ${mesh.cells.length} piece${mesh.cells.length === 1 ? '' : 's'} · ${ms.toFixed(1)} ms`;
 }
 
 function tileWindow(scene, margin) {

@@ -436,7 +436,7 @@ function bowOf(w, a, b, steps = 160) {
 }
 /** Laptop pixels per world unit of the plane view: 550 px across its window of 2 viewHalf (1280 x 720, round 2). */
 const laptopPx = (g) => 550 / (2 * g.viewHalf);
-const withCuts = GROUPS.filter((g) => g.fold !== 'snowflake');
+const withCuts = GROUPS.filter((g) => g.fold !== 'disc');
 
 test('warp: at Wavy 1 every cut edge of every preset bends visibly (finding #1)', () => {
   // Two bars, both measured on the exact warped edge:

@@ -16,7 +16,12 @@
 //   onState   optional: onState('fold' | 'pause' | 'unfold') whenever the button's state changes — 'pause' means it
 //             is playing; the other two say what the idle button would do. (Not called for the initial state.)
 //
-//   setStops([{t, label}])  the fold's main points (magnets + ticks); 0 and 1 are added if missing; keeps t.
+//   setStops([{t, label, main?}])  the fold's main points (magnets + ticks); 0 and 1 are added if missing; keeps t.
+//                           A stop with main: true gets a tick marked [data-main] (the journey's three: the shell prints
+//                           their labels, src/styles.css .scrub-journey).
+//   opts.toggle             (15 Nov 2026, the journey of src/journey.js) a function called INSTEAD of the default
+//                           toggle (Space, the button): the owner of a scrubber with more than two ends decides what
+//                           a press does (pause; else play to the next stop in the direction it was going).
 //   setDuration(sec)        seconds for a full 0 -> 1 play; a partial play takes the proportional time.
 //   set(t)                  jump to t (silently), stopping playback.
 //   get()                   current t in [0, 1].
@@ -70,7 +75,9 @@ export function normalizeStops(stops) {
       if (!Number.isFinite(t)) continue;
       t = clamp01(t);
       if (t < 1e-6) t = 0; else if (t > 1 - 1e-6) t = 1;
-      all.push({ t, label: s && typeof s.label === 'string' ? s.label : '' });
+      const o = { t, label: s && typeof s.label === 'string' ? s.label : '' };
+      if (s && s.main === true) o.main = true;                 // (kept only when set: a plain stop stays { t, label })
+      all.push(o);
     }
   }
   all.push({ t: 0, label: '' }, { t: 1, label: '' });
@@ -78,7 +85,7 @@ export function normalizeStops(stops) {
   const out = [];
   for (const s of all) {
     const prev = out[out.length - 1];
-    if (prev && s.t - prev.t < 1e-6) { if (!prev.label && s.label) prev.label = s.label; continue; }
+    if (prev && s.t - prev.t < 1e-6) { if (!prev.label && s.label) prev.label = s.label; if (s.main) prev.main = true; continue; }
     out.push(s);
   }
   return out;
@@ -320,6 +327,7 @@ export function createTimeline(opts = {}) {
       const tick = doc.createElement('i');
       tick.style.left = (s.t * 100).toFixed(4) + '%';
       if (s.label) tick.dataset.label = s.label;
+      if (s.main) tick.dataset.main = s.t <= 1e-6 ? 'start' : s.t >= 1 - 1e-6 ? 'end' : 'mid';
       return tick;
     }));
   }
@@ -393,7 +401,7 @@ export function createTimeline(opts = {}) {
     sync();
   }
 
-  const toggle = () => (playing ? stop() : play());
+  const toggle = () => (typeof opts.toggle === 'function' ? opts.toggle() : playing ? stop() : play());
 
   // The person moved the thumb (pointer, keyboard, assistive technology).
   function scrubTo(position) {
@@ -519,7 +527,7 @@ export function createTimeline(opts = {}) {
   return {
     setStops(next) {
       const cleaned = normalizeStops(next);
-      const same = cleaned.length === stops.length && cleaned.every((s, i) => s.t === stops[i].t && s.label === stops[i].label);
+      const same = cleaned.length === stops.length && cleaned.every((s, i) => s.t === stops[i].t && s.label === stops[i].label && !!s.main === !!stops[i].main);
       if (same) return;
       stops = cleaned;
       ts = stops.map((s) => s.t);

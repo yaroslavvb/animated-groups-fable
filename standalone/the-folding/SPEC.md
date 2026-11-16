@@ -1034,3 +1034,152 @@ round (the eleven designs, the judges, what shipped and why): `notes/patterns-ro
   presets that is no copy of a page group still has no Comma, and Paisley still searches for one (only the tests make
   such groups). (The Comma of a moved copy of a page group, `dev/patterns/README.md` and
   `notes/patterns-foundation.md` were done on 15 Nov.)
+
+## 12. 15 Nov 2026 — one journey: the surface, the tile, the pattern (Conway's chapter 8)
+
+The owner, 15 Nov 2026 (session message; the fixes link back to it from the page's
+[SPEC on GitHub](https://github.com/yaroslavvb/animated-groups-fable/blob/main/standalone/the-folding/SPEC.md)):
+
+> can you make sure that folding is compatible with Conway's approach to surfaces (chapter 8 in … The Symmetries of
+> Things) and implementation in https://spacesheep.dev/@yaroslavvb/classification-of-surfaces . In particular, I'm
+> confused about the folding of …#g=%2A632, Normally, the folded part is just the surface, but here there is a bit of
+> confusion about which part lies in the folding and which part lies in the tiling. Unify those two. Also, maybe the
+> Unfold and Tile buttons should be in the same place so I can first unfold and then tile. Also, get rid of
+> crystallographic notation. I only care about ortho.
+
+("ortho" is read as the orbifold notation.) Why and how it was decided: `notes/unify.md`.
+
+### 12.1 The model
+
+Chapter 8: "Any repeating pattern can be folded into an orbifold on some surface"; a surface is polygons and zippers.
+The page shows that as ONE journey with three stops (`src/journey.js`):
+
+| stop | what is on screen |
+|---|---|
+| **surface** | the tile with its zippers zipped: the orbifold's surface |
+| **tile** | the tile, flat, alone |
+| **pattern** | the copies of the tile that the group makes |
+
+- `t` (the fold, 0–1) and `tile` (the copies made, 0–1) lie on one line. **A tile that is not flat has no copies:**
+  `t > 0` means `tile = 0` (`normalizeState`). So there is no state "folded, with the pattern tiled" any more.
+- **What is folded is always the tile alone; the copies are always the pattern.** That holds for every group.
+- **A kaleidoscope's tile is its surface.** Every edge of the tile of `*2222`, `*442`, `*333`, `*632` is a mirror, so it
+  has no zipper: nothing is glued, and the tile is the orbifold already, a disk (fig. 8.1: "a triangle is a tidy
+  surface — it's a sphere with a hole in it") with a corner point at each corner.
+  - Fold type **`disc`** (`src/folds/disc.js`): `at(t)` is the identity, `duration` 0, `still: true`.
+  - The journey has no fold half for it. Its Fold is the pattern folding along its mirrors onto the tile: the tiling
+    run backwards.
+  - `src/folds/snowflake.js` (the star of 2n tiles folding onto the tile) stays in the tree with its tests, used by no
+    group, as the figure-8 Klein bottle does. Its star was the confusion: copies of the tile shown in the folding.
+
+### 12.2 The 3D pane shows the whole journey (`src/tiling3d.js`)
+
+On the tiling's half the 3D pane shows the tile making its copies round it: the plane's own plan (`P.getPlan()`), the
+same copies at the same moments. So the surface unfolds into the tile and the tile into the pattern in one view.
+
+- **The copies shown**: a round patch about the tile (`tilingPatch`): copies whose centre is within `T3_LIMITS.reach`
+  (4.4) tile radii, at most 64, each with its parent. The plane shows its whole window; the 3D pane this patch.
+- **The motions** are motions of space whose view from above is exactly the plane's card (`copyPlace`, `placePoint`):
+
+  | side pairing | motion | where |
+  |---|---|---|
+  | translation | slides | over the paper, lifted by `OVER` (0.014 tile sizes) |
+  | rotation | turns about its centre | over the paper, the same |
+  | reflection | a half-turn of space about the mirror line | under the paper; it lands back up (sand) |
+  | glide | the half-turn while it slides, sunk by the tile's half-width | under the paper |
+
+  A glide's tile lies on both sides of its axis, so the bare half screw would send half of it up through the paper;
+  sinking it by `dip · sin(π s)` keeps all of it below, and it is still a rigid motion.
+- A copy enters the picture once it has left its parent (`START_S`): before that it lies on its parent, and a second
+  sheet on the same spot would only make the nearly opaque paper denser there.
+- Every copy is the paper in its full tones, as the tile is. The tile is known by its bold edges and marked points.
+- The labels of the tile's points fade as the camera backs off (`PATTERN_LABELS`); the creases of the fold to come
+  fade as the first copies are made (`CREASE_GONE`).
+- The camera's frame is the bounding sphere of what is shown, so it backs off as the pattern grows.
+
+### 12.3 One transport (`src/index.template.html`, `src/styles.css`, `src/app.js`)
+
+One scrubber under the 3D pane: the surface at its left end, the tile in the middle (`TILE_AT` 0.5; a kaleidoscope: at
+the left end, named "tile = surface"), the pattern at its right end. A button at either end:
+
+| button | where | what it does |
+|---|---|---|
+| **Fold** (`#fold-btn`) | left of the scrubber | plays to the surface. From the pattern the copies are gathered first, `GATHER` (3.2) times as fast as they were made. A kaleidoscope's gathering is its fold: `KALEIDO_GATHER` 1.5. Disabled at the surface. |
+| **Unfold**, then **Tile** (`#next-btn`) | right of the scrubber | plays toward the pattern one stop at a time: Unfold to the flat tile, then Tile to the pattern. At the pattern, Tile gathers the copies (`REPLAY_GATHER` 7) and makes them again. |
+
+- A button pauses the play it started; the other one turns the play round. Space pauses, or goes on the way the last
+  play went.
+- The button that goes on that way is solid, the other outlined (`#fold-controls[data-lead]`, `[data-quiet]`).
+- The fill of the scrubber runs from the tile to the thumb, either way.
+- The names of the stops show while the transport's row has room (`@container fctl`): all three from 352 px, the two
+  ends from 272, none below. The narrowest row of the layout test's 23 sizes is 248 px (a 640 × 360 phone on its side).
+- The Tile bar left the plane pane. The plane keeps the tiling's words (`#tile-caption`) and, on a phone, its frame
+  under the words while copies are being made.
+- **The pale map** (`plane.js` `GHOST`): at `tile = 0` (the tile stop, and all through the fold) the plane keeps the
+  pattern under the tile at 0.4 of its strength, so a cut can still be chosen by eye. It is one cached image, gone by
+  `tile = 0.07`. Without a document (node) there is none.
+
+### 12.4 The address
+
+- The keys are unchanged: `g, pat, cut, seed, wavy, tile, t, view`. `tile` is written only when `t = 0`.
+- Decoded: `t > 0` sets `tile = 0`. An old link with `t=1` and no `tile` shows the surface, as before; its plane now
+  shows the pale map, not the full pattern.
+- A kaleidoscope has no fold: a `t` in its link shows its tile alone (`tile = 0`), which is its surface.
+
+### 12.5 The words (Conway's, and the Classification of Surfaces page's)
+
+- **No crystallographic names** anywhere: `hm` is gone from the group data, the chip, the picker and the dev pages.
+- The chip shows the orbifold symbol and `group.surface`, the surface's plain name: sphere, disk, torus, annulus,
+  Möbius band, Klein bottle, projective plane.
+- The caption (`group.topology`) says the surface as chapter 8 does, with its points:
+
+  | orbifold | caption |
+  |---|---|
+  | `o` | a sphere with a handle; no cone points, no mirrors |
+  | `**` | a twice-punched sphere; both rims are mirrors |
+  | `*x` | a punched crosscap; its rim is a mirror |
+  | `xx` | a pair of crosscaps; no cone points, no mirrors |
+  | `22x` | a sphere with a crosscap and two cone points of order 2 |
+  | `2222` `442` `333` `632` | a sphere with … cone points … |
+  | `22*` `2*22` `4*2` `3*3` | a punched sphere with … cone point(s) …; its rim is a mirror with/without corners |
+  | `*2222` `*442` `*333` `*632` | a punched sphere; its rim is a mirror with … corners … |
+
+- Its first words (`group.tidy`) are a link into the Classification of Surfaces page (`group.tidyAt`): the example of
+  its tab 4 for the torus, annulus, Möbius band, Klein bottle and disk; the crosscap of tab 1 for `22x`; tab 2 for the
+  spheres. `build.mjs` lets that one address through besides the companion link.
+- That link is a link in a sentence, one line high: the one control that is not a 44 px tap target (the chip is 2 px
+  above the caption's first line and the plane 4 to 8 px below it). WCAG 2.5.8 exempts such a link ("Inline"). The
+  layout gate and `tools/qa-matrix.mjs` ask of it: every piece inside the caption's box (the clamp cuts nothing of
+  it), at least 44 px wide, at least 14.5 px high.
+- The chip's tooltip counts the surface as that page does: χ, boundaries, sides (`groups.js` `surfaceFacts`).
+- The legend: "same colour = a zipper", "ink = mirror: the rim of a hole (∗)", "ring ∗n = corner point", "dashed =
+  the surface crosses itself (×)".
+- The shapes checked against chapter 8's examples (pp. 105–106): the disk ∗, the annulus ∗∗, the torus ○, the Möbius
+  band ∗× and the Klein bottle ×× are each drawn as that surface. The bottle is the cross-handle picture, which the
+  chapter shows equal to two crosscaps (⊗ = ××, p. 101).
+
+### 12.6 Removed
+
+- From `app.js`: the star's support — `motifFades`, `motifFade`, `ghostColor`, `ghostEase`, `GHOST_PRINT_MIX`,
+  `scene.star`. No mesh sets tint bit 0 now.
+- From the shell: `#tile-bar`, `#tile-btn`, `#tile-slider`, `#tile-scrub`.
+- From `__folding.getState()`: `tileBarOpen` (now `tileOpen`). Added: `journey`, `journeyStop`, `journeyTile`, `lead`,
+  `going`, `nextButton`. Added to `__folding`: `setJourney(j)`, `press('fold' | 'next')`.
+- `__folding.setT(0)` keeps the copies as they are; `setTile(0)` gives the tile alone.
+
+### 12.7 Tests and tools
+
+- New: `test/journey.test.js` (the line, the stops, the buttons' targets, the seconds, which groups have a fold half);
+  `test/tiling3d.test.js` (the patch; the mesh; every copy starts on its parent, lands on its place, is moved rigidly,
+  a flip under and a turn or slide over the paper, its view from above the plane's card; a mirror image lands back up;
+  nothing jumps; the lines); the pale map in `test/plane-tiling.test.js`.
+- `test/folds.test.js` takes the `disc` fold through the generic checks (still: nothing moves).
+- The layout gate (`test/shell-layout.lib.js`) checks the transport: the row's order, the buttons' words, the
+  scrubber's width, and the stops' names measured with their own font.
+- Tools: `dev/unify/journey-film.mjs` (the journey frame by frame), `dev/unify/transport-check.mjs` (the buttons, Space
+  and old links in a real Chrome), `dev/unify/drag-cost.mjs`. `tools/filmstrip.mjs` films the fold of the tile alone.
+  `tools/qa-matrix.mjs --interact` drives the new transport.
+- After a deploy: `dev/unify/live-check.mjs` on the real viewer — the owner's link `#g=%2A632`, the torus through
+  Fold, Unfold and Tile with the viewer's address, no crystallographic name for any group (text, tooltips, labels, the
+  picker), every caption's link, a click on `*x`'s opening the Möbius band of the Classification of Surfaces page, and
+  a phone. `dev/recut/ss-live.mjs` and `dev/recut/webkit-live.mjs` know the new chip and the new row.

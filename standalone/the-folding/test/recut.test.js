@@ -93,7 +93,7 @@ test('re-cut: the two shapes that pass through themselves have it, and only they
     assert.equal(canRecut(g), IDS.includes(g.id), g.id);
     const p = g.presets[g.presets.length - 1];
     const domain = buildDomain(g, { seed: p.seed, metric: p.metric, warp: makeWarp(g, 0) });
-    const mesh = g.fold === 'snowflake' ? null : buildMesh(g, domain, foldMeshOptions(g));
+    const mesh = g.fold === 'disc' ? null : buildMesh(g, domain, foldMeshOptions(g));
     const plain = createFold(g, domain, mesh, { anchor: (p.anchor || p.seed).slice() });
     const asked = createFold(g, domain, mesh, { anchor: (p.anchor || p.seed).slice(), recut: true });
     assert.equal(!!plain.recut, false, `${g.id}: the module's own fold has no recut`);

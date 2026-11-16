@@ -56,7 +56,7 @@
 //   &pieces=1                         overlay motifInTile(...) (teal) to check the clipping of the motif to the tile
 //   &hint=0                           no hint;   &star=0  no snowflake patch for the kaleidoscopes;   &bare=1  no toolbar
 //   &interactive=1 | 0                every group draggable | none; default as in the app (contract C2): the four
-//                                     kaleidoscopes (fold 'snowflake') are not interactive, every other group is
+//                                     kaleidoscopes (fold 'disc') are not interactive, every other group is
 //   ?sheet=1[&amp=..][&preset=..]     contact sheet: all 17 groups, each a live view
 //   &groups=333,442[&cols=2]          ... of these groups only (larger panels)
 // window.__demo = { setGroup(id), setPreset(i), setAmp(a), setSeed(x, y), getSeed(), getTile(), show(opts), stats(), ready }
@@ -86,19 +86,20 @@ const state = {
   interactive: q.get('interactive') === '1' ? true : q.get('interactive') === '0' ? false : null,   // null = as the app
 };
 /** Whether the cut of `group` can be dragged: as in the app (C2), unless the page says otherwise. */
-const interactiveFor = (group) => (state.interactive === null ? group.fold !== 'snowflake' : state.interactive);
+const interactiveFor = (group) => (state.interactive === null ? group.fold !== 'disc' : state.interactive);
 
 /**
- * The snowflake patch to outline: the fold's own `star` when src/folds/snowflake.js is there and works, else a stand-in
+ * The star to outline round a kaleidoscope's corner (an option of this page; the app draws none since 15 Nov 2026):
+ * the old fold's own `star` when src/folds/snowflake.js is there and works, else a stand-in
  * built the same way (the tiles around the tile's corner of highest order, the one nearest the window's centre).
  */
 let snowflake = null;
 import('../src/folds/snowflake.js').then((m) => {
   snowflake = m.default;
-  if (state.sheet) cells.forEach((c) => { if (c.group.fold === 'snowflake') c.draw(); }); else if (scene && scene.group.fold === 'snowflake') rebuild();
+  if (state.sheet) cells.forEach((c) => { if (c.group.fold === 'disc') c.draw(); }); else if (scene && scene.group.fold === 'disc') rebuild();
 }).catch(() => { snowflake = null; });
 function starOf(group, domain) {
-  if (group.fold !== 'snowflake' || !domain.conePoints.length) return null;
+  if (group.fold !== 'disc' || !domain.conePoints.length) return null;
   if (snowflake) {
     try { const st = snowflake(group, domain, null).star; if (st && st.length) return st; } catch (e) { /* fall through to the stand-in */ }
   }
@@ -157,7 +158,7 @@ function rebuild() {
   const np = drawPieces();
   const d = scene.domain;
   $('sym').textContent = group.label;
-  $('meta').textContent = `${group.hm} · ${group.shape}`;
+  $('meta').textContent = group.surface;
   $('readout').textContent = `seed ${d.seed[0].toFixed(3)}, ${d.seed[1].toFixed(3)} · ${d.poly.length} edges, ${d.classes} seams · domain ${scene.ms.toFixed(1)} ms · draw ${view.stats.ms.toFixed(1)} ms` + (state.pieces ? ` · ${np} motif pieces` : '');
   document.querySelectorAll('#presets button').forEach((b, i) => b.setAttribute('aria-pressed', String(!state.seed && i === state.preset)));
 }
@@ -165,7 +166,7 @@ function rebuild() {
 function fillControls() {
   const sel = $('groupsel');
   if (!sel.options.length) {
-    for (const g of GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}  ${g.hm}`; sel.appendChild(o); }
+    for (const g of GROUPS) { const o = document.createElement('option'); o.value = g.id; o.textContent = `${g.label}  ${g.surface}`; sel.appendChild(o); }
     sel.addEventListener('change', () => api.setGroup(sel.value));
     $('wavy').addEventListener('input', () => api.setAmp(Number($('wavy').value)));
   }
@@ -224,7 +225,7 @@ function buildSheet() {
       cap.innerHTML = '';
       const b = document.createElement('b'); b.textContent = group.label;
       cap.appendChild(b);
-      cap.appendChild(document.createTextNode(`${group.hm} · ${entry.seed ? 'seed ' + entry.scene.domain.seed.map((v) => v.toFixed(2)).join(', ') : entry.scene.preset.name} · ${entry.scene.domain.poly.length} edges` + (amp ? ` · wavy ${amp}` : '')));
+      cap.appendChild(document.createTextNode(`${group.surface} · ${entry.seed ? 'seed ' + entry.scene.domain.seed.map((v) => v.toFixed(2)).join(', ') : entry.scene.preset.name} · ${entry.scene.domain.poly.length} edges` + (amp ? ` · wavy ${amp}` : '')));
     };
     entry.view = createPlaneView(cv, { hint: state.groups || state.panels ? state.hint : false, onSeed(x, y, phase) { if (phase === 'start') return; entry.seed = [x, y]; draw(); } });
     entry.draw = draw;

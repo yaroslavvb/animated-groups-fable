@@ -16,7 +16,7 @@
 //
 // --interact adds (pictures <out>/interact-*.png, touch-390.png, frame-1280.png):
 //   mouse and keys   drag the cut, preset chips, the Wavy slider, turn the 3D view and see that nothing but
-//                    "reset view" resets its orientation, Fold / Pause / Unfold, Space, the scrubber's soft magnets,
+//                    "reset view" resets its orientation, Fold / Pause, Unfold / Tile, Space, the scrubber's soft magnets,
 //                    the seams sliding over the folded shape, the wheel (the zoom stays within a group and glides
 //                    back to 1 on a group change), the URL (SPEC 7: every parameter in the hash, a reload brings the
 //                    state back, legacy #<id> links, a hash that names nothing), arrow keys, the anchor (SPEC 7)
@@ -27,11 +27,13 @@
 //   frame            the page inside dev/app-frame.html (a stand-in of the spacesheep viewer: a frame of its own
 //                    origin under a 50 px bar; dist runs there in the strictest, opaque-origin sandbox): the host's
 //                    address follows the state (ss-hash), and that address opened afresh shows the same state
-//   tile             the replication step (10 Nov 2026, qa/rep-judge.md), at 1280 x 720 with the mouse and at 390 x 780
-//                    with touch: Tile fades the copies and replays from the tile alone, Pause (tile= in the address at
-//                    once), Space stays with Fold, the scrubber dragged, a drag of the cut while paused, the end (the
-//                    bar lingers, then folds away; tile= leaves the address), a pasted tile= link, a group change; the
-//                    3D pane is not redrawn by the step; the layout with the bar open; pictures tile-<size>-*.png
+//   tile             the tiling's half of the journey (10 Nov 2026, qa/rep-judge.md; one transport since 15 Nov 2026),
+//                    at 1280 x 720 with the mouse and at 390 x 780 with touch: Tile at the pattern gathers the copies
+//                    and makes them again from the tile alone, Pause (tile= in the address at once), Space goes on
+//                    with the tiling, the journey's scrubber dragged, a drag of the cut while paused, the end (the
+//                    pattern; tile= leaves the address), a pasted tile= link, a kaleidoscope's Fold (the pattern
+//                    gathered onto the tile, which is the surface), a group change; the layout with copies half
+//                    made; pictures tile-<size>-*.png
 //
 // Beyond the pictures, every shot is measured in the page, so that a blank canvas or a broken layout fails the run
 // without anybody looking:
@@ -142,6 +144,15 @@ const MEASURE = `(() => {
   for (const node of document.querySelectorAll('#app button, #app a[href], #app [data-scrub]')) {
     if (!node.getClientRects().length) continue;
     const b = rect(node);
+    // The caption's link (a.cap-link) is a link in a sentence: its height is the line's (WCAG 2.5.8, the exception
+    // "Inline"). It is asked to be all in view (every piece of it inside the caption's box: the clamp cuts nothing
+    // of it), at least 44 px wide and a line high.
+    if (node.classList.contains('cap-link')) {
+      const cap = rect(document.getElementById('caption')), parts = [...node.getClientRects()];
+      if (b.w < 43.5 || parts.some((r) => r.height < 14.5)) issues.push('the caption link is ' + Math.round(b.w) + ' x ' + Math.round(parts[0].height));
+      if (parts.some((r) => r.left < cap.x - 0.5 || r.right > cap.r + 0.5 || r.top < cap.y - 1.5 || r.bottom > cap.b + 1.5)) issues.push('the caption link is not all in view');
+      continue;
+    }
     if (b.w < 43.5 || b.h < 43.5) issues.push('tap target ' + (node.id ? '#' + node.id : node.textContent.trim().slice(0, 14)) + ' is ' + Math.round(b.w) + ' x ' + Math.round(b.h));
     if (b.x < -0.5 || b.r > vw + 0.5 || b.b > vh + 0.5) { if (!node.closest('#presets')) issues.push('control ' + (node.id || node.textContent.trim().slice(0, 14)) + ' leaves the window'); }
   }
@@ -301,7 +312,7 @@ try {
             if (typeof r.end[1] === 'number' && r.end[1] > worst) worst = r.end[1];
           }
         }
-        if (g.fold !== 'snowflake') {
+        if (g.fold !== 'disc') {
           await page.evaluate(() => { const F = window.__folding; F.setPreset(0); F.setAmp(1); F.setT(1); });
           await settle();
           const m = await measure();
@@ -450,45 +461,47 @@ try {
     check('the view is kept when the wave changes', same(v1, v2), viewOf(v2));
     await page.screenshot({ path: path.join(outDir, 'interact-3-rotated.png') }); pictures.push('interact-3-rotated.png');
 
-    // 5. Fold: the button flips, the motion is smooth, the view is still kept
-    const fb = await center('#fold-btn');
+    // 5. The journey's two buttons (15 Nov 2026; src/journey.js): Fold goes from the pattern all the way to the
+    //    surface — the copies are gathered first — smoothly, and the view is kept; Unfold comes back to the flat tile
+    const fb = await center('#fold-btn'), nb = await center('#next-btn');
+    const idle = () => page.waitForFunction(() => { const q = window.__folding.getState(); return !q.playing && !q.going; }, null, { timeout: 30000 });
     await F(() => {
       const W = window; W.__trace = [];
-      const tick = () => { W.__trace.push([performance.now(), W.__folding.timeline.get()]); if (W.__trace.length < 2000 && !W.__traceStop) requestAnimationFrame(tick); };
+      const tick = () => { W.__trace.push([performance.now(), W.__folding.timeline.get()]); if (W.__trace.length < 4000 && !W.__traceStop) requestAnimationFrame(tick); };
       W.__traceStop = false; requestAnimationFrame(tick);
     });
     await page.mouse.click(fb[0], fb[1]);
     await page.waitForTimeout(250);
     let p1 = await state();
-    check('a click on Fold starts the play and the button reads Pause', p1.playing === true && p1.button === 'Pause' && p1.t > 0 && p1.t < 1, `t ${p1.t.toFixed(3)}`);
-    await page.waitForFunction(() => !window.__folding.getState().playing, null, { timeout: 20000 });
+    check('a click on Fold starts the play and the button reads Pause', p1.playing === true && p1.button === 'Pause' && p1.going === 'surface' && p1.journey < 1, `journey ${p1.journey.toFixed(3)}`);
+    await idle();
     let p2 = await state();
     const trace = await F(() => { window.__traceStop = true; return window.__trace; });
     let maxDt = 0, back = 0, frames = 0;
-    for (let i = 1; i < trace.length; i++) { const d = trace[i][1] - trace[i - 1][1]; if (d > maxDt) maxDt = d; if (d < -1e-12) back++; if (d > 0) frames++; }
-    check('the fold plays to t = 1 and the button reads Unfold', p2.t === 1 && p2.button === 'Unfold' && p2.seamGap < 1e-6, `seam gap ${p2.seamGap}`);
-    check('the play is smooth: t never goes back and no frame jumps more than a twentieth of the way', back === 0 && maxDt < 0.05 && frames > 20, `${frames} moving frames, largest step ${maxDt.toFixed(4)}`);
+    for (let i = 1; i < trace.length; i++) { const d = trace[i - 1][1] - trace[i][1]; if (d > maxDt) maxDt = d; if (d < -1e-12) back++; if (d > 0) frames++; }
+    check('the fold plays to the surface (t = 1), where Fold has nothing left and the other button reads Unfold', p2.t === 1 && p2.tile === 0 && p2.journeyStop === 'surface' && p2.button === 'Fold' && p2.nextButton === 'Unfold' && p2.seamGap < 1e-6, `seam gap ${p2.seamGap}`);
+    check('the play is smooth: the journey never turns back and no frame jumps more than a twentieth of the way', back === 0 && maxDt < 0.05 && frames > 20, `${frames} moving frames, largest step ${maxDt.toFixed(4)}`);
     check('the view is kept while playing', same(v1, p2), viewOf(p2));
     await page.screenshot({ path: path.join(outDir, 'interact-4-folded.png') }); pictures.push('interact-4-folded.png');
-    await page.mouse.click(fb[0], fb[1]);
+    await page.mouse.click(nb[0], nb[1]);
     await page.waitForTimeout(200);
     let p3 = await state();
-    check('a click on Unfold plays back', p3.playing === true && p3.t < 1);
-    await page.mouse.click(fb[0], fb[1]);
+    check('a click on Unfold plays back', p3.playing === true && p3.t < 1 && p3.nextButton === 'Pause');
+    await page.mouse.click(nb[0], nb[1]);
     await page.waitForTimeout(120);
     let p4 = await state();
-    check('a click while it plays pauses it where it is', p4.playing === false && p4.t > 0 && p4.t < 1 && p4.button === 'Unfold', `t ${p4.t.toFixed(3)}, button ${p4.button}`);
+    check('a click while it plays pauses it where it is', p4.playing === false && p4.t > 0 && p4.t < 1 && p4.nextButton === 'Unfold', `t ${p4.t.toFixed(3)}, button ${p4.nextButton}`);
     await F(() => { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
     await page.keyboard.press('Space');
     await page.waitForTimeout(150);
     let p5 = await state();
-    check('Space toggles the play', p5.playing === true);
-    await page.waitForFunction(() => !window.__folding.getState().playing, null, { timeout: 20000 });
+    check('Space goes on the way it was going', p5.playing === true && p5.going === 'pattern');
+    await idle();
     let p6 = await state();
-    check('unfolded again: t = 0 and the button reads Fold', p6.t === 0 && p6.button === 'Fold');
+    check('unfolded: the flat tile, alone (t = 0, no copies); the buttons read Fold and Tile', p6.t === 0 && p6.tile === 0 && p6.journeyStop === 'tile' && p6.button === 'Fold' && p6.nextButton === 'Tile');
 
     // 6. the scrubber: continuous, with soft magnets (no jump to a tick)
-    await F(() => window.__folding.setGroup('o'));                 // three stops: 0, 0.45, 1
+    await F(() => window.__folding.setGroup('o'));                 // the journey's stops: the surface 0, the tube 0.275, the tile 0.5, layers, the pattern 1
     await settle();
     const sc = await center('#scrub');
     const x0 = sc[4] + 14, x1 = sc[4] + sc[2] - 14;
@@ -497,25 +510,25 @@ try {
     const ts = [];
     for (let i = 0; i <= 120; i++) {
       await page.mouse.move(x0 + ((x1 - x0) * i) / 120, sc[1]);
-      ts.push(await F(() => window.__folding.getState().t));
+      ts.push(await F(() => window.__folding.getState().journey));
     }
     await page.mouse.up();
-    // one mouse step is 1/120 of the track. Far from the stops t moves by as much; next to the inner stop (0.45) the
-    // map flattens (the magnet: slope 0 at the stop itself) and at the edge of its zone it is steeper (slope 1.6)
+    // one mouse step is 1/120 of the track. Far from the stops the journey j moves by as much; next to the tile (0.5)
+    // the map flattens (the magnet: slope 0 at the stop itself) and at the edge of its zone it is steeper
     const unit = 1 / 120;
     let mono = true, big = 0, slowest = Infinity, plain = [];
     for (let i = 1; i < ts.length; i++) {
       const d = ts[i] - ts[i - 1], mid = (ts[i] + ts[i - 1]) / 2;
       if (d <= 0 && ts[i] > 0 && ts[i] < 1) mono = false;
       if (d > big) big = d;
-      if (Math.abs(mid - 0.45) < 0.02 && d < slowest) slowest = d;
-      if ((mid > 0.12 && mid < 0.36) || (mid > 0.55 && mid < 0.9)) plain.push(d);
+      if (Math.abs(mid - 0.5) < 0.02 && d < slowest) slowest = d;
+      if ((mid > 0.07 && mid < 0.21) || (mid > 0.34 && mid < 0.44)) plain.push(d);
     }
     const plainMin = Math.min(...plain), plainMax = Math.max(...plain);
-    check('scrubbing is continuous: t follows the thumb strictly monotonically from 0 to 1, no step larger than twice the mouse step', mono && big < 2.2 * unit && ts[0] < 0.02 && ts[120] > 0.98,
+    check('scrubbing is continuous: the journey follows the thumb strictly monotonically from the surface to the pattern, no step larger than twice the mouse step', mono && big < 2.2 * unit && ts[0] < 0.02 && ts[120] > 0.98,
       `largest step ${(big / unit).toFixed(2)} mouse steps`);
-    check('away from the stops t is the thumb position (one mouse step = one step of t)', plainMin > 0.85 * unit && plainMax < 1.15 * unit, `${(plainMin / unit).toFixed(2)} to ${(plainMax / unit).toFixed(2)} mouse steps`);
-    check('a slight magnet at the inner stop: t slows down next to it, and never sticks', slowest < 0.6 * unit && slowest > 0, `slowest step ${(slowest / unit).toFixed(2)} mouse steps`);
+    check('away from the stops the journey is the thumb position (one mouse step = one step of it)', plainMin > 0.85 * unit && plainMax < 1.15 * unit, `${(plainMin / unit).toFixed(2)} to ${(plainMax / unit).toFixed(2)} mouse steps`);
+    check('a slight magnet at the tile: the journey slows down next to it, and never sticks', slowest < 0.6 * unit && slowest > 0, `slowest step ${(slowest / unit).toFixed(2)} mouse steps`);
     const vs = await state();
     check('the view is kept while scrubbing and across groups', same(v1, vs), viewOf(vs));
 
@@ -594,7 +607,7 @@ try {
     m = await measure();
     check('a legacy #<id> in the address switches the group and is rewritten to the new form', h1.groupId === '*632' && h1.t === 0 && h1.hash === h1.url && h1.hash.startsWith('#g=%2A632'), h1.hash);
     check('a kaleidoscope: nothing to cut — no hint, the static note instead of the presets and Wavy (SPEC 8 C1)',
-      m.hintHidden === true && m.cutNote === true && m.presetsShown === false && m.wavyShown === false && m.foldAttr === 'snowflake' && m.features === 'mirrors corners',
+      m.hintHidden === true && m.cutNote === true && m.presetsShown === false && m.wavyShown === false && m.foldAttr === 'disc' && m.features === 'mirrors corners',
       JSON.stringify({ hint: m.hintHidden, note: m.cutNote, presets: m.presetsShown, wavy: m.wavyShown, fold: m.foldAttr, features: m.features }));
     {
       const k0 = await state(), pk = await center('#plane-canvas');
@@ -630,10 +643,17 @@ try {
     check('the anchor follows the group of the hash', sameXY(h1.anchor, presetSeed('*632', 0)) && sameXY(h2.anchor, presetSeed('*632', 0)), `${JSON.stringify(h1.anchor)}, ${JSON.stringify(h2.anchor)}`);
 
     // 10. keys: arrows on the scrubber step it; arrows on the plane move the seed
-    await F(() => { window.__folding.setGroup('22*'); document.getElementById('scrubber').focus(); });
+    // (15 Nov 2026: the scrubber is the journey's: from the flat tile, right goes to the copies and left folds it)
+    await F(() => { window.__folding.setGroup('22*'); window.__folding.setJourney(0.5); document.getElementById('scrubber').focus(); });
+    const k0 = await state();
     await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight');
+    const kr = await state();
+    check('arrow keys on the scrubber step the journey: right of the flat tile the copies come', k0.journeyStop === 'tile' && kr.journey > 0.505 && kr.journey < 0.6 && kr.t === 0 && kr.tile > 0, `journey ${k0.journey.toFixed(4)} -> ${kr.journey.toFixed(4)}, tile ${kr.tile.toFixed(4)}`);
+    await F(() => window.__folding.setJourney(0.5));
+    await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowLeft'); await page.keyboard.press('ArrowLeft');
     const k1 = await state();
-    check('arrow keys on the scrubber step t', k1.t > 0.005 && k1.t < 0.05, `t ${k1.t.toFixed(4)}`);
+    check('arrow keys on the scrubber step the journey: left of the flat tile it folds, alone', k1.journey < 0.495 && k1.journey > 0.4 && k1.t > 0.005 && k1.t < 0.2 && k1.tile === 0, `journey ${k1.journey.toFixed(4)}, t ${k1.t.toFixed(4)}`);
+    await F(() => window.__folding.setJourney(0.5));
     await F(() => { document.getElementById('plane-canvas').focus(); });
     await page.keyboard.press('ArrowUp');
     await settle();
@@ -740,7 +760,7 @@ try {
       const sb = await box('#scrub');
       await swipe([sb.x + 16, sb.cy], [sb.x + sb.w * 0.62, sb.cy], 12);
       const a4 = await tstate();
-      check('touch: a finger scrubs', a4.t > 0.4 && a4.t < 0.8 && !a4.playing, `t ${a4.t.toFixed(3)}`);
+      check('touch: a finger scrubs', a4.journey > 0.4 && a4.journey < 0.8 && !a4.playing, `journey ${a4.journey.toFixed(3)}`);
       check('touch: the view is kept while scrubbing', Math.abs(a4.view.az - a3.view.az) < 0.2 && Math.abs(a4.view.el - a3.view.el) < 0.2 && Math.abs(a4.view.zoom - a3.view.zoom) < 0.01);
       const wb = await box('#wavy');
       await swipe([wb.x + 10, wb.cy], [wb.x + wb.w * 0.6, wb.cy], 8);
@@ -752,9 +772,9 @@ try {
       await tp.waitForTimeout(250);
       const a6 = await tstate();
       check('touch: a tap on Fold plays', a6.playing === true && a6.button === 'Pause');
-      await tp.waitForFunction(() => !window.__folding.getState().playing, null, { timeout: 20000 });
+      await tp.waitForFunction(() => { const q = window.__folding.getState(); return !q.playing && !q.going; }, null, { timeout: 30000 });
       const a7 = await tstate();
-      check('touch: it folds shut', a7.t === 1 && a7.seamGap < 1e-6 && a7.button === 'Unfold', `seam gap ${a7.seamGap}`);
+      check('touch: it folds shut', a7.t === 1 && a7.seamGap < 1e-6 && a7.nextButton === 'Unfold', `seam gap ${a7.seamGap}`);
       await tp.screenshot({ path: path.join(outDir, 'touch-390.png') });
       pictures.push('touch-390.png');
       const cb = await box('#chip');
@@ -793,7 +813,9 @@ try {
       await tctx.close();
     }
 
-    // ---- the replication step (Tile): real clicks / taps, keys and drags, laptop and phone (dev/rep-a/check-ui.mjs) ----
+    // ---- the tiling's half of the journey (Tile): real clicks / taps, keys and drags, laptop and phone -------------
+    // (10 Nov 2026: dev/rep-a/check-ui.mjs; 15 Nov 2026: the Tile bar left the plane pane — #next-btn and the journey's
+    // one scrubber under the 3D pane, which shows the same copies)
     for (const [size, tag] of [[DESKTOP, 'laptop'], [PHONE, 'phone']]) {
       const touchy = tag === 'phone';
       const rctx = await browser.newContext({ viewport: size, deviceScaleFactor: 2, hasTouch: touchy });
@@ -804,49 +826,51 @@ try {
       await rp.waitForFunction(() => window.__folding && window.__folding.ready, null, { timeout: 30000 });
       await rp.evaluate(() => window.__folding.ready);
       const rs = () => rp.evaluate(() => window.__folding.getState());
+      const rIdle = () => rp.waitForFunction(() => { const q = window.__folding.getState(); return !q.playing && !q.going; }, null, { timeout: 30000 });
       const shotT = async (name) => { const f = `tile-${tag}-${name}.png`; await rp.screenshot({ path: path.join(outDir, f) }); pictures.push(f); };
-      const btn = rp.locator('#tile-btn');
+      const btn = rp.locator('#next-btn');
       const press = () => (touchy ? btn.tap() : btn.click());
       let s = await rs();
-      check(`tile (${tag}): the page opens tiled, the bar closed, no tile= in the address`, s.tile === 1 && !s.tileBarOpen && !s.tileCaption && !/tile=/.test(s.url), JSON.stringify({ tile: s.tile, bar: s.tileBarOpen }));
-      const draws0 = await rp.evaluate(() => ({ draws: window.__folding.counters.draws, t: window.__folding.getState().t }));
+      check(`tile (${tag}): the page opens at the pattern: no words, no tile= in the address, the button reads Tile`, s.tile === 1 && s.journeyStop === 'pattern' && !s.tileOpen && !s.tileCaption && !/tile=/.test(s.url) && s.nextButton === 'Tile', JSON.stringify({ tile: s.tile, stop: s.journeyStop }));
+      const tri0 = s.triangles;
       await press();
       await rp.waitForTimeout(150);
       s = await rs();
-      check(`tile (${tag}): Tile starts (the copies fade): playing, the bar open, the button reads Pause`, s.tilePlaying && s.tileBarOpen && (await btn.textContent()).includes('Pause'), JSON.stringify({ tile: s.tile, playing: s.tilePlaying }));
-      await rp.waitForTimeout(1300);
+      check(`tile (${tag}): Tile at the pattern starts again (the copies are gathered): playing, the button reads Pause`, s.playing && s.going === 'pattern' && s.nextButton === 'Pause', JSON.stringify({ tile: s.tile, playing: s.playing }));
+      await rp.waitForTimeout(1500);
       s = await rs();
-      check(`tile (${tag}): then the copies are made again from the tile alone, with the words for what acts`, s.tilePlaying && s.tile > 0 && s.tile < 0.5 && s.tileCaption.length > 3, JSON.stringify({ tile: s.tile, caption: s.tileCaption }));
+      check(`tile (${tag}): then the copies are made again from the tile alone, with the words for what acts`, s.playing && s.tilePlaying && s.tile > 0 && s.tile < 0.5 && s.tileCaption.length > 3, JSON.stringify({ tile: s.tile, caption: s.tileCaption }));
       await shotT('1-playing');
       await press();
       await rp.waitForTimeout(500);
       s = await rs();
       const pausedAt = s.tile;
-      check(`tile (${tag}): Pause pauses part-way and the address has tile= at once`, !s.tilePlaying && s.tile > 0 && s.tile < 1 && /[#&]tile=0\.\d+/.test(s.hash) && (await btn.textContent()).includes('Tile'), JSON.stringify({ tile: s.tile, hash: s.hash }));
-      // the final fix (10 Nov 2026, findings 2 and 6): on the phone the plane frames the first layer between the words
-      // and the bar while the bar is open (plane.js setStepFrame); the laptop's plane keeps its window
-      check(`tile (${tag}): ${touchy ? 'the phone\'s plane frames the first layer while the bar is open' : 'the laptop\'s plane keeps its window'}`,
+      check(`tile (${tag}): Pause pauses part-way and the address has tile= at once`, !s.playing && s.tile > 0 && s.tile < 1 && s.t === 0 && /[#&]tile=0\.\d+/.test(s.hash) && s.nextButton === 'Tile', JSON.stringify({ tile: s.tile, hash: s.hash }));
+      // the final fix (10 Nov 2026, findings 2 and 6): on the phone the plane frames the first layer under the words
+      // while copies are being made (plane.js setStepFrame); the laptop's plane keeps its window
+      check(`tile (${tag}): ${touchy ? 'the phone\'s plane frames the first layer while copies are being made' : 'the laptop\'s plane keeps its window'}`,
         touchy ? s.tileFrame === 1 : s.tileFrame === 0, JSON.stringify({ frame: s.tileFrame }));
-      const draws1 = await rp.evaluate(() => ({ draws: window.__folding.counters.draws, t: window.__folding.getState().t }));
-      check(`tile (${tag}): the 3D pane is not redrawn by the step, and t stays`, draws1.draws === draws0.draws && draws1.t === draws0.t, JSON.stringify({ before: draws0, after: draws1 }));
+      check(`tile (${tag}): the tile stays flat (t = 0): only one of the two is under way`, s.t === 0 && s.triangles === tri0, JSON.stringify({ t: s.t }));
       const lm = await rp.evaluate(MEASURE);
-      check(`tile (${tag}): with the bar open nothing overlaps, leaves the window or is too small to tap`, lm.issues.length === 0 && lm.hintHidden === true, lm.issues.join('; ') || `hint hidden ${lm.hintHidden}`);
+      check(`tile (${tag}): with copies half made nothing overlaps, leaves the window or is too small to tap`, lm.issues.length === 0 && lm.hintHidden === true, lm.issues.join('; ') || `hint hidden ${lm.hintHidden}`);
       await shotT('2-paused');
-      // Space plays the Fold, not the tiling
+      // Space goes on the way the play was going: the tiling
       await rp.locator('#fold-canvas').click({ position: { x: 20, y: 20 } }).catch(() => {});
       await rp.keyboard.press('Space');
-      await rp.waitForTimeout(400);
+      await rp.waitForTimeout(300);
       s = await rs();
-      check(`tile (${tag}): Space plays the Fold; the tiling stays paused`, s.playing && !s.tilePlaying && Math.abs(s.tile - pausedAt) < 1e-9, JSON.stringify({ foldPlaying: s.playing, t: s.t, tile: s.tile }));
+      check(`tile (${tag}): Space goes on with the tiling`, s.playing && s.going === 'pattern' && s.tile >= pausedAt, JSON.stringify({ playing: s.playing, going: s.going, tile: s.tile }));
       await rp.keyboard.press('Space');
-      await rp.evaluate(() => window.__folding.setT(0));
+      await rp.waitForTimeout(200);
+      await rp.evaluate((u) => window.__folding.setTile(u), pausedAt);
       // the scrubber dragged from its thumb to the left: u goes down in steady steps
-      const sbx = await rp.locator('#tile-scrub').boundingBox();
-      const thumbX = sbx.x + 11 + (sbx.width - 22) * pausedAt, ty = sbx.y + sbx.height / 2;
+      const sbx = await rp.locator('#scrub').boundingBox();
+      const a = (await rs()).journeyTile, jAt = a + (1 - a) * pausedAt;
+      const thumbX = sbx.x + 11 + (sbx.width - 22) * jAt, ty = sbx.y + sbx.height / 2 + 5;
       const seen = [];
       await rp.mouse.move(thumbX, ty);
       await rp.mouse.down();
-      for (let i = 1; i <= 12; i++) { await rp.mouse.move(thumbX - (i / 12) * (sbx.width - 22) * 0.6 * pausedAt, ty); seen.push((await rs()).tile); }
+      for (let i = 1; i <= 12; i++) { await rp.mouse.move(thumbX - (i / 12) * (sbx.width - 22) * 0.6 * (jAt - a), ty); seen.push((await rs()).tile); }
       await rp.mouse.up();
       await rp.waitForTimeout(300);
       s = await rs();
@@ -860,7 +884,7 @@ try {
         await rp.mouse.up();
         await rp.waitForTimeout(300);
         s = await rs();
-        check(`tile (${tag}): dragging the cut while paused keeps u and the words`, !s.tilePlaying && Math.abs(s.tile - seen[seen.length - 1]) < 1e-6 && s.presetIndex === -1 && s.tileCaption.length > 3 && s.errors === 0, JSON.stringify({ tile: s.tile, seed: s.seed, caption: s.tileCaption }));
+        check(`tile (${tag}): dragging the cut while paused keeps u and the words`, !s.playing && Math.abs(s.tile - seen[seen.length - 1]) < 1e-6 && s.presetIndex === -1 && s.tileCaption.length > 3 && s.errors === 0, JSON.stringify({ tile: s.tile, seed: s.seed, caption: s.tileCaption }));
         // a preset chip and the Wavy slider while paused: u stays, the new tile's copies have their words
         const u0 = s.tile, chipB = await rp.locator('#presets .chip').nth(1).boundingBox();
         await rp.mouse.click(chipB.x + chipB.width / 2, chipB.y + chipB.height / 2);
@@ -874,32 +898,35 @@ try {
         await rp.waitForTimeout(250);
         const sw = await rs();
         check(`tile (${tag}): a preset chip and the Wavy slider while paused keep u and show the new tile's words`,
-          sp.presetIndex === 1 && Math.abs(sp.tile - u0) < 1e-9 && !sp.tilePlaying && sp.tileCaption.length > 3 && sw.amp > 0.3 && Math.abs(sw.tile - u0) < 1e-9 && !sw.tilePlaying && sw.tileCaption.length > 3 && sw.errors === 0,
+          sp.presetIndex === 1 && Math.abs(sp.tile - u0) < 1e-9 && !sp.playing && sp.tileCaption.length > 3 && sw.amp > 0.3 && Math.abs(sw.tile - u0) < 1e-9 && !sw.playing && sw.tileCaption.length > 3 && sw.errors === 0,
           JSON.stringify({ u0, preset: [sp.presetIndex, sp.tile, sp.tileCaption], wavy: [sw.amp, sw.tile, sw.tileCaption] }));
         await rp.evaluate(() => window.__folding.setAmp(0));
       }
-      // on to the end: the bar stays a moment, then folds away, and tile= leaves the address
+      // on to the end: the pattern, no words, and tile= leaves the address; the plane's window is as always again
       await press();
-      await rp.waitForFunction(() => !window.__folding.getState().tilePlaying, null, { timeout: 15000 });
+      await rIdle();
       s = await rs();
-      check(`tile (${tag}): it ends at u = 1 with the bar still open`, s.tile === 1 && s.tileBarOpen && !s.tileCaption, JSON.stringify({ tile: s.tile, bar: s.tileBarOpen }));
-      await rp.waitForTimeout(1700);
-      s = await rs();
-      check(`tile (${tag}): the bar folds away; the address has no tile=`, !s.tileBarOpen && !/tile=/.test(s.hash), JSON.stringify({ bar: s.tileBarOpen, hash: s.hash }));
-      await rp.waitForTimeout(600);
+      check(`tile (${tag}): it ends at the pattern (u = 1), without words, and the address has no tile=`, s.tile === 1 && s.journeyStop === 'pattern' && !s.tileCaption && !s.tileOpen && !/tile=/.test(s.hash), JSON.stringify({ tile: s.tile, hash: s.hash }));
+      await rp.waitForTimeout(700);
       s = await rs();
       check(`tile (${tag}): then the plane's window is as always again`, s.tileFrame === 0, JSON.stringify({ frame: s.tileFrame }));
-      // a pasted link opens the replication paused there
+      // a pasted link opens the tiling paused there
       await rp.evaluate(() => { location.hash = '#g=%2A632&tile=0.25'; });
       await rp.waitForTimeout(500);
       s = await rs();
-      check(`tile (${tag}): a link with tile=0.25 opens paused there, with the bar and the words`, s.groupId === '*632' && Math.abs(s.tile - 0.25) < 1e-9 && s.tileBarOpen && s.tileCaption.length > 3 && !s.tilePlaying, JSON.stringify({ g: s.groupId, tile: s.tile, caption: s.tileCaption }));
+      check(`tile (${tag}): a link with tile=0.25 opens paused there, with the words`, s.groupId === '*632' && Math.abs(s.tile - 0.25) < 1e-9 && s.tileOpen && s.tileCaption.length > 3 && !s.playing, JSON.stringify({ g: s.groupId, tile: s.tile, caption: s.tileCaption }));
       await shotT('3-link-s632-025');
-      // a group change completes it
+      // a kaleidoscope: its tile is its surface — Fold gathers the pattern onto it, and there is nothing more to fold
+      await rp.evaluate(() => window.__folding.setTile(1));
+      await (touchy ? rp.locator('#fold-btn').tap() : rp.locator('#fold-btn').click());
+      await rIdle();
+      s = await rs();
+      check(`tile (${tag}): *632 — Fold gathers the pattern onto the tile, which is the surface; Fold is then disabled`, s.tile === 0 && s.t === 0 && s.journey === 0 && s.journeyStop === 'tile' && (await rp.locator('#fold-btn').isDisabled()) && s.nextButton === 'Tile', JSON.stringify({ tile: s.tile, stop: s.journeyStop }));
+      // a group change shows the new pattern
       await rp.evaluate(() => window.__folding.setGroup('xx'));
       await rp.waitForTimeout(200);
       s = await rs();
-      check(`tile (${tag}): a group change shows the new pattern tiled`, s.groupId === 'xx' && s.tile === 1 && !s.tilePlaying, JSON.stringify({ g: s.groupId, tile: s.tile }));
+      check(`tile (${tag}): a group change shows the new pattern tiled`, s.groupId === 'xx' && s.tile === 1 && !s.playing, JSON.stringify({ g: s.groupId, tile: s.tile }));
       check(`tile (${tag}): nothing caught by the app`, (await rs()).errors === 0);
       await rctx.close();
     }

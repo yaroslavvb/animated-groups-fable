@@ -9,7 +9,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GROUPS, BY_ID } from '../src/groups.js';
 import { buildDomain, makeWarp } from '../src/domain.js';
-import { createPlaneView, CAPTION_SMALL } from '../src/plane.js';
+import { createPlaneView, CAPTION_SMALL, GHOST } from '../src/plane.js';
 
 /** A canvas that records the drawing calls, each painting call with the styles it paints with. */
 const PAINTS = { fill: ['fillStyle', 'globalAlpha'], fillRect: ['fillStyle', 'globalAlpha'], fillText: ['fillStyle', 'font', 'globalAlpha'],
@@ -46,14 +46,14 @@ function fakeCanvas(w, h) {
 function sceneOf(id, presetIndex = 0, amp = 0, seed) {
   const group = BY_ID[id], p = group.presets[presetIndex];
   const domain = buildDomain(group, { seed: seed || p.seed, metric: p.metric, warp: makeWarp(group, amp) });
-  return { group, domain, interactive: group.fold !== 'snowflake' };
+  return { group, domain, interactive: group.fold !== 'disc' };
 }
 /** The calls of one render (the recorder is emptied first). */
 function frame(P, calls) { calls.length = 0; P.render(); return calls.slice(); }
 
 test('u = 1 is the plane as always: nothing of the replication is built or drawn, also after one was shown (and faded)', () => {
   for (const g of GROUPS) {
-    for (const amp of g.fold === 'snowflake' ? [0] : [0, 1]) {
+    for (const amp of g.fold === 'disc' ? [0] : [0, 1]) {
       for (const [w, h] of [[620, 580], [226, 226]]) {
         const sc = sceneOf(g.id, 0, amp), tag = `${g.id} amp ${amp} ${w}x${h}`;
         const A = fakeCanvas(w, h), plansA = [];
@@ -78,6 +78,50 @@ test('u = 1 is the plane as always: nothing of the replication is built or drawn
         PA.destroy(); PB.destroy();
       }
     }
+  }
+});
+
+test('the pale map (15 Nov 2026): at u = 0 the pattern lies under the lone tile at GHOST.alpha, one image; it fades as the first copies are made and is gone at GHOST.until; none at u = 1; none without a document', () => {
+  assert.ok(GHOST.alpha > 0.2 && GHOST.alpha < 0.6 && GHOST.until > 0.02 && GHOST.until < 0.15);
+  const ghosts = (calls) => calls.filter((c) => c.op === 'drawImage' && c.globalAlpha > 0 && c.globalAlpha < 0.999);
+  for (const id of ['333', '*632', '**', 'xx', '22x']) {
+    for (const [w, h] of [[620, 580], [226, 226]]) {
+      const sc = sceneOf(id, 0, 0), tag = `${id} ${w}x${h}`;
+      // a document that can make canvases: the plane keeps its layers in them
+      const made = [];
+      const { canvas, calls } = fakeCanvas(w, h);
+      canvas.ownerDocument = { createElement: (name) => { assert.equal(name, 'canvas'); const f = fakeCanvas(w, h); made.push(f); return f.canvas; }, defaultView: null };
+      const P = createPlaneView(canvas, { hint: false });
+      P.setScene(sc);
+      P.setTiling(0);
+      let g = ghosts(frame(P, calls));
+      assert.equal(g.length, 1, `${tag}: one image of the pattern under the tile at u = 0`);
+      assert.ok(Math.abs(g[0].globalAlpha - GHOST.alpha) < 1e-9, `${tag}: at GHOST.alpha (${g[0].globalAlpha})`);
+      const fr = frame(P, calls), at = fr.findIndex((c) => c.op === 'drawImage' && c.globalAlpha < 0.999), first = fr.findIndex((c) => c.op === 'fill' || c.op === 'stroke');
+      assert.ok(at >= 0 && (first < 0 || at < first), `${tag}: the map is drawn first, under everything`);
+      // its layer holds the plane as always: outlines of the copies were stroked into it
+      assert.ok(made.some((f) => f.calls.some((c) => c.op === 'stroke')), `${tag}: the map's layer was drawn`);
+      let prev = GHOST.alpha;
+      for (const k of [0.2, 0.4, 0.6, 0.8]) {
+        P.setTiling(k * GHOST.until);
+        g = ghosts(frame(P, calls));
+        assert.equal(g.length, 1, `${tag}: the map at ${k} of its fade`);
+        assert.ok(g[0].globalAlpha < prev && g[0].globalAlpha > 0, `${tag}: it fades (${g[0].globalAlpha} after ${prev})`);
+        prev = g[0].globalAlpha;
+      }
+      for (const u of [GHOST.until, 0.2, 0.5, 0.9]) { P.setTiling(u); assert.equal(ghosts(frame(P, calls)).length, 0, `${tag}: no map at u = ${u}`); }
+      P.setTiling(1);
+      assert.equal(ghosts(frame(P, calls)).length, 0, `${tag}: no map over the pattern itself`);
+      // the same picture again when the tile comes back to u = 0 (a fold played back and forth)
+      P.setTiling(0);
+      assert.equal(ghosts(frame(P, calls)).length, 1, tag);
+      P.destroy();
+    }
+    // without a document (node, as every other test here): no map, nothing else changes
+    const sc = sceneOf(id, 0, 0), B = fakeCanvas(620, 580), PB = createPlaneView(B.canvas, { hint: false });
+    PB.setScene(sc); PB.setTiling(0);
+    assert.equal(frame(PB, B.calls).filter((c) => c.op === 'drawImage').length, 0, `${id}: no layer without a document`);
+    PB.destroy();
   }
 });
 
@@ -126,7 +170,7 @@ test('the plan, its words and the owner\'s callback: stops in u, one phase\'s wo
     for (const u of [0, 0.2, 0.6, 0.99]) { P.setTiling(u); frame(P, big.calls); }
     assert.equal(infos.length, 1, `${g.id}: one plan for one tile`);
     // a new tile (a dragged cut): a new plan; the owner hears of it if its timing differs
-    if (g.fold !== 'snowflake') {
+    if (g.fold !== 'disc') {
       const size = Math.sqrt(g.domainArea), p = g.presets[0].seed;
       P.setScene(sceneOf(g.id, 0, 0, [p[0] + 0.21 * size, p[1] - 0.13 * size]));
       frame(P, big.calls);
@@ -168,7 +212,7 @@ test('every group, every preset, straight and wavy, a laptop\'s and a phone\'s p
   let frames = 0;
   for (const g of GROUPS) {
     for (let pi = 0; pi < g.presets.length; pi++) {
-      for (const amp of g.fold === 'snowflake' ? [0] : [0, 1]) {
+      for (const amp of g.fold === 'disc' ? [0] : [0, 1]) {
         for (const [w, h] of [[620, 580], [226, 226]]) {
           const { canvas, out } = checkingCanvas(w, h);
           const P = createPlaneView(canvas, { hint: false });
@@ -250,7 +294,7 @@ test('finding 5: a drag while the replication is paused keeps it — the same le
   // the verifier's drag (qa/v4-fresh-eyes/E3-drag-jump-paused.png): 333 paused in its first layer, from (0.627, 0.064)
   // toward (0.641, 0.071): 4-px steps there renumbered the edges, and the copies jumped to another 3-fold centre
   const cases = [['333', [0.627, 0.064], [1, -0.5], 40, 1], ['333', [0.627, 0.064], [1, -0.5], 40, 0], ['2222', [0.373, 0.282], [1, -0.66], 40, 1]];
-  for (const g of GROUPS) if (g.fold !== 'snowflake') cases.push([g.id, g.presets[0].seed, [0.8, 0.6], 30, 1]);
+  for (const g of GROUPS) if (g.fold !== 'disc') cases.push([g.id, g.presets[0].seed, [0.8, 0.6], 30, 1]);
   let regrown = 0, stepsAll = 0;
   for (const [id, seed, dir, n, phase] of cases) {
     const { frames } = dragWhilePaused(id, seed, dir, n, { phase });

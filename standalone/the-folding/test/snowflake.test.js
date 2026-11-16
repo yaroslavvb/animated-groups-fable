@@ -835,7 +835,9 @@ test('the shape names the tile exactly (finding 47: *442 and *632 are both right
     }
     const key = angles.sort((x, y) => x - y).join(',');
     assert.equal(BY_ID[id].shape, byAngles[key], id + ': angles ' + key);
-    assert.equal(BY_ID[id].fold, 'snowflake');
+    // (15 Nov 2026: the kaleidoscopes' fold type is 'disc' — the tile is the surface; this module folds the star of
+    // tiles round one corner and is used by no group, as the figure-8 bottle of folds/roll.js)
+    assert.equal(BY_ID[id].fold, 'disc');
   }
 });
 

@@ -49,8 +49,8 @@
   function show() {
     const g = BY_ID[current];
     document.getElementById('chip-label').textContent = g.label;
-    document.getElementById('chip-rest').textContent = `${g.hm} · ${g.shape}`;
-    chip.setAttribute('aria-label', `Orbifold ${g.label}, ${g.hm}, ${g.shape}. Change`);
+    document.getElementById('chip-rest').textContent = g.surface;
+    chip.setAttribute('aria-label', `Orbifold ${g.label}, ${g.surface}. Change`);
   }
   show();
 
@@ -162,7 +162,7 @@
         mode === 'keyboard'
           ? c('opened from the keyboard: ring and highlight on the current node', [s.active, s.ring], [id, id])
           : c('opened by pointer or script: nothing highlighted, no ring', [s.active, s.ring, s.lit], [null, null, 0]),
-        c('info line reads label · hm · shape of the current group', s.info, `${g.label} · ${g.hm} · ${g.shape}`),
+        c('info line reads label · surface · topology of the current group', s.info, `${g.label} · ${g.surface} · ${g.topology}`),
       ];
     },
     // open from the chip as a keyboard user would: a key press on the focused chip, then its click

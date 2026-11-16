@@ -1,10 +1,14 @@
 // groups.js — registry of the 17 wallpaper groups and the group-theoretic helpers everything else uses.
 // A Group object:
 //   id        ASCII orbifold symbol: 'o','2222','**','xx','*x','22x','22*','*2222','2*22','442','4*2','*442','333','3*3','*333','632','*632'
-//   label     display symbol (∗ and × glyphs), hm (crystallographic name), shape (short noun for the folded shape), topology (precise phrase)
+//   label     display symbol (∗ and × glyphs), shape (a nickname for the folded paper: 'pillow', 'cone pouch'), surface (the
+//             orbifold's surface by its plain name: 'sphere', 'disk', 'torus', 'annulus', 'Möbius band', 'Klein bottle',
+//             'projective plane'), topology (the same in the words of Conway's chapter 8, with its points: 'a punched sphere
+//             with a cone point of order 3; its rim is a mirror with a corner of order 3'). No crystallographic name: the
+//             owner, 15 Nov 2026: "get rid of crystallographic notation", the orbifold symbol is the group's name here
 //   e1, e2    basis of the translation lattice (world units)
 //   reps      coset representatives of the lattice: every element is  translate(m*e1 + n*e2) ∘ reps[k]
-//   fold      'hinge' | 'torus' | 'cylinder' | 'mobius' | 'klein' | 'crosscap' | 'snowflake'
+//   fold      'hinge' | 'torus' | 'cylinder' | 'mobius' | 'klein' | 'crosscap' | 'disc' (a kaleidoscope: its tile is the surface)
 //   kaleido   null, or {group: Group (the kaleidoscope), cell: [[x,y],...] CCW polygon T, glued: [bool per side]}
 //             side i runs cell[i] -> cell[(i+1)%n]; glued[i] is true when the reflection in that side is NOT in this group
 //             (the two copies of T are joined there); false when it is a mirror of this group (an open rim).
@@ -19,17 +23,48 @@ import rollData from './groupdata/roll.js';
 import crosscapData from './groupdata/crosscap.js';
 import kaleidoData from './groupdata/kaleido.js';
 
+/** The tidy surfaces the 17 orbifolds have, longest name first, each with its place in the Classification of Surfaces page. */
+const TIDY = [
+  ['a sphere with a crosscap', 'zip&kind=crosscap'], ['a sphere with a handle', 'name&k=torus'],
+  ['a twice-punched sphere', 'name&k=annulus'], ['a punched crosscap', 'name&k=mobius'], ['a pair of crosscaps', 'name&k=klein'],
+  ['a punched sphere', 'name&k=disk'], ['a sphere', 'tidy'],
+];
+
 function buildRaw(raw) {
   const g = {
-    id: raw.id || null, label: raw.label || '', hm: raw.hm || '', shape: raw.shape || '', topology: raw.topology || '',
+    id: raw.id || null, label: raw.label || '', shape: raw.shape || '', surface: raw.surface || '', topology: raw.topology || '',
     e1: raw.e1.slice(), e2: raw.e2.slice(), reps: raw.reps.map((r) => ({ ...r })),
     fold: raw.fold || null, kaleido: null, warp: null,
     presets: (raw.presets || []).map((p) => ({ ...p })), viewHalf: raw.viewHalf || 1.2,
   };
+  // the surface as a tidy one of Conway's chapter 8 — the first words of `topology` — and where the Classification of
+  // Surfaces page shows it (its hash: an example of its tab 4, the crosscap of tab 1, or tab 2)
+  const tidy = TIDY.find((t) => g.topology.startsWith(t[0]));
+  g.tidy = tidy ? tidy[0] : ''; g.tidyAt = tidy ? tidy[1] : '';
   g.cellArea = Math.abs(g.e1[0] * g.e2[1] - g.e1[1] * g.e2[0]);
   g.domainArea = g.cellArea / g.reps.length;
   g.center = raw.center ? raw.center.slice() : [(g.e1[0] + g.e2[0]) / 2, (g.e1[1] + g.e2[1]) / 2];
   return g;
+}
+
+/**
+ * The surface under an orbifold symbol, as Conway's chapter 8 counts it (The Symmetries of Things, pp. 102-105): a
+ * sphere with `handles` handles (o), `boundaries` holes punched (*) and `crosscaps` crosscaps (x). Its Euler
+ * characteristic is chi = 2 - 2 handles - boundaries - crosscaps; it has one side exactly when it has a crosscap.
+ * `cones`: the orders of its cone points (digits before the first *), `corners`: of the corner points on its
+ * boundaries (digits after a *). `id`: the ASCII symbol ('3*3', '22x', 'o', ...).
+ */
+export function surfaceFacts(id) {
+  const s = String(id);
+  let handles = 0, boundaries = 0, crosscaps = 0;
+  const cones = [], corners = [];
+  for (const ch of s) {
+    if (ch === 'o') handles++;
+    else if (ch === '*') boundaries++;
+    else if (ch === 'x') crosscaps++;
+    else if (ch >= '2' && ch <= '9') (boundaries > 0 ? corners : cones).push(Number(ch));
+  }
+  return { handles, boundaries, crosscaps, cones, corners, chi: 2 - 2 * handles - boundaries - crosscaps, sides: crosscaps > 0 ? 1 : 2 };
 }
 
 /** Lattice coordinates (s, t) of the vector (x, y): (x, y) = s*e1 + t*e2. */

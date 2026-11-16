@@ -106,7 +106,7 @@ test('window: a small pane zooms in so that a tile takes at least 0.3 of its sho
   for (const g of GROUPS) {
     for (let pi = 0; pi < g.presets.length; pi++) for (const amp of [0, 1]) {
       const { canvas } = fakeCanvas(148, 148);
-      const P = createPlaneView(canvas), sc = sceneOf(g.id, pi, amp), snow = g.fold === 'snowflake';
+      const P = createPlaneView(canvas), sc = sceneOf(g.id, pi, amp), snow = g.fold === 'disc';
       P.setScene({ group: g, domain: sc.domain, interactive: !snow });
       const b = tileBox(sc.domain), lo = P.toCss(b[0], b[1]), hi = P.toCss(b[2], b[3]), tag = `${g.id} preset ${pi} amp ${amp}`;
       assert.ok(lo[0] >= 0 && hi[0] <= 148 && hi[1] >= 0 && lo[1] <= 148, `${tag}: the tile (${lo.map((v) => v.toFixed(1))} .. ${hi.map((v) => v.toFixed(1))}) is inside the 148 px window`);

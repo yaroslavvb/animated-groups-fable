@@ -49,7 +49,7 @@ test('plane: under a print the commas are gone, the print covers the plane, the 
   assert.equal(PRINT_FRONT.length, 2); assert.equal(PRINT_BACK.length, 2);
   for (const g of GROUPS) {
     for (const key of ['checker', 'rings']) {
-      const print = printFor(g, key), snow = g.fold === 'snowflake';
+      const print = printFor(g, key), snow = g.fold === 'disc';
       const { canvas, calls } = fakeCanvas(560, 520);
       const P = createPlaneView(canvas, { hint: false });
       P.setScene({ group: g, domain: domainOf(g), interactive: !snow, print });
@@ -100,7 +100,7 @@ test('plane: without a print the picture is the comma\'s, as before; switching b
 
 test('plane: the replication under a print — landed copies and cards carry the print, in the colour of the face that is up; no commas', () => {
   for (const id of ['2222', '22x', '*x', '333', '*442']) {
-    const g = BY_ID[id], snow = g.fold === 'snowflake';
+    const g = BY_ID[id], snow = g.fold === 'disc';
     const { canvas, calls } = fakeCanvas(560, 520);
     const P = createPlaneView(canvas, { hint: false });
     P.setScene({ group: g, domain: domainOf(g), interactive: !snow, print: printFor(g, 'checker') });
@@ -205,7 +205,7 @@ const pathOps = (calls) => calls.filter((c) => c.op === 'lineTo' || c.op === 'mo
 
 test('plane: a shape print is filled ONCE per window into three layers (dark, pale, pale back) and every frame draws them; a new window or print fills them anew; the built-in prints are drawn as before', () => {
   for (const id of ['*442', '22x', '632']) {
-    const g = BY_ID[id], snow = g.fold === 'snowflake', print = commaPrint(g);
+    const g = BY_ID[id], snow = g.fold === 'disc', print = commaPrint(g);
     const { canvas, calls, made } = fakeDocCanvas(560, 520);
     const P = createPlaneView(canvas, { hint: false });
     P.setScene({ group: g, domain: domainOf(g), interactive: !snow, print });
@@ -275,7 +275,7 @@ test('plane: a shape print without a document (node) is filled on the canvas its
 test('plane: under a shape print the cards of the Tile step fill ONE world-space Path2D (the tile\'s share of the print), made once per tile, print and scale, under each card\'s own transform', () => {
   class FakePath2D { constructor() { this.subs = 0; this.points = 0; } moveTo() { this.subs++; this.points++; } lineTo() { this.points++; } closePath() {} }
   for (const id of ['333', '*442']) {
-    const g = BY_ID[id], snow = g.fold === 'snowflake', print = commaPrint(g);
+    const g = BY_ID[id], snow = g.fold === 'disc', print = commaPrint(g);
     const { canvas, calls } = fakeDocCanvas(560, 520);
     canvas.ownerDocument.defaultView = { Path2D: FakePath2D };
     const P = createPlaneView(canvas, { hint: false });

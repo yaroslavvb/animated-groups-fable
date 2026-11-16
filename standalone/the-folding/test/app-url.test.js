@@ -95,8 +95,12 @@ test('url: the format — g always, every other key only when it is not its defa
   assert.equal(encodeHash({ g: '333', view: { az: 0, el: 55, zoom: 1, roll: 12.5 } }), '#g=333&view=0/55/1/12.5', 'roll only when it is not 0');
   assert.equal(encodeHash({ g: '4*2', cut: 1, seed: [0.2, 0.3], wavy: 1, t: 1, view: { az: -40.26, el: 12, zoom: 2.346, roll: -3 } }),
     '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&t=1&view=-40.3/12/2.35/-3', 'all keys, in order');
+  assert.equal(encodeHash({ g: '4*2', cut: 1, seed: [0.2, 0.3], wavy: 1, tile: 0.5, view: { az: -40.26, el: 12, zoom: 2.346, roll: -3 } }),
+    '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&tile=0.5&view=-40.3/12/2.35/-3', 'tile between wavy and view');
+  // (the journey, 15 Nov 2026: a tile that is not flat has no copies, so beside a t > 0 the tile key is not written)
   assert.equal(encodeHash({ g: '4*2', cut: 1, seed: [0.2, 0.3], wavy: 1, tile: 0.5, t: 1, view: { az: -40.26, el: 12, zoom: 2.346, roll: -3 } }),
-    '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&tile=0.5&t=1&view=-40.3/12/2.35/-3', 'tile between wavy and t');
+    '#g=4%2A2&cut=1&seed=0.2/0.3&wavy=1&t=1&view=-40.3/12/2.35/-3', 't where tile would be: a folded tile has no copies');
+  assert.deepEqual([decodeHash('#g=333&tile=0.4&t=0.5').tile, decodeHash('#g=333&t=0.5').tile, decodeHash('#g=333&t=0').tile], [0, 0, 1], 'decoded: t > 0 means tile = 0');
   // rounding: seed 4 decimals, t 3, wavy 2, angles 1, zoom 2; nothing written as -0 or with an exponent
   assert.equal(encodeHash({ g: '333', t: 0.12345 }), '#g=333&t=0.123');
   assert.equal(encodeHash({ g: '333', t: 0.9996 }), '#g=333&t=1');
@@ -150,13 +154,17 @@ test('url: the write policy — one write per 250 ms while the state changes, at
 
 /** A random state of a group, as the page would write it (values already at the precision of the hash). */
 function randomState(group, rnd) {
-  const snow = group.fold === 'snowflake';
+  const snow = group.fold === 'disc';
   const u = { g: group.id, cut: Math.floor(rnd() * group.presets.length), seed: null, wavy: 0, tile: 1, t: 0, view: null };
   if (!snow && rnd() < 0.6) u.seed = [round(group.center[0] + (2 * rnd() - 1) * group.viewHalf, 4), round(group.center[1] + (2 * rnd() - 1) * group.viewHalf, 4)];
   if (!snow && rnd() < 0.6) u.wavy = round(rnd(), 2);
   if (rnd() < 0.35) u.tile = Math.min(0.999, round(rnd(), 3));          // the replication paused part-way (1 = tiled)
   if (rnd() < 0.8) u.t = round(rnd(), 3);
   if (rnd() < 0.15) u.t = 1;
+  // the journey (15 Nov 2026): a kaleidoscope's tile is its surface (nothing to fold: t stays 0), and a tile that is
+  // not flat has no copies
+  if (snow) u.t = 0;
+  if (u.t > 0) u.tile = 0;
   const angle = () => { const a = round(360 * rnd() - 180, 1); return a <= -180 ? a + 360 : a; };   // in (-180, 180]
   if (rnd() < 0.8) u.view = { az: angle(), el: round(180 * rnd() - 90, 1), zoom: round(0.5 + 2.7 * rnd(), 2), roll: rnd() < 0.5 ? 0 : angle() };
   if (u.view && Math.abs(u.view.el) === 90) u.view.az = 0;                // looking straight down or up: az is 0 by convention
@@ -191,7 +199,8 @@ test('url: every parameter round-trips — decode(encode(state)) is the state, a
   assert.equal(n, 17 * 150);
   // every value of tile the page can write, 0 to 0.999 in steps of 0.001, comes back as itself
   for (let i = 0; i < 1000; i++) { const v = i / 1000, h = encodeHash({ g: '22x', tile: v }); assert.equal(decodeHash(h).tile, v, h); assert.match(h, WRAPPER_HASH); }
-  for (const h of ['#g=333', '#333', '#4*2', '#*632', '#g=%2A632&t=0.5']) assert.equal(decodeHash(h).tile, 1, `${h}: no tile = tiled`);
+  for (const h of ['#g=333', '#333', '#4*2', '#*632', '#g=%2A632&t=0']) assert.equal(decodeHash(h).tile, 1, `${h}: no tile = tiled`);
+  assert.equal(decodeHash('#g=%2A632&t=0.5').tile, 0, 'beside a t > 0: the tile alone');
 });
 
 test('url: every group id, in every spelling a person or an old link may use', () => {
@@ -267,7 +276,7 @@ test('url: malformed hashes name nothing; a malformed value is dropped and the r
 // own comma as a motif, and one whose find has no motif for some groups.
 const commaFind = (group) => ({ shapes: motifFor(group).polylines.map((p) => ({ pts: Array.from(p) })) });
 const URLP = registerPattern({ key: 'urlcomma', label: 'Url comma' }, commaFind).key;
-const HALF = registerPattern({ key: 'urlhalf' }, (group) => { if (group.fold === 'snowflake') throw new Error('no motif for ' + group.id); return commaFind(group); }).key;
+const HALF = registerPattern({ key: 'urlhalf' }, (group) => { if (group.fold === 'disc') throw new Error('no motif for ' + group.id); return commaFind(group); }).key;
 
 test('url: a registered pattern rides in the hash as pat=<key> — it round-trips, any spelling resolves, an unknown key is dropped (the address would lose a pattern registered after the page started: register before src/app.js runs)', () => {
   assert.equal(encodeHash({ g: '333', pat: URLP }), '#g=333&pat=urlcomma');
@@ -312,7 +321,7 @@ test('scene: a registered pattern is the scene\'s print (a shape print, no comma
     assert.equal(K.print, printFor(g, 'comma'), `${id}: the Comma is a print`);
     assert.deepEqual([K.print.kind, K.motif.length, !!K.M.motifTint], ['shapes', 0, false], `${id}: printed, not cut into the mesh`);
     assert.ok(C.M.motifTint, `${id}: the sheet's comma is cut into the mesh`);
-    if (g.fold === 'snowflake') {
+    if (g.fold === 'disc') {
       assert.equal(H.print, null, `${id}: no motif here: no print`);
       assert.equal(H.motif.length, C.motif.length, `${id}: ... and the comma on the sheet`);
       assert.equal(H.pattern, HALF, `${id}: the pattern stays the one asked for`);
@@ -424,7 +433,7 @@ test('colours (C3): a fold whose paper ends up turned over (fold.mirrored) gets 
 
 test('hint (C1): "drag to move the cut" until the first drag; the kaleidoscopes have nothing to cut and no hint', () => {
   for (const g of GROUPS) {
-    const kal = g.fold === 'snowflake';
+    const kal = g.fold === 'disc';
     for (const dragged of [false, true]) {
       const h = hintState(g, dragged);
       assert.equal(h.text, HINT_TEXT);
@@ -444,7 +453,7 @@ test('outline (5, the snowflake fixer\'s request): a kaleidoscope\'s mirror outl
     const bold = sceneLines(scene, 1).filter((l) => l.width === WIDTHS.edge);
     assert.equal(bold.length, scene.edges.length, g.id);
     scene.edges.forEach((e, i) => {
-      const want = e.mirror && g.fold === 'snowflake' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
+      const want = e.mirror && g.fold === 'disc' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
       assert.ok(bold.some((l) => l.points === e.out && l.xray === want), `${g.id} edge ${i} (${e.mirror ? 'mirror' : 'seam'}): x-ray ${want}`);
     });
   }

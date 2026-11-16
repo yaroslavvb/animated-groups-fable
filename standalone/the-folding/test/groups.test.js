@@ -51,7 +51,7 @@ test('kaleidoscope: orientation-preserving part has index 2 (hinge, crosscap) or
       assert.ok(near(g.domainArea, cellArea, 1e-9), g.id + ' tile area = cell area (half the pillow)');
       for (const r of g.reps) assert.ok(contains(g.warp, r), g.id + ' is a subgroup of its warp group');
       for (const r of k.reps) assert.ok(contains(g.warp, r), g.id + ' kaleidoscope is a subgroup of its warp group');
-    } else if (g.fold === 'snowflake') {
+    } else if (g.fold === 'disc') {
       assert.ok(near(g.domainArea, cellArea, 1e-9), g.id);
       assert.ok(g.kaleido.glued.every((x) => !x), g.id + ' every side is a mirror');
     }

@@ -1393,14 +1393,13 @@ test('captions (finding 19): the eight hinge groups in one pattern, read off the
   for (const id of HINGE) {
     const star = id.indexOf('*');
     const cones = [...(star < 0 ? id : id.slice(0, star))].map(Number), corners = star < 0 ? null : [...id.slice(star + 1)].map(Number);
+    // (15 Nov 2026: in the words of Conway's chapter 8 — a sphere; a disk is "a punched sphere", its boundary the
+    // rim, a mirror, with its corner points)
     let want;
-    if (!corners) want = `sphere with ${list(cones, 'cone point', 'cone points')}`;
-    else {
-      const parts = [];
-      if (cones.length) parts.push(list(cones, 'cone point', 'cone points'));
-      if (corners.length) parts.push(list(corners, 'mirror corner', 'mirror corners'));
-      want = `disc with ${parts.join(' and ')}` + (corners.length ? '' : '; its rim is a mirror');
-    }
+    if (!corners) want = `a sphere with ${list(cones, 'cone point', 'cone points')}`;
+    else want = 'a punched sphere' + (cones.length ? ` with ${list(cones, 'cone point', 'cone points')}` : '') +
+      '; its rim is a mirror ' + (corners.length ? `with ${list(corners, 'corner', 'corners')}` : 'without corners');
     assert.equal(BY_ID[id].topology, want, id);
+    assert.equal(BY_ID[id].surface, corners ? 'disk' : 'sphere', `${id}: the surface's plain name`);
   }
 });

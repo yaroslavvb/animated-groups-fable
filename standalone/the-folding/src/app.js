@@ -1,11 +1,18 @@
 // app.js — The Folding: the wiring (SPEC 5.12). OWNER: integrator (round 3: ui-app).
 //
-// State   { groupId, presetIndex | custom seed, cutIndex, metric, amp, t, anchor }
+// State   { groupId, presetIndex | custom seed, cutIndex, metric, amp, t, tile, anchor }
+//   t, tile             -> ONE journey (15 Nov 2026; src/journey.js): the surface (t = 1) ⇄ the flat tile (t = 0, tile = 0)
+//                          ⇄ the pattern (tile = 1), on one scrubber with a button at either end: Fold plays toward
+//                          the surface, Unfold and then Tile toward the pattern. A tile that is not flat has no copies
+//                          (t > 0 means tile = 0). The 3D pane shows the whole journey: the fold on one half, and on
+//                          the other the copies of the tile being made round it (src/tiling3d.js), so what is folded
+//                          is always just the surface, and the copies are always the pattern — for a kaleidoscope too,
+//                          whose tile is its surface (fold type 'disc': nothing to zip; its fold is the gathering)
 //   group change        -> preset 0, t = 0, the camera frame jumps to the new tile (its ORIENTATION is kept, the
 //                          zoom glides back to 1: a zoom carried into another shape could overflow the pane)
 //   seed / preset / amp -> rebuild domain, mesh and fold, keep t: with the shape folded, dragging in the plane makes
 //                          the seams slide over it live
-//   t                   -> owned by the timeline (src/timeline.js): scrubbing, Fold / Unfold, Space
+//   t                   -> owned by the journey's timeline (src/timeline.js): scrubbing, Fold, Unfold / Tile, Space
 //   cutIndex            -> the preset last chosen: its metric and its anchor stay while the cut is dragged
 //   anchor              -> preset.anchor ?? preset.seed of the chosen preset (SPEC 7 anchor contract, SPEC 8 C3), handed
 //                          to every fold as opts.anchor. Set when a group or a preset is chosen (on load and from the URL
@@ -98,7 +105,7 @@
 //   renderer, plane, timeline, picker, scene()           the parts, for a closer look
 // setSeed is ignored for the kaleidoscopes (nothing to cut, as in the plane).
 
-import { GROUPS, BY_ID, latticeCoords } from './groups.js';
+import { GROUPS, BY_ID, latticeCoords, surfaceFacts } from './groups.js';
 import { apply, inverse } from './geom.js';
 import { makeWarp, buildDomain } from './domain.js';
 import { buildMesh } from './mesh.js';
@@ -110,6 +117,8 @@ import { createPlaneView, assignEdgeColors, CAPTION_SMALL } from './plane.js';
 import { motifFor, motifInTile, motifTintMesh } from './motif.js';
 import { createHassePicker } from './hasse.js';
 import { createTimeline, enhanceRange } from './timeline.js';
+import { journeyLayout, journeyOf, stateOf, journeyStops, stopOf, nextTarget, normalizeState, segmentSeconds, AT_STOP } from './journey.js';
+import { buildTiling3D, mapTiling3D } from './tiling3d.js';
 import { classColor, hexToRgb, MIRROR_COLOR, CREASE_COLOR, MOTIF_COLOR, INK, SURFACE_FRONT, SURFACE_BACK, SURFACE_GHOST, MOTIF_FILL_3D,
   SURFACE_OPACITY, PRINT_FRONT, PRINT_BACK, PRINT_OPACITY, RECUT_COLOR } from './palette.js';
 
@@ -119,8 +128,30 @@ import { classColor, hexToRgb, MIRROR_COLOR, CREASE_COLOR, MOTIF_COLOR, INK, SUR
 
 export const DEFAULT_GROUP = '333';
 
-/** Line widths in css px at a 520 px pane (they shrink a little on a phone, see lineScale). */
-export const WIDTHS = { edge: 4.5, crease: 1.6, motif: 1.8, axis: 2.2, cut: 1.9 };
+/** The page that makes Conway's chapter 8 playable; the caption's first words link into it (group.tidyAt). */
+export const SURFACES_URL = 'https://spacesheep.dev/@yaroslavvb/classification-of-surfaces';
+/**
+ * The surface under a group's orbifold, counted as chapter 8 names a surface (p. 105; the Examples of the
+ * Classification of Surfaces page): 'χ = 0, 1 boundary, one side'.
+ */
+export function surfaceCount(group) {
+  const f = surfaceFacts(group.id);
+  return `χ = ${f.chi < 0 ? '−' + -f.chi : f.chi}, ${f.boundaries === 0 ? 'no boundary' : f.boundaries === 1 ? '1 boundary' : f.boundaries + ' boundaries'}, ${f.sides === 1 ? 'one side' : 'two sides'}`;
+}
+
+/** Line widths in css px at a 520 px pane (they shrink a little on a phone, see lineScale). copy*: the outlines of the
+ *  tile's copies in the 3D pane's pattern (src/tiling3d.js): a seam, a seam of a first-layer copy on its way, a mirror. */
+export const WIDTHS = { edge: 4.5, crease: 1.6, motif: 1.8, axis: 2.2, cut: 1.9, copy: 1.1, copyMoving: 2.6, copyMirror: 2.2 };
+/** The creases of the fold to come fade out of the flat tile as its first copies are made: gone at this u. */
+export const CREASE_GONE = 0.07;
+/**
+ * How strong the labels of the tile's points are in the 3D pane's pattern, by how far the camera has backed off (the
+ * frame's radius in tile radii): full to PATTERN_LABELS[0], gone at PATTERN_LABELS[1].
+ */
+export const PATTERN_LABELS = Object.freeze([1.5, 2.6]);
+export function patternLabelFade(zoomOut) { return 1 - smooth((zoomOut - PATTERN_LABELS[0]) / (PATTERN_LABELS[1] - PATTERN_LABELS[0])); }
+/** The invisible tags of those labels start here (the copies of a cone point use 1 .. the number of cone points). */
+const PATTERN_TAG = 24;
 /** Opacity of the motif lines (the commas). */
 export const MOTIF_ALPHA = 0.7;
 /** How strongly the tile's edges show through the surface (the renderer's x-ray share), and a kaleidoscope's outline. */
@@ -130,27 +161,21 @@ export const EDGE_XRAY = 0.42, KALEIDO_EDGE_XRAY = 0.85;
 // of the tile); its outline alone is a thin line on a bent translucent sheet, so the sheet itself carries it:
 // motifTintMesh cuts fold.mesh along the comma's outline and sets tint bit 1 inside, which the renderer draws in its
 // `fill` colour (MOTIF_FILL_3D, a deep teal, the surface's own hue: the coloured seams keep their contrast), on both
-// sides of the sheet alike (across a glide seam the front continues into the back). Tint bit 0 stays what the fold
-// gave it: a kaleidoscope star's mirror images (the renderer's `ghost`, see ghostColor), whose flaps carry their
-// filled commas onto the copy beneath. The fill is part of the sheet, so nothing changes colour in time.
+// sides of the sheet alike (across a glide seam the front continues into the back). Tint bit 0 (the renderer's
+// `ghost`) is set by no mesh now (a kaleidoscope's star of mirror images had it, until its tile became its surface on
+// 15 Nov 2026). The fill is part of the sheet, so nothing changes colour in time.
 const CREASE_SAMPLES = 13;
-// A kaleidoscope's copy of the motif fades while its flap comes down: from this share of the stage in which the flap
-// first moves (the flap is upright half way) to the end of that stage (see motifFades).
-const MOTIF_FADE_FROM = 0.45;
 
 // When the creases fade: [from, to] in t. They are where the tile bends on its way, not features of the orbifold, so
 // they are gone when the fold is complete. The cross-cap's hinges are done at its middle stop; what follows moves
 // the surface without regard to them (its window follows the fold's own times: creaseFade; this entry is for a
-// cross-cap without them). The snowflake's creases are mirrors of the pattern: they stay until the last fold, at
-// whose end they lie under the tile's outline.
-const CREASE_FADE = { hinge: [0.45, 1], crosscap: [0.2, 0.47], snowflake: [0.72, 1] };
+// cross-cap without them).
+const CREASE_FADE = { hinge: [0.45, 1], crosscap: [0.2, 0.47] };
 
 const INK_RGB = hexToRgb(MIRROR_COLOR), MARK_RGB = hexToRgb(INK), CREASE_RGB = hexToRgb(CREASE_COLOR);
+const COPY_RGB = hexToRgb('#8a8a93');           // FAINT (palette.js): the outline of a copy's seam, as the plane draws it
 const MOTIF_RGB = hexToRgb(MOTIF_COLOR), CUT_RGB = hexToRgb(RECUT_COLOR);
 const PRINT_FRONT_RGB = PRINT_FRONT.map(hexToRgb), PRINT_BACK_RGB = PRINT_BACK.map(hexToRgb);
-/** How far a kaleidoscope star's secondary tiles take the ghost colour under a print (the print shows through). */
-export const GHOST_PRINT_MIX = 0.3;
-
 const clamp01 = (v) => { const x = Number(v); return x > 0 ? (x < 1 ? x : 1) : 0; };   // NaN -> 0
 const smooth = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
 
@@ -169,8 +194,9 @@ export function resolveGroupId(raw) {
 
 /** The spacesheep viewer takes a hash from the frame only if it matches this (verified 9 Nov 2026). */
 export const WRAPPER_HASH = /^#[A-Za-z0-9_.=%&\/-]*$/;
-/** The keys of the hash, in the order they are written. `tile` (the replication step, 10 Nov 2026): how far the
- *  plane's replication has come, 0..1, 3 decimals; absent = 1, the tiling as always. */
+/** The keys of the hash, in the order they are written. `tile` (the tiling, 10 Nov 2026): how far the copies of the
+ *  tile have been made, 0..1, 3 decimals; absent = 1, the pattern — or, beside a t > 0, 0: a tile that is not flat has
+ *  no copies (the journey of src/journey.js, 15 Nov 2026), so `tile` is written only when t = 0. */
 export const HASH_KEYS = ['g', 'pat', 'cut', 'seed', 'wavy', 'tile', 't', 'view'];
 /** While the state keeps changing the hash is written at most once in this many ms (at once when a gesture ends). */
 export const HASH_THROTTLE_MS = 250;
@@ -232,7 +258,8 @@ export function encodeHash(u) {
   const w = fmt(clamp01(u.wavy), 2), t = fmt(clamp01(u.t), 3);
   const k = fmt(u.tile === undefined || u.tile === null ? 1 : clamp01(u.tile), 3);
   if (w !== '0') parts.push('wavy=' + w);
-  if (k !== '1') parts.push('tile=' + k);
+  // (the journey, 15 Nov 2026: a tile that is not flat has no copies — t says it all, tile = 0 is understood)
+  if (k !== '1' && t === '0') parts.push('tile=' + k);
   if (t !== '0') parts.push('t=' + t);
   if (u.view) {
     const az = fmtAngle(u.view.az || 0), el = fmt(Math.max(-90, Math.min(90, u.view.el)), 1);
@@ -244,8 +271,9 @@ export function encodeHash(u) {
 
 /**
  * The state a hash asks for, or null when it names none (empty, an unknown group, nothing of ours).
- *   new form  '#g=…&…'  -> { g, legacy: false, cut, seed, wavy, t, view, dropped }: a key that is missing takes its
- *             default (g: DEFAULT_GROUP); a malformed value (not a plain decimal, a cut the group does not have, a
+ *   new form  '#g=…&…'  -> { g, legacy: false, cut, seed, wavy, tile, t, view, dropped }: a key that is missing takes its
+ *             default (g: DEFAULT_GROUP; tile: 1, the pattern — but 0 beside a t > 0: a tile that is not flat has no
+ *             copies); a malformed value (not a plain decimal, a cut the group does not have, a
  *             seed or view with the wrong number of parts) is dropped too and named in `dropped`; t and wavy are
  *             clamped to [0, 1], el to [-90, 90], zoom to the renderer's limits, az and roll wrapped into (-180, 180].
  *             Keys are case-insensitive, the first of two equal keys wins, unknown keys are ignored.
@@ -290,6 +318,8 @@ export function decodeHash(raw) {
       out.view = { az: wrap180(p[0]), el: Math.max(-90, Math.min(90, p[1])), zoom: Math.max(ZOOM_LIMITS[0], Math.min(ZOOM_LIMITS[1], p[2])), roll: p.length === 4 ? wrap180(p[3]) : 0 };
     } else drop('view');
   }
+  // the journey (15 Nov 2026): a tile that is not flat has no copies — beside a t > 0, tile is 0 whatever the hash says
+  if (out.t > 0) out.tile = 0;
   return out;
 }
 
@@ -346,7 +376,7 @@ export function presetState(group, i) {
 /** The features of a group for #app[data-features] (SPEC 8 C1), in this order. */
 export const FEATURES = ['seams', 'mirrors', 'cones', 'corners', 'double'];
 /**
- * Which of FEATURES the group has, read off its orbifold symbol: seams = the tile has glued edges (every group but
+ * Which of FEATURES the group has, read off its orbifold symbol: seams = the tile has zippers (every group but
  * the four kaleidoscopes); mirrors = a * in the symbol; cones = digits before the *; corners = digits after it;
  * double = the closed shape crosses itself (the Klein bottle xx and the cross-cap 22x).
  */
@@ -354,7 +384,7 @@ export function groupFeatures(group) {
   const id = group.id, star = id.indexOf('*');
   const before = star < 0 ? id : id.slice(0, star), after = star < 0 ? '' : id.slice(star + 1);
   const has = {
-    seams: group.fold !== 'snowflake', mirrors: star >= 0, cones: /[2-9]/.test(before), corners: /[2-9]/.test(after),
+    seams: group.fold !== 'disc', mirrors: star >= 0, cones: /[2-9]/.test(before), corners: /[2-9]/.test(after),
     double: group.fold === 'klein' || group.fold === 'crosscap',
   };
   return FEATURES.filter((f) => has[f]);
@@ -486,41 +516,6 @@ function nearestSample(pts, x, y) {
   return best;
 }
 
-/**
- * When each copy of the motif on a kaleidoscope's star fades out: for every cell i of fold.mesh.cells a window [a, b]
- * of t, or null (the base tile: its copy rides on the lid, the top sheet over the tile, and stays). Every fold lays
- * its flap on the stack that is already there, and a flap folded along a mirror carries its copies of the pattern
- * exactly onto the copies under it: so the moment a cell's flap first lands, its comma lies a sheet away from another
- * one, and a pile of 2n commas (a ribbon) would build up. The landing copy therefore fades while its flap comes down,
- * from MOTIF_FADE_FROM of the stage in which the cell FIRST moves to the end of that stage (stages = the spans
- * between the fold's stops, one per completed crease). Then every pile shows exactly one comma at every stop, and at
- * t = 1 only the tile's own copy is left. The stage is read off the motion itself (fold.at at the stops), so it does
- * not depend on how the fold module orders its folds.
- */
-export function motifFades(fold, size) {
-  const cells = (fold.mesh && fold.mesh.cells) || [];
-  const ts = (fold.stops || []).map((s) => s.t).filter((t) => t >= 0 && t <= 1).sort((a, b) => a - b);
-  if (ts.length < 2) return cells.map(() => null);
-  const Fs = ts.map((t) => fold.at(t)), p = [0, 0, 0], q = [0, 0, 0], eps = 1e-6 * size;
-  return cells.map((c, i) => {
-    if (i === 0 || !c || !Array.isArray(c.poly) || !c.poly.length) return null;
-    let x = 0, y = 0;
-    for (const v of c.poly) { x += v[0] / c.poly.length; y += v[1] / c.poly.length; }
-    for (let k = 0; k + 1 < ts.length; k++) {
-      Fs[k](x, y, i, p); Fs[k + 1](x, y, i, q);
-      if (Math.hypot(q[0] - p[0], q[1] - p[1], q[2] - p[2]) > eps) return [ts[k] + MOTIF_FADE_FROM * (ts[k + 1] - ts[k]), ts[k + 1]];
-    }
-    return null;
-  });
-}
-
-/** How much of a motif copy is drawn at t (1 = all of it): 1 before its fade window, 0 after it, smooth inside. */
-export function motifFade(fade, t) {
-  if (!fade) return 1;
-  if (!(fade[1] > fade[0])) return t >= fade[1] ? 0 : 1;
-  return 1 - smooth((t - fade[0]) / (fade[1] - fade[0]));
-}
-
 let warpCache = null;
 function warpFor(group, amp) {
   if (!warpCache || warpCache.group !== group || warpCache.amp !== amp) warpCache = { group, amp, warp: makeWarp(group, amp) };
@@ -550,8 +545,8 @@ function warpFor(group, amp) {
 export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false, pattern = SHEET_PATTERN, recut = true } = {}, prevDomain = null) {
   const domain = buildDomain(group, { seed, metric, warp: warpFor(group, clamp01(amp)) });
   assignEdgeColors(domain, prevDomain && prevDomain.group === group ? prevDomain : null);
-  draft = draft === true && group.fold !== 'snowflake';
-  const tileMesh = group.fold === 'snowflake' ? null : buildMesh(group, domain, { ...foldMeshOptions(group), draft });
+  draft = draft === true && group.fold !== 'disc';             // (a kaleidoscope has no cut to drag)
+  const tileMesh = buildMesh(group, domain, { ...foldMeshOptions(group), draft });
   const foldOpts = foldOptions(draft ? { anchor, density: false } : { anchor });
   const fold = createFold(group, domain, tileMesh, recut ? { ...foldOpts, recut: true } : foldOpts);
   const patternKey = (pattern !== SHEET_PATTERN && resolvePattern(pattern)) || SHEET_PATTERN;
@@ -585,37 +580,23 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
     creases.push({ xy, cell: c.b != null ? c.b : (c.a != null ? c.a : 0), out: new Float32Array(3 * CREASE_SAMPLES) });
   }
 
-  // the motif: the parts of the pattern's commas that lie in the tile, each point with its piece. A kaleidoscope's
-  // star gets the comma of every cell (the image of the tile's under the element that carries the tile there):
-  // folded, they all land on one. The tile's own copy rides on the lid, the top sheet over the tile; the copy of
-  // every other cell fades as its flap lands (motifFades), so a pile of sheets shows one comma, not a ribbon.
-  // Each entry: copy = the cell it is drawn on (0 = the tile), part = which polyline of the tile's motif it copies,
-  // fade = its fade window or null.
+  // the motif: the parts of the pattern's commas that lie in the tile, each point with its piece.
+  // Each entry: copy = 0 (the tile; a kaleidoscope's star had one per cell until 15 Nov 2026), part = which polyline
+  // of the tile's motif it copies.
   const motif = [];
   const base = comma ? motifInTile(group, domain, motifFor(group)) : [];
-  const pushMotif = (xy, cells, copy, part, fade) => motif.push({ xy, cells, copy, part, fade, out: new Float32Array(3 * (xy.length >> 1)) });
-  if (!comma) { /* a print: no comma */ } else if (group.fold === 'snowflake' && Array.isArray(fold.cellMaps)) {
-    const q = [0, 0], fades = motifFades(fold, size);
-    fold.cellMaps.forEach((g, i) => {
-      base.forEach((pl, part) => {
-        const m = pl.length >> 1;
-        if (i === 0) { pushMotif(pl, new Uint16Array(m).fill(M.lid != null ? M.lid : 0), 0, part, null); return; }
-        const xy = new Float32Array(2 * m);
-        for (let k = 0; k < m; k++) { apply(g, pl[2 * k], pl[2 * k + 1], q); xy[2 * k] = q[0]; xy[2 * k + 1] = q[1]; }
-        pushMotif(xy, new Uint16Array(m).fill(i), i, part, fades[i] || null);
-      });
-    });
-  } else {
+  const pushMotif = (xy, cells, copy, part) => motif.push({ xy, cells, copy, part, out: new Float32Array(3 * (xy.length >> 1)) });
+  if (comma) {
     const one = M.cells.length <= 1 || typeof M.locate !== 'function';
     base.forEach((pl, part) => {
       const m = pl.length >> 1, cells = new Uint16Array(m);
       if (!one) for (let k = 0; k < m; k++) cells[k] = M.locate(pl[2 * k], pl[2 * k + 1]);
-      if (!M.recut) { pushMotif(pl, cells, 0, part, null); return; }
+      if (!M.recut) { pushMotif(pl, cells, 0, part); return; }
       // a re-cut tile: the outline is cut where it passes from one piece to the next (they come apart on the way)
       let from = 0;
       for (let k = 1; k <= m; k++) {
         if (k < m && M.cells[cells[k]].part === M.cells[cells[from]].part) continue;
-        if (k - from >= 2) pushMotif(pl.subarray(2 * from, 2 * k), cells.subarray(from, k), 0, part, null);
+        if (k - from >= 2) pushMotif(pl.subarray(2 * from, 2 * k), cells.subarray(from, k), 0, part);
         from = k;
       }
     });
@@ -655,7 +636,7 @@ export function buildScene(group, { seed, metric, amp = 0, anchor, draft = false
     group, domain, tileMesh, fold, M, n, cellOf, size, anchor: foldOpts.anchor || null, draft,
     pattern: patternKey, print, cuts, cutsFlat,
     pos: new Float32Array(3 * n), edges, creases, motif, cones,
-    stops: fold.stops, duration: fold.duration, star: fold.star || null,
+    stops: fold.stops, duration: fold.duration,
     axis: [], frame: null, nonFinite: 0, t: -1, pairs: null,
   };
 }
@@ -775,18 +756,38 @@ export function sceneLines(scene, k = 1) {
     const list = !(scene.t > 0) && scene.cutsFlat && scene.cutsFlat.length ? scene.cutsFlat : scene.cuts;
     if (cs && cs.alpha > 0.004) for (const c of list) lines.push({ points: c.out, color: CUT_RGB, width: WIDTHS.cut * cs.width * thin, alpha: cs.alpha, dashed: !!cs.dashed, xray: 0.45 });
   }
-  for (const m of scene.motif) {
-    const a = MOTIF_ALPHA * motifFade(m.fade, scene.t);       // a kaleidoscope's landed copies fade out (motifFades)
-    if (a > 0.004) lines.push({ points: m.out, color: MOTIF_RGB, width: WIDTHS.motif * thin, alpha: a, xray: 0.3 });
-  }
+  for (const m of scene.motif) lines.push({ points: m.out, color: MOTIF_RGB, width: WIDTHS.motif * thin, alpha: MOTIF_ALPHA, xray: 0.3 });
   for (const e of scene.edges) if (!e.mirror) lines.push({ points: e.out, color: e.color, width: WIDTHS.edge * k, xray: EDGE_XRAY });
   // a kaleidoscope's outline IS the orbifold: a flap passing in front of it (the last fold's hinge, a landing flap's
   // far edge) must not turn a side grey for a moment (finding 5; notes/snowflake-round3.md)
-  const mx = scene.group.fold === 'snowflake' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
+  const mx = scene.group.fold === 'disc' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
   for (const e of scene.edges) if (e.mirror) lines.push({ points: e.out, color: e.color, width: WIDTHS.edge * k, xray: mx });
   // the cross-cap's double line (it is what tells a cross-cap from a pillow) and the Klein bottle's two rims, which
   // become the curve where its neck goes through its wall
   for (const p of scene.axis) lines.push({ points: p, color: INK_RGB, width: WIDTHS.axis * thin, dashed: true, xray: 0.7 });
+  return lines;
+}
+
+/**
+ * The lines of the 3D pane's PATTERN (src/tiling3d.js; T mapped at u, the scene mapped at t = 0) for R.setLines, bottom
+ * to top: the creases of the fold to come (fading as the first copies are made), the outlines of the copies in the
+ * picture — a seam thin and grey, in its zipper's colour while a copy of the first layer is on its way; a mirror edge
+ * in ink; a copy that is turning under the paper does not show through it — and last the tile's own bold edges, as on
+ * the flat tile.
+ */
+export function tilingLines(scene, T, u, k = 1) {
+  const lines = [], thin = Math.max(k, 0.85);
+  const ca = (typeof scene.fold.creaseAlpha === 'function' ? scene.fold.creaseAlpha(0) : creaseAlpha(scene.group.fold, 0, scene.fold)) * (1 - smooth(u / CREASE_GONE));
+  if (ca > 0.004) for (const c of scene.creases) lines.push({ points: c.out, color: CREASE_RGB, width: WIDTHS.crease * thin, alpha: ca, dashed: true, xray: 0.5 });
+  for (const L of T.outlines) {
+    if (!L.shown || L.mirror) continue;
+    const first = L.moving && L.depth <= 1;
+    lines.push({ points: L.out, color: first ? L.color : COPY_RGB, width: (first ? WIDTHS.copyMoving : WIDTHS.copy) * thin, xray: L.under ? 0 : 0.25 });
+  }
+  for (const L of T.outlines) if (L.shown && L.mirror) lines.push({ points: L.out, color: INK_RGB, width: WIDTHS.copyMirror * thin, xray: L.under ? 0 : 0.3 });
+  const mx = scene.group.fold === 'disc' ? KALEIDO_EDGE_XRAY : EDGE_XRAY;
+  for (const e of scene.edges) if (!e.mirror) lines.push({ points: e.out, color: e.color, width: WIDTHS.edge * k, xray: EDGE_XRAY });
+  for (const e of scene.edges) if (e.mirror) lines.push({ points: e.out, color: e.color, width: WIDTHS.edge * k, xray: mx });
   return lines;
 }
 
@@ -820,24 +821,6 @@ export function sceneMarkers(scene, k = 1) {
   return first.concat(later);
 }
 
-/**
- * The colour of the secondary tiles of a kaleidoscope's star (the renderer's `ghost`, tint bit 0) at the scene's t.
- * They are grey while the star is being folded, so the tile stands out among its mirror images; during the last fold
- * they take the tile's own colour: folded up, every sheet of the stack IS the tile (and the top sheet, which is what
- * one sees, would otherwise leave the finished orbifold grey). Only a star has secondary tiles; the filled comma is
- * tint bit 1, drawn in the renderer's `fill` colour (MOTIF_FILL_3D, set once in start()), at every t.
- */
-export function ghostColor(scene) {
-  if (scene.group.fold !== 'snowflake') return SURFACE_GHOST;
-  const s = ghostEase(scene);
-  return SURFACE_GHOST.map((g, i) => g + (SURFACE_FRONT[i] - g) * s);
-}
-/** How far a star's secondary tiles have become the tile itself at the scene's t: 0 until the last fold, 1 at its end. */
-export function ghostEase(scene) {
-  if (scene.group.fold !== 'snowflake') return 0;
-  const stops = scene.stops, from = stops.length > 2 ? stops[stops.length - 2].t : 0.5;
-  return smooth((scene.t - from) / (1 - from));
-}
 /**
  * What the plane is told of a re-cut (plane.js setScene({ recut })): { name, home: [[x, y], ...] the home tile,
  * cuts: [Float32Array, ...] where the tile is cut (each cut once), active }, or null when the fold does not re-cut
@@ -883,7 +866,7 @@ export const HINT_TEXT = 'drag to move the cut';
  * kaleidoscopes have nothing to cut: no hint (SPEC 8 C1; the static #cut-note under the plane says what Fold does).
  */
 export function hintState(group, dragged) {
-  return { text: HINT_TEXT, hidden: !!(group && group.fold === 'snowflake') || !!dragged };
+  return { text: HINT_TEXT, hidden: !!(group && group.fold === 'disc') || !!dragged };
 }
 
 /** Widths follow the pane as the plane view's do: 1 at 520 px, down to 0.72 on a phone, up to 1.1. */
@@ -938,12 +921,13 @@ export function seamGap(scene) {
 /** Degrees the 3D view must turn under the person's hand before the "drag to turn" hint goes. */
 export const TURN_MIN_DEG = 2;
 /**
- * The replication's frame on a phone (the final fix, 10 Nov 2026: findings 2 and 6). While the step's bar is open on
- * a plane pane whose short side is under CAPTION_SMALL, the plane frames the tile and its first layer between the
- * words at the pane's head and the bar at its foot (plane.js setStepFrame): STEP_INSETS css px are theirs (the words:
- * 6 px from the top, 21 px high; the bar: 2 px from the bottom, 44 px high; a few px of air each).
+ * The tiling's frame on a phone (the final fix, 10 Nov 2026: findings 2 and 6). While copies are being made on a
+ * plane pane whose short side is under CAPTION_SMALL, the plane frames the tile and its first layer under the words at
+ * the pane's head (plane.js setStepFrame): STEP_INSETS css px are theirs (the words: 6 px from the top, 21 px high,
+ * a few px of air; the foot is free since 15 Nov 2026, when the Tile bar left the plane pane for the journey's
+ * scrubber).
  */
-export const STEP_INSETS = Object.freeze({ top: 30, bottom: 48 });
+export const STEP_INSETS = Object.freeze({ top: 30, bottom: 6 });
 
 function start(doc, win) {
   const $ = (id) => doc.getElementById(id);
@@ -953,11 +937,13 @@ function start(doc, win) {
     foldCanvas: $('fold-canvas'), foldLabels: $('fold-labels'), foldBtn: $('fold-btn'), scrubber: $('scrubber'),
     resetView: $('reset-view'), pickerMount: $('picker-mount'),
   };
+  // the journey's other button (Unfold / Tile), its scrubber's box and the controls' row; the page works without them
+  const nextBtn = $('next-btn'), scrubBox = $('scrub'), foldControls = $('fold-controls');
   const missing = Object.entries(el).filter(([, node]) => !node).map(([k]) => k);
   if (missing.length) throw new Error('The Folding: the page lacks ' + missing.join(', '));
   const turnHint = $('turn-hint');                // the shell's "drag to turn" (SPEC 8 C1); the page works without it
-  // the replication step: the Tile button, its scrubber, the words for what acts; the page works without them
-  const tileEl = { bar: $('tile-bar'), btn: $('tile-btn'), slider: $('tile-slider'), caption: $('tile-caption') };
+  // the tiling's words for what acts (over the plane); the page works without them
+  const tileEl = { caption: $('tile-caption') };
   // the pattern selector and the words over the fold pane (13 Nov 2026); the page works without them
   const patEl = { box: $('pattern-box'), select: $('pattern'), label: $('pattern-label') }, foldCap = $('fold-caption');
 
@@ -966,7 +952,7 @@ function start(doc, win) {
   let scene = null;
   let dragged = false;              // the person has moved the cut once: "drag to move the cut" has done its job
   let lastError = '';
-  let ghostKey = '';                // the ghost colour the renderer was last given (see ghostColor)
+  let ghostKey = '';                // 'plain' once the renderer has its ghost style (no mesh uses it now)
   let surfaceKey = '';              // the front colour the renderer was last given (surfaceStyle: follows t)
   let turned = false;               // the person has turned the 3D view: "drag to turn" is gone for good
   let turnFrom = null;              // the view when the person last put a hand on the 3D view (null: a script moved it)
@@ -983,12 +969,123 @@ function start(doc, win) {
   R.setStyle({ fill: MOTIF_FILL_3D });             // tint bit 1: the comma filled into the sheet (motifTintMesh)
   const P = createPlaneView(el.planeCanvas, { onSeed, hint: false, onTilingPlan: (info) => tilePlanChanged(info) });     // the shell's #hint is the one hint
   const later = typeof win.queueMicrotask === 'function' ? (f) => win.queueMicrotask(f) : (f) => Promise.resolve().then(f);
+  // ---- the journey (15 Nov 2026; src/journey.js) ------------------------------------------------------------------
+  // ONE scrubber: the surface (j = 0) ⇄ the flat tile (j = lay.a) ⇄ the pattern (j = 1); state.t and state.tile are
+  // read off j (stateOf). A button at either end of it: #fold-btn plays toward the surface — from the pattern the
+  // copies are gathered onto the tile first, GATHER times as fast as they were made (the fold that follows is the
+  // show; a kaleidoscope's gathering IS its fold: KALEIDO_GATHER) — and #next-btn toward the pattern, one stop at a
+  // time: Unfold to the flat tile, then Tile to the pattern (the owner: "the Unfold and Tile buttons should be in the
+  // same place so I can first unfold and then tile"); at the pattern, Tile makes the copies again (they are gathered
+  // at REPLAY_GATHER first). A button pauses the play it started; the other one turns the play round. Space pauses,
+  // or goes on the way the last play went. The button that goes on that way is solid, the other outlined
+  // (#fold-controls[data-lead], [data-quiet]).
+  const GATHER = 3.2, KALEIDO_GATHER = 1.5, REPLAY_GATHER = 7;
+  let lay = journeyLayout(0, 1);    // where the tile sits on the track, and the seconds of the two halves
+  let going = null;                 // the end the play under way is headed for: 'surface' | 'pattern' | null
+  let lead = 'surface';             // the way the last play went
+  let route = [];                   // the legs still ahead of the play under way: [{ j, gather }]
+  let leg = null;                   // where the leg under way ends (a j), or null
+  let tileInfo = null;              // the plan of the tiling on screen (P.tilingPlan()): its seconds, its layers' ends
   const timeline = createTimeline({
-    slider: el.scrubber, button: el.foldBtn,
-    onChange: (t) => { state.t = t; drawFold(false); scheduleHash(); },
-    // a play has ended or been paused: write the URL once the frame's last t is in (onState comes before onChange)
-    onState: (st) => { if (st !== 'pause') later(flushHash); },
+    slider: el.scrubber, button: null,
+    toggle: () => { if (timeline.isPlaying()) pausePlay(); else playToward(restLead()); },
+    onChange: (j) => { onJourney(j); scheduleHash(); },
+    // a play has ended or been paused: go on (or write the URL) once the frame's last j is in (onState comes before onChange)
+    onState: (st) => { if (st !== 'pause') later(afterPlay); else syncTransport(); },
   });
+  /** The way a press of Space (or the solid button) goes from where the thumb rests. */
+  function restLead() {
+    const j = timeline.get();
+    if (j <= AT_STOP) return 'pattern';
+    if (j >= 1 - AT_STOP) return 'surface';
+    return lead;
+  }
+  /** One leg: play to `target` at the speed of its half of the journey (gathering: `gather` times the tiling's). */
+  function startLeg(target, gather = 1) {
+    const j = timeline.get();
+    if (Math.abs(target - j) < 1e-9) return false;
+    timeline.setDuration(Math.max(0.2, segmentSeconds(lay, j, target, gather)) / Math.abs(target - j));
+    leg = target;
+    timeline.play(target);
+    return true;
+  }
+  function stepRoute() {
+    while (route.length) {
+      const nx = route.shift();
+      if (startLeg(nx.j, nx.gather)) { syncTransport(); return; }
+    }
+    going = null; leg = null;
+    syncTransport();
+    flushHash();
+  }
+  function playRoute(points, toward) {
+    route = points.slice();
+    going = toward; lead = toward;
+    stepRoute();
+  }
+  /** A play ended: at the end of its leg (the next leg, or done), or paused part-way / the thumb grabbed (the route is dropped). */
+  function afterPlay() {
+    if (timeline.isPlaying()) return;                          // (another play began in the meantime)
+    if (leg !== null && Math.abs(timeline.get() - leg) < 1e-9) { stepRoute(); return; }
+    route = []; going = null; leg = null;
+    syncTransport();
+    flushHash();
+  }
+  function pausePlay() { route = []; timeline.stop(); }
+  /** Fold (toward 'surface': all the way) or Unfold / Tile (toward 'pattern': to the next stop; at the pattern: again). */
+  function playToward(dir) {
+    const j = timeline.get(), a = lay.a;
+    if (dir === 'surface') {
+      if (j <= AT_STOP) return;                                // the surface already (a kaleidoscope: its tile)
+      const pts = [];
+      if (j > a + AT_STOP) pts.push({ j: a, gather: a > 0 ? GATHER : KALEIDO_GATHER });
+      if (a > 0) pts.push({ j: 0, gather: 1 });
+      playRoute(pts, 'surface');
+      return;
+    }
+    if (j >= 1 - AT_STOP) { playRoute([{ j: a, gather: REPLAY_GATHER }, { j: 1, gather: 1 }], 'pattern'); return; }
+    playRoute([{ j: nextTarget(lay, j, 'pattern'), gather: 1 }], 'pattern');
+  }
+  /** Play to the journey point jt, through the tile if it lies on the way. */
+  function playTo(jt) {
+    const j = timeline.get(), a = lay.a, pts = [], back = jt < j;
+    if (a > 0 && ((j < a - AT_STOP && jt > a + AT_STOP) || (j > a + AT_STOP && jt < a - AT_STOP))) pts.push({ j: a, gather: back ? GATHER : 1 });
+    pts.push({ j: jt, gather: back && jt >= a - AT_STOP ? (a > 0 ? GATHER : KALEIDO_GATHER) : 1 });
+    playRoute(pts, back ? 'surface' : 'pattern');
+  }
+  const journeyBusy = () => timeline.isPlaying() || route.length > 0;
+  /** The two buttons: what each would do now, which is solid, which is disabled. */
+  function syncTransport() {
+    const j = timeline.get(), a = lay.a, playing = timeline.isPlaying();
+    const foldPlays = playing && going === 'surface', nextPlays = playing && going === 'pattern';
+    const label = (btn, text) => { const l = (btn.querySelector && btn.querySelector('[data-label]')) || btn; if (l.textContent !== text) l.textContent = text; };
+    const attr = (node, k, v) => { if (v === null) { if (node.hasAttribute(k)) node.removeAttribute(k); } else if (node.getAttribute(k) !== v) node.setAttribute(k, v); };
+    const solid = playing && going ? going : restLead();
+    label(el.foldBtn, foldPlays ? 'Pause' : 'Fold');
+    attr(el.foldBtn, 'data-state', foldPlays ? 'pause' : 'fold');
+    attr(el.foldBtn, 'data-quiet', solid === 'surface' ? null : '');
+    const done = !foldPlays && j <= AT_STOP;                   // nothing left to fold
+    if (el.foldBtn.disabled !== done) el.foldBtn.disabled = done;
+    attr(el.foldBtn, 'aria-label', foldPlays ? 'Pause the folding' : a > 0 ? 'Fold: gather the pattern onto the tile and zip the tile up into its surface' : 'Fold the pattern along its mirrors onto the tile');
+    if (nextBtn) {
+      const onFold = a > 0 && j < a - AT_STOP;
+      label(nextBtn, nextPlays ? 'Pause' : onFold ? 'Unfold' : 'Tile');
+      attr(nextBtn, 'data-state', nextPlays ? 'pause' : onFold ? 'unfold' : 'tile');
+      attr(nextBtn, 'data-quiet', solid === 'pattern' ? null : '');
+      attr(nextBtn, 'aria-label', nextPlays ? 'Pause' : onFold ? 'Unfold the surface into the flat tile' : j >= 1 - AT_STOP ? 'Tile again: make the copies of the tile once more' : 'Tile: make the copies of the tile');
+    }
+    if (foldControls) attr(foldControls, 'data-lead', solid);
+  }
+  /** The scrubber moved (a play's frame, the person's hand): the state at j, drawn. */
+  function onJourney(j) {
+    const now = stateOf(lay, j), tiled = now.tile !== state.tile;
+    state.t = now.t; state.tile = now.tile;
+    if (tiled) showTile();
+    drawFold(false);
+    syncTransport();
+  }
+  el.foldBtn.addEventListener('click', () => { if (going === 'surface' && timeline.isPlaying()) pausePlay(); else playToward('surface'); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { if (going === 'pattern' && timeline.isPlaying()) pausePlay(); else playToward('pattern'); });
   const picker = createHassePicker({ mount: el.pickerMount, groups: GROUPS, onPick: (id) => { setGroup(id); flushHash(); } });
 
   // ---- the prints of the other groups, made while the page is idle (14 Nov 2026; src/patterns/warm.js) -------------
@@ -1009,110 +1106,65 @@ function start(doc, win) {
   for (const type of ['pointerdown', 'pointermove', 'keydown', 'wheel', 'touchstart']) doc.addEventListener(type, poke, { capture: true, passive: true });
   doc.addEventListener('visibilitychange', () => { if (doc.hidden !== true && state.groupId) warmer.warm(state.pattern, state.groupId); });
 
-  // ---- the replication step (10 Nov 2026, qa/rep-judge.md; src/replicate.js, plane.js renderTiling) -------------
-  // state.tile = u in [0, 1]: how far the copies of the tile have been made (1 = the tiling as always). It has its own
-  // timeline (the scrubber in the plane's bar, magnets at the end of every layer; Space stays with Fold) and its own
-  // button: Tile plays on from where it is, or, when the tiling is complete, fades the copies out (REPLAY_FADE s) and
-  // makes them again from the tile alone; Pause pauses. The bar shows its scrubber while u < 1 or while it plays,
-  // and folds away BAR_LINGER ms after the end. A group change completes it (u = 1); a cut, a preset or Wavy keep u
-  // (the plane plans the new tile's copies; a drag or a wave also keeps the length, so u keeps its moment: plane.js
-  // preparePlan). The hash carries u as tile=<u> when it is not 1. On a phone's plane (short side under CAPTION_SMALL)
-  // the plane frames the first layer between the words and the bar while the bar is open (syncStepFrame).
-  const REPLAY_FADE = 0.35, BAR_LINGER = 1400;
-  let tileFade = 0, fadeRaf = 0, barTimer = 0;
-  const tileTL = tileEl.slider ? createTimeline({
-    slider: tileEl.slider, button: null, keyTarget: null,
-    onChange: (u) => { state.tile = u; showTile(); scheduleHash(); },
-    onState: (st) => { syncTileBar(); if (st !== 'pause') later(flushHash); },
-  }) : null;
-  if (tileTL) tileTL.set(1);
-  // the magnets: the end of a layer, but never closer than TILE_STOP_GAP of the track to the last one kept or to the
-  // end (a kaleidoscope's 12 layers on a phone's 100 px track would leave no stretch without a detent)
-  const TILE_STOP_GAP = 0.08;
+  // ---- the tiling's half of the journey (10 Nov 2026, qa/rep-judge.md; src/replicate.js, plane.js renderTiling) ------
+  // state.tile = u in [0, 1]: how far the copies of the tile have been made (1 = the pattern). Since 15 Nov 2026 it is
+  // the journey's second half (above): no bar and no button of its own in the plane pane. While it is under way
+  // (0 < u < 1) the plane shows the words for what acts (#tile-caption) where the hint sits, and on a phone's plane
+  // (short side under CAPTION_SMALL) frames the first layer under the words (syncStepFrame). At u = 0 (the tile alone,
+  // and all through the fold) the plane keeps a pale map of the pattern under the tile, so a cut can still be chosen
+  // by eye (plane.js GHOST). A group change shows the pattern (u = 1); a cut, a preset or Wavy keep u (the plane plans
+  // the new tile's copies; a drag or a wave also keeps the length, so u keeps its moment: plane.js preparePlan). The
+  // hash carries u as tile=<u> when it is not 1 (and t when the tile is not flat: then u = 0 and is not written).
+  /** The plan of the tiling on screen changed (plane.js onTilingPlan), or was read after a rebuild. */
   function tilePlanChanged(info) {
-    if (!tileTL || !info) return;
-    tileTL.setDuration(info.duration);
-    const kept = [];
-    let last = 0;
-    for (const s of info.stops) if (s.t >= last + TILE_STOP_GAP && s.t <= 1 - TILE_STOP_GAP) { kept.push(s); last = s.t; }
-    tileTL.setStops(kept);                                   // (the timeline adds 0 and 1)
+    if (!info) return;
+    tileInfo = info;
+    syncJourney();
     syncCaption();
   }
-  function tileOpen() { return tilePlaying() || state.tile < 1 - 1e-4; }
-  function stopFade() { if (fadeRaf) { win.cancelAnimationFrame(fadeRaf); fadeRaf = 0; } tileFade = 0; }
-  function tilePlaying() { return !!fadeRaf || (tileTL ? tileTL.isPlaying() : false); }
-  function showTile() { poke(); P.setTiling(state.tile, tileFade); P.render(); syncTileBar(); }
-  function syncTileButton() {
-    if (!tileEl.btn) return;
-    const playing = tilePlaying();
-    tileEl.btn.dataset.state = playing ? 'pause' : 'play';
-    const label = tileEl.btn.querySelector('[data-label]');
-    const text = playing ? 'Pause' : 'Tile';
-    if (label && label.textContent !== text) label.textContent = text;
-    const aria = playing ? 'Pause the tiling' : state.tile < 1 - 1e-4 ? 'Go on making the tiling' : 'Show how the tiling is made';
-    if (tileEl.btn.getAttribute('aria-label') !== aria) tileEl.btn.setAttribute('aria-label', aria);
+  /** The scrubber's layout and stops for the fold and the tiling on screen; the thumb where the state lives. */
+  function syncJourney() {
+    if (!scene) return;
+    const next = journeyLayout(scene.fold.still ? 0 : scene.duration, tileInfo ? tileInfo.duration : 5);
+    const moved = next.a !== lay.a;
+    lay = next;
+    timeline.setStops(journeyStops(lay, scene.stops, tileInfo ? tileInfo.stops : []));
+    if (scrubBox && scrubBox.style) scrubBox.style.setProperty('--a', String(lay.a));
+    if (moved && !timeline.isPlaying()) timeline.set(journeyOf(lay, state.t, state.tile));   // (a kaleidoscope has no fold half)
+    syncTransport();
   }
+  /** Are copies being made or gathered (the tiling's half, between its ends)? */
+  function tileOpen() { return state.t === 0 && state.tile > 1e-4 && state.tile < 1 - 1e-4; }
+  function tilePlaying() { return timeline.isPlaying() && state.t === 0 && timeline.get() >= lay.a - AT_STOP; }
+  function showTile() { poke(); P.setTiling(state.tile, 0); P.render(); syncTiling(); }
   function syncCaption() {
     if (!tileEl.caption) return;
-    const text = tileOpen() ? P.tilingCaption(tileFade > 0 ? 0 : state.tile) : '';
+    const text = tileOpen() ? P.tilingCaption(state.tile) : '';
     if (tileEl.caption.textContent !== text) tileEl.caption.textContent = text;
     tileEl.caption.hidden = !text;
   }
-  function syncTileBar() {
-    if (tileEl.bar) {
-      if (tileOpen()) {
-        if (barTimer) { win.clearTimeout(barTimer); barTimer = 0; }
-        if (!tileEl.bar.hasAttribute('data-open')) tileEl.bar.setAttribute('data-open', '');
-      } else if (tileEl.bar.hasAttribute('data-open') && !barTimer) {
-        barTimer = win.setTimeout(() => { barTimer = 0; if (!tileOpen()) { tileEl.bar.removeAttribute('data-open'); syncHint(); syncStepFrame(); } }, BAR_LINGER);
-      }
-    }
+  /** The plane's words, its frame on a phone, and the hint that gives way to the words. */
+  function syncTiling() {
     syncStepFrame();
     syncCaption();
     syncHint();
-    syncTileButton();
   }
-  /** On a phone's plane, while the bar is open, the plane frames the first layer between the words and the bar. */
+  /** On a phone's plane, while copies are being made, the plane frames the first layer under the words. */
   function syncStepFrame() {
     if (!P.setStepFrame) return;
-    const open = !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
     const w = el.planeCanvas.clientWidth, h = el.planeCanvas.clientHeight;
-    P.setStepFrame(open && w > 0 && h > 0 && Math.min(w, h) < CAPTION_SMALL ? STEP_INSETS : null);
+    P.setStepFrame(tileOpen() && w > 0 && h > 0 && Math.min(w, h) < CAPTION_SMALL ? STEP_INSETS : null);
   }
-  /** The Tile button: pause; or go on from where it is; or, when the tiling is complete, fade the copies and replay. */
-  function tileToggle() {
-    if (!tileTL) return;
-    if (tilePlaying()) {
-      if (fadeRaf) { stopFade(); state.tile = 1; tileTL.set(1); showTile(); } else tileTL.stop();
-      syncTileBar();
-      return;
-    }
-    if (state.tile < 1 - 1e-4) { tileTL.play(1); syncTileBar(); return; }
-    tilePlanChanged(P.tilingPlan());                         // the plan of the tile on screen: the timeline's duration
-    let still = false;
-    try { still = !!(win.matchMedia && win.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* none */ }
-    const t0 = win.performance.now();
-    const step = () => {
-      const x = still ? 1 : Math.min(1, (win.performance.now() - t0) / (REPLAY_FADE * 1000));
-      // (the thumb goes back with the fade, so it does not snap from the end to 0 when the copies are made again;
-      // finding 14. Silent: u itself stays 1 until the fade is over)
-      if (x < 1) { tileFade = x * x * (3 - 2 * x); tileTL.set(1 - tileFade); P.setTiling(1, tileFade); P.render(); fadeRaf = win.requestAnimationFrame(step); return; }
-      fadeRaf = 0; tileFade = 0;
-      state.tile = 0; tileTL.set(0); P.setTiling(0, 0); P.render();
-      tileTL.play(1);
-      syncTileBar();
-    };
-    tileFade = 1e-4;
-    fadeRaf = win.requestAnimationFrame(step);
-    syncTileBar();
-  }
-  if (tileEl.btn) tileEl.btn.addEventListener('click', tileToggle);
-  /** The replication's state set from outside (a group change, the URL, the test handle): no play, no fade. */
-  function setTileState(u) {
-    stopFade();
-    if (tileTL) { tileTL.stop(); tileTL.set(clamp01(u)); state.tile = tileTL.get(); } else state.tile = 1;
+  /** The journey's state set from outside (a group change, the URL, the test handle): no play. */
+  function setJourneyState(t, tile) {
+    route = []; going = null; leg = null;
+    const want = normalizeState(t, tile);
+    timeline.set(journeyOf(lay, want.t, want.tile));         // (stops a play; silent)
+    const now = stateOf(lay, timeline.get());
+    state.t = now.t; state.tile = now.tile;
     P.setTiling(state.tile, 0);
-    syncTileBar();
+    syncTiling();
+    syncTransport();
   }
 
   // ---- drawing --------------------------------------------------------------------------------------------------
@@ -1131,9 +1183,64 @@ function start(doc, win) {
   }
   if (win.MutationObserver) new win.MutationObserver(applyLabelAlpha).observe(el.foldLabels, { childList: true, characterData: true, subtree: true });
 
+  // ---- the pattern in the 3D pane (15 Nov 2026; src/tiling3d.js) -------------------------------------------------
+  // On the tiling's half of the journey (t = 0, tile > 0) the 3D pane shows the tile making its copies round it — the
+  // plane's own plan (P.getPlan()), the same copies at the same moments — so the surface unfolds into the tile and the
+  // tile into the pattern in ONE view. `loaded` is the object whose mesh the renderer holds (the fold's scene, or the
+  // pattern's T3): the other one's is handed over when the journey crosses the tile.
+  let T3 = null, loaded = null;
+  function tilingScene() {
+    if (!scene || !P.getPlan) return null;
+    const plan = P.getPlan();
+    if (!plan) return null;
+    if (T3 && T3.plan === plan && T3.of === scene) return T3;
+    T3 = buildTiling3D(scene.group, scene.domain, plan, { edges: scene.edges });
+    T3.of = scene;
+    return T3;
+  }
+  function drawTiling(T, immediate) {
+    counters.draws++;
+    poke();
+    try {
+      if (scene.t !== 0) mapScene(scene, 0);                    // the tile's own edges and cone points, flat
+      mapTiling3D(T, state.tile);
+      if (scene.print) {
+        const ps = printStyle(scene.fold, 0), skey = 'print|' + scene.group.id + '|' + scene.pattern + '|' + ps.printFront[0].join();
+        if (skey !== surfaceKey) { surfaceKey = skey; R.setStyle({ print: printUniforms(scene.print), printFront: ps.printFront, printBack: ps.printBack, opacity: PRINT_OPACITY }); }
+      } else {
+        const st = surfaceStyle(scene.fold, 0), skey = 'plain|' + st.front.join();
+        if (skey !== surfaceKey) { surfaceKey = skey; R.setStyle({ front: st.front, back: st.back, print: null, opacity: SURFACE_OPACITY }); }
+      }
+      const k = lineScale(el.foldCanvas.clientWidth, el.foldCanvas.clientHeight);
+      // (every copy is the paper in its full tones, as the tile is: src/tiling3d.js)
+      if (loaded !== T) { R.setSurface({ positions: T.pos, indices: T.tri, uv: T.uv }); loaded = T; } else R.updatePositions(T.pos);
+      if (T.frame) R.setFrame(T.frame, immediate);
+      R.setLines(tilingLines(scene, T, state.tile, k));
+      // the tile's cone and corner points keep their marks; their labels fade as the camera backs off to hold the
+      // pattern (they name the points of the SURFACE; among sixty copies they are small print in the way)
+      const marks = sceneMarkers(scene, k), fade = patternLabelFade(T.frame ? T.frame.radius / T.radius : 1);
+      labelAlpha.clear();
+      marks.forEach((m, i) => {
+        if (!m.label) return;
+        const a = (m.labelAlpha === undefined ? 1 : m.labelAlpha) * fade;
+        if (a < 0.02) { m.label = ''; return; }
+        const bare = m.label.slice(0, m.label.length - tagOf(m.label)), tag = PATTERN_TAG + i;
+        m.label = bare + ZWSP.repeat(tag);
+        labelAlpha.set(tag, a);
+      });
+      R.setMarkers(marks);
+      R.render();
+      applyLabelAlpha();
+      syncFoldCaption();
+    } catch (e) { report(`drawing the pattern of ${scene.group.id} at tile = ${state.tile}`, e); }
+  }
+
   /** Map the scene at state.t and hand it to the renderer. `immediate`: the camera frame jumps instead of easing. */
   function drawFold(immediate, fresh = false) {
     if (!scene) return;
+    // the tiling's half of the journey: the pattern (the copies of the tile), in this same pane
+    const T = state.t === 0 && state.tile > 0 && R.ok !== false ? tilingScene() : null;
+    if (T) { drawTiling(T, immediate); return; }
     counters.draws++;
     poke();                                                     // (a frame: the idle making of prints waits)
     try {
@@ -1150,13 +1257,11 @@ function start(doc, win) {
       if (scene.nonFinite) report(`fold ${scene.group.id} at t = ${state.t}`, `${scene.nonFinite} points are not finite (drawn flat)`);
       const k = lineScale(el.foldCanvas.clientWidth, el.foldCanvas.clientHeight);
       // (uv: every vertex's point of the paper, where the print is evaluated)
-      if (fresh) R.setSurface({ positions: scene.pos, indices: scene.M.tri, tint: scene.M.tint && scene.M.tint.length >= scene.n ? scene.M.tint : undefined, uv: scene.M.xy });
+      if (fresh || loaded !== scene) { R.setSurface({ positions: scene.pos, indices: scene.M.tri, tint: scene.M.tint && scene.M.tint.length >= scene.n ? scene.M.tint : undefined, uv: scene.M.xy }); loaded = scene; }
       else R.updatePositions(scene.pos);
       if (scene.frame) R.setFrame(scene.frame, immediate);
-      // a star's secondary tiles: grey (the comma), or the print seen through a veil of grey, until the last fold
-      const ghost = scene.print ? SURFACE_GHOST : ghostColor(scene), mixG = scene.print ? GHOST_PRINT_MIX * (1 - ghostEase(scene)) : 1;
-      const gkey = ghost.join() + '|' + mixG.toFixed(4);
-      if (gkey !== ghostKey) { ghostKey = gkey; R.setStyle({ ghost, ghostMix: mixG }); }
+      // (no mesh has ghost tiles since 15 Nov 2026: the renderer's ghost colour is set once)
+      if (ghostKey !== 'plain') { ghostKey = 'plain'; R.setStyle({ ghost: SURFACE_GHOST, ghostMix: 1 }); }
       R.setLines(sceneLines(scene, k));
       const marks = sceneMarkers(scene, k);
       labelAlpha.clear();
@@ -1194,7 +1299,7 @@ function start(doc, win) {
     if (!scene) return;
     try {
       // the kaleidoscopes have nothing to cut: no handle, no drags (SPEC 8 C2)
-      P.setScene({ group: scene.group, domain: scene.domain, motif: motifFor(scene.group), star: scene.star || undefined, interactive: scene.group.fold !== 'snowflake',
+      P.setScene({ group: scene.group, domain: scene.domain, motif: motifFor(scene.group), interactive: scene.group.fold !== 'disc',
         print: scene.print || null, recut: planeRecut(scene, state.t) });
       shownPart = recutPartNow();
       if (now) P.render();
@@ -1222,9 +1327,10 @@ function start(doc, win) {
     syncFeatures();
     syncPattern();                                             // (#app[data-print]: the new scene's print, or none)
     // (a tile whose paper ends up turned over: the surface colours follow t, see drawFold)
-    timeline.setStops(scene.stops);
-    timeline.setDuration(scene.duration);
     drawPlane(true);
+    // the journey's layout and stops: this fold's, and the plan of this tile's copies (the plane makes it now)
+    try { tileInfo = P.tilingPlan() || tileInfo; } catch (e) { report(`planning the copies of ${group.id}`, e); }
+    syncJourney();
     drawFold(immediate, true);
     if (state.tile < 1) syncCaption();                         // the new tile's copies: their words
     return true;
@@ -1237,8 +1343,8 @@ function start(doc, win) {
   function syncHint() {
     const h = hintState(BY_ID[state.groupId], dragged);
     if (el.hint.textContent !== h.text) el.hint.textContent = h.text;
-    // the replication's bar and words take the hint's place while they show
-    el.hint.hidden = h.hidden || !!(tileEl.bar && tileEl.bar.hasAttribute('data-open'));
+    // the tiling's words take the hint's place while they show
+    el.hint.hidden = h.hidden || tileOpen();
   }
   /** #app[data-features]: the group's (SPEC 8 C1), and `recut` while the tile on screen is re-cut first; #app[data-words]. */
   function syncFeatures() {
@@ -1275,10 +1381,21 @@ function start(doc, win) {
     else if (el.app.getAttribute('data-print') !== kind) el.app.setAttribute('data-print', kind);
   }
   function fillShell(group) {
+    // the orbifold symbol and its surface by its plain name (no crystallographic name: the owner, 15 Nov 2026); the
+    // caption says the surface in the words of Conway's chapter 8, its first words a link to the page that makes the
+    // chapter playable; the chip's tooltip counts the surface as that page does (chi, boundaries, sides)
     el.chipSymbol.textContent = group.label;
-    el.chipMeta.textContent = group.hm + ' · ' + group.shape;
-    el.chip.setAttribute('aria-label', `Orbifold ${group.label}: ${group.hm}, ${group.shape}. Pick another`);
-    el.caption.textContent = group.topology;
+    el.chipMeta.textContent = group.surface;
+    el.chip.setAttribute('aria-label', `Orbifold ${group.label}: ${group.surface}. Pick another`);
+    el.chip.title = `Pick an orbifold. ${group.label}: ${group.surface} (${surfaceCount(group)})`;
+    const tidy = group.tidy && group.topology.startsWith(group.tidy) ? group.tidy : '';
+    if (tidy && typeof doc.createElement === 'function' && typeof el.caption.replaceChildren === 'function') {
+      const a = doc.createElement('a');
+      a.className = 'cap-link'; a.textContent = tidy;
+      a.href = SURFACES_URL + (group.tidyAt ? '#' + group.tidyAt : ''); a.target = '_blank'; a.rel = 'noopener';
+      a.title = `${tidy}: ${surfaceCount(group)} — in Classification of Surfaces`;
+      el.caption.replaceChildren(a, doc.createTextNode(group.topology.slice(tidy.length)));
+    } else el.caption.textContent = group.topology;
     el.presets.replaceChildren(...group.presets.map((p, i) => {
       const chip = doc.createElement('button');
       chip.type = 'button'; chip.className = 'chip'; chip.textContent = p.name; chip.title = p.name;
@@ -1286,7 +1403,7 @@ function start(doc, win) {
       chip.addEventListener('click', () => { setPreset(i); flushHash(); });
       return chip;
     }));
-    el.wavy.disabled = group.fold === 'snowflake';          // every edge is a mirror: the wave slides along them, nothing changes
+    el.wavy.disabled = group.fold === 'disc';               // every edge is a mirror: the wave slides along them, nothing changes
     el.wavy.value = String(state.amp);
     // what the legend and the cut controls show (SPEC 8 C1: styles.css reads these)
     el.app.setAttribute('data-fold', group.fold);
@@ -1303,7 +1420,7 @@ function start(doc, win) {
   function currentHash() { try { return win.location.hash || ''; } catch (e) { return ''; } }
   /** What the hash says about the state shown now (encodeHash takes it). */
   function urlState() {
-    const group = BY_ID[state.groupId], snow = group.fold === 'snowflake';
+    const group = BY_ID[state.groupId], snow = group.fold === 'disc';
     return {
       g: state.groupId, pat: state.pattern, cut: state.cutIndex,
       seed: !snow && state.presetIndex < 0 && scene ? [scene.domain.seed[0], scene.domain.seed[1]] : null,
@@ -1350,15 +1467,17 @@ function start(doc, win) {
     try {
       state.groupId = id;
       usePreset(group, 0);
-      state.t = 0;
-      if (changed) setTileState(1);                             // another pattern: shown tiled, as always
+      // another group: its pattern, tiled (the journey's far end); the same group again: the tile unfolded, its copies as they were
+      setJourneyState(0, changed ? 1 : state.tile);
       scene = null;                                             // seams of another group lend no colours
-      timeline.set(0);
       fillShell(group);
       if (!rebuild({ immediate: true })) {                      // (never seen: the presets are tested) go back
         Object.assign(state, before); scene = old;
-        if (state.groupId) { fillShell(BY_ID[state.groupId]); timeline.set(state.t); }
-      } else if (changed) zoomHome();                           // another shape: same orientation, zoom back to 1
+        if (state.groupId) { fillShell(BY_ID[state.groupId]); rebuild({ immediate: true }); setJourneyState(before.t, before.tile); }
+      } else {
+        setJourneyState(state.t, state.tile);                   // (the thumb on this group's track)
+        if (changed) zoomHome();                                // another shape: same orientation, zoom back to 1
+      }
       syncPresets(); syncHint();
     } finally { quiet--; }
     scheduleHash();
@@ -1387,7 +1506,7 @@ function start(doc, win) {
 
   function setSeed(x, y) {
     x = Number(x); y = Number(y);
-    if (!Number.isFinite(x + y) || !scene || scene.group.fold === 'snowflake') return getState();   // nothing to cut there
+    if (!Number.isFinite(x + y) || !scene || scene.group.fold === 'disc') return getState();   // nothing to cut there
     state.seed = [x, y];
     state.presetIndex = -1;                                   // a custom cut: no chip is lit (the metric of the last one stays)
     quiet++;
@@ -1405,9 +1524,10 @@ function start(doc, win) {
     return getState();
   }
 
+  /** The fold's t, set at once: t > 0 leaves the tile alone in the plane (tile = 0); t = 0 keeps the copies as they are. */
   function setT(t) {
     quiet++;
-    try { timeline.set(clamp01(t)); state.t = timeline.get(); drawFold(true); } finally { quiet--; }
+    try { const tt = clamp01(t); setJourneyState(tt, tt > 0 ? 0 : state.tile); P.render(); drawFold(true); } finally { quiet--; }
     scheduleHash();
     return getState();
   }
@@ -1435,7 +1555,7 @@ function start(doc, win) {
   function applyUrl(u) {
     const group = BY_ID[u.g];
     if (!group) return false;
-    const snow = group.fold === 'snowflake', custom = !snow && !!u.seed;
+    const snow = group.fold === 'disc', custom = !snow && !!u.seed;
     const p = presetState(group, u.cut);
     const want = { ...p, presetIndex: custom ? -1 : p.presetIndex, seed: custom ? [u.seed[0], u.seed[1]] : p.seed, amp: snow ? state.amp : clamp01(u.wavy),
       pattern: resolvePattern(u.pat) || DEFAULT_PATTERN };
@@ -1447,9 +1567,9 @@ function start(doc, win) {
     try {
       stopZoomHome();
       turnFrom = null;
-      state.t = clamp01(u.t);
-      timeline.set(state.t);
-      setTileState(u.tile === undefined || u.tile === null ? 1 : u.tile);
+      // (a tile that is not flat has no copies: t > 0 wins over tile; the thumb is placed once this group's track is known)
+      const wantJ = normalizeState(u.t, u.tile);
+      state.t = wantJ.t; state.tile = wantJ.tile;
       if (!same) {
         if (changed) { state.groupId = u.g; scene = null; }
         Object.assign(state, want);
@@ -1465,16 +1585,16 @@ function start(doc, win) {
         }
         if (!rebuild({ immediate: true, recolour: true, colourFrom })) {
           Object.assign(state, before); scene = old;
-          if (state.groupId) { fillShell(BY_ID[state.groupId]); timeline.set(state.t); }
+          if (state.groupId) { fillShell(BY_ID[state.groupId]); rebuild({ immediate: true }); setJourneyState(before.t, before.tile); }
           syncFeatures();
           return false;
         }
       }
-      state.t = timeline.get();
+      setJourneyState(wantJ.t, wantJ.tile);
       R.setView(viewFromUrl(u.view || DEFAULT_VIEW));
       drawFold(true);
       P.render();
-      syncPresets(); syncTileBar();
+      syncPresets(); syncTiling();
     } finally { quiet--; }
     return true;
   }
@@ -1527,7 +1647,9 @@ function start(doc, win) {
       seed: scene ? [scene.domain.seed[0], scene.domain.seed[1]] : state.seed.slice(),
       anchor: state.anchor ? state.anchor.slice() : null,
       metric: state.metric ? state.metric.slice() : null, amp: state.amp, t: state.t,
-      playing: timeline.isPlaying(), button: el.foldBtn.textContent.trim(),
+      playing: timeline.isPlaying(), button: el.foldBtn.textContent.trim(), nextButton: nextBtn ? nextBtn.textContent.trim() : '',
+      // the journey (src/journey.js): where the thumb is, the main stop it rests at, the way the solid button goes
+      journey: timeline.get(), journeyStop: stopOf(lay, timeline.get()), journeyTile: lay.a, lead: timeline.isPlaying() && going ? going : restLead(), going,
       stops: scene ? scene.stops.map((s) => ({ t: s.t, label: s.label })) : [], duration: scene ? scene.duration : null,
       foldType: group ? group.fold : null, vertices: scene ? scene.n : 0, triangles: scene ? scene.M.tri.length / 3 : 0,
       seamGap: Number.isNaN(gap) ? 'not finite' : gap, nonFinite: scene ? scene.nonFinite : 0,
@@ -1543,7 +1665,7 @@ function start(doc, win) {
         : null,
       foldCaption: foldCap && !foldCap.hidden ? foldCap.textContent : '',
       tile: state.tile, tilePlaying: tilePlaying(), tileCaption: tileEl.caption && !tileEl.caption.hidden ? tileEl.caption.textContent : '',
-      tileBarOpen: !!(tileEl.bar && tileEl.bar.hasAttribute('data-open')),
+      tileOpen: tileOpen(),
       // the replication's frame on a phone's plane (plane.js setStepFrame): 0 the window as always .. 1 the step's
       tileFrame: P.getStepFrame ? P.getStepFrame().mix : 0,
       view: viewAngles(), webgl: R.ok !== false, url, hash: currentHash(),
@@ -1557,7 +1679,7 @@ function start(doc, win) {
   // The frames of a drag are built with the draft mesh (rebuild({ draft: true })); when the drag ends the same cut is
   // built again with the full mesh (the same boundary samples: the seams stay where they are, the facets get finer).
   function onSeed(x, y, phase) {
-    if (!scene || scene.group.fold === 'snowflake') return;  // nothing to cut (the plane takes no drags there either)
+    if (!scene || scene.group.fold === 'disc') return;       // nothing to cut (the plane takes no drags there either)
     if (phase === 'end') {
       if (scene.draft) { quiet++; try { rebuild(); } finally { quiet--; } }
       flushHash();
@@ -1628,11 +1750,11 @@ function start(doc, win) {
     new win.ResizeObserver(() => syncStepFrame()).observe(el.planeCanvas);
   }
 
-  // Without WebGL 2 the 3D pane only shows the renderer's message: nothing to play, scrub or reset there. The plane,
-  // the presets, Wavy and the picker work as ever.
+  // Without WebGL 2 the 3D pane only shows the renderer's message: nothing to turn or reset there. The plane, the
+  // presets, Wavy, the picker and the journey's scrubber work as ever (its tiling half shows in the plane; the fold
+  // half has no picture).
   if (R.ok === false) {
-    for (const b of [el.foldBtn, el.scrubber, el.resetView]) b.disabled = true;
-    timeline.destroy();                                       // Space and the scrubber then do nothing either
+    el.resetView.disabled = true;
     if (turnHint) turnHint.hidden = true;
   }
 
@@ -1643,23 +1765,28 @@ function start(doc, win) {
     win.requestAnimationFrame(() => win.requestAnimationFrame(fin));
     win.setTimeout(fin, 300);
   });
+  const whenIdle = () => new Promise((resolve) => { const poll = () => { if (journeyBusy()) win.setTimeout(poll, 30); else resolve(getState()); }; poll(); });
   const api = {
     setGroup, setPreset, setSeed, setAmp, setT, setView, getState, setPattern,
-    /** The replication's progress u (0 = the tile alone, 1 = tiled), drawn at once. */
-    setTile(u) { quiet++; try { setTileState(u); P.render(); } finally { quiet--; } scheduleHash(); return getState(); },
-    /** Press the Tile button; resolves when the play has ended. */
+    /** The tiling's progress u (0 = the tile alone, 1 = the pattern), with the tile flat (t = 0), drawn at once. */
+    setTile(u) { quiet++; try { setJourneyState(0, u); P.render(); drawFold(true); } finally { quiet--; } scheduleHash(); return getState(); },
+    /** The journey point j (0 the surface, journeyTile the flat tile, 1 the pattern), drawn at once. */
+    setJourney(j) { const s = stateOf(lay, j); quiet++; try { setJourneyState(s.t, s.tile); P.render(); drawFold(true); } finally { quiet--; } scheduleHash(); return getState(); },
+    /** Tile: play to the pattern (unfolding first if the tile is not flat; at the pattern: once more from the tile alone); resolves at the end. */
     playTile() {
-      tileToggle();
-      return new Promise((resolve) => { const poll = () => { if (tilePlaying()) win.setTimeout(poll, 30); else resolve(getState()); }; poll(); });
+      const j = timeline.get(), a = lay.a;
+      if (j >= 1 - AT_STOP) playToward('pattern'); else playTo(1);
+      return whenIdle();
     },
+    /** Press a button of the journey: 'fold' (#fold-btn) or 'next' (#next-btn: Unfold, then Tile); resolves when the play has ended. */
+    press(which) { (which === 'fold' ? el.foldBtn : nextBtn).click(); return whenIdle(); },
     tilePlan: () => P.tilingPlan(),
     ready: null,
+    /** Play the fold to t (0 the flat tile, 1 the surface), gathering the copies first if there are any; no t: what Space does. */
     play(target) {
-      timeline.play(target);
-      return new Promise((resolve) => {
-        const poll = () => { if (timeline.isPlaying()) win.setTimeout(poll, 30); else resolve(getState()); };
-        poll();
-      });
+      if (target === undefined || target === null) { if (timeline.isPlaying()) pausePlay(); else playToward(restLead()); }
+      else { const tt = clamp01(target); if (tt > 0 || state.t > 0) playTo(journeyOf(lay, tt, 0)); }
+      return whenIdle();
     },
     resetView() { stopZoomHome(); turnFrom = null; R.resetView(true); R.render(); scheduleHash(); return getState(); },
     openPicker() { picker.open(state.groupId); return picker.isOpen(); },
