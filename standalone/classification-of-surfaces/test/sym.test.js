@@ -287,31 +287,30 @@ test('typing a signature as it is read, and deleting it again', async () => {
   assert.deepEqual(bind(C.tokensOf(sig), A), []);
 });
 
-test('the six designs: every mark lies inside its tile, for every example and some signatures of one\'s own', async () => {
+test('the print: every comma lies inside its tile, for every example and some signatures of one\'s own', async () => {
+  // Paisley alone since Mon 16 Nov 2026 ("keep the Paisley pattern and get rid of the selector"): the five other
+  // designs and their chooser went with it.
   const C = await import('../src/sym/catalog.js'), Mo = await import('../src/sym/motifs.js');
-  assert.deepEqual(Mo.PATTERNS.map((p) => p.label), ['Paisley', 'Soft commas', 'Tomoe', 'Checkerboard', 'Rings', 'Comma'], 'the names and order of The Folding\'s selector');
-  assert.equal(Mo.DEFAULT_PATTERN, 'paisley');
+  assert.deepEqual(Object.keys(Mo), ['design'], 'one print, nothing to choose');
   let shapes = 0;
   for (const t of [...ALL, '1', '*632x', '2*23', 'o2*', '23*45*6', 'xxxxx', 'ooo', '2*632*3x', '*22*', '3xx']) {
     const D = C.domainOf(C.parse(t)), G = D.G, normals = D.verts.map((v, i) => { const F = G.frame(v, D.verts[(i + 1) % D.n]); return [F[1], F[4], F[7]]; });
-    for (const { key } of Mo.PATTERNS) {
-      const des = Mo.design(D, key);
-      assert.ok(des.dark.length >= 1, `${t}/${key}: nothing dark`);
-      if (D.cells && D.cells.length === 2 && ['paisley', 'soft', 'comma'].includes(key)) assert.ok(des.dark.length >= 2, `${t}/${key}: the second half of the tile is bare`);
-      for (const sh of des.dark.concat(des.light)) {
-        shapes++;
-        assert.ok(sh.pts.length >= 3, `${t}/${key}: a shape of ${sh.pts.length} points`);
-        for (const p of sh.pts) {
-          assert.ok(p.every(Number.isFinite), `${t}/${key}: not a number`);
-          normals.forEach((nrm, i) => {
-            const side = G.kind === 'E' ? (p[0] - D.verts[i][0]) * nrm[0] + (p[1] - D.verts[i][1]) * nrm[1] : G.form(p, nrm);
-            assert.ok(side > -1e-7, `${t}/${key}: a mark is ${-side} outside edge ${i}`);
-          });
-        }
+    const des = Mo.design(D);
+    assert.ok(des.length >= 1, `${t}: nothing printed`);
+    if (D.cells && D.cells.length === 2) assert.ok(des.length >= 2, `${t}: the second half of the tile is bare`);
+    for (const sh of des) {
+      shapes++;
+      assert.ok(sh.pts.length >= 3 && sh.min >= 0, `${t}: a shape of ${sh.pts.length} points`);
+      for (const p of sh.pts) {
+        assert.ok(p.every(Number.isFinite), `${t}: not a number`);
+        normals.forEach((nrm, i) => {
+          const side = G.kind === 'E' ? (p[0] - D.verts[i][0]) * nrm[0] + (p[1] - D.verts[i][1]) * nrm[1] : G.form(p, nrm);
+          assert.ok(side > -1e-7, `${t}: a comma is ${-side} outside edge ${i}`);
+        });
       }
     }
   }
-  assert.ok(shapes > 1000, 'shapes checked: ' + shapes);
+  assert.ok(shapes > 150, 'shapes checked: ' + shapes);
 });
 
 test('many handles, many crosscaps: the tile search ends, and finds every tile once', async () => {

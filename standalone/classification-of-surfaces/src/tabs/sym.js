@@ -19,7 +19,6 @@ import { analyse, fval, PRICE, frac, fsub } from '../sym/orbifold.js';
 import { PRESETS, ALL, parse, textOf, linkOf, tokensOf, costOf, domainOf, structure, bind, addTo, removeAt, stepAt, tokenAt, toPretty, isEmpty, spelled, canon, whyNot } from '../sym/catalog.js';
 import { createPattern, BLUE, RED } from '../sym/pattern.js';
 import { pairCss } from '../sym/pairs.js';
-import { PATTERNS, DEFAULT_PATTERN, isPattern } from '../sym/motifs.js';
 import { buildSurface } from '../sym/surface.js';
 import { M, mixed } from '../mathbank.js';
 
@@ -28,12 +27,11 @@ const TURN = { 2: 'half a turn', 3: 'a third of a turn', 4: 'a quarter of a turn
 const SHAPE = { 2: 'lens', 3: 'triangle', 4: 'square', 5: 'pentagon', 6: 'hexagon', 7: 'heptagon', 8: 'octagon', 9: 'nonagon' };
 const plural = (k, one, many) => `${WORDS[k] || k} ${k === 1 ? one : many}`;
 const NAMES = { '0,1,0': 'a disc', '0,2,0': 'an annulus', '0,0,0': 'a sphere', '1,0,0': 'a torus', '2,0,0': 'a double torus', '0,0,1': 'a projective plane', '0,0,2': 'a Klein bottle', '0,1,1': 'a Möbius band', '0,3,0': 'a pair of pants' };
-const STORE = 'classification-of-surfaces.pattern';
 
 export function createSymTab(ctx) {
   const { stage, badge } = ctx;
   const $ = (id) => document.getElementById(id);
-  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), tag: $('pat-tag'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], pat: $('pat-select'), same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyPairs: $('key-pairs'), keyBack: $('key-back') };
+  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyPairs: $('key-pairs'), keyBack: $('key-back') };
   const pattern = createPattern($('pattern'), { tip: $('pat-tip') });
   // sel is the cursor: null = at the end, nothing chosen; i >= 0 = on the i-th character (just after it); -1 = before everything
   let sig = parse('*632'), model = null, sel = null, built = null, active = false, where = [], note = '';
@@ -58,15 +56,17 @@ export function createSymTab(ctx) {
       else { const p = parts.findIndex((q) => q.t === 'star' && q.star === b.star); where[i] = { part: p, corner: parts[p].corners.length }; parts[p].corners.push(k.v); }
     });
     built = buildSurface(parts);
+    // Each character on the surface: its label in the signature's own colour (blue or red), as in the bar above. A
+    // chosen one keeps its strength while the others fade. It used to get a ring round it; his note, Mon 16 Nov 2026:
+    // "this large circle selector is confusing, perhaps just use color, same as in the edit box".
     stage.extraMarkers = () => {
-      const out = [];
+      const out = [], one = on();
       tokens.forEach((k, i) => {
-        const w = where[i], a = built.anchors[w.part], lit = sel === i, blue = isBlue(i);
+        const w = where[i], a = built.anchors[w.part], blue = isBlue(i), faint = one !== null && one !== i;
         const p = w.corner !== undefined ? a.corners[w.corner]() : a.at();
         const label = k.t === 'd' ? String(k.v) : k.t === '*' ? '∗' : k.t === 'x' ? '×' : '○';
         const dot = k.t === 'd';
-        out.push({ p, color: blue ? BLUE : RED, size: dot ? 8 : 1, alpha: dot ? 1 : 0, shape: 'dot', label });
-        if (lit) out.push({ p, color: blue ? BLUE : RED, size: 26, shape: 'ring' });
+        out.push({ p, color: blue ? BLUE : RED, size: dot ? (one === i ? 11 : 8) : 1, alpha: dot ? (faint ? 0.3 : 1) : 0, shape: 'dot', label, labelColor: blue ? 'var(--blue)' : 'var(--red)', labelFaint: faint });
       });
       return out;
     };
@@ -107,7 +107,6 @@ export function createSymTab(ctx) {
         : kind === 'S' ? `<b>On a sphere.</b> It costs ${money(cost)}, which is ${mixed(chi)} short of $2: ${Math.round(2 / fval(chi))} symmetries.`
           : kind === 'E' ? '<b>On the plane.</b> It costs exactly $2.'
             : `<b>On the hyperbolic plane.</b> It costs ${money(cost)}, which is ${mixed(fsub(frac(0), chi))} too much for the plane.`;
-    el.tag.textContent = !D ? 'no pattern' : kind === 'S' ? 'the pattern, on a sphere' : kind === 'E' ? 'the pattern, on the plane' : 'the pattern, on the hyperbolic plane';
     el.hint.textContent = kind === 'S' ? 'drag to turn the ball' : 'drag to slide the pattern';
     el.none.hidden = !!D;
     if (!D) el.hint.hidden = true;
@@ -286,19 +285,6 @@ export function createSymTab(ctx) {
   el.zip.addEventListener('click', () => { if (model.A && model.tokens.length) ctx.goProveWords([model.A.word], toPretty(model.tokens)); });
   el.reset.addEventListener('click', () => pattern.resetView());
   $('pattern').addEventListener('pointerdown', () => { el.hint.hidden = true; }, { once: true });
-  // the design printed on the tiles: The Folding's six names
-  function setPattern(k, keep = true) {
-    if (!isPattern(k)) return false;
-    pattern.setPattern(k);
-    el.pat.value = k;
-    if (keep) { try { window.localStorage.setItem(STORE, k); } catch (e) { /* not kept, that is all */ } }
-    ctx.changed();
-    return true;
-  }
-  for (const p of PATTERNS) { const o = document.createElement('option'); o.value = p.key; o.textContent = p.label; el.pat.append(o); }
-  { let k = DEFAULT_PATTERN; try { const s = window.localStorage.getItem(STORE); if (isPattern(s)) k = s; } catch (e) { /* no storage here: the default */ } pattern.setPattern(k); el.pat.value = k; }
-  el.pat.addEventListener('change', () => setPattern(el.pat.value));
-
   return {
     enter() { active = true; load(sig, cursor()); },
     leave() { active = false; },
@@ -308,13 +294,12 @@ export function createSymTab(ctx) {
       if (isEmpty(sig)) out.push('sym:empty'); else if (!model.D) out.push('sym:bad'); else if (on() === null) out.push('symex:' + spelled(sig));
       return out;
     },
-    get() { return { k: linkOf(sig), p: pattern.pattern === DEFAULT_PATTERN ? undefined : pattern.pattern }; },
+    get() { return { k: linkOf(sig) }; },
     set(s) {
-      if (s && s.p && isPattern(s.p)) setPattern(s.p, false);
       const n = s && s.k !== undefined ? parse(s.k) : null;
       if (n) { sig = n; sel = null; if (active) load(n); }
     },
     // for the tests
-    go, usual, select, hop, bump, add, remove, move, key: (k, inBar = true) => key({ key: k }, inBar), setPattern, pattern, text: () => textOf(sig), example: () => ({ text: textOf(sig) }), model: () => model, selected: () => sel, built: () => built,
+    go, usual, select, hop, bump, add, remove, move, key: (k, inBar = true) => key({ key: k }, inBar), pattern, text: () => textOf(sig), example: () => ({ text: textOf(sig) }), model: () => model, selected: () => sel, built: () => built,
   };
 }

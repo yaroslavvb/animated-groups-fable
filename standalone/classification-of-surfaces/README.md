@@ -17,7 +17,7 @@ four tabs, in the book's order, and a fifth for what the chapter is for:
 | 2 Tidy surfaces | 96, 101–103 | add holes, handles, crosscaps, cross-handles to a sphere; a hole walks through a crosscap (Fig. 8.11); the trade ⊗ = ××; χ, boundaries, sides |
 | 3 Zip it up | 96–100, Fig. 8.1–8.10 | the Tidying Lemma by hand: tap an arrow, the pair is zipped, what you hold is tidy again |
 | 4 Examples | 104–106 | the book's seven surfaces; count a map, the boundaries, the sides; the symbol follows |
-| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can type (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it; six designs), the surface it folds up to; type, delete, step a digit |
+| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can type (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; type, delete, step a digit |
 
 The way in: every surface is polygons and zippers; zipping one pair at a time keeps it a sphere with holes, handles,
 crosscaps and cross-handles; two trades remove the cross-handles and the mixed case. Tab 3 lets you do that to the
@@ -32,7 +32,7 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `src/geo/` | the surface kit: sites and their charts, cells with holes, tubes, the crosscap collar, the flat patch, the twelve-site ball |
 | `src/zipper/` | tab 3: `engine.js` (the lemma's bookkeeping, pure), `view.js` (how a state is drawn), `parts.js` and `moves.js` (the motion of each zip) |
 | `src/examples/` | tab 4: the seven surfaces as cell complexes, their counts computed, the pinwheel |
-| `src/sym/` | tab 5: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the six designs printed on a tile), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
+| `src/sym/` | tab 5: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
 | `src/formulas.mjs` | the LaTeX the page composes while it runs; MathJax typesets everything at build time |
 | `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of tab 5 against its own tile |
@@ -137,20 +137,20 @@ end a corner of the last mirror if there is one. So `* 6 3 2` types `*632` (pass
 has, and the page says so on the way). The row under the bar does the same for a finger, with a delete button.
 The empty signature is the bare sphere with no symmetry (one tile, one mark; `#sym&k=1`, as the book writes it).
 
-**Six patterns** (the same ask: *"give me a chooser to choose between patterns, maybe reuse the patterns from
-https://spacesheep.dev/@yaroslavvb/the-folding#g=333"*). A chooser in the pattern pane's corner, with the names and
-order of The Folding's selector: Paisley (the default), Soft commas, Tomoe, Checkerboard, Rings, Comma; kept in the
-address (`&p=tomoe`) and between visits. The Folding's own prints are fitted by hand and by search to each of the 17
-plane groups (a table of knobs per group in its `src/patterns/`), so they cannot be carried to a sphere, a hyperbolic
-tiling or a signature typed a moment ago. Taken from it: the six ideas and names, its unit comma (`motif.js`
-`commaOutline`, copied) and the paper's two tones a side (`palette.js` `PRINT_FRONT` / `PRINT_BACK`). In
-`src/sym/motifs.js` each design is drawn on ONE tile from that tile's corners alone, and the symmetries carry it:
-a family of commas (a big one a cell, a small one in every corner with room); a fat comma with an eye; the tile
-split by an S into a dark and a light comma, the dark tail running into the farthest corner; triangles from a hub
-to the corners and the middles of the sides, every other one dark; the tile's outline shrunk again and again
-toward a point; one comma a cell. None has a symmetry of its own (the hub, the rings' point and the S sit off the
-middle; a tile of two mirror halves gets the same hand twice, not a mirror image), so every design has exactly the
-signature shown. Tested: every mark of every design lies inside its tile, for all examples.
+**The print: Paisley** (six prints behind a chooser for a day: the same ask of Sun 15 Nov, *"give me a chooser to
+choose between patterns, maybe reuse the patterns from https://spacesheep.dev/@yaroslavvb/the-folding#g=333"*; then
+his decision of Mon 16 Nov 2026: *"keep the Paisley pattern and get rid of the selector, and the 'pattern on a
+sphere' box, should be cleaner design"*). The chooser, its place in the address (`&p=`, now ignored) and in the
+browser's storage, and the five other designs (Soft commas, Tomoe, Checkerboard, Rings, Comma) are gone; commit
+`eac0a050` is the last that has them. The box in the pane's corner that said "the pattern, on a sphere" went too: the
+line beside the price says which of the three it is. What is left on the pattern pane is its reset button and, until
+the first touch, the hint. The Folding's own prints are fitted by hand and by search to each of the 17 plane groups
+(a table of knobs per group in its `src/patterns/`), so they cannot be carried to a sphere, a hyperbolic tiling or a
+signature typed a moment ago. Taken from it: the idea, the name and the paper's two tones a side (`palette.js`
+`PRINT_FRONT` / `PRINT_BACK`). In `src/sym/motifs.js` the print is drawn on ONE tile from that tile's corners alone,
+and the symmetries carry it: a family of commas, a big one a cell and a small one in every corner with room. It has
+no symmetry of its own (a comma has a hand; a tile of two mirror halves gets the same hand twice, not a mirror
+image), so the pattern has exactly the signature shown. Tested: every comma lies inside its tile, for all examples.
 
 **Four handles froze the page** (his report, the same night: *"If I type 4 handles in a row, the whole thing
 freezes."*). The tile of `oooo` is a 16-gon and sixteen tiles meet at each of its corners. Going round such a
@@ -227,6 +227,15 @@ note. Tab 3 keeps letters, because there they name the buttons that zip a pair, 
 tab 5 in tab 5's colours, pair for pair (`tabs/prove.js`: the `tile` preset takes `PAIR_COLORS`). The blue and red
 marks at the tile's corners are drawn after its edges now, which would otherwise cover them.
 
+**The surface's labels in the signature's colours, no ring** (his note, the same morning, with a picture of the ring
+on a rim: *"also this large circle selector is confusing, perhaps just use color, same as in the edit box"*). A
+chosen character used to get a 26 px ring round its place on the surface, which read as part of the surface (a loop
+in the rim). Now every label on the surface is written in its character's colour, the bar's own blue or red
+(`var(--blue)` / `var(--red)`, so the dark theme follows), and a chosen character keeps its strength while the others
+fade to half; a chosen digit's dot is a little larger. The renderer writes all labels in one ink and is vendored
+unchanged, so `stage.js` colours its label elements from outside, by position, after each render: a marker may carry
+`labelColor` and `labelFaint`. Colour and opacity only, because the renderer measures a label once.
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
@@ -244,8 +253,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 - `node --test`: 76 tests (the newest: on every example's tile and seven tiles of one's own each glued pair sits on
   exactly two edges and the pairs are numbered from the first, and fifteen pairs get fifteen different looks, none
-  of them near the pattern's red or blue; the five before it: typing and deleting a signature character by character; the six designs
-  inside their tiles; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
+  of them near the pattern's red or blue; the five before it: typing and deleting a signature character by character; the print
+  inside its tile on every example; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
   of the 47 examples each found as its example, with the example's tile; the four kinds without a pattern and what
   is offered for them, each offer having a pattern). The zipping's bookkeeping against an independent count of the glued surface (400 random
   gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
@@ -269,11 +278,11 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   47 examples at both widths, the add row and remove with real taps, fifteen signatures of one's own, a touch drag
   on the ball and on the disc, no error. Dark theme looked at.
   Typing with a real keyboard in headless Chrome, at 1280 and 390 px: Delete four times from `*632` to an empty bar,
-  `2 2 *` typed back (no pattern, a sphere, the plane), the cursor keys, a digit typed in the middle, the chooser
-  and its place in the address, a reload; the 3D view once round a circle comes home. The six designs looked at on
-  eleven signatures in all three geometries. In WebKit on the M5 (it did not answer over ssh at first, about
+  `2 2 *` typed back (no pattern, a sphere, the plane), the cursor keys, a digit typed in the middle, a reload;
+  the 3D view once round a circle comes home. (The chooser of prints and its six designs were checked then too,
+  and removed the next day.) In WebKit on the M5 (it did not answer over ssh at first, about
   22:00 PST, and did a quarter of an hour later): the same Delete and typing with real key presses at both widths,
-  the six designs, the 47 examples and nineteen signatures of one's own (four, five and six handles and twelve
+  the 47 examples and nineteen signatures of one's own (four, five and six handles and twelve
   crosscaps among them), the drags; no error. And with real keys in Chrome: `o` seven times (the seventh refused),
   `x` thirteen times, Delete twelve times, three long drags across the disc of `oooo`.
   Spellings and reasons (Mon 16 Nov 2026), with real clicks and keys in headless Chrome at 1280 and 390 px: `*4`
@@ -292,6 +301,11 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   colour at its middle, the key shows the same two swatches, a mouse on an edge brings its note, and tab 3 opens
   the tile with its two zips in those two colours. In WebKit on the M5 the same at both widths, the note by a
   finger; the published copy inside spacesheep's viewer likewise.
+  One print, bare pane, coloured labels (Mon 16 Nov 2026): in Chrome at 1280 and 390 px the pattern pane carries its
+  reset button and nothing else after the first touch, an old link with `&p=tomoe` opens its signature and the
+  address drops the `p`; the surface of `2*632*3x` writes its eight labels in the bar's own computed colours, a
+  chosen one stays while seven fade, no ring marker is made, and tabs 1 to 4 are unchanged. The same in WebKit on the
+  M5 at both widths and in the published copy.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

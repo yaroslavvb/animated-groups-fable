@@ -161,10 +161,6 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .btn-quiet > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .pane-reset { position: absolute; right: 4px; top: 4px; padding: 0; background: transparent; box-shadow: none; }
 /* a quiet native select beside a pane's reset button (tab 5: which pattern is printed on the tiles) */
-.panesel { position: absolute; right: 48px; top: 4px; height: var(--tap); display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
-.panesel-k { padding: 2px 7px 3px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); font-weight: 600; }
-.panesel select { height: 32px; max-width: 150px; padding: 0 6px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); color: var(--ink); font-size: 14px; }
-@media (max-width: 480px) { .panesel-k { display: none; } }
 ul.argument { list-style: disc; }
 .scrub { --rail-shift: 0px; position: relative; flex: 1 1 auto; min-width: 0; height: var(--tap); display: block; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .scrub[data-enhanced] { cursor: pointer; }
@@ -247,7 +243,6 @@ ul.argument { list-style: disc; }
 .fr { display: inline-flex; flex-direction: column; align-items: center; margin: 0 0.12em 0 0.14em; vertical-align: middle; font-size: 0.74em; line-height: 1; }
 .fr-n { padding: 0 0.14em 0.12em; border-bottom: 1px solid currentColor; }
 .fr-d { padding: 0.14em 0.14em 0; }
-.pane-tag { position: absolute; left: 8px; top: 8px; max-width: calc(100% - 64px); margin: 0; padding: 3px 9px 4px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); color: var(--muted); font-size: 13px; line-height: 16px; font-weight: 600; pointer-events: none; }
 .pane2 > canvas { cursor: grab; }
 .pane2 > canvas:active { cursor: grabbing; }
 .cost-rail { position: relative; height: 16px; max-width: 520px; margin: 24px auto 7px; border-radius: 5px; background: var(--card); box-shadow: inset 0 0 0 1px var(--hairline); }
@@ -285,8 +280,6 @@ ul.argument { list-style: disc; }
   .symcell { min-width: 36px; height: 50px; font-size: 36px; }
 }
 .app[data-tab="sym"] .badge { max-width: calc(100% - 60px); }
-.pane2 .pane-tag { max-width: calc(100% - 250px); }
-@media (max-width: 480px) { .pane2 .pane-tag { max-width: calc(100% - 200px); } }
 /* the row that adds to the signature: what each character is on the surface, in the signature's own colours */
 .symadd { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px; min-width: 0; }
 .symadd-k { margin-right: 4px; color: var(--muted); font-size: 13px; }
@@ -319,7 +312,7 @@ ul.argument { list-style: disc; }
 #sym-bad .why { display: block; text-align: left; }
 #sym-bad .tries { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
 #sym-bad .tries-k { color: var(--muted); font-size: 14px; margin-right: 2px; }
-@media (max-width: 480px) { .pat-none { top: calc(50% + 20px); padding: 10px 12px 12px; } #sym-bad { margin-top: 6px; } #sym-bad .tries { margin-top: 8px; } }      /* clear of the pane's tag and chooser */
+@media (max-width: 480px) { .pat-none { padding: 10px 12px 12px; } #sym-bad { margin-top: 6px; } #sym-bad .tries { margin-top: 8px; } }
 /* the key under tab 5's two pictures (only what is in them), and the note on a glued edge of the outlined tile */
 .caption .symkey { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; max-width: none; margin: 0 0 8px; color: var(--muted); font-size: 14px; }
 .sw-tile { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }

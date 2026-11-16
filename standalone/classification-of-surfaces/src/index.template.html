@@ -73,15 +73,10 @@
 
       <section class="pane pane2" id="pane2" data-tab-only="sym" data-ss-comments="off" aria-label="The pattern">
         <canvas id="pattern" tabindex="0" aria-label="The pattern. Drag to slide it; the arrow keys slide it too, and 0 puts it back."></canvas>
-        <p class="pane-tag" id="pat-tag"></p>
         <div class="pat-none" id="pat-none" hidden>
           <p class="pat-none-head">No pattern has this signature.</p>
           <p id="sym-bad" aria-live="polite"></p>
         </div>
-        <label class="panesel" title="What is printed on the tiles">
-          <span class="panesel-k">Pattern</span>
-          <select id="pat-select" aria-label="The pattern printed on the tiles"></select>
-        </label>
         <p class="pane-tip" id="pat-tip" role="status" hidden></p>
         <p class="hint" id="pat-hint">drag to slide the pattern</p>
         <button type="button" class="btn-quiet pane-reset" id="pat-reset" title="Put the pattern back" aria-label="Put the pattern back">
@@ -263,7 +258,7 @@
 
     <details class="fold" data-tab-only="sym">
       <summary>The three pictures</summary>
-      <p>Each tile carries the same print, in the darker tone of its colour; the chooser in the pattern's corner changes the print, never the symmetry. Teal tiles are copies of the outlined tile that the symmetry moved without turning it over; sand tiles are its mirror images. Fold the pattern so that every tile lies on the outlined one: the sand ones land face down, the two sides of one sheet.</p>
+      <p>Each tile carries the same print, a family of commas, in the darker tone of its colour. A comma has a hand and no symmetry of its own, so the pattern has exactly the signature's. Teal tiles are copies of the outlined tile that the symmetry moved without turning it over; sand tiles are its mirror images. Fold the pattern so that every tile lies on the outlined one: the sand ones land face down, the two sides of one sheet.</p>
       <p>What happens to the outlined tile's edges gives the surface. A mirror edge (red) stays an edge: the rim of a hole. Two edges of the same colour (and the same number of arrowheads) are zipped along their arrows, as in <a href="#prove" data-go="prove">tab 3</a>, which uses the same colours. Corners that meet at a point make a cone point, or a corner of the rim if they meet on a mirror.</p>
     </details>
     <details class="fold" data-tab-only="sym">

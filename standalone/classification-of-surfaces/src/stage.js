@@ -22,12 +22,26 @@ export function createStage(canvas, labelLayer) {
     setDark(!!(mq && mq.matches));
     R.setStyle({ ...sides(), opacity: THEME.opacity, background: null });
   }
+  // ---- a label in its marker's colour. The renderer writes every label in the page's ink; a marker may ask for
+  // another colour (labelColor: a CSS colour) or a fainter label (labelFaint: true). The renderer's labels are the
+  // layer's children, one a labelled marker, in the markers' order (render3d.js placeLabels), so they are styled from
+  // here by position after each render of ours. Colour and opacity only: a label is measured once, by its text.
+  let labelLooks = [];
+  function styleLabels() {
+    if (!labelLayer) return;
+    const els = labelLayer.children;
+    for (let i = 0; i < els.length; i++) { const look = labelLooks[i]; els[i].style.color = (look && look.color) || ''; els[i].style.opacity = look && look.faint ? '0.5' : ''; }
+  }
+  const render0 = R.render;
+  R.render = () => { render0.call(R); styleLabels(); };
   stage.decorate = () => {
     if (!stage.scene) return;
     const lines = stage.scene.lines(), marks = stage.scene.markers();
     if (stage.extraLines) lines.push(...stage.extraLines());
     if (stage.extraMarkers) marks.push(...stage.extraMarkers());
     R.setLines(lines); R.setMarkers(marks);
+    // as the renderer lists them: a marker with a place, and a label that is not empty
+    labelLooks = marks.filter((m) => m && m.p && Number.isFinite(m.p[0] + m.p[1] + m.p[2]) && m.label != null && m.label !== '').map((m) => ({ color: m.labelColor, faint: !!m.labelFaint }));
   };
   stage.setScene = (scene, frame, immediate = true) => {
     stage.scene = scene;

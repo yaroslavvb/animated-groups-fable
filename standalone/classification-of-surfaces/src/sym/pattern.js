@@ -11,9 +11,8 @@
 //                       tone belongs to the tile, whichever tile the list of tiles happens to be centred on: his
 //                       note, Mon 16 Nov 2026, "when I ... drag it around, colors flip which is distracting" (every
 //                       tone swapped each time a drag carried the middle of the view across a mirror)
-//   a design            what is printed on the tile (motifs.js: Paisley, Soft commas, Tomoe, Checkerboard, Rings,
-//                       Comma), in the darker tone of the tile's side. None has a symmetry of its own, so the
-//                       pattern has exactly the tile's
+//   the print           a family of commas on every tile (motifs.js: Paisley), in the darker tone of the tile's side.
+//                       It has no symmetry of its own, so the pattern has exactly the tile's
 //   red lines           mirrors (one colour of the book's signature: what reflects)        dashed: a glide's axis
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
@@ -26,12 +25,11 @@
 //   const P = createPattern(canvas, { tip });   tip: an element inside the canvas's pane, for the note on a glued edge
 //   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
 //   P.select(i | null)                  bring out what the i-th character of the signature stands for
-//   P.setPattern(key)                   another design (motifs.js PATTERNS)
 //   P.resetView()   P.draw()   P.state()   for the tests
 
 import { mul, apply, det, I3 } from './geom.js';
 import { tiles as makeTiles } from './orbifold.js';
-import { design, DEFAULT_PATTERN, isPattern } from './motifs.js';
+import { design } from './motifs.js';
 import { PRINT_FRONT, PRINT_BACK, hexToRgb } from '../vendor/the-folding/palette.js';
 import { pairStyle } from './pairs.js';
 
@@ -46,7 +44,7 @@ export function createPattern(canvas, opts = {}) {
   const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
   let W = 0, H = 0, dpr = 1;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
-  let budget = 1500, cache = new Map(), patternKey = DEFAULT_PATTERN, des = { dark: [], light: [], evenodd: false }, reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = 1500, cache = new Map(), des = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
@@ -196,12 +194,12 @@ export function createPattern(canvas, opts = {}) {
     const pick = sel !== null && binding[sel] ? binding[sel] : null;
     const dim = pick ? 0.38 : 1;
     const fill = [new Path2D(), new Path2D()], edge = [0, 1, 2].map(() => new Path2D());
-    const ink = [new Path2D(), new Path2D()], eyes = [new Path2D(), new Path2D()];       // the design: dark tone, then light on top; [front, back]
-    // a shape of the design, carried to a tile; on a small tile a curve keeps every second or third of its points
-    const print = (path, sh, M, b, flip) => {
-      const skip = b && (kind !== 'E' || sh.curve) ? Math.min(2 * b + 1, Math.max(1, Math.floor(sh.pts.length / 8))) : 1, pts = [];
+    const ink = [new Path2D(), new Path2D()];       // the print, in the darker tone of a tile's side: [a copy, a mirror image]
+    // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points
+    const print = (path, sh, M, b) => {
+      const skip = b ? Math.min(2 * b + 1, Math.max(1, Math.floor(sh.pts.length / 8))) : 1, pts = [];
       for (let i = 0; i < sh.pts.length; i += skip) pts.push(apply(M, sh.pts[i]));
-      if (sh.convex) closed(path, pts, flip); else blob(path, pts);
+      blob(path, pts);
     };
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
     const marks = A.classes.map(() => new Path2D());
@@ -238,8 +236,7 @@ export function createPattern(canvas, opts = {}) {
       for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
       A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); } });
       if (px >= 1.2) {
-        for (const sh of des.dark) if (px >= sh.min) print(ink[side], sh, M, b, t.flip);
-        for (const sh of des.light) if (px >= sh.min) print(eyes[side], sh, M, b, t.flip);
+        for (const sh of des) if (px >= sh.min) print(ink[side], sh, M, b);
       }
       if (px >= 4.5) for (const mk of marked) {
         const p = P[mk.v];
@@ -256,11 +253,8 @@ export function createPattern(canvas, opts = {}) {
 
     ctx.fillStyle = css(FRONT); ctx.fill(fill[0]);
     ctx.fillStyle = css(BACK); ctx.fill(fill[1]);
-    const rule = des.evenodd ? 'evenodd' : 'nonzero';
-    ctx.fillStyle = css(FRONT_INK); ctx.fill(ink[0], rule);
-    ctx.fillStyle = css(BACK_INK); ctx.fill(ink[1], rule);
-    ctx.fillStyle = css(FRONT); ctx.fill(eyes[0]);
-    ctx.fillStyle = css(BACK); ctx.fill(eyes[1]);
+    ctx.fillStyle = css(FRONT_INK); ctx.fill(ink[0]);
+    ctx.fillStyle = css(BACK_INK); ctx.fill(ink[1]);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
     // mirrors and glide axes: red
@@ -464,17 +458,15 @@ export function createPattern(canvas, opts = {}) {
       cache = new Map();
       reach = m.D.n ? Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at))) : 0;
       area = m.D.n ? Math.abs(G.area(m.D.verts)) || 1 : 1;
-      des = design(m.D, patternKey);
+      des = design(m.D);
       size(); firstView(); draw();
     },
     select(i) { sel = i; schedule(); },
-    setPattern(key) { if (!isPattern(key) || key === patternKey) return; patternKey = key; if (model) { des = design(model.D, key); schedule(); } },
-    get pattern() { return patternKey; },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, pattern: patternKey, shapes: des.dark.length + des.light.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }
