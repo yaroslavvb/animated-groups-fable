@@ -137,11 +137,14 @@ export function signatureOf(A) {
 }
 
 /**
- * The tiles of the pattern: every symmetry g (as a matrix) with g(at) within `radius` of `at`, found by walking
- * from tile to neighbouring tile. { M, flip }: flip = g turns the plane over (a mirror image of the tile).
+ * The tiles of the pattern: the symmetries g (as matrices) with g(at) within `radius` of `at`, the NEAREST ones first,
+ * at most `max` of them. Found by walking from tile to neighbouring tile, always going on from the nearest tile
+ * not yet looked at (a plain walk by number of steps would run out of its `max` long before it had gone round a
+ * corner where twelve tiles meet). { M, flip }: flip = g turns the plane over (a mirror image of the tile).
  */
 export function tiles(D, A, { radius = Infinity, max = 6000 } = {}) {
-  const G = D.G, n = D.n, out = [{ M: I3.slice(), flip: false }];
+  const G = D.G, n = D.n;
+  // have we met this tile? Points are filed in a grid; one near a cell wall is filed in the cells beyond it too.
   const grid = new Map(), Q = 64, EPS = 1e-9;        // two computations of one tile agree to about 1e-12 of its coordinates; two tiles never come this close
   const near = (p, q) => Math.abs(q[0] - p[0]) + Math.abs(q[1] - p[1]) + Math.abs(q[2] - p[2]) < EPS * (1 + Math.abs(p[2]));
   const known = (p, flip) => {
@@ -153,19 +156,30 @@ export function tiles(D, A, { radius = Infinity, max = 6000 } = {}) {
     const e = 2 * EPS * (1 + Math.abs(p[2])), c = [0, 1, 2].map((k) => { const lo = Math.floor((p[k] - e) * Q), hi = Math.floor((p[k] + e) * Q), r = []; for (let q = lo; q <= hi; q++) r.push(q); return r; });
     for (const x of c[0]) for (const y of c[1]) for (const z of c[2]) { const key = (flip ? 'f' : 'd') + x + ',' + y + ',' + z; const l = grid.get(key); if (l) l.push(p); else grid.set(key, [p]); }
   };
-  put(D.at, false);
-  const turns = D.edges.map((e) => !!(e.mirror || e.rev));
-  for (let h = 0; h < out.length && out.length < max; h++) {
-    const t = out[h];
+  // the tiles found and not yet gone on from, the nearest on top (a binary heap)
+  const heap = [];
+  const push = (t) => {
+    heap.push(t);
+    for (let i = heap.length - 1; i > 0;) { const up = (i - 1) >> 1; if (heap[up].d <= heap[i].d) break; [heap[up], heap[i]] = [heap[i], heap[up]]; i = up; }
+  };
+  const pop = () => {
+    const top = heap[0], last = heap.pop();
+    if (heap.length) {
+      heap[0] = last;
+      for (let i = 0; ;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l].d < heap[m].d) m = l; if (r < heap.length && heap[r].d < heap[m].d) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; }
+    }
+    return top;
+  };
+  const turns = D.edges.map((e) => !!(e.mirror || e.rev)), out = [];
+  put(D.at, false); push({ M: I3.slice(), flip: false, d: 0 });
+  while (heap.length && out.length < max) {
+    const t = pop();
+    out.push(t);
     for (let i = 0; i < n; i++) {
-      const M = mul(t.M, A.maps[i]), p = apply(M, D.at), flip = t.flip !== turns[i];
-      if (radius < Infinity && G.dist(p, D.at) > radius) continue;
-      if (known(p, flip)) continue;
-      put(p, flip); out.push({ M, flip });
-      if (out.length >= max) break;
+      const M = mul(t.M, A.maps[i]), p = apply(M, D.at), flip = t.flip !== turns[i], d = G.dist(p, D.at);
+      if (d > radius || known(p, flip)) continue;
+      put(p, flip); push({ M, flip, d });
     }
   }
-  // nearest first: a caller that is short of time draws only the head of the list
-  const far = out.map((t) => G.dist(apply(t.M, D.at), D.at)), order = out.map((_, i) => i).sort((a, b) => far[a] - far[b]);
-  return order.map((i) => out[i]);
+  return out.sort((x, y) => x.d - y.d);
 }

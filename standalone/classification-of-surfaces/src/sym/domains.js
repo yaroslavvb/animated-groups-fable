@@ -16,6 +16,7 @@
 // each edge a MIRROR or a SEAM. All mirrors: P is the tile, the group is the kaleidoscope. Otherwise the tile is P
 // together with its image in one seam, and every other seam is glued to its own image: by the turn that the two
 // seam reflections make together ('s'), or by that turn followed by a flip of the edge ('g', a glide).
+// canonical() makes a tile for any signature at all, by the same inscribed circle and the textbook gluing word.
 
 import { geometry, kindOfAngles, apply } from './geom.js';
 
@@ -87,6 +88,46 @@ export function regular(word, theta) {
     const id = t.replace(/-$/, ''), j = toks.findIndex((u, q) => q !== i && u.replace(/-$/, '') === id);
     if (j < 0) throw new Error('regular: the letter ' + id + ' must come twice');
     return { to: j, rev: t.endsWith('-') === toks[j].endsWith('-') };
+  });
+  return makeDomain(P.G, P.verts, edges, { at: P.G.polar(0.0001, 0.3) });
+}
+
+/**
+ * A tile for ANY signature { o, cones: [n, ...], stars: [[corner, ...], ...], x }: the textbook polygon of a surface,
+ * drawn round an inscribed circle. Going round it, the edges spell
+ *     a b a^-1 b^-1   for each handle                       c c   for each crosscap
+ *     e e^-1          for each cone point (the tile's corner between the two is the cone point, angle 2 pi / n)
+ *     h m ... m h^-1  for each boundary: a cut h out to the mirror, the mirror's edges with its corners between
+ *                     them (angle pi / n), and the cut back; where a cut meets the mirror the angle is pi / 2
+ * Every other corner of the tile lands on ONE ordinary point of the surface; there are N = 4o + 2x + cones + stars
+ * of them, so each gets the angle 2 pi / N. Because all edges touch one circle, an edge's length depends only on
+ * the angles at its two ends, and so every edge is as long as the one it is glued to: no equation has to be solved
+ * beyond the circle's radius. Meant for the plane and the hyperbolic plane (on the sphere an edge could be half a
+ * great circle; the fourteen spherical types have tiles of their own).
+ */
+export function canonical(sig) {
+  const N = 4 * sig.o + 2 * sig.x + sig.cones.length + sig.stars.length;
+  if (N < 2) return null;
+  const main = N / 2, divs = [], marks = [];             // an angle is pi / div; marks[i] says what edge i is
+  const put = (div, mark) => { divs.push(div); marks.push(mark); };
+  if (N === 2 && sig.cones.length === 1 && sig.stars.length === 1) {
+    // one cone point and one mirror: the ordinary point would be a flat corner on either side of the cone point,
+    // and with a cone point of order 2 (flat as well) the edges between them would have no length. Leave it out:
+    // the cut runs straight from the cone point to the mirror.
+    put(sig.cones[0] / 2, ['e', 1]); put(2, null);
+    for (const c of sig.stars[0]) put(c, null);
+    put(2, ['e', -1]);
+  } else {
+  for (let i = 0; i < sig.o; i++) { put(main, ['a' + i, 1]); put(main, ['b' + i, 1]); put(main, ['a' + i, -1]); put(main, ['b' + i, -1]); }
+  for (let i = 0; i < sig.x; i++) { put(main, ['c' + i, 1]); put(main, ['c' + i, 1]); }
+  sig.cones.forEach((n, i) => { put(main, ['e' + i, 1]); put(n / 2, ['e' + i, -1]); });
+  sig.stars.forEach((corners, i) => { put(main, ['h' + i, 1]); put(2, null); for (const c of corners) put(c, null); put(2, ['h' + i, -1]); });
+  }
+  const P = inscribed(divs);
+  const edges = marks.map((m, i) => {
+    if (!m) return { mirror: true };
+    const j = marks.findIndex((q, k) => k !== i && q && q[0] === m[0]);
+    return { to: j, rev: marks[j][1] === m[1] };
   });
   return makeDomain(P.G, P.verts, edges, { at: P.G.polar(0.0001, 0.3) });
 }

@@ -17,7 +17,7 @@ four tabs, in the book's order, and a fifth for what the chapter is for:
 | 2 Tidy surfaces | 96, 101–103 | add holes, handles, crosscaps, cross-handles to a sphere; a hole walks through a crosscap (Fig. 8.11); the trade ⊗ = ××; χ, boundaries, sides |
 | 3 Zip it up | 96–100, Fig. 8.1–8.10 | the Tidying Lemma by hand: tap an arrow, the pair is zipped, what you hold is tidy again |
 | 4 Examples | 104–106 | the book's seven surfaces; count a map, the boundaries, the sides; the symbol follows |
-| 5 Symmetries | Ch. 2–4, 9, 17–18 | 47 signatures on the sphere, the plane and the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; tap a character, step a digit |
+| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can write (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; tap a character, step a digit, add or remove a character |
 
 The way in: every surface is polygons and zippers; zipping one pair at a time keeps it a sphere with holes, handles,
 crosscaps and cross-handles; two trades remove the cross-handles and the mixed case. Tab 3 lets you do that to the
@@ -115,9 +115,28 @@ edges are strung into boundaries, the glued edges are handed to tab 3's bookkeep
 `bind()` fails if that is not the signature shown. The price must agree with the tile's area (Gauss-Bonnet) and the
 geometry; on the sphere the number of tiles must be 2 / (2 − price); no two tiles may overlap.
 
-Known limits: digits run 2 to 9; a tile's shape is one choice among many where the book says the pattern can be
-stretched (`*3*`, `o`, `**`); cone points and corners do not show in tab 3 (only the surface); the hyperbolic disc
-draws at most 4,200 tiles (fewer while a finger moves), which leaves the last pixel at the rim unfilled.
+**Any signature** (his next ask, the same evening: *"give a way to add x/ etc to give more signuatre flexibility
+(not just cone point, but give a way to modify the singuature)"*). The row under the signature adds a handle `o`, a
+cone point, a mirror `*`, a corner (on the chosen mirror, else the last) or a crosscap `x`, and removes the chosen
+character; a signature is data, `{ o, cones, stars, x }` (`src/sym/catalog.js` `parse`, `addTo`, `removeAt`,
+`stepAt`), and any text of that shape is a deep link (`#sym&k=2*632*3x`).
+
+- A crosscap next to handles turns each handle into two crosscaps, and a handle next to a crosscap arrives as two
+  (tab 2's trade, `o x = x x x`); the page says so when it happens.
+- A signature with no hand-made tile gets the general one (`src/sym/domains.js` `canonical`): the textbook polygon
+  of a surface (`a b a⁻¹ b⁻¹` per handle, `c c` per crosscap, `e e⁻¹` round each cone point, a cut out to each mirror
+  and back), drawn round an inscribed circle. Then an edge's length depends only on the angles at its ends, so every
+  edge is as long as its mate and only the circle's radius has to be solved for. It is used for signatures that cost
+  $2 or more; on the sphere the fourteen types all have tiles of their own.
+- Under $2 a signature that is not one of the fourteen spherical types has no pattern (a lone cone point, two of
+  different orders, the same for the corners of one mirror: the book's proviso, p. 53). The page shows the surface,
+  an empty pattern pane and says so.
+- In `NN` and `*NN` the two digits step together, so stepping never leaves the fourteen types by accident.
+
+Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
+fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
+(`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
+hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the rest of the rim is tinted.
 
 ## What is not there
 
@@ -129,12 +148,15 @@ draws at most 4,200 tiles (fewer while a finger moves), which leaves the last pi
 
 ## Checked
 
-- `node --test`: 66 tests. The zipping's bookkeeping against an independent count of the glued surface (400 random
+- `node --test`: 70 tests. The zipping's bookkeeping against an independent count of the glued surface (400 random
   gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
   1,345 more signatures (every `*pqr` and `pqr` with digits 2 to 9, every family over its numbers) each folded up
-  from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping.
+  from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping;
+  400 random signatures (over 250 of them on the general tile) folded up the same way; every signature of at most
+  four characters over `o 2 3 5 * x` either has a tile in the right geometry or is one of the ones without a
+  pattern, and the spherical ones among them are exactly the fourteen types; adding, removing, stepping, the trade.
 - Every zip of every preset and of 40 random deals, in three orders, stepped through all its phases in a browser: no error.
-- `node tools/check_quotes.mjs`: 69 citations, each at most 15 words and on its page.
+- `node tools/check_quotes.mjs`: 71 citations, each at most 15 words and on its page.
 - Looked at in headless Chrome at 1280 and 390 px wide, light and dark, with reduced motion; a real tap on an arrow,
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
   And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.
@@ -142,8 +164,11 @@ draws at most 4,200 tiles (fewer while a finger moves), which leaves the last pi
 - Tab 5 with a real mouse in headless Chrome: a long drag in each geometry (after six strokes across the hyperbolic
   disc the view is still an exact motion and the disc is full), once round a circle on the ball comes home exactly,
   the digit stepper, next and previous, the chips, `#sym&k=*732`, coming in by the tab button at 1280 and 390 px;
-  and every one of the 47 tiles zipped up in tab 3 (61 zips) ends as the surface tab 5 shows. In WebKit on the M5:
-  all 47 examples at both widths, a touch drag on the ball and on the disc, no error. Dark theme looked at.
+  and every one of the 47 tiles zipped up in tab 3 ends as the surface tab 5 shows, as do twelve signatures made
+  by hand on the general tile (93 zips in all). Editing with real clicks: add a crosscap to `*632`, remove it,
+  remove the mirror of `3*3` (no pattern, and the page says so), a deep link to `o2*3x`. In WebKit on the M5: all
+  47 examples at both widths, the add row and remove with real taps, fifteen signatures of one's own, a touch drag
+  on the ball and on the disc, no error. Dark theme looked at.
   Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

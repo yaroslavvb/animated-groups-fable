@@ -17,7 +17,7 @@
 // letters (the same letters tab 3 uses when it zips this tile up).
 //
 //   const P = createPattern(canvas);
-//   P.set({ D, A, binding, tokens })    a new pattern (the view starts over)
+//   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
 //   P.select(i | null)                  bring out what the i-th character of the signature stands for
 //   P.resetView()   P.draw()   P.state()   for the tests
 
@@ -102,7 +102,7 @@ export function createPattern(canvas) {
     const { D, A } = model;
     let radius = Infinity, max = 4200;
     if (G.kind === 'E') { const L = lay(); radius = (Math.hypot(W, H) / 2) / L.R + reach; }
-    if (G.kind === 'H') radius = 4.25 + 2 * reach;       // the middle of the view is within `reach` of the first tile
+    if (G.kind === 'H') radius = 5 + 2 * reach;          // the middle of the view is within `reach` of the first tile
     const key = G.kind + ':' + radius.toFixed(2) + ':' + max;
     if (!cache.has(key)) { if (cache.size > 3) cache.clear(); cache.set(key, makeTiles(D, A, { radius, max })); }
     const all = cache.get(key);
@@ -122,6 +122,15 @@ export function createPattern(canvas) {
     ctx.clearRect(0, 0, W, H);
     ctx.save();
     if (kind !== 'E') { ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip(); }
+    if (kind === 'H') {
+      // the hyperbolic disc has infinitely many tiles toward its rim and only some thousands are drawn: what is left
+      // of the rim gets the colour the tiles there would blur to, not the page's white
+      const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+      const flips = D.edges.some((e) => e.mirror || e.rev);
+      let bg = flips ? mixc(FRONT, BACK, 0.5) : FRONT;
+      if (A.stars.length) bg = mixc(bg, RED, 0.35);
+      ctx.fillStyle = css(bg); ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+    }
 
     const X = (p) => (kind === 'H' ? cx + (R * p[0]) / (1 + p[2]) : cx + R * p[0]);
     const Y = (p) => (kind === 'H' ? cy - (R * p[1]) / (1 + p[2]) : cy - R * p[1]);
@@ -203,7 +212,8 @@ export function createPattern(canvas) {
       for (let i = 0; i < n; i++) P[i] = apply(M, D.verts[i]);
       if (kind === 'S') { let vis = c[2] > 0; for (let i = 0; i < n && !vis; i++) if (P[i][2] > 0) vis = true; if (!vis) continue; }
       if (kind === 'E') { let inView = false; const m = reach * R + 4; if (X(c) > -m && X(c) < W + m && Y(c) > -m && Y(c) < H + m) inView = true; if (!inView) continue; }
-      if (kind === 'H' && px < 0.35) continue;
+      // too far out to show: by where the tile's NEAREST point is (a large tile far away still reaches in from the rim)
+      if (kind === 'H') { const near = Math.acosh(Math.max(1, c[2])) - reach; if (near > 5 || (px < 0.35 && near > 4)) continue; }
       drawn++;
       const b = px >= 20 ? 0 : px >= 7 ? 1 : 2;
       // the outline, edge by edge
@@ -377,6 +387,7 @@ export function createPattern(canvas) {
 
   const api = {
     set(m) {
+      if (!m) { model = null; G = null; sel = null; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       model = m; G = m.D.G; sel = null; quick = false;
       cache = new Map();
       reach = Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at)));

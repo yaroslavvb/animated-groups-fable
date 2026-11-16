@@ -1,14 +1,21 @@
-// catalog.js — the examples of the Symmetries tab: signatures and the tile each one is built from.
+// catalog.js — signatures, and the tile each one is built from.
 //
-// A FAMILY turns a few numbers into a tile (domains.js) and into the signature's characters ("tokens"):
-//   { t: 'o' | '*' | 'x' }            a wonder-ring, a kaleidoscope's star, a miracle's cross
-//   { t: 'd', v, p }                  a digit; p = which of the family's numbers it shows (the reader can change it)
-// An example is a family with its numbers, written as plain text: "*632", "3*3", "22x", "oo" (* for the star, x for
-// the cross, o for the ring). fromText() reads such a text; PRESETS lists the ones the page offers.
+// A SIGNATURE is data: { o, cones: [n, ...], stars: [[corner, ...], ...], x } (handles, cone points, boundaries each
+// with its corners in order, crosscaps). As plain text it is "*632", "3*3", "22x", "oo2*3*x" (* for the star, x for
+// the cross, o for the ring): parse() and textOf(). tokensOf() lists its characters:
+//   { t: 'o' | '*' | 'x', ref }       a wonder-ring, a kaleidoscope's star, a miracle's cross
+//   { t: 'd', v, ref }                a digit; ref says which cone point or which corner of which star it is
+// The reader may change it freely: addTo(), removeAt(), stepAt().
+//
+// domainOf() finds its tile. Many signatures have a hand-made one (FAMILIES: the kaleidoscopes, the gyration
+// groups, the 17 plane types, the 14 spherical ones ...); any other that costs $2 or more gets the general tile
+// (domains.js canonical). One that costs less than $2 and is not among the fourteen spherical types has no pattern
+// at all (the book's proviso, p. 53): domainOf() returns null.
 // The signature is never trusted: bind() compares the characters with what orbifold.js reads off the tile's glued
 // edges and says which corner class, boundary, handle or crosscap each character stands for.
 
-import { half, regular, mirrorAndMiracle, crossSphere, hemisphere, spindle } from './domains.js';
+import { half, regular, mirrorAndMiracle, crossSphere, hemisphere, spindle, canonical } from './domains.js';
+import { frac, fadd, fval, PRICE } from './orbifold.js';
 
 const TAU = 2 * Math.PI;
 const O = { t: 'o' }, S = { t: '*' }, X = { t: 'x' };
@@ -72,14 +79,98 @@ export function fromText(text) {
 export const toText = (tokens) => tokens.map((k) => (k.t === 'd' ? String(k.v) : k.t)).join('');
 export const toPretty = (tokens) => tokens.map((k) => (k.t === 'd' ? String(k.v) : k.t === '*' ? '∗' : k.t === 'x' ? '×' : '○')).join('');
 
-/** The example one step away: the family's number p changed by delta (2 .. 9), or null. */
-export function stepParam(example, p, delta) {
-  const v = example.params[p] + delta;
-  if (!(v >= 2 && v <= 9)) return null;
-  const params = example.params.slice();
-  params[p] = v;
-  return { family: example.family, params, text: toText(FAMILIES[example.family].tokens(params)) };
+// ---------------------------------------------------------------------------------------------------------------
+// A signature as data.
+
+const clone = (sig) => ({ o: sig.o, cones: sig.cones.slice(), stars: sig.stars.map((c) => c.slice()), x: sig.x });
+/** How many places it takes on the ball of the 3D pane (a handle takes two). */
+export const room = (sig) => 2 * sig.o + sig.x + sig.cones.length + sig.stars.length;
+const length = (sig) => sig.o + sig.x + sig.cones.length + sig.stars.reduce((s, c) => s + 1 + c.length, 0);
+/** What the page can show: something, at most twelve places on the ball, at most six corners on a mirror, fourteen characters. */
+const fits = (sig) => length(sig) >= 1 && length(sig) <= 14 && room(sig) <= 12 && sig.stars.every((c) => c.length <= 6);
+
+/** A signature from plain text ("22*3x"), or null. A ring next to a cross is read as two more crosses (o x = x x x). */
+export function parse(text) {
+  const s = String(text || '').trim().replace(/[∗＊]/g, '*').replace(/[×✕]/g, 'x').replace(/[○◦∘]/g, 'o');
+  const m = /^(o*)([2-9]*)((?:\*[2-9]*)*)(x*)$/.exec(s);
+  if (!m || !s) return null;
+  const sig = { o: m[1].length, cones: [...m[2]].map(Number), stars: m[3] ? m[3].split('*').slice(1).map((d) => [...d].map(Number)) : [], x: m[4].length };
+  if (sig.o && sig.x) { sig.x += 2 * sig.o; sig.o = 0; }
+  return fits(sig) ? sig : null;
 }
+export const textOf = (sig) => 'o'.repeat(sig.o) + sig.cones.join('') + sig.stars.map((c) => '*' + c.join('')).join('') + 'x'.repeat(sig.x);
+export function tokensOf(sig) {
+  const out = [];
+  for (let i = 0; i < sig.o; i++) out.push({ t: 'o', ref: { kind: 'o', i } });
+  sig.cones.forEach((v, i) => out.push({ t: 'd', v, ref: { kind: 'cone', i } }));
+  sig.stars.forEach((c, s) => { out.push({ t: '*', ref: { kind: 'star', s } }); c.forEach((v, i) => out.push({ t: 'd', v, ref: { kind: 'corner', s, i } })); });
+  for (let i = 0; i < sig.x; i++) out.push({ t: 'x', ref: { kind: 'x', i } });
+  return out;
+}
+/** Its price as a fraction (Table 3.1 of the book). */
+export function costOf(sig) {
+  let c = frac(2 * sig.o + sig.x + sig.stars.length);
+  for (const n of sig.cones) c = fadd(c, PRICE.cone(n));
+  for (const st of sig.stars) for (const n of st) c = fadd(c, PRICE.corner(n));
+  return c;
+}
+/** The tile of a pattern with this signature, or null where no pattern has it. */
+export function domainOf(sig) {
+  const ex = fromText(textOf(sig));
+  if (ex) return FAMILIES[ex.family].make(ex.params);
+  if (fval(costOf(sig)) < 2) return null;          // under $2 and not one of the fourteen spherical types
+  return canonical(sig);
+}
+/** What each character is, from the signature alone (for one that has no tile to compare with): as bind() answers, without the classes. */
+export function structure(tokens) {
+  return tokens.map((k) => (k.t === 'o' ? { t: 'o', k: k.ref.i } : k.t === 'x' ? { t: 'x', k: k.ref.i } : k.t === '*' ? { t: '*', star: k.ref.s }
+    : k.ref.kind === 'cone' ? { t: 'd', role: 'cone', cls: null } : { t: 'd', role: 'corner', cls: null, star: k.ref.s }));
+}
+
+/**
+ * The signature with one more thing: kind 'o' | 'x' | 'cone' | 'star' | 'corner'. A corner goes on the star `at`
+ * points into (after the corner it points at), else on the last star. A crosscap next to handles turns each handle
+ * into two crosscaps, and a handle next to a crosscap arrives as two crosscaps (the trade of tab 2, o x = x x x):
+ * `traded` says so. Returns { sig, ref, traded } with ref the new character, or null where it cannot be added.
+ */
+export function addTo(sig, kind, at = null) {
+  const s = clone(sig);
+  let ref, traded = false;
+  if (kind === 'o') { if (s.x) { s.x += 2; traded = true; ref = { kind: 'x', i: s.x - 1 }; } else { s.o++; ref = { kind: 'o', i: s.o - 1 }; } }
+  else if (kind === 'x') { if (s.o) { s.x += 2 * s.o; s.o = 0; traded = true; } s.x++; ref = { kind: 'x', i: s.x - 1 }; }
+  else if (kind === 'cone') { s.cones.push(2); ref = { kind: 'cone', i: s.cones.length - 1 }; }
+  else if (kind === 'star') { s.stars.push([]); ref = { kind: 'star', s: s.stars.length - 1 }; }
+  else if (kind === 'corner') {
+    if (!s.stars.length) return null;
+    const st = at && (at.kind === 'star' || at.kind === 'corner') ? at.s : s.stars.length - 1;
+    const pos = at && at.kind === 'corner' && at.s === st ? at.i + 1 : s.stars[st].length;
+    s.stars[st].splice(pos, 0, 2);
+    ref = { kind: 'corner', s: st, i: pos };
+  } else return null;
+  return fits(s) ? { sig: s, ref, traded } : null;
+}
+/** The signature without the character `ref` (a star goes with its corners), or null if nothing would be left. */
+export function removeAt(sig, ref) {
+  const s = clone(sig);
+  if (ref.kind === 'o') s.o--; else if (ref.kind === 'x') s.x--; else if (ref.kind === 'cone') s.cones.splice(ref.i, 1);
+  else if (ref.kind === 'star') s.stars.splice(ref.s, 1); else s.stars[ref.s].splice(ref.i, 1);
+  return length(s) >= 1 ? s : null;
+}
+/**
+ * The signature with the digit `ref` one more or one less (2 .. 9), or null. In NN and *NN the two digits go
+ * together: on a sphere two cone points, or the two corners of one mirror, must have the same order.
+ */
+export function stepAt(sig, ref, delta) {
+  const s = clone(sig), list = ref.kind === 'cone' ? s.cones : ref.kind === 'corner' ? s.stars[ref.s] : null;
+  if (!list) return null;
+  const v = list[ref.i] + delta;
+  if (!(v >= 2 && v <= 9)) return null;
+  const alone = length(s) === (ref.kind === 'cone' ? 2 : 3) && list.length === 2 && list[0] === list[1];
+  if (alone) { list[0] = v; list[1] = v; } else list[ref.i] = v;
+  return s;
+}
+/** The index of the token that `ref` names. */
+export const tokenAt = (tokens, ref) => tokens.findIndex((k) => k.ref.kind === ref.kind && (k.ref.i === ref.i || ref.i === undefined) && (k.ref.s === ref.s || ref.s === undefined));
 
 export const PRESETS = [
   { group: 'S', title: 'On the sphere', list: ['*532', '532', '*432', '432', '*332', '332', '3*2', '*225', '225', '2*5', '*55', '55', '5*', '5x', '*', 'x'] },

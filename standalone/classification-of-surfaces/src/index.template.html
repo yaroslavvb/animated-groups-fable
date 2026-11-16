@@ -54,6 +54,15 @@
           <button type="button" class="btn-quiet symnav" id="sym-next" aria-label="The next example"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></button>
           <div class="symstep" id="sym-step" role="group" aria-label="Change the chosen number"><button type="button" class="st-btn" id="sym-minus" aria-label="the chosen number, one less" disabled>−</button><button type="button" class="st-btn" id="sym-plus" aria-label="the chosen number, one more" disabled>+</button></div>
         </div>
+        <div class="symadd" id="sym-add" role="group" aria-label="Add to the signature, or take the chosen character away">
+          <span class="symadd-k">add</span>
+          <button type="button" class="chip addchip" data-add="o" title="A wonder-ring: a handle on the surface. $2"><b class="is-blue">\(\circ\)</b>handle</button>
+          <button type="button" class="chip addchip" data-add="cone" title="A gyration point: a cone point on the surface. Starts at 2: half a dollar"><b class="is-blue">\(2\)</b>cone</button>
+          <button type="button" class="chip addchip" data-add="star" title="A kaleidoscope: a mirror, the rim of a hole in the surface. $1"><b class="is-red">\(\ast\)</b>mirror</button>
+          <button type="button" class="chip addchip" data-add="corner" title="A point where mirrors cross: a corner of the chosen mirror (or of the last one). Starts at 2: a quarter"><b class="is-red">\(2\)</b>corner</button>
+          <button type="button" class="chip addchip" data-add="x" title="A miracle: a crosscap on the surface. $1"><b class="is-red">\(\times\)</b>crosscap</button>
+          <button type="button" class="chip addchip addchip-rm" id="sym-remove" title="Take the chosen character away" disabled>remove</button>
+        </div>
         <div class="symprice">
           <div class="cost-rail"><div class="cost-bar" id="sym-bar"></div><i class="cost-two"></i><div class="cost-total" id="sym-total"></div></div>
           <div class="cost-zones" aria-hidden="true"><span>under $2: a sphere</span><span>$2: the plane</span><span>over $2: hyperbolic</span></div>
@@ -64,6 +73,7 @@
       <section class="pane pane2" id="pane2" data-tab-only="sym" data-ss-comments="off" aria-label="The pattern">
         <canvas id="pattern" tabindex="0" aria-label="The pattern. Drag to slide it; the arrow keys slide it too, and 0 puts it back."></canvas>
         <p class="pane-tag" id="pat-tag"></p>
+        <p class="pat-none" id="pat-none" hidden>No pattern has this signature.</p>
         <p class="hint" id="pat-hint">drag to slide the pattern</p>
         <button type="button" class="btn-quiet pane-reset" id="pat-reset" title="Put the pattern back" aria-label="Put the pattern back">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
@@ -176,8 +186,9 @@
         <p data-when="zip:handle">One rim is zipped clockwise, the other counter-clockwise: two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
         <p data-when="zip:crosshandle">Both rims are zipped the same way round: one tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
         <p data-when="prove:any" id="prove-cap"></p>
-        <p data-when="sym:none">Tap a character of the signature: what it stands for lights up in the pattern and on the surface. A chosen number can be changed with − and +.</p>
+        <p data-when="sym:none">Tap a character of the signature: what it stands for lights up in the pattern and on the surface. Change a chosen number with − and +; add a character, or remove the chosen one, with the row under the signature.</p>
         <p id="sym-say" data-tab-only="sym"></p>
+        <p class="cap-more" data-when="sym:bad">Under $2 a pattern has to live on a sphere, and there the choice is narrow. Two cone points must have the same order, and so must the two corners of one mirror; one alone will not do. The surface on the right still exists: it just is not what any pattern folds up to. <a class="bk" data-p="53" data-q="but it turns out that there is a proviso">p. 53</a></p>
         <p class="cap-more" data-when="sym:cone">A number before the star is a gyration point: the pattern turns about it and no mirror passes through it. Folded up, the tiles round it roll into a cone. <a class="bk" data-p="112" data-q="A gyration point is rolled into a cone">p. 112</a></p>
         <p class="cap-more" data-when="sym:star">A star is a kaleidoscope: mirror lines, and the points where they cross. Folding along a mirror leaves an edge, so the surface gets a boundary. <a class="bk" data-p="20" data-q="designating the presence of a kaleidoscope separates the digit representing the gyration point">p. 20</a></p>
         <p class="cap-more" data-when="sym:corner">A number after a star is a point where that many mirrors cross. Folded up, it is a corner of the boundary. <a class="bk" data-p="112" data-q="A kaleidoscopic corner is folded up into just that">p. 112</a></p>
@@ -251,6 +262,7 @@
         <li>Under $2: a pattern on a sphere, and the change is 2 over the number of symmetries. <a class="bk" data-p="53" data-q="divided by the number of symmetries">p. 53</a></li>
         <li>Over $2: a pattern on the hyperbolic plane. Every such signature has one. <a class="bk" data-p="237" data-q="every signature with negative characteristic really does correspond to a group">p. 237</a></li>
       </ul>
+      <p>Any signature you can write has a price, and with the row under the signature you can write any: only a handful under $2 have no pattern. <a class="bk" data-p="237" data-q="there were “bad” signatures">p. 237</a></p>
       <p>The price is what each thing takes off the Euler characteristic of <a href="#tidy" data-go="tidy">tab 2</a>: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
     </details>
     <details class="fold" data-tab-only="sym">

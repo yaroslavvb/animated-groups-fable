@@ -8,7 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { apply } from '../src/sym/geom.js';
 import { analyse, tiles, fval, signatureOf } from '../src/sym/orbifold.js';
-import { FAMILIES, fromText, toText, bind, ALL, PRESETS, stepParam } from '../src/sym/catalog.js';
+import { FAMILIES, fromText, toText, bind, ALL, PRESETS, parse, textOf, stepAt, domainOf } from '../src/sym/catalog.js';
 
 const TAU = 2 * Math.PI;
 function build(text) {
@@ -100,12 +100,12 @@ test('changing a digit: every kaleidoscope and every gyration group with three d
 });
 
 test('stepping one digit walks from the sphere through the plane to the hyperbolic plane', () => {
-  let ex = fromText('*532');
-  const kinds = [];
-  for (let k = 0; k < 4; k++) { kinds.push(FAMILIES[ex.family].make(ex.params).G.kind + ':' + ex.text); ex = stepParam(ex, 0, 1); }
+  let sig = parse('*532');
+  const kinds = [], ref = { kind: 'corner', s: 0, i: 0 };
+  for (let k = 0; k < 4; k++) { kinds.push(domainOf(sig).G.kind + ':' + textOf(sig)); sig = stepAt(sig, ref, 1); }
   assert.deepEqual(kinds, ['S:*532', 'E:*632', 'H:*732', 'H:*832']);
-  assert.equal(stepParam(fromText('*932'), 0, 1), null);
-  assert.equal(stepParam(fromText('*232'), 0, -1), null);
+  assert.equal(stepAt(parse('*932'), ref, 1), null);
+  assert.equal(stepAt(parse('*232'), ref, -1), null);
 });
 
 test('the signature read off a tile, for a few by hand', () => {
@@ -139,4 +139,104 @@ test('a matrix that drifted off the group is put back onto it', async () => {
     for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) assert.ok(Math.abs(gram(F, a, b) - (a === b ? J[a] : 0)) < 1e-9 * size * size, `${kind}: columns ${a}, ${b}`);
     assert.equal(Math.sign(F[0] * (F[4] * F[8] - F[5] * F[7]) - F[1] * (F[3] * F[8] - F[5] * F[6]) + F[2] * (F[3] * F[7] - F[4] * F[6])), 1, kind + ': eight mirrors keep the sense');
   }
+});
+
+// ---- any signature at all: the editable model and the general tile
+test('a signature as text and as data', async () => {
+  const C = await import('../src/sym/catalog.js');
+  for (const t of ALL) assert.equal(C.textOf(C.parse(t)), t, t);
+  assert.deepEqual(C.parse('o23*45*x'), { o: 0, cones: [2, 3], stars: [[4, 5], []], x: 3 }, 'a ring beside a cross is read as two more crosses');
+  assert.equal(C.textOf(C.parse('oo23*45*x')), '23*45*xxxxx');
+  assert.equal(C.parse(''), null); assert.equal(C.parse('7*1'), null); assert.equal(C.parse('x*'), null); assert.equal(C.parse('ooooooo'), null, 'more than the ball holds');
+  assert.deepEqual(C.tokensOf(C.parse('3*3')).map((k) => k.t + (k.v || '') + ':' + k.ref.kind), ['d3:cone', '*:star', 'd3:corner']);
+  const cost = C.costOf(C.parse('*632'));
+  assert.deepEqual([cost.n, cost.d], [2, 1]);
+});
+
+test('adding, removing and stepping', async () => {
+  const C = await import('../src/sym/catalog.js');
+  const T = (sig) => C.textOf(sig);
+  let r = C.addTo(C.parse('*632'), 'x');
+  assert.equal(T(r.sig), '*632x'); assert.deepEqual(r.ref, { kind: 'x', i: 0 }); assert.equal(r.traded, false);
+  r = C.addTo(C.parse('oo'), 'x');
+  assert.equal(T(r.sig), 'xxxxx'); assert.equal(r.traded, true, 'a cross beside two rings: five crosses');
+  r = C.addTo(C.parse('2x'), 'o');
+  assert.equal(T(r.sig), '2xxx'); assert.equal(r.traded, true, 'a ring beside a cross arrives as two crosses');
+  assert.equal(T(C.addTo(C.parse('22'), 'cone').sig), '222');
+  assert.equal(T(C.addTo(C.parse('3*3'), 'star').sig), '3*3*');
+  assert.equal(C.addTo(C.parse('333'), 'corner'), null, 'a corner needs a mirror');
+  r = C.addTo(C.parse('*23*4'), 'corner', { kind: 'corner', s: 0, i: 0 });
+  assert.equal(T(r.sig), '*223*4'); assert.deepEqual(r.ref, { kind: 'corner', s: 0, i: 1 });
+  assert.equal(T(C.addTo(C.parse('*23*4'), 'corner').sig), '*23*42', 'with nothing chosen: on the last mirror');
+  assert.equal(T(C.addTo(C.parse('*23*4'), 'corner', { kind: 'star', s: 0 }).sig), '*232*4');
+  assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'star', s: 0 })), '2x', 'a mirror goes with its corners');
+  assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'corner', s: 0, i: 0 })), '2*3x');
+  assert.equal(C.removeAt(C.parse('x'), { kind: 'x', i: 0 }), null, 'something has to stay');
+  assert.equal(T(C.stepAt(C.parse('*532'), { kind: 'corner', s: 0, i: 0 }, 1)), '*632');
+  assert.equal(C.stepAt(C.parse('*932'), { kind: 'corner', s: 0, i: 0 }, 1), null);
+  assert.equal(T(C.stepAt(C.parse('55'), { kind: 'cone', i: 1 }, 1)), '66', 'the two cone points of NN go together');
+  assert.equal(T(C.stepAt(C.parse('*55'), { kind: 'corner', s: 0, i: 0 }, -1)), '*44');
+  assert.equal(T(C.stepAt(C.parse('2*55'), { kind: 'corner', s: 0, i: 0 }, 1)), '2*65', 'but not when something else is there');
+  let sig = C.parse('x');
+  for (let i = 0; i < 20; i++) { const a = C.addTo(sig, 'o'); if (!a) break; sig = a.sig; }
+  assert.ok(C.room(sig) === 11 && C.addTo(sig, 'o') === null && C.room(C.addTo(sig, 'x').sig) === 12 && C.addTo(C.addTo(sig, 'x').sig, 'x') === null, 'adding stops when the ball is full: ' + T(sig));
+});
+
+test('no pattern: the signatures under $2 that are not among the fourteen spherical types', async () => {
+  const C = await import('../src/sym/catalog.js');
+  for (const t of ['2', '7', '23', '95', '*2', '*9', '*23', '*45']) { const sig = C.parse(t); assert.ok(fval(C.costOf(sig)) < 2, t); assert.equal(C.domainOf(sig), null, t + ' has a tile'); }
+  // every other signature with at most four characters has one, and on a sphere it is one of the fourteen types
+  const chars = ['o', '2', '3', '5', '*', 'x'];
+  let seen = 0, sphere = new Set();
+  const grow = (s, n) => {
+    const sig = C.parse(s);
+    if (sig && C.textOf(sig) === s) {
+      seen++;
+      const D = C.domainOf(sig), cost = fval(C.costOf(sig));
+      if (!D) assert.ok(cost < 2 && /^\*?([2-9])?([2-9])?$/.test(s) && !/^\*?(.)\1$/.test(s), s + ' has no tile');
+      else { assert.equal(D.G.kind, cost < 2 - 1e-12 ? 'S' : cost > 2 + 1e-12 ? 'H' : 'E', s); if (D.G.kind === 'S') sphere.add(s); }
+    }
+    if (n) for (const c of chars) grow(s + c, n - 1);
+  };
+  grow('', 4);
+  assert.ok(seen > 150, 'tried ' + seen);
+  assert.deepEqual([...sphere].sort(), ['*', '*22', '*222', '*223', '*225', '*232', '*233', '*235', '*252', '*253', '*322', '*323', '*325', '*332', '*352', '*33', '*522', '*523', '*532', '*55', '2*', '2*2', '2*3', '2*5', '22', '222', '223', '225', '232', '233', '235', '252', '253', '2x', '3*', '3*2', '322', '323', '325', '33', '332', '352', '3x', '5*', '522', '523', '532', '55', '5x', 'x'].sort());
+});
+
+test('any signature: the general tile folds up to exactly what was asked for', async () => {
+  const C = await import('../src/sym/catalog.js');
+  let s = 12345;
+  const rnd = (n) => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return (s >>> 8) % n; };
+  let made = 0, general = 0;
+  const kinds = { E: 0, H: 0, S: 0 };
+  while (made < 400) {
+    const sig = { o: rnd(4) === 0 ? 1 + rnd(2) : 0, cones: Array.from({ length: rnd(4) }, () => 2 + rnd(6)), stars: Array.from({ length: rnd(3) }, () => Array.from({ length: rnd(4) }, () => 2 + rnd(5))), x: 0 };
+    if (!sig.o && rnd(3) === 0) sig.x = 1 + rnd(3);
+    const text = C.textOf(sig), back = C.parse(text);
+    if (!back) continue;
+    const D = C.domainOf(sig);
+    if (!D) { assert.ok(fval(C.costOf(sig)) < 2, text); continue; }
+    made++; kinds[D.G.kind]++;
+    if (!fromText(text)) general++;
+    const A = analyse(D), G = D.G, tokens = C.tokensOf(sig);
+    bind(tokens, A);                                                     // throws unless the tile's own reading is this signature
+    const cost = C.costOf(sig);
+    assert.equal(A.cost.n * cost.d, cost.n * A.cost.d, text + ': the price');
+    if (G.kind !== 'E') assert.ok(Math.abs(G.area(D.verts) - TAU * Math.abs(fval(A.chi))) < 1e-6, text + ': area against price');
+    for (let i = 0; i < D.n; i++) {
+      const e = D.edges[i], a = D.verts[i], b = D.verts[(i + 1) % D.n];
+      assert.ok(G.dist(a, b) > 1e-6, text + ': an edge of no length');
+      if (e.mirror) continue;
+      const c = D.verts[e.to], d = D.verts[(e.to + 1) % D.n], M = A.maps[i], pc = apply(M, c), pd = apply(M, d);
+      assert.ok(e.rev ? G.dist(pc, a) < 1e-6 && G.dist(pd, b) < 1e-6 : G.dist(pc, b) < 1e-6 && G.dist(pd, a) < 1e-6, text + ': a gluing misses');
+    }
+    // no two tiles overlap, as far out as a few tiles go
+    const reach = Math.max(...D.verts.map((v) => G.dist(v, D.at)));
+    const T = tiles(D, A, { radius: G.kind === 'S' ? Infinity : Math.min(2.6 * reach, reach + 3), max: 160 });
+    const P = T.map((t) => apply(t.M, D.at));
+    let min = Infinity;
+    for (let a = 0; a < P.length; a++) for (let b = a + 1; b < P.length; b++) min = Math.min(min, G.dist(P[a], P[b]));
+    assert.ok(P.length < 2 || min > 2 * D.clear - 1e-6, `${text}: two motifs ${min} apart, each has ${D.clear} of room`);
+  }
+  assert.ok(general > 250 && kinds.H > 300, `general tiles: ${general}; ${JSON.stringify(kinds)}`);
 });

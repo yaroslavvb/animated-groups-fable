@@ -83,13 +83,14 @@ for (const a of document.querySelectorAll('[data-go]')) a.addEventListener('clic
 $('view').addEventListener('pointerdown', () => { turnHint.hidden = true; }, { once: true });
 
 // ---- the hash: #<tab>&k=<state>
-let hashTimer = 0;
+let hashTimer = 0, lastHash = '';
 function scheduleHash() { clearTimeout(hashTimer); hashTimer = setTimeout(writeHash, 250); }
 function writeHash() {
   const s = current && current.get ? current.get() : {};
   const parts = [currentName];
   for (const [k, v] of Object.entries(s)) if (v !== undefined && v !== null && k !== 't') parts.push(k + '=' + encodeURIComponent(v));
   const h = '#' + parts.join('&');
+  lastHash = h;
   try { if (location.hash !== h) history.replaceState(null, '', h); } catch (e) { /* a sandboxed frame may refuse: the page works without */ }
 }
 function readHash() {
@@ -98,7 +99,8 @@ function readHash() {
   for (const p of parts) { const i = p.indexOf('='); if (i > 0) state[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); }
   return [name, state];
 }
-window.addEventListener('hashchange', () => { const [name, state] = readHash(); if (name !== currentName) show(name, state); });
+// a link followed or an address typed: another tab, or another state of this one (#sym&k=*732 while tab 5 is open)
+window.addEventListener('hashchange', () => { const [name, state] = readHash(); if (name !== currentName || location.hash !== lastHash) show(name, state); });
 
 if (!stage.R.ok) { const p = document.createElement('p'); p.className = 'r3d-message'; p.textContent = 'The 3D view needs WebGL 2, which this browser does not offer.'; $('pane').append(p); turnHint.hidden = true; }
 initBookRefs($('bkpop'));
