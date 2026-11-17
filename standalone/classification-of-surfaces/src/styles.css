@@ -83,7 +83,7 @@ a { color: var(--accent); text-underline-offset: 2px; }
 }
 @media (max-width: 859px) {
   .pane { aspect-ratio: 1 / 1; max-height: 58vh; }
-  /* on a phone the line that says what just happened stays under the stage, above the controls (tabs 2 and 3) */
+  /* on a phone the line that says what just happened stays under the stage, above the controls (the Tidy surfaces and Zip it up tabs) */
   .pane { order: 1; } .side { order: 2; } .playbar { order: 3; } .caption { order: 4; }
   .app[data-tab="tidy"] .caption, .app[data-tab="prove"] .caption { order: 2; min-height: 0; }
   .app[data-tab="tidy"] .side, .app[data-tab="prove"] .side { order: 3; }
@@ -160,7 +160,6 @@ a { color: var(--accent); text-underline-offset: 2px; }
 .btn-quiet { flex: none; height: var(--tap); min-width: var(--tap); display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px 0 8px; border: 4px solid transparent; border-radius: 12px; background: var(--ground) padding-box; box-shadow: inset 0 0 0 1px var(--hairline); color: var(--muted); font-size: 13px; line-height: 1; white-space: nowrap; cursor: pointer; }
 .btn-quiet > svg { flex: none; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .pane-reset { position: absolute; right: 4px; top: 4px; padding: 0; background: transparent; box-shadow: none; }
-/* a quiet native select beside a pane's reset button (tab 5: which pattern is printed on the tiles) */
 ul.argument { list-style: disc; }
 .scrub { --rail-shift: 0px; position: relative; flex: 1 1 auto; min-width: 0; height: var(--tap); display: block; touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 .scrub[data-enhanced] { cursor: pointer; }
@@ -183,7 +182,7 @@ ul.argument { list-style: disc; }
 .caption .cap-more { color: var(--muted); font-size: 15px; }
 .caption p:empty { display: none; }
 .caption p { margin: 0; max-width: 44em; }
-.app[data-tab="name"] .caption { display: none; }      /* tab 4 keeps its one line beside the counts */
+.app[data-tab="name"] .caption { display: none; }      /* the Examples tab keeps its one line beside the counts */
 
 .fold { margin: 14px 0 0; border-top: 1px solid var(--hairline); max-width: 46em; }
 .fold > summary { min-height: var(--tap); display: flex; align-items: center; gap: 8px; cursor: pointer; color: var(--muted); font-size: 15px; font-weight: 600; list-style: none; }
@@ -313,7 +312,7 @@ ul.argument { list-style: disc; }
 #sym-bad .tries { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 10px; }
 #sym-bad .tries-k { color: var(--muted); font-size: 14px; margin-right: 2px; }
 @media (max-width: 480px) { .pat-none { padding: 10px 12px 12px; } #sym-bad { margin-top: 6px; } #sym-bad .tries { margin-top: 8px; } }
-/* the key under tab 5's two pictures (only what is in them), and the note on a glued edge of the outlined tile */
+/* the key under the Symmetries tab's two pictures (only what is in them), and the note on a glued edge of the outlined tile */
 .caption .symkey { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; max-width: none; margin: 0 0 8px; color: var(--muted); font-size: 14px; }
 .sw-tile { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }
 .keypairs { display: inline-flex; align-items: center; gap: 3px; }

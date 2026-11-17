@@ -5,7 +5,7 @@
 //               a closed ring of corners, total 2 pi / n   -> kind 'cone',   order n  (n = 1: an ordinary point)
 //               a chain ending on mirrors, total pi / n    -> kind 'corner', order n  (n = 1: an ordinary rim point)
 //   stars     the boundaries: each a ring of mirror edges, with its corner classes of order > 1 in order round it
-//   surface   { o, star, x }: what the tile zips up to (tab 3's bookkeeping does this part: engine.js census)
+//   surface   { o, star, x }: what the tile zips up to (the Zip it up tab's bookkeeping does this part: engine.js census)
 //   cost, chi the signature's price as a fraction, and 2 - cost
 //   maps      maps[i]: the symmetry that takes the tile to its neighbour across edge i
 //   glides    the gluings that turn the tile over, each with a piece of its axis

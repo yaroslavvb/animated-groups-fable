@@ -17,7 +17,7 @@
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
 // One tile is outlined: the one the surface in the other pane is folded from. The two edges of each glued pair are
-// drawn alike: one colour and one number of arrowheads a pair (pairs.js; tab 3 zips the tile up in the same colours).
+// drawn alike: one colour and one number of arrowheads a pair (pairs.js; the Zip it up tab zips the tile up in the same colours).
 // They carried letters at first; his notes, Mon 16 Nov 2026: "I don't understand what a,b mean in the leftmost
 // diagram", then "instead of using letters a,b, use colors or edge styling to indicate edges which are matched up".
 // A pointer on a glued edge (or a tap) brings out the pair and says what it is, in opts.tip.

@@ -1,4 +1,4 @@
-// tabs/zip.js — tab 1, "Zippers": the four things a zipper can make (pp. 94-95), on a patch of sheet.
+// tabs/zip.js — the "Zippers" tab: the four things a zipper can make (pp. 94-95), on a patch of sheet.
 // One hole or two, arrows opposite or the same: cap, crosscap, handle, cross-handle. The scrubber zips and unzips.
 
 import { Scene } from '../geo/scene.js';

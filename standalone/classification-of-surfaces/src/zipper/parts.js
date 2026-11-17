@@ -1,4 +1,4 @@
-// parts.js — the moving pieces of tab 3 (Zip it up), each built on the Scene of geo/scene.js.
+// parts.js — the moving pieces of the Zip it up tab, each built on the Scene of geo/scene.js.
 //
 //   addCornerPoly   a flat polygon given by its corners (which may move): the pieces before any self-zip
 //   addInflate      Figure 8.1: a polygon is a disc is a sphere with a hole. The flat piece bulges into a dome,

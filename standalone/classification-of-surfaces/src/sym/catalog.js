@@ -193,7 +193,7 @@ export function structure(tokens) {
  *                  point if it is among the rings and cone points or at the start; at the end (or on a cross) a
  *                  corner of the last mirror if there is one, else a cone point. So signatures can be typed as read.
  * A crosscap next to handles turns each handle into two crosscaps, and a handle next to a crosscap arrives as two
- * crosscaps (the trade of tab 2, o x = x x x): `traded` says so. Returns { sig, ref, traded } with ref the new
+ * crosscaps (the trade of the Tidy surfaces tab, o x = x x x): `traded` says so. Returns { sig, ref, traded } with ref the new
  * character, or null where it cannot be added.
  */
 export function addTo(sig, kind, at = null, value = 2) {

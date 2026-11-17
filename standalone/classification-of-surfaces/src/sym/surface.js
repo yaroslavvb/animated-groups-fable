@@ -1,4 +1,4 @@
-// surface.js — the orbifold of a pattern as a surface in the 3D pane: a tidy surface of tab 2 (a sphere with
+// surface.js — the orbifold of a pattern as a surface in the 3D pane: a tidy surface of the Tidy surfaces tab (a sphere with
 // handles, holes and crosscaps) that also carries the signature's numbers:
 //   a digit before the star   a CONE POINT: a pointed cap, as sharp as a paper cone rolled from 1 / n of a disc
 //   a star                    a hole whose rim is a mirror (drawn red)
@@ -8,7 +8,7 @@
 //
 // A sphere with ONE hole is a disc, and is drawn as one (buildDisc): a flat plate whose edge is the mirror, with the
 // star's corners as real corners of the plate (sharper for a higher order) and the cone points standing on it. That
-// covers every kaleidoscope: the plate of *632 is its 30-60-90 triangle. An annulus and a Moebius band are tab 4's
+// covers every kaleidoscope: the plate of *632 is its 30-60-90 triangle. An annulus and a Moebius band are the Examples tab's
 // own models of them (buildModel), their edges the mirrors. Everything else stays on the ball.
 //
 //   buildSurface(parts) -> { scene, frame, anchors }
@@ -141,7 +141,7 @@ function buildDisc(parts) {
   return { scene, frame: { center: [cx, cy, 0.12], radius: Math.max(1.05, far * 1.12) }, anchors, view: { az: 0, el: 52 } };
 }
 
-/** Tab 4's band ('annulus') or twisted band ('mobius'), its boundaries the mirrors. */
+/** The Examples tab's band ('annulus') or twisted band ('mobius'), its boundaries the mirrors. */
 function buildModel(key, parts) {
   const m = measure(key), mesh = buildMesh(m.cx, m.paint.sign), scene = new Scene();
   const rims = m.boundaries.map((loop) => loopLine(m.cx, loop));

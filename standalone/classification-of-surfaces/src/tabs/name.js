@@ -1,4 +1,4 @@
-// tabs/name.js — tab 4, "Examples" (pp. 104-106): the book's seven example surfaces, each to be NAMED by counting
+// tabs/name.js — the "Examples" tab (pp. 104-106): the book's seven example surfaces, each to be NAMED by counting
 // three things on it. "We can immediately work out the tidy form of a surface just by drawing a map on the surface
 // and calculating its Euler characteristic, counting the number of boundaries, and checking whether the surface is
 // orientable" (p. 105). Three probes show the counting:
@@ -6,7 +6,7 @@
 //   Boundaries  every boundary curve in a colour of its own
 //   Sides       the book's pinwheel (p. 101), carried once round a loop: it comes back as it left, or mirrored
 // Every number shown is counted on the map by src/examples/complex.js; nothing about a surface is typed in here but
-// its caption. The symbol follows from the three numbers by Theorem 8.2, and "Show it tidy" opens it in tab 2.
+// its caption. The symbol follows from the three numbers by Theorem 8.2, and "Show it tidy" opens it in the Tidy surfaces tab.
 //
 //   #name&k=mobius            deep link to a surface
 //   tab.select(key)  tab.setProbe('map' | 'rims' | 'sides', on)  tab.pin(u)  tab.progress()  tab.numbers()   for the tools
@@ -145,7 +145,7 @@ export function createNameTab(ctx) {
 
   // ---- the readouts
   function readout() {
-    pieces.hidden = !(key === 'strange' || key === 'punched');      // the two that tab 3 builds from their pieces
+    pieces.hidden = !(key === 'strange' || key === 'punched');      // the two that the Zip it up tab builds from their pieces
     const { m } = cur;
     for (const p of PROBES) if (probes[p]) seen[key].add(p);
     const counted = seen[key].size === PROBES.length;              // the symbol goes on the stage once all three have been looked at

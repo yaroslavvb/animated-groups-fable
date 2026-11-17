@@ -390,7 +390,7 @@ test('a signature with no pattern: why, and the nearest ones that have one', asy
 test('glued pairs: each on exactly two edges, and a colour and a number of arrowheads of its own', async () => {
   // His ask, Mon 16 Nov 2026: "instead of using letters a,b, use colors or edge styling to indicate edges which are
   // matched up". The outlined tile's pairs are numbered in the order they are met going round it; pairs.js gives the
-  // k-th its look, and tab 3 colours the same tile in the same order.
+  // k-th its look, and the Zip it up tab colours the same tile in the same order.
   const C = await import('../src/sym/catalog.js');
   const { pairStyle, PAIR_COLORS } = await import('../src/sym/pairs.js');
   const looks = Array.from({ length: 15 }, (_, k) => pairStyle(k).color.join() + '/' + pairStyle(k).heads);

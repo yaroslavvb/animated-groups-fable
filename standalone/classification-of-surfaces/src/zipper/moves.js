@@ -1,10 +1,10 @@
-// moves.js — the motion of one zip in tab 3. playZip() plays a short sequence of phases on the stage and then
+// moves.js — the motion of one zip in the Zip it up tab. playZip() plays a short sequence of phases on the stage and then
 // calls done(), which draws the tidy state that follows. Each phase builds a scene of its own: everything that does
 // not take part is drawn as it stands (view.js), the piece being zipped is drawn here, in motion.
 //
 //   one polygon zipped to itself     Figure 8.1 first: the polygon inflates into a ball with one hole
 //   one rim, arrows opposite         the hole closes like a purse; unzipped arcs of rim stay as eyelets (8.4, 8.6)
-//   one rim, arrows the same way     all of the rim zipped: the crosscap of tab 1 (8.4); with rim left over: two
+//   one rim, arrows the same way     all of the rim zipped: the crosscap of the Zippers tab (8.4); with rim left over: two
 //                                    flaps grow over the hole and meet with a half twist (8.7)
 //   two rims                         the two holes grow tubes that meet (8.3); rim left over stays as an eyelet
 //                                    where they meet (8.8, 8.9)
@@ -205,7 +205,7 @@ function sameRim(a, looksNow, ci, slot, n, A, B) {
   }
 
   if (lenU + lenW === 0) {
-    // all of the rim is zipped to itself crosswise: the crosscap of tab 1
+    // all of the rim is zipped to itself crosswise: the crosscap of the Zippers tab
     return [{
       seconds: 1.5,
       enter: () => {

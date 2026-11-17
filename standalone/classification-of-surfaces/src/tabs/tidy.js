@@ -1,4 +1,4 @@
-// tabs/tidy.js — tab 2, "Tidy surfaces": a sphere with holes, handles, crosscaps and cross-handles (p. 96), built
+// tabs/tidy.js — the "Tidy surfaces" tab: a sphere with holes, handles, crosscaps and cross-handles (p. 96), built
 // with four steppers. Each new piece is zipped on in front of you. The two trades of pp. 101-102 turn every tidy
 // surface into one of the two normal forms of Theorem 8.2; the three numbers of p. 102 tell the forms apart.
 
@@ -139,7 +139,7 @@ export function createTidyTab(ctx) {
   }
 
   // The trades. A cross-handle unzips into its two holes and each is zipped again as a crosscap (Figure 8.10 says
-  // why that is the same surface: tab 3 lets you do it). A handle beside a crosscap: one of its holes takes a walk
+  // why that is the same surface: the Zip it up tab lets you do it). A handle beside a crosscap: one of its holes takes a walk
   // through the crosscap and comes back reversed, so the handle is a cross-handle, which is two crosscaps.
   function trade(from) {
     settle();

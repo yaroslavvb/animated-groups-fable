@@ -1,4 +1,4 @@
-// tabs/prove.js — tab 3, "Zip it up": the Tidying Lemma (pp. 96-100) by hand. A surface is given as polygons whose
+// tabs/prove.js — the "Zip it up" tab: the Tidying Lemma (pp. 96-100) by hand. A surface is given as polygons whose
 // edges carry zips (same colour = one zipper). Tap an arrow and that pair is zipped; what you hold is tidy again:
 // a sphere with holes, handles, crosscaps and cross-handles. When no zip is left, that is the surface's name.
 // engine.js does the bookkeeping, view.js the drawing, moves.js the motion of each zip.
@@ -20,7 +20,7 @@ const PRESETS = [
   { key: 'punched', label: 'The figure-eight hole', words: ['r p q! s t! r- u!', 'p v! s- w!'], pieces: ['the ring', 'the strap'] },
   { key: 'strange', label: 'The strange surface', words: ['r i f! j g! k h! r- u!', 'l m! n o! p q!', 'i s! l t!', 'j v! n w!', 'k x! p y!'], pieces: ['the ring', 'the middle', 'a band', 'a band', 'a band'] },
   { key: 'deal', label: 'Deal four triangles', words: null },
-  { key: 'tile', label: 'A tile from tab 5', words: null, hidden: true },      // filled in by tile()
+  { key: 'tile', label: 'A tile from Symmetries', words: null, hidden: true },      // filled in by tile()
 ];
 
 const NAMES = { 'o0*0x0': 'a sphere', 'o1*0x0': 'a torus', 'o0*0x1': 'a projective plane', 'o0*0x2': 'a Klein bottle', 'o0*1x0': 'a disk', 'o0*2x0': 'an annulus', 'o0*1x1': 'a Möbius band', 'o1*2x0': 'a twice-punched torus', 'o0*2x1': 'a punched Möbius band' };
@@ -80,7 +80,7 @@ export function createProveTab(ctx) {
     history = []; log = []; lastSay = p.note ? p.note() : '';
     colors = new Map();
     let k = 0;
-    const pal = p.key === 'tile' ? PAIR_COLORS : PALETTE;          // a tile from tab 5: the colours its glued pairs have there, in the same order
+    const pal = p.key === 'tile' ? PAIR_COLORS : PALETTE;          // a tile from the Symmetries tab: the colours its glued pairs have there, in the same order
     for (const c of state.comps) for (const e of c.rims[0]) if (e.s && !colors.has(e.id)) colors.set(e.id, pal[k++ % pal.length]);
     for (const b of el.presets.children) b.setAttribute('aria-pressed', String(b.dataset.key === preset.key));
     render(true);
@@ -216,11 +216,11 @@ export function createProveTab(ctx) {
     b.addEventListener('click', () => start(p));
     el.presets.append(b);
   }
-  // the tile of a pattern (tab 5): one polygon; its mirror edges are free edges, its glued edges zips
+  // the tile of a pattern (the Symmetries tab): one polygon; its mirror edges are free edges, its glued edges zips
   function tile(w, label) {
     const p = PRESETS.find((x) => x.key === 'tile');
-    p.words = w; p.label = label ? 'The tile of ' + label : 'A tile from tab 5';
-    p.note = () => `The outlined tile of ${label || 'the pattern'}. Its mirror edges stay open: they end as the rim of a hole. Its coloured edges are zipped, the two of one colour together, as tab 5 colours them. (Cone points and corners do not show here: only the surface.)`;
+    p.words = w; p.label = label ? 'The tile of ' + label : 'A tile from Symmetries';
+    p.note = () => `The outlined tile of ${label || 'the pattern'}. Its mirror edges stay open: they end as the rim of a hole. Its coloured edges are zipped, the two of one colour together, as Symmetries colours them. (Cone points and corners do not show here: only the surface.)`;
     const b = [...el.presets.children].find((c) => c.dataset.key === 'tile');
     if (b) { b.hidden = false; b.textContent = p.label; }
     start(p);

@@ -9,18 +9,19 @@ of surfaces. Reuse 3d visualization code from https://spacesheep.dev/@yaroslavvb
 'Classification of Surfaces' which walks me through the examples in the book by also adding interactive elements"*.
 
 Chapter 8 (printed pp. 93–106) of Conway, Burgiel & Goodman-Strauss, *The Symmetries of Things*, as one 3D stage with
-four tabs, in the book's order, and a fifth for what the chapter is for:
+five tabs: Symmetries first, which is what the chapter is for and the tab the page opens on, then the chapter's
+four in the book's order:
 
 | tab | pages | what you do |
 |---|---|---|
-| 1 Zippers | 93–95 | one hole or two, arrows opposite or the same: scrub a cap, a crosscap, a handle, a cross-handle shut |
-| 2 Tidy surfaces | 96, 101–103 | add holes, handles, crosscaps, cross-handles to a sphere; a hole walks through a crosscap (Fig. 8.11); the trade ⊗ = ××; χ, boundaries, sides |
-| 3 Zip it up | 96–100, Fig. 8.1–8.10 | the Tidying Lemma by hand: tap an arrow, the pair is zipped, what you hold is tidy again |
-| 4 Examples | 104–106 | the book's seven surfaces; count a map, the boundaries, the sides; the symbol follows |
-| 5 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can type (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; type, delete, step a digit |
+| 1 Symmetries | Ch. 2–4, 9, 17–18 | any signature you can type (47 offered) on the sphere, the plane or the hyperbolic plane: the signature, the pattern (drag it), the surface it folds up to; type, delete, step a digit |
+| 2 Zippers | 93–95 | one hole or two, arrows opposite or the same: scrub a cap, a crosscap, a handle, a cross-handle shut |
+| 3 Tidy surfaces | 96, 101–103 | add holes, handles, crosscaps, cross-handles to a sphere; a hole walks through a crosscap (Fig. 8.11); the trade ⊗ = ××; χ, boundaries, sides |
+| 4 Zip it up | 96–100, Fig. 8.1–8.10 | the Tidying Lemma by hand: tap an arrow, the pair is zipped, what you hold is tidy again |
+| 5 Examples | 104–106 | the book's seven surfaces; count a map, the boundaries, the sides; the symbol follows |
 
 The way in: every surface is polygons and zippers; zipping one pair at a time keeps it a sphere with holes, handles,
-crosscaps and cross-handles; two trades remove the cross-handles and the mixed case. Tab 3 lets you do that to the
+crosscaps and cross-handles; two trades remove the cross-handles and the mixed case. The Zip it up tab lets you do that to the
 book's own strange surface (p. 104) from its five pieces and watch it become ○∗∗.
 
 ## Files
@@ -30,12 +31,12 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `dist/index.html` | the built page, one self-contained file (what is deployed) |
 | `src/vendor/the-folding/` | The Folding's `render3d.js`, `palette.js`, `timeline.js`, unchanged (animated-groups-fable `0a82435`) |
 | `src/geo/` | the surface kit: sites and their charts, cells with holes, tubes, the crosscap collar, the flat patch, the twelve-site ball |
-| `src/zipper/` | tab 3: `engine.js` (the lemma's bookkeeping, pure), `view.js` (how a state is drawn), `parts.js` and `moves.js` (the motion of each zip) |
-| `src/examples/` | tab 4: the seven surfaces as cell complexes, their counts computed, the pinwheel |
-| `src/sym/` | tab 5: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
+| `src/zipper/` | the Zip it up tab: `engine.js` (the lemma's bookkeeping, pure), `view.js` (how a state is drawn), `parts.js` and `moves.js` (the motion of each zip) |
+| `src/examples/` | the Examples tab: the seven surfaces as cell complexes, their counts computed, the pinwheel |
+| `src/sym/` | the Symmetries tab: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
 | `src/formulas.mjs` | the LaTeX the page composes while it runs; MathJax typesets everything at build time |
-| `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of tab 5 against its own tile |
+| `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of the Symmetries tab against its own tile |
 | `tools/check_quotes.mjs` | every book citation quotes words that are on that page (needs the PDF and `pdftotext`) |
 
 Build: `node build.mjs` (esbuild through `npx`; MathJax from `~/.cache/mathjax-full-3.2.2`, `npm i mathjax-full@3.2.2`
@@ -43,19 +44,19 @@ there). `--hide prove,name` leaves a tab's button out, `--out dist/x.html` write
 Tests: `node --test`. Quotes: `node tools/check_quotes.mjs`.
 Screenshots: `node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs --root "$PWD" --page dist/index.html --steps steps.json`
 (`window.__surfaces = { show(tab, state), tabs, stage }`; `tabs.prove.dry(id)` runs every phase of a zip at once;
-`tabs.sym.go('*732')`, `tabs.sym.select(i)` and `tabs.sym.pattern.state()` drive and read tab 5).
+`tabs.sym.go('*732')`, `tabs.sym.select(i)` and `tabs.sym.pattern.state()` drive and read the Symmetries tab).
 Publish: `~/git0/flush-util/sheep publish reports/2026-11/2026-11-15-classification-of-surfaces/dist/index.html --as-rendered --name '…'`.
 
 ## How the 3D is built
 
-A body is cut into cells, one round each site: the flat patch of tab 1 has one or two, the ball has the twelve
+A body is cut into cells, one round each site: the flat patch of the Zippers tab has one or two, the ball has the twelve
 pentagons of a dodecahedron. A cell is a polar grid from its hole's rim to its outline; what a zipper makes is a
 separate patch welded to that rim (`src/geo/scene.js`). A zip is drawn by moving vertices, never by changing the mesh:
 the purse closes a hole, a tube half grows along a Bezier arc, the crosscap's collar rises onto its crossing segment.
 The renderer paints the two sides of the paper teal and sand by triangle winding, so where a one-sided surface is
 zipped, teal meets sand along the seam. That is the book's "front against back", for free.
 
-Tab 3's pictures are honest where the book's are: gaping zips leave eyelets (Fig. 8.6, 8.8, 8.9), a gaping crosscap is
+The Zip it up tab's pictures are honest where the book's are: gaping zips leave eyelets (Fig. 8.6, 8.8, 8.9), a gaping crosscap is
 a half-twisted strap across the hole (a punched Möbius band, Fig. 8.7). After each zip the picture is redrawn tidy;
 that step is a cut, not a motion ("we can just push the holes around", p. 96).
 
@@ -73,7 +74,7 @@ else: left-right turns about the vertical, up-down tilts to straight above or be
 the pointer comes home exactly. It does not change the renderer: its listeners sit on the canvas's parent, run after
 the renderer's, and set the view they want. The Folding and The Unfolding have the rolling ball still.
 
-## Tab 5, Symmetries
+## The Symmetries tab
 
 Added the same evening, at his ask: *"Add another tab to that page called Symmetries, where it lets me go through many
 examples of surfaces and lets me visualize the orbifold symbo, the surface surface and, corresponding to it, the
@@ -92,9 +93,9 @@ Three things say the same thing three ways, and every character of the signature
   are red lines, a glide's axis a dashed red line, gyration points and mirror crossings the crystallographers'
   marks (lens, triangle, square, ...). The outlined tile carries arrows and letters on its glued edges.
 - **the surface**, in the 3D pane (`src/sym/surface.js`): a sphere with one hole is drawn as a flat plate with the
-  star's corners as corners (the plate of `*632` is its 30-60-90 triangle); an annulus and a Möbius band are tab 4's
-  own models; everything else is a tidy ball of tab 2 with cone points (as sharp at the tip as a paper cone of
-  angle 2π/n), mirror rims and crosscaps. "Zip the outlined tile up in tab 3" hands the tile's word to tab 3.
+  star's corners as corners (the plate of `*632` is its 30-60-90 triangle); an annulus and a Möbius band are the Examples tab's
+  own models; everything else is a tidy ball of the Tidy surfaces tab with cone points (as sharp at the tip as a paper cone of
+  angle 2π/n), mirror rims and crosscaps. "Zip the outlined tile up in “Zip it up”" hands the tile's word to that tab.
 
 How an example is made (`src/sym/domains.js`): a polygon with angles π/d round an inscribed circle, in whichever
 geometry its angle sum puts it; each edge is a mirror or a seam. All mirrors: the kaleidoscope. Otherwise the tile is
@@ -104,7 +105,7 @@ families; regular polygons with a word give `o`, `xx`, `oo`, `xxx`, `o2`; three 
 
 Nothing about a signature is typed in and believed (`src/sym/orbifold.js`, `test/sym.test.js`): the tile's corners
 are walked round each point they share (total angle 2π/n: a cone point; π/n ending on mirrors: a corner), the mirror
-edges are strung into boundaries, the glued edges are handed to tab 3's bookkeeping for handles and crosscaps, and
+edges are strung into boundaries, the glued edges are handed to the Zip it up tab's bookkeeping for handles and crosscaps, and
 `bind()` fails if that is not the signature shown. The price must agree with the tile's area (Gauss-Bonnet) and the
 geometry; on the sphere the number of tiles must be 2 / (2 − price); no two tiles may overlap.
 
@@ -115,7 +116,7 @@ character; a signature is data, `{ o, cones, stars, x }` (`src/sym/catalog.js` `
 `stepAt`), and any text of that shape is a deep link (`#sym&k=2*632*3x`).
 
 - A crosscap next to handles turns each handle into two crosscaps, and a handle next to a crosscap arrives as two
-  (tab 2's trade, `o x = x x x`); the page says so when it happens.
+  (the Tidy surfaces tab's trade, `o x = x x x`); the page says so when it happens.
 - A signature with no hand-made tile gets the general one (`src/sym/domains.js` `canonical`): the textbook polygon
   of a surface (`a b a⁻¹ b⁻¹` per handle, `c c` per crosscap, `e e⁻¹` round each cone point, a cut out to each mirror
   and back), drawn round an inscribed circle. Then an edge's length depends only on the angles at its ends, so every
@@ -197,7 +198,7 @@ backwards: another orbifold, unless a × is there).
 …#sym&k=\*4 and drag it around, colors flip which is distracting. alos I don't understand what a,b mean in the
 leftmost diagram there. Maybe add explanations/tooltips somewhere or delete it"*). Three things were behind it.
 
-- *Every tile's tone swapped when a drag crossed a mirror*, on the plane and the hyperbolic plane: a bug since tab 5
+- *Every tile's tone swapped when a drag crossed a mirror*, on the plane and the hyperbolic plane: a bug since the Symmetries tab
   was made. The list of tiles is kept centred on the tile nearest the middle of the view (`pattern.js` `recentre`),
   and a tile was painted teal or sand by whether it is a mirror image of THAT tile. Each time the middle moved onto
   a mirror-image neighbour, all the tones swapped. A tile is now teal when it is a copy of the OUTLINED tile and
@@ -205,7 +206,7 @@ leftmost diagram there. Maybe add explanations/tooltips somewhere or delete it"*
   sphere was never affected: nothing is re-centred there.
 - *A flat plate turned from teal to sand when tipped over* (`*4`'s teardrop, and every one-hole orbifold that
   `surface.js` `buildDisc` draws). A plate has nothing to show underneath, so it has one colour on both sides now
-  (`scene.sameBothSides`, read by `stage.js`). A band (`**`) keeps its sand inside, and tabs 1 to 4 are as before.
+  (`scene.sameBothSides`, read by `stage.js`). A band (`**`) keeps its sand inside, and the four chapter tabs are as before.
 - *a, b* are the zips of the outlined tile: two edges with the same letter are glued to each other, arrow onto
   arrow, when the pattern folds up into the surface. The page said so only inside a fold. Now a key sits right
   under the two pictures and names only what is in them (the outlined tile; a, b; a copy of the tile; its mirror
@@ -223,8 +224,8 @@ allows has more than fifteen pairs. The colours keep clear of what the pattern a
 mirrors, blue gyration points) and each stroke has white under it, so a colour reads the same on a teal tile, a sand
 one and the print. The arrowheads still say which way the two edges go together. The key under the pictures shows a
 swatch for each pair on the screen; a pointer anywhere along a glued edge (or a tap) brings out its pair with the
-note. Tab 3 keeps letters, because there they name the buttons that zip a pair, and draws a tile handed over from
-tab 5 in tab 5's colours, pair for pair (`tabs/prove.js`: the `tile` preset takes `PAIR_COLORS`). The blue and red
+note. The Zip it up tab keeps letters, because there they name the buttons that zip a pair, and draws a tile handed over from
+the Symmetries tab in the Symmetries tab's colours, pair for pair (`tabs/prove.js`: the `tile` preset takes `PAIR_COLORS`). The blue and red
 marks at the tile's corners are drawn after its edges now, which would otherwise cover them.
 
 **The surface's labels in the signature's colours, no ring** (his note, the same morning, with a picture of the ring
@@ -236,9 +237,17 @@ fade to half; a chosen digit's dot is a little larger. The renderer writes all l
 unchanged, so `stage.js` colours its label elements from outside, by position, after each render: a marker may carry
 `labelColor` and `labelFaint`. Colour and opacity only, because the renderer measures a label once.
 
+**Symmetries first, and the tab the page opens on** (his ask through the page's Session tab, Mon 16 Nov 2026: *"make
+'symmetries' tab the default first tab"*). It was the fifth tab and the page opened on Zippers. Now it is first in
+the bar and `DEFAULT_TAB` in `src/app.js`, so a plain link opens on it, and so does a deep link whose `#…` part
+spacesheep's viewer has dropped. The four chapter tabs follow in the book's order. The page used to call its tabs by
+number ("tab 3"); with the order changed every such mention would have pointed at the wrong tab, so the page, the
+code's comments and this file now call a tab by its name, which no reordering makes wrong. Deep links are by name
+as before (`#zip`, `#tidy`, `#prove`, `#name`, `#sym`).
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
-(`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in tab 3 (only the surface); the
+(`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in the Zip it up tab (only the surface); the
 hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the rest of the rim is tinted.
 
 ## What is not there
@@ -257,7 +266,7 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   inside its tile on every example; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
   of the 47 examples each found as its example, with the example's tile; the four kinds without a pattern and what
   is offered for them, each offer having a pattern). The zipping's bookkeeping against an independent count of the glued surface (400 random
-  gluings, three zip orders each); the seven examples' counts against the book's table; tab 5: the 47 examples and
+  gluings, three zip orders each); the seven examples' counts against the book's table; the Symmetries tab: the 47 examples and
   1,345 more signatures (every `*pqr` and `pqr` with digits 2 to 9, every family over its numbers) each folded up
   from its own tile, its price against its area, the sphere's tile counts (`*532`: 120), no two tiles overlapping;
   400 random signatures (over 250 of them on the general tile) folded up the same way; every signature of at most
@@ -269,10 +278,10 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
   And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.
   Not tried on a real phone.
-- Tab 5 with a real mouse in headless Chrome: a long drag in each geometry (after six strokes across the hyperbolic
+- The Symmetries tab with a real mouse in headless Chrome: a long drag in each geometry (after six strokes across the hyperbolic
   disc the view is still an exact motion and the disc is full), once round a circle on the ball comes home exactly,
   the digit stepper, next and previous, the chips, `#sym&k=*732`, coming in by the tab button at 1280 and 390 px;
-  and every one of the 47 tiles zipped up in tab 3 ends as the surface tab 5 shows, as do twelve signatures made
+  and every one of the 47 tiles zipped up in the Zip it up tab ends as the surface the Symmetries tab shows, as do twelve signatures made
   by hand on the general tile (93 zips in all). Editing with real clicks: add a crosscap to `*632`, remove it,
   remove the mirror of `3*3` (no pattern, and the page says so), a deep link to `o2*3x`. In WebKit on the M5: all
   47 examples at both widths, the add row and remove with real taps, fifteen signatures of one's own, a touch drag
@@ -298,16 +307,16 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   off again) and by a mouse. The published copy inside spacesheep's viewer: 33 of 33 teal on `*632`, the key, the note.
   Colours for letters (Mon 16 Nov 2026): twenty signatures looked at in Chrome (one to eight pairs, all three
   geometries); at 1280 and 390 px `632`'s four glued edges are two looks, the canvas shows each edge in its own
-  colour at its middle, the key shows the same two swatches, a mouse on an edge brings its note, and tab 3 opens
+  colour at its middle, the key shows the same two swatches, a mouse on an edge brings its note, and the Zip it up tab opens
   the tile with its two zips in those two colours. In WebKit on the M5 the same at both widths, the note by a
   finger; the published copy inside spacesheep's viewer likewise.
   One print, bare pane, coloured labels (Mon 16 Nov 2026): in Chrome at 1280 and 390 px the pattern pane carries its
   reset button and nothing else after the first touch, an old link with `&p=tomoe` opens its signature and the
   address drops the `p`; the surface of `2*632*3x` writes its eight labels in the bar's own computed colours, a
-  chosen one stays while seven fade, no ring marker is made, and tabs 1 to 4 are unchanged. The same in WebKit on the
+  chosen one stays while seven fade, no ring marker is made, and the four chapter tabs are unchanged. The same in WebKit on the
   M5 at both widths and in the published copy.
-  Not tried on a real phone; no reader other than the author has gone through tab 5 yet.
+  Not tried on a real phone; no reader other than the author has gone through the Symmetries tab yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied
   (which way the arrows run is now always said "round the rim"; the trade of a cross-handle for two crosscaps links
-  to Figure 8.10 in tab 3; the pinwheel is explained; the symbol is worked out from the three numbers).
+  to Figure 8.10 in the Zip it up tab; the pinwheel is explained; the symbol is worked out from the three numbers).

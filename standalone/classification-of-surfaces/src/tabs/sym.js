@@ -1,4 +1,4 @@
-// tabs/sym.js — tab 5, "Symmetries": a signature, the pattern that has it, and the surface the pattern folds up to.
+// tabs/sym.js — the "Symmetries" tab, the first in the bar and the one the page opens on: a signature, the pattern that has it, and the surface the pattern folds up to.
 //
 // Three things on the screen say the same thing three ways, and every character of the signature ties them together:
 //   the signature   ∗632, in a bar that is typed into like a line of text: o, 2 .. 9, * and x add a character after
@@ -7,7 +7,7 @@
 //                   does the same for a finger
 //   the pattern     drawn in the geometry it lives in (src/sym/pattern.js): a sphere, the plane or the hyperbolic
 //                   plane, in one of six designs (src/sym/motifs.js)
-//   the surface     the pattern's orbifold in the 3D pane (src/sym/surface.js): a tidy surface of tab 2 with cone points
+//   the surface     the pattern's orbifold in the 3D pane (src/sym/surface.js): a tidy surface of the Tidy surfaces tab with cone points
 //                   and corners
 // Which geometry it is follows from the signature's price (the Magic Theorem): under $2 a sphere, exactly $2 the
 // plane, over $2 the hyperbolic plane. ANY signature can be made: one that has no hand-made tile gets the general
@@ -166,7 +166,7 @@ export function createSymTab(ctx) {
 
   // what the chosen character stands for, in this signature's own numbers
   function say() {
-    const trade = note === 'trade' ? `Beside a crosscap a handle is two crosscaps more: ${M('tradeO')} (<a href="#tidy&amp;k=ox">tab 2</a>). ` : '';
+    const trade = note === 'trade' ? `Beside a crosscap a handle is two crosscaps more: ${M('tradeO')} (<a href="#tidy&amp;k=ox">Tidy surfaces</a>). ` : '';
     if (on() === null) { el.say.innerHTML = trade; return; }
     const k = model.tokens[sel], kind = kindOf(sel), f = priceOf(sel), price = `<span class="nb">costs $${mixed(f)}</span>`, g = `<b class="${isBlue(sel) ? 'is-blue' : 'is-red'}">${glyph(k)}</b>`;
     const n = k.v;

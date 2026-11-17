@@ -15,7 +15,7 @@ export function createStage(canvas, labelLayer) {
   const mq = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
   const stage = { R, scene: null, extraLines: null, extraMarkers: null };
   const still = () => !!R.reducedMotion;
-  // A scene may ask for one colour on both of its sides (scene.sameBothSides: tab 5's flat plates, which otherwise turn
+  // A scene may ask for one colour on both of its sides (scene.sameBothSides: the Symmetries tab's flat plates, which otherwise turn
   // from teal to sand as a drag tips them over; his note, Mon 16 Nov 2026: "colors flip which is distracting").
   const sides = () => ({ front: THEME.front, back: stage.scene && stage.scene.sameBothSides ? THEME.front : THEME.back });
   function applyTheme() {

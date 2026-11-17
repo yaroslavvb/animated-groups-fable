@@ -19,6 +19,9 @@ const app = $('app');
 const stage = createStage($('view'), $('labels'));
 const turnHint = $('turn-hint');
 
+// The tab the page opens on when its address names none: Symmetries, which is also first in the bar (his ask, Mon 16
+// Nov 2026: "make 'symmetries' tab the default first tab"). The page calls its tabs by name, never by number.
+const DEFAULT_TAB = 'sym';
 let current = null, currentName = '';
 const timeline = createTimeline({
   slider: $('scrubber'), button: $('play'), labels: { fold: 'Zip', unfold: 'Unzip', pause: 'Pause' },
@@ -29,11 +32,11 @@ const timeline = createTimeline({
 const ctx = {
   stage, timeline, badge: $('badge'),
   changed() { syncText(); scheduleHash(); },
-  // show a surface in its tidy form: tab 2 with these counts ({ o, star, x, X })
+  // show a surface in its tidy form: the Tidy surfaces tab with these counts ({ o, star, x, X })
   goTidy(counts) { show('tidy'); tabs.tidy.setAll(counts); },
-  // zip a surface up from its pieces: tab 3 with that preset
+  // zip a surface up from its pieces: the Zip it up tab with that preset
   goProve(key) { show('prove'); tabs.prove.start(key); },
-  // zip one polygon up: tab 3 with the tile of a pattern (tab 5)
+  // zip one polygon up: the Zip it up tab with the tile of a pattern (the Symmetries tab)
   goProveWords(words, label) { show('prove'); tabs.prove.tile(words, label); window.scrollTo({ top: 0 }); },
 };
 const tabs = { zip: createZipTab(ctx), tidy: createTidyTab(ctx), prove: createProveTab(ctx), name: createNameTab(ctx), sym: createSymTab(ctx) };
@@ -46,7 +49,7 @@ function syncText() {
 }
 
 function show(name, state) {
-  if (!tabs[name]) name = 'zip';
+  if (!tabs[name]) name = DEFAULT_TAB;
   if (current && current.leave) current.leave();
   stage.stopAll();
   stage.extraLines = null; stage.extraMarkers = null;
@@ -86,11 +89,11 @@ function writeHash() {
 }
 function readHash() {
   const parts = location.hash.replace(/^#/, '').split('&').filter(Boolean);
-  const name = parts.shift() || 'zip', state = {};
+  const name = parts.shift() || DEFAULT_TAB, state = {};
   for (const p of parts) { const i = p.indexOf('='); if (i > 0) state[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); }
   return [name, state];
 }
-// a link followed or an address typed: another tab, or another state of this one (#sym&k=*732 while tab 5 is open)
+// a link followed or an address typed: another tab, or another state of this one (#sym&k=*732 while the Symmetries tab is open)
 window.addEventListener('hashchange', () => { const [name, state] = readHash(); if (name !== currentName || location.hash !== lastHash) show(name, state); });
 
 if (!stage.R.ok) { const p = document.createElement('p'); p.className = 'r3d-message'; p.textContent = 'The 3D view needs WebGL 2, which this browser does not offer.'; $('pane').append(p); turnHint.hidden = true; }

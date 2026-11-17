@@ -21,7 +21,7 @@
 </head>
 <body>
 <!--__MATH_CACHE__-->
-<div class="app" id="app" data-tab="zip">
+<div class="app" id="app" data-tab="sym">
 
   <header class="hdr">
     <h1 class="title">Classification of Surfaces</h1>
@@ -29,11 +29,11 @@
   </header>
 
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections of the chapter">
-    <button type="button" role="tab" class="tab" data-tab="zip" aria-selected="true"><span class="tab-n">1</span>Zippers</button>
-    <button type="button" role="tab" class="tab" data-tab="tidy" aria-selected="false"><span class="tab-n">2</span>Tidy surfaces</button>
-    <button type="button" role="tab" class="tab" data-tab="prove" aria-selected="false"><span class="tab-n">3</span>Zip it up</button>
-    <button type="button" role="tab" class="tab" data-tab="name" aria-selected="false"><span class="tab-n">4</span>Examples</button>
-    <button type="button" role="tab" class="tab" data-tab="sym" aria-selected="false"><span class="tab-n">5</span>Symmetries</button>
+    <button type="button" role="tab" class="tab" data-tab="sym" aria-selected="true"><span class="tab-n">1</span>Symmetries</button>
+    <button type="button" role="tab" class="tab" data-tab="zip" aria-selected="false"><span class="tab-n">2</span>Zippers</button>
+    <button type="button" role="tab" class="tab" data-tab="tidy" aria-selected="false"><span class="tab-n">3</span>Tidy surfaces</button>
+    <button type="button" role="tab" class="tab" data-tab="prove" aria-selected="false"><span class="tab-n">4</span>Zip it up</button>
+    <button type="button" role="tab" class="tab" data-tab="name" aria-selected="false"><span class="tab-n">5</span>Examples</button>
   </nav>
 
   <main class="main" id="main">
@@ -164,7 +164,7 @@
 
         <!-- 5 Symmetries -->
         <div class="panel" data-tab-only="sym">
-          <div class="row"><button type="button" class="chip" id="sym-zip">Zip the outlined tile up in tab 3</button></div>
+          <div class="row"><button type="button" class="chip" id="sym-zip">Zip the outlined tile up in “Zip it up”</button></div>
           <div class="sympresets" id="sym-presets"></div>
         </div>
 
@@ -226,7 +226,7 @@
         <p data-when="tidy:any">Press + to add a hole, a handle, a crosscap or a cross-handle. Where each sits does not matter. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
         <p data-when="tidy:X">A cross-handle is two crosscaps, \(\otimes = \times\times\): one square zips up to either. <a href="#prove&amp;k=fig810" data-go="prove" data-k="fig810">Zip it both ways</a> <a class="bk" data-p="101" data-q="a cross-handle may be replaced by two cross-caps">p. 101</a></p>
         <p data-when="tidy:ox">Next to a crosscap a handle can be made a cross-handle: unzip it, walk one of its two holes through the crosscap, and that hole’s arrow comes back reversed. So \(\circ\times = \otimes\times = \times\times\times\). <a class="bk" data-p="102" data-q="so that it returns with the reversed orientation">p. 102</a></p>
-        <p data-when="tidy:done">Nothing to trade. Trading always ends at handles and holes, \(\circ\cdots\circ\,\ast\cdots\ast\), or at holes and crosscaps, \(\ast\cdots\ast\,\times\cdots\times\). <a href="#prove" data-go="prove">Tab 3</a> shows that every surface is tidy to begin with. <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></p>
+        <p data-when="tidy:done">Nothing to trade. Trading always ends at handles and holes, \(\circ\cdots\circ\,\ast\cdots\ast\), or at holes and crosscaps, \(\ast\cdots\ast\,\times\cdots\times\). <a href="#prove" data-go="prove">Zip it up</a> shows that every surface is tidy to begin with. <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></p>
       </div>
 
     </div>
@@ -246,7 +246,7 @@
     </details>
     <details class="fold" data-tab-only="tidy">
       <summary>Why the book needs this</summary>
-      <p>Fold a repeating pattern up and you get its orbifold: one of these surfaces, with cone points inside and corner points on its boundaries. So the symbols \(\circ\), \(\ast\) and \(\times\) are all a signature can hold besides its numbers: wonders, kaleidoscopes and miracles. <a href="#sym" data-go="sym">Tab 5</a> shows them. <a class="bk" data-p="102" data-q="really are all that’s needed to specify its orbifold">p. 102</a></p>
+      <p>Fold a repeating pattern up and you get its orbifold: one of these surfaces, with cone points inside and corner points on its boundaries. So the symbols \(\circ\), \(\ast\) and \(\times\) are all a signature can hold besides its numbers: wonders, kaleidoscopes and miracles. <a href="#sym" data-go="sym">Symmetries</a> shows them. <a class="bk" data-p="102" data-q="really are all that’s needed to specify its orbifold">p. 102</a></p>
     </details>
     <details class="fold" data-tab-only="prove">
       <summary>What you are doing</summary>
@@ -259,7 +259,7 @@
     <details class="fold" data-tab-only="sym">
       <summary>The three pictures</summary>
       <p>Each tile carries the same print, a family of commas, in the darker tone of its colour. A comma has a hand and no symmetry of its own, so the pattern has exactly the signature's. Teal tiles are copies of the outlined tile that the symmetry moved without turning it over; sand tiles are its mirror images. Fold the pattern so that every tile lies on the outlined one: the sand ones land face down, the two sides of one sheet.</p>
-      <p>What happens to the outlined tile's edges gives the surface. A mirror edge (red) stays an edge: the rim of a hole. Two edges of the same colour (and the same number of arrowheads) are zipped along their arrows, as in <a href="#prove" data-go="prove">tab 3</a>, which uses the same colours. Corners that meet at a point make a cone point, or a corner of the rim if they meet on a mirror.</p>
+      <p>What happens to the outlined tile's edges gives the surface. A mirror edge (red) stays an edge: the rim of a hole. Two edges of the same colour (and the same number of arrowheads) are zipped along their arrows, as in <a href="#prove" data-go="prove">Zip it up</a>, which uses the same colours. Corners that meet at a point make a cone point, or a corner of the rim if they meet on a mirror.</p>
     </details>
     <details class="fold" data-tab-only="sym">
       <summary>The Magic Theorem</summary>
@@ -271,7 +271,7 @@
       </ul>
       <p>Any signature you can write has a price, and with the row under the signature you can write any: only a handful under $2 have no pattern. <a class="bk" data-p="237" data-q="there were “bad” signatures">p. 237</a></p>
       <p>Where a number stands matters: before the star it is a turn (blue), after a star a crossing of that many mirrors (red). So 4∗ and ∗4 are different things, and only the first has a pattern. What does not matter: the order of the blue numbers, which number of a star comes first, reading every star backwards, and the order of the stars. Type any of these and the page shows the usual spelling. <a class="bk" data-p="231" data-q="freely permute the digits">p. 231</a></p>
-      <p>The price is what each thing takes off the Euler characteristic of <a href="#tidy" data-go="tidy">tab 2</a>: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
+      <p>The price is what each thing takes off the Euler characteristic of <a href="#tidy" data-go="tidy">Tidy surfaces</a>: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
     </details>
     <details class="fold" data-tab-only="sym">
       <summary>The hyperbolic plane on a flat screen</summary>
@@ -282,9 +282,9 @@
       <summary>The chapter in four steps</summary>
       <ol class="argument">
         <li>A surface is polygons with zippers on their edges.</li>
-        <li>Zip one pair at a time. Each zip joins two pieces or makes a cap, a crosscap, a handle or a cross-handle, and may leave holes. So every surface is tidy. <a href="#prove" data-go="prove">Tab 3</a> <a class="bk" data-p="96" data-q="Every surface is topologically equivalent to a “tidy” one">p. 96</a></li>
-        <li>A cross-handle is two crosscaps, and next to a crosscap a handle is two more. So every surface is handles and holes, or holes and crosscaps. <a href="#tidy" data-go="tidy">Tab 2</a> <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></li>
-        <li>No two of these are the same surface: they differ in sides, in boundaries or in Euler characteristic. <a href="#name" data-go="name">Tab 4</a> counts them. <a class="bk" data-p="102" data-q="so that the numbers a, b, and c are invariants">p. 102</a></li>
+        <li>Zip one pair at a time. Each zip joins two pieces or makes a cap, a crosscap, a handle or a cross-handle, and may leave holes. So every surface is tidy. <a href="#prove" data-go="prove">Zip it up</a> <a class="bk" data-p="96" data-q="Every surface is topologically equivalent to a “tidy” one">p. 96</a></li>
+        <li>A cross-handle is two crosscaps, and next to a crosscap a handle is two more. So every surface is handles and holes, or holes and crosscaps. <a href="#tidy" data-go="tidy">Tidy surfaces</a> <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></li>
+        <li>No two of these are the same surface: they differ in sides, in boundaries or in Euler characteristic. <a href="#name" data-go="name">Examples</a> counts them. <a class="bk" data-p="102" data-q="so that the numbers a, b, and c are invariants">p. 102</a></li>
       </ol>
     </details>
 

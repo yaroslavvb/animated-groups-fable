@@ -1,4 +1,4 @@
-// examples.test.js — tab 4, "Examples" (pp. 104-106). The three numbers of every example surface are COUNTED on
+// examples.test.js — the "Examples" tab (pp. 104-106). The three numbers of every example surface are COUNTED on
 // its welded map (src/examples/complex.js); this file holds the book's values and checks the counting against them.
 //
 //   node --test test/examples.test.js
