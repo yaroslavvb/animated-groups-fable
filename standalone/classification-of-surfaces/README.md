@@ -36,12 +36,16 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `src/sym/` | the Symmetries tab: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
 | `src/sync.js` | one screen drives the others: the owner's open page sends its state through a spacesheep page stream, every other screen takes it |
+| `src/sharehash.js` | the address a reader can copy follows the page: inside spacesheep's viewer the page tells the viewer its fragment |
+| `src/showcase.template.html`, `src/showcase.js`, `src/showcase.css` | the Orbifold showcase: the Symmetries tab on its own page, built from this source into `../2026-11-17-orbifold-showcase/site/` |
 | `src/formulas.mjs` | the LaTeX the page composes while it runs; MathJax typesets everything at build time |
 | `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of the Symmetries tab against its own tile |
 | `tools/check_quotes.mjs` | every book citation quotes words that are on that page (needs the PDF and `pdftotext`) |
 
 Build: `node build.mjs` (esbuild through `npx`; MathJax from `~/.cache/mathjax-full-3.2.2`, `npm i mathjax-full@3.2.2`
-there). `--hide prove,name` leaves a tab's button out, `--out dist/x.html` writes another file.
+there). `--hide prove,name` leaves a tab's button out, `--out dist/x.html` writes another file;
+`--template`, `--entry` and `--css a.css,b.css` build another page from the same source (the showcase:
+`node build.mjs --template src/showcase.template.html --entry src/showcase.js --css src/styles.css,src/showcase.css --out ../2026-11-17-orbifold-showcase/site/index.html`).
 Tests: `node --test`. Quotes: `node tools/check_quotes.mjs`.
 Screenshots: `node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs --root "$PWD" --page dist/index.html --steps steps.json`
 (`window.__surfaces = { show(tab, state), tabs, stage }`; `tabs.prove.dry(id)` runs every phase of a zip at once;
@@ -315,6 +319,30 @@ ask: *"address the comments Chaim left"*, then *"When you fix them, make sure to
 - Both threads were answered on the page with one line each and a link, marked `<ai>` (replies `5a49a7a1…` and
   `45e51710…`); the threads are left open for him.
 
+**The Orbifold showcase, and what it changed here** (Tue 17 Nov 2026, week 47; his ask: *"Create a little showcase
+just the symmetries tab only, and also generate a video I can post on twitter ... the goal is interactive toy for
+people learning about Orbifolds, maybe hide the explanation below a tutorial tab ... along with things that can be
+tried, and a separate link to tutorial"*). The page and its video are in
+[`../2026-11-17-orbifold-showcase/`](../2026-11-17-orbifold-showcase/README.md); it is this tab's module on a page of
+its own (`src/showcase.*`), so the two cannot drift apart. What changed in the shared code:
+
+- **Deleting a star keeps its numbers** (`catalog.js` `removeAt`). It used to take the star's corners with it:
+  `*632` without its star was the empty signature. Now it is as in a line of text: the numbers stay and belong to
+  what stands before them, the star before it or, with none, the cone points, so `*632` becomes `632` (the mirrors
+  go, the triangle closes into a pillow) and `3*3` becomes `33`. Where the result would not fit the limits below,
+  the star goes with its numbers as before.
+- **The address bar follows the page** (`src/sharehash.js`). On spacesheep the page runs in a frame and the address
+  belongs to the viewer round it. The viewer takes a page's fragment only when the page says
+  `{type: "ss-hash", hash}`; its own bridge says so on a `hashchange`, and these pages write their address with
+  `replaceState`, which fires none. So the page says it itself, in the characters the viewer takes
+  (`[A-Za-z0-9_.=%&/-]`: the star of a signature travels as `%2A`, and the page reads either spelling). The state a
+  plain link opens is told as no fragment at all, so the plain link stays plain; another tab or signature reads
+  `...#sym&k=%2A732`, and that address opens the same thing for whoever gets it.
+- A broken escape in a typed address (`#sym&k=%zz`) used to stop the page from starting; that part is now ignored.
+- The tab's module no longer needs every control to be there (the example arrows and "Zip the outlined tile up" are
+  absent on the showcase), and `initBookRefs(pop, { open: false })` shows a citation's words without the link to
+  the scan, which only his tailnet serves.
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in the Zip it up tab (only the surface); the
@@ -330,7 +358,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 77 tests (the newest: a motion put back onto the group keeps the hand it is told, in all three
+- `node --test`: 81 tests (the newest: the address told to spacesheep's viewer holds only the characters it takes,
+  and deleting a star keeps its numbers; before them: a motion put back onto the group keeps the hand it is told, in all three
   geometries; before it: on every example's tile and seven tiles of one's own each glued pair sits on
   exactly two edges and the pairs are numbered from the first, and fifteen pairs get fifteen different looks, none
   of them near the pattern's red or blue; the five before it: typing and deleting a signature character by character; the print
@@ -344,7 +373,11 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   four characters over `o 2 3 5 * x` either has a tile in the right geometry or is one of the ones without a
   pattern, and the spherical ones among them are exactly the fourteen types; adding, removing, stepping, the trade.
 - Every zip of every preset and of 40 random deals, in three orders, stepped through all its phases in a browser: no error.
-- `node tools/check_quotes.mjs`: 75 citations, each at most 15 words and on its page.
+- `node tools/check_quotes.mjs`: 88 citations in the two templates, each at most 15 words and on its page.
+- The address, Tue 17 Nov 2026: 20 checks of both pages inside a frame (what each tells its parent, a fragment handed
+  down with `%2A`, a plain link staying plain, a broken escape); and on the published copies inside spacesheep's
+  viewer, a fresh session each: the plain link stays plain, another signature reads `...#sym&k=%2A732`, and that
+  address opens the same signature.
 - Looked at in headless Chrome at 1280 and 390 px wide, light and dark, with reduced motion; a real tap on an arrow,
   the chips, Unzip, and the deep links (`#zip&kind=handle`, `#tidy&k=oox*`, `#prove&k=fig810`, `#name&k=klein`).
   And in WebKit (Safari's engine) on the M5, at 390 and 1280 px: no error, no sideways scroll, the same layout as Chrome.

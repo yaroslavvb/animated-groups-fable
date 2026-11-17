@@ -17,6 +17,7 @@ import { createProveTab } from './tabs/prove.js';
 import { createNameTab } from './tabs/name.js';
 import { createSymTab } from './tabs/sym.js';
 import { createSync } from './sync.js';
+import { shareHash } from './sharehash.js';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -82,6 +83,7 @@ $('view').addEventListener('pointerdown', () => { turnHint.hidden = true; }, { o
 
 // ---- the hash: #<tab>&k=<state>
 let hashTimer = 0, lastHash = '';
+const HOME = '#' + DEFAULT_TAB + '&k=*632';      // what a plain link opens (tabs/sym.js starts on *632): told to the viewer as no fragment at all
 function scheduleHash() { clearTimeout(hashTimer); hashTimer = setTimeout(writeHash, 250); }
 function writeHash() {
   const s = current && current.get ? current.get() : {};
@@ -90,11 +92,12 @@ function writeHash() {
   const h = '#' + parts.join('&');
   lastHash = h;
   try { if (location.hash !== h) history.replaceState(null, '', h); } catch (e) { /* a sandboxed frame may refuse: the page works without */ }
+  shareHash(h === HOME ? '#' : h);     // on spacesheep: the address bar follows the tab and its state
 }
 function readHash() {
   const parts = location.hash.replace(/^#/, '').split('&').filter(Boolean);
   const name = parts.shift() || DEFAULT_TAB, state = {};
-  for (const p of parts) { const i = p.indexOf('='); if (i > 0) state[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); }
+  for (const p of parts) { const i = p.indexOf('='); if (i > 0) { try { state[p.slice(0, i)] = decodeURIComponent(p.slice(i + 1)); } catch (e) { /* a broken escape (#sym&k=%zz): that part is ignored */ } } }
   return [name, state];
 }
 // a link followed or an address typed: another tab, or another state of this one (#sym&k=*732 while the Symmetries tab is open)

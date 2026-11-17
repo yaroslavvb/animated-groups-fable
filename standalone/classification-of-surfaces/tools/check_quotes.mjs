@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // check_quotes.mjs — every book citation of the page quotes words that are on that page of the book.
 //   node tools/check_quotes.mjs [path to the PDF]
-// Reads data-p / data-q from src/index.template.html and the FIGS table of src/tabs/prove.js, extracts each cited
+// Reads data-p / data-q from src/index.template.html, src/showcase.template.html and the FIGS table of src/tabs/prove.js, extracts each cited
 // page with pdftotext (PDF page = printed page + 19) and looks for the words, ignoring line breaks, hyphenation at
 // line ends and the kind of quote marks. A quote is at most 15 words (the house rule). Exit 1 on any miss.
 import fs from 'node:fs';
@@ -13,8 +13,11 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PDF = process.argv[2] || path.join(os.homedir(), 'git0/animated-groups/Conway J., Goodman-Strauss C. (2008) The Symmetries of Things.pdf');
 const cites = [];
-const tpl = fs.readFileSync(path.join(ROOT, 'src/index.template.html'), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
-for (const m of tpl.matchAll(/data-p="(\d+)"\s+data-q="([^"]+)"/g)) cites.push({ p: +m[1], q: m[2], from: 'template' });
+for (const name of ['src/index.template.html', 'src/showcase.template.html']) {
+  if (!fs.existsSync(path.join(ROOT, name))) continue;
+  const tpl = fs.readFileSync(path.join(ROOT, name), 'utf8').replace(/<!--[\s\S]*?-->/g, '');
+  for (const m of tpl.matchAll(/data-p="(\d+)"\s+data-q="([^"]+)"/g)) cites.push({ p: +m[1], q: m[2], from: path.basename(name) });
+}
 for (const dir of ['src/tabs', 'src/zipper', 'src/examples']) {
   const d = path.join(ROOT, dir);
   if (!fs.existsSync(d)) continue;

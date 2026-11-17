@@ -116,7 +116,7 @@ export function createSymTab(ctx) {
     el.plus.disabled = !digit || !stepAt(sig, ref, 1);
     for (const b of el.adds) b.disabled = !addTo(sig, b.dataset.add, cursor());
     el.remove.disabled = empty;
-    el.zip.disabled = !D || empty;
+    if (el.zip) el.zip.disabled = !D || empty;
     // the price, part by part, on a ruler from $0 to $4 (longer for a dearer signature) with its mark at $2
     const span = Math.max(4, Math.ceil(fval(cost)));
     el.bar.textContent = '';
@@ -147,7 +147,7 @@ export function createSymTab(ctx) {
     if (name !== text) { el.canon.textContent = toPretty(tokensOf(parse(name))); el.canon.dataset.k = name; el.usual.textContent = name === textOf(canon(sig)) ? 'larger numbers first' : 'as the book lists it'; }
     for (const b of el.presets.querySelectorAll('.chip')) b.setAttribute('aria-pressed', String(b.dataset.k === name));
     const i0 = ALL.indexOf(name);
-    el.prev.disabled = i0 === 0; el.next.disabled = i0 === ALL.length - 1;
+    if (el.prev) { el.prev.disabled = i0 === 0; el.next.disabled = i0 === ALL.length - 1; }
   }
 
   // a signature no pattern has: why, in its own numbers, and the nearest ones that do have one
@@ -274,14 +274,13 @@ export function createSymTab(ctx) {
   const hop = (d) => { const i = ALL.indexOf(spelled(sig)), j = i < 0 ? 0 : i + d; if (j >= 0 && j < ALL.length) go(ALL[j]); };
   el.canon.addEventListener('click', () => usual());
   el.bad.addEventListener('click', (e) => { const b = e.target.closest && e.target.closest('.trychip'); if (b) go(b.dataset.k); });
-  el.prev.addEventListener('click', () => hop(-1));
-  el.next.addEventListener('click', () => hop(1));
+  if (el.prev) { el.prev.addEventListener('click', () => hop(-1)); el.next.addEventListener('click', () => hop(1)); }      // the showcase page has no example arrows
   el.minus.addEventListener('click', () => bump(-1));
   el.plus.addEventListener('click', () => bump(1));
   for (const b of el.adds) b.addEventListener('click', () => add(b.dataset.add));
   el.remove.addEventListener('click', remove);
   el.cells.addEventListener('click', (e) => { if (e.target === el.cells && sel !== null) select(null); });      // a tap on the bar beside the characters: the cursor to the end
-  el.zip.addEventListener('click', () => { if (model.A && model.tokens.length) ctx.goProveWords([model.A.word], toPretty(model.tokens)); });
+  if (el.zip) el.zip.addEventListener('click', () => { if (model.A && model.tokens.length) ctx.goProveWords([model.A.word], toPretty(model.tokens)); });
   el.reset.addEventListener('click', () => pattern.resetView());
   $('pattern').addEventListener('pointerdown', () => { el.hint.hidden = true; }, { once: true });
   return {

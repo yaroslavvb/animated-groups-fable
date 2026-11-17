@@ -12,11 +12,12 @@ export function bookLink(page, words, text = 'p. ' + page) {
   return `<a class="bk" href="${PDF}#page=${page + OFFSET}" target="_blank" rel="noopener" data-p="${page}" data-q="${q}" aria-label="${text}: “${q}”">${text}</a>`;
 }
 
-export function initBookRefs(pop) {
+/** open: false for a page meant for everyone: the citation shows its words and names the book, and links nowhere (the scan is on his tailnet only). */
+export function initBookRefs(pop, { open = true } = {}) {
   let shown = null, hideTimer = 0;
   for (const a of document.querySelectorAll('a.bk')) {
-    a.href = `${PDF}#page=${Number(a.dataset.p) + OFFSET}`;
-    a.target = '_blank'; a.rel = 'noopener';
+    if (open) { a.href = `${PDF}#page=${Number(a.dataset.p) + OFFSET}`; a.target = '_blank'; a.rel = 'noopener'; }
+    else { a.removeAttribute('href'); a.tabIndex = 0; a.setAttribute('role', 'note'); }
     a.setAttribute('aria-label', `${a.textContent}: “${a.dataset.q}”`);
   }
   function show(a) {
@@ -25,9 +26,8 @@ export function initBookRefs(pop) {
     shown = a;
     pop.textContent = '';
     const q = document.createElement('q'); q.textContent = a.dataset.q;
-    const src = document.createElement('span'); src.className = 'bkpop-src'; src.textContent = `${BOOK}, ${a.textContent} · `;
-    const open = document.createElement('a'); open.href = a.href; open.target = '_blank'; open.rel = 'noopener'; open.textContent = 'open the page';
-    src.append(open);
+    const src = document.createElement('span'); src.className = 'bkpop-src'; src.textContent = `${BOOK}, ${a.textContent}${open ? ' · ' : ''}`;
+    if (open) { const link = document.createElement('a'); link.href = a.href; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'open the page'; src.append(link); }
     pop.append(q, src);
     pop.hidden = false;
     const r = a.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight, vw = document.documentElement.clientWidth, vh = window.innerHeight;
@@ -47,6 +47,7 @@ export function initBookRefs(pop) {
   document.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest('a.bk');
     if (!a) return;
+    if (!open) { e.preventDefault(); if (shown === a && performance.now() - lastTouch < 800) hide(); else show(a); return; }
     if (performance.now() - lastTouch < 800 && shown !== a) { e.preventDefault(); show(a); }
     else if (performance.now() - lastTouch < 800 && shown === a) { e.preventDefault(); }
   });

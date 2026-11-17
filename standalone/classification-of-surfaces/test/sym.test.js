@@ -172,7 +172,13 @@ test('adding, removing and stepping', async () => {
   assert.equal(T(r.sig), '*223*4'); assert.deepEqual(r.ref, { kind: 'corner', s: 0, i: 1 });
   assert.equal(T(C.addTo(C.parse('*23*4'), 'corner').sig), '*23*42', 'with nothing chosen: on the last mirror');
   assert.equal(T(C.addTo(C.parse('*23*4'), 'corner', { kind: 'star', s: 0 }).sig), '*223*4', 'with the cursor on the star: its first corner');
-  assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'star', s: 0 })), '2x', 'a mirror goes with its corners');
+  // a star deleted as from a line of text: its numbers stay and belong to what stands before them (Tue 17 Nov 2026)
+  assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'star', s: 0 })), '223x', 'the star goes, its numbers are cone points now');
+  assert.equal(T(C.removeAt(C.parse('*632'), { kind: 'star', s: 0 })), '632', '*632 without its mirrors is 632');
+  assert.equal(T(C.removeAt(C.parse('2*23*45'), { kind: 'star', s: 1 })), '2*2345', 'the second star\'s numbers join the first star\'s');
+  assert.equal(T(C.removeAt(C.parse('2*23*45'), { kind: 'star', s: 0 })), '223*45');
+  assert.equal(T(C.removeAt(C.parse('*222222*222222'), { kind: 'star', s: 1 })), '*222222', 'twelve corners on one mirror would not fit: the star takes its own with it');
+  assert.equal(T(C.removeAt(C.parse('3*'), { kind: 'star', s: 0 })), '3');
   assert.equal(T(C.removeAt(C.parse('2*23x'), { kind: 'corner', s: 0, i: 0 })), '2*3x');
   assert.ok(C.isEmpty(C.removeAt(C.parse('x'), { kind: 'x', i: 0 })), 'the last character may go too');
   assert.equal(T(C.stepAt(C.parse('*532'), { kind: 'corner', s: 0, i: 0 }, 1)), '*632');

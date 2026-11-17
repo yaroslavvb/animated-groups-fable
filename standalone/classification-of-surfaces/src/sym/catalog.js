@@ -224,7 +224,14 @@ export function addTo(sig, kind, at = null, value = 2) {
 export function removeAt(sig, ref) {
   const s = clone(sig);
   if (ref.kind === 'o') s.o--; else if (ref.kind === 'x') s.x--; else if (ref.kind === 'cone') s.cones.splice(ref.i, 1);
-  else if (ref.kind === 'star') s.stars.splice(ref.s, 1); else s.stars[ref.s].splice(ref.i, 1);
+  else if (ref.kind === 'star') {
+    // As in a line of text: the star goes and its numbers stay, and they now belong to what stands before them, the
+    // star before or the cone points (*632 without its star is 632: the mirrors gone, the turns kept). Where that
+    // would pass the page's limits (six corners to a mirror), the star takes its numbers with it.
+    const [corners] = s.stars.splice(ref.s, 1), kept = clone(s);
+    if (ref.s > 0) kept.stars[ref.s - 1].push(...corners); else kept.cones.push(...corners);
+    return corners.length && fits(kept) ? kept : s;
+  } else s.stars[ref.s].splice(ref.i, 1);
   return s;
 }
 /**
