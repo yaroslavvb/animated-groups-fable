@@ -31,7 +31,7 @@ const NAMES = { '0,1,0': 'a disc', '0,2,0': 'an annulus', '0,0,0': 'a sphere', '
 export function createSymTab(ctx) {
   const { stage, badge } = ctx;
   const $ = (id) => document.getElementById(id);
-  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyPairs: $('key-pairs'), keyBack: $('key-back') };
+  const el = { cells: $('sym-cells'), where: $('sym-where'), minus: $('sym-minus'), plus: $('sym-plus'), prev: $('sym-prev'), next: $('sym-next'), bar: $('sym-bar'), total: $('sym-total'), say: $('sym-say'), presets: $('sym-presets'), zip: $('sym-zip'), hint: $('pat-hint'), reset: $('pat-reset'), none: $('pat-none'), remove: $('sym-remove'), adds: [...document.querySelectorAll('#sym-add [data-add]')], same: $('sym-same'), canon: $('sym-canon'), usual: $('sym-usual'), bad: $('sym-bad'), key: $('sym-key'), keyGlue: $('key-glue'), keyPairs: $('key-pairs') };
   const pattern = createPattern($('pattern'), { tip: $('pat-tip') });
   // sel is the cursor: null = at the end, nothing chosen; i >= 0 = on the i-th character (just after it); -1 = before everything
   let sig = parse('*632'), model = null, sel = null, built = null, active = false, where = [], note = '';
@@ -135,12 +135,11 @@ export function createSymTab(ctx) {
     el.total.style.left = Math.min(100, (fval(cost) / span) * 100) + '%';
     el.total.innerHTML = `<span>$${mixed(cost)}</span>`;
     el.total.dataset.side = fval(cost) / span > 0.8 ? 'left' : 'right';
-    // the key under the two pictures names only what is in them: an outlined tile, glued edges, mirror images
+    // the key under the two pictures names only what is in them: an outlined tile, glued edges
     el.key.hidden = !D || !D.n;
     const pairs = D ? model.A.pairs.length : 0;          // one swatch a glued pair, in the pair's colour (five at most: then the colours come round again)
     el.keyGlue.hidden = !pairs;
     el.keyPairs.innerHTML = Array.from({ length: Math.min(pairs, 5) }, (_, k) => `<i class="sw sw-pair" style="background:${pairCss(k)}"></i>`).join('');
-    el.keyBack.hidden = !D || !D.edges.some((e) => e.mirror || e.rev);
     // the same signature under another spelling: the book's, one tap away; the examples know it under any spelling
     const text = textOf(sig), name = spelled(sig);
     el.same.hidden = !model.D;                           // a signature no pattern has gets its reason instead (bad())

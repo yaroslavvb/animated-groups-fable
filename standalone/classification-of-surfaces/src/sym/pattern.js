@@ -7,12 +7,14 @@
 //                     the pattern along a hyperbolic line, so every tile can be brought to the middle
 //
 // What is drawn, tile by tile (orbifold.js tiles()):
-//   the tile itself     teal where it is a copy of the OUTLINED tile, sand where it is a mirror image of it. The
-//                       tone belongs to the tile, whichever tile the list of tiles happens to be centred on: his
-//                       note, Mon 16 Nov 2026, "when I ... drag it around, colors flip which is distracting" (every
-//                       tone swapped each time a drag carried the middle of the view across a mirror)
-//   the print           a family of commas on every tile (motifs.js: Paisley), in the darker tone of the tile's side.
-//                       It has no symmetry of its own, so the pattern has exactly the tile's
+//   the tile itself     one tone for every tile. Until Tue 17 Nov 2026 a mirror-image tile was sand and a copy teal;
+//                       Chaim Goodman-Strauss's note on the page that day: "*pqr's show two colors, and break the
+//                       symmetry, to be pqr!". He is right: a reflection then swapped the two tones, so what was
+//                       drawn under *632 had only the symmetries of 632. The picture has to have the signature's
+//                       symmetry and no less, so nothing may tell a tile from its mirror image but the print
+//   the print           a family of commas on every tile (motifs.js: Paisley), in a darker tone; in a mirror-image
+//                       tile it is the mirror image. It has no symmetry of its own, so the pattern has exactly the
+//                       signature's
 //   red lines           mirrors (one colour of the book's signature: what reflects)        dashed: a glide's axis
 //   blue / red marks    gyration points (blue) and the points where mirrors cross (red): a lens for order 2, then
 //                       a triangle, a square, a pentagon ... as crystallographers draw them
@@ -21,6 +23,9 @@
 // They carried letters at first; his notes, Mon 16 Nov 2026: "I don't understand what a,b mean in the leftmost
 // diagram", then "instead of using letters a,b, use colors or edge styling to indicate edges which are matched up".
 // A pointer on a glued edge (or a tap) brings out the pair and says what it is, in opts.tip.
+// When a drag has carried the outlined tile out of sight (off the pane, toward the disc's rim, behind the ball), the
+// outline goes to the tile nearest the middle of the view as the hand lets go: his second note, "dragging the fd
+// away to infinity, it could snap back". Any tile is as good a fundamental domain as another.
 //
 //   const P = createPattern(canvas, { tip });   tip: an element inside the canvas's pane, for the note on a glued edge
 //   P.set({ D, A, binding, tokens })    a new pattern (the view starts over); P.set(null): none, the pane is cleared
@@ -30,25 +35,27 @@
 import { mul, apply, det, I3 } from './geom.js';
 import { tiles as makeTiles } from './orbifold.js';
 import { design } from './motifs.js';
-import { PRINT_FRONT, PRINT_BACK, hexToRgb } from '../vendor/the-folding/palette.js';
+import { PRINT_FRONT, hexToRgb } from '../vendor/the-folding/palette.js';
 import { pairStyle } from './pairs.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
 const DARK = [0.08, 0.09, 0.12];
-// the paper of The Folding's prints: its front teal, its back sand, a light and a dark tone each
-const FRONT = hexToRgb(PRINT_FRONT[0]), BACK = hexToRgb(PRINT_BACK[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]), BACK_INK = hexToRgb(PRINT_BACK[1]);
+// the paper of The Folding's prints: teal, a light tone for the tile and a dark one for what is printed on it
+const FRONT = hexToRgb(PRINT_FRONT[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]);
 const css = (c, a = 1) => `rgba(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)},${a})`;
 
 export function createPattern(canvas, opts = {}) {
   const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
   let W = 0, H = 0, dpr = 1;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
-  // Is the tile the list is centred on a mirror image of the outlined one? Kept as a fact, flipped each time the
-  // middle of the view crosses onto a mirror-image neighbour, never read back off base's determinant: after a long
-  // way on the hyperbolic plane that determinant is rounding (and every tone would swap again).
-  let turned = false;
-  const hand = () => (turned ? -1 : 1);
+  // Does V turn the plane over? Does base? Kept as facts (each flips when the middle of the view crosses onto a
+  // mirror-image neighbour; base's is set when the outline moves), never read back off a determinant: a long way
+  // out on the hyperbolic plane a determinant is rounding. fix() is told them.
+  let vRev = false, bRev = false;
+  const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
+  let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
+  const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let budget = 1500, cache = new Map(), des = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
@@ -77,7 +84,7 @@ export function createPattern(canvas, opts = {}) {
   }
 
   function firstView() {
-    base = I3.slice(); turned = false;
+    base = I3.slice(); vRev = false; bRev = false;
     if (G.kind === 'S') {
       // the tile's own middle faces the eye, tipped a little so that no mirror hides on the rim
       const a = -0.42, b = 0.34, ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
@@ -95,20 +102,40 @@ export function createPattern(canvas, opts = {}) {
       if (best < 0) break;
       const h = A.maps[best], hi = A.maps[D.edges[best].mirror ? best : D.edges[best].to];     // the neighbour's own way back
       V = mul(V, h); base = mul(hi, base);
-      if (det(h) < 0) turned = !turned;          // h is one of the tile's own gluings: small and exact
+      if (det(h) < 0) { vRev = !vRev; bRev = !bRev; }          // h is one of the tile's own gluings: small and exact
       if (V0) V0 = mul(V0, h);
     }
     // A long way out on the hyperbolic plane the outlined tile's place is a matrix with entries of the size
     // e^distance: some 18 units out they are noise, and putting it "back onto the group" made it not-a-number for
-    // good. Well before that (about 10 units, long after the tile has shrunk out of sight at the rim) the outline
-    // moves to a tile by the middle of the view with the same hand, so the tones stay exactly as they are.
-    if (G.kind === 'H' && Math.max(...base.map(Math.abs)) > 2e4) {
-      const j = turned ? A.maps.findIndex((m) => det(m) < 0) : -1;
-      if (turned && j < 0) turned = false;
-      base = turned ? A.maps[j].slice() : I3.slice();
-    }
-    V = G.fix(V, hand()); base = G.fix(base, hand());
-    return V0 ? G.fix(V0, hand()) : V0;
+    // good. Well before that (about 10 units, long after the tile has shrunk out of sight at the rim, and only if
+    // one stroke goes that far: the outline comes back anyway when the hand lets go, settle() below) the outline
+    // moves to the tile in the middle of the view.
+    if (G.kind === 'H' && Math.max(...base.map(Math.abs)) > 2e4) { base = I3.slice(); bRev = false; }
+    V = G.fix(V, vHand()); base = G.fix(base, bHand());
+    return V0 ? G.fix(V0, vHand()) : V0;
+  }
+  /** Is the outlined tile still to be seen? Not once it has slid off the pane, shrunk toward the disc's rim, or gone behind the ball. */
+  function outlineSeen() {
+    const D = model.D;
+    if (!D.n) return true;
+    const c = apply(mul(V, base), D.at);
+    if (!(Number.isFinite(c[0]) && Number.isFinite(c[1]) && Number.isFinite(c[2]))) return false;
+    if (G.kind === 'S') return c[2] > 0.12;
+    if (G.kind === 'H') return c[2] < 4;                  // within two units of the middle (0.77 of the disc's radius): farther out it is a speck
+    const L = lay(), x = L.cx + L.R * c[0], y = L.cy - L.R * c[1];
+    return x > 0 && x < W && y > 0 && y < H;
+  }
+  /** If the outlined tile is out of sight, the outline goes to the tile nearest the middle of the view. Returns whether it moved. */
+  function settle() {
+    if (!model || !model.D.n || outlineSeen()) return false;
+    if (G.kind === 'S') {
+      let best = null, bz = -Infinity;
+      for (const t of tileList()) { const z = apply(mul(V, t.M), model.D.at)[2]; if (z > bz) { bz = z; best = t; } }
+      if (!best) return false;
+      base = best.M.slice(); bRev = !!best.flip;
+    } else { base = I3.slice(); bRev = false; }          // recentre() keeps the list centred on that tile
+    pulse = performance.now();
+    return true;
   }
 
   function tileList() {
@@ -131,8 +158,6 @@ export function createPattern(canvas, opts = {}) {
     size();
     const { D, A, binding } = model, kind = G.kind, L = lay(), { cx, cy, R } = L;
     const n = D.n, list = tileList();
-    // the list is centred on the tile nearest the middle of the view (recentre). When that tile is a mirror image of
-    // the outlined one (turned), "mirror image of the list's tile" means a copy of the outlined one
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.save();
@@ -141,9 +166,7 @@ export function createPattern(canvas, opts = {}) {
       // the hyperbolic disc has infinitely many tiles toward its rim and only some thousands are drawn: what is left
       // of the rim gets the colour the tiles there would blur to, not the page's white
       const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-      const flips = D.edges.some((e) => e.mirror || e.rev);
-      let bg = flips ? mixc(FRONT, BACK, 0.5) : FRONT;
-      if (A.stars.length) bg = mixc(bg, RED, 0.35);
+      const bg = A.stars.length ? mixc(FRONT, RED, 0.35) : FRONT;
       ctx.fillStyle = css(bg); ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
     }
 
@@ -207,8 +230,8 @@ export function createPattern(canvas, opts = {}) {
     // which corner class, star, glide the selected character stands for
     const pick = sel !== null && binding[sel] ? binding[sel] : null;
     const dim = pick ? 0.38 : 1;
-    const fill = [new Path2D(), new Path2D()], edge = [0, 1, 2].map(() => new Path2D());
-    const ink = [new Path2D(), new Path2D()];       // the print, in the darker tone of a tile's side: [a copy, a mirror image]
+    const fill = new Path2D(), edge = [0, 1, 2].map(() => new Path2D());
+    const ink = new Path2D();       // the print, in the darker tone
     // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points
     const print = (path, sh, M, b) => {
       const skip = b ? Math.min(2 * b + 1, Math.max(1, Math.floor(sh.pts.length / 8))) : 1, pts = [];
@@ -237,7 +260,7 @@ export function createPattern(canvas, opts = {}) {
       // too far out to show: by where the tile's NEAREST point is (a large tile far away still reaches in from the rim)
       if (kind === 'H') { const near = Math.acosh(Math.max(1, c[2])) - reach; if (near > 5 || (px < 0.35 && near > 4)) continue; }
       drawn++;
-      const b = px >= 20 ? 0 : px >= 7 ? 1 : 2, side = t.flip !== turned ? 1 : 0;      // 0: a copy of the outlined tile (teal), 1: its mirror image (sand)
+      const b = px >= 20 ? 0 : px >= 7 ? 1 : 2;
       // the outline, edge by edge
       const pts = [];
       for (let i = 0; i < n; i++) {
@@ -245,12 +268,12 @@ export function createPattern(canvas, opts = {}) {
         pts.push(a);
         for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st));
       }
-      if (n) { closed(fill[side], pts, t.flip); closed(edge[b], pts, t.flip); }
-      else fill[0].arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
+      if (n) { closed(fill, pts, t.flip); closed(edge[b], pts, t.flip); }
+      else fill.arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
       for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
       A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); } });
       if (px >= 1.2) {
-        for (const sh of des) if (px >= sh.min) print(ink[side], sh, M, b);
+        for (const sh of des) if (px >= sh.min) print(ink, sh, M, b);
       }
       if (px >= 4.5) for (const mk of marked) {
         const p = P[mk.v];
@@ -265,10 +288,8 @@ export function createPattern(canvas, opts = {}) {
     }
     stats = { tiles: list.length, drawn };
 
-    ctx.fillStyle = css(FRONT); ctx.fill(fill[0]);
-    ctx.fillStyle = css(BACK); ctx.fill(fill[1]);
-    ctx.fillStyle = css(FRONT_INK); ctx.fill(ink[0]);
-    ctx.fillStyle = css(BACK_INK); ctx.fill(ink[1]);
+    ctx.fillStyle = css(FRONT); ctx.fill(fill);
+    ctx.fillStyle = css(FRONT_INK); ctx.fill(ink);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
     // mirrors and glide axes: red
@@ -311,7 +332,9 @@ export function createPattern(canvas, opts = {}) {
         for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
         const out = new Path2D();
         closed(out, pts, flip);
-        ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fill(out);
+        const glow = calm ? 0 : Math.max(0, 1 - (performance.now() - pulse) / 600);
+        ctx.fillStyle = `rgba(255,255,255,${0.22 + 0.45 * glow})`; ctx.fill(out);
+        if (glow > 0) schedule();
         ctx.lineWidth = 2.6; ctx.strokeStyle = css(DARK, 0.95); ctx.stroke(out);
         // mirrors of the tile on top of its outline, in red
         for (let i = 0; i < n; i++) if (starOf[i] >= 0) { const p = new Path2D(); line(p, Q[i], Q[(i + 1) % n], stepsFor(Q[i], Q[(i + 1) % n])); const on = pick && pick.t === '*' && pick.star === starOf[i]; ctx.strokeStyle = css(RED, on || !pick ? 1 : 0.6); ctx.lineWidth = on ? 4.4 : 3; ctx.stroke(p); }
@@ -407,7 +430,7 @@ export function createPattern(canvas, opts = {}) {
   }
 
   // ---- sliding the pattern about
-  let drag = null, lastTap = 0, settle = 0;
+  let drag = null, lastTap = 0, still = 0;
   const local = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
   canvas.addEventListener('pointerdown', (e) => {
     if (!model || (e.pointerType === 'mouse' && e.button !== 0)) return;
@@ -427,11 +450,11 @@ export function createPattern(canvas, opts = {}) {
     if (!drag.moved) return;
     setHot(null);
     const p = unproject(x, y);
-    V = G.fix(mul(G.translate(drag.p0, p), drag.V0), hand());
+    V = G.fix(mul(G.translate(drag.p0, p), drag.V0), vHand());
     drag.V0 = recentre(drag.V0);
     // a very long stroke: start afresh from here, so that no huge slide has to be undone by a huge view
     if (G.kind === 'H' && G.dist(drag.p0, p) > 2.6) { drag.p0 = p; drag.V0 = V.slice(); }
-    quick = true; clearTimeout(settle);
+    quick = true; clearTimeout(still);
     schedule();
   });
   const up = (e) => {
@@ -446,7 +469,8 @@ export function createPattern(canvas, opts = {}) {
       if (now - lastTap < 320) { api.resetView(); lastTap = 0; } else lastTap = now;
       return;
     }
-    settle = setTimeout(() => { quick = false; schedule(); }, 140);     // the far rim is filled in once the hand is still
+    if (settle()) schedule();                                           // the outlined tile was dragged out of sight: it comes back
+    still = setTimeout(() => { quick = false; schedule(); }, 140);      // the far rim is filled in once the hand is still
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
@@ -458,8 +482,9 @@ export function createPattern(canvas, opts = {}) {
     if (!d) return;
     e.preventDefault();
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
-    V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V), hand());
+    V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V), vHand());
     recentre(null);
+    settle();
     schedule();
   });
   if (typeof ResizeObserver === 'function') new ResizeObserver(() => { if (model) schedule(); }).observe(canvas);
@@ -477,21 +502,21 @@ export function createPattern(canvas, opts = {}) {
     },
     select(i) { sel = i; schedule(); },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
-    /** Where the pattern is on the screen, to hand to another screen: { V, base, turned } (null: no pattern). */
-    getView() { return model ? { V: V.slice(), base: base.slice(), turned } : null; },
+    /** Where the pattern and its outlined tile are on the screen, to hand to another screen: { V, base, turned } (turned: base turns the plane over; null: no pattern). */
+    getView() { return model ? { V: V.slice(), base: base.slice(), turned: bRev } : null; },
     /** Put the pattern where another screen has it (what its getView() gave). Anything else is left alone. */
     setView(v) {
       const nine = (m) => Array.isArray(m) && m.length === 9 && m.every(Number.isFinite);
       if (!model || !v || !nine(v.V) || !nine(v.base)) return false;
-      turned = !!v.turned && G.kind !== 'S';
-      V = G.fix(v.V, hand()); base = G.kind === 'S' ? I3.slice() : G.fix(v.base, hand());
+      vRev = det(v.V) < 0; bRev = !!v.turned;              // V is always near the middle of the view: its determinant can be trusted
+      V = G.fix(v.V, vHand()); base = G.fix(v.base, bHand());
       quick = false; schedule();
       return true;
     },
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, turned, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }

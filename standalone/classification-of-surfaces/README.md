@@ -90,9 +90,10 @@ Three things say the same thing three ways, and every character of the signature
   ruler crosses $2 (the Magic Theorem, pp. 30, 53, 219).
 - **the pattern**, a 2D canvas (`src/sym/pattern.js`): an orthographic ball, the plane, or Poincaré's disc. A drag
   moves it by a motion of its own geometry, and the point taken stays under the finger (so a circle of the pointer
-  comes home exactly: no drift). Teal tiles are copies of the outlined tile, sand tiles its mirror images. Mirrors
+  comes home exactly: no drift). Every tile has one tone and carries the same print, mirrored where a mirror or a
+  miracle brought the tile there (two tones for the two hands went on Tue 17 Nov: "Chaim's two comments" below). Mirrors
   are red lines, a glide's axis a dashed red line, gyration points and mirror crossings the crystallographers'
-  marks (lens, triangle, square, ...). The outlined tile carries arrows and letters on its glued edges.
+  marks (lens, triangle, square, ...). On the outlined tile the two edges of each glued pair share a colour and a number of arrowheads.
 - **the surface**, in the 3D pane (`src/sym/surface.js`): a sphere with one hole is drawn as a flat plate with the
   star's corners as corners (the plate of `*632` is its 30-60-90 triangle); an annulus and a Möbius band are the Examples tab's
   own models; everything else is a tidy ball of the Tidy surfaces tab with cone points (as sharp at the tip as a paper cone of
@@ -204,7 +205,8 @@ leftmost diagram there. Maybe add explanations/tooltips somewhere or delete it"*
   and a tile was painted teal or sand by whether it is a mirror image of THAT tile. Each time the middle moved onto
   a mirror-image neighbour, all the tones swapped. A tile is now teal when it is a copy of the OUTLINED tile and
   sand when it is its mirror image (`side = t.flip !== (det(base) < 0)`), so the tone belongs to the tile. The
-  sphere was never affected: nothing is re-centred there.
+  sphere was never affected: nothing is re-centred there. (The two tones themselves went the next day: "Chaim's two
+  comments" below.)
 - *A flat plate turned from teal to sand when tipped over* (`*4`'s teardrop, and every one-hole orbifold that
   `surface.js` `buildDisc` draws). A plate has nothing to show underneath, so it has one colour on both sides now
   (`scene.sameBothSides`, read by `stage.js`). A band (`**`) keeps its sand inside, and the four chapter tabs are as before.
@@ -221,9 +223,9 @@ two edges of a glued pair are drawn alike and unlike every other pair: one colou
 (one, two or three, as on a textbook's polygon), so that pairs can be told apart without colour too
 (`src/sym/pairs.js` `pairStyle(k)`, k = the order in which the pairs are met going round the tile). Five colours
 (violet, gold, magenta, green, grey) times three counts give fifteen looks before one repeats, and no tile the page
-allows has more than fifteen pairs. The colours keep clear of what the pattern already uses (teal and sand tiles, red
-mirrors, blue gyration points) and each stroke has white under it, so a colour reads the same on a teal tile, a sand
-one and the print. The arrowheads still say which way the two edges go together. The key under the pictures shows a
+allows has more than fifteen pairs. The colours keep clear of what the pattern already uses (teal tiles, red
+mirrors, blue gyration points) and each stroke has white under it, so a colour reads the same on a tile and on the
+print. The arrowheads still say which way the two edges go together. The key under the pictures shows a
 swatch for each pair on the screen; a pointer anywhere along a glued edge (or a tap) brings out its pair with the
 note. The Zip it up tab keeps letters, because there they name the buttons that zip a pair, and draws a tile handed over from
 the Symmetries tab in the Symmetries tab's colours, pair for pair (`tabs/prove.js`: the `tile` preset takes `PAIR_COLORS`). The blue and red
@@ -289,6 +291,29 @@ this one (`src/sync.js`).
   reader's push comes back refused, and three states pushed into the stream with his key (the CLI) moved a signed-out
   screen to each of them. The route's conditions were read in spacesheep's source: the caller is the owner, the page
   names the stream in `data-push`, nobody else has edited or may edit the page (its roster holds only him).
+
+**Chaim's two comments** (Chaim Goodman-Strauss, on the published page, Tue 17 Nov 2026, week 47; threads
+`e62bd35e…` at 11:08 and `06ab350e…` at 12:03 on https://spacesheep.dev/@yaroslavvb/classification-of-surfaces; his
+ask: *"address the comments Chaim left"*, then *"When you fix them, make sure to reply to the comments."*).
+
+- *"\*pqr's show two colors, and break the symmetry, to be pqr!"* He is right, and it was wrong since the tab was
+  made. A tile that is a mirror image of the outlined one was sand and a copy teal, so a reflection swapped the two
+  tones: what was drawn under `*632` had only the symmetries that keep the tones, which is `632`. The same went for
+  every signature with a mirror or a miracle. A picture offered as "the pattern with this signature" has to have
+  that symmetry and no less. Now every tile has one tone, and the only thing that differs between a tile and its
+  mirror image is the print, which arrives mirrored: that is what a reflection does to it. The key's two entries (a
+  copy, its mirror image) are gone, the fold says why a second colour would take the mirrors away, and the rim of
+  the hyperbolic disc is tinted by the one tone. In `pattern.js` one path for the tiles and one for the print.
+- *"dragging the fd away to infinity, it could snap back."* When a drag has carried the outlined tile (the
+  fundamental domain) out of sight, the outline goes to the tile nearest the middle of the view as the hand lets go,
+  and glows for a moment (`pattern.js` `outlineSeen()` / `settle()`): off the pane on the plane, more than two units
+  from the middle of the hyperbolic disc (0.77 of its radius, where a tile is a speck), behind the ball on the
+  sphere. Every tile is as good a fundamental domain as another, so nothing else in the picture changes. The same
+  after a slide with the arrow keys. While the hand is still down nothing snaps. With one tone there is no hand to
+  keep, so the outline simply takes the middle tile; whether each of the two matrices turns the plane over is still
+  kept as a fact for `fix()` (`vRev`, `bRev`).
+- Both threads were answered on the page with one line each and a link, marked `<ai>` (replies `5a49a7a1…` and
+  `45e51710…`); the threads are left open for him.
 
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
@@ -367,7 +392,12 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   a count switched on, each arriving on the reader's screen; a reader's own move refused and left alone until the
   owner moves; Solo and back; a late screen with a link of its own going to the presenter, and staying put when
   nobody presents (19 checks, 32 pushes in all). On spacesheep itself, signed out: see "Not tried" above. Nine
-  long strokes out and nine back on `*732`: every matrix a number, the outlined tile teal whenever in view. In
+  long strokes out and nine back on `*732`: every matrix a number, the outlined tile teal whenever in view. Chaim's
+  two comments (the same day): on five patterns with mirrors or glides no sand tile is left (a few pale samples in
+  40,000 are the soft edges of the red lines; it was about half of them); on the plane, the hyperbolic plane and the
+  ball the outlined tile, dragged away three times, is back in the middle each time the hand lets go, and after each
+  of eighteen long strokes on `*732`; Chrome at 1280 and 390 px, WebKit on the M5 at both widths, and the published
+  copy inside spacesheep's viewer. In
   WebKit on the M5 (it did not answer over ssh at first that morning, and did twenty minutes later): the page as
   before at both widths, no error; the sync itself was not driven there.
   Not tried on a real phone; no reader other than the author has gone through the Symmetries tab yet.
