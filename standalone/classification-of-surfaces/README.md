@@ -367,8 +367,9 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   a count switched on, each arriving on the reader's screen; a reader's own move refused and left alone until the
   owner moves; Solo and back; a late screen with a link of its own going to the presenter, and staying put when
   nobody presents (19 checks, 32 pushes in all). On spacesheep itself, signed out: see "Not tried" above. Nine
-  long strokes out and nine back on `*732`: every matrix a number, the outlined tile teal whenever in view. Not
-  run in WebKit: the M5 did not answer over ssh that morning.
+  long strokes out and nine back on `*732`: every matrix a number, the outlined tile teal whenever in view. In
+  WebKit on the M5 (it did not answer over ssh at first that morning, and did twenty minutes later): the page as
+  before at both widths, no error; the sync itself was not driven there.
   Not tried on a real phone; no reader other than the author has gone through the Symmetries tab yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied
