@@ -341,7 +341,8 @@ its own (`src/showcase.*`), so the two cannot drift apart. What changed in the s
 - A broken escape in a typed address (`#sym&k=%zz`) used to stop the page from starting; that part is now ignored.
 - The tab's module no longer needs every control to be there (the example arrows and "Zip the outlined tile up" are
   absent on the showcase), and `initBookRefs(pop, { open: false })` shows a citation's words without the link to
-  the scan, which only his tailnet serves.
+  the scan, which only his tailnet serves; there the pop-up links the book at its publisher instead
+  (`https://doi.org/10.1201/b21368`). On this page the citations still open the scan.
 
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched

@@ -5,6 +5,7 @@
 const PDF = 'http://intel/animated-groups/Conway%20J.%2C%20Goodman-Strauss%20C.%20%282008%29%20The%20Symmetries%20of%20Things.pdf';
 const OFFSET = 19;            // PDF page = printed page + 19
 const BOOK = 'Conway, Burgiel & Goodman-Strauss, The Symmetries of Things';
+const BOOK_URL = 'https://doi.org/10.1201/b21368';        // the book at its publisher, for everyone (his ask, 17 Nov 2026: "Give a link to the Symmetry of Things book in the page")
 
 /** The html of a citation made while the page runs (the popover's handlers are delegated, so it just works). */
 export function bookLink(page, words, text = 'p. ' + page) {
@@ -12,7 +13,7 @@ export function bookLink(page, words, text = 'p. ' + page) {
   return `<a class="bk" href="${PDF}#page=${page + OFFSET}" target="_blank" rel="noopener" data-p="${page}" data-q="${q}" aria-label="${text}: “${q}”">${text}</a>`;
 }
 
-/** open: false for a page meant for everyone: the citation shows its words and names the book, and links nowhere (the scan is on his tailnet only). */
+/** open: false for a page meant for everyone: the citation shows its words and names the book; its pop-up links the book at its publisher, not the scan (which only his tailnet serves). */
 export function initBookRefs(pop, { open = true } = {}) {
   let shown = null, hideTimer = 0;
   for (const a of document.querySelectorAll('a.bk')) {
@@ -26,8 +27,10 @@ export function initBookRefs(pop, { open = true } = {}) {
     shown = a;
     pop.textContent = '';
     const q = document.createElement('q'); q.textContent = a.dataset.q;
-    const src = document.createElement('span'); src.className = 'bkpop-src'; src.textContent = `${BOOK}, ${a.textContent}${open ? ' · ' : ''}`;
-    if (open) { const link = document.createElement('a'); link.href = a.href; link.target = '_blank'; link.rel = 'noopener'; link.textContent = 'open the page'; src.append(link); }
+    const src = document.createElement('span'); src.className = 'bkpop-src'; src.textContent = `${BOOK}, ${a.textContent} · `;
+    const link = document.createElement('a'); link.target = '_blank'; link.rel = 'noopener';
+    if (open) { link.href = a.href; link.textContent = 'open the page'; } else { link.href = BOOK_URL; link.textContent = 'the book'; }
+    src.append(link);
     pop.append(q, src);
     pop.hidden = false;
     const r = a.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight, vw = document.documentElement.clientWidth, vh = window.innerHeight;
