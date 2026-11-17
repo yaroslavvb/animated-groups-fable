@@ -295,6 +295,17 @@ export function createSymTab(ctx) {
       return out;
     },
     get() { return { k: linkOf(sig) }; },
+    /** What the address does not hold and another screen needs to show the same (sync.js): the chosen character, and where the pattern has been slid to. */
+    live() {
+      const v = pattern.getView();
+      return { sel, pv: v ? { V: v.V.map((x) => Math.round(x * 1e7) / 1e7), base: v.base.map((x) => Number(x.toPrecision(10))), turned: v.turned } : null };
+    },
+    applyLive(l) {
+      if (!l || typeof l !== 'object' || !model) return;
+      const s = l.sel === null || (Number.isInteger(l.sel) && l.sel >= -1 && l.sel < model.tokens.length) ? l.sel : sel;
+      if (s !== sel) select(s);
+      if (l.pv) pattern.setView(l.pv);
+    },
     set(s) {
       const n = s && s.k !== undefined ? parse(s.k) : null;
       if (n) { sig = n; sel = null; if (active) load(n); }

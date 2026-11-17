@@ -211,6 +211,12 @@ export function createNameTab(ctx) {
     leave() { active = false; stopPin(); },
     when() { return 'name:' + key; },
     get() { return { k: key }; },
+    /** Which of the three counts are switched on: what another screen needs besides the address (sync.js). The pinwheel's journey runs on each screen's own clock. */
+    live() { return { p: (probes.map ? 'm' : '') + (probes.rims ? 'r' : '') + (probes.sides ? 's' : '') }; },
+    applyLive(l) {
+      if (!l || typeof l.p !== 'string') return;
+      for (const [name, letter] of [['map', 'm'], ['rims', 'r'], ['sides', 's']]) if (probes[name] !== l.p.includes(letter)) setProbe(name, l.p.includes(letter));
+    },
     // k: the surface; p (optional, for the tools): the probes that are on, as letters of "mrs"
     set(s) {
       if (s.k && SURFACES[s.k]) key = s.k;

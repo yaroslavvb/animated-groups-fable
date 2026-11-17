@@ -164,7 +164,7 @@ export function createProveTab(ctx) {
     const { state: after, info } = zip(before, id);
     if (!fits(after.comps[info.to])) { lastSay = 'That makes more holes and handles than this ball has room for. Try another pair first.'; panel(); return; }
     const looksAfter = nextLooks(looks0, before, info, after);
-    history.push({ state: copyState(before), looks: looksBefore, log: log.slice(), lastSay });
+    history.push({ id, state: copyState(before), looks: looksBefore, log: log.slice(), lastSay });
     const commit = () => {
       busy = null;
       state = after; looks = looksAfter;
@@ -233,6 +233,18 @@ export function createProveTab(ctx) {
     leave() { active = false; stopMove(); canvas.style.cursor = ''; hot = null; },
     when() { return 'prove:any'; },
     get() { return { k: preset.key, s: preset.key === 'deal' ? seed : undefined, w: preset.key === 'tile' && preset.words ? preset.words.join('|') : undefined }; },
+    /** The pairs zipped so far, in order: what another screen needs besides the address to hold the same surface (sync.js). */
+    live() { return { z: history.map((h) => h.id).join(',') }; },
+    applyLive(l) {
+      if (!l || typeof l.z !== 'string' || !state || !active) return;
+      const want = l.z ? l.z.split(',') : [], have = history.map((h) => h.id);
+      let same = 0;
+      while (same < want.length && same < have.length && want[same] === have[same]) same++;
+      if (same === want.length && same === have.length) return;
+      if (busy) busy.finish();
+      while (history.length > same) undo();
+      for (let i = same; i < want.length; i++) if (doZip(want[i], i < want.length - 1) === -1) break;      // those before the last at once, the last one played
+    },
     set(s) {
       const p = PRESETS.find((x) => x.key === s.k);
       if (!p) return;

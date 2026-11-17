@@ -44,6 +44,11 @@ export function createPattern(canvas, opts = {}) {
   const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
   let W = 0, H = 0, dpr = 1;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
+  // Is the tile the list is centred on a mirror image of the outlined one? Kept as a fact, flipped each time the
+  // middle of the view crosses onto a mirror-image neighbour, never read back off base's determinant: after a long
+  // way on the hyperbolic plane that determinant is rounding (and every tone would swap again).
+  let turned = false;
+  const hand = () => (turned ? -1 : 1);
   let budget = 1500, cache = new Map(), des = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
@@ -72,7 +77,7 @@ export function createPattern(canvas, opts = {}) {
   }
 
   function firstView() {
-    base = I3.slice();
+    base = I3.slice(); turned = false;
     if (G.kind === 'S') {
       // the tile's own middle faces the eye, tipped a little so that no mirror hides on the rim
       const a = -0.42, b = 0.34, ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
@@ -90,10 +95,20 @@ export function createPattern(canvas, opts = {}) {
       if (best < 0) break;
       const h = A.maps[best], hi = A.maps[D.edges[best].mirror ? best : D.edges[best].to];     // the neighbour's own way back
       V = mul(V, h); base = mul(hi, base);
+      if (det(h) < 0) turned = !turned;          // h is one of the tile's own gluings: small and exact
       if (V0) V0 = mul(V0, h);
     }
-    V = G.fix(V); base = G.fix(base);
-    return V0 ? G.fix(V0) : V0;
+    // A long way out on the hyperbolic plane the outlined tile's place is a matrix with entries of the size
+    // e^distance: some 18 units out they are noise, and putting it "back onto the group" made it not-a-number for
+    // good. Well before that (about 10 units, long after the tile has shrunk out of sight at the rim) the outline
+    // moves to a tile by the middle of the view with the same hand, so the tones stay exactly as they are.
+    if (G.kind === 'H' && Math.max(...base.map(Math.abs)) > 2e4) {
+      const j = turned ? A.maps.findIndex((m) => det(m) < 0) : -1;
+      if (turned && j < 0) turned = false;
+      base = turned ? A.maps[j].slice() : I3.slice();
+    }
+    V = G.fix(V, hand()); base = G.fix(base, hand());
+    return V0 ? G.fix(V0, hand()) : V0;
   }
 
   function tileList() {
@@ -117,8 +132,7 @@ export function createPattern(canvas, opts = {}) {
     const { D, A, binding } = model, kind = G.kind, L = lay(), { cx, cy, R } = L;
     const n = D.n, list = tileList();
     // the list is centred on the tile nearest the middle of the view (recentre). When that tile is a mirror image of
-    // the outlined one, base turns the plane over, and "mirror image of the list's tile" means a copy of the outlined one
-    const turned = det(base) < 0;
+    // the outlined one (turned), "mirror image of the list's tile" means a copy of the outlined one
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.save();
@@ -413,7 +427,7 @@ export function createPattern(canvas, opts = {}) {
     if (!drag.moved) return;
     setHot(null);
     const p = unproject(x, y);
-    V = G.fix(mul(G.translate(drag.p0, p), drag.V0));
+    V = G.fix(mul(G.translate(drag.p0, p), drag.V0), hand());
     drag.V0 = recentre(drag.V0);
     // a very long stroke: start afresh from here, so that no huge slide has to be undone by a huge view
     if (G.kind === 'H' && G.dist(drag.p0, p) > 2.6) { drag.p0 = p; drag.V0 = V.slice(); }
@@ -444,7 +458,7 @@ export function createPattern(canvas, opts = {}) {
     if (!d) return;
     e.preventDefault();
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
-    V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V));
+    V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V), hand());
     recentre(null);
     schedule();
   });
@@ -463,10 +477,21 @@ export function createPattern(canvas, opts = {}) {
     },
     select(i) { sel = i; schedule(); },
     resetView() { if (!model) return; firstView(); quick = false; schedule(); },
+    /** Where the pattern is on the screen, to hand to another screen: { V, base, turned } (null: no pattern). */
+    getView() { return model ? { V: V.slice(), base: base.slice(), turned } : null; },
+    /** Put the pattern where another screen has it (what its getView() gave). Anything else is left alone. */
+    setView(v) {
+      const nine = (m) => Array.isArray(m) && m.length === 9 && m.every(Number.isFinite);
+      if (!model || !v || !nine(v.V) || !nine(v.base)) return false;
+      turned = !!v.turned && G.kind !== 'S';
+      V = G.fix(v.V, hand()); base = G.kind === 'S' ? I3.slice() : G.fix(v.base, hand());
+      quick = false; schedule();
+      return true;
+    },
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
+    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, turned, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }

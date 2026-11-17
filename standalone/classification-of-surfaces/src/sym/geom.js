@@ -14,7 +14,8 @@
 //   translate(a, b)          the slide along the line a b that takes a to b
 //   angle(p, a, b)           the angle at p between the directions to a and to b
 //   lineDist(p, a, b)        the distance from p to the whole line through a and b
-//   fix(M)                   M put back onto the group of motions (after many products it has drifted off)
+//   fix(M, sign)             M put back onto the group of motions (after many products it has drifted off);
+//                            sign (optional): -1 if it is known to turn the plane over, +1 if not
 
 export const I3 = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 export function mul(A, B) {
@@ -107,10 +108,12 @@ export function geometry(kind) {
   /**
    * The exact motion nearest to a matrix that is one up to rounding. Products of many motions drift off the group
    * (on the hyperbolic plane the drift grows like e^distance); this puts a matrix back: where the origin goes, which
-   * way the x direction goes, and whether the plane is turned over are kept, the rest is rebuilt.
+   * way the x direction goes, and whether the plane is turned over are kept, the rest is rebuilt. Whether it is
+   * turned over is read off the determinant unless the caller knows (sign): far out on the hyperbolic plane the
+   * entries are of the size e^distance, and beyond about 13 the determinant's own rounding is larger than 1.
    */
-  G.fix = (M) => {
-    const sign = det(M) < 0 ? -1 : 1;
+  G.fix = (M, hand) => {
+    const sign = hand === 1 || hand === -1 ? hand : det(M) < 0 ? -1 : 1;
     if (kind === 'E') { const l = Math.hypot(M[0], M[3]) || 1, a = M[0] / l, c = M[3] / l; return [a, -sign * c, M[2], c, sign * a, M[5], 0, 0, 1]; }
     const p = G.norm([M[2], M[5], M[8]]);
     let t = [M[0], M[3], M[6]];

@@ -16,6 +16,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex">
+<!-- one screen drives the others (src/sync.js): the page reads this spacesheep stream, and its owner's open page may write it -->
+<meta name="ss-streams" content="classification-of-surfaces/view" data-push="classification-of-surfaces/view">
 <title>Classification of Surfaces</title>
 <style>/*__INLINE_CSS__*/</style>
 </head>
@@ -26,6 +28,7 @@
   <header class="hdr">
     <h1 class="title">Classification of Surfaces</h1>
     <p class="sub">Chapter 8 of <i>The Symmetries of Things</i>, to play with</p>
+    <button type="button" class="sync" id="sync-chip" hidden><i class="sync-dot" aria-hidden="true"></i><span class="sync-t"></span></button>
   </header>
 
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections of the chapter">

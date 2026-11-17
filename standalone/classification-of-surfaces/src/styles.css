@@ -320,3 +320,11 @@ ul.argument { list-style: disc; }
 .sw-pair { width: 16px; height: 4px; border-radius: 2px; }
 .pane-tip { position: absolute; z-index: 3; width: max-content; max-width: 236px; margin: 0; padding: 6px 10px 7px; border-radius: 8px; background: var(--ink); color: var(--ground); font-size: 13px; line-height: 1.35; pointer-events: none; transform: translate(-50%, calc(-100% - 22px)); }
 .pane-tip[data-below] { transform: translate(-50%, 22px); }
+/* one screen drives the others (sync.js): the chip in the header says what this screen is doing; a tap goes solo and back */
+.sync { display: inline-flex; align-items: center; gap: 7px; min-height: var(--tap); margin: -11px 0 -11px auto; padding: 0 12px; border: 0; border-radius: 22px; background: transparent; color: var(--muted); font-size: 14px; font-weight: 600; cursor: pointer; }
+.sync .sync-t { padding: 4px 0; }
+.sync-dot { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--faint); }
+.sync[data-state="live"], .sync[data-state="following"] { color: var(--accent); }
+.sync[data-state="live"] .sync-dot, .sync[data-state="following"] .sync-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.sync[data-state="solo"] .sync-dot { box-shadow: inset 0 0 0 1.5px var(--faint); opacity: 0.6; }
+@media (hover: hover) { .sync:hover { background: var(--card); } }

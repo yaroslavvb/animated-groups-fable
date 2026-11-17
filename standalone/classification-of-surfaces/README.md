@@ -35,6 +35,7 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `src/examples/` | the Examples tab: the seven surfaces as cell complexes, their counts computed, the pinwheel |
 | `src/sym/` | the Symmetries tab: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
+| `src/sync.js` | one screen drives the others: the owner's open page sends its state through a spacesheep page stream, every other screen takes it |
 | `src/formulas.mjs` | the LaTeX the page composes while it runs; MathJax typesets everything at build time |
 | `test/` | `node --test`: the engine against an independent count (400 random gluings), the seven examples against the book, every signature of the Symmetries tab against its own tile |
 | `tools/check_quotes.mjs` | every book citation quotes words that are on that page (needs the PDF and `pdftotext`) |
@@ -245,6 +246,50 @@ number ("tab 3"); with the order changed every such mention would have pointed a
 code's comments and this file now call a tab by its name, which no reordering makes wrong. Deep links are by name
 as before (`#zip`, `#tidy`, `#prove`, `#name`, `#sym`).
 
+**One screen drives the others** (his ask, Tue 17 Nov 2026, week 47: *"Make this collaborative so that multiple people
+can drag it and see the results, similar to how this page was done.
+https://spacesheep.dev/@misha/the-folding-synced#g=333&cut=2"*). That page uses spacesheep's page stream, and so does
+this one (`src/sync.js`).
+
+- *How it works.* The page's head declares a stream it reads and may write:
+  `<meta name="ss-streams" content="classification-of-surfaces/view" data-push="classification-of-surfaces/view">`.
+  That loads spacesheep's client, so `window.ss.stream(name)` exists. The open page of the space's **owner** pushes
+  its state into the stream, and every other screen that has the page open takes what arrives, signed-out readers
+  included.
+- *Who can drive.* Only the owner. spacesheep's push route lets through the space's owner and nobody else (its notes:
+  "only the space's owner is let through … so treat `ok: false` as 'this screen follows'"), and only for a page no
+  one else can edit. A reader's first touch tries one push, is refused, and that screen follows from then on. So
+  several people watch one person drag; several people cannot each drag for the others. That is the service's rule
+  and the same on the page it was modelled on. He leads from whichever of his own signed-in screens he touched last.
+- *What is sent* (`app.js` `snapshot()`, taken back by `applyRemote()`): the tab; what the tab keeps in the address
+  (the signature, the zipper and its scrubber, the tidy counts, the preset, the example); the 3D view; and what the
+  address does not hold: in Symmetries the chosen character and where the pattern has been slid to
+  (`pattern.getView()` / `setView()`), in Zip it up the pairs zipped so far in order (a follower plays the last one
+  and does the earlier ones at once), in Examples which counts are on. Under 1 KB a value.
+- *When.* While this screen is the one being touched, its state is looked at 14 times a second and sent when it has
+  changed; when it has not, once every 1.5 s for half an hour after the last touch, so that a screen that opens late
+  hears the presenter. A real gesture (`isTrusted`) is what makes a screen the driver. Each value carries a random
+  id for the tab and is ignored when it comes back.
+- *On a follower.* A value is taken when it says something new and this screen's own hand is not on it. A value that
+  only repeats the last one is not taken again, so a reader who wanders off is left alone until the presenter
+  moves. A screen that opens while someone presents goes to the presenter within a second or two; with nobody
+  presenting it stays on the address it was opened with (the stream's last value may be hours old and is not asked
+  for).
+- *The chip* at the right of the title says what this screen is doing: Synced (waiting), Live (it leads), Following,
+  Solo. A tap goes Solo (nothing sent, nothing followed) and back; the choice is kept in the browser. Outside
+  spacesheep (the tailnet copy) there is no `window.ss`, no chip, and nothing runs.
+- *Two things made exact on the way,* both in `src/sym/pattern.js`. Whether the tile at the middle of the view is a
+  mirror image of the outlined one is now kept as a fact (flipped when the middle crosses onto a mirror-image
+  neighbour) and no longer read off a determinant, which rounding made wrong beyond about 13 units on the hyperbolic
+  plane: the tones would have swapped again there. And the outlined tile's place, a matrix whose entries grow like
+  e^distance, turned to not-a-number for good some 18 units out; about 10 units out (four long strokes, long after
+  the tile has shrunk out of sight) the outline now moves to a tile by the middle of the view with the same hand.
+- *Not tried:* the owner's own push from the open page, which needs his signed-in browser. Everything round it is:
+  the declaration is read (a signed-out screen on the published page gets the stream, online and not denied), a
+  reader's push comes back refused, and three states pushed into the stream with his key (the CLI) moved a signed-out
+  screen to each of them. The route's conditions were read in spacesheep's source: the caller is the owner, the page
+  names the stream in `data-push`, nobody else has edited or may edit the page (its roster holds only him).
+
 Known limits: digits run 2 to 9; at most twelve places on the ball (a handle takes two), six corners on a mirror,
 fourteen characters; a tile's shape is one choice among many where the book says the pattern can be stretched
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in the Zip it up tab (only the surface); the
@@ -260,7 +305,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 76 tests (the newest: on every example's tile and seven tiles of one's own each glued pair sits on
+- `node --test`: 77 tests (the newest: a motion put back onto the group keeps the hand it is told, in all three
+  geometries; before it: on every example's tile and seven tiles of one's own each glued pair sits on
   exactly two edges and the pairs are numbered from the first, and fifteen pairs get fifteen different looks, none
   of them near the pattern's red or blue; the five before it: typing and deleting a signature character by character; the print
   inside its tile on every example; many handles and crosscaps: the tile search ends and finds every tile once; over 250 spellings
@@ -315,6 +361,14 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
   address drops the `p`; the surface of `2*632*3x` writes its eight labels in the bar's own computed colours, a
   chosen one stays while seven fade, no ring marker is made, and the four chapter tabs are unchanged. The same in WebKit on the
   M5 at both widths and in the published copy.
+  One screen drives the others (Tue 17 Nov 2026): with a stand-in for spacesheep's stream that keeps its rule, an
+  owner's screen, a reader's and two late ones in one headless Chrome: the pattern slid (also while the hand is
+  down), a signature typed, a character chosen, the surface turned, Zippers scrubbed, a pair zipped and unzipped,
+  a count switched on, each arriving on the reader's screen; a reader's own move refused and left alone until the
+  owner moves; Solo and back; a late screen with a link of its own going to the presenter, and staying put when
+  nobody presents (19 checks, 32 pushes in all). On spacesheep itself, signed out: see "Not tried" above. Nine
+  long strokes out and nine back on `*732`: every matrix a number, the outlined tile teal whenever in view. Not
+  run in WebKit: the M5 did not answer over ssh that morning.
   Not tried on a real phone; no reader other than the author has gone through the Symmetries tab yet.
 - A reader who had not written the page went through it from screenshots and the chapter's text: no wrong count,
   symbol or citation; fourteen findings on wording and on the links between the tabs, the wording ones applied

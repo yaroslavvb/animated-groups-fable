@@ -413,3 +413,20 @@ test('glued pairs: each on exactly two edges, and a colour and a number of arrow
   }
   assert.ok(tiles > 45 && most >= 12 && most <= 15, `tiles ${tiles}, most pairs on one ${most}`);
 });
+
+test('fix(): a motion put back onto the group keeps the hand it is told, far out too', async () => {
+  // Tue 17 Nov 2026: whether a far tile is a mirror image is now kept as a fact and handed to fix(); read off the
+  // determinant it is lost to rounding once a motion's entries pass about 1e5 (13 units out on the hyperbolic plane).
+  const { geometry, mul, det } = await import('../src/sym/geom.js');
+  for (const kind of ['S', 'E', 'H']) {
+    const G = geometry(kind), far = kind === 'S' ? 1.2 : kind === 'E' ? 40 : 5;          // on the hyperbolic plane noise is magnified like e^(2 distance): 5 units with this much noise is the test
+    const T = G.translate(G.origin, G.polar(far, 0.7)), R = G.reflect(G.polar(0.3, 0.2), G.polar(0.5, 1.9));
+    const noisy = (M) => M.map((x, i) => x * (1 + 1e-10 * Math.sin(7 * i + 1)));
+    for (const [M, hand] of [[T, 1], [mul(T, R), -1], [mul(R, T), -1], [mul(mul(T, R), R), 1]]) {
+      const F = G.fix(noisy(M), hand), scale = Math.max(...M.map(Math.abs));
+      assert.equal(det(F) < 0, hand < 0, `${kind}: the hand it was told`);
+      assert.ok(F.every((x, i) => Math.abs(x - M[i]) < 1e-5 * scale), `${kind}: still the same motion`);          // measured: 1e-6 of its size at most (noise 1e-10, magnified about 1e4 at 5 units)
+      assert.deepEqual(G.fix(noisy(M)), F, `${kind}: and the determinant says the same at this distance`);
+    }
+  }
+});

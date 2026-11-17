@@ -3,7 +3,10 @@
 // the tab bar, what text shows for the current tab and state, the play bar, the hash, the book citations.
 //
 //   #zip  #tidy  #prove  #name  #sym     deep links to the tabs (with &k=<state> where a tab has one: #sym&k=*732)
-//   window.__surfaces               { show(tab), tabs, stage } for the tools and tests
+//   window.__surfaces               { show(tab), tabs, stage, sync, snapshot(), applyRemote(s) } for the tools and tests
+//
+// One screen can drive the others: sync.js, through a spacesheep page stream. snapshot() and applyRemote() below are
+// the page's state as one small object and the way back.
 
 import { createStage } from './stage.js';
 import { createTimeline } from './vendor/the-folding/timeline.js';
@@ -13,6 +16,7 @@ import { createTidyTab } from './tabs/tidy.js';
 import { createProveTab } from './tabs/prove.js';
 import { createNameTab } from './tabs/name.js';
 import { createSymTab } from './tabs/sym.js';
+import { createSync } from './sync.js';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -100,4 +104,29 @@ if (!stage.R.ok) { const p = document.createElement('p'); p.className = 'r3d-mes
 initBookRefs($('bkpop'));
 const [name0, state0] = readHash();
 show(name0, state0);
-window.__surfaces = { show, tabs, stage, timeline, get tab() { return currentName; } };
+
+// ---- one screen drives the others (sync.js): the page's state as one small object, and the way back
+const round = (x, k) => Math.round(x * k) / k;
+const plain = (s) => JSON.stringify(Object.entries(s || {}).filter(([k, v]) => k !== 't' && v !== undefined && v !== null).map(([k, v]) => [k, String(v)]).sort());
+function snapshot() {
+  const s = current && current.get ? current.get() : {}, v = stage.R.getView(), st = {};
+  for (const [k, x] of Object.entries(s)) if (x !== undefined && x !== null) st[k] = typeof x === 'number' ? round(x, 1e3) : x;
+  const out = { tab: currentName, st };
+  if (current && current.live) out.live = current.live();
+  if (v && v.q) { out.q = v.q.map((x) => round(x, 1e4)); out.z = round(v.zoom, 1e3); }
+  return out;
+}
+function applyRemote(s) {
+  if (!s || typeof s.tab !== 'string' || !tabs[s.tab]) return;
+  const st = s.st && typeof s.st === 'object' ? s.st : {}, mine = current && current.get ? current.get() : {};
+  if (s.tab !== currentName || plain(st) !== plain(mine)) show(s.tab, st);                     // another tab, or another state of this one
+  else if (current.setT && Number.isFinite(st.t) && Math.abs(st.t - (mine.t || 0)) > 5e-4) { timeline.set(st.t); current.setT(st.t); }      // the scrubber
+  if (s.live && current.applyLive) current.applyLive(s.live);
+  if (Array.isArray(s.q) && s.q.length === 4 && s.q.every(Number.isFinite)) {
+    const v = stage.R.getView(), z = Number.isFinite(s.z) ? s.z : 1;
+    if (!v || !v.q || Math.abs(v.zoom - z) > 2e-3 || v.q.some((x, i) => Math.abs(x - s.q[i]) > 2e-4)) { stage.R.setView({ q: s.q, zoom: z }); stage.R.render(); }
+  }
+}
+const streamName = (document.querySelector('meta[name="ss-streams"]') || { dataset: {} }).dataset.push;
+const sync = createSync({ stream: streamName && window.ss && window.ss.stream ? window.ss.stream(streamName) : null, snapshot, apply: applyRemote, chip: $('sync-chip') });
+window.__surfaces = { show, tabs, stage, timeline, sync, snapshot, applyRemote, get tab() { return currentName; } };
