@@ -101,7 +101,7 @@
       : g.colors > 1
         ? `still frame K = ${g.kernel_orbifold} (coarser sublattice) → rolling Γ = ${g.projected_orbifold}`
         : `static ${g.projected_orbifold} in every frame`;
-    return `${g.chaim} · generators ${g.generators_label} · clockwork ${g.symbol} · ${colorWord} · ${rollingNote}`;
+    return `${g.chaim} · generators ${g.generators_label} · ${colorWord} · ${rollingNote}`;
   }
 
   function matchesRollingFilter(g, rollingFilter) {
@@ -197,8 +197,7 @@
       const sig = makeHtml('strong', 'hasse-floating-sig');
       renderChaimHtml(sig, g.chaim);
       const tuple = makeHtml('code', 'hasse-floating-tuple', g.generators_label);
-      const cw = makeHtml('span', 'hasse-floating-cw', `clockwork ${g.symbol}`);
-      head.append(sig, tuple, cw);
+      head.append(sig, tuple);
       floatingCard.append(head);
 
       const gens = makeHtml('div', 'hasse-floating-gens');
@@ -287,7 +286,7 @@
       const metaSpan = makeHtml(
         'span',
         'hasse-inspector-meta',
-        `clockwork ${g.symbol} · ${g.colors} colour${g.colors === 1 ? '' : 's'} · ${
+        `${g.colors} colour${g.colors === 1 ? '' : 's'} · ${
           g.rolling_only
             ? `still frame K = ${g.kernel_orbifold} → rolling Γ = ${g.projected_orbifold}`
             : g.colors > 1

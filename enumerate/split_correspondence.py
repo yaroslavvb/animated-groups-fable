@@ -31,9 +31,13 @@ snapshot of his catalog.  Entries he has not rendered yet get no line.  The
 source snapshot stays untouched; the rows are added while the pages are
 written.
 
-Every entry also shows its clockwork orbifold symbol (docs/data/catalog.json,
-the same symbol the catalogue prints) under its heading and in its tab; the
-snapshot printed it only where the book signature needed disambiguating.
+No entry shows a clockwork symbol, and no page says "clockwork": the short
+colour signature (with the Hermann-Mauguin name in each tab) names every
+entry.  drop_clockwork() takes the snapshot's own symbols (the eight it
+printed where a book signature needed disambiguating) and its wording out
+while the pages are written; the snapshot stays untouched.  (His ask, Thu 19
+Nov 2026: "I don't need the clockwork notation, just the short form notation
+... so I can get rid of all traces of clockwork".)
 
 Every entry finally gets a "Visualizations" section under its Extra links: up
 to four Showcase clips of that very group, a line to the family's section of
@@ -173,57 +177,37 @@ def add_vladimir_provenance(tail, meta):
     return tail.replace(anchor, anchor + addition, 1)
 
 
-CATALOG = DOCS / "data" / "catalog.json"
+# Reader-facing wording, longest first; class names, data attributes, file
+# names and URLs keep "clockwork" (nobody reads them).
+CLOCKWORK_WORDING = (
+    ("Clockwork/<wbr>colouring correspondence", "Animation/<wbr>colouring correspondence"),
+    ("Clockwork/colouring correspondence", "Animation/colouring correspondence"),
+    ("Clockwork group index", "Group index"),
+    ("Animated clockwork action for ", "Animation for "),
+    ("a clockwork animation", "an animation"),
+    ("Forward clockwork groups", "Forward groups"),
+    ("forward clockwork groups", "forward groups"),
+)
+CLOCKWORK_LABEL = re.compile(r'; (?:[Pp]roject-specific )?clockwork symbol [^"]*')
 
 
-def load_clockwork_symbols():
-    """The clockwork orbifold symbol of every catalogue group, as text and as
-    HTML: {id: (text, html)}.  Stars are shown as the page shows every
-    orbifold star, with the same glyph and class as the book signatures."""
-    star = '<span class="orbifold-star">∗</span>'
-    symbols = {}
-    for group in json.loads(CATALOG.read_text(encoding="utf-8"))["groups"]:
-        symbols[group["id"]] = (group["symbol"].replace("*", "∗"),
-                                group["symbolHtml"].replace("*", star))
-    return symbols
+def drop_clockwork(text):
+    """The page without its clockwork symbols or wording.
 
-
-def add_clockwork_symbols(fragment, gids, symbols):
-    """Give every entry its clockwork symbol, under the heading and in the tab.
-
-    The snapshot prints the symbol only where the book signature needs
-    disambiguating (3₁3₁3₁ against 3₂3₂3₂ and the like); the catalogue has one
-    for every group, so every entry now carries it, and the eight original
-    labels lose their "project-specific" wording."""
-    fragment = fragment.replace("Project-specific clockwork symbol", "Clockwork symbol")
-    fragment = fragment.replace("project-specific clockwork symbol", "clockwork symbol")
-    for gid in gids:
-        if gid not in symbols:
-            raise ValueError("%s is not in docs/data/catalog.json" % gid)
-        text, html = symbols[gid]
-        # The heading, after the signature (and any evidence note).
-        title = fragment.index('id="%s-title"' % gid)
-        header_end = fragment.index("</header>", title)
-        if "clockwork-disambiguator--heading" not in fragment[title:header_end]:
-            span = ('<span class="clockwork-disambiguator clockwork-disambiguator--heading" '
-                    'aria-label="Clockwork symbol %s">%s</span>\n          ' % (attr(text), html))
-            fragment = fragment[:header_end] + span + fragment[header_end:]
-        # The tab, between the signature and the Hermann-Mauguin name.
-        tab_start = fragment.index('<a class="clockwork-tab" id="tab-%s"' % gid)
-        tab_end = fragment.index("</a>", tab_start)
-        tab = fragment[tab_start:tab_end]
-        if "clockwork-disambiguator--tab" not in tab:
-            tab = re.sub(r'(aria-label="[^"]*colour action %s)"' % gid,
-                         r'\1; clockwork symbol %s"' % attr(text).replace("\\", "\\\\"), tab, count=1)
-            # The signature nests <span class="orbifold-star">, so find its
-            # balanced end rather than the first closing tag.
-            _start, signature_end = balanced(tab, '<span class="tab-signature">', "span")
-            tab = (tab[:signature_end]
-                   + '<span class="clockwork-disambiguator clockwork-disambiguator--tab" '
-                     'aria-label="Clockwork symbol %s">%s</span>' % (attr(text), html)
-                   + tab[signature_end:])
-            fragment = fragment[:tab_start] + tab + fragment[tab_end:]
-    return fragment
+    Removes every <span class="clockwork-disambiguator ...">, nested spans
+    and all, with the blank space it leaves; the "; clockwork symbol ..."
+    tail of a tab's aria-label; and the phrases in CLOCKWORK_WORDING."""
+    opening = '<span class="clockwork-disambiguator'
+    while opening in text:
+        start, end = balanced(text, opening, "span")
+        line_start = text.rfind("\n", 0, start) + 1
+        if not text[line_start:start].strip() and text[end:end + 1] == "\n":
+            start, end = line_start, end + 1  # the span had a line of its own
+        text = text[:start] + text[end:]
+    text = CLOCKWORK_LABEL.sub("", text)
+    for old, new in CLOCKWORK_WORDING:
+        text = text.replace(old, new)
+    return text
 
 
 VISUALIZATIONS_ASSETS = (
@@ -252,7 +236,7 @@ def add_visualizations(fragment, gids, visualizations):
 
 
 class Family:
-    def __init__(self, section, links, symbols, visualizations):
+    def __init__(self, section, links, visualizations):
         self.section = section
         self.hm = re.search(r'id="wallpaper-([^"]+)"', section).group(1)
         # The signature nests <span class="orbifold-star">, so cut it balanced.
@@ -268,9 +252,7 @@ class Family:
             section)
         gids = [gid for gid, _order in self.entries]
         self.tabs_html = add_visualizations(
-            add_clockwork_symbols(
-                add_vladimir_rows(cut(section, '<div class="clockwork-tabs"', "div"), gids, links),
-                gids, symbols),
+            add_vladimir_rows(cut(section, '<div class="clockwork-tabs"', "div"), gids, links),
             gids, visualizations)
         self.tabs = []
         for tab in re.finditer(
@@ -324,7 +306,6 @@ class Parts:
         self.notation = cut(directory, '<aside class="notation-caveat"', "aside")
         self.dialog = cut(source, '<section class="diagram-symbol-dialog"', "section")
         self.links_meta, self.links = load_links()
-        self.symbols = load_clockwork_symbols()
         self.visualizations = correspondence_visualizations.load()
         atlas = cut(source, '<div class="correspondence-atlas"', "div")
         self.families = []
@@ -335,7 +316,7 @@ class Parts:
             except ValueError:
                 break
             self.families.append(
-                Family(atlas[start:end], self.links, self.symbols, self.visualizations))
+                Family(atlas[start:end], self.links, self.visualizations))
             i = end
         if len(self.families) != 17:
             raise ValueError("expected 17 wallpaper families, found %d" % len(self.families))
@@ -389,7 +370,7 @@ def filter_bar_html(include_hasse_mode=False):
     ) if include_hasse_mode else ""
     return (
         '      <div class="correspondence-filters" data-correspondence-filters role="region" '
-        'aria-label="Filter the 68 clockwork groups">\n'
+        'aria-label="Filter the 68 forward groups">\n'
         '        <div class="correspondence-filter-controls">\n'
         '          <label class="correspondence-filter-field">\n'
         '            <span class="correspondence-filter-label">Number of colors</span>\n'
@@ -456,7 +437,7 @@ def index_page(parts):
         '    <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">\n'
         '      <h2 id="family-directory-title">Grouped by projected group</h2>\n'
         '      <p class="family-directory-note">One page per projected orbifold group: forget the clock and keep '
-        'every spatial operation. The badge counts the forward clockwork groups projecting to that orbifold group, '
+        'every spatial operation. The badge counts the forward groups projecting to that orbifold group, '
         '%d in all, and the small line names their Chaim orbifold signatures.</p>\n'
         '%s\n'
         '      <nav class="family-grid" aria-label="Projected orbifold groups">\n'
@@ -465,12 +446,12 @@ def index_page(parts):
         '    </section>\n\n'
         '    <section class="hasse-directory" id="hasse-diagram" aria-labelledby="hasse-diagram-title">\n'
         '      <h2 id="hasse-diagram-title">Hasse diagram</h2>\n'
-        '      <p class="family-directory-note">The 68 forward clockwork groups grouped by generator inclusion on a '
+        '      <p class="family-directory-note">The 68 forward groups grouped by generator inclusion on a '
         'shared translation lattice <code>T = ⟨t₁, t₂⟩</code>, marked exclusively in Conway/Chaim orbifold notation '
         '(with the concise generator tuple below each signature). Start with pure translations '
         '(<strong>◦</strong>, <code>⟨T⟩</code>) at the top and follow an edge downward to add a point-group or '
         'colour-permuting symmetry generator. Hover or focus any node to inspect its generators and see which '
-        'symmetry generator is added on each step down; click a node to open its colouring, clockwork film, and '
+        'symmetry generator is added on each step down; click a node to open its colouring, animation, and '
         '3D crystal.</p>\n'
         '%s\n'
         '      <div class="hasse-legend">\n'
@@ -482,8 +463,8 @@ def index_page(parts):
         '        <small class="hasse-scroll-hint">On a narrow screen, scroll the diagram sideways.</small>\n'
         '      </div>\n'
         '      <div class="hasse-diagram-wrap diagram" role="region" '
-        'aria-label="Scrollable Hasse inclusion diagram of the 68 clockwork groups" tabindex="0">'
-        '<svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim orbifold notation"></svg>'
+        'aria-label="Scrollable Hasse inclusion diagram of the 68 forward groups" tabindex="0">'
+        '<svg id="graph" aria-label="Hasse diagram of 68 forward groups marked in Chaim orbifold notation"></svg>'
         '</div>\n'
         '      <div class="hasse-inspector" data-hasse-inspector aria-live="polite"></div>\n'
         '      <p id="status" class="hasse-status" role="status" aria-live="polite">Loading Hasse diagram…</p>\n'
@@ -534,11 +515,11 @@ def family_page(parts, index):
     family = parts.families[index]
     previous = parts.families[index - 1] if index > 0 else None
     following = parts.families[index + 1] if index + 1 < len(parts.families) else None
-    title = "%s %s — Clockwork/colouring correspondence — Spacetime Groups" % (
+    title = "%s %s — Animation/colouring correspondence — Spacetime Groups" % (
         family.orbifold_text, family.hm)
     description = (
         "Wallpaper group %s (%s): %s over it, each with its cyclic colouring, "
-        "clockwork film and polar space group (%s)." % (
+        "animation and polar space group (%s)." % (
             family.hm, family.orbifold_text, family.count_text, family.space_groups_text))
     # Only the family pages carry entries, so only they load the Visualizations
     # stylesheet and the clip player.
@@ -566,7 +547,7 @@ def family_page(parts, index):
     body = (
         '<main class="correspondence-page correspondence-family-page">\n'
         '    <section class="directory family-page-header" aria-labelledby="page-title">\n'
-        '      <p class="family-breadcrumb"><a href="correspondence.html">Clockwork/colouring correspondence</a>'
+        '      <p class="family-breadcrumb"><a href="correspondence.html">Animation/colouring correspondence</a>'
         ' <span aria-hidden="true">·</span> wallpaper group %d of 17</p>\n'
         '      %s\n'
         '      <p class="family-summary">%s</p>\n'
@@ -597,7 +578,7 @@ def build():
     pages = {INDEX: index_page(parts)}
     for index, family in enumerate(parts.families):
         pages[DOCS / family.page] = family_page(parts, index)
-    return pages
+    return {page: drop_clockwork(text) for page, text in pages.items()}
 
 
 def main(argv):

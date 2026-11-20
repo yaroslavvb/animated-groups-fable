@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="An audited atlas of 68 forward clockwork groups, cyclic plane colourings, and interactive real-crystal examples, organized by Euclidean orbifold signature.">
+  <meta name="description" content="An audited atlas of 68 forward groups, cyclic plane colourings, and interactive real-crystal examples, organized by Euclidean orbifold signature.">
   <meta name="theme-color" content="#ffffff">
-  <title>Clockwork/colouring correspondence — Spacetime Groups</title>
+  <title>Animation/colouring correspondence — Spacetime Groups</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127902;&#65039;</text></svg>">
   <script data-mobile-viewport-bootstrap>
     (() => {
@@ -116,15 +116,15 @@
 
   <main class="correspondence-page">
     <section class="directory" aria-labelledby="page-title">
-      <h1 id="page-title">Clockwork/<wbr>colouring correspondence</h1>
-      <p class="directory-viewer-note">Each group has three corresponding visualizations: a static 2D colouring, a clockwork animation, and an interactive crystal model in the associated polar space group.</p>
+      <h1 id="page-title">Animation/<wbr>colouring correspondence</h1>
+      <p class="directory-viewer-note">Each group has three corresponding visualizations: a static 2D colouring, an animation, and an interactive crystal model in the associated polar space group.</p>
       <p class="directory-viewer-note"><a href="#correspondences">Grouped by projected group (17)</a> · <a href="#hasse-diagram">Hasse diagram by inclusion (68)</a> · <a href="polar-inclusions.html">Standalone inclusion diagram →</a></p>
     </section>
 
     <section class="family-directory" id="correspondences" aria-labelledby="family-directory-title">
       <h2 id="family-directory-title">Grouped by projected group</h2>
-      <p class="family-directory-note">One page per projected orbifold group: forget the clock and keep every spatial operation. The badge counts the forward clockwork groups projecting to that orbifold group, 68 in all, and the small line names their Chaim orbifold signatures.</p>
-      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 clockwork groups">
+      <p class="family-directory-note">One page per projected orbifold group: forget the clock and keep every spatial operation. The badge counts the forward groups projecting to that orbifold group, 68 in all, and the small line names their Chaim orbifold signatures.</p>
+      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 forward groups">
         <div class="correspondence-filter-controls">
           <label class="correspondence-filter-field">
             <span class="correspondence-filter-label">Number of colors</span>
@@ -260,8 +260,8 @@
 
     <section class="hasse-directory" id="hasse-diagram" aria-labelledby="hasse-diagram-title">
       <h2 id="hasse-diagram-title">Hasse diagram</h2>
-      <p class="family-directory-note">The 68 forward clockwork groups grouped by generator inclusion on a shared translation lattice <code>T = ⟨t₁, t₂⟩</code>, marked exclusively in Conway/Chaim orbifold notation (with the concise generator tuple below each signature). Start with pure translations (<strong>◦</strong>, <code>⟨T⟩</code>) at the top and follow an edge downward to add a point-group or colour-permuting symmetry generator. Hover or focus any node to inspect its generators and see which symmetry generator is added on each step down; click a node to open its colouring, clockwork film, and 3D crystal.</p>
-      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 clockwork groups">
+      <p class="family-directory-note">The 68 forward groups grouped by generator inclusion on a shared translation lattice <code>T = ⟨t₁, t₂⟩</code>, marked exclusively in Conway/Chaim orbifold notation (with the concise generator tuple below each signature). Start with pure translations (<strong>◦</strong>, <code>⟨T⟩</code>) at the top and follow an edge downward to add a point-group or colour-permuting symmetry generator. Hover or focus any node to inspect its generators and see which symmetry generator is added on each step down; click a node to open its colouring, animation, and 3D crystal.</p>
+      <div class="correspondence-filters" data-correspondence-filters role="region" aria-label="Filter the 68 forward groups">
         <div class="correspondence-filter-controls">
           <label class="correspondence-filter-field">
             <span class="correspondence-filter-label">Number of colors</span>
@@ -304,7 +304,7 @@
         <span><i class="hasse-dot hasse-dot--child" aria-hidden="true"></i>↓ Supergroup below (+generator)</span>
         <small class="hasse-scroll-hint">On a narrow screen, scroll the diagram sideways.</small>
       </div>
-      <div class="hasse-diagram-wrap diagram" role="region" aria-label="Scrollable Hasse inclusion diagram of the 68 clockwork groups" tabindex="0"><svg id="graph" aria-label="Hasse diagram of 68 clockwork groups marked in Chaim orbifold notation"></svg></div>
+      <div class="hasse-diagram-wrap diagram" role="region" aria-label="Scrollable Hasse inclusion diagram of the 68 forward groups" tabindex="0"><svg id="graph" aria-label="Hasse diagram of 68 forward groups marked in Chaim orbifold notation"></svg></div>
       <div class="hasse-inspector" data-hasse-inspector aria-live="polite"></div>
       <p id="status" class="hasse-status" role="status" aria-live="polite">Loading Hasse diagram…</p>
       <details class="hasse-details"><summary>How the orbifold generator inclusions and still-frame selector work</summary><p>All 68 groups are placed on the shared base translation lattice <code>T = ⟨t₁, t₂⟩</code> with origin <code>(0, 0)</code> so that every one of the <strong>123 immediate covering edges</strong> adds a single symmetry generator going downward: rotations <code>R₂</code> (180°), <code>R₃</code> (120°), <code>R₄</code> (90°), <code>R₆</code> (60°); mirrors <code>∗ₓ</code> (horizontal), <code>∗_d</code> (diagonal), <code>∗_d′</code> (anti-diagonal); glides <code>×ᵧ</code> (vertical) and <code>×ₓ′</code> (offset horizontal); or centred sublattice translations <code>t(0,½)</code>, <code>t(½,½)</code>, <code>t(⅔,⅓)</code>. A superscript <code>^(+1/N)</code> indicates that the generator also advances the cyclic colour/clock phase by <code>1/N</code> of a period.</p><p>Among the 17 monochrome orbifold groups, fixing a single origin and unit lattice realises <strong>27</strong> direct generator inclusions simultaneously; the remaining 4 abstract same-lattice index-2 pairs (<code>22∗ ⊂ ∗2222</code>, <code>×× ⊂ 22×</code>, <code>4∗2 ⊂ ∗442</code>, and the second diagonal mirror into <code>∗333</code>) require shifting the origin by a quarter-period or rotating the mirror axis, because in a fixed coordinate group two distinct index-2 subgroups on the same lattice generate a unique order-4 supergroup (<code>⟨R₂, ∗ₓ⟩ = ∗2222</code> and <code>⟨R₄, ∗_d⟩ = ∗442</code>).</p><p>In a single frozen frame (τ = 0), only the colour-fixing subgroup <i>K</i> = ker χ is visible; when the animation is rolling, forgetting the clock projects the group to the spatial orbifold group Γ. In <strong>45</strong> of the 68 groups (<i>K</i> ≇ Γ), the projected orbifold symmetry is absent from individual frames and only appears when the animation rolls — including <strong>8</strong> pure translation groups (<i>K</i> = ◦) whose frozen frames have no point or mirror symmetry at all. In another <strong>6</strong> centred groups, each frame still has a copy of Γ on a coarser sublattice, while the remaining <strong>17</strong> one-colour groups have their full symmetry in every frame.</p></details>
