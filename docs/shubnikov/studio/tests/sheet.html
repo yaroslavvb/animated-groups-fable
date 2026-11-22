@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Studio — contact sheet (developer page)</title>
+<style>
+  body { margin: 0; background: #777; font: 12px/1.3 ui-sans-serif, system-ui, sans-serif; color: #fff; }
+  canvas { display: block; }
+  #labels { position: absolute; left: 0; top: 0; pointer-events: none; }
+  #labels span { position: absolute; background: #000a; padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+</style>
+</head>
+<body>
+<!--
+  A developer page, not linked from the site: every preset (or every design
+  named in ?d=…) as a row of frames, drawn by the real renderer.
+
+    sheet.html                      all presets, 8 frames each
+    sheet.html?frames=4&size=220    fewer, larger
+    sheet.html?only=plume,commas    some presets
+    sheet.html?random=1..12         random designs by seed
+    sheet.html?tmax=0.25            frames across the first quarter of the loop only
+    sheet.html?direct=1             the single-pass renderer
+    sheet.html?compare=1            mark pixels where the shader and the
+                                    arithmetic of studio-core.mjs disagree
+-->
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<script type="module">
+import { buildGroup, compileFrame, inkAt, normaliseDesign, decodeDesign } from '../studio-core.mjs';
+import { Renderer } from '../studio-gl.mjs';
+import { PRESETS, randomDesign, censusFilm } from '../studio-presets.mjs';
+
+const params = new URLSearchParams(location.search);
+const classId = params.get('class') || 'g95-n2-3';
+const census = await (await fetch('../../data/census.json')).json();
+const group = buildGroup(census, classId);
+const frames = Number(params.get('frames') || 8);
+const size = Number(params.get('size') || 150);
+const span = Number(params.get('span') || 2.4);
+// the cell texture is matched to the pixels it will cover: a finer one would be read with gaps
+const quality = Number(params.get('q')) || Math.min(2048, Math.max(64, Math.ceil(size / span / 32) * 32));
+const tmax = Number(params.get('tmax') || 1);          // the frames span this much of the loop
+
+let rows = PRESETS.map((p) => ({ name: p.id, design: p.design }));
+rows.push({ name: 'census', design: censusFilm(group.cls) });
+if (params.get('only')) {
+  const want = params.get('only').split(',');
+  rows = rows.filter((r) => want.includes(r.name));
+}
+if (params.get('random')) {
+  const [a, b] = params.get('random').split('..').map(Number);
+  rows = [];
+  for (let s = a; s <= (b ?? a); s++) rows.push({ name: `random ${s}`, design: randomDesign(s) });
+}
+if (params.get('d')) rows = params.getAll('d').map((d, i) => ({ name: (params.getAll('name')[i]) || `link ${i + 1}`, design: decodeDesign(d, classId) }));
+rows = rows.map((r) => ({ ...r, design: normaliseDesign(r.design, classId) }));
+
+const canvas = document.querySelector('#c');
+const gap = 4;
+canvas.width = frames * (size + gap) + gap;
+canvas.height = rows.length * (size + gap) + gap;
+const renderer = new Renderer(canvas, { forceDirect: params.get('direct') === '1' });
+const gl = renderer.gl;
+gl.clearColor(0.45, 0.45, 0.45, 1);
+gl.clear(gl.COLOR_BUFFER_BIT);
+const labels = document.querySelector('#labels');
+const report = { mode: renderer.mode, rows: [], detail: [], mismatches: 0, compared: 0 };
+const view = { cx: 0, cy: 0, upp: span / size };
+rows.forEach((row, r) => {
+  const y = canvas.height - (r + 1) * (size + gap);
+  for (let f = 0; f < frames; f++) {
+    const t = tmax * f / frames;
+    const frame = compileFrame(row.design, group, t);
+    const x = gap + f * (size + gap);
+    renderer.render(frame, view, { port: [x, y, size, size], quality });
+    if (params.get('compare') === '1') {
+      const px = renderer.read(x, y, size, size);
+      let bad = 0, n = 0;
+      for (let j = 3; j < size; j += 7) {
+        for (let i = 3; i < size; i += 7) {
+          const at = inkAt(frame, view.cx + (i + 0.5 - size / 2) * view.upp, view.cy + (j + 0.5 - size / 2) * view.upp);
+          // near an outline the pixel is a blend, and a nearly cancelled ground is a soft grey
+          if (at.margin < 0.012 && !(at.ink === 0 && Math.abs(at.A) > 0.012 && Math.abs(at.G) < 1e-12)) continue;
+          n += 1;
+          const lum = px[4 * (j * size + i)];
+          const seen = at.ink === 0 ? (lum > 100 && lum < 156 ? 0 : 2) : lum > 127 ? 1 : -1;
+          if (seen !== at.ink) { bad += 1; if (report.detail.length < 12) report.detail.push({ row: row.name, t, i, j, lum, ink: at.ink, margin: at.margin, G: at.G, A: at.A, S: at.S, I: at.I }); }
+        }
+      }
+      report.mismatches += bad; report.compared += n;
+      if (bad) report.rows.push(`${row.name} t=${t.toFixed(3)}: ${bad}/${n}`);
+    }
+  }
+  const tag = document.createElement('span');
+  tag.textContent = row.name;
+  tag.style.left = `${gap + 2}px`;
+  tag.style.top = `${r * (size + gap) + gap + 2}px`;
+  labels.append(tag);
+});
+window.__sheet = report;
+document.title = `sheet ready (${renderer.mode})`;
+</script>
+</body>
+</html>

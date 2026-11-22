@@ -61,6 +61,16 @@ loop with ← → (shift for finer steps).
   cannot see carry their plane colour-group names
   (`docs/shubnikov/tools/name_colourings.py`).
 
+- **Studio** ([docs/shubnikov/studio/](docs/shubnikov/studio/)) — an editor
+  for two-colour films with the symmetry of a census class, opening in
+  `g95-n2-3`, the class of Plume Monochrome. A design is a list of shapes
+  with motions (orbit, path, spin, rock, pulse, blink) and of waves; the
+  group makes the copies, so the film has the class's symmetry whatever is
+  drawn. Shapes flood the ground (a soft Voronoi diagram of their copies),
+  stamp it, or invert it. All 307 two-colour classes are offered; the whole
+  design travels in the link. See its
+  [README](docs/shubnikov/studio/README.md).
+
 ## The computation (`enumerate/`)
 
 The classification is recomputed from scratch in exact rational arithmetic

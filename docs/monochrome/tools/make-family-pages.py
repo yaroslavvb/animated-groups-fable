@@ -104,10 +104,14 @@ NAV_GROUPS = [
     ('Colourings', [
         ('colour/', 'Entangled colourings'), ('colour/gyre/', 'Gyre'),
         ('colour/trefoil/', 'Trefoil'), ('monochrome/', 'Monochrome'),
+        # `add-nav.py` added these two to the pages on disk; they are named here
+        # too, so that a fresh stamp and `--check` agree with what is served.
+        ('shubnikov/', 'Shubnikov'),
     ]),
     ('Developer', [
         ('reports/', 'Reports'), ('motifs.html', 'Motifs'),
-        ('designer.html', 'Designer'), ('billiards.html', 'Billiards'),
+        ('designer.html', 'Designer'), ('shubnikov/studio/', 'Studio'),
+        ('billiards.html', 'Billiards'),
     ]),
     ('Superseded', [('crystals-colored.html', '269 coloured crystals')]),
 ]

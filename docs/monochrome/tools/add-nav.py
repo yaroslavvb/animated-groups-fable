@@ -13,6 +13,10 @@ Two changes, applied to all 88 pages under `docs/` that carry a site header:
    reaching the superseded crystal catalogue at all.
 4. **"Shubnikov" joins the Colourings group** after Monochrome (29 Sep 2026):
    the 990 cyclic colourings of the 68 forward film groups, docs/shubnikov/.
+5. **"Studio" joins the Developer group** after Designer (21 Nov 2026): the
+   editor that makes a two-colour film of a Shubnikov class from shapes and
+   motions, docs/shubnikov/studio/.  Only pages that already offer the
+   Designer gain it; the two reports with a short Developer group keep theirs.
 
 Run from the repository root:
 
@@ -42,6 +46,7 @@ COLOURINGS = [
     ("shubnikov/", "Shubnikov"),
 ]
 SHUBNIKOV = COLOURINGS[-1]
+STUDIO = ("shubnikov/studio/", "Studio")
 # The fifth group. 86 of the 88 pages carry it; the two report pages were
 # written before it existed and carried four groups where every other page
 # carries five.
@@ -62,6 +67,7 @@ def group_re(label: str) -> re.Pattern:
 CATALOGUES = group_re("Catalogues")
 COLOUR = group_re("Colour")
 COLOURINGS_RE = group_re("Colourings")
+DEVELOPER = group_re("Developer")
 PREFIX = re.compile(r'href="([^"]*?)(?:scott-gray-groups|correspondence)\.html"')
 ANCHOR = re.compile(r'<a\b[^>]*href="([^"]*)"[^>]*>')
 
@@ -77,6 +83,7 @@ HERE = {
     "colour/trefoil/index.html": "colour/trefoil/",
     "monochrome/index.html": "monochrome/",
     "shubnikov/index.html": "shubnikov/",
+    "shubnikov/studio/index.html": "shubnikov/studio/",
 }
 
 
@@ -169,6 +176,29 @@ def add_shubnikov(text: str, here: str | None) -> tuple[str, bool]:
     return text[:start] + new_body + text[end:], True
 
 
+def add_studio(text: str, here: str | None) -> tuple[str, bool]:
+    """Insert the Studio anchor after Designer in a Developer group that has one.
+
+    Idempotent, and written in whichever of the two header shapes the page
+    already uses.  A Developer group without the Designer (the two reports) is
+    left as it is: it lists where the report lives, not the tools."""
+    match = DEVELOPER.search(text)
+    if match is None:
+        return text, False
+    body = match.group("body")
+    designer = re.search(r'<a href="([^"]*?)designer\.html"[^>]*>[^<]*</a>', body)
+    if designer is None:
+        return text, False
+    prefix = designer.group(1)
+    if f'href="{prefix}{STUDIO[0]}"' in body:
+        return text, False
+    link = anchor(prefix, STUDIO[0], STUDIO[1], here)
+    inserted = (f"\n{match.group('lead')}  {link}" if "\n" in body else link)
+    new_body = body[: designer.end()] + inserted + body[designer.end():]
+    start, end = match.start("body"), match.end("body")
+    return text[:start] + new_body + text[end:], True
+
+
 ANY_GROUP = re.compile(
     r'(?P<lead>[ \t]*)<span class="navgroup(?: [^"]*)?">\s*'
     r'<span class="navgroup-label">(?P<label>[^<]*)</span>'
@@ -230,6 +260,10 @@ def missing(text: str) -> list[str]:
             gaps.append("the Colourings group does not hold all %d links" % len(COLOURINGS))
     if COLOUR.search(text):
         gaps.append('an old "Colour" group is still present')
+    dev = DEVELOPER.search(text)
+    if dev is not None and "designer.html" in dev.group("body") and not any(
+            h.endswith(STUDIO[0]) for h in ANCHOR.findall(dev.group("body"))):
+        gaps.append("the Developer group offers the Designer but not the Studio")
     if "navgroup-superseded" not in text:
         gaps.append("no Superseded group")
     if text.count('class="here"') > 1:
@@ -271,6 +305,7 @@ def main() -> int:
             out, did_showcase = add_showcase(out, here)
             out, did_colour = rename_colour(out, here)
             out, did_shubnikov = add_shubnikov(out, here)
+            out, did_studio = add_studio(out, here)
             out, did_superseded = add_superseded(out)
         except ValueError as exc:
             stale.append((rel, [str(exc)]))

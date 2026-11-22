@@ -891,6 +891,15 @@ function fillAlgebra() {
   link.href = href;
   link.textContent = href;
   rows.push(...algebraRow('permalink', link, true));
+  // A two-colour class can be drawn on by hand: the Studio takes shapes and
+  // motions and makes a film with exactly this class's symmetry.
+  if (cls.n === 2) {
+    const studio = document.createElement('a');
+    studio.className = 'permalink';
+    studio.href = `studio/?class=${encodeURIComponent(cls.id)}`;
+    studio.textContent = 'Make your own film in this class, in the Studio';
+    rows.push(...algebraRow('studio', studio, true));
+  }
   const name = nameOf(cls);
   if (name) rows.unshift(...algebraRow('name', name, true));
   viewer.algebra.replaceChildren(...rows);

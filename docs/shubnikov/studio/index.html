@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Studio: make your own black-and-white film with the symmetry of a Shubnikov class. Place shapes, give them motions, and the group does the rest — a quarter turn with a quarter loop keeps the inks, a half turn or half a loop swaps them.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Studio — Spacetime Groups</title>
+  <link rel="canonical" href="https://yaroslavvb.github.io/animated-groups-fable/shubnikov/studio/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+  <link rel="stylesheet" href="../../css/style.css?v=collapsible-header-v1">
+  <script defer src="../../js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="stylesheet" href="studio.css?v=studio-v1">
+  <script type="module" src="studio-app.mjs?v=studio-v1"></script>
+</head>
+<body class="studio-page">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="../../index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="../../index.html">Tutorial</a>
+        <a href="../../notation.html">Notation</a>
+        <a href="../../colourings-tutorial.html">Colourings</a>
+        <a href="../../subgroups-vs-colourings.html">Subgroups</a>
+        <a href="../../torus-cayley.html">Torus Cayley graphs</a>
+        <a href="../../hierarchy.html">Hierarchy</a>
+        <a href="../../history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="../../showcase/">Showcase</a>
+        <a href="../../catalog.html">275 spacetime</a>
+        <a href="../../wallpaper.html">275 spacetime (grouped)</a>
+        <a href="../../correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="../../patterns.html">609 patterns</a>
+        <a href="../../escher.html">107 Escher</a>
+        <a href="../../gallery.html">Gallery</a>
+        <a href="../../scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colourings</span>
+        <a href="../../colour/">Entangled colourings</a>
+        <a href="../../colour/gyre/">Gyre</a>
+        <a href="../../colour/trefoil/">Trefoil</a>
+        <a href="../../monochrome/">Monochrome</a>
+        <a href="../../shubnikov/">Shubnikov</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="../../reports/">Reports</a>
+        <a href="../../motifs.html">Motifs</a>
+        <a href="../../designer.html">Designer</a>
+        <a href="../../shubnikov/studio/" class="here">Studio</a>
+        <a href="../../billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="../../crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<main class="studio" aria-busy="true" data-census="../data/census.json?v=shubnikov-v3">
+  <section class="stage" aria-label="The film">
+    <div class="bar" role="toolbar" aria-label="Design">
+      <h1 class="bar-title">Studio <button type="button" class="class-chip" id="class-chip" title="the Shubnikov class whose symmetry every design here has; click to change it">g95-n2-3</button></h1>
+      <span class="bar-gap"></span>
+      <button type="button" id="presets" aria-haspopup="dialog" aria-expanded="false">Designs</button>
+      <button type="button" id="random" title="a design nobody chose (R)">Random</button>
+      <button type="button" id="undo" title="undo (Ctrl/Cmd+Z)" disabled>Undo</button>
+      <button type="button" id="redo" title="redo (Ctrl/Cmd+Shift+Z)" disabled>Redo</button>
+      <button type="button" id="copy-link" title="the whole design is in the address">Copy link</button>
+      <button type="button" id="export" aria-haspopup="menu" aria-expanded="false">Export</button>
+    </div>
+
+    <div class="viewport" id="viewport">
+      <canvas id="film" aria-label="The animation. Drag a shape to move it and every copy of it; drag the ground to pan; scroll or pinch to zoom."></canvas>
+      <canvas id="overlay" aria-hidden="true"></canvas>
+      <p class="hud" id="hud" role="status" aria-live="polite"></p>
+      <div class="empty" id="empty" hidden>
+        <p><b>Nothing is drawn yet.</b></p>
+        <p>Add a shape and give it a motion, or open one of the designs.</p>
+        <p><button type="button" id="empty-add">Add a shape</button> <button type="button" id="empty-designs">Designs</button></p>
+      </div>
+      <div class="view-tools" role="toolbar" aria-label="View">
+        <label class="tool-check" title="the cell, the rotation centres and what each does"><input type="checkbox" id="show-sym" checked> <span>Symmetry</span></label>
+        <label class="tool-select wide-only" title="draw the outlines of the shapes and of the copies the group makes">Outlines
+          <select id="show-outlines">
+            <option value="sel" selected>selected</option>
+            <option value="all">all</option>
+            <option value="none">none</option>
+          </select>
+        </label>
+        <button type="button" id="fit" title="bring the view home (0)">Home</button>
+        <button type="button" id="fullscreen" title="fullscreen (F)">Fullscreen</button>
+      </div>
+      <p class="fallback" id="fallback" hidden></p>
+    </div>
+
+    <div class="transport">
+      <div class="playrow">
+        <button type="button" id="play" aria-label="Pause" aria-pressed="true" title="play or pause (Space)">❚❚</button>
+        <div class="scrubwrap">
+          <input type="range" id="scrub" min="0" max="1000" step="1" value="0" aria-label="Time within the loop">
+          <div class="ticks" aria-hidden="true"><i style="left:0%"></i><i style="left:25%"></i><i style="left:50%"></i><i style="left:75%"></i><i style="left:100%"></i></div>
+        </div>
+        <output class="clock" id="clock" for="scrub">0.000</output>
+        <label class="tool-select">Inks
+          <select id="palette" aria-label="The two inks"></select>
+        </label>
+        <label class="tool-select">Loop
+          <select id="loop" aria-label="Seconds per loop">
+            <option value="3">3 s</option>
+            <option value="6">6 s</option>
+            <option value="8" selected>8 s</option>
+            <option value="10">10 s</option>
+            <option value="12">12 s</option>
+            <option value="20">20 s</option>
+            <option value="40">40 s</option>
+          </select>
+        </label>
+      </div>
+      <div class="strip" id="strip" aria-label="Eight frames of the loop; click one to go there"></div>
+      <p class="strip-note" id="strip-note"></p>
+    </div>
+  </section>
+
+  <aside class="panel" aria-label="The design">
+    <section class="card group-card" id="group-card"></section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Layers</h2>
+        <span class="card-gap"></span>
+        <button type="button" id="add-shape" title="a new shape, where the view is centred (N)">+ Shape</button>
+        <button type="button" id="add-wave" title="a plane wave, summed over the group">+ Wave</button>
+      </div>
+      <ol class="layers" id="layers"></ol>
+      <p class="hint" id="layers-hint"></p>
+    </section>
+
+    <section class="card inspector" id="inspector" aria-live="polite"></section>
+
+    <section class="card notes">
+      <details>
+        <summary>How a design becomes a film</summary>
+        <div class="prose" id="how"></div>
+      </details>
+      <details>
+        <summary>Keys and gestures</summary>
+        <dl class="keys">
+          <dt>drag a shape</dt><dd>move it, and every copy with it; any copy will do</dd>
+          <dt>drag the ground</dt><dd>pan</dd>
+          <dt>scroll, pinch</dt><dd>zoom</dd>
+          <dt>double-click the ground</dt><dd>a new shape there</dd>
+          <dt>drop a file on the film</dt><dd>open a design saved as JSON</dd>
+          <dt><kbd>Space</kbd></dt><dd>play, pause</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>step through the loop; with a shape selected and <kbd>Alt</kbd>, nudge it</dd>
+          <dt><kbd>Delete</kbd></dt><dd>remove the selected layer</dd>
+          <dt><kbd>D</kbd></dt><dd>duplicate it</dd>
+          <dt><kbd>N</kbd> <kbd>R</kbd></dt><dd>new shape, random design</dd>
+          <dt><kbd>0</kbd> <kbd>F</kbd></dt><dd>home view, fullscreen</dd>
+          <dt><kbd>Esc</kbd></dt><dd>let go of the selection</dd>
+        </dl>
+      </details>
+    </section>
+  </aside>
+</main>
+
+<dialog class="studio-dialog" id="designs-dialog" closedby="any" aria-labelledby="designs-title">
+  <form method="dialog" class="dialog-head">
+    <h3 id="designs-title">Designs</h3>
+    <button value="close" aria-label="Close">Close</button>
+  </form>
+  <div class="designs" id="designs"></div>
+</dialog>
+
+<dialog class="studio-dialog" id="class-dialog" closedby="any" aria-labelledby="class-title">
+  <form method="dialog" class="dialog-head">
+    <h3 id="class-title">The class</h3>
+    <button value="close" aria-label="Close">Close</button>
+  </form>
+  <div class="class-body">
+    <p>A design is a list of shapes and motions; the class decides what the group makes of it. Any of the census's 307 two-colour classes will take the design you have.</p>
+    <label>Class <select id="class-select"></select></label>
+    <p class="hint" id="class-note"></p>
+  </div>
+</dialog>
+
+<div class="menu" id="export-menu" role="menu" hidden>
+  <button type="button" role="menuitem" data-export="png">This frame, as a PNG</button>
+  <button type="button" role="menuitem" data-export="video">One loop, as a video</button>
+  <button type="button" role="menuitem" data-export="json">The design, as JSON</button>
+</div>
+
+<noscript>The Studio needs JavaScript and WebGL 2.</noscript>
+</body>
+</html>
