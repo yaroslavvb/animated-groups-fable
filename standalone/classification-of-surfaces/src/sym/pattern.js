@@ -432,10 +432,53 @@ export function createPattern(canvas, opts = {}) {
   // ---- sliding the pattern about
   let drag = null, lastTap = 0, still = 0;
   const local = (e) => { const r = canvas.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  // A slide coasts on a little once the hand lets go, and slows to a stop (his ask, Sat 21 Nov 2026 10:47: "add slight
+  // inertia for when I slide things"). Shepherd, the page's own agent, added it to the live page at 10:49 by editing the
+  // built file; this is that glide in the source, with its numbers: the speed is the hand's over its last 90 ms, none
+  // below 0.12 px per ms or once the hand rested 70 ms before letting go, at most 2.5 px per ms, and it falls to a third
+  // in about a fifth of a second. Each frame moves the point under the place the hand let go, as one more step of the
+  // drag would. A new touch, a wheel, a key, a reset or a pattern from another screen stops it; reduced motion has none.
+  let coast = 0;
+  const FADE = 200, MIN_SPEED = 0.12, MAX_SPEED = 2.5;      // ms; px per ms
+  const stopCoast = () => { if (coast) { cancelAnimationFrame(coast); coast = 0; } };
+  function release(was, t) {
+    const pts = was.trail;
+    if (calm || !pts || pts.length < 2 || typeof requestAnimationFrame !== 'function') return false;
+    const last = pts[pts.length - 1];
+    if (t - last.t > 70) return false;                         // the hand stopped before it let go
+    let first = last;
+    for (let i = pts.length - 2; i >= 0 && last.t - pts[i].t <= 90; i--) first = pts[i];
+    const dt = last.t - first.t;
+    if (dt < 8) return false;
+    let vx = (last.x - first.x) / dt, vy = (last.y - first.y) / dt;
+    const s = Math.hypot(vx, vy);
+    if (s < MIN_SPEED) return false;
+    if (s > MAX_SPEED) { vx *= MAX_SPEED / s; vy *= MAX_SPEED / s; }
+    const x = last.x, y = last.y;
+    let prev = performance.now();
+    const step = (now) => {
+      coast = 0;
+      if (!model) return;
+      const dt2 = Math.min(50, Math.max(0, now - prev)), k = Math.exp(-dt2 / FADE);
+      prev = now;
+      const dx = vx * FADE * (1 - k), dy = vy * FADE * (1 - k);
+      vx *= k; vy *= k;
+      if (dx || dy) {
+        V = G.fix(mul(G.translate(unproject(x, y), unproject(x + dx, y + dy)), V), vHand());
+        recentre(null);
+      }
+      if (Math.hypot(vx, vy) > 0.02) { quick = true; schedule(); coast = requestAnimationFrame(step); return; }
+      settle();                                                 // the outlined tile went out of sight: it comes back
+      clearTimeout(still); quick = false; schedule();
+    };
+    coast = requestAnimationFrame(step);
+    return true;
+  }
   canvas.addEventListener('pointerdown', (e) => {
+    stopCoast();
     if (!model || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const [x, y] = local(e);
-    drag = { id: e.pointerId, p0: unproject(x, y), V0: V.slice(), x, y, moved: false };
+    drag = { id: e.pointerId, p0: unproject(x, y), V0: V.slice(), x, y, moved: false, trail: [{ x, y, t: performance.now() }] };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* a synthetic pointer: no capture, the drag still works */ }
   });
   canvas.addEventListener('pointermove', (e) => {
@@ -446,6 +489,9 @@ export function createPattern(canvas, opts = {}) {
     }
     if (drag.id !== e.pointerId) return;
     const [x, y] = local(e);
+    const t = performance.now();
+    drag.trail.push({ x, y, t });
+    while (drag.trail.length > 2 && t - drag.trail[0].t > 120) drag.trail.shift();
     if (Math.hypot(x - drag.x, y - drag.y) > 3) drag.moved = true;
     if (!drag.moved) return;
     setHot(null);
@@ -469,11 +515,32 @@ export function createPattern(canvas, opts = {}) {
       if (now - lastTap < 320) { api.resetView(); lastTap = 0; } else lastTap = now;
       return;
     }
+    if (e.type === 'pointerup' && release(was, performance.now())) return;     // it coasts, and settles when it stops
     if (settle()) schedule();                                           // the outlined tile was dragged out of sight: it comes back
     still = setTimeout(() => { quick = false; schedule(); }, 140);      // the far rim is filled in once the hand is still
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
+  // A trackpad's two-finger swipe slides the pattern as well (Shepherd's change on the live page, Sat 21 Nov 2026
+  // 20:15, for his note that on the MacBook's trackpad a finger drag only zoomed): a wheel without ctrl moves the point
+  // under the pointer by the scroll, the way the fingers go with natural scrolling; a mouse wheel slides it too. A
+  // pinch does nothing here.
+  canvas.addEventListener('wheel', (e) => {
+    if (!model || e.ctrlKey) return;
+    e.preventDefault();
+    stopCoast();
+    let dx = e.deltaX, dy = e.deltaY;
+    if (e.deltaMode === 1) { dx *= 30; dy *= 30; } else if (e.deltaMode === 2) { dx *= 300; dy *= 300; }
+    dx = Math.max(-240, Math.min(240, dx)); dy = Math.max(-240, Math.min(240, dy));
+    if (!dx && !dy) return;
+    const [x, y] = local(e);
+    setHot(null);
+    V = G.fix(mul(G.translate(unproject(x, y), unproject(x - dx, y - dy)), V), vHand());
+    recentre(null);
+    quick = true; clearTimeout(still);
+    still = setTimeout(() => { settle(); quick = false; schedule(); }, 180);     // the outline comes back once it rests
+    schedule();
+  }, { passive: false });
   canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) setHot(null); });
   canvas.addEventListener('keydown', (e) => {
     if (!model) return;
@@ -481,6 +548,7 @@ export function createPattern(canvas, opts = {}) {
     if (e.key === '0' || e.key === 'Home') { api.resetView(); e.preventDefault(); return; }
     if (!d) return;
     e.preventDefault();
+    stopCoast();
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
     V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V), vHand());
     recentre(null);
@@ -491,6 +559,7 @@ export function createPattern(canvas, opts = {}) {
 
   const api = {
     set(m) {
+      stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
       if (!m) { model = null; G = null; sel = null; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       model = m; G = m.D.G; sel = null; quick = false;
@@ -501,13 +570,14 @@ export function createPattern(canvas, opts = {}) {
       size(); firstView(); draw();
     },
     select(i) { sel = i; schedule(); },
-    resetView() { if (!model) return; firstView(); quick = false; schedule(); },
+    resetView() { stopCoast(); if (!model) return; firstView(); quick = false; schedule(); },
     /** Where the pattern and its outlined tile are on the screen, to hand to another screen: { V, base, turned } (turned: base turns the plane over; null: no pattern). */
     getView() { return model ? { V: V.slice(), base: base.slice(), turned: bRev } : null; },
     /** Put the pattern where another screen has it (what its getView() gave). Anything else is left alone. */
     setView(v) {
       const nine = (m) => Array.isArray(m) && m.length === 9 && m.every(Number.isFinite);
       if (!model || !v || !nine(v.V) || !nine(v.base)) return false;
+      stopCoast();
       vRev = det(v.V) < 0; bRev = !!v.turned;              // V is always near the middle of the view: its determinant can be trusted
       V = G.fix(v.V, vHand()); base = G.fix(v.base, bHand());
       quick = false; schedule();

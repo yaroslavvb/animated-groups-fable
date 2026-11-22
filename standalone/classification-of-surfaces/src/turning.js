@@ -13,9 +13,10 @@
 //
 // How it sits on the renderer without changing it: the renderer's listeners are on the canvas and run first; this
 // module listens on the canvas's parent, so each event reaches it afterwards and it simply sets the view it wants
-// (R.setView), which also stops the renderer's momentum. Taps, double-tap to reset, wheel and pinch zoom stay the
-// renderer's. The twist of a two-finger pinch (and of Safari's trackpad rotate) is taken out again, and the arrow
-// keys turn and tilt instead of rolling the ball.
+// (R.setView), which also stops the renderer's momentum. Taps, double-tap to reset and a pinch's zoom stay the
+// renderer's; a wheel without ctrl (a trackpad's two-finger swipe, a mouse wheel) turns, as a drag does (Sat 21 Nov
+// 2026). The twist of a two-finger pinch (and of Safari's trackpad rotate) is taken out again, and the arrow keys turn
+// and tilt instead of rolling the ball.
 
 import { viewFromAzEl } from './vendor/the-folding/render3d.js';
 
@@ -86,6 +87,27 @@ export function createTurning(R, pane, canvas) {
   pane.addEventListener('pointerup', end);
   pane.addEventListener('pointercancel', end);
   pane.addEventListener('gesturechange', level);
+  // A trackpad's two-finger swipe turns the view, as a drag does (his note on the page, Sat 21 Nov 2026 20:12: on the
+  // MacBook's trackpad a finger drag zoomed and never turned). Shepherd, the page's own agent, did it on the live page
+  // at 20:15 by editing the built file (the renderer's wheel handler); this is that change in the source, with the
+  // renderer left as it was: any wheel without ctrl turns, and only a pinch (ctrl+wheel in Chrome and Firefox; Safari's
+  // gesture events) zooms. So a mouse wheel turns too and no longer zooms; wheel.js can tell a mouse's notch from a
+  // swipe if the wheel is to zoom again (in this listener: return when wheelSorter() says 'wheel'). The renderer reads
+  // every wheel as zoom, so this listens on the way down (capture) and keeps a turning wheel from the canvas. With
+  // natural scrolling, the fingers moving right give deltaX < 0.
+  pane.addEventListener('wheel', (e) => {
+    if (e.target !== canvas || e.ctrlKey) return;
+    e.preventDefault(); e.stopPropagation();
+    if (drag) return;                              // a button is down as well: the drag has the view
+    let dx = e.deltaX, dy = e.deltaY;
+    if (e.deltaMode === 1) { dx *= 30; dy *= 30; } else if (e.deltaMode === 2) { dx *= 300; dy *= 300; }
+    dx = Math.max(-240, Math.min(240, dx)); dy = Math.max(-240, Math.min(240, dy));
+    if (!dx && !dy) return;
+    const v = R.getView();
+    if (!v || !v.q) return;
+    const [az, el] = azElOf(v.q), k = sensitivity();
+    R.setView({ q: viewFromAzEl(az + dx * k, tilt(el - dy * k)).q });
+  }, { capture: true, passive: false });
   // the arrow keys turn and tilt (the renderer would roll the ball)
   pane.addEventListener('keydown', (e) => {
     if (e.target !== canvas || e.altKey || e.ctrlKey || e.metaKey) return;

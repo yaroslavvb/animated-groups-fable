@@ -35,6 +35,7 @@ book's own strange surface (p. 104) from its five pieces and watch it become ○
 | `src/examples/` | the Examples tab: the seven surfaces as cell complexes, their counts computed, the pinwheel |
 | `src/sym/` | the Symmetries tab: `geom.js` (sphere, plane, hyperbolic plane behind one interface), `domains.js` (a pattern's tile), `orbifold.js` (the signature read off the tile; the tiles of the pattern), `catalog.js` (signatures as data, the examples), `motifs.js` (the print on a tile: Paisley), `pairs.js` (the look of each glued pair of edges), `pattern.js` (the 2D pane), `surface.js` (the orbifold in 3D) |
 | `src/tabs/` | one module per tab; `src/app.js` the shell; `src/index.template.html` all the static words |
+| `src/turning.js`, `src/wheel.js` | how a drag and a wheel without ctrl (a trackpad's two-finger swipe) turn the 3D view (a turntable); `wheel.js`, not used, tells a swipe from a mouse's notch, for a wheel that zooms again |
 | `src/sync.js` | one screen drives the others: the owner's open page sends its state through a spacesheep page stream, every other screen takes it |
 | `src/sharehash.js` | the address a reader can copy follows the page: inside spacesheep's viewer the page tells the viewer its fragment |
 | `src/showcase.template.html`, `src/showcase.js`, `src/showcase.css` | the Orbifold showcase: the Symmetries tab on its own page, built from this source into `../2026-11-17-orbifold-showcase/site/` |
@@ -78,6 +79,20 @@ same evening: *"make Turnable the default and get rid of chooser"*. So `src/turn
 else: left-right turns about the vertical, up-down tilts to straight above or below, "up" stays up, and any loop of
 the pointer comes home exactly. It does not change the renderer: its listeners sit on the canvas's parent, run after
 the renderer's, and set the view they want. The Folding and The Unfolding have the rolling ball still.
+
+**A trackpad's two-finger swipe turns the view; only a pinch zooms** (Sat 21 Nov 2026, week 47). His note on the page,
+20:12: on the MacBook's trackpad a finger drag zoomed but never turned, while the mouse worked (his words to Shepherd:
+*"Make sure the interactions work using the Macintosh latest Touch API…"*). A swipe reaches the page as wheel events,
+and the renderer reads every wheel event as zoom (`render3d.js` onWheel). Shepherd, the page's own agent, changed the
+live page at 20:15 (version `d6a32866`, "syntax checked, runtime unverified") by editing the built file's renderer:
+any wheel without ctrl turns the 3D view and slides the pattern, and only ctrl+wheel (a pinch in Chrome and Firefox;
+Safari pinches with gesture events) zooms. The agent-requests pass carried that into the source on Sun 22 Nov, the
+renderer left unchanged: `src/turning.js` takes a wheel on the way down (capture) and turns, `src/sym/pattern.js`
+slides. **So a mouse wheel turns and slides too, and no longer zooms.** `src/wheel.js` (not used, tested) tells a
+mouse's notch from a swipe, if the wheel is to zoom again: its header says the two lines. Checked headless, on
+Shepherd's live page and on this build alike (synthetic wheel events, real mouse drags): a swipe turns and keeps the
+zoom, a pinch zooms, a mouse drag still turns; before Sat 20:15 the same swipe zoomed (1 to 0.96) and never turned. Not
+checked here: a real trackpad.
 
 ## The Symmetries tab
 
@@ -349,6 +364,20 @@ fourteen characters; a tile's shape is one choice among many where the book says
 (`*3*`, `o`, `**`, and every general tile); cone points and corners do not show in the Zip it up tab (only the surface); the
 hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the rest of the rim is tinted.
 
+### A slide coasts, and a two-finger swipe slides (Sat 21 Nov 2026, week 47)
+
+His ask on the page, Sat 21 Nov 2026 10:47: *"add slight inertia for when I slide things"*. Shepherd, the page's own
+agent, added a glide to the live page at 10:49 (version `05afd7b9`, "Haven't tried it in a browser yet") by editing
+the built file; the agent-requests pass carried it into `src/sym/pattern.js` on Sun 22 Nov with Shepherd's numbers. A
+slide carries on after the hand lets go and slows to a stop: the speed is the hand's over its last 90 ms, at most 2.5
+px per ms, it falls to a third in about a fifth of a second (`FADE` 200 ms), and nothing coasts below 0.12 px per ms or
+when the hand rested 70 ms before letting go. Each frame moves the point under the place the hand let go, as one more
+step of the drag would, so it works the same on the sphere, the plane and the hyperbolic disc, and the outline still
+comes back (settle()) once it stops. A new touch, a wheel, a key, a reset, another pattern or another screen's view
+stops it; `prefers-reduced-motion` has none. Shepherd's 20:15 change (above, under Turning the view) also made a wheel
+without ctrl slide the pattern: a two-finger swipe moves the point under the pointer the way the fingers go. Checked
+headless: a flick coasts and stops, a hand that rests before letting go doesn't coast, a touch stops a coast.
+
 ## What is not there
 
 - A join that involves a ball (not two polygons) changes the picture without motion: the two arrows stand out, then the
@@ -359,7 +388,8 @@ hyperbolic disc draws the 4,200 nearest tiles (fewer while a finger moves), the 
 
 ## Checked
 
-- `node --test`: 81 tests (the newest: the address told to spacesheep's viewer holds only the characters it takes,
+- `node --test`: 86 tests (the newest five, Sun 22 Nov 2026, for the unused `src/wheel.js`: a trackpad's swipe against a
+  mouse notch, lines, a pinch and modifier keys, and one gesture keeping one kind; before them, 81: the newest of those: the address told to spacesheep's viewer holds only the characters it takes,
   and deleting a star keeps its numbers; before them: a motion put back onto the group keeps the hand it is told, in all three
   geometries; before it: on every example's tile and seven tiles of one's own each glued pair sits on
   exactly two edges and the pairs are numbered from the first, and fifteen pairs get fifteen different looks, none
