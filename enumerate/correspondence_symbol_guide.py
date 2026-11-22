@@ -35,7 +35,7 @@ import re
 import correspondence_symbols
 
 PAGE = "correspondence-symbols.html"
-ASSET_VERSION = "symbol-guide-v1"
+ASSET_VERSION = "symbol-guide-v2"
 
 ORDER_WORD = {2: "half", 3: "third", 4: "quarter", 6: "sixth"}
 
@@ -497,8 +497,9 @@ def page(parts, head_for):
         '      <p class="family-breadcrumb"><a href="correspondence.html">Animation/colouring correspondence</a>'
         ' <span aria-hidden="true">·</span> diagram symbols</p>\n'
         '      <h1 id="page-title">What each diagram symbol does</h1>\n'
-        '      <p>A polar crystal has one direction, the polar axis %(c)s, that no symmetry of the crystal '
-        'reverses. Stand the axis upright. Every symmetry is then an isometry of the horizontal plane '
+        '      <p>A polar crystal has a direction, its polar axis %(c)s, that every symmetry of the crystal '
+        'keeps: none tilts it and none turns it over. Stand the axis upright. Every symmetry is then an '
+        'isometry of the horizontal plane '
         '(a shift, a turn, a reflection or a glide reflection) together with a rise along the axis:</p>\n'
         '      <p class="symbol-guide-law"><span class="symbol-guide-law-map">(<i>p</i>, <i>z</i>) ↦ '
         '(<i>g</i>·<i>p</i>, <i>z</i> + <i>h</i>)</span>'

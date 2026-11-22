@@ -265,6 +265,16 @@ await section('a link to one symbol lands on its card', async () => {
     const top = await page.locator('#rotation-6-3').evaluate((el) => el.getBoundingClientRect().top);
     assert.ok(top > 40 && top < 140, `the card is just under the header at ${width}px (top ${Math.round(top)})`);
     assert.ok(await colours(figure(page, 'rotation-6-3').locator('.symbol-view--crystal canvas')) >= 4);
+    // and inside the page the key jumps to a card, without scrolling past the ones between
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.locator('.symbol-key a[href="#plane-d"]').click();
+    await page.waitForTimeout(150);
+    const jumped = await page.locator('#plane-d').evaluate((el) => el.getBoundingClientRect().top);
+    assert.ok(jumped > 40 && jumped < 140, `the key jumps straight to a card at ${width}px (top ${Math.round(jumped)})`);
+    await page.locator('#plane-d .symbol-card-up').evaluate((a) => a.click());
+    await page.waitForTimeout(150);
+    const key = await page.locator('#marks').evaluate((el) => el.getBoundingClientRect().top);
+    assert.ok(key > 40 && key < 140, `and "All marks" jumps back (top ${Math.round(key)})`);
     assert.deepEqual(errors, []);
     await context.close();
   }

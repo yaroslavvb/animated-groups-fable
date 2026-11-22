@@ -7,6 +7,12 @@
   --figure-line: #dcd8cc;
 }
 
+/* The site scrolls smoothly, but a jump from the key to a card far down this
+   page would fly past a dozen running figures: here links jump. */
+html:has(.symbol-guide) {
+  scroll-behavior: auto;
+}
+
 .symbol-guide-intro {
   padding-top: clamp(1.6rem, 4vw, 2.6rem);
   padding-bottom: 0.6rem;
