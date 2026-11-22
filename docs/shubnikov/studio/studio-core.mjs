@@ -212,6 +212,51 @@ export function rotationCentres(group) {
   return out;
 }
 
+/**
+ * Mirror and glide axes of the group within `reach` cells of the origin, in
+ * lattice coordinates: a point `p` on the axis and its direction `d`.
+ *   kind  'mirror'  a reflection in the axis that costs no time and keeps the inks
+ *         'anti'    one that costs no time and swaps them
+ *         'glide'   every reflection in the axis also slides along it or costs time
+ * One axis carries many elements (the same reflection with every translation
+ * along it), so the kind is the best that any of them offers.
+ */
+export function mirrorAxes(group, reach = 2) {
+  const found = new Map();
+  const gcd = (a, b) => (b ? gcd(b, a % b) : Math.abs(a));
+  const column = (A) => (A[0][0] || A[1][0] ? [A[0][0], A[1][0]] : [A[0][1], A[1][1]]);
+  const primitive = (v) => { const g = gcd(v[0], v[1]) || 1; let w = [v[0] / g, v[1] / g]; if (w[0] < 0 || (w[0] === 0 && w[1] < 0)) w = [-w[0], -w[1]]; return w; };
+  const RANK = { glide: 0, anti: 1, mirror: 2 };
+  for (const el of group.elements) {
+    if (el.det > 0) continue;
+    const M = el.M;
+    const d = primitive(column([[M[0][0] + 1, M[0][1]], [M[1][0], M[1][1] + 1]]));   // M d = d
+    const n = primitive(column([[M[0][0] - 1, M[0][1]], [M[1][0], M[1][1] - 1]]));   // M n = -n
+    const det = d[0] * n[1] - d[1] * n[0];
+    for (let m0 = -reach - 1; m0 <= reach + 1; m0++) {
+      for (let m1 = -reach - 1; m1 <= reach + 1; m1++) {
+        const v0 = el.v[0] + m0, v1 = el.v[1] + m1;
+        const along = (v0 * n[1] - v1 * n[0]) / det, across = (d[0] * v1 - d[1] * v0) / det;
+        const p = [n[0] * across / 2, n[1] * across / 2];
+        const offset = -d[1] * p[0] + d[0] * p[1];
+        const key = `${d[0]},${d[1]},${Math.round(offset * 48)}`;
+        const slides = Math.abs(along - Math.round(along)) > 1e-9;
+        const kind = slides || el.tau > 1e-9 ? 'glide' : el.s ? 'anti' : 'mirror';
+        const had = found.get(key);
+        if (!had) found.set(key, { p, d, kind });
+        else if (RANK[kind] > RANK[had.kind]) had.kind = kind;
+      }
+    }
+  }
+  const limit = reach + 0.75;
+  // an axis is kept if it passes within reach of the origin
+  return [...found.values()].filter((axis) => {
+    const c = toCart(group, axis.p), dc = toCart(group, axis.d);
+    const len = Math.hypot(dc[0], dc[1]);
+    return Math.abs(c[0] * dc[1] - c[1] * dc[0]) / len <= limit * Math.max(Math.hypot(group.basis[0][0], group.basis[0][1]), Math.hypot(group.basis[1][0], group.basis[1][1]));
+  });
+}
+
 // ----------------------------------------------------------------- shapes --
 
 // a, n, q are each [min, max, default, label] when the shape uses them.

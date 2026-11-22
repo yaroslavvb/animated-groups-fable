@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
-  buildGroup, compileFrame, componentsAt, inkAt, applyElement, toCart, rotationCentres, describeElement,
+  buildGroup, compileFrame, componentsAt, inkAt, applyElement, toCart, rotationCentres, mirrorAxes, describeElement,
   encodeDesign, decodeDesign, normaliseDesign, layerVanishes, sdShape, SHAPES, stateAt,
   shapeBound, hitTest, waveTerms, newMove, MOVES,
 } from '../studio-core.mjs';
@@ -105,6 +105,41 @@ test('rotation centres: two 4-fold and two 2-fold per cell, every one an anti-ce
   for (const c of centres) assert.equal(c.kind, 'anti');
   // the smallest counter-clockwise quarter turn that keeps the inks costs a quarter loop
   assert.ok(Math.abs(at(0, 0).step.tau - 0.25) < 1e-12 && at(0, 0).step.s === 0);
+});
+
+test('mirror and glide axes: none in a rotation group, and each one found is an axis of an element', () => {
+  assert.equal(mirrorAxes(group).length, 0);
+  let seen = 0;
+  for (const cls of census.classes) {
+    if (cls.n !== 2 || !['pm', 'pg', 'cm', 'pmm', 'p4m', 'p4g', 'p3m1', 'p6m'].includes(census.films[cls.gid].family)) continue;
+    const g = buildGroup(census, cls.id);
+    const axes = mirrorAxes(g, 1);
+    assert.ok(axes.length > 0, `${cls.id} has reflections`);
+    for (const axis of axes) {
+      const q = [axis.p[0] + 0.37 * axis.d[0], axis.p[1] + 0.37 * axis.d[1]];
+      const moved = (el) => [el.M[0][0] * q[0] + el.M[0][1] * q[1] + el.v[0] - q[0], el.M[1][0] * q[0] + el.M[1][1] * q[1] + el.v[1] - q[1]];
+      const whole = (x) => Math.abs(x - Math.round(x)) < 1e-9;
+      // some reflection of the group carries a point of the axis along the axis, up to the lattice
+      const along = g.elements.some((el) => {
+        if (el.det > 0) return false;
+        const [dx, dy] = moved(el);
+        for (let a = -4; a <= 4; a++) for (let b = -4; b <= 4; b++) if (Math.abs((dx - a) * axis.d[1] - (dy - b) * axis.d[0]) < 1e-9) return true;
+        return false;
+      });
+      assert.ok(along, `${cls.id}: an axis that is no element's`);
+      if (axis.kind !== 'glide') {
+        // a mirror: with some lattice translation, an element fixes that point, costs no time, and has the stated ink
+        const fixed = g.elements.some((el) => {
+          if (el.det > 0 || el.tau > 1e-9 || (el.s === 1) !== (axis.kind === 'anti')) return false;
+          const [dx, dy] = moved(el);
+          return whole(dx) && whole(dy);
+        });
+        assert.ok(fixed, `${cls.id}: a ${axis.kind} axis nothing fixes`);
+      }
+    }
+    seen += 1;
+  }
+  assert.ok(seen > 60);
 });
 
 test('every element has a description', () => {

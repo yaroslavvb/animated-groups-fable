@@ -7,7 +7,7 @@
 // place to hang.
 
 import {
-  TAU, buildGroup, toCart, toLat, describeElement, rotationCentres, fractionGlyph,
+  TAU, buildGroup, toCart, toLat, describeElement, rotationCentres, mirrorAxes, fractionGlyph,
   SHAPES, SHAPE_INDEX, shapeDef, shapeSymmetry, shapeBound, sdShape,
   MOVES, newMove, stateAt, pivotAt, compileFrame, hitTest, layerVanishes, inkAt,
   normaliseDesign, normaliseLayer, encodeDesign, decodeDesign, layerLabel,
@@ -50,7 +50,8 @@ function fill(el, ...children) {
 // What the census does not say about a class, said by hand where it is known.
 const KNOWN = {
   'g95-n2-3': {
-    lede: 'p4 · film g95, ²4²4¹2 (P4₂), in two inks. The half of it that keeps the inks is g96, ⁴4⁴4²2 (P4₁); read as a magnetic group it is P_c4₁.',
+    lede: () => ['p4 · film g95, ²4²4¹2 (P4₂), in two inks. The half of it that keeps the inks is g96, ⁴4⁴4²2 (P4₁); read as a magnetic group it is ',
+      h('span', { class: 'sym' }, 'P', h('sub', { text: 'c' }), '4', h('sub', { text: '1' })), '.'],
     rules: [
       ['keep', 'A quarter turn ↺ together with a quarter of the loop: the same picture.'],
       ['swap', 'A half turn on its own, or half the loop on its own: black and white change places.'],
@@ -89,6 +90,7 @@ const state = {
   grey: false,
   hoverText: '',
   centres: [],
+  axes: null,
   message: '',
   messageUntil: 0,
 };
@@ -432,6 +434,7 @@ function drawSymmetry(vm) {
   ctx.setLineDash([5 * dpr, 5 * dpr]);
   strokeBoth(1 * dpr, ACCENT, 0.75);
   ctx.setLineDash([]);
+  drawAxes(vm, Math.max(Math.abs(lo0), Math.abs(hi0), Math.abs(lo1), Math.abs(hi1)));
   const r = clamp(0.028 / vm.upp, 5 * dpr, 11 * dpr);
   for (const centre of state.centres) {
     for (let a = lo0; a <= hi0; a++) {
@@ -440,6 +443,26 @@ function drawSymmetry(vm) {
         if (sx < -20 || sy < -20 || sx > vm.w + 20 || sy > vm.h + 20) continue;
         drawCentre(sx, sy, r, centre, dpr);
       }
+    }
+  }
+}
+
+// Mirrors are drawn solid, glides dashed; a mirror that swaps the inks is drawn
+// in two tones, as its line is the one place both inks must meet.
+function drawAxes(vm, reach) {
+  const g = state.group, dpr = vm.dpr;
+  if (!g.elements.some((el) => el.det < 0) || reach > 14) return;
+  if (!state.axes || state.axes.reach < reach) state.axes = { reach, list: mirrorAxes(g, reach) };
+  const far = (vm.w + vm.h) * vm.upp;
+  for (const axis of state.axes.list) {
+    const c = toCart(g, axis.p), dc = toCart(g, axis.d), len = Math.hypot(dc[0], dc[1]);
+    const a = toScreen(vm, c[0] - far * dc[0] / len, c[1] - far * dc[1] / len), b = toScreen(vm, c[0] + far * dc[0] / len, c[1] + far * dc[1] / len);
+    ctx.beginPath(); ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+    if (axis.kind === 'glide') { ctx.setLineDash([9 * dpr, 6 * dpr]); strokeBoth(1.5 * dpr, '#1f2430', 0.9); ctx.setLineDash([]); }
+    else if (axis.kind === 'mirror') strokeBoth(2 * dpr, '#1f2430', 0.95);
+    else {
+      ctx.lineWidth = 3.4 * dpr; ctx.strokeStyle = '#fff'; ctx.stroke();
+      ctx.setLineDash([7 * dpr, 7 * dpr]); ctx.lineWidth = 3.4 * dpr; ctx.strokeStyle = '#1f2430'; ctx.stroke(); ctx.setLineDash([]);
     }
   }
 }
@@ -1061,7 +1084,7 @@ function buildInspector(box) {
     layer.role === 'i' ? null : slider('edge', () => layer.h, (v) => { layer.h = v; }, { min: 0.002, max: 0.25, log: true, fmt: (v) => (v < 0.006 ? 'crisp' : v.toFixed(3)), title: layer.role === 'f' ? 'crisp: straight frontiers between copies; soft: they round off and merge' : 'soft: copies in the same ink merge like drops' }),
     h('h4', { text: 'Place' }),
     field('at', h('span', { class: 'pair' }, number(() => layer.at[0], (v) => { layer.at[0] = v; }, 'along the first lattice direction, in cells'), number(() => layer.at[1], (v) => { layer.at[1] = v; }, 'along the second'))),
-    field('centres', h('span', { class: 'pair' }, centreButtons)),
+    centreButtons.length ? field('centres', h('span', { class: 'pair' }, centreButtons)) : null,
     h('h4', { text: 'Motion' }),
     (layer.mv || []).map((mv, index) => moveCard(layer, mv, index)),
     (layer.mv || []).length === 0 ? h('p', { class: 'hint', text: 'It stands still, and in this class nothing may: add a motion.' }) : null,
@@ -1081,7 +1104,7 @@ function renderGroupCard() {
   const card = $('#group-card');
   fill(card, 
     h('p', { class: 'sig', text: `${g.id}` }),
-    h('p', { class: 'sub', text: known ? known.lede : `${g.film.family} · film ${g.gid}, ${g.film.signature} (${g.film.sgName}), in two inks. σ: ${sigma}; one period ↦ ${g.cls.ct}.` }),
+    h('p', { class: 'sub' }, known ? known.lede() : `${g.film.family} · film ${g.gid}, ${g.film.signature} (${g.film.sgName}), in two inks. σ: ${sigma}; one period ↦ ${g.cls.ct}.`),
     known ? h('ul', {}, known.rules.map(([kind, text]) => h('li', {}, h('i', { class: kind }), h('span', { text })))) : null,
     known ? h('p', { class: 'sub', style: 'margin-top:0.4rem', text: known.after }) : null,
     h('details', { open: known ? null : true },
@@ -1326,6 +1349,7 @@ function setClass(id) {
   state.group = group;
   state.classId = id;
   state.centres = rotationCentres(group);
+  state.axes = null;
   state.design.cls = id;
   state.sel = null;
   outlineCache.clear();
@@ -1406,7 +1430,17 @@ function wire() {
   $('#presets').addEventListener('click', openDesigns);
   $('#class-chip').addEventListener('click', openClasses);
   let seed = (Date.now() % 100000) | 0;
-  $('#random').addEventListener('click', () => { seed += 1; loadDesign(randomDesign(seed), { name: `Random design ${seed}` }); });
+  $('#random').addEventListener('click', () => {
+    // a design nobody chose, but not one the group cancels: every layer draws, and there is a ground
+    let design = null;
+    for (let tries = 0; tries < 24; tries++) {
+      seed += 1;
+      design = normaliseDesign(randomDesign(seed), state.classId);
+      const alive = design.L.every((layer) => !layerVanishes(layer, state.group));
+      if (alive && design.L.some((layer) => layer.k === 'w' || layer.role === 'f')) break;
+    }
+    loadDesign(design, { name: `Random design ${seed}` });
+  });
   $('#copy-link').addEventListener('click', async () => {
     commitEdit();
     clearTimeout(addressTimer);
