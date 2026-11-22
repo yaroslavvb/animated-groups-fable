@@ -17,7 +17,7 @@
 // Where a float texture cannot be rendered to, the same shader draws straight
 // to the screen instead (`direct`), slower and exactly the same picture.
 
-import { SHAPES, GLASS, STAMP_FLOOR, INVERT_CAP } from './studio-core.mjs';
+import { SHAPES, GLASS, STAMP_FLOOR, INVERT_CAP } from './studio-core.mjs?v=studio-v2';
 
 const DATA_W = 64;
 const DATA_H = 64;

@@ -278,6 +278,21 @@ test('hit test finds the copy under a point', () => {
   assert.equal(hitTest(frame, 0.5, 0.5, 0), null);
 });
 
+test('one cache token on the page and on every import between its modules', () => {
+  const read = (name) => readFileSync(fileURLToPath(new URL(`../${name}`, import.meta.url)), 'utf8');
+  const tokens = new Set();
+  for (const name of ['index.html', 'studio-app.mjs', 'studio-gl.mjs', 'tests/sheet.html']) {
+    const found = read(name).match(/studio-v\d+/g) || [];
+    assert.ok(found.length > 0, `${name} carries the token`);
+    found.forEach((t) => tokens.add(t));
+  }
+  assert.equal(tokens.size, 1, `one token everywhere, found ${[...tokens].join(', ')}`);
+  // and no module is imported without it, which would load a second copy of it
+  for (const name of ['studio-app.mjs', 'studio-gl.mjs', 'tests/sheet.html']) {
+    assert.equal((read(name).match(/from '\.\.?\/studio-[a-z]+\.mjs'/g) || []).length, 0, `${name}: an import without the token`);
+  }
+});
+
 test('other two-colour classes of the census build and keep their symmetry', () => {
   const ids = census.classes.filter((c) => c.n === 2).map((c) => c.id);
   assert.equal(ids.length, 307);

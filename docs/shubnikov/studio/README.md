@@ -137,6 +137,17 @@ picture turned; the frame half a loop on is its negative), and drives the
 editor: select, drag through a turned copy, handles, sliders, undo, links, the
 dialogs, another class, a phone.
 
+## Releasing a change
+
+The page's modules carry one cache token, `studio-vN`: on `studio.css` and
+`studio-app.mjs` in `index.html`, and on every import between the modules
+(`studio-app.mjs`, `studio-gl.mjs`, `tests/sheet.html`). Bump them all together
+whenever a module or the stylesheet changes. GitHub Pages lets a browser keep a
+file for ten minutes, and a reload refetches only the page itself; with the
+token on the imports as well, a reader who reloads straight after a deploy
+cannot be left with a new `studio-app.mjs` talking to an old `studio-core.mjs`.
+The Node suite fails if the tokens disagree.
+
 ## Adding a shape
 
 A shape is defined twice, and the browser suite holds the two together:

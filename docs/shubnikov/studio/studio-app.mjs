@@ -11,9 +11,9 @@ import {
   SHAPES, SHAPE_INDEX, shapeDef, shapeSymmetry, shapeBound, sdShape,
   MOVES, newMove, stateAt, pivotAt, compileFrame, hitTest, layerVanishes, inkAt,
   normaliseDesign, normaliseLayer, encodeDesign, decodeDesign, layerLabel,
-} from './studio-core.mjs';
-import { Renderer, PALETTES } from './studio-gl.mjs';
-import { PRESETS, randomDesign, censusFilm } from './studio-presets.mjs';
+} from './studio-core.mjs?v=studio-v2';
+import { Renderer, PALETTES } from './studio-gl.mjs?v=studio-v2';
+import { PRESETS, randomDesign, censusFilm } from './studio-presets.mjs?v=studio-v2';
 
 const $ = (selector, root = document) => root.querySelector(selector);
 const main = $('main.studio');

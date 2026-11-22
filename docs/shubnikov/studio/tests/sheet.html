@@ -27,9 +27,9 @@
 <canvas id="c"></canvas>
 <div id="labels"></div>
 <script type="module">
-import { buildGroup, compileFrame, inkAt, normaliseDesign, decodeDesign } from '../studio-core.mjs';
-import { Renderer } from '../studio-gl.mjs';
-import { PRESETS, randomDesign, censusFilm } from '../studio-presets.mjs';
+import { buildGroup, compileFrame, inkAt, normaliseDesign, decodeDesign } from '../studio-core.mjs?v=studio-v2';
+import { Renderer } from '../studio-gl.mjs?v=studio-v2';
+import { PRESETS, randomDesign, censusFilm } from '../studio-presets.mjs?v=studio-v2';
 
 const params = new URLSearchParams(location.search);
 const classId = params.get('class') || 'g95-n2-3';
