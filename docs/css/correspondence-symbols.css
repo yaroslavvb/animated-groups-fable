@@ -1,0 +1,636 @@
+/* The symbol guide (correspondence-symbols.html): what each diagram symbol of
+   the correspondence plates does.  The page chrome, the glyph classes and the
+   theme variables come from correspondence.css; this sheet lays out the key
+   table, the cards and the figures that js/correspondence-symbols.js draws. */
+
+.symbol-guide {
+  --figure-line: #dcd8cc;
+}
+
+.symbol-guide-intro {
+  padding-top: clamp(1.6rem, 4vw, 2.6rem);
+  padding-bottom: 0.6rem;
+}
+
+.symbol-guide-intro > p,
+.symbol-guide-section > p {
+  max-width: 46rem;
+  margin: 0 0 0.75rem;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.symbol-guide-intro .family-breadcrumb {
+  margin-bottom: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.symbol-guide i {
+  font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  font-size: 1.04em;
+}
+
+.symbol-guide-intro .symbol-guide-law {
+  display: grid;
+  justify-items: start;
+  gap: 0.15rem;
+  margin: 0.2rem 0 0.9rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--generator-ink);
+  background: var(--surface);
+  font-size: 1.12rem;
+}
+
+.symbol-guide-law-where {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.symbol-guide-section {
+  margin-top: 2.2rem;
+}
+
+.symbol-guide-section > h2 {
+  margin: 0 0 0.7rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.symbol-guide-section > .symbol-guide-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.symbol-guide-list {
+  max-width: 46rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.symbol-guide-list li {
+  padding: 0.38rem 0;
+}
+
+.symbol-guide-list li + li {
+  border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.symbol-guide-sources {
+  margin-top: 1rem !important;
+  color: var(--muted) !important;
+  font-size: 0.82rem !important;
+}
+
+/* --- the key: every mark, by what it does in the picture and whether it rises */
+.symbol-key {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.88rem;
+}
+
+.symbol-key th,
+.symbol-key td {
+  padding: 0.55rem 0.75rem;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.symbol-key thead th {
+  border-top: 0;
+  background: var(--surface-raised, #f1efe9);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.symbol-key tbody th {
+  width: 21%;
+  font-weight: 650;
+}
+
+.symbol-key td:nth-child(2) {
+  width: 21%;
+}
+
+.symbol-key-run {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin-right: 0.35rem;
+  padding-right: 0.35rem;
+  border-right: 1px solid var(--line);
+}
+
+.symbol-key-run:last-child {
+  margin-right: 0;
+  padding-right: 0;
+  border-right: 0;
+}
+
+.symbol-key-mark {
+  display: inline-grid;
+  justify-items: center;
+  gap: 0.1rem;
+  min-width: 2.7rem;
+  padding: 0.3rem 0.1rem 0.25rem;
+  border-radius: 6px;
+  color: var(--generator-ink);
+  font-size: 0.74rem;
+  font-weight: 650;
+  line-height: 1.1;
+  text-decoration: none;
+}
+
+.symbol-key-mark:hover,
+.symbol-key-mark:focus-visible {
+  background: color-mix(in srgb, var(--generator-ink) 9%, transparent);
+}
+
+.symbol-key-mark .diagram-symbol-icon {
+  width: 2.6rem;
+  height: 1.85rem;
+}
+
+.symbol-key-mark span {
+  color: var(--text);
+}
+
+.symbol-key-none {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+/* --- cards ----------------------------------------------------------------- */
+.symbol-group-title {
+  margin: 1.5rem 0 0.6rem;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.symbol-card {
+  margin: 0 0 1rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--generator-ink);
+  border-radius: 4px;
+  background: var(--surface);
+  /* style.css already keeps anchors clear of the sticky header */
+  scroll-margin-top: 0.6rem;
+}
+
+.symbol-card:target {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--generator-ink) 45%, transparent);
+}
+
+.symbol-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.symbol-card-glyph {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 5.6rem;
+  color: var(--generator-ink);
+}
+
+.symbol-card-glyph .diagram-symbol-icon {
+  width: 5.6rem;
+  height: 2.64rem;
+}
+
+.symbol-card-title {
+  min-width: 0;
+  flex: 1;
+}
+
+.symbol-card-title h3 {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.25;
+}
+
+.symbol-card-formula {
+  margin: 0.12rem 0 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.symbol-card-up {
+  flex: none;
+  align-self: flex-start;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.symbol-card-up:hover,
+.symbol-card-up:focus-visible {
+  color: var(--accent);
+}
+
+.symbol-card-body {
+  display: grid;
+  grid-template-columns: minmax(0, 17rem) minmax(0, 1fr);
+  gap: 1.1rem;
+  padding: 0.85rem 0.9rem 0.9rem;
+}
+
+.symbol-card-text dl {
+  margin: 0;
+}
+
+.symbol-card-text dt {
+  margin: 0.7rem 0 0.12rem;
+  color: var(--generator-ink);
+  font-size: 0.66rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.symbol-card-text dt:first-child {
+  margin-top: 0;
+}
+
+.symbol-card-text dd {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.symbol-card-text dd a,
+.symbol-places a {
+  white-space: nowrap;
+}
+
+.symbol-card-more {
+  margin: 0.8rem 0 0;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* style.css gives every <details> a raised card; this one is a plain line */
+details.symbol-places {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+/* Its own marker: WebKit hangs the native one outside the card's padding. */
+.symbol-places summary {
+  color: var(--accent);
+  cursor: pointer;
+  list-style: none;
+}
+
+.symbol-places summary::-webkit-details-marker {
+  display: none;
+}
+
+.symbol-places summary::before {
+  content: "▸ ";
+}
+
+.symbol-places[open] summary::before {
+  content: "▾ ";
+}
+
+.symbol-places p {
+  margin: 0.3rem 0 0;
+  line-height: 1.7;
+}
+
+/* --- figures --------------------------------------------------------------- */
+.symbol-figure {
+  min-width: 0;
+}
+
+/* Shown until the script builds the figure (and instead of it without
+   JavaScript); it holds roughly the figure's room so the page barely moves. */
+.symbol-figure-fallback {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1.75 / 1;
+  margin: 0;
+  padding: 1rem;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.symbol-views {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 0.7rem;
+}
+
+.symbol-view {
+  min-width: 0;
+}
+
+.symbol-view-title {
+  margin: 0 0 0.3rem;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.symbol-view-hint {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  line-height: 1.3;
+}
+
+.symbol-canvas {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--figure-line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+.symbol-view--crystal .symbol-canvas {
+  aspect-ratio: 1.2 / 1;
+  cursor: grab;
+  /* a sideways drag turns the crystal; an up-and-down swipe still scrolls */
+  touch-action: pan-y;
+}
+
+.symbol-view--crystal .symbol-canvas.is-turning {
+  cursor: grabbing;
+}
+
+.symbol-view--plate .symbol-canvas {
+  aspect-ratio: 1 / 1;
+}
+
+.symbol-plate-wrap {
+  position: relative;
+}
+
+.symbol-seed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+
+.symbol-seed:hover,
+.symbol-seed.is-dragging {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.symbol-seed.is-dragging {
+  cursor: grabbing;
+}
+
+.symbol-seed:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 0;
+}
+
+.symbol-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.symbol-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 2.25rem;
+  padding: 0.3rem 0.75rem;
+  border: 1px solid var(--control-line, #9aa0a8);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 620;
+  line-height: 1.1;
+  cursor: pointer;
+}
+
+.symbol-button:hover,
+.symbol-button:focus-visible {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.symbol-button--play {
+  min-width: 4.1rem;
+  justify-content: center;
+}
+
+.symbol-senses {
+  display: inline-flex;
+}
+
+.symbol-senses .symbol-button {
+  border-radius: 0;
+}
+
+.symbol-senses .symbol-button:first-child {
+  border-radius: 999px 0 0 999px;
+}
+
+.symbol-senses .symbol-button:last-child {
+  margin-left: -1px;
+  border-radius: 0 999px 999px 0;
+}
+
+.symbol-button[aria-pressed="true"] {
+  position: relative;
+  border-color: var(--generator-ink);
+  background: var(--generator-ink);
+  color: #fff;
+}
+
+.symbol-sense-arrow {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.symbol-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.7rem;
+  margin: 0.55rem 0 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+  line-height: 1.2;
+}
+
+.symbol-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.symbol-legend-swatch {
+  width: 0.78rem;
+  height: 0.78rem;
+  border: 1px solid #1f2430;
+  border-radius: 2px;
+}
+
+/* --- narrower screens ------------------------------------------------------ */
+@media (max-width: 1019px) {
+  .symbol-card-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .symbol-card-text {
+    max-width: 44rem;
+    order: 2;
+  }
+}
+
+@media (max-width: 639px) {
+  .symbol-guide-section {
+    margin-top: 1.7rem;
+  }
+
+  .symbol-views {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .symbol-view--plate {
+    width: min(100%, 21rem);
+  }
+
+  .symbol-card-head {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.7rem;
+    padding: 0.6rem 0.7rem;
+  }
+
+  .symbol-card-glyph,
+  .symbol-card-glyph .diagram-symbol-icon {
+    width: 4.25rem;
+    height: 2rem;
+  }
+
+  .symbol-card-body {
+    padding: 0.7rem;
+  }
+
+  .symbol-card-up {
+    display: none;
+  }
+
+  /* the key table reads as stacked rows */
+  .symbol-key,
+  .symbol-key tbody,
+  .symbol-key tr,
+  .symbol-key th,
+  .symbol-key td {
+    display: block;
+    width: auto !important;
+  }
+
+  .symbol-key thead {
+    display: none;
+  }
+
+  .symbol-key tbody tr {
+    padding: 0.5rem 0.6rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .symbol-key tbody tr:first-child {
+    border-top: 0;
+  }
+
+  .symbol-key th,
+  .symbol-key td {
+    padding: 0.1rem 0;
+    border: 0;
+  }
+
+  .symbol-key td::before {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--muted);
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .symbol-key td:nth-child(2)::before {
+    content: "No rise";
+  }
+
+  .symbol-key td:nth-child(3)::before {
+    content: "With a rise";
+  }
+
+  .symbol-key-run {
+    margin-right: 0.3rem;
+    padding-right: 0.3rem;
+  }
+
+  .symbol-key-mark {
+    min-width: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media print {
+  .symbol-controls,
+  .symbol-view-hint,
+  .symbol-card-up {
+    display: none;
+  }
+}

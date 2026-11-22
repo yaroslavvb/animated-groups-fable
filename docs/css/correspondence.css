@@ -2980,3 +2980,73 @@ details.book-audit {
   margin: 0.9rem 0 0;
   box-shadow: none;
 }
+
+/* The Diagram symbols card has two actions: the visual index below it, and the
+   symbol guide (correspondence-symbols.html), where every symbol has an
+   animated figure of what it does. The guide is the filled one. */
+.diagram-symbol-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.38rem;
+}
+
+.diagram-symbol-actions .diagram-symbol-open {
+  margin-top: 0;
+}
+
+.diagram-symbol-guide {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2.75rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--generator-ink);
+  border-radius: 999px;
+  background: var(--generator-ink);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 680;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.diagram-symbol-guide:hover,
+.diagram-symbol-guide:focus-visible {
+  border-color: color-mix(in srgb, var(--generator-ink) 80%, #000);
+  background: color-mix(in srgb, var(--generator-ink) 80%, #000);
+}
+
+/* Every name in the visual index opens that symbol's card in the guide. */
+.diagram-symbol-explanation strong a {
+  color: inherit;
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 60%, transparent);
+  text-underline-offset: 0.2em;
+}
+
+.diagram-symbol-explanation strong a:hover,
+.diagram-symbol-explanation strong a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: currentColor;
+}
+
+.diagram-symbol-dialog-scroll > .diagram-symbol-guide-note {
+  margin-top: 0.5rem;
+}
+
+@media (forced-colors: active) {
+  .diagram-symbol-guide {
+    border-color: LinkText;
+    background: Canvas;
+    color: LinkText;
+  }
+}
+
+@media print {
+  .diagram-symbol-guide {
+    display: none;
+  }
+}

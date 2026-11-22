@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="What each of the 21 crystallographic symbols on the correspondence plates does to a polar crystal: an animated figure of every translation, rotation axis, screw axis, mirror and glide plane, in the crystal and on its colour plate.">
+  <meta name="theme-color" content="#ffffff">
+  <title>Diagram symbols — Animation/colouring correspondence — Spacetime Groups</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#127902;&#65039;</text></svg>">
+  <script data-mobile-viewport-bootstrap>
+    (() => {
+      const root = document.documentElement;
+      const viewport = window.visualViewport;
+      let pendingFrame = 0;
+
+      const commit = () => {
+        pendingFrame = 0;
+        const layoutWidth = window.innerWidth;
+        const candidateWidth = viewport?.width;
+        // A pinch zoom also narrows the visual viewport, but the layout must
+        // not follow it: the viewer is magnifying a slice of the page, not
+        // asking for a narrower page.  Only an unscaled narrowing counts.
+        const pinchZoomed = Number.isFinite(viewport?.scale) && viewport.scale > 1.001;
+        const visibleWidth = Number.isFinite(candidateWidth) && candidateWidth > 0
+          ? Math.min(layoutWidth, candidateWidth)
+          : layoutWidth;
+        const constrained = !pinchZoomed && layoutWidth <= 620 && visibleWidth + 1 < layoutWidth;
+        root.toggleAttribute("data-visual-viewport-constrained", constrained);
+        if (constrained) {
+          root.style.setProperty(
+            "--clockwork-visual-viewport-width",
+            visibleWidth + "px",
+          );
+        } else {
+          root.style.removeProperty("--clockwork-visual-viewport-width");
+        }
+      };
+
+      const schedule = () => {
+        if (pendingFrame) return;
+        pendingFrame = window.requestAnimationFrame(commit);
+      };
+
+      commit();
+      window.addEventListener("resize", schedule, { passive: true });
+      viewport?.addEventListener("resize", schedule, { passive: true });
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
+  <script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+  <link rel="stylesheet" href="css/site-controls-v2.css">
+  <link rel="stylesheet" href="css/correspondence.css?v=symbol-guide-v1">
+  <link rel="stylesheet" href="css/correspondence-symbols.css?v=symbol-guide-v1">
+  <script type="module" src="js/correspondence-symbols.js?v=symbol-guide-v1"></script>
+</head>
+<body>
+  <a class="skip-link" href="#marks">Skip to the symbols</a>
+
+  <header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+        <span class="navgroup">
+          <span class="navgroup-label">Background</span>
+          <a href="index.html">Tutorial</a>
+          <a href="notation.html">Notation</a>
+          <a href="colourings-tutorial.html">Colourings</a>
+          <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+          <a href="hierarchy.html">Hierarchy</a>
+          <a href="history.html">History</a>
+        </span>
+        <span class="navgroup">
+          <span class="navgroup-label">Catalogues</span>
+          <a href="showcase/">Showcase</a>
+          <a href="catalog.html">275 spacetime</a>
+          <a href="wallpaper.html">275 spacetime (grouped)</a>
+          <a href="correspondence.html" aria-current="page">68 colored&lt;&gt;polar crystals</a>
+          <a href="patterns.html">609 patterns</a>
+          <a href="escher.html">107 Escher</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="scott-gray-groups.html">Reaction–diffusion</a>
+        </span>
+        <span class="navgroup">
+          <span class="navgroup-label">Colourings</span>
+          <a href="colour/">Entangled colourings</a>
+          <a href="colour/gyre/">Gyre</a>
+          <a href="colour/trefoil/">Trefoil</a>
+          <a href="monochrome/">Monochrome</a>
+          <a href="shubnikov/">Shubnikov</a>
+        </span>
+        <span class="navgroup">
+          <span class="navgroup-label">Developer</span>
+          <a href="reports/">Reports</a>
+          <a href="motifs.html">Motifs</a>
+          <a href="designer.html">Designer</a>
+          <a href="billiards.html">Billiards</a>
+        </span>
+        <span class="navgroup navgroup-superseded">
+          <span class="navgroup-label">Superseded</span>
+          <a href="crystals-colored.html">269 coloured crystals</a>
+        </span>
+      </nav>
+  </div>
+</header>
+
+  <main class="correspondence-page symbol-guide">
+    <section class="directory symbol-guide-intro" aria-labelledby="page-title">
+      <p class="family-breadcrumb"><a href="correspondence.html">Animation/colouring correspondence</a> <span aria-hidden="true">·</span> diagram symbols</p>
+      <h1 id="page-title">What each diagram symbol does</h1>
+      <p>A polar crystal has one direction, the polar axis <i>c</i>, that no symmetry of the crystal reverses. Stand the axis upright. Every symmetry is then an isometry of the horizontal plane (a shift, a turn, a reflection or a glide reflection) together with a rise along the axis:</p>
+      <p class="symbol-guide-law"><span class="symbol-guide-law-map">(<i>p</i>, <i>z</i>) ↦ (<i>g</i>·<i>p</i>, <i>z</i> + <i>h</i>)</span><span class="symbol-guide-law-where"><i>g</i> an isometry of the plane, <i>h</i> a height counted modulo the period <i>c</i></span></p>
+      <p>A colour plate is the crystal seen from above, looking down the axis. It shows <i>g</i> as it is. The rise <i>h</i> is carried by the colours, one colour for each height that occurs, so <i>N</i> colours cut the period into <i>N</i> equal steps. (In an entry’s animation the same height is the phase of the loop.) Each mark on a plate stands for one pair (<i>g</i>, <i>h</i>): its shape says what happens in the picture, its decoration how far up.</p>
+      <p>Nothing turns the axis over (in the animation, nothing runs time backwards), so the marks for operations that would (inversion centres, rotoinversion axes, mirrors and two-fold axes lying across <i>c</i>) never occur on these plates. The 21 marks below are all that do.</p>
+    </section>
+
+    <section class="symbol-guide-section" id="marks" aria-labelledby="marks-title">
+      <h2 id="marks-title">The 21 marks</h2>
+      <p class="symbol-guide-note">Rows say what the operation does in the picture, columns whether it also rises. Select a mark to see it act.</p>
+      <table class="symbol-key">
+        <thead><tr><th scope="col">In the picture</th><th scope="col">No rise</th><th scope="col">With a rise</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">a shift</th><td><a class="symbol-key-mark" href="#translation" aria-label="Translation"><svg class="diagram-symbol-icon diagram-symbol-icon--translation" data-legend-icon="translation" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="diagram-symbol-translation" d="M 8 23 L 60 9 M 50.81 17.17 L 60 9 L 47.95 6.55"></path></svg><span>translation</span></a></td><td><span class="symbol-key-none">a centring vector: no mark of its own</span></td></tr>
+          <tr><th scope="row">a turn by 360°/<i>n</i></th><td><a class="symbol-key-mark" href="#rotation-2-0" aria-label="2-fold rotation axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-2-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 A14.79,14.79 0 0 0 0,10.56 A14.79,14.79 0 0 0 0,-10.56 Z"/></svg><span>2</span></a><a class="symbol-key-mark" href="#rotation-3-0" aria-label="3-fold rotation axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z"/></svg><span>3</span></a><a class="symbol-key-mark" href="#rotation-4-0" aria-label="4-fold rotation axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z"/></svg><span>4</span></a><a class="symbol-key-mark" href="#rotation-6-0" aria-label="6-fold rotation axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z"/></svg><span>6</span></a></td><td><span class="symbol-key-run"><a class="symbol-key-mark" href="#rotation-2-1" aria-label="2₁ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-2-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 A14.79,14.79 0 0 0 0,10.56 A14.79,14.79 0 0 0 0,-10.56 Z M0.26,-8.1 L1.09,-9.04 L2.01,-9.89 L3,-10.65 L4.07,-11.31 L5.19,-11.86 L6.36,-12.31 L7.57,-12.64 L7.17,-14.44 L5.79,-14.06 L4.45,-13.56 L3.17,-12.93 L1.95,-12.17 L0.82,-11.3 L-0.23,-10.33 L-1.18,-9.26 Z M-0.26,8.1 L-1.09,9.04 L-2.01,9.89 L-3,10.65 L-4.07,11.31 L-5.19,11.86 L-6.36,12.31 L-7.57,12.64 L-7.17,14.44 L-5.79,14.06 L-4.45,13.56 L-3.17,12.93 L-1.95,12.17 L-0.82,11.3 L0.23,10.33 L1.18,9.26 Z"/></svg><span>2<sub>1</sub></span></a></span><span class="symbol-key-run"><a class="symbol-key-mark" href="#rotation-3-1" aria-label="3₁ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z M0.88,-11.89 L-4.33,-20.91 L-5.93,-19.98 L-0.72,-10.96 Z M-10.74,5.18 L-15.95,14.2 L-14.34,15.13 L-9.13,6.11 Z M9.86,6.71 L20.28,6.71 L20.28,4.86 L9.86,4.86 Z"/></svg><span>3<sub>1</sub></span></a><a class="symbol-key-mark" href="#rotation-3-2" aria-label="3₂ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z M0.72,-10.96 L5.93,-19.98 L4.33,-20.91 L-0.88,-11.89 Z M-9.86,4.86 L-20.28,4.86 L-20.28,6.71 L-9.86,6.71 Z M9.13,6.11 L14.34,15.13 L15.95,14.2 L10.74,5.18 Z"/></svg><span>3<sub>2</sub></span></a></span><span class="symbol-key-run"><a class="symbol-key-mark" href="#rotation-4-1" aria-label="4₁ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M1.24,-8.26 L-5.08,-14.58 L-6.38,-13.28 L-0.06,-6.95 Z M-8.26,-1.24 L-14.58,5.08 L-13.28,6.38 L-6.95,0.06 Z M-1.24,8.26 L5.08,14.58 L6.38,13.28 L0.06,6.95 Z M8.26,1.24 L14.58,-5.08 L13.28,-6.38 L6.95,-0.06 Z"/></svg><span>4<sub>1</sub></span></a><a class="symbol-key-mark" href="#rotation-4-2" aria-label="4₂ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M0.06,-6.95 L6.38,-13.28 L5.08,-14.58 L-1.24,-8.26 Z M-0.06,6.95 L-6.38,13.28 L-5.08,14.58 L1.24,8.26 Z"/></svg><span>4<sub>2</sub></span></a><a class="symbol-key-mark" href="#rotation-4-3" aria-label="4₃ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-3" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M0.06,-6.95 L6.38,-13.28 L5.08,-14.58 L-1.24,-8.26 Z M-6.95,-0.06 L-13.28,-6.38 L-14.58,-5.08 L-8.26,1.24 Z M-0.06,6.95 L-6.38,13.28 L-5.08,14.58 L1.24,8.26 Z M6.95,0.06 L13.28,6.38 L14.58,5.08 L8.26,-1.24 Z"/></svg><span>4<sub>3</sub></span></a></span><span class="symbol-key-run"><a class="symbol-key-mark" href="#rotation-6-1" aria-label="6₁ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M1.52,-9.68 L-5.67,-13.83 L-6.59,-12.23 L0.6,-8.08 Z M-7.62,-6.16 L-14.82,-2.01 L-13.9,-0.4 L-6.7,-4.56 Z M-9.14,3.52 L-9.14,11.83 L-7.3,11.83 L-7.3,3.52 Z M-1.52,9.68 L5.67,13.83 L6.59,12.23 L-0.6,8.08 Z M7.62,6.16 L14.82,2.01 L13.9,0.4 L6.7,4.56 Z M9.14,-3.52 L9.14,-11.83 L7.3,-11.83 L7.3,-3.52 Z"/></svg><span>6<sub>1</sub></span></a><a class="symbol-key-mark" href="#rotation-6-2" aria-label="6₂ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M1.52,-9.68 L-5.67,-13.83 L-6.59,-12.23 L0.6,-8.08 Z M-9.14,3.52 L-9.14,11.83 L-7.3,11.83 L-7.3,3.52 Z M7.62,6.16 L14.82,2.01 L13.9,0.4 L6.7,4.56 Z"/></svg><span>6<sub>2</sub></span></a><a class="symbol-key-mark" href="#rotation-6-3" aria-label="6₃ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-3" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M0.6,8.08 L-6.59,12.23 L-5.67,13.83 L1.52,9.68 Z"/></svg><span>6<sub>3</sub></span></a><a class="symbol-key-mark" href="#rotation-6-4" aria-label="6₄ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-4" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M-6.7,4.56 L-13.9,0.4 L-14.82,2.01 L-7.62,6.16 Z M7.3,3.52 L7.3,11.83 L9.14,11.83 L9.14,3.52 Z"/></svg><span>6<sub>4</sub></span></a><a class="symbol-key-mark" href="#rotation-6-5" aria-label="6₅ screw axis"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-5" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M-7.3,-3.52 L-7.3,-11.83 L-9.14,-11.83 L-9.14,-3.52 Z M-6.7,4.56 L-13.9,0.4 L-14.82,2.01 L-7.62,6.16 Z M0.6,8.08 L-6.59,12.23 L-5.67,13.83 L1.52,9.68 Z M7.3,3.52 L7.3,11.83 L9.14,11.83 L9.14,3.52 Z M6.7,-4.56 L13.9,-0.4 L14.82,-2.01 L7.62,-6.16 Z"/></svg><span>6<sub>5</sub></span></a></span></td></tr>
+          <tr><th scope="row">a reflection</th><td><a class="symbol-key-mark" href="#plane-m" aria-label="Mirror plane m"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-m" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-m" x1="6" y1="16" x2="62" y2="16"></line></svg><span><i>m</i></span></a></td><td><a class="symbol-key-mark" href="#plane-c" aria-label="Glide plane c"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-c" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-c" x1="6" y1="16" x2="62" y2="16"></line></svg><span><i>c</i></span></a></td></tr>
+          <tr><th scope="row">a reflection and a half-repeat shift</th><td><a class="symbol-key-mark" href="#plane-axial" aria-label="Glide plane a or b"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-axial" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-axial" x1="6" y1="16" x2="62" y2="16"></line><path class="diagram-symbol-glide-arrow" d="M22,16 L48,16"></path><path class="diagram-symbol-glide-head" d="M48.00,16.00 L37.00,16.00 L37.00,22.60 Z"></path></svg><span><i>a</i>, <i>b</i></span></a></td><td><a class="symbol-key-mark" href="#plane-n" aria-label="Diagonal glide plane n"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-n" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-n" x1="6" y1="16" x2="62" y2="16"></line></svg><span><i>n</i></span></a><a class="symbol-key-mark" href="#plane-d" aria-label="Diamond glide plane d"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-d" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-d" x1="6" y1="16" x2="62" y2="16"></line><path class="diagram-symbol-quarter-arrow" d="M 25.58 20.2 L 35.58 16 L 25.58 11.8"></path><path class="diagram-symbol-quarter-arrow" d="M 33.42 20.2 L 43.42 16 L 33.42 11.8"></path></svg><span><i>d</i></span></a></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="symbol-guide-section" id="figures" aria-labelledby="figures-title">
+      <h2 id="figures-title">Reading a figure</h2>
+      <ul class="symbol-guide-list">
+        <li><strong>Tiles</strong> are the copies of one motif. Their colour is their height, as on the plates.</li>
+        <li><strong>In the crystal</strong>: one period, with the axis up. The floor is height 0 and the dashed frame is height <i>c</i>, where everything repeats: the paler tiles up there are the bottom ones again. A stem drops from each tile to its footprint on the floor, and the mark lies on the floor where the plate has it.</li>
+        <li><strong>On the plate</strong>: the same tiles seen from above, each with its height written beside it as a fraction of <i>c</i>.</li>
+        <li><strong>The dark-outlined tile</strong> is carried by the operation from one copy to the next, again and again. Pause it, step it once, or look straight down the axis to watch the crystal turn into its plate.</li>
+        <li><strong>Move every tile</strong> applies the operation to the whole crystal at once. It lands on itself, which is what makes the operation a symmetry.</li>
+        <li><strong>Drag</strong> the crystal to turn it. Drag the ringed tile on the plate to move the motif: every copy follows.</li>
+      </ul>
+    </section>
+
+    <section class="symbol-guide-section" id="translations" aria-labelledby="translations-title">
+      <h2 id="translations-title">Translation</h2>
+
+      <article class="symbol-card" id="translation">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--translation" data-legend-icon="translation" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="diagram-symbol-translation" d="M 8 23 L 60 9 M 50.81 17.17 L 60 9 L 47.95 6.55"></path></svg></span>
+          <div class="symbol-card-title">
+            <h3>Translation</h3>
+            <p class="symbol-card-formula">(<i>p</i>, <i>z</i>) ↦ (<i>p</i> + <i>t</i>, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A shift by a lattice vector that lies across the axis. Nothing rises: every tile slides onto its neighbour at the same height.</dd>
+              <dt>On the plate</dt><dd>The pattern repeats along the arrow, colour for colour.</dd>
+              <dt>The mark</dt><dd>An open arrow from one lattice point to the next. Its letter (<i>X</i>, <i>Y</i> or <i>α</i>) names the translation in the entry’s generator table.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p1.html#g1">P1</a>, <a href="correspondence-pm.html#g10">Pm</a></dd>
+            </dl>
+            <p class="symbol-card-more">A lattice vector with a vertical part, such as the body-centring vector of an <i>I</i> lattice, shifts the picture and steps the colour as well. The plates give it no mark of its own.</p>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="translation" data-symbol-name="the translation">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="symbol-guide-section" id="axes" aria-labelledby="axes-title">
+      <h2 id="axes-title">Rotation and screw axes</h2>
+      <p>A turn by 360°/<i>n</i> about a line parallel to the axis, together with a rise of <i>m</i>/<i>n</i> of the period. Seen from above the line is a point, and the core of the mark gives <i>n</i>: a lens, a triangle, a diamond or a hexagon for 2, 3, 4 or 6. With no rise it is a rotation axis <i>n</i>. With a rise it is a screw axis <i>n</i><sub><i>m</i></sub>, named for its counter-clockwise turn, which rises <i>m</i><i>c</i>/<i>n</i>.</p>
+      <p>The clockwise turn about the same axis rises (<i>n</i> − <i>m</i>)<i>c</i>/<i>n</i>: one turn after the other leaves the picture where it was and lifts it by exactly one period. A generator table may quote either turn. A screw’s figure starts with the turn that rises less, and the two buttons under it switch between them.</p>
+      <p>A rotation axis keeps its own points fixed. A screw axis keeps nothing fixed: drag the motif onto the axis and its copies still stand at different heights.</p>
+
+      <h3 class="symbol-group-title" id="order-2">Half-turns: 2, 2<sub>1</sub></h3>
+
+      <article class="symbol-card" id="rotation-2-0">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-2-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 A14.79,14.79 0 0 0 0,10.56 A14.79,14.79 0 0 0 0,-10.56 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>2-fold rotation axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 180°, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A half-turn about the axis and no rise. Twice is the identity, so the copies come in pairs at one height.</dd>
+              <dt>On the plate</dt><dd>A 2-fold centre: the half-turn about the mark keeps every colour.</dd>
+              <dt>The mark</dt><dd>A lens, the shape with two corners. No tails, so no rise.</dd>
+              <dt>Drawn on</dt><dd><details class="symbol-places"><summary>18 plates</summary><p><a href="correspondence-p2.html#g7">C2</a>, <a href="correspondence-p2.html#g5">P2</a>, <a href="correspondence-pmg.html#g57">Pnc2</a>, <a href="correspondence-pmg.html#g66">Ama2</a>, <a href="correspondence-pmg.html#g67">Aea2</a>, <a href="correspondence-pmg.html#g56">Pma2</a>, <a href="correspondence-pgg.html#g59">Pnn2</a>, <a href="correspondence-pgg.html#g75">Fdd2</a>, <a href="correspondence-pgg.html#g58">Pba2</a>, <a href="correspondence-cmm.html#g69">Ccc2</a>, <a href="correspondence-cmm.html#g73">Ima2</a>, <a href="correspondence-cmm.html#g68">Cmm2</a>, <a href="correspondence-p4.html#g95">P4<sub>2</sub></a>, <a href="correspondence-p4.html#g99">I4<sub>1</sub></a>, <a href="correspondence-p4.html#g94">P4</a>, <a href="correspondence-p6.html#g244">P6<sub>2</sub></a>, <a href="correspondence-p6.html#g245">P6<sub>4</sub></a>, <a href="correspondence-p6.html#g243">P6</a></p></details></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-2-0" data-symbol-name="the 2-fold rotation axis" data-glyph-path="M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-2-1">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-2-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 A14.79,14.79 0 0 0 0,10.56 A14.79,14.79 0 0 0 0,-10.56 Z M0.26,-8.1 L1.09,-9.04 L2.01,-9.89 L3,-10.65 L4.07,-11.31 L5.19,-11.86 L6.36,-12.31 L7.57,-12.64 L7.17,-14.44 L5.79,-14.06 L4.45,-13.56 L3.17,-12.93 L1.95,-12.17 L0.82,-11.3 L-0.23,-10.33 L-1.18,-9.26 Z M-0.26,8.1 L-1.09,9.04 L-2.01,9.89 L-3,10.65 L-4.07,11.31 L-5.19,11.86 L-6.36,12.31 L-7.57,12.64 L-7.17,14.44 L-5.79,14.06 L-4.45,13.56 L-3.17,12.93 L-1.95,12.17 L-0.82,11.3 L0.23,10.33 L1.18,9.26 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>2<sub>1</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 180°, <i>z</i> + <i>c</i>/2)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A half-turn with a rise of half a period. Twice is the lattice translation <i>c</i>. The copies zigzag up the axis, and no point stays where it was.</dd>
+              <dt>On the plate</dt><dd>A 2-fold centre whose half-turn swaps the two colours. Where a plate has more colours, it steps the cycle half-way round.</dd>
+              <dt>The mark</dt><dd>The lens with two hooked tails, one for each height. A 2<sub>1</sub> axis is its own mirror image, so the sense of the hooks tells nothing.</dd>
+              <dt>Drawn on</dt><dd><details class="symbol-places"><summary>17 plates</summary><p><a href="correspondence-p2.html#g6">P2<sub>1</sub></a>, <a href="correspondence-p2.html#g7">C2</a>, <a href="correspondence-pmg.html#g61">Pca2<sub>1</sub></a>, <a href="correspondence-pmg.html#g62">Pmn2<sub>1</sub></a>, <a href="correspondence-pmg.html#g66">Ama2</a>, <a href="correspondence-pmg.html#g67">Aea2</a>, <a href="correspondence-pgg.html#g63">Pna2<sub>1</sub></a>, <a href="correspondence-pgg.html#g75">Fdd2</a>, <a href="correspondence-cmm.html#g70">Cmc2<sub>1</sub></a>, <a href="correspondence-cmm.html#g71">Imm2</a>, <a href="correspondence-cmm.html#g72">Iba2</a>, <a href="correspondence-p4.html#g96">P4<sub>1</sub></a>, <a href="correspondence-p4.html#g97">P4<sub>3</sub></a>, <a href="correspondence-p4.html#g98">I4</a>, <a href="correspondence-p6.html#g246">P6<sub>3</sub></a>, <a href="correspondence-p6.html#g247">P6<sub>5</sub></a>, <a href="correspondence-p6.html#g248">P6<sub>1</sub></a></p></details></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-2-1" data-symbol-name="the 2₁ screw axis" data-glyph-path="M0,-12 A16.81,16.81 0 0 0 0,12 A16.81,16.81 0 0 0 0,-12 Z M0.3,-9.2 L1.24,-10.27 L2.28,-11.24 L3.41,-12.1 L4.62,-12.85 L5.9,-13.48 L7.23,-13.99 L8.6,-14.36 L8.15,-16.41 L6.58,-15.98 L5.06,-15.41 L3.6,-14.69 L2.22,-13.83 L0.93,-12.84 L-0.26,-11.74 L-1.34,-10.52 Z M-0.3,9.2 L-1.24,10.27 L-2.28,11.24 L-3.41,12.1 L-4.62,12.85 L-5.9,13.48 L-7.23,13.99 L-8.6,14.36 L-8.15,16.41 L-6.58,15.98 L-5.06,15.41 L-3.6,14.69 L-2.22,13.83 L-0.93,12.84 L0.26,11.74 L1.34,10.52 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <h3 class="symbol-group-title" id="order-3">Third-turns: 3, 3<sub>1</sub>, 3<sub>2</sub></h3>
+
+      <article class="symbol-card" id="rotation-3-0">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>3-fold rotation axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 120°, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A third-turn about the axis and no rise: three copies at one height.</dd>
+              <dt>On the plate</dt><dd>A 3-fold centre: the third-turn about the mark keeps every colour.</dd>
+              <dt>The mark</dt><dd>A triangle. No tails, so no rise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p3.html#g227">R3</a>, <a href="correspondence-p3.html#g224">P3</a>, <a href="correspondence-p31m.html#g233">P31c</a>, <a href="correspondence-p31m.html#g232">P31m</a>, <a href="correspondence-p6.html#g246">P6<sub>3</sub></a>, <a href="correspondence-p6.html#g243">P6</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-3-0" data-symbol-name="the 3-fold rotation axis" data-glyph-path="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-3-1">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z M0.88,-11.89 L-4.33,-20.91 L-5.93,-19.98 L-0.72,-10.96 Z M-10.74,5.18 L-15.95,14.2 L-14.34,15.13 L-9.13,6.11 Z M9.86,6.71 L20.28,6.71 L20.28,4.86 L9.86,4.86 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>3<sub>1</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 120°, <i>z</i> + <i>c</i>/3)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A third-turn counter-clockwise, seen from above, with a rise of <i>c</i>/3. Three steps make one full turn and one period: a right-handed spiral stair.</dd>
+              <dt>On the plate</dt><dd>A 3-fold centre: the counter-clockwise third-turn sends each colour to the next in a cycle of three.</dd>
+              <dt>The mark</dt><dd>The triangle with three tails, one for each height. They point counter-clockwise, the way the stair climbs.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p3.html#g226">P3<sub>1</sub></a>, <a href="correspondence-p3.html#g227">R3</a>, <a href="correspondence-p31m.html#g234">R3m</a>, <a href="correspondence-p31m.html#g235">R3c</a>, <a href="correspondence-p6.html#g245">P6<sub>4</sub></a>, <a href="correspondence-p6.html#g248">P6<sub>1</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-3-1" data-symbol-name="the 3₁ screw axis" data-glyph-path="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M1,-13.51 L-4.92,-23.76 L-6.74,-22.71 L-0.82,-12.46 Z M-12.2,5.89 L-18.12,16.14 L-16.3,17.19 L-10.38,6.94 Z M11.2,7.62 L23.04,7.62 L23.04,5.52 L11.2,5.52 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-3-2">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-3-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-13.41 L-11.62,6.71 L11.62,6.71 Z M0.72,-10.96 L5.93,-19.98 L4.33,-20.91 L-0.88,-11.89 Z M-9.86,4.86 L-20.28,4.86 L-20.28,6.71 L-9.86,6.71 Z M9.13,6.11 L14.34,15.13 L15.95,14.2 L10.74,5.18 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>3<sub>2</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 120°, <i>z</i> + 2<i>c</i>/3)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A third-turn counter-clockwise with a rise of 2<i>c</i>/3. Turn clockwise instead and the rise is <i>c</i>/3: the left-handed stair, the mirror image of 3<sub>1</sub>.</dd>
+              <dt>On the plate</dt><dd>A 3-fold centre: the clockwise third-turn sends each colour to the next in a cycle of three.</dd>
+              <dt>The mark</dt><dd>The mirrored triangle: its three tails point clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p3.html#g225">P3<sub>2</sub></a>, <a href="correspondence-p3.html#g227">R3</a>, <a href="correspondence-p6.html#g244">P6<sub>2</sub></a>, <a href="correspondence-p6.html#g247">P6<sub>5</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-3-2" data-symbol-name="the 3₂ screw axis" data-glyph-path="M0,-15.24 L-13.2,7.62 L13.2,7.62 Z M0.82,-12.46 L6.74,-22.71 L4.92,-23.76 L-1,-13.51 Z M-11.2,5.52 L-23.04,5.52 L-23.04,7.62 L-11.2,7.62 Z M10.38,6.94 L16.3,17.19 L18.12,16.14 L12.2,5.89 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <h3 class="symbol-group-title" id="order-4">Quarter-turns: 4, 4<sub>1</sub>, 4<sub>2</sub>, 4<sub>3</sub></h3>
+
+      <article class="symbol-card" id="rotation-4-0">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>4-fold rotation axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 90°, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A quarter-turn about the axis and no rise: four copies at one height. Twice is a half-turn.</dd>
+              <dt>On the plate</dt><dd>A 4-fold centre: the quarter-turn about the mark keeps every colour.</dd>
+              <dt>The mark</dt><dd>A diamond, which is a square stood on its corner. No tails, so no rise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p4.html#g98">I4</a>, <a href="correspondence-p4.html#g94">P4</a>, <a href="correspondence-p4g.html#g135">P4nc</a>, <a href="correspondence-p4g.html#g132">P4bm</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-4-0" data-symbol-name="the 4-fold rotation axis" data-glyph-path="M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-4-1">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M1.24,-8.26 L-5.08,-14.58 L-6.38,-13.28 L-0.06,-6.95 Z M-8.26,-1.24 L-14.58,5.08 L-13.28,6.38 L-6.95,0.06 Z M-1.24,8.26 L5.08,14.58 L6.38,13.28 L0.06,6.95 Z M8.26,1.24 L14.58,-5.08 L13.28,-6.38 L6.95,-0.06 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>4<sub>1</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 90°, <i>z</i> + <i>c</i>/4)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A quarter-turn counter-clockwise with a rise of <i>c</i>/4: a right-handed spiral stair of four steps. Twice is a 2<sub>1</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 4-fold centre: the counter-clockwise quarter-turn sends each colour to the next in a cycle of four.</dd>
+              <dt>The mark</dt><dd>The diamond with four tails, one for each height, pointing counter-clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p4.html#g96">P4<sub>1</sub></a>, <a href="correspondence-p4.html#g99">I4<sub>1</sub></a>, <a href="correspondence-p4g.html#g137">I4<sub>1</sub>md</a>, <a href="correspondence-p4g.html#g139">I4<sub>1</sub>cd</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-4-1" data-symbol-name="the 4₁ screw axis" data-glyph-path="M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M1.41,-9.39 L-5.77,-16.57 L-7.25,-15.09 L-0.07,-7.9 Z M-9.39,-1.41 L-16.57,5.77 L-15.09,7.25 L-7.9,0.07 Z M-1.41,9.39 L5.77,16.57 L7.25,15.09 L0.07,7.9 Z M9.39,1.41 L16.57,-5.77 L15.09,-7.25 L7.9,-0.07 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-4-2">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M0.06,-6.95 L6.38,-13.28 L5.08,-14.58 L-1.24,-8.26 Z M-0.06,6.95 L-6.38,13.28 L-5.08,14.58 L1.24,8.26 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>4<sub>2</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 90°, <i>z</i> + <i>c</i>/2)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A quarter-turn with a rise of half a period, the same in either sense. Twice is a plain half-turn (a rise of <i>c</i> is no rise), so opposite tiles are level: two heights, two tiles at each.</dd>
+              <dt>On the plate</dt><dd>A 4-fold centre whose quarter-turn swaps the two colours and whose half-turn keeps them.</dd>
+              <dt>The mark</dt><dd>The diamond with two tails, one for each height. Like 2<sub>1</sub> it is its own mirror image.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p4.html#g95">P4<sub>2</sub></a>, <a href="correspondence-p4.html#g98">I4</a>, <a href="correspondence-p4g.html#g133">P4<sub>2</sub>bc</a>, <a href="correspondence-p4g.html#g134">P4<sub>2</sub>nm</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-4-2" data-symbol-name="the 4₂ screw axis" data-glyph-path="M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-4-3">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-4-3" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-9.5 L-9.5,0 L0,9.5 L9.5,0 Z M0.06,-6.95 L6.38,-13.28 L5.08,-14.58 L-1.24,-8.26 Z M-6.95,-0.06 L-13.28,-6.38 L-14.58,-5.08 L-8.26,1.24 Z M-0.06,6.95 L-6.38,13.28 L-5.08,14.58 L1.24,8.26 Z M6.95,0.06 L13.28,6.38 L14.58,5.08 L8.26,-1.24 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>4<sub>3</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 90°, <i>z</i> + 3<i>c</i>/4)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A quarter-turn counter-clockwise with a rise of 3<i>c</i>/4. Turn clockwise instead and the rise is <i>c</i>/4: the left-handed stair, the mirror image of 4<sub>1</sub>. Twice is again a 2<sub>1</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 4-fold centre: the clockwise quarter-turn sends each colour to the next in a cycle of four.</dd>
+              <dt>The mark</dt><dd>The mirrored diamond: its four tails point clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p4.html#g97">P4<sub>3</sub></a>, <a href="correspondence-p4.html#g99">I4<sub>1</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-4-3" data-symbol-name="the 4₃ screw axis" data-glyph-path="M0,-10.8 L-10.8,0 L0,10.8 L10.8,0 Z M0.07,-7.9 L7.25,-15.09 L5.77,-16.57 L-1.41,-9.39 Z M-7.9,-0.07 L-15.09,-7.25 L-16.57,-5.77 L-9.39,1.41 Z M-0.07,7.9 L-7.25,15.09 L-5.77,16.57 L1.41,9.39 Z M7.9,0.07 L15.09,7.25 L16.57,5.77 L9.39,-1.41 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <h3 class="symbol-group-title" id="order-6">Sixth-turns: 6, 6<sub>1</sub>, 6<sub>2</sub>, 6<sub>3</sub>, 6<sub>4</sub>, 6<sub>5</sub></h3>
+
+      <article class="symbol-card" id="rotation-6-0">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-0" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6-fold rotation axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn about the axis and no rise: six copies at one height. Twice is a third-turn, three times a half-turn.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre: the sixth-turn about the mark keeps every colour.</dd>
+              <dt>The mark</dt><dd>A hexagon. No tails, so no rise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g243">P6</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-0" data-symbol-name="the 6-fold rotation axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-6-1">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-1" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M1.52,-9.68 L-5.67,-13.83 L-6.59,-12.23 L0.6,-8.08 Z M-7.62,-6.16 L-14.82,-2.01 L-13.9,-0.4 L-6.7,-4.56 Z M-9.14,3.52 L-9.14,11.83 L-7.3,11.83 L-7.3,3.52 Z M-1.52,9.68 L5.67,13.83 L6.59,12.23 L-0.6,8.08 Z M7.62,6.16 L14.82,2.01 L13.9,0.4 L6.7,4.56 Z M9.14,-3.52 L9.14,-11.83 L7.3,-11.83 L7.3,-3.52 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6<sub>1</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i> + <i>c</i>/6)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn counter-clockwise with a rise of <i>c</i>/6: a right-handed spiral stair of six steps. Twice is a 3<sub>1</sub> screw, three times a 2<sub>1</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre: the counter-clockwise sixth-turn sends each colour to the next in a cycle of six.</dd>
+              <dt>The mark</dt><dd>The hexagon with six tails, one for each height, pointing counter-clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g248">P6<sub>1</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-1" data-symbol-name="the 6₁ screw axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M1.73,-11 L-6.44,-15.72 L-7.49,-13.9 L0.68,-9.18 Z M-8.66,-7 L-16.84,-2.28 L-15.79,-0.46 L-7.61,-5.18 Z M-10.39,4 L-10.39,13.44 L-8.29,13.44 L-8.29,4 Z M-1.73,11 L6.44,15.72 L7.49,13.9 L-0.68,9.18 Z M8.66,7 L16.84,2.28 L15.79,0.46 L7.61,5.18 Z M10.39,-4 L10.39,-13.44 L8.29,-13.44 L8.29,-4 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-6-2">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-2" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M1.52,-9.68 L-5.67,-13.83 L-6.59,-12.23 L0.6,-8.08 Z M-9.14,3.52 L-9.14,11.83 L-7.3,11.83 L-7.3,3.52 Z M7.62,6.16 L14.82,2.01 L13.9,0.4 L6.7,4.56 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6<sub>2</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i> + <i>c</i>/3)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn counter-clockwise with a rise of <i>c</i>/3. Three times is a plain half-turn, so opposite tiles are level: three heights, two tiles at each, on a right-handed double stair. Twice is a 3<sub>2</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre: the counter-clockwise sixth-turn sends each colour to the next in a cycle of three.</dd>
+              <dt>The mark</dt><dd>The hexagon with three tails, one for each height, pointing counter-clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g244">P6<sub>2</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-2" data-symbol-name="the 6₂ screw axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M1.73,-11 L-6.44,-15.72 L-7.49,-13.9 L0.68,-9.18 Z M-10.39,4 L-10.39,13.44 L-8.29,13.44 L-8.29,4 Z M8.66,7 L16.84,2.28 L15.79,0.46 L7.61,5.18 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-6-3">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-3" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M0.6,8.08 L-6.59,12.23 L-5.67,13.83 L1.52,9.68 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6<sub>3</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i> + <i>c</i>/2)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn with a rise of half a period, the same in either sense. Twice is a plain third-turn, so there are two heights with three tiles at each. Three times is a 2<sub>1</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre whose sixth-turn swaps the two colours and whose third-turn keeps them.</dd>
+              <dt>The mark</dt><dd>The hexagon with two tails, one for each height. It is its own mirror image.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g246">P6<sub>3</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-3" data-symbol-name="the 6₃ screw axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M0.68,9.18 L-7.49,13.9 L-6.44,15.72 L1.73,11 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-6-4">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-4" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M-6.7,4.56 L-13.9,0.4 L-14.82,2.01 L-7.62,6.16 Z M7.3,3.52 L7.3,11.83 L9.14,11.83 L9.14,3.52 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6<sub>4</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i> + 2<i>c</i>/3)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn counter-clockwise with a rise of 2<i>c</i>/3. Turn clockwise instead and the rise is <i>c</i>/3: the mirror image of 6<sub>2</sub>, a left-handed double stair. Twice is a 3<sub>1</sub> screw, three times a plain half-turn.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre: the clockwise sixth-turn sends each colour to the next in a cycle of three.</dd>
+              <dt>The mark</dt><dd>The mirrored hexagon with three tails: they point clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g245">P6<sub>4</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-4" data-symbol-name="the 6₄ screw axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M-7.61,5.18 L-15.79,0.46 L-16.84,2.28 L-8.66,7 Z M8.29,4 L8.29,13.44 L10.39,13.44 L10.39,4 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="rotation-6-5">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--rotation" data-legend-icon="rotation-6-5" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><path class="generator-symbol-core" transform="translate(34 16)" d="M0,-10.56 L-9.14,-5.28 L-9.14,5.28 L0,10.56 L9.14,5.28 L9.14,-5.28 Z M-0.6,-8.08 L6.59,-12.23 L5.67,-13.83 L-1.52,-9.68 Z M-7.3,-3.52 L-7.3,-11.83 L-9.14,-11.83 L-9.14,-3.52 Z M-6.7,4.56 L-13.9,0.4 L-14.82,2.01 L-7.62,6.16 Z M0.6,8.08 L-6.59,12.23 L-5.67,13.83 L1.52,9.68 Z M7.3,3.52 L7.3,11.83 L9.14,11.83 L9.14,3.52 Z M6.7,-4.56 L13.9,-0.4 L14.82,-2.01 L7.62,-6.16 Z"/></svg></span>
+          <div class="symbol-card-title">
+            <h3>6<sub>5</sub> screw axis</h3>
+            <p class="symbol-card-formula">(<i>r</i>, <i>θ</i>, <i>z</i>) ↦ (<i>r</i>, <i>θ</i> + 60°, <i>z</i> + 5<i>c</i>/6)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A sixth-turn counter-clockwise with a rise of 5<i>c</i>/6. Turn clockwise instead and the rise is <i>c</i>/6: the mirror image of 6<sub>1</sub>, a left-handed stair of six steps. Twice is a 3<sub>2</sub> screw, three times a 2<sub>1</sub> screw.</dd>
+              <dt>On the plate</dt><dd>A 6-fold centre: the clockwise sixth-turn sends each colour to the next in a cycle of six.</dd>
+              <dt>The mark</dt><dd>The mirrored hexagon with six tails: they point clockwise.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-p6.html#g247">P6<sub>5</sub></a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="rotation-6-5" data-symbol-name="the 6₅ screw axis" data-glyph-path="M0,-12 L-10.39,-6 L-10.39,6 L0,12 L10.39,6 L10.39,-6 Z M-0.68,-9.18 L7.49,-13.9 L6.44,-15.72 L-1.73,-11 Z M-8.29,-4 L-8.29,-13.44 L-10.39,-13.44 L-10.39,-4 Z M-7.61,5.18 L-15.79,0.46 L-16.84,2.28 L-8.66,7 Z M0.68,9.18 L-7.49,13.9 L-6.44,15.72 L1.73,11 Z M8.29,4 L8.29,13.44 L10.39,13.44 L10.39,4 Z M7.61,-5.18 L15.79,-0.46 L16.84,-2.28 L8.66,-7 Z">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="symbol-guide-section" id="planes" aria-labelledby="planes-title">
+      <h2 id="planes-title">Mirror and glide planes</h2>
+      <p>A reflection in a plane that contains the axis, followed by a shift inside the plane. Seen from above the plane is a line, and the way the line is drawn says where the shift points. In the formulas <i>x</i> is the distance from the plane, <i>y</i> runs along its line, and <i>b</i> is the repeat of the picture along that line, colours ignored.</p>
+      <p>A mirror keeps its own points fixed. A glide plane keeps nothing fixed, and the bare mirror image of a tile is not in the crystal.</p>
+
+      <article class="symbol-card" id="plane-m">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-m" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-m" x1="6" y1="16" x2="62" y2="16"></line></svg></span>
+          <div class="symbol-card-title">
+            <h3>Mirror plane <i>m</i></h3>
+            <p class="symbol-card-formula">(<i>x</i>, <i>y</i>, <i>z</i>) ↦ (−<i>x</i>, <i>y</i>, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>A reflection in a plane that contains the axis, and nothing more. Points of the plane stay where they are.</dd>
+              <dt>On the plate</dt><dd>A mirror line: the two sides are mirror images in the same colours.</dd>
+              <dt>The mark</dt><dd>A solid line: the plane seen edge-on, with no shift to show.</dd>
+              <dt>Drawn on</dt><dd><details class="symbol-places"><summary>28 plates</summary><p><a href="correspondence-pm.html#g10">Pm</a>, <a href="correspondence-cm.html#g8">Cm</a>, <a href="correspondence-pmm.html#g60">Pmc2<sub>1</sub></a>, <a href="correspondence-pmm.html#g64">Amm2</a>, <a href="correspondence-pmm.html#g65">Aem2</a>, <a href="correspondence-pmm.html#g74">Fmm2</a>, <a href="correspondence-pmm.html#g54">Pmm2</a>, <a href="correspondence-pmg.html#g62">Pmn2<sub>1</sub></a>, <a href="correspondence-pmg.html#g66">Ama2</a>, <a href="correspondence-pmg.html#g56">Pma2</a>, <a href="correspondence-cmm.html#g70">Cmc2<sub>1</sub></a>, <a href="correspondence-cmm.html#g71">Imm2</a>, <a href="correspondence-cmm.html#g73">Ima2</a>, <a href="correspondence-cmm.html#g68">Cmm2</a>, <a href="correspondence-p4m.html#g129">P4<sub>2</sub>mc</a>, <a href="correspondence-p4m.html#g130">P4<sub>2</sub>cm</a>, <a href="correspondence-p4m.html#g136">I4mm</a>, <a href="correspondence-p4m.html#g138">I4cm</a>, <a href="correspondence-p4m.html#g128">P4mm</a>, <a href="correspondence-p4g.html#g134">P4<sub>2</sub>nm</a>, <a href="correspondence-p4g.html#g137">I4<sub>1</sub>md</a>, <a href="correspondence-p4g.html#g132">P4bm</a>, <a href="correspondence-p3m1.html#g230">P3m1</a>, <a href="correspondence-p31m.html#g234">R3m</a>, <a href="correspondence-p31m.html#g232">P31m</a>, <a href="correspondence-p6m.html#g269">P6<sub>3</sub>cm</a>, <a href="correspondence-p6m.html#g271">P6<sub>3</sub>mc</a>, <a href="correspondence-p6m.html#g268">P6mm</a></p></details></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="plane-m" data-symbol-name="the Mirror plane m">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="plane-axial">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-axial" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-axial" x1="6" y1="16" x2="62" y2="16"></line><path class="diagram-symbol-glide-arrow" d="M22,16 L48,16"></path><path class="diagram-symbol-glide-head" d="M48.00,16.00 L37.00,16.00 L37.00,22.60 Z"></path></svg></span>
+          <div class="symbol-card-title">
+            <h3>Glide plane <i>a</i> or <i>b</i></h3>
+            <p class="symbol-card-formula">(<i>x</i>, <i>y</i>, <i>z</i>) ↦ (−<i>x</i>, <i>y</i> + <i>b</i>/2, <i>z</i>)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>The reflection, then a shift of half a repeat along the plane’s line. No rise. Twice is the translation <i>b</i>. The bare mirror image is not part of the crystal: the dashed outline in the figure marks the place it would have.</dd>
+              <dt>On the plate</dt><dd>A glide line: copies alternate from side to side like footprints, in one colour.</dd>
+              <dt>The mark</dt><dd>A dashed line: the shift lies in the picture. The half arrow, which the plates add to the Tables’ symbol, shows which way the entry’s generator steps.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-pg.html#g11">Pc</a>, <a href="correspondence-cm.html#g8">Cm</a>, <a href="correspondence-pgg.html#g63">Pna2<sub>1</sub></a>, <a href="correspondence-pgg.html#g58">Pba2</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="plane-axial" data-symbol-name="the Glide plane a or b">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="plane-c">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-c" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-c" x1="6" y1="16" x2="62" y2="16"></line></svg></span>
+          <div class="symbol-card-title">
+            <h3>Glide plane <i>c</i></h3>
+            <p class="symbol-card-formula">(<i>x</i>, <i>y</i>, <i>z</i>) ↦ (−<i>x</i>, <i>y</i>, <i>z</i> + <i>c</i>/2)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>The reflection, then a rise of half a period. Nothing moves along the line. Twice is the lattice translation <i>c</i>.</dd>
+              <dt>On the plate</dt><dd>It looks like a mirror line, but the two sides differ by half a period: a mirror that swaps the two colours.</dd>
+              <dt>The mark</dt><dd>A dotted line: the shift points along the axis, out of the picture.</dd>
+              <dt>Drawn on</dt><dd><details class="symbol-places"><summary>27 plates</summary><p><a href="correspondence-cm.html#g9">Cc</a>, <a href="correspondence-pmm.html#g55">Pcc2</a>, <a href="correspondence-pmm.html#g60">Pmc2<sub>1</sub></a>, <a href="correspondence-pmm.html#g64">Amm2</a>, <a href="correspondence-pmm.html#g65">Aem2</a>, <a href="correspondence-pmm.html#g74">Fmm2</a>, <a href="correspondence-pmg.html#g57">Pnc2</a>, <a href="correspondence-pmg.html#g61">Pca2<sub>1</sub></a>, <a href="correspondence-pmg.html#g67">Aea2</a>, <a href="correspondence-cmm.html#g69">Ccc2</a>, <a href="correspondence-cmm.html#g70">Cmc2<sub>1</sub></a>, <a href="correspondence-cmm.html#g72">Iba2</a>, <a href="correspondence-cmm.html#g73">Ima2</a>, <a href="correspondence-p4m.html#g129">P4<sub>2</sub>mc</a>, <a href="correspondence-p4m.html#g130">P4<sub>2</sub>cm</a>, <a href="correspondence-p4m.html#g131">P4cc</a>, <a href="correspondence-p4m.html#g136">I4mm</a>, <a href="correspondence-p4m.html#g138">I4cm</a>, <a href="correspondence-p4g.html#g133">P4<sub>2</sub>bc</a>, <a href="correspondence-p4g.html#g135">P4nc</a>, <a href="correspondence-p4g.html#g139">I4<sub>1</sub>cd</a>, <a href="correspondence-p3m1.html#g231">P3c1</a>, <a href="correspondence-p31m.html#g233">P31c</a>, <a href="correspondence-p31m.html#g235">R3c</a>, <a href="correspondence-p6m.html#g269">P6<sub>3</sub>cm</a>, <a href="correspondence-p6m.html#g270">P6cc</a>, <a href="correspondence-p6m.html#g271">P6<sub>3</sub>mc</a></p></details></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="plane-c" data-symbol-name="the Glide plane c">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="plane-n">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-n" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-n" x1="6" y1="16" x2="62" y2="16"></line></svg></span>
+          <div class="symbol-card-title">
+            <h3>Diagonal glide plane <i>n</i></h3>
+            <p class="symbol-card-formula">(<i>x</i>, <i>y</i>, <i>z</i>) ↦ (−<i>x</i>, <i>y</i> + <i>b</i>/2, <i>z</i> + <i>c</i>/2)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>The reflection, then half a repeat along the line and half a period up: one diagonal step inside the plane. Twice is the lattice translation <i>b</i> + <i>c</i>.</dd>
+              <dt>On the plate</dt><dd>A glide line that also swaps the two colours at every step.</dd>
+              <dt>The mark</dt><dd>Dashes and dots together: a shift in the picture and one along the axis. On a plate a half arrow shows which way the generator steps.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-cm.html#g9">Cc</a>, <a href="correspondence-pgg.html#g59">Pnn2</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="plane-n" data-symbol-name="the Diagonal glide plane n">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="symbol-card" id="plane-d">
+        <header class="symbol-card-head">
+          <span class="symbol-card-glyph" aria-hidden="true"><svg class="diagram-symbol-icon diagram-symbol-icon--plane" data-legend-icon="plane-d" viewBox="0 0 68 32" aria-hidden="true" focusable="false"><line class="diagram-symbol-plane plate-generator-axis--plane-d" x1="6" y1="16" x2="62" y2="16"></line><path class="diagram-symbol-quarter-arrow" d="M 25.58 20.2 L 35.58 16 L 25.58 11.8"></path><path class="diagram-symbol-quarter-arrow" d="M 33.42 20.2 L 43.42 16 L 33.42 11.8"></path></svg></span>
+          <div class="symbol-card-title">
+            <h3>Diamond glide plane <i>d</i></h3>
+            <p class="symbol-card-formula">(<i>x</i>, <i>y</i>, <i>z</i>) ↦ (−<i>x</i>, <i>y</i> + <i>b</i>/2, <i>z</i> + <i>c</i>/4)</p>
+          </div>
+          <a class="symbol-card-up" href="#marks">All marks <span aria-hidden="true">↑</span></a>
+        </header>
+        <div class="symbol-card-body">
+          <div class="symbol-card-text">
+            <dl>
+              <dt>In the crystal</dt><dd>The reflection, then half a repeat along the line and a quarter of a period up. Twice is <i>b</i> + <i>c</i>/2, a centring vector, so only centred lattices have such planes. Four times is the lattice translation 2<i>b</i> + <i>c</i>.</dd>
+              <dt>On the plate</dt><dd>A glide line along which the colours run through a cycle of four.</dd>
+              <dt>The mark</dt><dd>Dashes and dots with arrowheads. The arrows point along the line in the direction that goes with the rise; taken the other way the same glide descends by <i>c</i>/4. Measured in the conventional centred cell both parts are a quarter of an edge.</dd>
+              <dt>Drawn on</dt><dd><a href="correspondence-pgg.html#g75">Fdd2</a></dd>
+            </dl>
+          </div>
+          <div class="symbol-figure" data-symbol-figure data-symbol="plane-d" data-symbol-name="the Diamond glide plane d">
+            <p class="symbol-figure-fallback">The animated figure needs JavaScript.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="symbol-guide-section" id="at-a-glance" aria-labelledby="glance-title">
+      <h2 id="glance-title">Reading a mark at a glance</h2>
+      <ul class="symbol-guide-list">
+        <li><strong>Core.</strong> Lens, triangle, diamond, hexagon: a turn of order 2, 3, 4, 6. A line: a plane seen edge-on. An open arrow: a translation.</li>
+        <li><strong>Tails.</strong> None: no rise. Otherwise count them: the copies around the mark stand at that many heights, so the turn steps a cycle of that many colours.</li>
+        <li><strong>Sense.</strong> Tails pointing counter-clockwise: the stair climbs counter-clockwise, a right-handed screw (3<sub>1</sub>, 4<sub>1</sub>, 6<sub>1</sub>, 6<sub>2</sub>). Pointing clockwise: left-handed (3<sub>2</sub>, 4<sub>3</sub>, 6<sub>4</sub>, 6<sub>5</sub>). With two tails (2<sub>1</sub>, 4<sub>2</sub>, 6<sub>3</sub>) there is no handedness.</li>
+        <li><strong>Line.</strong> Solid: a reflection only. Dashed: half a repeat along the line. Dotted: half a period along the axis. Dashes and dots: both. With arrowheads: half a repeat along the line and a quarter of a period up.</li>
+        <li><strong>Fixed points.</strong> Only rotation axes and mirrors have them. Screw axes, glide planes and translations move every point.</li>
+        <li><strong>Colour.</strong> An operation that rises <i>h</i> moves a cycle of <i>N</i> colours on by <i>N</i><i>h</i>/<i>c</i> places.</li>
+      </ul>
+      <p class="symbol-guide-sources">Notation: <a href="https://journals.iucr.org/j/issues/2010/05/02/kk5061/kk5061fig12.html" target="_blank" rel="noopener"><cite>International Tables for Crystallography</cite> projection symbols</a> · <a href="http://img.chem.ucl.ac.uk/sgp/large/159az1.htm" target="_blank" rel="noopener">UCL P 3 1 c example</a> · <a href="correspondence.html">Back to the correspondence</a></p>
+    </section>
+  </main>
+</body>
+</html>

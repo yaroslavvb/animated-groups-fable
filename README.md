@@ -99,6 +99,15 @@ The classification is recomputed from scratch in exact rational arithmetic
   `docs/correspondence.html` (the index with one card per wallpaper group)
   and `docs/correspondence-<hm>.html`, one page per wallpaper group (17);
   old `correspondence.html#g244` links are redirected by the index.
+- `correspondence_symbol_guide.py` — the symbol guide
+  `docs/correspondence-symbols.html`, which `split_correspondence.py` writes
+  with the other pages: one card for each of the 21 diagram symbols, with the
+  operation written out, the plates that draw it, and a figure of what it does
+  to a polar crystal and to its colour plate (drawn and animated by
+  `docs/js/correspondence-symbols.js`). The "Diagram symbols" card of every
+  correspondence page links to it. `node tools/check_symbol_guide.mjs` checks
+  the figures' geometry and `tools/check_symbol_guide.browser.mjs` the page in
+  Chrome or WebKit.
 - `correspondence_visualizations.py` — the "Visualizations" section
   `split_correspondence.py` puts under each entry's Extra links: up to four
   Showcase clips of that group, chosen from `docs/showcase/data/showcase.json`

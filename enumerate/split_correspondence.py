@@ -17,6 +17,10 @@ text"; this script cuts the snapshot into
                                         p1, p2, pm, pg, cm, pmm, pmg, pgg,
                                         cmm, p4, p4m, p4g, p3, p3m1, p31m,
                                         p6, p6m
+    docs/correspondence-symbols.html    the symbol guide: what each of the 21
+                                        diagram symbols does, one animated
+                                        figure each (the text and layout are
+                                        in correspondence_symbol_guide.py)
 
 Every entry keeps its id, so a link that used to read
 correspondence.html#g244 still works: the index redirects it to
@@ -51,6 +55,10 @@ family pages (not the index, which holds no entries) load
 css/correspondence-visualizations.css and js/correspondence-visualizations.js,
 which plays a clip while it is on screen and frees it again when it is not.
 
+The "Diagram symbols" card of all 18 pages links to the symbol guide, and so
+does every name in its visual index (correspondence_symbol_guide.link_teaser
+and link_index); the snapshot itself carries neither link.
+
 Order of operations after editing the source:
     python3 correspondence_frames.py --check  every tab of a page shares one
                                             pattern and one set of generator
@@ -58,7 +66,7 @@ Order of operations after editing the source:
     python3 correspondence_symbols.py       redraw the symbols in the source
     python3 vladimir_catalog_links.py       refresh the catalog links (needs a
                                             checkout of vbulatov2011/colorsym-catalog)
-    python3 split_correspondence.py         write the 18 pages
+    python3 split_correspondence.py         write the 19 pages
     python3 split_correspondence.py --check exit 1 unless the pages are current
 """
 
@@ -69,6 +77,7 @@ import re
 import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import correspondence_symbol_guide  # noqa: E402
 import correspondence_symbols  # noqa: E402
 import correspondence_visualizations  # noqa: E402
 
@@ -302,9 +311,11 @@ class Parts:
         directory = cut(source, '<section class="directory"', "section")
         self.h1 = cut(directory, "<h1", "h1")
         self.note = cut(directory, '<p class="directory-viewer-note"', "p")
-        self.teaser = cut(directory, '<aside class="diagram-symbol-teaser"', "aside")
+        self.teaser = correspondence_symbol_guide.link_teaser(
+            cut(directory, '<aside class="diagram-symbol-teaser"', "aside"))
         self.notation = cut(directory, '<aside class="notation-caveat"', "aside")
-        self.dialog = cut(source, '<section class="diagram-symbol-dialog"', "section")
+        self.dialog = correspondence_symbol_guide.link_index(
+            cut(source, '<section class="diagram-symbol-dialog"', "section"))
         self.links_meta, self.links = load_links()
         self.visualizations = correspondence_visualizations.load()
         atlas = cut(source, '<div class="correspondence-atlas"', "div")
@@ -578,6 +589,7 @@ def build():
     pages = {INDEX: index_page(parts)}
     for index, family in enumerate(parts.families):
         pages[DOCS / family.page] = family_page(parts, index)
+    pages[DOCS / correspondence_symbol_guide.PAGE] = correspondence_symbol_guide.page(parts, head_for)
     return {page: drop_clockwork(text) for page, text in pages.items()}
 
 
