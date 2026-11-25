@@ -21,17 +21,21 @@
   </header>
 
   <section id="play" role="tabpanel">
-    <p class="lede">Tap two cone points on the surface (or their numbers), then move Length and Twist: that pair comes to the middle while the pattern shears along its cut.</p>
+    <p class="lede">Tap two features on the surface (or their symbols), then move Length and Twist: that pair comes to the middle while the pattern shears along its isolating cut.</p>
 
     <div class="ctrl-bar">
       <div class="seg" role="group" aria-label="Orbifold">
         <button class="chip" type="button" data-fam="3333" aria-pressed="true">3333</button>
         <button class="chip" type="button" data-fam="2223" aria-pressed="false">2223</button>
+        <button class="chip" type="button" data-fam="333*" aria-pressed="false">333∗</button>
+        <button class="chip" type="button" data-fam="333*3" aria-pressed="false">333∗3</button>
+        <button class="chip" type="button" data-fam="333x" aria-pressed="false">333×</button>
+        <button class="chip" type="button" data-fam="o33" aria-pressed="false">o33</button>
         <button class="chip" type="button" data-fam="2222" aria-pressed="false">2222</button>
       </div>
       <div class="sig-wrap">
         <span class="sig-label">Pair</span>
-        <div class="sig-digits" id="sig-digits" role="group" aria-label="Signature cone points">
+        <div class="sig-digits" id="sig-digits" role="group" aria-label="Orbifold features">
           <button class="sig-btn" type="button" data-cone="0" aria-pressed="true">3</button>
           <button class="sig-btn" type="button" data-cone="1" aria-pressed="true">3</button>
           <button class="sig-btn" type="button" data-cone="2" aria-pressed="false">3</button>
@@ -57,13 +61,13 @@
       <div class="pane" id="pane">
         <div class="pane-head">
           <span class="pane-title">Surface</span>
-          <span class="pane-sub" id="surf-sub">Tap two cone tips</span>
+          <span class="pane-sub" id="surf-sub">Tap two features</span>
           <button class="reset" type="button" id="reset3" aria-label="Reset surface orientation">Reset</button>
         </div>
         <div class="canvas-wrap ratio-surf">
-          <canvas id="view" tabindex="0" aria-label="3D orbifold ball with four cone points"></canvas>
+          <canvas id="view" tabindex="0" aria-label="3D orbifold surface with tappable features"></canvas>
           <div class="labels" id="labels"></div>
-          <span class="hint" id="view-hint">Drag to turn · tap cone tips</span>
+          <span class="hint" id="view-hint">Drag to turn · tap features</span>
         </div>
       </div>
     </div>
@@ -92,6 +96,29 @@
         </div>
       </div>
 
+      <div class="extra-sliders" id="extra-sliders" hidden>
+        <div class="slider-row" id="tau-row" hidden>
+          <label class="s-label" for="tau-range" id="tau-label">Handle shift</label>
+          <div class="scrub" id="tau-scrub" data-scrub>
+            <span class="scrub-rail"></span>
+            <span class="scrub-fill"></span>
+            <span class="scrub-ticks" data-ticks></span>
+            <input id="tau-range" type="range" min="0" max="1" step="0.001" value="0.7" aria-label="Handle shift">
+          </div>
+          <span class="s-val" id="val-tau">+0.200</span>
+        </div>
+        <div class="slider-row" id="b-row" hidden>
+          <label class="s-label" for="b-range" id="b-label">Handle len</label>
+          <div class="scrub" id="b-scrub" data-scrub>
+            <span class="scrub-rail"></span>
+            <span class="scrub-fill"></span>
+            <span class="scrub-ticks" data-ticks></span>
+            <input id="b-range" type="range" min="0" max="1" step="0.001" value="0.5" aria-label="Cuff length">
+          </div>
+          <span class="s-val" id="val-b">1.30</span>
+        </div>
+      </div>
+
       <div class="readout" id="readout">
         <span>Length <strong id="out-len">2.00</strong></span>
         <span class="sep">·</span>
@@ -105,12 +132,16 @@
         <span class="key-item"><i class="sw sw-ink"></i>tree</span>
         <span class="key-item"><i class="sw sw-amber-dash"></i>isolating cut</span>
         <span class="key-item"><i class="sw sw-amber-bead"></i>loop &amp; bead</span>
+        <span class="key-item" id="key-fault" hidden><i class="sw sw-blue-line"></i>handle fault line</span>
+        <span class="key-item" id="key-mirror" hidden><i class="sw sw-red-line"></i>mirror</span>
+        <span class="key-item" id="key-glide" hidden><i class="sw sw-red-dash"></i>glide axis</span>
       </div>
 
       <div class="moments" role="group" aria-label="Moments">
         <button class="chip" type="button" data-moment="follow" aria-pressed="false">Follow the tree</button>
         <button class="chip" type="button" data-moment="length" aria-pressed="false">Closer, further</button>
         <button class="chip" type="button" data-moment="half" aria-pressed="false">Half a turn</button>
+        <button class="chip" type="button" data-moment="fault" aria-pressed="false">Handle fault</button>
       </div>
       <p class="note" id="moment-note" aria-live="polite"></p>
     </div>
@@ -120,13 +151,13 @@
     <div class="tut-top">
       <button class="chip" type="button" id="back-play">← Back to Play</button>
     </div>
-    <p class="lede">How picking two features on a four-cone orbifold sets two Fenchel–Nielsen handles—the cut length \(L\) (or pair spacing \(\ell\) on \(2222\), closed length \(2\ell\)) and twist \(\mathrm{tw}\)—and why both are needed to navigate shapes of \(3333\), \(2223\), and \(2222\).</p>
+    <p class="lede">How picking any two features on an orbifold—a cone point \(p\), a composite \(22\) line, a mirror tree \({*}\dots\), a crosscap \({\times}\), or either side \(\tfrac{1}{2}o\) of a handle—sets an isolating geodesic of length \(L\) and twist \(\mathrm{tw}\), together with cuff lengths and handle fault-line shift on higher-dimensional families.</p>
 
     <details class="fold" open>
-      <summary>1. Vladimir Bulatov’s idea and Chaim Goodman-Strauss’s caveat</summary>
+      <summary>1. Vladimir Bulatov’s idea and Chaim Goodman-Strauss’s generalization</summary>
       <div class="fold-body">
-        <p><strong>Vladimir Bulatov</strong> suggested visualising how picking any pair of cone points on an orbifold’s 3D surface controls its isolating cut and twist handles; <strong>Chaim Goodman-Strauss</strong> added the caveat that a bare unordered pair of cone points does not uniquely name a cut. Built from their explanations as Yaroslav Bulatov understood them; neither has seen this build.</p>
-        <p>On any of the four-cone sphere orbifolds \(3333\), \(2223\), or \(2222\), a symmetry group with a single cone pair picked out has two real handles—the <strong>length</strong> of the simple closed geodesic separating that pair from the other two cones, and the <strong>twist</strong> along it. Because infinitely many homotopy classes of separating loops join the same unordered pair (distinguished by which <em>arc</em>, or tree edge, connects them), the 3D dodecahedron ball serves as a topological selector: whenever you re-pick a pair, the pattern stays stationary on screen, solves for the canonical tree copy closest to the previous cut, and glides smoothly onto the new pair’s midpoint.</p>
+        <p><strong>Vladimir Bulatov</strong> noted after seeing the first four-cone version that the paired 3D/2D view makes separating geodesics clear and suggested that pair separation and twist could parametrize arbitrary orbifold shapes. <strong>Chaim Goodman-Strauss</strong> had raised the caveat that a bare unordered pair of features does not uniquely name a cut (because infinitely many homotopy classes of separating loops join the same unordered pair), and then laid out the full generalization built here across all five feature types: cone points \(n\), composite pairs \(22\), mirror trees \({*}\dots\), crosscaps \({\times}\), and the two sides \(\tfrac{1}{2}o\) of each handle with its own fault-line shift.</p>
+        <p>On any four-feature group (\(3333\), \(2223\), \(333{*\!}\), \(333{*}3\), \(333{\times}\), \(o33\), or Euclidean \(2222\)), picking two features brings the unique shortest arc between them to the middle of the pattern and names the separating closed geodesic \(L\) with twist \(\mathrm{tw}\). The 3D surface acts as the topological selector: whenever you re-pick a pair, the tiling stays stationary on screen, solves for the canonical tree copy closest to the previous cut, and glides smoothly onto the new pair’s midpoint.</p>
       </div>
     </details>
 
@@ -151,20 +182,31 @@
         \[
           d_0(p,q) = \operatorname{arcosh}\!\left(\frac{\cos(\pi/p)\cos(\pi/q) + 1}{\sin(\pi/p)\sin(\pi/q)}\right).
         \]
-        <p>When \(p\) and \(q\) are not both \(2\), the tree geodesic through \(A, B\) and the isolating geodesic are ultraparallel (never meeting even if extended). Their shortest common-perpendicular distance \(m\) drops onto the tree line \(AB\) at hyperbolic distance \(d_A\) from \(A\) (the midpoint of \(AB\) when \(p = q\)):</p>
+        <p>When \(p\) and \(q\) are not both \(2\), the tree geodesic through \(A, B\) and the isolating geodesic are ultraparallel. Their shortest common-perpendicular distance \(m\) drops onto the tree line \(AB\) at hyperbolic distance \(d_A\) from \(A\) (the midpoint of \(AB\) when \(p = q\)):</p>
         \[
           \begin{aligned}
           \tanh d_A &= \frac{\cos(\pi/p)}{\tanh h_A},\\[4pt]
           \sinh m &= \frac{\sinh h_A}{\cosh d_A}.
           \end{aligned}
         \]
-        <p>When \(p = q = 2\) (on the \(2\text{–}2\) pairs of \(2223\)), \(h_A = h_B = 0\), so \(m = 0\): the tree lies directly on the isolating geodesic (drawn with an amber dashed line atop the ink tree). Walking the sharpest left-turn path \(T^{\mp k}(A, B)\) for integer steps \(k \ge 0\) along the tree—where \(T = R_A R_B\) is the product of cone rotations about \(A\) and \(B\)—converges to the two rim ends of the cut, with perpendicular legs \(h_A, h_B, h_C, h_D\) dropping from \(A, B, C, D\) onto it.</p>
+        <p>When \(p = q = 2\) (the \(2\text{–}2\) composite line-feature on \(2223\)), \(h_A = h_B = 0\) and \(m = 0\): the tree runs directly along the isolating geodesic. Walking the sharpest left-turn path \(T^{\mp k}(A, B)\) along the tree—where \(T = R_A R_B\)—converges to both rim ends of the cut, with perpendicular legs dropping from \(A, B, C, D\) onto it.</p>
+        <p>When one feature is a geodesic cuff of translation length \(b > 0\)—a plain mirror circle \({*}\) (\(b = b_*\)), a crosscap \({\times}\) with one-sided glide step \(b_\times\) (\(b = 2b_\times\)), or one side of a handle \(o\) (\(b = b_o\))—paired with a cone of order \(p\), the shortest orthogonal arc \(D\) from the cone to the cuff geodesic satisfies</p>
+        \[
+          \begin{aligned}
+          \sinh D &= \frac{\cosh(L/2) + \cos(\pi/p)\cosh(b/2)}{\sin(\pi/p)\sinh(b/2)},\\[4pt]
+          \cosh h_\gamma &= \frac{\cos(\pi/p) + \cosh(L/2)\cosh(b/2)}{\sinh(L/2)\sinh(b/2)}.
+          \end{aligned}
+        \]
+        <p>For \({*}3\), two mirror rays meet at \(\pi/3 < \pi\) inside a crown shifted outward from the separating cuff by \(w = \operatorname{arsinh}(\cos(\pi/6)/\sinh(b_*/2))\), so the shortest arc drops orthogonally onto the nearest mirror segment (between corners). When both sides \(o^+, o^-\) of a handle are paired together on \(o33\), they sit as the two equal cuffs of a one-holed torus of waist \(L\) joined by the orthogonal arc \(D_{oo}\):</p>
+        \[
+          \cosh D_{oo} = \frac{\cosh(L/2) + \cosh^2(b_o/2)}{\sinh^2(b_o/2)}.
+        \]
         <p>On the Euclidean pillow \(2222\) (fixed tile area \(2\)), the tree of length \(\ell\) runs between \((-\ell/2, 0)\) and \((\ell/2, 0)\), the second cone row lies \(w = 1/\ell\) above, and the isolating cut runs parallel halfway between them at distance \(m = \frac{1}{2\ell}\).</p>
       </div>
     </details>
 
     <details class="fold">
-      <summary>3. Twist period and the half-turn swap</summary>
+      <summary>3. Twist period, half-turn swap, and the handle fault line</summary>
       <div class="fold-body">
         <p>If \(t\) is the signed shear in hyperbolic length units along the hyperbolic cut axis of length \(L\), or \(s\) is the horizontal slide of the upper cone row along the Euclidean \(2222\) cut of closed length \(2\ell\), the dimensionless twist in turns is</p>
         \[
@@ -173,8 +215,8 @@
           \mathrm{tw} &= \frac{s}{2\ell}\quad(2222).
           \end{aligned}
         \]
-        <p>Increasing \(\mathrm{tw}\) by \(1\) shifts the upper cones \(C, D\) by one full period \(T(z) = e^{-L} z\) of the isolating geodesic (in upper half-plane coordinates \(z\) with the isolating axis along the positive imaginary axis, or full lattice vector \(2\ell\) in \(2222\)): every cone point and every local comma motif maps back onto its own copy, so \(\mathrm{tw} = -0.5\) and \(\mathrm{tw} = +0.5\) depict the same pattern.</p>
-        <p>Shifting by half a turn (\(\mathrm{tw} \mapsto \mathrm{tw} \pm \tfrac{1}{2}\)) slides the upper row rigidly by \(L/2\) (or \(\ell\) in \(2222\)). Whenever the far pair has equal cone orders (\(r = s\), as in \(3333\), \(2222\), and the \((3,2\mid 2,2)\) cut of \(2223\)), the cone lattice returns to the same sites with \(C\) and \(D\) swapped—carrying their attached rigid comma markings across (on \(3333\), the small comma slides onto \(D\)’s old site while \(C\)’s old site becomes blank, and each cone’s direction toward its former partner points opposite). Negating \(\mathrm{tw} \mapsto -\mathrm{tw}\) gives the mirror orbifold.</p>
+        <p>Increasing \(\mathrm{tw}\) by \(1\) shifts the far pair by one full period \(L\) along the isolating geodesic (or lattice vector \(2\ell\) in \(2222\)): every feature and rigid comma returns onto its own copy, so \(\mathrm{tw} = -0.5\) and \(\mathrm{tw} = +0.5\) depict the same pattern. Shifting by half a turn (\(\mathrm{tw} \mapsto \mathrm{tw} \pm \tfrac{1}{2}\)) slides the upper row by \(L/2\) (or \(\ell\)); whenever the far pair has equal cone orders, the lattice returns to the same sites with \(C\) and \(D\) swapped, carrying their rigid comma markings across.</p>
+        <p>On \(o33\), the handle itself is a translation-invariant geodesic \(\gamma_o\) of closed length \(b_o > 0\) whose two sides \(o^+\) and \(o^-\) glue along a fault line. The extra <strong>Handle shift</strong> parameter \(\tau_o \in [-0.5, +0.5]\) turns translates \(o^-\) against \(o^+\) along \(\gamma_o\) (drawn in blue on every tile with matching ticks on each side), also with exact period \(1\) turn. Together \((L, \mathrm{tw}, b_o, \tau_o)\) span all \(4\) Fenchel–Nielsen coordinates of \(o33\).</p>
       </div>
     </details>
 
@@ -187,10 +229,13 @@
     </details>
 
     <details class="fold">
-      <summary>5. Scope — why five cones, mirrors, handles, and crosscaps sit outside</summary>
+      <summary>5. All five feature kinds and carving arbitrary orbifolds</summary>
       <div class="fold-body">
-        <p>For a sphere orbifold with four cone points, Thurston’s dimension formula leaves \(2(4 - 3) = 2\) real Fenchel–Nielsen moduli: one simple closed curve separates \((2\text{ cones})\) from \((2\text{ cones})\), producing one Length and one Twist handle. With \(k \ge 5\) cones there are \(k - 3 \ge 2\) independent separating curves (\(2k - 6\) parameters), so two handles no longer suffice.</p>
-        <p>Three-cone spherical and triangle groups (such as \(332\), \(432\), \(532\)) are rigid with \(0\) continuous parameters. Groups with mirror lines (<code>∗</code>), handles (<code>o</code>), or crosscaps (<code>×</code>) cut along arcs ending on mirrors or non-orientable cuffs rather than clean cone pairs. Those wider families live in the companion pages <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a> and <a href="https://spacesheep.dev/@yaroslavvb/orbifold-showcase">Orbifold Showcase</a>.</p>
+        <p>Chaim Goodman-Strauss’s separation construction generalizes unchanged to all five topological building blocks: cone points \(n\), composite pairs \(22\) (whose tree degenerates into a straight line along the isolating cut), boundary/mirror trees \({*}n_1n_2\dots\), crosscaps \({\times}\) (a glide-reflection axis geodesic), and the two oriented sides \(o^+, o^-\) of a handle geodesic. In every case, picking two features extracts the shortest connecting arc between the point, geodesic, or convex mirror tree of each feature; repeating all symmetric copies builds a planar tree whose ends converge to the unique separating geodesic, placing Length and Twist cleanly at the center of the view.</p>
+        <p>Two mathematical points behind this picture are worth noting explicitly:</p>
+        <p><strong>No constraint on \(o\) beyond simplicity:</strong> Any simple non-separating closed geodesic on the orbifold acts as a handle geodesic \(\gamma_o\). There is no upper or lower bound on its length \(b_o > 0\) nor any restriction on the fault-line shift \(\tau_o\)—the only geometric requirement is that its lifts remain pairwise disjoint so the curve on the orbifold does not self-intersect.</p>
+        <p><strong>Generic uniqueness vs. symmetric tie walls:</strong> Inside a fixed homotopy class of arc on the orbifold, the shortest geodesic between two points, geodesics, or convex mirror trees is strictly unique. Globally (when optimizing over all lifts to select the canonical tile copy), it is unique for generic shapes, while symmetric loci form lower-dimensional tie walls—for example a square \(2222\) lattice where two diagonals have equal length, a half-turn on equal cones, or \(333{*}3\) at \(\tau_c = 0\) where adjacent mirror facets tie at equal distance.</p>
+        <p>Because each geometric picture already fixes every arc length and twist on its newly exposed cuffs, carving an arbitrary higher-genus or \(k \ge 5\)-feature orbifold recursively—peeling off two features along their separating geodesic in any order—carries known parameters at every step. Broader non-recursive families also appear in <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a> and <a href="https://spacesheep.dev/@yaroslavvb/orbifold-showcase">Orbifold Showcase</a>.</p>
       </div>
     </details>
   </section>

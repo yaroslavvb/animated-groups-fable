@@ -1,11 +1,11 @@
 // page.js — interactive controller for "Two features, two handles" (Demo 2a).
 
 import {
-  GH, GE, FAMILIES,
-  pairDistance, treeToCut,
-  recutH, recut2222,
+  GH, GE, FAMILIES, normalizeFamilyKey,
+  pairMetricsFor, recut,
   followTreeData, interpolateView,
-  stadium, beadOnLoop, sitesForBall,
+  stadium, handleBeltLoop, beadOnLoop, sitesForBall,
+  surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from './handles.js';
 import { createPattern } from './pattern-ext.js';
@@ -37,8 +37,20 @@ const labelsEl = $('#labels');
 const tipEl = $('#tip');
 const lenRange = $('#len-range');
 const twRange = $('#tw-range');
+const bRange = $('#b-range');
+const tauRange = $('#tau-range');
 const valLen = $('#val-len');
 const valTw = $('#val-tw');
+const valB = $('#val-b');
+const valTau = $('#val-tau');
+const bLabel = $('#b-label');
+const tauLabel = $('#tau-label');
+const extraSliders = $('#extra-sliders');
+const bRow = $('#b-row');
+const tauRow = $('#tau-row');
+const keyFault = $('#key-fault');
+const keyMirror = $('#key-mirror');
+const keyGlide = $('#key-glide');
 const outLen = $('#out-len');
 const outTw = $('#out-tw');
 const outGeo = $('#out-geo');
@@ -49,10 +61,21 @@ const reset3Btn = $('#reset3');
 const backPlayBtn = $('#back-play');
 
 const MOMENT_COPY = {
-  follow: 'Walking sharpest-left along the pair tree (T^∓k) runs straight to both rim ends of the isolating cut; four perpendicular legs drop from A, B, C, D onto it.',
   length: 'At Length = 0.80, the two 3-cones sit 1.18 apart (above the ln 3 ≈ 1.10 floor) with tree-to-cut distance 1.64. Slide Length up to draw them further apart.',
   half: 'Sweep Twist from 0 toward ±0.5 turns: the two far 3-cones swap sites carrying their comma markings, and −0.5 lands back on +0.5 identically.',
+  fault: 'On o33, o⁺ and o⁻ are the two sides of a handle geodesic γ_o. Drag Handle shift to shear the two sides against one another along the blue fault line, even as Length and Twist steer the cut.',
 };
+
+function followNoteFor(st) {
+  const fam = FAMILIES[st.k];
+  if (fam.mode === 'handle') {
+    return 'Repeating the shortest arc and cuff tree of the picked o33 pair runs straight to both rim ends of the isolating cut, while perpendicular legs drop onto it.';
+  }
+  if (fam.mode !== 'cones' && fam.mode !== 'pillow') {
+    return `Repeating copies of the shortest tree connecting ${fam.featLabels[st.perm[0]]} and ${fam.featLabels[st.perm[1]]} converges to both rim ends of the separating geodesic.`;
+  }
+  return 'Walking sharpest-left along the pair tree (T^∓k) runs straight to both rim ends of the isolating cut; four perpendicular legs drop from A, B, C, D onto it.';
+}
 
 // ---- State & view helpers
 function defaultThetas(k) {
@@ -68,6 +91,8 @@ function makeDefaultState(k = '3333') {
     orders: perm.map((c) => fam.baseOrders[c]),
     L: fam.defaultL,
     tw: fam.defaultTw,
+    b: fam.defaultB ?? 0,
+    tau: fam.defaultTau ?? 0,
     thetas: defaultThetas(fam.k),
   };
 }
@@ -78,14 +103,16 @@ let older = state.perm[0];
 let newer = state.perm[1];
 let promoted = null;
 let lenRangeBounds = FAMILIES['3333'].baseRange.slice();
+let bRangeBounds = [0.4, 3.0];
 let activeMoment = null;
-let followState = null; // { active, progress, data, raf }
-let glideState = null;  // { raf, promise, resolve }
+let followState = null;
+let glideState = null;
 let moveTimer = 0;
 let suppressSlider = false;
 
 let built = null;
 let loopCache = { key: '', loop: null };
+let beltCache = { k: '', loop: null };
 let stage = createStage(viewCanvas, labelsEl);
 const pattern = createPattern(patCanvas, { tip: tipEl });
 
@@ -95,6 +122,14 @@ function lToU(L) {
 }
 function uToL(u) {
   const lo = Math.log(lenRangeBounds[0]), hi = Math.log(lenRangeBounds[1]);
+  return Math.exp(lo + clamp(u, 0, 1) * (hi - lo));
+}
+function bToU(b) {
+  const lo = Math.log(bRangeBounds[0]), hi = Math.log(bRangeBounds[1]);
+  return clamp((Math.log(Math.max(bRangeBounds[0], b)) - lo) / (hi - lo || 1), 0, 1);
+}
+function uToB(u) {
+  const lo = Math.log(bRangeBounds[0]), hi = Math.log(bRangeBounds[1]);
   return Math.exp(lo + clamp(u, 0, 1) * (hi - lo));
 }
 const twToU = (tw) => clamp(tw + 0.5, 0, 1);
@@ -115,12 +150,31 @@ function ensureLenBounds(L, { reset = false } = {}) {
         [0.5, '0.5'], [Math.SQRT1_2, '1/√2'], [1, '1'], [Math.SQRT2, '√2'], [2, '2'],
       ]
     : [
-        [0.4, '0.4'], [0.6, '0.6'], [1, '1'], [2, '2'], [3, '3'], [5, '5'], [7, '7'],
+        [0.4, '0.4'], [0.6, '0.6'], [1, '1'], [2, '2'], [3, '3'], [5, '5'], [7, '7'], [9, '9'],
       ];
   const stops = ticks
     .filter(([v]) => v >= lo - 1e-6 && v <= hi + 1e-6)
     .map(([v, label]) => ({ t: lToU(v), label }));
   lenScrub.setStops(stops);
+}
+
+function ensureBStops() {
+  const fam = FAMILIES[state.k];
+  if (!fam.bRange) return;
+  bRangeBounds = fam.bRange.slice();
+  const [lo, hi] = bRangeBounds;
+  const ticks = [[0.3, '0.3'], [0.5, '0.5'], [0.8, '0.8'], [1.0, '1.0'], [1.4, '1.4'], [2.0, '2.0'], [3.0, '3.0']];
+  bScrub.setStops(ticks.filter(([v]) => v >= lo - 1e-6 && v <= hi + 1e-6).map(([v, label]) => ({ t: bToU(v), label })));
+}
+
+function onParamInput(dragging) {
+  if (followState && followState.active) followState.data = followTreeData(state);
+  drawPattern({ keepView: true, moving: dragging });
+  stage.decorate();
+  stage.R.render();
+  syncUI();
+  scheduleHashWrite();
+  scheduleSettle(dragging);
 }
 
 const lenScrub = createTimeline({
@@ -131,15 +185,7 @@ const lenScrub = createTimeline({
     cancelGlide();
     const dragging = !!(meta && meta.dragging);
     state.L = uToL(u);
-    if (followState && followState.active) {
-      followState.data = followTreeData(state);
-    }
-    drawPattern({ keepView: true, moving: dragging });
-    stage.decorate();
-    stage.R.render();
-    syncUI();
-    scheduleHashWrite();
-    scheduleSettle(dragging);
+    onParamInput(dragging);
   },
 });
 
@@ -151,25 +197,43 @@ const twScrub = createTimeline({
     cancelGlide();
     const dragging = !!(meta && meta.dragging);
     state.tw = uToTw(u);
-    if (followState && followState.active) {
-      followState.data = followTreeData(state);
-    }
-    drawPattern({ keepView: true, moving: dragging });
-    stage.decorate();
-    stage.R.render();
-    syncUI();
-    scheduleHashWrite();
-    scheduleSettle(dragging);
+    onParamInput(dragging);
   },
 });
 
-twScrub.setStops([
+const bScrub = createTimeline({
+  slider: bRange,
+  keyTarget: null,
+  onChange(u, meta) {
+    if (suppressSlider) return;
+    cancelGlide();
+    const dragging = !!(meta && meta.dragging);
+    state.b = uToB(u);
+    onParamInput(dragging);
+  },
+});
+
+const tauScrub = createTimeline({
+  slider: tauRange,
+  keyTarget: null,
+  onChange(u, meta) {
+    if (suppressSlider) return;
+    cancelGlide();
+    const dragging = !!(meta && meta.dragging);
+    state.tau = uToTw(u);
+    onParamInput(dragging);
+  },
+});
+
+const HALF_TURN_STOPS = [
   { t: 0, label: '-0.5' },
   { t: 0.25, label: '-0.25' },
   { t: 0.5, label: '0' },
   { t: 0.75, label: '+0.25' },
   { t: 1, label: '+0.5' },
-]);
+];
+twScrub.setStops(HALF_TURN_STOPS);
+tauScrub.setStops(HALF_TURN_STOPS);
 
 function scheduleSettle(dragging) {
   clearTimeout(moveTimer);
@@ -184,26 +248,38 @@ function scheduleSettle(dragging) {
 function getBallLoop() {
   const pairKey = `${state.k}:${state.perm[0]},${state.perm[1]}`;
   if (loopCache.key === pairKey && loopCache.loop) return loopCache.loop;
-  const { loopSites } = sitesForBall(built, [state.perm[0], state.perm[1]]);
+  const { loopSites } = sitesForBall(built, [state.perm[0], state.perm[1]], state.k);
   const sites = built.layout.sites;
   const loop = stadium(sites[loopSites[0]].site.n, sites[loopSites[1]].site.n, 1.014);
   loopCache = { key: pairKey, loop };
   return loop;
 }
 
+function getHandleBelt() {
+  if (state.k !== 'o33' || !built) return null;
+  if (beltCache.k === state.k && beltCache.loop) return beltCache.loop;
+  const loop = handleBeltLoop(built);
+  beltCache = { k: state.k, loop };
+  return loop;
+}
+
 function buildSurfaceForFamily(k) {
-  const fam = FAMILIES[k];
-  const parts = fam.baseOrders.map((n) => ({ t: 'cone', n }));
-  built = buildSurface(parts);
+  built = buildSurface(surfacePartsFor(k));
   loopCache = { key: '', loop: null };
+  beltCache = { k: '', loop: null };
   stage.setScene(built.scene, built.frame, true);
 }
 
 stage.extraLines = () => {
   if (!built) return [];
   const loop = getBallLoop();
-  const amber = isDark() ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
-  return [{ points: loop.flat, color: amber, width: 3.4, alpha: 0.95, xray: 0.18, loop: true }];
+  const dark = isDark();
+  const amber = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
+  const blueRgb = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
+  const lines = [{ points: loop.flat, color: amber, width: 3.4, alpha: 0.95, xray: 0.18, loop: true }];
+  const belt = getHandleBelt();
+  if (belt) lines.push({ points: belt.flat, color: blueRgb, width: 2.3, alpha: 0.9, xray: 0.18, loop: true });
+  return lines;
 };
 
 stage.extraMarkers = () => {
@@ -214,16 +290,16 @@ stage.extraMarkers = () => {
   const darkRgb = dark ? [0.9, 0.92, 0.95] : [0.08, 0.09, 0.12];
   const amber = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
   const picked = new Set([state.perm[0], state.perm[1]]);
-  const orders = FAMILIES[state.k].baseOrders;
-  const markers = built.anchors.map((anc, coneIdx) => {
-    const on = picked.has(coneIdx);
+  const feats = featureAnchorsForBall(built, state.k);
+  const markers = feats.map((ft, featIdx) => {
+    const on = picked.has(featIdx);
     return {
-      p: anc.at(),
+      p: ft.p,
       color: on ? blueRgb : darkRgb,
       size: on ? 7 : 5,
-      alpha: on ? 0.95 : 0.34,
+      alpha: on ? 0.95 : 0.38,
       shape: 'dot',
-      label: String(orders[coneIdx]),
+      label: ft.label,
       labelColor: on ? blueCss : undefined,
       labelFaint: !on,
     };
@@ -237,6 +313,17 @@ stage.extraMarkers = () => {
     alpha: 1,
     xray: 0.25,
   });
+  const belt = getHandleBelt();
+  if (belt) {
+    markers.push({
+      p: beadOnLoop(belt, state.tau + 0.5),
+      color: blueRgb,
+      size: 7.5,
+      shape: 'dot',
+      alpha: 0.95,
+      xray: 0.25,
+    });
+  }
   return markers;
 };
 
@@ -301,12 +388,7 @@ function startFollowAnimation() {
 
 // ---- Readout, buttons, hash
 function pairMetrics() {
-  if (state.k === '2222') {
-    return { d: state.L, mDist: 1 / (2 * state.L) };
-  }
-  const d = pairDistance(state.orders[0], state.orders[1], state.L);
-  const mDist = treeToCut(state.orders[0], state.orders[1], state.L).m;
-  return { d, mDist };
+  return pairMetricsFor(state);
 }
 
 function fmtSigned(v, dec) {
@@ -320,29 +402,64 @@ function syncUI() {
   for (const b of famBtns) b.setAttribute('aria-pressed', String(b.dataset.fam === state.k));
   const picked = new Set([state.perm[0], state.perm[1]]);
   sigBtns.forEach((b, idx) => {
-    b.textContent = String(fam.baseOrders[idx]);
+    const lbl = fam.featLabels[idx];
+    b.textContent = lbl;
+    b.setAttribute('aria-label', `Feature ${idx + 1}: ${lbl}`);
     b.setAttribute('aria-pressed', String(picked.has(idx)));
     b.toggleAttribute('data-pending', promoted === idx);
   });
 
   patSub.textContent = fam.kind === 'E' ? 'Euclidean plane · pair at centre' : 'Poincaré disc · pair at centre';
-  surfSub.textContent = promoted !== null ? `Cone ${fam.baseOrders[promoted]} ready — tap its partner` : 'Tap two cone tips';
+  surfSub.textContent = promoted !== null ? `${fam.featLabels[promoted]} ready — tap its partner` : 'Tap two features';
+
+  const hasB = !!fam.bRange;
+  const hasTau = !!fam.tauLabel;
+  extraSliders.hidden = !(hasB || hasTau);
+  bRow.hidden = !hasB;
+  tauRow.hidden = !hasTau;
+  if (hasB) {
+    bLabel.textContent = fam.bLabel;
+    bRange.setAttribute('aria-label', fam.bLabel);
+  }
+  if (hasTau) {
+    tauLabel.textContent = fam.tauLabel;
+    tauRange.setAttribute('aria-label', fam.tauLabel);
+  }
+  keyFault.hidden = state.k !== 'o33';
+  keyMirror.hidden = state.k !== '333*' && state.k !== '333*3';
+  keyGlide.hidden = state.k !== '333x';
 
   suppressSlider = true;
   ensureLenBounds(state.L);
   lenScrub.set(lToU(state.L));
   twScrub.set(twToU(state.tw));
+  if (hasB) {
+    ensureBStops();
+    bScrub.set(bToU(state.b));
+  }
+  if (hasTau) tauScrub.set(twToU(state.tau));
   suppressSlider = false;
 
   valLen.textContent = state.L.toFixed(2);
   valTw.textContent = fmtSigned(state.tw, 3);
+  if (hasB) valB.textContent = state.b.toFixed(2);
+  if (hasTau) valTau.textContent = fmtSigned(state.tau, 3);
+
   outLen.textContent = state.L.toFixed(2);
   outTw.textContent = fmtSigned(state.tw, 3);
   const { d, mDist } = pairMetrics();
-  outGeo.textContent = `pair ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
+  if (fam.mode === 'cones' || fam.mode === 'pillow') {
+    outGeo.textContent = `pair ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
+  } else if (fam.mode === 'handle') {
+    outGeo.textContent = `arc ${d.toFixed(2)} · cut ${mDist.toFixed(2)} · shift ${fmtSigned(state.tau, 3)}`;
+  } else {
+    outGeo.textContent = `arc ${d.toFixed(2)} · tree to cut ${mDist.toFixed(2)}`;
+  }
 
   for (const b of momentBtns) b.setAttribute('aria-pressed', String(b.dataset.moment === activeMoment));
-  momentNote.textContent = activeMoment ? MOMENT_COPY[activeMoment] : '';
+  momentNote.textContent = activeMoment === 'follow'
+    ? followNoteFor(state)
+    : activeMoment ? MOMENT_COPY[activeMoment] : '';
 }
 
 const fmtHashNum = (x, dec) => {
@@ -362,7 +479,12 @@ function isDefaultState() {
 function computeHash() {
   if (tab === 'tutorial') return '#tutorial';
   if (isDefaultState()) return '#';
-  return `#k=${state.k}&m=${state.perm.join('')}&l=${fmtHashNum(state.L, 3)}&tw=${fmtHashNum(state.tw, 4)}`;
+  const fam = FAMILIES[state.k];
+  let h = `#k=${state.k}&m=${state.perm.join('')}&l=${fmtHashNum(state.L, 3)}&tw=${fmtHashNum(state.tw, 4)}`;
+  if (fam.bRange) h += `&b=${fmtHashNum(state.b, 3)}`;
+  if (state.k === 'o33') h += `&to=${fmtHashNum(state.tau, 4)}`;
+  else if (state.k === '333*3') h += `&tc=${fmtHashNum(state.tau, 4)}`;
+  return h;
 }
 
 let hashTimer = 0;
@@ -406,13 +528,15 @@ function pickPair(i, j, { glide = true } = {}) {
 
   const fam = FAMILIES[state.k];
   const before = pattern.getView();
-  const next = fam.kind === 'E' ? recut2222(state, i, j) : recutH(state, i, j);
+  const next = recut(state, i, j);
   state = {
     k: next.k,
     perm: next.perm,
     orders: next.orders,
     L: next.L,
     tw: next.tw,
+    b: next.b ?? state.b,
+    tau: next.tau ?? state.tau,
     thetas: next.thetas,
   };
   older = next.perm[0];
@@ -468,16 +592,16 @@ function handleConeSelect(coneIdx) {
     syncUI();
     return stateSummary();
   }
-  // Replace older pick, keep newer
   const anchor = promoted !== null ? promoted : newer;
   return pickPair(anchor, coneIdx, { glide: true });
 }
 
 function setFamily(k, opts = {}) {
-  if (!FAMILIES[k]) return;
+  const key = normalizeFamilyKey(k);
+  if (!key) return;
   cancelGlide();
   cancelFollow();
-  const fam = FAMILIES[k];
+  const fam = FAMILIES[key];
   const prevK = state.k;
   const perm = opts.perm || fam.defaultM.split('').map(Number);
   state = {
@@ -486,6 +610,8 @@ function setFamily(k, opts = {}) {
     orders: perm.map((c) => fam.baseOrders[c]),
     L: opts.L ?? fam.defaultL,
     tw: opts.tw ?? fam.defaultTw,
+    b: opts.b ?? (fam.defaultB ?? 0),
+    tau: opts.tau ?? (fam.defaultTau ?? 0),
     thetas: opts.thetas || defaultThetas(fam.k),
   };
   older = perm[0];
@@ -521,7 +647,6 @@ function applyMoment(id) {
   cancelFollow();
   showTab('play', { writeHash: false });
   if (id === 'follow') {
-    setFamily('3333', { perm: [0, 1, 2, 3], L: 2.0, tw: 0.175, clearMoment: false });
     activeMoment = 'follow';
     syncUI();
     startFollowAnimation();
@@ -532,6 +657,10 @@ function applyMoment(id) {
   } else if (id === 'half') {
     setFamily('3333', { perm: [0, 1, 2, 3], L: 2.0, tw: 0, clearMoment: false });
     activeMoment = 'half';
+    syncUI();
+  } else if (id === 'fault') {
+    setFamily('o33', { perm: [0, 2, 1, 3], L: 2.2, tw: 0.15, b: 1.3, tau: 0.25, clearMoment: false });
+    activeMoment = 'fault';
     syncUI();
   }
   writeHashNow();
@@ -547,16 +676,20 @@ function applyHash(raw, { initial = false } = {}) {
     return;
   }
   const params = new URLSearchParams(h);
-  const k = FAMILIES[params.get('k')] ? params.get('k') : '3333';
+  const k = normalizeFamilyKey(params.get('k')) || '3333';
   const fam = FAMILIES[k];
   const mRaw = params.get('m') || fam.defaultM;
   const validM = /^[0-3]{4}$/.test(mRaw) && new Set(mRaw.split('')).size === 4;
   const perm = (validM ? mRaw : fam.defaultM).split('').map(Number);
   const lRaw = parseFloat(params.get('l'));
   const twRaw = parseFloat(params.get('tw'));
+  const bRaw = parseFloat(params.get('b'));
+  const tauRaw = parseFloat(params.get('to') ?? params.get('tc') ?? params.get('tau'));
   const L = Number.isFinite(lRaw) ? clamp(lRaw, fam.maxRange[0], fam.maxRange[1]) : fam.defaultL;
   const tw = Number.isFinite(twRaw) ? clamp(twRaw, -0.5, 0.5) : fam.defaultTw;
-  setFamily(k, { perm, L, tw });
+  const b = fam.bRange && Number.isFinite(bRaw) ? clamp(bRaw, fam.bRange[0], fam.bRange[1]) : (fam.defaultB ?? 0);
+  const tau = fam.tauLabel && Number.isFinite(tauRaw) ? clamp(tauRaw, -0.5, 0.5) : (fam.defaultTau ?? 0);
+  setFamily(k, { perm, L, tw, b, tau });
   showTab('play', { writeHash: !initial });
   if (initial) writeHashNow();
 }
@@ -588,21 +721,21 @@ reset3Btn.addEventListener('click', () => {
   stage.R.render();
 });
 
-// 3D ball cone-tip tap & hover
+// 3D ball feature tap & hover
 function coneScreenInfo() {
   if (!built) return [];
   const rect = viewCanvas.getBoundingClientRect();
   const { q } = stage.R.getView();
   const eye = eyeOf(q);
-  const { siteOf } = sitesForBall(built, [state.perm[0], state.perm[1]]);
-  const orders = FAMILIES[state.k].baseOrders;
-  return built.anchors.map((anc, i) => {
-    const n = built.layout.sites[siteOf[i]].site.n;
+  const fam = FAMILIES[state.k];
+  return featureAnchorsForBall(built, state.k).map((ft, i) => {
+    const n = built.layout.sites[ft.site].site.n;
     const dotEye = n[0] * eye[0] + n[1] * eye[1] + n[2] * eye[2];
-    const [x, y, vis] = stage.R.project(anc.at());
+    const [x, y, vis] = stage.R.project(ft.p);
     return {
       cone: i,
-      order: orders[i],
+      order: fam.baseOrders[i],
+      label: ft.label,
       x,
       y,
       clientX: rect.left + x,
@@ -686,9 +819,12 @@ function stateSummary() {
     perm: state.perm.slice(),
     m: state.perm.join(''),
     orders: state.orders.slice(),
+    featLabels: FAMILIES[state.k].featLabels.slice(),
     pair: [state.perm[0], state.perm[1]],
     L: state.L,
     tw: state.tw,
+    b: state.b,
+    tau: state.tau,
     d,
     mDist,
     promoted,
@@ -708,7 +844,7 @@ window.__handles = {
     cancelGlide();
     cancelFollow();
     if (opts.tab) showTab(opts.tab, { writeHash: false });
-    const nextK = opts.k && FAMILIES[opts.k] ? opts.k : state.k;
+    const nextK = (opts.k && normalizeFamilyKey(opts.k)) || state.k;
     const fam = FAMILIES[nextK];
     let perm = state.perm.slice();
     if (Array.isArray(opts.perm)) perm = opts.perm.slice();
@@ -716,9 +852,13 @@ window.__handles = {
     else if (nextK !== state.k) perm = fam.defaultM.split('').map(Number);
 
     const rawL = opts.L ?? opts.l;
-    const L = Number.isFinite(rawL) ? clamp(rawL, 0.15, 9) : (nextK !== state.k ? fam.defaultL : state.L);
+    const L = Number.isFinite(rawL) ? clamp(rawL, 0.15, 9.5) : (nextK !== state.k ? fam.defaultL : state.L);
     const tw = Number.isFinite(opts.tw) ? clamp(opts.tw, -0.5, 0.5) : (nextK !== state.k ? fam.defaultTw : state.tw);
-    setFamily(nextK, { perm, L, tw });
+    const rawB = opts.b;
+    const b = fam.bRange && Number.isFinite(rawB) ? clamp(rawB, fam.bRange[0], fam.bRange[1]) : (nextK !== state.k ? (fam.defaultB ?? 0) : state.b);
+    const rawTau = opts.tau ?? opts.to ?? opts.tc;
+    const tau = fam.tauLabel && Number.isFinite(rawTau) ? clamp(rawTau, -0.5, 0.5) : (nextK !== state.k ? (fam.defaultTau ?? 0) : state.tau);
+    setFamily(nextK, { perm, L, tw, b, tau });
     if (opts.follow) applyMoment('follow');
     else writeHashNow();
     return stateSummary();

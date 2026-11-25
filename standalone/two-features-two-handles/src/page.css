@@ -1,11 +1,13 @@
 :root {
   --amber: #e69f00;
+  --red: #c82333;
   --blue-bg: rgba(0, 114, 178, 0.12);
   --blue-ring: rgba(0, 114, 178, 0.34);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --amber: #f0a830;
+    --red: #ee5a62;
     --blue-bg: rgba(86, 180, 233, 0.16);
     --blue-ring: rgba(86, 180, 233, 0.38);
   }
@@ -222,14 +224,20 @@
   gap: 10px;
 }
 
-.sliders {
+.sliders,
+.extra-sliders {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
 }
+.extra-sliders[hidden],
+.slider-row[hidden],
+.key-item[hidden] {
+  display: none;
+}
 .slider-row {
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) 62px;
+  grid-template-columns: 92px minmax(0, 1fr) 62px;
   align-items: center;
   gap: 10px;
 }
@@ -297,6 +305,23 @@
   width: 18px;
   height: 0;
   border-top: 2.5px dashed var(--amber);
+}
+.sw-blue-line {
+  width: 18px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--blue);
+}
+.sw-red-line {
+  width: 18px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--red);
+}
+.sw-red-dash {
+  width: 18px;
+  height: 0;
+  border-top: 2.5px dashed var(--red);
 }
 .sw-amber-bead {
   width: 14px;
@@ -374,7 +399,8 @@
   .ratio-surf {
     aspect-ratio: 4 / 3;
   }
-  .sliders {
+  .sliders,
+  .extra-sliders {
     grid-template-columns: 1fr 1fr;
     gap: 18px;
   }

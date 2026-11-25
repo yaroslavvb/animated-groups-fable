@@ -2,11 +2,12 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
-  GH, GE, FAMILIES,
+  GH, GE, FAMILIES, normalizeFamilyKey,
   hgt, d0, pairDistance, pairLength, treeToCut,
   fourConeUHP, uhpToDisc, uhpToHyp, discToHyp, pairFrameUHP,
-  fourConeCentered, recutH, pillowCentered, recut2222,
-  followTreeData, interpolateView, stadium, beadOnLoop, sitesForBall,
+  fourConeCentered, coneFeatCentered, o33Centered, recut, recutH, pillowCentered, recut2222,
+  followTreeData, interpolateView, stadium, handleBeltLoop, beadOnLoop, sitesForBall,
+  surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from '../src/handles.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
@@ -318,4 +319,147 @@ test('3D ball stadium loop, bead, walk data, and view interpolation', () => {
   const m = buildPatternModel(st0, { follow: { active: true, data: fd, progress: 1 } });
   assert.equal(m.outline, false);
   assert.equal(m.marks.length, 2);
+});
+
+test('General five-feature families (333*, 333*3, 333x, o33) signatures across extreme parameters', () => {
+  assert.equal(normalizeFamilyKey('333∗'), '333*');
+  assert.equal(normalizeFamilyKey('333∗3'), '333*3');
+  assert.equal(normalizeFamilyKey('333×'), '333x');
+  assert.equal(normalizeFamilyKey('o33'), 'o33');
+
+  for (const L of [0.5, 1.4, 2.5, 5.5]) {
+    for (const tw of [-0.5, 0, 0.25, 0.5]) {
+      for (const b of [0.5, 1.4, 2.8]) {
+        const sStar = signatureOf(coneFeatCentered('333*', L, tw, b, 0).A);
+        assert.deepEqual(sStar, { o: 0, x: 0, cones: [3, 3, 3], stars: [[]] });
+      }
+      for (const b of [0.3, 0.7, 1.6]) {
+        const sX = signatureOf(coneFeatCentered('333x', L, tw, b, 0).A);
+        assert.deepEqual(sX, { o: 0, x: 1, cones: [3, 3, 3], stars: [] });
+      }
+      for (const tauC of [-0.5, -0.25, 0, 0.25, 0.5]) {
+        const sS3 = signatureOf(coneFeatCentered('333*3', L, tw, 1.4, tauC).A);
+        assert.deepEqual(sS3, { o: 0, x: 0, cones: [3, 3, 3], stars: [[3]] });
+      }
+      for (const perm of [[0, 2, 1, 3], [0, 1, 2, 3]]) {
+        for (const tauO of [-0.5, -0.2, 0, 0.2, 0.5]) {
+          const sO = signatureOf(o33Centered(L, tw, 1.3, tauO, { perm }).A);
+          assert.deepEqual(sO, { o: 1, x: 0, cones: [3, 3], stars: [] });
+        }
+      }
+    }
+  }
+});
+
+test('All 6 picks + 6-step chains on 333*, 333*3, 333x, o33 preserve features & commas to 1e-8', () => {
+  const buildCentered = (st) => FAMILIES[st.k].mode === 'handle'
+    ? o33Centered(st.L, st.tw, st.b, st.tau, { perm: st.perm, thetas: st.thetas })
+    : coneFeatCentered(st.k, st.L, st.tw, st.b, st.tau, { perm: st.perm, thetas: st.thetas });
+
+  const pairs = [[0, 1], [2, 3], [0, 2], [1, 3], [1, 2], [0, 3]];
+  const cases = [
+    { k: '333*', perm: [0, 1, 2, 3], L: 2.0, tw: 0.15, b: 1.4, tau: 0 },
+    { k: '333*3', perm: [0, 1, 2, 3], L: 2.0, tw: 0.15, b: 1.4, tau: 0.25 },
+    { k: '333x', perm: [0, 1, 2, 3], L: 2.0, tw: 0.15, b: 0.7, tau: 0 },
+    { k: 'o33', perm: [0, 2, 1, 3], L: 2.2, tw: 0.15, b: 1.3, tau: 0.2 },
+    { k: 'o33', perm: [0, 1, 2, 3], L: 2.5, tw: -0.18, b: 1.1, tau: -0.3 },
+  ];
+
+  for (const c of cases) {
+    const fam = FAMILIES[c.k];
+    const thetas = defaultCommas(c.k).map((sp) => (sp ? sp.theta : 0));
+    const st0 = { ...c, orders: c.perm.map((x) => fam.baseOrders[x]), thetas };
+    const b0 = buildCentered(st0);
+    const ts0 = tiles(b0.D, b0.A, { radius: 11, max: 7000, ms: 4000 });
+    const orbFeat0 = [0, 1, 2, 3].map((f) => {
+      const slot = st0.perm.indexOf(f);
+      return ts0.map((t) => apply(t.M, b0.home[slot]));
+    });
+    const orbCommas0 = b0.shapes.map((sh) => ts0.map((t) => sh.pts.map((p) => apply(t.M, p))));
+    const g0Line0 = b0.extraLines && b0.extraLines[0] ? ts0.map((t) => [apply(t.M, b0.extraLines[0].a), apply(t.M, b0.extraLines[0].b)]) : null;
+
+    for (const [i, j] of pairs) {
+      const st1 = recut(st0, i, j);
+      assert.ok(st1.tw >= -0.5 - 1e-12 && st1.tw <= 0.5 + 1e-12);
+      const b1 = buildCentered(st1);
+
+      for (let slot = 0; slot < 4; slot++) {
+        const f = st1.perm[slot];
+        const pOld = apply(st1.invQ, b1.home[slot]);
+        const isGeod = (c.k === 'o33' && f < 2) || ((c.k === '333*' || c.k === '333x' || c.k === '333*3') && f === fam.featIdx);
+        if (!isGeod) {
+          const dMin = Math.min(...orbFeat0[f].map((q) => GH.dist(pOld, q)));
+          assert.ok(dMin < 1e-9, `${c.k} pick (${i},${j}) feat ${f} drift ${dMin}`);
+        } else if (g0Line0 && b1.extraLines && b1.extraLines[0]) {
+          const hOldA = apply(st1.invQ, b1.extraLines[0].a);
+          const lMin = Math.min(...g0Line0.map(([u, v]) => GH.lineDist(hOldA, u, v)));
+          assert.ok(lMin < 1e-9, `${c.k} pick (${i},${j}) handle line drift ${lMin}`);
+        }
+      }
+
+      b1.shapes.forEach((sh1, si) => {
+        const ptsOld = sh1.pts.map((p) => apply(st1.invQ, p));
+        const bestComma = Math.min(...orbCommas0[si].map((oc) => Math.max(...ptsOld.map((p, pi) => GH.dist(p, oc[pi])))));
+        assert.ok(bestComma < 1e-9, `${c.k} pick (${i},${j}) comma ${si} drift ${bestComma}`);
+      });
+
+      const stBack = recut(st1, st0.perm[0], st0.perm[1]);
+      assert.ok(near(stBack.L, st0.L, 1e-9), `${c.k} round-trip L ${stBack.L} vs ${st0.L}`);
+    }
+
+    let cur = st0, Qacc = I3.slice();
+    for (const [ci, cj] of pairs) {
+      cur = recut(cur, ci, cj);
+      Qacc = GH.fix(mul(cur.Q, Qacc), 1);
+    }
+    const invQacc = GH.fix(inv(Qacc), 1);
+    const bChain = buildCentered(cur);
+    bChain.shapes.forEach((shC, si) => {
+      const ptsOld = shC.pts.map((p) => apply(invQacc, p));
+      const bestComma = Math.min(...orbCommas0[si].map((oc) => Math.max(...ptsOld.map((p, pi) => GH.dist(p, oc[pi])))));
+      assert.ok(bestComma < 1e-8, `${c.k} 6-step chain comma ${si} drift ${bestComma}`);
+    });
+  }
+});
+
+test('Period-1 invariance of tauO/tauC and 3D + followTreeData across all 7 families', () => {
+  for (const perm of [[0, 2, 1, 3], [0, 1, 2, 3]]) {
+    const bNeg = o33Centered(2.2, 0.15, 1.3, -0.5, { perm });
+    const bPos = o33Centered(2.2, 0.15, 1.3, 0.5, { perm });
+    const tsNeg = tiles(bNeg.D, bNeg.A, { radius: 8, max: 2000, ms: 2000 });
+    const cNeg = tsNeg.map((t) => bNeg.shapes[0].pts.map((p) => apply(t.M, p)));
+    const minC = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, k) => GH.dist(p, bPos.shapes[0].pts[k])))));
+    assert.ok(minC < 1e-9, `o33 tauO=-0.5 vs +0.5 comma drift ${minC}`);
+  }
+  {
+    const bNeg = coneFeatCentered('333*3', 2.0, 0.15, 1.4, -0.5);
+    const bPos = coneFeatCentered('333*3', 2.0, 0.15, 1.4, 0.5);
+    const tsNeg = tiles(bNeg.D, bNeg.A, { radius: 8, max: 2000, ms: 2000 });
+    const cNeg = tsNeg.map((t) => bNeg.shapes[0].pts.map((p) => apply(t.M, p)));
+    const minC = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, k) => GH.dist(p, bPos.shapes[0].pts[k])))));
+    assert.ok(minC < 1e-9, `333*3 tauC=-0.5 vs +0.5 comma drift ${minC}`);
+  }
+
+  for (const k of ['3333', '2223', '333*', '333*3', '333x', 'o33', '2222']) {
+    const built = buildSurface(surfacePartsFor(k));
+    built.scene.finish();
+    const feats = featureAnchorsForBall(built, k);
+    assert.equal(feats.length, 4);
+    for (const pair of [[0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2]]) {
+      const { loopSites } = sitesForBall(built, pair, k);
+      assert.ok(built.layout.sites[loopSites[0]].toward.has(loopSites[1]), `${k} ${pair} must have adjacent loopSites`);
+    }
+    if (k === 'o33') {
+      const belt = handleBeltLoop(built);
+      const b0 = beadOnLoop(belt, 0.0), b1 = beadOnLoop(belt, 1.0);
+      assert.ok(Math.hypot(b0[0] - b1[0], b0[1] - b1[1], b0[2] - b1[2]) < 1e-9);
+    }
+    const fam = FAMILIES[k];
+    const perm = fam.defaultM.split('').map(Number);
+    const st = { k, perm, orders: perm.map((c) => fam.baseOrders[c]), L: fam.defaultL, tw: fam.defaultTw, b: fam.defaultB ?? 0, tau: fam.defaultTau ?? 0, thetas: defaultCommas(k).map((c) => (c ? c.theta : 0)) };
+    const fd = followTreeData(st);
+    assert.ok(fd.fwdSegs.length >= 2 && fd.backSegs.length >= 2 && fd.legs.length === 4);
+    const pm = buildPatternModel(st, { follow: { active: true, data: fd, progress: 1 } });
+    assert.equal(pm.outline, false);
+  }
 });
