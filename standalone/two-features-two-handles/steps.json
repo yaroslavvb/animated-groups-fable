@@ -1,0 +1,67 @@
+[
+  {
+    "w": 1280,
+    "h": 800,
+    "wait": 500,
+    "eval": "(() => { const H = window.__handles.state(); const sw = document.documentElement.scrollWidth; const iw = window.innerWidth; const p2 = document.getElementById('pane2').getBoundingClientRect(); const p3 = document.getElementById('pane').getBoundingClientRect(); const lenB = document.getElementById('len-range').getBoundingClientRect(); const twB = document.getElementById('tw-range').getBoundingClientRect(); return { k: H.k, m: H.m, L: H.L, tw: H.tw, hash: H.hash, locHash: H.locationHash, overflowX: sw > iw, paneRowOk: Math.abs(p2.top - p3.top) < 6 && p2.left < p3.left && Math.abs(p2.height - p3.height) < 4, lenWidth: Math.round(lenB.width), twWidth: Math.round(twB.width), frontCones: H.coneScreen.filter(c => c.front).map(c => c.cone) }; })()",
+    "out": "shots/h-1280-open.png"
+  },
+  {
+    "eval": "(() => { const H = window.__handles; const s0 = H.state(); const c2 = s0.coneScreen.find(c => c.cone === 2 && c.front) || s0.coneScreen.find(c => c.cone !== 0 && c.cone !== 1 && c.front); const tBefore = s0.tileScreens.find(t => t.cone === c2.cone); const tB1 = s0.tileScreens.find(t => t.cone === 1); const v = document.getElementById('view'); v.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, clientX: c2.clientX, clientY: c2.clientY, button: 0 })); v.dispatchEvent(new PointerEvent('pointerup', { bubbles: true, pointerId: 1, pointerType: 'mouse', isPrimary: true, clientX: c2.clientX, clientY: c2.clientY, button: 0 })); const s1 = H.state(); const aPick = s1.tileScreens.find(t => t.cone === c2.cone); const aB1 = s1.tileScreens.find(t => t.cone === 1); const dPick = Math.hypot(tBefore.x - aPick.x, tBefore.y - aPick.y); const dB1 = Math.hypot(tB1.x - aB1.x, tB1.y - aB1.y); return { tappedCone: c2.cone, newM: s1.m, newPair: s1.pair, hashMatch: s1.hash === window.location.hash, conePixelDriftBeforeGlide: +dPick.toFixed(4), partnerPixelDriftBeforeGlide: +dB1.toFixed(4) }; })()",
+    "wait": 600,
+    "out": "shots/h-1280-recut.png"
+  },
+  {
+    "eval": "(() => { document.querySelector('[data-cone=\"2\"]').click(); const s = window.__handles.state(); return { pairAfterPromotedDigit: s.pair, promoted: s.promoted }; })()",
+    "wait": 150
+  },
+  {
+    "eval": "(() => { document.querySelector('[data-cone=\"3\"]').click(); return 'clicked 3'; })()",
+    "wait": 600
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); return { pairAfterSecondDigit: s.pair, m: s.m, hash: s.hash, locHash: window.location.hash, hashMatch: s.hash === window.location.hash }; })()"
+  },
+  {
+    "eval": "(() => { const len = document.getElementById('len-range'); const tw = document.getElementById('tw-range'); len.value = '0.35'; len.dispatchEvent(new Event('input', { bubbles: true })); len.dispatchEvent(new Event('change', { bubbles: true })); tw.value = '0.25'; tw.dispatchEvent(new Event('input', { bubbles: true })); tw.dispatchEvent(new Event('change', { bubbles: true })); return 'moved'; })()",
+    "wait": 250
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); return { L: +s.L.toFixed(3), tw: +s.tw.toFixed(3), hash: s.hash, locHash: window.location.hash, hashMatch: s.hash === window.location.hash, readout: s.readout }; })()"
+  },
+  {
+    "eval": "(() => { document.querySelector('[data-fam=\"2222\"]').click(); return 'fam 2222'; })()",
+    "wait": 400
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: +s.L.toFixed(3), tw: +s.tw.toFixed(3), hashMatch: s.hash === window.location.hash }; })()",
+    "out": "shots/h-1280-2222.png"
+  },
+  {
+    "eval": "(() => { document.querySelector('[data-moment=\"follow\"]').click(); return 'follow'; })()",
+    "wait": 2100
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); return { moment: s.moment, follow: s.follow, k: s.k, m: s.m, L: s.L, tw: s.tw, hash: s.hash, locHash: s.locationHash }; })()",
+    "out": "shots/h-1280-follow.png"
+  },
+  {
+    "eval": "(() => { document.querySelector('[data-tab=\"tutorial\"]').click(); return 'tutorial'; })()",
+    "wait": 400
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); const txt = document.getElementById('tutorial').textContent; const svgs = document.querySelectorAll('#tutorial .fold-body svg').length; return { tab: s.tab, hash: window.location.hash, svgs, unrenderedTex: txt.includes('\\\\(') || txt.includes('\\\\[') }; })()",
+    "out": "shots/h-tutorial-math.png",
+    "clip": { "x": 0, "y": 0, "width": 1280, "height": 800 }
+  },
+  {
+    "w": 390,
+    "h": 844,
+    "eval": "window.__handles.set({ tab: 'play', k: '3333', m: '0123', L: 2.0, tw: 0.175 })",
+    "wait": 400
+  },
+  {
+    "eval": "(() => { const s = window.__handles.state(); const sw = document.documentElement.scrollWidth; const iw = window.innerWidth; const p2 = document.getElementById('pane2').getBoundingClientRect(); const p3 = document.getElementById('pane').getBoundingClientRect(); const btns = [...document.querySelectorAll('.sig-btn')].map(b => Math.round(b.getBoundingClientRect().height)); return { overflowX: sw > iw, scrollWidth: sw, innerWidth: iw, patAboveSurf: p2.bottom <= p3.top + 2, patAspect: +(p2.width / p2.height).toFixed(2), sigBtnHeights: btns, hash: s.hash, locHash: s.locationHash }; })()",
+    "out": "shots/h-390-play.png"
+  }
+]

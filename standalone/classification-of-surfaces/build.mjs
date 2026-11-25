@@ -40,6 +40,10 @@ const CSS_SLOT = '/*__INLINE_CSS__*/', JS_SLOT = '/*__INLINE_JS__*/', CACHE_SLOT
 const ALLOW = [
   'https://spacesheep.dev/@yaroslavvb/',
   'https://doi.org/10.1201/b21368',             // The Symmetries of Things at its publisher (the showcase links the book)
+  'https://plume-monochrome.pages.dev/',
+  'https://yaroslavvb.github.io/animated-groups-fable/',
+  'https://chaimgoodmanstrauss.com/orbipix',
+  'https://symmhub.github.io/SymmHub/',
   'http://intel/animated-groups/',
   'http://www.w3.org/2000/svg', 'http://www.w3.org/1999/xhtml', 'http://www.w3.org/1999/xlink', 'http://www.w3.org/1998/Math/MathML',
 ];
