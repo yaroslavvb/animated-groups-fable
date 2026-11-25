@@ -510,6 +510,7 @@ function recentreStartView(Vstart, model) {
   for (let s = 0; s < 16 && GH.dist(GH.origin, apply(V, GH.origin)) > 3.5; s++) {
     let best = -1, bd = GH.dist(GH.origin, apply(V, D.at));
     for (let i = 0; i < D.n; i++) {
+      if (D.edges[i].mirror || D.edges[i].rev) continue;
       const cand = mul(V, A.maps[i]);
       const d = GH.dist(GH.origin, apply(cand, D.at));
       if (d < bd - 1e-9) { bd = d; best = i; }
@@ -685,7 +686,9 @@ function applyHash(raw, { initial = false } = {}) {
   const twRaw = parseFloat(params.get('tw'));
   const bRaw = parseFloat(params.get('b'));
   const tauRaw = parseFloat(params.get('to') ?? params.get('tc') ?? params.get('tau'));
-  const L = Number.isFinite(lRaw) ? clamp(lRaw, fam.maxRange[0], fam.maxRange[1]) : fam.defaultL;
+  const L = Number.isFinite(lRaw)
+    ? clamp(lRaw, fam.kind === 'E' ? 0.25 : 0.15, Math.max(fam.maxRange[1], fam.kind === 'E' ? 4 : 14))
+    : fam.defaultL;
   const tw = Number.isFinite(twRaw) ? clamp(twRaw, -0.5, 0.5) : fam.defaultTw;
   const b = fam.bRange && Number.isFinite(bRaw) ? clamp(bRaw, fam.bRange[0], fam.bRange[1]) : (fam.defaultB ?? 0);
   const tau = fam.tauLabel && Number.isFinite(tauRaw) ? clamp(tauRaw, -0.5, 0.5) : (fam.defaultTau ?? 0);

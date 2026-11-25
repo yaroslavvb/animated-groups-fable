@@ -45,6 +45,7 @@ import { tiles as makeTiles } from '../../2026-11-15-classification-of-surfaces/
 import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
 import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
 import { pairStyle } from '../../2026-11-15-classification-of-surfaces/src/sym/pairs.js';
+import { invH, psuI, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
@@ -52,6 +53,80 @@ const DARK = [0.08, 0.09, 0.12];
 // the paper of The Folding's prints: teal, a light tone for the tile and a dark one for what is printed on it
 const FRONT = hexToRgb(PRINT_FRONT[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]);
 const css = (c, a = 1) => `rgba(${Math.round(c[0] * 255)},${Math.round(c[1] * 255)},${Math.round(c[2] * 255)},${a})`;
+
+const hypLerp = (G, a, b, u) => {
+  const d = G.dist(a, b);
+  if (d < 1e-3) return G.norm([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u]);
+  const e2 = Math.exp(-2 * d), invDen = 1 / (1 - e2);
+  const wa = (Math.exp(-u * d) - Math.exp((u - 2) * d)) * invDen;
+  const wb = (Math.exp(-(1 - u) * d) - Math.exp(-(1 + u) * d)) * invDen;
+  return G.norm([wa * a[0] + wb * b[0], wa * a[1] + wb * b[1], wa * a[2] + wb * b[2]]);
+};
+
+/** Exact PSU(1,1) x Z2 hyperbolic tile enumerator centered at `focus` (in Poincare disc). */
+export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 1500 } = {}) {
+  const G = D.G, n = D.n;
+  if (!n) return [{ g: psuI(), M: I3.slice(), flip: false, d: 0 }];
+  const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const atD = toDisc(D.at);
+  const samplesD = [atD, ...D.verts.map(toDisc)];
+  for (let i = 0; i < n; i++) {
+    const a = D.verts[i], b = D.verts[(i + 1) % n], len = G.dist(a, b);
+    if (len > 2.0) {
+      const k = Math.ceil(len / 2.0);
+      for (let s = 1; s < k; s++) samplesD.push(toDisc(hypLerp(G, a, b, s / k)));
+    }
+  }
+  const tau = Math.max(1e-7, 1e-3 * Math.min(1, D.clear || 1));
+  const grid = new Map();
+  const cells = (w, flip, wide) => {
+    const out = [], tag = flip ? 'f' : 'd';
+    const r = Math.hypot(w[0], w[1]), d = 2 * Math.atanh(Math.min(1 - 1e-15, r)), th = Math.atan2(w[1], w[0]);
+    const e = wide ? 3 * tau + 1e-6 : 0;
+    for (let id = Math.floor((d - e) * 16); id <= Math.floor((d + e) * 16); id++) {
+      if (id < 0) continue;
+      const N = Math.max(1, Math.min(1 << 20, Math.round(16 * Math.sinh((id + 0.5) / 16)))), k = N / TAU, et = e / Math.max(0.05, Math.sinh(d));
+      const lo = Math.floor((th - et) * k), hi = Math.min(lo + N - 1, Math.floor((th + et) * k));
+      for (let it = lo; it <= hi; it++) out.push(tag + id + ':' + (((it % N) + N) % N));
+    }
+    return out;
+  };
+  const known = (w, flip) => {
+    const list = grid.get(cells(w, flip, false)[0]);
+    if (list) for (const q of list) if (discDist(w, q) < tau) return true;
+    return false;
+  };
+  const put = (w, flip) => { for (const key of cells(w, flip, true)) { const l = grid.get(key); if (l) l.push(w); else grid.set(key, [w]); } };
+  const scoreOf = (g) => {
+    let best = Infinity;
+    for (let i = 0; i < samplesD.length; i++) {
+      const d = discDist(psuApplyDisc(g, samplesD[i]), focus);
+      if (d < best) best = d;
+    }
+    return best;
+  };
+  const heap = [];
+  const push = (t) => { heap.push(t); for (let i = heap.length - 1; i > 0;) { const up = (i - 1) >> 1; if (heap[up].d <= heap[i].d) break; [heap[up], heap[i]] = [heap[i], heap[up]]; i = up; } };
+  const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; for (let i = 0; ;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l].d < heap[m].d) m = l; if (r < heap.length && heap[r].d < heap[m].d) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
+
+  const out = [], t0 = typeof performance !== 'undefined' ? performance.now() : 0;
+  const g0 = psuI();
+  put(atD, false); push({ g: g0, flip: false, d: scoreOf(g0) });
+  while (heap.length && out.length < max) {
+    const t = pop();
+    out.push({ g: t.g, M: psuToSO21(t.g), flip: t.flip, d: t.d });
+    if ((out.length & 63) === 0 && typeof performance !== 'undefined' && performance.now() - t0 > ms) break;
+    for (let i = 0; i < n; i++) {
+      const g = psuMul(t.g, maps2[i]), flip = !!g[4], d = scoreOf(g);
+      if (!(d <= radius)) continue;
+      const w = psuApplyDisc(g, atD);
+      if (known(w, flip)) continue;
+      put(w, flip); push({ g, flip, d });
+    }
+  }
+  return out;
+}
 
 export function createPattern(canvas, opts = {}) {
   const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
@@ -64,7 +139,7 @@ export function createPattern(canvas, opts = {}) {
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let budget = 1500, cache = new Map(), des = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = 1500, cache = new Map(), hCache = null, des = [], desAt = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
@@ -103,7 +178,9 @@ export function createPattern(canvas, opts = {}) {
   /** Keep the tile nearest the middle of the view the one the list of tiles is centred on (the pattern does not move). */
   function recentre(V0) {
     if (G.kind === 'S') return V0;
-    const { D, A } = model, far = (M) => { const p = apply(M, D.at); return p[0] * p[0] + p[1] * p[1]; };
+    const { D, A } = model;
+    const ref = G.kind === 'H' && model.center ? model.center : D.at;
+    const far = (M) => { const p = apply(M, ref); return p[0] * p[0] + p[1] * p[1]; };
     for (let guard = 0; guard < 400; guard++) {
       let best = -1, bd = far(V) - 1e-9;
       for (let i = 0; i < D.n; i++) { const d = far(mul(V, A.maps[i])); if (d < bd) { bd = d; best = i; } }
@@ -150,14 +227,18 @@ export function createPattern(canvas, opts = {}) {
     const { D, A } = model;
     let radius = Infinity, max = 4200;
     if (G.kind === 'E') { const L = lay(); radius = (Math.hypot(W, H) / 2) / L.R + reach; }
-    if (G.kind === 'H') radius = 5 + 2 * reach;          // the middle of the view is within `reach` of the first tile
+    if (G.kind === 'H') {
+      const focusPt = apply(invH(V), [0, 0, 1]);
+      const focus = [focusPt[0] / (1 + focusPt[2]), focusPt[1] / (1 + focusPt[2])];
+      const wantMax = quick ? budget : max;
+      if (!hCache || discDist(focus, hCache.focus) >= 0.5 || (!quick && hCache.max < max)) {
+        hCache = { focus, max: wantMax, list: tilesPSU(D, A, { focus, radius: 5.6, max: wantMax }) };
+      }
+      return quick && hCache.list.length > budget ? hCache.list.slice(0, budget) : hCache.list;
+    }
     const key = G.kind + ':' + radius.toFixed(2) + ':' + max;
-    // set(model, { moving }): the tile changes at every tick, so nothing is cached yet; make the short list only
-    if (quick && G.kind === 'H' && !cache.has(key)) return makeTiles(D, A, { radius, max: budget });
     if (!cache.has(key)) { if (cache.size > 3) cache.clear(); cache.set(key, makeTiles(D, A, { radius, max })); }
-    const all = cache.get(key);
-    // while the hand moves, on the hyperbolic plane: only the nearest tiles, as many as were drawn in time last time
-    return quick && G.kind === 'H' && all.length > budget ? all.slice(0, budget) : all;
+    return cache.get(key);
   }
 
   // ---- drawing
@@ -183,6 +264,7 @@ export function createPattern(canvas, opts = {}) {
     const X = (p) => (kind === 'H' ? cx + (R * p[0]) / (1 + p[2]) : cx + R * p[0]);
     const Y = (p) => (kind === 'H' ? cy - (R * p[1]) / (1 + p[2]) : cy - R * p[1]);
     const lerp = (a, b, t) => G.norm([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]);
+    const lerpEdge = (a, b, u) => (kind === 'H' ? hypLerp(G, a, b, u) : lerp(a, b, u));
     // a small shape that need not be convex (the comma): on the sphere, whatever of it is behind the ball is pressed
     // onto the rim (the exact cut below pairs each way out with the next way in, which is only right for a convex tile)
     const blob = (path, pts) => {
@@ -226,15 +308,17 @@ export function createPattern(canvas, opts = {}) {
     const line = (path, a, b, steps) => {
       let on = false;
       for (let s = 0; s <= steps; s++) {
-        const p = s === 0 ? a : s === steps ? b : lerp(a, b, s / steps);
+        const p = s === 0 ? a : s === steps ? b : lerpEdge(a, b, s / steps);
         if (kind === 'S' && p[2] < 0) { on = false; continue; }
         if (!on) { path.moveTo(X(p), Y(p)); on = true; } else path.lineTo(X(p), Y(p));
       }
     };
-    const stepsFor = (a, b) => {
+    const stepsFor = (a, b, minSteps = 1) => {
       if (kind === 'E') return 1;
-      if (kind === 'S') return Math.max(2, Math.ceil(G.dist(a, b) / 0.11));
-      return Math.max(1, Math.min(12, Math.ceil(Math.hypot(X(a) - X(b), Y(a) - Y(b)) / 9)));
+      const d = G.dist(a, b);
+      if (kind === 'S') return Math.max(Math.max(2, minSteps), Math.ceil(d / 0.11));
+      const pxLen = Math.hypot(X(a) - X(b), Y(a) - Y(b));
+      return Math.max(minSteps, Math.min(36, Math.ceil(Math.max(pxLen / 9, d * 3))));
     };
 
     // which corner class, star, glide the selected character stands for
@@ -263,37 +347,51 @@ export function createPattern(canvas, opts = {}) {
     });
     let drawn = 0;
     const P = new Array(n);
+    const vPsu = kind === 'H' ? so21ToPSU(V, vRev) : null;
     for (const t of list) {
-      const M = mul(V, t.M), c = apply(M, D.at);
+      const M = kind === 'H' && t.g ? psuToSO21(psuMul(vPsu, t.g)) : mul(V, t.M);
+      const c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       for (let i = 0; i < n; i++) P[i] = apply(M, D.verts[i]);
       if (kind === 'S') { let vis = c[2] > 0; for (let i = 0; i < n && !vis; i++) if (P[i][2] > 0) vis = true; if (!vis) continue; }
       if (kind === 'E') { let inView = false; const m = reach * R + 4; if (X(c) > -m && X(c) < W + m && Y(c) > -m && Y(c) < H + m) inView = true; if (!inView) continue; }
-      // too far out to show: by where the tile's NEAREST point is (a large tile far away still reaches in from the rim)
-      if (kind === 'H') { const near = Math.acosh(Math.max(1, c[2])) - reach; if (near > 5 || (px < 0.35 && near > 4)) continue; }
+      let nearD = 0;
+      if (kind === 'H') {
+        nearD = t.g ? Math.max(0, t.d - 0.5) : Math.max(0, Math.acosh(Math.max(1, c[2])) - reach);
+        if (nearD > 5.5 || (!t.g && px < 0.35 && nearD > 4)) continue;
+      }
       drawn++;
-      const b = px >= 20 ? 0 : px >= 7 ? 1 : 2;
+      const effPx = kind === 'H' ? Math.max(px, (0.45 * R) / (1 + Math.cosh(nearD))) : px;
+      const b = effPx >= 20 ? 0 : effPx >= 7 ? 1 : 2;
       // the outline, edge by edge
       const pts = [];
       for (let i = 0; i < n; i++) {
         const a = P[i], q = P[(i + 1) % n], st = stepsFor(a, q);
         pts.push(a);
-        for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st));
+        for (let s = 1; s < st; s++) pts.push(lerpEdge(a, q, s / st));
       }
       if (n) { closed(fill, pts, t.flip); closed(edge[b], pts, t.flip); }
       else fill.arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
       for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
-      A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); } });
-      (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : Math.max(2, stepsFor(a, q))); });
-      if (px >= 1.2) {
+      A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); } });
+      (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); });
+      if (kind === 'H') {
+        for (let si = 0; si < des.length; si++) {
+          const sh = des[si], q = apply(M, desAt[si] || D.at);
+          const shPx = (Math.max(D.clear, 0.45) * R) / (1 + q[2]);
+          if (shPx >= Math.max(1.2, sh.min || 0)) print(ink, sh, M, shPx >= 20 ? 0 : shPx >= 7 ? 1 : 2);
+        }
+      } else if (px >= 1.2) {
         for (const sh of des) if (px >= sh.min) print(ink, sh, M, b);
       }
-      if (px >= 4.5) for (const mk of marked) {
+      for (const mk of marked) {
         const p = P[mk.v];
+        const mpx = kind === 'H' ? (Math.max(D.clear, 0.45) * R) / (1 + p[2]) : px;
+        if (mpx < 4.5) continue;
         if (kind === 'S' && p[2] < 0.05) continue;
-        const to = mk.toward === null ? c : P[mk.toward], q = lerp(p, to, 0.06);
+        const to = mk.toward === null ? c : P[mk.toward], q = lerpEdge(p, to, 0.06);
         const ang = Math.atan2(Y(q) - Y(p), X(q) - X(p)), on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id));
-        const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * px), x = X(p), y = Y(p), path = marks[mk.c.id];
+        const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
         if (r < 1.1) continue;
         if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); path.closePath(); }
         else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08); for (let k = 0; k < m; k++) { const a = ang + (TAU * k) / m, qx = x + rr * Math.cos(a), qy = y + rr * Math.sin(a); if (k) path.lineTo(qx, qy); else path.moveTo(qx, qy); } path.closePath(); }
@@ -394,7 +492,7 @@ export function createPattern(canvas, opts = {}) {
         for (const ln of model.lines || []) {
           if (!ln.once) continue;
           const a = apply(M, ln.a), q = apply(M, ln.b), p = new Path2D();
-          line(p, a, q, kind === 'E' ? 1 : Math.max(ln.steps || 2, stepsFor(a, q)));
+          line(p, a, q, kind === 'E' ? 1 : stepsFor(a, q, ln.steps || 2));
           ctx.strokeStyle = css(ln.color || DARK, ln.alpha === undefined ? 1 : ln.alpha); ctx.lineWidth = ln.width || 2.4; ctx.setLineDash(ln.dash || []); ctx.stroke(p);
           ctx.setLineDash([]);
         }
@@ -611,13 +709,20 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { model = null; G = null; sel = null; hCache = null; des = []; desAt = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (!keep) sel = null; quick = false;
       cache = new Map();
+      hCache = null;
       reach = m.D.n ? Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at))) : 0;
       area = m.D.n ? Math.abs(G.area(m.D.verts)) || 1 : 1;
       des = (m.design || design)(m.D);
+      desAt = des.map((sh) => {
+        if (!sh.pts || !sh.pts.length) return m.D.at;
+        const s = [0, 0, 0];
+        for (const p of sh.pts) { s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; }
+        return G.norm(s);
+      });
       size();
       if (!keep) firstView();
       else if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }

@@ -2,14 +2,147 @@
 // Ported from math-general.md (F1–F11), math-2222.md (§3.5, §11.9), orbifold-handles-hyperbolic-check.py (H0–H6),
 // and engine-check.mjs (pillow2222, fourCone, stadium). Zero DOM dependencies.
 
-import { geometry, mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
+import { geometry, mul, apply, inv, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
 import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;
-export const GH = geometry('H');
+
+// ---- Exact Lorentz O+(2,1) & PSU(1,1) x Z2 hyperbolic isometries (exact at large L and twist)
+export const invH = (M) => [M[0], M[3], -M[6], M[1], M[4], -M[7], -M[2], -M[5], M[8]];
+const boostTo0 = (p) => { const [x, y, z] = p, k = 1 / (z + 1); return [1 + x * x * k, x * y * k, -x, x * y * k, 1 + y * y * k, -y, -x, -y, z]; };
+const boostFrom0 = (p) => { const [x, y, z] = p, k = 1 / (z + 1); return [1 + x * x * k, x * y * k, x, x * y * k, 1 + y * y * k, y, x, y, z]; };
+const normH = (v) => {
+  const l = Math.sqrt(Math.abs(v[0] * v[0] + v[1] * v[1] - v[2] * v[2])) || 1;
+  const s = v[2] < 0 ? -1 : 1;
+  return [(s * v[0]) / l, (s * v[1]) / l, (s * v[2]) / l];
+};
+
+export const psuI = () => [1, 0, 0, 0, 0];
+export const psuNorm = (g) => {
+  const s = 1 / Math.sqrt(Math.max(1e-30, g[0] * g[0] + g[1] * g[1] - g[2] * g[2] - g[3] * g[3]));
+  return [g[0] * s, g[1] * s, g[2] * s, g[3] * s, g[4]];
+};
+export const psuInv = (g) => (g[4] ? [g[0], g[1], -g[2], g[3], 1] : [g[0], -g[1], -g[2], -g[3], 0]);
+export const psuMul = (g1, g2) => {
+  const ar1 = g1[0], ai1 = g1[1], br1 = g1[2], bi1 = g1[3];
+  const ar2 = g2[0], ai2 = g1[4] ? -g2[1] : g2[1];
+  const br2 = g2[2], bi2 = g1[4] ? -g2[3] : g2[3];
+  return psuNorm([
+    (ar1 * ar2 - ai1 * ai2) + (br1 * br2 + bi1 * bi2),
+    (ar1 * ai2 + ai1 * ar2) + (bi1 * br2 - br1 * bi2),
+    (ar1 * br2 - ai1 * bi2) + (br1 * ar2 + bi1 * ai2),
+    (ar1 * bi2 + ai1 * br2) + (bi1 * ar2 - br1 * ai2),
+    g1[4] ^ g2[4],
+  ]);
+};
+export const psuApplyDisc = (g, w) => {
+  const u = w[0], v = g[4] ? -w[1] : w[1];
+  const nr = g[0] * u - g[1] * v + g[2], ni = g[0] * v + g[1] * u + g[3];
+  const dr = g[2] * u + g[3] * v + g[0], di = g[2] * v - g[3] * u - g[1];
+  const d2 = dr * dr + di * di;
+  return [(nr * dr + ni * di) / d2, (ni * dr - nr * di) / d2];
+};
+export const psuToSO21 = (g) => {
+  const ar = g[0], ai = g[1], br = g[2], bi = g[3], s = g[4] ? -1 : 1;
+  const a2r = ar * ar - ai * ai, a2i = 2 * ar * ai, b2r = br * br - bi * bi, b2i = 2 * br * bi;
+  return [
+    a2r + b2r, s * (b2i - a2i), 2 * (ar * br - ai * bi),
+    a2i + b2i, s * (a2r - b2r), 2 * (ar * bi + ai * br),
+    2 * (ar * br + ai * bi), s * 2 * (ar * bi - ai * br), ar * ar + ai * ai + br * br + bi * bi,
+  ];
+};
+export const discDist = (w1, w2) => {
+  const dx = w1[0] - w2[0], dy = w1[1] - w2[1];
+  const r1 = w1[0] * w1[0] + w1[1] * w1[1], r2 = w2[0] * w2[0] + w2[1] * w2[1];
+  const den = Math.max(1e-30, (1 - r1) * (1 - r2));
+  return Math.acosh(1 + (2 * (dx * dx + dy * dy)) / den);
+};
+const psuBoostFrom0 = (p) => { const s = Math.sqrt(2 * (p[2] + 1)); return [s / 2, 0, p[0] / s, p[1] / s, 0]; };
+const psuBoostTo0 = (p) => { const s = Math.sqrt(2 * (p[2] + 1)); return [s / 2, 0, -p[0] / s, -p[1] / s, 0]; };
+const psuRot = (th) => [Math.cos(th / 2), Math.sin(th / 2), 0, 0, 0];
+export const psuBoostX = (x) => [Math.cosh(x / 2), 0, Math.sinh(x / 2), 0, 0];
+const psuFrame = (p, q) => {
+  const qr = apply(boostTo0(p), q);
+  return psuMul(psuBoostFrom0(p), psuRot(Math.atan2(qr[1], qr[0])));
+};
+export const psuRotate = (p, ang) => psuMul(psuBoostFrom0(p), psuMul(psuRot(ang), psuBoostTo0(p)));
+const psuRotAtX = (x, h, sgn, ang) =>
+  psuMul(psuBoostX(x), psuMul(psuRotate([0, sgn * Math.sinh(h), Math.cosh(h)], ang), psuBoostX(-x)));
+const psuFit = (a0, a1, b0, b1, rev = false) =>
+  psuMul(psuFrame(b0, b1), psuMul(rev ? [1, 0, 0, 0, 1] : psuI(), psuInv(psuFrame(a0, a1))));
+const psuReflect = (a, b) => psuFit(a, b, a, b, true);
+
+export function psuAxisOfTrans(gIn) {
+  const g = gIn[0] < 0 ? [-gIn[0], -gIn[1], -gIn[2], -gIn[3], 0] : gIn;
+  const ar = g[0], ai = g[1], br = g[2], bi = g[3];
+  const s = Math.sqrt(Math.max(1e-30, ar * ar - 1));
+  const bAbs = Math.hypot(br, bi);
+  const len = 2 * Math.acosh(Math.max(1, ar));
+  const phi = Math.atan2(bi, br);
+  const c = Math.sqrt((bAbs + s) / (2 * s));
+  const sh = ai / Math.sqrt(2 * s * (bAbs + s));
+  const F = psuMul(psuRot(phi), [c, 0, 0, sh, 0]);
+  return { len, F, invF: psuInv(F) };
+}
+
+export function so21ToPSU(M, flip) {
+  const p = normH([M[2], M[5], M[8]]);
+  const t0 = apply(boostTo0(p), [M[0], M[3], M[6]]);
+  const g = psuMul(psuBoostFrom0(p), psuRot(Math.atan2(t0[1], t0[0])));
+  const rev = (flip === true || flip === false) ? flip : det(M) < 0;
+  return rev ? [g[0], g[1], g[2], g[3], 1] : g;
+}
+
+function makeExactH() {
+  const G = geometry('H');
+  G.inv = invH;
+  G.fix = (M, hand) => {
+    const sign = hand === 1 || hand === -1 ? hand : (det(M) < 0 ? -1 : 1);
+    const p = G.norm([M[2], M[5], M[8]]);
+    const t0 = apply(boostTo0(p), [M[0], M[3], M[6]]);
+    const th = Math.atan2(t0[1], t0[0]), c = Math.cos(th), s = Math.sin(th);
+    return mul(boostFrom0(p), [c, -sign * s, 0, s, sign * c, 0, 0, 0, 1]);
+  };
+  G.dist = (a, b) => {
+    const d = [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    const dd = d[0] * d[0] + d[1] * d[1] - d[2] * d[2];
+    if (dd < 4 && (dd >= 0 || Math.hypot(d[0], d[1], d[2]) < 1e-3 * (a[2] + b[2]))) {
+      return 2 * Math.asinh(Math.sqrt(Math.max(0, dd)) / 2);
+    }
+    return Math.acosh(Math.max(1, a[2] * b[2] - a[0] * b[0] - a[1] * b[1]));
+  };
+  G.frame = (p, q) => {
+    const qr = apply(boostTo0(p), q);
+    const th = Math.atan2(qr[1], qr[0]), c = Math.cos(th), s = Math.sin(th);
+    return mul(boostFrom0(p), [c, -s, 0, s, c, 0, 0, 0, 1]);
+  };
+  G.fit = (a0, a1, b0, b1, rev = false) => psuToSO21(psuFit(a0, a1, b0, b1, rev));
+  G.reflect = (a, b) => psuToSO21(psuReflect(a, b));
+  G.rotate = (p, ang) => {
+    const c = Math.cos(ang), s = Math.sin(ang);
+    return mul(mul(boostFrom0(p), [c, -s, 0, s, c, 0, 0, 0, 1]), boostTo0(p));
+  };
+  G.translate = (a, b) => (G.dist(a, b) < 1e-12 ? I3.slice() : mul(mul(G.frame(b, a), [-1, 0, 0, 0, -1, 0, 0, 0, 1]), invH(G.frame(a, b))));
+  G.angle = (p, a, b) => {
+    const B = boostTo0(p), qa = apply(B, a), qb = apply(B, b);
+    return Math.abs(Math.atan2(qa[0] * qb[1] - qa[1] * qb[0], qa[0] * qb[0] + qa[1] * qb[1]));
+  };
+  G.lineDist = (p, a, b) => {
+    const F = G.frame(a, b), n = [F[1], F[4], F[7]];
+    return Math.asinh(Math.abs(p[0] * n[0] + p[1] * n[1] - p[2] * n[2]));
+  };
+  G.foot = (p, a, b) => {
+    const F = G.frame(a, b), n = [F[1], F[4], F[7]];
+    const s = p[0] * n[0] + p[1] * n[1] - p[2] * n[2];
+    return G.norm([p[0] - s * n[0], p[1] - s * n[1], p[2] - s * n[2]]);
+  };
+  return G;
+}
+
+export const GH = makeExactH();
 export const GE = geometry('E');
 
 export const FAMILIES = {
@@ -220,8 +353,8 @@ const lcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], 
 const wrapHalf = (t) => { const r = ((((t + 0.5) % 1) + 1) % 1) - 0.5; return r <= -0.5 + 1e-12 ? 0.5 : r; };
 const mod1 = (t) => ((t % 1) + 1) % 1;
 
-function makeDom(verts, pairs) {
-  const n = verts.length, edges = new Array(n);
+function edgesFromPairs(n, pairs) {
+  const edges = new Array(n);
   for (const p of pairs) {
     if (p.mirror) edges[p.a] = { mirror: true };
     else {
@@ -229,7 +362,48 @@ function makeDom(verts, pairs) {
       edges[p.b] = { to: p.a, rev: !!p.rev };
     }
   }
-  return makeDomain(GH, verts, edges);
+  return edges;
+}
+
+function buildCenteredDomain(symVerts, edges, P_symToPair, symAt = null) {
+  const D_sym = makeDomain(GH, symVerts, edges, symAt ? { at: symAt } : {});
+  const A_sym = analyse(D_sym);
+
+  const n = symVerts.length;
+  const maps2_sym = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const e = edges[i];
+    const a = symVerts[i], b = symVerts[(i + 1) % n];
+    if (e.mirror) {
+      maps2_sym[i] = psuReflect(a, b);
+    } else if (e.to > i) {
+      const c = symVerts[e.to], d = symVerts[(e.to + 1) % n];
+      const g = e.rev ? psuFit(c, d, a, b, true) : psuFit(c, d, b, a, false);
+      maps2_sym[i] = g;
+      maps2_sym[e.to] = psuInv(g);
+    }
+  }
+
+  const invP = psuInv(P_symToPair);
+  const maps2 = new Array(n);
+  for (let i = 0; i < n; i++) {
+    const e = edges[i];
+    if (e.mirror) maps2[i] = psuMul(P_symToPair, psuMul(maps2_sym[i], invP));
+    else if (e.to > i) {
+      const g = psuMul(P_symToPair, psuMul(maps2_sym[i], invP));
+      maps2[i] = g;
+      maps2[e.to] = psuInv(g);
+    }
+  }
+  const maps = maps2.map(psuToSO21);
+  const M_s2p = psuToSO21(P_symToPair);
+  const toPairFromSym = (v) => GH.norm(apply(M_s2p, v));
+  const verts = symVerts.map(toPairFromSym);
+  const at = toPairFromSym(D_sym.at);
+  const glides = A_sym.glides.map((g) => ({ ...g, seg: g.seg && [toPairFromSym(g.seg[0]), toPairFromSym(g.seg[1])] }));
+  const D = makeDomain(GH, verts, edges, { at });
+  const A = { ...A_sym, maps, maps2, glides };
+  return { D, A };
 }
 
 /** Find translation axis, length, and frame F (F^-1 M F = boostX(+len)) for hyperbolic M. */
@@ -243,7 +417,8 @@ export function axisOfTrans(M) {
   const p0 = GH.norm([n[2] * n[0], n[2] * n[1], 1 + n[2] * n[2]]);
   const p1 = apply(M, p0);
   const F = GH.frame(p0, p1);
-  return { len: GH.dist(p0, p1), p0, p1, F, invF: GH.fix(inv(F), 1) };
+  const len = Math.acosh(Math.max(1, (M[0] + M[4] + M[8] - 1) / 2));
+  return { len, p0, p1, F, invF: GH.fix(invH(F), 1) };
 }
 
 /** Signed (u, h) along the x-axis of frame invF for a hyperboloid point P. */
@@ -531,7 +706,7 @@ export function recutH(state, i, j) {
     tw: twp,
     thetas: newThetas,
     Q,
-    invQ: GH.fix(inv(Q), 1),
+    invQ: GH.fix(invH(Q), 1),
   };
 }
 
@@ -539,31 +714,35 @@ export function recutH(state, i, j) {
 export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, perm = [0, 1, 2, 3], k = '3333' } = {}) {
   const [p, q, r, s] = orders;
   const c = L / 2, t = tw * L;
+  const shift = t >= 0 ? -c / 2 + t / 2 : c / 2 + t / 2;
   const hA = hgt(p, q, L), hB = hgt(q, p, L), hC = hgt(r, s, L), hD = hgt(s, r, L);
-  const A0 = offH(-c / 2, hA, -1), B0 = offH(c / 2, hB, -1);
-  const C0 = offH(t - c / 2, hC, 1), D0 = offH(t + c / 2, hD, 1);
-  const Ds0 = offH(t - 1.5 * c, hD, 1), Bs0 = offH(-1.5 * c, hB, -1);
+  const A_s = offH(-c / 2 - shift, hA, -1), B_s = offH(c / 2 - shift, hB, -1);
+  const C_s = offH(t - c / 2 - shift, hC, 1), D_s = offH(t + c / 2 - shift, hD, 1);
+  const Ds_s = offH(t - 1.5 * c - shift, hD, 1), Bs_s = offH(-1.5 * c - shift, hB, -1);
+  const Ap_s = offH(1.5 * c - shift, hA, -1), Cp_s = offH(t + 1.5 * c - shift, hC, 1);
 
-  const mid0 = GH.mix(A0, B0, 0.5);
-  const Pmat = GH.fix(inv(GH.frame(mid0, B0)), 1);
-  const toPair = (v) => GH.norm(apply(Pmat, v));
+  const symVerts = t >= 0 ? [A_s, B_s, D_s, C_s, Ds_s, Bs_s] : [B_s, Ap_s, Cp_s, D_s, C_s, A_s];
+  const symAt = t >= 0
+    ? GH.mix(GH.mix(A_s, D_s, 0.5), GH.mix(B_s, C_s, 0.5), 0.47)
+    : GH.mix(GH.mix(B_s, Cp_s, 0.5), GH.mix(Ap_s, C_s, 0.5), 0.47);
+  const P_symToPair = psuInv(psuFrame(midH(A_s, B_s), B_s));
+  const M_s2p = psuToSO21(P_symToPair);
+  const toPairFromSym = (v) => GH.norm(apply(M_s2p, v));
+  const P_psu = psuMul(P_symToPair, psuBoostX(-shift));
+  const Pmat = psuToSO21(P_psu);
 
-  const verts = [A0, B0, D0, C0, Ds0, Bs0].map(toPair);
-  const at = toPair(GH.mix(GH.mix(A0, D0, 0.5), GH.mix(B0, C0, 0.5), 0.47));
   const edges = [5, 4, 3, 2, 1, 0].map((to) => ({ to, rev: false }));
-  const D = makeDomain(GH, verts, edges, { at });
-  const A = analyse(D);
+  const { D, A } = buildCenteredDomain(symVerts, edges, P_symToPair, symAt);
 
-  // Where the cut (y = 0 in offH frame) crosses edge 4 (Ds0 -> Bs0) and edge 1 (B0 -> D0)
-  const rawVerts = [A0, B0, D0, C0, Ds0, Bs0];
+  // Where the cut (y = 0 in offH frame) crosses edge 4 and edge 1
   const cross0 = (i) => {
-    const u = rawVerts[i], v = rawVerts[(i + 1) % 6];
+    const u = symVerts[i], v = symVerts[(i + 1) % 6];
     const den = u[1] - v[1];
     const frac = Math.abs(den) < 1e-15 ? 0 : u[1] / den;
-    return toPair(GH.norm([u[0] + frac * (v[0] - u[0]), 0, u[2] + frac * (v[2] - u[2])]));
+    return toPairFromSym(GH.norm([u[0] + frac * (v[0] - u[0]), 0, u[2] + frac * (v[2] - u[2])]));
   };
   const cutA = cross0(4), cutB = cross0(1);
-  const home = [verts[0], verts[1], verts[3], verts[2]];
+  const home = [A_s, B_s, C_s, D_s].map(toPairFromSym);
   const partners = [home[1], home[0], home[3], home[2]];
 
   const specs = commas || defaultCommas(k);
@@ -577,7 +756,7 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
     shapes.push(moved(commaAt(GH, GH.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
   }
 
-  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], Pmat, shapes };
+  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], Pmat, P_psu, shapes };
 }
 
 function placeCommas(G, k, perm, home, partners, commas, thetas) {
@@ -594,9 +773,9 @@ function placeCommas(G, k, perm, home, partners, commas, thetas) {
   return shapes;
 }
 
-function thetaDelta(F_old, F_new, M_cut) {
-  const R = mul(inv(F_new), mul(M_cut, F_old));
-  return Math.atan2(R[3], R[0]);
+function thetaDeltaPsu(pOld, partOld, pNew, partNew, M_cut_psu) {
+  const r = psuMul(psuInv(psuFrame(pNew, partNew)), psuMul(M_cut_psu, psuFrame(pOld, partOld)));
+  return Math.atan2(2 * r[0] * r[1], r[0] * r[0] - r[1] * r[1]);
 }
 
 function cutEndpoints(u, v) {
@@ -612,21 +791,25 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0) {
   const { D: Ddist, hA, hG } = pantsConeCuff(3, b, L);
   const hU = hgt(3, 3, L);
   const t = tw * L;
+  const symShift = t / 2;
   const gam = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
+  const gamS = (u) => GH.norm(apply(boostX(-symShift), gam(u)));
   const A_L = offH(-L / 2, hA, -1), A_R = offH(L / 2, hA, -1);
   const UL = offH(t - L / 2, hU, 1), UM = offH(t, hU, 1), UR = offH(t + L / 2, hU, 1);
   const F_L = gam(-b / 2), F_R = gam(b / 2);
 
-  let D, crL = null, crR = null, footFeat = F_R, featDist = Ddist, wMir = 0;
+  const A_Ls = offH(-L / 2 - symShift, hA, -1), A_Rs = offH(L / 2 - symShift, hA, -1);
+  const UL_s = offH(symShift - L / 2, hU, 1), UM_s = offH(symShift, hU, 1), UR_s = offH(symShift + L / 2, hU, 1);
+  const F_Ls = gamS(-b / 2), F_Rs = gamS(b / 2);
+
+  let symVerts, pairs, crL = null, crR = null, crL_s = null, crR_s = null, footFeat = F_R, footFeat_s = F_Rs, featDist = Ddist, wMir = 0;
   if (k === '333*') {
-    D = makeDom([F_L, F_R, A_R, UR, UM, UL, A_L], [
-      { a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 },
-    ]);
+    symVerts = [F_Ls, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
+    pairs = [{ a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 }];
   } else if (k === '333x') {
-    const F_M = gam(0);
-    D = makeDom([F_L, F_M, F_R, A_R, UR, UM, UL, A_L], [
-      { a: 0, b: 1, rev: true }, { a: 2, b: 7 }, { a: 3, b: 6 }, { a: 4, b: 5 },
-    ]);
+    const F_Ms = gamS(0);
+    symVerts = [F_Ls, F_Ms, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
+    pairs = [{ a: 0, b: 1, rev: true }, { a: 2, b: 7 }, { a: 3, b: 6 }, { a: 4, b: 5 }];
   } else {
     const phi = PI / 6;
     wMir = Math.asinh(Math.cos(phi) / Math.sinh(b / 2));
@@ -635,37 +818,46 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0) {
     const M = GH.fit(offH(-b / 2, 0, -1), offH(b / 2, 0, -1), gam(tauC * b - b / 2), gam(tauC * b + b / 2), false);
     crL = apply(M, mir(-s));
     crR = apply(M, mir(s));
-    D = makeDom([crL, crR, A_R, UR, UM, UL, A_L], [
-      { a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 },
-    ]);
+    crL_s = GH.norm(apply(boostX(-symShift), crL));
+    crR_s = GH.norm(apply(boostX(-symShift), crR));
+    symVerts = [crL_s, crR_s, A_Rs, UR_s, UM_s, UL_s, A_Ls];
+    pairs = [{ a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 }];
 
-    const TF = GH.fit(F_L, F_R, F_R, gam(1.5 * b), false);
-    const invTF = inv(TF);
+    const TF_s = psuFit(F_Ls, F_Rs, F_Rs, gamS(1.5 * b), false);
+    const invTF_s = psuInv(TF_s);
     let bestD = Infinity;
     for (let m = -2; m <= 2; m++) {
-      let Tm = I3;
-      const step = m >= 0 ? TF : invTF;
-      for (let q = 0; q < Math.abs(m); q++) Tm = mul(step, Tm);
-      const cL = apply(Tm, crL), cR = apply(Tm, crR);
+      let Tm = psuI();
+      const step = m >= 0 ? TF_s : invTF_s;
+      for (let q = 0; q < Math.abs(m); q++) Tm = psuMul(step, Tm);
+      const TmMat = psuToSO21(Tm);
+      const cL = apply(TmMat, crL_s), cR = apply(TmMat, crR_s);
       const Fm = GH.frame(cL, cR);
-      const qa = apply(inv(Fm), A_R);
+      const qa = apply(invH(Fm), A_Rs);
       const segLen = GH.dist(cL, cR);
       const u = Math.max(0, Math.min(segLen, Math.atanh(Math.max(-1 + 1e-15, Math.min(1 - 1e-15, qa[0] / qa[2])))));
       const cand = apply(Fm, [Math.sinh(u), 0, Math.cosh(u)]);
-      const dc = GH.dist(A_R, cand);
-      if (dc < bestD - 1e-12) { bestD = dc; footFeat = cand; }
+      const dc = GH.dist(A_Rs, cand);
+      if (dc < bestD - 1e-12) { bestD = dc; footFeat_s = cand; }
     }
+    footFeat = GH.norm(apply(boostX(symShift), footFeat_s));
     featDist = bestD;
   }
 
-  const A = analyse(D);
+  const edges = edgesFromPairs(symVerts.length, pairs);
+  const { D, A } = buildCenteredDomain(symVerts, edges, psuBoostX(symShift));
   const TF = GH.fit(F_L, F_R, F_R, gam(1.5 * b), false);
+  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / 3);
+  const R_UM_psu = psuRotAtX(t, hU, 1, TAU / 3);
+  const R_UR_psu = psuRotAtX(t + L / 2, hU, 1, TAU / 3);
   return {
-    D, A, A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, featDist,
+    D, A, symVerts, edges, symShift,
+    A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, featDist,
+    A_Ls, A_Rs, UL_s, UM_s, UR_s, F_Ls, F_Rs, crL_s, crR_s, footFeat_s,
     hA, hG, hU, b, wMir,
-    R_AR: GH.rotate(A_R, TAU / 3),
-    R_UM: GH.rotate(UM, TAU / 3),
-    R_UR: GH.rotate(UR, TAU / 3),
+    R_AR: psuToSO21(R_AR_psu), R_AR_psu,
+    R_UM: psuToSO21(R_UM_psu), R_UM_psu,
+    R_UR: psuToSO21(R_UR_psu), R_UR_psu,
     T_cut: boostX(L),
     TF,
     cutRawA: cutEndpoints(A_L, UL),
@@ -694,13 +886,8 @@ function buildConeFeatCutFromState(state) {
   const cut = buildConeFeatCut(state.k, state.L, state.tw, bParam, tauC);
   const mp = coneFeatMapping(state.k, perm);
   const d = mp.featPicked ? cut.featDist : pairDistance(3, 3, state.L);
-  const mDist = mp.featPicked ? segDistToXAxis(cut.A_R, cut.footFeat) : treeToCut(3, 3, state.L).m;
+  const mDist = mp.featPicked ? segDistToXAxis(cut.A_Rs, cut.footFeat_s) : treeToCut(3, 3, state.L).m;
   return { ...cut, ...mp, perm, d, mDist };
-}
-
-function domainInPair(cutD, toPair) {
-  const D = makeDomain(GH, cutD.verts.map(toPair), cutD.edges, { at: toPair(cutD.at) });
-  return { D, A: analyse(D) };
 }
 
 export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, thetas = null, perm = [0, 1, 2, 3] } = {}) {
@@ -715,17 +902,27 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
   rawPos[fi] = cut.footFeat; rawPartner[fi] = cut.A_R;
   clsOfFeat[fi] = k === '333*3' ? cut.A.cls[0] : -1;
 
-  const pL = rawPos[perm[0]], pR = rawPos[perm[1]];
-  const Pmat = GH.fix(inv(GH.frame(midH(pL, pR), pR)), 1);
-  const toPair = (v) => GH.norm(apply(Pmat, v));
-  const { D, A } = domainInPair(cut.D, toPair);
+  const symPos = new Array(4), symPartner = new Array(4);
+  symPos[mp.lowerCone] = cut.A_Rs; symPartner[mp.lowerCone] = cut.F_Rs;
+  symPos[mp.upperMin] = cut.UM_s; symPartner[mp.upperMin] = cut.UR_s;
+  symPos[mp.upperMax] = cut.UR_s; symPartner[mp.upperMax] = cut.UM_s;
+  symPos[fi] = cut.footFeat_s; symPartner[fi] = cut.A_Rs;
 
-  const home = perm.map((f) => toPair(rawPos[f]));
-  const canonPartners = perm.map((f) => toPair(rawPartner[f]));
+  const pL_sym = symPos[perm[0]], pR_sym = symPos[perm[1]];
+  const P_symToPair = psuInv(psuFrame(midH(pL_sym, pR_sym), pR_sym));
+  const P_psu = psuMul(P_symToPair, psuBoostX(-cut.symShift));
+  const Pmat = psuToSO21(P_psu);
+  const M_s2p = psuToSO21(P_symToPair);
+  const toPairFromSym = (v) => GH.norm(apply(M_s2p, v));
+  const { D, A } = buildCenteredDomain(cut.symVerts, cut.edges, P_symToPair);
+
+  const home = perm.map((f) => toPairFromSym(symPos[f]));
+  const canonPartners = perm.map((f) => toPairFromSym(symPartner[f]));
   const shapes = placeCommas(GH, k, perm, home, canonPartners, commas, thetas);
 
-  const featDots = mp.featPicked ? [toPair(cut.footFeat)] : [];
+  const featDots = mp.featPicked ? [toPairFromSym(cut.footFeat_s)] : [];
   const marks = [clsOfFeat[perm[0]], clsOfFeat[perm[1]]].filter((c) => c >= 0);
+  const x0_sym = axisCoords(I3, midH(pL_sym, pR_sym)).u;
 
   return {
     D,
@@ -733,16 +930,17 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     cut,
     mp,
     home,
-    cutSeg: [toPair(offH(-L / 2, 0, 1)), toPair(offH(L / 2, 0, 1))],
+    cutSeg: [toPairFromSym(offH(x0_sym - L / 2, 0, 1)), toPairFromSym(offH(x0_sym + L / 2, 0, 1))],
     treeSeg: [home[0], home[1]],
     Pmat,
+    P_psu,
     rawPos,
     rawPartner,
     featDots,
     marks,
     extraLines: [],
     d: mp.featPicked ? cut.featDist : pairDistance(3, 3, L),
-    mDist: mp.featPicked ? segDistToXAxis(cut.A_R, cut.footFeat) : treeToCut(3, 3, L).m,
+    mDist: mp.featPicked ? segDistToXAxis(cut.A_Rs, cut.footFeat_s) : treeToCut(3, 3, L).m,
     shapes,
   };
 }
@@ -750,33 +948,49 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
 // ---- Handle family o33 ({o+, o-, 3_a, 3_b})
 function buildO33Mixed(L, tw, bo, tauO = 0) {
   const { D: Ddist, hA, hG } = pantsConeCuff(3, bo, L);
-  const t = tw * L, hb = bo / 2;
-  const Tx = boostX(t);
-  const gP = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
-  const gM = (u) => apply(Tx, [Math.sinh(u), Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)]);
+  const t = tw * L, symShift = t / 2, hb = bo / 2;
+  const baseP = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
+  const baseM = (u) => [Math.sinh(u), Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
+  const gP = baseP;
+  const gM = (u) => apply(boostX(t), baseM(u));
+  const gP_s = (u) => GH.norm(apply(boostX(-symShift), baseP(u)));
+  const gM_s = (u) => GH.norm(apply(boostX(symShift), baseM(u)));
+
   const A_L = offH(-L / 2, hA, -1), A_R = offH(L / 2, hA, -1);
   const B_L = offH(t - L / 2, hA, 1), B_R = offH(t + L / 2, hA, 1);
+  const A_Ls = offH(-L / 2 - symShift, hA, -1), A_Rs = offH(L / 2 - symShift, hA, -1);
+  const B_Ls = offH(symShift - L / 2, hA, 1), B_Rs = offH(symShift + L / 2, hA, 1);
+
   const f = mod1(tauO);
-  let verts, pairs, vertA, vertB;
+  let symVerts, pairs, vertA, vertB;
   if (f < 1e-10 || f > 1 - 1e-10) {
-    verts = [gP(-hb), gP(hb), A_R, B_R, gM(hb), gM(-hb), B_L, A_L];
+    symVerts = [gP_s(-hb), gP_s(hb), A_Rs, B_Rs, gM_s(hb), gM_s(-hb), B_Ls, A_Ls];
     pairs = [{ a: 0, b: 4 }, { a: 1, b: 7 }, { a: 2, b: 6 }, { a: 3, b: 5 }];
     vertA = 2; vertB = 3;
   } else {
-    verts = [gP(-hb), gP(hb - f * bo), gP(hb), A_R, B_R, gM(hb), gM(-hb + f * bo), gM(-hb), B_L, A_L];
+    symVerts = [gP_s(-hb), gP_s(hb - f * bo), gP_s(hb), A_Rs, B_Rs, gM_s(hb), gM_s(-hb + f * bo), gM_s(-hb), B_Ls, A_Ls];
     pairs = [{ a: 0, b: 5 }, { a: 1, b: 6 }, { a: 2, b: 9 }, { a: 3, b: 8 }, { a: 4, b: 7 }];
     vertA = 3; vertB = 4;
   }
-  const D = makeDom(verts, pairs), A = analyse(D);
-  const H_glue = GH.fit(gP(-hb), gP(hb), gM(-hb + tauO * bo), gM(hb + tauO * bo), false);
-  const ToP = GH.fit(gP(-hb), gP(hb), gP(hb), gP(3 * hb), false);
-  const ToM = GH.fit(gM(-hb), gM(hb), gM(hb), gM(3 * hb), false);
+  const edges = edgesFromPairs(symVerts.length, pairs);
+  const { D, A } = buildCenteredDomain(symVerts, edges, psuBoostX(symShift));
+
+  const H_glue_psu = psuMul(psuBoostX(t), psuFit(baseP(-hb), baseP(hb), baseM(-hb + tauO * bo), baseM(hb + tauO * bo), false));
+  const ToP_psu = psuFit(baseP(-hb), baseP(hb), baseP(hb), baseP(3 * hb), false);
+  const ToM_psu = psuMul(psuBoostX(t), psuMul(psuFit(baseM(-hb), baseM(hb), baseM(hb), baseM(3 * hb), false), psuBoostX(-t)));
+  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / 3);
+  const R_BR_psu = psuRotAtX(t + L / 2, hA, 1, TAU / 3);
   return {
-    mode: 'mixed', D, A, A_L, A_R, B_L, B_R, vertA, vertB,
-    gP, gM, H_glue, ToP, ToM,
-    R_AR: GH.rotate(A_R, TAU / 3), R_BR: GH.rotate(B_R, TAU / 3), T_cut: boostX(L),
-    hA, hG, Ddist, d: Ddist,
-    mDist: segDistToXAxis(A_R, gP(hb)),
+    mode: 'mixed', D, A, symVerts, edges, symShift,
+    A_L, A_R, B_L, B_R, A_Ls, A_Rs, B_Ls, B_Rs, vertA, vertB,
+    gP, gM, gP_s, gM_s,
+    H_glue: psuToSO21(H_glue_psu), H_glue_psu,
+    ToP: psuToSO21(ToP_psu), ToP_psu,
+    ToM: psuToSO21(ToM_psu), ToM_psu,
+    R_AR: psuToSO21(R_AR_psu), R_AR_psu,
+    R_BR: psuToSO21(R_BR_psu), R_BR_psu,
+    T_cut: boostX(L), hA, hG, Ddist, d: Ddist,
+    mDist: segDistToXAxis(A_Rs, gP_s(hb)),
   };
 }
 
@@ -784,27 +998,52 @@ function buildO33Split(L, tw, bo, tauO = 0) {
   const h3 = hgt(3, 3, L);
   const { Doo, ho } = handleSplitGeom(bo, L);
   const t = tw * L, hb = bo / 2;
-  const cP = (u) => apply(boostX(t - L / 4), [Math.sinh(u), Math.cosh(u) * Math.sinh(ho), Math.cosh(u) * Math.cosh(ho)]);
-  const cM = (u) => apply(boostX(t + L / 4), [Math.sinh(u), Math.cosh(u) * Math.sinh(ho), Math.cosh(u) * Math.cosh(ho)]);
+  const baseC = (u) => [Math.sinh(u), Math.cosh(u) * Math.sinh(ho), Math.cosh(u) * Math.cosh(ho)];
+  const cP = (u) => apply(boostX(t - L / 4), baseC(u));
+  const cM = (u) => apply(boostX(t + L / 4), baseC(u));
   const AL = offH(-L / 2, h3, -1), AM = offH(0, h3, -1), AR = offH(L / 2, h3, -1);
   const Tg = boostX(L), cP2 = (u) => apply(Tg, cP(u));
+  const symShift = t <= 0 ? (t + L / 4) / 2 : (t - L / 4) / 2;
+  const cS = (xOff, u) => GH.norm(apply(boostX(xOff - symShift), baseC(u)));
+  const cP_s = (u) => cS(t - L / 4, u), cM_s = (u) => cS(t + L / 4, u);
+  const cP2_s = (u) => cS(t + 3 * L / 4, u), cM0_s = (u) => cS(t - 3 * L / 4, u);
+  const AL_s = offH(-L / 2 - symShift, h3, -1), AM_s = offH(-symShift, h3, -1), AR_s = offH(L / 2 - symShift, h3, -1);
+
   const f = mod1(tauO);
-  let verts, pairs;
+  let symVerts, pairs;
   if (f < 1e-10 || f > 1 - 1e-10) {
-    verts = [AL, AM, AR, cP2(-hb), cM(hb), cM(-hb), cP(hb), cP(-hb)];
+    symVerts = t <= 0
+      ? [AL_s, AM_s, AR_s, cP2_s(-hb), cM_s(hb), cM_s(-hb), cP_s(hb), cP_s(-hb)]
+      : [AL_s, AM_s, AR_s, cM_s(hb), cM_s(-hb), cP_s(hb), cP_s(-hb), cM0_s(hb)];
     pairs = [{ a: 0, b: 1 }, { a: 2, b: 7 }, { a: 3, b: 5 }, { a: 4, b: 6 }];
   } else {
-    verts = [AL, AM, AR, cP2(-hb), cM(hb), cM(-hb + f * bo), cM(-hb), cP(hb), cP(-hb + f * bo), cP(-hb)];
+    symVerts = t <= 0
+      ? [AL_s, AM_s, AR_s, cP2_s(-hb), cM_s(hb), cM_s(-hb + f * bo), cM_s(-hb), cP_s(hb), cP_s(-hb + f * bo), cP_s(-hb)]
+      : [AL_s, AM_s, AR_s, cM_s(hb), cM_s(-hb + f * bo), cM_s(-hb), cP_s(hb), cP_s(-hb + f * bo), cP_s(-hb), cM0_s(hb)];
     pairs = [{ a: 0, b: 1 }, { a: 2, b: 9 }, { a: 3, b: 6 }, { a: 4, b: 7 }, { a: 5, b: 8 }];
   }
-  const D = makeDom(verts, pairs), A = analyse(D);
-  const ToP = GH.fit(cP(-hb), cP(hb), cP(hb), cP(3 * hb), false);
-  const ToM = GH.fit(cM(-hb), cM(hb), cM(hb), cM(3 * hb), false);
-  const H_glue = GH.fit(cP(hb), cP(-hb), cM(-hb + tauO * bo), cM(hb + tauO * bo), false);
+  const edges = edgesFromPairs(symVerts.length, pairs);
+  const { D, A } = buildCenteredDomain(symVerts, edges, psuBoostX(symShift));
+
+  const To0_psu = psuFit(baseC(-hb), baseC(hb), baseC(hb), baseC(3 * hb), false);
+  const ToP_psu = psuMul(psuBoostX(t - L / 4), psuMul(To0_psu, psuBoostX(-(t - L / 4))));
+  const ToM_psu = psuMul(psuBoostX(t + L / 4), psuMul(To0_psu, psuBoostX(-(t + L / 4))));
+  const H0_glue_psu = psuFit(baseC(hb), baseC(-hb), baseC(-hb + tauO * bo), baseC(hb + tauO * bo), false);
+  const H_glue_psu = psuMul(psuBoostX(t + L / 4), psuMul(H0_glue_psu, psuBoostX(-(t - L / 4))));
+  const R_AL_psu = psuRotAtX(-L / 2, h3, -1, TAU / 3);
+  const R_AM_psu = psuRotAtX(0, h3, -1, TAU / 3);
+  const R_AR_psu = psuRotAtX(L / 2, h3, -1, TAU / 3);
   return {
-    mode: 'split', D, A, AL, AM, AR, cP, cM, cP2,
-    R_AL: GH.rotate(AL, TAU / 3), R_AM: GH.rotate(AM, TAU / 3), R_AR: GH.rotate(AR, TAU / 3),
-    T_cut: Tg, ToP, ToM, H_glue, Doo, ho, h3,
+    mode: 'split', D, A, symVerts, edges, symShift,
+    AL, AM, AR, cP, cM, cP2, AL_s, AM_s, AR_s, cP_s, cM_s,
+    R_AL: psuToSO21(R_AL_psu), R_AL_psu,
+    R_AM: psuToSO21(R_AM_psu), R_AM_psu,
+    R_AR: psuToSO21(R_AR_psu), R_AR_psu,
+    T_cut: Tg,
+    ToP: psuToSO21(ToP_psu), ToP_psu,
+    ToM: psuToSO21(ToM_psu), ToM_psu,
+    H_glue: psuToSO21(H_glue_psu), H_glue_psu,
+    Doo, ho, h3,
   };
 }
 
@@ -832,13 +1071,13 @@ function buildO33CutFromState(state) {
     const cut = buildO33Mixed(state.L, state.tw, bo, tauO);
     const usesLower = perm[0] === 0 || perm[1] === 0;
     const hb = bo / 2;
-    const mDist = usesLower ? segDistToXAxis(cut.A_R, cut.gP(hb)) : segDistToXAxis(cut.B_R, cut.gM(hb));
+    const mDist = usesLower ? segDistToXAxis(cut.A_Rs, cut.gP_s(hb)) : segDistToXAxis(cut.B_Rs, cut.gM_s(hb));
     return { ...cut, ...mp, perm, usesLower, d: cut.Ddist, mDist };
   }
   const cut = buildO33Split(state.L, state.tw, bo, tauO);
   const hb = bo / 2;
   const d = mp.handlesPicked ? cut.Doo : pairDistance(3, 3, state.L);
-  const mDist = mp.handlesPicked ? segDistToXAxis(cut.cP(hb), cut.cM(-hb)) : treeToCut(3, 3, state.L).m;
+  const mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(3, 3, state.L).m;
   return { ...cut, ...mp, perm, d, mDist };
 }
 
@@ -848,7 +1087,8 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
   const BLUE = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   let cut, d, mDist;
   const rawPos = new Array(4), rawPartner = new Array(4), clsOfFeat = new Array(4).fill(-1);
-  const handleLinesRaw = [];
+  const symPos = new Array(4), symPartner = new Array(4);
+  const handleLinesSym = [];
 
   if (mp.mode === 'mixed') {
     cut = buildO33Mixed(L, tw, bo, tauO);
@@ -856,40 +1096,56 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     rawPos[1] = cut.gM(hb); rawPartner[1] = cut.B_R;
     rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.gP(hb); clsOfFeat[mp.lowerCone] = cut.A.cls[cut.vertA];
     rawPos[mp.upperCone] = cut.B_R; rawPartner[mp.upperCone] = cut.gM(hb); clsOfFeat[mp.upperCone] = cut.A.cls[cut.vertB];
+
+    symPos[0] = cut.gP_s(hb); symPartner[0] = cut.A_Rs;
+    symPos[1] = cut.gM_s(hb); symPartner[1] = cut.B_Rs;
+    symPos[mp.lowerCone] = cut.A_Rs; symPartner[mp.lowerCone] = cut.gP_s(hb);
+    symPos[mp.upperCone] = cut.B_Rs; symPartner[mp.upperCone] = cut.gM_s(hb);
+
     const usesLower = perm[0] === 0 || perm[1] === 0;
     d = cut.Ddist;
-    mDist = usesLower ? segDistToXAxis(cut.A_R, cut.gP(hb)) : segDistToXAxis(cut.B_R, cut.gM(hb));
-    const Tx = boostX(tw * L);
-    handleLinesRaw.push([cut.gP(-hb), cut.gP(hb)]);
-    handleLinesRaw.push([cut.gP(0), offH(0, Math.max(0.05, cut.hG - 0.14), -1)]);
-    handleLinesRaw.push([cut.gM(0), apply(Tx, offH(0, Math.max(0.05, cut.hG - 0.14), 1))]);
+    mDist = usesLower ? segDistToXAxis(cut.A_Rs, cut.gP_s(hb)) : segDistToXAxis(cut.B_Rs, cut.gM_s(hb));
+    handleLinesSym.push([cut.gP_s(-hb), cut.gP_s(hb)]);
+    handleLinesSym.push([cut.gP_s(0), offH(-cut.symShift, Math.max(0.05, cut.hG - 0.14), -1)]);
+    handleLinesSym.push([cut.gM_s(0), offH(cut.symShift, Math.max(0.05, cut.hG - 0.14), 1)]);
   } else {
     cut = buildO33Split(L, tw, bo, tauO);
     rawPos[0] = cut.cP(hb); rawPartner[0] = cut.cM(-hb);
     rawPos[1] = cut.cM(-hb); rawPartner[1] = cut.cP(hb);
     rawPos[mp.coneAM] = cut.AM; rawPartner[mp.coneAM] = cut.AR; clsOfFeat[mp.coneAM] = cut.A.cls[1];
     rawPos[mp.coneAR] = cut.AR; rawPartner[mp.coneAR] = cut.AM; clsOfFeat[mp.coneAR] = cut.A.cls[2];
+
+    symPos[0] = cut.cP_s(hb); symPartner[0] = cut.cM_s(-hb);
+    symPos[1] = cut.cM_s(-hb); symPartner[1] = cut.cP_s(hb);
+    symPos[mp.coneAM] = cut.AM_s; symPartner[mp.coneAM] = cut.AR_s;
+    symPos[mp.coneAR] = cut.AR_s; symPartner[mp.coneAR] = cut.AM_s;
+
     d = mp.handlesPicked ? cut.Doo : pairDistance(3, 3, L);
-    mDist = mp.handlesPicked ? segDistToXAxis(cut.cP(hb), cut.cM(-hb)) : treeToCut(3, 3, L).m;
-    handleLinesRaw.push([cut.cP(-hb), cut.cP(hb)]);
-    handleLinesRaw.push([cut.cP(0), apply(boostX(tw * L - L / 4), [0, Math.sinh(Math.max(0.05, cut.ho - 0.14)), Math.cosh(Math.max(0.05, cut.ho - 0.14))])]);
-    handleLinesRaw.push([cut.cM(0), apply(boostX(tw * L + L / 4), [0, Math.sinh(Math.max(0.05, cut.ho - 0.14)), Math.cosh(Math.max(0.05, cut.ho - 0.14))])]);
+    mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(3, 3, L).m;
+    const t = tw * L;
+    handleLinesSym.push([cut.cP_s(-hb), cut.cP_s(hb)]);
+    handleLinesSym.push([cut.cP_s(0), offH(t - L / 4 - cut.symShift, Math.max(0.05, cut.ho - 0.14), 1)]);
+    handleLinesSym.push([cut.cM_s(0), offH(t + L / 4 - cut.symShift, Math.max(0.05, cut.ho - 0.14), 1)]);
   }
 
-  const pL = rawPos[perm[0]], pR = rawPos[perm[1]];
-  const Pmat = GH.fix(inv(GH.frame(midH(pL, pR), pR)), 1);
-  const toPair = (v) => GH.norm(apply(Pmat, v));
-  const { D, A } = domainInPair(cut.D, toPair);
-  const home = perm.map((f) => toPair(rawPos[f]));
-  const canonPartners = perm.map((f) => toPair(rawPartner[f]));
+  const pL_sym = symPos[perm[0]], pR_sym = symPos[perm[1]];
+  const P_symToPair = psuInv(psuFrame(midH(pL_sym, pR_sym), pR_sym));
+  const P_psu = psuMul(P_symToPair, psuBoostX(-cut.symShift));
+  const Pmat = psuToSO21(P_psu);
+  const M_s2p = psuToSO21(P_symToPair);
+  const toPairFromSym = (v) => GH.norm(apply(M_s2p, v));
+  const { D, A } = buildCenteredDomain(cut.symVerts, cut.edges, P_symToPair);
+  const home = perm.map((f) => toPairFromSym(symPos[f]));
+  const canonPartners = perm.map((f) => toPairFromSym(symPartner[f]));
   const shapes = placeCommas(GH, 'o33', perm, home, canonPartners, commas, thetas);
 
-  const featDots = [perm[0], perm[1]].filter((f) => f < 2).map((f) => toPair(rawPos[f]));
+  const featDots = [perm[0], perm[1]].filter((f) => f < 2).map((f) => toPairFromSym(symPos[f]));
   const marks = [clsOfFeat[perm[0]], clsOfFeat[perm[1]]].filter((c) => c >= 0);
+  const x0_sym = axisCoords(I3, midH(pL_sym, pR_sym)).u;
   const extraLines = [
-    { a: toPair(handleLinesRaw[0][0]), b: toPair(handleLinesRaw[0][1]), color: BLUE, width: 2.3, alpha: 0.9, steps: 6 },
-    { a: toPair(handleLinesRaw[1][0]), b: toPair(handleLinesRaw[1][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
-    { a: toPair(handleLinesRaw[2][0]), b: toPair(handleLinesRaw[2][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
+    { a: toPairFromSym(handleLinesSym[0][0]), b: toPairFromSym(handleLinesSym[0][1]), color: BLUE, width: 2.3, alpha: 0.9, steps: 6 },
+    { a: toPairFromSym(handleLinesSym[1][0]), b: toPairFromSym(handleLinesSym[1][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
+    { a: toPairFromSym(handleLinesSym[2][0]), b: toPairFromSym(handleLinesSym[2][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
   ];
 
   return {
@@ -898,9 +1154,10 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     cut,
     mp,
     home,
-    cutSeg: [toPair(offH(-L / 2, 0, 1)), toPair(offH(L / 2, 0, 1))],
+    cutSeg: [toPairFromSym(offH(x0_sym - L / 2, 0, 1)), toPairFromSym(offH(x0_sym + L / 2, 0, 1))],
     treeSeg: [home[0], home[1]],
     Pmat,
+    P_psu,
     rawPos,
     rawPartner,
     featDots,
@@ -912,11 +1169,12 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
   };
 }
 
-// ---- Exact stationary re-cuts for 333*, 333*3, 333x, o33
-function alignToSlot(M_cone, Qcut, oldVert, targetU, Lp) {
-  const q = apply(Qcut, apply(M_cone, oldVert));
+// ---- Exact stationary re-cuts for 333*, 333*3, 333x, o33 (PSU(1,1)-exact)
+function alignToSlotPsu(M_cone_psu, Qcut_psu, oldVert, targetU, Lp) {
+  const g0 = psuMul(Qcut_psu, M_cone_psu);
+  const q = apply(psuToSO21(g0), oldVert);
   const m = Math.round((axisCoords(I3, q).u - targetU) / Lp);
-  return mul(boostX(-m * Lp), mul(Qcut, M_cone));
+  return psuMul(psuBoostX(-m * Lp), g0);
 }
 
 export function recutConeFeat(state, i, j) {
@@ -934,45 +1192,48 @@ export function recutConeFeat(state, i, j) {
 
   if (mp1.lowerCone === oldC.mp.lowerCone) {
     const newC = coneFeatCentered(k, L, tw, bParam, tauC, { perm: newPerm, thetas });
-    const Q = GH.fix(mul(newC.Pmat, inv(oldC.Pmat)), 1);
-    return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bParam, tau: tauC, thetas: thetas.slice(), Q, invQ: GH.fix(inv(Q), 1) };
+    const Q_psu = psuMul(newC.P_psu, psuInv(oldC.P_psu));
+    return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bParam, tau: tauC, thetas: thetas.slice(), Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
   }
 
   const g0 = oldC.cut;
   const fromUM = mp1.lowerCone === oldC.mp.upperMin;
   let best = null;
   for (let km = -2; km <= 2; km++) {
-    const Tk = boostX(km * L), Ak = apply(Tk, g0.A_R), RAk = GH.rotate(Ak, TAU / 3);
+    const Tk_psu = psuBoostX(km * L), Tk = boostX(km * L);
+    const Ak = offH(km * L + L / 2, g0.hA, -1);
+    const RAk_psu = psuRotAtX(km * L + L / 2, g0.hA, -1, TAU / 3);
     const FLk = apply(Tk, g0.F_L), FRk = apply(Tk, g0.F_R);
-    let Tnew, Anew, U1, U2, gL, gR, cL = null, cR = null, mapOldLower, mapOldUM, mapOldUR;
+    let Tnew_psu, Anew, U1, U2, gL, gR, cL = null, cR = null, mapOldLower_psu, mapOldUM_psu, mapOldUR_psu;
     if (fromUM) {
-      Tnew = mul(RAk, g0.R_UR);
+      Tnew_psu = psuMul(RAk_psu, g0.R_UR_psu);
       Anew = g0.UM; U1 = Ak; U2 = g0.UR;
       gL = apply(g0.R_UM, FLk); gR = apply(g0.R_UM, FRk);
       if (k === '333*3') { cL = apply(g0.R_UM, apply(Tk, g0.crL)); cR = apply(g0.R_UM, apply(Tk, g0.crR)); }
-      mapOldUM = I3; mapOldLower = Tk; mapOldUR = I3;
+      mapOldUM_psu = psuI(); mapOldLower_psu = Tk_psu; mapOldUR_psu = psuI();
     } else {
-      Tnew = mul(g0.R_UM, RAk);
+      Tnew_psu = psuMul(g0.R_UM_psu, RAk_psu);
       Anew = g0.UR; U1 = g0.UM; U2 = Ak;
-      gL = apply(inv(RAk), FLk); gR = apply(inv(RAk), FRk);
-      if (k === '333*3') { cL = apply(inv(RAk), apply(Tk, g0.crL)); cR = apply(inv(RAk), apply(Tk, g0.crR)); }
-      mapOldUR = I3; mapOldUM = I3; mapOldLower = Tk;
+      const invRAk = psuToSO21(psuInv(RAk_psu));
+      gL = apply(invRAk, FLk); gR = apply(invRAk, FRk);
+      if (k === '333*3') { cL = apply(invRAk, apply(Tk, g0.crL)); cR = apply(invRAk, apply(Tk, g0.crR)); }
+      mapOldUR_psu = psuI(); mapOldUM_psu = psuI(); mapOldLower_psu = Tk_psu;
     }
-    const tr = Tnew[0] + Tnew[4] + Tnew[8];
-    if (tr <= 3 + 1e-7) continue;
-    const len = Math.acosh((tr - 1) / 2);
-    if (!best || len < best.len) best = { km, Tnew, Anew, U1, U2, gL, gR, cL, cR, mapOldLower, mapOldUM, mapOldUR, len };
+    if (Math.abs(Tnew_psu[0]) <= 1 + 1e-7) continue;
+    const len = 2 * Math.acosh(Math.max(1, Math.abs(Tnew_psu[0])));
+    if (!best || len < best.len) best = { km, Tnew_psu, Anew, U1, U2, gL, gR, cL, cR, mapOldLower_psu, mapOldUM_psu, mapOldUR_psu, len };
   }
 
-  const ax = axisOfTrans(best.Tnew);
+  const ax = psuAxisOfTrans(best.Tnew_psu);
   const Lp = ax.len;
-  let invF = ax.invF;
-  if (axisCoords(invF, best.Anew).h > 0) invF = mul(GH.rotate(GH.origin, PI), invF);
-  const g2 = geodesicCoordsInFrame(invF, best.gL, best.gR);
-  const Qcut = GH.fix(mul(boostX(-g2.u), invF), 1);
+  let invF_psu = ax.invF;
+  if (axisCoords(psuToSO21(invF_psu), best.Anew).h > 0) invF_psu = psuMul(psuRot(PI), invF_psu);
+  const g2 = geodesicCoordsInFrame(psuToSO21(invF_psu), best.gL, best.gR);
+  const Qcut_psu = psuMul(psuBoostX(-g2.u), invF_psu);
+  const Qcut = psuToSO21(Qcut_psu);
 
   const conePtInBest = { [mp1.lowerCone]: best.Anew, [fromUM ? oldC.mp.lowerCone : oldC.mp.upperMin]: best.U1, [fromUM ? oldC.mp.upperMax : oldC.mp.lowerCone]: best.U2 };
-  const coneMapInOld = { [oldC.mp.lowerCone]: best.mapOldLower, [oldC.mp.upperMin]: best.mapOldUM, [oldC.mp.upperMax]: best.mapOldUR };
+  const coneMapInOld = { [oldC.mp.lowerCone]: best.mapOldLower_psu, [oldC.mp.upperMin]: best.mapOldUM_psu, [oldC.mp.upperMax]: best.mapOldUR_psu };
   const cUM = axisCoords(Qcut, conePtInBest[mp1.upperMin]);
   const twP = wrapHalf(cUM.u / Lp);
 
@@ -981,7 +1242,7 @@ export function recutConeFeat(state, i, j) {
     const qMid = midH(apply(Qcut, best.cL), apply(Qcut, best.cR));
     const { hG: hGp } = pantsConeCuff(3, b, Lp);
     const Fgam = GH.frame([0, -Math.sinh(hGp), Math.cosh(hGp)], [Math.sinh(1), -Math.cosh(1) * Math.sinh(hGp), Math.cosh(1) * Math.cosh(hGp)]);
-    const qm = apply(inv(Fgam), qMid);
+    const qm = apply(invH(Fgam), qMid);
     tauCp = wrapHalf(Math.atanh(qm[0] / qm[2]) / b);
   }
 
@@ -989,14 +1250,12 @@ export function recutConeFeat(state, i, j) {
   const targetU = { [mp1.lowerCone]: Lp / 2, [mp1.upperMin]: twP * Lp, [mp1.upperMax]: twP * Lp + Lp / 2 };
   const newThetas = thetas.slice();
   for (const cIdx of [mp1.lowerCone, mp1.upperMin, mp1.upperMax]) {
-    const M_cut = alignToSlot(coneMapInOld[cIdx], Qcut, oldC.rawPos[cIdx], targetU[cIdx], Lp);
-    const F_old = GH.frame(oldC.rawPos[cIdx], oldC.rawPartner[cIdx]);
-    const F_new = GH.frame(newC.rawPos[cIdx], newC.rawPartner[cIdx]);
-    newThetas[cIdx] = thetas[cIdx] + thetaDelta(F_old, F_new, M_cut);
+    const M_cut_psu = alignToSlotPsu(coneMapInOld[cIdx], Qcut_psu, oldC.rawPos[cIdx], targetU[cIdx], Lp);
+    newThetas[cIdx] = thetas[cIdx] + thetaDeltaPsu(oldC.rawPos[cIdx], oldC.rawPartner[cIdx], newC.rawPos[cIdx], newC.rawPartner[cIdx], M_cut_psu);
   }
 
-  const Q = GH.fix(mul(newC.Pmat, mul(Qcut, inv(oldC.Pmat))), 1);
-  return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bParam, tau: tauCp, thetas: newThetas, Q, invQ: GH.fix(inv(Q), 1) };
+  const Q_psu = psuMul(newC.P_psu, psuMul(Qcut_psu, psuInv(oldC.P_psu)));
+  return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bParam, tau: tauCp, thetas: newThetas, Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
 }
 
 export function recutO33(state, i, j) {
@@ -1015,122 +1274,126 @@ export function recutO33(state, i, j) {
   // Same unordered partition -> Qcut = I3
   if (mp1.mode === oldC.mp.mode && (mp1.mode === 'split' || mp1.lowerCone === oldC.mp.lowerCone)) {
     const newC = o33Centered(L, tw, bo, tauO, { perm: newPerm, thetas });
-    const Q = GH.fix(mul(newC.Pmat, inv(oldC.Pmat)), 1);
-    return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bo, tau: tauO, thetas: thetas.slice(), Q, invQ: GH.fix(inv(Q), 1) };
+    const Q_psu = psuMul(newC.P_psu, psuInv(oldC.P_psu));
+    return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bo, tau: tauO, thetas: thetas.slice(), Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
   }
 
   const g0 = oldC.cut;
-  let Qcut, Lp, twP, tauOp, M_cone2_pre, M_cone3_pre, oldV2, oldV3, targetU2, targetU3;
+  let Qcut_psu, Qcut, Lp, twP, tauOp, M_cone2_pre_psu, M_cone3_pre_psu, oldV2, oldV3, targetU2, targetU3;
   const newLowerIs = (c) => (mp1.mode === 'mixed' ? mp1.lowerCone === c : mp1.coneAM === c);
 
   if (oldC.mp.mode === 'mixed' && mp1.mode === 'split') {
+    const t = tw * L;
     let best = null;
     for (let km = -2; km <= 2; km++) {
-      const Tk = boostX(km * L), Bk = apply(Tk, g0.B_R), Tsp = mul(g0.R_AR, GH.rotate(Bk, TAU / 3));
-      const tr = Tsp[0] + Tsp[4] + Tsp[8];
-      if (tr <= 3 + 1e-7) continue;
-      const len = Math.acosh((tr - 1) / 2);
-      if (!best || len < best.len) best = { km, Tk, Bk, Tsp, len };
+      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hA, 1);
+      const R_Bk_psu = psuRotAtX(t + km * L + L / 2, g0.hA, 1, TAU / 3);
+      const Tsp_psu = psuMul(g0.R_AR_psu, R_Bk_psu);
+      if (Math.abs(Tsp_psu[0]) <= 1 + 1e-7) continue;
+      const len = 2 * Math.acosh(Math.max(1, Math.abs(Tsp_psu[0])));
+      if (!best || len < best.len) best = { km, Tk_psu, Tk: boostX(km * L), Bk, Tsp_psu, len };
     }
-    const ax = axisOfTrans(best.Tsp);
+    const ax = psuAxisOfTrans(best.Tsp_psu);
     Lp = ax.len;
-    let invF = ax.invF;
-    if (axisCoords(invF, g0.A_R).h > 0) invF = mul(GH.rotate(GH.origin, PI), invF);
+    let invF_psu = ax.invF;
+    if (axisCoords(psuToSO21(invF_psu), g0.A_R).h > 0) invF_psu = psuMul(psuRot(PI), invF_psu);
     const posAM = newLowerIs(oldC.mp.lowerCone) ? g0.A_R : best.Bk;
-    Qcut = GH.fix(mul(boostX(-axisCoords(invF, posAM).u), invF), 1);
-    const invQ = GH.fix(inv(Qcut), 1);
+    Qcut_psu = psuMul(psuBoostX(-axisCoords(psuToSO21(invF_psu), posAM).u), invF_psu);
+    Qcut = psuToSO21(Qcut_psu);
     const cgP = geodesicCoordsInFrame(Qcut, g0.gP(-hb), g0.gP(hb));
     const cgM = geodesicCoordsInFrame(Qcut, apply(best.Tk, g0.gM(-hb)), apply(best.Tk, g0.gM(hb)));
     twP = wrapHalf((cgP.u + Lp / 4) / Lp);
 
     const { ho } = handleSplitGeom(bo, Lp);
-    const TxM = boostX(cgM.u);
-    const Fm = GH.frame(apply(TxM, [0, Math.sinh(ho), Math.cosh(ho)]), apply(TxM, [Math.sinh(1), Math.cosh(1) * Math.sinh(ho), Math.cosh(1) * Math.cosh(ho)]));
-    const img = apply(Qcut, apply(mul(best.Tk, g0.H_glue), apply(invQ, cgP.footOnGam)));
-    tauOp = wrapHalf(axisCoords(inv(Fm), img).u / bo);
+    const Fm_psu = psuMul(psuBoostX(cgM.u), psuBoostFrom0([0, Math.sinh(ho), Math.cosh(ho)]));
+    const gM_p = psuMul(Qcut_psu, psuMul(best.Tk_psu, g0.H_glue_psu));
+    // footOnGam in cut: cgP.footOnGam transformed cleanly back from Qcut via psuToSO21(psuInv(Qcut_psu))
+    const footRaw = apply(psuToSO21(psuInv(Qcut_psu)), cgP.footOnGam);
+    const img = apply(psuToSO21(gM_p), footRaw);
+    tauOp = wrapHalf(axisCoords(psuToSO21(psuInv(Fm_psu)), img).u / bo);
 
     const cL = oldC.mp.lowerCone, cU = oldC.mp.upperCone;
     const uOf = { [cL]: mp1.coneAM === cL ? 0 : Lp / 2, [cU]: mp1.coneAM === cU ? 0 : Lp / 2 };
-    const mOf = { [cL]: I3, [cU]: best.Tk };
-    M_cone2_pre = mOf[2]; M_cone3_pre = mOf[3];
+    const mOf = { [cL]: psuI(), [cU]: best.Tk_psu };
+    M_cone2_pre_psu = mOf[2]; M_cone3_pre_psu = mOf[3];
     oldV2 = oldC.rawPos[2]; oldV3 = oldC.rawPos[3];
     targetU2 = uOf[2]; targetU3 = uOf[3];
   } else if (oldC.mp.mode === 'split' && mp1.mode === 'mixed') {
     const lowIsOldAM = mp1.lowerCone === oldC.mp.coneAM;
     const Acone = lowIsOldAM ? g0.AM : g0.AL;
-    const Tmix = mul(inv(GH.rotate(Acone, TAU / 3)), inv(g0.ToP));
-    const ax = axisOfTrans(Tmix);
+    const R_Acone_psu = lowIsOldAM ? g0.R_AM_psu : g0.R_AL_psu;
+    const Tmix_psu = psuMul(psuInv(R_Acone_psu), psuInv(g0.ToP_psu));
+    const ax = psuAxisOfTrans(Tmix_psu);
     Lp = ax.len;
-    let invF = ax.invF;
-    if (axisCoords(invF, Acone).h > 0) invF = mul(GH.rotate(GH.origin, PI), invF);
-    const cgP0 = geodesicCoordsInFrame(invF, g0.cP(-hb), g0.cP(hb));
-    Qcut = GH.fix(mul(boostX(-cgP0.u), invF), 1);
-    const invQ = GH.fix(inv(Qcut), 1);
+    let invF_psu = ax.invF;
+    if (axisCoords(psuToSO21(invF_psu), Acone).h > 0) invF_psu = psuMul(psuRot(PI), invF_psu);
+    const cgP0 = geodesicCoordsInFrame(psuToSO21(invF_psu), g0.cP(-hb), g0.cP(hb));
+    Qcut_psu = psuMul(psuBoostX(-cgP0.u), invF_psu);
+    Qcut = psuToSO21(Qcut_psu);
     const cgP = geodesicCoordsInFrame(Qcut, g0.cP(-hb), g0.cP(hb));
     const cgM = geodesicCoordsInFrame(Qcut, g0.cM(-hb), g0.cM(hb));
     twP = wrapHalf(cgM.u / Lp);
 
     const { hG: hGp } = pantsConeCuff(3, bo, Lp);
-    const TxM = boostX(cgM.u);
-    const Fm = GH.frame(apply(TxM, [0, Math.sinh(hGp), Math.cosh(hGp)]), apply(TxM, [Math.sinh(1), Math.cosh(1) * Math.sinh(hGp), Math.cosh(1) * Math.cosh(hGp)]));
-    const img = apply(Qcut, apply(g0.H_glue, apply(invQ, cgP.footOnGam)));
-    tauOp = wrapHalf(axisCoords(inv(Fm), img).u / bo);
+    const Fm_psu = psuMul(psuBoostX(cgM.u), psuBoostFrom0([0, Math.sinh(hGp), Math.cosh(hGp)]));
+    const footRaw = apply(psuToSO21(psuInv(Qcut_psu)), cgP.footOnGam);
+    const img = apply(psuToSO21(psuMul(Qcut_psu, g0.H_glue_psu)), footRaw);
+    tauOp = wrapHalf(axisCoords(psuToSO21(psuInv(Fm_psu)), img).u / bo);
 
     const cLow = mp1.lowerCone, cUp = mp1.upperCone;
-    const mLow = lowIsOldAM ? I3 : boostX(-L);
-    const mUp = I3;
+    const mLow = lowIsOldAM ? psuI() : psuBoostX(-L);
+    const mUp = psuI();
     const mOf = { [cLow]: mLow, [cUp]: mUp };
     const uOf = { [cLow]: Lp / 2, [cUp]: twP * Lp + Lp / 2 };
-    M_cone2_pre = mOf[2]; M_cone3_pre = mOf[3];
+    M_cone2_pre_psu = mOf[2]; M_cone3_pre_psu = mOf[3];
     oldV2 = oldC.rawPos[2]; oldV3 = oldC.rawPos[3];
     targetU2 = uOf[2]; targetU3 = uOf[3];
   } else {
     // Mixed -> Mixed
+    const t = tw * L;
     let best = null;
     for (let km = -2; km <= 2; km++) {
-      const Tk = boostX(km * L), Bk = apply(Tk, g0.B_R), RBk = GH.rotate(Bk, TAU / 3);
-      const Tnew = mul(inv(RBk), g0.ToP);
-      const tr = Tnew[0] + Tnew[4] + Tnew[8];
-      if (tr <= 3 + 1e-7) continue;
-      const len = Math.acosh((tr - 1) / 2);
-      if (!best || len < best.len) best = { km, Tk, Bk, RBk, Tnew, len };
+      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hA, 1);
+      const RBk_psu = psuRotAtX(t + km * L + L / 2, g0.hA, 1, TAU / 3);
+      const Tnew_psu = psuMul(psuInv(RBk_psu), g0.ToP_psu);
+      if (Math.abs(Tnew_psu[0]) <= 1 + 1e-7) continue;
+      const len = 2 * Math.acosh(Math.max(1, Math.abs(Tnew_psu[0])));
+      if (!best || len < best.len) best = { km, Tk_psu, Tk: boostX(km * L), Bk, RBk_psu, Tnew_psu, len };
     }
-    const ax = axisOfTrans(best.Tnew);
+    const ax = psuAxisOfTrans(best.Tnew_psu);
     Lp = ax.len;
-    let invF = ax.invF;
-    if (axisCoords(invF, best.Bk).h > 0) invF = mul(GH.rotate(GH.origin, PI), invF);
-    const cgP0 = geodesicCoordsInFrame(invF, g0.gP(-hb), g0.gP(hb));
-    Qcut = GH.fix(mul(boostX(-cgP0.u), invF), 1);
-    const invQ = GH.fix(inv(Qcut), 1);
+    let invF_psu = ax.invF;
+    if (axisCoords(psuToSO21(invF_psu), best.Bk).h > 0) invF_psu = psuMul(psuRot(PI), invF_psu);
+    const cgP0 = geodesicCoordsInFrame(psuToSO21(invF_psu), g0.gP(-hb), g0.gP(hb));
+    Qcut_psu = psuMul(psuBoostX(-cgP0.u), invF_psu);
+    Qcut = psuToSO21(Qcut_psu);
     const cgP = geodesicCoordsInFrame(Qcut, g0.gP(-hb), g0.gP(hb));
     const cgM = geodesicCoordsInFrame(Qcut, apply(best.Tk, g0.gM(-hb)), apply(best.Tk, g0.gM(hb)));
     twP = wrapHalf(cgM.u / Lp);
 
     const { hG: hGp } = pantsConeCuff(3, bo, Lp);
-    const TxM = boostX(cgM.u);
-    const Fm = GH.frame(apply(TxM, [0, Math.sinh(hGp), Math.cosh(hGp)]), apply(TxM, [Math.sinh(1), Math.cosh(1) * Math.sinh(hGp), Math.cosh(1) * Math.cosh(hGp)]));
-    const img = apply(Qcut, apply(mul(best.Tk, g0.H_glue), apply(invQ, cgP.footOnGam)));
-    tauOp = wrapHalf(axisCoords(inv(Fm), img).u / bo);
+    const Fm_psu = psuMul(psuBoostX(cgM.u), psuBoostFrom0([0, Math.sinh(hGp), Math.cosh(hGp)]));
+    const footRaw = apply(psuToSO21(psuInv(Qcut_psu)), cgP.footOnGam);
+    const img = apply(psuToSO21(psuMul(Qcut_psu, psuMul(best.Tk_psu, g0.H_glue_psu))), footRaw);
+    tauOp = wrapHalf(axisCoords(psuToSO21(psuInv(Fm_psu)), img).u / bo);
 
     const cLowNew = mp1.lowerCone, cUpNew = mp1.upperCone;
-    const mOf = { [cLowNew]: best.Tk, [cUpNew]: inv(best.RBk) };
+    const mOf = { [cLowNew]: best.Tk_psu, [cUpNew]: psuInv(best.RBk_psu) };
     const uOf = { [cLowNew]: Lp / 2, [cUpNew]: twP * Lp + Lp / 2 };
-    M_cone2_pre = mOf[2]; M_cone3_pre = mOf[3];
+    M_cone2_pre_psu = mOf[2]; M_cone3_pre_psu = mOf[3];
     oldV2 = oldC.rawPos[2]; oldV3 = oldC.rawPos[3];
     targetU2 = uOf[2]; targetU3 = uOf[3];
   }
 
   const newC = o33Centered(Lp, twP, bo, tauOp, { perm: newPerm, thetas });
   const newThetas = thetas.slice();
-  for (const [cIdx, M_pre, oldV, tU] of [[2, M_cone2_pre, oldV2, targetU2], [3, M_cone3_pre, oldV3, targetU3]]) {
-    const M_cut = alignToSlot(M_pre, Qcut, oldV, tU, Lp);
-    const F_old = GH.frame(oldC.rawPos[cIdx], oldC.rawPartner[cIdx]);
-    const F_new = GH.frame(newC.rawPos[cIdx], newC.rawPartner[cIdx]);
-    newThetas[cIdx] = thetas[cIdx] + thetaDelta(F_old, F_new, M_cut);
+  for (const [cIdx, M_pre_psu, oldV, tU] of [[2, M_cone2_pre_psu, oldV2, targetU2], [3, M_cone3_pre_psu, oldV3, targetU3]]) {
+    const M_cut_psu = alignToSlotPsu(M_pre_psu, Qcut_psu, oldV, tU, Lp);
+    newThetas[cIdx] = thetas[cIdx] + thetaDeltaPsu(oldC.rawPos[cIdx], oldC.rawPartner[cIdx], newC.rawPos[cIdx], newC.rawPartner[cIdx], M_cut_psu);
   }
 
-  const Q = GH.fix(mul(newC.Pmat, mul(Qcut, inv(oldC.Pmat))), 1);
-  return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bo, tau: tauOp, thetas: newThetas, Q, invQ: GH.fix(inv(Q), 1) };
+  const Q_psu = psuMul(newC.P_psu, psuMul(Qcut_psu, psuInv(oldC.P_psu)));
+  return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bo, tau: tauOp, thetas: newThetas, Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
 }
 
 /** Unified stationary re-cut across all 7 orbifold families. */
@@ -1171,7 +1434,7 @@ export function followTreeData(state) {
     const hC = hgt(orders[2], orders[3], L), hD = hgt(orders[3], orders[2], L);
     const A0 = offH(-c / 2, hA, -1), B0 = offH(c / 2, hB, -1);
     const C0 = offH(t - c / 2, hC, 1), D0 = offH(t + c / 2, hD, 1);
-    const Pmat = GH.fix(inv(GH.frame(GH.mix(A0, B0, 0.5), B0)), 1);
+    const Pmat = GH.fix(invH(GH.frame(GH.mix(A0, B0, 0.5), B0)), 1);
     const toPair = (v) => GH.norm(apply(Pmat, v));
     const fwdVerts = [toPair(A0), toPair(B0)];
     for (let m = 1; m <= K; m++) {
@@ -1389,7 +1652,7 @@ export function recut2222(state, i, j) {
 export function interpolateView(kind, M0, M1, u) {
   const e = u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u);
   const G = kind === 'E' ? GE : GH;
-  const rel = G.fix(mul(inv(M1), M0), 1);
+  const rel = G.fix(mul(kind === 'E' ? inv(M1) : invH(M1), M0), 1);
   if (kind === 'E') {
     const ang = Math.atan2(rel[3], rel[0]), tx = rel[2], ty = rel[5];
     const a = (1 - e) * ang, c = Math.cos(a), s = Math.sin(a);

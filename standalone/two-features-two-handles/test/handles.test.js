@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 
 import {
   GH, GE, FAMILIES, normalizeFamilyKey,
+  invH, psuI, psuMul, psuInv, psuApplyDisc, psuToSO21, so21ToPSU, discDist, psuRotate, psuBoostX, psuAxisOfTrans,
   hgt, d0, pairDistance, pairLength, treeToCut,
   fourConeUHP, uhpToDisc, uhpToHyp, discToHyp, pairFrameUHP,
   fourConeCentered, coneFeatCentered, o33Centered, recut, recutH, pillowCentered, recut2222,
@@ -10,6 +11,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from '../src/handles.js';
+import { tilesPSU } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
@@ -461,5 +463,204 @@ test('Period-1 invariance of tauO/tauC and 3D + followTreeData across all 7 fami
     assert.ok(fd.fwdSegs.length >= 2 && fd.backSegs.length >= 2 && fd.legs.length === 4);
     const pm = buildPatternModel(st, { follow: { active: true, data: fd, progress: 1 } });
     assert.equal(pm.outline, false);
+  }
+});
+
+test('Exact Lorentz invH, so21ToPSU/psuToSO21 roundtrip, and psuAxisOfTrans accuracy', () => {
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const samplePt = GH.polar(3.2, 1.1);
+  for (const flip of [false, true]) {
+    const M = GH.fit(GH.polar(1.5, 0.4), GH.polar(4.1, -0.7), GH.polar(5.0, 2.1), GH.polar(3.8, -1.9), flip);
+    const P = mul(M, invH(M));
+    for (let i = 0; i < 9; i++) assert.ok(near(P[i], I3[i], 1e-10), `M * invH(M) idx=${i}: ${P[i]}`);
+    const g = so21ToPSU(M, flip);
+    const M2 = psuToSO21(g);
+    const dErr = discDist(toDisc(apply(M, samplePt)), toDisc(apply(M2, samplePt)));
+    assert.ok(dErr < 1e-11, `so21ToPSU/psuToSO21 flip=${flip} drift ${dErr}`);
+  }
+  const Tsp = psuMul(psuRotate(GH.polar(3.0, -0.3), TAU / 3), psuRotate(GH.polar(6.0, 0.2), TAU / 3));
+  const ax = psuAxisOfTrans(Tsp);
+  const conj = psuMul(ax.invF, psuMul(Tsp, ax.F));
+  const want = psuBoostX(ax.len);
+  assert.ok(discDist(psuApplyDisc(conj, [0, 0]), psuApplyDisc(want, [0, 0])) < 1e-10, `axis conj disc mismatch`);
+  assert.ok(Math.abs(conj[1]) < 1e-9 && Math.abs(conj[3]) < 1e-9, `axis conj imaginary parts: ${conj[1]}, ${conj[3]}`);
+});
+
+test('Repro #k=o33&m=2103&l=9.56&tw=0.4295&b=1.3&to=0.4736 sweep, tilesPSU, and recut invariance', () => {
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const baseSt = {
+    k: 'o33', perm: [2, 1, 0, 3], orders: [3, 0, 0, 3],
+    L: 9.56, b: 1.3, tau: 0.4736,
+    thetas: defaultCommas('o33').map((sp) => (sp ? sp.theta : 0)),
+  };
+  for (const tw of [-0.5, -0.49, -0.4295, -0.2, 0, 0.2, 0.35, 0.4295, 0.48, 0.5]) {
+    const m = buildPatternModel({ ...baseSt, tw });
+    assert.deepEqual(signatureOf(m.A), { o: 1, x: 0, cones: [3, 3], stars: [] });
+    const rt = Math.max(...m.A.maps2.map((g, i) => {
+      const p = psuMul(g, m.A.maps2[m.D.edges[i].to]);
+      return 2 * Math.asinh(Math.hypot(p[2], p[3]));
+    }));
+    assert.ok(rt < 1e-9, `tw=${tw} maps2 roundtrip ${rt}`);
+
+    const c3 = psuMul(m.A.maps2[2], m.A.maps2[8]);
+    const c3cube = psuMul(c3, psuMul(c3, c3));
+    const cycErr = 2 * Math.asinh(Math.hypot(c3cube[2], c3cube[3]));
+    assert.ok(cycErr < 1e-6, `tw=${tw} 3-cone cycle err ${cycErr}`);
+    assert.ok(discDist(psuApplyDisc(c3cube, toDisc(m.D.at)), toDisc(m.D.at)) < 1e-6, `tw=${tw} 3-cone cycle point drift`);
+
+    const ts = tilesPSU(m.D, m.A, { focus: [0, 0], radius: 5.6, max: 4200 });
+    assert.ok(ts.length >= 500 && ts.length < 4200, `tw=${tw} expected healthy tiling, got ${ts.length}`);
+    for (let i = 1; i < Math.min(20, ts.length); i++) {
+      assert.ok(discDist(psuApplyDisc(ts[i].g, toDisc(m.D.at)), toDisc(m.D.at)) > 0.1, 'no origin collision');
+    }
+  }
+
+  // Orbit matcher in PSU local frame for all 6 recut picks from the exact repro
+  const st0 = { ...baseSt, tw: 0.4295 };
+  const c0 = o33Centered(st0.L, st0.tw, st0.b, st0.tau, { perm: st0.perm, thetas: st0.thetas });
+  const atD = toDisc(c0.D.at);
+  const nearestInOrbit = (targetPt, refPt, conePt = null, targetCommaD = null, refCommaD = null) => {
+    const targetD = toDisc(targetPt), refD = toDisc(refPt);
+    const grid = new Map();
+    const keyOf = (w, f) => {
+      const r2 = Math.hypot(w[0], w[1]), d = 2 * Math.atanh(Math.min(1 - 1e-15, r2)), th = Math.atan2(w[1], w[0]);
+      return (f ? 'f' : 'd') + Math.round(d * 8) + ':' + Math.round(th * 12);
+    };
+    const heap = [{ g: psuI(), d: discDist(refD, targetD) }];
+    const push = (x) => { heap.push(x); for (let i = heap.length - 1; i > 0;) { const u = (i - 1) >> 1; if (heap[u].d <= heap[i].d) break; [heap[u], heap[i]] = [heap[i], heap[u]]; i = u; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; for (let i = 0;;) { const l = 2 * i + 1, r2 = l + 1; let mn = i; if (l < heap.length && heap[l].d < heap[mn].d) mn = l; if (r2 < heap.length && heap[r2].d < heap[mn].d) mn = r2; if (mn === i) break; [heap[mn], heap[i]] = [heap[i], heap[mn]]; i = mn; } } return top; };
+    grid.set(keyOf(atD, false), [atD]);
+    let bestD = Infinity, bestG = psuI(), count = 0;
+    while (heap.length && count < 15000) {
+      const cur = pop(); count++;
+      const dc = discDist(psuApplyDisc(cur.g, refD), targetD);
+      if (dc < bestD) { bestD = dc; bestG = cur.g; }
+      if (dc < 1e-10) break;
+      for (let i = 0; i < c0.D.n; i++) {
+        const g = psuMul(cur.g, c0.A.maps2[i]), w = psuApplyDisc(g, atD), k = keyOf(w, !!g[4]), list = grid.get(k);
+        if (list && list.some((q) => discDist(w, q) < 1e-4)) continue;
+        if (list) list.push(w); else grid.set(k, [w]);
+        const d = discDist(psuApplyDisc(g, refD), targetD);
+        if (d < 20) push({ g, d });
+      }
+    }
+    if (!conePt) return bestD;
+    let bestComma = Infinity;
+    for (let rot = 0; rot < 3; rot++) {
+      const gRot = psuMul(bestG, psuRotate(conePt, (rot * TAU) / 3));
+      const err = Math.max(...refCommaD.map((w, idx) => discDist(psuApplyDisc(gRot, w), targetCommaD[idx])));
+      if (err < bestComma) bestComma = err;
+    }
+    return { bestD, bestComma };
+  };
+
+  const nearestLineInOrbit = (targetA, targetB, refA, refB) => {
+    const toH = (d) => { const r2 = d[0] * d[0] + d[1] * d[1]; return [2 * d[0] / (1 - r2), 2 * d[1] / (1 - r2), (1 + r2) / (1 - r2)]; };
+    const refAD = toDisc(refA), refBD = toDisc(refB);
+    const refMid = toDisc(GH.norm([(refA[0] + refB[0]) / 2, (refA[1] + refB[1]) / 2, (refA[2] + refB[2]) / 2]));
+    const targetMid = toDisc(GH.norm([(targetA[0] + targetB[0]) / 2, (targetA[1] + targetB[1]) / 2, (targetA[2] + targetB[2]) / 2]));
+    const grid = new Map();
+    const keyOf = (w) => Math.round(w[0] * 24) + ':' + Math.round(w[1] * 24);
+    const heap = [{ g: psuI(), d: discDist(refMid, targetMid) }];
+    grid.set(keyOf(atD), [atD]);
+    let bestErr = Infinity, count = 0;
+    while (heap.length && count < 10000) {
+      heap.sort((x, y) => x.d - y.d);
+      const cur = heap.shift(); count++;
+      const mA = toH(psuApplyDisc(cur.g, refAD)), mB = toH(psuApplyDisc(cur.g, refBD));
+      const err = GH.lineDist(targetA, mA, mB) + GH.lineDist(targetB, mA, mB);
+      if (err < bestErr) bestErr = err;
+      if (err < 1e-8) break;
+      for (let i = 0; i < c0.D.n; i++) {
+        const g = psuMul(cur.g, c0.A.maps2[i]), w = psuApplyDisc(g, atD), k = keyOf(w), list = grid.get(k);
+        if (list && list.some((q) => discDist(w, q) < 1e-4)) continue;
+        if (list) list.push(w); else grid.set(k, [w]);
+        const d = discDist(psuApplyDisc(g, refMid), targetMid);
+        if (d < 25) heap.push({ g, d });
+      }
+    }
+    return bestErr;
+  };
+
+  const c0HLineA = c0.extraLines[0].a, c0HLineB = c0.extraLines[0].b;
+  for (const [i, j] of [[0, 1], [2, 3], [0, 2], [1, 3], [1, 2], [0, 3]]) {
+    const r = recut(st0, i, j);
+    assert.ok(r.tw >= -0.5 - 1e-12 && r.tw <= 0.5 + 1e-12);
+    const cm = o33Centered(r.L, r.tw, r.b, r.tau, { perm: r.perm, thetas: r.thetas });
+    const hErr = nearestLineInOrbit(GH.norm(apply(r.invQ, cm.extraLines[0].a)), GH.norm(apply(r.invQ, cm.extraLines[0].b)), c0HLineA, c0HLineB);
+    assert.ok(hErr < 1e-7, `repro recut (${i},${j}) handle line drift ${hErr}`);
+
+    for (const [ci, si] of [[2, 0], [3, 1]]) {
+      const targetCone = GH.norm(apply(r.invQ, cm.home[r.perm.indexOf(ci)]));
+      const refCone = c0.home[st0.perm.indexOf(ci)];
+      const targetCommaD = cm.shapes[si].pts.map((p) => toDisc(GH.norm(apply(r.invQ, p))));
+      const refCommaD = c0.shapes[si].pts.map(toDisc);
+      const { bestD, bestComma } = nearestInOrbit(targetCone, refCone, refCone, targetCommaD, refCommaD);
+      assert.ok(bestD < 5e-8, `repro recut (${i},${j}) cone ${ci} drift ${bestD}`);
+      assert.ok(bestComma < 1e-7, `repro recut (${i},${j}) comma ${si} drift ${bestComma}`);
+    }
+  }
+});
+
+test('All 6 hyperbolic families at extreme L in [0.4, 11.5] and tw in [-0.5, 0.5]: signatures, area, roundtrip, continuity, period-1', () => {
+  const expectedSig = {
+    '3333': { o: 0, x: 0, cones: [3, 3, 3, 3], stars: [] },
+    '2223': { o: 0, x: 0, cones: [3, 2, 2, 2], stars: [] },
+    '333*': { o: 0, x: 0, cones: [3, 3, 3], stars: [[]] },
+    '333*3': { o: 0, x: 0, cones: [3, 3, 3], stars: [[3]] },
+    '333x': { o: 0, x: 1, cones: [3, 3, 3], stars: [] },
+    'o33': { o: 1, x: 0, cones: [3, 3], stars: [] },
+  };
+  const buildFor = (k, perm, L, tw) => {
+    const fam = FAMILIES[k];
+    if (fam.mode === 'cones') return fourConeCentered(perm.map((c) => fam.baseOrders[c]), L, tw, { perm, k });
+    if (fam.mode === 'handle') return o33Centered(L, tw, fam.defaultB, 0.4736, { perm });
+    return coneFeatCentered(k, L, tw, fam.defaultB, fam.defaultTau ?? 0, { perm });
+  };
+
+  for (const k of ['3333', '2223', '333*', '333*3', '333x', 'o33']) {
+    const fam = FAMILIES[k];
+    const perms = k === 'o33' ? [[0, 2, 1, 3], [2, 1, 0, 3], [0, 1, 2, 3], [2, 3, 0, 1]] : k === '2223' ? [[3, 0, 1, 2], [0, 1, 2, 3]] : [[0, 1, 2, 3], [2, 3, 0, 1]];
+    const expectedArea = { '3333': (TAU * 2) / 3, '2223': TAU / 6, '333*': TAU, '333*3': (TAU * 4) / 3, '333x': TAU, 'o33': (TAU * 4) / 3 }[k];
+    for (const L of [0.4, 2.0, 5.5, 9.56, 11.5]) {
+      for (const tw of [-0.5, -0.49, -0.25, 0, 0.25, 0.4295, 0.49, 0.5]) {
+        for (const perm of perms) {
+          const b = buildFor(k, perm, L, tw);
+          assert.deepEqual(signatureOf(b.A), expectedSig[k], `${k} L=${L} tw=${tw} perm=${perm}`);
+          assert.ok(near(Math.abs(GH.area(b.D.verts)), expectedArea, 1e-5), `${k} L=${L} tw=${tw} area`);
+          const rt = Math.max(...b.A.maps2.map((g, i) => {
+            const j = b.D.edges[i].mirror ? i : b.D.edges[i].to;
+            const p = psuMul(g, b.A.maps2[j]);
+            return 2 * Math.asinh(Math.hypot(p[2], p[3]));
+          }));
+          assert.ok(rt < (L > 10 ? 1e-8 : 1e-9), `${k} L=${L} tw=${tw} perm=${perm} rt=${rt}`);
+        }
+      }
+    }
+
+    // Period-1 invariance tw=-0.5 vs +0.5 at L=9.56
+    const pNeg = buildFor(k, perms[0], 9.56, -0.5);
+    const pPos = buildFor(k, perms[0], 9.56, 0.5);
+    const tsNeg = tilesPSU(pNeg.D, pNeg.A, { focus: [0, 0], radius: 7.5, max: 4200 });
+    const cNeg = tsNeg.map((t) => pNeg.shapes[0].pts.map((p) => apply(t.M, p)));
+    const minC = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, idx) => GH.dist(p, pPos.shapes[0].pts[idx])))));
+    assert.ok(minC < 1e-8, `${k} L=9.56 period-1 comma drift ${minC}`);
+
+    if (k === 'o33') {
+      const sNeg = buildFor(k, [0, 1, 2, 3], 9.56, -0.5);
+      const sPos = buildFor(k, [0, 1, 2, 3], 9.56, 0.5);
+      const tsS = tilesPSU(sNeg.D, sNeg.A, { focus: [0, 0], radius: 7.5, max: 4200 });
+      const minCS = Math.min(...tsS.map((t) => Math.max(...sPos.shapes[0].pts.map((p, idx) => GH.dist(apply(t.M, sNeg.shapes[0].pts[idx]), p)))));
+      assert.ok(minCS < 1e-8, `o33 Split L=9.56 period-1 comma drift ${minCS}`);
+    }
+  }
+
+  // Domain-switch continuity across tw = -1e-9 vs +1e-9 at L=9.56 for 3333, 2223, o33 Split
+  for (const [k, perm] of [['3333', [0, 1, 2, 3]], ['2223', [3, 0, 1, 2]], ['o33', [0, 1, 2, 3]]]) {
+    const mA = buildFor(k, perm, 9.56, -1e-9);
+    const mB = buildFor(k, perm, 9.56, 1e-9);
+    const tsA = tilesPSU(mA.D, mA.A, { focus: [0, 0], radius: 5.0, max: 600 });
+    const minC = Math.min(...tsA.map((t) => Math.max(...mB.shapes[0].pts.map((p, idx) => GH.dist(apply(t.M, mA.shapes[0].pts[idx]), p)))));
+    assert.ok(minC < 1e-7, `${k} continuity across tw=0 drift ${minC}`);
   }
 });
