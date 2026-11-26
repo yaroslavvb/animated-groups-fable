@@ -285,8 +285,9 @@ test('Full turn (-0.5 vs +0.5) returns every centre and every comma; half-turn s
       }
     }
     // Commas also repeat after full turn (-0.5 -> +0.5)
-    const cNeg = tsNeg.map((t) => bNeg.shapes[2].pts.map((p) => apply(t.M, p)));
-    const cPos0 = bPos.shapes[2].pts;
+    // (the last comma of the print, however many it has: paisley.js ties whole commas, 3333 has two)
+    const cNeg = tsNeg.map((t) => bNeg.shapes[bNeg.shapes.length - 1].pts.map((p) => apply(t.M, p)));
+    const cPos0 = bPos.shapes[bPos.shapes.length - 1].pts;
     const minComma = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, k) => GH.dist(p, cPos0[k])))));
     assert.ok(minComma < 1e-9, `3333 full turn comma drift ${minComma}`);
 
@@ -301,8 +302,8 @@ test('Full turn (-0.5 vs +0.5) returns every centre and every comma; half-turn s
     const tsNeg = tiles(bNeg.D, bNeg.A, { radius: 6, max: 200 });
     const setNeg = tsNeg.flatMap((t) => bNeg.home.map((p) => apply(t.M, p)));
     for (const p of bPos.home) assert.ok(Math.min(...setNeg.map((x) => GE.dist(x, p))) < 1e-9);
-    const cNeg = tsNeg.map((t) => bNeg.shapes[2].pts.map((p) => apply(t.M, p)));
-    const minComma = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, k) => GE.dist(p, bPos.shapes[2].pts[k])))));
+    const cNeg = tsNeg.map((t) => bNeg.shapes[bNeg.shapes.length - 1].pts.map((p) => apply(t.M, p)));
+    const minComma = Math.min(...cNeg.map((pts) => Math.max(...pts.map((p, k) => GE.dist(p, bPos.shapes[bPos.shapes.length - 1].pts[k])))));
     assert.ok(minComma < 1e-9);
   }
 });
@@ -628,7 +629,10 @@ test('Repro #k=o33&m=2103&l=9.56&tw=0.4295&b=1.3&to=0.4736 sweep, tilesPSU, and 
     const hErr = nearestLineInOrbit(GH.norm(apply(r.invQ, cm.extraLines[0].a)), GH.norm(apply(r.invQ, cm.extraLines[0].b)), c0HLineA, c0HLineB);
     assert.ok(hErr < 1e-7, `repro recut (${i},${j}) handle line drift ${hErr}`);
 
-    for (const [ci, si] of [[2, 0], [3, 1]]) {
+    // which drawn comma rides with which cone point is read off the print (paisley.js ties whole commas: o33 has one)
+    const coneShapes = [];
+    { let si = 0; defaultCommas('o33').forEach((sp, f) => { const n = sp ? (sp.shapes ? sp.shapes.length : 1) : 0; for (let q = 0; q < n; q++) coneShapes.push([f, si + q]); si += n; }); }
+    for (const [ci, si] of coneShapes) {
       const targetCone = GH.norm(apply(r.invQ, cm.home[r.perm.indexOf(ci)]));
       const refCone = c0.home[st0.perm.indexOf(ci)];
       const targetCommaD = cm.shapes[si].pts.map((p) => toDisc(GH.norm(apply(r.invQ, p))));

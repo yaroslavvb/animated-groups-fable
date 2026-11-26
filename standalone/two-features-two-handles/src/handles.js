@@ -1927,6 +1927,8 @@ export function sitesForBall(built, pair, k = '3333') {
 /** The pair-centred pattern of a state, whichever family it is of; commas: a print in place of the family's own. */
 export function centredFor(state, { dark = false, commas = null } = {}) {
   const fam = FAMILIES[state.k];
+  // the print: the state's own (page.js keeps it across picks) or the family's, at its size for this state
+  if (!commas) commas = paisley.specsAt(state.print || paisley.print(state.k), state);
   if (fam.mode === 'pillow') return pillowCentered(state.L, state.tw, { thetas: state.thetas, perm: state.perm, commas });
   if (fam.mode === 'cones') return fourConeCentered(state.orders, state.L, state.tw, { thetas: state.thetas, perm: state.perm, k: state.k, commas });
   if (fam.mode === 'handle') return o33Centered(state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { thetas: state.thetas, perm: state.perm, dark, k: state.k, commas });
@@ -1936,6 +1938,58 @@ const paisley = createPaisley({ families: FAMILIES, centred: (st, commas) => cen
 /** The view in which a family's default pattern lies exactly as on the Classification of Surfaces page, or null. */
 export const paisleyView = (k) => (FAMILIES[k] ? paisley.view(k) : null);
 export const paisleyInfo = (k) => (FAMILIES[k] ? paisley.info(k) : null);
+/** The family's print at its default numbers: { k, perm, twBase, fit, specs } (paisley.js). */
+export const paisleyPrint = (k) => (FAMILIES[k] ? paisley.print(k) : null);
+/**
+ * After a pick: the commas as they were drawn in the state before it (at the size they had there), tied anew to
+ * the blocks of the new pair's cut. Nothing moves.
+ */
+export function retiePrint(after, before) {
+  const pr = before.print || paisley.print(before.k);
+  return paisley.retie({ ...after, print: null }, { ...pr, specs: paisley.specsAt(pr, before) || pr.specs, fit: 1 });
+}
+/** How large the print is drawn at a state (1: as laid). */
+export const printScale = (state) => paisley.scaleAt(state.print || paisley.print(state.k), state);
+/**
+ * The print and the comma angles of a link to another pair than the family's own: what picks leave on the default
+ * pattern. The shortest chain of picks that names the four features as the link does is run (at most four; the
+ * pairs are tried in one fixed order), and the default print, which no pick moves, is tied to the blocks of the
+ * last pick's cut. The link's own numbers then carry it from there. null where the pair is the family's own, or
+ * no chain of picks names the features so (a hand-written m): then the family's print is drawn in the link's
+ * frames, as before.
+ */
+const linkedCache = new Map();
+export function linkedPrint(k, perm) {
+  const fam = FAMILIES[k], target = perm.join('');
+  if (!fam || target === fam.defaultM) return null;
+  const cacheKey = k + ' ' + target;
+  if (linkedCache.has(cacheKey)) return linkedCache.get(cacheKey);
+  let out = null;
+  try {
+    const p0 = fam.defaultM.split('').map(Number);
+    const st0 = { k, perm: p0, orders: p0.map((c) => fam.baseOrders[c]), L: fam.defaultL, tw: fam.defaultTw, b: fam.defaultB ?? 0, tau: fam.defaultTau ?? 0, thetas: defaultCommas(k).map((sp) => (sp ? sp.theta : 0)) };
+    const seen = new Map([[fam.defaultM, { st: st0, prev: null }]]);
+    let frontier = [st0];
+    for (let depth = 0; depth < 4 && !seen.has(target) && frontier.length; depth++) {
+      const next = [];
+      for (const st of frontier) for (const [i, j] of [[0, 1], [2, 3], [0, 2], [1, 3], [1, 2], [0, 3]]) {
+        let r = null;
+        try { r = recut(st, i, j); } catch (err) { continue; }
+        const key = r.perm.join('');
+        if (seen.has(key)) continue;
+        const st1 = { k, perm: r.perm, orders: r.orders, L: r.L, tw: r.tw, b: r.b ?? st.b, tau: r.tau ?? st.tau, thetas: r.thetas };
+        seen.set(key, { st: st1, prev: st });
+        next.push(st1);
+      }
+      frontier = next;
+    }
+    const hit = seen.get(target);
+    if (hit && hit.prev) out = { print: retiePrint(hit.st, hit.prev), thetas: hit.st.thetas.slice(), base: { L: hit.st.L, tw: hit.st.tw, b: hit.st.b, tau: hit.st.tau } };
+  } catch (err) { out = null; }
+  linkedCache.set(cacheKey, out);
+  return out;
+}
+
 /**
  * Is this state a family's default numbers, with its default pair? There the pattern is the one the Classification
  * of Surfaces page draws for the signature, and it opens (and resets) lying as it lies there: that page's tile in

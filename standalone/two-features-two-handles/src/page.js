@@ -6,7 +6,7 @@ import {
   followTreeData, interpolateView,
   stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
-  defaultCommas, buildPatternModel, atDefaults, paisleyView, paisleyInfo,
+  defaultCommas, buildPatternModel, atDefaults, paisleyView, paisleyInfo, retiePrint, linkedPrint, printScale,
   psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist,
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
@@ -552,7 +552,7 @@ function pickPair(i, j, { glide = true } = {}) {
 
   const fam = FAMILIES[state.k];
   const before = pattern.getView();
-  const next = recut(state, i, j);
+  const next = recut(state, i, j), stateBefore = state;
   state = {
     k: next.k,
     perm: next.perm,
@@ -563,6 +563,8 @@ function pickPair(i, j, { glide = true } = {}) {
     tau: next.tau ?? state.tau,
     thetas: next.thetas,
   };
+  // the commas stay where they are, and are tied to the blocks of the new pair's cut: a Twist then slides them whole
+  try { state.print = retiePrint(state, stateBefore); } catch (err) { state.print = stateBefore.print || null; }
   older = next.perm[0];
   newer = next.perm[1];
   promoted = null;
@@ -641,6 +643,7 @@ function setFamily(k, opts = {}) {
   const fam = FAMILIES[key];
   const prevK = state.k;
   const perm = opts.perm || fam.defaultM.split('').map(Number);
+  const linked = opts.thetas ? null : linkedPrint(fam.k, perm);          // another pair than the family's own: the print a pick of it leaves
   state = {
     k: fam.k,
     perm,
@@ -649,7 +652,8 @@ function setFamily(k, opts = {}) {
     tw: opts.tw ?? fam.defaultTw,
     b: opts.b ?? (fam.defaultB ?? 0),
     tau: opts.tau ?? (fam.defaultTau ?? 0),
-    thetas: opts.thetas || defaultThetas(fam.k),
+    thetas: opts.thetas || (linked ? linked.thetas : defaultThetas(fam.k)),
+    print: linked ? linked.print : null,
   };
   older = perm[0];
   newer = perm[1];
@@ -886,6 +890,7 @@ function stateSummary() {
     promoted,
     custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
     classified: { at: atDefaults(state), view: paisleyView(state.k), ...paisleyInfo(state.k) },
+    print: { scale: printScale(state), fit: state.print ? state.print.fit : paisleyInfo(state.k).fit, own: !!state.print, joint: state.print && state.print.joint ? { delta: state.print.joint.delta, clear: state.print.joint.clear, seal: !!state.print.joint.seal, fitted: !!state.print.joint.fitted } : paisleyInfo(state.k).joint },
     autoCenter,
     moment: activeMoment,
     follow: !!(followState && followState.active),

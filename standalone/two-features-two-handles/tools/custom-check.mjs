@@ -24,7 +24,7 @@ if (shots) fs.mkdirSync(shots, { recursive: true });
 
 let failed = 0, errors = 0;
 const ok = (cond, what, extra = '') => { if (!cond) failed++; console.log(`${cond ? 'ok  ' : 'FAIL'} ${what}${cond ? '' : '  ' + extra}`); };
-const S = (T) => T.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, classified: s.classified, tab: s.tab, pat: s.pattern, moment: s.moment }; });
+const S = (T) => T.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, classified: s.classified, print: s.print, tab: s.tab, pat: s.pattern, moment: s.moment }; });
 // the same engine in node: the print must come out the same on every machine
 const engine = await import(path.join(root, 'src/handles.js'));
 const mul3 = (A, B) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => A[3 * r] * B[c] + A[3 * r + 1] * B[3 + c] + A[3 * r + 2] * B[6 + c]));
@@ -80,7 +80,8 @@ try {
       await page.waitForTimeout(350);
       const s = await S(T), mine = engine.paisleyInfo(k);
       ok(s.k === k && s.classified.at && s.classified.exact && offClassified(s) < 1e-6, `${k}: opens on the Classification page's pattern, lying as it lies there`, JSON.stringify([s.classified.at, s.classified.exact, offClassified(s)]));
-      ok(s.pat.shapes === mine.tied.length && s.classified.tied.join() === mine.tied.join() && s.classified.shapes === mine.shapes, `${k}: the same parts on the same cone points here as in node`, JSON.stringify([s.pat.shapes, s.classified.tied, mine.tied]));
+      ok(s.pat.shapes === mine.tied.length && s.classified.tied.join() === mine.tied.join() && s.classified.shapes === mine.shapes, `${k}: the same commas on the same cone points here as in node`, JSON.stringify([s.pat.shapes, s.classified.tied, mine.tied]));
+      ok(s.pat.shapes === s.classified.shapes && s.classified.joint.clear && s.print.scale === 1 && Math.abs(s.classified.joint.delta - mine.joint.delta) < 1e-6, `${k}: every comma whole, at that page's size, and a joint that runs through none`, JSON.stringify([s.pat.shapes, s.classified.shapes, s.classified.joint, s.print]));
       await shot(page, 'p-' + k.replace('*', 's'));
     }
     // a slider moves: the pattern holds its place (the view is not touched), and Reset then centres on the pair
@@ -90,8 +91,49 @@ try {
     await T.evaluate(() => { const r = document.getElementById('tw-range'); r.value = '0.62'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); });
     await page.waitForTimeout(400);
     let s = await S(T);
-    ok(!s.classified.at && Math.abs(s.tw - before.tw) > 0.05 && s.pat.shapes === before.pat.shapes, 'Twist moved: the same parts, cut along the cut beforehand, slide', JSON.stringify([s.tw, s.pat.shapes]));
+    ok(!s.classified.at && Math.abs(s.tw - before.tw) > 0.05 && s.pat.shapes === before.pat.shapes && s.pat.shapes === s.classified.shapes && s.print.scale === 1, 'Twist moved on 3333: the same commas, whole and at their size, ride with their blocks', JSON.stringify([s.tw, s.pat.shapes, s.print]));
     await shot(page, 'p-3333-twist');
+    // his example: "…#k=2222&m=0123&l=1&tw=0.0067, if I apply the twist, it breaks comma"
+    {
+      const ex = await newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 }, '#k=2222&m=0123&l=1&tw=0.0067');
+      let se = await S(ex.T);
+      ok(se.k === '2222' && Math.abs(se.tw - 0.0067) < 1e-9 && se.pat.shapes === se.classified.shapes && se.print.scale === 1, 'his link to 2222 at Twist 0.0067: two whole commas a tile', JSON.stringify([se.tw, se.pat.shapes, se.classified.shapes, se.print]));
+      for (const u of ['0.8', '0.07', '1']) {
+        await ex.T.evaluate((v) => { const r = document.getElementById('tw-range'); r.value = v; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); }, u);
+        await ex.page.waitForTimeout(250);
+        se = await S(ex.T);
+        ok(se.pat.shapes === se.classified.shapes && se.print.scale === 1, `2222 at Twist ${se.tw.toFixed(2)}: still two whole commas a tile, at their size`, JSON.stringify([se.pat.shapes, se.print]));
+      }
+      await shot(ex.page, 'p-2222-twist');
+      await ex.ctx.close();
+    }
+    // 333∗: one comma fills the tile, larger than any block: whole all the same, drawn in a little once the Twist leaves the family's own
+    await T.click('[data-fam="333*"]');
+    await page.waitForTimeout(300);
+    const star0 = await S(T);
+    await T.evaluate(() => { const r = document.getElementById('tw-range'); r.value = '0.75'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); });
+    await page.waitForTimeout(400);
+    s = await S(T);
+    ok(star0.print.scale === 1 && star0.print.fit < 1 && s.pat.shapes === 1 && s.print.scale < 1 && Math.abs(s.print.scale - s.print.fit) < 1e-9, '333∗ twisted: its one comma whole, drawn in to its block', JSON.stringify([star0.print, s.pat.shapes, s.print]));
+    await shot(page, 'p-333s-twist');
+    // a pick: the commas stay and are tied to the new pair's blocks; a Twist along the new cut keeps them whole; the link says the same
+    await T.click('[data-fam="3333"]');
+    await page.waitForTimeout(300);
+    await T.evaluate(() => window.__handles.pick(0, 2, { glide: false }));
+    await page.waitForTimeout(400);
+    s = await S(T);
+    ok(s.m !== before.m && s.print.own && s.print.joint.clear && s.pat.shapes === before.pat.shapes && s.print.scale === 1, 'a pick on 3333: the same commas, tied to the new pair\'s blocks', JSON.stringify([s.m, s.print, s.pat.shapes]));
+    await T.evaluate(() => { const r = document.getElementById('tw-range'); r.value = '0.3'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); });
+    await page.waitForTimeout(400);
+    s = await S(T);
+    ok(s.pat.shapes === before.pat.shapes && s.print.scale === 1, 'and a Twist along the new cut: whole, at their size', JSON.stringify([s.tw, s.pat.shapes, s.print]));
+    await shot(page, 'p-3333-pick-twist');
+    {
+      const linked = await newPage({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }, s.hash);
+      const sl = await S(linked.T);
+      ok(sl.m === s.m && sl.print.own && sl.print.joint.clear && Math.abs(sl.print.joint.delta - s.print.joint.delta) < 1e-6 && sl.pat.shapes === s.pat.shapes, 'the link to that state opens with the same print', JSON.stringify([sl.m, sl.print, s.print]));
+      await linked.ctx.close();
+    }
     await T.click('#reset2');
     await page.waitForTimeout(300);
     s = await S(T);

@@ -13,26 +13,41 @@
 //      tile's cone points on two of this pattern's, and keeps the motion only if it carries every gluing of that
 //      tile to a symmetry of this pattern. No table: the two groups are compared.
 //   2. That page's commas, carried by that motion, are the print at the default numbers: the same picture.
-//   3. That page's commas are large: at the default numbers the isolating cut of the default pair runs through
-//      them. A Twist cuts the pattern along that cut and slides one side along the other ("cut and slide",
-//      rigid-print.js), so each comma is cut along it beforehand, once, into the part on each side. At Twist 0 the
-//      parts lie together as that page's comma; a Twist slides them apart along the dashed line, as a fault does.
-//   4. Each part is then tied to a cone point on its own side of the cut, in that cone point's own frame (toward
-//      its partner), and rides with it for good. Length, Twist and the shifts move cone points, and a part goes
-//      with its own; a re-cut turns the frame under it by the angle handles.js already keeps (thetas), so it stays
-//      where it was. (Only the default pair's cut is prepared: cut along all three, a comma would be confetti.
-//      After a pick, a Twist carries whole parts, and they may come to overlap. So may they under Length: no
-//      motion of the plane takes one length of the cut to another.)
+//   3. A Twist must not break a comma. His ask on seeing the first version (each comma cut along the isolating
+//      cut, the halves sliding apart): "make sure that this is changed so that there are less breaks in pattern …
+//      Find out what is done in …twist-of-2222… to avoid breaks in commas. On that page, all the shearing I can
+//      apply doesn't actually change the pattern. The commas are all whole. If it's possible to make generalizable,
+//      apply this to other orbifolds as well", and: "for 2222, we can draw on the original orbifold, and then twist
+//      parameter just affects how the copies of that pattern stack up together".
+//      What that page does: its print belongs to the paper. The dominoes along a row of the picked pair make a
+//      block, and a twist slides whole blocks along the rows of the other pair's centres: the print's joint is
+//      that row (the far seal), where no comma lies, not the loop drawn between the two rows.
+//      What carries over: a Twist slides the two sides of the isolating cut along it, and that slide carries
+//      every curve that keeps its distance from the cut along itself. So the print may be parted along any such
+//      curve (on the plane a parallel line: the far row is one). jointOf looks for one that runs through no
+//      comma; then the orbifold falls into pieces that no Twist changes, with the commas drawn whole on them, and
+//      a Twist only changes how the pieces are stacked.
+//   4. Each comma is tied to a cone point of its piece (its block), in that cone point's own frame (toward its
+//      partner), and rides with it for good (tie). Where a comma is larger than any block (333∗: one comma fills
+//      the tile) it is drawn in toward its cone point until it fits, over the first fortieth of a turn of Twist
+//      away from where the print was laid (scaleAt); at that Twist itself it is that page's comma, whole.
+//   5. A pick moves nothing, as before (handles.js thetas). It re-ties the same commas to the blocks of the new
+//      pair's cut (retie), so that a Twist along that cut slides them whole too. Under Length a comma still rides
+//      rigid with its cone point, and commas can come to overlap: no motion of the plane takes one length of the
+//      cut to another.
 //
 // Where no such motion is found (a typed signature whose default numbers are not that page's metric: one with a
 // mirror, a crosscap or a handle), the same design is laid on this page's own default tile: Paisley still, in the
 // same tones, though not that page's very picture.
 //
-//   createPaisley({ families, centred, GH, GE }) -> { specs(k), view(k), info(k) }
+//   createPaisley({ families, centred, GH, GE }) -> { specs(k), view(k), info(k), print(k), retie, specsAt, scaleAt }
 //     centred(state, commas)   the page's pattern for a state, drawn with the given commas (handles.js)
 //     specs(k)   per feature: null, or { theta: 0, shapes: [{ pts, min }] } in that feature's frame at the default numbers
 //     view(k)    the view in which the default pattern lies exactly as on that page (a motion of the plane), or null
-//     info(k)    { exact, shapes, split, tied: [feature of each part] }: for the checks
+//     info(k)    { exact, shapes, split, joint: { delta, clear, seal, fitted, rhoA, rhoC }, fit, tied: [feature of each comma] }: for the checks
+//     print(k)   the family's print: { k, perm, twBase, fit, specs }
+//     retie(state, print) -> print     after a pick: the same commas, tied to the new pair's blocks
+//     specsAt(print, state)            the commas to draw at a state (drawn in by scaleAt where they must be)
 
 import { apply, mul, inv as inv3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { analyse, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
@@ -63,17 +78,40 @@ const side = (m, p) => m[0] * p[0] + m[1] * p[1] + m[2] * p[2];
 const flatOf = (G, p) => (G.kind === 'H' ? [p[0] / (1 + p[2]), p[1] / (1 + p[2])] : [p[0], p[1]]);
 /** An order of places that no machine's rounding decides: the higher on the pane first, then the further left. */
 const byPlace = (a, b) => (Math.abs(a[1] - b[1]) > 1e-7 ? b[1] - a[1] : Math.abs(a[0] - b[0]) > 1e-7 ? a[0] - b[0] : 0);
-/** The part of the outline `pts` on the side sgn of the line m, and a hair (lap) beyond it: the two parts of a comma overlap by two hairs, so no seam shows where they meet. */
-function partOf(G, pts, m, sgn, lap) {
+/** side() as a distance: itself on the plane, its asinh on the hyperbolic plane; and back. */
+const toDist = (G, v) => (G.kind === 'H' ? Math.asinh(v) : v), toSide = (G, d) => (G.kind === 'H' ? Math.sinh(d) : d);
+/** How far apart two lines that do not meet are (on2: a point of the second). */
+const lineGap = (G, m1, m2, on2) => (G.kind === 'H' ? Math.acosh(Math.max(1, Math.abs(m1[0] * m2[0] + m1[1] * m2[1] - m1[2] * m2[2]))) : Math.abs(side(m1, on2)));
+/**
+ * The part of the outline `pts` on the side sgn of the curve side(m, .) = c (the line m itself for c = 0, else a
+ * curve that keeps its distance from it), and a hair (lap) beyond it: the two parts of a comma overlap by two
+ * hairs, so no seam shows where they meet.
+ */
+function partOf(G, pts, m, sgn, lap, c = 0) {
   const out = [], n = pts.length;
   for (let i = 0; i < n; i++) {
-    const a = pts[i], b = pts[(i + 1) % n], sa = sgn * side(m, a) + lap, sb = sgn * side(m, b) + lap;
+    const a = pts[i], b = pts[(i + 1) % n], sa = sgn * (side(m, a) - c) + lap, sb = sgn * (side(m, b) - c) + lap;
     if (sa >= 0) out.push(a);
     if ((sa > 0 && sb < 0) || (sa < 0 && sb > 0)) out.push(G.norm([(a[0] * sb - b[0] * sa) / (sb - sa), (a[1] * sb - b[1] * sa) / (sb - sa), (a[2] * sb - b[2] * sa) / (sb - sa)]));
   }
   return out;
 }
 const LAP = 0.004;          // a third of a pixel in the middle of the pane
+const CLEAR = 0.012;        // how far a joint keeps from a comma for choice: a pixel
+const TIGHT = 0.001;        // and at the very least
+const TURN = 0.025;         // over this much Twist a comma larger than its block is drawn in to fit it (of a whole turn)
+
+/** A point given in a cone point's own frame (the cone point at the origin), drawn in toward the cone point by the factor s. */
+function drawnIn(G, p, s) {
+  if (s === 1) return p;
+  if (G.kind !== 'H') return [s * p[0], s * p[1], 1];
+  const r = Math.acosh(Math.max(1, p[2])), sh = Math.sinh(r);
+  if (sh < 1e-12) return p;
+  const k = Math.sinh(s * r) / sh;
+  return [k * p[0], k * p[1], Math.cosh(s * r)];
+}
+/** The middle of an outline. */
+const midOf = (G, pts) => G.norm(pts.reduce((sum, p) => [sum[0] + p[0], sum[1] + p[1], sum[2] + p[2]], [0, 0, 0]).map((x) => x / pts.length));
 
 export function createPaisley({ families, centred, GH, GE }) {
   const cache = new Map(), busy = new Set();
@@ -190,67 +228,256 @@ export function createPaisley({ families, centred, GH, GE }) {
     }
     if (!shapes) shapes = design(D).map((sh) => ({ pts: sh.pts.slice(), min: sh.min }));
 
-    // Cut each comma along the default pair's isolating cut, wherever a lift of the cut crosses it. Only where each
-    // side of the cut has a cone point to carry its parts (not o33: its handle has none, and its commas stay whole).
+    const tied = tie(G, fam, st.perm, base, frame, ts, shapes, null);
+    const print = { k, perm: st.perm.slice(), twBase: st.tw, fit: tied.fit, specs: tied.specs };
+    return { specs: tied.specs, print, view, exact, tied: tied.tied, count: shapes.length, split: tied.parts > shapes.length, joint: tied.joint };
+  }
+
+  /**
+   * After a pick: the commas stay where they are drawn, and are tied anew, each to a cone point of its block of
+   * the NEW pair's cut, so that a Twist along that cut slides them whole too. `state` is the state after the pick
+   * (its thetas keep the old print in place), `pr` the print before it. Nothing moves.
+   */
+  function retie(state, pr) {
+    const fam = families[state.k], G = fam.kind === 'E' ? GE : GH;
+    const probePts = [G.origin, G.polar(0.5, 0), G.polar(0.5, Math.PI / 2)];
+    const base = centred(state, [0, 1, 2, 3].map((f) => ({ theta: state.thetas[f] || 0, shapes: [{ pts: probePts, min: 0 }] })));
+    const frame = base.shapes.map((sh) => G.frame(sh.pts[0], sh.pts[1]));
+    const ts = tiles(base.D, base.A, { radius: fam.kind === 'E' ? 9 : 9.5, max: 3000, ms: 60000 });
+    const shown = centred(state, specsAt(pr, state) || pr.specs).shapes.map((sh) => ({ pts: sh.pts, min: sh.min }));
+    const tied = tie(G, fam, state.perm, base, frame, ts, shown, state.thetas);
+    return { k: state.k, perm: state.perm.slice(), twBase: state.tw, fit: tied.fit, specs: tied.specs, joint: tied.joint, tied: tied.tied };
+  }
+
+  /**
+   * How large the print is drawn at a Twist: whole (1) for a print whose commas fit their blocks, and at the
+   * Twist the print was laid at; else drawn in toward the cone points, down to the print's `fit`, over the first
+   * TURN of Twist away from there. (A whole turn away is the same pattern again, and the same size.)
+   */
+  function scaleAt(pr, state) {
+    if (!pr || !(pr.fit < 1) || pr.perm.join('') !== state.perm.join('')) return 1;
+    let d = Math.abs(state.tw - pr.twBase);
+    d = Math.min(d, Math.abs(1 - d));
+    const x = Math.min(1, d / TURN);
+    return pr.fit + (1 - pr.fit) * (1 - x) * (1 - x);
+  }
+  /** The commas to draw at a state: the print's own, or drawn in (scaleAt). */
+  function specsAt(pr, state) {
+    if (!pr) return null;
+    const sc = scaleAt(pr, state);
+    if (sc === 1) return pr.specs;
+    const G = families[state.k].kind === 'E' ? GE : GH;
+    return pr.specs.map((sp) => sp && { theta: sp.theta, shapes: sp.shapes.map((sh) => ({ pts: sh.pts.map((q) => drawnIn(G, q, sc)), min: sh.min })) });
+  }
+
+  /**
+   * The lifts of the isolating cut round the middle, each once and each with its sides named: side(m, p) > 0 on
+   * the side of the far pair. (A cut through two half-turn centres is its own image turned over, so it comes
+   * twice, once for each side. That is right: it is a seal, with a block of the picked pair's on either side.)
+   * The first is the model's own.
+   */
+  function liftsOf(G, model, ts, coneSlots, reach) {
+    const [a0, b0] = model.cutSeg, out = [], seen = new Set(), lim = toSide(G, reach);
+    const put = (M) => {
+      const a = M ? apply(M, a0) : a0, b = M ? apply(M, b0) : b0;
+      let m = lineOf(G, a, b);
+      if (M && Math.abs(side(m, G.origin)) > lim) return;
+      let s = 0;
+      for (const slot of coneSlots) { const h = model.home[slot], v = side(m, M ? apply(M, h) : h); s += slot < 2 ? -v : v; }
+      if (s < 0) m = [-m[0], -m[1], -m[2]];
+      const key = Math.round(m[0] * 1e5) + ':' + Math.round(m[1] * 1e5) + ':' + Math.round(m[2] * 1e5);
+      if (seen.has(key)) return;
+      seen.add(key);
+      out.push({ m, on: G.mix(a, b, 0.5) });
+    };
+    put(null);
+    for (const t of ts) put(t.M);
+    return out;
+  }
+
+  /**
+   * Where the print may be parted. A Twist cuts the pattern along the lifts of the isolating cut and slides one
+   * side along the other. The same slide carries every curve that keeps its distance from a lift along itself, so
+   * the print can be parted along such a curve instead (its JOINT), at an offset d from every lift, d > 0 toward
+   * the far pair: on the plane a parallel line, and for 2222 the row of the far pair's centres, which is what the
+   * Twist of 2222 page does. Any offset will do at which the joints of different lifts do not meet and no cone
+   * point is passed: from -rhoA to rhoC. (A pair of half-turn centres lies ON its cut: the range ends at 0 there,
+   * and the cut itself is the joint, a seal.) The offset is taken where the joints run through no comma, if there
+   * is such a stretch: on the far side for choice (the commas by the picked pair then ride with it and the picture
+   * round the pair holds still), the widest stretch, its middle. Then no comma is ever cut and none meets another,
+   * at any Twist: each rides whole with its block. `clear` says whether there was such a stretch.
+   */
+  function jointOf(G, lifts, shapes, cones) {
+    const l0 = lifts[0];
+    let rhoA = Infinity, rhoC = Infinity, sealA = false, sealC = false;
+    for (let i = 1; i < lifts.length; i++) {
+      const l = lifts[i], v0 = toDist(G, side(l0.m, l.on)), v1 = toDist(G, side(l.m, l0.on));
+      if (Math.abs(v0) < 1e-7 && Math.abs(v1) < 1e-7) continue;          // the cut itself, the other way up
+      const gap = lineGap(G, l0.m, l.m, l.on) / 2;
+      if (v0 > 0 && v1 > 0) rhoC = Math.min(rhoC, gap); else if (v0 < 0 && v1 < 0) rhoA = Math.min(rhoA, gap);
+    }
+    for (const c of cones) {
+      const v = toDist(G, side(l0.m, c.p));
+      if (Math.abs(v) < 1e-7) { if (c.far) sealC = true; else sealA = true; } else if (v > 0) rhoC = Math.min(rhoC, v); else rhoA = Math.min(rhoA, -v);
+    }
+    if (sealC) rhoC = 0;
+    if (sealA) rhoA = 0;
+    const EDGE = 1e-3, from = sealA ? 0 : -(rhoA - EDGE), to = sealC ? 0 : rhoC - EDGE;
+    // the stretches of offsets at which some lift's joint would run through some comma
+    const raw = [];
+    for (const sh of shapes) for (const l of lifts) {
+      let lo = Infinity, hi = -Infinity;
+      for (const q of sh.pts) { const d = side(l.m, q); if (d < lo) lo = d; if (d > hi) hi = d; }
+      lo = toDist(G, lo); hi = toDist(G, hi);
+      if (hi <= from - CLEAR || lo >= to + CLEAR) continue;
+      raw.push([lo, hi]);
+    }
+    raw.sort((x, y) => x[0] - y[0]);
+    /** The stretches of offsets that keep `margin` from every comma. */
+    const freeAt = (margin) => {
+      const out = [];
+      let at = from;
+      for (const [lo, hi] of raw) { if (lo - margin > at) out.push([at, Math.min(lo - margin, to)]); if (hi + margin > at) at = hi + margin; if (at >= to) break; }
+      if (at < to) out.push([at, to]);
+      return out;
+    };
+    // a seal is a joint if no comma lies across it, however near one comes
+    const sealFree = (sealA || sealC) && raw.every(([lo, hi]) => !(lo < -1e-4 && hi > 1e-4));
+    const widest = (list) => list.reduce((best, g) => (!best || g[1] - g[0] > best[1] - best[0] + 1e-9 ? g : best), null);
+    let delta = 0, clear = true, free = [], far = null, near = null;
+    for (const margin of [CLEAR, TIGHT]) {          // a pixel's clearance if there is such a stretch, else any clearance at all
+      free = freeAt(margin);
+      far = widest(free.map((g) => [Math.max(g[0], 0), g[1]]).filter((g) => g[1] - g[0] > 1e-4));
+      near = widest(free.map((g) => [g[0], Math.min(g[1], 0)]).filter((g) => g[1] - g[0] > 1e-4));
+      if (far || near) break;
+    }
+    if (sealC && sealFree) delta = 0;
+    else if (far) delta = (far[0] + far[1]) / 2;
+    else if (sealA && sealFree) delta = 0;
+    else if (near) delta = (near[0] + near[1]) / 2;
+    else {
+      // No such stretch: a comma is larger than any block (333∗: one comma fills the tile). Then the offset at which
+      // the joints cross the fewest commas, and of those the one that takes the least off the comma it crosses.
+      clear = false;
+      let bestCuts = Infinity, bestDepth = Infinity;
+      for (let i = 0; i <= 200; i++) {
+        const d = from + ((to - from) * i) / 200;
+        let cuts = 0, depth = 0;
+        for (const [lo, hi] of raw) if (lo + 2 * LAP < d && d < hi - 2 * LAP) { cuts++; depth += Math.min(d - lo, hi - d); }
+        if (cuts < bestCuts || (cuts === bestCuts && depth < bestDepth - 1e-9)) { bestCuts = cuts; bestDepth = depth; delta = d; }
+      }
+    }
+    return { delta, clear, rhoA, rhoC, seal: (sealC || sealA) && delta === 0, free };
+  }
+
+  /**
+   * Tie every comma to a cone point of its block: one on its own side of every joint (jointOf), near its middle,
+   * in that cone point's own frame (toward its partner). It rides with it for good: Length, Twist and the shifts
+   * move cone points, and a comma goes with its own; a re-cut turns the frame under it by the angle handles.js
+   * keeps (thetas), so it stays where it was.
+   *
+   * Where the joints cannot miss the commas, a comma is larger than any block (333∗: one comma fills the tile).
+   * It is still tied whole, to the block its middle is in, and `fit` says how far in toward its cone point it has
+   * to be drawn for the joints to miss it (scaleAt draws it so once the Twist has left the print's own). Only if
+   * no drawing-in helps is it cut along the joint, into the part on each side.
+   *
+   * A comma in the middle of a cell is about as near to two corners of the cell, so "the nearest" would be decided
+   * by the last digit: of the cone points within an eighth of the nearest one's distance, it goes to the one that
+   * carries fewer so far, then to the nearer, then to the lower number. (The commas are taken in their own order
+   * and a comma's parts by place: which side of a line a machine calls the first must not decide who carries
+   * what. Nor must the order of the tiles: of two copies of a cone point as near, the one by place.)
+   */
+  function tie(G, fam, perm, model, frame, ts, shapes, thetas) {
+    const inv = G.inv || inv3;
     const coneFeats = [0, 1, 2, 3].filter((f) => fam.baseOrders[f] > 1);
-    const sideOfFeat = (f) => (st.perm.indexOf(f) < 2 ? 0 : 1);
-    const split = !!base.cutSeg && [0, 1].every((sd) => coneFeats.some((f) => sideOfFeat(f) === sd));
-    const cuts = split ? ts.map((t) => lineOf(G, apply(t.M, base.cutSeg[0]), apply(t.M, base.cutSeg[1]))) : [];
-    let parts = shapes.map((sh, j) => ({ pts: sh.pts, min: sh.min, j }));
-    for (const m of cuts) {
-      let crossed = false;
+    const homes = coneFeats.map((f) => { const slot = perm.indexOf(f), p = model.home[slot]; return { f, far: slot >= 2, copies: ts.map((t) => apply(t.M, p)) }; });
+    const lifts = model.cutSeg && coneFeats.length ? liftsOf(G, model, ts, coneFeats.map((f) => perm.indexOf(f)), G.kind === 'E' ? 8 : 6) : [];
+    const cones = [];
+    for (const h of homes) for (const p of h.copies) cones.push({ p, far: h.far });
+    // in one block: on the same side of every joint (a cone point ON a joint, a seal's, carries nothing)
+    const together = (x, q, c) => { for (const l of lifts) { const u = side(l.m, q) - c; if (Math.abs(u) < 1e-7 || (side(l.m, x) - c) * u < 0) return false; } return true; };
+    /** Each part with the cone point that carries it: { pc, f, q (where that cone point is), back, fwd (to its frame and from it) }. */
+    const assign = (parts, c) => {
+      for (const pc of parts) pc.mid = midOf(G, pc.pts);
+      parts.sort((x, y) => x.j - y.j || byPlace(flatOf(G, x.mid), flatOf(G, y.mid)));
+      const has = [0, 0, 0, 0], out = [];
       for (const pc of parts) {
-        let lo = Infinity, hi = -Infinity;
-        for (const p of pc.pts) { const d = side(m, p); if (d < lo) lo = d; if (d > hi) hi = d; }
-        pc.lo = lo; pc.hi = hi;
-        if (lo < -2 * LAP && hi > 2 * LAP) crossed = true;
+        const mid = pc.mid, near = [], any = [];
+        for (const h of homes) {
+          const order = h.copies.map((q, i) => [apart(G, q, mid), i]).sort((x, y) => (Math.abs(x[0] - y[0]) > 1e-9 * Math.max(1, Math.abs(x[0])) ? x[0] - y[0] : byPlace(flatOf(G, h.copies[x[1]]), flatOf(G, h.copies[y[1]])) || x[1] - y[1]));
+          if (order.length) any.push({ d: G.dist(h.copies[order[0][1]], mid), f: h.f, i: order[0][1], q: h.copies[order[0][1]] });
+          for (let j = 0; j < Math.min(order.length, 60); j++) {
+            const i = order[j][1];
+            if (together(mid, h.copies[i], c)) { near.push({ d: G.dist(h.copies[i], mid), f: h.f, i, q: h.copies[i] }); break; }
+          }
+        }
+        const pool = near.length ? near : any;          // no cone point in its block within reach: the nearest of all
+        if (!pool.length) continue;
+        const dmin = Math.min(...pool.map((x) => x.d));
+        const cands = pool.filter((x) => x.d <= 1.125 * dmin + 1e-6);
+        cands.sort((x, y) => (has[x.f] - has[y.f]) || (Math.abs(x.d - y.d) > 1e-6 ? x.d - y.d : x.f - y.f));
+        const pick = cands[0];
+        has[pick.f]++;
+        const fwd = mul(ts[pick.i].M, frame[pick.f]);
+        out.push({ pc, f: pick.f, q: pick.q, fwd, back: inv(fwd) });
       }
-      if (!crossed) continue;
-      const next = [];
-      for (const pc of parts) {
-        if (!(pc.lo < -2 * LAP && pc.hi > 2 * LAP)) { next.push(pc); continue; }
-        for (const sgn of [1, -1]) { const pts = partOf(G, pc.pts, m, sgn, LAP); if (pts.length >= 3) next.push({ pts, min: pc.min, j: pc.j }); }
+      return out;
+    };
+
+    const whole = () => shapes.map((sh, j) => ({ pts: sh.pts, min: sh.min, j }));
+    let joint = lifts.length ? jointOf(G, lifts, shapes, cones) : { delta: 0, clear: true, rhoA: 0, rhoC: 0, seal: false, free: [] };
+    let ties = null, fit = 1;
+    if (joint.clear) ties = assign(whole(), toSide(G, joint.delta));
+    else {
+      // larger than any block: whole all the same, and how far in they must be drawn for the joints to miss them
+      const loose = assign(whole(), toSide(G, joint.delta));
+      const drawn = (sc) => loose.map((t) => ({ pts: t.pc.pts.map((q) => G.norm(apply(t.fwd, drawnIn(G, G.norm(apply(t.back, q)), sc)))), min: t.pc.min }));
+      const fits = (sc) => {
+        const sh = drawn(sc), j = jointOf(G, lifts, sh, cones);
+        if (!j.clear) return null;
+        const c = toSide(G, j.delta);
+        for (let i = 0; i < sh.length; i++) if (!together(midOf(G, sh[i].pts), loose[i].q, c)) return null;
+        return j;
+      };
+      let lo = 0, hi = 0, found = null;
+      for (let sc = 0.96; sc >= 0.34 && !found; sc -= 0.04) { const j = fits(sc); if (j) { found = j; lo = sc; hi = sc + 0.04; } }
+      if (found) {
+        for (let it = 0; it < 6; it++) { const mid = (lo + hi) / 2, j = fits(mid); if (j) { lo = mid; found = j; } else hi = mid; }
+        fit = lo * 0.985;          // a little inside the largest that fits, so the joints clear the commas by more than a hair
+        joint = { ...(fits(fit) || found), clear: true, fitted: true };
+        ties = loose;
       }
-      parts = next;
+    }
+    if (!ties) {
+      // no drawing-in helps: cut along the joints that cross
+      const c = toSide(G, joint.delta);
+      let parts = whole();
+      for (const l of lifts) {
+        let crossed = false;
+        for (const pc of parts) {
+          let lo = Infinity, hi = -Infinity;
+          for (const p of pc.pts) { const d = side(l.m, p) - c; if (d < lo) lo = d; if (d > hi) hi = d; }
+          pc.lo = lo; pc.hi = hi;
+          if (lo < -2 * LAP && hi > 2 * LAP) crossed = true;
+        }
+        if (!crossed) continue;
+        const next = [];
+        for (const pc of parts) {
+          if (!(pc.lo < -2 * LAP && pc.hi > 2 * LAP)) { next.push(pc); continue; }
+          for (const sgn of [1, -1]) { const pts = partOf(G, pc.pts, l.m, sgn, LAP, c); if (pts.length >= 3) next.push({ pts, min: pc.min, j: pc.j }); }
+        }
+        parts = next;
+      }
+      ties = assign(parts, c);
     }
 
-    // Tie each part to a cone point near its middle and on its own side of every lift of the cut, in that cone
-    // point's frame. A part in the middle of a cell is about as near to two corners of the cell, so "the nearest"
-    // would be decided by the last digit: of the cone points within an eighth of the nearest one's distance, the
-    // part goes to the one that carries fewer parts so far, then to the nearer, then to the lower number.
-    // (The parts are taken comma by comma, and a comma's parts by place: which side of a line a machine calls the
-    // first must not decide who carries what. Nor must the order of the tiles: of two copies of a cone point as near,
-    // the one by place.)
-    for (const pc of parts) pc.mid = G.norm(pc.pts.reduce((sum, p) => [sum[0] + p[0], sum[1] + p[1], sum[2] + p[2]], [0, 0, 0]).map((x) => x / pc.pts.length));
-    parts.sort((x, y) => x.j - y.j || byPlace(flatOf(G, x.mid), flatOf(G, y.mid)));
-    const homes = coneFeats.map((f) => { const p = base.home[st.perm.indexOf(f)]; return { f, copies: ts.map((t) => apply(t.M, p)) }; });
-    const together = (c, q) => { for (const m of cuts) if (side(m, c) * side(m, q) < 0) return false; return true; };
-    const has = [0, 0, 0, 0];
     const out = [null, null, null, null], tied = [];
-    for (const f of coneFeats) out[f] = { theta: 0, shapes: [] };
-    for (const pc of parts) {
-      const mid = pc.mid;
-      const near = [], any = [];
-      for (const h of homes) {
-        const order = h.copies.map((q, i) => [apart(G, q, mid), i]).sort((x, y) => (Math.abs(x[0] - y[0]) > 1e-9 * Math.max(1, Math.abs(x[0])) ? x[0] - y[0] : byPlace(flatOf(G, h.copies[x[1]]), flatOf(G, h.copies[y[1]])) || x[1] - y[1]));
-        if (order.length) any.push({ d: G.dist(h.copies[order[0][1]], mid), f: h.f, M: ts[order[0][1]].M });
-        for (let j = 0; j < Math.min(order.length, 24); j++) {
-          const i = order[j][1];
-          if (together(mid, h.copies[i])) { near.push({ d: G.dist(h.copies[i], mid), f: h.f, M: ts[i].M }); break; }
-        }
-      }
-      const pool = near.length ? near : any;          // no cone point on its side within reach: the nearest of all
-      if (!pool.length) continue;
-      const dmin = Math.min(...pool.map((c) => c.d));
-      const cands = pool.filter((c) => c.d <= 1.125 * dmin + 1e-6);
-      cands.sort((x, y) => (has[x.f] - has[y.f]) || (Math.abs(x.d - y.d) > 1e-6 ? x.d - y.d : x.f - y.f));
-      const pick = cands[0];
-      has[pick.f]++;
-      const back = mul(inv(frame[pick.f]), inv(pick.M));
-      out[pick.f].shapes.push({ pts: pc.pts.map((p) => G.norm(apply(back, p))), min: pc.min });
-      tied.push(pick.f);
+    for (const f of coneFeats) out[f] = { theta: thetas ? thetas[f] || 0 : 0, shapes: [] };
+    for (const t of ties) {
+      out[t.f].shapes.push({ pts: t.pc.pts.map((q) => G.norm(apply(t.back, q))), min: t.pc.min });
+      tied.push(t.f);
     }
-    return { specs: out, view, exact, tied, count: shapes.length, split: split && parts.length > shapes.length };
+    return { specs: out, tied, parts: ties.length, joint, fit };
   }
 
   const get = (k) => {
@@ -258,7 +485,7 @@ export function createPaisley({ families, centred, GH, GE }) {
     if (busy.has(k)) return null;          // asked for while it is being made (the pattern it is made from wants commas): none yet
     busy.add(k);
     let made = null;
-    try { made = make(k); } catch (err) { made = { specs: NONE, view: null, exact: false, tied: [], count: 0, split: false, error: String(err && err.message) }; }
+    try { made = make(k); } catch (err) { made = { specs: NONE, print: null, view: null, exact: false, tied: [], count: 0, split: false, joint: null, error: String(err && err.message) }; }
     busy.delete(k);
     cache.set(k, made);
     return made;
@@ -267,6 +494,9 @@ export function createPaisley({ families, centred, GH, GE }) {
   return {
     specs: (k) => { const m = get(k); return m ? m.specs : NONE; },
     view: (k) => { const m = get(k); return m && m.view ? m.view.slice() : null; },
-    info: (k) => { const m = get(k); return m ? { exact: m.exact, shapes: m.count, split: m.split, tied: m.tied.slice(), error: m.error || null } : null; },
+    info: (k) => { const m = get(k); return m ? { exact: m.exact, shapes: m.count, split: m.split, joint: m.joint && { delta: m.joint.delta, clear: m.joint.clear, seal: !!m.joint.seal, fitted: !!m.joint.fitted, rhoA: m.joint.rhoA, rhoC: m.joint.rhoC }, fit: m.print ? m.print.fit : 1, tied: m.tied.slice(), error: m.error || null } : null; },
+    /** The print of a family at its default numbers: { k, perm, twBase, fit, specs }; null while it is being made. */
+    print: (k) => { const m = get(k); return m ? m.print : null; },
+    retie, specsAt, scaleAt,
   };
 }
