@@ -300,34 +300,6 @@
   color: var(--ink);
   border-color: var(--muted);
 }
-.pane-check {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-height: 44px;
-  padding: 0 6px;
-  font-size: 0.82rem;
-  color: var(--muted);
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.pane-check:hover {
-  color: var(--ink);
-}
-.pane-check input[type="checkbox"] {
-  width: 15px;
-  height: 15px;
-  margin: 0;
-  accent-color: var(--blue);
-  cursor: pointer;
-}
-.pane-check:has(input:focus-visible) {
-  outline: 2px solid var(--blue);
-  outline-offset: -2px;
-  border-radius: 6px;
-}
 
 .canvas-wrap {
   position: relative;

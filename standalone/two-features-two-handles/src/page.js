@@ -60,7 +60,6 @@ const momentBtns = [...document.querySelectorAll('[data-moment]')];
 const momentNote = $('#moment-note');
 const reset2Btn = $('#reset2');
 const reset3Btn = $('#reset3');
-const centerToggle = $('#center-toggle');
 const backPlayBtn = $('#back-play');
 
 const MOMENT_COPY = {
@@ -105,7 +104,7 @@ let state = makeDefaultState('3333');
 let older = state.perm[0];
 let newer = state.perm[1];
 let promoted = null;
-let autoCenter = centerToggle ? centerToggle.checked : true;
+let autoCenter = false;
 let lenRangeBounds = FAMILIES['3333'].baseRange.slice();
 let bRangeBounds = [0.4, 3.0];
 let activeMoment = null;
@@ -414,9 +413,7 @@ function syncUI() {
     b.toggleAttribute('data-pending', promoted === idx);
   });
 
-  if (centerToggle) centerToggle.checked = autoCenter;
-  const modeSuffix = autoCenter ? 'pair at centre' : 'view fixed';
-  patSub.textContent = fam.kind === 'E' ? `Euclidean plane · ${modeSuffix}` : `Poincaré disc · ${modeSuffix}`;
+  patSub.textContent = fam.kind === 'E' ? 'Euclidean plane' : 'Poincaré disc';
   surfSub.textContent = promoted !== null ? `${fam.featLabels[promoted]} ready — tap its partner` : 'Tap two features';
 
   const hasB = !!fam.bRange;
@@ -774,12 +771,6 @@ reset3Btn.addEventListener('click', () => {
   stage.R.resetView();
   stage.R.render();
 });
-if (centerToggle) {
-  centerToggle.addEventListener('change', () => {
-    autoCenter = centerToggle.checked;
-    syncUI();
-  });
-}
 
 // 3D ball feature tap & hover
 function coneScreenInfo() {
@@ -905,10 +896,7 @@ window.__handles = {
   set(opts = {}) {
     cancelGlide();
     cancelFollow();
-    if (typeof opts.autoCenter === 'boolean') {
-      autoCenter = opts.autoCenter;
-      if (centerToggle) centerToggle.checked = autoCenter;
-    }
+    if (typeof opts.autoCenter === 'boolean') autoCenter = opts.autoCenter;
     if (opts.tab) showTab(opts.tab, { writeHash: false });
     const nextK = (opts.k && normalizeFamilyKey(opts.k)) || state.k;
     const fam = FAMILIES[nextK];
