@@ -1043,19 +1043,23 @@ export function createPattern(canvas, opts = {}) {
         if (G.kind === 'H') {
           if (!isIdentityPsu(bPsu)) {
             const vWorld = psuMul(vPsu, bPsu);
-            if (Math.hypot(vWorld[0], vWorld[1]) < 150) {
+            if (Number.isFinite(vWorld[0]) && Number.isFinite(vWorld[1]) && Math.hypot(vWorld[0], vWorld[1]) < 150) {
+              if (drag && drag.v0Psu) drag.v0Psu = psuMul(drag.v0Psu, bPsu);
               vPsu = vWorld; V = psuToSO21(vPsu); vRev = !!vPsu[4];
-              bPsu = psuI(); base = I3.slice(); bRev = false;
-              recentre(null);
             }
+            bPsu = psuI(); base = I3.slice(); bRev = false;
           }
+          if (drag && drag.v0Psu) drag.v0Psu = recentre(drag.v0Psu);
+          else recentre(null);
         } else if (G.kind === 'E') {
-          if (Math.hypot(base[2], base[5]) > 1e-12 || Math.abs(base[0] - 1) > 1e-12 || bRev) {
+          if (Math.hypot(base[2], base[5]) > 1e-12 || Math.abs(base[0] - 1) > 1e-12 || Math.abs(base[1]) > 1e-12 || bRev) {
+            if (drag && drag.V0) drag.V0 = G.fix(mul(drag.V0, base), vHand() * bHand());
             V = G.fix(mul(V, base), vHand() * bHand());
             vRev = vRev !== bRev;
             base = I3.slice(); bRev = false;
-            recentre(null);
           }
+          if (drag && drag.V0) drag.V0 = recentre(drag.V0);
+          else recentre(null);
         }
         if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
       }

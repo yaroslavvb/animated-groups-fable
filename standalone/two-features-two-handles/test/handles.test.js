@@ -11,7 +11,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from '../src/handles.js';
-import { locateTilePSU, tilesPSU, poincareArc } from '../src/pattern-ext.js';
+import { locateTilePSU, tilesPSU, poincareArc, createPattern } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
@@ -1007,4 +1007,131 @@ test('Intrinsic geodesics stay continuous across tw=0 and drag+slider keeps Foll
     if (d < minErr) minErr = d;
   }
   assert.ok(minErr < 1e-9, `Follow overlay detached from tiled cone after drag+slider: ${minErr}`);
+});
+
+test('followTreeData cutPts reaches ends across all families and keepView clears stale bPsu even when |vWorld| >= 150', () => {
+  const toD = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+
+  // 1. All 7 families: followTreeData.cutPts aligns with cutSeg and reaches ends (±9 on hyperbolic)
+  for (const k of Object.keys(FAMILIES)) {
+    const f = FAMILIES[k];
+    const perms = [f.defaultM.split('').map(Number)];
+    if (k === 'o33' || k === '333*' || k === '333*3' || k === '333x') perms.push([0, 2, 1, 3], [2, 3, 0, 1]);
+    for (const perm of perms) {
+      for (const [L, tw] of [[f.defaultL, 0.0079], [f.kind === 'E' ? 0.5 : 0.6, -0.25]]) {
+        const st = {
+          k, perm, orders: perm.map((c) => f.baseOrders[c]),
+          L, tw, b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+          thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+        };
+        const fd = followTreeData(st);
+        const m = buildPatternModel(st, { follow: { active: true, progress: 1, data: fd } });
+        const cutLine = m.lines.find((ln) => ln.dash && !ln.once);
+        if (f.kind === 'H') {
+          assert.ok(discDist(toD(fd.cutPts[0]), toD(fd.ends[0])) < 1e-12, `${k} cutPts[0] != ends[0]`);
+          assert.ok(discDist(toD(fd.cutPts[fd.cutPts.length - 1]), toD(fd.ends[1])) < 1e-12, `${k} cutPts.at(-1) != ends[1]`);
+          fd.cutPts.forEach((p, idx) => {
+            // Interior points (|u|<=6) hold < 1e-11; rim endpoints (|u|<=9, z~4051) scale by cosh(9) under float64 lineDist.
+            const tol = idx >= 4 && idx <= fd.cutPts.length - 5 ? 1e-11 : 1e-9;
+            assert.ok(GH.lineDist(p, cutLine.a, cutLine.b) < tol, `${k} cutPts[${idx}] off cutSeg`);
+          });
+        } else {
+          assert.ok(Math.abs(fd.cutPts[0][1] - cutLine.a[1]) < 1e-12);
+          assert.ok(Math.abs(fd.cutPts[1][1] - cutLine.b[1]) < 1e-12);
+          assert.ok(fd.cutPts[0][0] <= -12 && fd.cutPts[1][0] >= 12);
+        }
+      }
+    }
+  }
+
+  // 2. createPattern keepView tests: stub minimal canvas + Path2D + window in finally block
+  const prevWin = globalThis.window;
+  const prevPath2D = globalThis.Path2D;
+  const noop = () => {};
+  const stubCtx = {
+    setTransform: noop, clearRect: noop, save: noop, restore: noop,
+    beginPath: noop, arc: noop, clip: noop, fillRect: noop, fill: noop,
+    stroke: noop, setLineDash: noop, moveTo: noop, lineTo: noop,
+  };
+  const stubCanvas = {
+    width: 500, height: 500,
+    getContext: () => stubCtx,
+    getBoundingClientRect: () => ({ left: 0, top: 0, width: 500, height: 500 }),
+    addEventListener: noop,
+  };
+  globalThis.window = { matchMedia: () => ({ matches: false }), devicePixelRatio: 1 };
+  globalThis.Path2D = class { moveTo() {} lineTo() {} quadraticCurveTo() {} arc() {} };
+  try {
+    const P = createPattern(stubCanvas);
+    const st08 = {
+      k: '3333', perm: [0, 1, 2, 3], orders: [3, 3, 3, 3],
+      L: 0.8, tw: 0.0079, b: 0, tau: 0,
+      thetas: defaultCommas('3333').map((s) => (s ? s.theta : 0)),
+    };
+    const m08 = buildPatternModel(st08);
+    const st06 = { ...st08, L: 0.6 };
+    const m06 = buildPatternModel(st06);
+    const fd06 = followTreeData(st06);
+
+    const assertAlignedWithTiles = (m, stFd, view, tag) => {
+      const M_once = mul(view.V, view.base);
+      const vPsu = so21ToPSU(view.V, false);
+      const ts = tilesPSU(m.D, m.A, { focus: psuApplyDisc(psuInv(vPsu), [0, 0]), radius: 4.5, max: 2000 });
+      const overlayCone = toD(apply(M_once, m.home[0]));
+      let bestConeErr = Infinity;
+      for (const t of ts) {
+        const d = discDist(overlayCone, toD(apply(mul(view.V, t.M), m.home[0])));
+        if (d < bestConeErr) bestConeErr = d;
+      }
+      assert.ok(bestConeErr < 1e-9, `${tag} cone alignment err=${bestConeErr}`);
+
+      const cutLine = m.lines.find((ln) => ln.dash && !ln.once);
+      const fMid = apply(M_once, stFd.feet[1]);
+      let bestCutDist = Infinity;
+      for (const t of ts) {
+        const Mt = psuToSO21(psuMul(vPsu, t.g));
+        const d = GH.lineDist(fMid, apply(Mt, cutLine.a), apply(Mt, cutLine.b));
+        if (d < bestCutDist) bestCutDist = d;
+      }
+      assert.ok(bestCutDist < 1e-9, `${tag} cutSeg alignment dist=${bestCutDist}`);
+    };
+
+    // Case A: single neighbor-tile step (edge 4 at L=0.80) -> L=0.60 keepView
+    P.set(m08);
+    const gEdge4 = m08.A.maps[4];
+    P.setView({ V: mul(GH.translate([0, 0, 1], GH.polar(0.7, 0.2)), gEdge4), base: inv(gEdge4), turned: false }, { sync: true });
+    P.set(buildPatternModel(st06, { follow: { active: true, progress: 1, data: fd06 } }), { keepView: true });
+    assertAlignedWithTiles(m06, fd06, P.getView(), 'edge4 L=0.8->0.6');
+
+    // Case B: overflow |vWorld| >= 150 (|bPsu| ~ 100, |vPsu| ~ 1.3) -> stale bPsu MUST be cleared
+    const farTile = tilesPSU(m08.D, m08.A, { focus: [0, 0], radius: 10.5, max: 6000 })
+      .find((t) => Math.hypot(t.g[0], t.g[1]) > 100 && Math.hypot(t.g[0], t.g[1]) < 145);
+    assert.ok(farTile, 'expected tile with 100 < |g| < 145');
+    let vOverflow = so21ToPSU(GH.translate(GH.polar(1.5, 0), GH.origin), false);
+    for (let th = 0; th < TAU; th += 0.3) {
+      const cand = so21ToPSU(GH.translate(GH.polar(1.5, th), GH.origin), false);
+      const vw = psuMul(cand, farTile.g);
+      if (Math.hypot(vw[0], vw[1]) > 180) { vOverflow = cand; break; }
+    }
+    P.set(m08);
+    P.setView({ V: psuToSO21(vOverflow), base: psuToSO21(farTile.g), turned: false }, { sync: true });
+    P.set(buildPatternModel(st06, { follow: { active: true, progress: 1, data: fd06 } }), { keepView: true });
+    const vAfterOverflow = P.getView();
+    assert.ok(vAfterOverflow.base[8] < 100, `stale bPsu survived overflow: base[8]=${vAfterOverflow.base[8]}`);
+    assertAlignedWithTiles(m06, fd06, vAfterOverflow, 'overflow |vWorld|>=150');
+
+    // Case C: identity base with shifted V (L=0.80 -> L=2.5) recenters V and stays aligned
+    const st25 = { ...st08, L: 2.5 };
+    const m25 = buildPatternModel(st25);
+    const fd25 = followTreeData(st25);
+    P.set(m08);
+    P.setView({ V: GH.translate([0, 0, 1], GH.polar(1.4, -0.7)), base: I3.slice(), turned: false }, { sync: true });
+    P.set(buildPatternModel(st25, { follow: { active: true, progress: 1, data: fd25 } }), { keepView: true });
+    assertAlignedWithTiles(m25, fd25, P.getView(), 'identity-base L=0.8->2.5');
+  } finally {
+    if (prevWin === undefined) delete globalThis.window;
+    else globalThis.window = prevWin;
+    if (prevPath2D === undefined) delete globalThis.Path2D;
+    else globalThis.Path2D = prevPath2D;
+  }
 });

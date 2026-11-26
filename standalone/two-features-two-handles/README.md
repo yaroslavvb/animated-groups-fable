@@ -16,7 +16,7 @@ Incorporates Vladimir Bulatov's and Chaim Goodman-Strauss's email feedback after
 - `src/pattern-ext.js` — local copy of `pattern.js` with `outline: false`, `tileEdges: false`, `center`, `dots`, `setView`, Klein ray-marching `locateTilePSU` view recentering (`keepView` recentering into the updated lattice on slider updates), focus-seeded `PSU(1,1)` tile walker (`tilesPSU`), exact Poincaré disc circular arcs (`poincareArc` / `hypArc`), shift-invariant hyperbolic tile cache (`hCache.shift`), linear non-`closePath` `Path2D` building, and local mark/comma scale gating (leaving `2026-11-15-classification-of-surfaces` unmodified).
 - `src/rigid-print.js` — rigid comma generator anchored in each cone's local frame (`big`, `small`).
 - `src/page.template.html`, `src/page.css`, `src/page.js` — Play & Tutorial tabs, responsive 2D + 3D panes, 7 family chips, Length and Twist plus contextual cuff-length (`b`) and shift (`tau_o`, `tau_c`) sliders, four moment chips (`Follow the tree`, `Closer, further`, `Half a turn`, `Handle fault`), five MathJax tutorial folds, hash state (`#`, `#k=...`), and `window.__handles`.
-- `test/handles.test.js` — pure geometry & re-cut invariants test suite (17 tests).
+- `test/handles.test.js` — pure geometry & re-cut invariants test suite (18 tests).
 - `steps.json` — headless Chrome / screenshot verification plan (`1280×800` and `390×844`).
 
 ## Build & Check Commands
@@ -52,7 +52,7 @@ node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs \
 
 ## Checked / Not Tried Yet
 
-- **Checked (`node --test`, 17/17 passing):**
+- **Checked (`node --test`, 18/18 passing):**
   - `math-general.md` §9 reference vector `(3,4|2,5), L=1.6, t=0.5` UHP and disc points + `R_A R_B R_D R_C = I` to `1e-10`, plus design moment numbers (`3333` & `2223` `BC`, `CA`, `DA`, `F2`, `F7`).
   - All 6 pairwise picks (and 5–6-step chained recuts) across all 7 families (`3333`, `2223`, `2222`, `333∗`, `333∗3`, `333×`, and both Mixed `{o⁺, 3}` and Split `{o⁺, o⁻}` cuts on `o33`): cone points, geodesic cuffs, `∗3` corners, `H_glue` gluings, and rigid commas stay stationary in place to `1e-9` (`1e-8` over 6 steps), with exact round-trips.
   - Full-turn (`-0.5` vs `+0.5`) periodicity of Twist, `tau_o`, and `tau_c`, and half-turn far-pair swap.
@@ -63,6 +63,7 @@ node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs \
   - 3D dodecahedron neighbour selection for all 6 pairs on all 7 families, `stadium`, closed `handleBeltLoop` on `o33`, `followTreeData`, and `interpolateView` endpoints.
   - Exact Poincaré disc circular arcs (`poincareArc` matching `hypLerp` to `< 1e-9`) and shift-invariant `hCache` across tile crossings up to `H_REBUILD_DRIFT` (`0.65`) with zero rim popping.
   - Intrinsic-geodesic-only rendering (`tileEdges: false` hiding arbitrary bookkeeping domain seams across all 7 families), continuous `fourConeCentered` `cutSeg` across `tw = 0`, and `keepView` recentering into the updated lattice when moving sliders after dragging (`< 1e-9` `Follow the tree` overlay alignment).
+  - Hardened `keepView` fallback clearing stale `bPsu`/`base` even when `|vWorld| >= 150` (always recentering into the updated lattice and syncing any in-flight `drag`), plus full-rim `followTreeData` `cutPts` (`±9` matching `ends`) across all 7 families.
 - **Checked (Chrome `shot.mjs`, drag/wheel/coast profiler & `dark_shot.mjs`):**
   - On `#k=3333&m=0123&l=5&tw=-0.5`, eliminating the Chromium `Path2D.closePath()` $O(N^2)$ path-closing overhead, switching hyperbolic geodesics to exact `path.arc()` circular arcs, maintaining shift-invariant `hCache` without budget oscillation, and drawing inertia synchronously cut drag/coast JS frame times from `~35 ms` (`~20 fps`) down to `1.9–3.4 ms` (`60 fps` inertia at `17.0 ms` avg frame interval), and `2223` (`L=3`) from `76.5 ms` JS / `48.6 ms` GPU down to `2.7 ms` JS / `2.5 ms` GPU.
   - Interactive flows across `1280×800` and `390×844` (light & dark): `paneRowOk: true`, `conePixelDriftBeforeGlide: 0`, `333∗`, `333∗3`, `333×`, `o33` Mixed/Split + Handle shift + `Follow the tree`, `2222`, `Tutorial` (177 formulas typeset at build, `clippedSvgs: []` at 390 px, `overflowX: false`, `44 px` touch targets, `0` console/page errors, `0` scrub hits).

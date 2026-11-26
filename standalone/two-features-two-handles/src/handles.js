@@ -1416,7 +1416,7 @@ export function followTreeData(state) {
       kind: 'E',
       fwdSegs: Array.from({ length: 8 }, (_, i) => [[(-0.5 + i) * ell, 0, 1], [(0.5 + i) * ell, 0, 1]]),
       backSegs: Array.from({ length: 8 }, (_, i) => [[(-0.5 - i) * ell, 0, 1], [(-1.5 - i) * ell, 0, 1]]),
-      cutPts: [[-6 * ell, w / 2, 1], [6 * ell, w / 2, 1]],
+      cutPts: [[-12 * Math.max(1, ell), w / 2, 1], [12 * Math.max(1, ell), w / 2, 1]],
       ends: null,
       legs: [[A, fA], [B, fB], [C, fC], [D, fD]],
       feet: [fA, fC],
@@ -1444,7 +1444,7 @@ export function followTreeData(state) {
       backVerts.push(toPair(offH(-c / 2 - m * L, hA, -1)));
     }
     const cutPts = [];
-    for (let i = -10; i <= 10; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
+    for (let i = -12; i <= 12; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
     const fA0 = offH(-c / 2, 0, 1), fB0 = offH(c / 2, 0, 1);
     const fC0 = offH(t - c / 2, 0, 1), fD0 = offH(t + c / 2, 0, 1);
     return {
@@ -1509,7 +1509,7 @@ export function followTreeData(state) {
   }
 
   const cutPts = [];
-  for (let i = -10; i <= 10; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
+  for (let i = -12; i <= 12; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
   const footOf = (p) => { const ac = axisCoords(I3, p); return offH(ac.u, 0, 1); };
   const legs = legPts.map((p) => [toPair(p), toPair(footOf(p))]);
   return {
