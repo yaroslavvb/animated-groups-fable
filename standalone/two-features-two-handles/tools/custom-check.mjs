@@ -1,12 +1,13 @@
-// custom-check.mjs — the "Custom" chip in a real Chrome: typed with the keyboard, tapped, dragged, linked to, on a wide
-// screen and on a phone in the dark.
+// custom-check.mjs — the text field after the chips ("or type an orbifold") in a real Chrome: typed with the keyboard,
+// tapped, dragged, linked to, on a wide screen and on a phone in the dark.
 //
 //   node tools/custom-check.mjs [--root <this folder>] [--page site/index.html] [--shots <dir>] [--live <url>]
 // --live takes the page's address on spacesheep (https://spacesheep.dev/@yaroslavvb/two-features-two-handles): there
 // the page runs in the viewer's frame, so the checks are made in that frame and the viewer's own address is checked too.
 // Needs The Folding's browser door (~/git/animated-groups-fable/standalone/the-folding/tools/browser.mjs) and its
 // PLAYWRIGHT_MJS / FOLDING_BROWSER settings, as steps.json's shot.mjs does. Prints one line a check (ok / FAIL) and
-// exits 1 if any failed or the page logged an error.
+// exits 1 if any failed or the page logged an error. No default of a family is written in here: the page's own
+// state says what a fresh orbifold's numbers are.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,25 +23,26 @@ if (shots) fs.mkdirSync(shots, { recursive: true });
 
 let failed = 0, errors = 0;
 const ok = (cond, what, extra = '') => { if (!cond) failed++; console.log(`${cond ? 'ok  ' : 'FAIL'} ${what}${cond ? '' : '  ' + extra}`); };
-const S = (page) => page.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, tab: s.tab, pat: s.pattern, moment: s.moment }; });
-const ui = (page) => page.evaluate(() => ({
-  open: !document.getElementById('custom-ed').hidden,
-  chip: document.getElementById('custom-chip').getAttribute('aria-pressed'),
-  pressed: [...document.querySelectorAll('[data-fam][aria-pressed="true"]')].map((b) => b.dataset.fam),
-  cells: [...document.querySelectorAll('#cu-cells .symcell')].map((b) => b.getAttribute('aria-label').split(':')[0]).join(' '),
-  caretAfter: (() => { const kids = [...document.getElementById('cu-cells').children]; return kids.findIndex((c) => c.classList.contains('symcaret')); })(),
-  say: document.getElementById('cu-say').textContent,
-  sayState: document.getElementById('cu-say').dataset.state,
-  tries: [...document.querySelectorAll('#cu-say .trychip')].map((b) => b.dataset.k),
-  pair: [...document.querySelectorAll('.sig-btn')].map((b) => b.textContent + (b.getAttribute('aria-pressed') === 'true' ? '!' : '')).join(' '),
-  minus: document.getElementById('cu-minus').disabled, plus: document.getElementById('cu-plus').disabled,
-  focusInBar: document.getElementById('cu-cells').contains(document.activeElement) || document.activeElement === document.getElementById('cu-cells'),
-  overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-  keys: { fault: !document.getElementById('key-fault').hidden, mirror: !document.getElementById('key-mirror').hidden, glide: !document.getElementById('key-glide').hidden },
-  rows: { tau: !document.getElementById('tau-row').hidden && !document.getElementById('extra-sliders').hidden, b: !document.getElementById('b-row').hidden && !document.getElementById('extra-sliders').hidden, tauLabel: document.getElementById('tau-label').textContent, bLabel: document.getElementById('b-label').textContent },
-}));
+const S = (T) => T.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, tab: s.tab, pat: s.pattern, moment: s.moment }; });
+const ui = (T) => T.evaluate(() => {
+  const f = document.getElementById('custom-in'), pop = document.getElementById('custom-pop');
+  const fr = f.getBoundingClientRect(), pr = pop.hidden ? null : pop.getBoundingClientRect();
+  return {
+    value: f.value, on: f.dataset.on === '1', placeholder: f.placeholder, focused: document.activeElement === f,
+    color: getComputedStyle(f).color, muted: getComputedStyle(document.querySelector('.sig-label')).color,
+    field: [Math.round(fr.width), Math.round(fr.height)],
+    note: pop.hidden ? '' : pop.textContent, tries: [...pop.querySelectorAll('.trylink')].map((b) => b.dataset.k),
+    noteBox: pr && { left: Math.round(pr.left), right: Math.round(pr.right), top: Math.round(pr.top), under: Math.round(pr.top - fr.bottom) },
+    pressed: [...document.querySelectorAll('[data-fam][aria-pressed="true"]')].map((b) => b.dataset.fam),
+    pair: [...document.querySelectorAll('.sig-btn')].map((b) => b.textContent + (b.getAttribute('aria-pressed') === 'true' ? '!' : '')).join(' '),
+    overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1, vw: document.documentElement.clientWidth,
+    keys: { fault: !document.getElementById('key-fault').hidden, mirror: !document.getElementById('key-mirror').hidden, glide: !document.getElementById('key-glide').hidden },
+    rows: { tau: !document.getElementById('tau-row').hidden && !document.getElementById('extra-sliders').hidden, b: !document.getElementById('b-row').hidden && !document.getElementById('extra-sliders').hidden, tauLabel: document.getElementById('tau-label').textContent, bLabel: document.getElementById('b-label').textContent },
+    old: !!document.getElementById('custom-chip') || !!document.getElementById('custom-ed') || !!document.querySelector('.symcells'),
+  };
+});
 const shot = async (page, name, o = {}) => { if (shots) await page.screenshot({ path: path.join(shots, name + '.png'), ...o }); };
-const type = async (page, keys) => { for (const k of keys) await page.keyboard.press(k); };
+const paneTop = (T) => T.evaluate(() => document.getElementById('pane2').getBoundingClientRect().top);
 
 async function newPage(ctxOpts, hash = '') {
   const ctx = await B.browser.newContext(ctxOpts);
@@ -57,155 +59,158 @@ async function newPage(ctxOpts, hash = '') {
   await T.waitForFunction(() => window.__handles && window.__handles.state().pattern);
   await page.waitForTimeout(500);
   if (opt.live) { const box = await (await T.frameElement()).boundingBox(); off = { x: box.x, y: box.y }; }
-  return { ctx, page, T, off };
+  /** Empty the field and type into it, key by key. */
+  const typeIn = async (text) => { await T.click('#custom-in'); await page.keyboard.press(process.platform === 'darwin' ? 'Meta+A' : 'Control+A'); await page.keyboard.press('Backspace'); if (text) await page.keyboard.type(text, { delay: 15 }); await page.waitForTimeout(250); };
+  return { ctx, page, T, off, typeIn };
 }
 
 try {
   // ---------------------------------------------------------------- wide screen, a mouse and a keyboard
   {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
+    const { ctx, page, T, off, typeIn } = await newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
     let u = await ui(T), s = await S(T);
-    ok(!u.open && u.chip === 'false' && u.pressed.join() === '3333', 'a plain link: the editor is shut, 3333 pressed', JSON.stringify(u.pressed));
-    ok(s.hash === '#', 'a plain link keeps the plain address', s.hash);
+    ok(!u.old, 'the Custom chip and its editor are gone', JSON.stringify(u.old));
+    ok(u.value === '' && /orbifold/.test(u.placeholder) && /2345/.test(u.placeholder) && !u.on && u.pressed.join() === '3333', 'a plain link: an empty field whose hint says an orbifold can be typed, 3333 pressed', u.placeholder);
+    ok(s.hash === '#' && u.note === '', 'a plain link keeps the plain address, and no note', s.hash + ' ' + u.note);
+    ok(u.field[1] >= 44, 'the field is as tall as a chip', u.field.join('x'));
+    // the hint's own examples must be ones the page shows
+    const examples = u.placeholder.split(':')[1].split(',').map((x) => x.trim()).filter(Boolean);
+    ok(examples.length >= 3, 'the hint gives examples', u.placeholder);
+    for (const ex of examples) {
+      await typeIn(ex);
+      const [se, ue] = [await S(T), await ui(T)];
+      ok(ue.on && ue.note === '' && se.custom.why === null, `the hint's example ${ex} is shown when typed`, JSON.stringify([se.k, ue.on, ue.note]));
+    }
+    await typeIn('');          // the field first: a tap on a field that holds an orbifold brings it back
+    await T.click('[data-fam="3333"]');
+    await T.evaluate(() => document.activeElement && document.activeElement.blur());
+    await shot(page, 'w01-plain');
+    const top0 = await paneTop(T);
 
-    await T.click('#custom-chip');
-    u = await ui(T); s = await S(T);
-    ok(u.open && u.chip === 'true' && u.pressed.length === 0, 'Custom opens the editor and is the one chip pressed', JSON.stringify(u));
-    ok(u.cells === '3 3 3 3' && u.focusInBar && s.k === '3333', 'it opens on the orbifold shown, the bar holding the keyboard', u.cells + ' ' + u.focusInBar);
-    ok(u.sayState === 'ok' && /Four features: 3 · 3 · 3 · 3\./.test(u.say), 'the line under the bar names the four features', u.say);
-    await shot(page, 'w01-open');
-    const paneTop0 = await T.evaluate(() => document.getElementById('pane2').getBoundingClientRect().top);
-
-    // Delete down to an empty bar, as on the Classification page
-    await type(page, ['Backspace']);
-    u = await ui(T); s = await S(T);
-    ok(u.cells === '3 3 3' && s.k === '3333' && u.sayState === 'no' && /has three features/.test(u.say) && /Still showing 3333/.test(u.say), 'three features: the reason, and the page keeps 3333', u.say);
-    ok(u.tries.join() === '3332', 'the nearest that works is offered', u.tries.join());
-    const paneTop1 = await T.evaluate(() => document.getElementById('pane2').getBoundingClientRect().top);
-    ok(Math.abs(paneTop1 - paneTop0) < 1, 'the panes do not jump when the line changes', `${paneTop0} -> ${paneTop1}`);
+    // typed key by key: nothing changes until there are four features, then the orbifold is shown
+    await T.click('#custom-in');
+    for (const [ch, want] of [['2', 'one'], ['3', 'two'], ['7', 'three']]) {
+      await page.keyboard.type(ch);
+      await page.waitForTimeout(120);
+      u = await ui(T); s = await S(T);
+      ok(s.k === '3333' && new RegExp(`has ${want} feature`).test(u.note) && u.noteBox && u.noteBox.under >= 0 && u.noteBox.under < 12, `"${u.value}": 3333 stays, and a note under the field says ${want} of four`, JSON.stringify([s.k, u.note, u.noteBox]));
+    }
+    ok(u.tries.join() === '2372', 'the nearest that works is offered', u.tries.join());
+    ok(Math.abs((await paneTop(T)) - top0) < 1, 'the note moves nothing on the page');
     await shot(page, 'w02-three');
-    await type(page, ['Backspace', 'Backspace', 'Backspace']);
-    u = await ui(T);
-    ok(u.cells === '' && /An empty bar/.test(u.say) && u.tries.length >= 3, 'an empty bar says what it takes and gives examples', u.say + ' ' + u.tries.join());
-    await type(page, ['Backspace']);
-    ok((await ui(T)).cells === '', 'Delete on an empty bar does nothing');
-
-    // type 2 3 4 5
-    await type(page, ['2', '3', '4']);
-    s = await S(T);
-    ok(s.k === '3333', 'nothing changes while three characters are typed', s.k);
-    await type(page, ['5']);
-    await page.waitForTimeout(300);
+    await page.keyboard.type('9');
+    await page.waitForTimeout(350);
     u = await ui(T); s = await S(T);
-    ok(s.k === '2345' && u.pair === '2! 3! 4 5' && u.sayState === 'ok', 'the fourth character shows 2345', s.k + ' | ' + u.pair);
-    ok(s.hash === '#k=2345&m=0123&l=2.634&tw=0' && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
+    ok(s.k === '2379' && u.on && u.note === '' && u.pressed.length === 0 && u.pair === '2! 3! 7 9', 'the fourth character shows 2379: the field lit like a pressed chip, no chip pressed', JSON.stringify([s.k, u.on, u.pressed, u.pair]));
+    ok(/^#k=2379&m=0123&l=[\d.]+&tw=-?[\d.]+$/.test(s.hash) && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
     ok(s.pat && s.pat.tiles > 3, 'the pattern is drawn', JSON.stringify(s.pat && s.pat.tiles));
-    await shot(page, 'w03-2345');
+    await shot(page, 'w03-2379');
 
-    // sliders, then a digit stepped: the pair and the sliders stay
+    // a pair picked, sliders moved, then a digit changed in the field: the pair and the sliders stay
     await T.evaluate(() => window.__handles.set({ L: 1.4, tw: -0.2 }));
     await T.evaluate(() => window.__handles.tapCone(2));
     await T.evaluate(() => window.__handles.tapCone(1));
     await T.evaluate(() => window.__handles.waitGlide());
     s = await S(T);
     const kept = { m: s.m, L: s.L, tw: s.tw };
-    ok(s.m.slice(0, 2).split('').sort().join('') === '12', 'a pair picked on a custom orbifold', s.m);
-    await T.focus('#cu-cells');
-    await type(page, ['End', 'ArrowLeft']);          // on the last character, 5
-    u = await ui(T);
-    ok(u.minus === false && u.plus === false, 'a chosen digit can be stepped');
-    await T.click('#cu-plus');
-    await page.waitForTimeout(200);
-    s = await S(T); u = await ui(T);
-    ok(s.k === '2346' && s.m === kept.m && Math.abs(s.L - kept.L) < 1e-9 && Math.abs(s.tw - kept.tw) < 1e-9, 'a digit stepped: the pair and the sliders stay', `${s.k} ${s.m} ${s.L} ${s.tw}`);
-    await T.focus('#cu-cells');          // the arrows are the bar's own keys
-    await type(page, ['ArrowUp', 'ArrowUp', 'ArrowUp']);
+    ok(s.m.slice(0, 2).split('').sort().join('') === '12', 'a pair picked on a typed orbifold', s.m);
+    await T.click('#custom-in');
+    await page.keyboard.press('End');
+    await page.keyboard.press('Backspace');
+    await page.waitForTimeout(150);
+    ok((await S(T)).k === '2379' && /has three features/.test((await ui(T)).note), 'one character deleted: 2379 stays meanwhile');
+    await page.keyboard.type('5');
+    await page.waitForTimeout(300);
     s = await S(T);
-    ok(s.k === '2349', 'the up arrow steps it too, to 9', s.k);
-    await type(page, ['ArrowUp']);
-    ok((await S(T)).k === '2349' && (await ui(T)).plus === true, '9 is the highest order');
+    ok(s.k === '2375' && s.m === kept.m && Math.abs(s.L - kept.L) < 1e-9 && Math.abs(s.tw - kept.tw) < 1e-9, 'a digit changed: the pair and the sliders stay', `${s.k} ${s.m} ${s.L} ${s.tw}`);
 
-    // a mirror, then a corner on it
-    await type(page, ['End', 'Backspace', '*']);
-    await page.waitForTimeout(300);
+    // loose notation: spaces, the star and the cross as typed or as printed, rings and crosses anywhere, capitals
+    for (const [text, k, pair] of [['2 3 4 *', '234*', '2 ∗ 3 4'], ['234∗5', '234*5', '2 ∗5 3 4'], ['x 2 3 4', '234x', '2 × 3 4'], ['2,3,4,×', '234x', '2 × 3 4'], ['27o', 'o27', 'o⁺ o⁻ 2 7'], ['O27', 'o27', 'o⁺ o⁻ 2 7'], ['5432', '5432', '5 4 3 2']]) {
+      await typeIn(text);
+      s = await S(T); u = await ui(T);
+      ok(s.k === k && u.on && u.value === text && u.pair.replace(/!/g, '') === pair && u.note === '', `"${text}" is read as ${k}, and stays as typed`, JSON.stringify([s.k, u.value, u.pair, u.note]));
+    }
+    await typeIn('234*5');
     s = await S(T); u = await ui(T);
-    ok(s.k === '234*' && u.pair.replace(/!/g, '') === '2 ∗ 3 4' && u.keys.mirror && u.rows.b && u.rows.bLabel === 'Mirror len' && !u.rows.tau, '234∗: a mirror, its key and its length slider', s.k + ' | ' + u.pair + ' ' + JSON.stringify(u.rows));
-    ok(/^#k=234\*&m=\d{4}&l=[\d.]+&tw=-?[\d.]+&b=[\d.]+$/.test(s.hash), 'its address', s.hash);
-    await type(page, ['5']);
-    await page.waitForTimeout(300);
-    s = await S(T); u = await ui(T);
-    ok(s.k === '234*5' && u.pair.replace(/!/g, '') === '2 ∗5 3 4' && u.rows.tau && u.rows.tauLabel === 'Corner shift' && /&tc=/.test(s.hash), '234∗5: a digit after the star is a corner, with its shift slider', s.k + ' | ' + u.pair + ' ' + s.hash);
+    ok(u.keys.mirror && u.rows.b && u.rows.bLabel === 'Mirror len' && u.rows.tau && u.rows.tauLabel === 'Corner shift' && /^#k=234\*5&m=\d{4}&l=[\d.]+&tw=-?[\d.]+&b=[\d.]+&tc=-?[\d.]+$/.test(s.hash), '234∗5: the mirror\'s key, its length and its corner shift, its address', JSON.stringify(u.rows) + ' ' + s.hash);
     if (opt.live) {
       await page.waitForTimeout(400);
       ok(/#k=234%2A5&m=\d{4}&l=[\d.]+&tw=-?[\d.]+&b=[\d.]+&tc=/.test(page.url()), 'on spacesheep the viewer\'s address follows, the star as %2A', page.url());
     }
     await shot(page, 'w04-234s5');
-    await type(page, ['6']);
-    u = await ui(T); s = await S(T);
-    ok(s.k === '234*5' && /the mirror has two corners/.test(u.say) && u.tries.join() === '234*5,234*', 'two corners: not built, said so', u.say + ' | ' + u.tries.join());
-    await T.click('#cu-say .trychip[data-k="234*"]');
-    await page.waitForTimeout(200);
-    ok((await S(T)).k === '234*' && (await ui(T)).cells === '2 3 4 star', 'a tap on an offer takes it', (await ui(T)).cells);
-
-    // a crosscap in place of the mirror, by the buttons
-    await T.click('#cu-remove');
-    await T.click('#cu-add [data-add="x"]');
-    await page.waitForTimeout(300);
-    s = await S(T); u = await ui(T);
-    ok(s.k === '234x' && u.keys.glide && u.rows.bLabel === 'Crosscap len', '234×: the add row works, the glide key shows', s.k + ' ' + JSON.stringify(u.keys));
-    await shot(page, 'w05-234x');
-
-    // a handle
-    await type(page, ['Home', 'o']);
+    await typeIn('234x');
     u = await ui(T);
-    ok(/×××/.test(u.say) || /crosscaps/.test(u.say), 'a ring beside a cross becomes two crosses more, and that is too many', u.say);
-    await T.evaluate(() => window.__handles.custom.go('o27'));
+    ok(u.keys.glide && u.rows.bLabel === 'Crosscap len' && !u.rows.tau, '234×: the glide key and the crosscap\'s length', JSON.stringify([u.keys, u.rows]));
+    await typeIn('o27');
+    u = await ui(T); s = await S(T);
+    ok(u.keys.fault && u.rows.tau && u.rows.tauLabel === 'Handle shift' && /&to=/.test(s.hash), 'o27: the handle\'s fault line key and its shift', JSON.stringify(u.rows) + ' ' + s.hash);
+
+    // what cannot be shown says why, and offers what can. The page keeps the last orbifold it could show: what was
+    // there before, or what the text was on its way (2345 while 23456 is typed)
+    for (const [text, stays, re, tries] of [['234*56', '234*5', /the mirror has two corners/, '234*5,234*'], ['22*x', 'o27', /has a mirror and a crosscap/, '222*,222x'], ['oo', 'o27', /has two handles/, 'o22'], ['23456', '2345', /has five features/, '2345'], ['*632', 'o27', /has one feature/, '222*6,222*'], ['2y4', 'o27', /Not a signature/, ''], ['1', 'o27', /Not a signature/, '']]) {
+      await typeIn('o27');
+      await typeIn(text);
+      u = await ui(T); s = await S(T);
+      ok(s.k === stays && !u.on && re.test(u.note) && u.tries.join() === tries, `"${text}": ${stays} stays, the note says why`, JSON.stringify([s.k, u.note, u.tries]));
+      ok(u.noteBox.left >= 0 && u.noteBox.right <= u.vw && !u.overflowX, `"${text}": the note is inside the page`, JSON.stringify(u.noteBox));
+    }
+    await shot(page, 'w05-why');
+    await page.keyboard.press('Enter');
+    ok((await S(T)).k === 'o27' && (await ui(T)).value === '1', 'Enter on what cannot be shown changes nothing');
+    await typeIn('22*x');
+    await T.click('#custom-pop .trylink[data-k="222x"]');
     await page.waitForTimeout(300);
+    u = await ui(T); s = await S(T);
+    ok(s.k === '222x' && u.on && u.value === '222×' && u.focused && u.note === '', 'a tap on an offer takes it; the field keeps the keyboard', JSON.stringify([s.k, u.value, u.focused]));
+
+    // the field beside the chips: a chip takes over, the field keeps its text in gray, a tap on it brings it back
+    await T.click('[data-fam="333*3"]');
+    await page.waitForTimeout(250);
+    u = await ui(T); s = await S(T);
+    ok(s.k === '333*3' && !u.on && u.value === '222×' && u.pressed.join() === '333*3' && u.color === u.muted && u.note === '', 'a chip of the page takes over; the field keeps its text, gray and unlit', JSON.stringify([s.k, u.on, u.value, u.color, u.muted]));
+    await shot(page, 'w06-chip');
+    await T.click('#custom-in');
+    await page.waitForTimeout(250);
     s = await S(T); u = await ui(T);
-    ok(s.k === 'o27' && u.pair.replace(/!/g, '') === 'o⁺ o⁻ 2 7' && u.keys.fault && u.rows.tau && u.rows.tauLabel === 'Handle shift' && /&to=/.test(s.hash), 'o27: a handle, its fault line key and its shift', s.k + ' ' + u.pair + ' ' + s.hash);
+    ok(s.k === '222x' && u.on && u.pressed.length === 0, 'a tap on the field brings its orbifold back, as a chip would', JSON.stringify([s.k, u.on]));
+    await typeIn('3333');
+    u = await ui(T); s = await S(T);
+    ok(s.k === '3333' && !u.on && u.pressed.join() === '3333', 'one of the page\'s own typed in lights its chip, not the field', JSON.stringify([s.k, u.on, u.pressed]));
+    await typeIn('2222');
+    ok((await S(T)).k === '2222' && /Euclidean/.test(await T.textContent('#pat-sub')), '2222 typed is the flat one');
+    await typeIn('');
+    u = await ui(T);
+    ok((await S(T)).k === '2222' && u.note === '' && !u.on, 'an emptied field says nothing and changes nothing');
+
+    // a moment leaves for 3333 while the field holds a typed orbifold: its text stays, unlit
+    await typeIn('o29');
     for (const [i, j] of [[0, 1], [2, 3], [1, 2], [0, 3], [0, 2]]) {
       await T.evaluate(([a, b]) => window.__handles.pick(a, b), [i, j]);
       await T.evaluate(() => window.__handles.waitGlide());
     }
     s = await S(T);
-    ok(s.k === 'o27' && Number.isFinite(s.L) && s.pat.tiles > 3, 'five picks on o27 leave a drawn pattern', JSON.stringify({ L: s.L, tw: s.tw, tiles: s.pat.tiles }));
-    await T.evaluate(() => window.__handles.moment('follow'));
+    ok(s.k === 'o29' && Number.isFinite(s.L) && s.pat.tiles > 3, 'five picks on o29 leave a drawn pattern', JSON.stringify({ L: s.L, tw: s.tw, tiles: s.pat.tiles }));
+    await T.evaluate(() => { document.activeElement && document.activeElement.blur(); window.__handles.moment('follow'); });
     await page.waitForTimeout(2200);
-    ok((await S(T)).moment === 'follow', 'Follow the tree runs on a custom orbifold');
-    await shot(page, 'w06-o27-follow');
-
-    // a moment leaves for 3333: the bar follows; a chip of the page shuts the editor
+    ok((await S(T)).moment === 'follow', 'Follow the tree runs on a typed orbifold');
+    await shot(page, 'w07-o29-follow');
     await T.evaluate(() => window.__handles.moment('half'));
     await page.waitForTimeout(200);
     u = await ui(T); s = await S(T);
-    ok(s.k === '3333' && u.open && u.cells === '3 3 3 3' && u.pressed.length === 0, 'a moment goes to 3333 and the bar follows', u.cells);
-    await T.click('[data-fam="333*3"]');
-    await page.waitForTimeout(200);
-    u = await ui(T); s = await S(T);
-    ok(!u.open && u.chip === 'false' && u.pressed.join() === '333*3' && s.k === '333*3', 'a chip of the page shuts the editor', JSON.stringify(u.pressed));
-    await T.click('#custom-chip');
-    await page.waitForTimeout(250);
-    u = await ui(T); s = await S(T);
-    ok(u.open && u.cells === 'ring 2 7' && s.k === 'o27' && u.pressed.length === 0, 'Custom again comes back to the orbifold typed last: o27', u.cells + ' ' + s.k);
-    await T.click('[data-fam="333*3"]');
-    await T.evaluate(() => window.__handles.custom.open({ focus: true }));
-    await T.evaluate(() => window.__handles.state());
-    u = await ui(T);
-    ok(u.open && u.cells === '3 3 3 star 3', 'opened without recall it is on what is shown: 333∗3', u.cells);
+    ok(s.k === '3333' && !u.on && u.value === 'o29' && u.pressed.join() === '3333', 'a moment goes to 3333: the field keeps o29, unlit', JSON.stringify([s.k, u.value, u.on]));
 
-    // typing does not leak: a slider keeps its keys, the tutorial tab takes none
+    // typing stays in the field: nothing typed elsewhere reaches it
     await T.focus('#len-range');
-    await type(page, ['2']);
-    ok((await ui(T)).cells === '3 3 3 star 3', 'a digit typed on a slider is not taken');
+    await page.keyboard.press('2');
     await T.click('.tab2[data-tab="tutorial"]');
     await T.evaluate(() => document.activeElement && document.activeElement.blur());
-    await type(page, ['2', 'Backspace', 'Backspace']);
+    for (const k of ['2', '3', 'Backspace']) await page.keyboard.press(k);
     await T.click('.tab2[data-tab="play"]');
-    ok((await ui(T)).cells === '3 3 3 star 3', 'nothing is typed from the Tutorial tab');
+    ok((await ui(T)).value === 'o29' && (await S(T)).k === '3333', 'keys pressed on a slider or on the Tutorial tab do not reach the field');
 
-    // drags and the ends of every slider on custom orbifolds: the pattern stays drawn
+    // drags and the ends of every slider on typed orbifolds: the pattern stays drawn
     for (const t of ['2345', '957*', '259*4', '957x', 'o29', '9999', '2229']) {
-      await T.evaluate((x) => window.__handles.custom.go(x), t);
+      await T.evaluate((x) => { document.activeElement && document.activeElement.blur(); window.__handles.custom.type(x); }, t);
       await page.waitForTimeout(250);
       const box = await T.evaluate(() => { const r = document.getElementById('pattern').getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width }; });
       let worst = Infinity;
@@ -217,7 +222,7 @@ try {
         await page.waitForTimeout(120);
         worst = Math.min(worst, (await S(T)).pat.tiles);
       }
-      ok(worst > 3, `${t}: dragged six times, the pattern stays drawn`, 'fewest tiles ' + worst);
+      ok((await S(T)).k === t && worst > 3, `${t}: dragged six times, the pattern stays drawn`, 'fewest tiles ' + worst);
       const ends = await T.evaluate(async () => {
         const out = [];
         for (const id of ['len-range', 'tw-range', 'b-range', 'tau-range']) {
@@ -236,69 +241,69 @@ try {
       ok(bad.length === 0, `${t}: every slider at both ends`, JSON.stringify(bad));
       await T.click('#reset2');
     }
-
-    // 2222 through the editor is the page's flat family
-    await T.evaluate(() => window.__handles.custom.go('2222'));
-    await page.waitForTimeout(300);
-    s = await S(T); u = await ui(T);
-    ok(s.k === '2222' && u.open && /Euclidean/.test(await T.textContent('#pat-sub')), '2222 typed is the flat one', s.k);
-    await T.evaluate(() => window.__handles.custom.go('2223'));
-    await page.waitForTimeout(300);
-    ok((await S(T)).k === '2223', 'and one digit up it is hyperbolic 2223');
     await ctx.close();
   }
 
   // ---------------------------------------------------------------- links
   {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=259%2A4&m=1302&l=1.3&tw=-0.25&b=0.8&tc=0.1');
-    let s = await S(T), u = await ui(T);
-    ok(s.k === '259*4' && s.m === '1302' && Math.abs(s.L - 1.3) < 1e-9 && Math.abs(s.b - 0.8) < 1e-9 && Math.abs(s.tau - 0.1) < 1e-9, 'a link to a custom orbifold opens it with its numbers', JSON.stringify(s));
-    ok(u.open && u.chip === 'true' && u.cells === '2 5 9 star 4' && u.pressed.length === 0, 'with the editor open on it', u.cells);
+    const { ctx, page, T } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=259%2A4&m=1302&l=1.3&tw=-0.25&b=0.8&tc=0.1');
+    const s = await S(T), u = await ui(T);
+    ok(s.k === '259*4' && s.m === '1302' && Math.abs(s.L - 1.3) < 1e-9 && Math.abs(s.b - 0.8) < 1e-9 && Math.abs(s.tau - 0.1) < 1e-9, 'a link to a typed orbifold opens it with its numbers', JSON.stringify(s));
+    ok(u.on && u.value === '259∗4' && u.pressed.length === 0 && u.note === '', 'with the field holding it, lit', JSON.stringify([u.on, u.value]));
     ok(s.hash === '#k=259*4&m=1302&l=1.3&tw=-0.25&b=0.8&tc=0.1', 'and the same address back', s.hash);
     await shot(page, 'l01-link');
     await ctx.close();
   }
   {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=237');
+    const { ctx, page, T } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=237');
     const s = await S(T), u = await ui(T);
-    ok(s.k === '3333' && u.open && u.cells === '2 3 7' && /has three features/.test(u.say), 'a link to a signature the page cannot show opens the editor on it, with the reason', JSON.stringify({ k: s.k, cells: u.cells, say: u.say }));
+    ok(s.k === '3333' && u.value === '237' && !u.on && /has three features/.test(u.note) && u.tries.join() === '2372', 'a link to a signature the page cannot show: it is in the field, with the reason', JSON.stringify({ k: s.k, value: u.value, note: u.note }));
+    await shot(page, 'l02-237');
+    await T.click('h1');
+    await page.waitForTimeout(150);
+    ok((await ui(T)).value === '237', 'the field keeps it');
     await ctx.close();
   }
   {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=nonsense');
+    const { ctx, T } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=o33&m=0213&l=2.2&tw=0.15&b=1.3&to=0.25');
     const s = await S(T), u = await ui(T);
-    ok(s.k === '3333' && !u.open, 'a broken link opens the page as before', JSON.stringify({ k: s.k, open: u.open }));
-    await ctx.close();
-  }
-  {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 1280, height: 900 } }, '#k=o33&m=0213&l=2.2&tw=0.15&b=1.3&to=0.25');
-    const s = await S(T), u = await ui(T);
-    ok(s.k === 'o33' && !u.open && u.pressed.join() === 'o33', 'an old link to a family of the page is unchanged', JSON.stringify(u.pressed));
+    ok(s.k === 'o33' && !u.on && u.value === '' && u.pressed.join() === 'o33', 'an old link to a family of the page is unchanged', JSON.stringify(u.pressed));
     await ctx.close();
   }
 
-  // ---------------------------------------------------------------- a phone, dark
+  // ---------------------------------------------------------------- narrower windows: the chips, the field and the Pair buttons
+  for (const w of [1100, 940, 760, 600]) {
+    const { ctx, T } = await newPage({ viewport: { width: w, height: 800 } });
+    const u = await ui(T);
+    const rows = await T.evaluate(() => ['[data-fam="3333"]', '#custom-in', '.sig-wrap', '#pane2'].map((q) => { const r = document.querySelector(q).getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.right)]; }));
+    ok(!u.overflowX && u.field[0] >= 150 && rows[1][2] <= w && rows[2][1] < rows[3][1], `${w} px wide: the field keeps its width, nothing wider than the window`, JSON.stringify([u.field, rows]));
+    await ctx.close();
+  }
+
+  // ---------------------------------------------------------------- a phone, dark, touch
   {
-    const { ctx, page, T, off } = await newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, colorScheme: 'dark', hasTouch: true, isMobile: true }, '#k=o25');
+    const { ctx, page, T } = await newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, colorScheme: 'dark', hasTouch: true, isMobile: true }, '#k=o25');
     let u = await ui(T);
-    ok(u.open && !u.overflowX, 'a phone: the editor open, nothing wider than the screen', JSON.stringify({ open: u.open, overflowX: u.overflowX }));
-    const order = await T.evaluate(() => ['.seg', '#custom-ed', '.sig-wrap', '#pane2'].map((q) => Math.round(document.querySelector(q).getBoundingClientRect().top)));
-    ok(order[0] < order[1] && order[1] < order[2] && order[2] < order[3], 'the editor sits under the chips, before the Pair buttons', order.join(' '));
-    const small = await T.evaluate(() => [...document.querySelectorAll('#custom-ed button')].filter((b) => !b.classList.contains('symcell') && b.offsetParent !== null).map((b) => { const r = b.getBoundingClientRect(); return [b.id || b.dataset.add || b.dataset.k, Math.round(r.width), Math.round(r.height)]; }).filter(([, w, h]) => h < 40 || w < 40));
-    ok(small.length === 0, 'the editor\'s buttons are a finger wide', JSON.stringify(small));
-    await T.tap('#cu-add [data-add="cone"]');
-    u = await ui(T);
-    ok(/has five features/.test(u.say) && !u.overflowX, 'a tap on "cone" adds one; five features are too many', u.say);
-    await shot(page, 'p01-phone-dark', { fullPage: true });
-    await T.tap('#cu-remove');
-    await page.waitForTimeout(200);
-    ok((await S(T)).k === 'o25', 'delete takes it away again');
-    for (const t of ['2379', '957*', '222*2', '999x', 'o99', '22222*']) {
-      await T.evaluate((x) => window.__handles.custom.go(x), t);
+    ok(u.on && u.value === 'o25' && !u.overflowX && u.field[1] >= 44 && u.field[0] >= 150, 'a phone: the field lit on o25, a finger tall, nothing wider than the screen', JSON.stringify([u.on, u.value, u.field, u.overflowX]));
+    const fontPx = await T.evaluate(() => parseFloat(getComputedStyle(document.getElementById('custom-in')).fontSize));
+    ok(fontPx >= 16, 'its text is 16 px, so a phone does not zoom in on it', String(fontPx));
+    await T.tap('#custom-in');
+    for (const t of ['o252', '23*56', '22**', '99999999', 'o o o', 'nonsense text here']) {
+      await T.evaluate((x) => window.__handles.custom.type(x), t);
+      await page.waitForTimeout(200);
+      u = await ui(T);
+      ok(u.note !== '' && u.noteBox.left >= 0 && u.noteBox.right <= u.vw && !u.overflowX, `"${t}" on a phone: its note is inside the screen`, JSON.stringify([u.note.slice(0, 40), u.noteBox, u.vw]));
+    }
+    await shot(page, 'p01-phone-dark-note');
+    const small = await T.evaluate(() => [...document.querySelectorAll('#custom-pop .trylink')].map((b) => { const r = b.getBoundingClientRect(); return [b.dataset.k, Math.round(r.width), Math.round(r.height)]; }).filter(([, w, h]) => h < 32 || w < 44));
+    ok(small.length === 0, 'the offers are wide enough for a finger', JSON.stringify(small));
+    for (const t of ['2379', '957*', '222*2', '999x', 'o99']) {
+      await T.evaluate((x) => window.__handles.custom.type(x), t);
       await page.waitForTimeout(250);
       u = await ui(T);
-      ok(!u.overflowX, `${t} on a phone: nothing wider than the screen`);
+      ok((await S(T)).k === t && u.on && !u.overflowX, `${t} on a phone: shown, nothing wider than the screen`);
     }
+    await shot(page, 'p02-phone-dark', { fullPage: true });
     await ctx.close();
   }
 } finally {

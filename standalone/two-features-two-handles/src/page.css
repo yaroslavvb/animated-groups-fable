@@ -131,102 +131,113 @@
   outline-offset: 2px;
 }
 
-/* "Custom": the signature typed like a line of text (the bar of the Classification of Surfaces page, styles.css
-   .symcells ...), a size smaller and set to the left, under the chips it belongs to */
-.custom-ed {
-  flex: 1 0 100%;
+/* Any orbifold, typed: one quiet field after the chips, its hint in its placeholder. It is a chip's size and takes a
+   pressed chip's look while the orbifold shown is the one it holds. */
+.seg {
+  flex: 1 1 auto;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
 }
-.custom-ed[hidden] {
+.custom-field {
+  display: inline-flex;
+  flex: 1 1 210px;
+  min-width: 150px;
+  max-width: 290px;
+}
+.custom-in {
+  appearance: none;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 11px;
+  border: 4px solid transparent;
+  border-radius: 12px;
+  background: var(--ground) padding-box;
+  box-shadow: inset 0 0 0 1px var(--hairline);
+  color: var(--muted);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+}
+.custom-in::placeholder {
+  color: var(--faint);
+  opacity: 1;
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.custom-in:focus {
+  outline: none;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--muted);
+}
+.custom-in:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.custom-in[data-on="1"] {
+  color: var(--ink);
+  background-color: var(--accent-soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+.custom-in.nope {
+  animation: custom-nope 0.25s;
+}
+@keyframes custom-nope {
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .custom-in.nope { animation: none; }
+}
+/* why what is typed is not shown: a note right under the field, lying over the page so that nothing moves */
+.ctrl-bar {
+  position: relative;
+}
+.custom-pop {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  top: 100%;
+  width: max-content;
+  margin: 0;
+  padding: 7px 11px 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--ground);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+.custom-pop[hidden] {
   display: none;
 }
-/* beside each other the chips and the Pair buttons share the first line, and the editor takes the next; where they
-   wrap, the editor stays under the chips it belongs to */
-@media (min-width: 940px) {
-  .custom-ed {
-    order: 3;
-  }
-}
-.custom-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 10px;
-}
-.custom-ed .symcells {
-  min-width: 120px;
-  min-height: 52px;
-}
-.custom-ed .symcell {
-  min-width: 32px;
-  height: 46px;
-  font-size: 31px;
-}
-.custom-ed .symcaret {
-  height: 32px;
-}
-.custom-ed .symstep {
-  margin-left: 0;
-}
-.custom-ed .symadd {
-  justify-content: flex-start;
-}
-.custom-say {
-  margin: 8px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--muted);
-}
-.custom-say b {
+.custom-pop b {
   color: var(--ink);
   font-weight: 650;
 }
-.custom-say .cu-l1,
-.custom-say .cu-l2 {
-  display: block;
+.custom-pop .tries {
+  white-space: nowrap;
 }
-.custom-say[data-state="no"] .cu-l1 {
+.custom-pop .trylink {
+  appearance: none;
+  min-width: 44px;
+  min-height: 32px;
+  margin: 2px 0 0 4px;
+  padding: 0 9px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--hairline);
   color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
 }
-/* the second line holds the offers (chips) or the rule; side by side it keeps a chip's height either way, so the
-   panes below do not jump as the signature is typed */
-.custom-say .cu-l2 {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 8px;
-}
-@media (min-width: 940px) {
-  .custom-say .cu-l1 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .custom-say .cu-l2 {
-    min-height: 38px;
-  }
-  .custom-say .trychip {
-    min-height: 38px;
-    min-width: 52px;
-    font-size: 16px;
-  }
-}
-.custom-say .tries {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-}
-@media (max-width: 480px) {
-  .custom-ed {
-    padding: 8px 8px 10px;
-  }
-  .custom-ed .symstep .st-btn {
-    width: 44px;
-  }
+@media (hover: hover) {
+  .custom-pop .trylink:hover { background: var(--hairline); }
 }
 
 .play-panes {

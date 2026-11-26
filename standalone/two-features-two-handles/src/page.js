@@ -10,7 +10,7 @@ import {
   psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist,
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
-import { createCustomEditor } from './custom-ui.js';
+import { createCustomField } from './custom-ui.js';
 import { mul, apply, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
 import { createStage } from '../../2026-11-15-classification-of-surfaces/src/stage.js';
@@ -403,9 +403,8 @@ function fmtSigned(v, dec) {
 
 function syncUI() {
   const fam = FAMILIES[state.k];
-  if (fam.custom && !custom.isOpen()) custom.open({ focus: false, text: state.k });          // a typed orbifold is always shown with the bar it was typed in
-  for (const b of famBtns) b.setAttribute('aria-pressed', String(!custom.isOpen() && b.dataset.fam === state.k));
-  custom.sync();
+  for (const b of famBtns) b.setAttribute('aria-pressed', String(b.dataset.fam === state.k));
+  custom.sync();          // the text field after the chips: lit while the orbifold shown is the one typed there
   const picked = new Set([state.perm[0], state.perm[1]]);
   sigBtns.forEach((b, idx) => {
     const lbl = fam.featLabels[idx];
@@ -661,16 +660,17 @@ function setFamily(k, opts = {}) {
   writeHashNow();
 }
 
-/** "Custom": put a typed signature's family on the page. While the shape stays (a digit stepped), so do the pair and the sliders. */
+/** Put a typed signature's family on the page. While the shape stays (a digit changed), so do the pair and the sliders. */
 function showCustom(key) {
   const fam = FAMILIES[key], prev = FAMILIES[state.k];
   const same = prev.mode === fam.mode && prev.kind === fam.kind;
   setFamily(key, same ? { perm: state.perm.slice(), L: state.L, tw: state.tw, b: state.b, tau: state.tau } : {});
 }
-const custom = createCustomEditor({
+const custom = createCustomField({
   resolve: normalizeFamilyKey,
   show: showCustom,
   shown: () => state.k,
+  isCustom: (k) => !!FAMILIES[k].custom,
   labelOf: (k) => FAMILIES[k].label,
 });
 
@@ -728,7 +728,7 @@ function applyHash(raw, { initial = false } = {}) {
   const params = new URLSearchParams(h);
   const k = normalizeFamilyKey(params.get('k')) || '3333';
   const fam = FAMILIES[k];
-  const typed = params.get('k') && !normalizeFamilyKey(params.get('k')) ? params.get('k') : null;          // a signature the page cannot show: the editor opens on it and says why
+  const typed = params.get('k') && !normalizeFamilyKey(params.get('k')) ? params.get('k') : null;          // not a family: it goes into the text field as written, which says why
   const mRaw = params.get('m') || fam.defaultM;
   const validM = /^[0-3]{4}$/.test(mRaw) && new Set(mRaw.split('')).size === 4;
   const perm = (validM ? mRaw : fam.defaultM).split('').map(Number);
@@ -743,7 +743,7 @@ function applyHash(raw, { initial = false } = {}) {
   const b = fam.bRange && Number.isFinite(bRaw) ? clamp(bRaw, fam.bRange[0], fam.bRange[1]) : (fam.defaultB ?? 0);
   const tau = fam.tauLabel && Number.isFinite(tauRaw) ? clamp(tauRaw, -0.5, 0.5) : (fam.defaultTau ?? 0);
   setFamily(k, { perm, L, tw, b, tau });
-  if (typed) custom.open({ focus: false, text: typed });
+  if (typed) custom.fill(typed);
   showTab('play', { writeHash: !initial });
   if (initial) writeHashNow();
 }
@@ -755,9 +755,8 @@ for (const b of tabBtns) {
 if (backPlayBtn) backPlayBtn.addEventListener('click', () => showTab('play'));
 
 for (const b of famBtns) {
-  b.addEventListener('click', () => { custom.close(); setFamily(b.dataset.fam); });
+  b.addEventListener('click', () => setFamily(b.dataset.fam));
 }
-$('#custom-chip').addEventListener('click', () => { custom.open({ recall: true }); syncUI(); });
 
 sigBtns.forEach((b, idx) => {
   b.addEventListener('click', () => handleConeSelect(idx));
@@ -889,7 +888,7 @@ function stateSummary() {
     d,
     mDist,
     promoted,
-    custom: { open: custom.isOpen(), text: custom.text(), sel: custom.selected(), why: custom.isOpen() ? custom.why() : null },
+    custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
     autoCenter,
     moment: activeMoment,
     follow: !!(followState && followState.active),

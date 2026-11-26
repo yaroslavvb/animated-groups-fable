@@ -1,4 +1,4 @@
-// custom.js — a typed signature as one of this page's families (the "Custom" chip). Pure: no DOM, no engine.
+// custom.js — a typed signature as one of this page's families (the text field after the chips). Pure: no DOM, no engine.
 //
 // The page cuts an orbifold between two pairs of FEATURES, so it takes exactly four of them. A feature is
 //   a cone point          a digit before any star
@@ -14,9 +14,26 @@
 // (2222 alone is flat: the page's own Euclidean family, which handles.js knows by name.)
 // Anything else gets its reason in its own numbers and the nearest signatures that do work: whyNot().
 //
-// The signature's grammar, its editing and its spellings are the Classification of Surfaces page's (catalog.js).
+// The signature's grammar is the Classification of Surfaces page's (catalog.js parse); readSignature() takes it as
+// people type it.
 
 import { parse, textOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+
+/**
+ * A signature as people type it, or null for what is none: spaces and commas anywhere; ∗ or *; × or x or X; ○ or o
+ * or O or 0; and the rings and crosses wherever they were put (their place says nothing: catalog.js writes rings
+ * first and crosses last). What is left must read as digits 2 .. 9, then stars, each with its digits. Nothing typed
+ * is the empty signature.
+ */
+export function readSignature(text) {
+  const s = String(text == null ? '' : text).replace(/[\s,;·]+/g, '').replace(/[∗＊⋆✱]/g, '*').replace(/[×✕✖X]/g, 'x').replace(/[○◦∘◯oO0]/g, 'o');
+  if (!/^[2-9*xo]*$/.test(s)) return null;
+  const count = (ch) => s.split(ch).length - 1;
+  return parse('o'.repeat(count('o')) + s.replace(/[ox]/g, '') + 'x'.repeat(count('x')));
+}
+
+/** What was typed as catalog.js writes it ("3 3 3 ∗ 3" is "333*3"), or null for what is no signature. */
+export const canonText = (text) => { const sig = readSignature(text); return sig ? textOf(sig) : null; };
 
 /** The features of a signature, in reading order: rings (two each), cone points, mirrors, crosses. */
 export function featuresOf(sig) {
@@ -61,8 +78,8 @@ export function specOf(sig) {
   return null;
 }
 
-/** The same from plain text ("234*5", "234∗5"); null for what is no signature or what the engine cannot build. */
-export const customSpec = (text) => specOf(parse(text));
+/** The same from text as typed ("234*5", "234∗5", "2 3 4 x"); null for what is no signature or what the engine cannot build. */
+export const customSpec = (text) => specOf(readSignature(text));
 
 /** Does the page show this signature: one of the engine's shapes, or the flat 2222? */
 export const shows = (sig) => !!sig && (textOf(sig) === '2222' || !!specOf(sig));
