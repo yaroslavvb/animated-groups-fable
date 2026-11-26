@@ -59,6 +59,7 @@ const momentBtns = [...document.querySelectorAll('[data-moment]')];
 const momentNote = $('#moment-note');
 const reset2Btn = $('#reset2');
 const reset3Btn = $('#reset3');
+const centerToggle = $('#center-toggle');
 const backPlayBtn = $('#back-play');
 
 const MOMENT_COPY = {
@@ -103,6 +104,7 @@ let state = makeDefaultState('3333');
 let older = state.perm[0];
 let newer = state.perm[1];
 let promoted = null;
+let autoCenter = centerToggle ? centerToggle.checked : true;
 let lenRangeBounds = FAMILIES['3333'].baseRange.slice();
 let bRangeBounds = [0.4, 3.0];
 let activeMoment = null;
@@ -410,7 +412,9 @@ function syncUI() {
     b.toggleAttribute('data-pending', promoted === idx);
   });
 
-  patSub.textContent = fam.kind === 'E' ? 'Euclidean plane · pair at centre' : 'Poincaré disc · pair at centre';
+  if (centerToggle) centerToggle.checked = autoCenter;
+  const modeSuffix = autoCenter ? 'pair at centre' : 'view fixed';
+  patSub.textContent = fam.kind === 'E' ? `Euclidean plane · ${modeSuffix}` : `Poincaré disc · ${modeSuffix}`;
   surfSub.textContent = promoted !== null ? `${fam.featLabels[promoted]} ready — tap its partner` : 'Tap two features';
 
   const hasB = !!fam.bRange;
@@ -505,6 +509,18 @@ function scheduleHashWrite() {
 // ---- Actions: pair re-pick, tap, family, moments, tabs
 function recentreStartView(Vstart, model) {
   const G = FAMILIES[state.k].kind === 'E' ? GE : GH;
+  if (G.kind === 'E') {
+    const { D, A } = model;
+    let Vc = Vstart.slice();
+    const far = (M) => { const p = apply(M, D.at); return p[0] * p[0] + p[1] * p[1]; };
+    for (let guard = 0; guard < 120; guard++) {
+      let best = -1, bd = far(Vc) - 1e-9;
+      for (let i = 0; i < D.n; i++) { const d = far(mul(Vc, A.maps[i])); if (d < bd) { bd = d; best = i; } }
+      if (best < 0) break;
+      Vc = mul(Vc, A.maps[best]);
+    }
+    return G.fix(Vc, 1);
+  }
   if (G.kind !== 'H') return Vstart;
   const { D, A } = model;
   let vPsu = so21ToPSU(Vstart, det(Vstart) < 0);
@@ -555,13 +571,24 @@ function pickPair(i, j, { glide = true } = {}) {
   syncUI();
   writeHashNow();
 
-  const shouldGlide = glide && before && !prefersReduced() && typeof requestAnimationFrame === 'function';
-  if (shouldGlide) {
-    const G = fam.kind === 'E' ? GE : GH;
-    let Vstart = fam.kind === 'H'
+  const G = fam.kind === 'E' ? GE : GH;
+  let Vstart = null;
+  if (before) {
+    Vstart = fam.kind === 'H'
       ? psuToSO21(psuMul(so21ToPSU(before.V, det(before.V) < 0), so21ToPSU(next.invQ, false)))
       : G.fix(mul(before.V, next.invQ), 1);
     Vstart = recentreStartView(Vstart, currentModel);
+  }
+
+  if (!autoCenter) {
+    if (Vstart) {
+      pattern.setView({ V: Vstart, base: I3.slice(), turned: false }, { moving: false, sync: true });
+    }
+    return stateSummary();
+  }
+
+  const shouldGlide = glide && Vstart && !prefersReduced() && typeof requestAnimationFrame === 'function';
+  if (shouldGlide) {
     pattern.setView({ V: Vstart, base: I3.slice(), turned: false }, { moving: true, sync: true });
 
     let resolveFn;
@@ -729,6 +756,12 @@ reset3Btn.addEventListener('click', () => {
   stage.R.resetView();
   stage.R.render();
 });
+if (centerToggle) {
+  centerToggle.addEventListener('change', () => {
+    autoCenter = centerToggle.checked;
+    syncUI();
+  });
+}
 
 // 3D ball feature tap & hover
 function coneScreenInfo() {
@@ -837,6 +870,7 @@ function stateSummary() {
     d,
     mDist,
     promoted,
+    autoCenter,
     moment: activeMoment,
     follow: !!(followState && followState.active),
     hash: computeHash(),
@@ -852,6 +886,10 @@ window.__handles = {
   set(opts = {}) {
     cancelGlide();
     cancelFollow();
+    if (typeof opts.autoCenter === 'boolean') {
+      autoCenter = opts.autoCenter;
+      if (centerToggle) centerToggle.checked = autoCenter;
+    }
     if (opts.tab) showTab(opts.tab, { writeHash: false });
     const nextK = (opts.k && normalizeFamilyKey(opts.k)) || state.k;
     const fam = FAMILIES[nextK];
