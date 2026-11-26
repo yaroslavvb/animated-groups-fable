@@ -239,7 +239,10 @@ export function createPattern(canvas, opts = {}) {
       blob(path, pts);
     };
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
-    const marks = A.classes.map(() => new Path2D());
+    // each class's marks in four bins by size, so that the white rim round a mark shrinks with it (his note, Thu 26 Nov
+    // 2026: near the disc's edge a constant 1 px rim left the small triangles "basically white"); the smallest get none
+    const MARK_BINS = [6, 4, 2.5, 0], MARK_RIM = [1, 0.6, 0.35, 0];
+    const marks = A.classes.map(() => MARK_BINS.map(() => new Path2D()));
     const starOf = new Array(n).fill(-1);
     A.stars.forEach((s, k) => s.edges.forEach((e) => { starOf[e] = k; }));
     // the corner classes that get a mark, and from which corner each is drawn
@@ -280,8 +283,9 @@ export function createPattern(canvas, opts = {}) {
         if (kind === 'S' && p[2] < 0.05) continue;
         const to = mk.toward === null ? c : P[mk.toward], q = lerp(p, to, 0.06);
         const ang = Math.atan2(Y(q) - Y(p), X(q) - X(p)), on = pick && pick.t === 'd' && pick.cls === mk.c.id;
-        const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * px), x = X(p), y = Y(p), path = marks[mk.c.id];
+        const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * px), x = X(p), y = Y(p);
         if (r < 1.1) continue;
+        const path = marks[mk.c.id][MARK_BINS.findIndex((m) => r >= m)];
         if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); path.closePath(); }
         else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08); for (let k = 0; k < m; k++) { const a = ang + (TAU * k) / m, qx = x + rr * Math.cos(a), qy = y + rr * Math.sin(a); if (k) path.lineTo(qx, qy); else path.moveTo(qx, qy); } path.closePath(); }
       }
@@ -312,9 +316,11 @@ export function createPattern(canvas, opts = {}) {
       for (const mk of marked) {
         const on = pick && pick.t === 'd' && pick.cls === mk.c.id, col = mk.c.kind === 'cone' ? BLUE : RED;
         ctx.fillStyle = css(col, on || !pick ? 1 : dim);
-        ctx.fill(marks[mk.c.id]);
-        ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${on || !pick ? 0.95 : 0.5})`;
-        ctx.stroke(marks[mk.c.id]);
+        ctx.strokeStyle = `rgba(255,255,255,${on || !pick ? 0.95 : 0.5})`;
+        marks[mk.c.id].forEach((path, b) => {
+          ctx.fill(path);
+          if (MARK_RIM[b]) { ctx.lineWidth = MARK_RIM[b] * (on ? 1.6 : 1); ctx.stroke(path); }
+        });
       }
     };
 
@@ -332,8 +338,8 @@ export function createPattern(canvas, opts = {}) {
         for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
         const out = new Path2D();
         closed(out, pts, flip);
-        const glow = calm ? 0 : Math.max(0, 1 - (performance.now() - pulse) / 600);
-        ctx.fillStyle = `rgba(255,255,255,${0.22 + 0.45 * glow})`; ctx.fill(out);
+        const glow = calm ? 0 : Math.max(0, 1 - (performance.now() - pulse) / 420);      // Shepherd, Thu 26 Nov 09:22: the snap-back flash toned down
+        ctx.fillStyle = `rgba(255,255,255,${0.22 + 0.12 * glow * glow})`; ctx.fill(out);
         if (glow > 0) schedule();
         ctx.lineWidth = 2.6; ctx.strokeStyle = css(DARK, 0.95); ctx.stroke(out);
         // mirrors of the tile on top of its outline, in red
