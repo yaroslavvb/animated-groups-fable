@@ -856,7 +856,7 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
   const UL_s = offH(symShift - L / 2, hV, 1), UM_s = offH(symShift, hU, 1), UR_s = offH(symShift + L / 2, hV, 1);
   const F_Ls = gamS(-b / 2), F_Rs = gamS(b / 2);
 
-  let symVerts, pairs, crL = null, crR = null, crL_s = null, crR_s = null, footFeat = F_R, footFeat_s = F_Rs, featDist = Ddist, wMir = 0;
+  let symVerts, pairs, crL = null, crR = null, crL_s = null, crR_s = null, footFeat = F_R, footFeat_s = F_Rs, footCorner = null, footCorner_s = null, featDist = Ddist, wMir = 0;
   if (fam.mode === 'cone-star') {
     symVerts = [F_Ls, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
     pairs = [{ a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 }];
@@ -892,9 +892,10 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
       const u = Math.max(0, Math.min(segLen, Math.atanh(Math.max(-1 + 1e-15, Math.min(1 - 1e-15, qa[0] / qa[2])))));
       const cand = apply(Fm, [Math.sinh(u), 0, Math.cosh(u)]);
       const dc = GH.dist(A_Rs, cand);
-      if (dc < bestD - 1e-12) { bestD = dc; footFeat_s = cand; }
+      if (dc < bestD - 1e-12) { bestD = dc; footFeat_s = cand; footCorner_s = cL; }
     }
     footFeat = GH.norm(apply(boostX(symShift), footFeat_s));
+    footCorner = GH.norm(apply(boostX(symShift), footCorner_s));
     featDist = bestD;
   }
 
@@ -906,8 +907,8 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
   const R_UR_psu = psuRotAtX(t + L / 2, hV, 1, TAU / ord.ur);
   return {
     D, A, symVerts, edges, symShift, ord,
-    A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, featDist,
-    A_Ls, A_Rs, UL_s, UM_s, UR_s, F_Ls, F_Rs, crL_s, crR_s, footFeat_s,
+    A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, footCorner, featDist,
+    A_Ls, A_Rs, UL_s, UM_s, UR_s, F_Ls, F_Rs, crL_s, crR_s, footFeat_s, footCorner_s,
     hA, hG, hU, b, wMir,
     R_AR: psuToSO21(R_AR_psu), R_AR_psu,
     R_UM: psuToSO21(R_UM_psu), R_UM_psu,
@@ -1577,9 +1578,16 @@ export function followTreeData(state) {
       legPts = [cut.AM, cut.AR, cut.cP(hb), cut.cM(-hb)];
     }
   } else if (c.mp.featPicked) {
-    periodFwd = fam.mode === 'cone-star3'
-      ? [cut.A_L, cut.crL, cut.crR, cut.A_R]
-      : [cut.A_L, cut.F_L, cut.F_R, cut.A_R];
+    if (fam.mode === 'cone-star3') {
+      const footL = GH.norm(apply(invH(cut.TF), cut.footFeat));
+      periodFwd = [cut.A_L, footL];
+      if (cut.footCorner && GH.dist(footL, cut.footCorner) > 1e-7 && GH.dist(cut.footCorner, cut.footFeat) > 1e-7) {
+        periodFwd.push(cut.footCorner);
+      }
+      periodFwd.push(cut.footFeat, cut.A_R);
+    } else {
+      periodFwd = [cut.A_L, cut.F_L, cut.F_R, cut.A_R];
+    }
     legPts = [cut.A_R, cut.footFeat, cut.UM, cut.UR];
   } else {
     periodFwd = [cut.UL, cut.UM, cut.UR];

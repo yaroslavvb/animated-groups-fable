@@ -31,7 +31,7 @@ Two asks that morning, from a Claude session in `animated-groups-fable` (`40b381
 - `src/custom.js` — a signature as people type it (`readSignature`, `canonText`), as one of the engine's shapes (`customSpec`, `specOf`), its features (`featuresOf`), and why one cannot be shown with the nearest that can (`whyNot`). Pure.
 - `src/custom-ui.js` — the text field after the chips and the note under it (`createCustomField`, `noteFor`).
 - `src/page.template.html`, `src/page.css`, `src/page.js` — Play & Tutorial tabs, responsive 2D + 3D panes, uncentered pair selection by default (Pattern stays fixed in place when picking a new pair; Pattern Reset centers on the active pair), 7 family chips, Length and Twist plus contextual cuff-length (`b`) and shift (`tau_o`, `tau_c`) sliders, four moment chips (`Follow the tree`, `Closer, further`, `Half a turn`, `Handle fault`), five MathJax tutorial folds, hash state (`#`, `#k=...`), and `window.__handles`.
-- `test/handles.test.js` — pure geometry & re-cut invariants test suite (21 tests).
+- `test/handles.test.js` — pure geometry & re-cut invariants test suite (22 tests).
 - `test/custom.test.js` — typed orbifolds (8 tests): loose spellings read, 36 signatures read back off their tiles with Gauss–Bonnet areas, all 6 picks and 6-step chains on 25 custom states, period 1 of twist and shifts, the 3D ball, the walk, tiling from far foci.
 - `tools/custom-check.mjs` — the text field in a real Chrome (92 checks): keys, taps, drags, slider ends, links, four window widths, a phone in the dark; `--live <the spacesheep address>` runs them in the viewer's frame. It holds no default of a family: the page's own state says what a fresh orbifold's numbers are.
 - `tools/custom-webkit.mjs` — the text field on the live page in Safari's engine (14 checks); it runs on the M5, where WebKit is.
@@ -70,7 +70,7 @@ node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs \
 
 ## Checked / Not Tried Yet
 
-- **Checked (`node --test`, 21/21 passing):**
+- **Checked (`node --test`, 22/22 passing):**
   - `math-general.md` §9 reference vector `(3,4|2,5), L=1.6, t=0.5` UHP and disc points + `R_A R_B R_D R_C = I` to `1e-10`, plus design moment numbers (`3333` & `2223` `BC`, `CA`, `DA`, `F2`, `F7`).
   - All 6 pairwise picks (and 5–6-step chained recuts) across all 7 families (`3333`, `2223`, `2222`, `333∗`, `333∗3`, `333×`, and both Mixed `{o⁺, 3}` and Split `{o⁺, o⁻}` cuts on `o33`): cone points, geodesic cuffs, `∗3` corners, `H_glue` gluings, and rigid commas stay stationary in place to `1e-9` (`1e-8` over 6 steps), with exact round-trips.
   - Full-turn (`-0.5` vs `+0.5`) periodicity of Twist, `tau_o`, and `tau_c`, and half-turn far-pair swap.
@@ -85,6 +85,7 @@ node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs \
   - Intrinsic rigid cone-mark orientation (`markRefs` in each cone's partner/comma frame so triangles/lenses stay steady across `tw = 0`, `tw = ±0.5`, and `recut`), topological `hScale` + per-segment width buckets (`segBucket`), and `333x` lower-cone mark highlight fix.
   - Smooth `tauC`-independent centering frame (`framePos`) and symmetric 3-lift orbifold `tree to cut` distance (`coneFeatTreeToCut`) on `333*3`, eliminating the disc teleport and metric jump across the `tc = 0` `60°`-corner cut-locus while keeping the shortest-arc wall handoff exact.
   - Default parameters across all 7 built-in families (`3333`, `2223`, `333∗`, `333∗3`, `333×`, `o33`, `2222`) matched to the canonical orbifold metrics of `classification-of-surfaces` (`domainOf(parse(k))`) and verified isometric (and orientation-preserving on `333∗3` and `o33`).
+  - Fixed `followTreeData` on cornered-mirror orbifolds (`cone-star3`: `333∗3`, `234∗5`, `259∗4`, etc.) to walk along the actual perpendicular `treeSeg` (`A_R → footFeat`) and the orange mirror wall via `footCorner`, eliminating the stray diagonal chord to the polygon corner.
 - **Checked (Chrome `shot.mjs`, drag/wheel/coast profiler & `dark_shot.mjs`):**
   - On `#k=3333&m=0123&l=5&tw=-0.5`, eliminating the Chromium `Path2D.closePath()` $O(N^2)$ path-closing overhead, switching hyperbolic geodesics to exact `path.arc()` circular arcs, maintaining shift-invariant `hCache` without budget oscillation, and drawing inertia synchronously cut drag/coast JS frame times from `~35 ms` (`~20 fps`) down to `1.9–3.4 ms` (`60 fps` inertia at `17.0 ms` avg frame interval), and `2223` (`L=3`) from `76.5 ms` JS / `48.6 ms` GPU down to `2.7 ms` JS / `2.5 ms` GPU.
   - Interactive flows across `1280×800` and `390×844` (light & dark): `paneRowOk: true`, `conePixelDriftBeforeGlide: 0`, `333∗`, `333∗3`, `333×`, `o33` Mixed/Split + Handle shift + `Follow the tree`, `2222`, `Tutorial` (177 formulas typeset at build, `clippedSvgs: []` at 390 px, `overflowX: false`, `44 px` touch targets, `0` console/page errors, `0` scrub hits).

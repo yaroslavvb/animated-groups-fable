@@ -1534,3 +1534,77 @@ test('Default parameters of all 7 families match classification-of-surfaces cano
     assert.ok(bestErr < tol, `${k} defaults did not match classification-of-surfaces (err=${bestErr} >= ${tol})`);
   }
 });
+
+test('cone-star3 Follow the tree walks along treeSeg and mirror wall with zero stray corner chord', () => {
+  const applyM = (M, v) => apply(M, v);
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+
+  const cases = [
+    { kStr: '234*5', L: 3.221, tw: 0.3276, b: 2.21, tc: 0.0139, perm: [0, 1, 2, 3] },
+    { kStr: '234*5', L: 3.221, tw: 0.3276, b: 2.21, tc: 0.0139, perm: [1, 2, 0, 3] },
+    { kStr: '234*5', L: 3.221, tw: 0.3276, b: 2.21, tc: 0.0139, perm: [1, 3, 0, 2] },
+    { kStr: '957*9', L: 4.1, tw: -0.22, b: 1.7, tc: -0.35, perm: [0, 1, 2, 3] },
+    { kStr: '259*4', L: 1.5, tw: 0.41, b: 0.9, tc: 0.42, perm: [1, 2, 0, 3] },
+    { kStr: '222*2', L: 2.4, tw: -0.15, b: 1.1, tc: 0.18, perm: [0, 1, 2, 3] },
+  ];
+  for (const tc of [-0.5, -0.45, -0.01, 0, 0.0139, 0.269, 0.45, 0.5]) {
+    cases.push({ kStr: '333*3', L: 3.221, tw: 0.0614, b: 2.512, tc, perm: [0, 1, 2, 3] });
+  }
+
+  for (const { kStr, L, tw, b, tc, perm } of cases) {
+    const k = normalizeFamilyKey(kStr);
+    const fam = FAMILIES[k];
+    const orders = perm.map((c) => fam.baseOrders[c]);
+    const st = { k, perm, orders, L, tw, b, tau: tc, thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)) };
+    const c = coneFeatCentered(k, L, tw, b, tc, { perm });
+    const fd = followTreeData(st);
+    const toPair = (v) => GH.norm(applyM(c.Pmat, v));
+    const { cut } = c;
+    const invTF = invH(cut.TF);
+
+    assert.ok(fd.fwdSegs.length >= 6 && fd.backSegs.length >= 6 && fd.legs.length === 4, `${kStr} perm=${perm} tc=${tc}`);
+    for (const seg of [...fd.fwdSegs, ...fd.backSegs]) {
+      assert.ok(seg[0].every(Number.isFinite) && seg[1].every(Number.isFinite));
+      assert.ok(GH.dist(seg[0], seg[1]) > 1e-6, `${kStr} degenerate segment`);
+    }
+
+    const AL = toPair(cut.A_L), AR = toPair(cut.A_R);
+    const footR = toPair(cut.footFeat);
+    const footL = toPair(applyM(invTF, cut.footFeat));
+    const corner = toPair(cut.footCorner);
+
+    // First segment in period 0 is exact TF^-1 tile copy of treeSeg [A_L -> footL]
+    assert.ok(GH.dist(fd.fwdSegs[0][0], AL) < 1e-9 && GH.dist(fd.fwdSegs[0][1], footL) < 1e-9);
+    assert.ok(Math.abs(GH.dist(fd.fwdSegs[0][0], fd.fwdSegs[0][1]) - cut.featDist) < 1e-9);
+
+    // Period-0 walk reaches AR via [footR -> AR], matching treeSeg exactly
+    const nPer = fd.fwdSegs.findIndex((s) => GH.dist(s[1], AR) < 1e-9);
+    assert.ok(nPer === 2 || nPer === 3, `${kStr} tc=${tc}: unexpected period segments nPer=${nPer}`);
+    assert.ok(GH.dist(fd.fwdSegs[nPer][0], footR) < 1e-9 && GH.dist(fd.fwdSegs[nPer][1], AR) < 1e-9);
+    assert.ok(Math.abs(GH.dist(fd.fwdSegs[nPer][0], fd.fwdSegs[nPer][1]) - cut.featDist) < 1e-9);
+    const treeMin = Math.min(
+      GH.dist(fd.fwdSegs[nPer][0], c.treeSeg[0]) + GH.dist(fd.fwdSegs[nPer][1], c.treeSeg[1]),
+      GH.dist(fd.fwdSegs[nPer][0], c.treeSeg[1]) + GH.dist(fd.fwdSegs[nPer][1], c.treeSeg[0]),
+    );
+    assert.ok(treeMin < 1e-9, `${kStr} treeSeg mismatch ${treeMin}`);
+
+    // Mirror wall segment(s) pass through footCorner when split across two mirror copies and avoid polygon corner chord [A_R, crR]
+    if (nPer === 3) {
+      assert.ok(GH.dist(fd.fwdSegs[1][1], corner) < 1e-9 && GH.dist(fd.fwdSegs[2][0], corner) < 1e-9);
+    }
+
+    // Outgoing segment at AR leaves along sharpest-left tile copy R_AR^-1(footFeat) (collinear 180 deg at 2-cone)
+    const nextTarget = toPair(applyM(invH(cut.R_AR), cut.footFeat));
+    assert.ok(GH.dist(fd.fwdSegs[nPer + 1][0], AR) < 1e-9 && GH.dist(fd.fwdSegs[nPer + 1][1], nextTarget) < 1e-8);
+    if (cut.ord.low === 2) {
+      const a0 = toDisc(footR), aMid = toDisc(AR), a1 = toDisc(nextTarget);
+      assert.ok(GH.dist(footR, AR) + GH.dist(AR, nextTarget) - GH.dist(footR, nextTarget) < 1e-8, `${kStr} 2-cone walk not collinear`);
+      assert.ok(Math.hypot(a0[0] - aMid[0], a0[1] - aMid[1]) > 1e-3 && Math.hypot(a1[0] - aMid[0], a1[1] - aMid[1]) > 1e-3);
+    }
+
+    // Forward and backward walks converge to the isolating cut rim ends in Poincaré disc coords
+    const df = toDisc(fd.fwdSegs[fd.fwdSegs.length - 1][1]), ef = toDisc(fd.ends[1]);
+    const db = toDisc(fd.backSegs[fd.backSegs.length - 1][1]), eb = toDisc(fd.ends[0]);
+    assert.ok(Math.hypot(df[0] - ef[0], df[1] - ef[1]) < 0.01 && Math.hypot(db[0] - eb[0], db[1] - eb[1]) < 0.01);
+  }
+});
