@@ -1608,3 +1608,65 @@ test('cone-star3 Follow the tree walks along treeSeg and mirror wall with zero s
     assert.ok(Math.hypot(df[0] - ef[0], df[1] - ef[1]) < 0.01 && Math.hypot(db[0] - eb[0], db[1] - eb[1]) < 0.01);
   }
 });
+
+test('Follow the tree aligns feet at tw=0 on cone-feat families and matches leg sets identically between tw=-0.5 and +0.5', () => {
+  const segDist = (G, a, b) => Math.min(
+    G.dist(a[0], b[0]) + G.dist(a[1], b[1]),
+    G.dist(a[0], b[1]) + G.dist(a[1], b[0]),
+  );
+
+  const symCases = [
+    { kStr: '3333', perm: [0, 1, 2, 3], L: 2.0, b: 0, tau: 0 },
+    { kStr: '2223', perm: [0, 1, 2, 3], L: 1.6, b: 0, tau: 0 },
+    { kStr: '333*', perm: [0, 1, 2, 3], L: 3.015, b: 1.534, tau: 0 },
+    { kStr: '333*3', perm: [0, 1, 2, 3], L: 3.221, b: 2.512, tau: -0.2814 },
+    { kStr: '333*3', perm: [2, 3, 0, 1], L: 3.221, b: 2.512, tau: -0.2814 },
+    { kStr: '333x', perm: [0, 1, 2, 3], L: 3.215, b: 1.265, tau: 0 },
+    { kStr: '234*5', perm: [0, 1, 2, 3], L: 3.221, b: 2.21, tau: 0.0139 },
+    { kStr: 'o33', perm: [0, 2, 1, 3], L: 3.588, b: 2.039, tau: 0 },
+    { kStr: '2222', perm: [0, 1, 2, 3], L: 1.3, b: 0, tau: 0 },
+  ];
+
+  for (const { kStr, perm, L, b, tau } of symCases) {
+    const k = normalizeFamilyKey(kStr);
+    const fam = FAMILIES[k];
+    const G = fam.kind === 'E' ? GE : GH;
+    const orders = perm.map((c) => fam.baseOrders[c]);
+    const st = (tw) => ({ k, perm, orders, L, tw, b, tau, thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)) });
+
+    const fd0 = followTreeData(st(0));
+    const fdM = followTreeData(st(-0.5));
+    const fdP = followTreeData(st(0.5));
+
+    assert.equal(fd0.legs.length, 4);
+    assert.ok(fd0.extraLegs.length >= 8, `${kStr} perm=${perm} expected periodic extraLegs`);
+
+    // 1. At tw = 0 black and yellow dots meet (dist = 0); at tw = +-0.5 they sit symmetrically +-L/2 (or +-ell on 2222) apart
+    const expectedHalf = k === '2222' ? L : L / 2;
+    assert.ok(G.dist(fd0.feet[0], fd0.feet[1]) < 1e-9, `${kStr} perm=${perm}: feet[0]!=feet[1] at tw=0`);
+    assert.ok(Math.abs(G.dist(fdM.feet[0], fdM.feet[1]) - expectedHalf) < 1e-9, `${kStr} tw=-0.5 feetDist mismatch`);
+    assert.ok(Math.abs(G.dist(fdP.feet[0], fdP.feet[1]) - expectedHalf) < 1e-9, `${kStr} tw=+0.5 feetDist mismatch`);
+
+    // 2. Full drawn leg sets match primary legs identically between tw=-0.5 and tw=+0.5
+    const allM = [...fdM.legs, ...fdM.extraLegs];
+    const allP = [...fdP.legs, ...fdP.extraLegs];
+    for (const lg of fdP.legs) {
+      const best = Math.min(...allM.map((cand) => segDist(G, lg, cand)));
+      assert.ok(best < 1e-8, `${kStr} perm=${perm}: +0.5 primary leg missing in -0.5 full leg set (err=${best})`);
+    }
+    for (const lg of fdM.legs) {
+      const best = Math.min(...allP.map((cand) => segDist(G, lg, cand)));
+      assert.ok(best < 1e-8, `${kStr} perm=${perm}: -0.5 primary leg missing in +0.5 full leg set (err=${best})`);
+    }
+  }
+
+  // Also check o33 split {o+, o-} full leg set parity between tw=-0.5 and tw=+0.5
+  const fdSplitM = followTreeData({ k: 'o33', perm: [0, 1, 2, 3], orders: [0, 0, 3, 3], L: 3.545, tw: -0.5, b: 2.039, tau: 0.153 });
+  const fdSplitP = followTreeData({ k: 'o33', perm: [0, 1, 2, 3], orders: [0, 0, 3, 3], L: 3.545, tw: 0.5, b: 2.039, tau: 0.153 });
+  for (const lg of fdSplitM.legs) {
+    assert.ok(Math.min(...[...fdSplitP.legs, ...fdSplitP.extraLegs].map((c) => segDist(GH, lg, c))) < 1e-8);
+  }
+  for (const lg of fdSplitP.legs) {
+    assert.ok(Math.min(...[...fdSplitM.legs, ...fdSplitM.extraLegs].map((c) => segDist(GH, lg, c))) < 1e-8);
+  }
+});

@@ -1507,18 +1507,26 @@ export function followTreeData(state) {
     const ell = L, w = 1 / ell, s = 2 * ell * tw;
     const A = [-ell / 2, 0, 1], B = [ell / 2, 0, 1], C = [-ell / 2 + s, w, 1], D = [ell / 2 + s, w, 1];
     const fA = [-ell / 2, w / 2, 1], fB = [ell / 2, w / 2, 1], fC = [-ell / 2 + s, w / 2, 1], fD = [ell / 2 + s, w / 2, 1];
+    const baseLegs = [[A, fA], [B, fB], [C, fC], [D, fD]];
+    const extraLegs = [];
+    for (const m of [-2, -1, 1, 2]) {
+      const dx = 2 * m * ell;
+      for (const [p, q] of baseLegs) extraLegs.push([[p[0] + dx, p[1], 1], [q[0] + dx, q[1], 1]]);
+    }
     return {
       kind: 'E',
       fwdSegs: Array.from({ length: 8 }, (_, i) => [[(-0.5 + i) * ell, 0, 1], [(0.5 + i) * ell, 0, 1]]),
       backSegs: Array.from({ length: 8 }, (_, i) => [[(-0.5 - i) * ell, 0, 1], [(-1.5 - i) * ell, 0, 1]]),
       cutPts: [[-12 * Math.max(1, ell), w / 2, 1], [12 * Math.max(1, ell), w / 2, 1]],
       ends: null,
-      legs: [[A, fA], [B, fB], [C, fC], [D, fD]],
+      legs: baseLegs,
+      extraLegs,
       feet: [fA, fC],
     };
   }
   const toSegs = (vs) => { const out = []; for (let i = 0; i + 1 < vs.length; i++) out.push([vs[i], vs[i + 1]]); return out; };
   const K = Math.min(14, Math.ceil(5 / L) + 1);
+  const K_leg = Math.min(6, Math.max(1, Math.ceil(3.5 / L)));
 
   if (fam.mode === 'cones') {
     const c = L / 2, t = tw * L;
@@ -1542,13 +1550,21 @@ export function followTreeData(state) {
     for (let i = -12; i <= 12; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
     const fA0 = offH(-c / 2, 0, 1), fB0 = offH(c / 2, 0, 1);
     const fC0 = offH(t - c / 2, 0, 1), fD0 = offH(t + c / 2, 0, 1);
+    const basePairs = [[A0, fA0], [B0, fB0], [C0, fC0], [D0, fD0]];
+    const extraLegs = [];
+    for (let m = -K_leg; m <= K_leg; m++) {
+      if (m === 0) continue;
+      const Tm = boostX(m * L);
+      for (const [p, q] of basePairs) extraLegs.push([toPair(apply(Tm, p)), toPair(apply(Tm, q))]);
+    }
     return {
       kind: 'H',
       fwdSegs: toSegs(fwdVerts),
       backSegs: toSegs(backVerts),
       cutPts,
       ends: [toPair(offH(-9, 0, 1)), toPair(offH(9, 0, 1))],
-      legs: [[toPair(A0), toPair(fA0)], [toPair(B0), toPair(fB0)], [toPair(C0), toPair(fC0)], [toPair(D0), toPair(fD0)]],
+      legs: basePairs.map(([p, q]) => [toPair(p), toPair(q)]),
+      extraLegs,
       feet: [toPair(fA0), toPair(fC0)],
     };
   }
@@ -1588,10 +1604,10 @@ export function followTreeData(state) {
     } else {
       periodFwd = [cut.A_L, cut.F_L, cut.F_R, cut.A_R];
     }
-    legPts = [cut.A_R, cut.footFeat, cut.UM, cut.UR];
+    legPts = [cut.A_R, cut.footFeat, cut.UR, cut.UM];
   } else {
     periodFwd = [cut.UL, cut.UM, cut.UR];
-    legPts = [cut.UM, cut.UR, cut.A_R, cut.footFeat];
+    legPts = [cut.UR, cut.UM, cut.A_R, cut.footFeat];
   }
 
   const fwdVerts = [];
@@ -1614,6 +1630,12 @@ export function followTreeData(state) {
   for (let i = -12; i <= 12; i++) cutPts.push(toPair(offH(0.75 * i, 0, 1)));
   const footOf = (p) => { const ac = axisCoords(I3, p); return offH(ac.u, 0, 1); };
   const legs = legPts.map((p) => [toPair(p), toPair(footOf(p))]);
+  const extraLegs = [];
+  for (let m = -K_leg; m <= K_leg; m++) {
+    if (m === 0) continue;
+    const Tm = boostX(m * L);
+    for (const p of legPts) extraLegs.push([toPair(apply(Tm, p)), toPair(apply(Tm, footOf(p)))]);
+  }
   return {
     kind: 'H',
     fwdSegs: toSegs(fwdVerts),
@@ -1621,6 +1643,7 @@ export function followTreeData(state) {
     cutPts,
     ends: [toPair(offH(-9, 0, 1)), toPair(offH(9, 0, 1))],
     legs,
+    extraLegs,
     feet: [toPair(footOf(legPts[0])), toPair(footOf(legPts[2]))],
   };
 }
@@ -1934,6 +1957,9 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     } else {
       for (const s of walkSegs) lines.push({ a: s[0], b: s[1], color: INK, width: 3.8, alpha: 0.95, once: true, steps: 8 });
       for (const lg of fd.legs) lines.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
+      if (fd.extraLegs) {
+        for (const lg of fd.extraLegs) lines.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
+      }
       for (let i = 0; i + 1 < fd.cutPts.length; i++) {
         lines.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: [1, 1, 1], width: 5.0, alpha: 0.9, once: true, steps: 4 });
       }
