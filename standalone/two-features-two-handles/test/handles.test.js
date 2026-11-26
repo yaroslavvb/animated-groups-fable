@@ -635,7 +635,9 @@ test('Repro #k=o33&m=2103&l=9.56&tw=0.4295&b=1.3&to=0.4736 sweep, tilesPSU, and 
       const refCommaD = c0.shapes[si].pts.map(toDisc);
       const { bestD, bestComma } = nearestInOrbit(targetCone, refCone, refCone, targetCommaD, refCommaD);
       assert.ok(bestD < 5e-8, `repro recut (${i},${j}) cone ${ci} drift ${bestD}`);
-      assert.ok(bestComma < 1e-7, `repro recut (${i},${j}) comma ${si} drift ${bestComma}`);
+      // the print's parts are large now (paisley.js: that page's commas, up to two units from the cone point that
+      // carries them), so a cone point held to 5e-8 at this extreme Length holds its part to a few times that
+      assert.ok(bestComma < 1e-6, `repro recut (${i},${j}) comma ${si} drift ${bestComma}`);
     }
   }
 });

@@ -1,13 +1,11 @@
 :root {
   --amber: #e69f00;
-  --red: #c82333;
   --blue-bg: rgba(0, 114, 178, 0.12);
   --blue-ring: rgba(0, 114, 178, 0.34);
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --amber: #f0a830;
-    --red: #ee5a62;
     --blue-bg: rgba(86, 180, 233, 0.16);
     --blue-ring: rgba(86, 180, 233, 0.38);
   }

@@ -6,7 +6,7 @@ import {
   followTreeData, interpolateView,
   stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
-  defaultCommas, buildPatternModel,
+  defaultCommas, buildPatternModel, atDefaults, paisleyView, paisleyInfo,
   psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist,
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
@@ -290,21 +290,25 @@ stage.extraMarkers = () => {
   const dark = isDark();
   const blueRgb = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   const blueCss = dark ? '#56b4e9' : '#0072b2';
-  const darkRgb = dark ? [0.9, 0.92, 0.95] : [0.08, 0.09, 0.12];
   const amber = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
   const picked = new Set([state.perm[0], state.perm[1]]);
   const feats = featureAnchorsForBall(built, state.k);
+  // every feature in the signature's own colour, as the Classification of Surfaces page writes it: blue for what
+  // keeps the pattern's sense (cone points, a handle), red for what reflects (a mirror, a crosscap). The picked pair
+  // is told by the loop round it and by its larger dots, not by greying the others
+  const redRgb = dark ? [0.941, 0.541, 0.294] : [0.761, 0.314, 0.039];
+  const redCss = dark ? '#f08a4b' : '#c2500a';
   const markers = feats.map((ft, featIdx) => {
-    const on = picked.has(featIdx);
+    const on = picked.has(featIdx), red = /^[∗×]/.test(ft.label);
     return {
       p: ft.p,
-      color: on ? blueRgb : darkRgb,
-      size: on ? 7 : 5,
-      alpha: on ? 0.95 : 0.38,
+      color: red ? redRgb : blueRgb,
+      size: on ? 9 : 6.5,
+      alpha: 1,
       shape: 'dot',
       label: ft.label,
-      labelColor: on ? blueCss : undefined,
-      labelFaint: !on,
+      labelColor: red ? redCss : blueCss,
+      labelFaint: false,
     };
   });
   const loop = getBallLoop();
@@ -653,15 +657,13 @@ function setFamily(k, opts = {}) {
   if (opts.clearMoment !== false) activeMoment = null;
   ensureLenBounds(state.L, { reset: true });
   if (!built || prevK !== fam.k) buildSurfaceForFamily(fam.k);
-  renderAll({ keepView: false, moving: false });
+  renderAll({ keepView: false, moving: false });          // at the family's default numbers the model opens as classified (handles.js atDefaults)
   writeHashNow();
 }
 
-/** Put a typed signature's family on the page. While the shape stays (a digit changed), so do the pair and the sliders. */
+/** Put a typed signature's family on the page, at its default numbers: where it has them, the shape the Classification of Surfaces page draws. */
 function showCustom(key) {
-  const fam = FAMILIES[key], prev = FAMILIES[state.k];
-  const same = prev.mode === fam.mode && prev.kind === fam.kind;
-  setFamily(key, same ? { perm: state.perm.slice(), L: state.L, tw: state.tw, b: state.b, tau: state.tau } : {});
+  setFamily(key);
 }
 const custom = createCustomField({
   resolve: normalizeFamilyKey,
@@ -733,12 +735,15 @@ function applyHash(raw, { initial = false } = {}) {
   const twRaw = parseFloat(params.get('tw'));
   const bRaw = parseFloat(params.get('b'));
   const tauRaw = parseFloat(params.get('to') ?? params.get('tc') ?? params.get('tau'));
+  // A link carries its numbers as the page writes them, to three or four decimals: one that reads as the family's
+  // default number IS that number, so that a link copied at the defaults opens on the classified pattern, exactly.
+  const snap = (v, def, dec) => (fmtHashNum(v, dec) === fmtHashNum(def, dec) ? def : v);
   const L = Number.isFinite(lRaw)
-    ? clamp(lRaw, fam.kind === 'E' ? 0.25 : 0.15, Math.max(fam.maxRange[1], fam.kind === 'E' ? 4 : 14))
+    ? snap(clamp(lRaw, fam.kind === 'E' ? 0.25 : 0.15, Math.max(fam.maxRange[1], fam.kind === 'E' ? 4 : 14)), fam.defaultL, 3)
     : fam.defaultL;
-  const tw = Number.isFinite(twRaw) ? clamp(twRaw, -0.5, 0.5) : fam.defaultTw;
-  const b = fam.bRange && Number.isFinite(bRaw) ? clamp(bRaw, fam.bRange[0], fam.bRange[1]) : (fam.defaultB ?? 0);
-  const tau = fam.tauLabel && Number.isFinite(tauRaw) ? clamp(tauRaw, -0.5, 0.5) : (fam.defaultTau ?? 0);
+  const tw = Number.isFinite(twRaw) ? snap(clamp(twRaw, -0.5, 0.5), fam.defaultTw, 4) : fam.defaultTw;
+  const b = fam.bRange && Number.isFinite(bRaw) ? snap(clamp(bRaw, fam.bRange[0], fam.bRange[1]), fam.defaultB ?? 0, 3) : (fam.defaultB ?? 0);
+  const tau = fam.tauLabel && Number.isFinite(tauRaw) ? snap(clamp(tauRaw, -0.5, 0.5), fam.defaultTau ?? 0, 4) : (fam.defaultTau ?? 0);
   setFamily(k, { perm, L, tw, b, tau });
   if (typed) custom.fill(typed);
   showTab('play', { writeHash: !initial });
@@ -880,6 +885,7 @@ function stateSummary() {
     mDist,
     promoted,
     custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
+    classified: { at: atDefaults(state), view: paisleyView(state.k), ...paisleyInfo(state.k) },
     autoCenter,
     moment: activeMoment,
     follow: !!(followState && followState.active),

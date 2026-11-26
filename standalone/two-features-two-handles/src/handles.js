@@ -7,6 +7,8 @@ import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/
 import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
 import { customSpec, canonText } from './custom.js';
+import { createPaisley } from './paisley.js';
+import { parse as parseSignature, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;
@@ -272,8 +274,24 @@ export function normalizeFamilyKey(raw) {
   // on the numbers of the built-in family of its shape, with its own orders
   const spec = customSpec(s);
   if (!spec) return null;
-  if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, custom: true };
+  if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, ...canonicalDefaults(spec), custom: true };
   return spec.k;
+}
+/**
+ * The numbers at which a typed family is the orbifold the Classification of Surfaces page draws for its signature.
+ * Four cone points p q r s: that page's tile is a quadrilateral with corners pi/p .. pi/s round an inscribed circle
+ * and its mirror image, so the cut between {p, q} and {s, r} has no twist, the corners run p, q, r, s round it
+ * (this page's A, B, D, C), and its length follows from the side p-q (F1). With a cuff the numbers stay those of
+ * the built-in family of the shape: finding that page's metric there would take solving for four numbers.
+ */
+function canonicalDefaults(spec) {
+  if (spec.mode !== 'cones') return {};
+  try {
+    const sig = parseSignature(spec.k), Dc = sig ? domainOf(sig) : null, cell = Dc && Dc.cells && Dc.cells[0];
+    if (!cell || cell.verts.length !== 4 || Dc.G.kind !== 'H') return {};
+    const [p, q] = spec.baseOrders, L = pairLength(p, q, Dc.G.dist(cell.verts[0], cell.verts[1]));
+    return Number.isFinite(L) && L > 0 ? { defaultM: '0132', defaultL: L, defaultTw: 0 } : {};
+  } catch (err) { return {}; }
 }
 const CUSTOM_BASE = { cones: '3333', 'cone-star': '333*', 'cone-star3': '333*3', 'cone-x': '333x', handle: 'o33' };
 /** The orders of a cone-and-cuff family's three cone points by the place each takes in the cut. */
@@ -302,6 +320,11 @@ function customCommas(fam) {
 }
 
 export function defaultCommas(k) {
+  if (FAMILIES[k]) return paisley.specs(k);          // the print of the Classification of Surfaces page (paisley.js); what follows is the print before it
+  return smallCommas(k);
+}
+/** The small commas the page had until Thu 26 Nov 2026: one by each cone point, sized to stay clear at every setting. */
+export function smallCommas(k) {
   if (FAMILIES[k] && FAMILIES[k].custom) return customCommas(FAMILIES[k]);
   if (k === '3333') {
     return [
@@ -775,16 +798,7 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
   const home = [A_s, B_s, C_s, D_s].map(toPairFromSym);
   const partners = [home[1], home[0], home[3], home[2]];
 
-  const specs = commas || defaultCommas(k);
-  const angles = thetas || specs.map((sp) => (sp ? sp.theta : 0));
-  const shapes = [];
-  for (let cone = 0; cone < 4; cone++) {
-    const slot = perm.indexOf(cone), sp = specs[cone];
-    if (!sp || slot < 0) continue;
-    const th = angles[cone];
-    const F = GH.frame(home[slot], partners[slot]);
-    shapes.push(moved(commaAt(GH, GH.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
-  }
+  const shapes = placeCommas(GH, k, perm, home, partners, commas, thetas);
 
   return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes, markRefs: buildMarkRefs(GH, k, perm, D, A, home, partners, thetas) };
 }
@@ -798,7 +812,11 @@ function placeCommas(G, k, perm, home, partners, commas, thetas) {
     if (!sp || slot < 0) continue;
     const th = angles[feat];
     const F = G.frame(home[slot], partners[slot]);
-    shapes.push(moved(commaAt(G, G.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
+    if (sp.shapes) {
+      // outlines given in the feature's own frame (paisley.js): turned with the frame's angle, carried by the frame
+      const a = th - sp.theta, c = Math.cos(a), sn = Math.sin(a), FR = mul(F, [c, -sn, 0, sn, c, 0, 0, 0, 1]);
+      for (const sh of sp.shapes) shapes.push(moved(sh, FR));
+    } else shapes.push(moved(commaAt(G, G.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
   }
   return shapes;
 }
@@ -1906,22 +1924,39 @@ export function sitesForBall(built, pair, k = '3333') {
   return { siteOf, loopSites: [sa, sb], adjacent: L.sites[sa].toward.has(sb), complement: false };
 }
 
+/** The pair-centred pattern of a state, whichever family it is of; commas: a print in place of the family's own. */
+export function centredFor(state, { dark = false, commas = null } = {}) {
+  const fam = FAMILIES[state.k];
+  if (fam.mode === 'pillow') return pillowCentered(state.L, state.tw, { thetas: state.thetas, perm: state.perm, commas });
+  if (fam.mode === 'cones') return fourConeCentered(state.orders, state.L, state.tw, { thetas: state.thetas, perm: state.perm, k: state.k, commas });
+  if (fam.mode === 'handle') return o33Centered(state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { thetas: state.thetas, perm: state.perm, dark, k: state.k, commas });
+  return coneFeatCentered(state.k, state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { thetas: state.thetas, perm: state.perm, commas });
+}
+const paisley = createPaisley({ families: FAMILIES, centred: (st, commas) => centredFor(st, { commas }), GH, GE });
+/** The view in which a family's default pattern lies exactly as on the Classification of Surfaces page, or null. */
+export const paisleyView = (k) => (FAMILIES[k] ? paisley.view(k) : null);
+export const paisleyInfo = (k) => (FAMILIES[k] ? paisley.info(k) : null);
+/**
+ * Is this state a family's default numbers, with its default pair? There the pattern is the one the Classification
+ * of Surfaces page draws for the signature, and it opens (and resets) lying as it lies there: that page's tile in
+ * the middle, turned as it is there. At any other numbers the pattern opens on its pair.
+ */
+export function atDefaults(state) {
+  const fam = FAMILIES[state.k], near = (a, b) => Math.abs(a - b) < 1e-9;
+  if (!fam) return false;
+  const specs = defaultCommas(state.k);
+  return state.perm.join('') === fam.defaultM && near(state.L, fam.defaultL) && near(state.tw, fam.defaultTw)
+    && near(state.b ?? fam.defaultB ?? 0, fam.defaultB ?? 0) && near(state.tau ?? fam.defaultTau ?? 0, fam.defaultTau ?? 0)
+    && (state.thetas || []).every((t, i) => near(t, specs[i] ? specs[i].theta : 0));
+}
+
 // ---- Build the pattern model for pattern-ext.js from current state
 export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   const INK = [0.08, 0.09, 0.12];
   const AMBER = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
   const BLUE = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   const fam = FAMILIES[state.k];
-  let built;
-  if (fam.mode === 'pillow') {
-    built = pillowCentered(state.L, state.tw, { thetas: state.thetas, perm: state.perm });
-  } else if (fam.mode === 'cones') {
-    built = fourConeCentered(state.orders, state.L, state.tw, { thetas: state.thetas, perm: state.perm, k: state.k });
-  } else if (fam.mode === 'handle') {
-    built = o33Centered(state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { thetas: state.thetas, perm: state.perm, dark, k: state.k });
-  } else {
-    built = coneFeatCentered(state.k, state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { thetas: state.thetas, perm: state.perm });
-  }
+  const built = centredFor(state, { dark });
   const { D, A, home, cutSeg, treeSeg, farTreeSeg, shapes } = built;
 
   const lines = [
@@ -1983,10 +2018,12 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     outline: false,
     tileEdges: false,
     center: fam.kind === 'E' ? [0, 0, 1] : GH.origin,
+    firstV: atDefaults(state) ? paisley.view(state.k) : null,
     design: () => shapes,
     lines,
     dots,
     marks: built.marks ?? [A.cls[0], A.cls[1]],
+    dimMarks: false,
     markRefs: built.markRefs,
   };
 }

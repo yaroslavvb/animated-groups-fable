@@ -269,7 +269,7 @@ export function createPattern(canvas, opts = {}) {
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], desRad = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
@@ -305,7 +305,8 @@ export function createPattern(canvas, opts = {}) {
       V = mul(mul(Rx, Ry), G.translate(model.D.face || model.D.at, G.origin));
       vPsu = psuI();
     } else {
-      V = G.translate(model.center || model.D.at, G.origin);
+      // a model may say how it opens (firstV: a motion that keeps the plane's hand); else its centre goes to the middle
+      V = model.firstV ? G.fix(model.firstV, 1) : G.translate(model.center || model.D.at, G.origin);
       vPsu = G.kind === 'H' ? so21ToPSU(V, false) : psuI();
     }
   }
@@ -634,11 +635,16 @@ export function createPattern(canvas, opts = {}) {
         (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); });
       }
       if (kind === 'H') {
+        // an outline is drawn by its own size on the screen (its reach from its middle, at the disc's scale there):
+        // all of its points from 9 px, every third from 4 px, every fifth below, and not at all under 2.3 px. A
+        // print's commas differ widely in size (the Classification page's Paisley), so the tile's room cannot say
         for (let si = 0; si < des.length; si++) {
           const sh = des[si], q = apply(M, desAt[si] || D.at);
-          const shPx = (hScale * R) / (1 + q[2]);
-          if (shPx >= Math.max(1.2, sh.min || 0)) print(ink, sh, M, shPx >= 20 ? 0 : shPx >= 7 ? 1 : 2);
+          const rPx = (desRad[si] * R) / (1 + q[2]);
+          if (rPx >= 2.3) print(ink, sh, M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2);
         }
+      } else if (kind === 'E') {
+        for (let si = 0; si < des.length; si++) { const rPx = desRad[si] * R; if (rPx >= 2.3) print(ink, des[si], M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2); }
       } else if (px >= 1.2) {
         for (const sh of des) if (px >= sh.min) print(ink, sh, M, b);
       }
@@ -696,9 +702,12 @@ export function createPattern(canvas, opts = {}) {
     const drawMarks = () => {
       for (const mk of marked) {
         const on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id)), col = mk.c.kind === 'cone' ? BLUE : RED;
-        ctx.fillStyle = css(col, on || !(pick || also) ? 1 : dim);
+        // model.dimMarks === false: every mark in its full colour, as on the Classification of Surfaces page with
+        // nothing chosen; the marks brought out together are told by their size alone
+        const full = on || !(pick || also) || (!pick && model.dimMarks === false);
+        ctx.fillStyle = css(col, full ? 1 : dim);
         ctx.fill(marks[mk.c.id]);
-        ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${on || !(pick || also) ? 0.95 : 0.5})`;
+        ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${full ? 0.95 : 0.5})`;
         ctx.stroke(marks[mk.c.id]);
       }
     };
@@ -1029,7 +1038,7 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (!keep) sel = null; quick = false;
       cache = new Map();
@@ -1054,6 +1063,8 @@ export function createPattern(canvas, opts = {}) {
         for (const p of sh.pts) { s[0] += p[0]; s[1] += p[1]; s[2] += p[2]; }
         return G.norm(s);
       });
+      // each outline's own reach from its middle: how large it comes out on the screen decides how finely it is drawn
+      desRad = des.map((sh, i) => (sh.pts && sh.pts.length ? Math.max(...sh.pts.map((p) => G.dist(desAt[i], p))) : 0));
       size();
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else {

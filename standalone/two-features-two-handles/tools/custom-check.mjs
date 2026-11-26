@@ -1,5 +1,6 @@
 // custom-check.mjs — the text field after the chips ("or type an orbifold") in a real Chrome: typed with the keyboard,
-// tapped, dragged, linked to, on a wide screen and on a phone in the dark.
+// tapped, dragged, linked to, on a wide screen and on a phone in the dark. And the print: at a family's default
+// numbers the pattern is the Classification of Surfaces page's, lying as it lies there (src/paisley.js).
 //
 //   node tools/custom-check.mjs [--root <this folder>] [--page site/index.html] [--shots <dir>] [--live <url>]
 // --live takes the page's address on spacesheep (https://spacesheep.dev/@yaroslavvb/two-features-two-handles): there
@@ -23,7 +24,12 @@ if (shots) fs.mkdirSync(shots, { recursive: true });
 
 let failed = 0, errors = 0;
 const ok = (cond, what, extra = '') => { if (!cond) failed++; console.log(`${cond ? 'ok  ' : 'FAIL'} ${what}${cond ? '' : '  ' + extra}`); };
-const S = (T) => T.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, tab: s.tab, pat: s.pattern, moment: s.moment }; });
+const S = (T) => T.evaluate(() => { const s = window.__handles.state(); return { k: s.k, m: s.m, L: s.L, tw: s.tw, b: s.b, tau: s.tau, hash: s.hash, loc: s.locationHash, feat: s.featLabels, custom: s.custom, classified: s.classified, tab: s.tab, pat: s.pattern, moment: s.moment }; });
+// the same engine in node: the print must come out the same on every machine
+const engine = await import(path.join(root, 'src/handles.js'));
+const mul3 = (A, B) => [0, 1, 2].flatMap((r) => [0, 1, 2].map((c) => A[3 * r] * B[c] + A[3 * r + 1] * B[3 + c] + A[3 * r + 2] * B[6 + c]));
+/** How far the pattern on the screen is from lying as on the Classification page (0: exactly so; Infinity: that page has no such view). */
+const offClassified = (s) => { const v = s.classified.view; if (!v) return Infinity; const now = mul3(s.pat.V, s.pat.base); return Math.max(...now.map((x, i) => Math.abs(x - v[i]))); };
 const ui = (T) => T.evaluate(() => {
   const f = document.getElementById('custom-in'), pop = document.getElementById('custom-pop');
   const fr = f.getBoundingClientRect(), pr = pop.hidden ? null : pop.getBoundingClientRect();
@@ -65,6 +71,63 @@ async function newPage(ctxOpts, hash = '') {
 }
 
 try {
+  // ---------------------------------------------------------------- the print: the Classification page's, at the defaults
+  {
+    const { ctx, page, T } = await newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
+    const chips = await T.evaluate(() => [...document.querySelectorAll('[data-fam]')].map((b) => b.dataset.fam));
+    for (const k of chips) {
+      await T.click(`[data-fam="${k}"]`);
+      await page.waitForTimeout(350);
+      const s = await S(T), mine = engine.paisleyInfo(k);
+      ok(s.k === k && s.classified.at && s.classified.exact && offClassified(s) < 1e-6, `${k}: opens on the Classification page's pattern, lying as it lies there`, JSON.stringify([s.classified.at, s.classified.exact, offClassified(s)]));
+      ok(s.pat.shapes === mine.tied.length && s.classified.tied.join() === mine.tied.join() && s.classified.shapes === mine.shapes, `${k}: the same parts on the same cone points here as in node`, JSON.stringify([s.pat.shapes, s.classified.tied, mine.tied]));
+      await shot(page, 'p-' + k.replace('*', 's'));
+    }
+    // a slider moves: the pattern holds its place (the view is not touched), and Reset then centres on the pair
+    await T.click('[data-fam="3333"]');
+    await page.waitForTimeout(300);
+    const before = await S(T);
+    await T.evaluate(() => { const r = document.getElementById('tw-range'); r.value = '0.62'; r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); });
+    await page.waitForTimeout(400);
+    let s = await S(T);
+    ok(!s.classified.at && Math.abs(s.tw - before.tw) > 0.05 && s.pat.shapes === before.pat.shapes, 'Twist moved: the same parts, cut along the cut beforehand, slide', JSON.stringify([s.tw, s.pat.shapes]));
+    await shot(page, 'p-3333-twist');
+    await T.click('#reset2');
+    await page.waitForTimeout(300);
+    s = await S(T);
+    ok(offClassified(s) > 1e-3, 'Reset away from the defaults centres on the pair', String(offClassified(s)));
+    // back at the defaults, dragged away, Reset: the classified view again
+    await T.click('[data-fam="2222"]');
+    await page.waitForTimeout(300);
+    const box = await (await T.$('#pattern')).boundingBox();
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 90, box.y + box.height / 2 + 40, { steps: 6 });
+    await page.mouse.up();
+    await page.waitForTimeout(900);
+    s = await S(T);
+    const dragged = offClassified(s);
+    await T.click('#reset2');
+    await page.waitForTimeout(300);
+    s = await S(T);
+    ok(dragged > 1e-3 && s.classified.at && offClassified(s) < 1e-6, '2222 dragged, then Reset: lying as on the Classification page again', JSON.stringify([dragged, offClassified(s)]));
+    await ctx.close();
+
+    // a link copied at the defaults carries rounded numbers: it opens on the defaults themselves
+    for (const k of chips) {
+      const fresh = await newPage({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 });
+      await fresh.T.click(`[data-fam="${k}"]`);
+      await fresh.page.waitForTimeout(250);
+      const hash = (await S(fresh.T)).hash;
+      await fresh.ctx.close();
+      if (hash === '#') continue;
+      const linked = await newPage({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }, hash.replace('*', '%2A'));
+      const sl = await S(linked.T);
+      ok(sl.k === k && sl.classified.at && offClassified(sl) < 1e-6 && sl.hash === hash, `a link copied at ${k}'s defaults (${hash}) opens as classified`, JSON.stringify([sl.k, sl.classified.at, offClassified(sl), sl.hash]));
+      await linked.ctx.close();
+    }
+  }
+
   // ---------------------------------------------------------------- wide screen, a mouse and a keyboard
   {
     const { ctx, page, T, off, typeIn } = await newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 });
@@ -102,17 +165,17 @@ try {
     await page.waitForTimeout(350);
     u = await ui(T); s = await S(T);
     ok(s.k === '2379' && u.on && u.note === '' && u.pressed.length === 0 && u.pair === '2! 3! 7 9', 'the fourth character shows 2379: the field lit like a pressed chip, no chip pressed', JSON.stringify([s.k, u.on, u.pressed, u.pair]));
-    ok(/^#k=2379&m=0123&l=[\d.]+&tw=-?[\d.]+$/.test(s.hash) && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
+    ok(/^#k=2379&m=\d{4}&l=[\d.]+&tw=-?[\d.]+$/.test(s.hash) && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
+    ok(s.classified.at && s.classified.exact && offClassified(s) < 1e-6, 'a typed orbifold of four cone points opens on the Classification page\'s tile, lying as it lies there', JSON.stringify([s.classified.at, s.classified.exact, offClassified(s)]));
     ok(s.pat && s.pat.tiles > 3, 'the pattern is drawn', JSON.stringify(s.pat && s.pat.tiles));
     await shot(page, 'w03-2379');
 
-    // a pair picked, sliders moved, then a digit changed in the field: the pair and the sliders stay
+    // a pair picked, sliders moved, then a digit changed in the field: the new orbifold opens at its own numbers
     await T.evaluate(() => window.__handles.set({ L: 1.4, tw: -0.2 }));
     await T.evaluate(() => window.__handles.tapCone(2));
     await T.evaluate(() => window.__handles.tapCone(1));
     await T.evaluate(() => window.__handles.waitGlide());
     s = await S(T);
-    const kept = { m: s.m, L: s.L, tw: s.tw };
     ok(s.m.slice(0, 2).split('').sort().join('') === '12', 'a pair picked on a typed orbifold', s.m);
     await T.click('#custom-in');
     await page.keyboard.press('End');
@@ -122,7 +185,7 @@ try {
     await page.keyboard.type('5');
     await page.waitForTimeout(300);
     s = await S(T);
-    ok(s.k === '2375' && s.m === kept.m && Math.abs(s.L - kept.L) < 1e-9 && Math.abs(s.tw - kept.tw) < 1e-9, 'a digit changed: the pair and the sliders stay', `${s.k} ${s.m} ${s.L} ${s.tw}`);
+    ok(s.k === '2375' && s.classified.at && offClassified(s) < 1e-6, 'a digit changed: the new orbifold opens at its own default numbers, as classified', `${s.k} ${s.m} ${s.L} ${s.tw} ${offClassified(s)}`);
 
     // loose notation: spaces, the star and the cross as typed or as printed, rings and crosses anywhere, capitals
     for (const [text, k, pair] of [['2 3 4 *', '234*', '2 ∗ 3 4'], ['234∗5', '234*5', '2 ∗5 3 4'], ['x 2 3 4', '234x', '2 × 3 4'], ['2,3,4,×', '234x', '2 × 3 4'], ['27o', 'o27', 'o⁺ o⁻ 2 7'], ['O27', 'o27', 'o⁺ o⁻ 2 7'], ['5432', '5432', '5 4 3 2']]) {
