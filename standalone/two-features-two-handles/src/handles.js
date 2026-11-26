@@ -751,7 +751,7 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
     shapes.push(moved(commaAt(GH, GH.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
   }
 
-  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes };
+  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes, markRefs: buildMarkRefs(GH, k, perm, D, A, home, partners, thetas) };
 }
 
 function placeCommas(G, k, perm, home, partners, commas, thetas) {
@@ -766,6 +766,30 @@ function placeCommas(G, k, perm, home, partners, commas, thetas) {
     shapes.push(moved(commaAt(G, G.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
   }
   return shapes;
+}
+
+function buildMarkRefs(G, k, perm, D, A, home, partners, thetas) {
+  const fam = FAMILIES[k];
+  const specs = defaultCommas(k);
+  const angles = thetas || specs.map((sp) => (sp ? sp.theta : 0));
+  const refs = {};
+  for (let slot = 0; slot < 4; slot++) {
+    const feat = perm[slot];
+    if (fam.baseOrders[feat] <= 1) continue;
+    const p = home[slot], partner = partners[slot];
+    let bestV = -1, bestD = Infinity;
+    for (let vi = 0; vi < D.n; vi++) {
+      const d = G.dist(p, D.verts[vi]);
+      if (d < bestD) { bestD = d; bestV = vi; }
+    }
+    if (bestV < 0 || bestD > 1e-5) continue;
+    const cid = A.cls[bestV];
+    const th0 = specs[feat] ? specs[feat].theta : 0;
+    const F = G.frame(p, partner);
+    const a = angles[feat] - th0;
+    refs[cid] = { v: bestV, dir: apply(F, [Math.cos(a), Math.sin(a), 0]) };
+  }
+  return refs;
 }
 
 function thetaDeltaPsu(pOld, partOld, pNew, partNew, M_cut_psu) {
@@ -891,7 +915,7 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
   const mp = coneFeatMapping(k, perm);
 
   const rawPos = new Array(4), rawPartner = new Array(4), clsOfFeat = new Array(4).fill(-1);
-  rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.F_R; clsOfFeat[mp.lowerCone] = cut.A.cls[2];
+  rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.F_R; clsOfFeat[mp.lowerCone] = cut.A.cls[k === '333x' ? 3 : 2];
   rawPos[mp.upperMin] = cut.UM; rawPartner[mp.upperMin] = cut.UR; clsOfFeat[mp.upperMin] = cut.A.cls[k === '333x' ? 5 : 4];
   rawPos[mp.upperMax] = cut.UR; rawPartner[mp.upperMax] = cut.UM; clsOfFeat[mp.upperMax] = cut.A.cls[k === '333x' ? 4 : 3];
   rawPos[fi] = cut.footFeat; rawPartner[fi] = cut.A_R;
@@ -938,6 +962,7 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     d: mp.featPicked ? cut.featDist : pairDistance(3, 3, L),
     mDist: mp.featPicked ? segDistToXAxis(cut.A_Rs, cut.footFeat_s) : treeToCut(3, 3, L).m,
     shapes,
+    markRefs: buildMarkRefs(GH, k, perm, D, A, home, canonPartners, thetas),
   };
 }
 
@@ -1163,6 +1188,7 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     d,
     mDist,
     shapes,
+    markRefs: buildMarkRefs(GH, 'o33', perm, D, A, home, canonPartners, thetas),
   };
 }
 
@@ -1564,6 +1590,7 @@ export function pillowCentered(ell, tw, { commas = null, thetas = null, perm = [
     farTreeSeg: [V[5], V[3]],
     cutSeg: [[-ell / 2 + s / 2, w / 2, 1], [1.5 * ell + s / 2, w / 2, 1]],
     shapes,
+    markRefs: buildMarkRefs(GE, '2222', perm, D, A, home, partners, thetas),
   };
 }
 
@@ -1857,5 +1884,6 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     lines,
     dots,
     marks: built.marks ?? [A.cls[0], A.cls[1]],
+    markRefs: built.markRefs,
   };
 }

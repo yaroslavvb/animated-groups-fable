@@ -1135,3 +1135,175 @@ test('followTreeData cutPts reaches ends across all families and keepView clears
     else globalThis.Path2D = prevPath2D;
   }
 });
+
+test('Rigid cone markRefs prevent orientation jumps across tw=0, match at tw=+-0.5, stay invariant under recut, and highlight 333x cone', () => {
+  const toD = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const angDeg = (G, p, u) => {
+    const dx = G.kind === 'H' ? u[0] * (1 + p[2]) - p[0] * u[2] : u[0];
+    const dy = G.kind === 'H' ? u[1] * (1 + p[2]) - p[1] * u[2] : u[1];
+    return (Math.atan2(dy, dx) * 180) / Math.PI;
+  };
+  const modDiffDeg = (a, b, period) => {
+    let d = (((b - a) % period) + period) % period;
+    return d > period / 2 ? period - d : d;
+  };
+
+  // 1. Every interior cone class across all 7 families has markRefs, and 333x picked cones are included in m.marks
+  for (const k of Object.keys(FAMILIES)) {
+    const f = FAMILIES[k];
+    const perms = [f.defaultM.split('').map(Number)];
+    if (k === '2223') perms.push([3, 0, 1, 2], [0, 3, 1, 2]);
+    if (k === 'o33' || k === '333*' || k === '333*3' || k === '333x') perms.push([0, 2, 1, 3], [2, 3, 0, 1]);
+    for (const perm of perms) {
+      for (const tw of [-0.5, -0.0051, 0.01, 0.5]) {
+        const st = {
+          k, perm, orders: perm.map((c) => f.baseOrders[c]),
+          L: f.kind === 'E' ? 1.2 : 1.6, tw,
+          b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+          thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+        };
+        const m = buildPatternModel(st);
+        const coneClasses = m.A.classes.filter((c) => c.kind === 'cone' && c.n > 1);
+        for (const c of coneClasses) {
+          assert.ok(m.markRefs && m.markRefs[c.id], `${k} m=${perm.join('')} tw=${tw} missing markRefs[${c.id}]`);
+          const v = m.markRefs[c.id].v;
+          assert.equal(m.A.cls[v], c.id, `${k} markRefs[${c.id}].v wrong class`);
+        }
+        for (const slot of [0, 1]) {
+          if (f.baseOrders[perm[slot]] > 1) {
+            const G = f.kind === 'E' ? GE : GH;
+            const cid = coneClasses.find((c) => c.verts.some((vi) => G.dist(m.home[slot], m.D.verts[vi]) < 1e-6))?.id;
+            assert.ok(cid !== undefined && m.marks.includes(cid), `${k} m=${perm.join('')} picked cone class ${cid} missing from marks`);
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Orientation continuity across tw=0 and periodicity across tw=+-0.5
+  const sweepCases = [
+    ['2223', [3, 0, 1, 2], 1.6],
+    ['3333', [0, 1, 2, 3], 1.6],
+    ['333*', [0, 1, 2, 3], 1.6],
+    ['333*', [2, 3, 0, 1], 1.6],
+    ['333*3', [0, 1, 2, 3], 1.6],
+    ['333*3', [2, 3, 0, 1], 1.6],
+    ['333x', [0, 1, 2, 3], 1.6],
+    ['333x', [2, 3, 0, 1], 1.6],
+    ['o33', [0, 2, 1, 3], 1.6],
+    ['o33', [2, 3, 0, 1], 1.6],
+    ['2222', [0, 1, 2, 3], 1.2],
+  ];
+  for (const [k, perm, L] of sweepCases) {
+    const f = FAMILIES[k];
+    const G = f.kind === 'E' ? GE : GH;
+    const mk = (tw) => buildPatternModel({
+      k, perm, orders: perm.map((c) => f.baseOrders[c]),
+      L, tw, b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+      thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+    });
+
+    const collectMarks = (m) => {
+      const ts = f.kind === 'H'
+        ? tilesPSU(m.D, m.A, { focus: [0, 0], radius: 2.2, max: 500 })
+        : [{ M: I3.slice() }];
+      const out = [];
+      for (const t of ts) {
+        for (const c of m.A.classes) {
+          const ref = m.markRefs && m.markRefs[c.id];
+          if (!ref) continue;
+          const p = apply(t.M, m.D.verts[ref.v]);
+          const u = apply(t.M, ref.dir);
+          if (f.kind === 'H' && Math.hypot(...toD(p)) > 0.72) continue;
+          out.push({ n: c.n, pos: p, ang: angDeg(G, p, u) });
+        }
+      }
+      return out;
+    };
+
+    // (a) Stationary picked cones stay fixed across tw = -0.0051 vs +0.010 and tw = -0.5 vs +0.5
+    const mNeg = mk(-0.0051), mPos = mk(0.01);
+    const mHalfNeg = mk(-0.5), mHalfPos = mk(0.5);
+    for (const slot of [0, 1]) {
+      const feat = perm[slot];
+      const ord = f.baseOrders[feat];
+      if (ord <= 1) continue;
+      const refAngleOf = (m) => {
+        const cid = Object.keys(m.markRefs).find((id) => G.dist(m.D.verts[m.markRefs[id].v], m.home[slot]) < 1e-6);
+        const ref = m.markRefs[cid];
+        return angDeg(G, m.D.verts[ref.v], ref.dir);
+      };
+      assert.ok(modDiffDeg(refAngleOf(mNeg), refAngleOf(mPos), 360 / ord) < 1e-9, `${k} m=${perm.join('')} slot=${slot} rotated across tw`);
+      assert.ok(modDiffDeg(refAngleOf(mHalfNeg), refAngleOf(mHalfPos), 360 / ord) < 1e-9, `${k} m=${perm.join('')} slot=${slot} rotated across tw=+-0.5`);
+    }
+
+    // (b) All nearby tiled cone marks vary continuously across tw=0 (< 0.5 deg) and match at tw=+-0.5 (< 1e-6 deg)
+    const zeroA = collectMarks(mk(-0.0005)), zeroB = collectMarks(mk(0.0005));
+    for (const a of zeroA) {
+      const best = zeroB.filter((b) => b.n === a.n).reduce((acc, b) => {
+        const d = G.dist(a.pos, b.pos);
+        return d < acc.d ? { d, b } : acc;
+      }, { d: Infinity, b: null });
+      if (best.b && best.d < 0.05) {
+        const da = modDiffDeg(a.ang, best.b.ang, 360 / a.n);
+        assert.ok(da < 0.5, `${k} m=${perm.join('')} jumped ${da.toFixed(2)} deg across tw=0`);
+      }
+    }
+    const halfA = collectMarks(mHalfNeg), halfB = collectMarks(mHalfPos);
+    for (const a of halfA) {
+      const best = halfB.filter((b) => b.n === a.n).reduce((acc, b) => {
+        const d = G.dist(a.pos, b.pos);
+        return d < acc.d ? { d, b } : acc;
+      }, { d: Infinity, b: null });
+      if (best.b && best.d < 1e-5) {
+        const da = modDiffDeg(a.ang, best.b.ang, 360 / a.n);
+        assert.ok(da < 1e-6, `${k} m=${perm.join('')} jumped ${da.toFixed(6)} deg between tw=-0.5 and +0.5`);
+      }
+    }
+  }
+
+  // 3. All 6 recut pair picks on all 7 families preserve markRefs cone orientation (< 1e-6 deg)
+  for (const k of Object.keys(FAMILIES)) {
+    const f = FAMILIES[k];
+    const G = f.kind === 'E' ? GE : GH;
+    const perm0 = f.defaultM.split('').map(Number);
+    const st0 = {
+      k, perm: perm0, orders: perm0.map((c) => f.baseOrders[c]),
+      L: f.defaultL, tw: f.defaultTw, b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+      thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+    };
+    const m0 = buildPatternModel(st0);
+    for (let i = 0; i < 4; i++) {
+      for (let j = i + 1; j < 4; j++) {
+        const r = recut(st0, i, j);
+        const m1 = buildPatternModel(r);
+        const ts1 = f.kind === 'H'
+          ? tilesPSU(m1.D, m1.A, { focus: [0, 0], radius: 5.5, max: 3000 })
+          : tiles(m1.D, m1.A, { radius: 4, max: 200 });
+        for (const cid of Object.keys(m0.markRefs)) {
+          const ref0 = m0.markRefs[cid];
+          const ord = m0.A.classes[cid].n;
+          const qp = apply(r.Q, m0.D.verts[ref0.v]);
+          const qu = apply(r.Q, ref0.dir);
+          const ang0 = angDeg(G, qp, qu);
+          let matched = 0;
+          for (const t of ts1) {
+            for (const cid1 of Object.keys(m1.markRefs)) {
+              if (m1.A.classes[cid1].n !== ord) continue;
+              const ref1 = m1.markRefs[cid1];
+              const p1 = apply(t.M, m1.D.verts[ref1.v]);
+              if (G.dist(qp, p1) < 1e-5) {
+                matched++;
+                const u1 = apply(t.M, ref1.dir);
+                const ang1 = angDeg(G, p1, u1);
+                const da = modDiffDeg(ang0, ang1, 360 / ord);
+                assert.ok(da < 1e-6, `${k} recut(${i},${j}) cone mark rotated by ${da} deg`);
+              }
+            }
+          }
+          assert.ok(matched >= 1, `${k} recut(${i},${j}) could not match cone mark in new tiling`);
+        }
+      }
+    }
+  }
+});

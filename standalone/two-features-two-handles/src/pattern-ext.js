@@ -542,12 +542,19 @@ export function createPattern(canvas, opts = {}) {
     const marks = A.classes.map(() => new Path2D());
     const starOf = new Array(n).fill(-1);
     A.stars.forEach((s, k) => s.edges.forEach((e) => { starOf[e] = k; }));
+    const hScale = kind === 'H' ? Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area))) : 0.45;
+    const segBucket = (a, q) => {
+      const midZ = (a[2] + q[2]) / Math.sqrt(Math.max(1e-12, 2 * (1 + a[2] * q[2] - a[0] * q[0] - a[1] * q[1])));
+      const sPx = (hScale * R) / (1 + Math.min(a[2], q[2], midZ));
+      return sPx >= 20 ? 0 : sPx >= 7 ? 1 : 2;
+    };
     // the corner classes that get a mark, and from which corner each is drawn
     const marked = A.classes.filter((c) => c.n > 1).map((c) => {
-      const v = c.verts[0];
+      const ref = model.markRefs && model.markRefs[c.id];
+      const v = ref ? ref.v : c.verts[0];
       let toward = null;
-      if (c.kind === 'corner') { const en = c.ends[0]; toward = en.side === 'start' ? (en.e + 1) % n : en.e; }
-      return { c, v, toward };
+      if (!ref && c.kind === 'corner') { const en = c.ends[0]; toward = en.side === 'start' ? (en.e + 1) % n : en.e; }
+      return { c, v, toward, dir: ref ? ref.dir : null };
     });
     let drawn = 0;
     const P = new Array(n);
@@ -574,7 +581,7 @@ export function createPattern(canvas, opts = {}) {
         }
         if (minZ > H_CULL_Z) continue;
         drawn++;
-        effPx = Math.max(px, (0.45 * R) / (1 + minZ));
+        effPx = (hScale * R) / (1 + minZ);
         b = effPx >= 20 ? 0 : effPx >= 7 ? 1 : 2;
         for (let i = 0; i < n; i++) {
           const pi = P[i], invZ = 1 / (1 + pi[2]);
@@ -604,11 +611,12 @@ export function createPattern(canvas, opts = {}) {
         for (let i = 0; i < n; i++) {
           if (starOf[i] >= 0) {
             const j = i + 1 === n ? 0 : i + 1;
-            hypArcD(mirrors[starOf[i]][b], DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], true);
+            const mb = segBucket(P[i], P[j]);
+            hypArcD(mirrors[starOf[i]][mb], DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], true);
           }
         }
-        A.glides.forEach((g, k) => { if (g.seg) hypArc(glides[k][b], apply(M, g.seg[0]), apply(M, g.seg[1]), true); });
-        (model.lines || []).forEach((ln, k) => { if (!ln.once) hypArc(extras[k][b], apply(M, ln.a), apply(M, ln.b), true); });
+        A.glides.forEach((g, k) => { if (g.seg) { const ga = apply(M, g.seg[0]), gb = apply(M, g.seg[1]); hypArc(glides[k][segBucket(ga, gb)], ga, gb, true); } });
+        (model.lines || []).forEach((ln, k) => { if (!ln.once) { const la = apply(M, ln.a), lb = apply(M, ln.b); hypArc(extras[k][segBucket(la, lb)], la, lb, true); } });
       } else {
         drawn++;
         effPx = px;
@@ -628,7 +636,7 @@ export function createPattern(canvas, opts = {}) {
       if (kind === 'H') {
         for (let si = 0; si < des.length; si++) {
           const sh = des[si], q = apply(M, desAt[si] || D.at);
-          const shPx = (Math.max(D.clear, 0.45) * R) / (1 + q[2]);
+          const shPx = (hScale * R) / (1 + q[2]);
           if (shPx >= Math.max(1.2, sh.min || 0)) print(ink, sh, M, shPx >= 20 ? 0 : shPx >= 7 ? 1 : 2);
         }
       } else if (px >= 1.2) {
@@ -636,11 +644,20 @@ export function createPattern(canvas, opts = {}) {
       }
       for (const mk of marked) {
         const p = P[mk.v];
-        const mpx = kind === 'H' ? (Math.max(D.clear, 0.45) * R) / (1 + p[2]) : px;
+        const mpx = kind === 'H' ? (hScale * R) / (1 + p[2]) : px;
         if (mpx < 4.5) continue;
         if (kind === 'S' && p[2] < 0.05) continue;
-        const to = mk.toward === null ? c : P[mk.toward], q = lerpEdge(p, to, 0.06);
-        const ang = Math.atan2(Y(q) - Y(p), X(q) - X(p)), on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id));
+        let ang;
+        if (mk.dir) {
+          const u = apply(M, mk.dir);
+          ang = kind === 'H'
+            ? Math.atan2(-(u[1] * (1 + p[2]) - p[1] * u[2]), u[0] * (1 + p[2]) - p[0] * u[2])
+            : Math.atan2(-u[1], u[0]);
+        } else {
+          const q = lerpEdge(p, mk.toward === null ? c : P[mk.toward], 0.06);
+          ang = Math.atan2(Y(q) - Y(p), X(q) - X(p));
+        }
+        const on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id));
         const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
         if (r < 1.1) continue;
         if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); }
