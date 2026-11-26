@@ -11,7 +11,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from '../src/handles.js';
-import { locateTilePSU, tilesPSU } from '../src/pattern-ext.js';
+import { locateTilePSU, tilesPSU, poincareArc } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
@@ -822,4 +822,103 @@ test('Complementary pair tree (farTreeSeg) renders symmetrically and matches swa
     if (ln.width === 3.0 && ln.color[0] > 0.8 && ln.color[2] < 0.1) ambers.push(idx);
   });
   assert.ok(halos.length > 0 && ambers.length === halos.length && Math.max(...halos) < Math.min(...ambers), 'follow cut halos precede amber strokes');
+});
+
+test('poincareArc matches hyperbolic geodesics to 1e-9 and shift-invariant hCache prevents rim popping', () => {
+  const cx = 250, cy = 200, R = 180;
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const hypLerpH = (a, b, u) => {
+    const d = GH.dist(a, b);
+    if (d < 1e-3) return GH.norm([a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u]);
+    const e2 = Math.exp(-2 * d), invDen = 1 / (1 - e2);
+    const wa = (Math.exp(-u * d) - Math.exp((u - 2) * d)) * invDen;
+    const wb = (Math.exp(-(1 - u) * d) - Math.exp(-(1 + u) * d)) * invDen;
+    return GH.norm([wa * a[0] + wb * b[0], wa * a[1] + wb * b[1], wa * a[2] + wb * b[2]]);
+  };
+  const checkGeodesic = (A, B, label) => {
+    const [ax, ay] = toDisc(A), [bx, by] = toDisc(B);
+    const arc = poincareArc(ax, ay, bx, by, cx, cy, R);
+    assert.equal(arc.line, false, `${label} should be curved arc`);
+    let da = arc.a2 - arc.a1;
+    if (da > Math.PI) da -= TAU;
+    else if (da < -Math.PI) da += TAU;
+    assert.ok(Math.abs(da) < Math.PI, `${label} arc sweep >= PI: ${da}`);
+    assert.equal(arc.ccw, da < 0, `${label} ccw mismatch`);
+    for (const u of [0.25, 0.5, 0.75]) {
+      const m = hypLerpH(A, B, u);
+      const [mx, my] = toDisc(m);
+      const sx = cx + R * mx, sy = cy - R * my;
+      const err = Math.abs(Math.hypot(sx - arc.scx, sy - arc.scy) - arc.sr) / R;
+      assert.ok(err < 1e-9, `${label} u=${u} radial err=${err}`);
+      const am = Math.atan2(sy - arc.scy, sx - arc.scx);
+      let dm = am - arc.a1;
+      if (dm > Math.PI) dm -= TAU;
+      else if (dm < -Math.PI) dm += TAU;
+      assert.ok(da > 0 ? (dm > 0 && dm < da) : (dm < 0 && dm > da), `${label} u=${u} sweep outside arc: dm=${dm}, da=${da}`);
+    }
+  };
+
+  // Curved edges & shifted tree/cut lines of #k=3333&m=0123&l=5&tw=-0.5 (including sr > 2000 near-diameter case)
+  const st3333 = { k: '3333', perm: [0, 1, 2, 3], orders: [3, 3, 3, 3], L: 5, tw: -0.5, b: 0, tau: 0, thetas: defaultCommas('3333').map((s) => (s ? s.theta : 0)) };
+  const m3333 = buildPatternModel(st3333);
+  for (let i = 0; i < m3333.D.n; i++) {
+    const A = m3333.D.verts[i], B = m3333.D.verts[(i + 1) % m3333.D.n];
+    const [ax, ay] = toDisc(A), [bx, by] = toDisc(B);
+    if (Math.abs(ax * by - ay * bx) > 1e-4) checkGeodesic(A, B, `3333 edge ${i}`);
+  }
+  const Tshift = GH.translate([0, 0, 1], GH.norm([0, Math.sinh(0.08), Math.cosh(0.08)]));
+  m3333.lines.forEach((ln, idx) => checkGeodesic(apply(Tshift, ln.a), apply(Tshift, ln.b), `3333 shifted line ${idx}`));
+
+  // Diameter through origin & tiny < 1.5 px chord return { line: true }
+  const diam = poincareArc(-0.5, -0.3, 0.5, 0.3, cx, cy, R);
+  assert.equal(diam.line, true, 'diameter should be line');
+  const tiny = poincareArc(0.2, 0.2, 0.2 + 0.5 / R, 0.2 + 0.5 / R, cx, cy, R);
+  assert.equal(tiny.line, true, '< 1.5 px chord should be line');
+
+  // Shift-invariant hCache check across tile crossings up to H_REBUILD_DRIFT (0.65)
+  const stO33 = { k: 'o33', perm: [0, 2, 1, 3], orders: [0, 0, 3, 3], L: 5, tw: 0.2, b: 1.3, tau: 0.2, thetas: defaultCommas('o33').map((s) => (s ? s.theta : 0)) };
+  for (const [label, st] of [['3333 L=5', st3333], ['o33 L=5', stO33]]) {
+    const model = buildPatternModel(st);
+    const { D, A } = model;
+    const hMids = [];
+    for (let i = 0; i < D.n; i++) {
+      const a = D.verts[i], b = D.verts[(i + 1) % D.n], len = GH.dist(a, b);
+      if (len > 2.0) {
+        const k = Math.ceil(len / 2.0);
+        for (let s = 1; s < k; s++) hMids.push(hypLerpH(a, b, s / k));
+      }
+    }
+    const cached = tilesPSU(D, A, { focus: [0, 0], radius: 5.9, max: 4200 });
+    const cacheSet = cached.map((t) => toDisc(apply(t.M, D.at)));
+    const hasTileAt = (w) => cacheSet.some((q) => discDist(w, q) < 1e-4);
+
+    // Drag in small steps across tile edges summing to 0.58 hyperbolic units (< 0.65 H_REBUILD_DRIFT)
+    let vPsu = psuI(), shift = psuI();
+    const stepT = so21ToPSU(GH.translate([0, 0, 1], GH.norm([Math.sinh(0.115) * 0.8, Math.sinh(0.115) * 0.6, Math.cosh(0.115)])), false);
+    for (let s = 0; s < 5; s++) {
+      vPsu = psuMul(stepT, vPsu);
+      const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+      const { g } = locateTilePSU(D, A, focus);
+      vPsu = psuMul(vPsu, g);
+      shift = psuMul(psuInv(g), shift);
+    }
+    const vEff = psuMul(vPsu, shift);
+    const focusInCache = psuApplyDisc(psuInv(vEff), [0, 0]);
+    const drift = discDist(focusInCache, [0, 0]);
+    assert.ok(drift < 0.65 && drift > 0.5, `${label} drift=${drift}`);
+
+    // Enumerate world tiles around shifted center up to 5.4 and assert every live minZ <= cosh(5.2) tile is already cached
+    const worldFresh = tilesPSU(D, A, { focus: focusInCache, radius: 5.4, max: 4200 });
+    const cullZ = Math.cosh(5.2);
+    for (const wt of worldFresh) {
+      const M = psuToSO21(psuMul(vEff, wt.g));
+      let minZ = apply(M, D.at)[2];
+      for (const v of D.verts) minZ = Math.min(minZ, apply(M, v)[2]);
+      for (const s of hMids) minZ = Math.min(minZ, apply(M, s)[2]);
+      if (minZ <= cullZ) {
+        const wAt = psuApplyDisc(wt.g, toDisc(D.at));
+        assert.ok(hasTileAt(wAt), `${label} visible tile minZ=${minZ.toFixed(2)} missing from r=5.9 hCache at drift=${drift.toFixed(3)}`);
+      }
+    }
+  }
 });

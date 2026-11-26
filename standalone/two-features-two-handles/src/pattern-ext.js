@@ -63,6 +63,28 @@ const hypLerp = (G, a, b, u) => {
   return G.norm([wa * a[0] + wb * b[0], wa * a[1] + wb * b[1], wa * a[2] + wb * b[2]]);
 };
 
+/** Compute screen-space Poincare disc orthogonal circular arc (or chord shortcut) from `(ax, ay)` to `(bx, by)`. */
+export function poincareArc(ax, ay, bx, by, cx, cy, R) {
+  const sx1 = cx + R * ax, sy1 = cy - R * ay;
+  const sx2 = cx + R * bx, sy2 = cy - R * by;
+  const dx = sx2 - sx1, dy = sy2 - sy1, ch2 = dx * dx + dy * dy;
+  const det2 = 2 * (ax * by - ay * bx);
+  if (ch2 < 2.25 || Math.abs(det2) < 1e-6) return { line: true, sx1, sy1, sx2, sy2 };
+  const r1 = 1 + ax * ax + ay * ay, r2 = 1 + bx * bx + by * by;
+  const ux = (r1 * by - r2 * ay) / det2, uy = (ax * r2 - bx * r1) / det2;
+  const rc2 = ux * ux + uy * uy - 1;
+  if (!(rc2 > 0)) return { line: true, sx1, sy1, sx2, sy2 };
+  const sr = R * Math.sqrt(rc2);
+  if (sr > 2e5 || (sr > 4 && ch2 < 1.6 * sr)) return { line: true, sx1, sy1, sx2, sy2 };
+  const scx = cx + R * ux, scy = cy - R * uy;
+  const a1 = Math.atan2(sy1 - scy, sx1 - scx);
+  const a2 = Math.atan2(sy2 - scy, sx2 - scx);
+  let da = a2 - a1;
+  if (da > Math.PI) da -= TAU;
+  else if (da < -Math.PI) da += TAU;
+  return { line: false, sx1, sy1, sx2, sy2, scx, scy, sr, a1, a2, ccw: da < 0 };
+}
+
 const clampDisc = (w) => {
   const r = Math.hypot(w[0], w[1]);
   return r >= 1 - 1e-12 ? [(w[0] * (1 - 1e-12)) / r, (w[1] * (1 - 1e-12)) / r] : w;
@@ -164,12 +186,15 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
       for (let s = 1; s < k; s++) samplesD.push(toDisc(hypLerp(G, a, b, s / k)));
     }
   }
+  const ns = samplesD.length, sX = new Float64Array(ns), sY = new Float64Array(ns);
+  for (let i = 0; i < ns; i++) { sX[i] = samplesD[i][0]; sY[i] = samplesD[i][1]; }
+  const tMax = Math.tanh(radius / 2), maxR2 = Math.min(1 - 1e-15, tMax * tMax);
   const tau = Math.max(1e-7, 1e-3 * Math.min(1, D.clear || 1));
   const grid = new Map();
-  const cells = (w, flip, wide) => {
+  const cells = (w, flip) => {
     const out = [], tag = flip ? 'f' : 'd';
     const r = Math.hypot(w[0], w[1]), d = 2 * Math.atanh(Math.min(1 - 1e-15, r)), th = Math.atan2(w[1], w[0]);
-    const e = wide ? 3 * tau + 1e-6 : 0;
+    const e = 3 * tau + 1e-6;
     for (let id = Math.floor((d - e) * 16); id <= Math.floor((d + e) * 16); id++) {
       if (id < 0) continue;
       const N = Math.max(1, Math.min(1 << 20, Math.round(16 * Math.sinh((id + 0.5) / 16)))), k = N / TAU, et = e / Math.max(0.05, Math.sinh(d));
@@ -178,21 +203,32 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
     }
     return out;
   };
+  const cellKey = (w, flip) => {
+    const r = Math.hypot(w[0], w[1]), d = 2 * Math.atanh(Math.min(1 - 1e-15, r)), th = Math.atan2(w[1], w[0]);
+    const id = Math.max(0, Math.floor(d * 16));
+    const N = Math.max(1, Math.min(1 << 20, Math.round(16 * Math.sinh((id + 0.5) / 16)))), k = N / TAU;
+    const it = Math.floor(th * k);
+    return (flip ? 'f' : 'd') + id + ':' + (((it % N) + N) % N);
+  };
   const known = (w, flip) => {
-    const list = grid.get(cells(w, flip, false)[0]);
+    const list = grid.get(cellKey(w, flip));
     if (list) for (const q of list) if (discDist(w, q) < tau) return true;
     return false;
   };
-  const put = (w, flip) => { for (const key of cells(w, flip, true)) { const l = grid.get(key); if (l) l.push(w); else grid.set(key, [w]); } };
-  const scoreOf = (gRel) => {
-    let best = Infinity;
-    for (let i = 0; i < samplesD.length; i++) {
-      const w = psuApplyDisc(gRel, samplesD[i]);
-      const d = 2 * Math.atanh(Math.min(1 - 1e-15, Math.hypot(w[0], w[1])));
-      if (d < best) best = d;
+  const put = (w, flip) => { for (const key of cells(w, flip)) { const l = grid.get(key); if (l) l.push(w); else grid.set(key, [w]); } };
+  const minR2Of = (gRel) => {
+    const ar = gRel[0], ai = gRel[1], br = gRel[2], bi = gRel[3], flip = gRel[4];
+    let bestR2 = Infinity;
+    for (let i = 0; i < ns; i++) {
+      const u = sX[i], v = flip ? -sY[i] : sY[i];
+      const nr = ar * u - ai * v + br, ni = ar * v + ai * u + bi;
+      const dr = br * u + bi * v + ar, di = br * v - bi * u - ai;
+      const r2 = (nr * nr + ni * ni) / (dr * dr + di * di);
+      if (r2 < bestR2) bestR2 = r2;
     }
-    return best;
+    return bestR2;
   };
+  const distFromR2 = (r2) => 2 * Math.atanh(Math.sqrt(Math.min(1 - 1e-15, r2)));
   const heap = [];
   const push = (t) => { heap.push(t); for (let i = heap.length - 1; i > 0;) { const up = (i - 1) >> 1; if (heap[up].d <= heap[i].d) break; [heap[up], heap[i]] = [heap[i], heap[up]]; i = up; } };
   const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; for (let i = 0; ;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l].d < heap[m].d) m = l; if (r < heap.length && heap[r].d < heap[m].d) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
@@ -201,17 +237,19 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
   const g0 = locateTilePSU(D, A, [fx, fy]).g;
   const gRel0 = psuMul(focusTo0, g0);
   put(psuApplyDisc(gRel0, atD), !!g0[4]);
-  push({ g: g0, gRel: gRel0, flip: !!g0[4], d: scoreOf(gRel0) });
+  push({ g: g0, gRel: gRel0, flip: !!g0[4], d: distFromR2(minR2Of(gRel0)) });
   while (heap.length && out.length < max) {
     const t = pop();
     out.push({ g: t.g, M: psuToSO21(t.g), flip: t.flip, d: t.d });
     if ((out.length & 63) === 0 && typeof performance !== 'undefined' && performance.now() - t0 > ms) break;
     for (let i = 0; i < n; i++) {
-      const g = psuMul(t.g, maps2[i]), gRel = psuMul(t.gRel, maps2[i]), flip = !!g[4], d = scoreOf(gRel);
-      if (!(d <= radius)) continue;
+      const gRel = psuMul(t.gRel, maps2[i]);
+      const r2 = minR2Of(gRel);
+      if (!(r2 <= maxR2)) continue;
+      const g = psuMul(t.g, maps2[i]), flip = !!g[4];
       const w = psuApplyDisc(gRel, atD);
       if (known(w, flip)) continue;
-      put(w, flip); push({ g, gRel, flip, d });
+      put(w, flip); push({ g, gRel, flip, d: distFromR2(r2) });
     }
   }
   return out;
@@ -224,12 +262,14 @@ export function createPattern(canvas, opts = {}) {
   // Does V turn the plane over? Does base? Kept as facts (each flips when the middle of the view crosses onto a
   // mirror-image neighbour; base's is set when the outline moves), never read back off a determinant: a long way
   // out on the hyperbolic plane a determinant is rounding. fix() is told them.
+  const H_CACHE_RADIUS = 5.9, H_REBUILD_DRIFT = 0.65, H_CULL_Z = Math.cosh(5.2), H_FULL_MAX = 4200;
+  const isIdentityPsu = (g) => Math.abs(g[0] - 1) < 1e-12 && !g[4] && Math.hypot(g[1], g[2], g[3]) < 1e-12;
   let vRev = false, bRev = false;
+  let vPsu = psuI(), bPsu = psuI();
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
-  const applyMoveH = (T, M, handRev) => psuToSO21(psuMul(so21ToPSU(T, false), so21ToPSU(M, handRev)));
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let budget = 1500, cache = new Map(), hCache = null, des = [], desAt = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
@@ -257,29 +297,34 @@ export function createPattern(canvas, opts = {}) {
   }
 
   function firstView() {
-    base = I3.slice(); vRev = false; bRev = false;
+    base = I3.slice(); vRev = false; bRev = false; bPsu = psuI();
     if (G.kind === 'S') {
       // the tile's own middle faces the eye, tipped a little so that no mirror hides on the rim
       const a = -0.42, b = 0.34, ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
       const Rx = [1, 0, 0, 0, ca, -sa, 0, sa, ca], Ry = [cb, 0, sb, 0, 1, 0, -sb, 0, cb];
       V = mul(mul(Rx, Ry), G.translate(model.D.face || model.D.at, G.origin));
-    } else V = G.translate(model.center || model.D.at, G.origin);
+      vPsu = psuI();
+    } else {
+      V = G.translate(model.center || model.D.at, G.origin);
+      vPsu = G.kind === 'H' ? so21ToPSU(V, false) : psuI();
+    }
   }
   /** Keep the tile containing the middle of the view the one the list of tiles is centred on (the pattern does not move). */
   function recentre(V0) {
     if (G.kind === 'S') return V0;
     const { D, A } = model;
     if (G.kind === 'H') {
-      const vRevOld = vRev;
-      let vPsu = so21ToPSU(V, vRevOld);
       const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
       const { g } = locateTilePSU(D, A, focus);
+      if (isIdentityPsu(g)) return V0;
       vPsu = psuMul(vPsu, g);
       V = psuToSO21(vPsu); vRev = !!vPsu[4];
-      const bPsu = psuMul(psuInv(g), so21ToPSU(base, bRev));
-      if (Math.hypot(bPsu[0], bPsu[1]) > 150) { base = I3.slice(); bRev = false; }
+      const invG = psuInv(g);
+      bPsu = psuMul(invG, bPsu);
+      if (Math.hypot(bPsu[0], bPsu[1]) > 150) { bPsu = psuI(); base = I3.slice(); bRev = false; }
       else { base = psuToSO21(bPsu); bRev = !!bPsu[4]; }
-      return V0 ? psuToSO21(psuMul(so21ToPSU(V0, vRevOld), g)) : V0;
+      if (hCache) hCache.shift = psuMul(invG, hCache.shift);
+      return V0 ? psuMul(V0, g) : V0;
     }
     const ref = D.at;
     const far = (M) => { const p = apply(M, ref); return p[0] * p[0] + p[1] * p[1]; };
@@ -299,7 +344,7 @@ export function createPattern(canvas, opts = {}) {
   function outlineSeen() {
     const D = model.D;
     if (!D.n) return true;
-    const M = G.kind === 'H' ? psuToSO21(psuMul(so21ToPSU(V, vRev), so21ToPSU(base, bRev))) : mul(V, base);
+    const M = G.kind === 'H' ? psuToSO21(psuMul(vPsu, bPsu)) : mul(V, base);
     const c = apply(M, D.at);
     if (!(Number.isFinite(c[0]) && Number.isFinite(c[1]) && Number.isFinite(c[2]))) return false;
     if (G.kind === 'S') return c[2] > 0.12;
@@ -315,20 +360,26 @@ export function createPattern(canvas, opts = {}) {
       for (const t of tileList()) { const z = apply(mul(V, t.M), model.D.at)[2]; if (z > bz) { bz = z; best = t; } }
       if (!best) return false;
       base = best.M.slice(); bRev = !!best.flip;
-    } else { base = I3.slice(); bRev = false; }          // recentre() keeps the list centred on that tile
+    } else { base = I3.slice(); bRev = false; bPsu = psuI(); }          // recentre() keeps the list centred on that tile
     pulse = performance.now();
     return true;
   }
 
   function tileList() {
     const { D, A } = model;
-    let radius = Infinity, max = 4200;
+    let radius = Infinity, max = H_FULL_MAX;
     if (G.kind === 'E') { const L = lay(); radius = (Math.hypot(W, H) / 2) / L.R + reach; }
     if (G.kind === 'H') {
-      const focus = psuApplyDisc(psuInv(so21ToPSU(V, vRev)), [0, 0]);
-      const wantMax = quick ? budget : max;
-      if (!hCache || discDist(focus, hCache.focus) >= 0.5 || (!quick && hCache.max < max)) {
-        hCache = { focus, max: wantMax, list: tilesPSU(D, A, { focus, radius: 5.6, max: wantMax }) };
+      const wantMax = quick ? budget : H_FULL_MAX;
+      let need = !hCache || (!quick && hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max);
+      if (!need) {
+        const vEff = psuMul(vPsu, hCache.shift);
+        const focusInCache = psuApplyDisc(psuInv(vEff), [0, 0]);
+        if (discDist(focusInCache, hCache.focus) >= H_REBUILD_DRIFT) need = true;
+      }
+      if (need) {
+        const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+        hCache = { focus, shift: psuI(), max: wantMax, list: tilesPSU(D, A, { focus, radius: H_CACHE_RADIUS, max: wantMax }) };
       }
       return quick && hCache.list.length > budget ? hCache.list.slice(0, budget) : hCache.list;
     }
@@ -361,10 +412,33 @@ export function createPattern(canvas, opts = {}) {
     const Y = (p) => (kind === 'H' ? cy - (R * p[1]) / (1 + p[2]) : cy - R * p[1]);
     const lerp = (a, b, t) => G.norm([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]);
     const lerpEdge = (a, b, u) => (kind === 'H' ? hypLerp(G, a, b, u) : lerp(a, b, u));
+    const hypArcD = (path, ax, ay, sx1, sy1, bx, by, sx2, sy2, move) => {
+      if (move) path.moveTo(sx1, sy1);
+      const dx = sx2 - sx1, dy = sy2 - sy1, ch2 = dx * dx + dy * dy;
+      const det2 = 2 * (ax * by - ay * bx);
+      if (ch2 < 2.25 || Math.abs(det2) < 1e-6) { path.lineTo(sx2, sy2); return; }
+      const r1 = 1 + ax * ax + ay * ay, r2 = 1 + bx * bx + by * by;
+      const ux = (r1 * by - r2 * ay) / det2, uy = (ax * r2 - bx * r1) / det2;
+      const rc2 = ux * ux + uy * uy - 1;
+      if (!(rc2 > 0)) { path.lineTo(sx2, sy2); return; }
+      const sr = R * Math.sqrt(rc2);
+      if (sr > 2e5 || (sr > 4 && ch2 < 1.6 * sr)) { path.lineTo(sx2, sy2); return; }
+      const scx = cx + R * ux, scy = cy - R * uy;
+      const a1 = Math.atan2(sy1 - scy, sx1 - scx), a2 = Math.atan2(sy2 - scy, sx2 - scx);
+      let da = a2 - a1;
+      if (da > Math.PI) da -= TAU;
+      else if (da < -Math.PI) da += TAU;
+      path.arc(scx, scy, sr, a1, a2, da < 0);
+    };
+    const hypArc = (path, a, b, move) => {
+      const za = 1 + a[2], zb = 1 + b[2];
+      const ax = a[0] / za, ay = a[1] / za, bx = b[0] / zb, by = b[1] / zb;
+      hypArcD(path, ax, ay, cx + R * ax, cy - R * ay, bx, by, cx + R * bx, cy - R * by, move);
+    };
     // a small shape that need not be convex (the comma): on the sphere, whatever of it is behind the ball is pressed
     // onto the rim (the exact cut below pairs each way out with the next way in, which is only right for a convex tile)
     const blob = (path, pts) => {
-      if (kind !== 'S') { path.moveTo(X(pts[0]), Y(pts[0])); for (let i = 1; i < pts.length; i++) path.lineTo(X(pts[i]), Y(pts[i])); path.closePath(); return; }
+      if (kind !== 'S') { path.moveTo(X(pts[0]), Y(pts[0])); for (let i = 1; i < pts.length; i++) path.lineTo(X(pts[i]), Y(pts[i])); return; }
       let front = 0;
       for (const p of pts) if (p[2] >= 0) front++;
       if (front < 3) return;
@@ -373,21 +447,33 @@ export function createPattern(canvas, opts = {}) {
         if (p[2] < 0) { const l = Math.hypot(x, y) || 1; x /= l; y /= l; }
         if (i) path.lineTo(cx + R * x, cy - R * y); else path.moveTo(cx + R * x, cy - R * y);
       });
-      path.closePath();
     };
     // a closed CONVEX outline given by points of the geometry, added to a path (on the sphere: only what faces the eye)
-    const closed = (path, pts, flip) => {
+    const closed = (path, pts, flip, stroke = false) => {
       const m = pts.length;
-      if (kind !== 'S') { path.moveTo(X(pts[0]), Y(pts[0])); for (let i = 1; i < m; i++) path.lineTo(X(pts[i]), Y(pts[i])); path.closePath(); return; }
+      if (kind !== 'S') {
+        const x0 = X(pts[0]), y0 = Y(pts[0]);
+        path.moveTo(x0, y0);
+        for (let i = 1; i < m; i++) path.lineTo(X(pts[i]), Y(pts[i]));
+        if (stroke) path.lineTo(x0, y0);
+        return;
+      }
       let any = false, all = true;
       for (const p of pts) { if (p[2] >= 0) any = true; else all = false; }
       if (!any) return;
-      if (all) { path.moveTo(X(pts[0]), Y(pts[0])); for (let i = 1; i < m; i++) path.lineTo(X(pts[i]), Y(pts[i])); path.closePath(); return; }
+      if (all) {
+        const x0 = X(pts[0]), y0 = Y(pts[0]);
+        path.moveTo(x0, y0);
+        for (let i = 1; i < m; i++) path.lineTo(X(pts[i]), Y(pts[i]));
+        if (stroke) path.lineTo(x0, y0);
+        return;
+      }
       const rim = (a, b) => { const t = a[2] / (a[2] - b[2]), x = a[0] + t * (b[0] - a[0]), y = a[1] + t * (b[1] - a[1]), l = Math.hypot(x, y) || 1; return [x / l, y / l]; };
       let i0 = 0;
       while (!(pts[(i0 + m - 1) % m][2] < 0 && pts[i0][2] >= 0)) i0++;
       const e0 = rim(pts[(i0 + m - 1) % m], pts[i0]);
-      path.moveTo(cx + R * e0[0], cy - R * e0[1]);
+      const x0 = cx + R * e0[0], y0 = cy - R * e0[1];
+      path.moveTo(x0, y0);
       let out = null;
       for (let k = 0; k < m; k++) {
         const p = pts[(i0 + k) % m], q = pts[(i0 + k + 1) % m];
@@ -398,10 +484,11 @@ export function createPattern(canvas, opts = {}) {
         }
       }
       if (out) path.arc(cx, cy, R, -Math.atan2(out[1], out[0]), -Math.atan2(e0[1], e0[0]), !flip);
-      path.closePath();
+      if (stroke) path.lineTo(x0, y0);
     };
     // an open line: a -> b along the geometry's straight line, in `steps` pieces (on the sphere: the visible part)
     const line = (path, a, b, steps) => {
+      if (kind === 'H') { hypArc(path, a, b, true); return; }
       let on = false;
       for (let s = 0; s <= steps; s++) {
         const p = s === 0 ? a : s === steps ? b : lerpEdge(a, b, s / steps);
@@ -421,12 +508,32 @@ export function createPattern(canvas, opts = {}) {
     const pick = sel !== null && binding[sel] ? binding[sel] : null;
     const also = model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
     const dim = pick || also ? 0.38 : 1;
+    const needFill = kind !== 'H' || A.stars.length > 0;
     const fill = new Path2D(), edge = [0, 1, 2].map(() => new Path2D());
     const ink = new Path2D();       // the print, in the darker tone
     // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points
     const print = (path, sh, M, b) => {
-      const skip = b ? Math.min(2 * b + 1, Math.max(1, Math.floor(sh.pts.length / 8))) : 1, pts = [];
-      for (let i = 0; i < sh.pts.length; i += skip) pts.push(apply(M, sh.pts[i]));
+      const pts0 = sh.pts, nPts = pts0.length;
+      if (!nPts) return;
+      const skip = b ? Math.min(2 * b + 1, Math.max(1, Math.floor(nPts / 8))) : 1;
+      if (kind === 'H') {
+        const m0 = M[0], m1 = M[1], m2 = M[2], m3 = M[3], m4 = M[4], m5 = M[5], m6 = M[6], m7 = M[7], m8 = M[8];
+        const p0 = pts0[0], z0 = R / (1 + m6 * p0[0] + m7 * p0[1] + m8 * p0[2]);
+        path.moveTo(cx + (m0 * p0[0] + m1 * p0[1] + m2 * p0[2]) * z0, cy - (m3 * p0[0] + m4 * p0[1] + m5 * p0[2]) * z0);
+        for (let i = skip; i < nPts; i += skip) {
+          const p = pts0[i], z = R / (1 + m6 * p[0] + m7 * p[1] + m8 * p[2]);
+          path.lineTo(cx + (m0 * p[0] + m1 * p[1] + m2 * p[2]) * z, cy - (m3 * p[0] + m4 * p[1] + m5 * p[2]) * z);
+        }
+        return;
+      }
+      if (kind === 'E') {
+        const p0 = apply(M, pts0[0]);
+        path.moveTo(cx + R * p0[0], cy - R * p0[1]);
+        for (let i = skip; i < nPts; i += skip) { const q = apply(M, pts0[i]); path.lineTo(cx + R * q[0], cy - R * q[1]); }
+        return;
+      }
+      const pts = [];
+      for (let i = 0; i < nPts; i += skip) pts.push(apply(M, pts0[i]));
       blob(path, pts);
     };
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
@@ -443,34 +550,80 @@ export function createPattern(canvas, opts = {}) {
     });
     let drawn = 0;
     const P = new Array(n);
-    const vPsu = kind === 'H' ? so21ToPSU(V, vRev) : null;
+    const vPsuEff = kind === 'H' ? (hCache ? psuMul(vPsu, hCache.shift) : vPsu) : null;
+    const DX = kind === 'H' && n ? new Float64Array(n) : null;
+    const DY = DX ? new Float64Array(n) : null;
+    const SX = DX ? new Float64Array(n) : null;
+    const SY = DX ? new Float64Array(n) : null;
     for (const t of list) {
-      const M = kind === 'H' && t.g ? psuToSO21(psuMul(vPsu, t.g)) : mul(V, t.M);
+      const M = kind === 'H' && t.g ? psuToSO21(psuMul(vPsuEff, t.g)) : mul(V, t.M);
       const c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       for (let i = 0; i < n; i++) P[i] = apply(M, D.verts[i]);
       if (kind === 'S') { let vis = c[2] > 0; for (let i = 0; i < n && !vis; i++) if (P[i][2] > 0) vis = true; if (!vis) continue; }
       if (kind === 'E') { let inView = false; const m = reach * R + 4; if (X(c) > -m && X(c) < W + m && Y(c) > -m && Y(c) < H + m) inView = true; if (!inView) continue; }
-      let nearD = 0;
+      let b, effPx;
       if (kind === 'H') {
-        nearD = t.g ? Math.max(0, t.d - 0.5) : Math.max(0, Math.acosh(Math.max(1, c[2])) - reach);
-        if (nearD > 5.5 || (!t.g && px < 0.35 && nearD > 4)) continue;
+        const m6 = M[6], m7 = M[7], m8 = M[8];
+        let minZ = c[2];
+        for (let i = 0; i < n; i++) if (P[i][2] < minZ) minZ = P[i][2];
+        for (let i = 0; i < hMidSamples.length; i++) {
+          const s = hMidSamples[i], sz = m6 * s[0] + m7 * s[1] + m8 * s[2];
+          if (sz < minZ) minZ = sz;
+        }
+        if (minZ > H_CULL_Z) continue;
+        drawn++;
+        effPx = Math.max(px, (0.45 * R) / (1 + minZ));
+        b = effPx >= 20 ? 0 : effPx >= 7 ? 1 : 2;
+        for (let i = 0; i < n; i++) {
+          const pi = P[i], invZ = 1 / (1 + pi[2]);
+          const dx = pi[0] * invZ, dy = pi[1] * invZ;
+          DX[i] = dx; DY[i] = dy;
+          SX[i] = cx + R * dx; SY[i] = cy - R * dy;
+        }
+        if (n) {
+          if (needFill) {
+            fill.moveTo(SX[0], SY[0]);
+            for (let i = 0; i < n; i++) {
+              const j = i + 1 === n ? 0 : i + 1;
+              hypArcD(fill, DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], false);
+            }
+          }
+          if (effPx >= 2.0) {
+            const ep = edge[b];
+            ep.moveTo(SX[0], SY[0]);
+            for (let i = 0; i < n; i++) {
+              const j = i + 1 === n ? 0 : i + 1;
+              hypArcD(ep, DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], false);
+            }
+          }
+        } else {
+          if (needFill) fill.arc(cx, cy, R, 0, TAU);
+        }
+        for (let i = 0; i < n; i++) {
+          if (starOf[i] >= 0) {
+            const j = i + 1 === n ? 0 : i + 1;
+            hypArcD(mirrors[starOf[i]][b], DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], true);
+          }
+        }
+        A.glides.forEach((g, k) => { if (g.seg) hypArc(glides[k][b], apply(M, g.seg[0]), apply(M, g.seg[1]), true); });
+        (model.lines || []).forEach((ln, k) => { if (!ln.once) hypArc(extras[k][b], apply(M, ln.a), apply(M, ln.b), true); });
+      } else {
+        drawn++;
+        effPx = px;
+        b = effPx >= 20 ? 0 : effPx >= 7 ? 1 : 2;
+        const pts = [];
+        for (let i = 0; i < n; i++) {
+          const a = P[i], q = P[(i + 1) % n], st = stepsFor(a, q);
+          pts.push(a);
+          for (let s = 1; s < st; s++) pts.push(lerpEdge(a, q, s / st));
+        }
+        if (n) { closed(fill, pts, t.flip, false); closed(edge[b], pts, t.flip, true); }
+        else fill.arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
+        for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
+        A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); } });
+        (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); });
       }
-      drawn++;
-      const effPx = kind === 'H' ? Math.max(px, (0.45 * R) / (1 + Math.cosh(nearD))) : px;
-      const b = effPx >= 20 ? 0 : effPx >= 7 ? 1 : 2;
-      // the outline, edge by edge
-      const pts = [];
-      for (let i = 0; i < n; i++) {
-        const a = P[i], q = P[(i + 1) % n], st = stepsFor(a, q);
-        pts.push(a);
-        for (let s = 1; s < st; s++) pts.push(lerpEdge(a, q, s / st));
-      }
-      if (n) { closed(fill, pts, t.flip); closed(edge[b], pts, t.flip); }
-      else fill.arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
-      for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
-      A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); } });
-      (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); });
       if (kind === 'H') {
         for (let si = 0; si < des.length; si++) {
           const sh = des[si], q = apply(M, desAt[si] || D.at);
@@ -489,13 +642,13 @@ export function createPattern(canvas, opts = {}) {
         const ang = Math.atan2(Y(q) - Y(p), X(q) - X(p)), on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id));
         const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
         if (r < 1.1) continue;
-        if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); path.closePath(); }
-        else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08); for (let k = 0; k < m; k++) { const a = ang + (TAU * k) / m, qx = x + rr * Math.cos(a), qy = y + rr * Math.sin(a); if (k) path.lineTo(qx, qy); else path.moveTo(qx, qy); } path.closePath(); }
+        if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); }
+        else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08), x0 = x + rr * Math.cos(ang), y0 = y + rr * Math.sin(ang); path.moveTo(x0, y0); for (let k = 1; k < m; k++) { const a = ang + (TAU * k) / m; path.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } path.lineTo(x0, y0); }
       }
     }
     stats = { tiles: list.length, drawn };
 
-    ctx.fillStyle = css(FRONT); ctx.fill(fill);
+    if (needFill) { ctx.fillStyle = css(FRONT); ctx.fill(fill); }
     ctx.fillStyle = css(FRONT_INK); ctx.fill(ink);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
@@ -509,15 +662,15 @@ export function createPattern(canvas, opts = {}) {
     });
     A.glides.forEach((g, k) => {
       const on = pick && pick.t === 'x' && pick.k % A.glides.length === k;
-      ctx.strokeStyle = css(RED, on || !pick ? 1 : dim);
-      glides[k].forEach((p, b) => { ctx.lineWidth = widths[b] * (on ? 1.7 : 1); ctx.setLineDash([widths[b] * 3.2, widths[b] * 3]); ctx.stroke(p); });
+      const a0 = on || !pick ? 1 : dim;
+      glides[k].forEach((p, b) => { ctx.strokeStyle = css(RED, b === 2 ? a0 * 0.78 : a0); ctx.lineWidth = widths[b] * (on ? 1.7 : 1); ctx.setLineDash(b === 2 ? [] : [widths[b] * 3.2, widths[b] * 3]); ctx.stroke(p); });
       ctx.setLineDash([]);
     });
     // the caller's lines, in their own colour (never the mirrors' red or the gyration points' blue), thinner on small tiles
     (model.lines || []).forEach((ln, k) => {
       if (ln.once) return;
-      ctx.strokeStyle = css(ln.color || DARK, ln.alpha === undefined ? 1 : ln.alpha);
-      extras[k].forEach((p, b) => { const f = [1, 0.7, 0.4][b]; ctx.lineWidth = (ln.width || 2) * f; ctx.setLineDash(ln.dash ? ln.dash.map((x) => x * f) : []); ctx.stroke(p); });
+      const a0 = ln.alpha === undefined ? 1 : ln.alpha;
+      extras[k].forEach((p, b) => { const f = [1, 0.7, 0.4][b]; ctx.strokeStyle = css(ln.color || DARK, b === 2 && ln.dash ? a0 * 0.78 : a0); ctx.lineWidth = (ln.width || 2) * f; ctx.setLineDash(b === 2 || !ln.dash ? [] : ln.dash.map((x) => x * f)); ctx.stroke(p); });
       ctx.setLineDash([]);
     });
     // the marked points: blue inside the surface (gyrations), red on a mirror. Drawn last, over the outlined tile,
@@ -536,17 +689,22 @@ export function createPattern(canvas, opts = {}) {
     const found = [], afterDots = [];
     home = null;
     {
-      const M = kind === 'H' ? psuToSO21(psuMul(vPsu, so21ToPSU(base, bRev))) : mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
+      const M = kind === 'H' ? psuToSO21(psuMul(vPsu, bPsu)) : mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       const visible = kind !== 'S' || c[2] > -0.2;
       if (n && visible && (px > 3 || model.outline === false)) {
         if (px > 3) home = [X(c), Y(c), px];          // its middle on the screen, and its room there in px
         if (model.outline !== false) {
           const flip = M[0] * (M[4] * M[8] - M[5] * M[7]) - M[1] * (M[3] * M[8] - M[5] * M[6]) + M[2] * (M[3] * M[7] - M[4] * M[6]) < 0;
-          const pts = [];
-          for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
           const out = new Path2D();
-          closed(out, pts, flip);
+          if (kind === 'H') {
+            out.moveTo(X(Q[0]), Y(Q[0]));
+            for (let i = 0; i < n; i++) hypArc(out, Q[i], Q[(i + 1) % n], false);
+          } else {
+            const pts = [];
+            for (let i = 0; i < n; i++) { const a = Q[i], q = Q[(i + 1) % n], st = stepsFor(a, q); pts.push(a); for (let s = 1; s < st; s++) pts.push(lerp(a, q, s / st)); }
+            closed(out, pts, flip, true);
+          }
           const glow = calm ? 0 : Math.max(0, 1 - (performance.now() - pulse) / 600);
           ctx.fillStyle = `rgba(255,255,255,${0.22 + 0.45 * glow})`; ctx.fill(out);
           if (glow > 0) schedule();
@@ -634,8 +792,13 @@ export function createPattern(canvas, opts = {}) {
       ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
       if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, 1); ctx.stroke(); }
     }
-    // a moving hand wants some 25 frames a second: fewer tiles next time if this took longer, more if there was time to spare
-    if (quick && kind === 'H') { const ms = performance.now() - t0; budget = Math.round(Math.max(350, Math.min(2200, budget * Math.max(0.6, Math.min(1.3, 34 / Math.max(1, ms)))))); }
+    // Keep 60+ fps smooth with EMA hysteresis and zero frame-to-frame budget oscillation
+    if (quick && kind === 'H') {
+      const ms = performance.now() - t0;
+      emaMs = 0.75 * emaMs + 0.25 * ms;
+      if (emaMs > 14) budget = Math.max(600, Math.round(budget * 0.85));
+      else if (emaMs < 8 && budget < H_FULL_MAX) budget = Math.min(H_FULL_MAX, Math.round(budget * 1.15));
+    }
   }
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
 
@@ -704,12 +867,25 @@ export function createPattern(canvas, opts = {}) {
       vx *= k; vy *= k;
       if (dx || dy) {
         const T = G.translate(unproject(x, y), unproject(x + dx, y + dy));
-        V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
+        if (G.kind === 'H') {
+          vPsu = psuMul(so21ToPSU(T, false), vPsu);
+          V = psuToSO21(vPsu); vRev = !!vPsu[4];
+        } else {
+          V = G.fix(mul(T, V), vHand());
+        }
         recentre(null);
       }
-      if (Math.hypot(vx, vy) > 0.02) { quick = true; schedule(); coast = requestAnimationFrame(step); return; }
-      settle();                                                 // the outlined tile went out of sight: it comes back
-      clearTimeout(still); quick = false; schedule();
+      if (Math.hypot(vx, vy) > 0.02) {
+        quick = true;
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        draw();
+        coast = requestAnimationFrame(step);
+        return;
+      }
+      const moved = settle();                                                 // the outlined tile went out of sight: it comes back
+      clearTimeout(still); quick = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      if (moved || model.outline !== false || (G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max)))) draw();
     };
     coast = requestAnimationFrame(step);
     return true;
@@ -718,7 +894,7 @@ export function createPattern(canvas, opts = {}) {
     stopCoast();
     if (!model || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const [x, y] = local(e);
-    drag = { id: e.pointerId, p0: unproject(x, y), V0: V.slice(), x, y, moved: false, trail: [{ x, y, t: performance.now() }] };
+    drag = { id: e.pointerId, p0: unproject(x, y), V0: V.slice(), v0Psu: G.kind === 'H' ? vPsu.slice() : null, x, y, moved: false, trail: [{ x, y, t: performance.now() }] };
     try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* a synthetic pointer: no capture, the drag still works */ }
   });
   canvas.addEventListener('pointermove', (e) => {
@@ -737,10 +913,16 @@ export function createPattern(canvas, opts = {}) {
     setHot(null);
     const p = unproject(x, y);
     const T = G.translate(drag.p0, p);
-    V = G.kind === 'H' ? applyMoveH(T, drag.V0, vRev) : G.fix(mul(T, drag.V0), vHand());
-    drag.V0 = recentre(drag.V0);
-    // a very long stroke: start afresh from here, so that no huge slide has to be undone by a huge view
-    if (G.kind === 'H' && G.dist(drag.p0, p) > 2.6) { drag.p0 = p; drag.V0 = V.slice(); }
+    if (G.kind === 'H') {
+      vPsu = psuMul(so21ToPSU(T, false), drag.v0Psu);
+      V = psuToSO21(vPsu); vRev = !!vPsu[4];
+      drag.v0Psu = recentre(drag.v0Psu);
+      // a very long stroke: start afresh from here, so that no huge slide has to be undone by a huge view
+      if (G.dist(drag.p0, p) > 2.6) { drag.p0 = p; drag.v0Psu = vPsu.slice(); drag.V0 = V.slice(); }
+    } else {
+      V = G.fix(mul(T, drag.V0), vHand());
+      drag.V0 = recentre(drag.V0);
+    }
     quick = true; clearTimeout(still);
     schedule();
   });
@@ -757,8 +939,13 @@ export function createPattern(canvas, opts = {}) {
       return;
     }
     if (e.type === 'pointerup' && release(was, performance.now())) return;     // it coasts, and settles when it stops
-    if (settle()) schedule();                                           // the outlined tile was dragged out of sight: it comes back
-    still = setTimeout(() => { quick = false; schedule(); }, 140);      // the far rim is filled in once the hand is still
+    const moved = settle();
+    if (moved) schedule();                                           // the outlined tile was dragged out of sight: it comes back
+    still = setTimeout(() => {
+      const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
+      quick = false;
+      if (moved || model.outline !== false || wasTruncated) schedule();
+    }, 140);      // the far rim is filled in once the hand is still
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
@@ -777,10 +964,20 @@ export function createPattern(canvas, opts = {}) {
     const [x, y] = local(e);
     setHot(null);
     const T = G.translate(unproject(x, y), unproject(x - dx, y - dy));
-    V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
+    if (G.kind === 'H') {
+      vPsu = psuMul(so21ToPSU(T, false), vPsu);
+      V = psuToSO21(vPsu); vRev = !!vPsu[4];
+    } else {
+      V = G.fix(mul(T, V), vHand());
+    }
     recentre(null);
     quick = true; clearTimeout(still);
-    still = setTimeout(() => { settle(); quick = false; schedule(); }, 180);     // the outline comes back once it rests
+    still = setTimeout(() => {
+      const moved = settle();
+      const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
+      quick = false;
+      if (moved || model.outline !== false || wasTruncated) schedule();
+    }, 180);     // the outline comes back once it rests
     schedule();
   }, { passive: false });
   canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) setHot(null); });
@@ -793,7 +990,12 @@ export function createPattern(canvas, opts = {}) {
     stopCoast();
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
     const T = G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0])));
-    V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
+    if (G.kind === 'H') {
+      vPsu = psuMul(so21ToPSU(T, false), vPsu);
+      V = psuToSO21(vPsu); vRev = !!vPsu[4];
+    } else {
+      V = G.fix(mul(T, V), vHand());
+    }
     recentre(null);
     settle();
     schedule();
@@ -809,11 +1011,22 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; hCache = null; des = []; desAt = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (!keep) sel = null; quick = false;
       cache = new Map();
       hCache = null;
+      hMidSamples = [];
+      if (G.kind === 'H' && m.D.n) {
+        const Dn = m.D.n, Dv = m.D.verts;
+        for (let i = 0; i < Dn; i++) {
+          const a = Dv[i], b = Dv[(i + 1) % Dn], len = G.dist(a, b);
+          if (len > 2.0) {
+            const k = Math.ceil(len / 2.0);
+            for (let s = 1; s < k; s++) hMidSamples.push(hypLerp(G, a, b, s / k));
+          }
+        }
+      }
       reach = m.D.n ? Math.max(...m.D.verts.map((v) => G.dist(v, m.D.at))) : 0;
       area = m.D.n ? Math.abs(G.area(m.D.verts)) || 1 : 1;
       des = (m.design || design)(m.D);
@@ -824,12 +1037,12 @@ export function createPattern(canvas, opts = {}) {
         return G.norm(s);
       });
       size();
-      if (!keep) firstView();
+      if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
       draw();
     },
     select(i) { sel = i; schedule(); },
-    resetView() { stopCoast(); if (!model) return; firstView(); quick = false; schedule(); },
+    resetView() { stopCoast(); if (!model) return; hCache = null; emaMs = 8; budget = H_FULL_MAX; firstView(); quick = false; schedule(); },
     /** Where the pattern and its outlined tile are on the screen, to hand to another screen: { V, base, turned } (turned: base turns the plane over; null: no pattern). */
     getView() { return model ? { V: V.slice(), base: base.slice(), turned: bRev } : null; },
     /** Put the pattern where another screen has it (what its getView() gave). Anything else is left alone. */
@@ -839,12 +1052,15 @@ export function createPattern(canvas, opts = {}) {
       stopCoast();
       vRev = det(v.V) < 0; bRev = !!v.turned;              // V is always near the middle of the view: its determinant can be trusted
       V = G.fix(v.V, vHand()); base = G.fix(v.base, bHand());
+      vPsu = G.kind === 'H' ? so21ToPSU(V, vRev) : psuI();
+      bPsu = G.kind === 'H' ? so21ToPSU(base, bRev) : psuI();
+      if (hCache && !isIdentityPsu(hCache.shift)) hCache = null;
       quick = !!o.moving;
       if (o.sync) draw(); else schedule();
       return true;
     },
     /** Where a point of the outlined tile (in the tile's own coordinates) is on the canvas, in css px: [x, y]; null with no pattern. */
-    projectTile(p) { if (!model) return null; const L = lay(), q = apply(mul(V, base), p), k = G.kind === 'H' ? 1 / (1 + q[2]) : 1; return [L.cx + L.R * q[0] * k, L.cy - L.R * q[1] * k]; },
+    projectTile(p) { if (!model) return null; const L = lay(), q = apply(G.kind === 'H' ? psuToSO21(psuMul(vPsu, bPsu)) : mul(V, base), p), k = G.kind === 'H' ? 1 / (1 + q[2]) : 1; return [L.cx + L.R * q[0] * k, L.cy - L.R * q[1] * k]; },
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
