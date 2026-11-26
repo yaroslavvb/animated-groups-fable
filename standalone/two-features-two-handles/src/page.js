@@ -7,9 +7,10 @@ import {
   stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
+  psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist,
 } from './handles.js';
-import { createPattern } from './pattern-ext.js';
-import { mul, apply, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
+import { createPattern, locateTilePSU } from './pattern-ext.js';
+import { mul, apply, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
 import { createStage } from '../../2026-11-15-classification-of-surfaces/src/stage.js';
 import { eyeOf } from '../../2026-11-15-classification-of-surfaces/src/turning.js';
@@ -505,20 +506,23 @@ function scheduleHashWrite() {
 function recentreStartView(Vstart, model) {
   const G = FAMILIES[state.k].kind === 'E' ? GE : GH;
   if (G.kind !== 'H') return Vstart;
-  let V = Vstart;
   const { D, A } = model;
-  for (let s = 0; s < 16 && GH.dist(GH.origin, apply(V, GH.origin)) > 3.5; s++) {
-    let best = -1, bd = GH.dist(GH.origin, apply(V, D.at));
+  let vPsu = so21ToPSU(Vstart, det(Vstart) < 0);
+  const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+  const { g } = locateTilePSU(D, A, focus);
+  vPsu = psuMul(vPsu, g);
+  if (vPsu[4]) {
+    const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
+    let bestPsu = null, bestD = Infinity;
     for (let i = 0; i < D.n; i++) {
-      if (D.edges[i].mirror || D.edges[i].rev) continue;
-      const cand = mul(V, A.maps[i]);
-      const d = GH.dist(GH.origin, apply(cand, D.at));
-      if (d < bd - 1e-9) { bd = d; best = i; }
+      if (!(D.edges[i].mirror || D.edges[i].rev)) continue;
+      const cand = psuMul(vPsu, maps2[i]);
+      const d = discDist(psuApplyDisc(psuInv(cand), [0, 0]), [0, 0]);
+      if (d < bestD) { bestD = d; bestPsu = cand; }
     }
-    if (best < 0) break;
-    V = GH.fix(mul(V, A.maps[best]), 1);
+    if (bestPsu) vPsu = bestPsu;
   }
-  return V;
+  return psuToSO21(vPsu);
 }
 
 function pickPair(i, j, { glide = true } = {}) {
@@ -554,7 +558,9 @@ function pickPair(i, j, { glide = true } = {}) {
   const shouldGlide = glide && before && !prefersReduced() && typeof requestAnimationFrame === 'function';
   if (shouldGlide) {
     const G = fam.kind === 'E' ? GE : GH;
-    let Vstart = G.fix(mul(before.V, next.invQ), 1);
+    let Vstart = fam.kind === 'H'
+      ? psuToSO21(psuMul(so21ToPSU(before.V, det(before.V) < 0), so21ToPSU(next.invQ, false)))
+      : G.fix(mul(before.V, next.invQ), 1);
     Vstart = recentreStartView(Vstart, currentModel);
     pattern.setView({ V: Vstart, base: I3.slice(), turned: false }, { moving: true, sync: true });
 

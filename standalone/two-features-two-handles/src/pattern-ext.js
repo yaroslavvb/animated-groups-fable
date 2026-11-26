@@ -45,7 +45,7 @@ import { tiles as makeTiles } from '../../2026-11-15-classification-of-surfaces/
 import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
 import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
 import { pairStyle } from '../../2026-11-15-classification-of-surfaces/src/sym/pairs.js';
-import { invH, psuI, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
+import { invH, psuI, psuNorm, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
@@ -63,10 +63,96 @@ const hypLerp = (G, a, b, u) => {
   return G.norm([wa * a[0] + wb * b[0], wa * a[1] + wb * b[1], wa * a[2] + wb * b[2]]);
 };
 
+const clampDisc = (w) => {
+  const r = Math.hypot(w[0], w[1]);
+  return r >= 1 - 1e-12 ? [(w[0] * (1 - 1e-12)) / r, (w[1] * (1 - 1e-12)) / r] : w;
+};
+const discToKlein = (w) => { const r2 = w[0] * w[0] + w[1] * w[1], s = 1 / (1 + r2); return [2 * w[0] * s, 2 * w[1] * s, 1]; };
+const kleinToDisc = (k) => { const r2 = k[0] * k[0] + k[1] * k[1], s = 1 / (1 + Math.sqrt(Math.max(1e-15, 1 - r2))); return [k[0] * s, k[1] * s]; };
+const buildKleinNorms = (D) => {
+  if (D._kleinNorms) return D._kleinNorms;
+  const norms = [];
+  for (let i = 0; i < D.n; i++) {
+    const a = D.verts[i], b = D.verts[(i + 1) % D.n];
+    const N = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const l = Math.hypot(N[0], N[1], N[2]) || 1;
+    const u = [N[0] / l, N[1] / l, N[2] / l];
+    if (u[0] * D.at[0] + u[1] * D.at[1] + u[2] * D.at[2] < 0) { u[0] = -u[0]; u[1] = -u[1]; u[2] = -u[2]; }
+    norms.push(u);
+  }
+  D._kleinNorms = norms;
+  return norms;
+};
+
+/** Exact Cyrus-Beck geodesic ray-marcher in Klein disc + PSU(1,1) x Z2 returning tile g containing `targetDisc`. */
+export function locateTilePSU(D, A, targetDisc, maxSteps = 400) {
+  if (!D.n) return { g: psuI(), inside: true, steps: 0 };
+  const target = clampDisc(targetDisc);
+  const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
+  const norms = buildKleinNorms(D);
+  const atD = [D.at[0] / (1 + D.at[2]), D.at[1] / (1 + D.at[2])];
+  let gAcc = psuI(), pD = atD, lastEdge = -1, zeroRun = 0;
+  let bestG = gAcc, bestDist = discDist(target, atD);
+
+  for (let step = 0; step < maxSteps; step++) {
+    const qD = clampDisc(psuApplyDisc(psuInv(gAcc), target));
+    const qDist = discDist(qD, atD);
+    if (qDist < bestDist) { bestDist = qDist; bestG = gAcc; }
+    const qK = discToKlein(qD);
+    let minSq = Infinity;
+    const sqs = new Array(D.n);
+    for (let i = 0; i < D.n; i++) {
+      const N = norms[i], s = N[0] * qK[0] + N[1] * qK[1] + N[2] * qK[2];
+      sqs[i] = s;
+      if (s < minSq) minSq = s;
+    }
+    if (minSq >= -1e-11) return { g: gAcc, inside: true, steps: step };
+
+    const pK = discToKlein(pD);
+    let bestEdge = -1, bestT = Infinity;
+    for (let i = 0; i < D.n; i++) {
+      if (i === lastEdge) continue;
+      const sq = sqs[i];
+      if (sq >= -1e-14) continue;
+      const N = norms[i], sp = Math.max(0, N[0] * pK[0] + N[1] * pK[1] + N[2] * pK[2]);
+      const t = sp / (sp - sq);
+      if (t < bestT) { bestT = t; bestEdge = i; }
+    }
+    if (bestEdge < 0) {
+      for (let i = 0; i < D.n; i++) {
+        const sq = sqs[i];
+        if (sq >= -1e-14) continue;
+        const N = norms[i], sp = Math.max(0, N[0] * pK[0] + N[1] * pK[1] + N[2] * pK[2]);
+        const t = sp / (sp - sq);
+        if (t < bestT) { bestT = t; bestEdge = i; }
+      }
+      if (bestEdge < 0) return { g: bestG, inside: false, steps: step };
+    }
+    if (bestT < 1e-9) {
+      zeroRun++;
+      if (zeroRun > 12) {
+        pD = [pD[0] + 1e-5 * (atD[0] - pD[0]), pD[1] + 1e-5 * (atD[1] - pD[1])];
+        zeroRun = 0; lastEdge = -1;
+        continue;
+      }
+    } else zeroRun = 0;
+
+    const wK = [pK[0] + bestT * (qK[0] - pK[0]), pK[1] + bestT * (qK[1] - pK[1]), 1];
+    const stepG = maps2[bestEdge];
+    gAcc = psuMul(gAcc, stepG);
+    pD = clampDisc(psuApplyDisc(psuInv(stepG), kleinToDisc(wK)));
+    const e = D.edges[bestEdge];
+    lastEdge = e.mirror ? bestEdge : e.to;
+  }
+  return { g: bestG, inside: false, steps: maxSteps };
+}
+
 /** Exact PSU(1,1) x Z2 hyperbolic tile enumerator centered at `focus` (in Poincare disc). */
 export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 1500 } = {}) {
   const G = D.G, n = D.n;
   if (!n) return [{ g: psuI(), M: I3.slice(), flip: false, d: 0 }];
+  const [fx, fy] = clampDisc(focus);
+  const focusTo0 = psuNorm([1, 0, -fx, -fy, 0]);
   const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
   const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
   const atD = toDisc(D.at);
@@ -98,10 +184,11 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
     return false;
   };
   const put = (w, flip) => { for (const key of cells(w, flip, true)) { const l = grid.get(key); if (l) l.push(w); else grid.set(key, [w]); } };
-  const scoreOf = (g) => {
+  const scoreOf = (gRel) => {
     let best = Infinity;
     for (let i = 0; i < samplesD.length; i++) {
-      const d = discDist(psuApplyDisc(g, samplesD[i]), focus);
+      const w = psuApplyDisc(gRel, samplesD[i]);
+      const d = 2 * Math.atanh(Math.min(1 - 1e-15, Math.hypot(w[0], w[1])));
       if (d < best) best = d;
     }
     return best;
@@ -111,18 +198,20 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
   const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; for (let i = 0; ;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l].d < heap[m].d) m = l; if (r < heap.length && heap[r].d < heap[m].d) m = r; if (m === i) break; [heap[m], heap[i]] = [heap[i], heap[m]]; i = m; } } return top; };
 
   const out = [], t0 = typeof performance !== 'undefined' ? performance.now() : 0;
-  const g0 = psuI();
-  put(atD, false); push({ g: g0, flip: false, d: scoreOf(g0) });
+  const g0 = locateTilePSU(D, A, [fx, fy]).g;
+  const gRel0 = psuMul(focusTo0, g0);
+  put(psuApplyDisc(gRel0, atD), !!g0[4]);
+  push({ g: g0, gRel: gRel0, flip: !!g0[4], d: scoreOf(gRel0) });
   while (heap.length && out.length < max) {
     const t = pop();
     out.push({ g: t.g, M: psuToSO21(t.g), flip: t.flip, d: t.d });
     if ((out.length & 63) === 0 && typeof performance !== 'undefined' && performance.now() - t0 > ms) break;
     for (let i = 0; i < n; i++) {
-      const g = psuMul(t.g, maps2[i]), flip = !!g[4], d = scoreOf(g);
+      const g = psuMul(t.g, maps2[i]), gRel = psuMul(t.gRel, maps2[i]), flip = !!g[4], d = scoreOf(gRel);
       if (!(d <= radius)) continue;
-      const w = psuApplyDisc(g, atD);
+      const w = psuApplyDisc(gRel, atD);
       if (known(w, flip)) continue;
-      put(w, flip); push({ g, flip, d });
+      put(w, flip); push({ g, gRel, flip, d });
     }
   }
   return out;
@@ -137,6 +226,7 @@ export function createPattern(canvas, opts = {}) {
   // out on the hyperbolic plane a determinant is rounding. fix() is told them.
   let vRev = false, bRev = false;
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
+  const applyMoveH = (T, M, handRev) => psuToSO21(psuMul(so21ToPSU(T, false), so21ToPSU(M, handRev)));
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   let budget = 1500, cache = new Map(), hCache = null, des = [], desAt = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
@@ -175,11 +265,23 @@ export function createPattern(canvas, opts = {}) {
       V = mul(mul(Rx, Ry), G.translate(model.D.face || model.D.at, G.origin));
     } else V = G.translate(model.center || model.D.at, G.origin);
   }
-  /** Keep the tile nearest the middle of the view the one the list of tiles is centred on (the pattern does not move). */
+  /** Keep the tile containing the middle of the view the one the list of tiles is centred on (the pattern does not move). */
   function recentre(V0) {
     if (G.kind === 'S') return V0;
     const { D, A } = model;
-    const ref = G.kind === 'H' && model.center ? model.center : D.at;
+    if (G.kind === 'H') {
+      const vRevOld = vRev;
+      let vPsu = so21ToPSU(V, vRevOld);
+      const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+      const { g } = locateTilePSU(D, A, focus);
+      vPsu = psuMul(vPsu, g);
+      V = psuToSO21(vPsu); vRev = !!vPsu[4];
+      const bPsu = psuMul(psuInv(g), so21ToPSU(base, bRev));
+      if (Math.hypot(bPsu[0], bPsu[1]) > 150) { base = I3.slice(); bRev = false; }
+      else { base = psuToSO21(bPsu); bRev = !!bPsu[4]; }
+      return V0 ? psuToSO21(psuMul(so21ToPSU(V0, vRevOld), g)) : V0;
+    }
+    const ref = D.at;
     const far = (M) => { const p = apply(M, ref); return p[0] * p[0] + p[1] * p[1]; };
     for (let guard = 0; guard < 400; guard++) {
       let best = -1, bd = far(V) - 1e-9;
@@ -190,12 +292,6 @@ export function createPattern(canvas, opts = {}) {
       if (det(h) < 0) { vRev = !vRev; bRev = !bRev; }          // h is one of the tile's own gluings: small and exact
       if (V0) V0 = mul(V0, h);
     }
-    // A long way out on the hyperbolic plane the outlined tile's place is a matrix with entries of the size
-    // e^distance: some 18 units out they are noise, and putting it "back onto the group" made it not-a-number for
-    // good. Well before that (about 10 units, long after the tile has shrunk out of sight at the rim, and only if
-    // one stroke goes that far: the outline comes back anyway when the hand lets go, settle() below) the outline
-    // moves to the tile in the middle of the view.
-    if (G.kind === 'H' && Math.max(...base.map(Math.abs)) > 2e4) { base = I3.slice(); bRev = false; }
     V = G.fix(V, vHand()); base = G.fix(base, bHand());
     return V0 ? G.fix(V0, vHand()) : V0;
   }
@@ -203,7 +299,8 @@ export function createPattern(canvas, opts = {}) {
   function outlineSeen() {
     const D = model.D;
     if (!D.n) return true;
-    const c = apply(mul(V, base), D.at);
+    const M = G.kind === 'H' ? psuToSO21(psuMul(so21ToPSU(V, vRev), so21ToPSU(base, bRev))) : mul(V, base);
+    const c = apply(M, D.at);
     if (!(Number.isFinite(c[0]) && Number.isFinite(c[1]) && Number.isFinite(c[2]))) return false;
     if (G.kind === 'S') return c[2] > 0.12;
     if (G.kind === 'H') return c[2] < 4;                  // within two units of the middle (0.77 of the disc's radius): farther out it is a speck
@@ -228,8 +325,7 @@ export function createPattern(canvas, opts = {}) {
     let radius = Infinity, max = 4200;
     if (G.kind === 'E') { const L = lay(); radius = (Math.hypot(W, H) / 2) / L.R + reach; }
     if (G.kind === 'H') {
-      const focusPt = apply(invH(V), [0, 0, 1]);
-      const focus = [focusPt[0] / (1 + focusPt[2]), focusPt[1] / (1 + focusPt[2])];
+      const focus = psuApplyDisc(psuInv(so21ToPSU(V, vRev)), [0, 0]);
       const wantMax = quick ? budget : max;
       if (!hCache || discDist(focus, hCache.focus) >= 0.5 || (!quick && hCache.max < max)) {
         hCache = { focus, max: wantMax, list: tilesPSU(D, A, { focus, radius: 5.6, max: wantMax }) };
@@ -440,7 +536,7 @@ export function createPattern(canvas, opts = {}) {
     const found = [], afterDots = [];
     home = null;
     {
-      const M = mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
+      const M = kind === 'H' ? psuToSO21(psuMul(vPsu, so21ToPSU(base, bRev))) : mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
       const ppu = kind === 'H' ? R / (1 + c[2]) : R, px = D.clear * ppu;
       const visible = kind !== 'S' || c[2] > -0.2;
       if (n && visible && (px > 3 || model.outline === false)) {
@@ -607,7 +703,8 @@ export function createPattern(canvas, opts = {}) {
       const dx = vx * FADE * (1 - k), dy = vy * FADE * (1 - k);
       vx *= k; vy *= k;
       if (dx || dy) {
-        V = G.fix(mul(G.translate(unproject(x, y), unproject(x + dx, y + dy)), V), vHand());
+        const T = G.translate(unproject(x, y), unproject(x + dx, y + dy));
+        V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
         recentre(null);
       }
       if (Math.hypot(vx, vy) > 0.02) { quick = true; schedule(); coast = requestAnimationFrame(step); return; }
@@ -639,7 +736,8 @@ export function createPattern(canvas, opts = {}) {
     if (!drag.moved) return;
     setHot(null);
     const p = unproject(x, y);
-    V = G.fix(mul(G.translate(drag.p0, p), drag.V0), vHand());
+    const T = G.translate(drag.p0, p);
+    V = G.kind === 'H' ? applyMoveH(T, drag.V0, vRev) : G.fix(mul(T, drag.V0), vHand());
     drag.V0 = recentre(drag.V0);
     // a very long stroke: start afresh from here, so that no huge slide has to be undone by a huge view
     if (G.kind === 'H' && G.dist(drag.p0, p) > 2.6) { drag.p0 = p; drag.V0 = V.slice(); }
@@ -678,7 +776,8 @@ export function createPattern(canvas, opts = {}) {
     if (!dx && !dy) return;
     const [x, y] = local(e);
     setHot(null);
-    V = G.fix(mul(G.translate(unproject(x, y), unproject(x - dx, y - dy)), V), vHand());
+    const T = G.translate(unproject(x, y), unproject(x - dx, y - dy));
+    V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
     recentre(null);
     quick = true; clearTimeout(still);
     still = setTimeout(() => { settle(); quick = false; schedule(); }, 180);     // the outline comes back once it rests
@@ -693,7 +792,8 @@ export function createPattern(canvas, opts = {}) {
     e.preventDefault();
     stopCoast();
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
-    V = G.fix(mul(G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0]))), V), vHand());
+    const T = G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0])));
+    V = G.kind === 'H' ? applyMoveH(T, V, vRev) : G.fix(mul(T, V), vHand());
     recentre(null);
     settle();
     schedule();

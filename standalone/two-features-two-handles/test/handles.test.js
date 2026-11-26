@@ -11,7 +11,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel,
 } from '../src/handles.js';
-import { tilesPSU } from '../src/pattern-ext.js';
+import { locateTilePSU, tilesPSU } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
@@ -662,5 +662,78 @@ test('All 6 hyperbolic families at extreme L in [0.4, 11.5] and tw in [-0.5, 0.5
     const tsA = tilesPSU(mA.D, mA.A, { focus: [0, 0], radius: 5.0, max: 600 });
     const minC = Math.min(...tsA.map((t) => Math.max(...mB.shapes[0].pts.map((p, idx) => GH.dist(apply(t.M, mA.shapes[0].pts[idx]), p)))));
     assert.ok(minC < 1e-7, `${k} continuity across tw=0 drift ${minC}`);
+  }
+});
+
+test('Drag recentering (locateTilePSU) and far-focus tilesPSU never vanish on o33 b=0.4 or any hyperbolic family', () => {
+  const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+  const repro = {
+    k: 'o33', perm: [0, 2, 1, 3], orders: [0, 3, 0, 3],
+    L: 2.006, tw: -0.0344, b: 0.4, tau: 0.485,
+    thetas: defaultCommas('o33').map((s) => (s ? s.theta : 0)),
+  };
+  const m0 = buildPatternModel(repro);
+  for (let ai = 0; ai < 16; ai++) {
+    const ang = (ai * TAU) / 16;
+    let vPsu = psuI();
+    const dragStep = so21ToPSU(GH.translate(GH.origin, GH.polar(1.5, ang)), false);
+    for (let step = 0; step < 50; step++) {
+      vPsu = psuMul(dragStep, vPsu);
+      const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+      const res = locateTilePSU(m0.D, m0.A, focus);
+      assert.ok(res.inside, `repro ang=${ai} step=${step} locateTilePSU failed`);
+      vPsu = psuMul(vPsu, res.g);
+      const newFocus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+      assert.ok(discDist(newFocus, [0, 0]) < 5.0, `repro ang=${ai} step=${step} newFocus too far: ${discDist(newFocus, [0, 0])}`);
+      if (step % 5 === 4 || step === 0) {
+        const ts = tilesPSU(m0.D, m0.A, { focus: newFocus, radius: 5.6, max: 4200 });
+        const drawn = ts.filter((t) => Math.max(0, t.d - 0.5) <= 5.5).length;
+        assert.ok(drawn >= 350, `repro ang=${ai} step=${step} drawn=${drawn}`);
+      }
+    }
+  }
+
+  for (let ai = 0; ai < 8; ai++) {
+    const ang = (ai * TAU) / 8;
+    for (const dist of [0, 5.5, 9.0, 12.0]) {
+      const focus = toDisc(GH.polar(dist, ang));
+      const ts = tilesPSU(m0.D, m0.A, { focus, radius: 5.6, max: 4200 });
+      const drawn = ts.filter((t) => Math.max(0, t.d - 0.5) <= 5.5).length;
+      assert.ok(drawn >= 350, `far focus dist=${dist} ang=${ai} drawn=${drawn}`);
+    }
+  }
+
+  for (const k of ['3333', '2223', '333*', '333*3', '333x', 'o33']) {
+    const fam = FAMILIES[k];
+    const perms = k === 'o33' ? [[0, 2, 1, 3], [0, 1, 2, 3]] : [[0, 1, 2, 3]];
+    const bs = fam.bRange ? [0.25, 0.4, 1.4] : [0];
+    for (const perm of perms) {
+      for (const L of [0.4, 2.0, 9.56]) {
+        for (const tw of [-0.5, 0, 0.43]) {
+          for (const b of bs) {
+            const mod = buildPatternModel({
+              k, perm, orders: perm.map((c) => fam.baseOrders[c]), L, tw, b, tau: 0.485,
+              thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+            });
+            for (let ai = 0; ai < 8; ai++) {
+              const ang = (ai * TAU) / 8;
+              let vPsu = psuI();
+              const dragStep = so21ToPSU(GH.translate(GH.origin, GH.polar(2.0, ang)), false);
+              for (let s = 0; s < 10; s++) {
+                vPsu = psuMul(dragStep, vPsu);
+                const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+                const res = locateTilePSU(mod.D, mod.A, focus);
+                assert.ok(res.inside, `${k} perm=${perm} L=${L} tw=${tw} b=${b} ang=${ai} step=${s} locateTilePSU failed`);
+                vPsu = psuMul(vPsu, res.g);
+              }
+              const finalFocus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+              const ts = tilesPSU(mod.D, mod.A, { focus: finalFocus, radius: 5.6, max: 4200 });
+              const drawn = ts.filter((t) => Math.max(0, t.d - 0.5) <= 5.5).length;
+              assert.ok(drawn >= 200, `${k} perm=${perm} L=${L} tw=${tw} b=${b} ang=${ai} drawn=${drawn}`);
+            }
+          }
+        }
+      }
+    }
   }
 });
