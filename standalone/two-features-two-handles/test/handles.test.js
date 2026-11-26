@@ -13,7 +13,8 @@ import {
 } from '../src/handles.js';
 import { locateTilePSU, tilesPSU, poincareArc, createPattern } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
+import { signatureOf, tiles, analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
+import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
 
 const TAU = 2 * Math.PI;
@@ -1031,8 +1032,8 @@ test('followTreeData cutPts reaches ends across all families and keepView clears
           assert.ok(discDist(toD(fd.cutPts[0]), toD(fd.ends[0])) < 1e-12, `${k} cutPts[0] != ends[0]`);
           assert.ok(discDist(toD(fd.cutPts[fd.cutPts.length - 1]), toD(fd.ends[1])) < 1e-12, `${k} cutPts.at(-1) != ends[1]`);
           fd.cutPts.forEach((p, idx) => {
-            // Interior points (|u|<=6) hold < 1e-11; rim endpoints (|u|<=9, z~4051) scale by cosh(9) under float64 lineDist.
-            const tol = idx >= 4 && idx <= fd.cutPts.length - 5 ? 1e-11 : 1e-9;
+            // Float64 GH.lineDist rounding scales with Lorentz z (~1e-14 * p[2]); stay < 1e-11 near center.
+            const tol = Math.max(1e-11, p[2] * 3e-14);
             assert.ok(GH.lineDist(p, cutLine.a, cutLine.b) < tol, `${k} cutPts[${idx}] off cutSeg`);
           });
         } else {
@@ -1413,5 +1414,86 @@ test('333*3 Corner shift (tauC) keeps centering frame, cones, cuts, and mDist co
     const yPos = Math.asinh(posSm.D.verts[1][1]);
     assert.ok(Math.abs(yZero) < 1e-12, `L=${L} perm=${perm} crR y at tc=0: ${yZero}`);
     assert.ok(yNeg * yPos < 0 && Math.abs(yPos - yNeg) < 0.02, `L=${L} perm=${perm} crR jumped across tc=0: ${yNeg} -> ${yPos}`);
+  }
+});
+
+test('Default parameters of all 7 families match classification-of-surfaces canonical domains and stay inside slider bounds', () => {
+  const builtins = ['3333', '2223', '333*', '333*3', '333x', 'o33', '2222'];
+  const collectPts = (D, A, ts, rMax, includeCorners) => {
+    const pts = [];
+    for (const cid of A.cones) {
+      const cls = A.classes[cid], v0 = D.verts[cls.verts[0]];
+      for (const t of ts) { const p = apply(t.M, v0); if (GH.dist(GH.origin, p) < rMax) pts.push({ kind: 'cone', n: cls.n, p }); }
+    }
+    if (includeCorners) {
+      for (const st of A.stars) for (const cid of st.corners) {
+        const cls = A.classes[cid], v0 = D.verts[cls.verts[0]];
+        for (const t of ts) { const p = apply(t.M, v0); if (GH.dist(GH.origin, p) < rMax) pts.push({ kind: 'corner', n: cls.n, p }); }
+      }
+    }
+    const uniq = [];
+    for (const item of pts) {
+      if (!uniq.some((u) => u.kind === item.kind && u.n === item.n && GH.dist(u.p, item.p) < 1e-4)) uniq.push(item);
+    }
+    return uniq;
+  };
+
+  for (const k of builtins) {
+    const f = FAMILIES[k];
+    assert.ok(f.defaultL >= f.baseRange[0] - 1e-12 && f.defaultL <= f.baseRange[1] + 1e-12, `${k} defaultL=${f.defaultL} outside baseRange`);
+    assert.ok(f.defaultTw >= -0.5 && f.defaultTw <= 0.5, `${k} defaultTw=${f.defaultTw} out of range`);
+    if (f.bRange) assert.ok(f.defaultB >= f.bRange[0] - 1e-12 && f.defaultB <= f.bRange[1] + 1e-12, `${k} defaultB=${f.defaultB} outside bRange`);
+    if (f.tauLabel) assert.ok(f.defaultTau >= -0.5 && f.defaultTau <= 0.5, `${k} defaultTau=${f.defaultTau} out of range`);
+
+    if (k === '2222') {
+      assert.equal(f.defaultL, 1);
+      assert.equal(f.defaultTw, 0);
+      continue;
+    }
+
+    const perm = f.defaultM.split('').map(Number);
+    const m = buildPatternModel({
+      k, perm, orders: perm.map((c) => f.baseOrders[c]),
+      L: f.defaultL, tw: f.defaultTw, b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+      thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+    });
+    const D_ref = domainOf(parse(k)), A_ref = analyse(D_ref);
+    const tsRef = tilesPSU(D_ref, A_ref, { focus: [0, 0], radius: 7.5, max: 4000 });
+    const tsOur = tilesPSU(m.D, m.A, { focus: [0, 0], radius: 6.5, max: 2500 });
+    const withCorners = k === '333*3';
+    const cRef = collectPts(D_ref, A_ref, tsRef, 7.0, withCorners);
+    const cOur = collectPts(m.D, m.A, tsOur, 5.2, withCorners);
+    cOur.sort((a, b) => GH.dist(GH.origin, a.p) - GH.dist(GH.origin, b.p));
+    const a0 = cOur.find((p) => p.kind === 'cone');
+    const a1 = cOur.find((p) => p !== a0 && p.kind === 'cone');
+    const d01 = GH.dist(a0.p, a1.p);
+    const revs = (k === '333*3' || k === 'o33') ? [false] : [false, true];
+
+    let bestErr = Infinity;
+    for (const b0 of cRef) {
+      if (b0.kind !== a0.kind || b0.n !== a0.n || GH.dist(GH.origin, b0.p) > 3.2) continue;
+      for (const b1 of cRef) {
+        if (b1.kind !== a1.kind || b1.n !== a1.n || Math.abs(GH.dist(b0.p, b1.p) - d01) > 1e-3) continue;
+        for (const rev of revs) {
+          const M = GH.fit(a0.p, a1.p, b0.p, b1.p, rev);
+          let worst = 0;
+          for (const x of cOur) {
+            if (GH.dist(a0.p, x.p) > 4.2) continue;
+            const q = apply(M, x.p);
+            let mn = Infinity;
+            for (const y of cRef) {
+              if (y.kind === x.kind && y.n === x.n) {
+                const d = GH.dist(q, y.p);
+                if (d < mn) mn = d;
+              }
+            }
+            if (mn > worst) worst = mn;
+          }
+          if (worst < bestErr) bestErr = worst;
+        }
+      }
+    }
+    const tol = (k === '3333' || k === '2223') ? 1e-11 : 1e-4;
+    assert.ok(bestErr < tol, `${k} defaults did not match classification-of-surfaces (err=${bestErr} >= ${tol})`);
   }
 });

@@ -98,7 +98,7 @@ try {
     await page.waitForTimeout(300);
     u = await ui(T); s = await S(T);
     ok(s.k === '2345' && u.pair === '2! 3! 4 5' && u.sayState === 'ok', 'the fourth character shows 2345', s.k + ' | ' + u.pair);
-    ok(s.hash === '#k=2345&m=0123&l=2&tw=0.175' && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
+    ok(s.hash === '#k=2345&m=0123&l=2.634&tw=0' && s.loc === s.hash, 'the address follows', s.hash + ' ' + s.loc);
     ok(s.pat && s.pat.tiles > 3, 'the pattern is drawn', JSON.stringify(s.pat && s.pat.tiles));
     await shot(page, 'w03-2345');
 

@@ -107,7 +107,7 @@
     "out": "shots/h-390-o33.png"
   },
   {
-    "eval": "window.__handles.set({ tab: 'play', k: '3333', m: '0123', L: 2.0, tw: 0.175 })",
+    "eval": "window.__handles.set({ tab: 'play', k: '3333' })",
     "wait": 400
   },
   {
