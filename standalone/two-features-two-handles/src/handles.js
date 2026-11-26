@@ -6,6 +6,7 @@ import { geometry, mul, apply, inv, det, I3 } from '../../2026-11-15-classificat
 import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
 import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
+import { customSpec } from './custom.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;
@@ -264,10 +265,42 @@ export const FAMILIES = {
 export function normalizeFamilyKey(raw) {
   if (!raw) return null;
   const s = String(raw).replace(/∗/g, '*').replace(/×/g, 'x');
-  return FAMILIES[s] ? s : null;
+  if (FAMILIES[s]) return s;
+  // "Custom": any signature of one of the engine's shapes (custom.js) becomes a family the first time it is asked
+  // for, on the numbers of the built-in family of its shape, with its own orders
+  const spec = customSpec(s);
+  if (!spec) return null;
+  if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, custom: true };
+  return spec.k;
+}
+const CUSTOM_BASE = { cones: '3333', 'cone-star': '333*', 'cone-star3': '333*3', 'cone-x': '333x', handle: 'o33' };
+/** The orders of a cone-and-cuff family's three cone points by the place each takes in the cut. */
+const roleOrders = (fam, mp) => ({ low: fam.baseOrders[mp.lowerCone], um: fam.baseOrders[mp.upperMin], ur: fam.baseOrders[mp.upperMax] });
+
+/**
+ * Commas for a custom family: one a cone point, none on a cuff, and among four cone points one of the lowest
+ * order goes bare (as the fourth of 3333 does). A half-turn point takes the small commas of 2223. A cone point of
+ * order n >= 3 takes the commas of 3333, put further out as n grows so that its n copies round the point keep the
+ * room they have round a 3 (sinh(rho) sin(pi / n) held).
+ */
+function customCommas(fam) {
+  const THREE = [{ which: 'big', rho: 0.38, size: 0.175, theta: 1.9 }, { which: 'big', rho: 0.33, size: 0.13, theta: 2.6 }, { which: 'small', rho: 0.29, size: 0.095, theta: 2.2 }];
+  const TWO = [{ which: 'big', rho: 0.18, size: 0.09, theta: -PI / 2 }, { which: 'small', rho: 0.15, size: 0.068, theta: -PI / 2 }, { which: 'big', rho: 0.16, size: 0.075, theta: -PI / 2 }];
+  const cones = [0, 1, 2, 3].filter((f) => fam.baseOrders[f] > 1);
+  let bare = -1;
+  if (cones.length === 4) { const low = Math.min(...fam.baseOrders); bare = fam.baseOrders.lastIndexOf(low); }
+  const out = [null, null, null, null];
+  let j = 0;
+  for (const f of cones) {
+    if (f === bare) continue;
+    const n = fam.baseOrders[f], sp = (n === 2 ? TWO : THREE)[j++ % 3];
+    out[f] = n <= 3 ? { ...sp } : { ...sp, rho: Math.asinh((Math.sinh(sp.rho) * Math.sin(PI / 3)) / Math.sin(PI / n)) };
+  }
+  return out;
 }
 
 export function defaultCommas(k) {
+  if (FAMILIES[k] && FAMILIES[k].custom) return customCommas(FAMILIES[k]);
   if (k === '3333') {
     return [
       { which: 'big', rho: 0.38, size: 0.175, theta: 1.9 },
@@ -804,33 +837,33 @@ function cutEndpoints(u, v) {
 }
 
 // ---- Cone + geodesic cuff families (333*, 333*3, 333x)
-function buildConeFeatCut(k, L, tw, bParam, tauC = 0) {
+function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur: 3 }) {
   const fam = FAMILIES[k];
   const b = (fam.bMult || 1) * bParam;
-  const { D: Ddist, hA, hG } = pantsConeCuff(3, b, L);
-  const hU = hgt(3, 3, L);
+  const { D: Ddist, hA, hG } = pantsConeCuff(ord.low, b, L);
+  const hU = hgt(ord.um, ord.ur, L), hV = hgt(ord.ur, ord.um, L);          // the far pair: UM (order um), UL = UR (order ur)
   const t = tw * L;
   const symShift = t / 2;
   const gam = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
   const gamS = (u) => GH.norm(apply(boostX(-symShift), gam(u)));
   const A_L = offH(-L / 2, hA, -1), A_R = offH(L / 2, hA, -1);
-  const UL = offH(t - L / 2, hU, 1), UM = offH(t, hU, 1), UR = offH(t + L / 2, hU, 1);
+  const UL = offH(t - L / 2, hV, 1), UM = offH(t, hU, 1), UR = offH(t + L / 2, hV, 1);
   const F_L = gam(-b / 2), F_R = gam(b / 2);
 
   const A_Ls = offH(-L / 2 - symShift, hA, -1), A_Rs = offH(L / 2 - symShift, hA, -1);
-  const UL_s = offH(symShift - L / 2, hU, 1), UM_s = offH(symShift, hU, 1), UR_s = offH(symShift + L / 2, hU, 1);
+  const UL_s = offH(symShift - L / 2, hV, 1), UM_s = offH(symShift, hU, 1), UR_s = offH(symShift + L / 2, hV, 1);
   const F_Ls = gamS(-b / 2), F_Rs = gamS(b / 2);
 
   let symVerts, pairs, crL = null, crR = null, crL_s = null, crR_s = null, footFeat = F_R, footFeat_s = F_Rs, featDist = Ddist, wMir = 0;
-  if (k === '333*') {
+  if (fam.mode === 'cone-star') {
     symVerts = [F_Ls, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
     pairs = [{ a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 }];
-  } else if (k === '333x') {
+  } else if (fam.mode === 'cone-x') {
     const F_Ms = gamS(0);
     symVerts = [F_Ls, F_Ms, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
     pairs = [{ a: 0, b: 1, rev: true }, { a: 2, b: 7 }, { a: 3, b: 6 }, { a: 4, b: 5 }];
   } else {
-    const phi = PI / 6;
+    const phi = PI / (2 * (fam.corner || 3));          // half the corner's angle: the mirrors cross at pi / n
     wMir = Math.asinh(Math.cos(phi) / Math.sinh(b / 2));
     const s = Math.atanh(Math.tanh(b / 2) * Math.cosh(wMir));
     const mir = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(wMir), Math.cosh(u) * Math.cosh(wMir)];
@@ -866,11 +899,11 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0) {
   const edges = edgesFromPairs(symVerts.length, pairs);
   const { D, A } = buildCenteredDomain(symVerts, edges, psuBoostX(symShift));
   const TF = GH.fit(F_L, F_R, F_R, gam(1.5 * b), false);
-  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / 3);
-  const R_UM_psu = psuRotAtX(t, hU, 1, TAU / 3);
-  const R_UR_psu = psuRotAtX(t + L / 2, hU, 1, TAU / 3);
+  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / ord.low);
+  const R_UM_psu = psuRotAtX(t, hU, 1, TAU / ord.um);
+  const R_UR_psu = psuRotAtX(t + L / 2, hV, 1, TAU / ord.ur);
   return {
-    D, A, symVerts, edges, symShift,
+    D, A, symVerts, edges, symShift, ord,
     A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, featDist,
     A_Ls, A_Rs, UL_s, UM_s, UR_s, F_Ls, F_Rs, crL_s, crR_s, footFeat_s,
     hA, hG, hU, b, wMir,
@@ -900,11 +933,18 @@ function coneFeatMapping(k, perm) {
 function coneFeatTreeToCut(cut) {
   const { A_R, footFeat, R_AR } = cut;
   const invR = invH(R_AR);
-  return Math.min(
+  let best = Math.min(
     segDistToXAxis(A_R, footFeat),
     segDistToXAxis(apply(R_AR, A_R), apply(R_AR, footFeat)),
     segDistToXAxis(apply(invR, A_R), apply(invR, footFeat)),
   );
+  // a cone point of order 4 or more has further copies of the edge round it than the edge and its two nearest turns
+  let M = R_AR;
+  for (let j = 2; j < (cut.ord ? cut.ord.low : 3) - 1; j++) {
+    M = mul(R_AR, M);
+    best = Math.min(best, segDistToXAxis(apply(M, A_R), apply(M, footFeat)));
+  }
+  return best;
 }
 
 function buildConeFeatCutFromState(state) {
@@ -912,24 +952,27 @@ function buildConeFeatCutFromState(state) {
   const perm = state.perm || fam.defaultM.split('').map(Number);
   const bParam = state.b ?? fam.defaultB;
   const tauC = state.tau ?? fam.defaultTau ?? 0;
-  const cut = buildConeFeatCut(state.k, state.L, state.tw, bParam, tauC);
   const mp = coneFeatMapping(state.k, perm);
-  const d = mp.featPicked ? cut.featDist : pairDistance(3, 3, state.L);
-  const mDist = mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(3, 3, state.L).m;
+  const ord = roleOrders(fam, mp);
+  const cut = buildConeFeatCut(state.k, state.L, state.tw, bParam, tauC, ord);
+  const d = mp.featPicked ? cut.featDist : pairDistance(ord.um, ord.ur, state.L);
+  const mDist = mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(ord.um, ord.ur, state.L).m;
   return { ...cut, ...mp, perm, d, mDist };
 }
 
 export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, thetas = null, perm = [0, 1, 2, 3] } = {}) {
   const fam = FAMILIES[k], fi = fam.featIdx;
-  const cut = buildConeFeatCut(k, L, tw, bParam, tauC);
   const mp = coneFeatMapping(k, perm);
+  const ord = roleOrders(fam, mp);
+  const cut = buildConeFeatCut(k, L, tw, bParam, tauC, ord);
+  const isX = fam.mode === 'cone-x';
 
   const rawPos = new Array(4), rawPartner = new Array(4), clsOfFeat = new Array(4).fill(-1);
-  rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.F_R; clsOfFeat[mp.lowerCone] = cut.A.cls[k === '333x' ? 3 : 2];
-  rawPos[mp.upperMin] = cut.UM; rawPartner[mp.upperMin] = cut.UR; clsOfFeat[mp.upperMin] = cut.A.cls[k === '333x' ? 5 : 4];
-  rawPos[mp.upperMax] = cut.UR; rawPartner[mp.upperMax] = cut.UM; clsOfFeat[mp.upperMax] = cut.A.cls[k === '333x' ? 4 : 3];
+  rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.F_R; clsOfFeat[mp.lowerCone] = cut.A.cls[isX ? 3 : 2];
+  rawPos[mp.upperMin] = cut.UM; rawPartner[mp.upperMin] = cut.UR; clsOfFeat[mp.upperMin] = cut.A.cls[isX ? 5 : 4];
+  rawPos[mp.upperMax] = cut.UR; rawPartner[mp.upperMax] = cut.UM; clsOfFeat[mp.upperMax] = cut.A.cls[isX ? 4 : 3];
   rawPos[fi] = cut.footFeat; rawPartner[fi] = cut.A_R;
-  clsOfFeat[fi] = k === '333*3' ? cut.A.cls[0] : -1;
+  clsOfFeat[fi] = fam.mode === 'cone-star3' ? cut.A.cls[0] : -1;
 
   const symPos = new Array(4), symPartner = new Array(4);
   symPos[mp.lowerCone] = cut.A_Rs; symPartner[mp.lowerCone] = cut.F_Rs;
@@ -938,7 +981,7 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
   symPos[fi] = cut.footFeat_s; symPartner[fi] = cut.A_Rs;
 
   const framePos = symPos.slice();
-  if (k === '333*3') {
+  if (fam.mode === 'cone-star3') {
     framePos[fi] = GH.norm(apply(
       GH.frame(cut.A_Rs, cut.F_Rs),
       GH.polar(GH.dist(cut.A_Rs, cut.F_Rs) + cut.wMir, 0),
@@ -977,28 +1020,29 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     featDots,
     marks,
     extraLines: [],
-    d: mp.featPicked ? cut.featDist : pairDistance(3, 3, L),
-    mDist: mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(3, 3, L).m,
+    d: mp.featPicked ? cut.featDist : pairDistance(ord.um, ord.ur, L),
+    mDist: mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(ord.um, ord.ur, L).m,
     shapes,
     markRefs: buildMarkRefs(GH, k, perm, D, A, home, canonPartners, thetas),
   };
 }
 
 // ---- Handle family o33 ({o+, o-, 3_a, 3_b})
-function buildO33Mixed(L, tw, bo, tauO = 0) {
-  const { D: Ddist, hA, hG } = pantsConeCuff(3, bo, L);
+function buildO33Mixed(L, tw, bo, tauO = 0, pLow = 3, pUp = 3) {
+  const { D: Ddist, hA, hG } = pantsConeCuff(pLow, bo, L);
+  const { D: DdistUp, hA: hB, hG: hGu } = pantsConeCuff(pUp, bo, L);
   const t = tw * L, symShift = t / 2, hb = bo / 2;
   const baseP = (u) => [Math.sinh(u), -Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
-  const baseM = (u) => [Math.sinh(u), Math.cosh(u) * Math.sinh(hG), Math.cosh(u) * Math.cosh(hG)];
+  const baseM = (u) => [Math.sinh(u), Math.cosh(u) * Math.sinh(hGu), Math.cosh(u) * Math.cosh(hGu)];
   const gP = baseP;
   const gM = (u) => apply(boostX(t), baseM(u));
   const gP_s = (u) => GH.norm(apply(boostX(-symShift), baseP(u)));
   const gM_s = (u) => GH.norm(apply(boostX(symShift), baseM(u)));
 
   const A_L = offH(-L / 2, hA, -1), A_R = offH(L / 2, hA, -1);
-  const B_L = offH(t - L / 2, hA, 1), B_R = offH(t + L / 2, hA, 1);
+  const B_L = offH(t - L / 2, hB, 1), B_R = offH(t + L / 2, hB, 1);
   const A_Ls = offH(-L / 2 - symShift, hA, -1), A_Rs = offH(L / 2 - symShift, hA, -1);
-  const B_Ls = offH(symShift - L / 2, hA, 1), B_Rs = offH(symShift + L / 2, hA, 1);
+  const B_Ls = offH(symShift - L / 2, hB, 1), B_Rs = offH(symShift + L / 2, hB, 1);
 
   const f = mod1(tauO);
   let symVerts, pairs, vertA, vertB;
@@ -1017,10 +1061,10 @@ function buildO33Mixed(L, tw, bo, tauO = 0) {
   const H_glue_psu = psuMul(psuBoostX(t), psuFit(baseP(-hb), baseP(hb), baseM(-hb + tauO * bo), baseM(hb + tauO * bo), false));
   const ToP_psu = psuFit(baseP(-hb), baseP(hb), baseP(hb), baseP(3 * hb), false);
   const ToM_psu = psuMul(psuBoostX(t), psuMul(psuFit(baseM(-hb), baseM(hb), baseM(hb), baseM(3 * hb), false), psuBoostX(-t)));
-  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / 3);
-  const R_BR_psu = psuRotAtX(t + L / 2, hA, 1, TAU / 3);
+  const R_AR_psu = psuRotAtX(L / 2, hA, -1, TAU / pLow);
+  const R_BR_psu = psuRotAtX(t + L / 2, hB, 1, TAU / pUp);
   return {
-    mode: 'mixed', D, A, symVerts, edges, symShift,
+    mode: 'mixed', D, A, symVerts, edges, symShift, pLow, pUp, hB, hGu, DdistUp,
     A_L, A_R, B_L, B_R, A_Ls, A_Rs, B_Ls, B_Rs, vertA, vertB,
     gP, gM, gP_s, gM_s,
     H_glue: psuToSO21(H_glue_psu), H_glue_psu,
@@ -1033,20 +1077,20 @@ function buildO33Mixed(L, tw, bo, tauO = 0) {
   };
 }
 
-function buildO33Split(L, tw, bo, tauO = 0) {
-  const h3 = hgt(3, 3, L);
+function buildO33Split(L, tw, bo, tauO = 0, pAM = 3, pAR = 3) {
+  const h3 = hgt(pAM, pAR, L), h3r = hgt(pAR, pAM, L);
   const { Doo, ho } = handleSplitGeom(bo, L);
   const t = tw * L, hb = bo / 2;
   const baseC = (u) => [Math.sinh(u), Math.cosh(u) * Math.sinh(ho), Math.cosh(u) * Math.cosh(ho)];
   const cP = (u) => apply(boostX(t - L / 4), baseC(u));
   const cM = (u) => apply(boostX(t + L / 4), baseC(u));
-  const AL = offH(-L / 2, h3, -1), AM = offH(0, h3, -1), AR = offH(L / 2, h3, -1);
+  const AL = offH(-L / 2, h3r, -1), AM = offH(0, h3, -1), AR = offH(L / 2, h3r, -1);
   const Tg = boostX(L), cP2 = (u) => apply(Tg, cP(u));
   const symShift = t <= 0 ? (t + L / 4) / 2 : (t - L / 4) / 2;
   const cS = (xOff, u) => GH.norm(apply(boostX(xOff - symShift), baseC(u)));
   const cP_s = (u) => cS(t - L / 4, u), cM_s = (u) => cS(t + L / 4, u);
   const cP2_s = (u) => cS(t + 3 * L / 4, u), cM0_s = (u) => cS(t - 3 * L / 4, u);
-  const AL_s = offH(-L / 2 - symShift, h3, -1), AM_s = offH(-symShift, h3, -1), AR_s = offH(L / 2 - symShift, h3, -1);
+  const AL_s = offH(-L / 2 - symShift, h3r, -1), AM_s = offH(-symShift, h3, -1), AR_s = offH(L / 2 - symShift, h3r, -1);
 
   const f = mod1(tauO);
   let symVerts, pairs;
@@ -1069,11 +1113,11 @@ function buildO33Split(L, tw, bo, tauO = 0) {
   const ToM_psu = psuMul(psuBoostX(t + L / 4), psuMul(To0_psu, psuBoostX(-(t + L / 4))));
   const H0_glue_psu = psuFit(baseC(hb), baseC(-hb), baseC(-hb + tauO * bo), baseC(hb + tauO * bo), false);
   const H_glue_psu = psuMul(psuBoostX(t + L / 4), psuMul(H0_glue_psu, psuBoostX(-(t - L / 4))));
-  const R_AL_psu = psuRotAtX(-L / 2, h3, -1, TAU / 3);
-  const R_AM_psu = psuRotAtX(0, h3, -1, TAU / 3);
-  const R_AR_psu = psuRotAtX(L / 2, h3, -1, TAU / 3);
+  const R_AL_psu = psuRotAtX(-L / 2, h3r, -1, TAU / pAR);
+  const R_AM_psu = psuRotAtX(0, h3, -1, TAU / pAM);
+  const R_AR_psu = psuRotAtX(L / 2, h3r, -1, TAU / pAR);
   return {
-    mode: 'split', D, A, symVerts, edges, symShift,
+    mode: 'split', D, A, symVerts, edges, symShift, pAM, pAR,
     AL, AM, AR, cP, cM, cP2, AL_s, AM_s, AR_s, cP_s, cM_s,
     R_AL: psuToSO21(R_AL_psu), R_AL_psu,
     R_AM: psuToSO21(R_AM_psu), R_AM_psu,
@@ -1101,27 +1145,27 @@ function o33Mapping(perm) {
 }
 
 function buildO33CutFromState(state) {
-  const fam = FAMILIES.o33;
+  const fam = FAMILIES[state.k] || FAMILIES.o33, ord = fam.baseOrders;
   const perm = state.perm || fam.defaultM.split('').map(Number);
   const bo = state.b ?? fam.defaultB;
   const tauO = state.tau ?? fam.defaultTau;
   const mp = o33Mapping(perm);
   if (mp.mode === 'mixed') {
-    const cut = buildO33Mixed(state.L, state.tw, bo, tauO);
+    const cut = buildO33Mixed(state.L, state.tw, bo, tauO, ord[mp.lowerCone], ord[mp.upperCone]);
     const usesLower = perm[0] === 0 || perm[1] === 0;
     const hb = bo / 2;
     const mDist = usesLower ? segDistToXAxis(cut.A_Rs, cut.gP_s(hb)) : segDistToXAxis(cut.B_Rs, cut.gM_s(hb));
-    return { ...cut, ...mp, perm, usesLower, d: cut.Ddist, mDist };
+    return { ...cut, ...mp, perm, usesLower, d: usesLower ? cut.Ddist : cut.DdistUp, mDist };
   }
-  const cut = buildO33Split(state.L, state.tw, bo, tauO);
+  const cut = buildO33Split(state.L, state.tw, bo, tauO, ord[mp.coneAM], ord[mp.coneAR]);
   const hb = bo / 2;
-  const d = mp.handlesPicked ? cut.Doo : pairDistance(3, 3, state.L);
-  const mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(3, 3, state.L).m;
+  const d = mp.handlesPicked ? cut.Doo : pairDistance(cut.pAM, cut.pAR, state.L);
+  const mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(cut.pAM, cut.pAR, state.L).m;
   return { ...cut, ...mp, perm, d, mDist };
 }
 
-export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null, perm = [0, 2, 1, 3], dark = false } = {}) {
-  const mp = o33Mapping(perm);
+export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null, perm = [0, 2, 1, 3], dark = false, k = 'o33' } = {}) {
+  const mp = o33Mapping(perm), ord = (FAMILIES[k] || FAMILIES.o33).baseOrders;
   const hb = bo / 2;
   const BLUE = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   let cut, d, mDist;
@@ -1130,7 +1174,7 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
   const handleLinesSym = [];
 
   if (mp.mode === 'mixed') {
-    cut = buildO33Mixed(L, tw, bo, tauO);
+    cut = buildO33Mixed(L, tw, bo, tauO, ord[mp.lowerCone], ord[mp.upperCone]);
     rawPos[0] = cut.gP(hb); rawPartner[0] = cut.A_R;
     rawPos[1] = cut.gM(hb); rawPartner[1] = cut.B_R;
     rawPos[mp.lowerCone] = cut.A_R; rawPartner[mp.lowerCone] = cut.gP(hb); clsOfFeat[mp.lowerCone] = cut.A.cls[cut.vertA];
@@ -1142,13 +1186,13 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     symPos[mp.upperCone] = cut.B_Rs; symPartner[mp.upperCone] = cut.gM_s(hb);
 
     const usesLower = perm[0] === 0 || perm[1] === 0;
-    d = cut.Ddist;
+    d = usesLower ? cut.Ddist : cut.DdistUp;
     mDist = usesLower ? segDistToXAxis(cut.A_Rs, cut.gP_s(hb)) : segDistToXAxis(cut.B_Rs, cut.gM_s(hb));
     handleLinesSym.push([cut.gP_s(-hb), cut.gP_s(hb)]);
     handleLinesSym.push([cut.gP_s(0), offH(-cut.symShift, Math.max(0.05, cut.hG - 0.14), -1)]);
-    handleLinesSym.push([cut.gM_s(0), offH(cut.symShift, Math.max(0.05, cut.hG - 0.14), 1)]);
+    handleLinesSym.push([cut.gM_s(0), offH(cut.symShift, Math.max(0.05, cut.hGu - 0.14), 1)]);
   } else {
-    cut = buildO33Split(L, tw, bo, tauO);
+    cut = buildO33Split(L, tw, bo, tauO, ord[mp.coneAM], ord[mp.coneAR]);
     rawPos[0] = cut.cP(hb); rawPartner[0] = cut.cM(-hb);
     rawPos[1] = cut.cM(-hb); rawPartner[1] = cut.cP(hb);
     rawPos[mp.coneAM] = cut.AM; rawPartner[mp.coneAM] = cut.AR; clsOfFeat[mp.coneAM] = cut.A.cls[1];
@@ -1159,8 +1203,8 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     symPos[mp.coneAM] = cut.AM_s; symPartner[mp.coneAM] = cut.AR_s;
     symPos[mp.coneAR] = cut.AR_s; symPartner[mp.coneAR] = cut.AM_s;
 
-    d = mp.handlesPicked ? cut.Doo : pairDistance(3, 3, L);
-    mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(3, 3, L).m;
+    d = mp.handlesPicked ? cut.Doo : pairDistance(cut.pAM, cut.pAR, L);
+    mDist = mp.handlesPicked ? segDistToXAxis(cut.cP_s(hb), cut.cM_s(-hb)) : treeToCut(cut.pAM, cut.pAR, L).m;
     const t = tw * L;
     handleLinesSym.push([cut.cP_s(-hb), cut.cP_s(hb)]);
     handleLinesSym.push([cut.cP_s(0), offH(t - L / 4 - cut.symShift, Math.max(0.05, cut.ho - 0.14), 1)]);
@@ -1176,7 +1220,7 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
   const { D, A } = buildCenteredDomain(cut.symVerts, cut.edges, P_symToPair);
   const home = perm.map((f) => toPairFromSym(symPos[f]));
   const canonPartners = perm.map((f) => toPairFromSym(symPartner[f]));
-  const shapes = placeCommas(GH, 'o33', perm, home, canonPartners, commas, thetas);
+  const shapes = placeCommas(GH, k, perm, home, canonPartners, commas, thetas);
 
   const featDots = [perm[0], perm[1]].filter((f) => f < 2).map((f) => toPairFromSym(symPos[f]));
   const marks = [clsOfFeat[perm[0]], clsOfFeat[perm[1]]].filter((c) => c >= 0);
@@ -1206,7 +1250,7 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     d,
     mDist,
     shapes,
-    markRefs: buildMarkRefs(GH, 'o33', perm, D, A, home, canonPartners, thetas),
+    markRefs: buildMarkRefs(GH, k, perm, D, A, home, canonPartners, thetas),
   };
 }
 
@@ -1243,21 +1287,21 @@ export function recutConeFeat(state, i, j) {
   for (let km = -2; km <= 2; km++) {
     const Tk_psu = psuBoostX(km * L), Tk = boostX(km * L);
     const Ak = offH(km * L + L / 2, g0.hA, -1);
-    const RAk_psu = psuRotAtX(km * L + L / 2, g0.hA, -1, TAU / 3);
+    const RAk_psu = psuRotAtX(km * L + L / 2, g0.hA, -1, TAU / g0.ord.low);
     const FLk = apply(Tk, g0.F_L), FRk = apply(Tk, g0.F_R);
     let Tnew_psu, Anew, U1, U2, gL, gR, cL = null, cR = null, mapOldLower_psu, mapOldUM_psu, mapOldUR_psu;
     if (fromUM) {
       Tnew_psu = psuMul(RAk_psu, g0.R_UR_psu);
       Anew = g0.UM; U1 = Ak; U2 = g0.UR;
       gL = apply(g0.R_UM, FLk); gR = apply(g0.R_UM, FRk);
-      if (k === '333*3') { cL = apply(g0.R_UM, apply(Tk, g0.crL)); cR = apply(g0.R_UM, apply(Tk, g0.crR)); }
+      if (fam.mode === 'cone-star3') { cL = apply(g0.R_UM, apply(Tk, g0.crL)); cR = apply(g0.R_UM, apply(Tk, g0.crR)); }
       mapOldUM_psu = psuI(); mapOldLower_psu = Tk_psu; mapOldUR_psu = psuI();
     } else {
       Tnew_psu = psuMul(g0.R_UM_psu, RAk_psu);
       Anew = g0.UR; U1 = g0.UM; U2 = Ak;
       const invRAk = psuToSO21(psuInv(RAk_psu));
       gL = apply(invRAk, FLk); gR = apply(invRAk, FRk);
-      if (k === '333*3') { cL = apply(invRAk, apply(Tk, g0.crL)); cR = apply(invRAk, apply(Tk, g0.crR)); }
+      if (fam.mode === 'cone-star3') { cL = apply(invRAk, apply(Tk, g0.crL)); cR = apply(invRAk, apply(Tk, g0.crR)); }
       mapOldUR_psu = psuI(); mapOldUM_psu = psuI(); mapOldLower_psu = Tk_psu;
     }
     if (Math.abs(Tnew_psu[0]) <= 1 + 1e-7) continue;
@@ -1279,9 +1323,9 @@ export function recutConeFeat(state, i, j) {
   const twP = wrapHalf(cUM.u / Lp);
 
   let tauCp = tauC;
-  if (k === '333*3') {
+  if (fam.mode === 'cone-star3') {
     const qMid = midH(apply(Qcut, best.cL), apply(Qcut, best.cR));
-    const { hG: hGp } = pantsConeCuff(3, b, Lp);
+    const { hG: hGp } = pantsConeCuff(fam.baseOrders[mp1.lowerCone], b, Lp);
     const Fgam = GH.frame([0, -Math.sinh(hGp), Math.cosh(hGp)], [Math.sinh(1), -Math.cosh(1) * Math.sinh(hGp), Math.cosh(1) * Math.cosh(hGp)]);
     const qm = apply(invH(Fgam), qMid);
     tauCp = wrapHalf(Math.atanh(qm[0] / qm[2]) / b);
@@ -1301,22 +1345,22 @@ export function recutConeFeat(state, i, j) {
 
 export function recutO33(state, i, j) {
   const { perm, L, tw, thetas } = state;
-  const fam = FAMILIES.o33;
+  const k = FAMILIES[state.k] ? state.k : 'o33', fam = FAMILIES[k], ord = fam.baseOrders;
   if (i === j || i < 0 || i > 3 || j < 0 || j > 3) throw new Error('recutO33: invalid pair');
   const bo = state.b ?? fam.defaultB;
   const tauO = state.tau ?? fam.defaultTau;
   const hb = bo / 2;
 
-  const oldC = o33Centered(L, tw, bo, tauO, { perm, thetas });
+  const oldC = o33Centered(L, tw, bo, tauO, { perm, thetas, k });
   const others = [0, 1, 2, 3].filter((x) => x !== i && x !== j);
   const newPerm = [i, j, others[0], others[1]];
   const mp1 = o33Mapping(newPerm);
 
   // Same unordered partition -> Qcut = I3
   if (mp1.mode === oldC.mp.mode && (mp1.mode === 'split' || mp1.lowerCone === oldC.mp.lowerCone)) {
-    const newC = o33Centered(L, tw, bo, tauO, { perm: newPerm, thetas });
+    const newC = o33Centered(L, tw, bo, tauO, { perm: newPerm, thetas, k });
     const Q_psu = psuMul(newC.P_psu, psuInv(oldC.P_psu));
-    return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bo, tau: tauO, thetas: thetas.slice(), Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
+    return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L, tw, b: bo, tau: tauO, thetas: thetas.slice(), Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
   }
 
   const g0 = oldC.cut;
@@ -1327,8 +1371,8 @@ export function recutO33(state, i, j) {
     const t = tw * L;
     let best = null;
     for (let km = -2; km <= 2; km++) {
-      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hA, 1);
-      const R_Bk_psu = psuRotAtX(t + km * L + L / 2, g0.hA, 1, TAU / 3);
+      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hB, 1);
+      const R_Bk_psu = psuRotAtX(t + km * L + L / 2, g0.hB, 1, TAU / g0.pUp);
       const Tsp_psu = psuMul(g0.R_AR_psu, R_Bk_psu);
       if (Math.abs(Tsp_psu[0]) <= 1 + 1e-7) continue;
       const len = 2 * Math.acosh(Math.max(1, Math.abs(Tsp_psu[0])));
@@ -1337,7 +1381,11 @@ export function recutO33(state, i, j) {
     const ax = psuAxisOfTrans(best.Tsp_psu);
     Lp = ax.len;
     let invF_psu = ax.invF;
-    if (axisCoords(psuToSO21(invF_psu), g0.A_R).h > 0) invF_psu = psuMul(psuRot(PI), invF_psu);
+    // the two cone points belong below their cut, the handle above. Two half-turn points lie ON the cut (the pants
+    // between them has no room): there the handle says which side is which
+    const hConeSp = axisCoords(psuToSO21(invF_psu), g0.A_R).h;
+    const coneAbove = Math.abs(hConeSp) > 1e-7 ? hConeSp > 0 : geodesicCoordsInFrame(psuToSO21(invF_psu), g0.gP(-hb), g0.gP(hb)).h < 0;
+    if (coneAbove) invF_psu = psuMul(psuRot(PI), invF_psu);
     const posAM = newLowerIs(oldC.mp.lowerCone) ? g0.A_R : best.Bk;
     Qcut_psu = psuMul(psuBoostX(-axisCoords(psuToSO21(invF_psu), posAM).u), invF_psu);
     Qcut = psuToSO21(Qcut_psu);
@@ -1375,7 +1423,7 @@ export function recutO33(state, i, j) {
     const cgM = geodesicCoordsInFrame(Qcut, g0.cM(-hb), g0.cM(hb));
     twP = wrapHalf(cgM.u / Lp);
 
-    const { hG: hGp } = pantsConeCuff(3, bo, Lp);
+    const { hG: hGp } = pantsConeCuff(ord[mp1.upperCone], bo, Lp);
     const Fm_psu = psuMul(psuBoostX(cgM.u), psuBoostFrom0([0, Math.sinh(hGp), Math.cosh(hGp)]));
     const footRaw = apply(psuToSO21(psuInv(Qcut_psu)), cgP.footOnGam);
     const img = apply(psuToSO21(psuMul(Qcut_psu, g0.H_glue_psu)), footRaw);
@@ -1394,8 +1442,8 @@ export function recutO33(state, i, j) {
     const t = tw * L;
     let best = null;
     for (let km = -2; km <= 2; km++) {
-      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hA, 1);
-      const RBk_psu = psuRotAtX(t + km * L + L / 2, g0.hA, 1, TAU / 3);
+      const Tk_psu = psuBoostX(km * L), Bk = offH(t + km * L + L / 2, g0.hB, 1);
+      const RBk_psu = psuRotAtX(t + km * L + L / 2, g0.hB, 1, TAU / g0.pUp);
       const Tnew_psu = psuMul(psuInv(RBk_psu), g0.ToP_psu);
       if (Math.abs(Tnew_psu[0]) <= 1 + 1e-7) continue;
       const len = 2 * Math.acosh(Math.max(1, Math.abs(Tnew_psu[0])));
@@ -1412,7 +1460,7 @@ export function recutO33(state, i, j) {
     const cgM = geodesicCoordsInFrame(Qcut, apply(best.Tk, g0.gM(-hb)), apply(best.Tk, g0.gM(hb)));
     twP = wrapHalf(cgM.u / Lp);
 
-    const { hG: hGp } = pantsConeCuff(3, bo, Lp);
+    const { hG: hGp } = pantsConeCuff(ord[mp1.upperCone], bo, Lp);
     const Fm_psu = psuMul(psuBoostX(cgM.u), psuBoostFrom0([0, Math.sinh(hGp), Math.cosh(hGp)]));
     const footRaw = apply(psuToSO21(psuInv(Qcut_psu)), cgP.footOnGam);
     const img = apply(psuToSO21(psuMul(Qcut_psu, psuMul(best.Tk_psu, g0.H_glue_psu))), footRaw);
@@ -1426,7 +1474,7 @@ export function recutO33(state, i, j) {
     targetU2 = uOf[2]; targetU3 = uOf[3];
   }
 
-  const newC = o33Centered(Lp, twP, bo, tauOp, { perm: newPerm, thetas });
+  const newC = o33Centered(Lp, twP, bo, tauOp, { perm: newPerm, thetas, k });
   const newThetas = thetas.slice();
   for (const [cIdx, M_pre_psu, oldV, tU] of [[2, M_cone2_pre_psu, oldV2, targetU2], [3, M_cone3_pre_psu, oldV3, targetU3]]) {
     const M_cut_psu = alignToSlotPsu(M_pre_psu, Qcut_psu, oldV, tU, Lp);
@@ -1434,7 +1482,7 @@ export function recutO33(state, i, j) {
   }
 
   const Q_psu = psuMul(newC.P_psu, psuMul(Qcut_psu, psuInv(oldC.P_psu)));
-  return { k: 'o33', perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bo, tau: tauOp, thetas: newThetas, Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
+  return { k, perm: newPerm, orders: newPerm.map((c) => fam.baseOrders[c]), L: Lp, tw: twP, b: bo, tau: tauOp, thetas: newThetas, Q: psuToSO21(Q_psu), invQ: psuToSO21(psuInv(Q_psu)) };
 }
 
 /** Unified stationary re-cut across all 7 orbifold families. */
@@ -1504,7 +1552,7 @@ export function followTreeData(state) {
 
   // Generalized walk for 333*, 333*3, 333x, o33
   const c = fam.mode === 'handle'
-    ? o33Centered(L, tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { perm: state.perm, thetas: state.thetas })
+    ? o33Centered(L, tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { perm: state.perm, thetas: state.thetas, k })
     : coneFeatCentered(k, L, tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { perm: state.perm, thetas: state.thetas });
   const toPair = (v) => GH.norm(apply(c.Pmat, v));
   const cut = c.cut;
@@ -1527,7 +1575,7 @@ export function followTreeData(state) {
       legPts = [cut.AM, cut.AR, cut.cP(hb), cut.cM(-hb)];
     }
   } else if (c.mp.featPicked) {
-    periodFwd = k === '333*3'
+    periodFwd = fam.mode === 'cone-star3'
       ? [cut.A_L, cut.crL, cut.crR, cut.A_R]
       : [cut.A_L, cut.F_L, cut.F_R, cut.A_R];
     legPts = [cut.A_R, cut.footFeat, cut.UM, cut.UR];
@@ -1779,11 +1827,11 @@ export function beadOnLoop(loop, u) {
 
 /** Parts list passed to buildSurface(parts) for each of the 7 families. */
 export function surfacePartsFor(k) {
-  if (k === '333*') return [{ t: 'cone', n: 3 }, { t: 'star', corners: [] }, { t: 'cone', n: 3 }, { t: 'cone', n: 3 }];
-  if (k === '333*3') return [{ t: 'cone', n: 3 }, { t: 'star', corners: [3] }, { t: 'cone', n: 3 }, { t: 'cone', n: 3 }];
-  if (k === '333x') return [{ t: 'cone', n: 3 }, { t: 'x' }, { t: 'cone', n: 3 }, { t: 'cone', n: 3 }];
-  if (k === 'o33') return [{ t: 'o' }, { t: 'cone', n: 3 }, { t: 'cone', n: 3 }];
-  return (FAMILIES[k] || FAMILIES['3333']).baseOrders.map((n) => ({ t: 'cone', n }));
+  const fam = FAMILIES[k] || FAMILIES['3333'], cone = (f) => ({ t: 'cone', n: fam.baseOrders[f] });
+  if (fam.mode === 'handle') return [{ t: 'o' }, cone(2), cone(3)];
+  if (fam.mode === 'cones' || fam.mode === 'pillow') return fam.baseOrders.map((n) => ({ t: 'cone', n }));
+  const cuff = fam.mode === 'cone-x' ? { t: 'x' } : { t: 'star', corners: fam.mode === 'cone-star3' ? [fam.corner || 3] : [] };
+  return [0, 1, 2, 3].map((f) => (f === fam.featIdx ? cuff : cone(f)));
 }
 
 function nearestSite(L, p) {
@@ -1799,7 +1847,7 @@ function nearestSite(L, p) {
 export function featureAnchorsForBall(built, k = '3333') {
   const L = built.layout;
   const labels = (FAMILIES[k] || FAMILIES['3333']).featLabels;
-  if (k === 'o33') {
+  if ((FAMILIES[k] || FAMILIES['3333']).mode === 'handle') {
     const p2 = built.anchors[1].at(), p3 = built.anchors[2].at();
     return [
       { p: L.sites[0].site.n.map((x) => 1.15 * x), site: 0, label: labels[0] },
@@ -1836,7 +1884,7 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   } else if (fam.mode === 'cones') {
     built = fourConeCentered(state.orders, state.L, state.tw, { thetas: state.thetas, perm: state.perm, k: state.k });
   } else if (fam.mode === 'handle') {
-    built = o33Centered(state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { thetas: state.thetas, perm: state.perm, dark });
+    built = o33Centered(state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { thetas: state.thetas, perm: state.perm, dark, k: state.k });
   } else {
     built = coneFeatCentered(state.k, state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { thetas: state.thetas, perm: state.perm });
   }

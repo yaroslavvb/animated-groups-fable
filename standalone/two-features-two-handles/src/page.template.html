@@ -32,6 +32,24 @@
         <button class="chip" type="button" data-fam="333x" aria-pressed="false">333×</button>
         <button class="chip" type="button" data-fam="o33" aria-pressed="false">o33</button>
         <button class="chip" type="button" data-fam="2222" aria-pressed="false">2222</button>
+        <button class="chip" type="button" id="custom-chip" aria-pressed="false" aria-expanded="false" aria-controls="custom-ed">Custom</button>
+      </div>
+      <div class="custom-ed" id="custom-ed" hidden>
+        <div class="custom-row">
+          <div class="symcells" id="cu-cells" role="group" tabindex="0"></div>
+          <div class="symstep" role="group" aria-label="Change the chosen number"><button type="button" class="st-btn" id="cu-minus" aria-label="the chosen number, one less" disabled>−</button><button type="button" class="st-btn" id="cu-plus" aria-label="the chosen number, one more" disabled>+</button></div>
+          <div class="symadd" id="cu-add" role="group" aria-label="Add to the signature, or take the chosen character away">
+            <span class="symadd-k">add</span>
+            <button type="button" class="chip addchip" data-add="o" title="A handle. It counts as two features: its two sides"><b class="is-blue">\(\circ\)</b>handle</button>
+            <button type="button" class="chip addchip" data-add="cone" title="A cone point. Starts at 2"><b class="is-blue">\(2\)</b>cone</button>
+            <button type="button" class="chip addchip" data-add="star" title="A mirror"><b class="is-red">\(\ast\)</b>mirror</button>
+            <button type="button" class="chip addchip" data-add="corner" title="A corner of the mirror. Starts at 2"><b class="is-red">\(2\)</b>corner</button>
+            <button type="button" class="chip addchip" data-add="x" title="A crosscap"><b class="is-red">\(\times\)</b>crosscap</button>
+            <button type="button" class="chip addchip addchip-rm" id="cu-remove" title="Delete the chosen character, or the last one. The Delete key does the same" disabled><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.2 4.5h9.3v11H7.2L2.5 10zM10 7.6l4 4.8M14 7.6l-4 4.8"/></svg>delete</button>
+          </div>
+        </div>
+        <p class="custom-say" id="cu-say" aria-live="polite"></p>
+        <div id="cu-glyphs" hidden><span data-g="2">\(2\)</span><span data-g="3">\(3\)</span><span data-g="4">\(4\)</span><span data-g="5">\(5\)</span><span data-g="6">\(6\)</span><span data-g="7">\(7\)</span><span data-g="8">\(8\)</span><span data-g="9">\(9\)</span><span data-g="o">\(\circ\)</span><span data-g="*">\(\ast\)</span><span data-g="x">\(\times\)</span></div>
       </div>
       <div class="sig-wrap">
         <span class="sig-label">Pair</span>
@@ -240,6 +258,7 @@
         <p><strong>No constraint on \(o\) beyond simplicity:</strong> Any simple non-separating closed geodesic on the orbifold acts as a handle geodesic \(\gamma_o\). There is no upper or lower bound on its length \(b_o > 0\) nor any restriction on the fault-line shift \(\tau_o\)—the only geometric requirement is that its lifts remain pairwise disjoint so the curve on the orbifold does not self-intersect.</p>
         <p><strong>Generic uniqueness vs. symmetric tie walls:</strong> Inside a fixed homotopy class of arc on the orbifold, the shortest geodesic between two points, geodesics, or convex mirror trees is strictly unique. Globally (when optimizing over all lifts to select the canonical tile copy), it is unique for generic shapes, while symmetric loci form lower-dimensional tie walls—for example a square \(2222\) lattice where two diagonals have equal length, a half-turn on equal cones, or \(333{*}3\) at \(\tau_c = 0\) where adjacent mirror facets tie at equal distance.</p>
         <p>Because each geometric picture already fixes every arc length and twist on its newly exposed cuffs, carving an arbitrary higher-genus or \(k \ge 5\)-feature orbifold recursively—peeling off two features along their separating geodesic in any order—carries known parameters at every step. Broader non-recursive families also appear in <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a> and <a href="https://spacesheep.dev/@yaroslavvb/orbifold-showcase">Orbifold Showcase</a>.</p>
+        <p><strong>Custom.</strong> On the Play tab the Custom chip takes any signature of these shapes, typed as on <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a>: four cone points \(p\,q\,r\,s\) of any orders from \(2\) to \(9\); three cone points with a mirror \({*}\), a mirror with one corner \({*}n\) or a crosscap \({\times}\); or a handle with two cone points \(o\,p\,q\). Every formula above is used with the orders typed: each cone point brings its own \(\cos(\pi/p)\) and \(\sin(\pi/p)\), and a corner of order \(n\), where the mirrors cross at \(\pi/n\), sets its crown back from the cuff by \(w = \operatorname{arsinh}\bigl(\cos(\pi/2n)/\sinh(b_*/2)\bigr)\). Not built here: two or more mirrors, crosscaps or handles together, a mirror with several corners, and signatures with fewer or more than four features.</p>
       </div>
     </details>
   </section>

@@ -131,6 +131,104 @@
   outline-offset: 2px;
 }
 
+/* "Custom": the signature typed like a line of text (the bar of the Classification of Surfaces page, styles.css
+   .symcells ...), a size smaller and set to the left, under the chips it belongs to */
+.custom-ed {
+  flex: 1 0 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+}
+.custom-ed[hidden] {
+  display: none;
+}
+/* beside each other the chips and the Pair buttons share the first line, and the editor takes the next; where they
+   wrap, the editor stays under the chips it belongs to */
+@media (min-width: 940px) {
+  .custom-ed {
+    order: 3;
+  }
+}
+.custom-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.custom-ed .symcells {
+  min-width: 120px;
+  min-height: 52px;
+}
+.custom-ed .symcell {
+  min-width: 32px;
+  height: 46px;
+  font-size: 31px;
+}
+.custom-ed .symcaret {
+  height: 32px;
+}
+.custom-ed .symstep {
+  margin-left: 0;
+}
+.custom-ed .symadd {
+  justify-content: flex-start;
+}
+.custom-say {
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+.custom-say b {
+  color: var(--ink);
+  font-weight: 650;
+}
+.custom-say .cu-l1,
+.custom-say .cu-l2 {
+  display: block;
+}
+.custom-say[data-state="no"] .cu-l1 {
+  color: var(--ink);
+}
+/* the second line holds the offers (chips) or the rule; side by side it keeps a chip's height either way, so the
+   panes below do not jump as the signature is typed */
+.custom-say .cu-l2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+@media (min-width: 940px) {
+  .custom-say .cu-l1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .custom-say .cu-l2 {
+    min-height: 38px;
+  }
+  .custom-say .trychip {
+    min-height: 38px;
+    min-width: 52px;
+    font-size: 16px;
+  }
+}
+.custom-say .tries {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+@media (max-width: 480px) {
+  .custom-ed {
+    padding: 8px 8px 10px;
+  }
+  .custom-ed .symstep .st-btn {
+    width: 44px;
+  }
+}
+
 .play-panes {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
