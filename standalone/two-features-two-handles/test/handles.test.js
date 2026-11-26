@@ -737,3 +737,89 @@ test('Drag recentering (locateTilePSU) and far-focus tilesPSU never vanish on o3
     }
   }
 });
+
+test('Complementary pair tree (farTreeSeg) renders symmetrically and matches swapped-pair treeSeg across all 7 families', () => {
+  const cases = [
+    ['3333', [0, 1, 2, 3]],
+    ['2223', [0, 1, 2, 3]],
+    ['2223', [3, 0, 1, 2]],
+    ['333*', [0, 1, 2, 3]],
+    ['333*3', [0, 1, 2, 3]],
+    ['333x', [0, 1, 2, 3]],
+    ['o33', [0, 2, 1, 3]],
+    ['o33', [0, 1, 2, 3]],
+    ['2222', [0, 1, 2, 3]],
+  ];
+
+  for (const [k, perm] of cases) {
+    const fam = FAMILIES[k];
+    const G = fam.kind === 'E' ? GE : GH;
+    const L = k === '2222' ? 1.1 : 2.2;
+    const b = fam.defaultB ?? 0, tau = fam.defaultTau ?? 0;
+    const thetas = defaultCommas(k).map((s) => (s ? s.theta : 0));
+
+    let refLen = null;
+    for (const tw of [-0.5, -0.25, 0, 0.25, 0.5]) {
+      const st = { k, perm, orders: perm.map((c) => fam.baseOrders[c]), L, tw, b, tau, thetas };
+      const m = buildPatternModel(st);
+      const nonOnce = m.lines.filter((ln) => !ln.once);
+      const cutLn = nonOnce[nonOnce.length - 1];
+      const treeLn = nonOnce[nonOnce.length - 2];
+      const farLn = nonOnce[nonOnce.length - 3];
+      assert.ok(cutLn && cutLn.dash, `${k} missing cutSeg`);
+      assert.equal(treeLn.alpha, 0.9, `${k} picked tree alpha`);
+      assert.equal(farLn.alpha, 0.5, `${k} farTree alpha`);
+      const len = G.dist(farLn.a, farLn.b);
+      if (refLen === null) refLen = len;
+      assert.ok(near(len, refLen, 1e-7), `${k} tw=${tw} farTree len varied: ${len} vs ${refLen}`);
+    }
+
+    const st = { k, perm, orders: perm.map((c) => fam.baseOrders[c]), L, tw: 0.23, b, tau, thetas };
+    const m1 = buildPatternModel(st);
+    const nonOnce = m1.lines.filter((ln) => !ln.once);
+    const cutLn = nonOnce[nonOnce.length - 1];
+    const treeLn = nonOnce[nonOnce.length - 2];
+    const farLn = nonOnce[nonOnce.length - 3];
+
+    const side = (pt) => {
+      if (fam.kind === 'E') return pt[1] - cutLn.a[1];
+      const F = GH.frame(cutLn.a, cutLn.b), n = [F[1], F[4], F[7]];
+      return pt[0] * n[0] + pt[1] * n[1] - pt[2] * n[2];
+    };
+    const st0 = side(treeLn.a), st1 = side(treeLn.b), sf0 = side(farLn.a), sf1 = side(farLn.b);
+    if (Math.abs(sf0) < 1e-9 && Math.abs(sf1) < 1e-9) {
+      assert.ok(Math.abs(st0) > 0.1 && st0 * st1 > 0, `${k} expected cut through (2,2) far pair`);
+    } else {
+      assert.ok(st0 * st1 >= -1e-9 && sf0 * sf1 >= -1e-9 && (st0 + st1) * (sf0 + sf1) < 0, `${k} farTree not on opposite side of cutSeg`);
+    }
+
+    const r = recut(st, perm[2], perm[3]);
+    const st2 = { k: r.k, perm: r.perm, orders: r.orders, L: r.L, tw: r.tw, b: r.b ?? st.b, tau: r.tau ?? st.tau, thetas: r.thetas };
+    const m2 = buildPatternModel(st2);
+    const nonOnce2 = m2.lines.filter((ln) => !ln.once);
+    const tree2 = nonOnce2[nonOnce2.length - 2];
+    if (fam.kind === 'E') {
+      const p0 = apply(r.invQ, tree2.a), p1 = apply(r.invQ, tree2.b);
+      assert.ok(near(p0[1], farLn.a[1], 1e-8) && near(p1[1], farLn.a[1], 1e-8), `2222 swapped y mismatch`);
+      assert.ok(near(GE.dist(tree2.a, tree2.b), GE.dist(farLn.a, farLn.b), 1e-8), `2222 swapped len mismatch`);
+    } else {
+      const p0 = GH.norm(apply(r.invQ, tree2.a)), p1 = GH.norm(apply(r.invQ, tree2.b));
+      const dMatch = Math.min(
+        Math.max(GH.dist(p0, farLn.a), GH.dist(p1, farLn.b)),
+        Math.max(GH.dist(p0, farLn.b), GH.dist(p1, farLn.a)),
+      );
+      assert.ok(dMatch < 1e-8, `${k} perm=${perm} swapped treeSeg vs farTreeSeg mismatch: ${dMatch}`);
+    }
+  }
+
+  // Verify Follow the tree draws all white halo segments before all amber segments (no white cap notches)
+  const st3 = { k: '3333', perm: [0, 1, 2, 3], orders: [3, 3, 3, 3], L: 2.0, tw: -0.45, thetas: defaultCommas('3333').map((s) => (s ? s.theta : 0)) };
+  const mf = buildPatternModel(st3, { follow: { active: true, progress: 1, data: followTreeData(st3) } });
+  const halos = [], ambers = [];
+  mf.lines.forEach((ln, idx) => {
+    if (!ln.once) return;
+    if (ln.width === 5.0 && ln.color[0] === 1 && ln.color[1] === 1 && ln.color[2] === 1) halos.push(idx);
+    if (ln.width === 3.0 && ln.color[0] > 0.8 && ln.color[2] < 0.1) ambers.push(idx);
+  });
+  assert.ok(halos.length > 0 && ambers.length === halos.length && Math.max(...halos) < Math.min(...ambers), 'follow cut halos precede amber strokes');
+});

@@ -756,7 +756,7 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
     shapes.push(moved(commaAt(GH, GH.polar(sp.rho, th), sp.size, th + 1.3, sp.which, 2.0), F));
   }
 
-  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], Pmat, P_psu, shapes };
+  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes };
 }
 
 function placeCommas(G, k, perm, home, partners, commas, thetas) {
@@ -932,6 +932,7 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     home,
     cutSeg: [toPairFromSym(offH(x0_sym - L / 2, 0, 1)), toPairFromSym(offH(x0_sym + L / 2, 0, 1))],
     treeSeg: [home[0], home[1]],
+    farTreeSeg: [home[2], home[3]],
     Pmat,
     P_psu,
     rawPos,
@@ -1156,6 +1157,7 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
     home,
     cutSeg: [toPairFromSym(offH(x0_sym - L / 2, 0, 1)), toPairFromSym(offH(x0_sym + L / 2, 0, 1))],
     treeSeg: [home[0], home[1]],
+    farTreeSeg: [home[2], home[3]],
     Pmat,
     P_psu,
     rawPos,
@@ -1564,6 +1566,7 @@ export function pillowCentered(ell, tw, { commas = null, thetas = null, perm = [
   return {
     D, A, home,
     treeSeg: [V[0], V[2]],
+    farTreeSeg: [V[5], V[3]],
     cutSeg: [[-ell / 2 + s / 2, w / 2, 1], [1.5 * ell + s / 2, w / 2, 1]],
     shapes,
   };
@@ -1797,10 +1800,11 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   } else {
     built = coneFeatCentered(state.k, state.L, state.tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { thetas: state.thetas, perm: state.perm });
   }
-  const { D, A, home, cutSeg, treeSeg, shapes } = built;
+  const { D, A, home, cutSeg, treeSeg, farTreeSeg, shapes } = built;
 
   const lines = [
     ...(built.extraLines || []),
+    ...(farTreeSeg ? [{ a: farTreeSeg[0], b: farTreeSeg[1], color: INK, width: 1.9, alpha: 0.5, steps: 6 }] : []),
     { a: treeSeg[0], b: treeSeg[1], color: INK, width: 2.3, alpha: 0.9, steps: 6 },
     { a: cutSeg[0], b: cutSeg[1], color: AMBER, width: 2.2, dash: [6, 4.5], alpha: 1, steps: 8 },
   ];
@@ -1833,6 +1837,8 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
       for (const lg of fd.legs) lines.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
       for (let i = 0; i + 1 < fd.cutPts.length; i++) {
         lines.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: [1, 1, 1], width: 5.0, alpha: 0.9, once: true, steps: 4 });
+      }
+      for (let i = 0; i + 1 < fd.cutPts.length; i++) {
         lines.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: AMBER, width: 3.0, alpha: 1, once: true, steps: 4 });
       }
       if (fd.ends) {
