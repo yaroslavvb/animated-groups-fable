@@ -20,6 +20,46 @@ import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sy
 const TAU = 2 * Math.PI;
 const near = (a, b, tol = 1e-9) => Math.abs(a - b) <= tol;
 const cDist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unit3 = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const ang3 = (a, b) => Math.acos(Math.max(-1, Math.min(1, dot3(unit3(a), unit3(b)))));
+
+function sphericalWinding(pts, q) {
+  const uq = unit3(q);
+  const ref = Math.abs(uq[2]) < 0.9 ? [0, 0, 1] : [1, 0, 0];
+  const ex = unit3(cross3(ref, uq)), ey = cross3(uq, ex);
+  const proj = (p) => { const up = unit3(p), d = 1 + dot3(up, uq); return [dot3(up, ex) / d, dot3(up, ey) / d]; };
+  let sum = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = proj(pts[i]), b = proj(pts[(i + 1) % pts.length]);
+    sum += Math.atan2(a[0] * b[1] - a[1] * b[0], a[0] * b[0] + a[1] * b[1]);
+  }
+  const w = Math.round(sum / TAU);
+  return w || 0;
+}
+
+function assertBallLoopForPair(built, pair, k = '3333') {
+  const { siteOf, loopSites, complement } = sitesForBall(built, pair, k);
+  assert.deepEqual(loopSites, [siteOf[pair[0]], siteOf[pair[1]]], `${k} ${pair} loopSites must match picked pair`);
+  assert.equal(complement, false, `${k} ${pair} must not fall back to complement`);
+  const sites = built.layout.sites;
+  const loop = stadium(sites[loopSites[0]].site.n, sites[loopSites[1]].site.n, 1.014);
+  const pickedSet = new Set(pair);
+  for (let f = 0; f < 4; f++) {
+    const n = sites[siteOf[f]].site.n;
+    const minAng = Math.min(...loop.pts.map((p) => ang3(p, n)));
+    const w = sphericalWinding(loop.pts, n);
+    if (pickedSet.has(f)) {
+      assert.equal(Math.abs(w), 1, `${k} ${pair} picked feat ${f} winding=${w}`);
+      assert.ok(minAng >= 0.35, `${k} ${pair} picked feat ${f} minAng=${minAng}`);
+    } else {
+      assert.equal(w, 0, `${k} ${pair} unselected feat ${f} winding=${w}`);
+      assert.ok(minAng >= 0.38, `${k} ${pair} unselected feat ${f} minAng=${minAng}`);
+    }
+  }
+  return loop;
+}
 
 test('math-general.md §9 test vector (3,4|2,5), L = 1.6, t = 0.5', () => {
   const g = fourConeUHP([3, 4, 2, 5], 1.6, 0.5);
@@ -296,9 +336,7 @@ test('3D ball stadium loop, bead, walk data, and view interpolation', () => {
     const built = buildSurface(parts);
     built.scene.finish();
     for (const pair of [[0, 1], [1, 3], [0, 2], [2, 3]]) {
-      const { loopSites } = sitesForBall(built, pair);
-      assert.ok(built.layout.sites[loopSites[0]].toward.has(loopSites[1]), `loopSites ${loopSites} must be neighbours`);
-      const loop = stadium(built.layout.sites[loopSites[0]].site.n, built.layout.sites[loopSites[1]].site.n, 1.014);
+      const loop = assertBallLoopForPair(built, pair, k);
       const b0 = beadOnLoop(loop, 0.0);
       const b1 = beadOnLoop(loop, 1.0);
       assert.ok(Math.hypot(b0[0] - b1[0], b0[1] - b1[1], b0[2] - b1[2]) < 1e-9);
@@ -449,8 +487,7 @@ test('Period-1 invariance of tauO/tauC and 3D + followTreeData across all 7 fami
     const feats = featureAnchorsForBall(built, k);
     assert.equal(feats.length, 4);
     for (const pair of [[0, 1], [2, 3], [0, 2], [1, 3], [0, 3], [1, 2]]) {
-      const { loopSites } = sitesForBall(built, pair, k);
-      assert.ok(built.layout.sites[loopSites[0]].toward.has(loopSites[1]), `${k} ${pair} must have adjacent loopSites`);
+      assertBallLoopForPair(built, pair, k);
     }
     if (k === 'o33') {
       const belt = handleBeltLoop(built);

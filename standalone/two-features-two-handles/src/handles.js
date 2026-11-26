@@ -6,7 +6,7 @@ import { geometry, mul, apply, inv, det, I3 } from '../../2026-11-15-classificat
 import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
 import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
-import { customSpec } from './custom.js';
+import { customSpec, canonText } from './custom.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;
@@ -266,8 +266,10 @@ export function normalizeFamilyKey(raw) {
   if (!raw) return null;
   const s = String(raw).replace(/∗/g, '*').replace(/×/g, 'x');
   if (FAMILIES[s]) return s;
-  // "Custom": any signature of one of the engine's shapes (custom.js) becomes a family the first time it is asked
-  // for, on the numbers of the built-in family of its shape, with its own orders
+  const t = canonText(s);          // the same signature however it was typed: "2 2 2 2", "3 3 3 ∗ 3", "x234"
+  if (t && FAMILIES[t]) return t;
+  // any other signature of one of the engine's shapes (custom.js) becomes a family the first time it is asked for,
+  // on the numbers of the built-in family of its shape, with its own orders
   const spec = customSpec(s);
   if (!spec) return null;
   if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, custom: true };
@@ -1780,17 +1782,20 @@ function packClosedLoop(pts) {
 }
 
 /** Closed stadium loop on a sphere of radius R around two site normals n1, n2. */
-export function stadium(n1, n2, R = 1, rho = 0.36, m = 24) {
+export function stadium(n1, n2, R = 1, rho = 0.36, m = 24, waist = null) {
   const k = unit3(cross3(n1, n2)), th = ang3(n1, n2), pts = [];
   const s = Math.sin(th);
+  const w = waist === null ? (th > 1.5 ? Math.min(rho, 0.16) : rho) : waist;
+  const sideM = w < rho ? Math.max(m, 32) : m;
   const at = (t) => n1.map((x, i) => (Math.sin((1 - t) * th) / s) * x + (Math.sin(t * th) / s) * n2[i]);
-  const off = (p, dir, a) => p.map((x, i) => (Math.cos(rho) * x + Math.sin(rho) * (Math.cos(a) * dir[i] + Math.sin(a) * k[i])) * R);
-  for (let i = 0; i <= m; i++) pts.push(off(at(i / m), k, PI / 2));
+  const rAt = (t) => rho - (rho - w) * Math.sin(PI * t) ** 2;
+  const off = (p, dir, a, r) => p.map((x, i) => (Math.cos(r) * x + Math.sin(r) * (Math.cos(a) * dir[i] + Math.sin(a) * k[i])) * R);
+  for (let i = 0; i <= sideM; i++) { const t = i / sideM; pts.push(off(at(t), k, PI / 2, rAt(t))); }
   const e2 = unit3(cross3(k, n2));
-  for (let i = 1; i < m; i++) pts.push(off(n2, e2, PI / 2 - (PI * i) / m));
-  for (let i = 0; i <= m; i++) pts.push(off(at(1 - i / m), k, -PI / 2));
+  for (let i = 1; i < m; i++) pts.push(off(n2, e2, PI / 2 - (PI * i) / m, rho));
+  for (let i = 0; i <= sideM; i++) { const t = 1 - i / sideM; pts.push(off(at(t), k, -PI / 2, rAt(t))); }
   const e1 = unit3(cross3(n1, k));
-  for (let i = 1; i < m; i++) pts.push(off(n1, e1, -PI / 2 + (PI * i) / m));
+  for (let i = 1; i < m; i++) pts.push(off(n1, e1, -PI / 2 + (PI * i) / m, rho));
   return packClosedLoop(pts);
 }
 
@@ -1862,14 +1867,12 @@ export function featureAnchorsForBall(built, k = '3333') {
   });
 }
 
-/** Which dodecahedron sites the 4 features occupy, and which neighbouring pair gets the stadium loop. */
+/** Which dodecahedron sites the 4 features occupy, with loopSites always matching the picked pair. */
 export function sitesForBall(built, pair, k = '3333') {
   const L = built.layout;
   const siteOf = featureAnchorsForBall(built, k).map((f) => f.site);
   const [a, b] = pair, sa = siteOf[a], sb = siteOf[b];
-  if (L.sites[sa].toward.has(sb)) return { siteOf, loopSites: [sa, sb], complement: false };
-  const others = [0, 1, 2, 3].filter((m) => m !== a && m !== b);
-  return { siteOf, loopSites: [siteOf[others[0]], siteOf[others[1]]], complement: true };
+  return { siteOf, loopSites: [sa, sb], adjacent: L.sites[sa].toward.has(sb), complement: false };
 }
 
 // ---- Build the pattern model for pattern-ext.js from current state

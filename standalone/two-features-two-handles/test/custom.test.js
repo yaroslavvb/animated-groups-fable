@@ -1,4 +1,4 @@
-// custom.test.js — the "Custom" chip: any signature of the engine's four shapes, with any orders 2 .. 9.
+// custom.test.js — the text field after the chips: any signature of the engine's shapes, with any orders 2 .. 9.
 //
 // Nothing here is looked up: a typed signature becomes a family (handles.js normalizeFamilyKey), its tile is built,
 // folded up on paper (orbifold.js analyse) and the signature read off again; its area is held to Gauss–Bonnet; and
@@ -14,7 +14,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel, pairMetricsFor,
 } from '../src/handles.js';
-import { customSpec, specOf, whyNot, shows, featuresOf, featureLabel, prettyOf } from '../src/custom.js';
+import { customSpec, specOf, whyNot, shows, featuresOf, featureLabel, prettyOf, readSignature, canonText } from '../src/custom.js';
 import { tilesPSU, locateTilePSU } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles, fval } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
@@ -70,10 +70,37 @@ test('a typed signature becomes a family: its shape, its features in the engine\
   assert.equal(f('o23').tauLabel, 'Handle shift');
   assert.equal(f('2345').custom, true);
   // what the engine does not build is no family
-  for (const t of ['', '1', '237', '22222', '22**', '22*x', '2xx', 'oo', 'o2*', '234*56', '*2345', 'o2', 'o234', 'abc', '2 3 4 5', '2341', 'o22x'])
+  for (const t of ['', '1', '237', '22222', '22**', '22*x', '2xx', 'oo', 'o2*', '234*56', '*2345', 'o2', 'o234', 'abc', '2341', 'o22x', '2y45', '2-3-4-5'])
     assert.equal(normalizeFamilyKey(t), null, `"${t}" is no family`);
   assert.equal(customSpec('2222'), null);          // flat: the page's own family, not a custom one
   assert.ok(shows(parse('2222')) && shows(parse('2345')) && !shows(parse('237')));
+});
+
+test('a signature is read as people type it', () => {
+  const r = (t) => { const s = readSignature(t); return s ? textOf(s) : null; };
+  // spaces and commas anywhere; the star and the cross as typed or as printed; capitals; a zero for the ring
+  for (const [typed, want] of [['2345', '2345'], [' 2 3 4 5 ', '2345'], ['2,3,4,5', '2345'], ['234*5', '234*5'], ['234∗5', '234*5'], ['2 3 4 ∗ 5', '234*5'],
+    ['234x', '234x'], ['234×', '234x'], ['234X', '234x'], ['o23', 'o23'], ['O23', 'o23'], ['○23', 'o23'], ['023', 'o23'], ['', '']]) assert.equal(r(typed), want, `"${typed}"`);
+  // rings and crosses wherever they were put: their place in a signature says nothing
+  for (const [typed, want] of [['x234', '234x'], ['2x34', '234x'], ['23o', 'o23'], ['2o3', 'o23'], ['23*5x', '23*5x'], ['x23*5', '23*5x']]) assert.equal(r(typed), want, `"${typed}"`);
+  // a digit keeps its side of the star: before it a cone point, after it a corner
+  assert.equal(r('5*234'), '5*234');
+  assert.deepEqual(readSignature('5*234'), { o: 0, cones: [5], stars: [[2, 3, 4]], x: 0 });
+  // a ring beside a cross is two crosses more, as catalog.js reads it
+  assert.equal(r('o2x'), '2xxx');
+  // what is no signature
+  for (const t of ['1', '10', 'abc', '2y45', '23-45', '2345!', '(2345)', '2345/', '∞']) assert.equal(readSignature(t), null, `"${t}"`);
+  // and the families take the same spellings
+  assert.equal(normalizeFamilyKey('2 3 4 5'), '2345');
+  assert.equal(normalizeFamilyKey('x 2 3 4'), '234x');
+  assert.equal(normalizeFamilyKey('2,3,4,∗5'), '234*5');
+  assert.equal(normalizeFamilyKey('27O'), 'o27');
+  assert.equal(normalizeFamilyKey('3 3 3 ∗ 3'), '333*3');
+  assert.ok(!FAMILIES['333*3'].custom);
+  assert.equal(normalizeFamilyKey('2 2 2 2'), '2222');          // the page's own flat family, not a custom one
+  assert.ok(!FAMILIES['2222'].custom);
+  assert.equal(customSpec('2 3 4 x').k, '234x');
+  assert.deepEqual([canonText('x 2 3 4'), canonText('2 2 2 2'), canonText('2y'), canonText('')], ['234x', '2222', null, '']);
 });
 
 test('what cannot be shown says why, and offers signatures that can', () => {
@@ -208,9 +235,20 @@ test('the 3D ball, the walk and the pattern model of a custom orbifold', () => {
     const feats = featureAnchorsForBall(built, k);
     assert.deepEqual(feats.map((f) => f.label), fam.featLabels, text);
     for (const pair of PAIRS) {
-      const { loopSites } = sitesForBall(built, pair, k);
-      assert.ok(built.layout.sites[loopSites[0]].toward.has(loopSites[1]), `${text} ${pair}: the loop's two sites are neighbours`);
-      const loop = stadium(built.layout.sites[loopSites[0]].site.n, built.layout.sites[loopSites[1]].site.n, 1.014);
+      const { siteOf, loopSites, complement } = sitesForBall(built, pair, k);
+      assert.deepEqual(loopSites, [siteOf[pair[0]], siteOf[pair[1]]], `${text} ${pair}: loopSites must match picked pair`);
+      assert.equal(complement, false, `${text} ${pair}: complement must be false`);
+      const ns = [0, 1, 2, 3].map((f) => built.layout.sites[siteOf[f]].site.n);
+      const ang = (a, b) => {
+        const la = Math.hypot(...a) || 1, lb = Math.hypot(...b) || 1;
+        return Math.acos(Math.max(-1, Math.min(1, (a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) / (la * lb))));
+      };
+      const loop = stadium(ns[pair[0]], ns[pair[1]], 1.014);
+      const pickedSet = new Set(pair);
+      for (let f = 0; f < 4; f++) {
+        const minAng = Math.min(...loop.pts.map((p) => ang(p, ns[f])));
+        assert.ok(minAng >= (pickedSet.has(f) ? 0.35 : 0.38), `${text} ${pair} feat ${f} clearance ${minAng}`);
+      }
       const b0 = beadOnLoop(loop, 0), b1 = beadOnLoop(loop, 1);
       assert.ok(Math.hypot(b0[0] - b1[0], b0[1] - b1[1], b0[2] - b1[2]) < 1e-9);
     }
