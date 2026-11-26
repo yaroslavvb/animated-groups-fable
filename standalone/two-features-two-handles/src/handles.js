@@ -897,6 +897,16 @@ function coneFeatMapping(k, perm) {
   return { featPicked: false, lowerCone, upperMin: u1, upperMax: u2 };
 }
 
+function coneFeatTreeToCut(cut) {
+  const { A_R, footFeat, R_AR } = cut;
+  const invR = invH(R_AR);
+  return Math.min(
+    segDistToXAxis(A_R, footFeat),
+    segDistToXAxis(apply(R_AR, A_R), apply(R_AR, footFeat)),
+    segDistToXAxis(apply(invR, A_R), apply(invR, footFeat)),
+  );
+}
+
 function buildConeFeatCutFromState(state) {
   const fam = FAMILIES[state.k];
   const perm = state.perm || fam.defaultM.split('').map(Number);
@@ -905,7 +915,7 @@ function buildConeFeatCutFromState(state) {
   const cut = buildConeFeatCut(state.k, state.L, state.tw, bParam, tauC);
   const mp = coneFeatMapping(state.k, perm);
   const d = mp.featPicked ? cut.featDist : pairDistance(3, 3, state.L);
-  const mDist = mp.featPicked ? segDistToXAxis(cut.A_Rs, cut.footFeat_s) : treeToCut(3, 3, state.L).m;
+  const mDist = mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(3, 3, state.L).m;
   return { ...cut, ...mp, perm, d, mDist };
 }
 
@@ -927,7 +937,15 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
   symPos[mp.upperMax] = cut.UR_s; symPartner[mp.upperMax] = cut.UM_s;
   symPos[fi] = cut.footFeat_s; symPartner[fi] = cut.A_Rs;
 
-  const pL_sym = symPos[perm[0]], pR_sym = symPos[perm[1]];
+  const framePos = symPos.slice();
+  if (k === '333*3') {
+    framePos[fi] = GH.norm(apply(
+      GH.frame(cut.A_Rs, cut.F_Rs),
+      GH.polar(GH.dist(cut.A_Rs, cut.F_Rs) + cut.wMir, 0),
+    ));
+  }
+
+  const pL_sym = framePos[perm[0]], pR_sym = framePos[perm[1]];
   const P_symToPair = psuInv(psuFrame(midH(pL_sym, pR_sym), pR_sym));
   const P_psu = psuMul(P_symToPair, psuBoostX(-cut.symShift));
   const Pmat = psuToSO21(P_psu);
@@ -960,7 +978,7 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     marks,
     extraLines: [],
     d: mp.featPicked ? cut.featDist : pairDistance(3, 3, L),
-    mDist: mp.featPicked ? segDistToXAxis(cut.A_Rs, cut.footFeat_s) : treeToCut(3, 3, L).m,
+    mDist: mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(3, 3, L).m,
     shapes,
     markRefs: buildMarkRefs(GH, k, perm, D, A, home, canonPartners, thetas),
   };

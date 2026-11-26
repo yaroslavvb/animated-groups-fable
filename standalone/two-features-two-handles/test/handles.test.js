@@ -9,7 +9,7 @@ import {
   fourConeCentered, coneFeatCentered, o33Centered, recut, recutH, pillowCentered, recut2222,
   followTreeData, interpolateView, stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
-  defaultCommas, buildPatternModel,
+  defaultCommas, buildPatternModel, pairMetricsFor,
 } from '../src/handles.js';
 import { locateTilePSU, tilesPSU, poincareArc, createPattern } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
@@ -1305,5 +1305,113 @@ test('Rigid cone markRefs prevent orientation jumps across tw=0, match at tw=+-0
         }
       }
     }
+  }
+});
+
+test('333*3 Corner shift (tauC) keeps centering frame, cones, cuts, and mDist continuous across tc=0', () => {
+  const angDeg = (p, u) => Math.atan2(-(u[1] * (1 + p[2]) - p[1] * u[2]), u[0] * (1 + p[2]) - p[0] * u[2]) * (180 / Math.PI);
+  const lcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[1] * b[0] - a[0] * b[1]];
+  const ldot = (a, b) => a[0] * b[0] + a[1] * b[1] - a[2] * b[2];
+  const offH = (u, h, s) => [Math.sinh(u) * Math.cosh(h), s * Math.sinh(h), Math.cosh(u) * Math.cosh(h)];
+  const segDistToX = (P, Q) => {
+    const dP = Math.abs(Math.asinh(P[1])), dQ = Math.abs(Math.asinh(Q[1]));
+    const nR = lcross(P, Q), nn = Math.sqrt(Math.max(1e-30, ldot(nR, nR)));
+    const n = [nR[0] / nn, nR[1] / nn, nR[2] / nn];
+    if (Math.abs(n[1]) > 1 + 1e-12 && Math.abs(n[0]) < Math.abs(n[2])) {
+      const u = Math.atanh(n[0] / n[2]), m = Math.acosh(Math.abs(n[1]));
+      const sgn = GH.mix(P, Q, 0.5)[1] >= 0 ? 1 : -1;
+      const foot = offH(u, m, sgn);
+      if (Math.abs(GH.dist(P, foot) + GH.dist(Q, foot) - GH.dist(P, Q)) < 1e-6) return m;
+    }
+    return Math.min(dP, dQ);
+  };
+
+  const tcs = [-0.5, -0.25, -0.0014, 0, 0.0014, 0.25, 0.5];
+  const configs = [
+    { L: 0.577, tw: 0.15, b: 1.4, perm: [0, 1, 2, 3] },
+    { L: 0.577, tw: 0.15, b: 1.4, perm: [1, 0, 2, 3] },
+    { L: 2.0, tw: 0.15, b: 1.4, perm: [0, 1, 2, 3] },
+  ];
+
+  for (const { L, tw, b, perm } of configs) {
+    const featSlot = perm.indexOf(1);
+    const thetas = defaultCommas('333*3').map((s) => (s ? s.theta : 0));
+    const byTc = new Map();
+
+    for (const tc of tcs) {
+      const c = coneFeatCentered('333*3', L, tw, b, tc, { perm, thetas });
+      const pm = pairMetricsFor({ k: '333*3', perm, L, tw, b, tau: tc });
+      assert.ok(near(pm.d, c.d, 1e-12), `pairMetricsFor d mismatch at tc=${tc}`);
+      assert.ok(near(pm.mDist, c.mDist, 1e-12), `pairMetricsFor mDist mismatch at tc=${tc}`);
+      byTc.set(tc, c);
+    }
+
+    const ref = byTc.get(0);
+    const coneSlots = [0, 1, 2, 3].filter((s) => perm[s] !== 1);
+    const coneCids = Object.keys(ref.markRefs).filter((id) => ref.A.classes[id].n === 3);
+    assert.equal(coneCids.length, 3);
+
+    for (const tc of tcs) {
+      const c = byTc.get(tc);
+      for (let i = 0; i < 4; i++) {
+        assert.ok(Math.abs(c.P_psu[i] - ref.P_psu[i]) < 1e-12, `L=${L} perm=${perm} tc=${tc} P_psu[${i}] shifted`);
+      }
+      assert.equal(c.P_psu[4], ref.P_psu[4]);
+      for (const slot of coneSlots) {
+        assert.ok(GH.dist(c.home[slot], ref.home[slot]) < 1e-12, `L=${L} perm=${perm} tc=${tc} cone slot=${slot} moved`);
+      }
+      for (let k = 0; k < 2; k++) {
+        assert.ok(GH.dist(c.cutSeg[k], ref.cutSeg[k]) < 1e-12, `L=${L} perm=${perm} tc=${tc} cutSeg[${k}] moved`);
+      }
+      assert.equal(c.shapes.length, ref.shapes.length);
+      for (let si = 0; si < ref.shapes.length; si++) {
+        assert.equal(c.shapes[si].pts.length, ref.shapes[si].pts.length);
+        for (let pi = 0; pi < ref.shapes[si].pts.length; pi++) {
+          assert.ok(GH.dist(c.shapes[si].pts[pi], ref.shapes[si].pts[pi]) < 1e-12, `L=${L} tc=${tc} comma moved`);
+        }
+      }
+      for (const cid of coneCids) {
+        const ra = ref.markRefs[cid], rb = c.markRefs[cid];
+        assert.ok(GH.dist(ref.D.verts[ra.v], c.D.verts[rb.v]) < 1e-12);
+        assert.ok(Math.abs(angDeg(ref.D.verts[ra.v], ra.dir) - angDeg(c.D.verts[rb.v], rb.dir)) < 1e-10);
+      }
+    }
+
+    // Continuity & even symmetry of d and mDist across tc=0
+    const negSm = byTc.get(-0.0014), zero = byTc.get(0), posSm = byTc.get(0.0014);
+    assert.ok(Math.abs(negSm.d - posSm.d) < 1e-11 && Math.abs(zero.d - posSm.d) < 1e-3);
+    assert.ok(Math.abs(negSm.mDist - posSm.mDist) < 1e-11 && Math.abs(zero.mDist - posSm.mDist) < 1e-3);
+    for (const tc of [0.0014, 0.25, 0.5]) {
+      const a = byTc.get(-tc), bC = byTc.get(tc);
+      assert.ok(near(a.d, bC.d, 1e-11), `L=${L} d(-${tc}) vs d(+${tc})`);
+      assert.ok(near(a.mDist, bC.mDist, 1e-11), `L=${L} mDist(-${tc}) vs mDist(+${tc})`);
+    }
+
+    // mDist matches full cut-orbit minimum distance at tc=-0.25, -0.0014, +0.0014
+    for (const tc of [-0.25, -0.0014, 0.0014]) {
+      const c = byTc.get(tc);
+      const ts = tilesPSU(c.D, c.A, { focus: [0, 0], radius: 6.0, max: 1500 });
+      let bestOrb = Infinity;
+      for (const t of ts) {
+        const ca = apply(t.M, c.cutSeg[0]), cb = apply(t.M, c.cutSeg[1]);
+        const qA = apply(invH(GH.frame(ca, cb)), c.home[0]);
+        const qB = apply(invH(GH.frame(ca, cb)), c.home[1]);
+        bestOrb = qA[1] * qB[1] > 0 ? Math.min(bestOrb, segDistToX(qA, qB)) : 0;
+      }
+      assert.ok(near(c.mDist, bestOrb, 1e-7), `L=${L} perm=${perm} tc=${tc} mDist=${c.mDist} vs orbit=${bestOrb}`);
+    }
+
+    // Frame anchor matches exact footFeat at tc = +-0.5 (home[featSlot] lies on y = 0)
+    for (const tc of [-0.5, 0.5]) {
+      const y = Math.asinh(byTc.get(tc).home[featSlot][1]);
+      assert.ok(Math.abs(y) < 1e-10, `L=${L} perm=${perm} tc=${tc} expected home[${featSlot}] on y=0, got ${y}`);
+    }
+
+    // Mirror corner crR (D.verts[1]) glides smoothly across y = 0 at tc = 0
+    const yNeg = Math.asinh(negSm.D.verts[1][1]);
+    const yZero = Math.asinh(zero.D.verts[1][1]);
+    const yPos = Math.asinh(posSm.D.verts[1][1]);
+    assert.ok(Math.abs(yZero) < 1e-12, `L=${L} perm=${perm} crR y at tc=0: ${yZero}`);
+    assert.ok(yNeg * yPos < 0 && Math.abs(yPos - yNeg) < 0.02, `L=${L} perm=${perm} crR jumped across tc=0: ${yNeg} -> ${yPos}`);
   }
 });
