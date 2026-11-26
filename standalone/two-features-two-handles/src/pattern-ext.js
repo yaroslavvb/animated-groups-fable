@@ -509,6 +509,7 @@ export function createPattern(canvas, opts = {}) {
     const also = model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
     const dim = pick || also ? 0.38 : 1;
     const needFill = kind !== 'H' || A.stars.length > 0;
+    const showEdges = model.tileEdges !== false;
     const fill = new Path2D(), edge = [0, 1, 2].map(() => new Path2D());
     const ink = new Path2D();       // the print, in the darker tone
     // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points
@@ -589,7 +590,7 @@ export function createPattern(canvas, opts = {}) {
               hypArcD(fill, DX[i], DY[i], SX[i], SY[i], DX[j], DY[j], SX[j], SY[j], false);
             }
           }
-          if (effPx >= 2.0) {
+          if (showEdges && effPx >= 2.0) {
             const ep = edge[b];
             ep.moveTo(SX[0], SY[0]);
             for (let i = 0; i < n; i++) {
@@ -618,7 +619,7 @@ export function createPattern(canvas, opts = {}) {
           pts.push(a);
           for (let s = 1; s < st; s++) pts.push(lerpEdge(a, q, s / st));
         }
-        if (n) { closed(fill, pts, t.flip, false); closed(edge[b], pts, t.flip, true); }
+        if (n) { closed(fill, pts, t.flip, false); if (showEdges) closed(edge[b], pts, t.flip, true); }
         else fill.arc(cx, cy, R, 0, TAU);              // no edges: the one tile is the whole sphere
         for (let i = 0; i < n; i++) if (starOf[i] >= 0) line(mirrors[starOf[i]][b], P[i], P[(i + 1) % n], stepsFor(P[i], P[(i + 1) % n]));
         A.glides.forEach((g, k) => { if (g.seg) { const a = apply(M, g.seg[0]), q = apply(M, g.seg[1]); line(glides[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); } });
@@ -651,7 +652,7 @@ export function createPattern(canvas, opts = {}) {
     if (needFill) { ctx.fillStyle = css(FRONT); ctx.fill(fill); }
     ctx.fillStyle = css(FRONT_INK); ctx.fill(ink);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-    [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
+    if (showEdges) [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
     // mirrors and glide axes: red
     const widths = [2.1, 1.4, 0.8];
     A.stars.forEach((s, k) => {
@@ -1038,7 +1039,26 @@ export function createPattern(canvas, opts = {}) {
       });
       size();
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
-      else if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
+      else {
+        if (G.kind === 'H') {
+          if (!isIdentityPsu(bPsu)) {
+            const vWorld = psuMul(vPsu, bPsu);
+            if (Math.hypot(vWorld[0], vWorld[1]) < 150) {
+              vPsu = vWorld; V = psuToSO21(vPsu); vRev = !!vPsu[4];
+              bPsu = psuI(); base = I3.slice(); bRev = false;
+              recentre(null);
+            }
+          }
+        } else if (G.kind === 'E') {
+          if (Math.hypot(base[2], base[5]) > 1e-12 || Math.abs(base[0] - 1) > 1e-12 || bRev) {
+            V = G.fix(mul(V, base), vHand() * bHand());
+            vRev = vRev !== bRev;
+            base = I3.slice(); bRev = false;
+            recentre(null);
+          }
+        }
+        if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
+      }
       draw();
     },
     select(i) { sel = i; schedule(); },

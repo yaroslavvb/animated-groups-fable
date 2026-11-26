@@ -922,3 +922,89 @@ test('poincareArc matches hyperbolic geodesics to 1e-9 and shift-invariant hCach
     }
   }
 });
+
+test('Intrinsic geodesics stay continuous across tw=0 and drag+slider keeps Follow overlay aligned (tileEdges: false)', () => {
+  const toD = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
+
+  // 1. Every family sets tileEdges: false
+  for (const k of Object.keys(FAMILIES)) {
+    const f = FAMILIES[k];
+    const perm = f.defaultM.split('').map(Number);
+    const st = {
+      k, perm, orders: perm.map((c) => f.baseOrders[c]),
+      L: f.defaultL, tw: f.defaultTw, b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+      thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+    };
+    const m = buildPatternModel(st);
+    assert.equal(m.tileEdges, false, `${k} expected tileEdges: false`);
+  }
+
+  // 2. Intrinsic tiled lines (treeSeg, farTreeSeg, cutSeg, extraLines) are continuous across tw=-0.0002 vs +0.0002 and tw=0 vs +0.0079
+  const checks = [
+    ['3333', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+    ['3333', [0, 1, 2, 3], 0.8, 0, 0.0079],
+    ['2223', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+    ['333*', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+    ['333*3', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+    ['333x', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+    ['o33', [0, 2, 1, 3], 1.5, -0.0002, 0.0002],
+    ['o33', [0, 1, 2, 3], 1.5, -0.0002, 0.0002],
+  ];
+  for (const [k, perm, L, twA, twB] of checks) {
+    const f = FAMILIES[k];
+    const mk = (tw) => buildPatternModel({
+      k, perm, orders: perm.map((c) => f.baseOrders[c]), L, tw,
+      b: f.defaultB ?? 0, tau: f.defaultTau ?? 0,
+      thetas: defaultCommas(k).map((s) => (s ? s.theta : 0)),
+    });
+    const collectMids = (m) => {
+      const ts = tilesPSU(m.D, m.A, { focus: [0, 0], radius: 3.5, max: 1200 });
+      const out = [];
+      for (const t of ts) {
+        for (const ln of m.lines) {
+          if (ln.once) continue;
+          const a = apply(t.M, ln.a), b = apply(t.M, ln.b);
+          const mid = toD(GH.mix(a, b, 0.5));
+          if (Math.hypot(mid[0], mid[1]) < 0.7) out.push(mid);
+        }
+      }
+      return out;
+    };
+    const aMids = collectMids(mk(twA)), bMids = collectMids(mk(twB));
+    assert.equal(aMids.length, bMids.length, `${k} L=${L} line count changed (${aMids.length} vs ${bMids.length})`);
+    let worst = 0;
+    for (const p of aMids) {
+      let best = Infinity;
+      for (const q of bMids) {
+        const d = discDist(p, q);
+        if (d < best) best = d;
+      }
+      if (best > worst) worst = best;
+    }
+    assert.ok(worst < 0.015, `${k} L=${L} ${twA}..${twB} intrinsic line jumped: worstMidShift=${worst}`);
+  }
+
+  // 3. After dragging across the cut and moving (L, tw), recentering vWorld = psuMul(vPsu, bPsu) keeps Follow overlay aligned to < 1e-9
+  const st0 = { k: '3333', perm: [0, 1, 2, 3], orders: [3, 3, 3, 3], L: 0.8, tw: 0, b: 0, tau: 0, thetas: defaultCommas('3333').map((s) => (s ? s.theta : 0)) };
+  const m0 = buildPatternModel(st0);
+  const Tdrag = so21ToPSU(GH.translate([0, 0, 1], GH.norm([Math.sinh(3.5) * 0.5, -Math.sinh(3.5) * 0.866, Math.cosh(3.5)])), false);
+  const loc0 = locateTilePSU(m0.D, m0.A, psuApplyDisc(psuInv(Tdrag), [0, 0]));
+  const vPsu0 = psuMul(Tdrag, loc0.g);
+  const bPsu0 = psuInv(loc0.g);
+  const vWorld = psuMul(vPsu0, bPsu0);
+
+  const st1 = { ...st0, L: 1.4, tw: 0.25 };
+  const m1 = buildPatternModel(st1);
+  const loc1 = locateTilePSU(m1.D, m1.A, psuApplyDisc(psuInv(vWorld), [0, 0]));
+  const vPsu1 = psuMul(vWorld, loc1.g);
+  const bPsu1 = psuInv(loc1.g);
+  const overlayA = psuApplyDisc(psuMul(vPsu1, bPsu1), toD(m1.home[0]));
+  const tiles1 = tilesPSU(m1.D, m1.A, { focus: psuApplyDisc(psuInv(vPsu1), [0, 0]), radius: 4.5, max: 2000 });
+  let minErr = Infinity;
+  for (const t of tiles1) {
+    const q = psuApplyDisc(psuMul(vPsu1, t.g), toD(m1.home[0]));
+    const d = discDist(overlayA, q);
+    if (d < minErr) minErr = d;
+  }
+  assert.ok(minErr < 1e-9, `Follow overlay detached from tiled cone after drag+slider: ${minErr}`);
+});

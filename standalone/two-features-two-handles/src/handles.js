@@ -734,14 +734,9 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
   const edges = [5, 4, 3, 2, 1, 0].map((to) => ({ to, rev: false }));
   const { D, A } = buildCenteredDomain(symVerts, edges, P_symToPair, symAt);
 
-  // Where the cut (y = 0 in offH frame) crosses edge 4 and edge 1
-  const cross0 = (i) => {
-    const u = symVerts[i], v = symVerts[(i + 1) % 6];
-    const den = u[1] - v[1];
-    const frac = Math.abs(den) < 1e-15 ? 0 : u[1] / den;
-    return toPairFromSym(GH.norm([u[0] + frac * (v[0] - u[0]), 0, u[2] + frac * (v[2] - u[2])]));
-  };
-  const cutA = cross0(4), cutB = cross0(1);
+  // Continuous canonical pair-centred cut segment of exact length L = 2c
+  const cutA = GH.norm(apply(Pmat, offH(-c, 0, 1)));
+  const cutB = GH.norm(apply(Pmat, offH(c, 0, 1)));
   const home = [A_s, B_s, C_s, D_s].map(toPairFromSym);
   const partners = [home[1], home[0], home[3], home[2]];
 
@@ -1856,6 +1851,7 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     A,
     home,
     outline: false,
+    tileEdges: false,
     center: fam.kind === 'E' ? [0, 0, 1] : GH.origin,
     design: () => shapes,
     lines,
