@@ -1,0 +1,311 @@
+<!doctype html>
+<!--
+  Classification of Surfaces — page shell. build.mjs strips these comments, typesets \( ... \) with MathJax, and
+  inlines src/styles.css and the bundle of src/app.js. One self-contained file.
+
+  The page is one 3D stage shared by five tabs (the fifth, Symmetries, adds a 2D pane for the pattern). What a tab shows beside and under the stage lives here as static
+  markup, so the build can typeset it; src/app.js only shows and hides it:
+     [data-tab-only="zip tidy"]      shown while one of these tabs is current
+     [data-when="zip:cap"]           shown while that tab is in that state (a caption per state)
+  Book citations: <a class="bk" data-p="94" data-q="words from that page">p. 94</a>. src/bookref.js gives each its
+  link (the tailnet copy of the book, at that page) and the popover with the words.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex">
+<!-- one screen drives the others (src/sync.js): the page reads this spacesheep stream, and its owner's open page may write it -->
+<meta name="ss-streams" content="classification-of-surfaces/view" data-push="classification-of-surfaces/view">
+<title>Classification of Surfaces</title>
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<div class="app" id="app" data-tab="sym">
+
+  <header class="hdr">
+    <h1 class="title">Classification of Surfaces</h1>
+    <p class="sub">Chapter 8 of <i>The Symmetries of Things</i>, to play with</p>
+    <button type="button" class="sync" id="sync-chip" hidden><i class="sync-dot" aria-hidden="true"></i><span class="sync-t"></span></button>
+  </header>
+
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Sections of the chapter">
+    <button type="button" role="tab" class="tab" data-tab="sym" aria-selected="true"><span class="tab-n">1</span>Symmetries</button>
+    <button type="button" role="tab" class="tab" data-tab="zip" aria-selected="false"><span class="tab-n">2</span>Zippers</button>
+    <button type="button" role="tab" class="tab" data-tab="tidy" aria-selected="false"><span class="tab-n">3</span>Tidy surfaces</button>
+    <button type="button" role="tab" class="tab" data-tab="prove" aria-selected="false"><span class="tab-n">4</span>Zip it up</button>
+    <button type="button" role="tab" class="tab" data-tab="name" aria-selected="false"><span class="tab-n">5</span>Examples</button>
+  </nav>
+
+  <main class="main" id="main">
+
+    <p class="lede" data-tab-only="zip">A zipper is a pair of arrows to be glued, tail to tail and head to head. Zip the rim of one hole, or of two: only four things can happen. <a class="bk" data-p="93" data-q="a pair of directed edges (these we call zips) that we intend to identify">p. 93</a></p>
+    <p class="lede" data-tab-only="tidy">A tidy surface is a sphere with holes, handles, crosscaps and cross-handles. Only how many of each matters. <a class="bk" data-p="96" data-q="the important point is just how many of each of these things there are">p. 96</a></p>
+    <p class="lede" data-tab-only="prove">Every surface is polygons and zippers. Zip one pair at a time: what you hold stays tidy (a sphere with holes, handles, crosscaps, cross-handles), so it ends tidy. <a class="bk" data-p="97" data-q="zip up any one zip-pair of a tidy surface">p. 97</a></p>
+    <p class="lede" data-tab-only="name">To name a surface, count three things: its Euler characteristic, its boundaries, its sides. <a class="bk" data-p="105" data-q="counting the number of boundaries, and checking whether the surface is orientable">p. 105</a></p>
+
+    <p class="lede" data-tab-only="sym">A pattern folds up, tile onto tile, into a surface: its orbifold. The signature lists what is on that surface. <a class="bk" data-p="75" data-q="the folding taking all the points of the same kind to a single point">p. 75</a></p>
+
+    <div class="work">
+
+      <div class="symhead" id="sym-top" data-tab-only="sym">
+        <div class="symrow">
+          <button type="button" class="btn-quiet symnav" id="sym-prev" aria-label="The example before"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg></button>
+          <div class="symcells" id="sym-cells" role="group" tabindex="0"></div>
+          <button type="button" class="btn-quiet symnav" id="sym-next" aria-label="The next example"><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></button>
+          <div class="symstep" id="sym-step" role="group" aria-label="Change the chosen number"><button type="button" class="st-btn" id="sym-minus" aria-label="the chosen number, one less" disabled>−</button><button type="button" class="st-btn" id="sym-plus" aria-label="the chosen number, one more" disabled>+</button></div>
+        </div>
+        <div class="symadd" id="sym-add" role="group" aria-label="Add to the signature, or take the chosen character away">
+          <span class="symadd-k">add</span>
+          <button type="button" class="chip addchip" data-add="o" title="A wonder-ring: a handle on the surface. $2"><b class="is-blue">\(\circ\)</b>handle</button>
+          <button type="button" class="chip addchip" data-add="cone" title="A gyration point: a cone point on the surface. Starts at 2: half a dollar"><b class="is-blue">\(2\)</b>cone</button>
+          <button type="button" class="chip addchip" data-add="star" title="A kaleidoscope: a mirror, the rim of a hole in the surface. $1"><b class="is-red">\(\ast\)</b>mirror</button>
+          <button type="button" class="chip addchip" data-add="corner" title="A point where mirrors cross: a corner of the chosen mirror (or of the last one). Starts at 2: a quarter"><b class="is-red">\(2\)</b>corner</button>
+          <button type="button" class="chip addchip" data-add="x" title="A miracle: a crosscap on the surface. $1"><b class="is-red">\(\times\)</b>crosscap</button>
+          <button type="button" class="chip addchip addchip-rm" id="sym-remove" title="Delete the chosen character, or the last one. The Delete key does the same" disabled><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.2 4.5h9.3v11H7.2L2.5 10zM10 7.6l4 4.8M14 7.6l-4 4.8"/></svg>delete</button>
+        </div>
+        <div class="symprice">
+          <div class="cost-rail"><div class="cost-bar" id="sym-bar"></div><i class="cost-two"></i><div class="cost-total" id="sym-total"></div></div>
+          <div class="cost-zones" aria-hidden="true"><span>under $2: a sphere</span><span>$2: the plane</span><span>over $2: hyperbolic</span></div>
+          <p class="symsame" id="sym-same" data-show="0" hidden>the same as <button type="button" class="chip symchip samechip" id="sym-canon" title="Its usual spelling. Tap, or press Enter, to write it this way"></button> <span id="sym-usual">its usual spelling</span> <a class="bk" data-p="31" data-q="we can tell at a glance which patterns have the same type">p. 31</a></p>
+          <p class="symwhere" id="sym-where" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <section class="pane pane2" id="pane2" data-tab-only="sym" data-ss-comments="off" aria-label="The pattern">
+        <canvas id="pattern" tabindex="0" aria-label="The pattern. Drag to slide it; the arrow keys slide it too, and 0 puts it back."></canvas>
+        <div class="pat-none" id="pat-none" hidden>
+          <p class="pat-none-head">No pattern has this signature.</p>
+          <p id="sym-bad" aria-live="polite"></p>
+        </div>
+        <p class="pane-tip" id="pat-tip" role="status" hidden></p>
+        <p class="hint" id="pat-hint">drag to slide the pattern</p>
+        <button type="button" class="btn-quiet pane-reset" id="pat-reset" title="Put the pattern back" aria-label="Put the pattern back">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
+        </button>
+      </section>
+
+      <section class="pane" id="pane" data-ss-comments="off" data-ss-thumb aria-label="The surface in 3D">
+        <canvas id="view"></canvas>
+        <div class="labels" id="labels"></div>
+        <div class="badge" id="badge" aria-live="polite"></div>
+        <p class="hint" id="turn-hint">drag to turn</p>
+        <button type="button" class="btn-quiet pane-reset" id="reset-view" title="Reset the 3D view" aria-label="Reset the 3D view">
+          <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
+        </button>
+      </section>
+
+      <aside class="side" id="side">
+
+        <!-- 1 Zippers -->
+        <div class="panel" data-tab-only="zip">
+          <table class="grid2" role="presentation">
+            <thead><tr><td></td><th scope="col">arrows run<br>opposite ways<br>round the rim</th><th scope="col">arrows run<br>the same way<br>round the rim</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">one<br>hole</th>
+                <td><button type="button" class="pick" data-kind="cap" aria-pressed="true"><span class="pick-n">Cap</span><span class="pick-s">nothing</span></button></td>
+                <td><button type="button" class="pick" data-kind="crosscap" aria-pressed="false"><span class="pick-n">Crosscap</span><span class="pick-s">\(\times\)</span></button></td></tr>
+              <tr><th scope="row">two<br>holes</th>
+                <td><button type="button" class="pick" data-kind="handle" aria-pressed="false"><span class="pick-n">Handle</span><span class="pick-s">\(\circ\)</span></button></td>
+                <td><button type="button" class="pick" data-kind="crosshandle" aria-pressed="false"><span class="pick-n">Cross-handle</span><span class="pick-s">\(\otimes\)</span></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 2 Tidy surfaces -->
+        <div class="panel" data-tab-only="tidy">
+          <div class="steppers" id="steppers">
+            <div class="stepper" data-f="star"><span class="st-sym">\(\ast\)</span><span class="st-name">holes <small>each lowers \(\chi\) by 1</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one hole fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more hole">+</button></div>
+            <div class="stepper" data-f="o"><span class="st-sym">\(\circ\)</span><span class="st-name">handles <small>by 2</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more handle">+</button></div>
+            <div class="stepper" data-f="x"><span class="st-sym">\(\times\)</span><span class="st-name">crosscaps <small>by 1</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one crosscap fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more crosscap">+</button></div>
+            <div class="stepper" data-f="X"><span class="st-sym">\(\otimes\)</span><span class="st-name">cross-handles <small>by 2</small></span><button type="button" class="st-btn" data-d="-1" aria-label="one cross-handle fewer">−</button><output class="st-val">0</output><button type="button" class="st-btn" data-d="1" aria-label="one more cross-handle">+</button></div>
+          </div>
+          <div class="trades" id="trades">
+            <button type="button" class="chip" id="trade-X" hidden>Trade \(\otimes \to \times\times\)</button>
+            <button type="button" class="chip" id="trade-o" hidden>Walk one end of the handle through the crosscap</button>
+          </div>
+          <dl class="facts" id="facts">
+            <div><dt>Euler characteristic</dt><dd id="fact-chi"></dd></div>
+            <div><dt>Boundaries</dt><dd id="fact-b"></dd></div>
+            <div><dt>Sides</dt><dd id="fact-sides"></dd></div>
+          </dl>
+          <div class="row">
+            <button type="button" class="chip" id="tidy-book">The book's: 3 handles, 2 holes, 1 crosscap</button>
+            <button type="button" class="chip" id="tidy-clear">Sphere</button>
+          </div>
+        </div>
+
+        <!-- 3 Zip it up -->
+        <div class="panel" data-tab-only="prove">
+          <div class="chips" id="prove-presets" role="group" aria-label="What to zip"></div>
+          <p class="side-k" id="prove-zips-k">The pairs left to zip</p>
+          <div class="chips" id="prove-zips" role="group" aria-labelledby="prove-zips-k"></div>
+          <div class="row">
+            <button type="button" class="chip" id="prove-undo" disabled>Unzip the last</button>
+            <button type="button" class="chip" id="prove-reset">Start over</button>
+          </div>
+          <ol class="steps" id="prove-log" aria-live="polite"></ol>
+        </div>
+
+        <!-- 4 Examples -->
+        <div class="panel" data-tab-only="name">
+          <div class="chips" id="name-presets" role="group" aria-label="Surface"></div>
+          <div class="probes" id="probes" role="group" aria-label="What to count">
+            <button type="button" class="chip" data-probe="map" aria-pressed="false">Map</button>
+            <button type="button" class="chip" data-probe="rims" aria-pressed="false">Boundaries</button>
+            <button type="button" class="chip" data-probe="sides" aria-pressed="false">Sides</button>
+          </div>
+          <dl class="facts" id="name-facts">
+            <div><dt>Euler characteristic</dt><dd id="name-chi"></dd></div>
+            <div><dt>Boundaries</dt><dd id="name-b"></dd></div>
+            <div><dt>Sides</dt><dd id="name-sides"></dd></div>
+            <div><dt>So it is</dt><dd id="name-sym"></dd></div>
+          </dl>
+        </div>
+
+        <!-- 5 Symmetries -->
+        <div class="panel" data-tab-only="sym">
+          <div class="row"><button type="button" class="chip" id="sym-zip">Zip the outlined tile up in “Zip it up”</button></div>
+          <div class="sympresets" id="sym-presets"></div>
+        </div>
+
+      </aside>
+
+      <div class="playbar" id="playbar" data-tab-only="zip">
+        <button type="button" class="btn-primary" id="play" data-state="fold"><span data-label>Zip</span></button>
+        <div class="scrub" id="scrub" data-scrub>
+          <span class="scrub-rail"></span>
+          <span class="scrub-fill"></span>
+          <span class="scrub-ticks" data-ticks></span>
+          <input type="range" id="scrubber" min="0" max="1" step="any" value="0" aria-label="How far the zipper is closed">
+        </div>
+      </div>
+
+      <div class="caption" id="caption" aria-live="polite">
+        <p data-when="zip:cap">One arrow runs clockwise round the rim, its mate counter-clockwise: the two halves are mirror images, so the hole just closes. A cap adds nothing. <a class="bk" data-p="94" data-q="zipping this up just seals the hole, so we can ignore it">p. 94</a></p>
+        <p data-when="zip:crosscap">Both arrows run the same way round, so each rim point is glued to the one opposite. The sheet has to pass through itself, and through that line you come out on its back: one side. <a class="bk" data-p="94" data-q="letting the surface cross itself along a line">p. 94</a></p>
+        <p data-when="zip:handle">One rim is zipped clockwise, the other counter-clockwise: two tubes grow out of the same side and meet. <a class="bk" data-p="95" data-q="grow out of the same side of the surface and then meet">p. 95</a></p>
+        <p data-when="zip:crosshandle">Both rims are zipped the same way round: one tube grows out, the other in. They meet through the sheet, front against back. <a class="bk" data-p="95" data-q="grow out of opposite sides of the surface to form a cross-handle">p. 95</a></p>
+        <p data-when="prove:any" id="prove-cap"></p>
+        <div data-tab-only="sym"><p class="symkey" id="sym-key">
+          <span class="lg"><i class="sw sw-tile"></i>outlined: one tile, the one that folds up into the surface</span>
+          <span class="lg" id="key-glue"><span class="keypairs" id="key-pairs"></span>edges of one colour are glued to each other, arrow onto arrow</span>
+        </p></div>
+        <p data-when="sym:none">The signature is a line you can type: o, 2 to 9, ∗ and x add a character, Delete takes one away (all the way to nothing), the arrows move the cursor, Enter puts it in its usual order. The row under it does the same for a finger. Tap a character and what it stands for lights up in the pattern and on the surface.</p>
+        <p class="cap-more" data-when="sym:empty">Nothing in the signature: a pattern with no symmetry but leaving it alone. Its surface is the bare sphere, where every signature starts. <a class="bk" data-p="53" data-q="with the convention that digits 1 can be omitted">p. 53</a></p>
+        <p id="sym-say" data-tab-only="sym"></p>
+        <p class="cap-more" data-when="sym:bad">The surface on the right still exists; it is just not what any pattern folds up to. Only four kinds of signature fail, all under $2: N, MN, ∗N and ∗MN, with M and N different. <a class="bk" data-p="53" data-q="but it turns out that there is a proviso">p. 53</a> <a class="bk" data-p="57" data-q="by the reflections in the sides of a two-sided polygon">p. 57</a></p>
+        <p class="cap-more" data-when="sym:cone">A number before the star is a gyration point: the pattern turns about it and no mirror passes through it. Folded up, the tiles round it roll into a cone. <a class="bk" data-p="112" data-q="A gyration point is rolled into a cone">p. 112</a></p>
+        <p class="cap-more" data-when="sym:star">A star is a kaleidoscope: mirror lines, and the points where they cross. Folding along a mirror leaves an edge, so the surface gets a boundary. <a class="bk" data-p="20" data-q="designating the presence of a kaleidoscope separates the digit representing the gyration point">p. 20</a></p>
+        <p class="cap-more" data-when="sym:corner">A number after a star is a point where that many mirrors cross. Folded up, it is a corner of the boundary. <a class="bk" data-p="112" data-q="A kaleidoscopic corner is folded up into just that">p. 112</a></p>
+        <p class="cap-more" data-when="sym:x">A cross is a miracle: a mirror image that no mirror explains. Folded up, it is a crosscap. <a class="bk" data-p="24" data-q="does not go through a mirror">p. 24</a></p>
+        <p class="cap-more" data-when="sym:o">A ring is a wonder: the pattern repeats along two paths that no turn, mirror or miracle explains. Folded up, it is a handle. <a class="bk" data-p="26" data-q="such repetitions always come in pairs">p. 26</a></p>
+        <p class="cap-more" data-when="symex:*632">The book's first pattern. Its tile is a triangle of mirrors, and that triangle is already the surface: a disc with three corners. <a class="bk" data-p="30" data-q="the first pattern we analyzed">p. 30</a></p>
+        <p class="cap-more" data-when="symex:*532">120 tiles: 60 as printed, 60 mirrored. On a sphere the change from $2 counts them. <a class="bk" data-p="53" data-q="divided by the number of symmetries">p. 53</a></p>
+        <p class="cap-more" data-when="symex:*">One mirror: the equator. Fold the sphere along it and a hemisphere is left, a disc. <a class="bk" data-p="76" data-q="Folding a sphere (left) into a hemisphere (right)">p. 76</a></p>
+        <p class="cap-more" data-when="symex:x">Every point is glued to the opposite one. No mirror, and yet commas come back mirrored: the surface is a crosscap on a sphere. <a class="bk" data-p="79" data-q="the orbifold obtained by folding each point of the sphere onto the point opposite it">p. 79</a></p>
+        <p class="cap-more" data-when="symex:3*3">A disc with one cone point inside and one corner on its rim. <a class="bk" data-p="114" data-q="with a cone point of order 3 in the interior">p. 114</a></p>
+        <p class="cap-more" data-when="symex:4*2">Again a disc with one cone point and one corner. <a class="bk" data-p="114" data-q="also a topological disk, with one cone point and one corner point">p. 114</a></p>
+        <p class="cap-more" data-when="symex:2*22">A disc with one cone point and two corners. <a class="bk" data-p="115" data-q="a topological disk, with one cone point and two corner points">p. 115</a></p>
+        <p class="cap-more" data-when="symex:22*">A disc with two cone points and a smooth rim: this kaleidoscope has no corners. <a class="bk" data-p="115" data-q="a topological disk, with two cone points">p. 115</a></p>
+        <p class="cap-more" data-when="symex:2222">Four kinds of half-turn and nothing else. <a class="bk" data-p="116" data-q="simply a sphere with four cone points">p. 116</a></p>
+        <p class="cap-more" data-when="symex:22x">Two kinds of half-turn and a miracle. <a class="bk" data-p="29" data-q="like that of all planar patterns">p. 29</a></p>
+        <p class="cap-more" data-when="symex:**">Two kinds of parallel mirror. Fold along them into a strip, then roll the strip up. <a class="bk" data-p="109" data-q="We then roll this strip into a cylinder">p. 109</a></p>
+        <p class="cap-more" data-when="symex:*x">A mirror and a miracle: the surface is a Möbius band, its one edge the mirror. <a class="bk" data-p="24" data-q="A pattern with a mirror and a miracle">p. 24</a></p>
+        <p class="cap-more" data-when="symex:xx">Two miracles and no mirror: a Klein bottle. <a class="bk" data-p="25" data-q="More than one kind of miracle">p. 25</a></p>
+        <p class="cap-more" data-when="symex:o">Nothing but repeats: a torus. <a class="bk" data-p="26" data-q="A wonderful wonder-ring">p. 26</a></p>
+        <p class="cap-more" data-when="symex:*732">A little too much for the plane, so it lives on the hyperbolic one. Every triangle here is the same size: those near the rim only look small. <a class="bk" data-p="219" data-q="they classify the corresponding symmetry groups in the">p. 219</a></p>
+        <p class="cap-more" data-when="symex:4*3">What Escher's Circle Limit IV seems to be. <a class="bk" data-p="224" data-q="At first glance, M. C. Escher’s Circle Limit IV">p. 224</a></p>
+        <p class="cap-more" data-when="symex:*3333">What Circle Limit IV really is: mirrors that cut the plane into four-cornered tiles, three mirrors through every corner. <a class="bk" data-p="224" data-q="you will find that they cut the (hyperbolic) plane into">p. 224</a></p>
+        <p class="cap-more" data-when="symex:23x">The pattern that opens the book's hyperbolic chapter. <a class="bk" data-p="219" data-q="A hyperbolic pattern of type">p. 219</a></p>
+        <p class="cap-more" data-when="symex:*3*">An annulus, one rim smooth and one with a corner. Such a pattern can be stretched. <a class="bk" data-p="238" data-q="thus has one degree of freedom in its construction">p. 238</a></p>
+        <p class="cap-more" data-when="symex:xxx">Three miracles and nothing else. <a class="bk" data-p="231" data-q="For your viewing pleasure, this figure has signature">p. 231</a></p>
+        <p class="cap-more" data-when="symex:oo">A sphere with two handles, as a pattern. Its tile is an octagon; the eight corners, 45° each, all land on one point of the surface.</p>
+        <p class="cap-more" data-when="symex:***">A pair of pants, every cuff a mirror.</p>
+        <p data-when="tidy:any">Press + to add a hole, a handle, a crosscap or a cross-handle. Where each sits does not matter. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
+        <p data-when="tidy:X">A cross-handle is two crosscaps, \(\otimes = \times\times\): one square zips up to either. <a href="#prove&amp;k=fig810" data-go="prove" data-k="fig810">Zip it both ways</a> <a class="bk" data-p="101" data-q="a cross-handle may be replaced by two cross-caps">p. 101</a></p>
+        <p data-when="tidy:ox">Next to a crosscap a handle can be made a cross-handle: unzip it, walk one of its two holes through the crosscap, and that hole’s arrow comes back reversed. So \(\circ\times = \otimes\times = \times\times\times\). <a class="bk" data-p="102" data-q="so that it returns with the reversed orientation">p. 102</a></p>
+        <p data-when="tidy:done">Nothing to trade. Trading always ends at handles and holes, \(\circ\cdots\circ\,\ast\cdots\ast\), or at holes and crosscaps, \(\ast\cdots\ast\,\times\cdots\times\). <a href="#prove" data-go="prove">Zip it up</a> shows that every surface is tidy to begin with. <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></p>
+      </div>
+
+    </div>
+
+    <details class="fold" data-tab-only="zip">
+      <summary>Why only four</summary>
+      <p>A zipper pairs two arrows. They sit on one rim or on two. Go once round the rim: one arrow points with you and its mate against you, or both point with you. That is two choices twice.</p>
+    </details>
+    <details class="fold" data-tab-only="zip">
+      <summary>The two colours</summary>
+      <p>Teal is the front of the paper, sand its back. On a one-sided surface you can get from teal to sand without crossing an edge: through a crosscap's line, or along a cross-handle past its seam.</p>
+    </details>
+    <details class="fold" data-tab-only="tidy">
+      <summary>The three numbers</summary>
+      <p>Draw any map on a surface: its Euler characteristic \(\chi\) is vertices minus edges plus faces, whatever the map. A sphere has \(\chi = 2\). A hole or a crosscap lowers \(\chi\) by 1, a handle or a cross-handle by 2: \(\chi = 2 - 2a - b - c - 2d\) for \(a\) handles, \(b\) holes, \(c\) crosscaps, \(d\) cross-handles. <a class="bk" data-p="103" data-q="adding a handle (◦) decreases the Euler characteristic by 2">p. 103</a></p>
+      <p>After the trades, \(\circ^{a}\ast^{b}\) is two-sided with \(\chi = 2 - 2a - b\), and \(\ast^{b}\times^{c}\) with at least one crosscap is one-sided with \(\chi = 2 - b - c\). Two different symbols differ in sides, boundaries or \(\chi\), so they are different surfaces. <a class="bk" data-p="102" data-q="all these surfaces are topologically distinct">p. 102</a></p>
+    </details>
+    <details class="fold" data-tab-only="tidy">
+      <summary>Why the book needs this</summary>
+      <p>Fold a repeating pattern up and you get its orbifold: one of these surfaces, with cone points inside and corner points on its boundaries. So the symbols \(\circ\), \(\ast\) and \(\times\) are all a signature can hold besides its numbers: wonders, kaleidoscopes and miracles. <a href="#sym" data-go="sym">Symmetries</a> shows them. <a class="bk" data-p="102" data-q="really are all that’s needed to specify its orbifold">p. 102</a></p>
+    </details>
+    <details class="fold" data-tab-only="prove">
+      <summary>What you are doing</summary>
+      <p>The book takes a surface as finitely many triangles with zippers on their edges; polygons do as well. <a class="bk" data-p="97" data-q="a collection of triangles that have zips indicating how they should be pieced together">p. 97</a></p>
+      <p>A polygon is a disc, and a disc is a sphere with a hole. That is where every piece starts: tidy. The edge of a hole is its rim: a boundary of the surface. <a class="bk" data-p="97" data-q="a triangle is just a sphere with a hole">p. 97</a></p>
+      <p>A zip joins two rims, or two stretches of one rim. Go once round: one arrow points with you and its mate against you (opposite ways), or both with you (the same way). Whatever rim is not zipped stays a hole: the book calls that case gaping, and the case with nothing left snug. <a class="bk" data-p="97" data-q="the same surfaces as the snug ones, with an extra boundary or two">p. 97</a></p>
+      <p>After each zip the picture is redrawn with every piece in a place of its own. Nothing is lost by that. <a class="bk" data-p="96" data-q="since we can just push the holes around">p. 96</a></p>
+    </details>
+
+    <details class="fold" data-tab-only="sym">
+      <summary>The three pictures</summary>
+      <p>Each tile carries the same print, a family of commas. A comma has a hand and no symmetry of its own, so the pattern has exactly the signature's. Where a mirror or a miracle carries a tile, the print arrives mirrored, and nothing else tells such a tile from the others: a second colour for them would take the mirrors away again. Fold the pattern so that every tile lies on the outlined one: the mirrored ones land face down, the two sides of one sheet. Drag the outlined tile out of sight and the outline comes back to a tile in the middle, since every tile is as good as another.</p>
+      <p>What happens to the outlined tile's edges gives the surface. A mirror edge (red) stays an edge: the rim of a hole. Two edges of the same colour (and the same number of arrowheads) are zipped along their arrows, as in <a href="#prove" data-go="prove">Zip it up</a>, which uses the same colours. Corners that meet at a point make a cone point, or a corner of the rim if they meet on a mirror.</p>
+    </details>
+    <details class="fold" data-tab-only="sym">
+      <summary>The Magic Theorem</summary>
+      <p>Everything in a signature has a price: \(\circ\) costs $2, \(\ast\) and \(\times\) cost $1, a number \(n\) before the star \(\frac{n-1}{n}\), a number \(n\) after a star \(\frac{n-1}{2n}\). <a class="bk" data-p="29" data-q="associate a cost to every symbol in the signature">p. 29</a></p>
+      <ul class="argument">
+        <li>Exactly $2: a pattern on the plane. That leaves 17 signatures. <a class="bk" data-p="30" data-q="The signatures of plane repeating patterns are precisely those with total">p. 30</a></li>
+        <li>Under $2: a pattern on a sphere, and the change is 2 over the number of symmetries. <a class="bk" data-p="53" data-q="divided by the number of symmetries">p. 53</a></li>
+        <li>Over $2: a pattern on the hyperbolic plane. Every such signature has one. <a class="bk" data-p="237" data-q="every signature with negative characteristic really does correspond to a group">p. 237</a></li>
+      </ul>
+      <p>Any signature you can write has a price, and with the row under the signature you can write any: only a handful under $2 have no pattern. <a class="bk" data-p="237" data-q="there were “bad” signatures">p. 237</a></p>
+      <p>Where a number stands matters: before the star it is a turn (blue), after a star a crossing of that many mirrors (red). So 4∗ and ∗4 are different things, and only the first has a pattern. What does not matter: the order of the blue numbers, which number of a star comes first, reading every star backwards, and the order of the stars. Type any of these and the page shows the usual spelling. <a class="bk" data-p="231" data-q="freely permute the digits">p. 231</a></p>
+      <p>The price is what each thing takes off the Euler characteristic of <a href="#tidy" data-go="tidy">Tidy surfaces</a>: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
+    </details>
+    <details class="fold" data-tab-only="sym">
+      <summary>The hyperbolic plane on a flat screen</summary>
+      <p>The disc is Poincaré's picture of it. Angles are true; straight lines show as arcs that meet the rim squarely; and the rim is infinitely far away, so the tiles crowding toward it are all the size of the one in the middle. Drag any of them to the middle to see. <a class="bk" data-p="221" data-q="takes hyperbolic straight lines to arcs of circles perpendicular to the boundary">p. 221</a></p>
+    </details>
+
+    <details class="fold">
+      <summary>The chapter in four steps</summary>
+      <ol class="argument">
+        <li>A surface is polygons with zippers on their edges.</li>
+        <li>Zip one pair at a time. Each zip joins two pieces or makes a cap, a crosscap, a handle or a cross-handle, and may leave holes. So every surface is tidy. <a href="#prove" data-go="prove">Zip it up</a> <a class="bk" data-p="96" data-q="Every surface is topologically equivalent to a “tidy” one">p. 96</a></li>
+        <li>A cross-handle is two crosscaps, and next to a crosscap a handle is two more. So every surface is handles and holes, or holes and crosscaps. <a href="#tidy" data-go="tidy">Tidy surfaces</a> <a class="bk" data-p="97" data-q="it suffices to add either handles or crosscaps and maybe to punch some holes">p. 97</a></li>
+        <li>No two of these are the same surface: they differ in sides, in boundaries or in Euler characteristic. <a href="#name" data-go="name">Examples</a> counts them. <a class="bk" data-p="102" data-q="so that the numbers a, b, and c are invariants">p. 102</a></li>
+      </ol>
+    </details>
+
+    <p class="next" data-tab-only="zip"><a href="#tidy" data-go="tidy">Next: 2 Tidy surfaces</a></p>
+    <p class="next" data-tab-only="tidy"><a href="#prove" data-go="prove">Next: 3 Zip it up</a></p>
+    <p class="next" data-tab-only="prove"><a href="#name" data-go="name">Next: 4 Examples</a></p>
+    <p class="next" data-tab-only="name"><a href="#sym" data-go="sym">Next: 5 Symmetries</a></p>
+
+  </main>
+
+  <footer class="legend">
+    <span class="lg" data-tab-only="zip tidy prove name"><i class="sw sw-front"></i>front</span>
+    <span class="lg" data-tab-only="zip tidy prove name"><i class="sw sw-back"></i>back</span>
+    <span class="lg" data-tab-only="zip tidy prove"><i class="sw sw-zip"></i>one zipper: same colour, glue along the arrows</span>
+    <span class="lg" data-tab-only="sym"><i class="sw sw-blue"></i>keeps the pattern's sense: turns, wonders</span>
+    <span class="lg" data-tab-only="sym"><i class="sw sw-red"></i>reflects: mirrors, miracles</span>
+    <span class="lg lg-links">3D from <a href="https://spacesheep.dev/@yaroslavvb/the-folding">The Folding</a> · <a href="https://spacesheep.dev/@yaroslavvb/chaim-scott-vladimir-hub">Chaim · Scott · Vladimir Hub</a></span>
+  </footer>
+</div>
+<div class="bkpop" id="bkpop" hidden></div>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>

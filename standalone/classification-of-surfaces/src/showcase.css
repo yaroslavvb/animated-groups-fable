@@ -1,0 +1,49 @@
+/* Orbifold showcase: what the toy's own page adds to styles.css (two tabs, the things to try, the tutorial). */
+
+/* two tabs, as wide as their words, right below the title */
+.tabs2 { margin-bottom: 14px; }
+.tabs2 .tab { flex: 0 0 auto; min-width: 116px; padding: 0 18px; }
+@media (max-width: 620px) { .tabs2 { flex-wrap: nowrap; } .tabs2 .tab { flex: 1 1 0; min-width: 0; font-size: 15px; } }
+
+/* the signature has no example arrows beside it here */
+.show .symrow { justify-content: center; }
+
+/* things to try: a chip that sets the toy up, and one line of what to do */
+.tries { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--hairline); }
+.tries-h { margin: 0 0 8px; font-size: 17px; font-weight: 650; letter-spacing: -0.01em; }
+.trylist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px 22px; }
+@media (min-width: 860px) { .trylist { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.trylist li { display: grid; grid-template-columns: 78px minmax(0, 1fr); align-items: start; gap: 10px; }
+.trylist p { margin: 0; padding-top: 3px; font-size: 15px; line-height: 1.45; color: var(--muted); }
+.trylist p b { color: var(--ink); font-weight: 650; }
+.trylist .try { width: 100%; min-width: 0; }
+.tries-more { margin: 12px 0 0; font-size: 15px; color: var(--muted); max-width: 52em; }
+.tries-more a { font-weight: 600; white-space: nowrap; }
+.fold-wide { max-width: none; }
+
+/* the tutorial: plain reading */
+.tut { max-width: 44em; font-size: 16px; line-height: 1.55; }
+.tut h2 { margin: 22px 0 8px; font-size: 19px; line-height: 1.25; font-weight: 650; letter-spacing: -0.01em; }
+.tut h2:first-child { margin-top: 4px; }
+.tut p { margin: 0 0 10px; }
+.tut .argument { font-size: 16px; }
+.tut a:not(.bk) { font-weight: 600; }
+.chartable { display: grid; grid-template-columns: max-content minmax(0, 1.7fr) minmax(0, 1fr) max-content; gap: 0; margin: 0 0 12px; font-size: 15px; line-height: 1.4; }
+.chartable > [role="row"] { display: contents; }
+.chartable span { padding: 8px 12px 8px 0; border-top: 1px solid var(--hairline); }
+.chartable .ct-head span { border-top: 0; padding-top: 0; color: var(--muted); font-size: 13px; font-weight: 600; }
+.chartable b { font-size: 1.15em; }
+@media (max-width: 560px) {
+  /* a phone: each character is a small card, its three facts under it */
+  .chartable { grid-template-columns: minmax(0, 1fr); }
+  .chartable .ct-head { display: none; }
+  .chartable > [role="row"] { display: grid; grid-template-columns: 64px minmax(0, 1fr); padding: 8px 0; border-top: 1px solid var(--hairline); }
+  .chartable span { padding: 1px 0; border-top: 0; }
+  .chartable [role="row"] > span:first-child { grid-row: 1 / span 3; }
+  .chartable [role="row"] > span:not(:first-child) { grid-column: 2; }
+}
+
+/* the foot: the two colours, and where this comes from (one sentence, which wraps as a sentence on a phone) */
+.lg-credit { margin-left: auto; }
+@media (max-width: 620px) { .lg-credit { margin-left: 0; flex-basis: 100%; } }
+.chartable b { font-size: 1.3em; }

@@ -1,0 +1,173 @@
+<!doctype html>
+<!--
+  Orbifold showcase — the Symmetries tab of the Classification of Surfaces page on its own, as a toy, with a list of
+  things to try and the explanation under a second tab. His ask, Tue 17 Nov 2026: "Create a little showcase just the
+  symmetries tab only ... make it a bit cleaner/simpler, the goal is interactive toy for people learning about
+  Orbifolds, maybe hide the explanation below a tutorial tab, and have a simple interactive demo of symmetries, along
+  with things that can be tried, and a separate link to tutorial".
+
+  Built by ../build.mjs with this template, src/showcase.js and src/styles.css + src/showcase.css:
+    node build.mjs \-\-template src/showcase.template.html \-\-entry src/showcase.js \-\-css src/styles.css,src/showcase.css \-\-out ../2026-11-17-orbifold-showcase/site/index.html
+  The notes on each character and on the examples are taken from src/index.template.html at build time (the
+  __SYM_NOTES__ slot), so they are written once. Play and Tutorial are the two views: #k=*632, #tutorial.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Orbifold Showcase</title>
+<meta name="description" content="A toy for orbifolds: type a symmetry's signature and see a pattern that has it, on the sphere, the plane or the hyperbolic plane, and the surface the pattern folds into.">
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<div class="app show" id="app" data-tab="sym" data-view="play">
+
+  <header class="hdr">
+    <h1 class="title">Orbifold showcase</h1>
+    <p class="sub">Type a symmetry’s signature. See a pattern that has it, and the surface the pattern folds into.</p>
+  </header>
+
+  <nav class="tabs tabs2" id="tabs" role="tablist" aria-label="The toy and its explanation">
+    <button type="button" role="tab" class="tab" data-view="play" aria-selected="true">Play</button>
+    <button type="button" role="tab" class="tab" data-view="tutorial" aria-selected="false">Tutorial</button>
+  </nav>
+
+  <main class="main" id="main">
+
+    <!-- ============ Play ============ -->
+    <div id="play">
+      <div class="work">
+
+        <div class="symhead" id="sym-top">
+          <div class="symrow">
+            <div class="symcells" id="sym-cells" role="group" tabindex="0"></div>
+            <div class="symstep" id="sym-step" role="group" aria-label="Change the chosen number"><button type="button" class="st-btn" id="sym-minus" aria-label="the chosen number, one less" disabled>−</button><button type="button" class="st-btn" id="sym-plus" aria-label="the chosen number, one more" disabled>+</button></div>
+          </div>
+          <div class="symadd" id="sym-add" role="group" aria-label="Add to the signature, or take the chosen character away">
+            <span class="symadd-k">add</span>
+            <button type="button" class="chip addchip" data-add="o" title="A wonder-ring: a handle on the surface. $2"><b class="is-blue">\(\circ\)</b>handle</button>
+            <button type="button" class="chip addchip" data-add="cone" title="A gyration point: a cone point on the surface. Starts at 2: half a dollar"><b class="is-blue">\(2\)</b>cone</button>
+            <button type="button" class="chip addchip" data-add="star" title="A kaleidoscope: a mirror, the rim of a hole in the surface. $1"><b class="is-red">\(\ast\)</b>mirror</button>
+            <button type="button" class="chip addchip" data-add="corner" title="A point where mirrors cross: a corner of the chosen mirror (or of the last one). Starts at 2: a quarter"><b class="is-red">\(2\)</b>corner</button>
+            <button type="button" class="chip addchip" data-add="x" title="A miracle: a crosscap on the surface. $1"><b class="is-red">\(\times\)</b>crosscap</button>
+            <button type="button" class="chip addchip addchip-rm" id="sym-remove" title="Delete the chosen character, or the last one. The Delete key does the same" disabled><svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M7.2 4.5h9.3v11H7.2L2.5 10zM10 7.6l4 4.8M14 7.6l-4 4.8"/></svg>delete</button>
+          </div>
+          <div class="symprice">
+            <div class="cost-rail"><div class="cost-bar" id="sym-bar"></div><i class="cost-two"></i><div class="cost-total" id="sym-total"></div></div>
+            <div class="cost-zones" aria-hidden="true"><span>under $2: a sphere</span><span>$2: the plane</span><span>over $2: hyperbolic</span></div>
+            <p class="symsame" id="sym-same" data-show="0" hidden>the same as <button type="button" class="chip symchip samechip" id="sym-canon" title="Its usual spelling. Tap, or press Enter, to write it this way"></button> <span id="sym-usual">its usual spelling</span></p>
+            <p class="symwhere" id="sym-where" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <section class="pane pane2" id="pane2" data-ss-comments="off" aria-label="The pattern">
+          <canvas id="pattern" tabindex="0" aria-label="The pattern. Drag to slide it; the arrow keys slide it too, and 0 puts it back."></canvas>
+          <div class="pat-none" id="pat-none" hidden>
+            <p class="pat-none-head">No pattern has this signature.</p>
+            <p id="sym-bad" aria-live="polite"></p>
+          </div>
+          <p class="pane-tip" id="pat-tip" role="status" hidden></p>
+          <p class="hint" id="pat-hint">drag to slide the pattern</p>
+          <button type="button" class="btn-quiet pane-reset" id="pat-reset" title="Put the pattern back" aria-label="Put the pattern back">
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
+          </button>
+        </section>
+
+        <section class="pane" id="pane" data-ss-comments="off" data-ss-thumb aria-label="The surface in 3D">
+          <canvas id="view"></canvas>
+          <div class="labels" id="labels"></div>
+          <div class="badge" id="badge" aria-live="polite"></div>
+          <p class="hint" id="turn-hint">drag to turn</p>
+          <button type="button" class="btn-quiet pane-reset" id="reset-view" title="Reset the 3D view" aria-label="Reset the 3D view">
+            <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M4.4 9.6a5.7 5.7 0 1 1 1.7 4.5M4.2 5.6v4.2h4.2"/></svg>
+          </button>
+        </section>
+
+        <div class="caption" id="caption" aria-live="polite">
+          <p class="symkey" id="sym-key">
+            <span class="lg"><i class="sw sw-tile"></i>outlined: one tile, the one that folds up into the surface</span>
+            <span class="lg" id="key-glue"><span class="keypairs" id="key-pairs"></span>edges of one colour are glued to each other, arrow onto arrow</span>
+          </p>
+          <p class="cap-more" data-when="sym:none">Tap a character of the signature: what it stands for lights up in both pictures.</p>
+<!--__SYM_NOTES__-->
+        </div>
+      </div>
+
+      <section class="tries" aria-labelledby="tries-h">
+        <h2 class="tries-h" id="tries-h">Things to try</h2>
+        <ol class="trylist">
+          <li><button type="button" class="chip symchip try" data-try="*632" data-sel="1">∗632</button><p><b>Three worlds, one number apart.</b> The 6 is chosen: press <b>+</b> and the plane becomes the hyperbolic disc. Press <b>−</b> twice and it is a ball.</p></li>
+          <li><button type="button" class="chip symchip try" data-try="*632" data-sel="0">∗632</button><p><b>Take the mirrors away.</b> The ∗ is chosen: delete it. The mirrors go, and the triangle closes into a pillow with three cone points.</p></li>
+          <li><button type="button" class="chip symchip try" data-try="o">○</button><p><b>A handle.</b> Nothing but repeats, two ways round: a torus. Add a cone point and it no longer fits the plane.</p></li>
+          <li><button type="button" class="chip symchip try" data-try="*x">∗×</button><p><b>One side only.</b> A mirror and a miracle: a Möbius band. Swap the ∗ for a second × and it is a Klein bottle.</p></li>
+          <li><button type="button" class="chip symchip try" data-try="*4">∗4</button><p><b>A signature no pattern has.</b> The page says why, and offers the nearest ones that work.</p></li>
+          <li><button type="button" class="chip symchip try" data-try="1">empty</button><p><b>From nothing.</b> A bare sphere. Type <b>2&nbsp;∗&nbsp;2&nbsp;2</b>, or tap the chips under the signature, and watch the price reach $2.</p></li>
+        </ol>
+        <p class="tries-more">Drag either picture. On the hyperbolic disc, drag a small tile from the rim to the middle: it was never small. <a href="#tutorial" data-view-go="tutorial">How it works: the tutorial</a></p>
+      </section>
+
+      <details class="fold fold-wide" id="examples">
+        <summary>47 examples</summary>
+        <div class="sympresets" id="sym-presets"></div>
+      </details>
+    </div>
+
+    <!-- ============ Tutorial ============ -->
+    <article class="tut" id="tutorial" hidden>
+
+      <h2>Three pictures of one thing</h2>
+      <p>A repeating pattern has symmetries: turns, mirrors, and two subtler kinds. Its <b>signature</b>, the line you type in the toy, lists them. The toy’s first picture is a pattern with exactly those symmetries. Fold that pattern up, tile onto tile, until every tile lies on one, and you hold a surface with a few special points on it: the pattern’s <b>orbifold</b>, the second picture. The signature is also the list of what is on that surface. <a class="bk" data-p="75" data-q="the folding taking all the points of the same kind to a single point">p. 75</a></p>
+      <p>Each tile carries the same print, a family of commas. A comma has a hand and no symmetry of its own, so the pattern has exactly the signature’s. Where a mirror or a miracle carries a tile, the print arrives mirrored, and nothing else tells such a tile from the others: a second colour for them would take the mirrors away again.</p>
+      <p>One tile is outlined. What happens to its edges gives the surface. A mirror edge (red) stays an edge: the rim of a hole. Two edges of the same colour, with the same number of arrowheads, are glued along their arrows. Corners that meet at a point make a cone point, or a corner of the rim if they meet on a mirror.</p>
+
+      <h2>What each character is</h2>
+      <div class="chartable" role="table" aria-label="The characters of a signature">
+        <div role="row" class="ct-head"><span role="columnheader">character</span><span role="columnheader">in the pattern</span><span role="columnheader">on the surface</span><span role="columnheader">costs</span></div>
+        <div role="row"><span role="cell"><b class="is-blue">\(\circ\)</b></span><span role="cell">a wonder: the pattern repeats along two paths that no turn, mirror or miracle explains <a class="bk" data-p="26" data-q="such repetitions always come in pairs">p. 26</a></span><span role="cell">a handle</span><span role="cell">$2</span></div>
+        <div role="row"><span role="cell"><b class="is-blue">\(n\)</b> before \(\ast\)</span><span role="cell">a gyration point: the pattern turns about it, and no mirror passes through it <a class="bk" data-p="112" data-q="A gyration point is rolled into a cone">p. 112</a></span><span role="cell">a cone point</span><span role="cell">\(\frac{n-1}{n}\)</span></div>
+        <div role="row"><span role="cell"><b class="is-red">\(\ast\)</b></span><span role="cell">a kaleidoscope: mirror lines <a class="bk" data-p="20" data-q="designating the presence of a kaleidoscope separates the digit representing the gyration point">p. 20</a></span><span role="cell">the rim of a hole</span><span role="cell">$1</span></div>
+        <div role="row"><span role="cell"><b class="is-red">\(n\)</b> after \(\ast\)</span><span role="cell">a point where that many mirrors cross <a class="bk" data-p="112" data-q="A kaleidoscopic corner is folded up into just that">p. 112</a></span><span role="cell">a corner of that rim</span><span role="cell">\(\frac{n-1}{2n}\)</span></div>
+        <div role="row"><span role="cell"><b class="is-red">\(\times\)</b></span><span role="cell">a miracle: a mirror image that no mirror explains <a class="bk" data-p="24" data-q="does not go through a mirror">p. 24</a></span><span role="cell">a crosscap</span><span role="cell">$1</span></div>
+      </div>
+
+      <h2>The Magic Theorem</h2>
+      <p>Everything in a signature has a price, the last column above. Add it up. <a class="bk" data-p="29" data-q="associate a cost to every symbol in the signature">p. 29</a></p>
+      <ul class="argument">
+        <li>Exactly $2: a pattern on the plane. That leaves 17 signatures. <a class="bk" data-p="30" data-q="The signatures of plane repeating patterns are precisely those with total">p. 30</a></li>
+        <li>Under $2: a pattern on a sphere, and the change is 2 over the number of symmetries. <a class="bk" data-p="53" data-q="divided by the number of symmetries">p. 53</a></li>
+        <li>Over $2: a pattern on the hyperbolic plane. Every such signature has one. <a class="bk" data-p="237" data-q="every signature with negative characteristic really does correspond to a group">p. 237</a></li>
+      </ul>
+      <p>The price is what each thing takes off the surface’s Euler characteristic: a sphere has 2, a handle takes 2, a hole or a crosscap 1. A cone point of order \(n\) is shared by \(n\) tiles, so it counts as \(\frac{1}{n}\) of a point and takes \(\frac{n-1}{n}\).</p>
+
+      <h2>Typing a signature</h2>
+      <p>The keys o, 2 to 9, ∗ and x add a character after the cursor. Delete takes one away, all the way to an empty line: a bare sphere. The arrows move the cursor, and with a number chosen − and + step it. The chips under the signature do the same for a finger.</p>
+      <p>Where a number stands matters: before the star it is a turn (blue), after a star a crossing of that many mirrors (red). So 4∗ and ∗4 are different things. What does not matter: the order of the blue numbers, which number of a star comes first, reading every star backwards, and the order of the stars. Type any of these and the page shows the usual spelling. <a class="bk" data-p="231" data-q="freely permute the digits">p. 231</a></p>
+      <p>Under $2 four kinds of signature have no pattern: N, MN, ∗N and ∗MN, with M and N different. On a sphere a turn about a point is a turn about the opposite point too, and mirrors through a point cross again opposite, so such things come in equal pairs. The page says which rule a signature breaks and offers the nearest ones that work. <a class="bk" data-p="53" data-q="but it turns out that there is a proviso">p. 53</a></p>
+
+      <h2>The hyperbolic plane on a flat screen</h2>
+      <p>The disc is Poincaré’s picture of it. Angles are true; straight lines show as arcs that meet the rim squarely; and the rim is infinitely far away, so the tiles crowding toward it are all the size of the one in the middle. Drag any of them to the middle to see. <a class="bk" data-p="221" data-q="takes hyperbolic straight lines to arcs of circles perpendicular to the boundary">p. 221</a></p>
+
+      <h2>More</h2>
+      <ul class="argument">
+        <li>The same toy inside a page on why every surface is a sphere with handles, holes and crosscaps: <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a>.</li>
+        <li>Cut a tile out of an orbifold and fold it back: <a href="https://spacesheep.dev/@yaroslavvb/the-folding">The Folding</a>.</li>
+        <li>All of this is from Conway, Burgiel and Goodman-Strauss, <a href="https://doi.org/10.1201/b21368" target="_blank" rel="noopener"><i>The Symmetries of Things</i></a> (2008). The page numbers are the book’s.</li>
+        <li><a href="orbifolds.mp4">A short video of this page</a>.</li>
+      </ul>
+      <p><button type="button" class="chip" data-view-go="play">Back to the toy</button></p>
+    </article>
+
+  </main>
+
+  <footer class="legend">
+    <span class="lg"><i class="sw sw-blue"></i>keeps the pattern’s sense: turns, wonders</span>
+    <span class="lg"><i class="sw sw-red"></i>reflects: mirrors, miracles</span>
+    <span class="lg-credit">after <a href="https://doi.org/10.1201/b21368" target="_blank" rel="noopener"><i>The Symmetries of Things</i></a>, part of <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a></span>
+  </footer>
+</div>
+<div class="bkpop" id="bkpop" hidden></div>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>
