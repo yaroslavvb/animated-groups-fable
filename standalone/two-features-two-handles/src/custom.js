@@ -12,12 +12,20 @@
 //   three cone points and a crosscap          234x     mode 'cone-x'
 //   a handle and two cone points              o23      mode 'handle'
 // (2222 alone is flat: the page's own Euclidean family, which handles.js knows by name.)
-// Anything else gets its reason in its own numbers and the nearest signatures that do work: whyNot().
+//
+// Since Thu 26 Nov 2026 the page shows every other signature too (his ask: "allow modifying more orbifolds, more
+// than just 2 pairs ones like 2222 … Also support other orbifolds which don't have these parameters. In that case,
+// the pair controls are just disabled"):
+//   five or six cone points                   22233    mode 'multi' (multi.js): a cut, a Length and a Twist a pair
+//   any other signature that has a pattern    237, ∗2222, 3∗3, oo    mode 'still': the Classification of Surfaces
+//                                             page's pattern and surface, with the pair controls switched off
+// What is left has no pattern at all (one cone point alone, two of different orders): whyNot() says so.
 //
 // The signature's grammar is the Classification of Surfaces page's (catalog.js parse); readSignature() takes it as
 // people type it.
 
-import { parse, textOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse, textOf, domainOf, whyNot as noPattern } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { multiSpec } from './multi.js';
 
 /**
  * A signature as people type it, or null for what is none: spaces and commas anywhere; ∗ or *; × or x or X; ○ or o
@@ -81,40 +89,58 @@ export function specOf(sig) {
 /** The same from text as typed ("234*5", "234∗5", "2 3 4 x"); null for what is no signature or what the engine cannot build. */
 export const customSpec = (text) => specOf(readSignature(text));
 
-/** Does the page show this signature: one of the engine's shapes, or the flat 2222? */
-export const shows = (sig) => !!sig && (textOf(sig) === '2222' || !!specOf(sig));
+/**
+ * How many numbers an orbifold's shape has (the dimension of its space of shapes): 3 for each handle and crosscap
+ * beyond a sphere, 2 for each cone point, 1 for each corner, counted as -3 chi + 2 cones + corners with chi the
+ * Euler characteristic of the surface under it (a mirror is a hole). 0 or less: rigid.
+ */
+export function movesOf(sig) {
+  // on the plane a pattern's size is no shape, and a torus, a Klein bottle, a band keep numbers the count below misses
+  const flat = { o: 2, xx: 1, '**': 1, '*x': 1, 2222: 2, '*2222': 1, '22*': 1, '22x': 1, '2*22': 1 }[textOf(sig)];
+  if (flat !== undefined) return flat;
+  const corners = sig.stars.reduce((s, c) => s + c.length, 0);
+  return Math.max(0, -3 * (2 - 2 * sig.o - sig.x - sig.stars.length) + 2 * sig.cones.length + corners);
+}
+
+/**
+ * A signature the page shows without pair controls: any that has a pattern (catalog.js domainOf) and is neither
+ * four features of the engine's shapes nor five or six cone points.
+ *   { k, label, mode: 'still', kind: 'S' | 'E' | 'H', featLabels, parts (for surface.js buildSurface), moves, rigid }
+ */
+export function stillSpec(sig) {
+  if (!sig || featuresOf(sig).length === 0 || textOf(sig) === '2222' || specOf(sig) || multiSpec(sig)) return null;          // (nothing typed is no orbifold to show)
+  let D = null;
+  try { D = domainOf(sig); } catch (err) { D = null; }
+  if (!D) return null;
+  const parts = [];
+  for (let i = 0; i < sig.o; i++) parts.push({ t: 'o' });
+  for (const n of sig.cones) parts.push({ t: 'cone', n });
+  for (const corners of sig.stars) parts.push({ t: 'star', corners: corners.slice() });
+  for (let i = 0; i < sig.x; i++) parts.push({ t: 'x' });
+  const featLabels = parts.map((p) => (p.t === 'cone' ? String(p.n) : p.t === 'star' ? '∗' + p.corners.join('') : p.t === 'x' ? '×' : 'o'));
+  const moves = movesOf(sig);
+  return { k: textOf(sig), label: prettyOf(sig), mode: 'still', kind: D.G.kind, featLabels, parts, moves, rigid: moves === 0 || D.G.kind === 'S' };
+}
+
+/** How the page shows a signature: 'pairs' (four features), 'multi' (five or six cone points), 'still', or null. */
+export const kindOf = (sig) => (!sig ? null : textOf(sig) === '2222' || specOf(sig) ? 'pairs' : multiSpec(sig) ? 'multi' : stillSpec(sig) ? 'still' : null);
+/** Does the page show this signature at all? */
+export const shows = (sig) => !!kindOf(sig);
 
 /**
  * Why the page cannot show a signature, and the nearest ones it can:
- *   { kind, count, tries: [text, ...] }
+ *   { kind, m, n, tries: [text, ...] }
  * kind: 'empty'    nothing typed
- *       'few'      fewer than four features (count of them)
- *       'many'     more than four
- *       'corners'  four features, one of them a mirror with two or more corners
- *       'cuffs'    four features, more than one of them a mirror, a crosscap or a handle
- * null where it can be shown.
+ *       'cone'     one cone point alone (order m)          'cones'    two cone points of different orders (m, n)
+ *       'corner'   a mirror with one corner alone          'corners'  a mirror with two corners of different orders
+ *       'none'     no pattern, for another reason
+ * (the four shapes the book's proviso leaves out: no pattern folds up to them). null where it can be shown.
  */
 export function whyNot(sig) {
   if (!sig || shows(sig)) return null;
-  const feats = featuresOf(sig), count = feats.length;
-  const tries = [], seen = new Set();
-  const offer = (s) => { if (!s || !shows(s)) return; const t = textOf(s); if (!seen.has(t)) { seen.add(t); tries.push(t); } };
-  const mk = (o, cones, stars, x) => ({ o, cones, stars, x });
-  const twos = (n) => new Array(Math.max(0, n)).fill(2);
-  if (count === 0) {
-    for (const t of ['2345', '334*', '245*3', '237x', 'o25']) offer(parse(t));
-    return { kind: 'empty', count, tries };
-  }
-  const cuffs = sig.o + sig.stars.length + sig.x;
-  // the same cone points and ONE of its cuffs, filled up with half-turn points (or cut down) to four features
-  const withOne = (o, stars, x) => {
-    const room = 4 - 2 * o - stars.length - x;
-    offer(mk(o, sig.cones.slice(0, room).concat(twos(room - sig.cones.length)), stars, x));
-  };
-  if (cuffs === 0) withOne(0, [], 0);
-  if (sig.o) withOne(1, [], 0);
-  for (const corners of sig.stars) { withOne(0, [corners.slice(0, 1)], 0); if (corners.length) withOne(0, [[]], 0); }
-  if (sig.x) withOne(0, [], 1);
-  const kind = count < 4 ? 'few' : count > 4 ? 'many' : cuffs > 1 ? 'cuffs' : 'corners';
-  return { kind, count, tries: tries.slice(0, 4) };
+  if (featuresOf(sig).length === 0) return { kind: 'empty', tries: ['2345', '22233', '237', '*2222'] };
+  let w = null;
+  try { w = noPattern(sig); } catch (err) { w = null; }
+  if (!w) return { kind: 'none', tries: [] };
+  return { kind: w.kind, m: w.m, n: w.n, tries: w.tries.map((t) => t.text).filter((t) => shows(parse(t))).slice(0, 4) };
 }

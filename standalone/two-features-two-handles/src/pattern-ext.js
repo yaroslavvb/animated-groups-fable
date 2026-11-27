@@ -1033,7 +1033,9 @@ export function createPattern(canvas, opts = {}) {
     /**
      * A new pattern. o.keepView: it is the last one a little changed (a knob moved its tile), so the view, the
      * outline's place and the chosen character stay. o.moving: more such changes follow at once, so draw as during a
-     * drag (on the hyperbolic plane: the nearest tiles only) and fill in when they stop.
+     * drag (on the hyperbolic plane: the nearest tiles only) and fill in when they stop. o.carry (with keepView, on
+     * the hyperbolic plane): a motion, as a spinor, by which the new pattern's frame differs from the last one's;
+     * the view goes with it, so that what the page holds still (a picked pair) stays where it is on the screen.
      */
     set(m, o = {}) {
       stopCoast();
@@ -1069,10 +1071,11 @@ export function createPattern(canvas, opts = {}) {
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else {
         if (G.kind === 'H') {
-          if (!isIdentityPsu(bPsu)) {
-            const vWorld = psuMul(vPsu, bPsu);
+          const carry = o.carry && o.carry.length >= 4 && o.carry.every(Number.isFinite) && !isIdentityPsu(o.carry) ? o.carry : null;
+          if (!isIdentityPsu(bPsu) || carry) {
+            const step = carry ? psuMul(bPsu, carry) : bPsu, vWorld = psuNorm(psuMul(vPsu, step));
             if (Number.isFinite(vWorld[0]) && Number.isFinite(vWorld[1]) && Math.hypot(vWorld[0], vWorld[1]) < 150) {
-              if (drag && drag.v0Psu) drag.v0Psu = psuMul(drag.v0Psu, bPsu);
+              if (drag && drag.v0Psu) drag.v0Psu = psuMul(drag.v0Psu, step);
               vPsu = vWorld; V = psuToSO21(vPsu); vRev = !!vPsu[4];
             }
             bPsu = psuI(); base = I3.slice(); bRev = false;

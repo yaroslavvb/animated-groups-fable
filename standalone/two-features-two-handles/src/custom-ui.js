@@ -19,28 +19,21 @@
 import { textOf, parse } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 import { readSignature, whyNot, prettyOf } from './custom.js';
 
-const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const listOf = (items) => (items.length <= 1 ? items.join('') : items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1]);
-
-/** The mirrors, crosscaps and handles of a signature in words: "a mirror and a crosscap", "two handles". */
-function cuffWords(sig) {
-  const part = (n, one, many) => (n === 1 ? one : n > 1 ? `${WORDS[n] || n} ${many}` : '');
-  return listOf([part(sig.o, 'a handle', 'handles'), part(sig.stars.length, 'a mirror', 'mirrors'), part(sig.x, 'a crosscap', 'crosscaps')].filter(Boolean));
-}
-
 /** Why the text of the field is not on the page: { kind, html, tries } or null (nothing typed, or it is shown). */
 export function noteFor(text) {
   if (!String(text || '').trim()) return null;
   const sig = readSignature(text);
   if (!sig) return { kind: 'bad', tries: [], html: 'Not a signature. A digit 2–9 is a cone point, ∗ a mirror (digits after it are its corners), × a crosscap, o a handle.' };
   const w = whyNot(sig);
-  if (!w) return null;
-  const name = `<b>${esc(prettyOf(sig))}</b>`, n = WORDS[w.count] || String(w.count);
-  const html = w.kind === 'few' ? `${name} has ${n} feature${w.count === 1 ? '' : 's'}${sig.o ? ' (a handle counts as two)' : ''}; a cut runs between two pairs, so it takes four.`
-    : w.kind === 'many' ? `${name} has ${n} features; one cut sorts four.`
-      : w.kind === 'corners' ? `In ${name} the mirror has ${WORDS[sig.stars.find((c) => c.length > 1).length]} corners; one at most is built here.`
-        : `${name} has ${cuffWords(sig)}; one mirror, crosscap or handle at most is built here, beside cone points.`;
+  if (!w || w.kind === 'empty') return null;
+  // every signature that has a pattern is shown now; what is left has none (the book's four exceptions)
+  const name = `<b>${esc(prettyOf(sig))}</b>`;
+  const html = w.kind === 'cone' ? `No pattern has ${name}: one cone point cannot stand alone.`
+    : w.kind === 'cones' ? `No pattern has ${name}: two cone points alone must be of one order.`
+      : w.kind === 'corner' ? `No pattern has ${name}: a mirror cannot have one corner alone.`
+        : w.kind === 'corners' ? `No pattern has ${name}: a mirror's two corners alone must be of one order.`
+          : `No pattern has ${name}.`;
   return { kind: w.kind, tries: w.tries, html };
 }
 

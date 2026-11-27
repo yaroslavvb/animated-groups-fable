@@ -6,8 +6,9 @@ import { geometry, mul, apply, inv, det, I3 } from '../../2026-11-15-classificat
 import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
 import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
-import { customSpec, canonText } from './custom.js';
+import { customSpec, canonText, readSignature, stillSpec } from './custom.js';
 import { createPaisley } from './paisley.js';
+import { createMulti, multiSpec } from './multi.js';
 import { parse as parseSignature, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 
 const TAU = 2 * Math.PI;
@@ -146,6 +147,7 @@ function makeExactH() {
 }
 
 export const GH = makeExactH();
+const multi = createMulti({ GH, psu: { mul: psuMul, inv: psuInv, rotate: psuRotate, toSO21: psuToSO21 } });
 export const GE = geometry('E');
 
 export const FAMILIES = {
@@ -273,9 +275,29 @@ export function normalizeFamilyKey(raw) {
   // any other signature of one of the engine's shapes (custom.js) becomes a family the first time it is asked for,
   // on the numbers of the built-in family of its shape, with its own orders
   const spec = customSpec(s);
-  if (!spec) return null;
-  if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, ...canonicalDefaults(spec), custom: true };
-  return spec.k;
+  if (spec) {
+    if (!FAMILIES[spec.k]) FAMILIES[spec.k] = { ...FAMILIES[CUSTOM_BASE[spec.mode]], ...spec, ...canonicalDefaults(spec), custom: true };
+    return spec.k;
+  }
+  // five or six cone points (multi.js): a pair, a cut, a Length and a Twist for every two of them, in the order named
+  const sig = readSignature(s), more = sig && multiSpec(sig);
+  if (more) {
+    if (!FAMILIES[more.k]) {
+      const d = multi.defaults(more.orders);
+      // (a Length from 1 to 5: a shorter cut has a collar so wide, and a longer one runs so far, that the tile
+      // round one point reaches further than the numbers carry. Measured over 3,000 random shapes: none without a
+      // tile from 1.2 to 4.5, one from 1 to 5, one in a hundred from 0.6 to 6: multi.js dirichlet)
+      FAMILIES[more.k] = { ...more, baseOrders: more.orders.slice(), defaultM: '', defaultL: d.L[0], defaultTw: 0, defaults: { L: d.L.slice(), tw: d.tw.slice() }, baseRange: [0.8, 5.5], maxRange: [0.7, 6.0], custom: true };
+    }
+    return more.k;
+  }
+  // any other signature with a pattern: shown as the Classification of Surfaces page shows it, the pair controls off
+  const still = sig && stillSpec(sig);
+  if (still) {
+    if (!FAMILIES[still.k]) FAMILIES[still.k] = { ...still, baseOrders: [], defaultM: '', defaultL: 1, defaultTw: 0, baseRange: [0.6, 5.0], maxRange: [0.4, 7.0], custom: true };
+    return still.k;
+  }
+  return null;
 }
 /**
  * The numbers at which a typed family is the orbifold the Classification of Surfaces page draws for its signature.
@@ -538,7 +560,11 @@ function segDistToXAxis(P, Q) {
 /** Exact pair distance d and tree-to-cut distance mDist for any family state. */
 export function pairMetricsFor(state) {
   const fam = FAMILIES[state.k];
-  if (!fam) return { d: state.L, mDist: 0 };
+  if (!fam || fam.mode === 'still') return { d: 0, mDist: 0 };
+  if (fam.mode === 'multi') {
+    const b = multi.build(state.orders, state.Ls, state.tws), cut = b.cuts[state.active || 0];
+    return { d: GH.dist(cut.A, cut.B), mDist: GH.lineDist(GH.mix(cut.A, cut.B, 0.5), cut.seg[0], cut.seg[1]) };
+  }
   if (fam.mode === 'pillow') return { d: state.L, mDist: 1 / (2 * state.L) };
   if (fam.mode === 'cones') {
     const p = state.orders[0], q = state.orders[1];
@@ -1882,8 +1908,9 @@ export function beadOnLoop(loop, u) {
 /** Parts list passed to buildSurface(parts) for each of the 7 families. */
 export function surfacePartsFor(k) {
   const fam = FAMILIES[k] || FAMILIES['3333'], cone = (f) => ({ t: 'cone', n: fam.baseOrders[f] });
+  if (fam.mode === 'still') return fam.parts.map((p) => ({ ...p }));
   if (fam.mode === 'handle') return [{ t: 'o' }, cone(2), cone(3)];
-  if (fam.mode === 'cones' || fam.mode === 'pillow') return fam.baseOrders.map((n) => ({ t: 'cone', n }));
+  if (fam.mode === 'cones' || fam.mode === 'pillow' || fam.mode === 'multi') return fam.baseOrders.map((n) => ({ t: 'cone', n }));
   const cuff = fam.mode === 'cone-x' ? { t: 'x' } : { t: 'star', corners: fam.mode === 'cone-star3' ? [fam.corner || 3] : [] };
   return [0, 1, 2, 3].map((f) => (f === fam.featIdx ? cuff : cone(f)));
 }
@@ -2005,11 +2032,60 @@ export function atDefaults(state) {
 }
 
 // ---- Build the pattern model for pattern-ext.js from current state
+/** The default state of a family of five or six cone points: every pair at the Classification page's numbers, the first pair picked. */
+export function multiState(k, over = {}) {
+  const fam = FAMILIES[k], d = fam.defaults, m = d.L.length;
+  const num = (list, def, lo, hi) => def.map((v, i) => (list && Number.isFinite(list[i]) ? Math.max(lo, Math.min(hi, list[i])) : v));
+  const Ls = num(over.Ls, d.L, fam.maxRange[0], fam.maxRange[1]), tws = num(over.tws, d.tw, -0.5, 0.5);
+  const active = Math.max(0, Math.min(m - 1, over.active | 0)), shown = Math.max(active + 1, Math.min(m, over.shown || 1));
+  return { k, mode: 'multi', orders: fam.orders.slice(), Ls, tws, active, shown, perm: [2 * active, 2 * active + 1], L: Ls[active], tw: tws[active], b: 0, tau: 0, thetas: [] };
+}
+/** Is a state of five or six cone points the Classification page's shape (every pair at its default numbers)? */
+export const multiAtDefaults = (state) => { const d = FAMILIES[state.k].defaults; return state.Ls.every((v, i) => Math.abs(v - d.L[i]) < 1e-9) && state.tws.every((v, i) => Math.abs(v - d.tw[i]) < 1e-9); };
+/** For the checks: the print of a family of five or six cone points, and a state's pattern. */
+export const multiPrint = (k) => multi.printOf(FAMILIES[k].orders);
+export const multiCentred = (state) => multi.centred(state);
+export const multiBuild = (state) => multi.build(state.orders, state.Ls, state.tws);
+
+/** The pattern of an orbifold shown still: the Classification of Surfaces page's own tile and print, its tile lines and all. */
+function stillModel(fam) {
+  const D = domainOf(parseSignature(fam.k));
+  return { D, A: analyse(D), home: [], outline: false, lines: [], dots: [], marks: null };
+}
+/** The pattern of five or six cone points (multi.js): every pair's tree and cut, the picked pair's the heavier. */
+const lastGood = new Map();
+function multiModel(state, dark) {
+  const INK = [0.08, 0.09, 0.12], AMBER = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
+  // should a tile not be found at some numbers, the pattern keeps the last one it had (a slider must not stop the page)
+  let c = null;
+  try { c = multi.centred(state); lastGood.set(state.k, c); } catch (err) { c = lastGood.get(state.k) || multi.centred(multiState(state.k, { active: state.active, shown: state.shown })); }
+  const lines = [];
+  c.pairs.forEach((pr, i) => {
+    const on = i === state.active;
+    if (!on && i >= state.shown) return;
+    lines.push({ a: pr.tree[0], b: pr.tree[1], color: INK, width: on ? 2.3 : 1.9, alpha: on ? 0.9 : 0.5, steps: 6 });
+    lines.push({ a: pr.cut[0], b: pr.cut[1], color: AMBER, width: on ? 2.2 : 1.6, dash: [6, 4.5], alpha: on ? 1 : 0.7, steps: 8 });
+  });
+  // The model is in the frame of its tile (multi.js centred says why), so it says how it is to be looked at:
+  //   pose        the motion that lays the picked pair level in the middle; page.js keeps the pair there while its
+  //               sliders move (the view is carried by the change of pose)
+  //   firstV      how it opens: where the numbers are the Classification page's and the first pair is picked, as
+  //               that page lies (classified: true); else by its pose
+  const classified = multiAtDefaults(state) && state.active === 0;
+  return {
+    D: c.D, A: c.A, home: c.home, outline: false, tileEdges: false, center: GH.mix(c.home[c.marks[0]], c.home[c.marks[1]], 0.5),
+    firstV: classified ? c.view : c.pose, classified, pose: c.pose,
+    design: () => c.shapes, lines, dots: [], marks: c.marks, dimMarks: false,
+  };
+}
+
 export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   const INK = [0.08, 0.09, 0.12];
   const AMBER = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
   const BLUE = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   const fam = FAMILIES[state.k];
+  if (fam.mode === 'still') return stillModel(fam);
+  if (fam.mode === 'multi') return multiModel(state, dark);
   const built = centredFor(state, { dark });
   const { D, A, home, cutSeg, treeSeg, farTreeSeg, shapes } = built;
 

@@ -32,7 +32,7 @@
         <button class="chip" type="button" data-fam="333x" aria-pressed="false">333×</button>
         <button class="chip" type="button" data-fam="o33" aria-pressed="false">o33</button>
         <button class="chip" type="button" data-fam="2222" aria-pressed="false">2222</button>
-        <span class="custom-field"><input class="custom-in" id="custom-in" type="text" inputmode="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="24" placeholder="or type an orbifold: 2345, 234∗5, o27" aria-label="Another orbifold: type its signature, such as 2345, 234*5 or o27" aria-describedby="custom-pop" data-on="0"></span>
+        <span class="custom-field"><input class="custom-in" id="custom-in" type="text" inputmode="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="24" placeholder="or type any orbifold: 2345, 22233, ∗237" aria-label="Another orbifold: type its signature, such as 2345, 234*5 or o27" aria-describedby="custom-pop" data-on="0"></span>
       </div>
       <p class="custom-pop" id="custom-pop" role="status" aria-live="polite" hidden></p>
       <div class="sig-wrap">
@@ -42,6 +42,11 @@
           <button class="sig-btn" type="button" data-cone="1" aria-pressed="true">3</button>
           <button class="sig-btn" type="button" data-cone="2" aria-pressed="false">3</button>
           <button class="sig-btn" type="button" data-cone="3" aria-pressed="false">3</button>
+          <button class="sig-btn" type="button" data-cone="4" aria-pressed="false" hidden></button>
+          <button class="sig-btn" type="button" data-cone="5" aria-pressed="false" hidden></button>
+          <button class="sig-btn" type="button" data-cone="6" aria-pressed="false" hidden></button>
+          <button class="sig-btn" type="button" data-cone="7" aria-pressed="false" hidden></button>
+          <button class="pair-add" type="button" id="pair-add" aria-label="Pick another pair to move" title="Another pair" hidden>+</button>
         </div>
       </div>
     </div>
@@ -121,6 +126,7 @@
         </div>
       </div>
 
+      <p class="note still-note" id="still-note" hidden></p>
       <div class="readout" id="readout">
         <span>Length <strong id="out-len">2.63</strong></span>
         <span class="sep">·</span>

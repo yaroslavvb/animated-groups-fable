@@ -89,6 +89,8 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
+  min-width: 0;
 }
 .sig-label {
   font-size: 0.86rem;
@@ -97,7 +99,9 @@
 }
 .sig-digits {
   display: inline-flex;
+  flex-wrap: wrap;          /* eight symbols, or one as long as ∗2222, on a phone: a second row, never a page wider than the screen */
   gap: 6px;
+  min-width: 0;
 }
 
 .sig-btn {
@@ -121,6 +125,24 @@
   background: var(--blue-bg);
   color: var(--blue);
 }
+.sig-btn[data-gap="1"] { margin-right: 10px; }
+.sig-btn[data-off="1"] { opacity: 0.5; }
+.sig-btn:disabled { opacity: 0.55; cursor: default; }
+.pair-add {
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px dashed var(--line, #c9ced6);
+  background: transparent;
+  color: var(--muted, #5b6470);
+  font: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.pair-add:hover { color: var(--ink, #14161c); border-style: solid; }
+.sliders[inert] { opacity: 0.4; }
+.still-note { margin: 2px 0 0; }
 .sig-btn[data-pending="true"] {
   box-shadow: 0 0 0 3px var(--blue-ring);
 }
@@ -529,4 +551,8 @@
     min-height: 44px;
     padding: 0 8px;
   }
+  /* five or six cone points and the plus on one row of a phone: the symbols a little narrower, as tall as ever */
+  .sig-digits[data-many="1"] { gap: 6px 4px; }
+  .sig-digits[data-many="1"] .sig-btn { min-width: 38px; padding: 0 6px; }
+  .sig-digits[data-many="1"] .sig-btn[data-gap="1"] { margin-right: 6px; }
 }

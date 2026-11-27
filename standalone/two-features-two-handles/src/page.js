@@ -7,6 +7,7 @@ import {
   stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel, atDefaults, paisleyView, paisleyInfo, retiePrint, linkedPrint, printScale,
+  multiState, multiAtDefaults, multiPrint,
   psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist,
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
@@ -31,6 +32,12 @@ const playSec = $('#play');
 const tutSec = $('#tutorial');
 const famBtns = [...document.querySelectorAll('[data-fam]')];
 const sigBtns = [...document.querySelectorAll('.sig-btn')];
+const pairAdd = $('#pair-add');
+const sliderBox = document.querySelector('.controls .sliders');
+const stillNote = $('#still-note');
+const readoutEl = $('#readout');
+const keyRow = document.querySelector('.key-row');
+const momentsRow = document.querySelector('.moments');
 const patSub = $('#pat-sub');
 const surfSub = $('#surf-sub');
 const patCanvas = $('#pattern');
@@ -98,6 +105,13 @@ function makeDefaultState(k = '3333') {
     thetas: defaultThetas(fam.k),
   };
 }
+
+// Three kinds of orbifold are shown (custom.js): four features with one isolating cut (the page's own: `pairs`),
+// five or six cone points with a cut a pair (multi.js: state.mode 'multi'), and every other signature, shown as
+// the Classification of Surfaces page shows it with the pair controls off (state.mode 'still').
+const isMulti = () => state.mode === 'multi';
+const isStill = () => state.mode === 'still';
+const isPairs = () => !state.mode;
 
 let tab = 'play';
 let state = makeDefaultState('3333');
@@ -171,6 +185,8 @@ function ensureBStops() {
 }
 
 function onParamInput(dragging) {
+  if (isStill()) return;
+  if (isMulti()) { state.Ls[state.active] = state.L; state.tws[state.active] = state.tw; }          // the sliders move the picked pair's numbers
   if (followState && followState.active) followState.data = followTreeData(state);
   drawPattern({ keepView: true, moving: dragging });
   stage.decorate();
@@ -267,19 +283,27 @@ function getHandleBelt() {
 }
 
 function buildSurfaceForFamily(k) {
-  built = buildSurface(surfacePartsFor(k));
   loopCache = { key: '', loop: null };
   beltCache = { k: '', loop: null };
+  try { built = buildSurface(surfacePartsFor(k)); } catch (err) { built = null; return; }          // more pieces than the ball has places: the surface pane keeps what it had
   stage.setScene(built.scene, built.frame, true);
 }
 
+/** The loop round another pair of a family of five or six cone points (not the picked one). */
+function ballLoopOf(pairIdx) {
+  const { loopSites } = sitesForBall(built, [2 * pairIdx, 2 * pairIdx + 1], state.k);
+  const sites = built.layout.sites;
+  return stadium(sites[loopSites[0]].site.n, sites[loopSites[1]].site.n, 1.014);
+}
+
 stage.extraLines = () => {
-  if (!built) return [];
+  if (!built || isStill() || !built.layout) return [];
   const loop = getBallLoop();
   const dark = isDark();
   const amber = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
   const blueRgb = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   const lines = [{ points: loop.flat, color: amber, width: 3.4, alpha: 0.95, xray: 0.18, loop: true }];
+  if (isMulti()) for (let i = 0; i < state.shown; i++) if (i !== state.active) lines.push({ points: ballLoopOf(i).flat, color: amber, width: 2.0, alpha: 0.6, xray: 0.12, loop: true });
   const belt = getHandleBelt();
   if (belt) lines.push({ points: belt.flat, color: blueRgb, width: 2.3, alpha: 0.9, xray: 0.18, loop: true });
   return lines;
@@ -291,15 +315,20 @@ stage.extraMarkers = () => {
   const blueRgb = dark ? [0.337, 0.706, 0.914] : [0, 0.447, 0.698];
   const blueCss = dark ? '#56b4e9' : '#0072b2';
   const amber = dark ? [0.941, 0.659, 0.188] : [0.902, 0.624, 0];
-  const picked = new Set([state.perm[0], state.perm[1]]);
-  const feats = featureAnchorsForBall(built, state.k);
+  const picked = isStill() ? new Set() : new Set([state.perm[0], state.perm[1]]);
+  // an orbifold shown still may be drawn as a plate or a band (surface.js): no ball, no sites, only its anchors
+  const feats = built.layout && !isStill() ? featureAnchorsForBall(built, state.k)
+    : built.anchors.flatMap((a, idx) => {
+        const lbl = FAMILIES[state.k].featLabels[idx] || '', star = lbl[0] === '∗';
+        return [{ p: a.at(), label: star ? '∗' : lbl }, ...(star ? a.corners.map((c, q) => ({ p: c(), label: lbl[1 + q] || '', red: true })) : [])];
+      });
   // every feature in the signature's own colour, as the Classification of Surfaces page writes it: blue for what
   // keeps the pattern's sense (cone points, a handle), red for what reflects (a mirror, a crosscap). The picked pair
   // is told by the loop round it and by its larger dots, not by greying the others
   const redRgb = dark ? [0.941, 0.541, 0.294] : [0.761, 0.314, 0.039];
   const redCss = dark ? '#f08a4b' : '#c2500a';
   const markers = feats.map((ft, featIdx) => {
-    const on = picked.has(featIdx), red = /^[∗×]/.test(ft.label);
+    const on = picked.has(featIdx), red = !!ft.red || /^[∗×]/.test(ft.label);          // (a mirror's corners are red too)
     return {
       p: ft.p,
       color: red ? redRgb : blueRgb,
@@ -311,6 +340,7 @@ stage.extraMarkers = () => {
       labelFaint: false,
     };
   });
+  if (isStill() || !built.layout) return markers;
   const loop = getBallLoop();
   markers.push({
     p: beadOnLoop(loop, state.tw + 0.5),
@@ -335,13 +365,21 @@ stage.extraMarkers = () => {
 };
 
 let currentModel = null;
-function drawPattern({ keepView = false, moving = false } = {}) {
+/**
+ * still (five or six cone points, with keepView): nothing is to move on the pattern (another pair was picked). Else
+ * the picked pair is what stays where it is: its model is in the frame of its tile and says by `pose` where the
+ * pair lies, so the view goes with the change of pose.
+ */
+function drawPattern({ keepView = false, moving = false, still = false } = {}) {
   const model = buildPatternModel(state, {
     dark: isDark(),
     follow: followState && followState.active ? followState : null,
   });
+  const last = currentModel;
   currentModel = model;
-  pattern.set(model, { keepView, moving });
+  let carry = null;
+  if (keepView && !still && model.pose && last && last.pose) carry = psuMul(psuInv(so21ToPSU(last.pose, false)), so21ToPSU(model.pose, false));
+  pattern.set(model, { keepView, moving, carry });
 }
 
 function renderAll({ keepView = false, moving = false } = {}) {
@@ -405,20 +443,42 @@ function fmtSigned(v, dec) {
 }
 
 function syncUI() {
-  const fam = FAMILIES[state.k];
+  const fam = FAMILIES[state.k], still = isStill(), many = isMulti();
   for (const b of famBtns) b.setAttribute('aria-pressed', String(b.dataset.fam === state.k));
   custom.sync();          // the text field after the chips: lit while the orbifold shown is the one typed there
-  const picked = new Set([state.perm[0], state.perm[1]]);
+  const picked = still ? new Set() : new Set([state.perm[0], state.perm[1]]);
   sigBtns.forEach((b, idx) => {
     const lbl = fam.featLabels[idx];
+    b.hidden = lbl === undefined;
+    if (lbl === undefined) return;
     b.textContent = lbl;
     b.setAttribute('aria-label', `Feature ${idx + 1}: ${lbl}`);
     b.setAttribute('aria-pressed', String(picked.has(idx)));
     b.toggleAttribute('data-pending', promoted === idx);
+    b.disabled = still;
+    // five or six cone points: taken two by two as named, a gap after each pair; a pair not yet picked is pale
+    b.dataset.gap = many && idx % 2 === 1 && idx < fam.featLabels.length - 1 ? '1' : '0';
+    b.dataset.off = many && (idx >> 1) >= state.shown ? '1' : '0';
   });
+  pairAdd.hidden = !(many && state.shown < fam.pairs.length);
+  pairAdd.parentElement.dataset.many = fam.featLabels.length > 4 ? '1' : '0';          // more than four symbols: closer together on a phone (page.css)
 
-  patSub.textContent = fam.kind === 'E' ? 'Euclidean plane' : 'Poincaré disc';
-  surfSub.textContent = promoted !== null ? `${fam.featLabels[promoted]} ready — tap its partner` : 'Tap two features';
+  patSub.textContent = fam.kind === 'E' ? 'Euclidean plane' : fam.kind === 'S' ? 'Sphere' : 'Poincaré disc';
+  surfSub.textContent = still ? (fam.rigid ? 'Rigid: nothing to move' : 'Shown as classified')
+    : many ? `Pair ${state.active + 1} of ${fam.pairs.length}: tap a feature for its pair`
+      : promoted !== null ? `${fam.featLabels[promoted]} ready — tap its partner` : 'Tap two features';
+  // the pair controls: off for an orbifold shown still
+  sliderBox.toggleAttribute('inert', still);
+  readoutEl.hidden = still;
+  keyRow.hidden = still;
+  momentsRow.hidden = !isPairs();
+  momentNote.hidden = !isPairs();
+  stillNote.hidden = !still;
+  if (still) {
+    stillNote.textContent = fam.rigid
+      ? `${fam.label} is rigid: its shape has no Length or Twist to move, so the pair controls are off.`
+      : `${fam.label} has ${fam.moves} number${fam.moves === 1 ? '' : 's'} of shape, none of them built here yet (this page moves pairs of features: four features, or five or six cone points), so the pair controls are off.`;
+  }
 
   const hasB = !!fam.bRange;
   const hasTau = !!fam.tauLabel;
@@ -456,7 +516,11 @@ function syncUI() {
   outLen.textContent = state.L.toFixed(2);
   outTw.textContent = fmtSigned(state.tw, 3);
   const { d, mDist } = pairMetrics();
-  if (fam.mode === 'cones' || fam.mode === 'pillow') {
+  if (many) {
+    outGeo.textContent = `pair ${state.active + 1} (${fam.featLabels[state.perm[0]]}·${fam.featLabels[state.perm[1]]}) ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
+  } else if (still) {
+    outGeo.textContent = '';
+  } else if (fam.mode === 'cones' || fam.mode === 'pillow') {
     outGeo.textContent = `pair ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
   } else if (fam.mode === 'handle') {
     outGeo.textContent = `arc ${d.toFixed(2)} · cut ${mDist.toFixed(2)} · shift ${fmtSigned(state.tau, 3)}`;
@@ -488,6 +552,8 @@ function computeHash() {
   if (tab === 'tutorial') return '#tutorial';
   if (isDefaultState()) return '#';
   const fam = FAMILIES[state.k];
+  if (isStill()) return `#k=${state.k}`;
+  if (isMulti()) return `#k=${state.k}&p=${state.active + 1}&n=${state.shown}&l=${state.Ls.map((x) => fmtHashNum(x, 3)).join(',')}&tw=${state.tws.map((x) => fmtHashNum(x, 4)).join(',')}`;
   let h = `#k=${state.k}&m=${state.perm.join('')}&l=${fmtHashNum(state.L, 3)}&tw=${fmtHashNum(state.tw, 4)}`;
   if (fam.bRange) h += `&b=${fmtHashNum(state.b, 3)}`;
   if (fam.mode === 'handle') h += `&to=${fmtHashNum(state.tau, 4)}`;
@@ -544,7 +610,37 @@ function recentreStartView(Vstart, model) {
   return psuToSO21(vPsu);
 }
 
+/**
+ * Five or six cone points: pick pair i to move (the sliders, the heavy tree and cut, the loop on the surface go to
+ * it). Nothing moves on the pattern: its tile, and so its frame, is the same whichever pair is picked.
+ */
+function activatePair(i) {
+  const fam = FAMILIES[state.k];
+  if (!isMulti() || i < 0 || i >= fam.pairs.length) return stateSummary();
+  cancelGlide();
+  cancelFollow();
+  const had = !!currentModel;
+  state.active = i;
+  state.shown = Math.max(state.shown, i + 1);
+  state.perm = [2 * i, 2 * i + 1];
+  state.L = state.Ls[i];
+  state.tw = state.tws[i];
+  loopCache = { key: '', loop: null };
+  ensureLenBounds(state.L, { reset: true });
+  drawPattern({ keepView: had, moving: false, still: true });          // the tile is the same one, whichever pair is picked
+  stage.decorate();
+  stage.R.render();
+  syncUI();
+  writeHashNow();
+  return stateSummary();
+}
+/** The plus after the features: the next pair not yet picked. */
+function addPair() {
+  return isMulti() ? activatePair(Math.min(state.shown, FAMILIES[state.k].pairs.length - 1)) : stateSummary();
+}
+
 function pickPair(i, j, { glide = true } = {}) {
+  if (!isPairs()) return stateSummary();
   if (i === j || i < 0 || i > 3 || j < 0 || j > 3) return stateSummary();
   cancelGlide();
   cancelFollow();
@@ -622,6 +718,8 @@ function pickPair(i, j, { glide = true } = {}) {
 }
 
 function handleConeSelect(coneIdx) {
+  if (isStill()) return stateSummary();
+  if (isMulti()) return coneIdx >= 0 && (coneIdx >> 1) < FAMILIES[state.k].pairs.length ? activatePair(coneIdx >> 1) : stateSummary();          // a tap on a feature picks its pair (the cone point left over has none)
   if (coneIdx < 0 || coneIdx > 3) return stateSummary();
   const a = state.perm[0], b = state.perm[1];
   if (coneIdx === a || coneIdx === b) {
@@ -642,6 +740,17 @@ function setFamily(k, opts = {}) {
   cancelFollow();
   const fam = FAMILIES[key];
   const prevK = state.k;
+  if (fam.mode === 'multi' || fam.mode === 'still') {
+    state = fam.mode === 'multi' ? multiState(fam.k, opts.multi || {}) : { k: fam.k, mode: 'still', perm: [], orders: [], L: 1, tw: 0, b: 0, tau: 0, thetas: [] };
+    older = newer = 0;
+    promoted = null;
+    activeMoment = null;
+    if (fam.mode === 'multi') ensureLenBounds(state.L, { reset: true });
+    if (!built || prevK !== fam.k) buildSurfaceForFamily(fam.k);
+    renderAll({ keepView: false, moving: false });
+    writeHashNow();
+    return;
+  }
   const perm = opts.perm || fam.defaultM.split('').map(Number);
   const linked = opts.thetas ? null : linkedPrint(fam.k, perm);          // another pair than the family's own: the print a pick of it leaves
   state = {
@@ -732,6 +841,15 @@ function applyHash(raw, { initial = false } = {}) {
   const k = normalizeFamilyKey(params.get('k')) || '3333';
   const fam = FAMILIES[k];
   const typed = params.get('k') && !normalizeFamilyKey(params.get('k')) ? params.get('k') : null;          // not a family: it goes into the text field as written, which says why
+  if (fam.mode === 'multi' || fam.mode === 'still') {
+    // five or six cone points: a Length and a Twist a pair, as lists; a number that reads as the default IS the default
+    const d = fam.defaults, list = (name, def, dec) => (params.get(name) || '').split(',').map((t, i) => { const v = parseFloat(t); return Number.isFinite(v) && def[i] !== undefined && fmtHashNum(v, dec) === fmtHashNum(def[i], dec) ? def[i] : v; });
+    setFamily(k, fam.mode === 'multi' ? { multi: { Ls: list('l', d.L, 3), tws: list('tw', d.tw, 4), active: (parseInt(params.get('p'), 10) || 1) - 1, shown: parseInt(params.get('n'), 10) || 1 } } : {});
+    if (typed) custom.fill(typed);
+    showTab('play', { writeHash: !initial });
+    if (initial) writeHashNow();
+    return;
+  }
   const mRaw = params.get('m') || fam.defaultM;
   const validM = /^[0-3]{4}$/.test(mRaw) && new Set(mRaw.split('')).size === 4;
   const perm = (validM ? mRaw : fam.defaultM).split('').map(Number);
@@ -767,6 +885,7 @@ for (const b of famBtns) {
 sigBtns.forEach((b, idx) => {
   b.addEventListener('click', () => handleConeSelect(idx));
 });
+pairAdd.addEventListener('click', () => addPair());
 
 for (const b of momentBtns) {
   b.addEventListener('click', () => applyMoment(b.dataset.moment));
@@ -783,7 +902,7 @@ reset3Btn.addEventListener('click', () => {
 
 // 3D ball feature tap & hover
 function coneScreenInfo() {
-  if (!built) return [];
+  if (!built || !built.layout || isStill()) return [];          // an orbifold shown still has nothing to tap
   const rect = viewCanvas.getBoundingClientRect();
   const { q } = stage.R.getView();
   const eye = eyeOf(q);
@@ -865,6 +984,7 @@ window.addEventListener('hashchange', () => applyHash(window.location.hash, { in
 
 // ---- Verification / inspection API
 function stateSummary() {
+  if (!isPairs()) return otherSummary();
   const { d, mDist } = pairMetrics();
   const patRect = patCanvas.getBoundingClientRect();
   const tileScreens = currentModel && currentModel.home
@@ -903,10 +1023,40 @@ function stateSummary() {
   };
 }
 
+/** The same for an orbifold of five or six cone points, or one shown still. */
+function otherSummary() {
+  const fam = FAMILIES[state.k], many = isMulti(), { d, mDist } = pairMetrics();
+  const pr = many ? multiPrint(state.k) : null;
+  // where the tile's own features are on the pattern's canvas, and (five or six cone points) the middle of the picked pair
+  const spot = (p) => { const pt = pattern.projectTile(p); return pt ? { x: pt[0], y: pt[1] } : null; };
+  const home = (currentModel && currentModel.home) || [];
+  const tileScreens = home.map((p, slot) => ({ slot, ...spot(p) }));
+  const pairMid = many && home.length ? spot(GH.mix(home[2 * state.active], home[2 * state.active + 1], 0.5)) : null;
+  return {
+    tileScreens, pairMid,
+    tab, k: state.k, mode: state.mode, perm: state.perm.slice(), m: state.perm.join(''), orders: (state.orders || []).slice(),
+    featLabels: fam.featLabels.slice(), pair: state.perm.slice(), L: state.L, tw: state.tw, b: 0, tau: 0, d, mDist, promoted: null,
+    multi: many ? { Ls: state.Ls.slice(), tws: state.tws.slice(), active: state.active, shown: state.shown, pairs: fam.pairs.length, atDefaults: multiAtDefaults(state), fit: pr.fit, commas: pr.count, joints: pr.joints, view: currentModel && currentModel.classified ? currentModel.firstV : null, pose: currentModel && currentModel.pose } : null,
+    still: many ? null : { rigid: !!fam.rigid, moves: fam.moves, kind: fam.kind },
+    controls: { off: sliderBox.hasAttribute('inert'), add: !pairAdd.hidden, note: stillNote.hidden ? '' : stillNote.textContent },
+    custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
+    moment: null, follow: false, hash: computeHash(), locationHash: window.location.hash || '#',
+    readout: `${valLen.textContent} | ${valTw.textContent} | ${outGeo.textContent}`,
+    surface: !!built, pattern: pattern.state(),
+  };
+}
+
 window.__handles = {
+  pair(i) { return activatePair(i); },
+  add() { return addPair(); },
   set(opts = {}) {
     cancelGlide();
     cancelFollow();
+    if (opts.k ? ['multi', 'still'].includes((FAMILIES[normalizeFamilyKey(opts.k)] || {}).mode) : !isPairs()) {
+      const key = (opts.k && normalizeFamilyKey(opts.k)) || state.k;
+      setFamily(key, FAMILIES[key].mode === 'multi' ? { multi: { Ls: opts.Ls || (key === state.k ? state.Ls : null), tws: opts.tws || (key === state.k ? state.tws : null), active: opts.active ?? (key === state.k ? state.active : 0), shown: opts.shown ?? (key === state.k ? state.shown : 1) } } : {});
+      return stateSummary();
+    }
     if (typeof opts.autoCenter === 'boolean') autoCenter = opts.autoCenter;
     if (opts.tab) showTab(opts.tab, { writeHash: false });
     const nextK = (opts.k && normalizeFamilyKey(opts.k)) || state.k;

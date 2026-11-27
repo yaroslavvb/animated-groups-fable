@@ -68,18 +68,18 @@ function nearest(G, pts, p) {
  * point is [x, y, z]): scaled so that side(m, p) is the distance of p from the line on the plane, and its sinh on the
  * hyperbolic plane.
  */
-function lineOf(G, a, b) {
+export function lineOf(G, a, b) {
   const m = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   const w = G.kind === 'H' ? Math.sqrt(Math.max(1e-300, m[0] * m[0] + m[1] * m[1] - m[2] * m[2])) : Math.hypot(m[0], m[1]) || 1;
   return [m[0] / w, m[1] / w, m[2] / w];
 }
-const side = (m, p) => m[0] * p[0] + m[1] * p[1] + m[2] * p[2];
+export const side = (m, p) => m[0] * p[0] + m[1] * p[1] + m[2] * p[2];
 /** Where a point is on the pane: the Poincaré disc, or the plane itself. */
-const flatOf = (G, p) => (G.kind === 'H' ? [p[0] / (1 + p[2]), p[1] / (1 + p[2])] : [p[0], p[1]]);
+export const flatOf = (G, p) => (G.kind === 'H' ? [p[0] / (1 + p[2]), p[1] / (1 + p[2])] : [p[0], p[1]]);
 /** An order of places that no machine's rounding decides: the higher on the pane first, then the further left. */
-const byPlace = (a, b) => (Math.abs(a[1] - b[1]) > 1e-7 ? b[1] - a[1] : Math.abs(a[0] - b[0]) > 1e-7 ? a[0] - b[0] : 0);
+export const byPlace = (a, b) => (Math.abs(a[1] - b[1]) > 1e-7 ? b[1] - a[1] : Math.abs(a[0] - b[0]) > 1e-7 ? a[0] - b[0] : 0);
 /** side() as a distance: itself on the plane, its asinh on the hyperbolic plane; and back. */
-const toDist = (G, v) => (G.kind === 'H' ? Math.asinh(v) : v), toSide = (G, d) => (G.kind === 'H' ? Math.sinh(d) : d);
+export const toDist = (G, v) => (G.kind === 'H' ? Math.asinh(v) : v), toSide = (G, d) => (G.kind === 'H' ? Math.sinh(d) : d);
 /** How far apart two lines that do not meet are (on2: a point of the second). */
 const lineGap = (G, m1, m2, on2) => (G.kind === 'H' ? Math.acosh(Math.max(1, Math.abs(m1[0] * m2[0] + m1[1] * m2[1] - m1[2] * m2[2]))) : Math.abs(side(m1, on2)));
 /**
@@ -99,10 +99,10 @@ function partOf(G, pts, m, sgn, lap, c = 0) {
 const LAP = 0.004;          // a third of a pixel in the middle of the pane
 const CLEAR = 0.012;        // how far a joint keeps from a comma for choice: a pixel
 const TIGHT = 0.001;        // and at the very least
-const TURN = 0.025;         // over this much Twist a comma larger than its block is drawn in to fit it (of a whole turn)
+export const TURN = 0.025;         // over this much Twist a comma larger than its block is drawn in to fit it (of a whole turn)
 
 /** A point given in a cone point's own frame (the cone point at the origin), drawn in toward the cone point by the factor s. */
-function drawnIn(G, p, s) {
+export function drawnIn(G, p, s) {
   if (s === 1) return p;
   if (G.kind !== 'H') return [s * p[0], s * p[1], 1];
   const r = Math.acosh(Math.max(1, p[2])), sh = Math.sinh(r);
@@ -111,7 +111,84 @@ function drawnIn(G, p, s) {
   return [k * p[0], k * p[1], Math.cosh(s * r)];
 }
 /** The middle of an outline. */
-const midOf = (G, pts) => G.norm(pts.reduce((sum, p) => [sum[0] + p[0], sum[1] + p[1], sum[2] + p[2]], [0, 0, 0]).map((x) => x / pts.length));
+export const midOf = (G, pts) => G.norm(pts.reduce((sum, p) => [sum[0] + p[0], sum[1] + p[1], sum[2] + p[2]], [0, 0, 0]).map((x) => x / pts.length));
+
+/**
+ * Where the print may be parted. A Twist cuts the pattern along the lifts of the isolating cut and slides one
+ * side along the other. The same slide carries every curve that keeps its distance from a lift along itself, so
+ * the print can be parted along such a curve instead (its JOINT), at an offset d from every lift, d > 0 toward
+ * the far pair: on the plane a parallel line, and for 2222 the row of the far pair's centres, which is what the
+ * Twist of 2222 page does. Any offset will do at which the joints of different lifts do not meet and no cone
+ * point is passed: from -rhoA to rhoC. (A pair of half-turn centres lies ON its cut: the range ends at 0 there,
+ * and the cut itself is the joint, a seal.) The offset is taken where the joints run through no comma, if there
+ * is such a stretch: on the far side for choice (the commas by the picked pair then ride with it and the picture
+ * round the pair holds still), the widest stretch, its middle. Then no comma is ever cut and none meets another,
+ * at any Twist: each rides whole with its block. `clear` says whether there was such a stretch.
+ */
+export function jointOf(G, lifts, shapes, cones, others = []) {
+  const l0 = lifts[0];
+  let rhoA = Infinity, rhoC = Infinity, sealA = false, sealC = false;
+  // (others: the lifts of OTHER cuts, where an orbifold has several: their joints must not be met either)
+  for (const l of lifts.slice(1).concat(others)) {
+    const v0 = toDist(G, side(l0.m, l.on)), v1 = toDist(G, side(l.m, l0.on));
+    // the cut itself, the other way up, or met again through other tiles (a tile far out is good to five digits, and two lifts are never that near)
+    if (Math.abs(v0) < 1e-5 && Math.abs(v1) < 1e-5) continue;
+    const gap = lineGap(G, l0.m, l.m, l.on) / 2;
+    if (v0 > 0 && v1 > 0) rhoC = Math.min(rhoC, gap); else if (v0 < 0 && v1 < 0) rhoA = Math.min(rhoA, gap);
+  }
+  for (const c of cones) {
+    const v = toDist(G, side(l0.m, c.p));
+    if (Math.abs(v) < 1e-5) { if (c.far) sealC = true; else sealA = true; } else if (v > 0) rhoC = Math.min(rhoC, v); else rhoA = Math.min(rhoA, -v);
+  }
+  if (sealC) rhoC = 0;
+  if (sealA) rhoA = 0;
+  const EDGE = 1e-3, from = sealA ? 0 : -(rhoA - EDGE), to = sealC ? 0 : rhoC - EDGE;
+  // the stretches of offsets at which some lift's joint would run through some comma
+  const raw = [];
+  for (const sh of shapes) for (const l of lifts) {
+    let lo = Infinity, hi = -Infinity;
+    for (const q of sh.pts) { const d = side(l.m, q); if (d < lo) lo = d; if (d > hi) hi = d; }
+    lo = toDist(G, lo); hi = toDist(G, hi);
+    if (hi <= from - CLEAR || lo >= to + CLEAR) continue;
+    raw.push([lo, hi]);
+  }
+  raw.sort((x, y) => x[0] - y[0]);
+  /** The stretches of offsets that keep `margin` from every comma. */
+  const freeAt = (margin) => {
+    const out = [];
+    let at = from;
+    for (const [lo, hi] of raw) { if (lo - margin > at) out.push([at, Math.min(lo - margin, to)]); if (hi + margin > at) at = hi + margin; if (at >= to) break; }
+    if (at < to) out.push([at, to]);
+    return out;
+  };
+  // a seal is a joint if no comma lies across it, however near one comes
+  const sealFree = (sealA || sealC) && raw.every(([lo, hi]) => !(lo < -1e-4 && hi > 1e-4));
+  const widest = (list) => list.reduce((best, g) => (!best || g[1] - g[0] > best[1] - best[0] + 1e-9 ? g : best), null);
+  let delta = 0, clear = true, free = [], far = null, near = null;
+  for (const margin of [CLEAR, TIGHT]) {          // a pixel's clearance if there is such a stretch, else any clearance at all
+    free = freeAt(margin);
+    far = widest(free.map((g) => [Math.max(g[0], 0), g[1]]).filter((g) => g[1] - g[0] > 1e-4));
+    near = widest(free.map((g) => [g[0], Math.min(g[1], 0)]).filter((g) => g[1] - g[0] > 1e-4));
+    if (far || near) break;
+  }
+  if (sealC && sealFree) delta = 0;
+  else if (far) delta = (far[0] + far[1]) / 2;
+  else if (sealA && sealFree) delta = 0;
+  else if (near) delta = (near[0] + near[1]) / 2;
+  else {
+    // No such stretch: a comma is larger than any block (333∗: one comma fills the tile). Then the offset at which
+    // the joints cross the fewest commas, and of those the one that takes the least off the comma it crosses.
+    clear = false;
+    let bestCuts = Infinity, bestDepth = Infinity;
+    for (let i = 0; i <= 200; i++) {
+      const d = from + ((to - from) * i) / 200;
+      let cuts = 0, depth = 0;
+      for (const [lo, hi] of raw) if (lo + 2 * LAP < d && d < hi - 2 * LAP) { cuts++; depth += Math.min(d - lo, hi - d); }
+      if (cuts < bestCuts || (cuts === bestCuts && depth < bestDepth - 1e-9)) { bestCuts = cuts; bestDepth = depth; delta = d; }
+    }
+  }
+  return { delta, clear, rhoA, rhoC, seal: (sealC || sealA) && delta === 0, free };
+}
 
 export function createPaisley({ families, centred, GH, GE }) {
   const cache = new Map(), busy = new Set();
@@ -293,81 +370,6 @@ export function createPaisley({ families, centred, GH, GE }) {
     put(null);
     for (const t of ts) put(t.M);
     return out;
-  }
-
-  /**
-   * Where the print may be parted. A Twist cuts the pattern along the lifts of the isolating cut and slides one
-   * side along the other. The same slide carries every curve that keeps its distance from a lift along itself, so
-   * the print can be parted along such a curve instead (its JOINT), at an offset d from every lift, d > 0 toward
-   * the far pair: on the plane a parallel line, and for 2222 the row of the far pair's centres, which is what the
-   * Twist of 2222 page does. Any offset will do at which the joints of different lifts do not meet and no cone
-   * point is passed: from -rhoA to rhoC. (A pair of half-turn centres lies ON its cut: the range ends at 0 there,
-   * and the cut itself is the joint, a seal.) The offset is taken where the joints run through no comma, if there
-   * is such a stretch: on the far side for choice (the commas by the picked pair then ride with it and the picture
-   * round the pair holds still), the widest stretch, its middle. Then no comma is ever cut and none meets another,
-   * at any Twist: each rides whole with its block. `clear` says whether there was such a stretch.
-   */
-  function jointOf(G, lifts, shapes, cones) {
-    const l0 = lifts[0];
-    let rhoA = Infinity, rhoC = Infinity, sealA = false, sealC = false;
-    for (let i = 1; i < lifts.length; i++) {
-      const l = lifts[i], v0 = toDist(G, side(l0.m, l.on)), v1 = toDist(G, side(l.m, l0.on));
-      if (Math.abs(v0) < 1e-7 && Math.abs(v1) < 1e-7) continue;          // the cut itself, the other way up
-      const gap = lineGap(G, l0.m, l.m, l.on) / 2;
-      if (v0 > 0 && v1 > 0) rhoC = Math.min(rhoC, gap); else if (v0 < 0 && v1 < 0) rhoA = Math.min(rhoA, gap);
-    }
-    for (const c of cones) {
-      const v = toDist(G, side(l0.m, c.p));
-      if (Math.abs(v) < 1e-7) { if (c.far) sealC = true; else sealA = true; } else if (v > 0) rhoC = Math.min(rhoC, v); else rhoA = Math.min(rhoA, -v);
-    }
-    if (sealC) rhoC = 0;
-    if (sealA) rhoA = 0;
-    const EDGE = 1e-3, from = sealA ? 0 : -(rhoA - EDGE), to = sealC ? 0 : rhoC - EDGE;
-    // the stretches of offsets at which some lift's joint would run through some comma
-    const raw = [];
-    for (const sh of shapes) for (const l of lifts) {
-      let lo = Infinity, hi = -Infinity;
-      for (const q of sh.pts) { const d = side(l.m, q); if (d < lo) lo = d; if (d > hi) hi = d; }
-      lo = toDist(G, lo); hi = toDist(G, hi);
-      if (hi <= from - CLEAR || lo >= to + CLEAR) continue;
-      raw.push([lo, hi]);
-    }
-    raw.sort((x, y) => x[0] - y[0]);
-    /** The stretches of offsets that keep `margin` from every comma. */
-    const freeAt = (margin) => {
-      const out = [];
-      let at = from;
-      for (const [lo, hi] of raw) { if (lo - margin > at) out.push([at, Math.min(lo - margin, to)]); if (hi + margin > at) at = hi + margin; if (at >= to) break; }
-      if (at < to) out.push([at, to]);
-      return out;
-    };
-    // a seal is a joint if no comma lies across it, however near one comes
-    const sealFree = (sealA || sealC) && raw.every(([lo, hi]) => !(lo < -1e-4 && hi > 1e-4));
-    const widest = (list) => list.reduce((best, g) => (!best || g[1] - g[0] > best[1] - best[0] + 1e-9 ? g : best), null);
-    let delta = 0, clear = true, free = [], far = null, near = null;
-    for (const margin of [CLEAR, TIGHT]) {          // a pixel's clearance if there is such a stretch, else any clearance at all
-      free = freeAt(margin);
-      far = widest(free.map((g) => [Math.max(g[0], 0), g[1]]).filter((g) => g[1] - g[0] > 1e-4));
-      near = widest(free.map((g) => [g[0], Math.min(g[1], 0)]).filter((g) => g[1] - g[0] > 1e-4));
-      if (far || near) break;
-    }
-    if (sealC && sealFree) delta = 0;
-    else if (far) delta = (far[0] + far[1]) / 2;
-    else if (sealA && sealFree) delta = 0;
-    else if (near) delta = (near[0] + near[1]) / 2;
-    else {
-      // No such stretch: a comma is larger than any block (333∗: one comma fills the tile). Then the offset at which
-      // the joints cross the fewest commas, and of those the one that takes the least off the comma it crosses.
-      clear = false;
-      let bestCuts = Infinity, bestDepth = Infinity;
-      for (let i = 0; i <= 200; i++) {
-        const d = from + ((to - from) * i) / 200;
-        let cuts = 0, depth = 0;
-        for (const [lo, hi] of raw) if (lo + 2 * LAP < d && d < hi - 2 * LAP) { cuts++; depth += Math.min(d - lo, hi - d); }
-        if (cuts < bestCuts || (cuts === bestCuts && depth < bestDepth - 1e-9)) { bestCuts = cuts; bestDepth = depth; delta = d; }
-      }
-    }
-    return { delta, clear, rhoA, rhoC, seal: (sealC || sealA) && delta === 0, free };
   }
 
   /**

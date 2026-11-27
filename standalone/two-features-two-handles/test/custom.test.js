@@ -1,4 +1,5 @@
 // custom.test.js — the text field after the chips: any signature of the engine's shapes, with any orders 2 .. 9.
+// (Five or six cone points, and the signatures shown still, are in multi.test.js.)
 //
 // Nothing here is looked up: a typed signature becomes a family (handles.js normalizeFamilyKey), its tile is built,
 // folded up on paper (orbifold.js analyse) and the signature read off again; its area is held to Gauss–Bonnet; and
@@ -69,11 +70,17 @@ test('a typed signature becomes a family: its shape, its features in the engine\
   assert.equal(f('234x').bMult, 2);
   assert.equal(f('o23').tauLabel, 'Handle shift');
   assert.equal(f('2345').custom, true);
-  // what the engine does not build is no family
-  for (const t of ['', '1', '237', '22222', '22**', '22*x', '2xx', 'oo', 'o2*', '234*56', '*2345', 'o2', 'o234', 'abc', '2341', 'o22x', '2y45', '2-3-4-5'])
+  // what is no signature, or a signature no pattern has, is no family
+  for (const t of ['', '1', 'abc', '2341', '2y45', '2-3-4-5', '5', '23', '*5', '*23'])
     assert.equal(normalizeFamilyKey(t), null, `"${t}" is no family`);
+  // what the four-feature engine does not build is a family all the same, shown another way (multi.test.js):
+  // five or six cone points with a cut for every pair, anything else as classified, its pair controls off
+  for (const t of ['22222', '234567']) assert.equal(FAMILIES[normalizeFamilyKey(t)].mode, 'multi', t);
+  for (const t of ['237', '22**', '22*x', '2xx', 'oo', 'o2*', '234*56', '*2345', 'o2', 'o234', 'o22x', '2222222'])
+    assert.equal(FAMILIES[normalizeFamilyKey(t)].mode, 'still', t);
+  for (const t of ['237', '22222', 'oo', '234*56']) assert.equal(customSpec(t), null, t);          // none of them is one of the engine's four-feature shapes
   assert.equal(customSpec('2222'), null);          // flat: the page's own family, not a custom one
-  assert.ok(shows(parse('2222')) && shows(parse('2345')) && !shows(parse('237')));
+  assert.ok(shows(parse('2222')) && shows(parse('2345')) && shows(parse('237')) && shows(parse('22222')) && !shows(parse('23')) && !shows(parse('')));
 });
 
 test('a signature is read as people type it', () => {
@@ -105,24 +112,18 @@ test('a signature is read as people type it', () => {
 
 test('what cannot be shown says why, and offers signatures that can', () => {
   const w = (t) => whyNot(parse(t));
-  assert.equal(w('2345'), null);
-  assert.equal(w('2222'), null);
-  assert.deepEqual([w('').kind, w('').count], ['empty', 0]);
-  assert.deepEqual([w('237').kind, w('237').count, w('237').tries], ['few', 3, ['2372']]);
-  assert.deepEqual([w('22').kind, w('22').tries], ['few', ['2222']]);
-  assert.deepEqual([w('o').kind, w('o').count, w('o').tries], ['few', 2, ['o22']]);
-  assert.deepEqual([w('23*').kind, w('23*').count, w('23*').tries], ['few', 3, ['232*']]);
-  assert.deepEqual([w('2*3').kind, w('2*3').count, w('2*3').tries], ['few', 2, ['222*3', '222*']]);
-  assert.deepEqual([w('*632').kind, w('*632').count], ['few', 1]);
-  assert.deepEqual([w('23456').kind, w('23456').count, w('23456').tries], ['many', 5, ['2345']]);
-  assert.deepEqual([w('2345*').kind, w('2345*').tries], ['many', ['234*']]);
-  assert.deepEqual([w('234*56').kind, w('234*56').tries], ['corners', ['234*5', '234*']]);
-  assert.deepEqual([w('22**').kind, w('22**').tries], ['cuffs', ['222*']]);
-  assert.deepEqual([w('22*x').kind, w('22*x').tries], ['cuffs', ['222*', '222x']]);
-  assert.deepEqual([w('oo').kind, w('oo').tries], ['cuffs', ['o22']]);
-  assert.deepEqual([w('xxxx').kind, w('xxxx').tries], ['cuffs', ['222x']]);
+  // every signature that has a pattern is shown: nothing to say
+  for (const t of ['2345', '2222', '237', '22', 'o', '23*', '2*3', '*632', '23456', '2345*', '234*56', '22**', '22*x', 'oo', 'xxxx', '*', 'x', '**', '*x', 'xx', '2*22', '*2222', '22222', '234*567', 'ooo', '***', 'o2*3', '2345x', '99*99'])
+    assert.equal(w(t), null, t);
+  // nothing typed
+  assert.deepEqual([w('').kind, w('').tries], ['empty', ['2345', '22233', '237', '*2222']]);
+  // the four shapes no pattern folds up to: one cone point alone, two of different orders, and the same with corners
+  assert.deepEqual([w('5').kind, w('5').m, w('5').tries], ['cone', 5, ['55', '5*', '5x']]);
+  assert.deepEqual([w('23').kind, w('23').m, w('23').n, w('23').tries], ['cones', 2, 3, ['22', '33', '322']]);
+  assert.deepEqual([w('*5').kind, w('*5').m, w('*5').tries], ['corner', 5, ['5*', '*55']]);
+  assert.deepEqual([w('*23').kind, w('*23').m, w('*23').n, w('*23').tries], ['corners', 2, 3, ['2*3', '3*2', '32*', '*22']]);
   // every offer is one the page shows
-  for (const t of ['', '2', '237', 'o', '*', 'x', '**', '*x', 'xx', '2*22', '*2222', '22222', '234*567', 'ooo', '***', 'o2*3', '2345x', '99*99'])
+  for (const t of ['', '2', '9', '29', '*2', '*29', '5', '23', '*5', '*23'])
     for (const tr of w(t).tries) assert.ok(normalizeFamilyKey(tr), `${t} -> ${tr}`);
   assert.deepEqual(featuresOf(parse('o23*5x')).map(featureLabel), ['2', '3', '∗5', '×', '×', '×']);      // a ring beside a cross is two crosses more
   assert.deepEqual(featuresOf(parse('o23')).map(featureLabel), ['o⁺', 'o⁻', '2', '3']);
