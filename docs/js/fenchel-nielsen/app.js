@@ -2,15 +2,17 @@
 
 import {
   parseOrbifold,
+  createDefaultCarving,
   createRandomCarving,
   hasMultipleCarvings,
   getCutOptions,
   formatFrac
-} from "./orbifold.js?v=fn-v4";
+} from "./orbifold.js?v=fn-v5";
 
 import {
   ID3,
   mul3,
+  det3,
   apply3,
   invLorentz,
   normTime,
@@ -22,9 +24,26 @@ import {
   reorthonormalizeLorentz,
   panCameraByDiskDelta,
   wrapCameraInGroupWithColor,
+  wrapPointIntoTileI,
   buildRealization,
-  generateTiling
-} from "./hyperbolic.js?v=fn-v4";
+  generateTiling,
+  recutHyperbolic
+} from "./hyperbolic.js?v=fn-v5";
+
+import {
+  EID3,
+  emul3,
+  edet3,
+  eapply,
+  buildEuclideanRealization,
+  generateEuclideanTiling,
+  panEuclideanCamera,
+  wrapEuclideanCameraWithColor,
+  wrapPointIntoEucFD,
+  recutEuclidean
+} from "./euclidean.js?v=fn-v5";
+
+const EUC_VIEW_R = 2.6;
 
 const QUOTIENT_COLORS = [
   ["#dce8f5", "#ebf2fa"], // sky slate
@@ -50,6 +69,7 @@ const state = {
   cameraM: ID3,
   cameraWrapped: false,
   cameraColor: 0,
+  parityFlip: 0,
   hoveredCutId: null,
   refineTimer: null,
   rafId: null
@@ -67,9 +87,20 @@ const els = {
   slidersHost: document.getElementById("sliders-host")
 };
 
+function isSupportedGeometry(orb) {
+  return Boolean(orb?.ok && (orb.geometry === "hyperbolic" || orb.geometry === "euclidean"));
+}
+
+function identityCamera(orb) {
+  return orb?.geometry === "euclidean" ? EID3 : ID3;
+}
+
 function formatItemDisplayName(id, orb, carving) {
   const cut = carving.cuts.find((c) => c.id === id);
   if (cut) return cut.name;
+  if (id === "e1") return "e₁";
+  if (id === "e2") return "e₂";
+  if (id === "e3") return "e₃";
   if (id.startsWith("cone:")) {
     return orb.coneItems[parseInt(id.split(":")[1], 10)]?.shortLabel || id;
   }
@@ -120,7 +151,7 @@ function cutRoleLabel(cut, opts, orb, carving) {
 }
 
 // ---------------------------------------------------------------------------
-// 1. Canvas Poincaré Disk Renderer
+// 1. Canvas Poincaré Disk & Euclidean Plane Renderer
 // ---------------------------------------------------------------------------
 
 function prepCanvas(canvas) {
@@ -154,6 +185,132 @@ function drawPolygonPath(ctx, toPx, vertsH) {
     }
   }
   ctx.closePath();
+}
+
+function drawEucPolygonPath(ctx, toPx, vertsE) {
+  ctx.beginPath();
+  for (let i = 0; i < vertsE.length; i++) {
+    const [px, py] = toPx(vertsE[i]);
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.closePath();
+}
+
+function drawHyperbolicEdge(ctx, toPx, u, w) {
+  const pu = poincare(u);
+  const pw = poincare(w);
+  const d = Math.hypot(pu[0] - pw[0], pu[1] - pw[1]);
+  const steps = d > 0.35 ? 10 : d > 0.14 ? 6 : 3;
+  const samples = geodesicSamples(u, w, steps);
+  ctx.beginPath();
+  for (let s = 0; s < samples.length; s++) {
+    const [px, py] = toPx(samples[s]);
+    if (s === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+}
+
+function sortStationaryDrawList(drawList) {
+  drawList.sort((a, b) => {
+    const ra = Math.round((a.sy + 0.137) * 0.25);
+    const rb = Math.round((b.sy + 0.137) * 0.25);
+    return ra !== rb ? ra - rb : a.sx - b.sx;
+  });
+}
+
+function stationaryRefEuc(real) {
+  if (real.dirichletPoly) {
+    if (real.dirichletBase) return real.dirichletBase;
+    const vs = real.dirichletPoly.vertsE;
+    let sx = 0;
+    let sy = 0;
+    for (let i = 0; i < vs.length; i++) {
+      sx += vs[i][0];
+      sy += vs[i][1];
+    }
+    return vs.length > 0 ? [sx / vs.length, sy / vs.length] : [0, 0];
+  }
+  const uniq = [];
+  for (const poly of real.fdPolygons) {
+    for (const v of poly.vertsE) {
+      if (!uniq.some((u) => Math.hypot(u[0] - v[0], u[1] - v[1]) < 1e-4)) {
+        uniq.push(v);
+      }
+    }
+  }
+  if (uniq.length === 0) return [0, 0];
+  let sx = 0;
+  let sy = 0;
+  for (const u of uniq) {
+    sx += u[0];
+    sy += u[1];
+  }
+  return [sx / uniq.length, sy / uniq.length];
+}
+
+function stationaryRefHyp(real) {
+  if (real.dirichletPoly) {
+    return real.dirichletBase || real.dirichletPoly.centroid;
+  }
+  const uniq = [];
+  for (const poly of real.fdPolygons) {
+    for (const v of poly.vertsH) {
+      const pv = poincare(v);
+      if (!uniq.some((u) => Math.hypot(u.pv[0] - pv[0], u.pv[1] - pv[1]) < 1e-4)) {
+        uniq.push({ v, pv });
+      }
+    }
+  }
+  if (uniq.length === 0) return [0, 0, 1];
+  let sx = 0;
+  let sy = 0;
+  let st = 0;
+  for (const u of uniq) {
+    sx += u.v[0];
+    sy += u.v[1];
+    st += u.v[2];
+  }
+  return normTime([sx, sy, st]);
+}
+
+function tileUniformFill(coloring, t, poly, real, hasOrientRev) {
+  if (coloring === "quotient") {
+    return QUOTIENT_COLORS[(t.color ?? 0) & 3][0];
+  }
+  if (coloring === "none") {
+    return "#f7f6f1";
+  }
+  if (hasOrientRev) {
+    return t.detPos !== Boolean(state.parityFlip) ? "#e2e7ee" : "#f9f8f4";
+  }
+  if ((real.quotient?.quotientSize ?? 1) >= 2) {
+    return ((t.color ?? 0) & 1) === 0 ? "#e2e7ee" : "#f9f8f4";
+  }
+  return ((poly?.parity ?? 0) ^ (t.detPos ? 0 : 1)) === 0 ? "#e2e7ee" : "#f9f8f4";
+}
+
+function dedupScreenMarker(buckets, px, py, kind, order) {
+  const scale = 0.25;
+  const bx = Math.round(px * scale);
+  const by = Math.round(py * scale);
+  for (let dx = -1; dx <= 1; dx++) {
+    for (let dy = -1; dy <= 1; dy++) {
+      const list = buckets.get(`${bx + dx},${by + dy}`);
+      if (!list) continue;
+      for (let i = 0; i < list.length; i++) {
+        const m = list[i];
+        if (m.kind === kind && m.order === order && Math.hypot(px - m.px, py - m.py) < 2.0) {
+          return false;
+        }
+      }
+    }
+  }
+  const home = `${bx},${by}`;
+  if (!buckets.has(home)) buckets.set(home, []);
+  buckets.get(home).push({ px, py, kind, order });
+  return true;
 }
 
 function drawMarker(ctx, x, y, mk, sizeScale = 1) {
@@ -196,124 +353,80 @@ function drawMarker(ctx, x, y, mk, sizeScale = 1) {
   ctx.restore();
 }
 
-function renderDisk(maxPolys = 2200) {
-  const cv = els.canvas;
-  if (!cv) return;
-  const { ctx, size } = prepCanvas(cv);
+function renderEuclideanCanvas(ctx, size, real, maxPolys) {
   const cx = size / 2;
   const cy = size / 2;
-  const R = size * 0.48;
-  const toPx = (p) => [cx + p[0] * R, cy - p[1] * R];
-
-  ctx.clearRect(0, 0, size, size);
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, R, 0, Math.PI * 2);
-  ctx.fillStyle = "#f2f1ec";
-  ctx.fill();
-  ctx.clip();
-
-  const real = state.realization;
-  if (!real) {
-    ctx.restore();
-    ctx.beginPath();
-    ctx.arc(cx, cy, R, 0, Math.PI * 2);
-    ctx.strokeStyle = "#c7c7d1";
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-    return;
-  }
-
-  const tiles = generateTiling(real, state.cameraM, {
-    maxPolys,
-    rMax: 0.985,
-    cameraColor: state.cameraColor
-  });
+  const scalePx = size / (2 * EUC_VIEW_R);
+  const toPx = ([x, y]) => [cx + x * scalePx, cy - y * scalePx];
   const { hoveredCutId, coloring } = state;
 
-  const pieceIndexById = new Map();
+  ctx.save();
+  ctx.fillStyle = "#f2f1ec";
+  ctx.fillRect(0, 0, size, size);
+  ctx.beginPath();
+  ctx.rect(0, 0, size, size);
+  ctx.clip();
+
+  const tiles = generateEuclideanTiling(real, state.cameraM, {
+    viewRadius: EUC_VIEW_R * 1.9,
+    maxTiles: Math.min(maxPolys, 1600),
+    cameraColor: state.cameraColor,
+    useDirichlet: coloring !== "pieces" && Boolean(real.dirichletPoly)
+  });
+  const hasOrientRev = real.gens.some((g) => edet3(g.M) < 0);
+
   if (coloring === "pieces") {
+    const pieceIndexById = new Map();
     for (let pi = 0; pi < real.fdPolygons.length; pi++) {
       const pid = real.fdPolygons[pi].pieceId;
       if (!pieceIndexById.has(pid)) pieceIndexById.set(pid, pieceIndexById.size);
     }
-  }
 
-  // 1. Tile polygons shaded according to selected coloring mode
-  for (let ti = 0; ti < tiles.length; ti++) {
-    const t = tiles[ti];
-    const CM = t.CM || mul3(state.cameraM, t.M);
-    const tileDetFlip = t.detPos ? 0 : 1;
-    for (let pi = 0; pi < real.fdPolygons.length; pi++) {
-      const poly = real.fdPolygons[pi];
-      const worldVerts = poly.vertsH.map((v) => normTime(apply3(CM, v)));
-      drawPolygonPath(ctx, toPx, worldVerts);
-      if (coloring === "quotient") {
-        const pair = QUOTIENT_COLORS[(t.color ?? 0) & 3];
-        ctx.fillStyle = real.fdHasBothParities && poly.parity === 1 ? pair[1] : pair[0];
-      } else if (coloring === "pieces") {
-        const pIdx = pieceIndexById.get(poly.pieceId) ?? 0;
-        const pair = PIECE_COLORS[pIdx % PIECE_COLORS.length];
-        ctx.fillStyle = pair[poly.parity ^ tileDetFlip];
-      } else if (coloring === "none") {
-        ctx.fillStyle = "#f7f6f1";
-      } else {
-        const p = poly.parity ^ tileDetFlip;
-        ctx.fillStyle = p === 0 ? "#e2e7ee" : "#f9f8f4";
-      }
-      ctx.fill();
-      ctx.strokeStyle = "rgba(26, 26, 31, 0.20)";
-      ctx.lineWidth = 0.7;
-      ctx.stroke();
-    }
-  }
-
-  // 2. Highlight assembled fundamental domain
-  if (!state.cameraWrapped) {
-    const showFdFill = coloring === "parity" || coloring === "none";
-    for (let pi = 0; pi < real.fdPolygons.length; pi++) {
-      const poly = real.fdPolygons[pi];
-      const worldVerts = poly.vertsH.map((v) => normTime(apply3(state.cameraM, v)));
-      drawPolygonPath(ctx, toPx, worldVerts);
-      if (showFdFill) {
-        ctx.fillStyle = "rgba(15, 90, 138, 0.14)";
-        ctx.fill();
-        ctx.strokeStyle = "rgba(15, 90, 138, 0.58)";
-        ctx.lineWidth = 1.5;
-      } else {
-        ctx.strokeStyle = "rgba(26, 26, 31, 0.55)";
-        ctx.lineWidth = 1.6;
-      }
-      ctx.stroke();
-    }
-  }
-
-  // 3. Lifted cut geodesics and twist ticks
-  if (real.cutSegments.length > 0) {
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
-      if (t.r > 0.94) continue;
-      const CM = t.CM || mul3(state.cameraM, t.M);
+      const CM = t.CM || emul3(state.cameraM, t.M);
+      const tileDetFlip = t.detPos ? 0 : 1;
+      for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+        const poly = real.fdPolygons[pi];
+        const worldVerts = poly.vertsE.map((v) => eapply(CM, v));
+        drawEucPolygonPath(ctx, toPx, worldVerts);
+        const pIdx = pieceIndexById.get(poly.pieceId) ?? 0;
+        const pair = PIECE_COLORS[pIdx % PIECE_COLORS.length];
+        ctx.fillStyle = pair[(poly.parity ?? 0) ^ tileDetFlip];
+        ctx.fill();
+        ctx.strokeStyle = "rgba(26, 26, 31, 0.22)";
+        ctx.lineWidth = 0.75;
+        ctx.stroke();
+      }
+    }
+
+    if (!state.cameraWrapped) {
+      for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+        const poly = real.fdPolygons[pi];
+        const worldVerts = poly.vertsE.map((v) => eapply(state.cameraM, v));
+        drawEucPolygonPath(ctx, toPx, worldVerts);
+        ctx.strokeStyle = "rgba(26, 26, 31, 0.55)";
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+    }
+
+    for (let ti = 0; ti < tiles.length; ti++) {
+      const t = tiles[ti];
+      const CM = t.CM || emul3(state.cameraM, t.M);
       const isFD = Boolean(t.isFD) && !state.cameraWrapped;
       for (const seg of real.cutSegments) {
-        const pA = normTime(apply3(CM, seg.A));
-        const pB = normTime(apply3(CM, seg.B));
-        const dA = poincare(pA);
-        const dB = poincare(pB);
-        const distDisk = Math.hypot(dA[0] - dB[0], dA[1] - dB[1]);
-        if (distDisk < 0.008) continue;
-
-        const pts = geodesicSamples(pA, pB, distDisk > 0.25 ? 12 : 6);
         const isHov = hoveredCutId === seg.cutId;
         ctx.save();
         ctx.beginPath();
-        for (let k = 0; k < pts.length; k++) {
-          const [px, py] = toPx(pts[k]);
+        const samples = seg.samples || [seg.A, seg.B];
+        for (let k = 0; k < samples.length; k++) {
+          const [px, py] = toPx(eapply(CM, samples[k]));
           if (k === 0) ctx.moveTo(px, py);
           else ctx.lineTo(px, py);
         }
         ctx.strokeStyle = seg.color;
-        ctx.globalAlpha = isFD ? 0.98 : isHov ? 0.9 : 0.62;
+        ctx.globalAlpha = isFD ? 0.98 : isHov ? 0.92 : 0.62;
         ctx.lineWidth = isFD ? (isHov ? 4.4 : 3.0) : isHov ? 2.8 : 1.5;
         ctx.lineCap = "round";
         if (seg.isMirrorWall) ctx.setLineDash([6, 3]);
@@ -324,24 +437,20 @@ function renderDisk(maxPolys = 2200) {
 
     if (!state.cameraWrapped) {
       for (const seg of real.cutSegments) {
-        if (!seg.twistTicks || !seg.frame) continue;
-        const wf = {
-          P: normTime(apply3(state.cameraM, seg.frame.P)),
-          T: apply3(state.cameraM, seg.frame.T),
-          N: apply3(state.cameraM, seg.frame.N)
-        };
-        const tickOffsets = [0, seg.twistTurns * seg.length];
-        for (let k = 0; k < tickOffsets.length; k++) {
-          const s = ((tickOffsets[k] % seg.length) + seg.length) % seg.length;
-          const pt = slideFrame(wf, s);
-          const nStep = 0.085;
-          const pIn = normTime([
-            pt.P[0] + nStep * pt.N[0] * (k === 0 ? 1 : -1),
-            pt.P[1] + nStep * pt.N[1] * (k === 0 ? 1 : -1),
-            pt.P[2] + nStep * pt.N[2] * (k === 0 ? 1 : -1)
-          ]);
-          const [x0, y0] = toPx(poincare(pt.P));
-          const [x1, y1] = toPx(poincare(pIn));
+        if (!seg.twistTicks || !seg.tickBase || !seg.tickNormal) continue;
+        const b0 = eapply(state.cameraM, seg.tickBase);
+        const e0 = eapply(state.cameraM, [
+          seg.tickBase[0] + seg.tickNormal[0],
+          seg.tickBase[1] + seg.tickNormal[1]
+        ]);
+        const b1 = eapply(state.cameraM, seg.tickEnd || seg.tickBase);
+        const e1 = eapply(state.cameraM, [
+          (seg.tickEnd || seg.tickBase)[0] - seg.tickNormal[0],
+          (seg.tickEnd || seg.tickBase)[1] - seg.tickNormal[1]
+        ]);
+        for (const [a, b] of [[b0, e0], [b1, e1]]) {
+          const [x0, y0] = toPx(a);
+          const [x1, y1] = toPx(b);
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(x0, y0);
@@ -354,20 +463,406 @@ function renderDisk(maxPolys = 2200) {
         }
       }
     }
-  }
-
-  // 4. Cone & corner markers
-  if (real.markers.length > 0) {
+  } else {
+    // Stationary modes (parity, quotient, none): 2-pass screen-sorted fill then border stroke
+    const refE = stationaryRefEuc(real);
+    const drawList = [];
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
-      const isFD = Boolean(t.isFD) && !state.cameraWrapped;
-      if (t.r > 0.72 && !isFD) continue;
+      const CM = t.CM || emul3(state.cameraM, t.M);
+      const [sx, sy] = toPx(eapply(CM, refE));
+      if (real.dirichletPoly) {
+        drawList.push({
+          sx,
+          sy,
+          worldVerts: real.dirichletPoly.vertsE.map((v) => eapply(CM, v)),
+          fill: tileUniformFill(coloring, t, real.dirichletPoly, real, hasOrientRev)
+        });
+      } else {
+        drawList.push({
+          sx,
+          sy,
+          polys: real.fdPolygons.map((poly) => ({
+            worldVerts: poly.vertsE.map((v) => eapply(CM, v)),
+            fill: tileUniformFill(coloring, t, poly, real, hasOrientRev),
+            ext: poly.isExteriorEdge
+          }))
+        });
+      }
+    }
+    sortStationaryDrawList(drawList);
+
+    // Pass 1: fills (and interior triangulation seam seals)
+    for (let di = 0; di < drawList.length; di++) {
+      const item = drawList[di];
+      if (real.dirichletPoly) {
+        drawEucPolygonPath(ctx, toPx, item.worldVerts);
+        ctx.fillStyle = item.fill;
+        ctx.fill();
+      } else {
+        for (let pi = 0; pi < item.polys.length; pi++) {
+          const p = item.polys[pi];
+          drawEucPolygonPath(ctx, toPx, p.worldVerts);
+          ctx.fillStyle = p.fill;
+          ctx.fill();
+          if (p.ext) {
+            ctx.strokeStyle = p.fill;
+            ctx.lineWidth = 0.85;
+            for (let e = 0; e < p.worldVerts.length; e++) {
+              if (p.ext[e] !== false) continue;
+              const [x0, y0] = toPx(p.worldVerts[e]);
+              const [x1, y1] = toPx(p.worldVerts[(e + 1) % p.worldVerts.length]);
+              ctx.beginPath();
+              ctx.moveTo(x0, y0);
+              ctx.lineTo(x1, y1);
+              ctx.stroke();
+            }
+          }
+        }
+      }
+    }
+
+    // Pass 2: exterior cell borders
+    ctx.strokeStyle = "rgba(26, 26, 31, 0.22)";
+    ctx.lineWidth = 0.75;
+    for (let di = 0; di < drawList.length; di++) {
+      const item = drawList[di];
+      if (real.dirichletPoly) {
+        drawEucPolygonPath(ctx, toPx, item.worldVerts);
+        ctx.stroke();
+      } else {
+        for (let pi = 0; pi < item.polys.length; pi++) {
+          const p = item.polys[pi];
+          for (let e = 0; e < p.worldVerts.length; e++) {
+            if (p.ext && p.ext[e] === false) continue;
+            const [x0, y0] = toPx(p.worldVerts[e]);
+            const [x1, y1] = toPx(p.worldVerts[(e + 1) % p.worldVerts.length]);
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    if (hoveredCutId) {
+      for (let ti = 0; ti < tiles.length; ti++) {
+        const t = tiles[ti];
+        const CM = t.CM || emul3(state.cameraM, t.M);
+        for (const seg of real.cutSegments) {
+          if (seg.cutId !== hoveredCutId) continue;
+          const samples = seg.samples || [seg.A, seg.B];
+          ctx.save();
+          ctx.beginPath();
+          for (let k = 0; k < samples.length; k++) {
+            const [px, py] = toPx(eapply(CM, samples[k]));
+            if (k === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = seg.color;
+          ctx.globalAlpha = 0.9;
+          ctx.lineWidth = 2.6;
+          ctx.lineCap = "round";
+          if (seg.isMirrorWall) ctx.setLineDash([6, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  }
+
+  // Cone & corner markers culled and deduplicated by spatial screen buckets
+  const activeMarkers =
+    coloring !== "pieces" && real.dirichletPoly?.markers?.length ? real.dirichletPoly.markers : real.markers;
+  if (activeMarkers.length > 0) {
+    const markerBuckets = new Map();
+    for (let ti = 0; ti < tiles.length; ti++) {
+      const t = tiles[ti];
+      const CM = t.CM || emul3(state.cameraM, t.M);
+      for (const mk of activeMarkers) {
+        const [px, py] = toPx(eapply(CM, mk.P));
+        if (px < -16 || px > size + 16 || py < -16 || py > size + 16) continue;
+        if (!dedupScreenMarker(markerBuckets, px, py, mk.kind, mk.order)) continue;
+        drawMarker(ctx, px, py, mk, 1.0);
+      }
+    }
+  }
+
+  ctx.restore();
+}
+
+function renderDisk(maxPolys = 2200) {
+  const cv = els.canvas;
+  if (!cv) return;
+  const real = state.realization;
+  const isEuc = real?.geometry === "euclidean";
+  cv.classList.toggle("is-euclidean", isEuc);
+
+  const { ctx, size } = prepCanvas(cv);
+  ctx.clearRect(0, 0, size, size);
+
+  if (isEuc) {
+    renderEuclideanCanvas(ctx, size, real, maxPolys);
+    return;
+  }
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const R = size * 0.48;
+  const toPx = (p) => [cx + p[0] * R, cy - p[1] * R];
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, R, 0, Math.PI * 2);
+  ctx.fillStyle = "#f2f1ec";
+  ctx.fill();
+  ctx.clip();
+
+  if (!real) {
+    ctx.restore();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.strokeStyle = "#c7c7d1";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    return;
+  }
+
+  const { hoveredCutId, coloring } = state;
+  const tiles = generateTiling(real, state.cameraM, {
+    maxPolys,
+    rMax: 0.985,
+    cameraColor: state.cameraColor,
+    useDirichlet: coloring !== "pieces" && Boolean(real.dirichletPoly)
+  });
+  const hasOrientRev = real.gens.some((g) => det3(g.M) < 0);
+
+  if (coloring === "pieces") {
+    const pieceIndexById = new Map();
+    for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+      const pid = real.fdPolygons[pi].pieceId;
+      if (!pieceIndexById.has(pid)) pieceIndexById.set(pid, pieceIndexById.size);
+    }
+
+    for (let ti = 0; ti < tiles.length; ti++) {
+      const t = tiles[ti];
       const CM = t.CM || mul3(state.cameraM, t.M);
-      for (const mk of real.markers) {
+      const tileDetFlip = t.detPos ? 0 : 1;
+      for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+        const poly = real.fdPolygons[pi];
+        const worldVerts = poly.vertsH.map((v) => normTime(apply3(CM, v)));
+        drawPolygonPath(ctx, toPx, worldVerts);
+        const pIdx = pieceIndexById.get(poly.pieceId) ?? 0;
+        const pair = PIECE_COLORS[pIdx % PIECE_COLORS.length];
+        ctx.fillStyle = pair[poly.parity ^ tileDetFlip];
+        ctx.fill();
+        ctx.strokeStyle = "rgba(26, 26, 31, 0.20)";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+      }
+    }
+
+    if (!state.cameraWrapped) {
+      for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+        const poly = real.fdPolygons[pi];
+        const worldVerts = poly.vertsH.map((v) => normTime(apply3(state.cameraM, v)));
+        drawPolygonPath(ctx, toPx, worldVerts);
+        ctx.strokeStyle = "rgba(26, 26, 31, 0.55)";
+        ctx.lineWidth = 1.6;
+        ctx.stroke();
+      }
+    }
+
+    if (real.cutSegments.length > 0) {
+      for (let ti = 0; ti < tiles.length; ti++) {
+        const t = tiles[ti];
+        if (t.r > 0.94) continue;
+        const CM = t.CM || mul3(state.cameraM, t.M);
+        const isFD = Boolean(t.isFD) && !state.cameraWrapped;
+        for (const seg of real.cutSegments) {
+          const pA = normTime(apply3(CM, seg.A));
+          const pB = normTime(apply3(CM, seg.B));
+          const dA = poincare(pA);
+          const dB = poincare(pB);
+          const distDisk = Math.hypot(dA[0] - dB[0], dA[1] - dB[1]);
+          if (distDisk < 0.008) continue;
+
+          const pts = geodesicSamples(pA, pB, distDisk > 0.25 ? 12 : 6);
+          const isHov = hoveredCutId === seg.cutId;
+          ctx.save();
+          ctx.beginPath();
+          for (let k = 0; k < pts.length; k++) {
+            const [px, py] = toPx(pts[k]);
+            if (k === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = seg.color;
+          ctx.globalAlpha = isFD ? 0.98 : isHov ? 0.9 : 0.62;
+          ctx.lineWidth = isFD ? (isHov ? 4.4 : 3.0) : isHov ? 2.8 : 1.5;
+          ctx.lineCap = "round";
+          if (seg.isMirrorWall) ctx.setLineDash([6, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      if (!state.cameraWrapped) {
+        for (const seg of real.cutSegments) {
+          if (!seg.twistTicks || !seg.frame) continue;
+          const wf = {
+            P: normTime(apply3(state.cameraM, seg.frame.P)),
+            T: apply3(state.cameraM, seg.frame.T),
+            N: apply3(state.cameraM, seg.frame.N)
+          };
+          const tickOffsets = [0, seg.twistTurns * seg.length];
+          for (let k = 0; k < tickOffsets.length; k++) {
+            const s = ((tickOffsets[k] % seg.length) + seg.length) % seg.length;
+            const pt = slideFrame(wf, s);
+            const nStep = 0.085;
+            const pIn = normTime([
+              pt.P[0] + nStep * pt.N[0] * (k === 0 ? 1 : -1),
+              pt.P[1] + nStep * pt.N[1] * (k === 0 ? 1 : -1),
+              pt.P[2] + nStep * pt.N[2] * (k === 0 ? 1 : -1)
+            ]);
+            const [x0, y0] = toPx(poincare(pt.P));
+            const [x1, y1] = toPx(poincare(pIn));
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(x0, y0);
+            ctx.lineTo(x1, y1);
+            ctx.strokeStyle = "#1a1a1f";
+            ctx.lineWidth = 2.2;
+            ctx.lineCap = "round";
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+    }
+  } else {
+    // Stationary modes (parity, quotient, none): 2-pass screen-sorted fill then border stroke
+    const refH = stationaryRefHyp(real);
+    const drawList = [];
+    for (let ti = 0; ti < tiles.length; ti++) {
+      const t = tiles[ti];
+      const CM = t.CM || mul3(state.cameraM, t.M);
+      const [sx, sy] = toPx(poincare(normTime(apply3(CM, refH))));
+      if (real.dirichletPoly) {
+        drawList.push({
+          sx,
+          sy,
+          worldVerts: real.dirichletPoly.vertsH.map((v) => normTime(apply3(CM, v))),
+          fill: tileUniformFill(coloring, t, real.dirichletPoly, real, hasOrientRev)
+        });
+      } else {
+        drawList.push({
+          sx,
+          sy,
+          polys: real.fdPolygons.map((poly) => ({
+            worldVerts: poly.vertsH.map((v) => normTime(apply3(CM, v))),
+            fill: tileUniformFill(coloring, t, poly, real, hasOrientRev),
+            ext: poly.isExteriorEdge
+          }))
+        });
+      }
+    }
+    sortStationaryDrawList(drawList);
+
+    // Pass 1: fills (and interior triangulation seam seals)
+    for (let di = 0; di < drawList.length; di++) {
+      const item = drawList[di];
+      if (real.dirichletPoly) {
+        drawPolygonPath(ctx, toPx, item.worldVerts);
+        ctx.fillStyle = item.fill;
+        ctx.fill();
+      } else {
+        for (let pi = 0; pi < item.polys.length; pi++) {
+          const p = item.polys[pi];
+          drawPolygonPath(ctx, toPx, p.worldVerts);
+          ctx.fillStyle = p.fill;
+          ctx.fill();
+          if (p.ext) {
+            ctx.strokeStyle = p.fill;
+            ctx.lineWidth = 0.85;
+            for (let e = 0; e < p.worldVerts.length; e++) {
+              if (p.ext[e] !== false) continue;
+              drawHyperbolicEdge(ctx, toPx, p.worldVerts[e], p.worldVerts[(e + 1) % p.worldVerts.length]);
+            }
+          }
+        }
+      }
+    }
+
+    // Pass 2: exterior cell borders
+    ctx.strokeStyle = "rgba(26, 26, 31, 0.22)";
+    ctx.lineWidth = real.dirichletPoly ? 0.7 : 0.75;
+    for (let di = 0; di < drawList.length; di++) {
+      const item = drawList[di];
+      if (real.dirichletPoly) {
+        drawPolygonPath(ctx, toPx, item.worldVerts);
+        ctx.stroke();
+      } else {
+        for (let pi = 0; pi < item.polys.length; pi++) {
+          const p = item.polys[pi];
+          for (let e = 0; e < p.worldVerts.length; e++) {
+            if (p.ext && p.ext[e] === false) continue;
+            drawHyperbolicEdge(ctx, toPx, p.worldVerts[e], p.worldVerts[(e + 1) % p.worldVerts.length]);
+          }
+        }
+      }
+    }
+
+    // Highlight hovered or dragged cut geodesics only (keeps idle look identical on Reshuffle)
+    if (hoveredCutId && real.cutSegments.length > 0) {
+      for (let ti = 0; ti < tiles.length; ti++) {
+        const t = tiles[ti];
+        if (t.r > 0.94) continue;
+        const CM = t.CM || mul3(state.cameraM, t.M);
+        for (const seg of real.cutSegments) {
+          if (seg.cutId !== hoveredCutId) continue;
+          const pA = normTime(apply3(CM, seg.A));
+          const pB = normTime(apply3(CM, seg.B));
+          const dA = poincare(pA);
+          const dB = poincare(pB);
+          const distDisk = Math.hypot(dA[0] - dB[0], dA[1] - dB[1]);
+          if (distDisk < 0.008) continue;
+
+          const pts = geodesicSamples(pA, pB, distDisk > 0.25 ? 12 : 6);
+          ctx.save();
+          ctx.beginPath();
+          for (let k = 0; k < pts.length; k++) {
+            const [px, py] = toPx(pts[k]);
+            if (k === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.strokeStyle = seg.color;
+          ctx.globalAlpha = 0.88;
+          ctx.lineWidth = 2.4;
+          ctx.lineCap = "round";
+          if (seg.isMirrorWall) ctx.setLineDash([6, 3]);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+  }
+
+  // Cone & corner markers culled, scaled, and deduplicated by spatial screen buckets
+  const activeMarkers =
+    coloring !== "pieces" && real.dirichletPoly?.markers?.length ? real.dirichletPoly.markers : real.markers;
+  if (activeMarkers.length > 0) {
+    const markerBuckets = new Map();
+    for (let ti = 0; ti < tiles.length; ti++) {
+      const t = tiles[ti];
+      const CM = t.CM || mul3(state.cameraM, t.M);
+      for (const mk of activeMarkers) {
         const dp = poincare(normTime(apply3(CM, mk.P)));
-        if (Math.hypot(dp[0], dp[1]) > 0.94) continue;
+        const rDisk = Math.hypot(dp[0], dp[1]);
+        if (rDisk > 0.90) continue;
         const [px, py] = toPx(dp);
-        const scale = isFD ? 1.12 : Math.max(0.55, 0.95 - 0.5 * Math.hypot(dp[0], dp[1]));
+        if (!dedupScreenMarker(markerBuckets, px, py, mk.kind, mk.order)) continue;
+        const scale = Math.max(0.55, 1.0 - 0.45 * rDisk);
         drawMarker(ctx, px, py, mk, scale);
       }
     }
@@ -425,9 +920,16 @@ function renderStatusAndMeta() {
         : `${orb.canonical} · χ = ${chiStr} · ${orb.teichDim}D`;
     return;
   }
+  if (orb.geometry === "euclidean") {
+    els.statusBanner.hidden = true;
+    els.orbMeta.textContent =
+      orb.teichDim === 0
+        ? `${orb.canonical} · χ = 0 · Euclidean · Rigid (0D)`
+        : `${orb.canonical} · χ = 0 · Euclidean · ${orb.teichDim}D`;
+    return;
+  }
 
-  const geom = orb.geometry === "spherical" ? "Spherical" : "Euclidean";
-  els.orbMeta.textContent = `${orb.canonical} · χ = ${chiStr} · ${geom}`;
+  els.orbMeta.textContent = `${orb.canonical} · χ = ${chiStr} · Spherical`;
   els.statusBanner.hidden = false;
   els.statusBanner.className = "status-banner";
   els.statusBanner.textContent = "";
@@ -436,12 +938,12 @@ function renderStatusAndMeta() {
   const strongSig = document.createElement("strong");
   strongSig.textContent = orb.canonical;
   const strongGeom = document.createElement("strong");
-  strongGeom.textContent = `${geom} (χ = ${chiStr})`;
+  strongGeom.textContent = `Spherical (χ = ${chiStr})`;
   msg.append(
     strongSig,
     " is ",
     strongGeom,
-    ` with cost ${formatFrac(orb.cost)} — hyperbolic coordinates require χ < 0.`
+    ` with cost ${formatFrac(orb.cost)} — coordinates require χ ≤ 0.`
   );
   els.statusBanner.append(msg);
 
@@ -458,7 +960,7 @@ function renderStatusAndMeta() {
 function updateReshuffleButton() {
   const orb = state.orb;
   const carving = state.carving;
-  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving || carving.cuts.length === 0) {
+  if (!isSupportedGeometry(orb) || !carving || carving.cuts.length === 0) {
     els.btnReshuffle.hidden = true;
     return;
   }
@@ -466,8 +968,54 @@ function updateReshuffleButton() {
   els.btnReshuffle.hidden = false;
   els.btnReshuffle.disabled = !canReshuffle;
   els.btnReshuffle.title = canReshuffle
-    ? "Pick a different random carving"
+    ? "Pick a different carving without changing the orbifold"
     : "Only one carving exists for this orbifold";
+}
+
+function rebuildOnSliderChange() {
+  const orb = state.orb;
+  const oldReal = state.realization;
+  const isEuc = orb.geometry === "euclidean";
+  const oldBase = oldReal?.dirichletBase || null;
+
+  const newReal = isEuc
+    ? buildEuclideanRealization(orb, state.carving, { dirichletBase: oldBase })
+    : buildRealization(orb, state.carving, { dirichletBase: oldBase });
+
+  const sameGens =
+    oldReal?.quotient &&
+    oldReal.gens.length === newReal.gens.length &&
+    oldReal.quotient.quotientSize === newReal.quotient.quotientSize &&
+    oldReal.gens.every((g, i) => g.label === newReal.gens[i].label);
+
+  if (sameGens) {
+    newReal.quotient = oldReal.quotient;
+    if (newReal.dirichletPoly?.sideGens) {
+      const qm = oldReal.quotient.genColorMasks;
+      for (const sg of newReal.dirichletPoly.sideGens) {
+        if (sg.word) {
+          let m = 0;
+          for (let wi = 0; wi < sg.word.length; wi++) m ^= qm[sg.word[wi]];
+          sg.colorMask = m;
+        }
+      }
+    }
+    if (oldBase && newReal.dirichletBase) {
+      const wrapped = isEuc
+        ? wrapPointIntoEucFD(oldBase, newReal.fdPolygons, newReal.gens, oldReal.quotient.genColorMasks)
+        : wrapPointIntoTileI(oldBase, newReal.fdPolygons, newReal.gens, oldReal.quotient.genColorMasks);
+      newReal.pullColorXor = wrapped.colorXor;
+      newReal.pullDetFlip = wrapped.detFlip || 0;
+    }
+  }
+
+  state.realization = newReal;
+  if (newReal.pullColorXor) {
+    state.cameraColor = (state.cameraColor ^ newReal.pullColorXor) & 3;
+  }
+  if (newReal.pullDetFlip) {
+    state.parityFlip ^= newReal.pullDetFlip;
+  }
 }
 
 function renderSliders() {
@@ -475,7 +1023,7 @@ function renderSliders() {
   const orb = state.orb;
   const carving = state.carving;
 
-  if (!orb?.ok || orb.geometry !== "hyperbolic") {
+  if (!isSupportedGeometry(orb)) {
     els.controlsCol.hidden = true;
     updateReshuffleButton();
     return;
@@ -499,17 +1047,24 @@ function renderSliders() {
     group.dataset.cutId = cut.id;
     group.style.borderLeftColor = cut.color;
 
-    group.addEventListener("mouseenter", () => {
-      state.hoveredCutId = cut.id;
-      syncHoverVisuals();
-      scheduleDiskRender(false);
-    });
-    group.addEventListener("mouseleave", () => {
-      if (state.hoveredCutId === cut.id) {
-        state.hoveredCutId = null;
+    let pointerHovered = false;
+    let activeDrag = false;
+    const syncHoverForGroup = () => {
+      const target = pointerHovered || activeDrag ? cut.id : state.hoveredCutId === cut.id ? null : state.hoveredCutId;
+      if (state.hoveredCutId !== target) {
+        state.hoveredCutId = target;
         syncHoverVisuals();
         scheduleDiskRender(false);
       }
+    };
+
+    group.addEventListener("mouseenter", () => {
+      pointerHovered = true;
+      syncHoverForGroup();
+    });
+    group.addEventListener("mouseleave", () => {
+      pointerHovered = false;
+      syncHoverForGroup();
     });
 
     const head = document.createElement("div");
@@ -537,6 +1092,11 @@ function renderSliders() {
       cut.kind === "bridge-arc";
     const lenSymText = isArcOrCrosscap ? "d" : "ℓ";
 
+    const defMin = cut.kind === "crosscap" ? 0.15 : 0.25;
+    const defMax = cut.kind === "crosscap" ? 2.75 : 5.5;
+    const minVal = Math.min(defMin, Math.max(0.05, Math.floor(cut.length * 10) / 10 - 0.1));
+    const maxVal = Math.max(defMax, Math.ceil(cut.length * 10) / 10 + 0.5);
+
     const lenRow = document.createElement("div");
     lenRow.className = "param-row";
     const lenSym = document.createElement("span");
@@ -546,9 +1106,9 @@ function renderSliders() {
     const lenInput = document.createElement("input");
     lenInput.type = "range";
     lenInput.className = "fn-range";
-    lenInput.min = cut.kind === "crosscap" ? "0.15" : "0.25";
-    lenInput.max = cut.kind === "crosscap" ? "2.75" : "5.5";
-    lenInput.step = "0.01";
+    lenInput.min = String(minVal);
+    lenInput.max = String(maxVal);
+    lenInput.step = "0.005";
     lenInput.value = String(cut.length);
     lenInput.style.accentColor = cut.color;
     lenInput.setAttribute("aria-label", `${cut.name} ${lenSymText}`);
@@ -557,13 +1117,29 @@ function renderSliders() {
     lenVal.className = "param-val";
     lenVal.textContent = cut.length.toFixed(2);
 
+    lenInput.addEventListener("pointerdown", () => {
+      activeDrag = true;
+      syncHoverForGroup();
+    });
+    lenInput.addEventListener("pointerup", () => {
+      activeDrag = false;
+      syncHoverForGroup();
+    });
+    lenInput.addEventListener("blur", () => {
+      activeDrag = false;
+      syncHoverForGroup();
+    });
     lenInput.addEventListener("input", () => {
       cut.length = parseFloat(lenInput.value);
       lenVal.textContent = cut.length.toFixed(2);
-      state.realization = buildRealization(state.orb, state.carving);
+      rebuildOnSliderChange();
       scheduleDiskRender(true);
     });
-    lenInput.addEventListener("change", () => scheduleDiskRender(false));
+    lenInput.addEventListener("change", () => {
+      activeDrag = false;
+      syncHoverForGroup();
+      scheduleDiskRender(false);
+    });
 
     lenRow.append(lenSym, lenInput, lenVal);
     group.append(lenRow);
@@ -581,7 +1157,7 @@ function renderSliders() {
       twInput.className = "fn-range";
       twInput.min = "-1";
       twInput.max = "1";
-      twInput.step = "0.005";
+      twInput.step = "0.002";
       twInput.value = String(cut.twistTurns);
       twInput.style.accentColor = cut.color;
       twInput.setAttribute("aria-label", `${cut.name} twist`);
@@ -591,13 +1167,29 @@ function renderSliders() {
       twVal.className = "param-val";
       twVal.textContent = formatTw(cut.twistTurns);
 
+      twInput.addEventListener("pointerdown", () => {
+        activeDrag = true;
+        syncHoverForGroup();
+      });
+      twInput.addEventListener("pointerup", () => {
+        activeDrag = false;
+        syncHoverForGroup();
+      });
+      twInput.addEventListener("blur", () => {
+        activeDrag = false;
+        syncHoverForGroup();
+      });
       twInput.addEventListener("input", () => {
         cut.twistTurns = parseFloat(twInput.value);
         twVal.textContent = formatTw(cut.twistTurns);
-        state.realization = buildRealization(state.orb, state.carving);
+        rebuildOnSliderChange();
         scheduleDiskRender(true);
       });
-      twInput.addEventListener("change", () => scheduleDiskRender(false));
+      twInput.addEventListener("change", () => {
+        activeDrag = false;
+        syncHoverForGroup();
+        scheduleDiskRender(false);
+      });
 
       twRow.append(twSym, twInput, twVal);
       group.append(twRow);
@@ -631,9 +1223,10 @@ function updateColorSelectLabels() {
 
 function renderAllViews(resetCamera = false) {
   if (resetCamera) {
-    state.cameraM = ID3;
+    state.cameraM = identityCamera(state.orb);
     state.cameraWrapped = false;
     state.cameraColor = 0;
+    state.parityFlip = 0;
   }
   renderStatusAndMeta();
   updateColorSelectLabels();
@@ -658,6 +1251,9 @@ function loadSignature(rawSig, pushUrl = true) {
   if (parsed.ok && parsed.geometry === "hyperbolic") {
     state.carving = createRandomCarving(parsed);
     state.realization = buildRealization(parsed, state.carving);
+  } else if (parsed.ok && parsed.geometry === "euclidean") {
+    state.carving = createDefaultCarving(parsed);
+    state.realization = buildEuclideanRealization(parsed, state.carving);
   } else {
     state.carving = null;
     state.realization = null;
@@ -681,13 +1277,60 @@ els.colorSelect?.addEventListener("change", () => {
 });
 
 els.btnReshuffle?.addEventListener("click", () => {
-  if (!state.orb?.ok || state.orb.geometry !== "hyperbolic") return;
+  const orb = state.orb;
+  if (!isSupportedGeometry(orb) || !state.carving || !state.realization) return;
+  const isEuc = orb.geometry === "euclidean";
+
+  let res = null;
+  let fallbackRes = null;
+  let lastSeenSig = "";
+  for (let attempt = 0; attempt < 6; attempt++) {
+    const candidate = createRandomCarving(orb, state.carving);
+    const sig = JSON.stringify(candidate.cuts.map((c) => c.pair));
+    if (attempt > 0 && sig === lastSeenSig) continue;
+    lastSeenSig = sig;
+    let curRes = null;
+    try {
+      curRes = isEuc
+        ? recutEuclidean(orb, state.carving, state.realization, candidate)
+        : recutHyperbolic(orb, state.carving, state.realization, candidate);
+    } catch {
+      curRes = null;
+    }
+    if (curRes) {
+      if (!fallbackRes) fallbackRes = curRes;
+      if (curRes.realization.quotient?.exactTransferred !== false) {
+        res = curRes;
+        break;
+      }
+    }
+  }
+  if (!res) res = fallbackRes;
+  if (!res) return;
+
   state.hoveredCutId = null;
-  state.carving = createRandomCarving(state.orb, state.carving);
-  state.realization = buildRealization(state.orb, state.carving);
-  state.cameraM = ID3;
-  state.cameraWrapped = false;
-  state.cameraColor = 0;
+  state.carving = res.carving;
+  state.realization = res.realization;
+  state.cameraColor = (state.cameraColor ^ (res.colorXor || 0)) & 3;
+  state.parityFlip ^= res.detFlip || 0;
+  state.cameraWrapped = true;
+
+  if (isEuc) {
+    state.cameraM = emul3(state.cameraM, res.invQ);
+    const wrapped = wrapEuclideanCameraWithColor(state.cameraM, state.realization);
+    state.cameraM = wrapped.cameraE;
+    state.cameraColor = (state.cameraColor ^ wrapped.colorXor) & 3;
+  } else {
+    let nextCam = mul3(state.cameraM, res.invQ);
+    if (nextCam[2][2] <= 5000) nextCam = reorthonormalizeLorentz(nextCam);
+    state.cameraM = nextCam;
+    if (state.cameraM[2][2] > 2.0) {
+      const wrapped = wrapCameraInGroupWithColor(state.cameraM, state.realization);
+      state.cameraM = wrapped.cameraM;
+      state.cameraColor = (state.cameraColor ^ wrapped.colorXor) & 3;
+    }
+  }
+
   updateColorSelectLabels();
   renderSliders();
   scheduleDiskRender(false);
@@ -696,6 +1339,7 @@ els.btnReshuffle?.addEventListener("click", () => {
 if (els.canvas) {
   const activePointers = new Map();
   let dragStartPt = null;
+  let dragStartPx = null;
   let dragStartCamera = null;
 
   const clientCoordsToDisk = (clientX, clientY) => {
@@ -716,6 +1360,7 @@ if (els.canvas) {
   const resetDragAnchor = () => {
     if (activePointers.size === 0) {
       dragStartPt = null;
+      dragStartPx = null;
       dragStartCamera = null;
       return;
     }
@@ -725,7 +1370,10 @@ if (els.canvas) {
       sx += p.clientX;
       sy += p.clientY;
     }
-    dragStartPt = clientCoordsToDisk(sx / activePointers.size, sy / activePointers.size);
+    const mx = sx / activePointers.size;
+    const my = sy / activePointers.size;
+    dragStartPx = [mx, my];
+    dragStartPt = clientCoordsToDisk(mx, my);
     dragStartCamera = state.cameraM;
   };
 
@@ -737,7 +1385,7 @@ if (els.canvas) {
   });
 
   els.canvas.addEventListener("pointermove", (e) => {
-    if (!dragStartPt || !activePointers.has(e.pointerId)) return;
+    if (!state.realization || !activePointers.has(e.pointerId)) return;
     activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
     let sx = 0;
     let sy = 0;
@@ -745,7 +1393,30 @@ if (els.canvas) {
       sx += p.clientX;
       sy += p.clientY;
     }
-    const curPt = clientCoordsToDisk(sx / activePointers.size, sy / activePointers.size);
+    const mx = sx / activePointers.size;
+    const my = sy / activePointers.size;
+
+    if (state.realization.geometry === "euclidean") {
+      if (!dragStartPx) return;
+      const rect = els.canvas.getBoundingClientRect();
+      const scalePx = rect.width / (2 * EUC_VIEW_R);
+      const dx = (mx - dragStartPx[0]) / scalePx;
+      const dy = -(my - dragStartPx[1]) / scalePx;
+      const res = panEuclideanCamera(dragStartCamera, dx, dy, state.realization);
+      let nextCam = res.cameraE;
+      if (res.wrapped) {
+        state.cameraWrapped = true;
+        state.cameraColor = (state.cameraColor ^ res.colorXor) & 3;
+        dragStartPx = [mx, my];
+        dragStartCamera = nextCam;
+      }
+      state.cameraM = nextCam;
+      scheduleDiskRender(true);
+      return;
+    }
+
+    if (!dragStartPt) return;
+    const curPt = clientCoordsToDisk(mx, my);
     const Pstart = liftDisk(dragStartPt[0], dragStartPt[1]);
     const Pcur = liftDisk(curPt[0], curPt[1]);
     const M1 = mobiusTranslateToOrigin(Pstart);
@@ -755,7 +1426,7 @@ if (els.canvas) {
       const wrappedRes = wrapCameraInGroupWithColor(nextCam, state.realization);
       nextCam = wrappedRes.cameraM;
       state.cameraWrapped = true;
-      state.cameraColor ^= wrappedRes.colorXor;
+      state.cameraColor = (state.cameraColor ^ wrappedRes.colorXor) & 3;
       dragStartPt = curPt;
       dragStartCamera = nextCam;
     }
@@ -766,6 +1437,14 @@ if (els.canvas) {
   const endDrag = (e) => {
     if (!activePointers.has(e.pointerId)) return;
     activePointers.delete(e.pointerId);
+    if (activePointers.size === 0 && state.realization?.geometry === "euclidean") {
+      const wrapped = wrapEuclideanCameraWithColor(state.cameraM, state.realization);
+      state.cameraM = wrapped.cameraE;
+      if (wrapped.colorXor) {
+        state.cameraWrapped = true;
+        state.cameraColor = (state.cameraColor ^ wrapped.colorXor) & 3;
+      }
+    }
     resetDragAnchor();
     if (activePointers.size === 0) {
       scheduleDiskRender(false);
@@ -778,31 +1457,48 @@ if (els.canvas) {
     "wheel",
     (e) => {
       if (!state.realization || e.ctrlKey) return;
+      const isEuc = state.realization.geometry === "euclidean";
       const rect = els.canvas.getBoundingClientRect();
       const R = rect.width * 0.48;
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      if (Math.hypot(e.clientX - cx, e.clientY - cy) > R + 4) return;
+      if (!isEuc && Math.hypot(e.clientX - cx, e.clientY - cy) > R + 4) return;
 
       e.preventDefault();
-      let dx = e.deltaX;
-      let dy = e.deltaY;
+      let dxPx = e.deltaX;
+      let dyPx = e.deltaY;
       if (e.deltaMode === 1) {
-        dx *= 16;
-        dy *= 16;
+        dxPx *= 16;
+        dyPx *= 16;
       } else if (e.deltaMode === 2) {
-        dx *= rect.height * 0.5;
-        dy *= rect.height * 0.5;
+        dxPx *= rect.height * 0.5;
+        dyPx *= rect.height * 0.5;
       }
+
+      if (isEuc) {
+        const scalePx = rect.width / (2 * EUC_VIEW_R);
+        const dx = -dxPx / scalePx;
+        const dy = dyPx / scalePx;
+        if (Math.hypot(dx, dy) < 1e-6) return;
+        const res = panEuclideanCamera(state.cameraM, dx, dy, state.realization);
+        state.cameraM = res.cameraE;
+        if (res.wrapped) {
+          state.cameraWrapped = true;
+          state.cameraColor = (state.cameraColor ^ res.colorXor) & 3;
+        }
+        scheduleDiskRender(true);
+        return;
+      }
+
       const scale = Math.max(120, R * 1.15);
-      const du = -dx / scale;
-      const dv = dy / scale;
+      const du = -dxPx / scale;
+      const dv = dyPx / scale;
       if (Math.hypot(du, dv) < 1e-6) return;
       const res = panCameraByDiskDelta(state.cameraM, du, dv, state.realization);
       state.cameraM = res.cameraM;
       if (res.wrapped) {
         state.cameraWrapped = true;
-        state.cameraColor ^= res.colorXor;
+        state.cameraColor = (state.cameraColor ^ res.colorXor) & 3;
       }
       scheduleDiskRender(true);
     },
@@ -810,9 +1506,10 @@ if (els.canvas) {
   );
 
   els.canvas.addEventListener("dblclick", () => {
-    state.cameraM = ID3;
+    state.cameraM = identityCamera(state.orb);
     state.cameraWrapped = false;
     state.cameraColor = 0;
+    state.parityFlip = 0;
     scheduleDiskRender(false);
   });
 }

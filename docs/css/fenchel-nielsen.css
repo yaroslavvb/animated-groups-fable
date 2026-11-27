@@ -180,6 +180,10 @@ body.fn-page {
   user-select: none;
 }
 #disk-canvas:active { cursor: grabbing; }
+#disk-canvas.is-euclidean {
+  border-radius: 10px;
+  border: 1px solid var(--fn-ink);
+}
 
 .disk-hint {
   font-size: 12px;

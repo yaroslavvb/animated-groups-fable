@@ -33,8 +33,19 @@ import {
   panCameraByDiskDelta,
   wrapCameraInGroupWithColor,
   buildRealization,
-  generateTiling
+  generateTiling,
+  recutHyperbolic
 } from "../docs/js/fenchel-nielsen/hyperbolic.js";
+import {
+  EID3,
+  emul3,
+  edet3,
+  eapply,
+  polygonAreaE,
+  buildEuclideanRealization,
+  generateEuclideanTiling,
+  recutEuclidean
+} from "../docs/js/fenchel-nielsen/euclidean.js";
 
 function matPow(M, k) {
   let acc = ID3;
@@ -451,6 +462,218 @@ console.log("7. Checking Z_2^2 quotient coloring solver, zero homomorphism contr
     verifyTilingHomomorphism(`${sig}#panned`, r, pannedTiles, cameraColor);
     const wrappedRes = wrapCameraInGroupWithColor(cameraM, r);
     assert(typeof wrappedRes.colorXor === "number");
+  }
+}
+
+// ============================================================================
+// 8. Euclidean Orbifolds (All 17) & Stationary Recut Invariance
+// ============================================================================
+{
+  const verifyEucHomomorphism = (label, r, tiles) => {
+    const masks = r.quotient?.genColorMasks;
+    if (!masks || r.quotient.quotientSize <= 1) return;
+    const p0 = r.fdPolygons[0].centroid;
+    const tp1 = p0;
+    const tp2 = [p0[0] + 0.031, p0[1] - 0.023];
+    const buckets = new Map();
+    const scale = 40;
+    for (const t of tiles) {
+      const a1 = eapply(t.CM, tp1);
+      const a2 = eapply(t.CM, tp2);
+      const bx = Math.round(a1[0] * scale);
+      const by = Math.round(a1[1] * scale);
+      const key = `${bx},${by}`;
+      if (!buckets.has(key)) buckets.set(key, []);
+      buckets.get(key).push({ detPos: t.detPos, a1, a2, color: t.color });
+    }
+    let checked = 0;
+    for (const t of tiles) {
+      if (t.r > 2.2) continue;
+      for (let gi = 0; gi < r.gens.length; gi++) {
+        const CM2 = emul3(t.CM, r.gens[gi].M);
+        const detPos = edet3(CM2) >= 0;
+        const a1 = eapply(CM2, tp1);
+        const a2 = eapply(CM2, tp2);
+        const bx = Math.round(a1[0] * scale);
+        const by = Math.round(a1[1] * scale);
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const list = buckets.get(`${bx + dx},${by + dy}`);
+            if (!list) continue;
+            for (const t2 of list) {
+              if (t2.detPos !== detPos) continue;
+              if (Math.hypot(a1[0] - t2.a1[0], a1[1] - t2.a1[1]) < 1e-4 &&
+                  Math.hypot(a2[0] - t2.a2[0], a2[1] - t2.a2[1]) < 1e-4) {
+                checked++;
+                assert.equal(
+                  t.color ^ masks[gi],
+                  t2.color,
+                  `${label}: Euclidean quotient contradiction on gen ${gi}`
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    assert(checked > 0, `${label}: no Euclidean Cayley edges verified`);
+  };
+
+  // 8a. All 17 wallpaper groups
+  const EUC_17 = [
+    "2222", "o", "*2222",
+    "2*22", "22*", "22x", "**", "*x", "xx",
+    "*442", "442", "4*2", "*632", "632", "*333", "3*3", "333"
+  ];
+  for (const sig of EUC_17) {
+    const orb = parseOrbifold(sig);
+    assert(orb.ok && orb.geometry === "euclidean", `${sig}: expected valid euclidean orbifold`);
+    const c = createDefaultCarving(orb);
+    const r = buildEuclideanRealization(orb, c);
+    assert(r.areaError < 1e-6, `${sig}: areaError=${r.areaError}`);
+    assert(r.maxIsometryError < 1e-10, `${sig}: maxIsometryError=${r.maxIsometryError}`);
+    if (r.dirichletPoly) {
+      const dArea = Math.abs(polygonAreaE(r.dirichletPoly.vertsE));
+      assert(Math.abs(dArea - r.expectedArea) < 1e-6, `${sig}: dirichlet area ${dArea} vs ${r.expectedArea}`);
+    }
+    const tiles = generateEuclideanTiling(r, EID3, { viewRadius: 3.5, maxTiles: 450, cameraColor: 0 });
+    assert(tiles.length > 0, `${sig}: empty Euclidean tiling`);
+    verifyEucHomomorphism(sig, r, tiles);
+  }
+
+  // 8b. Stationary recutEuclidean invariance on 2222 (at handles.js params), o, *2222
+  const checkEucMarkers = (oldR, newR, Q) => {
+    const tiles = generateEuclideanTiling(newR, EID3, { viewRadius: 5.5, maxTiles: 700, cameraColor: 0 });
+    let worst = 0;
+    for (const mk of oldR.markers) {
+      const tp = eapply(Q, mk.P);
+      let best = Infinity;
+      for (const tile of tiles) {
+        for (const nmk of newR.markers) {
+          if (nmk.kind !== mk.kind || nmk.order !== mk.order) continue;
+          const np = eapply(tile.CM, nmk.P);
+          best = Math.min(best, Math.hypot(np[0] - tp[0], np[1] - tp[1]));
+        }
+      }
+      if (best > worst) worst = best;
+    }
+    return worst;
+  };
+
+  {
+    const orb2 = parseOrbifold("2222");
+    let c2 = createDefaultCarving(orb2);
+    c2.cuts[0].length = 1.186;
+    c2.cuts[0].twistTurns = -0.0596;
+    let r2 = buildEuclideanRealization(orb2, c2);
+    for (let s = 0; s < 12; s++) {
+      const next = createRandomCarving(orb2, c2);
+      const res = recutEuclidean(orb2, c2, r2, next);
+      assert(res && res.realization.areaError < 1e-9, `2222 step ${s} areaError`);
+      assert(res.realization.maxIsometryError < 1e-10, `2222 step ${s} isomError`);
+      assert(res.realization.quotient.exactTransferred === true, `2222 step ${s} quotient transfer failed`);
+      const err = checkEucMarkers(r2, res.realization, res.Q);
+      assert(err < 1e-8, `2222 step ${s} marker lattice drift ${err}`);
+      const dArea = Math.abs(polygonAreaE(res.realization.dirichletPoly.vertsE));
+      assert(Math.abs(dArea - res.realization.expectedArea) < 1e-6, `2222 step ${s} dirichlet area`);
+      const tiles = generateEuclideanTiling(res.realization, EID3, { viewRadius: 3.5, maxTiles: 450, cameraColor: 0, useDirichlet: true });
+      verifyEucHomomorphism(`2222#${s}`, res.realization, tiles);
+      c2 = res.carving;
+      r2 = res.realization;
+    }
+
+    for (const sig of ["o", "*2222"]) {
+      const orb = parseOrbifold(sig);
+      let curC = createDefaultCarving(orb);
+      let curR = buildEuclideanRealization(orb, curC);
+      for (let s = 0; s < 5; s++) {
+        const res = recutEuclidean(orb, curC, curR, createRandomCarving(orb, curC));
+        assert(res && res.realization.areaError < 1e-9, `${sig} step ${s} areaError`);
+        assert(res.realization.quotient.exactTransferred === true, `${sig} step ${s} quotient transfer failed`);
+        const err = checkEucMarkers(curR, res.realization, res.Q);
+        assert(err < 1e-8, `${sig} step ${s} marker lattice drift ${err}`);
+        const tiles = generateEuclideanTiling(res.realization, EID3, { viewRadius: 3.5, maxTiles: 450, cameraColor: 0, useDirichlet: Boolean(res.realization.dirichletPoly) });
+        verifyEucHomomorphism(`${sig}#${s}`, res.realization, tiles);
+        curC = res.carving;
+        curR = res.realization;
+      }
+    }
+  }
+
+  // 8c. Stationary recutHyperbolic invariance across all multi-carving modes
+  const checkHypMarkers = (oldR, newR, Q) => {
+    const center = newR.fdPolygons?.[0]?.centroid;
+    let worst = 0;
+    for (const mk of oldR.markers) {
+      let targetP = normTime(apply3(Q, mk.P));
+      if (center) {
+        let curD = -mdot(targetP, center);
+        for (let step = 0; step < 60; step++) {
+          let bestPt = null;
+          let bestD = curD;
+          for (const g of newR.gens) {
+            const cand = normTime(apply3(g.M, targetP));
+            const d = -mdot(cand, center);
+            if (d < bestD - 1e-6) {
+              bestD = d;
+              bestPt = cand;
+            }
+          }
+          if (!bestPt) break;
+          targetP = bestPt;
+          curD = bestD;
+        }
+      }
+      const t = targetP[2], x = targetP[0], y = targetP[1], tp1 = 1 + t;
+      const invB = [
+        [1 + (x * x) / tp1, (x * y) / tp1, -x],
+        [(x * y) / tp1, 1 + (y * y) / tp1, -y],
+        [-x, -y, t]
+      ];
+      const tiles = generateTiling(newR, invB, { maxPolys: 1600, rMax: 0.99 });
+      let best = Infinity;
+      for (const tile of tiles) {
+        for (const nmk of newR.markers) {
+          if (nmk.kind !== mk.kind || nmk.order !== mk.order) continue;
+          best = Math.min(best, hypDist(normTime(apply3(tile.M, nmk.P)), targetP));
+        }
+      }
+      if (best > worst) worst = best;
+    }
+    return worst;
+  };
+
+  const HYP_RECUT_SIGS = [
+    "3322", "2223", "2345", "22223", "222222", "oo", "o22", "222x",
+    "*3333", "*2345", "*22222", "2*222", "2*234", "22*222", "o*222", "*22*222"
+  ];
+  for (const sig of HYP_RECUT_SIGS) {
+    const orb = parseOrbifold(sig);
+    let curC = createDefaultCarving(orb);
+    let curR = buildRealization(orb, curC);
+    for (let s = 0; s < 3; s++) {
+      const nextC = createRandomCarving(orb, curC);
+      const res = recutHyperbolic(orb, curC, curR, nextC);
+      assert(res, `${sig} step ${s}: recutHyperbolic returned null`);
+      const { carving, realization, Q } = res;
+      assert(realization.areaError < 1e-5, `${sig} step ${s}: areaError=${realization.areaError}`);
+      assert(realization.maxLorentzError < 1e-4, `${sig} step ${s}: lorentzError=${realization.maxLorentzError}`);
+      assert(realization.quotient.exactTransferred === true, `${sig} step ${s}: quotient transfer fallback`);
+      const hd = checkHypMarkers(curR, realization, Q);
+      assert(hd < 1e-3, `${sig} step ${s}: marker orbit hypDist=${hd}`);
+      if (realization.dirichletPoly) {
+        let ang = 0;
+        const nrm = realization.dirichletPoly.sideOutNormals;
+        for (let i = 0; i < nrm.length; i++) {
+          const c = Math.max(-1, Math.min(1, -mdot(nrm[(i - 1 + nrm.length) % nrm.length], nrm[i])));
+          ang += Math.acos(c);
+        }
+        const dArea = (nrm.length - 2) * Math.PI - ang;
+        assert(Math.abs(dArea - orb.areaNum) < 1e-4, `${sig} step ${s}: Dirichlet area mismatch ${dArea} vs ${orb.areaNum}`);
+      }
+      curC = carving;
+      curR = realization;
+    }
   }
 }
 

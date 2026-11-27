@@ -331,6 +331,7 @@ export function parseOrbifold(input) {
   }));
 
   const nTop = 2 * g + k + m + b;
+  let teichDimOut = teichDim;
   let mode = "non-hyperbolic";
   if (geometry === "hyperbolic") {
     if (teichDim === 0) {
@@ -349,6 +350,30 @@ export function parseOrbifold(input) {
         raw,
         error: `Unsupported hyperbolic topology "${canonical}" (nTop=${nTop}, dim=${teichDim}).`
       };
+    }
+  } else if (geometry === "euclidean") {
+    if (g === 0 && k === 0 && m === 4 && b === 0) {
+      mode = "euc-2222";
+      teichDimOut = 2;
+    } else if (g === 1 && k === 0 && m === 0 && b === 0) {
+      mode = "euc-torus";
+      teichDimOut = 2;
+    } else if (g === 0 && k === 0 && m === 0 && b === 1 && n === 4) {
+      mode = "euc-rect-mirror";
+      teichDimOut = 1;
+    } else if (
+      (g === 0 && k === 0 && m === 1 && b === 1 && n === 2) || // 2*22
+      (g === 0 && k === 0 && m === 2 && b === 1 && n === 0) || // 22*
+      (g === 0 && k === 1 && m === 2 && b === 0) ||            // 22x
+      (g === 0 && k === 0 && m === 0 && b === 2 && n === 0) || // **
+      (g === 0 && k === 1 && m === 0 && b === 1 && n === 0) || // *x
+      (g === 0 && k === 2 && m === 0 && b === 0)               // xx
+    ) {
+      mode = "euc-1d";
+      teichDimOut = 1;
+    } else {
+      mode = "euc-rigid";
+      teichDimOut = 0;
     }
   }
 
@@ -370,14 +395,17 @@ export function parseOrbifold(input) {
     chi,
     areaOverPi,
     areaNum,
-    teichDim,
+    teichDim: teichDimOut,
     geometry,
     mode,
     coneItems,
     mirrorLoops,
     handleItems,
     crosscapItems,
-    suggestion: geometry === "hyperbolic" ? null : suggestHyperbolic(canonical, { handles: g, crosscaps: k, cones, mirrors })
+    suggestion:
+      geometry === "hyperbolic" || geometry === "euclidean"
+        ? null
+        : suggestHyperbolic(canonical, { handles: g, crosscaps: k, cones, mirrors })
   };
 }
 
@@ -456,7 +484,7 @@ function defaultCutValues(kind, idx) {
  * Create the initial cuts array and build the carving pieces tree.
  */
 export function createDefaultCarving(orb) {
-  if (!orb.ok || orb.geometry !== "hyperbolic") {
+  if (!orb.ok || (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean")) {
     return { cuts: [], rootId: null, pieces: [], steps: [] };
   }
 
@@ -477,6 +505,60 @@ export function createDefaultCarving(orb) {
       ...spec
     });
   };
+
+  if (orb.geometry === "euclidean") {
+    if (orb.mode === "euc-2222") {
+      pushCut({
+        kind: "pair",
+        name: "γ₁",
+        hasTwist: true,
+        length: 1.18,
+        twistTurns: 0,
+        pair: ["cone:0", "cone:1"],
+        desc: "Euclidean pillowcase geodesic"
+      });
+    } else if (orb.mode === "euc-torus") {
+      pushCut({
+        kind: "handle",
+        name: "h₁",
+        hasTwist: true,
+        targetId: "handle:0",
+        length: 1.18,
+        twistTurns: 0,
+        pair: ["e1", "e2"],
+        desc: "Flat torus basis loop"
+      });
+    } else if (orb.mode === "euc-rect-mirror") {
+      pushCut({
+        kind: "mirror-arc",
+        name: "α₁",
+        hasTwist: false,
+        loopIndex: 0,
+        length: 1.25,
+        pair: ["corner:0:0", "corner:0:1"],
+        desc: "Rectangle orthogeodesic midline"
+      });
+    } else if (orb.mode === "euc-1d") {
+      const kind =
+        orb.k > 0
+          ? "crosscap"
+          : orb.b === 2
+          ? "collar"
+          : orb.n > 0
+          ? "mirror-arc"
+          : "smooth-mirror";
+      const name = kind === "mirror-arc" ? "α₁" : kind === "crosscap" ? "x₁" : "γ₁";
+      pushCut({
+        kind,
+        name,
+        hasTwist: false,
+        length: 1.25,
+        pair: null,
+        desc: `Euclidean 1D shape parameter (${orb.canonical})`
+      });
+    }
+    return rebuildCarving(orb, { cuts });
+  }
 
   if (orb.mode === "mirror-poly") {
     const ring = orb.mirrorLoops[0].corners.map((c) => c.id);
@@ -723,7 +805,7 @@ function getPoolDisplayItem(id, orb, cutById) {
  * Rebuild pieces tree, repair invalid downstream pairs cleanly, and collect per-step UI options.
  */
 export function rebuildCarving(orb, inputCarving) {
-  if (!orb.ok || orb.geometry !== "hyperbolic") {
+  if (!orb.ok || (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean")) {
     return { cuts: [], pieces: [], rootId: null, steps: [] };
   }
 
@@ -733,6 +815,135 @@ export function rebuildCarving(orb, inputCarving) {
 
   const pieces = [];
   const steps = new Array(cuts.length);
+
+  if (orb.geometry === "euclidean") {
+    if (orb.mode === "euc-rigid") {
+      pieces.push({
+        id: "piece:0",
+        kind: "euc-rigid",
+        features: [],
+        degenerate: false
+      });
+      return { cuts, pieces, rootId: "piece:0", steps };
+    }
+    if (orb.mode === "euc-2222") {
+      const cut = cuts[0];
+      const pool = ["cone:0", "cone:1", "cone:2", "cone:3"];
+      let [a, b] = cut.pair || [];
+      if (!pool.includes(a) || !pool.includes(b) || a === b) {
+        a = "cone:0";
+        b = "cone:1";
+        cut.pair = [a, b];
+      }
+      const validPairs = [];
+      for (let i = 0; i < 4; i++) {
+        for (let j = i + 1; j < 4; j++) validPairs.push([pool[i], pool[j]]);
+      }
+      steps[0] = {
+        cutId: cut.id,
+        pairMode: "any",
+        selectableIds: [...pool],
+        validPairs,
+        currentPair: [...cut.pair],
+        itemsDisplay: pool.map((id) => getPoolDisplayItem(id, orb, cutById))
+      };
+      const rest = pool.filter((id) => id !== a && id !== b);
+      pieces.push(
+        {
+          id: `piece:pant:${cut.id}`,
+          kind: "pant",
+          features: [makeItemNode(a, orb, labelMap), makeItemNode(b, orb, labelMap), { id: cut.id, kind: "cut", cutId: cut.id, label: cut.name, color: cut.color }],
+          boundaryCutId: cut.id,
+          degenerate: false
+        },
+        {
+          id: "piece:pant-final",
+          kind: "pant",
+          features: [makeItemNode(rest[0], orb, labelMap), makeItemNode(rest[1], orb, labelMap), { id: cut.id, kind: "cut", cutId: cut.id, label: cut.name, color: cut.color }],
+          boundaryCutId: null,
+          degenerate: false
+        }
+      );
+      return { cuts, pieces, rootId: `piece:pant:${cut.id}`, steps };
+    }
+    if (orb.mode === "euc-torus") {
+      const cut = cuts[0];
+      const basisPairs = [
+        ["e1", "e2"],
+        ["e2", "e3"],
+        ["e3", "e1"]
+      ];
+      let [a, b] = cut.pair || [];
+      const match = basisPairs.some(([u, v]) => (u === a && v === b) || (u === b && v === a));
+      if (!match) {
+        cut.pair = ["e1", "e2"];
+      } else {
+        const canonicalPair = basisPairs.find(([u, v]) => (u === a && v === b) || (u === b && v === a));
+        cut.pair = [...canonicalPair];
+      }
+      steps[0] = {
+        cutId: cut.id,
+        pairMode: "torus-basis",
+        selectableIds: ["e1", "e2", "e3"],
+        validPairs: basisPairs,
+        currentPair: [...cut.pair],
+        itemsDisplay: []
+      };
+      pieces.push({ id: "piece:0", kind: "euc-torus", features: [], degenerate: false });
+      return { cuts, pieces, rootId: "piece:0", steps };
+    }
+    if (orb.mode === "euc-rect-mirror") {
+      const cut = cuts[0];
+      const ring = orb.mirrorLoops[0].corners.map((c) => c.id);
+      const adj = adjacentPairsOfRing(ring);
+      let idx = cut.pair ? isPairMatchingRing(ring, cut.pair[0], cut.pair[1]) : -1;
+      if (idx === -1) {
+        idx = 0;
+        cut.pair = [adj[0][0], adj[0][1]];
+      } else {
+        cut.pair = [ring[idx], ring[(idx + 1) % ring.length]];
+      }
+      steps[0] = {
+        cutId: cut.id,
+        pairMode: "adjacent",
+        selectableIds: [...ring],
+        validPairs: adj.map(([u, v]) => [u, v]),
+        currentPair: [...cut.pair],
+        itemsDisplay: ring.map((id) => getPoolDisplayItem(id, orb, cutById))
+      };
+      const [u, v] = cut.pair;
+      const rem = ring.filter((id) => id !== u && id !== v);
+      pieces.push(
+        {
+          id: `piece:cut:${cut.id}`,
+          kind: "mirror-poly",
+          features: [makeItemNode(u, orb, labelMap), makeItemNode(v, orb, labelMap), { id: cut.id, kind: "cut", cutId: cut.id, label: cut.name, color: cut.color }],
+          boundaryCutId: cut.id,
+          degenerate: false
+        },
+        {
+          id: "piece:final",
+          kind: "mirror-poly",
+          features: [makeItemNode(rem[0], orb, labelMap), makeItemNode(rem[1], orb, labelMap), { id: cut.id, kind: "cut", cutId: cut.id, label: cut.name, color: cut.color }],
+          boundaryCutId: null,
+          degenerate: false
+        }
+      );
+      return { cuts, pieces, rootId: `piece:cut:${cut.id}`, steps };
+    }
+    // euc-1d
+    const cut = cuts[0];
+    steps[0] = {
+      cutId: cut.id,
+      pairMode: "none",
+      selectableIds: [],
+      validPairs: [],
+      currentPair: null,
+      itemsDisplay: []
+    };
+    pieces.push({ id: "piece:0", kind: "euc-1d", features: [], degenerate: false });
+    return { cuts, pieces, rootId: "piece:0", steps };
+  }
 
   const isDegenerateTwoCone = (fList) => {
     const orders = fList.filter((f) => f.kind === "cone").map((f) => f.order);
@@ -1442,12 +1653,21 @@ function collectSpherePool(orb) {
  * under cut reordering and inside/outside orientation swaps.
  */
 export function carvingPartitionSignature(orb, carving) {
-  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving) return "";
-  if (orb.mode === "rigid") return "rigid";
+  if (!orb?.ok || (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean") || !carving) return "";
+  if (orb.mode === "rigid" || orb.mode === "euc-rigid") return orb.mode;
+  if (orb.mode === "euc-1d") return "euc-1d";
+  if (orb.mode === "euc-torus") {
+    return `torus:${(carving.cuts[0]?.pair || ["e1", "e2"]).join(",")}`;
+  }
 
   const leavesOf = buildLeafResolver(carving.pieces);
 
-  if (orb.mode === "mirror-poly") {
+  if (orb.mode === "euc-2222") {
+    const U = ["cone:0", "cone:1", "cone:2", "cone:3"];
+    return bipartitionKey(...splitUniverse(leavesOf(carving.cuts[0].id), U));
+  }
+
+  if (orb.mode === "mirror-poly" || orb.mode === "euc-rect-mirror") {
     const U = orb.mirrorLoops[0].corners.map((c) => c.id);
     const keys = carving.cuts
       .filter((c) => c.kind === "mirror-arc")
@@ -1500,8 +1720,11 @@ export function carvingPartitionSignature(orb, carving) {
  * prefer geometrically distinct carvings (e.g. Snowflake vs Caterpillar) on Reshuffle.
  */
 export function carvingShapeSignature(orb, carving) {
-  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving) return "";
-  if (orb.mode === "rigid") return "rigid";
+  if (!orb?.ok || (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean") || !carving) return "";
+  if (orb.mode === "rigid" || orb.mode === "euc-rigid") return orb.mode;
+  if (orb.mode === "euc-1d" || orb.mode === "euc-torus" || orb.mode === "euc-2222" || orb.mode === "euc-rect-mirror") {
+    return carvingPartitionSignature(orb, carving);
+  }
 
   const leavesOf = buildLeafResolver(carving.pieces);
   const cutLeafIds = new Set(
@@ -1592,7 +1815,12 @@ export function carvingShapeSignature(orb, carving) {
  * Return true iff this orbifold admits at least two distinct labeled carvings.
  */
 export function hasMultipleCarvings(orb, carving) {
-  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving || carving.cuts.length === 0) {
+  if (
+    !orb?.ok ||
+    (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean") ||
+    !carving ||
+    carving.cuts.length === 0
+  ) {
     return false;
   }
   const basePart = carvingPartitionSignature(orb, carving);
@@ -1616,7 +1844,7 @@ export function hasMultipleCarvings(orb, carving) {
  * a different topological shape when available).
  */
 export function createRandomCarving(orb, prevCarving = null, rng = Math.random) {
-  if (!orb?.ok || orb.geometry !== "hyperbolic") {
+  if (!orb?.ok || (orb.geometry !== "hyperbolic" && orb.geometry !== "euclidean")) {
     return { cuts: [], rootId: null, pieces: [], steps: [] };
   }
 
