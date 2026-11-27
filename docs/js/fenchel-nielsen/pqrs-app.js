@@ -9,7 +9,7 @@ import {
   computeDragAlign,
   deformPqrsPartition,
   recenterPqrsState
-} from "./pqrs.js?v=fn-v7";
+} from "./pqrs.js?v=fn-v8";
 
 import {
   ID3,
@@ -26,17 +26,18 @@ import {
   panCameraByDiskDelta,
   wrapCameraInGroupWithColor,
   generateTiling
-} from "./hyperbolic.js?v=fn-v7";
+} from "./hyperbolic.js?v=fn-v8";
 
 import {
   EID3,
   emul3,
+  einv3,
   edet3,
   eapply,
   generateEuclideanTiling,
   panEuclideanCamera,
   wrapEuclideanCameraWithColor
-} from "./euclidean.js?v=fn-v7";
+} from "./euclidean.js?v=fn-v8";
 
 const EUC_VIEW_R = 2.6;
 
@@ -268,6 +269,14 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
     ctx.stroke();
   }
 
+  ctx.save();
+  drawEucPolygonPath(ctx, toPx, real.dirichletPoly.vertsE.map((v) => eapply(state.cameraM, v)));
+  ctx.strokeStyle = "rgba(26, 26, 31, 0.72)";
+  ctx.lineWidth = 1.9;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+  ctx.restore();
+
   const activeMarkers = real.dirichletPoly.markers || real.markers || [];
   if (activeMarkers.length > 0) {
     const buckets = new Map();
@@ -356,6 +365,14 @@ function renderDisk(maxPolys = 2200) {
     drawPolygonPath(ctx, toPx, drawList[i].worldVerts);
     ctx.stroke();
   }
+
+  ctx.save();
+  drawPolygonPath(ctx, toPx, real.dirichletPoly.vertsH.map((v) => normTime(apply3(state.cameraM, v))));
+  ctx.strokeStyle = "rgba(26, 26, 31, 0.72)";
+  ctx.lineWidth = 1.9;
+  ctx.lineJoin = "round";
+  ctx.stroke();
+  ctx.restore();
 
   const activeMarkers = real.dirichletPoly.markers || real.markers || [];
   if (activeMarkers.length > 0) {
@@ -614,6 +631,13 @@ function renderPartitionCards() {
         const nextEll = isTwist ? curCoords.ell : rawVal;
         const nextTheta = isTwist ? rawVal : curCoords.theta;
         state.pqrs = deformPqrsPartition(state.pqrs, k, nextEll, nextTheta, state.activeAlign);
+        const pullM = state.pqrs.realization?.pullM;
+        if (pullM && pullM !== ID3 && pullM !== EID3) {
+          state.cameraM =
+            state.pqrs.geometry === "euclidean"
+              ? emul3(state.cameraM, einv3(pullM))
+              : reorthonormalizeLorentz(mul3(state.cameraM, invLorentz(pullM)));
+        }
         if (state.pqrs.realization?.pullColorXor) {
           state.cameraColor = (state.cameraColor ^ state.pqrs.realization.pullColorXor) & 3;
         }

@@ -8,7 +8,7 @@ import {
   getCutOptions,
   getCutMarkerSides,
   formatFrac
-} from "./orbifold.js?v=fn-v7";
+} from "./orbifold.js?v=fn-v8";
 
 import {
   ID3,
@@ -29,7 +29,7 @@ import {
   buildRealization,
   generateTiling,
   recutHyperbolic
-} from "./hyperbolic.js?v=fn-v7";
+} from "./hyperbolic.js?v=fn-v8";
 
 import {
   EID3,
@@ -42,7 +42,7 @@ import {
   wrapEuclideanCameraWithColor,
   wrapPointIntoEucFD,
   recutEuclidean
-} from "./euclidean.js?v=fn-v7";
+} from "./euclidean.js?v=fn-v8";
 
 const EUC_VIEW_R = 2.6;
 
@@ -215,6 +215,45 @@ function drawHyperbolicEdge(ctx, toPx, u, w) {
     else ctx.lineTo(px, py);
   }
   ctx.stroke();
+}
+
+function drawFdHighlight(ctx, real, cameraM, toPx, isEuc) {
+  ctx.save();
+  ctx.strokeStyle = "rgba(26, 26, 31, 0.72)";
+  ctx.lineWidth = 1.9;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  if (real.dirichletPoly) {
+    const verts = isEuc
+      ? real.dirichletPoly.vertsE.map((v) => eapply(cameraM, v))
+      : real.dirichletPoly.vertsH.map((v) => normTime(apply3(cameraM, v)));
+    if (isEuc) drawEucPolygonPath(ctx, toPx, verts);
+    else drawPolygonPath(ctx, toPx, verts);
+    ctx.stroke();
+  } else {
+    for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+      const p = real.fdPolygons[pi];
+      const verts = isEuc
+        ? p.vertsE.map((v) => eapply(cameraM, v))
+        : p.vertsH.map((v) => normTime(apply3(cameraM, v)));
+      for (let e = 0; e < verts.length; e++) {
+        if (p.isExteriorEdge && p.isExteriorEdge[e] === false) continue;
+        const u = verts[e];
+        const w = verts[(e + 1) % verts.length];
+        if (isEuc) {
+          const [x0, y0] = toPx(u);
+          const [x1, y1] = toPx(w);
+          ctx.beginPath();
+          ctx.moveTo(x0, y0);
+          ctx.lineTo(x1, y1);
+          ctx.stroke();
+        } else {
+          drawHyperbolicEdge(ctx, toPx, u, w);
+        }
+      }
+    }
+  }
+  ctx.restore();
 }
 
 function sortStationaryDrawList(drawList) {
@@ -575,6 +614,8 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
       }
     }
 
+    drawFdHighlight(ctx, real, state.cameraM, toPx, true);
+
     if (hoveredCutId && !hasTwoSidedMarkers && real.cutSegments.length > 0) {
       for (let ti = 0; ti < tiles.length; ti++) {
         const t = tiles[ti];
@@ -841,6 +882,8 @@ function renderDisk(maxPolys = 2200) {
         }
       }
     }
+
+    drawFdHighlight(ctx, real, state.cameraM, toPx, false);
 
     // Subtle dashed hairline on hover only when the cut lacks special points on both sides
     if (hoveredCutId && !hasTwoSidedMarkers && real.cutSegments.length > 0) {

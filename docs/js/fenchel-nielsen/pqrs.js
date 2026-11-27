@@ -1,6 +1,6 @@
 // Exact 3-partition coupled Fenchel-Nielsen geometry for 4-cone sphere orbifolds (P Q R S).
 
-import { frac, addFrac, subFrac, formatFrac } from "./orbifold.js?v=fn-v7";
+import { frac, addFrac, subFrac, formatFrac } from "./orbifold.js?v=fn-v8";
 import {
   ID3,
   mul3,
@@ -26,7 +26,7 @@ import {
   hypDist,
   mobiusTranslateToOrigin,
   buildHyperbolicDirichlet
-} from "./hyperbolic.js?v=fn-v7";
+} from "./hyperbolic.js?v=fn-v8";
 import {
   EID3,
   emul3,
@@ -36,7 +36,7 @@ import {
   erotAt,
   reduceSuperbase,
   buildEuclideanDirichlet
-} from "./euclidean.js?v=fn-v7";
+} from "./euclidean.js?v=fn-v8";
 
 export const PQRS_LETTERS = ["P", "Q", "R", "S"];
 
@@ -393,6 +393,7 @@ function buildHyperbolicPqrsRealization(state) {
   const shortCenter = baryWithDistinctWeights(tPts);
   let chosenBase = dirichletBase;
   let pullColorXor = 0;
+  let pullM = ID3;
 
   if (!chosenBase) {
     chosenBase = shortCenter;
@@ -415,6 +416,7 @@ function buildHyperbolicPqrsRealization(state) {
       if (!bestPt) break;
       cur = bestPt;
       curDot = bestDot;
+      pullM = reorthonormalizeLorentz(mul3(dirGens[bestGi].M, pullM));
       pullColorXor ^= dirMasks[bestGi];
     }
     chosenBase = cur;
@@ -443,6 +445,7 @@ function buildHyperbolicPqrsRealization(state) {
     fdPolygons: dirichletPoly ? [dirichletPoly] : [],
     dirichletPoly,
     dirichletBase: chosenBase,
+    pullM,
     pullColorXor,
     gens: dirGens,
     quotient,
@@ -564,6 +567,7 @@ function buildEuclideanPqrsRealization(state) {
 
   let chosenBase = dirichletBase;
   let pullColorXor = 0;
+  let pullM = EID3;
   if (!chosenBase) {
     chosenBase = [P0[0] + 0.37 * va[0] + 0.31 * vb[0], P0[1] + 0.37 * va[1] + 0.31 * vb[1]];
   } else {
@@ -577,10 +581,10 @@ function buildEuclideanPqrsRealization(state) {
       const kN = Math.round(rn / 2);
       const shiftM = kM * 2;
       const shiftN = kN * 2;
-      chosenBase = [
-        chosenBase[0] - shiftM * va[0] - shiftN * vb[0],
-        chosenBase[1] - shiftM * va[1] - shiftN * vb[1]
-      ];
+      const sx = -shiftM * va[0] - shiftN * vb[0];
+      const sy = -shiftM * va[1] - shiftN * vb[1];
+      chosenBase = [chosenBase[0] + sx, chosenBase[1] + sy];
+      pullM = etrans(sx, sy);
       if (Math.abs(kM) & 1) pullColorXor ^= dirMasks[0] ^ dirMasks[1];
       if (Math.abs(kN) & 1) pullColorXor ^= dirMasks[0] ^ dirMasks[3];
     }
@@ -599,6 +603,7 @@ function buildEuclideanPqrsRealization(state) {
     fdPolygons: dirichletPoly ? [dirichletPoly] : [],
     dirichletPoly,
     dirichletBase: chosenBase,
+    pullM,
     pullColorXor,
     gens,
     quotient: {
