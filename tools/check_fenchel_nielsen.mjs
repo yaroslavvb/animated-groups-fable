@@ -5,6 +5,10 @@ import {
   PRESETS,
   parseOrbifold,
   createDefaultCarving,
+  createRandomCarving,
+  hasMultipleCarvings,
+  carvingPartitionSignature,
+  carvingShapeSignature,
   setCutPair,
   cycleCarvingTopology,
   totalSliderCount
@@ -280,6 +284,54 @@ for (const sig of ["3322", "*3333", "2*32", "222222", "o2", "23x", "*22*22"]) {
     checkGeneratorRelations(`${sig}@(${len},${tw})`, r);
     // For extreme length=5.0, tiles are enormous; verify non-overlap inside r < 0.4
     checkTilingCoverage(`${sig}@(${len},${tw})`, r, 120, len > 3 ? 0.4 : 0.55);
+  }
+}
+
+console.log("6. Checking random carvings, hasMultipleCarvings, and Reshuffle invariants...");
+{
+  const multiTrue = ["3322", "2223", "2345", "22223", "222222", "*3333", "*22222", "*222222", "2*222", "oo", "o22", "222x"];
+  const multiFalse = ["237", "*642", "o2", "2*32", "23x", "23*", "23*2", "xxx", "*22*22"];
+
+  for (const sig of multiTrue) {
+    const o = parseOrbifold(sig);
+    const c = createDefaultCarving(o);
+    assert.equal(hasMultipleCarvings(o, c), true, `${sig}: expected hasMultipleCarvings === true`);
+  }
+  for (const sig of multiFalse) {
+    const o = parseOrbifold(sig);
+    const c = createDefaultCarving(o);
+    assert.equal(hasMultipleCarvings(o, c), false, `${sig}: expected hasMultipleCarvings === false`);
+  }
+
+  const shapeStrict = new Set(["3322", "2345", "222222", "oo"]);
+  for (const sig of ["3322", "2345", "222222", "oo", "*3333", "*22222", "2*222"]) {
+    const o = parseOrbifold(sig);
+    let cur = createRandomCarving(o);
+    assert.equal(totalSliderCount(cur), o.teichDim, `${sig}#rand0: slider count`);
+    let r = buildRealization(o, cur);
+    checkGeneratorRelations(`${sig}#rand0`, r);
+    checkTilingCoverage(`${sig}#rand0`, r, 150, 0.55);
+
+    for (let step = 1; step <= 5; step++) {
+      const next = createRandomCarving(o, cur);
+      assert.equal(totalSliderCount(next), o.teichDim, `${sig}#reshuffle${step}: slider count`);
+      assert.notEqual(
+        carvingPartitionSignature(o, next),
+        carvingPartitionSignature(o, cur),
+        `${sig}#reshuffle${step}: partition did not change`
+      );
+      if (shapeStrict.has(sig)) {
+        assert.notEqual(
+          carvingShapeSignature(o, next),
+          carvingShapeSignature(o, cur),
+          `${sig}#reshuffle${step}: shape did not change`
+        );
+      }
+      r = buildRealization(o, next);
+      checkGeneratorRelations(`${sig}#reshuffle${step}`, r);
+      checkTilingCoverage(`${sig}#reshuffle${step}`, r, 150, 0.55);
+      cur = next;
+    }
   }
 }
 

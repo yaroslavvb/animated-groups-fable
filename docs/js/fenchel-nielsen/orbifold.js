@@ -1351,3 +1351,351 @@ export function totalSliderCount(carving) {
   }
   return count;
 }
+
+function buildLeafResolver(pieces) {
+  const childMap = new Map();
+  for (const p of pieces) {
+    if (!p.boundaryCutId || !p.features) continue;
+    childMap.set(
+      p.boundaryCutId,
+      p.features.filter((f) => !(f.kind === "cut" && f.cutId === p.boundaryCutId)).map((f) => f.id)
+    );
+  }
+  const memo = new Map();
+  const leavesOf = (id) => {
+    if (memo.has(id)) return memo.get(id);
+    const children = childMap.get(id);
+    const out = children ? children.flatMap((cid) => leavesOf(cid)) : [id];
+    memo.set(id, out);
+    return out;
+  };
+  return leavesOf;
+}
+
+function splitUniverse(leafIds, universe) {
+  const set = new Set(leafIds);
+  const sideA = [];
+  const sideB = [];
+  for (const id of universe) {
+    if (set.has(id)) sideA.push(id);
+    else sideB.push(id);
+  }
+  return [sideA, sideB];
+}
+
+function bipartitionKey(sideA, sideB) {
+  const a = [...sideA].sort().join(",");
+  const b = [...sideB].sort().join(",");
+  return a < b ? `${a}|${b}` : `${b}|${a}`;
+}
+
+function featureTypeToken(orb, cutLeafIds, id) {
+  if (id.startsWith("cone:")) {
+    const idx = parseInt(id.split(":")[1], 10);
+    return `c${orb.cones[idx]}`;
+  }
+  if (id.startsWith("corner:")) {
+    const [, j, r] = id.split(":").map(Number);
+    return `r${orb.mirrors[j][r]}`;
+  }
+  if (id.startsWith("smooth:")) return "S";
+  if (id.startsWith("collar:")) {
+    const j = parseInt(id.split(":")[1], 10);
+    return `M(${orb.mirrors[j].join(",")})`;
+  }
+  if (id.startsWith("crosscap:")) return "X";
+  if (cutLeafIds.has(id)) return "ARC";
+  return id;
+}
+
+function sideShapeToken(orb, cutLeafIds, sideIds) {
+  const handleCounts = new Map();
+  const tokens = [];
+  for (const id of sideIds) {
+    if (id.startsWith("handle:")) {
+      const h = id.split(":")[1];
+      handleCounts.set(h, (handleCounts.get(h) || 0) + 1);
+    } else {
+      tokens.push(featureTypeToken(orb, cutLeafIds, id));
+    }
+  }
+  for (const count of handleCounts.values()) {
+    tokens.push(count >= 2 ? "H2" : "H1");
+  }
+  tokens.sort();
+  return tokens.join(",");
+}
+
+function collectSpherePool(orb) {
+  const pool = [];
+  for (const h of orb.handleItems) pool.push(h.plusId, h.minusId);
+  for (const c of orb.coneItems) pool.push(c.id);
+  for (const ml of orb.mirrorLoops) {
+    pool.push(ml.corners.length === 0 ? `smooth:${ml.loopIndex}` : `collar:${ml.loopIndex}`);
+  }
+  for (const xc of orb.crosscapItems) pool.push(`crosscap:${xc.index}`);
+  return pool;
+}
+
+/**
+ * Canonical signature of the labeled geodesic curve set of a carving, invariant
+ * under cut reordering and inside/outside orientation swaps.
+ */
+export function carvingPartitionSignature(orb, carving) {
+  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving) return "";
+  if (orb.mode === "rigid") return "rigid";
+
+  const leavesOf = buildLeafResolver(carving.pieces);
+
+  if (orb.mode === "mirror-poly") {
+    const U = orb.mirrorLoops[0].corners.map((c) => c.id);
+    const keys = carving.cuts
+      .filter((c) => c.kind === "mirror-arc")
+      .map((c) => bipartitionKey(...splitUniverse(leavesOf(c.id), U)))
+      .sort();
+    return keys.join(";");
+  }
+
+  if (orb.mode === "cone-mirror") {
+    const corners = orb.mirrorLoops[0].corners.map((c) => c.id);
+    const cut0 = carving.cuts[0];
+    const slotKey = `slot:${[...cut0.pair].sort().join("-")}`;
+    const U = [...corners, cut0.id];
+    const arcKeys = carving.cuts
+      .slice(1)
+      .filter((c) => c.kind === "mirror-arc")
+      .map((c) => bipartitionKey(...splitUniverse(leavesOf(c.id), U)))
+      .sort();
+    return [slotKey, ...arcKeys].join(";");
+  }
+
+  const parts = [];
+  for (const ml of orb.mirrorLoops) {
+    if (ml.corners.length < 2) continue;
+    const bCut = carving.cuts.find((c) => c.kind === "bridge-arc" && c.loopIndex === ml.loopIndex);
+    if (!bCut) continue;
+    parts.push(`m${ml.loopIndex}:${[...bCut.pair].sort().join("-")}`);
+    const mArcs = carving.cuts.filter((c) => c.kind === "mirror-arc" && c.loopIndex === ml.loopIndex);
+    if (mArcs.length > 0) {
+      const U = [...ml.corners.map((c) => c.id), bCut.id];
+      const arcKeys = mArcs.map((c) => bipartitionKey(...splitUniverse(leavesOf(c.id), U))).sort();
+      parts.push(`m${ml.loopIndex}-arcs:${arcKeys.join(",")}`);
+    }
+  }
+
+  if (orb.mode === "pants") {
+    const U = collectSpherePool(orb);
+    const pairKeys = carving.cuts
+      .filter((c) => c.kind === "pair")
+      .map((c) => bipartitionKey(...splitUniverse(leavesOf(c.id), U)))
+      .sort();
+    if (pairKeys.length > 0) parts.push(`pairs:${pairKeys.join(";")}`);
+  }
+
+  return parts.join("|");
+}
+
+/**
+ * Canonical signature of the unlabeled topological shape of a carving, used to
+ * prefer geometrically distinct carvings (e.g. Snowflake vs Caterpillar) on Reshuffle.
+ */
+export function carvingShapeSignature(orb, carving) {
+  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving) return "";
+  if (orb.mode === "rigid") return "rigid";
+
+  const leavesOf = buildLeafResolver(carving.pieces);
+  const cutLeafIds = new Set(
+    carving.cuts.filter((c) => c.kind === "cone-mirror-arc" || c.kind === "bridge-arc").map((c) => c.id)
+  );
+
+  const shapeParts = [];
+
+  const canonicalBipartShape = (leafIds, universe) => {
+    const [sideA, sideB] = splitUniverse(leafIds, universe);
+    const a = sideShapeToken(orb, cutLeafIds, sideA);
+    const b = sideShapeToken(orb, cutLeafIds, sideB);
+    return a < b ? `${a}|${b}` : `${b}|${a}`;
+  };
+
+  if (orb.mode === "mirror-poly") {
+    const U = orb.mirrorLoops[0].corners.map((c) => c.id);
+    const keys = carving.cuts
+      .filter((c) => c.kind === "mirror-arc")
+      .map((c) => canonicalBipartShape(leavesOf(c.id), U))
+      .sort();
+    shapeParts.push(`mp:${keys.join(";")}`);
+  } else if (orb.mode === "cone-mirror") {
+    const corners = orb.mirrorLoops[0].corners.map((c) => c.id);
+    const cut0 = carving.cuts[0];
+    if (corners.length >= 3) {
+      const slotOrders = cut0.pair.map((id) => itemOrderInOrb(orb, id)).sort((a, b) => a - b);
+      shapeParts.push(`slot:${slotOrders.join("-")}`);
+    }
+    const U = [...corners, cut0.id];
+    const arcKeys = carving.cuts
+      .slice(1)
+      .filter((c) => c.kind === "mirror-arc")
+      .map((c) => canonicalBipartShape(leavesOf(c.id), U))
+      .sort();
+    if (arcKeys.length > 0) shapeParts.push(`arcs:${arcKeys.join(";")}`);
+  } else {
+    for (const ml of orb.mirrorLoops) {
+      if (ml.corners.length < 2) continue;
+      const bCut = carving.cuts.find((c) => c.kind === "bridge-arc" && c.loopIndex === ml.loopIndex);
+      if (!bCut) continue;
+      if (ml.corners.length >= 3) {
+        const slotOrders = bCut.pair.map((id) => itemOrderInOrb(orb, id)).sort((a, b) => a - b);
+        shapeParts.push(`m${ml.loopIndex}-slot:${slotOrders.join("-")}`);
+      }
+      const mArcs = carving.cuts.filter((c) => c.kind === "mirror-arc" && c.loopIndex === ml.loopIndex);
+      if (mArcs.length > 0) {
+        const U = [...ml.corners.map((c) => c.id), bCut.id];
+        const arcKeys = mArcs.map((c) => canonicalBipartShape(leavesOf(c.id), U)).sort();
+        shapeParts.push(`m${ml.loopIndex}-arcs:${arcKeys.join(";")}`);
+      }
+    }
+    if (orb.mode === "pants") {
+      const U = collectSpherePool(orb);
+      const pairKeys = carving.cuts
+        .filter((c) => c.kind === "pair")
+        .map((c) => canonicalBipartShape(leavesOf(c.id), U))
+        .sort();
+      if (pairKeys.length > 0) shapeParts.push(`pairs:${pairKeys.join(";")}`);
+    }
+  }
+
+  // Include sorted piece boundary-type summaries so tree shapes like 222222
+  // Snowflake vs Caterpillar remain strictly distinct.
+  const pieceSummaries = carving.pieces
+    .filter((p) => p.kind === "pant" || p.kind === "mirror-poly")
+    .map((p) => {
+      const featTokens = p.features
+        .map((f) => {
+          if (f.kind === "cone") return `c${f.order}`;
+          if (f.kind === "corner") return `r${f.order}`;
+          if (f.kind === "handle-end") return "H";
+          if (f.kind === "crosscap-end") return "X";
+          if (f.kind === "smooth-end") return "S";
+          if (f.kind === "collar-end") return "M";
+          return "cut";
+        })
+        .sort();
+      return `${p.kind}[${featTokens.join(",")}]`;
+    })
+    .sort();
+
+  shapeParts.push(`pieces:${pieceSummaries.join("|")}`);
+  return shapeParts.join("##");
+}
+
+/**
+ * Return true iff this orbifold admits at least two distinct labeled carvings.
+ */
+export function hasMultipleCarvings(orb, carving) {
+  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving || carving.cuts.length === 0) {
+    return false;
+  }
+  const basePart = carvingPartitionSignature(orb, carving);
+  for (let i = 0; i < carving.cuts.length; i++) {
+    const opts = getCutOptions(orb, carving, i);
+    if (opts.pairMode !== "none" && opts.validPairs.length > 1) {
+      for (const [u, v] of opts.validPairs) {
+        const cand = setCutPair(orb, carving, i, u, v);
+        if (carvingPartitionSignature(orb, cand) !== basePart) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+}
+
+/**
+ * Pick a random valid carving for `orb`. When `prevCarving` is supplied and multiple
+ * distinct carvings exist, return a strictly different carving (preferring one with
+ * a different topological shape when available).
+ */
+export function createRandomCarving(orb, prevCarving = null, rng = Math.random) {
+  if (!orb?.ok || orb.geometry !== "hyperbolic") {
+    return { cuts: [], rootId: null, pieces: [], steps: [] };
+  }
+
+  const base = createDefaultCarving(orb);
+  if (!hasMultipleCarvings(orb, base)) {
+    return base;
+  }
+
+  const sampleOnce = () => {
+    let cur = createDefaultCarving(orb);
+    for (let i = 0; i < cur.cuts.length; i++) {
+      const opts = getCutOptions(orb, cur, i);
+      if (opts.pairMode !== "none" && opts.validPairs.length > 1) {
+        const pick = opts.validPairs[Math.floor(rng() * opts.validPairs.length)];
+        cur = setCutPair(orb, cur, i, pick[0], pick[1]);
+      }
+    }
+    return cur;
+  };
+
+  if (!prevCarving) {
+    return sampleOnce();
+  }
+
+  const prevPart = carvingPartitionSignature(orb, prevCarving);
+  const prevShape = carvingShapeSignature(orb, prevCarving);
+
+  let firstDiffPart = null;
+  for (let attempt = 0; attempt < 30; attempt++) {
+    const cand = sampleOnce();
+    const part = carvingPartitionSignature(orb, cand);
+    if (part === prevPart) continue;
+    if (!firstDiffPart) firstDiffPart = cand;
+    if (carvingShapeSignature(orb, cand) !== prevShape) {
+      return cand;
+    }
+  }
+
+  // Fallback bounded DFS over mutable steps if random sampling did not hit a new shape
+  const mutableIndices = [];
+  for (let i = 0; i < base.cuts.length; i++) {
+    const opts = getCutOptions(orb, base, i);
+    if (opts.pairMode !== "none") mutableIndices.push(i);
+  }
+
+  const candidates = [];
+  const seenParts = new Set();
+  const dfs = (depth, cur) => {
+    if (candidates.length >= 80) return;
+    if (depth === mutableIndices.length) {
+      const part = carvingPartitionSignature(orb, cur);
+      if (!seenParts.has(part)) {
+        seenParts.add(part);
+        candidates.push({
+          part,
+          shape: carvingShapeSignature(orb, cur),
+          carving: cur
+        });
+      }
+      return;
+    }
+    const cutIdx = mutableIndices[depth];
+    const opts = getCutOptions(orb, cur, cutIdx);
+    for (const [u, v] of opts.validPairs) {
+      dfs(depth + 1, setCutPair(orb, cur, cutIdx, u, v));
+      if (candidates.length >= 80) break;
+    }
+  };
+  dfs(0, base);
+
+  const diffShape = candidates.filter((c) => c.part !== prevPart && c.shape !== prevShape);
+  if (diffShape.length > 0) {
+    return diffShape[Math.floor(rng() * diffShape.length)].carving;
+  }
+
+  const diffPart = candidates.filter((c) => c.part !== prevPart);
+  if (diffPart.length > 0) {
+    return diffPart[Math.floor(rng() * diffPart.length)].carving;
+  }
+
+  return firstDiffPart || base;
+}

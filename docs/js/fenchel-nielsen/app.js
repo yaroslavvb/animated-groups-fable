@@ -1,16 +1,12 @@
-// Main interactive workbench controller for Fenchel-Nielsen orbifold coordinates.
+// Minimal interactive workbench controller for Fenchel-Nielsen orbifold coordinates.
 
 import {
-  PRESETS,
   parseOrbifold,
-  createDefaultCarving,
+  createRandomCarving,
+  hasMultipleCarvings,
   getCutOptions,
-  setCutPair,
-  cycleCarvingTopology,
-  totalSliderCount,
-  formatFrac,
-  formatAreaPi
-} from "./orbifold.js?v=fn-v2";
+  formatFrac
+} from "./orbifold.js?v=fn-v3";
 
 import {
   ID3,
@@ -26,12 +22,9 @@ import {
   reorthonormalizeLorentz,
   panCameraByDiskDelta,
   wrapCameraInGroup,
-  det3,
   buildRealization,
   generateTiling
-} from "./hyperbolic.js?v=fn-v2";
-
-import { renderSchematic } from "./schematic.js?v=fn-v2";
+} from "./hyperbolic.js?v=fn-v3";
 
 const state = {
   orb: null,
@@ -39,62 +32,21 @@ const state = {
   realization: null,
   cameraM: ID3,
   cameraWrapped: false,
-  activePickCutIndex: null,
-  pendingNodeId: null,
   hoveredCutId: null,
-  animFrame: null,
   refineTimer: null,
-  rafRenderPending: false,
-  overlays: {
-    cuts: true,
-    fd: true,
-    seams: false,
-    markers: true,
-    parity: true
-  }
+  rafId: null
 };
 
-// DOM references
 const els = {
   sigForm: document.getElementById("sig-form"),
   sigInput: document.getElementById("sig-input"),
-  presetGroups: document.getElementById("preset-groups"),
+  orbMeta: document.getElementById("orb-meta"),
   statusBanner: document.getElementById("status-banner"),
-  kpis: document.getElementById("kpi-grid"),
   canvas: document.getElementById("disk-canvas"),
-  schematicHost: document.getElementById("schematic-host"),
-  slidersHost: document.getElementById("sliders-host"),
-  btnCycleCarving: document.getElementById("btn-cycle-carving"),
-  btnCancelPick: document.getElementById("btn-cancel-pick"),
-  btnRecenter: document.getElementById("btn-recenter"),
-  btnResetParams: document.getElementById("btn-reset-params"),
-  btnRandomize: document.getElementById("btn-randomize"),
-  genSummary: document.getElementById("gen-diag"),
-  genBody: document.getElementById("gen-tbody")
+  controlsCol: document.getElementById("controls-col"),
+  btnReshuffle: document.getElementById("btn-reshuffle"),
+  slidersHost: document.getElementById("sliders-host")
 };
-
-function cutKindLabel(cut) {
-  switch (cut.kind) {
-    case "pair":
-      return "Closed geodesic";
-    case "mirror-arc":
-      return "Orthogeodesic arc";
-    case "cone-mirror-arc":
-      return "Cone-mirror arc";
-    case "bridge-arc":
-      return "Cuff–mirror bridge";
-    case "handle":
-      return "Handle loop";
-    case "crosscap":
-      return "Crosscap core";
-    case "smooth-mirror":
-      return "Smooth mirror";
-    case "collar":
-      return "Collar cuff";
-    default:
-      return cut.kind;
-  }
-}
 
 function formatItemDisplayName(id, orb, carving) {
   const cut = carving.cuts.find((c) => c.id === id);
@@ -123,10 +75,28 @@ function formatItemDisplayName(id, orb, carving) {
   return id;
 }
 
-function stopActiveAnimation() {
-  if (state.animFrame) {
-    cancelAnimationFrame(state.animFrame);
-    state.animFrame = null;
+function cutRoleLabel(cut, opts, orb, carving) {
+  if (opts.pairMode === "edge-slot" && cut.pair) {
+    const nu = formatItemDisplayName(cut.pair[0], orb, carving);
+    const nv = formatItemDisplayName(cut.pair[1], orb, carving);
+    return `Edge ${nu}–${nv}`;
+  }
+  if (cut.pair) {
+    const nu = formatItemDisplayName(cut.pair[0], orb, carving);
+    const nv = formatItemDisplayName(cut.pair[1], orb, carving);
+    return `${nu} + ${nv}`;
+  }
+  switch (cut.kind) {
+    case "handle":
+      return "Handle";
+    case "crosscap":
+      return "Crosscap";
+    case "collar":
+      return "Collar";
+    case "smooth-mirror":
+      return "Smooth mirror";
+    default:
+      return "";
   }
 }
 
@@ -236,9 +206,9 @@ function renderDisk(maxPolys = 2200) {
   }
 
   const tiles = generateTiling(real, state.cameraM, { maxPolys, rMax: 0.985 });
-  const { overlays, hoveredCutId } = state;
+  const { hoveredCutId } = state;
 
-  // 1. Draw all tile polygons
+  // 1. Tile polygons with orientation parity shading
   for (let ti = 0; ti < tiles.length; ti++) {
     const t = tiles[ti];
     const CM = t.CM || mul3(state.cameraM, t.M);
@@ -247,12 +217,8 @@ function renderDisk(maxPolys = 2200) {
       const poly = real.fdPolygons[pi];
       const worldVerts = poly.vertsH.map((v) => normTime(apply3(CM, v)));
       drawPolygonPath(ctx, toPx, worldVerts);
-      if (overlays.parity) {
-        const p = poly.parity ^ tileDetFlip;
-        ctx.fillStyle = p === 0 ? "#e2e7ee" : "#f9f8f4";
-      } else {
-        ctx.fillStyle = "#f7f6f1";
-      }
+      const p = poly.parity ^ tileDetFlip;
+      ctx.fillStyle = p === 0 ? "#e2e7ee" : "#f9f8f4";
       ctx.fill();
       ctx.strokeStyle = "rgba(26, 26, 31, 0.20)";
       ctx.lineWidth = 0.7;
@@ -261,7 +227,7 @@ function renderDisk(maxPolys = 2200) {
   }
 
   // 2. Highlight assembled fundamental domain
-  if (overlays.fd && !state.cameraWrapped) {
+  if (!state.cameraWrapped) {
     for (let pi = 0; pi < real.fdPolygons.length; pi++) {
       const poly = real.fdPolygons[pi];
       const worldVerts = poly.vertsH.map((v) => normTime(apply3(state.cameraM, v)));
@@ -274,27 +240,8 @@ function renderDisk(maxPolys = 2200) {
     }
   }
 
-  // 3. Draw half-pant internal seams
-  if (overlays.seams && real.seamSegments.length > 0) {
-    ctx.save();
-    ctx.setLineDash([4, 4]);
-    ctx.strokeStyle = "rgba(26, 26, 31, 0.45)";
-    ctx.lineWidth = 1.2;
-    for (const seg of real.seamSegments) {
-      ctx.beginPath();
-      for (let i = 0; i < seg.length; i++) {
-        const pt = poincare(normTime(apply3(state.cameraM, liftDisk(seg[i][0], seg[i][1]))));
-        const [px, py] = toPx(pt);
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.stroke();
-    }
-    ctx.restore();
-  }
-
-  // 4. Draw lifted cut geodesics across tiles
-  if (overlays.cuts && real.cutSegments.length > 0) {
+  // 3. Lifted cut geodesics and twist ticks
+  if (real.cutSegments.length > 0) {
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
       if (t.r > 0.94) continue;
@@ -327,8 +274,7 @@ function renderDisk(maxPolys = 2200) {
       }
     }
 
-    // Draw twist footpoint ticks along FD cut geodesics
-    if (overlays.fd && !state.cameraWrapped) {
+    if (!state.cameraWrapped) {
       for (const seg of real.cutSegments) {
         if (!seg.twistTicks || !seg.frame) continue;
         const wf = {
@@ -362,8 +308,8 @@ function renderDisk(maxPolys = 2200) {
     }
   }
 
-  // 5. Draw cone & corner markers
-  if (overlays.markers && real.markers.length > 0) {
+  // 4. Cone & corner markers
+  if (real.markers.length > 0) {
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
       const isFD = Boolean(t.isFD) && !state.cameraWrapped;
@@ -381,7 +327,6 @@ function renderDisk(maxPolys = 2200) {
 
   ctx.restore();
 
-  // Disk boundary ring
   ctx.beginPath();
   ctx.arc(cx, cy, R, 0, Math.PI * 2);
   ctx.strokeStyle = "#1a1a1f";
@@ -391,176 +336,127 @@ function renderDisk(maxPolys = 2200) {
 
 function scheduleDiskRender(fast = false) {
   if (fast) {
-    if (!state.rafRenderPending) {
-      state.rafRenderPending = true;
-      requestAnimationFrame(() => {
-        state.rafRenderPending = false;
+    if (state.rafId === null) {
+      state.rafId = requestAnimationFrame(() => {
+        state.rafId = null;
         renderDisk(950);
       });
     }
     clearTimeout(state.refineTimer);
     state.refineTimer = setTimeout(() => renderDisk(2200), 130);
   } else {
+    if (state.rafId !== null) {
+      cancelAnimationFrame(state.rafId);
+      state.rafId = null;
+    }
     clearTimeout(state.refineTimer);
     renderDisk(2200);
   }
 }
 
 // ---------------------------------------------------------------------------
-// 2. UI Rendering: KPIs, Presets, Cut Slider Cards, Diagnostics
+// 2. Minimal UI Rendering: Meta, Status Banner, Reshuffle, Parameter Sliders
 // ---------------------------------------------------------------------------
 
-function renderPresets() {
-  els.presetGroups.innerHTML = "";
-  const activeCanon = state.orb?.ok ? state.orb.canonical : "";
-  for (const grp of PRESETS) {
-    const row = document.createElement("div");
-    row.className = "preset-row";
-    const lbl = document.createElement("span");
-    lbl.className = "preset-group-lbl";
-    lbl.textContent = grp.group;
-    row.append(lbl);
-    for (const item of grp.items) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = `preset-btn ${item.sig === activeCanon ? "is-active" : ""}`;
-      btn.textContent = item.sig;
-      btn.title = item.note;
-      btn.addEventListener("click", () => loadSignature(item.sig));
-      row.append(btn);
-    }
-    els.presetGroups.append(row);
-  }
-}
-
-function renderStatusAndKPIs() {
+function renderStatusAndMeta() {
   const orb = state.orb;
   if (!orb || !orb.ok) {
+    els.orbMeta.textContent = "";
     els.statusBanner.hidden = false;
     els.statusBanner.className = "status-banner is-error";
     els.statusBanner.textContent = orb?.error || "Invalid orbifold signature.";
-    els.kpis.innerHTML = "";
     return;
   }
 
-  if (orb.geometry !== "hyperbolic") {
-    els.statusBanner.hidden = false;
-    els.statusBanner.className = "status-banner";
-    const geomTitle = orb.geometry === "spherical" ? "Spherical (χ > 0)" : "Euclidean (χ = 0)";
-    els.statusBanner.innerHTML = `<span><strong>${orb.canonical}</strong> is <strong>${geomTitle}</strong> with cost ${formatFrac(orb.cost)} and χ = ${formatFrac(orb.chi)} — hyperbolic Fenchel–Nielsen coordinates require cost &gt; 2 (χ &lt; 0).</span>`;
-    if (orb.suggestion) {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "btn btn-sm btn-primary";
-      btn.textContent = `Try ${orb.suggestion} →`;
-      btn.addEventListener("click", () => loadSignature(orb.suggestion));
-      els.statusBanner.append(btn);
-    }
-  } else {
+  const chiStr = formatFrac(orb.chi).replace("-", "−");
+  if (orb.geometry === "hyperbolic") {
     els.statusBanner.hidden = true;
+    els.orbMeta.textContent =
+      orb.teichDim === 0
+        ? `${orb.canonical} · χ = ${chiStr} · Rigid (0D)`
+        : `${orb.canonical} · χ = ${chiStr} · ${orb.teichDim}D`;
+    return;
   }
 
-  const sliderCount = state.carving ? totalSliderCount(state.carving) : 0;
-  const cutsCount = state.carving ? state.carving.cuts.length : 0;
-  const geomLabel =
-    orb.geometry === "hyperbolic" ? "Hyperbolic ℍ²" : orb.geometry === "euclidean" ? "Euclidean E²" : "Spherical S²";
+  const geom = orb.geometry === "spherical" ? "Spherical" : "Euclidean";
+  els.orbMeta.textContent = `${orb.canonical} · χ = ${chiStr} · ${geom}`;
+  els.statusBanner.hidden = false;
+  els.statusBanner.className = "status-banner";
+  els.statusBanner.textContent = "";
 
-  const cards = [
-    { val: orb.canonical, lbl: "Orbifold", sub: orb.mode === "non-hyperbolic" ? "No ℍ² metric" : `Mode: ${orb.mode}` },
-    { val: geomLabel, lbl: "Geometry", sub: `Cost = ${formatFrac(orb.cost)}` },
-    { val: formatFrac(orb.chi), lbl: "Euler χ", sub: "χ = 2 − cost" },
-    {
-      val: orb.geometry === "hyperbolic" ? formatAreaPi(orb.areaOverPi) : "—",
-      lbl: "Hyperbolic area",
-      sub: orb.geometry === "hyperbolic" ? `≈ ${orb.areaNum.toFixed(3)}` : "Requires χ < 0"
-    },
-    {
-      val: `${orb.teichDim}D`,
-      lbl: "Teichmüller dim",
-      sub:
-        orb.geometry === "hyperbolic"
-          ? `${cutsCount} ${cutsCount === 1 ? "cut" : "cuts"} · ${sliderCount} ${sliderCount === 1 ? "slider" : "sliders"}`
-          : "0D"
-    }
-  ];
+  const msg = document.createElement("span");
+  const strongSig = document.createElement("strong");
+  strongSig.textContent = orb.canonical;
+  const strongGeom = document.createElement("strong");
+  strongGeom.textContent = `${geom} (χ = ${chiStr})`;
+  msg.append(
+    strongSig,
+    " is ",
+    strongGeom,
+    ` with cost ${formatFrac(orb.cost)} — hyperbolic coordinates require χ < 0.`
+  );
+  els.statusBanner.append(msg);
 
-  els.kpis.innerHTML = "";
-  for (const c of cards) {
-    const div = document.createElement("div");
-    div.className = "kpi-card";
-    div.innerHTML = `<div class="kpi-val">${c.val}</div><div class="kpi-lbl">${c.lbl}</div><div class="kpi-sub">${c.sub}</div>`;
-    els.kpis.append(div);
+  if (orb.suggestion) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn btn-sm btn-primary";
+    btn.textContent = `Try ${orb.suggestion} →`;
+    btn.addEventListener("click", () => loadSignature(orb.suggestion));
+    els.statusBanner.append(btn);
   }
 }
 
-function renderDiagnostics() {
-  const real = state.realization;
-  if (!real) {
-    els.genSummary.textContent = "No hyperbolic realization built.";
-    els.genBody.innerHTML = "";
+function updateReshuffleButton() {
+  const orb = state.orb;
+  const carving = state.carving;
+  if (!orb?.ok || orb.geometry !== "hyperbolic" || !carving || carving.cuts.length === 0) {
+    els.btnReshuffle.hidden = true;
     return;
   }
-  els.genSummary.textContent = `Exact Gauss–Bonnet area = ${real.totalArea.toFixed(6)} (error ${real.areaError.toExponential(2)}) · max O(2,1) Lorentz error = ${real.maxLorentzError.toExponential(2)}`;
-  els.genBody.innerHTML = "";
-  for (const g of real.gens) {
-    const M = g.M;
-    const tr = M[0][0] + M[1][1] + M[2][2];
-    const det = det3(M);
-    let type = g.role;
-    let invStr = "";
-    if (det < 0 && Math.abs(tr - 1) < 1e-4) {
-      type = "reflection";
-      invStr = "order 2";
-    } else if (det < 0) {
-      type = "glide";
-      const d = Math.acosh(Math.max(1, (1 - tr) / 2));
-      invStr = `step d = ${d.toFixed(3)}`;
-    } else if (tr < 3 - 1e-5) {
-      type = "rotation";
-      const ang = Math.acos(Math.max(-1, Math.min(1, (tr - 1) / 2)));
-      const ord = Math.round((2 * Math.PI) / Math.max(1e-6, ang));
-      invStr = `2π/${ord}`;
-    } else if (tr > 3 + 1e-5) {
-      type = "translation";
-      const ell = Math.acosh(Math.max(1, (tr - 1) / 2));
-      invStr = `ℓ = ${ell.toFixed(3)}`;
-    }
-    const row = document.createElement("tr");
-    row.innerHTML = `<td>${g.label}</td><td>${type}</td><td>${det > 0 ? "+1" : "−1"}</td><td>${tr.toFixed(4)}</td><td>${invStr}</td>`;
-    els.genBody.append(row);
-  }
+  const canReshuffle = hasMultipleCarvings(orb, carving);
+  els.btnReshuffle.hidden = false;
+  els.btnReshuffle.disabled = !canReshuffle;
+  els.btnReshuffle.title = canReshuffle
+    ? "Pick a different random carving"
+    : "Only one carving exists for this orbifold";
 }
 
 function renderSliders() {
   els.slidersHost.innerHTML = "";
   const orb = state.orb;
   const carving = state.carving;
-  if (!orb || !orb.ok || orb.geometry !== "hyperbolic") return;
 
-  if (carving.cuts.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "panel";
-    empty.innerHTML = `<p class="panel-sub"><strong>${orb.canonical}</strong> is a rigid hyperbolic orbifold (Teichmüller dimension 0). All angles and lengths are uniquely fixed with no free sliders.</p>`;
-    els.slidersHost.append(empty);
+  if (!orb?.ok || orb.geometry !== "hyperbolic") {
+    els.controlsCol.hidden = true;
+    updateReshuffleButton();
+    return;
+  }
+
+  els.controlsCol.hidden = false;
+  updateReshuffleButton();
+
+  if (!carving || carving.cuts.length === 0) {
+    const note = document.createElement("p");
+    note.className = "rigid-note";
+    note.textContent = `${orb.canonical} is rigid (0 parameters).`;
+    els.slidersHost.append(note);
     return;
   }
 
   carving.cuts.forEach((cut, idx) => {
     const opts = getCutOptions(orb, carving, idx);
-    const isPicking = state.activePickCutIndex === idx;
-    const isHovered = state.hoveredCutId === cut.id;
+    const group = document.createElement("div");
+    group.className = `cut-group ${state.hoveredCutId === cut.id ? "is-hovered" : ""}`;
+    group.dataset.cutId = cut.id;
+    group.style.borderLeftColor = cut.color;
 
-    const card = document.createElement("div");
-    card.className = `cut-card ${isPicking ? "is-picking" : ""} ${isHovered ? "is-hovered" : ""}`;
-    card.dataset.cutId = cut.id;
-    card.style.borderLeftColor = cut.color;
-
-    card.addEventListener("mouseenter", () => {
+    group.addEventListener("mouseenter", () => {
       state.hoveredCutId = cut.id;
       syncHoverVisuals();
       scheduleDiskRender(false);
     });
-    card.addEventListener("mouseleave", () => {
+    group.addEventListener("mouseleave", () => {
       if (state.hoveredCutId === cut.id) {
         state.hoveredCutId = null;
         syncHoverVisuals();
@@ -568,140 +464,70 @@ function renderSliders() {
       }
     });
 
-    // Header
     const head = document.createElement("div");
-    head.className = "cut-card-head";
-    const isFoldedTwoTwo =
-      cut.kind === "pair" &&
-      carving.pieces.some((p) => p.boundaryCutId === cut.id && p.degenerate);
-    const badgeText = isFoldedTwoTwo ? "Folded (2,2) bar" : cutKindLabel(cut);
-    head.innerHTML = `
-      <span class="cut-title"><span class="cut-dot" style="background:${cut.color};"></span>${cut.name}</span>
-      <span class="cut-badge">${badgeText}</span>
-    `;
-    card.append(head);
+    head.className = "cut-head";
 
-    // Pair selector row (for every cut where user picks how to carve it out!)
-    if (opts.pairMode !== "none") {
-      const pairRow = document.createElement("div");
-      pairRow.className = "pair-row";
-      const lbl = document.createElement("label");
-      lbl.className = "pair-lbl";
-      lbl.textContent = opts.pairMode === "edge-slot" ? "Anchor edge:" : "Draw around:";
-      lbl.htmlFor = `pair-sel-${idx}`;
+    const title = document.createElement("span");
+    title.className = "cut-title";
+    const dot = document.createElement("span");
+    dot.className = "cut-dot";
+    dot.style.background = cut.color;
+    title.append(dot, cut.name);
 
-      const select = document.createElement("select");
-      select.id = `pair-sel-${idx}`;
-      select.className = "pair-select";
+    const pair = document.createElement("span");
+    pair.className = "cut-pair";
+    pair.textContent = cutRoleLabel(cut, opts, orb, carving);
 
-      const curA = opts.currentPair[0];
-      const curB = opts.currentPair[1];
-      for (const [u, v] of opts.validPairs) {
-        const opt = document.createElement("option");
-        opt.value = `${u}||${v}`;
-        const nu = formatItemDisplayName(u, orb, carving);
-        const nv = formatItemDisplayName(v, orb, carving);
-        opt.textContent = opts.pairMode === "edge-slot" ? `Edge (${nu}, ${nv})` : `${nu} + ${nv}`;
-        if ((u === curA && v === curB) || (u === curB && v === curA)) {
-          opt.selected = true;
-        }
-        select.append(opt);
-      }
-      select.addEventListener("change", () => {
-        const [u, v] = select.value.split("||");
-        applyCarvingUpdate(setCutPair(state.orb, state.carving, idx, u, v));
-      });
+    head.append(title, pair);
+    group.append(head);
 
-      const pickBtn = document.createElement("button");
-      pickBtn.type = "button";
-      pickBtn.className = "btn btn-sm";
-      pickBtn.setAttribute("aria-pressed", String(isPicking));
-      pickBtn.textContent = isPicking ? "Picking…" : "Pick on diagram";
-      pickBtn.addEventListener("click", () => {
-        if (state.activePickCutIndex === idx) {
-          state.activePickCutIndex = null;
-          state.pendingNodeId = null;
-        } else {
-          state.activePickCutIndex = idx;
-          state.pendingNodeId = null;
-        }
-        renderAllViews(false);
-      });
+    // Length / arc / core-step slider
+    const isArcOrCrosscap =
+      cut.kind === "crosscap" ||
+      cut.kind === "mirror-arc" ||
+      cut.kind === "cone-mirror-arc" ||
+      cut.kind === "bridge-arc";
+    const lenSymText = isArcOrCrosscap ? "d" : "ℓ";
 
-      pairRow.append(lbl, select, pickBtn);
-      card.append(pairRow);
-    }
-
-    // Length slider
     const lenRow = document.createElement("div");
     lenRow.className = "param-row";
-    const lenLabelText =
-      cut.kind === "crosscap"
-        ? `Core step d (${cut.name})`
-        : cut.kind === "mirror-arc" || cut.kind === "cone-mirror-arc" || cut.kind === "bridge-arc"
-        ? `Arc length d (${cut.name})`
-        : `Length ℓ (${cut.name})`;
-    const formatLenVal = (val) =>
-      cut.kind === "crosscap" ? `d = ${val.toFixed(2)} (cuff = ${(2 * val).toFixed(2)})` : `ℓ = ${val.toFixed(2)}`;
-
-    const lenTop = document.createElement("div");
-    lenTop.className = "param-top";
-    const lenNameEl = document.createElement("span");
-    lenNameEl.className = "param-name";
-    lenNameEl.textContent = lenLabelText;
-    const lenValEl = document.createElement("span");
-    lenValEl.className = "param-val";
-    lenValEl.textContent = formatLenVal(cut.length);
-    lenTop.append(lenNameEl, lenValEl);
+    const lenSym = document.createElement("span");
+    lenSym.className = "param-sym";
+    lenSym.textContent = lenSymText;
 
     const lenInput = document.createElement("input");
     lenInput.type = "range";
     lenInput.className = "fn-range";
     lenInput.min = cut.kind === "crosscap" ? "0.15" : "0.25";
-    lenInput.max = cut.kind === "crosscap" ? "2.75" : "5.50";
+    lenInput.max = cut.kind === "crosscap" ? "2.75" : "5.5";
     lenInput.step = "0.01";
     lenInput.value = String(cut.length);
     lenInput.style.accentColor = cut.color;
-    lenInput.setAttribute("aria-label", `${lenLabelText} slider`);
+    lenInput.setAttribute("aria-label", `${cut.name} ${lenSymText}`);
 
-    let twistValEl = null;
-    const formatTwistVal = (turns, length) => {
-      const sign = turns >= 0 ? "+" : "";
-      const tau = turns * length;
-      const tSign = tau >= 0 ? "+" : "";
-      return `${sign}${turns.toFixed(2)} turns (τ = ${tSign}${tau.toFixed(2)})`;
-    };
+    const lenVal = document.createElement("span");
+    lenVal.className = "param-val";
+    lenVal.textContent = cut.length.toFixed(2);
 
     lenInput.addEventListener("input", () => {
-      stopActiveAnimation();
       cut.length = parseFloat(lenInput.value);
-      lenValEl.textContent = formatLenVal(cut.length);
-      if (twistValEl) twistValEl.textContent = formatTwistVal(cut.twistTurns, cut.length);
+      lenVal.textContent = cut.length.toFixed(2);
       state.realization = buildRealization(state.orb, state.carving);
-      renderDiagnostics();
       scheduleDiskRender(true);
     });
     lenInput.addEventListener("change", () => scheduleDiskRender(false));
 
-    lenRow.append(lenTop, lenInput);
-    card.append(lenRow);
+    lenRow.append(lenSym, lenInput, lenVal);
+    group.append(lenRow);
 
-    // Twist slider (when hasTwist)
+    // Twist slider (when applicable)
     if (cut.hasTwist) {
       const twRow = document.createElement("div");
       twRow.className = "param-row";
-      const twTop = document.createElement("div");
-      twTop.className = "param-top";
-      const twNameEl = document.createElement("span");
-      twNameEl.className = "param-name";
-      twNameEl.textContent = `Twist θ (${cut.name})`;
-      twistValEl = document.createElement("span");
-      twistValEl.className = "param-val";
-      twistValEl.textContent = formatTwistVal(cut.twistTurns, cut.length);
-      twTop.append(twNameEl, twistValEl);
+      const twSym = document.createElement("span");
+      twSym.className = "param-sym";
+      twSym.textContent = "θ";
 
-      const twControls = document.createElement("div");
-      twControls.className = "param-controls";
       const twInput = document.createElement("input");
       twInput.type = "range";
       twInput.className = "fn-range";
@@ -710,139 +536,33 @@ function renderSliders() {
       twInput.step = "0.005";
       twInput.value = String(cut.twistTurns);
       twInput.style.accentColor = cut.color;
-      twInput.setAttribute("aria-label", `Twist ${cut.name} slider`);
+      twInput.setAttribute("aria-label", `${cut.name} twist`);
 
-      const dehnBtn = document.createElement("button");
-      dehnBtn.type = "button";
-      dehnBtn.className = "btn btn-sm";
-      dehnBtn.textContent = "Dehn twist ↻";
-      dehnBtn.title = "Animate θ → θ + 1 turn (a full Dehn twist leaves the tiling invariant)";
+      const formatTw = (v) => (v >= 0 ? `+${v.toFixed(2)}` : v.toFixed(2));
+      const twVal = document.createElement("span");
+      twVal.className = "param-val";
+      twVal.textContent = formatTw(cut.twistTurns);
 
       twInput.addEventListener("input", () => {
-        stopActiveAnimation();
         cut.twistTurns = parseFloat(twInput.value);
-        twistValEl.textContent = formatTwistVal(cut.twistTurns, cut.length);
+        twVal.textContent = formatTw(cut.twistTurns);
         state.realization = buildRealization(state.orb, state.carving);
-        renderDiagnostics();
         scheduleDiskRender(true);
       });
       twInput.addEventListener("change", () => scheduleDiskRender(false));
 
-      dehnBtn.addEventListener("click", () => {
-        stopActiveAnimation();
-        const start = cut.twistTurns;
-        const duration = 1350;
-        const t0 = performance.now();
-        const stepAnim = (now) => {
-          const u = Math.min(1, (now - t0) / duration);
-          const ease = u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
-          const val = start + ease;
-          cut.twistTurns = val;
-          const displayTurns = val > 1 ? val - 2 : val;
-          twInput.value = String(Math.max(-1, Math.min(1, displayTurns)));
-          twistValEl.textContent = formatTwistVal(val, cut.length);
-          state.realization = buildRealization(state.orb, state.carving);
-          renderDisk(1000);
-          if (u < 1) {
-            state.animFrame = requestAnimationFrame(stepAnim);
-          } else {
-            state.animFrame = null;
-            // Wrap smoothly modulo 1 into [-1, 1]
-            let final = cut.twistTurns;
-            while (final > 1.0001) final -= 1;
-            while (final < -1.0001) final += 1;
-            cut.twistTurns = Math.round(final * 1000) / 1000;
-            twInput.value = String(cut.twistTurns);
-            twistValEl.textContent = formatTwistVal(cut.twistTurns, cut.length);
-            state.realization = buildRealization(state.orb, state.carving);
-            renderDiagnostics();
-            renderDisk(2200);
-          }
-        };
-        state.animFrame = requestAnimationFrame(stepAnim);
-      });
-
-      twControls.append(twInput, dehnBtn);
-      twRow.append(twTop, twControls);
-      card.append(twRow);
-    } else {
-      const note = document.createElement("div");
-      note.className = "no-twist-note";
-      note.textContent =
-        cut.kind === "crosscap"
-          ? "1-parameter cut: crosscap has a fixed half-turn glide twist."
-          : "1-parameter cut: mirror boundary fixes twist = 0.";
-      card.append(note);
+      twRow.append(twSym, twInput, twVal);
+      group.append(twRow);
     }
 
-    els.slidersHost.append(card);
+    els.slidersHost.append(group);
   });
 }
 
 function syncHoverVisuals() {
-  for (const card of els.slidersHost.querySelectorAll(".cut-card")) {
-    card.classList.toggle("is-hovered", card.dataset.cutId === state.hoveredCutId);
+  for (const el of els.slidersHost.querySelectorAll(".cut-group")) {
+    el.classList.toggle("is-hovered", el.dataset.cutId === state.hoveredCutId);
   }
-}
-
-function renderSchematicView() {
-  renderSchematic(els.schematicHost, state.orb, state.carving, state.realization, state, {
-    onSelectCutPair: (cutIdx, u, v) => {
-      state.activePickCutIndex = null;
-      state.pendingNodeId = null;
-      applyCarvingUpdate(setCutPair(state.orb, state.carving, cutIdx, u, v));
-    },
-    onPickNode: (nodeId) => {
-      const cutIdx = state.activePickCutIndex;
-      if (cutIdx === null) return;
-      const opts = getCutOptions(state.orb, state.carving, cutIdx);
-      if (!opts.selectableIds.includes(nodeId)) return;
-
-      if (!state.pendingNodeId) {
-        state.pendingNodeId = nodeId;
-        renderSchematicView();
-        return;
-      }
-      if (state.pendingNodeId === nodeId) {
-        state.pendingNodeId = null;
-        renderSchematicView();
-        return;
-      }
-      const first = state.pendingNodeId;
-      const ok = opts.validPairs.some(
-        ([u, v]) => (u === first && v === nodeId) || (u === nodeId && v === first)
-      );
-      if (ok) {
-        state.activePickCutIndex = null;
-        state.pendingNodeId = null;
-        applyCarvingUpdate(setCutPair(state.orb, state.carving, cutIdx, first, nodeId));
-      } else {
-        // Restart pair selection with clicked node as new first node
-        state.pendingNodeId = nodeId;
-        renderSchematicView();
-      }
-    },
-    onHoverCut: (cutId) => {
-      state.hoveredCutId = cutId;
-      syncHoverVisuals();
-      scheduleDiskRender(false);
-    },
-    onSelectCutCard: (cutIdx) => {
-      const opts = getCutOptions(state.orb, state.carving, cutIdx);
-      if (opts.pairMode === "none") return;
-      state.activePickCutIndex = state.activePickCutIndex === cutIdx ? null : cutIdx;
-      state.pendingNodeId = null;
-      renderAllViews(false);
-    }
-  });
-}
-
-function updateCarvingActionButtons() {
-  const hasMutable =
-    state.carving &&
-    state.carving.cuts.some((_, i) => getCutOptions(state.orb, state.carving, i).validPairs.length > 1);
-  if (els.btnCycleCarving) els.btnCycleCarving.hidden = !hasMutable;
-  if (els.btnCancelPick) els.btnCancelPick.hidden = state.activePickCutIndex === null;
 }
 
 function renderAllViews(resetCamera = false) {
@@ -850,29 +570,16 @@ function renderAllViews(resetCamera = false) {
     state.cameraM = ID3;
     state.cameraWrapped = false;
   }
-  renderPresets();
-  renderStatusAndKPIs();
-  renderSchematicView();
+  renderStatusAndMeta();
   renderSliders();
-  renderDiagnostics();
-  updateCarvingActionButtons();
   scheduleDiskRender(false);
 }
 
-function applyCarvingUpdate(nextCarving) {
-  stopActiveAnimation();
-  state.carving = nextCarving;
-  state.realization = buildRealization(state.orb, state.carving);
-  renderAllViews(false);
-}
-
 function loadSignature(rawSig, pushUrl = true) {
-  stopActiveAnimation();
   const parsed = parseOrbifold(rawSig);
   state.orb = parsed;
-  state.activePickCutIndex = null;
-  state.pendingNodeId = null;
   state.hoveredCutId = null;
+
   if (parsed.ok) {
     els.sigInput.value = parsed.canonical;
     if (pushUrl) {
@@ -881,13 +588,15 @@ function loadSignature(rawSig, pushUrl = true) {
       window.history.replaceState(null, "", url.toString());
     }
   }
+
   if (parsed.ok && parsed.geometry === "hyperbolic") {
-    state.carving = createDefaultCarving(parsed);
+    state.carving = createRandomCarving(parsed);
     state.realization = buildRealization(parsed, state.carving);
   } else {
     state.carving = null;
     state.realization = null;
   }
+
   renderAllViews(true);
 }
 
@@ -900,66 +609,17 @@ els.sigForm?.addEventListener("submit", (e) => {
   loadSignature(els.sigInput.value);
 });
 
-els.btnCycleCarving?.addEventListener("click", () => {
-  if (!state.orb || !state.carving) return;
-  state.activePickCutIndex = null;
-  state.pendingNodeId = null;
-  applyCarvingUpdate(cycleCarvingTopology(state.orb, state.carving));
-});
-
-els.btnCancelPick?.addEventListener("click", () => {
-  state.activePickCutIndex = null;
-  state.pendingNodeId = null;
-  renderAllViews(false);
-});
-
-els.btnRecenter?.addEventListener("click", () => {
+els.btnReshuffle?.addEventListener("click", () => {
+  if (!state.orb?.ok || state.orb.geometry !== "hyperbolic") return;
+  state.hoveredCutId = null;
+  state.carving = createRandomCarving(state.orb, state.carving);
+  state.realization = buildRealization(state.orb, state.carving);
   state.cameraM = ID3;
   state.cameraWrapped = false;
-  scheduleDiskRender(false);
-});
-
-els.btnResetParams?.addEventListener("click", () => {
-  if (!state.orb || state.orb.geometry !== "hyperbolic") return;
-  stopActiveAnimation();
-  state.cameraM = ID3;
-  state.cameraWrapped = false;
-  state.carving = createDefaultCarving(state.orb);
-  state.realization = buildRealization(state.orb, state.carving);
-  renderAllViews(true);
-});
-
-els.btnRandomize?.addEventListener("click", () => {
-  if (!state.orb || !state.carving || state.carving.cuts.length === 0) return;
-  stopActiveAnimation();
-  for (const c of state.carving.cuts) {
-    if (c.kind === "crosscap") {
-      c.length = Math.round((0.65 + Math.random() * 1.45) * 100) / 100;
-    } else {
-      c.length = Math.round((0.8 + Math.random() * 2.4) * 100) / 100;
-    }
-    if (c.hasTwist) {
-      c.twistTurns = Math.round(((Math.random() - 0.5) * 1.4) * 200) / 200;
-    }
-  }
-  state.realization = buildRealization(state.orb, state.carving);
   renderSliders();
-  renderDiagnostics();
   scheduleDiskRender(false);
 });
 
-// Overlay checkboxes
-for (const key of Object.keys(state.overlays)) {
-  const chk = document.getElementById(`ov-${key}`);
-  if (!chk) continue;
-  chk.checked = state.overlays[key];
-  chk.addEventListener("change", () => {
-    state.overlays[key] = chk.checked;
-    scheduleDiskRender(false);
-  });
-}
-
-// Mouse / touch Mobius pan and two-finger trackpad scroll on canvas
 if (els.canvas) {
   const activePointers = new Map();
   let dragStartPt = null;

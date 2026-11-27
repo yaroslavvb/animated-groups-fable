@@ -6,7 +6,7 @@
 <title>Fenchel–Nielsen Orbifold Explorer — Spacetime Groups</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
 <link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
-<link rel="stylesheet" href="css/fenchel-nielsen.css?v=fn-v2">
+<link rel="stylesheet" href="css/fenchel-nielsen.css?v=fn-v3">
 <script defer src="js/site-header.js?v=collapsible-header-v1"></script>
 </head>
 <body class="fn-page">
@@ -62,88 +62,33 @@
 </header>
 
 <main class="fn-shell">
-  <p class="fn-kicker">Hyperbolic Orbifolds · Teichmüller Coordinates</p>
-  <h1>Fenchel–Nielsen Orbifold Explorer</h1>
-  <p class="fn-lede">
-    Enter any Conway orbifold signature, choose how to carve it into rigid pieces by selecting which pairs each cut draws around, and dial the hyperbolic lengths and twists live in the Poincaré disk.
-  </p>
-
-  <section class="input-panel" aria-label="Orbifold signature and presets">
+  <div class="fn-topbar">
     <form class="sig-form" id="sig-form">
-      <label class="sig-label" for="sig-input">Orbifold notation</label>
-      <input class="sig-input" id="sig-input" type="text" value="3322" spellcheck="false" autocomplete="off" placeholder="e.g. 3322, *3333, 2*32">
+      <label class="sig-label" for="sig-input">Orbifold</label>
+      <input class="sig-input" id="sig-input" type="text" value="3322" spellcheck="false" autocomplete="off" placeholder="e.g. 3322, *3333, 2*32, oo">
       <button class="btn btn-primary" type="submit">Apply</button>
-      <span class="sig-help">Supports cones (<span class="orb">3322</span>, <span class="orb">(12)222</span>), mirrors (<span class="orb">*3333</span>, <span class="orb">2*32</span>), handles (<span class="orb">o2</span>, <span class="orb">oo</span>), crosscaps (<span class="orb">23x</span>, <span class="orb">xxx</span>).</span>
     </form>
-    <div class="preset-groups" id="preset-groups"></div>
-  </section>
+    <span class="orb-meta" id="orb-meta" aria-live="polite"></span>
+  </div>
 
   <div class="status-banner" id="status-banner" hidden role="status"></div>
 
-  <div class="kpi-grid" id="kpi-grid"></div>
+  <div class="fn-stage" id="fn-stage">
+    <div class="disk-col">
+      <canvas id="disk-canvas" width="560" height="560" aria-label="Interactive Poincaré disk hyperbolic orbifold tiling"></canvas>
+      <p class="disk-hint">Drag or two-finger scroll to pan · double-click to recenter</p>
+    </div>
 
-  <div class="workbench">
-    <section class="panel" aria-label="Poincaré disk tiling">
-      <div class="panel-head">
-        <div>
-          <h2 class="panel-title">Poincaré Disk Realization (ℍ²)</h2>
-          <p class="panel-sub">Color-coded curves trace the chosen cuts lifted across the universal cover.</p>
-        </div>
+    <aside class="controls-col" id="controls-col" aria-label="Fenchel–Nielsen parameters">
+      <div class="controls-head">
+        <span class="controls-title">Parameters</span>
+        <button class="btn btn-sm" id="btn-reshuffle" type="button">Reshuffle</button>
       </div>
-
-      <div class="disk-stage">
-        <canvas id="disk-canvas" width="520" height="520" aria-label="Interactive Poincaré disk hyperbolic orbifold tiling"></canvas>
-        <p class="disk-hint">Drag or two-finger scroll inside the disk to pan in ℍ² · double-click to recenter.</p>
-
-        <div class="overlay-bar">
-          <label class="chk"><input type="checkbox" id="ov-cuts" checked> Cut geodesics</label>
-          <label class="chk"><input type="checkbox" id="ov-fd" checked> Fundamental domain</label>
-          <label class="chk"><input type="checkbox" id="ov-seams"> Half-pant seams</label>
-          <label class="chk"><input type="checkbox" id="ov-markers" checked> Feature markers</label>
-          <label class="chk"><input type="checkbox" id="ov-parity" checked> Parity shading</label>
-        </div>
-
-        <div class="disk-actions">
-          <button class="btn btn-sm" id="btn-recenter" type="button">Recenter</button>
-          <button class="btn btn-sm" id="btn-reset-params" type="button">Reset</button>
-          <button class="btn btn-sm" id="btn-randomize" type="button">Randomize</button>
-        </div>
-      </div>
-
-      <details class="gen-drawer">
-        <summary>Generators &amp; Live Verification</summary>
-        <div class="gen-diag" id="gen-diag"></div>
-        <div style="overflow-x:auto;">
-          <table class="gen-table">
-            <thead>
-              <tr><th>Generator</th><th>Type</th><th>Det</th><th>Trace</th><th>Invariant</th></tr>
-            </thead>
-            <tbody id="gen-tbody"></tbody>
-          </table>
-        </div>
-      </details>
-    </section>
-
-    <aside class="controls-col" aria-label="Carving diagram and Fenchel-Nielsen sliders">
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2 class="panel-title">How it's carved</h2>
-            <p class="panel-sub">Each slider below selects which pair its cut draws around.</p>
-          </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="btn btn-sm" id="btn-cancel-pick" type="button" hidden>Cancel pick</button>
-            <button class="btn btn-sm" id="btn-cycle-carving" type="button">Cycle carving</button>
-          </div>
-        </div>
-        <div id="schematic-host"></div>
-      </section>
-
       <div class="sliders-stack" id="sliders-host"></div>
     </aside>
   </div>
 </main>
 
-<script type="module" src="js/fenchel-nielsen/app.js?v=fn-v2"></script>
+<script type="module" src="js/fenchel-nielsen/app.js?v=fn-v3"></script>
 </body>
 </html>
