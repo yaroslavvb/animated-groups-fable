@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The real 2222</title>
+<style>
+/*__INLINE_CSS__*/
+</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<main class="app">
+  <header class="hdr">
+    <h1 class="title">The real 2222</h1>
+    <p class="sub">Three paired-corner coordinates on one 2222 orbifold pillow: adjust length or twist in any partition to deform all three.</p>
+  </header>
+
+  <section class="workspace" aria-label="3D pillow and coupled partition sliders">
+    <div class="stage-wrap" id="stage-wrap">
+      <div class="stage-card">
+        <div class="pane" id="pane">
+          <canvas id="view" tabindex="0" aria-label="Interactive 3D 2222 orbifold pillow"></canvas>
+          <div class="labels" id="labels" aria-hidden="true"></div>
+          <button type="button" class="btn-quiet pane-reset" id="reset-view" aria-label="Reset 3D camera" title="Reset camera view">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7"/>
+              <path d="M4 4v4.7h4.7"/>
+            </svg>
+          </button>
+          <p class="hint">Drag to turn · pinch to zoom</p>
+        </div>
+        <div class="stage-foot">
+          <div class="stage-meta">
+            <strong id="shape-kind">square envelope</strong>
+            <span class="edges-val" id="edges-readout">edges 1.00, 1.00, 1.41</span>
+          </div>
+          <div class="presets" role="group" aria-label="Shape presets">
+            <button type="button" class="preset-btn" id="preset-square">Square</button>
+            <button type="button" class="preset-btn" id="preset-reg">Regular tetrahedron</button>
+            <button type="button" class="preset-btn" id="preset-reset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend" aria-label="Legend">
+        <span class="lg"><i class="sw sw-cut"></i><span>isolating cut (c = <span id="cut-readout">0.296</span>)</span></span>
+        <span class="lg"><i class="sw sw-front"></i>plain band</span>
+        <span class="lg"><i class="sw sw-band-shade"></i>shaded band</span>
+        <span class="lg"><i class="sw sw-ab"></i>{A, B} | {C, D}</span>
+        <span class="lg"><i class="sw sw-ac"></i>{A, C} | {B, D}</span>
+        <span class="lg"><i class="sw sw-ad"></i>{A, D} | {B, C}</span>
+      </div>
+    </div>
+
+    <div class="controls-col" id="controls-col">
+      <article class="partition-card is-active" data-part="0" data-color="ab">
+        <button type="button" class="part-head" data-select="0" aria-pressed="true">
+          <span class="part-id">
+            <i class="part-dot"></i>
+            <span class="part-title">{A, B} | {C, D}</span>
+          </span>
+          <span class="part-badge">active cut</span>
+        </button>
+        <div class="slider-group">
+          <label class="srow" for="len-0">
+            <span class="slabel">Length</span>
+            <div class="swrap">
+              <input id="len-0" type="range" min="0.55" max="1.95" step="0.005" value="1">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:11.22%"></i>
+                <i style="left:32.14%"></i>
+                <i style="left:61.73%"></i>
+              </div>
+            </div>
+            <output class="sval" id="len-val-0" for="len-0">1.000</output>
+          </label>
+          <label class="srow" for="tw-0">
+            <span class="slabel">Twist</span>
+            <div class="swrap">
+              <input id="tw-0" type="range" min="-0.5" max="0.5" step="0.002" value="0">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:0%"></i>
+                <i style="left:25%"></i>
+                <i style="left:50%"></i>
+                <i style="left:75%"></i>
+                <i style="left:100%"></i>
+              </div>
+            </div>
+            <output class="sval" id="tw-val-0" for="tw-0">+0.000</output>
+          </label>
+        </div>
+      </article>
+
+      <article class="partition-card" data-part="1" data-color="ac">
+        <button type="button" class="part-head" data-select="1" aria-pressed="false">
+          <span class="part-id">
+            <i class="part-dot"></i>
+            <span class="part-title">{A, C} | {B, D}</span>
+          </span>
+          <span class="part-badge">active cut</span>
+        </button>
+        <div class="slider-group">
+          <label class="srow" for="len-1">
+            <span class="slabel">Length</span>
+            <div class="swrap">
+              <input id="len-1" type="range" min="0.55" max="1.95" step="0.005" value="1">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:11.22%"></i>
+                <i style="left:32.14%"></i>
+                <i style="left:61.73%"></i>
+              </div>
+            </div>
+            <output class="sval" id="len-val-1" for="len-1">1.000</output>
+          </label>
+          <label class="srow" for="tw-1">
+            <span class="slabel">Twist</span>
+            <div class="swrap">
+              <input id="tw-1" type="range" min="-0.5" max="0.5" step="0.002" value="0">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:0%"></i>
+                <i style="left:25%"></i>
+                <i style="left:50%"></i>
+                <i style="left:75%"></i>
+                <i style="left:100%"></i>
+              </div>
+            </div>
+            <output class="sval" id="tw-val-1" for="tw-1">+0.000</output>
+          </label>
+        </div>
+      </article>
+
+      <article class="partition-card" data-part="2" data-color="ad">
+        <button type="button" class="part-head" data-select="2" aria-pressed="false">
+          <span class="part-id">
+            <i class="part-dot"></i>
+            <span class="part-title">{A, D} | {B, C}</span>
+          </span>
+          <span class="part-badge">active cut</span>
+        </button>
+        <div class="slider-group">
+          <label class="srow" for="len-2">
+            <span class="slabel">Length</span>
+            <div class="swrap">
+              <input id="len-2" type="range" min="0.55" max="1.95" step="0.005" value="1.414">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:11.22%"></i>
+                <i style="left:32.14%"></i>
+                <i style="left:61.73%"></i>
+              </div>
+            </div>
+            <output class="sval" id="len-val-2" for="len-2">1.414</output>
+          </label>
+          <label class="srow" for="tw-2">
+            <span class="slabel">Twist</span>
+            <div class="swrap">
+              <input id="tw-2" type="range" min="-0.5" max="0.5" step="0.002" value="-0.25">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:0%"></i>
+                <i style="left:25%"></i>
+                <i style="left:50%"></i>
+                <i style="left:75%"></i>
+                <i style="left:100%"></i>
+              </div>
+            </div>
+            <output class="sval" id="tw-val-2" for="tw-2">-0.250</output>
+          </label>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+<script>
+/*__INLINE_JS__*/
+</script>
+</body>
+</html>
