@@ -771,6 +771,7 @@ export function createPattern(canvas, opts = {}) {
     const starOf = new Array(n).fill(-1);
     A.stars.forEach((s, k) => s.edges.forEach((e) => { starOf[e] = k; }));
     const hScale = kind === 'H' ? Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area))) : 0.45;
+    const markScale = kind === 'H' ? Math.min(0.75, Math.max(0.20, 0.30 * Math.sqrt(area))) : 0.45;
     const segBucket = (a, q) => {
       const midZ = (a[2] + q[2]) / Math.sqrt(Math.max(1e-12, 2 * (1 + a[2] * q[2] - a[0] * q[0] - a[1] * q[1])));
       const sPx = (hScale * R) / (1 + Math.min(a[2], q[2], midZ));
@@ -883,9 +884,18 @@ export function createPattern(canvas, opts = {}) {
       for (const mk of marked) {
         const picked = !!(pick && pick.t === 'd' && pick.cls === mk.c.id);
         const p = P[mk.v];
-        const mpx = kind === 'H' ? (hScale * R) / (1 + p[2]) : px;
-        if (mpx < (picked ? 3.0 : 4.5)) continue;
-        if (kind === 'S' && p[2] < 0.05) continue;
+        const on = picked || !!(also && also.has(mk.c.id));
+        let r;
+        if (kind === 'H') {
+          const rHyp = (picked ? 0.125 : on ? 0.115 : 0.080) * markScale;
+          r = (rHyp * R) / (1 + p[2]);
+          if (r < 0.9) continue;
+        } else {
+          if (px < (picked ? 3.0 : 4.5)) continue;
+          if (kind === 'S' && p[2] < 0.05) continue;
+          r = Math.min(picked ? 10 : on ? 9.5 : 6.5, (picked ? 0.36 : on ? 0.34 : 0.24) * px);
+          if (r < 1.1) continue;
+        }
         let ang;
         if (mk.dir) {
           const u = apply(M, mk.dir);
@@ -896,10 +906,8 @@ export function createPattern(canvas, opts = {}) {
           const q = lerpEdge(p, mk.toward === null ? c : P[mk.toward], 0.06);
           ang = Math.atan2(Y(q) - Y(p), X(q) - X(p));
         }
-        const on = picked || !!(also && also.has(mk.c.id));
-        const r = Math.min(picked ? 10 : on ? 9.5 : 6.5, (picked ? 0.36 : on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
-        if (r < 1.1) continue;
-        if (picked && pickHalo && r >= 2.2) {
+        const x = X(p), y = Y(p), path = marks[mk.c.id];
+        if (picked && pickHalo && r >= 1.8) {
           const hr = r * 1.85;
           pickHalo.moveTo(x + hr, y);
           pickHalo.arc(x, y, hr, 0, TAU);

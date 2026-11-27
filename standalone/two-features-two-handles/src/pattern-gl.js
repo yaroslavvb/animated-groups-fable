@@ -122,9 +122,9 @@ layout(std140) uniform SegBlock {
 };
 
 layout(std140) uniform MarkBlock {
-  vec4 mPos[128];   // (px, py, ux, uy)
+  vec4 mFrame[128]; // (ar, ai, br, bi) local PSU(1,1) frame: pg -> 0, ug -> +x
   vec4 mMeta[128];  // (order, isCone, clsId, isAlso)
-  vec4 mBound[128]; // (-Mx, -My, +Mz, 0.0)
+  vec4 mBound[128]; // (-Mx, -My, +Mz, markScale)
 };
 
 uniform sampler2DArray uCommaTex; // 256 x 256 x N RGBA8
@@ -162,18 +162,6 @@ vec2 psuApply(vec4 g, float flip, vec2 w) {
   float di = g.z * v - g.w * u - g.y;
   float d2 = max(1e-20, dr * dr + di * di);
   return vec2(nr * dr + ni * di, ni * dr - nr * di) / d2;
-}
-
-vec2 psuPushDir(vec4 g, float flip, vec2 p0, vec2 dir0) {
-  float u = p0.x;
-  float v = flip > 0.5 ? -p0.y : p0.y;
-  float dr = g.z * u + g.w * v + g.x;
-  float di = g.z * v - g.w * u - g.y;
-  vec2 ds = vec2(dir0.x, flip > 0.5 ? -dir0.y : dir0.y);
-  vec2 den2 = vec2(dr * dr - di * di, 2.0 * dr * di);
-  vec2 dw = vec2(ds.x * den2.x + ds.y * den2.y, ds.y * den2.x - ds.x * den2.y);
-  float l2 = dot(dw, dw);
-  return l2 > 1e-24 ? dw * inversesqrt(l2) : dir0;
 }
 
 vec4 psuInv(vec4 g, float flip) {
@@ -541,77 +529,81 @@ void main() {
       col = mix(col, grpCol, grpCov * grpAlpha);
     }
 
-    // ---- 4. Marked Vertices (1-dot Minkowski cull before psuApply)
+    // ---- 4. Marked Vertices (1-dot Minkowski cull + exact intrinsic conformal frame)
     int nMarks = uCounts.w;
     bool dimMarks = uParams.z > 0.5;
-    vec4 Tinv = psuInv(T, Tflip);
-    float TinvFlip = Tflip;
-
-    if (pickType > 3.5 && nMarks > 0) {
-      float haloMaxCosh = cosh(min(5.0, (24.0 / pxPerHyp) * 1.05 + 0.02));
-      float haloFillCov = 0.0;
-      float haloRingCov = 0.0;
-      vec3 haloCol = C_BLUE;
-      for (int i = 0; i < 128; i++) {
-        if (i >= nMarks) break;
-        if (dot(Q, mBound[i].xyz) > haloMaxCosh) continue;
-        vec4 mMetaV = mMeta[i];
-        if (abs(mMetaV.z - pickId) > 0.25) continue;
-        vec2 ps = psuApply(Tinv, TinvFlip, mPos[i].xy);
-        float mpx = hScale * R * 0.5 * max(1e-5, 1.0 - dot(ps, ps));
-        float r = min(10.0, 0.36 * mpx);
-        if (mpx < 3.0 || r < 2.2) continue;
-        float hr = 1.85 * r;
-        float d = length((wClamped - ps) * R);
-        if (d > hr + 2.0) continue;
-        haloCol = mMetaV.y > 0.5 ? C_BLUE : C_RED;
-        float fCov = clamp((hr + 0.5 / dpr - d) * dpr, 0.0, 1.0);
-        float rCov = lineCov(abs(d - hr), 0.8, dpr);
-        haloFillCov = max(haloFillCov, fCov);
-        haloRingCov = max(haloRingCov, rCov);
-      }
-      if (haloFillCov > 0.0) col = mix(col, haloCol, haloFillCov * 0.22);
-      if (haloRingCov > 0.0) col = mix(col, haloCol, haloRingCov * 0.78);
-    }
-
     if (nMarks > 0) {
-      float markMaxCosh = cosh(min(5.0, (18.0 / pxPerHyp) * 1.05 + 0.02));
-      for (int i = 0; i < 128; i++) {
-        if (i >= nMarks) break;
-        if (dot(Q, mBound[i].xyz) > markMaxCosh) continue;
-        vec4 mPosV = mPos[i];
-        vec2 ps = psuApply(Tinv, TinvFlip, mPosV.xy);
-        vec2 dDisc = (wClamped - ps) * R;
-        if (dot(dDisc, dDisc) > 324.0) continue;
-        float mpx = hScale * R * 0.5 * max(1e-5, 1.0 - dot(ps, ps));
-        vec4 mMetaV = mMeta[i];
-        int order = int(mMetaV.x + 0.5);
-        bool isCone = mMetaV.y > 0.5;
-        bool picked = (pickType > 3.5 && abs(mMetaV.z - pickId) < 0.25);
-        bool on = picked || (pickType < 0.5 && mMetaV.w > 0.5);
-        if (mpx < (picked ? 3.0 : 4.5)) continue;
-        float r = min(picked ? 10.0 : (on ? 9.5 : 6.5), (picked ? 0.36 : (on ? 0.34 : 0.24)) * mpx);
-        if (r < 1.1) continue;
-        float boundR = (order == 2 || order == 3 ? 1.25 : 1.08) * r + 2.5;
-        if (dot(dDisc, dDisc) > boundR * boundR) continue;
+      float msTop = mBound[0].w;
+      float rHypMax = 1.25 * 0.125 * msTop;
 
-        vec2 us = psuPushDir(Tinv, TinvFlip, mPosV.xy, mPosV.zw);
-        vec2 localPx = vec2(dDisc.x * us.x + dDisc.y * us.y, dDisc.y * us.x - dDisc.x * us.y);
-        float sd = order == 2
-          ? vesicaSDF(localPx, r)
-          : regularPolySDF(localPx, order, r * (order == 3 ? 1.25 : 1.08));
+      if (pickType > 3.5 && 1.85 * 0.125 * msTop * pxPerHyp >= 0.9) {
+        float haloMaxCosh = cosh(min(5.0, (1.85 * 0.125 * msTop + 3.0 / pxPerHyp) * 1.12 + 0.01));
+        float haloFillCov = 0.0;
+        float haloRingCov = 0.0;
+        vec3 haloCol = C_BLUE;
+        for (int i = 0; i < 128; i++) {
+          if (i >= nMarks) break;
+          vec4 mb = mBound[i];
+          if (dot(Q, mb.xyz) > haloMaxCosh) continue;
+          vec4 mMetaV = mMeta[i];
+          if (abs(mMetaV.z - pickId) > 0.25) continue;
+          float rHyp = 0.125 * mb.w;
+          vec2 qm = psuApply(mFrame[i], 0.0, qD);
+          float pxPerLocal = R * oneMinusWs2 / max(1e-6, 1.0 - dot(qm, qm));
+          float rPx = tanh(0.5 * rHyp) * pxPerLocal;
+          if (rPx < 0.9) continue;
+          float hrDisc = tanh(0.5 * 1.85 * rHyp);
+          float dPx = (length(qm) - hrDisc) * pxPerLocal;
+          if (dPx > 2.5) continue;
+          float vis = smoothstep(0.9, 2.0, rPx);
+          haloCol = mMetaV.y > 0.5 ? C_BLUE : C_RED;
+          float fCov = clamp((0.5 / dpr - dPx) * dpr, 0.0, 1.0) * vis;
+          float rCov = lineCov(abs(dPx), 0.8, dpr) * vis;
+          haloFillCov = max(haloFillCov, fCov);
+          haloRingCov = max(haloRingCov, rCov);
+        }
+        if (haloFillCov > 0.0) col = mix(col, haloCol, haloFillCov * 0.22);
+        if (haloRingCov > 0.0) col = mix(col, haloCol, haloRingCov * 0.78);
+      }
 
-        bool hasAnySel = (pickType > 0.5) || (uPick.w < 0.99);
-        bool full = on || !hasAnySel || (pickType < 0.5 && !dimMarks);
-        float fAlpha = full ? 1.0 : dimA;
-        float sWidth = picked ? 2.0 : (on ? 1.6 : 1.0);
-        float sAlpha = full ? 0.95 : 0.5;
-        float hp = 0.5 / dpr;
-        float fillCov = clamp((hp - sd) * dpr, 0.0, 1.0);
-        float strokeCov = lineCov(abs(sd), 0.5 * sWidth, dpr);
-        vec3 mCol = isCone ? C_BLUE : C_RED;
-        col = mix(col, mCol, fillCov * fAlpha);
-        col = mix(col, vec3(1.0), strokeCov * sAlpha);
+      if (rHypMax * pxPerHyp >= 0.55) {
+        float markMaxCosh = cosh(min(5.0, (rHypMax + 3.0 / pxPerHyp) * 1.12 + 0.01));
+        for (int i = 0; i < 128; i++) {
+          if (i >= nMarks) break;
+          vec4 mb = mBound[i];
+          if (dot(Q, mb.xyz) > markMaxCosh) continue;
+          vec4 mMetaV = mMeta[i];
+          int order = int(mMetaV.x + 0.5);
+          bool isCone = mMetaV.y > 0.5;
+          bool picked = (pickType > 3.5 && abs(mMetaV.z - pickId) < 0.25);
+          bool on = picked || (pickType < 0.5 && mMetaV.w > 0.5);
+          float rHyp = (picked ? 0.125 : (on ? 0.115 : 0.080)) * mb.w;
+          vec2 qm = psuApply(mFrame[i], 0.0, qD);
+          float qm2 = dot(qm, qm);
+          float rhoD = tanh(0.5 * rHyp);
+          float mult = (order == 2 || order == 3) ? 1.25 : 1.08;
+          float pxPerLocal = R * oneMinusWs2 / max(1e-6, 1.0 - qm2);
+          float rPx = rhoD * pxPerLocal;
+          if (rPx < 0.55) continue;
+          float sdDisc = order == 2
+            ? vesicaSDF(qm, rhoD)
+            : regularPolySDF(qm, order, rhoD * mult);
+          float sdPx = sdDisc * pxPerLocal;
+
+          bool hasAnySel = (pickType > 0.5) || (uPick.w < 0.99);
+          bool full = on || !hasAnySel || (pickType < 0.5 && !dimMarks);
+          float vis = smoothstep(0.55, 1.25, rPx);
+          float fAlpha = (full ? 1.0 : dimA) * vis;
+          float baseSw = picked ? 2.0 : (on ? 1.6 : 1.0);
+          float sWidth = min(baseSw, max(0.35, 0.24 * rPx));
+          float sAlpha = (full ? 0.95 : 0.5) * vis;
+          float hp = 0.5 / dpr;
+          float fillCov = clamp((hp - sdPx) * dpr, 0.0, 1.0);
+          float strokeCov = lineCov(abs(sdPx), 0.5 * sWidth, dpr);
+          vec3 mCol = isCone ? C_BLUE : C_RED;
+          col = mix(col, mCol, fillCov * fAlpha);
+          col = mix(col, vec3(1.0), strokeCov * sAlpha);
+        }
       }
     }
 
@@ -650,6 +642,22 @@ function pushDirDisc(g, p0, dir0) {
   const wx = sx * d2r + sy * d2i, wy = sy * d2r - sx * d2i;
   const l = Math.hypot(wx, wy) || 1;
   return [wx / l, wy / l];
+}
+
+/** Local PSU(1,1) frame sending disc point pg to 0 and tangent direction ug to (+1, 0). */
+export function markLocalFrame(pg, ug) {
+  const px = pg[0], py = pg[1];
+  const l = Math.hypot(ug[0], ug[1]) || 1;
+  const th = -0.5 * Math.atan2(ug[1] / l, ug[0] / l);
+  const ca = Math.cos(th), sa = Math.sin(th);
+  const g = 1 / Math.sqrt(Math.max(1e-12, 1 - (px * px + py * py)));
+  return [
+    g * ca,
+    g * sa,
+    -g * (ca * px - sa * py),
+    -g * (sa * px + ca * py),
+    false,
+  ];
 }
 
 function buildKleinNorms(D) {
@@ -1308,6 +1316,8 @@ export function createHyperbolicGL(canvas2d) {
       });
       const markInst = [];
       const hScale = Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area)));
+      const markScale = Math.min(0.75, Math.max(0.20, 0.30 * Math.sqrt(area)));
+      const markMargin = Math.max(0.45, 0.72 * hScale);
       for (const mk of marked) {
         const pH = D.verts[mk.v], p0 = toDisc(pH);
         let dir0;
@@ -1329,16 +1339,17 @@ export function createHyperbolicGL(canvas2d) {
         const mSeen = [];
         for (const g of candTiles) {
           const pg = psuApplyDisc(g, p0);
-          if (pointDistToD(pg, D, norms, S_edges, edgeLens) > 0.72 * hScale) continue;
+          if (pointDistToD(pg, D, norms, S_edges, edgeLens) > markMargin) continue;
           let dup = false;
           for (const prev of mSeen) { if (discDist(prev, pg) < 1e-3) { dup = true; break; } }
           if (dup) continue;
           mSeen.push(pg);
           if (markInst.length >= MAX_ITEMS) return false;
           const ug = pushDirDisc(g, p0, dir0);
+          const F = markLocalFrame(pg, ug);
           const mH = discToH(pg);
           markInst.push({
-            p: pg, u: ug, mH, order: mk.c.n,
+            F, mH, order: mk.c.n,
             isCone: mk.c.kind === 'cone' ? 1 : 0,
             clsId: mk.c.id,
             isAlso: alsoSet && alsoSet.has(mk.c.id) ? 1 : 0,
@@ -1384,9 +1395,9 @@ export function createHyperbolicGL(canvas2d) {
       markData.fill(0);
       for (let i = 0; i < markInst.length; i++) {
         const mk = markInst[i];
-        putVec4(markData, 0 * MAX_ITEMS, i, mk.p[0], mk.p[1], mk.u[0], mk.u[1]);
+        putVec4(markData, 0 * MAX_ITEMS, i, mk.F[0], mk.F[1], mk.F[2], mk.F[3]);
         putVec4(markData, 1 * MAX_ITEMS, i, mk.order, mk.isCone, mk.clsId, mk.isAlso);
-        putVec4(markData, 2 * MAX_ITEMS, i, -mk.mH[0], -mk.mH[1], mk.mH[2], 0);
+        putVec4(markData, 2 * MAX_ITEMS, i, -mk.mH[0], -mk.mH[1], mk.mH[2], markScale);
       }
       gl.bindBuffer(gl.UNIFORM_BUFFER, markUbo);
       gl.bufferSubData(gl.UNIFORM_BUFFER, 0, markData);
