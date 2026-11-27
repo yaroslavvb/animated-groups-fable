@@ -249,13 +249,14 @@ export function createPillowStage(canvas, labelLayer, scrollHost) {
       nextState.e[1][0],
       nextState.e[1][1],
       nextState.activeFrame.map((r) => r.join(',')).join('/'),
+      nextState.q90 || 0,
       nextState.pr || 0,
     ].join('|');
 
     if (key !== printKey) {
       printKey = key;
       texTurn ^= 1;
-      const P = pairPrintParams(nextState.e, nextState.activeFrame, nextState.pr || 0);
+      const P = pairPrintParams(nextState.e, nextState.activeFrame, nextState.pr || 0, nextState.q90);
       const placed = printOf('2222', P, cellBox(mesh.ca, mesh.cb));
       R.setStyle({
         print: printTexture(fields, placed, mesh.ca, mesh.cb, PRINT_SIZE, texBuf[texTurn]),

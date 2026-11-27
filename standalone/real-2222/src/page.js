@@ -17,6 +17,7 @@ import {
 } from './real2222.js';
 import { placedInPane, samePrint } from './paisley.js';
 import { createPillowStage } from './pillow3d.js';
+import { createUnfoldPane } from './unfold2d.js';
 
 const $ = (id) => document.getElementById(id);
 const PAISLEY_FNS = { placedInPane, samePrint };
@@ -50,6 +51,7 @@ function fmtSigned(v) {
 const initial = parseHash();
 let model = createModel(initial);
 const pillow = createPillowStage($('view'), $('labels'), $('stage-wrap'));
+const unfold = createUnfoldPane($('unfold'));
 
 const lenInputs = [0, 1, 2].map((i) => $(`len-${i}`));
 const twInputs = [0, 1, 2].map((i) => $(`tw-${i}`));
@@ -112,6 +114,7 @@ function syncControls() {
 
 function renderAll() {
   pillow.set(model);
+  unfold.set(model);
   syncControls();
   const info = pillow.info();
   shapeKindEl.textContent = info.kind || 'tetrahedron';
@@ -191,10 +194,15 @@ window.addEventListener('hashchange', () => {
 });
 
 const paneEl = $('pane');
+const unfoldPaneEl = $('unfold-pane');
 if (typeof ResizeObserver === 'function') {
   new ResizeObserver(() => pillow.resize()).observe(paneEl);
+  new ResizeObserver(() => unfold.resize()).observe(unfoldPaneEl);
 } else {
-  window.addEventListener('resize', () => pillow.resize());
+  window.addEventListener('resize', () => {
+    pillow.resize();
+    unfold.resize();
+  });
 }
 
 renderAll();
@@ -207,9 +215,11 @@ window.__real2222 = {
     activeFrame: model.activeFrame.map((r) => [...r]),
     cFrac: model.cFrac,
     pr: model.pr,
+    q90: model.q90,
   }),
   partitions: () => readPartitions(model).map((p) => ({ idx: p.idx, ell: p.ell, t: p.t, M: p.M })),
   info: () => pillow.info(),
+  unfoldInfo: () => unfold.info(),
   activate: (idx) => {
     activatePartition(model, idx, PAISLEY_FNS);
     renderAll();

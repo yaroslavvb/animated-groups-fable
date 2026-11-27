@@ -19,16 +19,27 @@
   <section class="workspace" aria-label="3D pillow and coupled partition sliders">
     <div class="stage-wrap" id="stage-wrap">
       <div class="stage-card">
-        <div class="pane" id="pane">
-          <canvas id="view" tabindex="0" aria-label="Interactive 3D 2222 orbifold pillow"></canvas>
-          <div class="labels" id="labels" aria-hidden="true"></div>
-          <button type="button" class="btn-quiet pane-reset" id="reset-view" aria-label="Reset 3D camera" title="Reset camera view">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7"/>
-              <path d="M4 4v4.7h4.7"/>
-            </svg>
-          </button>
-          <p class="hint">Drag to turn · pinch to zoom</p>
+        <div class="viz-grid">
+          <div class="viz-cell">
+            <div class="pane" id="pane">
+              <canvas id="view" tabindex="0" aria-label="Interactive 3D 2222 orbifold pillow"></canvas>
+              <div class="labels" id="labels" aria-hidden="true"></div>
+              <span class="viz-tag">3D surface</span>
+              <button type="button" class="btn-quiet pane-reset" id="reset-view" aria-label="Reset 3D camera" title="Reset camera view">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7"/>
+                  <path d="M4 4v4.7h4.7"/>
+                </svg>
+              </button>
+              <p class="hint">Drag to turn · pinch to zoom</p>
+            </div>
+          </div>
+          <div class="viz-cell">
+            <div class="pane unfold-pane" id="unfold-pane">
+              <canvas id="unfold" aria-label="Rigidly unfolded 2222 Euclidean wallpaper"></canvas>
+              <span class="viz-tag">Rigid unfolding</span>
+            </div>
+          </div>
         </div>
         <div class="stage-foot">
           <div class="stage-meta">
@@ -46,6 +57,7 @@
       <div class="legend" aria-label="Legend">
         <span class="lg"><i class="sw sw-s1"></i><span>side 1 pair</span></span>
         <span class="lg"><i class="sw sw-s2"></i><span>side 2 pair</span></span>
+        <span class="lg"><i class="sw sw-net"></i><span>unfolded pillow net</span></span>
         <span class="lg"><i class="sw sw-crease"></i><span>other creases</span></span>
       </div>
     </div>

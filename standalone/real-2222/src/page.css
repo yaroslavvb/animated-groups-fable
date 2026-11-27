@@ -17,7 +17,7 @@ html, body {
 }
 
 .app {
-  max-width: 1120px;
+  max-width: 1240px;
   padding-top: 12px;
   padding-bottom: 24px;
 }
@@ -44,14 +44,14 @@ html, body {
   align-items: start;
 }
 
-@media (min-width: 860px) {
+@media (min-width: 960px) {
   .workspace {
-    grid-template-columns: minmax(0, 1.28fr) minmax(308px, 376px);
+    grid-template-columns: minmax(0, 1.55fr) minmax(300px, 344px);
     gap: 16px 18px;
   }
 }
 
-/* ---- 3D Stage Card ---- */
+/* ---- 3D + Unfolded Stage Card ---- */
 .stage-wrap {
   min-width: 0;
 }
@@ -63,19 +63,52 @@ html, body {
   overflow: hidden;
 }
 
+.viz-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.viz-cell {
+  min-width: 0;
+}
+
+.viz-cell + .viz-cell {
+  border-top: 1px solid var(--hairline);
+}
+
+@media (min-width: 640px) {
+  .viz-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .viz-cell + .viz-cell {
+    border-top: 0;
+    border-left: 1px solid var(--hairline);
+  }
+}
+
 .stage-card .pane {
   border: 0;
   border-radius: 0;
   aspect-ratio: auto;
-  height: clamp(320px, 60vh, 540px);
+  height: clamp(340px, 56vh, 470px);
   max-height: none;
-  min-height: 280px;
+  min-height: 240px;
 }
 
-@media (max-width: 859px) {
+@media (min-width: 640px) and (max-width: 959px) {
   .stage-card .pane {
-    height: min(47vh, 360px);
-    min-height: 260px;
+    height: clamp(260px, 38vh, 360px);
+  }
+}
+
+@media (max-width: 639px) {
+  .stage-card .pane {
+    height: 290px;
+  }
+
+  .stage-card .unfold-pane {
+    height: 250px;
   }
 }
 
@@ -86,6 +119,37 @@ html, body {
 
 .stage-card .pane > canvas:active {
   cursor: grabbing;
+}
+
+.stage-card .unfold-pane > canvas {
+  touch-action: pan-y;
+  cursor: default;
+}
+
+.stage-card .unfold-pane > canvas:active {
+  cursor: default;
+}
+
+.viz-tag {
+  position: absolute;
+  left: 10px;
+  top: 9px;
+  z-index: 2;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+  background: color-mix(in srgb, var(--ground) 86%, transparent);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+}
+
+.stage-card .pane-reset {
+  right: 6px;
+  top: 5px;
+  z-index: 2;
 }
 
 .stage-card .labels {
@@ -393,6 +457,14 @@ html, body {
   width: 9.5px;
   height: 9.5px;
   background: var(--side2);
+}
+
+.sw-net {
+  width: 16px;
+  height: 11px;
+  border-radius: 2px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
 }
 
 .sw-crease {

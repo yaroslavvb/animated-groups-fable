@@ -4,6 +4,8 @@ import {
   REG_ELL,
   SQRT2,
   det2,
+  sub2,
+  norm2,
   sub3,
   cross3,
   dot3,
@@ -20,6 +22,7 @@ import {
   buildPillowMesh,
   pairVectors,
   pairPrintParams,
+  unfoldedNet,
 } from '../src/real2222.js';
 import {
   unitFields,
@@ -28,6 +31,8 @@ import {
   cellBox,
   placedInPane,
   samePrint,
+  outline,
+  sizeOf,
 } from '../src/paisley.js';
 
 const PAISLEY_FNS = { placedInPane, samePrint };
@@ -197,5 +202,65 @@ test('buildPillowMesh area, cut length, band tinting, and seamless 2222 paisley 
       }
     }
     assert.ok(maxDiff < 1, `seam diff too large (${maxDiff}) for activeIdx=${st.activeIdx}`);
+  }
+});
+
+test('unfoldedNet congruence, continuity across t=0, angle preservation, and rigid comma shape match', () => {
+  for (const [ell, t] of [[1, 0], [1, -0.01], [1, 0.01], [REG_ELL, 0.25], [1.22, -0.31]]) {
+    const model = createModel({ ell, t });
+    const S = solidFromBasis(model.e, { minConorm: 0 });
+    const net = unfoldedNet(S);
+    assert.equal(net.tris.length, 4);
+    assert.ok(Math.abs(net.area - 2) < 1e-12, `net area ${net.area} !== 2`);
+    assert.equal(net.edges.length, 9);
+
+    // Every unfolded triangle edge has exact same length as the corresponding 3D disphenoid edge
+    const faces = new Set();
+    for (const tr of net.tris) {
+      faces.add([...tr.names].sort().join(''));
+      for (let e = 0; e < 3; e++) {
+        const a2 = tr.pts[e];
+        const b2 = tr.pts[(e + 1) % 3];
+        const a3 = S.stage[tr.names[e]];
+        const b3 = S.stage[tr.names[(e + 1) % 3]];
+        assert.ok(Math.abs(norm2(sub2(b2, a2)) - norm3(sub3(b3, a3))) < 1e-11, '2D/3D edge length mismatch');
+      }
+    }
+    assert.equal(faces.size, 4, 'unfolded net must cover all 4 distinct faces');
+  }
+
+  // Continuous net outline across t = -0.01 -> 0 -> +0.01
+  const outNeg = unfoldedNet(solidFromBasis(createModel({ ell: 1, t: -0.01 }).e, { minConorm: 0 })).outline;
+  const outPos = unfoldedNet(solidFromBasis(createModel({ ell: 1, t: 0.01 }).e, { minConorm: 0 })).outline;
+  const xsNeg = outNeg.map((p) => p[0]).sort((a, b) => a - b);
+  const xsPos = outPos.map((p) => p[0]).sort((a, b) => a - b);
+  for (let i = 0; i < 4; i++) {
+    assert.ok(Math.abs(xsNeg[i] - xsPos[i]) < 0.05, 'net jumped unexpectedly across t=0');
+  }
+
+  // Angle preservation when switching partition & dragging
+  const st = createModel({ ell: 1.05, t: 0.12 });
+  activatePartition(st, 1, PAISLEY_FNS);
+  const ang1 = pairVectors(st.e, st.activeFrame).ang;
+  setPartitionParams(st, 1, 1.18, -0.22, PAISLEY_FNS);
+  assert.ok(Math.abs(pairVectors(st.e, st.activeFrame).ang - ang1) < 1e-11, 'plane angle jumped on drag');
+  assert.ok(Math.abs(det2(st.e[0], st.e[1]) - 1) < 1e-11);
+
+  // Rigid comma congruence between 3D SDF printOf and 2D placedInPane
+  const pv = pairVectors(st.e, st.activeFrame);
+  const P = pairPrintParams(st.e, st.activeFrame, st.pr || 0, st.q90);
+  const c3d = printOf('2222', P, { x0: -2, x1: 2, y0: -2, y1: 2 });
+  const c2d = placedInPane('2222', P, [0, 0], pv.vh, { x0: -2, x1: 2, y0: -2, y1: 2 });
+  assert.ok(c3d.length > 0 && c2d.length > 0);
+  const big3d = c3d.find((c) => c.kind === 'big');
+  const big2d = c2d.find((c) => c.kind === 'big');
+  assert.ok(Math.abs(sizeOf(big3d) - sizeOf(big2d)) < 1e-12, 'big comma scale differs between 2D and 3D');
+  const o3 = outline(big3d);
+  const o2 = outline(big2d);
+  assert.equal(o3.length, o2.length);
+  for (let i = 0; i < o3.length; i++) {
+    const e3 = norm2(sub2(o3[(i + 1) % o3.length], o3[i]));
+    const e2 = norm2(sub2(o2[(i + 1) % o2.length], o2[i]));
+    assert.ok(Math.abs(e3 - e2) < 1e-12, 'comma polygon distorted between 3D and 2D');
   }
 });

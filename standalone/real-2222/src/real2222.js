@@ -253,11 +253,13 @@ export function createModel({ ell = 1, t = 0, cFrac = DEFAULT_C, activeIdx = 0, 
     activeFrame: M0,
     cFrac: clamp(cFrac, 0.05, 0.95),
     pr: pr || 0,
+    q90: 0,
   };
   if (activeIdx === 1 || activeIdx === 2) {
     const sf = sellingFrames(state.e);
     state.activeIdx = activeIdx;
     state.activeFrame = sf[activeIdx].M;
+    state.q90 = Math.round(pairVectors(state.e, state.activeFrame).ang / 90);
   }
   return state;
 }
@@ -268,14 +270,14 @@ export function readPartitions(state) {
   return sf.map((f, k) => (k === state.activeIdx ? { idx: k, M: state.activeFrame, ell: actPv.ell, t: actPv.t, pv: actPv } : f));
 }
 
-export function pairPrintParams(e, M, bits = 0) {
+export function pairPrintParams(e, M, bits = 0, q90 = null) {
   const pv = pairVectors(e, M);
   return {
     l: pv.ell,
     w: pv.w,
     s: 2 * pv.ell * mod(pv.t, 1),
     bits: bits || 0,
-    q90: Math.round(pv.ang / 90),
+    q90: q90 !== null && q90 !== undefined ? q90 : Math.round(pv.ang / 90),
   };
 }
 
@@ -283,17 +285,30 @@ export function pairPrintParams(e, M, bits = 0) {
  * Optionally find bits in 0..7 keeping the exact same comma layout in fixed plane coordinates
  * when switching active frames (requires placedInPane & samePrint injected to stay dependency-light).
  */
-export function bitsThatKeep2222(state, nextFrame, paisleyFns = null) {
+export function bitsThatKeep2222(state, nextFrame, paisleyFns = null, nextQ90 = null) {
   if (!paisleyFns) return 0;
   const { placedInPane, samePrint } = paisleyFns;
   if (!placedInPane || !samePrint) return 0;
   const wide = { x0: -2.6, x1: 2.6, y0: -2.6, y1: 2.6 };
   const keep = { x0: -1.25, x1: 1.25, y0: -1.25, y1: 1.25 };
   const prevPv = pairVectors(state.e, state.activeFrame);
-  const prevPlaced = placedInPane('2222', pairPrintParams(state.e, state.activeFrame, state.pr || 0), [0, 0], prevPv.vh, wide);
+  const prevPlaced = placedInPane(
+    '2222',
+    pairPrintParams(state.e, state.activeFrame, state.pr || 0, state.q90),
+    [0, 0],
+    prevPv.vh,
+    wide
+  );
   const nextPv = pairVectors(state.e, nextFrame);
+  const targetQ90 = nextQ90 !== null && nextQ90 !== undefined ? nextQ90 : Math.round(nextPv.ang / 90);
   for (let b = 0; b < 8; b++) {
-    const cand = placedInPane('2222', pairPrintParams(state.e, nextFrame, b), [0, 0], nextPv.vh, wide);
+    const cand = placedInPane(
+      '2222',
+      pairPrintParams(state.e, nextFrame, b, targetQ90),
+      [0, 0],
+      nextPv.vh,
+      wide
+    );
     if (samePrint(prevPlaced, cand, keep, 1e-6)) return b;
   }
   return null;
@@ -303,9 +318,11 @@ export function activatePartition(state, idx, paisleyFns = null) {
   if (idx < 0 || idx > 2 || idx === state.activeIdx) return state;
   const sf = sellingFrames(state.e);
   const nextFrame = sf[idx].M;
-  const kept = bitsThatKeep2222(state, nextFrame, paisleyFns);
+  const nextQ90 = Math.round(pairVectors(state.e, nextFrame).ang / 90);
+  const kept = bitsThatKeep2222(state, nextFrame, paisleyFns, nextQ90);
   state.activeIdx = idx;
   state.activeFrame = nextFrame;
+  state.q90 = nextQ90;
   state.pr = kept !== null ? kept : 0;
   return state;
 }
@@ -314,7 +331,8 @@ export function setPartitionParams(state, idx, ell, t, paisleyFns = null) {
   if (idx !== state.activeIdx) activatePartition(state, idx, paisleyFns);
   const safeEll = clamp(Number.isFinite(ell) ? ell : 1, 0.35, 3.0);
   const safeT = clamp(Number.isFinite(t) ? t : 0, T_MIN, T_MAX);
-  state.e = basisFromPair(safeEll, safeT, state.activeFrame, 0);
+  const angDeg = pairVectors(state.e, state.activeFrame).ang;
+  state.e = basisFromPair(safeEll, safeT, state.activeFrame, angDeg);
   return state;
 }
 
@@ -461,5 +479,122 @@ export function buildPillowMesh(e, activeFrame, cFrac = DEFAULT_C, { minConorm =
     corners: V,
     ca: mul2(2, toPair(S.va)),
     cb: mul2(2, toPair(S.vb)),
+  };
+}
+
+function classifyEdgeNames(a, b) {
+  const pair = [a, b].sort().join('');
+  if (pair === 'AB') return { partIdx: 0, side: 0 };
+  if (pair === 'CD') return { partIdx: 0, side: 1 };
+  if (pair === 'AC') return { partIdx: 1, side: 0 };
+  if (pair === 'BD') return { partIdx: 1, side: 1 };
+  if (pair === 'AD') return { partIdx: 2, side: 0 };
+  return { partIdx: 2, side: 1 };
+}
+
+/**
+ * Rigid 4-triangle planar unfolding (two-cell parallelogram strip) of S nearest `target`.
+ */
+export function unfoldedNet(S, target = [0, 0.45]) {
+  const { va, vb, sigma, bends } = S;
+  const pt = (i, j) => [i * va[0] + j * vb[0], i * va[1] + j * vb[1]];
+  const nm = (i, j) => 'ABCD'[(i & 1) + 2 * (j & 1)];
+
+  let best = null;
+  for (let m = -2; m <= 2; m++) {
+    for (let n = -2; n <= 2; n++) {
+      const cx = m * va[0] + (n + 0.5) * vb[0];
+      const cy = m * va[1] + (n + 0.5) * vb[1];
+      const d2 = (cx - target[0]) ** 2 + (cy - target[1]) ** 2 - 1e-6 * cy;
+      if (!best || d2 < best.d2) best = { m, n, cx, cy, d2 };
+    }
+  }
+  const { m, n } = best;
+  const raw = [
+    [[m - 1, n], [m, n], [m, n + 1]],
+    [[m - 1, n], [m, n + 1], [m - 1, n + 1]],
+    [[m, n], [m + 1, n], [m + 1, n + 1]],
+    [[m, n], [m + 1, n + 1], [m, n + 1]],
+  ];
+
+  const tris = raw.map((tri) => {
+    const ord = sigma > 0 ? tri : [tri[0], tri[2], tri[1]];
+    return {
+      pts: ord.map(([i, j]) => pt(i, j)),
+      names: ord.map(([i, j]) => nm(i, j)),
+    };
+  });
+
+  const edgeMap = new Map();
+  for (const tri of raw) {
+    for (let e = 0; e < 3; e++) {
+      const [i0, j0] = tri[e];
+      const [i1, j1] = tri[(e + 1) % 3];
+      const k0 = `${i0},${j0}`;
+      const k1 = `${i1},${j1}`;
+      const key = k0 < k1 ? `${k0}|${k1}` : `${k1}|${k0}`;
+      const existing = edgeMap.get(key);
+      if (existing) {
+        existing.count++;
+      } else {
+        const n0 = nm(i0, j0);
+        const n1 = nm(i1, j1);
+        const { partIdx, side } = classifyEdgeNames(n0, n1);
+        edgeMap.set(key, {
+          a: pt(i0, j0),
+          b: pt(i1, j1),
+          names: [n0, n1],
+          partIdx,
+          side,
+          bend: bends[partIdx],
+          count: 1,
+        });
+      }
+    }
+  }
+
+  const edges = [...edgeMap.values()].map((ed) => ({
+    a: ed.a,
+    b: ed.b,
+    names: ed.names,
+    partIdx: ed.partIdx,
+    side: ed.side,
+    bend: ed.bend,
+    boundary: ed.count === 1,
+  }));
+
+  const rimCoords = [
+    [m - 1, n],
+    [m, n],
+    [m + 1, n],
+    [m - 1, n + 1],
+    [m, n + 1],
+    [m + 1, n + 1],
+  ];
+  const corners = rimCoords.map(([i, j]) => ({ i, j, pt: pt(i, j), name: nm(i, j) }));
+
+  // Pick one clean label position per class {A, B, C, D}, preferring interior-ish corners nearest centroid
+  const labelCorners = {};
+  for (const c of corners) {
+    const d2 = (c.pt[0] - best.cx) ** 2 + (c.pt[1] - best.cy) ** 2;
+    if (!labelCorners[c.name] || d2 < labelCorners[c.name].d2 - 1e-9) {
+      labelCorners[c.name] = { ...c, d2 };
+    }
+  }
+
+  const outline = [pt(m - 1, n), pt(m + 1, n), pt(m + 1, n + 1), pt(m - 1, n + 1)];
+  let area = 0;
+  for (const t of tris) {
+    area += 0.5 * Math.abs(det2(sub2(t.pts[1], t.pts[0]), sub2(t.pts[2], t.pts[0])));
+  }
+
+  return {
+    tris,
+    outline,
+    edges,
+    corners,
+    labelCorners,
+    centroid: [best.cx, best.cy],
+    area,
   };
 }
