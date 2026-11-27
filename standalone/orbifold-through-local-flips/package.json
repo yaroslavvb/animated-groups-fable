@@ -1,0 +1,9 @@
+{
+  "name": "orbifold-through-local-flips",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "cd ../classification-of-surfaces && node build.mjs --template ../orbifold-through-local-flips/src/page.template.html --entry ../orbifold-through-local-flips/src/page.js --css src/styles.css,../orbifold-through-local-flips/src/page.css --out ../orbifold-through-local-flips/site/index.html && cp ../orbifold-through-local-flips/site/index.html ../../docs/orbifold-through-local-flips.html"
+  }
+}

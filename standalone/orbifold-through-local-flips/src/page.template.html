@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-page="flips">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Orbifold through local flips</title>
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<main class="app flips-app">
+  <header class="top">
+    <h1 data-ss-id="title">Orbifold through local flips</h1>
+  </header>
+
+  <p class="lede" data-ss-id="lede">Type an orbifold. Its pattern is cut into rigid pieces, and every cut has a Length, and a Twist where it can turn. Click a cut, in the diagram or on the pattern, to cut another way: the pattern stays exactly where it is, and only the cuts and their numbers change.</p>
+
+  <div class="ctrl-bar" data-ss-react="off">
+    <div class="presets" id="presets">
+      <div class="preset-row box-row row-wide">
+        <label class="preset-lab" for="custom-in">orbifold</label>
+        <span class="custom-field"><input class="custom-in" id="custom-in" type="text" inputmode="text" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="24" placeholder="type any orbifold: 2345, 22∗3, o∗2" aria-describedby="custom-pop box-hint" data-on="0"></span>
+        <span class="box-hint" id="box-hint">handles o · cone points 2–9 · each mirror ∗ and its corners · crosscaps ×</span>
+        <p class="custom-pop" id="custom-pop" role="status" aria-live="polite" hidden></p>
+      </div>
+      <div class="preset-row row-wide" role="group" aria-label="Orbifolds on the hyperbolic plane">
+        <span class="preset-lab">hyperbolic</span>
+        <button class="chip" type="button" data-k="3333">3333</button>
+        <button class="chip" type="button" data-k="2223">2223</button>
+        <button class="chip" type="button" data-k="22222">22222</button>
+        <button class="chip" type="button" data-k="333*2x">333∗2×</button>
+        <button class="chip" type="button" data-k="o33">o33</button>
+        <button class="chip" type="button" data-k="oo">oo</button>
+        <button class="chip" type="button" data-k="33*2">33∗2</button>
+        <button class="chip" type="button" data-k="***">∗∗∗</button>
+        <button class="chip" type="button" data-k="*22222">∗22222</button>
+        <button class="chip" type="button" data-k="32*54">32∗54</button>
+        <button class="chip" type="button" data-k="732">732</button>
+      </div>
+      <div class="preset-row" role="group" aria-label="Orbifolds on the plane">
+        <span class="preset-lab">plane</span>
+        <button class="chip" type="button" data-k="2222">2222</button>
+        <button class="chip" type="button" data-k="o">o</button>
+        <button class="chip" type="button" data-k="*2222">∗2222</button>
+        <button class="chip" type="button" data-k="22*">22∗</button>
+        <button class="chip" type="button" data-k="**">∗∗</button>
+        <button class="chip" type="button" data-k="*x">∗×</button>
+        <button class="chip" type="button" data-k="632">632</button>
+      </div>
+      <div class="preset-row" role="group" aria-label="Orbifolds on the sphere">
+        <span class="preset-lab">sphere</span>
+        <button class="chip" type="button" data-k="*532">∗532</button>
+        <button class="chip" type="button" data-k="3*2">3∗2</button>
+        <button class="chip" type="button" data-k="5x">5×</button>
+        <button class="chip" type="button" data-k="2*3">2∗3</button>
+        <button class="chip" type="button" data-k="*225">∗225</button>
+      </div>
+      <div class="preset-row" id="recent-row" role="group" aria-label="Orbifolds you typed" hidden>
+        <span class="preset-lab">yours</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="sig-line" id="sig-line" data-ss-id="sig-line"></p>
+
+  <div class="panes" data-ss-comments="off">
+    <div class="pane pane-pattern" id="pane-pattern">
+      <div class="pane-head">
+        <span class="pane-title">Pattern</span>
+        <span class="pane-sub" id="pat-sub">Poincaré disc</span>
+        <label class="seams-toggle"><input type="checkbox" id="seams" checked> seams</label>
+        <button class="reset" type="button" id="reset-view">Centre</button>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="pattern" tabindex="0" aria-label="The repeating pattern, with the cuts of the decomposition drawn over it"></canvas>
+        <span class="hint" id="pat-hint">Drag to slide</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="pane pane-cuts">
+        <div class="pane-head">
+          <span class="pane-title">Cuts</span>
+          <span class="pane-sub" id="cut-sub">click a numbered cut to flip it</span>
+          <button class="reset" type="button" id="undo" disabled>Undo</button>
+          <button class="reset" type="button" id="reset">Reset</button>
+        </div>
+        <svg id="schematic" role="group" aria-label="The decomposition: a dot for each piece, a line for each cut"></svg>
+        <p class="say" id="say" role="status" aria-live="polite"></p>
+      </div>
+      <div class="cuts" id="cuts"></div>
+      <p class="legend" id="legend">
+        <span><i class="lg lg-cuff"></i>cuff: Length and Twist</span>
+        <span><i class="lg lg-arc"></i>arc: Length</span>
+        <span><i class="lg lg-seam"></i>seams of the pieces</span>
+        <span><i class="lg lg-mirror"></i>mirror</span>
+        <span><i class="lg lg-cone"></i>cone point</span>
+      </p>
+    </div>
+  </div>
+
+  <section class="notes" data-ss-id="notes" data-ss-section>
+    <details data-ss-id="note-moves">
+      <summary>The moves</summary>
+      <ul>
+        <li data-ss-id="move-flip"><b>Edge flip.</b> A cuff between two pairs of pants has four neighbours; the flip pairs them the next way round, \((AB\,|\,CD)\to(AC\,|\,BD)\to(AD\,|\,BC)\). Of the curves that pair them so and cross the old cuff twice, the shortest is taken; if it is longer than the page can draw and the pairing after it is not, that one is taken. An arc between two mirror polygons flips to the common perpendicular of the other two mirrors.</li>
+        <li data-ss-id="move-swap"><b>Handle swap.</b> A cuff with both sides on one pair of pants is replaced by the shortest loop that crosses it once.</li>
+        <li data-ss-id="move-pop"><b>Mirror pop and merge.</b> A cuff with a mirror behind it opens into arcs that run from the mirror round each of the two things in front of it, trading its Twist for a second Length; two such arcs close into the cuff again.</li>
+        <li data-ss-id="move-slide"><b>Slide.</b> An arc that runs from a mirror round a cone point or a cuff, next to a mirror polygon, moves to the polygon's third mirror.</li>
+      </ul>
+      <p data-ss-id="note-same">A move changes coordinates, not the pattern: the group \(\Gamma\) stays as it is, the new Length is read off the trace of the new curve's motion, and each Twist changes by the step the foot of a seam takes along its cuff.</p>
+      <p data-ss-id="note-undo">Undo steps back through flips and slider moves (also ⌘Z or Ctrl+Z). The address of the page holds the cut and its numbers, so a link brings a state back.</p>
+    </details>
+    <details data-ss-id="note-count">
+      <summary>How many numbers</summary>
+      <p data-ss-id="count-formula">On the hyperbolic plane an orbifold with underlying surface \(|O|\), \(k\) cone points and \(l\) mirror corners has \(-3\chi(|O|)+2k+l\) numbers of shape. A cuff between two pieces carries two of them (Length, Twist); a crosscap, a smooth mirror and an arc carry one.</p>
+      <p data-ss-id="count-rigid">An orbifold with none is rigid: every type on the sphere, eight on the plane, and \(pqr\), \(\ast pqr\), \(p\ast q\) on the hyperbolic plane. It is drawn with the tile and the print of Classification of Surfaces, and has nothing to cut. On the plane the area is fixed, which leaves nine types with one or two numbers. <a href="https://yaroslavvb.github.io/animated-groups-fable/two-features-two-handles.html">Two features, two handles</a> works four small hyperbolic types by hand.</p>
+    </details>
+    <details data-ss-id="note-limits">
+      <summary>What is not built</summary>
+      <ul>
+        <li data-ss-id="limit-crosscap">Two crosscaps cannot yet be traded for a one-sided handle (a fourth move); every crosscap stays cut along its own core.</li>
+        <li data-ss-id="limit-crown">A cuff between two mirrors with corners, or between such a mirror and a crosscap, offers no pop.</li>
+        <li data-ss-id="limit-long">A move that would make a cuff longer than 9.5 or an arc longer than 6 is turned down: such a piece is a sliver on the screen.</li>
+        <li data-ss-id="limit-print">After a flip the commas lie as they did, some across the new cuts; the first slider you move inks them afresh inside the new pieces.</li>
+      </ul>
+    </details>
+  </section>
+</main>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>

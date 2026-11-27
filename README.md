@@ -78,6 +78,15 @@ loop with ← → (shift for finer steps).
   custom orbifold typing, multi-pair chains, WebGL2 rendering, and smooth
   60 FPS interactive panning.
 
+- **Orbifold through local flips** ([docs/orbifold-through-local-flips.html](docs/orbifold-through-local-flips.html),
+  source in [standalone/orbifold-through-local-flips/](standalone/orbifold-through-local-flips/)) —
+  type any orbifold; its pattern is cut into rigid pieces with a Length and a
+  Twist for every cut, and a click on a cut (edge flip, handle swap, mirror
+  pop and merge, arc flip, slide) cuts it another way while the pattern stays
+  exactly where it is. Hyperbolic, plane and sphere; Undo; the state travels
+  in the link. See its
+  [README](standalone/orbifold-through-local-flips/README.md).
+
 ## The computation (`enumerate/`)
 
 The classification is recomputed from scratch in exact rational arithmetic

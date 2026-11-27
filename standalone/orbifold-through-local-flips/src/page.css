@@ -1,0 +1,169 @@
+/* Orbifold through local flips. The look is the Classification of Surfaces page's (its styles.css comes first in the
+   bundle: the palette, the chips, 44 px controls) and the layout is Two features, two handles': the pattern large on
+   the left, what you work with in a column on the right. */
+
+:root {
+  --amber: #e69f00;
+  --blue-bg: rgba(0, 114, 178, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --amber: #f0a830; --blue-bg: rgba(86, 180, 233, 0.16); }
+}
+
+.flips-app { max-width: 1220px; margin: 0 auto; padding: 16px 18px 28px; }
+.flips-app .top { margin-bottom: 8px; }
+.flips-app h1 { margin: 0; font-size: clamp(1.35rem, 2.5vw, 1.85rem); line-height: 1.18; text-wrap: balance; }
+.flips-app .lede { margin: 8px 0 12px; color: var(--muted); font-size: 0.98rem; line-height: 1.5; max-width: 104ch; }
+
+/* ---- the orbifold box: rows of entries, and one quiet field */
+.ctrl-bar { margin-bottom: 8px; }
+.presets { display: flex; flex-direction: column; gap: 6px; }
+/* where there is room the short rows (plane, sphere, yours) share a line, so that the pattern begins higher */
+@media (min-width: 621px) {
+  .presets { flex-direction: row; flex-wrap: wrap; gap: 6px 22px; }
+  .preset-row { flex: 0 1 auto; }
+  .preset-row.row-wide { flex: 1 1 100%; }
+}
+.preset-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.preset-lab { flex: 0 0 5.4em; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); }
+.flips-app .chip { flex: 0 0 auto; text-align: center; padding: 0 11px; letter-spacing: 0.02em; }
+.box-row { position: relative; }
+.box-row .preset-lab { color: var(--ink); }
+.box-hint { flex: 1 1 14em; min-width: 0; color: var(--faint); font-size: 0.82rem; line-height: 1.3; }
+.custom-field { display: inline-flex; flex: 0 1 300px; min-width: 170px; }
+/* a phone: each row of entries is one line that slides sideways, so the pattern is on the first screen */
+@media (max-width: 620px) {
+  .preset-row:not(.box-row) {
+    flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; margin: -3px -18px -3px 0; padding: 3px 34px 3px 0;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
+  }
+  .preset-row:not(.box-row)::-webkit-scrollbar { display: none; }
+  .preset-row:not(.box-row) .preset-lab { position: sticky; left: 0; z-index: 1; align-self: stretch; display: flex; align-items: center; flex-basis: 4.9em; background: var(--ground); box-shadow: 8px 0 6px -2px var(--ground); }
+  .box-row .preset-lab { flex-basis: 4.9em; }
+  .custom-field { flex: 1 1 0; }
+  .box-hint { flex: 1 1 100%; }
+}
+.custom-in {
+  appearance: none; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 0 11px;
+  border: 4px solid transparent; border-radius: 12px; background: var(--ground) padding-box; box-shadow: inset 0 0 0 1px var(--hairline);
+  color: var(--muted); font: inherit; font-size: 16px; line-height: 1.2; letter-spacing: 0.02em;
+}
+.custom-in::placeholder { color: var(--faint); opacity: 1; font-size: 14px; letter-spacing: 0; }
+.custom-in:focus { outline: none; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--muted); }
+.custom-in:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.custom-in[data-on="1"] { color: var(--ink); background-color: var(--accent-soft); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.custom-in.nope { animation: custom-nope 0.25s; }
+@keyframes custom-nope { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+@media (prefers-reduced-motion: reduce) { .custom-in.nope { animation: none; } }
+.custom-pop {
+  position: absolute; z-index: 6; left: 0; top: 100%; width: max-content; max-width: min(100%, 46em); margin: 2px 0 0; padding: 7px 11px 8px;
+  border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  color: var(--muted); font-size: 0.86rem; line-height: 1.45;
+}
+.custom-pop b { color: var(--ink); font-weight: 650; }
+.custom-pop .trylink {
+  appearance: none; min-width: 44px; min-height: 32px; margin: 2px 0 0 4px; padding: 0 9px; border: 0; border-radius: 8px;
+  background: var(--card); box-shadow: inset 0 0 0 1px var(--hairline); color: var(--ink); font: inherit; font-size: 0.95rem; letter-spacing: 0.02em; cursor: pointer;
+}
+
+.sig-line { margin: 10px 0 10px; font-size: 0.95rem; line-height: 1.45; color: var(--muted); min-height: 1.45em; }
+.sig-line b { color: var(--ink); font-weight: 650; letter-spacing: 0.03em; font-size: 1.05rem; }
+.sig-line .n { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+
+/* ---- the two columns */
+.panes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-items: start; }
+@media (min-width: 900px) {
+  .panes { grid-template-columns: minmax(0, 1.75fr) minmax(300px, 1fr); gap: 16px; }
+  /* the pattern stays in sight while a long list of cuts is gone through */
+  .flips-app .pane.pane-pattern { position: sticky; top: 8px; }
+}
+/* the Classification page places .pane and .side on its own grid, and reorders them on a phone: not here */
+.flips-app .pane, .flips-app .side { order: 0; grid-column: auto; grid-row: auto; }
+.flips-app .pane { position: static; aspect-ratio: auto; max-height: none; min-height: 0; min-width: 0; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground); padding: 10px 12px 12px; overflow: visible; }
+.pane-head { display: flex; align-items: center; gap: 10px; min-height: 44px; margin-bottom: 4px; }
+.pane-title { font-weight: 650; }
+.pane-sub { color: var(--muted); font-size: 0.86rem; flex: 1 1 auto; min-width: 0; }
+.reset {
+  appearance: none; min-height: 44px; min-width: 44px; padding: 0 12px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground);
+  color: var(--ink); font: inherit; font-size: 0.9rem; cursor: pointer;
+}
+.reset:disabled { opacity: 0.4; cursor: default; }
+@media (hover: hover) { .reset:not(:disabled):hover { background: var(--card); } }
+.seams-toggle { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 4px; color: var(--muted); font-size: 0.86rem; cursor: pointer; }
+.seams-toggle input { width: 18px; height: 18px; accent-color: var(--accent); }
+.canvas-wrap { position: relative; width: 100%; aspect-ratio: 1 / 1; max-height: min(78vh, 760px); margin: 0 auto; }
+.canvas-wrap > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; border-radius: 6px; outline-offset: -3px; cursor: grab; }
+.canvas-wrap > canvas:active { cursor: grabbing; }
+.flips-app .hint { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); }
+/* a phone: the pattern stays at the top of the screen while the diagram and the sliders pass under it, so that what a
+   slider does is seen while it is moved */
+@media (max-width: 899px) {
+  .flips-app .pane.pane-pattern { position: sticky; top: 0; z-index: 5; padding: 4px 10px 8px; box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.35); }
+  .pane-pattern .pane-head { min-height: 44px; margin-bottom: 0; }
+  .canvas-wrap { max-height: 42vh; max-width: 42vh; }
+}
+
+.side { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+#schematic { display: block; width: 100%; height: auto; max-height: 260px; -webkit-user-select: none; user-select: none; }
+.say { margin: 2px 0 0; min-height: 1.4em; font-size: 0.86rem; line-height: 1.4; color: var(--muted); }
+.say[data-kind="no"] { color: var(--red); }
+
+/* the diagram */
+.sch-twig { fill: none; stroke: var(--faint); stroke-width: 1; }
+.sch-under { fill: none; stroke: var(--ground); stroke-width: 6.5; stroke-linecap: round; }
+.sch-line { fill: none; stroke-width: 3; stroke-linecap: round; }
+.sch-hit { fill: none; stroke: transparent; stroke-width: 16; }
+.sch-cut.on .sch-line { stroke-width: 5.2; }
+.sch-cut.can, .sch-handle.can { cursor: pointer; }
+.sch-piece { fill: var(--ink); stroke: var(--ground); stroke-width: 1.5; }
+.sch-piece.half { stroke: var(--red); stroke-width: 2.2; }
+.sch-piece.mirror { fill: var(--ground); stroke: var(--red); stroke-width: 2.2; }
+.sch-piece.cap { fill: var(--ground); stroke: var(--muted); stroke-width: 1.3; }
+.sch-leaf { font: 600 14px var(--font); text-anchor: middle; fill: var(--ink); paint-order: stroke; stroke: var(--ground); stroke-width: 3.5px; }
+.sch-leaf.sym { font-size: 18px; }
+.sch-leaf.cone { fill: var(--blue); }
+.sch-leaf.mirror { fill: var(--red); }
+.sch-tap { fill: transparent; }
+.sch-knob { fill: var(--ground); stroke-width: 2.2; }
+.sch-handle.on .sch-knob { stroke-width: 3.4; }
+.sch-tag { fill: var(--ground); stroke: var(--hairline); stroke-width: 1; }
+.sch-num { font: 650 11px var(--font); text-anchor: middle; fill: var(--ink); pointer-events: none; font-variant-numeric: tabular-nums; }
+.sch-handle:focus-visible { outline: none; }
+.sch-handle:focus-visible .sch-knob { stroke-width: 4; }
+
+/* ---- the cuts, each with its numbers */
+.cuts { display: flex; flex-direction: column; gap: 8px; }
+.cut { border: 1px solid var(--hairline); border-radius: 8px; padding: 8px 12px 10px; background: var(--ground); }
+.cut.on { border-color: var(--muted); background: var(--card); }
+.cut-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; min-height: 36px; }
+.cut-sw { flex: 0 0 22px; height: 0; border-top: 4px solid var(--c, #888); border-radius: 2px; }
+.cut[data-type="arc"] .cut-sw { border-top-style: dashed; }
+.cut-n { font-weight: 700; font-variant-numeric: tabular-nums; }
+.cut-what { flex: 1 1 7.5em; min-width: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.3; }
+.cut-moves { display: flex; flex: 0 1 auto; gap: 6px; margin-left: auto; }
+.cut-flip {
+  appearance: none; flex: 0 0 auto; min-height: 44px; padding: 0 11px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground);
+  color: var(--ink); font: inherit; font-size: 0.84rem; line-height: 1.15; cursor: pointer; max-width: 11em; text-align: center; flex: 0 1 auto;
+}
+@media (hover: hover) { .cut-flip:hover { background: var(--card); } }
+.cut-row { display: grid; grid-template-columns: 4.2em minmax(0, 1fr) 3.6em; align-items: center; gap: 8px; min-height: 44px; }
+.cut-row label { font-size: 0.9rem; font-weight: 600; }
+.cut-row output { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 0.92rem; }
+.cut-row input[type="range"] { width: 100%; height: 44px; margin: 0; accent-color: var(--accent); background: transparent; touch-action: pan-y; }
+.rigid-note { margin: 0; padding: 10px 12px; border: 1px solid var(--hairline); border-radius: 8px; color: var(--muted); font-size: 0.92rem; line-height: 1.45; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0; color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.lg { display: inline-block; width: 22px; height: 0; border-top: 3px solid var(--amber); }
+.lg-arc { border-top-style: dashed; }
+.lg-seam { border-top: 1.4px solid var(--muted); }
+.lg-mirror { border-top-color: #d55e00; }
+.lg-cone { width: 0; height: 0; border-top: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #0072b2; }
+
+/* ---- the notes */
+.notes { margin-top: 18px; max-width: 80ch; }
+.notes details { border-top: 1px solid var(--hairline); padding: 4px 0; }
+.notes summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-weight: 650; }
+.notes ul { margin: 2px 0 10px; padding-left: 1.2em; }
+.notes li, .notes p { margin: 0 0 8px; line-height: 1.55; color: var(--ink); }
+.notes mjx-container svg { vertical-align: middle; }
