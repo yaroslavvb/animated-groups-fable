@@ -536,7 +536,7 @@ void main() {
       float msTop = mBound[0].w;
       float rHypMax = 1.25 * 0.125 * msTop;
 
-      if (pickType > 3.5 && 1.85 * 0.125 * msTop * pxPerHyp >= 0.9) {
+      if (pickType > 3.5 && 1.85 * 0.125 * msTop * pxPerHyp >= 0.65) {
         float haloMaxCosh = cosh(min(5.0, (1.85 * 0.125 * msTop + 3.0 / pxPerHyp) * 1.12 + 0.01));
         float haloFillCov = 0.0;
         float haloRingCov = 0.0;
@@ -551,11 +551,11 @@ void main() {
           vec2 qm = psuApply(mFrame[i], 0.0, qD);
           float pxPerLocal = R * oneMinusWs2 / max(1e-6, 1.0 - dot(qm, qm));
           float rPx = tanh(0.5 * rHyp) * pxPerLocal;
-          if (rPx < 0.9) continue;
+          if (rPx < 0.7) continue;
           float hrDisc = tanh(0.5 * 1.85 * rHyp);
           float dPx = (length(qm) - hrDisc) * pxPerLocal;
           if (dPx > 2.5) continue;
-          float vis = smoothstep(0.9, 2.0, rPx);
+          float vis = smoothstep(0.7, 2.6, rPx);
           haloCol = mMetaV.y > 0.5 ? C_BLUE : C_RED;
           float fCov = clamp((0.5 / dpr - dPx) * dpr, 0.0, 1.0) * vis;
           float rCov = lineCov(abs(dPx), 0.8, dpr) * vis;
@@ -566,7 +566,7 @@ void main() {
         if (haloRingCov > 0.0) col = mix(col, haloCol, haloRingCov * 0.78);
       }
 
-      if (rHypMax * pxPerHyp >= 0.55) {
+      if (rHypMax * pxPerHyp >= 0.35) {
         float markMaxCosh = cosh(min(5.0, (rHypMax + 3.0 / pxPerHyp) * 1.12 + 0.01));
         for (int i = 0; i < 128; i++) {
           if (i >= nMarks) break;
@@ -584,7 +584,7 @@ void main() {
           float mult = (order == 2 || order == 3) ? 1.25 : 1.08;
           float pxPerLocal = R * oneMinusWs2 / max(1e-6, 1.0 - qm2);
           float rPx = rhoD * pxPerLocal;
-          if (rPx < 0.55) continue;
+          if (rPx < 0.40) continue;
           float sdDisc = order == 2
             ? vesicaSDF(qm, rhoD)
             : regularPolySDF(qm, order, rhoD * mult);
@@ -592,17 +592,18 @@ void main() {
 
           bool hasAnySel = (pickType > 0.5) || (uPick.w < 0.99);
           bool full = on || !hasAnySel || (pickType < 0.5 && !dimMarks);
-          float vis = smoothstep(0.55, 1.25, rPx);
-          float fAlpha = (full ? 1.0 : dimA) * vis;
+          float fillVis = smoothstep(0.40, 2.8, rPx);
+          float strokeVis = smoothstep(1.2, 3.0, rPx);
+          float fAlpha = (full ? 1.0 : dimA) * fillVis;
           float baseSw = picked ? 2.0 : (on ? 1.6 : 1.0);
-          float sWidth = min(baseSw, max(0.35, 0.24 * rPx));
-          float sAlpha = (full ? 0.95 : 0.5) * vis;
+          float sWidth = min(baseSw, max(0.25, 0.24 * rPx));
+          float sAlpha = (full ? 0.95 : 0.5) * strokeVis;
           float hp = 0.5 / dpr;
           float fillCov = clamp((hp - sdPx) * dpr, 0.0, 1.0);
           float strokeCov = lineCov(abs(sdPx), 0.5 * sWidth, dpr);
           vec3 mCol = isCone ? C_BLUE : C_RED;
           col = mix(col, mCol, fillCov * fAlpha);
-          col = mix(col, vec3(1.0), strokeCov * sAlpha);
+          if (sAlpha > 0.005) col = mix(col, vec3(1.0), strokeCov * sAlpha);
         }
       }
     }

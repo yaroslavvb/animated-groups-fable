@@ -768,6 +768,21 @@ export function createPattern(canvas, opts = {}) {
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
     const extras = (model.lines || []).map(() => [0, 1, 2].map(() => new Path2D()));          // the caller's own lines (a loop of the orbifold), tile by tile
     const marks = A.classes.map(() => new Path2D());
+    const fadingMarks = [];
+    const smoothstep = (e0, e1, x) => { const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+    const stampMark = (path, order, x, y, r, ang) => {
+      if (order === 2) {
+        const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r;
+        path.moveTo(x + a1 * ux, y + a1 * uy);
+        path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy);
+        path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy);
+      } else {
+        const rr = r * (order === 3 ? 1.25 : 1.08), x0 = x + rr * Math.cos(ang), y0 = y + rr * Math.sin(ang);
+        path.moveTo(x0, y0);
+        for (let k = 1; k < order; k++) { const a = ang + (TAU * k) / order; path.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); }
+        path.lineTo(x0, y0);
+      }
+    };
     const starOf = new Array(n).fill(-1);
     A.stars.forEach((s, k) => s.edges.forEach((e) => { starOf[e] = k; }));
     const hScale = kind === 'H' ? Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area))) : 0.45;
@@ -889,7 +904,7 @@ export function createPattern(canvas, opts = {}) {
         if (kind === 'H') {
           const rHyp = (picked ? 0.125 : on ? 0.115 : 0.080) * markScale;
           r = (rHyp * R) / (1 + p[2]);
-          if (r < 0.9) continue;
+          if (r < 0.40) continue;
         } else {
           if (px < (picked ? 3.0 : 4.5)) continue;
           if (kind === 'S' && p[2] < 0.05) continue;
@@ -906,14 +921,17 @@ export function createPattern(canvas, opts = {}) {
           const q = lerpEdge(p, mk.toward === null ? c : P[mk.toward], 0.06);
           ang = Math.atan2(Y(q) - Y(p), X(q) - X(p));
         }
-        const x = X(p), y = Y(p), path = marks[mk.c.id];
-        if (picked && pickHalo && r >= 1.8) {
+        const x = X(p), y = Y(p);
+        if (picked && pickHalo && r >= (kind === 'H' ? 0.7 : 1.8)) {
           const hr = r * 1.85;
           pickHalo.moveTo(x + hr, y);
           pickHalo.arc(x, y, hr, 0, TAU);
         }
-        if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); }
-        else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08), x0 = x + rr * Math.cos(ang), y0 = y + rr * Math.sin(ang); path.moveTo(x0, y0); for (let k = 1; k < m; k++) { const a = ang + (TAU * k) / m; path.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } path.lineTo(x0, y0); }
+        if (kind === 'H' && r < 2.8) {
+          fadingMarks.push({ mk, picked, on, r, x, y, ang });
+        } else {
+          stampMark(marks[mk.c.id], mk.c.n, x, y, r, ang);
+        }
       }
     }
     stats = { tiles: list.length, drawn };
@@ -978,6 +996,24 @@ export function createPattern(canvas, opts = {}) {
         ctx.fill(marks[mk.c.id]);
         ctx.lineWidth = picked ? 2 : on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${full ? 0.95 : 0.5})`;
         ctx.stroke(marks[mk.c.id]);
+      }
+      for (const item of fadingMarks) {
+        const { mk, picked, on, r, x, y, ang } = item;
+        const col = mk.c.kind === 'cone' ? BLUE : RED;
+        const full = on || !(pick || also) || (!pick && model.dimMarks === false);
+        const fillVis = smoothstep(0.40, 2.8, r);
+        const strokeVis = smoothstep(1.2, 3.0, r);
+        if (fillVis <= 0.005) continue;
+        const p = new Path2D();
+        stampMark(p, mk.c.n, x, y, r, ang);
+        ctx.fillStyle = css(col, (full ? 1 : dim) * fillVis);
+        ctx.fill(p);
+        if (strokeVis > 0.01) {
+          const baseSw = picked ? 2 : on ? 1.6 : 1;
+          ctx.lineWidth = Math.min(baseSw, Math.max(0.25, 0.24 * r));
+          ctx.strokeStyle = `rgba(255,255,255,${(full ? 0.95 : 0.5) * strokeVis})`;
+          ctx.stroke(p);
+        }
       }
     };
 
