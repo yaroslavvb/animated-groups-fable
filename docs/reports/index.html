@@ -79,6 +79,13 @@
   <p class="subtitle">Research and development notes for Spacetime Groups.</p>
   <p class="reports-intro">Mathematical explanations, numerical evidence, and recorded experiments behind the animations. Each report states its own scope; earlier search counts describe the catalog at the time of writing.</p>
 
+  <article class="thm report-feature" aria-labelledby="smooth-hyp-report">
+    <span class="label">Performance note · 27 November 2026</span>
+    <h2 id="smooth-hyp-report"><a href="smooth-hyperbolic-animation/">Smooth hyperbolic animation: lessons &amp; tools</a></h2>
+    <p>How WebGL2 per-pixel Klein folding, dual SDF/mipmap atlases, <code>0.75x</code> FBO scaling, conformal markers, and <code>psuPow</code> wheel smoothing cut main-thread JS by 68x–147x for <code>*2334</code> and <code>*237</code>, packaged with TestUFO-style VSYNC telemetry as a migration playbook.</p>
+    <p><a href="smooth-hyperbolic-animation/">Read the guide →</a></p>
+  </article>
+
   <article class="thm report-feature" aria-labelledby="find-film-tutorial">
     <span class="label">Interactive tutorial · 2 November 2026</span>
     <h2 id="find-film-tutorial"><a href="find-film/">find_film.py, one line at a time</a></h2>
@@ -121,6 +128,7 @@
 
   <h2 id="verification">Computation and verification</h2>
   <ul class="report-list">
+    <li><a class="report-title" href="smooth-hyperbolic-animation/">Smooth hyperbolic animation: lessons &amp; tools</a><p>Benchmarks (<code>*2334</code>, <code>*237</code>, <code>3333</code>), WebGL2 Klein folding recipes, <code>perf-monitor.js</code> VSYNC diagnostics, and the 4-step migration playbook for <code>classification-of-surfaces</code>.</p></li>
     <li><a class="report-title" href="../scott-gray/research/generator-direction-audit.md">Generator direction and time-offset audit</a><span class="report-format">Markdown</span><p>Saved-field checks of forward and inverse time shifts, and the coordinate conventions behind displayed rotation arrows.</p></li>
     <li><a class="report-title" href="../scott-gray/SOLVER.md">The 442 periodic-orbit solver</a><span class="report-format">Markdown</span><p>Conventions, symmetry constraints, numerical methods, and the generator overlays.</p></li>
     <li><a class="report-title" href="../scott-gray/VERIFIED-ORBITS.md">Numerical verification of the bundled 442 orbits</a><span class="report-format">Markdown</span><p>Delivered data, orbit admission, parameter continuation, and spatial refinement.</p></li>

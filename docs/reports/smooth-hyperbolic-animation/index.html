@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smooth Hyperbolic Animation: Lessons &amp; Tools for Classification of Surfaces</title>
+<meta name="description" content="Measured benchmarks, architecture fixes, and diagnostic tools that brought two-features-two-handles to locked 60 Hz, packaged as a migration playbook for classification-of-surfaces#sym&amp;k=*2334.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%230072b2'/%3E%3Cpath d='M17 6l-7 12h6l-1 8 7-12h-6z' fill='%23ffffff'/%3E%3C/svg%3E">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --card: #f7f7f8;
+  --line: #e5e5ea;
+  --ink: #1a1a1f;
+  --muted: #52514a;
+  --label: #595962;
+  --accent: #0072b2;
+  --accent-ink: #005a8e;
+  --good: #168a4c;
+  --good-ink: #0f6f3c;
+  --warn: #b45309;
+  --crit-ink: #c81e1e;
+  --code-bg: #f3f3f6;
+}
+* { box-sizing: border-box; }
+html { background: var(--bg); color: var(--ink); scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.wrap {
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 28px clamp(16px, 4vw, 32px) 64px;
+}
+h1, h2, h3 {
+  text-wrap: balance;
+  color: var(--ink);
+  letter-spacing: -0.015em;
+}
+h1 {
+  font-size: clamp(26px, 4.4vw, 36px);
+  line-height: 1.18;
+  margin: 0 0 10px;
+}
+h2 {
+  font-size: clamp(20px, 3vw, 24px);
+  line-height: 1.25;
+  margin: 0 0 10px;
+}
+h3 {
+  font-size: 16px;
+  line-height: 1.35;
+  margin: 0 0 6px;
+}
+p { margin: 0 0 12px; max-width: 68ch; }
+.lede { color: var(--muted); font-size: 18px; line-height: 1.5; max-width: 64ch; }
+.kicker {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+  margin: 0 0 8px;
+}
+.sub { color: var(--muted); font-size: 15px; }
+a { color: var(--accent-ink); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+code, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.86em;
+}
+code {
+  background: var(--code-bg);
+  color: var(--ink);
+  padding: 1px 5px;
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--ink);
+  padding: 14px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  line-height: 1.48;
+  overflow-x: auto;
+  font-size: 13.5px;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Navigation pills */
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0 24px;
+}
+.toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 550;
+}
+.toc a:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+section { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--line); }
+section:first-of-type { margin-top: 24px; padding-top: 0; border-top: 0; }
+
+/* KPI row (4 across on desktop, 2x2 on phone - never an orphan tile) */
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0 6px;
+}
+.kpi {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 14px 16px;
+}
+.kpi-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label);
+}
+.kpi-val {
+  font-size: clamp(22px, 3vw, 29px);
+  font-weight: 750;
+  line-height: 1.15;
+  margin: 6px 0 4px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--ink);
+}
+.kpi-val.is-good { color: var(--good-ink); }
+.kpi-val.is-accent { color: var(--accent-ink); }
+.kpi-sub { font-size: 13.5px; color: var(--muted); line-height: 1.35; }
+@media (max-width: 720px) {
+  .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Balanced card grid (:has() never leaves a lone card on the last row) */
+.cards {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  margin: 16px 0;
+}
+.cards:has(> :last-child:nth-child(1)) { --cols: 1; }
+.cards:has(> :last-child:nth-child(2)),
+.cards:has(> :last-child:nth-child(4)) { --cols: 2; }
+.cards:has(> :last-child:nth-child(7)),
+.cards:has(> :last-child:nth-child(8)) { --cols: 4; }
+.card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 16px;
+}
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--label);
+  margin-bottom: 6px;
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  flex: none;
+}
+.dot.warn { background: var(--warn); }
+.dot.crit { background: var(--crit-ink); }
+.dot.good { background: var(--good); }
+.card p { font-size: 15px; color: var(--muted); margin: 0; }
+.card code { font-size: 0.84em; }
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+}
+
+/* Horizontal bar charts */
+.chart-box {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 16px 18px;
+  margin: 14px 0 16px;
+}
+.chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+.chart-title { font-size: 15.5px; font-weight: 700; color: var(--ink); }
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.leg-item { display: inline-flex; align-items: center; gap: 6px; }
+.swatch { width: 12px; height: 10px; border-radius: 2px; display: inline-block; }
+.sw-cos { background: #737380; }
+.sw-max { background: #d4d4dc; border: 1px solid #9d9daa; }
+.sw-gl { background: var(--good); }
+.sw-gpu { background: var(--accent); }
+.bar-group {
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.bar-group:first-of-type { border-top: 0; padding-top: 2px; }
+.bar-group-title {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 14.5px;
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+.bar-group-meta { font-size: 13px; font-weight: 450; color: var(--label); font-variant-numeric: tabular-nums; }
+.bar-row {
+  display: grid;
+  grid-template-columns: 164px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+.bar-label { font-size: 13.5px; color: var(--muted); }
+.bar-track-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.bar-track {
+  position: relative;
+  flex: 1;
+  height: 16px;
+  background: var(--card);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.bar-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #b8b8c4;
+  z-index: 2;
+  pointer-events: none;
+}
+.bar-tick.is-60 { background: #8e8e9c; }
+.bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 3px;
+  z-index: 1;
+}
+.bar-fill.is-max { background: #d4d4dc; }
+.bar-fill.is-cos { background: #6b6b76; }
+.bar-fill.is-gl { background: var(--good); min-width: 3px; }
+.bar-fill.is-gpu { background: var(--accent); }
+.bar-val {
+  min-width: 112px;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.bar-val.is-crit { color: var(--crit-ink); }
+.bar-val.is-good { color: var(--good-ink); }
+.bar-val.is-accent { color: var(--accent-ink); }
+.budget-note {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  font-size: 13px;
+  color: var(--label);
+}
+@media (max-width: 640px) {
+  .bar-row { grid-template-columns: 1fr; gap: 4px; }
+  .bar-val { min-width: 0; }
+}
+
+/* Tables */
+.scroll-x { overflow-x: auto; max-width: 100%; margin: 14px 0; }
+table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 14.5px;
+}
+th, td {
+  text-align: left;
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+th {
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--label);
+}
+th.num, td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.picto-cell { width: 76px; padding-right: 6px; }
+.picto-svg { width: 60px; height: 30px; display: block; }
+.good-num { color: var(--good-ink); font-weight: 700; }
+.crit-num { color: var(--crit-ink); font-weight: 700; }
+
+/* Inline SVG containers */
+.diagram-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  padding: 14px 16px;
+  margin: 14px 0 16px;
+}
+svg.diagram { width: 100%; height: auto; display: block; }
+.figcap { font-size: 13.5px; color: var(--label); margin: 8px 0 0; }
+.pipe-band {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 12px 14px;
+}
+.pipe-band + .pipe-band { margin-top: 10px; }
+.pipe-title {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--label);
+  margin-bottom: 8px;
+}
+.pipe-title.is-good { color: var(--good-ink); }
+.pipe-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+.pipe-step {
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: var(--bg);
+  padding: 10px 11px;
+}
+.pipe-step.is-good { border-color: var(--good); }
+.pipe-step.is-crit { border-color: var(--crit-ink); }
+.pipe-step strong { display: block; font-size: 13.5px; line-height: 1.3; color: var(--ink); }
+.pipe-step.is-crit strong { color: var(--crit-ink); }
+.pipe-step.is-good-end strong { color: var(--good-ink); }
+.pipe-step span { display: block; font-size: 12.5px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+@media (max-width: 700px) {
+  .pipe-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 440px) {
+  .pipe-row { grid-template-columns: 1fr; }
+}
+
+/* Collapsible code recipes & sources */
+details {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 6px 14px;
+  margin: 10px 0;
+}
+summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 650;
+  font-size: 15px;
+  color: var(--ink);
+  list-style: none;
+}
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: "+";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+  font-size: 14px;
+  color: var(--accent-ink);
+  flex: none;
+}
+details[open] summary::before { content: "-"; }
+details .detail-body { padding: 6px 0 10px; }
+
+/* Numbered playbook steps */
+.steps {
+  display: grid;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+.step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 14px 16px;
+  align-items: start;
+}
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 750;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+.step p { font-size: 15px; color: var(--muted); margin: 4px 0 0; }
+
+/* Copyable Fable prompt box */
+.prompt-box {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+  padding: 16px;
+  margin: 16px 0;
+}
+.prompt-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.btn-copy {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 6px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #ffffff;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.btn-copy:hover { background: var(--accent-ink); border-color: var(--accent-ink); }
+.prompt-box pre {
+  background: var(--bg);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+footer {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--label);
+}
+.foot-links { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header data-ss-id="section-hero" data-ss-section>
+    <div class="kicker" data-ss-id="hero-kicker">Rendering Architecture &amp; Diagnostics · 27 Nov 2026</div>
+    <h1 data-ss-id="hero-title">Smooth Hyperbolic Animation: Lessons &amp; Tools for Classification of Surfaces</h1>
+    <p class="lede" data-ss-id="hero-lede">Replacing per-frame Canvas 2D tile loops with per-pixel Klein folding in WebGL2 dropped main-thread JavaScript on <code>*2334</code> from <code>6.8 ms</code> to <code>0.10 ms</code> while eliminating rim pop-in, trackpad judder, and scroll hijacking.</p>
+
+    <div class="kpis" data-ss-id="hero-kpis">
+      <div class="kpi" data-ss-id="kpi-2334">
+        <div class="kpi-label">*2334 JS speedup</div>
+        <div class="kpi-val is-good">68x</div>
+        <div class="kpi-sub"><code>6.8 ms</code> → <code>0.10 ms</code> median</div>
+      </div>
+      <div class="kpi" data-ss-id="kpi-237">
+        <div class="kpi-label">*237 JS speedup</div>
+        <div class="kpi-val is-good">147x</div>
+        <div class="kpi-sub"><code>29.4 ms</code> → <code>0.20 ms</code> (no 93.9 ms spike)</div>
+      </div>
+      <div class="kpi" data-ss-id="kpi-gpu">
+        <div class="kpi-label">*2334 GPU p50</div>
+        <div class="kpi-val is-accent">1.60 ms</div>
+        <div class="kpi-sub"><code>0.75x</code> FBO (<code>2.18 ms</code> at <code>1x</code>)</div>
+      </div>
+      <div class="kpi" data-ss-id="kpi-vsync">
+        <div class="kpi-label">*2334 Debug Lock</div>
+        <div class="kpi-val">60.00 Hz</div>
+        <div class="kpi-sub">0 stutters across 210 frames</div>
+      </div>
+    </div>
+
+    <nav class="toc" aria-label="Page sections" data-ss-react="off">
+      <a href="#benchmarks">Benchmarks</a>
+      <a href="#diagnosis">Why *2334 Stutters</a>
+      <a href="#lessons">6 Architecture Fixes</a>
+      <a href="#tools">Diagnostic Tools</a>
+      <a href="#fable">Plan for Fable</a>
+    </nav>
+  </header>
+
+  <section id="benchmarks" data-ss-id="section-benchmarks" data-ss-section>
+    <h2 data-ss-id="bench-heading">WebGL2 Cuts *2334 Main-Thread Work 68x and *237 Work 147x</h2>
+    <p data-ss-id="bench-intro">Both pages were profiled side by side in Chromium (<code>1280x800</code>, <code>2x</code> DPR, Metal ANGLE): active two-finger wheel panning in <code>classification-of-surfaces</code> (<code>536x468</code> CSS, <code>1072x936</code> px) vs continuous <code>#debug</code> auto-panning in <code>two-features-two-handles</code> (<code>777x592</code> CSS, <code>1130x1132</code> GL px).</p>
+
+    <div class="chart-box" data-ss-id="chart-js-gpu">
+      <div class="chart-head">
+        <div class="chart-title">Frame render cost by orbifold (0–32 ms scale, lower is faster)</div>
+        <div class="legend" aria-hidden="true">
+          <span class="leg-item"><i class="swatch sw-cos"></i>COS Canvas 2D JS p50</span>
+          <span class="leg-item"><i class="swatch sw-max"></i>COS peak spike</span>
+          <span class="leg-item"><i class="swatch sw-gl"></i>TFTH WebGL2 JS p50</span>
+          <span class="leg-item"><i class="swatch sw-gpu"></i>TFTH WebGL2 GPU p50</span>
+        </div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-group-title">
+          <span><code>*2334</code> — target orbifold</span>
+          <span class="bar-group-meta">3,450 cached tiles · 220 comma pts/tile · 60.0032 Hz locked</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">COS Canvas 2D JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-max" style="width: 51.3%;"></div>
+              <div class="bar-fill is-cos" style="width: 21.3%;"></div>
+            </div>
+            <div class="bar-val">6.8 ms (max 16.4)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gl" style="width: 0.9%;"></div>
+            </div>
+            <div class="bar-val is-good">0.10 ms (p95 0.40)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 GPU</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gpu" style="width: 5.0%;"></div>
+            </div>
+            <div class="bar-val is-accent">1.60 ms (p95 1.77)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-group-title">
+          <span><code>*237</code> — dense tiny-tile stress test</span>
+          <span class="bar-group-meta">4,200 capped tiles · 173 comma pts/tile · 59.9986 Hz locked</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">COS Canvas 2D JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-max" style="width: 100%;"></div>
+              <div class="bar-fill is-cos" style="width: 91.9%;"></div>
+            </div>
+            <div class="bar-val is-crit">29.4 ms (93.9 spike)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gl" style="width: 0.9%;"></div>
+            </div>
+            <div class="bar-val is-good">0.20 ms (p95 0.50)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 GPU</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gpu" style="width: 9.9%;"></div>
+            </div>
+            <div class="bar-val is-accent">3.16 ms (p95 3.38)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bar-group">
+        <div class="bar-group-title">
+          <span><code>3333</code> — four cone points</span>
+          <span class="bar-group-meta">4,200 capped tiles · 158 comma pts/tile · 60.0258 Hz locked</span>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">COS Canvas 2D JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-max" style="width: 39.1%;"></div>
+              <div class="bar-fill is-cos" style="width: 5.9%;"></div>
+            </div>
+            <div class="bar-val">1.9 ms (max 12.5)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 JS</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gl" style="width: 0.9%;"></div>
+            </div>
+            <div class="bar-val is-good">0.10 ms (p95 0.30)</div>
+          </div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-label">TFTH WebGL2 GPU</div>
+          <div class="bar-track-wrap">
+            <div class="bar-track" aria-hidden="true">
+              <span class="bar-tick" style="left: 26%;"></span>
+              <span class="bar-tick is-60" style="left: 52.1%;"></span>
+              <div class="bar-fill is-gpu" style="width: 5.8%;"></div>
+            </div>
+            <div class="bar-val is-accent">1.84 ms (p95 2.09)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="budget-note">Vertical guides at <strong>8.33 ms</strong> (120 Hz ProMotion, 26%) and <strong>16.67 ms</strong> (60 Hz VSYNC, 52%). Track capped at 32 ms; <code>*237</code> Canvas 2D settle redraw spikes to <code>93.9 ms</code> (2.9x past track end).</div>
+    </div>
+
+    <div class="chart-box" data-ss-id="chart-fbo-scale">
+      <div class="chart-head">
+        <div class="chart-title">*2334 Interactive 0.75x FBO Cuts GPU Fragment Load by 32%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Native 1.0x Retina</div>
+        <div class="bar-track-wrap">
+          <div class="bar-track" aria-hidden="true">
+            <div class="bar-fill is-cos" style="width: 87%;"></div>
+          </div>
+          <div class="bar-val">2.18 ms p50 (2.31 p95)</div>
+        </div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Interactive 0.75x FBO</div>
+        <div class="bar-track-wrap">
+          <div class="bar-track" aria-hidden="true">
+            <div class="bar-fill is-gpu" style="width: 60%;"></div>
+          </div>
+          <div class="bar-val is-accent">1.49 ms p50 (1.80 p95)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-x" data-ss-id="table-benchmarks">
+      <table>
+        <thead>
+          <tr>
+            <th>Orbifold</th>
+            <th class="num">Tiles</th>
+            <th class="num">COS JS p50</th>
+            <th class="num">COS JS max</th>
+            <th class="num">TFTH JS p50</th>
+            <th class="num">TFTH GPU p50</th>
+            <th class="num">TFTH FPS / Stutters</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>*2334</code></td>
+            <td class="num">3,450</td>
+            <td class="num">6.8 ms</td>
+            <td class="num">16.4 ms</td>
+            <td class="num good-num">0.10 ms</td>
+            <td class="num">1.60 ms</td>
+            <td class="num good-num">60 fps · 0</td>
+          </tr>
+          <tr>
+            <td><code>*237</code></td>
+            <td class="num">4,200</td>
+            <td class="num crit-num">29.4 ms</td>
+            <td class="num crit-num">93.9 ms</td>
+            <td class="num good-num">0.20 ms</td>
+            <td class="num">3.16 ms</td>
+            <td class="num good-num">60 fps · 0</td>
+          </tr>
+          <tr>
+            <td><code>3333</code></td>
+            <td class="num">4,200</td>
+            <td class="num">1.9 ms</td>
+            <td class="num">12.5 ms</td>
+            <td class="num good-num">0.10 ms</td>
+            <td class="num">1.84 ms</td>
+            <td class="num good-num">60 fps · 0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="diagnosis" data-ss-id="section-diagnosis" data-ss-section>
+    <h2 data-ss-id="diag-heading">Why <code>classification-of-surfaces#sym&amp;k=*2334</code> Stutters Today</h2>
+    <p data-ss-id="diag-intro">In <code>standalone/classification-of-surfaces/src/sym/pattern.js</code>, every drag or wheel frame walks up to 4,200 hyperbolic matrices on the CPU, allocates ~20 <code>Path2D</code> buckets per frame, and oscillates tile count whenever frame time crosses 34 ms.</p>
+
+    <div class="diagram-card" data-ss-id="diagram-pipeline">
+      <div class="pipe-band">
+        <div class="pipe-title">Current: sym/pattern.js (per-frame CPU tile enumeration)</div>
+        <div class="pipe-row">
+          <div class="pipe-step"><strong>1. Raw wheel / drag</strong><span>Cursor-anchored jump adds holonomy</span></div>
+          <div class="pipe-step"><strong>2. 3,450 tiles in JS</strong><span><code>all.slice(0, budget)</code> @29 fps</span></div>
+          <div class="pipe-step"><strong>3. 20+ Path2D paths</strong><span>19 fills + 24 strokes each frame</span></div>
+          <div class="pipe-step is-crit"><strong>4. 6.8–29.4 ms + pop-in</strong><span>180 ms timer flashes rim tiles</span></div>
+        </div>
+      </div>
+      <div class="pipe-band">
+        <div class="pipe-title is-good">Target: pattern-gl.js + thin 2D overlay (O(1) CPU per frame)</div>
+        <div class="pipe-row">
+          <div class="pipe-step is-good"><strong>1. 2-stage psuPow</strong><span>Center pan + 450 ms scroll latch</span></div>
+          <div class="pipe-step is-good"><strong>2. 32-gon Klein fold</strong><span>1-dot Minkowski + 4 static UBOs</span></div>
+          <div class="pipe-step is-good"><strong>3. 0.75x FBO + 1x settle</strong><span>+ 1 outlined tile in 2D overlay</span></div>
+          <div class="pipe-step is-good is-good-end"><strong>4. 0.10 ms JS · 1.6 ms GPU</strong><span>Locked 60 Hz, zero rim pop-in</span></div>
+        </div>
+      </div>
+      <div class="figcap">Architecture shift: upload static fundamental-domain UBOs once per orbifold change instead of rebuilding thousands of tiles every frame.</div>
+    </div>
+
+    <div class="cards" data-ss-id="cards-diagnosis">
+      <div class="card" data-ss-id="card-diag-tiles">
+        <div class="card-tag"><span class="dot crit" aria-hidden="true"></span>CPU bottleneck</div>
+        <h3>CPU tile loop &amp; Path2D churn</h3>
+        <p><code>pattern.js:141-292</code> projects up to 4,200 tiles in JS every frame (3,450 cached on <code>*2334</code>), rebuilding comma and mirror <code>Path2D</code> objects synchronously on the main thread.</p>
+      </div>
+      <div class="card" data-ss-id="card-diag-budget">
+        <div class="card-tag"><span class="dot warn" aria-hidden="true"></span>Visual artifact</div>
+        <h3>29 FPS budget truncation &amp; rim pop-in</h3>
+        <p><code>pattern.js:150, 405, 547</code> targets <code>34 ms</code> (~29 FPS) while dragging, slices <code>all.slice(0, budget)</code>, then pops missing outer tiles back in after a 140–180 ms timer.</p>
+      </div>
+      <div class="card" data-ss-id="card-diag-wheel">
+        <div class="card-tag"><span class="dot warn" aria-hidden="true"></span>Input &amp; scroll</div>
+        <h3>Raw wheel jumps &amp; off-center holonomy</h3>
+        <p><code>pattern.js:534-549</code> applies raw <code>wheel</code> deltas anchored at cursor <code>(x, y)</code>, rotating the pattern via hyperbolic holonomy on vertical wheel reversals and hijacking page scrolls.</p>
+      </div>
+      <div class="card" data-ss-id="card-diag-marks">
+        <div class="card-tag"><span class="dot" aria-hidden="true"></span>Marker sizing</div>
+        <h3>Non-conformal markers &amp; hard cutoffs</h3>
+        <p><code>pattern.js:244, 281-291</code> sizes all vertices of a tile from one tile-center <code>px</code>, clamps radii at <code>6.5 px</code>, and hard-drops vertices abruptly when <code>px &lt; 4.5</code> or <code>r &lt; 1.1</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="lessons" data-ss-id="section-lessons" data-ss-section>
+    <h2 data-ss-id="lessons-heading">Six Architecture Fixes That Unlocked Locked 60 Hz</h2>
+    <p data-ss-id="lessons-intro">Every smoothness gain in <code>two-features-two-handles</code> came from moving geometry work out of the per-frame CPU loop and enforcing hyperbolic group invariants on motion.</p>
+
+    <div class="scroll-x" data-ss-id="table-lessons">
+      <table>
+        <thead>
+          <tr>
+            <th>Visual</th>
+            <th>Technique</th>
+            <th>What it fixes</th>
+            <th>Source &amp; commit</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <circle cx="30" cy="15" r="12" fill="none" stroke="#595962" stroke-width="1.3"/>
+                <polygon points="22,10 38,10 35,21 25,21" fill="rgba(0,114,178,0.14)" stroke="#0072b2" stroke-width="1.4"/>
+                <path d="M12 15l12 0" stroke="#168a4c" stroke-width="1.6"/>
+              </svg>
+            </td>
+            <td><strong>Per-pixel Klein Cyrus-Beck folding</strong> in <code>PSU(1,1) x Z2</code></td>
+            <td>Replaces 4,200-tile CPU walks with a 56-step ray march inside a 32-gon disc proxy. Eliminates rim pop-in and <code>SO(2,1)</code> <code>e^d</code> precision blowup.</td>
+            <td><code>pattern-gl.js</code><br><code>8deb8377</code></td>
+          </tr>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <rect x="6" y="5" width="16" height="20" rx="2" fill="#f7f7f8" stroke="#0072b2" stroke-width="1.4"/>
+                <rect x="26" y="7" width="12" height="16" rx="2" fill="#f7f7f8" stroke="#168a4c" stroke-width="1.4"/>
+                <circle cx="48" cy="15" r="5" fill="#168a4c" opacity="0.75"/>
+              </svg>
+            </td>
+            <td><strong>Dual-channel SDF + mipmap atlas</strong> &amp; 1-dot Minkowski cull</td>
+            <td><code>R</code> channel stores SDF (sharp zoom), <code>G</code> stores antialiased mask queried with <code>textureGrad</code> (alias-free rim), cross-faded across <code>tpp 0.75..2.2</code> over 4 static <code>std140</code> UBOs.</td>
+            <td><code>pattern-gl.js</code><br><code>9912bf9a</code></td>
+          </tr>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <rect x="5" y="7" width="18" height="16" rx="2" fill="rgba(0,114,178,0.15)" stroke="#0072b2" stroke-width="1.4"/>
+                <path d="M26 15h8" stroke="#595962" stroke-width="1.5"/>
+                <rect x="37" y="4" width="18" height="22" rx="2" fill="none" stroke="#168a4c" stroke-width="1.5"/>
+              </svg>
+            </td>
+            <td><strong>0.75x interactive offscreen FBO</strong> + linear blit</td>
+            <td>Scales fragment shading down while moving (cap <code>1.25M</code> px, cutting <code>*2334</code> GPU cost 32% from <code>2.18</code> to <code>1.49 ms</code>) and restores sharp <code>1x</code> 140 ms after motion stops.</td>
+            <td><code>pattern-gl.js</code><br><code>9912bf9a</code></td>
+          </tr>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <circle cx="18" cy="15" r="4" fill="#0072b2"/>
+                <circle cx="32" cy="9" r="3" fill="#595962"/>
+                <circle cx="32" cy="21" r="3" fill="#595962"/>
+                <circle cx="46" cy="15" r="3" fill="#168a4c"/>
+                <path d="M22 13l7-3M22 17l7 3M35 10l8 4M35 20l8-4" stroke="#595962" stroke-width="1.3"/>
+              </svg>
+            </td>
+            <td><strong>Exact covering-tile BFS</strong> (<code>collectFeatureTiles</code>)</td>
+            <td>Walks face-adjacent mirrors and gluings out to exact distance margins instead of depth-2/3 shells, stopping seam clipping on high-valence orbifolds.</td>
+            <td><code>pattern-gl.js</code><br><code>759b4bdf</code></td>
+          </tr>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <polygon points="15,8 22,20 8,20" fill="#0072b2"/>
+                <polygon points="34,11 39,19 29,19" fill="#0072b2" opacity="0.65"/>
+                <circle cx="49" cy="15" r="2.2" fill="#0072b2" opacity="0.28"/>
+              </svg>
+            </td>
+            <td><strong>Conformal <code>markLocalFrame</code></strong>, rim fade &amp; <code>sSym</code> dashes</td>
+            <td>Sizes markers from local conformal factor <code>1 - |qm|^2</code>, fades alpha smoothly over <code>0.40..2.8 px</code>, and computes rigid dash phase <code>sSym</code> along each geodesic.</td>
+            <td><code>pattern-gl.js</code><br><code>9912bf9a</code> <code>4dadd4c2</code><br><code>522f8838</code></td>
+          </tr>
+          <tr>
+            <td class="picto-cell">
+              <svg class="picto-svg" viewBox="0 0 60 30" aria-hidden="true">
+                <path d="M6 21 C 16 21, 18 9, 30 9 C 42 9, 44 21, 54 9" fill="none" stroke="#168a4c" stroke-width="1.8"/>
+                <line x1="6" y1="24" x2="54" y2="24" stroke="#d4d4dc" stroke-width="1.2"/>
+              </svg>
+            </td>
+            <td><strong>2-stage <code>psuPow</code> filter</strong>, center pan &amp; 450 ms latch</td>
+            <td>Exponentially smooths trackpad steps (<code>WHEEL_TAU = 22 ms</code>), anchors wheel pans at origin (<code>&lt; 1e-12</code> rotation), and blocks page scroll from moving canvases.</td>
+            <td><code>pattern-ext.js</code><br><code>turning.js</code><br><code>9912bf9a</code> <code>4b7093bb</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <details data-ss-id="recipe-gl">
+      <summary><span>Code Recipe A — Klein fold, 1-dot Minkowski cull &amp; dual SDF/mipmap cross-fade (<code>pattern-gl.js</code>)</span></summary>
+      <div class="detail-body">
+        <pre><code>// 1. Fold fragment disc point qD into fundamental domain D in Klein coordinates
+vec2 qK = discToKlein(qD), pK = discToKlein(pD);
+for (int i = 0; i &lt; nEdges; i++) {
+  vec3 N = eNorm[i].xyz;
+  float sq = N.x * qK.x + N.y * qK.y + N.z;
+  if (sq &lt; -1e-7) { /* track earliest Klein exit t = sp / (sp - sq) */ }
+}
+// Apply inverse PSU(1,1) x Z2 edge gluing and continue (zero sqrt inside inner loop)
+
+// 2. One Minkowski dot product culls each pre-packed UBO comma instance
+if (dot(Q, bnd.xyz) &gt; bnd.w) continue;
+
+// 3. Cross-fade crisp SDF (zoomed) with textureGrad mipmap mask (minification near rim)
+float tpp = duv * 256.0;
+float sdPx = (textureLod(uCommaTex, vec3(uv, layer), 0.0).r - 0.5) * 0.22 / max(duv, 1e-6);
+float covSdf = smoothstep(0.65, -0.65, sdPx);
+float covMip = textureGrad(uCommaTex, vec3(uv, layer), vec2(duv, 0.0), vec2(0.0, duv)).g;
+float cov = mix(covSdf, covMip, smoothstep(0.75, 2.2, tpp));</code></pre>
+      </div>
+    </details>
+
+    <details data-ss-id="recipe-marks">
+      <summary><span>Code Recipe B — Conformal <code>markLocalFrame</code> scaling, rim fade &amp; <code>sSym</code> dashes (<code>pattern-gl.js</code>)</span></summary>
+      <div class="detail-body">
+        <pre><code>// Local conformal pixel density at the vertex itself (monotonic across panning &amp; deformation)
+float pxPerLocal = R * oneMinusWs2 / max(1e-6, 1.0 - dot(qm, qm));
+float rPx = rhoD * pxPerLocal;
+if (rPx &lt; 0.40) continue;
+
+// Smooth progressive fade-out and white rim collapse near the rim
+float fillVis   = smoothstep(0.40, 2.8, rPx);
+float strokeVis = smoothstep(1.2, 3.0, rPx);
+float sWidth    = min(baseSw, max(0.25, 0.24 * rPx));
+
+// Geodesic midpoint-symmetric arc parameter keeps dashes locked under motion
+float sH = 0.5 * log(((1.0 + u.x) * (1.0 + u.x) + u.y * u.y) / max(1e-12, (1.0 - u.x) * (1.0 - u.x) + u.y * u.y));
+sSym = abs(sH - 0.5 * lenH);</code></pre>
+      </div>
+    </details>
+
+    <details data-ss-id="recipe-input">
+      <summary><span>Code Recipe C — 2-stage <code>psuPow</code> wheel filter, center pan &amp; 450 ms scroll latch (<code>pattern-ext.js</code>)</span></summary>
+      <div class="detail-body">
+        <pre><code>// Anchor wheel pan at disc center so rapid up/down wheel reversals add zero curvature rotation
+const T = wheelPanTransform(G, lay().R, dx, dy);
+wRem = psuMul(so21ToPSU(T, false), wRem);
+
+// Two-stage critically damped exponential filter (WHEEL_TAU = 22 ms) in requestAnimationFrame
+const a = 1 - Math.exp(-dt / WHEEL_TAU);
+const stepMid = psuPow(wRem, a);
+wRem  = psuMul(wRem, psuInv(stepMid));
+wLead = psuMul(stepMid, wLead);
+const stepV = psuPow(wLead, a);
+wLead = psuMul(wLead, psuInv(stepV));
+vPsu  = psuMul(stepV, vPsu);
+
+// 450 ms latch prevents page scrolling from hijacking #pattern or #view zoom/tilt
+if (pageScrollLatched) { pageScrollUntil = performance.now() + 450; return; }
+if (opts.canWheel &amp;&amp; !opts.canWheel(e)) { markPageScroll(); return; }</code></pre>
+      </div>
+    </details>
+  </section>
+
+  <section id="tools" data-ss-id="section-tools" data-ss-section>
+    <h2 data-ss-id="tools-heading">Diagnostic &amp; Verification Tools Ready for Immediate Reuse</h2>
+    <p data-ss-id="tools-intro">Before tuning shaders or loops on <code>*2334</code>, reuse the telemetry module and automated test harnesses built in <code>standalone/two-features-two-handles</code>.</p>
+
+    <div class="cards" data-ss-id="diagram-jitter">
+      <div class="card" data-ss-id="jitter-card-cos">
+        <div class="card-tag"><span class="dot crit" aria-hidden="true"></span>Canvas 2D under scroll (*237 / *2334 peak)</div>
+        <svg class="diagram" viewBox="0 0 360 112" role="img" aria-label="Canvas 2D telemetry chart showing amber and red frame-drop spikes above the 16.7 ms target alongside high purple JS render trace.">
+          <line x1="8" y1="62" x2="228" y2="62" stroke="#168a4c" stroke-width="1" opacity="0.5"/>
+          <line x1="8" y1="45" x2="228" y2="45" stroke="#b45309" stroke-width="1" stroke-dasharray="4 3" opacity="0.65"/>
+          <rect x="14" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <rect x="32" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <rect x="50" y="38" width="12" height="59" fill="#d97706"/>
+          <rect x="68" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <rect x="86" y="14" width="12" height="83" fill="#c81e1e"/>
+          <rect x="104" y="36" width="12" height="61" fill="#d97706"/>
+          <rect x="122" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <rect x="140" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <rect x="158" y="18" width="12" height="79" fill="#c81e1e"/>
+          <rect x="176" y="62" width="12" height="35" fill="#168a4c" opacity="0.72"/>
+          <rect x="194" y="32" width="12" height="65" fill="#d97706"/>
+          <rect x="212" y="61" width="12" height="36" fill="#168a4c" opacity="0.72"/>
+          <polyline points="20,84 38,83 56,70 74,84 92,30 110,68 128,82 146,84 164,34 182,83 200,66 218,83" fill="none" stroke="#7c3aed" stroke-width="2"/>
+          <text x="236" y="42" font-size="12.5" font-weight="700" fill="#c81e1e">Dropped frames</text>
+          <text x="236" y="60" font-size="11.5" fill="#52514a">JS spikes &gt; 16.7 ms</text>
+          <text x="236" y="76" font-size="11.5" fill="#52514a">settle timer refills</text>
+        </svg>
+      </div>
+      <div class="card" data-ss-id="jitter-card-gl">
+        <div class="card-tag"><span class="dot good" aria-hidden="true"></span>WebGL2 + O(1) overlay (*2334 Debug)</div>
+        <svg class="diagram" viewBox="0 0 360 112" role="img" aria-label="WebGL2 telemetry chart showing uniform green 16.7 ms frame bars, 0.10 ms purple JS line, and 1.60 ms blue GPU line.">
+          <line x1="8" y1="62" x2="228" y2="62" stroke="#168a4c" stroke-width="1" opacity="0.5"/>
+          <line x1="8" y1="45" x2="228" y2="45" stroke="#b45309" stroke-width="1" stroke-dasharray="4 3" opacity="0.65"/>
+          <rect x="14" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="32" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="50" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="68" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="86" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="104" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="122" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="140" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="158" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="176" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="194" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <rect x="212" y="61" width="12" height="36" fill="#168a4c" opacity="0.75"/>
+          <polyline points="20,94 38,94 56,94 74,93 92,94 110,94 128,94 146,94 164,93 182,94 200,94 218,94" fill="none" stroke="#7c3aed" stroke-width="2"/>
+          <polyline points="20,87 38,86 56,87 74,87 92,86 110,87 128,87 146,86 164,87 182,87 200,86 218,87" fill="none" stroke="#0072b2" stroke-width="2"/>
+          <text x="236" y="42" font-size="12.5" font-weight="700" fill="#0f6f3c">VSYNC locked</text>
+          <text x="236" y="60" font-size="11.5" fill="#52514a">JS 0.10 ms (purple)</text>
+          <text x="236" y="76" font-size="11.5" fill="#005a8e">GPU 1.60 ms (blue)</text>
+        </svg>
+      </div>
+    </div>
+    <p class="figcap" data-ss-id="jitter-cap"><code>drawJitterGraph</code> compares frame <code>dt</code> bars against <code>±0.5T</code> stutter bounds while separating main-thread JS (purple) from WebGL2 GPU fill time (blue).</p>
+
+    <div class="cards" data-ss-id="cards-tools">
+      <div class="card" data-ss-id="card-tool-perf">
+        <div class="card-tag"><span class="dot good" aria-hidden="true"></span>Reusable module</div>
+        <h3><code>perf-monitor.js</code></h3>
+        <p>TestUFO-style <code>RefreshRateCalculator</code> (5-frame cycle filter + OLS phase regression to 4 decimals), <code>SyncJitterMonitor</code> (9-state lock machine + input-to-render latency), and <code>drawJitterGraph</code>.</p>
+      </div>
+      <div class="card" data-ss-id="card-tool-gpu">
+        <div class="card-tag"><span class="dot" aria-hidden="true"></span>Non-blocking telemetry</div>
+        <h3>Async WebGL2 GPU timer ring</h3>
+        <p>3-frame <code>EXT_disjoint_timer_query_webgl2</code> ring inside <code>pattern-gl.js</code> reads GPU p50/p95 time asynchronously without pipeline stalls or <code>gl.finish()</code>.</p>
+      </div>
+      <div class="card" data-ss-id="card-tool-debug">
+        <div class="card-tag"><span class="dot" aria-hidden="true"></span>Repeatable harness</div>
+        <h3><code>#debug</code> auto-pan &amp; state API</h3>
+        <p>Auto-driving geodesic pan (<code>Slow</code>/<code>Med</code>/<code>Fast</code>), <code>Auto</code>/<code>1x</code> FBO toggle, and <code>window.__handles.debug()</code> expose live telemetry for reproducible Playwright checks.</p>
+      </div>
+      <div class="card" data-ss-id="card-tool-tests">
+        <div class="card-tag"><span class="dot good" aria-hidden="true"></span>Regression gates</div>
+        <h3>Node + Playwright suite</h3>
+        <p>Unit tests (<code>perf-monitor.test.js</code>, <code>gl-tiles.test.js</code>, <code>mark-scale.test.js</code>, <code>scroll-stability.test.js</code>) plus live Chromium desktop &amp; <code>390x844</code> checks.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="fable" data-ss-id="section-fable" data-ss-section>
+    <h2 data-ss-id="fable-heading">Four-Step Playbook for Fable on <code>classification-of-surfaces</code></h2>
+    <p data-ss-id="fable-intro"><code>classification-of-surfaces</code> already uses the exact same domain structure <code>D</code>, <code>analyse(D)</code>, <code>design(D)</code>, <code>A.stars</code>, <code>A.glides</code>, and <code>A.classes</code> — <code>pattern-gl.js</code> even imports helpers from it today.</p>
+
+    <div class="steps" data-ss-id="steps-playbook">
+      <div class="step" data-ss-id="step-1">
+        <div class="step-num" aria-hidden="true">1</div>
+        <div>
+          <h3>Wire <code>perf-monitor.js</code> &amp; a repeatable pan test</h3>
+          <p>Import <code>SyncJitterMonitor</code> and <code>drawJitterGraph</code> into <code>standalone/classification-of-surfaces/src/</code> behind a <code>?debug</code> / <code>#debug</code> panel and record baseline JS ms, stutters, and wheel latency on <code>#sym&amp;k=*2334</code> and <code>#sym&amp;k=*237</code>.</p>
+        </div>
+      </div>
+      <div class="step" data-ss-id="step-2">
+        <div class="step-num" aria-hidden="true">2</div>
+        <div>
+          <h3>Mount <code>pattern-gl.js</code> behind <code>#pattern</code> for <code>G.kind === 'H'</code></h3>
+          <p>Feed <code>createHyperbolicGL(canvas)</code> from <code>D</code>, <code>A</code>, and <code>design(D)</code> with <code>locateTilePSU</code> and <code>smoothClosedPath</code>. Keep Canvas 2D <code>#pattern</code> as a transparent top layer drawing only the single outlined tile, glued-edge chevrons, and hover tip.</p>
+        </div>
+      </div>
+      <div class="step" data-ss-id="step-3">
+        <div class="step-num" aria-hidden="true">3</div>
+        <div>
+          <h3>Port 2-stage <code>psuPow</code> wheel smoothing &amp; 450 ms scroll latch</h3>
+          <p>Update <code>sym/pattern.js</code> to use <code>wheelPanTransform</code> (zero off-center holonomy), <code>WHEEL_TAU = 22 ms</code> fractional <code>psuPow</code> steps, and the 450 ms page-scroll latch matching <code>turning.js</code>.</p>
+        </div>
+      </div>
+      <div class="step" data-ss-id="step-4">
+        <div class="step-num" aria-hidden="true">4</div>
+        <div>
+          <h3>Gate deployment on Playwright 60 Hz &amp; mobile checks</h3>
+          <p>Verify <code>*2334</code> and <code>*237</code> achieve <code>jsP95 &lt; 2 ms</code>, <code>gpuP95 &lt; 5 ms</code>, <code>0</code> stutters during sustained pan, no rim pop-in, working scroll-past, and clean <code>390x844</code> layout.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="prompt-box" data-ss-id="block-fable-prompt">
+      <div class="prompt-head">
+        <h3>Ready-to-paste task prompt for Fable</h3>
+        <button id="copy" class="btn-copy" type="button">Copy prompt for Fable</button>
+      </div>
+      <pre><code id="prompt">Make hyperbolic pattern panning &amp; interaction smooth (locked 60 Hz, zero rim pop-in, zero scroll hijacking) on https://spacesheep.dev/@yaroslavvb/classification-of-surfaces#sym&amp;k=%2A2334 by porting the proven WebGL2 + smoothing architecture from standalone/two-features-two-handles/:
+
+1. Baseline first: Reuse standalone/two-features-two-handles/src/perf-monitor.js (RefreshRateCalculator, SyncJitterMonitor, drawJitterGraph) to benchmark #sym&amp;k=*2334 and #sym&amp;k=*237 before and after.
+2. Per-pixel WebGL2 backend: Mount pattern-gl.js behind #pattern when G.kind === 'H' (56-step Klein Cyrus-Beck fold in PSU(1,1) x Z2, 4 std140 UBOs, 1-dot Minkowski cull, dual-channel SDF+mipmap comma atlas, collectFeatureTiles BFS, 0.75x interactive FBO blit, conformal markLocalFrame sizing with smoothstep fade, and sSym rigid dashes). Keep #pattern transparent on top only for the 1 outlined tile, glued edges, and hover tip.
+3. Input &amp; scroll hygiene: Port wheelPanTransform (center-anchored), 2-stage psuPow wheel smoothing (WHEEL_TAU = 22 ms), and the 450 ms page-scroll latch in sym/pattern.js (matching turning.js).
+4. Acceptance gates: Node unit tests pass, Playwright confirms #sym&amp;k=*2334 and #sym&amp;k=*237 hit 60 Hz with jsP95 &lt; 2 ms, gpuP95 &lt; 5 ms, 0 stutters, clean 390x844 phone layout, and page scrolling over #pattern never pans the disc.</code></pre>
+    </div>
+  </section>
+
+  <footer data-ss-id="section-sources" data-ss-react="off">
+    <details>
+      <summary><span>Sources, commits &amp; measurement environment</span></summary>
+      <div class="detail-body">
+        <p class="sub">Measured 27 Nov 2026 in headless Chromium (<code>1280x800</code>, <code>dpr=2</code>, Metal ANGLE WebGL2) comparing local builds of <code>standalone/classification-of-surfaces/dist/index.html</code> and <code>docs/two-features-two-handles.html</code>.</p>
+        <p class="sub">Reference commits in <code>animated-groups-fable</code>: <code>8deb8377</code> (WebGL2 Klein fold), <code>6c211e87</code> (double-covered cut flicker), <code>9912bf9a</code> (UBO Minkowski, FBO 0.75x, rigid dashes, 2-stage <code>psuPow</code>), <code>637f8901</code> (TestUFO-style Debug monitor), <code>4dadd4c2</code> (conformal marker scaling), <code>522f8838</code> (rim opacity fade), <code>759b4bdf</code> (<code>collectFeatureTiles</code> BFS), <code>4b7093bb</code> (scroll latch, center wheel pan, cut tracking).</p>
+      </div>
+    </details>
+    <div class="foot-links">
+      <a href="../../two-features-two-handles.html#debug">Reference implementation (#debug)</a>
+      <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces#sym&amp;k=%2A2334">Target page (*2334)</a>
+      <a href="../">All Reports</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+function copyText(text) {
+  var area = document.createElement('textarea');
+  area.value = text;
+  area.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;font-size:16px';
+  area.setAttribute('readonly', '');
+  var focused = document.activeElement;
+  var copied = false;
+  try {
+    document.body.appendChild(area);
+    area.select();
+    area.setSelectionRange(0, text.length);
+    area.removeAttribute('readonly');
+    copied = document.execCommand('copy');
+  } catch (_) {
+    // Try the async API only after the synchronous attempt.
+  } finally {
+    area.remove();
+    if (focused && focused.focus) focused.focus({ preventScroll: true });
+  }
+  if (copied) return Promise.resolve();
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text);
+  }
+  return Promise.reject(new Error('Copy unavailable'));
+}
+
+var copyBtn = document.querySelector('#copy');
+if (copyBtn) {
+  copyBtn.addEventListener('click', function () {
+    copyText(document.querySelector('#prompt').textContent).then(
+      function () { copyBtn.textContent = 'Copied \u2713'; },
+      function () { copyBtn.textContent = 'Could not copy \u2014 try another browser'; }
+    );
+  });
+}
+</script>
+</body>
+</html>
