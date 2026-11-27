@@ -908,7 +908,7 @@ export function createPattern(canvas, opts = {}) {
           if (dt.after) { afterDots.push(item); continue; }
           ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 5, 0, TAU);
           ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
-          if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, 1); ctx.stroke(); }
+          if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, dt.alpha === undefined ? 1 : dt.alpha); ctx.stroke(); }          // (a faint dot has a faint ring)
         }
         // a wonder-ring chosen: its two wanderings, out of the tile across one glued edge and across the other
         if (pick && pick.t === 'o') {
@@ -941,7 +941,7 @@ export function createPattern(canvas, opts = {}) {
       const dt = item.dt;
       ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 6, 0, TAU);
       ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
-      if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, 1); ctx.stroke(); }
+      if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, dt.alpha === undefined ? 1 : dt.alpha); ctx.stroke(); }
     }
     // Keep 60+ fps smooth with EMA hysteresis and zero frame-to-frame budget oscillation
     if (quick && kind === 'H') {

@@ -901,6 +901,7 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
   const F_Ls = gamS(-b / 2), F_Rs = gamS(b / 2);
 
   let symVerts, pairs, crL = null, crR = null, crL_s = null, crR_s = null, footFeat = F_R, footFeat_s = F_Rs, footCorner = null, footCorner_s = null, featDist = Ddist, wMir = 0;
+  let footAlt = null, footAlt_s = null, footCornerAlt = null, footCornerAlt_s = null, featDistAlt = Infinity;          // a mirror with a corner: the next shortest arc (below)
   if (fam.mode === 'cone-star') {
     symVerts = [F_Ls, F_Rs, A_Rs, UR_s, UM_s, UL_s, A_Ls];
     pairs = [{ a: 0, mirror: true }, { a: 1, b: 6 }, { a: 2, b: 5 }, { a: 3, b: 4 }];
@@ -923,7 +924,8 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
 
     const TF_s = psuFit(F_Ls, F_Rs, F_Rs, gamS(1.5 * b), false);
     const invTF_s = psuInv(TF_s);
-    let bestD = Infinity;
+    let bestD = Infinity, bestM = 0;
+    const feet = [];
     for (let m = -2; m <= 2; m++) {
       let Tm = psuI();
       const step = m >= 0 ? TF_s : invTF_s;
@@ -933,14 +935,28 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
       const Fm = GH.frame(cL, cR);
       const qa = apply(invH(Fm), A_Rs);
       const segLen = GH.dist(cL, cR);
-      const u = Math.max(0, Math.min(segLen, Math.atanh(Math.max(-1 + 1e-15, Math.min(1 - 1e-15, qa[0] / qa[2])))));
+      const uRaw = Math.atanh(Math.max(-1 + 1e-15, Math.min(1 - 1e-15, qa[0] / qa[2])));
+      const u = Math.max(0, Math.min(segLen, uRaw));
       const cand = apply(Fm, [Math.sinh(u), 0, Math.cosh(u)]);
       const dc = GH.dist(A_Rs, cand);
-      if (dc < bestD - 1e-12) { bestD = dc; footFeat_s = cand; footCorner_s = cL; }
+      feet.push({ m, dc, cand, cL, square: uRaw > 1e-9 && uRaw < segLen - 1e-9 });
+      if (dc < bestD - 1e-12) { bestD = dc; footFeat_s = cand; footCorner_s = cL; bestM = m; }
     }
     footFeat = GH.norm(apply(boostX(symShift), footFeat_s));
     footCorner = GH.norm(apply(boostX(symShift), footCorner_s));
     featDist = bestD;
+    // The next shortest arc: square on another wall of the mirror. The tree is the SHORTEST arc from the cone point
+    // to the mirror, and at Corner shift 0 the cone point stands on the bisector of the mirror's corner: its two
+    // walls are equally near (the corner itself is further), and the nearest point of the mirror passes from one
+    // wall to the other without crossing what lies between. Drawn alone, the tree turns about the cone point in
+    // one step there. So near that tie both arcs are drawn, cross-faded (cornerFade, buildPatternModel).
+    let alt = null;
+    for (const f of feet) if (f.m !== bestM && f.square && (!alt || f.dc < alt.dc)) alt = f;
+    if (alt) {
+      footAlt_s = alt.cand; footCornerAlt_s = alt.cL; featDistAlt = alt.dc;
+      footAlt = GH.norm(apply(boostX(symShift), footAlt_s));
+      footCornerAlt = GH.norm(apply(boostX(symShift), footCornerAlt_s));
+    }
   }
 
   const edges = edgesFromPairs(symVerts.length, pairs);
@@ -953,6 +969,7 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
     D, A, symVerts, edges, symShift, ord,
     A_L, A_R, UL, UM, UR, F_L, F_R, crL, crR, footFeat, footCorner, featDist,
     A_Ls, A_Rs, UL_s, UM_s, UR_s, F_Ls, F_Rs, crL_s, crR_s, footFeat_s, footCorner_s,
+    footAlt, footCornerAlt, featDistAlt, footAlt_s, footCornerAlt_s,
     hA, hG, hU, b, wMir,
     R_AR: psuToSO21(R_AR_psu), R_AR_psu,
     R_UM: psuToSO21(R_UM_psu), R_UM_psu,
@@ -962,6 +979,20 @@ function buildConeFeatCut(k, L, tw, bParam, tauC = 0, ord = { low: 3, um: 3, ur:
     cutRawA: cutEndpoints(A_L, UL),
     cutRawB: cutEndpoints(A_R, UR),
   };
+}
+
+/**
+ * A mirror with a corner, by Corner shift (in turns): how strongly the shortest arc from the cone point to the
+ * mirror is drawn (main) and the next shortest (alt). At Corner shift 0 the two are equally short, mirror images
+ * of each other, and the shortest changes walls: there each is drawn half. Away from 0 the second fades out, gone
+ * at CORNER_FADE of a turn. main + alt = 1.
+ * His ask, Thu 26 Nov 2026, on 234*2 ("If I modify the corner shift here, the tree, the 'follow the tree line,'
+ * jumps rapidly. Is that necessary here?"), and of three ways offered: "make it a cross-fade".
+ */
+export const CORNER_FADE = 0.06;
+export function cornerFade(tauC) {
+  const t = Math.abs(tauC - Math.round(tauC)), x = Math.min(1, t / CORNER_FADE), s = x * x * (3 - 2 * x);
+  return { main: 0.5 + 0.5 * s, alt: 0.5 - 0.5 * s };
 }
 
 function coneFeatMapping(k, perm) {
@@ -1071,6 +1102,9 @@ export function coneFeatCentered(k, L, tw, bParam, tauC = 0, { commas = null, th
     mDist: mp.featPicked ? coneFeatTreeToCut(cut) : treeToCut(ord.um, ord.ur, L).m,
     shapes,
     markRefs: buildMarkRefs(GH, k, perm, D, A, home, canonPartners, thetas),
+    // a mirror with a corner: the next shortest arc from the cone point to the mirror (seg: cone point, foot), how
+    // strongly each of the two is drawn (cornerFade), and whether they are the far pair's tree (the mirror not picked)
+    treeFade: cut.footAlt_s ? { ...cornerFade(tauC), far: !mp.featPicked, seg: [toPairFromSym(cut.A_Rs), toPairFromSym(cut.footAlt_s)], length: cut.featDistAlt } : null,
   };
 }
 
@@ -1544,7 +1578,8 @@ export function recut(state, i, j) {
 }
 
 /** Walk, legs, and highlighted cut data for the "Follow the tree" moment (pair-centred frame). */
-export function followTreeData(state) {
+/** alt (a mirror with a corner): the walk that goes by the next shortest arc to the mirror instead of the shortest. */
+export function followTreeData(state, { alt = false } = {}) {
   const { k, orders, L, tw } = state;
   const fam = FAMILIES[k];
   if (k === '2222') {
@@ -1618,7 +1653,7 @@ export function followTreeData(state) {
     ? o33Centered(L, tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau, { perm: state.perm, thetas: state.thetas, k })
     : coneFeatCentered(k, L, tw, state.b ?? fam.defaultB, state.tau ?? fam.defaultTau ?? 0, { perm: state.perm, thetas: state.thetas });
   const toPair = (v) => GH.norm(apply(c.Pmat, v));
-  const cut = c.cut;
+  const cut = alt && c.cut.footAlt ? { ...c.cut, footFeat: c.cut.footAlt, footCorner: c.cut.footCornerAlt } : c.cut;
 
   let periodFwd, legPts;
   if (fam.mode === 'handle') {
@@ -2088,55 +2123,84 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   if (fam.mode === 'multi') return multiModel(state, dark);
   const built = centredFor(state, { dark });
   const { D, A, home, cutSeg, treeSeg, farTreeSeg, shapes } = built;
+  // A mirror with a corner, near Corner shift 0: two arcs from the cone point to the mirror are almost equally
+  // short, and the shortest changes walls at 0. Both are drawn, the shortest the stronger (cornerFade): the tree
+  // does not jump, it fades from one into the other. Away from 0 there is one tree, drawn as ever.
+  const fade = built.treeFade && built.treeFade.alt > 0 ? built.treeFade : null;
+  const wTree = fade && !fade.far ? fade.main : 1, wFar = fade && fade.far ? fade.main : 1;
 
   const lines = [
     ...(built.extraLines || []),
-    ...(farTreeSeg ? [{ a: farTreeSeg[0], b: farTreeSeg[1], color: INK, width: 1.9, alpha: 0.5, steps: 6 }] : []),
-    { a: treeSeg[0], b: treeSeg[1], color: INK, width: 2.3, alpha: 0.9, steps: 6 },
+    ...(farTreeSeg ? [{ a: farTreeSeg[0], b: farTreeSeg[1], color: INK, width: 1.9, alpha: 0.5 * wFar, steps: 6 }] : []),
+    ...(fade && fade.far ? [{ a: fade.seg[0], b: fade.seg[1], color: INK, width: 1.9, alpha: 0.5 * fade.alt, steps: 6 }] : []),
+    { a: treeSeg[0], b: treeSeg[1], color: INK, width: 2.3, alpha: 0.9 * wTree, steps: 6 },
+    ...(fade && !fade.far ? [{ a: fade.seg[0], b: fade.seg[1], color: INK, width: 2.3, alpha: 0.9 * fade.alt, steps: 6 }] : []),
     { a: cutSeg[0], b: cutSeg[1], color: AMBER, width: 2.2, dash: [6, 4.5], alpha: 1, steps: 8 },
   ];
   const dots = [];
   if (!(follow && follow.active) && built.featDots) {
     for (const p of built.featDots) {
-      dots.push({ p, color: BLUE, stroke: [1, 1, 1], r: 5.5 });
+      dots.push(wTree < 1 ? { p, color: BLUE, stroke: [1, 1, 1], r: 5.5, alpha: wTree } : { p, color: BLUE, stroke: [1, 1, 1], r: 5.5 });
     }
+    // the foot of the second arc, as faint as its arc
+    if (fade && !fade.far && built.featDots.length) dots.push({ p: fade.seg[1], color: BLUE, stroke: [1, 1, 1], r: 5.5, alpha: fade.alt });
   }
 
   if (follow && follow.active) {
-    const fd = follow.data;
     const progress = follow.progress ?? 1;
-    const walkSegs = [...fd.fwdSegs, ...fd.backSegs];
-    const totalF = fd.fwdSegs.length, totalB = fd.backSegs.length;
-    if (progress < 0.45) {
-      const fCount = Math.max(1, Math.ceil((progress / 0.45) * totalF));
-      for (let i = 0; i < fCount; i++) lines.push({ a: fd.fwdSegs[i][0], b: fd.fwdSegs[i][1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
-      const last = fd.fwdSegs[Math.min(fCount - 1, totalF - 1)][1];
-      dots.push({ p: last, color: AMBER, stroke: INK, r: 5.5 });
-    } else if (progress < 0.9) {
-      for (const s of fd.fwdSegs) lines.push({ a: s[0], b: s[1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
-      const bCount = Math.max(1, Math.ceil(((progress - 0.45) / 0.45) * totalB));
-      for (let i = 0; i < bCount; i++) lines.push({ a: fd.backSegs[i][0], b: fd.backSegs[i][1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
-      const last = fd.backSegs[Math.min(bCount - 1, totalB - 1)][1];
-      dots.push({ p: last, color: AMBER, stroke: INK, r: 5.5 });
-      if (fd.ends) dots.push({ p: fd.ends[1], color: AMBER, stroke: INK, r: 6.5, after: true });
+    /** What one walk draws at this stage of the moment: its own strokes (path), the cut's (the same for any walk), its dots. */
+    const walkOf = (fd) => {
+      const path = [], cut = [], ds = [];
+      const walkSegs = [...fd.fwdSegs, ...fd.backSegs];
+      const totalF = fd.fwdSegs.length, totalB = fd.backSegs.length;
+      if (progress < 0.45) {
+        const fCount = Math.max(1, Math.ceil((progress / 0.45) * totalF));
+        for (let i = 0; i < fCount; i++) path.push({ a: fd.fwdSegs[i][0], b: fd.fwdSegs[i][1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
+        const last = fd.fwdSegs[Math.min(fCount - 1, totalF - 1)][1];
+        ds.push({ p: last, color: AMBER, stroke: INK, r: 5.5 });
+      } else if (progress < 0.9) {
+        for (const s of fd.fwdSegs) path.push({ a: s[0], b: s[1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
+        const bCount = Math.max(1, Math.ceil(((progress - 0.45) / 0.45) * totalB));
+        for (let i = 0; i < bCount; i++) path.push({ a: fd.backSegs[i][0], b: fd.backSegs[i][1], color: INK, width: 4.0, alpha: 0.95, once: true, steps: 8 });
+        const last = fd.backSegs[Math.min(bCount - 1, totalB - 1)][1];
+        ds.push({ p: last, color: AMBER, stroke: INK, r: 5.5 });
+        if (fd.ends) ds.push({ p: fd.ends[1], color: AMBER, stroke: INK, r: 6.5, after: true });
+      } else {
+        for (const s of walkSegs) path.push({ a: s[0], b: s[1], color: INK, width: 3.8, alpha: 0.95, once: true, steps: 8 });
+        for (const lg of fd.legs) path.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
+        if (fd.extraLegs) {
+          for (const lg of fd.extraLegs) path.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
+        }
+        for (let i = 0; i + 1 < fd.cutPts.length; i++) {
+          cut.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: [1, 1, 1], width: 5.0, alpha: 0.9, once: true, steps: 4 });
+        }
+        for (let i = 0; i + 1 < fd.cutPts.length; i++) {
+          cut.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: AMBER, width: 3.0, alpha: 1, once: true, steps: 4 });
+        }
+        if (fd.ends) {
+          ds.push({ p: fd.ends[0], color: AMBER, stroke: INK, r: 6.5, after: true });
+          ds.push({ p: fd.ends[1], color: AMBER, stroke: INK, r: 6.5, after: true });
+        }
+        ds.push({ p: fd.feet[0], color: INK, r: 4.5 });
+        ds.push({ p: fd.feet[1], color: AMBER, stroke: INK, r: 6 });
+      }
+      return { path, cut, ds };
+    };
+    const one = walkOf(follow.data);
+    if (!fade) {
+      lines.push(...one.path, ...one.cut);
+      dots.push(...one.ds);
     } else {
-      for (const s of walkSegs) lines.push({ a: s[0], b: s[1], color: INK, width: 3.8, alpha: 0.95, once: true, steps: 8 });
-      for (const lg of fd.legs) lines.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
-      if (fd.extraLegs) {
-        for (const lg of fd.extraLegs) lines.push({ a: lg[0], b: lg[1], color: INK, width: 1.2, alpha: 0.75, once: true, steps: 8 });
-      }
-      for (let i = 0; i + 1 < fd.cutPts.length; i++) {
-        lines.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: [1, 1, 1], width: 5.0, alpha: 0.9, once: true, steps: 4 });
-      }
-      for (let i = 0; i + 1 < fd.cutPts.length; i++) {
-        lines.push({ a: fd.cutPts[i], b: fd.cutPts[i + 1], color: AMBER, width: 3.0, alpha: 1, once: true, steps: 4 });
-      }
-      if (fd.ends) {
-        dots.push({ p: fd.ends[0], color: AMBER, stroke: INK, r: 6.5, after: true });
-        dots.push({ p: fd.ends[1], color: AMBER, stroke: INK, r: 6.5, after: true });
-      }
-      dots.push({ p: fd.feet[0], color: INK, r: 4.5 });
-      dots.push({ p: fd.feet[1], color: AMBER, stroke: INK, r: 6 });
+      // The walk by the second arc as well. What the two walks share is drawn once, as ever; what is one walk's
+      // alone is drawn as strongly as its arc.
+      const two = walkOf(followTreeData(state, { alt: true }));
+      const sameLine = (u, v) => u.width === v.width && GH.dist(u.a, v.a) < 1e-9 && GH.dist(u.b, v.b) < 1e-9;
+      const sameDot = (u, v) => u.r === v.r && !!u.after === !!v.after && GH.dist(u.p, v.p) < 1e-9;
+      for (const u of one.path) lines.push(two.path.some((v) => sameLine(u, v)) ? u : { ...u, alpha: u.alpha * fade.main });
+      for (const v of two.path) if (!one.path.some((u) => sameLine(u, v))) lines.push({ ...v, alpha: v.alpha * fade.alt });
+      lines.push(...one.cut);
+      for (const u of one.ds) dots.push(two.ds.some((v) => sameDot(u, v)) ? u : { ...u, alpha: fade.main });
+      for (const v of two.ds) if (!one.ds.some((u) => sameDot(u, v))) dots.push({ ...v, alpha: fade.alt });
     }
     void BLUE;
   }
