@@ -17,7 +17,7 @@ import path from 'node:path';
 
 const args = process.argv.slice(2), opt = {};
 for (let i = 0; i < args.length; i++) if (args[i].startsWith('--')) opt[args[i].slice(2)] = args[i + 1] && !args[i + 1].startsWith('--') ? args[++i] : true;
-const { openBrowser } = await import(path.join(process.env.HOME, 'git/animated-groups-fable/standalone/the-folding/tools/browser.mjs'));
+const { openBrowser } = await import(new URL('../../the-folding/tools/browser.mjs', import.meta.url));
 const root = path.resolve(opt.root || path.join(path.dirname(new URL(import.meta.url).pathname), '..'));
 const B = await openBrowser({ root });
 const base = opt.live || B.url(opt.page || 'site/index.html');

@@ -40,11 +40,11 @@
 //   model.marks = [class id, ...]       corner classes brought out together
 //   P.projectTile(p)                    a point of the outlined tile, on the canvas (css px)
 
-import { mul, apply, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { tiles as makeTiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
-import { pairStyle } from '../../2026-11-15-classification-of-surfaces/src/sym/pairs.js';
+import { mul, apply, det, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { tiles as makeTiles } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { PRINT_FRONT, hexToRgb } from '../../classification-of-surfaces/src/vendor/the-folding/palette.js';
+import { pairStyle } from '../../classification-of-surfaces/src/sym/pairs.js';
 import { invH, psuI, psuNorm, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
 import { createHyperbolicGL } from './pattern-gl.js';
 

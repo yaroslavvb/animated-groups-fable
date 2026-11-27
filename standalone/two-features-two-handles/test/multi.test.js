@@ -15,12 +15,12 @@ import assert from 'node:assert/strict';
 
 import { GH, invH, FAMILIES, normalizeFamilyKey, buildPatternModel, multiState, multiAtDefaults, multiPrint, multiCentred, multiBuild, surfacePartsFor, pairMetricsFor, psuToSO21 } from '../src/handles.js';
 import { readSignature, kindOf, whyNot, movesOf, stillSpec } from '../src/custom.js';
-import { mul, apply, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { analyse, signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
-import { inscribed } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
-import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
+import { mul, apply, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { analyse, signatureOf, tiles } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { parse, domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
+import { inscribed } from '../../classification-of-surfaces/src/sym/domains.js';
+import { buildSurface } from '../../classification-of-surfaces/src/sym/surface.js';
 
 const G = GH, TAU = 2 * Math.PI;
 const MANY = ['22222', '222222', '33333', '333333', '22233', '223344', '23456', '234567', '22223', '99999'];

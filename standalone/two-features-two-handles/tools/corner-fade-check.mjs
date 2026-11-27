@@ -19,7 +19,7 @@ for (let i = 0; i < args.length; i++) if (args[i].startsWith('--')) opt[args[i].
 const root = path.resolve(opt.root || path.join(path.dirname(new URL(import.meta.url).pathname), '..'));
 const shots = opt.shots ? path.resolve(opt.shots) : null;
 if (shots) fs.mkdirSync(shots, { recursive: true });
-const { openBrowser } = await import(path.join(process.env.HOME, 'git/animated-groups-fable/standalone/the-folding/tools/browser.mjs'));
+const { openBrowser } = await import(new URL('../../the-folding/tools/browser.mjs', import.meta.url));
 const H = await import(path.join(root, 'src/handles.js'));
 const G = H.GH;
 const k = H.normalizeFamilyKey('234*2'), L = 3.221, tw = 0.0614, b = 2.512;

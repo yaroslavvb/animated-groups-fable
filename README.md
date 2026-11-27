@@ -71,6 +71,13 @@ loop with ← → (shift for finer steps).
   design travels in the link. See its
   [README](docs/shubnikov/studio/README.md).
 
+- **Two features, two handles** ([docs/two-features-two-handles.html](docs/two-features-two-handles.html),
+  source in [standalone/two-features-two-handles/](standalone/two-features-two-handles/)) —
+  interactive Fenchel–Nielsen Poincaré disc & 3D orbifold explorer across all
+  five Conway–Thurston feature kinds (`n`, `22`, `∗`/`∗n`, `×`, `½ o`) with
+  custom orbifold typing, multi-pair chains, WebGL2 rendering, and smooth
+  60 FPS interactive panning.
+
 ## The computation (`enumerate/`)
 
 The classification is recomputed from scratch in exact rational arithmetic

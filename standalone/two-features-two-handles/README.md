@@ -4,9 +4,8 @@ Interactive Fenchel–Nielsen explorer across all five Conway–Thurston feature
 
 Incorporates Vladimir Bulatov's and Chaim Goodman-Strauss's email feedback after seeing the first four-cone version: generalizing pair separation and twist from cone pairs to all five feature kinds (`∗`, `∗3`, `×`, `½ o`) and adding the `o` handle fault-line shift parameter (`tau_o`, shifting `o⁻` against `o⁺` along the blue handle geodesic `gamma_o`), cuff lengths, and exact recursive re-cutting across any pair.
 
-- **Spec:** [`spec-orbifold-handles.md`](../2026-11-24-symhub-meeting-notes-week-48/notes/spec-orbifold-handles.md)
-- **Live page (anyone with the link):** https://spacesheep.dev/@yaroslavvb/two-features-two-handles
-- **Tailnet:** http://intel/reports/2026-11/2026-11-24-two-features-two-handles/site/index.html
+- **GitHub Pages:** https://yaroslavvb.github.io/animated-groups-fable/two-features-two-handles.html
+- **Live page (Spacesheep mirror):** https://spacesheep.dev/@yaroslavvb/two-features-two-handles
 - **Hub:** [Chaim · Scott · Vladimir Hub](https://spacesheep.dev/@yaroslavvb/chaim-scott-vladimir-hub)
 - **Companions:** [Classification of Surfaces](https://spacesheep.dev/@yaroslavvb/classification-of-surfaces), [Orbifold Showcase](https://spacesheep.dev/@yaroslavvb/orbifold-showcase)
 
@@ -121,27 +120,22 @@ Two asks that morning, from a Claude session in `animated-groups-fable` (`40b381
 Pure math & invariance suite (`node --test`):
 
 ```sh
-cd /Users/solid/git0/gyroscope/reports/2026-11/2026-11-24-two-features-two-handles
+cd standalone/two-features-two-handles
 node --test
 ```
 
-Bundle single-file site (from `2026-11-15-classification-of-surfaces`, never leaving any edits in `E`):
+Bundle single-file site and update GitHub Pages (`docs/two-features-two-handles.html`):
 
 ```sh
-cd /Users/solid/git0/gyroscope/reports/2026-11/2026-11-15-classification-of-surfaces
-node build.mjs \
-  --template ../2026-11-24-two-features-two-handles/src/page.template.html \
-  --entry    ../2026-11-24-two-features-two-handles/src/page.js \
-  --css      src/styles.css,../2026-11-24-two-features-two-handles/src/page.css \
-  --out      ../2026-11-24-two-features-two-handles/site/index.html \
-  --math
+cd standalone/two-features-two-handles
+npm run build
 ```
 
 Browser verification (`shot.mjs`):
 
 ```sh
-cd /Users/solid/git0/gyroscope/reports/2026-11/2026-11-24-two-features-two-handles
-node ~/git/animated-groups-fable/standalone/the-folding/tools/shot.mjs \
+cd standalone/two-features-two-handles
+node ../the-folding/tools/shot.mjs \
   --root "$PWD" \
   --page site/index.html \
   --steps steps.json

@@ -12,7 +12,7 @@
 //                                                        radius `size` in the geometry's units, turned by `turn`
 //   moved(shape, M) -> shape                             the same comma carried by the motion M (a 3 x 3 matrix)
 
-import { apply } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
+import { apply } from '../../classification-of-surfaces/src/sym/geom.js';
 
 function strokeComma({ turn, fat, taper = 1, n = 32 }) {
   const w = (t) => fat * Math.pow(1 - t, taper), out = [], inn = [];

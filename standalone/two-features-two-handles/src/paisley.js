@@ -49,10 +49,10 @@
 //     retie(state, print) -> print     after a pick: the same commas, tied to the new pair's blocks
 //     specsAt(print, state)            the commas to draw at a state (drawn in by scaleAt where they must be)
 
-import { apply, mul, inv as inv3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { analyse, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { apply, mul, inv as inv3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { analyse, tiles } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { parse, domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
 
 /** How far apart, for comparing only (no acosh): the chord on the plane, minus the Lorentz product on the hyperbolic plane. */
 const apart = (G, a, b) => (G.kind === 'H' ? a[2] * b[2] - a[0] * b[0] - a[1] * b[1] : (a[0] - b[0]) * (a[0] - b[0]) + (a[1] - b[1]) * (a[1] - b[1]));

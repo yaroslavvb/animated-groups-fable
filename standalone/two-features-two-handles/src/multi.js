@@ -26,11 +26,11 @@
 // The tile (dirichlet) is the set of points nearer to one chosen point than to any copy of it: convex whatever the
 // lengths and twists, which is what the pattern pane's walk from tile to tile needs.
 
-import { mul, apply, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { inscribed, makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
-import { tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { mul, apply, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { inscribed, makeDomain } from '../../classification-of-surfaces/src/sym/domains.js';
+import { tiles } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
 import { jointOf, lineOf, side, toSide, flatOf, byPlace, midOf, drawnIn, TURN } from './paisley.js';
 
 const TAU = 2 * Math.PI;

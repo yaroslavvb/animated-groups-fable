@@ -24,7 +24,7 @@
 // The signature's grammar is the Classification of Surfaces page's (catalog.js parse); readSignature() takes it as
 // people type it.
 
-import { parse, textOf, tokensOf, tokenAt, domainOf, whyNot as noPattern } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse, textOf, tokensOf, tokenAt, domainOf, whyNot as noPattern } from '../../classification-of-surfaces/src/sym/catalog.js';
 import { multiSpec } from './multi.js';
 
 /**

@@ -2,14 +2,14 @@
 // Ported from math-general.md (F1–F11), math-2222.md (§3.5, §11.9), orbifold-handles-hyperbolic-check.py (H0–H6),
 // and engine-check.mjs (pillow2222, fourCone, stadium). Zero DOM dependencies.
 
-import { geometry, mul, apply, inv, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { makeDomain } from '../../2026-11-15-classification-of-surfaces/src/sym/domains.js';
-import { analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
+import { geometry, mul, apply, inv, det, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { makeDomain } from '../../classification-of-surfaces/src/sym/domains.js';
+import { analyse } from '../../classification-of-surfaces/src/sym/orbifold.js';
 import { commaAt, moved } from './rigid-print.js';
 import { customSpec, canonText, readSignature, stillSpec } from './custom.js';
 import { createPaisley } from './paisley.js';
 import { createMulti, multiSpec } from './multi.js';
-import { parse as parseSignature, tokensOf, bind, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse as parseSignature, tokensOf, bind, domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;

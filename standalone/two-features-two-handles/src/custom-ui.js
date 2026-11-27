@@ -16,7 +16,7 @@
 //     isCustom(key)   is that family one made here (not one of the page's chips)
 //     labelOf(key)    how the page writes it (234∗5)
 
-import { textOf, parse } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { textOf, parse } from '../../classification-of-surfaces/src/sym/catalog.js';
 import { readSignature, whyNot, prettyOf, cursorTokenIndex } from './custom.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

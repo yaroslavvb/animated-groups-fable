@@ -12,11 +12,11 @@ import {
   defaultCommas, buildPatternModel, pairMetricsFor, multiState,
 } from '../src/handles.js';
 import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath, psuPow } from '../src/pattern-ext.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { signatureOf, tiles, analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { parse, tokensOf, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
-import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { mul, apply, inv, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { signatureOf, tiles, analyse } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { parse, tokensOf, domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
+import { buildSurface } from '../../classification-of-surfaces/src/sym/surface.js';
 
 const TAU = 2 * Math.PI;
 const near = (a, b, tol = 1e-9) => Math.abs(a - b) <= tol;

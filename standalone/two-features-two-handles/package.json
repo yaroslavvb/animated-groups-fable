@@ -1,0 +1,9 @@
+{
+  "name": "two-features-two-handles",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "cd ../classification-of-surfaces && node build.mjs --template ../two-features-two-handles/src/page.template.html --entry ../two-features-two-handles/src/page.js --css src/styles.css,../two-features-two-handles/src/page.css --out ../two-features-two-handles/site/index.html && cp ../two-features-two-handles/site/index.html ../../docs/two-features-two-handles.html"
+  }
+}

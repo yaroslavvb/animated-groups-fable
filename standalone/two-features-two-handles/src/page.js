@@ -12,12 +12,12 @@ import {
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
 import { createCustomField } from './custom-ui.js';
-import { mul, apply, det, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
-import { createStage } from '../../2026-11-15-classification-of-surfaces/src/stage.js';
-import { eyeOf } from '../../2026-11-15-classification-of-surfaces/src/turning.js';
-import { createTimeline } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/timeline.js';
-import { shareHash } from '../../2026-11-15-classification-of-surfaces/src/sharehash.js';
+import { mul, apply, det, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { buildSurface } from '../../classification-of-surfaces/src/sym/surface.js';
+import { createStage } from '../../classification-of-surfaces/src/stage.js';
+import { eyeOf } from '../../classification-of-surfaces/src/turning.js';
+import { createTimeline } from '../../classification-of-surfaces/src/vendor/the-folding/timeline.js';
+import { shareHash } from '../../classification-of-surfaces/src/sharehash.js';
 
 const mqDark = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
 const mqReduce = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;

@@ -12,10 +12,10 @@ import assert from 'node:assert/strict';
 
 import { GH, GE, FAMILIES, normalizeFamilyKey, defaultCommas, centredFor, recut, paisleyInfo, paisleyView, paisleyPrint, retiePrint, linkedPrint, printScale } from '../src/handles.js';
 import { createPaisley } from '../src/paisley.js';
-import { mul, apply } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { analyse, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
-import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { mul, apply } from '../../classification-of-surfaces/src/sym/geom.js';
+import { analyse, tiles } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
+import { parse, domainOf } from '../../classification-of-surfaces/src/sym/catalog.js';
 
 const CHIPS = ['3333', '2223', '2222', '333*', '333*3', '333x', 'o33'];
 const FOUR_CONES = ['2345', '9999', '2229', '2227', '3456'];          // typed: four cone points of any orders

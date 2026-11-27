@@ -4,8 +4,8 @@
 // geodesic ray-marching + PSU(1,1) x Z2 side-pairings. Reads geometry from std140 UBOs, culls commas/edges/segments/
 // marks in 1 Minkowski dot product, renders rigid hyperbolic-arc dashes, and uses a reusable offscreen FBO during scroll.
 
-import { apply } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
+import { apply } from '../../classification-of-surfaces/src/sym/geom.js';
+import { PRINT_FRONT, hexToRgb } from '../../classification-of-surfaces/src/vendor/the-folding/palette.js';
 import { psuI, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
 
 const FRONT = hexToRgb(PRINT_FRONT[0]);

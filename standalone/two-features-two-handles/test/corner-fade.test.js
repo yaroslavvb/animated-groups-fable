@@ -16,7 +16,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import { GH, FAMILIES, normalizeFamilyKey, coneFeatCentered, buildPatternModel, followTreeData, cornerFade, CORNER_FADE, defaultCommas, invH } from '../src/handles.js';
-import { apply } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
+import { apply } from '../../classification-of-surfaces/src/sym/geom.js';
 
 const G = GH;
 /** The mirror picked with a cone point, either way round, and the mirror in the far pair. */

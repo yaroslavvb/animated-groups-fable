@@ -17,10 +17,10 @@ import {
 } from '../src/handles.js';
 import { customSpec, specOf, whyNot, shows, featuresOf, featureLabel, prettyOf, readSignature, canonText, cursorTokenIndex } from '../src/custom.js';
 import { tilesPSU, locateTilePSU } from '../src/pattern-ext.js';
-import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
-import { signatureOf, tiles, fval } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { parse, textOf, costOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
-import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
+import { mul, apply, inv, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
+import { signatureOf, tiles, fval } from '../../classification-of-surfaces/src/sym/orbifold.js';
+import { parse, textOf, costOf } from '../../classification-of-surfaces/src/sym/catalog.js';
+import { buildSurface } from '../../classification-of-surfaces/src/sym/surface.js';
 
 const TAU = 2 * Math.PI;
 const near = (a, b, tol = 1e-9) => Math.abs(a - b) <= tol;
