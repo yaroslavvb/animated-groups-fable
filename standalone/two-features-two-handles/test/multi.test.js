@@ -13,7 +13,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { GH, FAMILIES, normalizeFamilyKey, buildPatternModel, multiState, multiAtDefaults, multiPrint, multiCentred, multiBuild, surfacePartsFor, pairMetricsFor, psuToSO21 } from '../src/handles.js';
+import { GH, invH, FAMILIES, normalizeFamilyKey, buildPatternModel, multiState, multiAtDefaults, multiPrint, multiCentred, multiBuild, surfacePartsFor, pairMetricsFor, psuToSO21 } from '../src/handles.js';
 import { readSignature, kindOf, whyNot, movesOf, stillSpec } from '../src/custom.js';
 import { mul, apply, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { analyse, signatureOf, tiles } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
@@ -268,4 +268,51 @@ test('every other signature that has a pattern is shown still, and what has none
   }
   assert.equal(stillSpec(readSignature('3333')), null);
   assert.equal(whyNot(readSignature('237')), null);
+});
+
+test('(2, 2) pairs single-cover their cut geodesic at length L/2 with zero double-covered overlaps across twist', () => {
+  const assertDisjointCutCopies = (m, cutLn, expectedLen, label) => {
+    assert.ok(Math.abs(G.dist(cutLn.a, cutLn.b) - expectedLen) < 1e-8, `${label}: cut length`);
+    const ts = tiles(m.D, m.A, { radius: 4.0, max: 600 });
+    const axis = G.frame(cutLn.a, cutLn.b);
+    const invAxis = invH(axis);
+    const intervals = [];
+    for (const t of ts) {
+      const ca = apply(t.M, cutLn.a), cb = apply(t.M, cutLn.b);
+      if (G.lineDist(ca, cutLn.a, cutLn.b) > 1e-4 || G.lineDist(cb, cutLn.a, cutLn.b) > 1e-4) continue;
+      const qa = apply(invAxis, ca), qb = apply(invAxis, cb);
+      const u0 = Math.asinh(qa[0]), u1 = Math.asinh(qb[0]);
+      const lo = Math.min(u0, u1), hi = Math.max(u0, u1);
+      if (intervals.some(([a, b]) => Math.abs(a - lo) < 1e-4 && Math.abs(b - hi) < 1e-4)) continue;
+      intervals.push([lo, hi]);
+    }
+    assert.ok(intervals.length >= 2, `${label}: expected multiple collinear copies`);
+    intervals.sort((a, b) => a[0] - b[0]);
+    for (let i = 1; i < intervals.length; i++) {
+      assert.ok(intervals[i][0] >= intervals[i - 1][1] - 1e-4, `${label}: overlapping cut intervals ${JSON.stringify(intervals)}`);
+    }
+  };
+
+  const k222222 = normalizeFamilyKey('222222');
+  for (const tw2 of [-0.25, -0.15, 0, 0.0307, 0.25, 0.4]) {
+    const st = {
+      k: k222222, mode: 'multi', orders: [2, 2, 2, 2, 2, 2],
+      Ls: [2.634, 2.634, 2.634], tws: [0.021, -0.2475, tw2],
+      active: 2, shown: 3, L: 2.634, tw: tw2, b: 0, tau: 0,
+    };
+    const m = buildPatternModel(st);
+    for (let pair = 0; pair < 3; pair++) {
+      assertDisjointCutCopies(m, m.lines[2 * pair + 1], 2.634 / 2, `222222 tw2=${tw2} pair=${pair}`);
+    }
+  }
+
+  for (const [famKey, perm, ord, L] of [
+    ['2223', [0, 1, 2, 3], [2, 2, 2, 3], 1.5],
+    [normalizeFamilyKey('3322'), [2, 3, 0, 1], [2, 2, 3, 3], 1.734],
+  ]) {
+    const st = { k: famKey, perm, orders: ord, L, tw: 0.17, b: 0, tau: 0 };
+    const m = buildPatternModel(st);
+    const cutLn = m.lines.find((ln) => ln.dash && !ln.once);
+    assertDisjointCutCopies(m, cutLn, L / 2, `${famKey} perm=${perm.join('')}`);
+  }
 });

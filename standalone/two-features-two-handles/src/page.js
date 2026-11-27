@@ -517,12 +517,13 @@ function syncUI() {
   outLen.textContent = state.L.toFixed(2);
   outTw.textContent = fmtSigned(state.tw, 3);
   const { d, mDist } = pairMetrics();
+  const cutDistText = mDist < 1e-4 ? 'tree on cut' : `tree to cut ${mDist.toFixed(2)}`;
   if (many) {
-    outGeo.textContent = `pair ${state.active + 1} (${fam.featLabels[state.perm[0]]}·${fam.featLabels[state.perm[1]]}) ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
+    outGeo.textContent = `pair ${state.active + 1} (${fam.featLabels[state.perm[0]]}·${fam.featLabels[state.perm[1]]}) ${d.toFixed(2)} apart · ${cutDistText}`;
   } else if (still) {
     outGeo.textContent = '';
   } else if (fam.mode === 'cones' || fam.mode === 'pillow') {
-    outGeo.textContent = `pair ${d.toFixed(2)} apart · tree to cut ${mDist.toFixed(2)}`;
+    outGeo.textContent = `pair ${d.toFixed(2)} apart · ${cutDistText}`;
   } else if (fam.mode === 'handle') {
     outGeo.textContent = `arc ${d.toFixed(2)} · cut ${mDist.toFixed(2)} · shift ${fmtSigned(state.tau, 3)}`;
   } else {

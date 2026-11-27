@@ -818,15 +818,20 @@ export function fourConeCentered(orders, L, tw, { commas = null, thetas = null, 
   const edges = [5, 4, 3, 2, 1, 0].map((to) => ({ to, rev: false }));
   const { D, A } = buildCenteredDomain(symVerts, edges, P_symToPair, symAt);
 
-  // Continuous canonical pair-centred cut segment of exact length L = 2c
+  // Continuous canonical pair-centred cut segment of exact length L = 2c; when either pair is (2, 2), its geodesic
+  // is stabilized by two half-turns with fundamental segment [A, B] of length L/2 so emitting length L would double-cover it.
   const cutA = GH.norm(apply(Pmat, offH(-c, 0, 1)));
   const cutB = GH.norm(apply(Pmat, offH(c, 0, 1)));
   const home = [A_s, B_s, C_s, D_s].map(toPairFromSym);
   const partners = [home[1], home[0], home[3], home[2]];
+  const cutOnPicked = p === 2 && q === 2;
+  const cutOnFar = r === 2 && s === 2;
+  const cutOnTree = cutOnPicked || cutOnFar;
+  const cutSeg = cutOnPicked ? [home[0], home[1]] : cutOnFar ? [home[2], home[3]] : [cutA, cutB];
 
   const shapes = placeCommas(GH, k, perm, home, partners, commas, thetas);
 
-  return { D, A, home, cutSeg: [cutA, cutB], treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes, markRefs: buildMarkRefs(GH, k, perm, D, A, home, partners, thetas) };
+  return { D, A, home, cutSeg, cutOnTree, treeSeg: [home[0], home[1]], farTreeSeg: [home[2], home[3]], Pmat, P_psu, shapes, markRefs: buildMarkRefs(GH, k, perm, D, A, home, partners, thetas) };
 }
 
 function placeCommas(G, k, perm, home, partners, commas, thetas) {
@@ -2130,7 +2135,9 @@ function multiModel(state, dark) {
     const on = i === state.active;
     if (!on && i >= state.shown) return;
     lines.push({ a: pr.tree[0], b: pr.tree[1], color: INK, width: on ? 2.3 : 1.9, alpha: on ? 0.9 : 0.5, steps: 6 });
-    lines.push({ a: pr.cut[0], b: pr.cut[1], color: AMBER, width: on ? 2.2 : 1.6, dash: [6, 4.5], alpha: on ? 1 : 0.7, steps: 8 });
+    const cutW = pr.onCut ? (on ? 2.4 : 2.0) : (on ? 2.2 : 1.6);
+    const cutA = pr.onCut ? (on ? 1 : 0.85) : (on ? 1 : 0.7);
+    lines.push({ a: pr.cut[0], b: pr.cut[1], color: AMBER, width: cutW, dash: pr.onCut ? [6, 5] : [6, 4.5], alpha: cutA, steps: 8 });
   });
   // The model is in the frame of its tile (multi.js centred says why), so it says how it is to be looked at:
   //   pose        the motion that lays the picked pair level in the middle; page.js keeps the pair there while its
@@ -2167,7 +2174,7 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     ...(fade && fade.far ? [{ a: fade.seg[0], b: fade.seg[1], color: INK, width: 1.9, alpha: 0.5 * fade.alt, steps: 6 }] : []),
     { a: treeSeg[0], b: treeSeg[1], color: INK, width: 2.3, alpha: 0.9 * wTree, steps: 6 },
     ...(fade && !fade.far ? [{ a: fade.seg[0], b: fade.seg[1], color: INK, width: 2.3, alpha: 0.9 * fade.alt, steps: 6 }] : []),
-    { a: cutSeg[0], b: cutSeg[1], color: AMBER, width: 2.2, dash: [6, 4.5], alpha: 1, steps: 8 },
+    { a: cutSeg[0], b: cutSeg[1], color: AMBER, width: built.cutOnTree ? 2.4 : 2.2, dash: built.cutOnTree ? [6, 5] : [6, 4.5], alpha: 1, steps: 8 },
   ];
   const dots = [];
   if (!(follow && follow.active) && built.featDots) {

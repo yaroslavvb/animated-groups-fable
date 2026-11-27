@@ -465,7 +465,19 @@ export function createMulti({ GH, psu }) {
       const to = G.translate(sh.mid, O), from = mul(B, inv(to));
       shapes.push({ pts: sh.pts.map((q) => G.norm(apply(from, drawnIn(G, G.norm(apply(to, q)), sc)))), min: sh.min });
     }
-    const pairs = b.cuts.map((cut) => ({ tree: [move(cut.A), move(cut.B)], cut: cut.seg.map(move), L: cut.L, d: G.dist(cut.A, cut.B), toCut: G.lineDist(G.mix(cut.A, cut.B, 0.5), cut.seg[0], cut.seg[1]) }));
+    const pairs = b.cuts.map((cut, i) => {
+      // Two order-2 cone points (hA = hB = 0) lie ON their isolating geodesic, so [cut.A, cut.B] (length L/2) already
+      // single-covers the geodesic; cut.seg (length L) would wrap it twice and slide two opposing dash trains out of phase.
+      const onCut = orders[2 * i] === 2 && orders[2 * i + 1] === 2;
+      return {
+        tree: [move(cut.A), move(cut.B)],
+        cut: (onCut ? [cut.A, cut.B] : cut.seg).map(move),
+        onCut,
+        L: cut.L,
+        d: G.dist(cut.A, cut.B),
+        toCut: G.lineDist(G.mix(cut.A, cut.B, 0.5), cut.seg[0], cut.seg[1]),
+      };
+    });
     return { D, A, home: b.cones.map(move), pairs, shapes, marks: [2 * a, 2 * a + 1], pose: mul(Q, Bi), view: mul(pr.view, Bi), scale: sc, built: b };
   }
 

@@ -834,6 +834,8 @@ test('Complementary pair tree (farTreeSeg) renders symmetrically and matches swa
     const st0 = side(treeLn.a), st1 = side(treeLn.b), sf0 = side(farLn.a), sf1 = side(farLn.b);
     if (Math.abs(sf0) < 1e-9 && Math.abs(sf1) < 1e-9) {
       assert.ok(Math.abs(st0) > 0.1 && st0 * st1 > 0, `${k} expected cut through (2,2) far pair`);
+    } else if (Math.abs(st0) < 1e-9 && Math.abs(st1) < 1e-9) {
+      assert.ok(Math.abs(sf0) > 0.1 && sf0 * sf1 > 0, `${k} expected cut through (2,2) picked pair`);
     } else {
       assert.ok(st0 * st1 >= -1e-9 && sf0 * sf1 >= -1e-9 && (st0 + st1) * (sf0 + sf1) < 0, `${k} farTree not on opposite side of cutSeg`);
     }

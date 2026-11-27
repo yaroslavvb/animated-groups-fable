@@ -491,7 +491,8 @@ void main() {
           float dOff = wd.w * scaleF;
           float per = dOn + dOff;
           float sC = clamp(sArcPx, 0.0, max(0.0, totPx));
-          float ph = mod(sC, per);
+          float sSym = abs(sC - 0.5 * max(0.0, totPx));
+          float ph = mod(sSym + 0.5 * dOn, per);
           float dAlong = ph <= dOn ? 0.0 : min(ph - dOn, per - ph);
           float dDashed = length(vec2(dCss, dAlong));
           distUsed = mix(dCss, dDashed, dashBlend);
