@@ -45,11 +45,26 @@ import { tiles as makeTiles } from '../../classification-of-surfaces/src/sym/orb
 import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
 import { PRINT_FRONT, hexToRgb } from '../../classification-of-surfaces/src/vendor/the-folding/palette.js';
 import { pairStyle } from '../../classification-of-surfaces/src/sym/pairs.js';
-import { invH, psuI, psuNorm, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
+import { invH, psuI, psuNorm, psuInv, psuMul, psuBoostX, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
 import { createHyperbolicGL } from './pattern-gl.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
+
+/** Center-anchored wheel pan transform: immune to off-center hyperbolic/spherical curvature. */
+export function wheelPanTransform(G, R, dx, dy) {
+  const u = -dx / R, v = dy / R, d2 = u * u + v * v;
+  let to;
+  if (G.kind === 'E') to = [u, v, 1];
+  else if (G.kind === 'S') {
+    if (d2 >= 1) { const l = Math.sqrt(d2); to = [u / l, v / l, 0]; }
+    else to = [u, v, Math.sqrt(1 - d2)];
+  } else {
+    const m = Math.min(1, 0.93 / Math.sqrt(d2 || 1e-12)), a = u * m, b = v * m, q = a * a + b * b;
+    to = [(2 * a) / (1 - q), (2 * b) / (1 - q), (1 + q) / (1 - q)];
+  }
+  return G.translate(G.origin, to);
+}
 
 /** Exact fractional exponential power g^alpha in PSU(1,1) (orientation-preserving) for sub-frame motion smoothing. */
 export function psuPow(g, alpha) {
@@ -1142,7 +1157,33 @@ export function createPattern(canvas, opts = {}) {
   // in about a fifth of a second. Each frame moves the point under the place the hand let go, as one more step of the
   // drag would. A new touch, a wheel, a key, a reset or a pattern from another screen stops it; reduced motion has none.
   const WHEEL_TAU = 22;
+  const PAGE_SCROLL_HOLD_MS = 450;
   let coast = 0, wheelRaf = 0, wPrev = 0, wRem = psuI(), wLead = psuI(), panDist = 0;
+  let autoTrack = null;
+  let pageScrollLatched = false, pageScrollUntil = 0;
+  let lastPtrX = NaN, lastPtrY = NaN, scrollPtrX = NaN, scrollPtrY = NaN;
+  const markPageScroll = () => {
+    pageScrollLatched = true;
+    pageScrollUntil = performance.now() + PAGE_SCROLL_HOLD_MS;
+    scrollPtrX = lastPtrX;
+    scrollPtrY = lastPtrY;
+  };
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('scroll', markPageScroll, { passive: true });
+  }
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('wheel', (e) => {
+      if (e.target !== canvas && !(canvas.contains && canvas.contains(e.target))) markPageScroll();
+    }, { capture: true, passive: true });
+    document.addEventListener('pointermove', (e) => {
+      const movedFromScroll = !Number.isFinite(scrollPtrX) || Math.hypot(e.clientX - scrollPtrX, e.clientY - scrollPtrY) > 6;
+      lastPtrX = e.clientX; lastPtrY = e.clientY;
+      if (pageScrollLatched && movedFromScroll && performance.now() > pageScrollUntil
+          && (e.target === canvas || (canvas.contains && canvas.contains(e.target)))) {
+        pageScrollLatched = false;
+      }
+    }, { capture: true, passive: true });
+  }
   let glInteractive = false, glRefine = 0;
   const FADE = 200, MIN_SPEED = 0.12, MAX_SPEED = 2.5;      // ms; px per ms
   const isSmallPsu = (g) => Math.abs(Math.abs(g[0]) - 1) < 1e-8 && Math.hypot(g[1], g[2], g[3]) < 4e-5;
@@ -1159,6 +1200,7 @@ export function createPattern(canvas, opts = {}) {
     }, ms);
   };
   const stopMotion = (commit = false) => {
+    autoTrack = null;
     if (coast) { cancelAnimationFrame(coast); coast = 0; }
     if (wheelRaf) { cancelAnimationFrame(wheelRaf); wheelRaf = 0; }
     if (commit && model && G && G.kind === 'H' && (!isIdentityPsu(wRem) || !isIdentityPsu(wLead))) {
@@ -1227,6 +1269,7 @@ export function createPattern(canvas, opts = {}) {
     const step = (now) => {
       coast = 0;
       if (!model) return;
+      autoTrack = null;
       const dt2 = Math.min(50, Math.max(0, now - prev)), k = Math.exp(-dt2 / FADE);
       prev = now;
       const dx = vx * FADE * (1 - k), dy = vy * FADE * (1 - k);
@@ -1260,6 +1303,7 @@ export function createPattern(canvas, opts = {}) {
     return true;
   }
   canvas.addEventListener('pointerdown', (e) => {
+    pageScrollLatched = false; pageScrollUntil = 0;
     stopMotion(true);
     if (!model || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const [x, y] = local(e);
@@ -1332,15 +1376,17 @@ export function createPattern(canvas, opts = {}) {
   // pinch does nothing here.
   canvas.addEventListener('wheel', (e) => {
     if (!model || e.ctrlKey) return;
+    if (pageScrollLatched) { pageScrollUntil = performance.now() + PAGE_SCROLL_HOLD_MS; return; }
+    if (opts.canWheel && !opts.canWheel(e)) { markPageScroll(); return; }
     e.preventDefault();
+    autoTrack = null;
     if (coast) { cancelAnimationFrame(coast); coast = 0; }
     let dx = e.deltaX, dy = e.deltaY;
     if (e.deltaMode === 1) { dx *= 30; dy *= 30; } else if (e.deltaMode === 2) { dx *= 300; dy *= 300; }
     dx = Math.max(-240, Math.min(240, dx)); dy = Math.max(-240, Math.min(240, dy));
     if (!dx && !dy) return;
-    const [x, y] = local(e);
     setHot(null);
-    const T = G.translate(unproject(x, y), unproject(x - dx, y - dy));
+    const T = wheelPanTransform(G, lay().R, dx, dy);
     if (G.kind === 'H' && !calm && typeof requestAnimationFrame === 'function') {
       wRem = psuMul(so21ToPSU(T, false), wRem);
       clearTimeout(glRefine); glRefine = 0;
@@ -1519,13 +1565,54 @@ export function createPattern(canvas, opts = {}) {
       const dtSec = Math.min(0.05, Math.max(0.001, dtMs / 1000));
       const stepDist = speed * dtSec;
       if (G.kind === 'H') {
-        const T = G.translate(G.origin, G.polar(stepDist, angle));
-        const tPsu = so21ToPSU(T, false);
-        panDist += psuStepDist(tPsu);
-        vPsu = psuMul(tPsu, vPsu);
-        V = psuToSO21(vPsu); vRev = !!vPsu[4];
-        recentre(null);
-        if (usingGL) settle();
+        const { D, A } = model;
+        if (autoTrack === null && Math.abs(angle) < 1e-9 && model.activeCut && model.cutPeriod > 0) {
+          const Mv = psuToSO21(vPsu);
+          const ts = tilesPSU(D, A, { focus: psuApplyDisc(psuInv(vPsu), [0, 0]), radius: 2.5, max: 120 });
+          let best = null, bd = Infinity;
+          for (const t of ts) {
+            const a = apply(Mv, apply(t.M, model.activeCut[0]));
+            const b = apply(Mv, apply(t.M, model.activeCut[1]));
+            const d = G.lineDist(G.origin, a, b);
+            if (d < bd) { bd = d; best = { a, b }; }
+          }
+          if (best && bd < 1e-3) {
+            const foot = G.foot(G.origin, best.a, best.b);
+            const toward = G.dist(foot, best.b) > 1e-6 ? best.b : best.a;
+            const F = G.frame(foot, toward);
+            const Falign = F[0] < 0 ? [-F[0], -F[1], F[2], -F[3], -F[4], F[5], -F[6], -F[7], F[8]] : F;
+            if (Math.abs(Falign[3]) < 1e-3) {
+              autoTrack = { basePsu: psuMul(psuInv(so21ToPSU(Falign, false)), vPsu), L: model.cutPeriod, phase: 0 };
+            } else {
+              autoTrack = false;
+            }
+          } else {
+            autoTrack = false;
+          }
+        }
+        if (autoTrack) {
+          const vOld = vPsu;
+          autoTrack.phase = (autoTrack.phase + stepDist) % autoTrack.L;
+          panDist += stepDist;
+          const rawV = psuMul(psuBoostX(autoTrack.phase), autoTrack.basePsu);
+          const { g } = locateTilePSU(D, A, psuApplyDisc(psuInv(rawV), [0, 0]));
+          vPsu = psuMul(rawV, g);
+          V = psuToSO21(vPsu); vRev = !!vPsu[4];
+          const invDelta = psuMul(psuInv(vPsu), psuMul(psuBoostX(stepDist), vOld));
+          bPsu = psuMul(invDelta, bPsu);
+          if (Math.hypot(bPsu[0], bPsu[1]) > 150) { bPsu = psuI(); base = I3.slice(); bRev = false; }
+          else { base = psuToSO21(bPsu); bRev = !!bPsu[4]; }
+          if (hCache && !isIdentityPsu(invDelta)) hCache.shift = psuMul(invDelta, hCache.shift);
+          if (usingGL) settle();
+        } else {
+          const T = G.translate(G.origin, G.polar(stepDist, angle));
+          const tPsu = so21ToPSU(T, false);
+          panDist += psuStepDist(tPsu);
+          vPsu = psuMul(tPsu, vPsu);
+          V = psuToSO21(vPsu); vRev = !!vPsu[4];
+          recentre(null);
+          if (usingGL) settle();
+        }
       } else if (G.kind === 'E') {
         const dE = stepDist * Math.sqrt(area || 1);
         const T = G.translate(G.origin, G.polar(dE, angle));

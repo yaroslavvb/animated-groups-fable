@@ -45,6 +45,31 @@ export function twistOf(q) {
 export function createTurning(R, pane, canvas) {
   const ptrs = new Map();
   let drag = null;          // one pointer down: { id, x0, y0, az0, el0, moved }
+  const PAGE_SCROLL_HOLD_MS = 450;
+  let pageScrollLatched = false, pageScrollUntil = 0;
+  let lastPtrX = NaN, lastPtrY = NaN, scrollPtrX = NaN, scrollPtrY = NaN;
+  const markPageScroll = () => {
+    pageScrollLatched = true;
+    pageScrollUntil = performance.now() + PAGE_SCROLL_HOLD_MS;
+    scrollPtrX = lastPtrX;
+    scrollPtrY = lastPtrY;
+  };
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('scroll', markPageScroll, { passive: true });
+  }
+  if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
+    document.addEventListener('wheel', (e) => {
+      if (e.target !== canvas && !(canvas.contains && canvas.contains(e.target))) markPageScroll();
+    }, { capture: true, passive: true });
+    document.addEventListener('pointermove', (e) => {
+      const movedFromScroll = !Number.isFinite(scrollPtrX) || Math.hypot(e.clientX - scrollPtrX, e.clientY - scrollPtrY) > 6;
+      lastPtrX = e.clientX; lastPtrY = e.clientY;
+      if (pageScrollLatched && movedFromScroll && performance.now() > pageScrollUntil
+          && (e.target === canvas || (canvas.contains && canvas.contains(e.target)))) {
+        pageScrollLatched = false;
+      }
+    }, { capture: true, passive: true });
+  }
 
   const sensitivity = () => { const b = canvas.getBoundingClientRect(); return Math.min(0.011, Math.max(0.0045, Math.PI / (0.85 * Math.max(1, Math.min(b.width, b.height))))) / DEG; };   // degrees per px, the renderer's own
   const tilt = (el) => Math.max(-89.9, Math.min(89.9, el));
@@ -65,6 +90,7 @@ export function createTurning(R, pane, canvas) {
   // after the renderer has had each event (it listens on the canvas itself)
   pane.addEventListener('pointerdown', (e) => {
     if (e.target !== canvas || (e.pointerType === 'mouse' && e.button !== 0)) return;
+    pageScrollLatched = false; pageScrollUntil = 0;
     ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
     if (ptrs.size === 1) begin(e.pointerId, e.clientX, e.clientY); else drag = null;
   });
@@ -97,6 +123,11 @@ export function createTurning(R, pane, canvas) {
   // natural scrolling, the fingers moving right give deltaX < 0.
   pane.addEventListener('wheel', (e) => {
     if (e.target !== canvas || e.ctrlKey) return;
+    if (pageScrollLatched) {
+      pageScrollUntil = performance.now() + PAGE_SCROLL_HOLD_MS;
+      e.stopPropagation();
+      return;
+    }
     e.preventDefault(); e.stopPropagation();
     if (drag) return;                              // a button is down as well: the drag has the view
     let dx = e.deltaX, dy = e.deltaY;

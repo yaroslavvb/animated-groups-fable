@@ -2147,6 +2147,7 @@ function multiModel(state, dark) {
   const classified = multiAtDefaults(state) && state.active === 0;
   return {
     D: c.D, A: c.A, home: c.home, outline: false, tileEdges: false, center: GH.mix(c.home[c.marks[0]], c.home[c.marks[1]], 0.5),
+    activeCut: c.pairs[state.active].cut, cutPeriod: c.pairs[state.active].L,
     firstV: classified ? c.view : c.pose, classified, pose: c.pose,
     design: () => c.shapes, lines, dots: [], marks: c.marks, dimMarks: false,
     binding: state.orders.map((_, f) => ({ t: 'd', role: 'cone', cls: f })),
@@ -2252,6 +2253,8 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
     outline: false,
     tileEdges: false,
     center: fam.kind === 'E' ? [0, 0, 1] : GH.origin,
+    activeCut: cutSeg,
+    cutPeriod: fam.kind === 'H' ? state.L : null,
     firstV: atDefaults(state) ? paisley.view(state.k) : null,
     design: () => shapes,
     lines,

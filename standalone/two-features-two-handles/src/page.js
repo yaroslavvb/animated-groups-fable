@@ -156,7 +156,9 @@ let built = null;
 let loopCache = { key: '', loop: null };
 let beltCache = { k: '', loop: null };
 let stage = createStage(viewCanvas, labelsEl);
-const pattern = createPattern(patCanvas, { tip: tipEl });
+let patWheelArmed = false;
+const canPatternWheel = () => tab !== 'debug' || !debugRunning || isPatternFs() || patWheelArmed;
+const pattern = createPattern(patCanvas, { tip: tipEl, canWheel: canPatternWheel });
 
 function lToU(L) {
   const lo = Math.log(lenRangeBounds[0]), hi = Math.log(lenRangeBounds[1]);
@@ -955,6 +957,7 @@ function showTab(nextTab, { writeHash = true } = {}) {
   if (tab === 'debug') {
     if (prevTab !== 'debug') {
       debugRunning = true;
+      patWheelArmed = false;
       debugMonitor.reset('Measuring refresh rate...', true);
     }
     pattern.setGpuTiming(true);
@@ -1074,6 +1077,7 @@ for (const b of momentBtns) {
 }
 
 function resetAll() {
+  patWheelArmed = false;
   setFamily(state.k);
   stage.R.resetView();
   stage.R.render();
@@ -1127,9 +1131,18 @@ for (const b of dbgScaleBtns) {
 const recordDbgInput = (e) => {
   if (tab === 'debug') debugMonitor.recordInput(e.timeStamp, performance.now());
 };
-patCanvas.addEventListener('pointerdown', recordDbgInput, { passive: true });
+patCanvas.addEventListener('pointerdown', (e) => {
+  patWheelArmed = true;
+  recordDbgInput(e);
+}, { passive: true });
 patCanvas.addEventListener('pointermove', recordDbgInput, { passive: true });
-patCanvas.addEventListener('wheel', recordDbgInput, { passive: true });
+patCanvas.addEventListener('wheel', (e) => {
+  if (canPatternWheel()) recordDbgInput(e);
+}, { passive: true });
+document.addEventListener('pointerdown', (e) => {
+  if (e.target !== patCanvas && !(patCanvas.contains && patCanvas.contains(e.target))) patWheelArmed = false;
+}, { capture: true, passive: true });
+window.addEventListener('scroll', () => { patWheelArmed = false; }, { passive: true });
 
 document.addEventListener('visibilitychange', () => {
   if (tab === 'debug') debugMonitor.onVisibilityChange(document.hidden);
