@@ -11,7 +11,8 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel, pairMetricsFor,
 } from '../src/handles.js';
-import { locateTilePSU, tilesPSU, poincareArc, createPattern } from '../src/pattern-ext.js';
+import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath } from '../src/pattern-ext.js';
+import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles, analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
 import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
@@ -1104,7 +1105,7 @@ test('followTreeData cutPts reaches ends across all families and keepView clears
     addEventListener: noop,
   };
   globalThis.window = { matchMedia: () => ({ matches: false }), devicePixelRatio: 1 };
-  globalThis.Path2D = class { moveTo() {} lineTo() {} quadraticCurveTo() {} arc() {} };
+  globalThis.Path2D = class { moveTo() {} lineTo() {} quadraticCurveTo() {} bezierCurveTo() {} closePath() {} arc() {} };
   try {
     const P = createPattern(stubCanvas);
     const st08 = {
@@ -1675,4 +1676,53 @@ test('Follow the tree aligns feet at tw=0 on cone-feat families and matches leg 
   for (const lg of fdSplitP.legs) {
     assert.ok(Math.min(...[...fdSplitM.legs, ...fdSplitM.extraLegs].map((c) => segDist(GH, lg, c))) < 1e-8);
   }
+});
+
+test('smoothClosedPath emits finite corner-preserving Catmull-Rom cubics for commas and keeps sharp corners', () => {
+  const recorder = () => {
+    const ops = [];
+    return {
+      ops,
+      moveTo(x, y) { ops.push(['M', x, y]); },
+      lineTo(x, y) { ops.push(['L', x, y]); },
+      bezierCurveTo(c1x, c1y, c2x, c2y, x, y) { ops.push(['C', c1x, c1y, c2x, c2y, x, y]); },
+      closePath() { ops.push(['Z']); },
+    };
+  };
+
+  for (const [k, R] of [['222222222222', 340], ['2223', 340], ['2222', 120]]) {
+    const D = domainOf(parse(k));
+    const des = design(D);
+    for (const sh of des) {
+      const sx = [], sy = [];
+      for (const p of sh.pts) {
+        const px = D.G.kind === 'H' ? 360 + (R * p[0]) / (1 + p[2]) : 360 + R * p[0];
+        const py = D.G.kind === 'H' ? 360 - (R * p[1]) / (1 + p[2]) : 360 - R * p[1];
+        if (!sx.length || (px - sx[sx.length - 1]) ** 2 + (py - sy[sy.length - 1]) ** 2 > 1e-4) {
+          sx.push(px); sy.push(py);
+        }
+      }
+      while (sx.length > 1 && (sx[0] - sx[sx.length - 1]) ** 2 + (sy[0] - sy[sy.length - 1]) ** 2 <= 1e-4) {
+        sx.pop(); sy.pop();
+      }
+      const path = recorder();
+      smoothClosedPath(path, sx, sy, sx.length);
+      assert.equal(path.ops[0][0], 'M');
+      assert.equal(path.ops[path.ops.length - 1][0], 'Z');
+      const cubics = path.ops.filter((o) => o[0] === 'C');
+      assert.equal(cubics.length, sx.length, `${k}: expected closed C1/C0 cubic per deduplicated edge`);
+      for (let i = 0; i < cubics.length; i++) {
+        const [, c1x, c1y, c2x, c2y, x, y] = cubics[i];
+        assert.ok([c1x, c1y, c2x, c2y, x, y].every(Number.isFinite), `${k}: non-finite Bezier coord`);
+        const x0 = sx[i], y0 = sy[i], chord = Math.hypot(x - x0, y - y0);
+        assert.ok(Math.hypot(c1x - x0, c1y - y0) < 0.5 * chord, `${k}: c1 handle overshoot`);
+        assert.ok(Math.hypot(c2x - x, c2y - y) < 0.5 * chord, `${k}: c2 handle overshoot`);
+      }
+    }
+  }
+
+  // A square has 4 orthogonal corners: all 4 segments remain crisp lineTo edges (no rounded ballooning)
+  const sqPath = recorder();
+  smoothClosedPath(sqPath, [0, 100, 100, 0], [0, 0, 100, 100], 4);
+  assert.deepEqual(sqPath.ops.map((o) => o[0]), ['M', 'L', 'L', 'L', 'L', 'Z']);
 });

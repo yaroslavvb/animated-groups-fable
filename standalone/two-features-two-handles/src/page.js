@@ -66,7 +66,6 @@ const outGeo = $('#out-geo');
 const momentBtns = [...document.querySelectorAll('[data-moment]')];
 const momentNote = $('#moment-note');
 const pane2El = $('#pane2');
-const reset2Btn = $('#reset2');
 const fs2Btn = $('#fs2');
 const reset3Btn = $('#reset3');
 const backPlayBtn = $('#back-play');
@@ -893,10 +892,11 @@ for (const b of momentBtns) {
   b.addEventListener('click', () => applyMoment(b.dataset.moment));
 }
 
-reset2Btn.addEventListener('click', () => {
-  cancelGlide();
-  pattern.resetView();
-});
+function resetAll() {
+  setFamily(state.k);
+  stage.R.resetView();
+  stage.R.render();
+}
 
 const nativeFsEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
 let fallbackFs = false;
@@ -948,10 +948,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && fallbackFs) { fallbackFs = false; syncFsUI(); }
 });
 
-reset3Btn.addEventListener('click', () => {
-  stage.R.resetView();
-  stage.R.render();
-});
+reset3Btn.addEventListener('click', resetAll);
 
 // 3D ball feature tap & hover
 function coneScreenInfo() {
@@ -1141,6 +1138,7 @@ window.__handles = {
     return stateSummary();
   },
   moment(id) { applyMoment(id); return stateSummary(); },
+  reset() { resetAll(); return stateSummary(); },
   custom,
   state: stateSummary,
   waitGlide,

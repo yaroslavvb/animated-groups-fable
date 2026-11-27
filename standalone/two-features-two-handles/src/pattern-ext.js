@@ -49,6 +49,66 @@ import { invH, psuI, psuNorm, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
+
+/**
+ * Emit a smooth closed centripetal Catmull-Rom spline (alpha = 0.5) as cubic Bezier segments
+ * on `path` for deduplicated screen-space vertices `(xs[0..count-1], ys[0..count-1])`,
+ * preserving sharp corners (turn angle > 60 deg, e.g. comma tail tips).
+ */
+export function smoothClosedPath(path, xs, ys, count, buf = null) {
+  if (count <= 0) return;
+  if (count < 3 || typeof path.bezierCurveTo !== 'function') {
+    path.moveTo(xs[0], ys[0]);
+    for (let i = 1; i < count; i++) path.lineTo(xs[i], ys[i]);
+    if (count >= 2 && typeof path.closePath === 'function') path.closePath();
+    return;
+  }
+  const b = buf && buf.cap >= count ? buf : {
+    dx: new Float64Array(count),
+    dy: new Float64Array(count),
+    len: new Float64Array(count),
+    rt: new Float64Array(count),
+    tx: new Float64Array(count),
+    ty: new Float64Array(count),
+    sharp: new Uint8Array(count),
+  };
+  const { dx, dy, len, rt, tx, ty, sharp } = b;
+  for (let i = 0; i < count; i++) {
+    const j = i + 1 === count ? 0 : i + 1;
+    const vx = xs[j] - xs[i], vy = ys[j] - ys[i];
+    const l = Math.hypot(vx, vy) || 1e-9;
+    dx[i] = vx; dy[i] = vy; len[i] = l; rt[i] = Math.sqrt(l);
+  }
+  for (let i = 0; i < count; i++) {
+    const p = i === 0 ? count - 1 : i - 1;
+    const cosTurn = (dx[p] * dx[i] + dy[p] * dy[i]) / (len[p] * len[i]);
+    if (cosTurn < 0.5) { sharp[i] = 1; continue; }
+    sharp[i] = 0;
+    const dp = rt[p], di = rt[i], s = dp + di || 1e-9;
+    const w1 = di / (dp * s), w2 = dp / (di * s);
+    tx[i] = w1 * dx[p] + w2 * dx[i];
+    ty[i] = w1 * dy[p] + w2 * dy[i];
+  }
+  path.moveTo(xs[0], ys[0]);
+  for (let i = 0; i < count; i++) {
+    const j = i + 1 === count ? 0 : i + 1;
+    if (sharp[i] && sharp[j]) { path.lineTo(xs[j], ys[j]); continue; }
+    const d3 = rt[i] / 3;
+    let c1x, c1y, c2x, c2y;
+    if (sharp[i]) {
+      c2x = xs[j] - d3 * tx[j]; c2y = ys[j] - d3 * ty[j];
+      c1x = (xs[i] + 2 * xs[j]) / 3 - d3 * tx[j]; c1y = (ys[i] + 2 * ys[j]) / 3 - d3 * ty[j];
+    } else if (sharp[j]) {
+      c1x = xs[i] + d3 * tx[i]; c1y = ys[i] + d3 * ty[i];
+      c2x = (xs[j] + 2 * xs[i]) / 3 + d3 * tx[i]; c2y = (ys[j] + 2 * ys[i]) / 3 + d3 * ty[i];
+    } else {
+      c1x = xs[i] + d3 * tx[i]; c1y = ys[i] + d3 * ty[i];
+      c2x = xs[j] - d3 * tx[j]; c2y = ys[j] - d3 * ty[j];
+    }
+    path.bezierCurveTo(c1x, c1y, c2x, c2y, xs[j], ys[j]);
+  }
+  path.closePath();
+}
 const DARK = [0.08, 0.09, 0.12];
 // the paper of The Folding's prints: teal, a light tone for the tile and a dark one for what is printed on it
 const FRONT = hexToRgb(PRINT_FRONT[0]), FRONT_INK = hexToRgb(PRINT_FRONT[1]);
@@ -269,7 +329,8 @@ export function createPattern(canvas, opts = {}) {
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], desRad = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], desRad = [], desExpNeg = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  const smBuf = { cap: 0, ptCap: 0, sx: null, sy: null, dx: null, dy: null, len: null, rt: null, tx: null, ty: null, sharp: null };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
 
@@ -513,13 +574,46 @@ export function createPattern(canvas, opts = {}) {
     const showEdges = model.tileEdges !== false;
     const fill = new Path2D(), edge = [0, 1, 2].map(() => new Path2D());
     const ink = new Path2D();       // the print, in the darker tone
-    // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points
-    const print = (path, sh, M, b) => {
+    // a comma of the print, carried to a tile; on a small tile it keeps every second or third of its points,
+    // and when large enough on screen it renders as a corner-preserving closed Catmull-Rom spline
+    const print = (path, sh, M, b, rPx = 0) => {
       const pts0 = sh.pts, nPts = pts0.length;
       if (!nPts) return;
+      const smooth = b === 0 && rPx >= 10;
       const skip = b ? Math.min(2 * b + 1, Math.max(1, Math.floor(nPts / 8))) : 1;
+      let sx, sy, sc = 0;
+      const ensureSm = () => {
+        if (smBuf.cap < nPts) {
+          const cap = Math.max(128, nPts);
+          smBuf.cap = cap;
+          smBuf.sx = new Float64Array(cap); smBuf.sy = new Float64Array(cap);
+          smBuf.dx = new Float64Array(cap); smBuf.dy = new Float64Array(cap);
+          smBuf.len = new Float64Array(cap); smBuf.rt = new Float64Array(cap);
+          smBuf.tx = new Float64Array(cap); smBuf.ty = new Float64Array(cap);
+          smBuf.sharp = new Uint8Array(cap);
+        }
+        sx = smBuf.sx; sy = smBuf.sy;
+      };
+      const pushPt = (x, y) => {
+        if (!sc || (x - sx[sc - 1]) * (x - sx[sc - 1]) + (y - sy[sc - 1]) * (y - sy[sc - 1]) > 1e-4) {
+          sx[sc] = x; sy[sc] = y; sc++;
+        }
+      };
+      const trimClose = () => {
+        while (sc > 1 && (sx[0] - sx[sc - 1]) * (sx[0] - sx[sc - 1]) + (sy[0] - sy[sc - 1]) * (sy[0] - sy[sc - 1]) <= 1e-4) sc--;
+      };
       if (kind === 'H') {
         const m0 = M[0], m1 = M[1], m2 = M[2], m3 = M[3], m4 = M[4], m5 = M[5], m6 = M[6], m7 = M[7], m8 = M[8];
+        if (smooth) {
+          ensureSm();
+          for (let i = 0; i < nPts; i++) {
+            const p = pts0[i], z = R / (1 + m6 * p[0] + m7 * p[1] + m8 * p[2]);
+            pushPt(cx + (m0 * p[0] + m1 * p[1] + m2 * p[2]) * z, cy - (m3 * p[0] + m4 * p[1] + m5 * p[2]) * z);
+          }
+          trimClose();
+          smoothClosedPath(path, sx, sy, sc, smBuf);
+          return;
+        }
         const p0 = pts0[0], z0 = R / (1 + m6 * p0[0] + m7 * p0[1] + m8 * p0[2]);
         path.moveTo(cx + (m0 * p0[0] + m1 * p0[1] + m2 * p0[2]) * z0, cy - (m3 * p0[0] + m4 * p0[1] + m5 * p0[2]) * z0);
         for (let i = skip; i < nPts; i += skip) {
@@ -529,13 +623,35 @@ export function createPattern(canvas, opts = {}) {
         return;
       }
       if (kind === 'E') {
+        if (smooth) {
+          ensureSm();
+          for (let i = 0; i < nPts; i++) {
+            const q = apply(M, pts0[i]);
+            pushPt(cx + R * q[0], cy - R * q[1]);
+          }
+          trimClose();
+          smoothClosedPath(path, sx, sy, sc, smBuf);
+          return;
+        }
         const p0 = apply(M, pts0[0]);
         path.moveTo(cx + R * p0[0], cy - R * p0[1]);
         for (let i = skip; i < nPts; i += skip) { const q = apply(M, pts0[i]); path.lineTo(cx + R * q[0], cy - R * q[1]); }
         return;
       }
       const pts = [];
-      for (let i = 0; i < nPts; i += skip) pts.push(apply(M, pts0[i]));
+      let allFront = smooth;
+      for (let i = 0; i < nPts; i += skip) {
+        const q = apply(M, pts0[i]);
+        pts.push(q);
+        if (allFront && q[2] < 0) allFront = false;
+      }
+      if (allFront) {
+        ensureSm();
+        for (let i = 0; i < pts.length; i++) pushPt(cx + R * pts[i][0], cy - R * pts[i][1]);
+        trimClose();
+        smoothClosedPath(path, sx, sy, sc, smBuf);
+        return;
+      }
       blob(path, pts);
     };
     const mirrors = A.stars.map(() => [0, 1, 2].map(() => new Path2D())), glides = A.glides.map(() => [0, 1, 2].map(() => new Path2D()));
@@ -635,18 +751,18 @@ export function createPattern(canvas, opts = {}) {
         (model.lines || []).forEach((ln, k) => { if (ln.once) return; const a = apply(M, ln.a), q = apply(M, ln.b); line(extras[k][b], a, q, kind === 'E' ? 1 : stepsFor(a, q, 2)); });
       }
       if (kind === 'H') {
-        // an outline is drawn by its own size on the screen (its reach from its middle, at the disc's scale there):
-        // all of its points from 9 px, every third from 4 px, every fifth below, and not at all under 2.3 px. A
-        // print's commas differ widely in size (the Classification page's Paisley), so the tile's room cannot say
+        // an outline is drawn by its own size on the screen (its near-edge reach from its middle, at the disc's scale
+        // there, so a large comma extending inward from the rim still renders smoothly): all points + splines from
+        // 9 px (smooth >= 10 px), every third from 4 px, every fifth below, and not at all under 2.3 px.
         for (let si = 0; si < des.length; si++) {
           const sh = des[si], q = apply(M, desAt[si] || D.at);
-          const rPx = (desRad[si] * R) / (1 + q[2]);
-          if (rPx >= 2.3) print(ink, sh, M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2);
+          const rNear = (desRad[si] * R) / (1 + Math.max(1, q[2] * desExpNeg[si]));
+          if (rNear >= 2.3) print(ink, sh, M, rNear >= 9 ? 0 : rNear >= 4 ? 1 : 2, rNear);
         }
       } else if (kind === 'E') {
-        for (let si = 0; si < des.length; si++) { const rPx = desRad[si] * R; if (rPx >= 2.3) print(ink, des[si], M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2); }
+        for (let si = 0; si < des.length; si++) { const rPx = desRad[si] * R; if (rPx >= 2.3) print(ink, des[si], M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2, rPx); }
       } else if (px >= 1.2) {
-        for (const sh of des) if (px >= sh.min) print(ink, sh, M, b);
+        for (let si = 0; si < des.length; si++) { const sh = des[si]; if (px >= sh.min) print(ink, sh, M, b, desRad[si] * R); }
       }
       for (const mk of marked) {
         const p = P[mk.v];
@@ -1040,7 +1156,7 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (!keep) sel = null; quick = false;
       cache = new Map();
@@ -1067,6 +1183,7 @@ export function createPattern(canvas, opts = {}) {
       });
       // each outline's own reach from its middle: how large it comes out on the screen decides how finely it is drawn
       desRad = des.map((sh, i) => (sh.pts && sh.pts.length ? Math.max(...sh.pts.map((p) => G.dist(desAt[i], p))) : 0));
+      desExpNeg = desRad.map((r) => Math.exp(-r));
       size();
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else {

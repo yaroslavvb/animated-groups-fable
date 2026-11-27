@@ -147,10 +147,16 @@ try {
       ok(sl.m === s.m && sl.print.own && sl.print.joint.clear && Math.abs(sl.print.joint.delta - s.print.joint.delta) < 1e-6 && sl.pat.shapes === s.pat.shapes, 'the link to that state opens with the same print', JSON.stringify([sl.m, sl.print, s.print]));
       await linked.ctx.close();
     }
-    await T.click('#reset2');
+    // Single Reset lives on the Surface pane (#reset3), while pattern.resetView() centers on the picked pair away from defaults
+    ok(await T.evaluate(() => document.getElementById('reset2') === null && document.getElementById('reset3') !== null), 'only Surface pane has Reset (#reset2 gone, #reset3 present)');
+    await T.evaluate(() => window.__handles.pattern.resetView());
     await page.waitForTimeout(300);
     s = await S(T);
-    ok(offClassified(s) > 1e-3, 'Reset away from the defaults centres on the pair', String(offClassified(s)));
+    ok(offClassified(s) > 1e-3, 'pattern.resetView away from the defaults centres on the pair', String(offClassified(s)));
+    await T.click('#reset3');
+    await page.waitForTimeout(300);
+    s = await S(T);
+    ok(s.classified.at && s.m === '0123' && Math.abs(s.tw) < 1e-9 && offClassified(s) < 1e-6, 'Reset on Surface resets orbifold parameters and Poincare disc view', JSON.stringify([s.classified.at, s.m, s.tw, offClassified(s)]));
     // back at the defaults, dragged away, Reset: the classified view again
     await T.click('[data-fam="2222"]');
     await page.waitForTimeout(300);
@@ -162,7 +168,7 @@ try {
     await page.waitForTimeout(900);
     s = await S(T);
     const dragged = offClassified(s);
-    await T.click('#reset2');
+    await T.click('#reset3');
     await page.waitForTimeout(300);
     s = await S(T);
     ok(dragged > 1e-3 && s.classified.at && offClassified(s) < 1e-6, '2222 dragged, then Reset: lying as on the Classification page again', JSON.stringify([dragged, offClassified(s)]));
@@ -375,7 +381,7 @@ try {
       });
       const bad = ends.filter(([, , tiles, fin]) => !(tiles > 3) || !fin);
       ok(bad.length === 0, `${t}: every slider at both ends`, JSON.stringify(bad));
-      await T.click('#reset2');
+      await T.click('#reset3');
     }
     await ctx.close();
   }
@@ -440,8 +446,8 @@ try {
         s = await T.evaluate(() => window.__handles.tapCone(4)).then(() => S(T));
         ok(s.multi.active === 1 && (await ui(T)).grayed === '++++-', `${text}: the cone point left over has no pair: a tap on it changes nothing, and its symbol stays gray`, JSON.stringify([s.multi.active, (await ui(T)).grayed]));
       }
-      // Reset: the picked pair level in the middle
-      await T.click('#reset2');
+      // pattern.resetView lays the picked pair level in the middle (keeping modified parameters for the link check below)
+      await T.evaluate(() => window.__handles.pattern.resetView());
       await page.waitForTimeout(400);
       s = await S(T);
       const a = s.multi.active, size = await T.evaluate(() => { const c = document.getElementById('pattern'); return [c.clientWidth, c.clientHeight]; });
@@ -490,7 +496,10 @@ try {
         worst = Math.min(worst, (await S(T)).pat.tiles);
       }
       ok(worst > 3, `${text}: dragged six times, the pattern stays drawn`, 'fewest tiles ' + worst);
-      await T.click('#reset2');
+      await T.click('#reset3');
+      await page.waitForTimeout(400);
+      s = await S(T);
+      ok(s.multi.atDefaults && s.multi.active === 0 && s.multi.shown === 1 && offClassified(s) < 1e-6, `${text}: Surface Reset restores defaults and Poincare disc view`, JSON.stringify([s.multi.atDefaults, s.multi.active, s.multi.shown, offClassified(s)]));
     }
     // the shortest cut beside the longest: the far corner of the sliders (found by sweep: the pattern pane once listed a tile eight times here)
     await T.evaluate(() => window.__handles.set({ k: '777777', Ls: [1.46, 4.52, 1.05], tws: [0.2, -0.3, 0.4], active: 2, shown: 3 }));
