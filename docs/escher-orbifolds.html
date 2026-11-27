@@ -1,0 +1,2521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Escher's Symmetry Groups in Orbifold Notation — Spacetime Groups</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
+<script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #f7f7f8;
+  --ink: #1a1a1f;
+  --muted: #52514a;
+  --line: #e5e5ea;
+  --line-strong: #c8c8d0;
+  --accent: #0f5a8a;
+  --accent-soft: #eaf3fa;
+  --amber: #9c5b10;
+  --amber-soft: #fdf4e7;
+  --green: #1e6b48;
+  --green-soft: #eaf6ef;
+  --radius: 6px;
+}
+
+* { box-sizing: border-box; }
+html { overflow-x: clip; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  max-width: 1020px;
+  margin: 0 auto;
+  padding: 28px clamp(16px, 4vw, 32px) 64px;
+}
+
+.prose { max-width: 42em; }
+
+.kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+
+h1, h2, h3 {
+  color: var(--ink);
+  text-wrap: balance;
+  line-height: 1.2;
+}
+h1 {
+  font-size: clamp(28px, 6vw, 42px);
+  letter-spacing: -0.02em;
+  margin: 0 0 10px;
+}
+h2 {
+  font-size: clamp(21px, 4vw, 27px);
+  letter-spacing: -0.015em;
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+h3 {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.lede {
+  font-size: 18px;
+  color: var(--muted);
+  margin: 0 0 22px;
+  max-width: 42em;
+}
+p { margin: 0 0 14px; }
+a { color: var(--accent); text-underline-offset: 2px; }
+
+.orb {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-weight: 700;
+  font-size: 0.96em;
+  letter-spacing: 0.01em;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+.orb-lg {
+  font-size: 1.08em;
+  background: var(--accent-soft);
+  border-color: #c6dfef;
+  color: var(--accent);
+}
+
+section { margin-top: 44px; }
+section:first-of-type { margin-top: 0; }
+
+/* Card grid that never leaves an orphan on the last row */
+.cards {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  margin: 18px 0;
+}
+.cards:has(> :last-child:nth-child(1)) { --cols: 1; }
+.cards:has(> :last-child:nth-child(2)),
+.cards:has(> :last-child:nth-child(4)) { --cols: 2; }
+.cards.kpi-row:has(> :last-child:nth-child(4)) { --cols: 4; }
+.cards:has(> :last-child:nth-child(7)),
+.cards:has(> :last-child:nth-child(8)) { --cols: 4; }
+@media (max-width: 760px) {
+  .cards.kpi-row:has(> :last-child:nth-child(4)) { --cols: 2; }
+}
+@media (max-width: 640px) {
+  .cards { grid-template-columns: 1fr; }
+  .cards.kpi-row:has(> :last-child:nth-child(4)) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.card, .kpi {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+.kpi .val {
+  font-size: clamp(24px, 4.5vw, 32px);
+  font-weight: 750;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+.kpi .lbl {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.kpi .sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0 26px;
+}
+.toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+.toc a:hover { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Hero split: cost spectrum + notation key */
+.hero-pair {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1.35fr 1fr;
+  align-items: start;
+  margin-top: 16px;
+}
+@media (max-width: 820px) {
+  .hero-pair { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+.panel-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.panel-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+  margin: 0 0 12px;
+}
+
+/* Cost spectrum chart */
+.spectrum-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Orbifold legend table */
+.mini-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.mini-table th, .mini-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: middle;
+}
+.mini-table tr:last-child td { border-bottom: 0; }
+.mini-table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+/* Exhibit showcase block: canvas + spec card */
+.exhibit {
+  display: grid;
+  grid-template-columns: minmax(280px, 420px) 1fr;
+  gap: 22px;
+  align-items: start;
+  padding: 20px;
+  margin: 22px 0;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+@media (max-width: 780px) {
+  .exhibit {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 16px;
+  }
+}
+
+.disk-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.disk-canvas {
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 1;
+  display: block;
+  border-radius: 50%;
+  background: #f5f4f0;
+  border: 1px solid var(--line-strong);
+}
+.square-canvas {
+  border-radius: var(--radius);
+}
+.sphere-canvas {
+  cursor: grab;
+  touch-action: none;
+  background: #f3f5f8;
+}
+.sphere-canvas:active { cursor: grabbing; }
+
+.caption-line {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  width: 100%;
+}
+button.ctrl {
+  min-height: 44px;
+  padding: 8px 13px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+button.ctrl:hover { border-color: var(--accent); background: var(--accent-soft); }
+button.ctrl[aria-pressed="true"],
+button.ctrl.is-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+}
+button.ctrl:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+.exhibit-meta { min-width: 0; }
+.exhibit-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.exhibit-year {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0 14px;
+}
+@media (max-width: 480px) {
+  .facts { grid-template-columns: 1fr; }
+}
+.fact {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+}
+.fact-k {
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+.fact-v {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.callout {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  font-size: 14.5px;
+  margin-top: 10px;
+}
+.callout strong.tag {
+  display: inline-block;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--amber);
+  margin-right: 6px;
+}
+.callout.good strong.tag { color: var(--green); }
+
+/* Stage description blocks for CL-IV ladder */
+.stage-notes { margin-top: 10px; }
+.stage-note {
+  display: none;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  font-size: 14.5px;
+}
+.stage-note.is-active { display: block; }
+
+/* Triptych (3 geometries) */
+.triptych {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+@media (max-width: 820px) {
+  .triptych { grid-template-columns: 1fr; }
+}
+.trip-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.trip-card .disk-canvas { max-width: 280px; }
+.trip-head {
+  width: 100%;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+.trip-geom {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.trip-foot {
+  width: 100%;
+  font-size: 13.5px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+.trip-foot strong { color: var(--ink); }
+
+/* Reference data tables */
+.table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  margin: 16px 0;
+  background: var(--bg);
+}
+table.atlas {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14.5px;
+  min-width: 640px;
+}
+table.atlas thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line-strong);
+  padding: 10px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+}
+table.atlas thead th.num,
+table.atlas tbody td.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.atlas tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+table.atlas tbody tr:last-child td { border-bottom: 0; }
+table.atlas tbody tr.hi-row { background: var(--accent-soft); }
+.glyph-cell { width: 72px; }
+table.atlas.atlas-compact th,
+table.atlas.atlas-compact td {
+  padding: 7px 8px;
+  font-size: 13.5px;
+}
+.glyph-svg { width: 60px; height: 30px; display: block; }
+
+/* Legend swatches */
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.sw { display: inline-flex; align-items: center; gap: 5px; }
+.sw i {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.2);
+  display: inline-block;
+}
+
+details.sources {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-top: 24px;
+}
+details.sources summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+details.sources ul {
+  margin: 10px 0 4px;
+  padding-left: 20px;
+  font-size: 14px;
+  color: var(--muted);
+}
+details.sources li { margin-bottom: 6px; }
+
+footer.page-foot {
+  margin-top: 36px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+body.orb-page {
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+.orb-page main.shell {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 28px clamp(16px, 4vw, 32px) 56px;
+}
+.orb-page h2 { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.orb-page .callout strong.tag {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: 11.5px;
+  margin-right: 6px;
+}
+.hfrac {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  font-size: 0.8em;
+  line-height: 1.05;
+  margin: 0 2px;
+}
+.hfrac > span:first-child { border-bottom: 1px solid currentColor; padding: 0 2px; }
+.hfrac > span:last-child { padding: 0 2px; }
+
+</style>
+</head>
+<body class="orb-page">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="index.html">Tutorial</a>
+        <a href="notation.html">Notation</a>
+        <a href="colourings-tutorial.html">Colourings</a>
+        <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+        <a href="hierarchy.html">Hierarchy</a>
+        <a href="history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="showcase/">Showcase</a>
+        <a href="catalog.html">275 spacetime</a>
+        <a href="wallpaper.html">275 spacetime (grouped)</a>
+        <a href="correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="patterns.html">609 patterns</a>
+        <a href="escher.html">107 Escher</a>
+        <a href="escher-orbifolds.html" class="here">Escher orbifolds</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colourings</span>
+        <a href="colour/">Entangled colourings</a>
+        <a href="colour/gyre/">Gyre</a>
+        <a href="colour/trefoil/">Trefoil</a>
+        <a href="monochrome/">Monochrome</a>
+        <a href="shubnikov/">Shubnikov</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="reports/">Reports</a>
+        <a href="motifs.html">Motifs</a>
+        <a href="designer.html">Designer</a>
+        <a href="shubnikov/studio/">Studio</a>
+        <a href="billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+<main class="shell">
+
+<section>
+  <p class="kicker">Orbifold Atlas · Hyperbolic, Euclidean &amp; Spherical</p>
+  <h1>Escher's symmetry groups, read as orbifolds</h1>
+  <p class="lede">
+    Conway's orbifold cost separates all constant-curvature patterns at a single threshold:
+    Escher's carved spheres sit below 2, his 137 periodic plane drawings sit exactly at 2, and his four
+    <em>Circle Limit</em> woodcuts cross above 2 into the hyperbolic plane ℍ<sup>2</sup>.
+  </p>
+
+  <div class="cards kpi-row">
+    <div class="kpi">
+      <div class="val">4 prints</div>
+      <div class="lbl">Hyperbolic <em>Circle Limits</em></div>
+      <div class="sub">1958–1960, Poincaré disk</div>
+    </div>
+    <div class="kpi">
+      <div class="val">cost &gt; 2</div>
+      <div class="lbl">Hyperbolic threshold</div>
+      <div class="sub"><i>χ</i> = 2 - cost &lt; 0</div>
+    </div>
+    <div class="kpi">
+      <div class="val">+1/12</div>
+      <div class="lbl">Cost step per geometry</div>
+      <div class="sub">3*2 → 4*2 → 4*3 (23/12 → 25/12)</div>
+    </div>
+    <div class="kpi">
+      <div class="val">17 groups</div>
+      <div class="lbl">Euclidean plane (cost = 2)</div>
+      <div class="sub">Realised across 137 plane drawings</div>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="Page sections">
+    <a href="#hyperbolic">1. Hyperbolic works</a>
+    <a href="#three-geometries">2. One motif, 3 geometries</a>
+    <a href="#beyond-escher">3. Beyond Escher (Dunham)</a>
+    <a href="#euclidean-spherical">4. Spherical &amp; plane atlas</a>
+    <a href="#rights">5. Rights &amp; sources</a>
+  </nav>
+
+  <div class="hero-pair">
+    <div class="panel">
+      <p class="panel-title">Gauss–Bonnet cost splits Escher's three geometries at 2</p>
+      <p class="panel-sub">Total orbifold cost (= 2 - <i>χ</i>) across Escher's spherical carvings, Euclidean walls, and hyperbolic prints.</p>
+      <svg class="spectrum-svg" viewBox="0 0 620 278" role="img" aria-label="Horizontal chart of orbifold cost anchored at 2 showing spherical groups below 2, Euclidean at 2, and hyperbolic Escher groups from 49/24 to 3.">
+        <!-- Exact linear scale: x(cost) = 332 + (cost - 2) * 178 -->
+        <rect x="225" y="34" width="107" height="212" fill="#f7f7f8" rx="4"></rect>
+        <rect x="332" y="34" width="210" height="212" fill="#eaf3fa" opacity="0.55" rx="4"></rect>
+        <line x1="332" y1="26" x2="332" y2="250" stroke="#1a1a1f" stroke-width="2" stroke-dasharray="4 3"></line>
+        <text x="275" y="25" text-anchor="middle" font-size="10" font-weight="700" fill="#52514a">SPHERICAL (χ &gt; 0)</text>
+        <text x="332" y="13" text-anchor="middle" font-size="10.5" font-weight="700" fill="#1a1a1f">COST = 2 (E²)</text>
+        <text x="460" y="25" text-anchor="middle" font-size="10" font-weight="700" fill="#0f5a8a">HYPERBOLIC (χ &lt; 0)</text>
+
+        <!-- Grid ticks: 1.5 (x=243), 2.0 (x=332), 2.5 (x=421), 3.0 (x=510) -->
+        <line x1="243" y1="246" x2="243" y2="252" stroke="#888" stroke-width="1"></line>
+        <text x="243" y="266" text-anchor="middle" font-size="11" fill="#52514a">1.5</text>
+        <text x="332" y="266" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a1f">2.0</text>
+        <line x1="421" y1="246" x2="421" y2="252" stroke="#888" stroke-width="1"></line>
+        <text x="421" y="266" text-anchor="middle" font-size="11" fill="#52514a">2.5</text>
+        <line x1="510" y1="246" x2="510" y2="252" stroke="#888" stroke-width="1"></line>
+        <text x="510" y="266" text-anchor="middle" font-size="11" fill="#52514a">3.0</text>
+
+        <!-- Row 1: *22 (cost 1.5, x=243) -->
+        <text x="6" y="51" font-size="12" font-weight="600" fill="#1a1a1f">Maple Ball (carved)</text>
+        <line x1="243" y1="47" x2="332" y2="47" stroke="#52514a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="243" cy="47" r="5" fill="#1a1a1f"></circle>
+        <text x="235" y="51" text-anchor="end" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#1a1a1f">*22 (3/2)</text>
+
+        <!-- Row 2: 332 (cost 11/6 = 1.8333, x=302) -->
+        <text x="6" y="75" font-size="12" font-weight="600" fill="#1a1a1f">Fish Sphere (1940)</text>
+        <line x1="302" y1="71" x2="332" y2="71" stroke="#52514a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="302" cy="71" r="5" fill="#1a1a1f"></circle>
+        <text x="294" y="75" text-anchor="end" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#1a1a1f">332 (11/6)</text>
+
+        <!-- Row 3: 3*2 (cost 23/12 = 1.9167, x=317) -->
+        <text x="6" y="99" font-size="12" font-weight="600" fill="#1a1a1f">Maple Ball (uniform)</text>
+        <line x1="317" y1="95" x2="332" y2="95" stroke="#52514a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="317" cy="95" r="5" fill="#1a1a1f"></circle>
+        <text x="309" y="99" text-anchor="end" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#1a1a1f">3*2 (23/12)</text>
+
+        <!-- Row 4: 4*2 / 442 / 632 (cost 2.0, x=332) -->
+        <text x="6" y="123" font-size="12" font-weight="600" fill="#1a1a1f">17 Plane Divisions</text>
+        <circle cx="332" cy="119" r="6" fill="#1e6b48"></circle>
+        <text x="344" y="123" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#1e6b48">4*2, 632, o (2)</text>
+
+        <!-- Row 5: *642 / 3*4 (cost 49/24 = 2.0417, x=339) -->
+        <text x="6" y="147" font-size="12" font-weight="600" fill="#1a1a1f">Coxeter &amp; CL-II</text>
+        <line x1="332" y1="143" x2="339" y2="143" stroke="#0f5a8a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="339" cy="143" r="5" fill="#0f5a8a"></circle>
+        <text x="347" y="147" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#0f5a8a">*642, 3*4 (49/24)</text>
+
+        <!-- Row 6: 2*32 / 433 / 4*3 (cost 25/12 = 2.0833, x=347) -->
+        <text x="6" y="171" font-size="12" font-weight="600" fill="#1a1a1f">CL-I, CL-III, CL-IV</text>
+        <line x1="332" y1="167" x2="347" y2="167" stroke="#0f5a8a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="347" cy="167" r="5" fill="#0f5a8a"></circle>
+        <text x="355" y="171" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#0f5a8a">2*32, 433, 4*3 (25/12)</text>
+
+        <!-- Row 7: 2*33 (cost 13/6 = 2.1667, x=362) -->
+        <text x="6" y="195" font-size="12" font-weight="600" fill="#1a1a1f">CL-IV 2-fold var.</text>
+        <line x1="332" y1="191" x2="362" y2="191" stroke="#0f5a8a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="362" cy="191" r="5" fill="#0f5a8a"></circle>
+        <text x="370" y="195" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#0f5a8a">2*33 (13/6)</text>
+
+        <!-- Row 8: *3333 / 3322 (cost 7/3 = 2.3333, x=391) -->
+        <text x="6" y="219" font-size="12" font-weight="600" fill="#1a1a1f">CL-III 1-col &amp; *3333</text>
+        <line x1="332" y1="215" x2="391" y2="215" stroke="#0f5a8a" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="391" cy="215" r="5" fill="#0f5a8a"></circle>
+        <text x="399" y="219" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#0f5a8a">3322, *3333 (7/3)</text>
+
+        <!-- Row 9: 222222 (cost 3.0, x=510) -->
+        <text x="6" y="241" font-size="12" font-weight="600" fill="#1a1a1f">CL-III 4-col kernel</text>
+        <line x1="332" y1="237" x2="510" y2="237" stroke="#9c5b10" stroke-width="5" stroke-linecap="round"></line>
+        <circle cx="510" cy="237" r="5" fill="#9c5b10"></circle>
+        <text x="518" y="241" font-size="11" font-family="ui-monospace,monospace" font-weight="700" fill="#9c5b10">222222 (3)</text>
+      </svg>
+    </div>
+
+    <div class="panel">
+      <p class="panel-title">Reading a Conway orbifold signature</p>
+      <p class="panel-sub">Sum the feature costs: <i>χ</i> = 2 − cost, and hyperbolic area is −2<i>πχ</i>.</p>
+      <table class="mini-table">
+        <thead>
+          <tr><th>Mark</th><th>Geometry</th><th>Cost</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="orb">n</span></td>
+            <td>n-fold gyration center</td>
+            <td><span class="hfrac"><span><i>n</i> − 1</span><span><i>n</i></span></span></td>
+          </tr>
+          <tr>
+            <td><span class="orb">*</span></td>
+            <td>Kaleidoscopic mirror loop</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><span class="orb">*n</span></td>
+            <td>Mirror corner, angle <i>π</i>/<i>n</i></td>
+            <td>1 +<span class="hfrac"><span><i>n</i> − 1</span><span>2<i>n</i></span></span></td>
+          </tr>
+          <tr>
+            <td><span class="orb">×</span></td>
+            <td>Glide reflection (crosscap)</td>
+            <td>1</td>
+          </tr>
+          <tr>
+            <td><span class="orb">o</span></td>
+            <td>Translation torus (handle)</td>
+            <td>2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="hyperbolic">
+  <h2>1. Hyperbolic Escher works (ℍ<sup>2</sup>, cost &gt; 2)</h2>
+  <p class="prose">
+    Every point inside the Poincaré disk lies in ℍ<sup>2</sup>, where hyperbolic lines appear as circular arcs perpendicular to the rim. Below are exact Minkowski-hyperboloid reconstructions of the four <em>Circle Limit</em> groups and their geometric precursor.
+  </p>
+
+  <!-- 1A. Coxeter {6,4} *642 -->
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-coxeter" width="400" height="400" aria-label="Poincare disk rendering of Coxeter's 1957 triangle grid *642"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" data-target="coxeter" data-action="overlay" aria-pressed="true">Grid + domain</button>
+        <button class="ctrl" type="button" data-target="coxeter" data-action="chiral" aria-pressed="false">Chiral 642 half</button>
+      </div>
+      <p class="caption-line">Triangles invert across hyperbolic geodesics right to the rim.</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3>Coxeter's {6,4} Triangle Grid</h3>
+        <span class="exhibit-year">1957 precursor · Fig. 7</span>
+      </div>
+      <p>
+        H. S. M. Coxeter sent Escher a reprint of <em>Crystal Symmetry and its Generalizations</em> containing this (30°, 45°, 90°) reflection tessellation — giving Escher "quite a shock" and launching the <em>Circle Limit</em> series.
+      </p>
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Orbifold</div><div class="fact-v"><span class="orb orb-lg">*642</span></div></div>
+        <div class="fact"><div class="fact-k">Coxeter</div><div class="fact-v">[6, 4]</div></div>
+        <div class="fact"><div class="fact-k">Cost &amp; <i>χ</i></div><div class="fact-v">49/24, <i>χ</i> = -1/24</div></div>
+        <div class="fact"><div class="fact-k">2-Colour kernel</div><div class="fact-v"><span class="orb">642</span> (index 2)</div></div>
+      </div>
+      <div class="callout good">
+        <strong class="tag">Reading the orbifold</strong>
+        One fundamental triangle has area <i>π</i>/12. Twelve meet around each <i>π</i>/6 vertex (<span class="orb">*6</span>), eight around each <i>π</i>/4 vertex (<span class="orb">*4</span>), and four around each right angle (<span class="orb">*2</span>).
+      </div>
+    </div>
+  </article>
+
+  <!-- 1B. Circle Limit I: 2*32 -->
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-cl1" width="400" height="400" aria-label="Poincare disk schematic of Escher's Circle Limit I with orbifold 2*32"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" data-target="cl1" data-action="overlay" aria-pressed="true">Symmetry overlay (2*32)</button>
+      </div>
+      <p class="caption-line">Original geometric schematic of the <span class="orb">2*32</span> fish tiling (<a href="https://mcescher.com/gallery/symmetry/" target="_blank" rel="noopener">mcescher.com</a>).</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3><em>Circle Limit I</em> — Angular Black &amp; White Fish</h3>
+        <span class="exhibit-year">1958 · Cat. 429</span>
+      </div>
+      <p>
+        Each fish is bisected by a hyperbolic geodesic mirror along its backbone. Two orthogonal backbone diameters cross at the center (<span class="orb">*2</span>), while three black noses and three white tails alternate around every <span class="orb">*3</span> corner.
+      </p>
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Orbifold</div><div class="fact-v"><span class="orb orb-lg">2*32</span></div></div>
+        <div class="fact"><div class="fact-k">Coxeter</div><div class="fact-v">cmm<sub>3,2</sub> (index 2 in [6,4])</div></div>
+        <div class="fact"><div class="fact-k">Cost &amp; <i>χ</i></div><div class="fact-v">25/12, <i>χ</i> = -1/12</div></div>
+        <div class="fact"><div class="fact-k">Colour symmetry</div><div class="fact-v">None (incongruent shapes)</div></div>
+      </div>
+      <div class="callout">
+        <strong class="tag">Why no 2-colour swap exists</strong>
+        Dark fish have 60° noses and 90° tails; light fish have 90° noses and 60° tails. Along each backbone line, traffic flips direction and colour every two fish lengths — a flaw Escher fixed in <em>Circle Limit III</em>.
+      </div>
+    </div>
+  </article>
+
+  <!-- 1C. Circle Limit II: 3*4 -> *444 -->
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-cl2" width="400" height="400" aria-label="Poincare disk schematic of Escher's Circle Limit II with orbifold 3*4 and 3-colour kernel *444"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" data-target="cl2" data-action="overlay" aria-pressed="true">Symmetry overlay (3*4)</button>
+        <button class="ctrl" type="button" data-target="cl2" data-action="kernel" aria-pressed="false">1-colour *444 triangle</button>
+      </div>
+      <p class="caption-line">Four-armed crosses on {8,3}; mirrors fix all three colours.</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3><em>Circle Limit II</em> — 3-Coloured Four-Armed Crosses</h3>
+        <span class="exhibit-year">1959 · Cat. 432</span>
+      </div>
+      <p>
+        Escher's first hyperbolic 3-colour symmetry work replaces fish with 4-armed crosses on {8,3}. Four mirror lines at 45° pass through each cross center (<span class="orb">*4</span>), while 3-fold gyrations (<span class="orb">3</span>) sit beside every arm tip.
+      </p>
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Orbifold (uncoloured)</div><div class="fact-v"><span class="orb orb-lg">3*4</span></div></div>
+        <div class="fact"><div class="fact-k">Coxeter</div><div class="fact-v">[3<sup>+</sup>, 8] (index 2 in [8,3])</div></div>
+        <div class="fact"><div class="fact-k">Cost &amp; <i>χ</i></div><div class="fact-v">49/24, <i>χ</i> = -1/24</div></div>
+        <div class="fact"><div class="fact-k">3-Colour kernel</div><div class="fact-v"><span class="orb">*444</span> (index 3, <i>χ</i> = -1/8)</div></div>
+      </div>
+      <div class="callout good">
+        <strong class="tag">Unique ℤ<sub>3</sub> homomorphism</strong>
+        In 3*4 = ⟨ R, m | R<sup>3</sup> = m<sup>2</sup> = (m R m R<sup>−1</sup>)<sup>4</sup> = 1⟩, mapping R ↦ (0 1 2) forces every mirror m ↦ id. Thus all mirrors keep colours fixed, and the colour-preserving kernel is the equilateral 45° mirror triangle <span class="orb">*444</span>.
+      </div>
+    </div>
+  </article>
+
+  <!-- 1D. Circle Limit III: 433 -> A_4 -->
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-cl3" width="400" height="400" aria-label="Poincare disk schematic of Escher's Circle Limit III with orbifold 433 and A4 4-colouring"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" data-target="cl3" data-action="overlay" aria-pressed="true">433 centers</button>
+        <button class="ctrl" type="button" data-target="cl3" data-action="onecol" aria-pressed="false">1-colour (3322)</button>
+        <button class="ctrl" type="button" data-target="cl3" data-action="geod" aria-pressed="false">Compare geodesics</button>
+      </div>
+      <p class="caption-line">White backbone arcs hit the boundary at Coxeter's 79.97°, not 90°.</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3><em>Circle Limit III</em> — Four-Coloured Schools of Fish</h3>
+        <span class="exhibit-year">1959 · Cat. 434</span>
+      </div>
+      <p>
+        Four fish meet at right fin tips (<span class="orb">4</span>, disk center), three at left fin tips (<span class="orb">3</span>), and three head-to-tail where white backbones cross (<span class="orb">3</span>). Because 90° ≠ 120°, the fish are chiral and have zero mirrors.
+      </p>
+      <div class="facts">
+        <div class="fact"><div class="fact-k">Orbifold (uncoloured)</div><div class="fact-v"><span class="orb orb-lg">433</span></div></div>
+        <div class="fact"><div class="fact-k">Coxeter / Dual</div><div class="fact-v">Chiral (4,3,3), index 4 in [8,3]</div></div>
+        <div class="fact"><div class="fact-k">Cost &amp; <i>χ</i></div><div class="fact-v">25/12, <i>χ</i> = -1/12</div></div>
+        <div class="fact"><div class="fact-k">Colour group &amp; kernel</div><div class="fact-v">A<sub>4</sub>, <span class="orb">3322</span> (idx 4) → <span class="orb">222222</span> (idx 12)</div></div>
+      </div>
+      <div class="callout good">
+        <strong class="tag">Why opposite center fish match colours</strong>
+        No homomorphism 433 → S<sub>4</sub> sends the order-4 generator a to a 4-cycle: both order-3 generators are even, forcing a into A<sub>4</sub> as a double transposition (0 1)(2 3). Meanwhile the backbone step aba fixes the fish's own colour, preserving single-colour streams.
+      </div>
+      <div class="callout">
+        <strong class="tag">Equidistant arcs</strong>
+        Coxeter proved Escher's white arcs are hypercycles meeting the boundary circle at <i>ω</i> = arccos((2<sup>1/4</sup> − 2<sup>−1/4</sup>)/2) ≈ 79.97° — toggle "Compare geodesics" to see the nearby 90° hyperbolic lines diverge.
+      </div>
+    </div>
+  </article>
+
+  <!-- 1E. Circle Limit IV: 4*3 -> 2*33 -> *3333 -> *3 -->
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-cl4" width="400" height="400" aria-label="Interactive Poincare disk showing the four symmetry stages of Circle Limit IV"></canvas>
+      <div class="controls" role="group" aria-label="Circle Limit IV symmetry stage">
+        <button class="ctrl is-on" type="button" data-cl4="4*3" aria-pressed="true">4*3 Outlines</button>
+        <button class="ctrl" type="button" data-cl4="2*33" aria-pressed="false">2*33 Alternation</button>
+        <button class="ctrl" type="button" data-cl4="*3333" aria-pressed="false">*3333 Periodic</button>
+        <button class="ctrl" type="button" data-cl4="*3" aria-pressed="false">*3 Actual print</button>
+      </div>
+      <p class="caption-line">Toggle the four stages analyzed by Dunham (Bridges 2009); disk is upright (D<sub>3</sub> vertical axis).</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3><em>Circle Limit IV (Heaven and Hell)</em> — Symmetry-Breaking Ladder</h3>
+        <span class="exhibit-year">July 1960 · Cat. 436</span>
+      </div>
+      <p>
+        The silhouettes of angels and devils sit in a hyperbolic square tiling of <span class="orb">4*3</span>, where bilateral mirrors bound 60°-cornered squares around 4-fold wingtip centers. Escher's interior shading then breaks that symmetry in stages.
+      </p>
+
+      <div class="stage-notes">
+        <div class="stage-note is-active" data-stage="4*3">
+          <strong>Stage 1 — Outlines / uniform detail: <span class="orb">4*3</span></strong> ([4<sup>+</sup>, 6], cost = 25/12, <i>χ</i> = -1/12, index 2 in [6,4]). Every angel and devil carries full identical weight, preserving both mirrors and 4-fold wingtip centers.
+        </div>
+        <div class="stage-note" data-stage="2*33">
+          <strong>Stage 2 — 2-fold dominance (Dunham Fig. 7): <span class="orb">2*33</span></strong> (cmm<sub>3,3</sub>, cost = 13/6, <i>χ</i> = -1/6, index 2 in <span class="orb">4*3</span>). Opposite square quadrants alternate angel-dominant vs. devil-dominant, halving the 4-fold centers to 2-fold.
+        </div>
+        <div class="stage-note" data-stage="*3333">
+          <strong>Stage 3 — Periodic mirror-only dominance (Dunham Fig. 5): <span class="orb">*3333</span></strong> (cost = 7/3, <i>χ</i> = -1/3, index 4 in <span class="orb">4*3</span>). Often misattributed to the finished print: every wingtip rotation disappears, leaving four <span class="orb">*3</span> corners per square.
+        </div>
+        <div class="stage-note" data-stage="*3">
+          <strong>Stage 4 — Actual finished woodcut: finite <span class="orb">*3</span> (D<sub>3</sub>, order 6)</strong>. Escher alternated six global wedges around the center (three devil-dominant, three angel-dominant), breaking all hyperbolic translations—ignoring his bottom <span class="orb">MCE VII-'60</span> signature.
+        </div>
+      </div>
+
+      <div class="table-scroll" style="margin-top:12px;">
+        <table class="atlas atlas-compact" style="min-width:0;">
+          <thead>
+            <tr><th>Stage</th><th>Orbifold</th><th class="num">Cost</th><th class="num"><i>χ</i></th><th>Symmetry</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Outlines</td><td><span class="orb">4*3</span></td><td class="num">25/12</td><td class="num">−1/12</td><td>Mirrors + 4-fold</td></tr>
+            <tr><td>Alternating</td><td><span class="orb">2*33</span></td><td class="num">13/6</td><td class="num">−1/6</td><td>Mirrors + 2-fold</td></tr>
+            <tr><td>Periodic</td><td><span class="orb">*3333</span></td><td class="num">7/3</td><td class="num">−1/3</td><td>Mirrors only</td></tr>
+            <tr class="hi-row"><td>Actual print</td><td><span class="orb">*3</span> (D<sub>3</sub>)</td><td class="num">5/3</td><td class="num">ord. 6</td><td>3 mirrors + 120°</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="three-geometries">
+  <h2>2. One motif across all three geometries (<i>χ</i> &gt; 0 → <i>χ</i> = 0 → <i>χ</i> &lt; 0)</h2>
+  <p class="prose">
+    Escher executed <em>Angels and Devils</em> across every constant-curvature surface over nineteen years. In orbifold cost, moving from the sphere to the Euclidean plane to the hyperbolic disk adds exactly +1/12 per step.
+  </p>
+
+  <div class="triptych">
+    <div class="trip-card">
+      <div class="trip-head">
+        <span class="trip-geom">Spherical · 𝕊<sup>2</sup></span>
+        <span class="orb">3*2</span>
+      </div>
+      <canvas class="disk-canvas sphere-canvas" id="cv-sphere" width="320" height="320" aria-label="Interactive 3D sphere showing Escher's Angels and Devils spherical tiling 3*2"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" id="btn-sphere-spin" aria-pressed="true">Pause spin</button>
+        <button class="ctrl" type="button" id="btn-sphere-carved" aria-pressed="false">Carved relief (*22)</button>
+      </div>
+      <div class="trip-foot">
+        <strong>Carved Maple Ball (1942)</strong> · {4,3}<br>
+        Uniform: <span class="orb">3*2</span>, <i>χ</i> = +1/12 (order 24, 12 angels + 12 devils). Drag sphere to rotate.
+      </div>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-head">
+        <span class="trip-geom">Euclidean · 𝔼<sup>2</sup></span>
+        <span class="orb">4*2</span>
+      </div>
+      <canvas class="disk-canvas square-canvas" id="cv-euclid" width="320" height="320" aria-label="Euclidean tiling diagram for Escher Drawing 45 Angels and Devils, orbifold 4*2"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" id="btn-euclid-ov" aria-pressed="true">Mirror &amp; 4-center grid</button>
+      </div>
+      <div class="trip-foot">
+        <strong>Notebook Drawing #45 (1941)</strong> · {4,4}<br>
+        Wallpaper p4g: <span class="orb">4*2</span>, cost = 2, <i>χ</i> = 0. Two motifs, trivial colour group.
+      </div>
+    </div>
+
+    <div class="trip-card">
+      <div class="trip-head">
+        <span class="trip-geom">Hyperbolic · ℍ<sup>2</sup></span>
+        <span class="orb">4*3</span>
+      </div>
+      <canvas class="disk-canvas" id="cv-trip-hyp" width="320" height="320" aria-label="Hyperbolic tiling diagram for Circle Limit IV outlines, orbifold 4*3"></canvas>
+      <div class="controls">
+        <button class="ctrl" type="button" id="btn-triphyp-ov" aria-pressed="true">Square mirrors</button>
+      </div>
+      <div class="trip-foot">
+        <strong>Circle Limit IV outlines (1960)</strong> · {6,4}<br>
+        Coxeter [4<sup>+</sup>,6]: <span class="orb">4*3</span>, cost = 25/12, <i>χ</i> = -1/12. Negative curvature opens the corner to 60°.
+      </div>
+    </div>
+  </div>
+
+  <div class="table-scroll">
+    <table class="atlas">
+      <thead>
+        <tr>
+          <th class="glyph-cell">Curve</th>
+          <th>Motif family</th>
+          <th>Spherical (<i>χ</i> &gt; 0)</th>
+          <th>Euclidean (<i>χ</i> = 0)</th>
+          <th>Hyperbolic (<i>χ</i> &lt; 0)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="glyph-cell">
+            <svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true">
+              <circle cx="15" cy="15" r="9" fill="none" stroke="#1a1a1f" stroke-width="1.5"/>
+              <rect x="26" y="7" width="14" height="16" fill="none" stroke="#1e6b48" stroke-width="1.5"/>
+              <path d="M44,6 Q50,15 44,24 M58,6 Q52,15 58,24" fill="none" stroke="#0f5a8a" stroke-width="1.8"/>
+            </svg>
+          </td>
+          <td><strong>Angels &amp; Devils</strong></td>
+          <td><span class="orb">3*2</span> (Maple Ball 1942, <i>χ</i>=+1/12)</td>
+          <td><span class="orb">4*2</span> (Drawing #45, 1941, p4g)</td>
+          <td><span class="orb">4*3</span> (<em>Circle Limit IV</em> outlines, 1960)</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">
+            <svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true">
+              <circle cx="15" cy="15" r="9" fill="none" stroke="#1a1a1f" stroke-width="1.5"/>
+              <polygon points="33,6 41,22 25,22" fill="none" stroke="#1e6b48" stroke-width="1.5"/>
+              <path d="M44,6 Q50,15 44,24 M58,6 Q52,15 58,24" fill="none" stroke="#0f5a8a" stroke-width="1.8"/>
+            </svg>
+          </td>
+          <td><strong>Fish (4-colour)</strong></td>
+          <td><span class="orb">332</span> (Beechwood Sphere 1940, ord. 12)</td>
+          <td><span class="orb">442</span> (Drawing #20, 1938, p4)</td>
+          <td><span class="orb">552</span> (Dunham {5,5} 5-colour, <i>χ</i>=-1/10)</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell">
+            <svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true">
+              <circle cx="15" cy="15" r="9" fill="none" stroke="#1a1a1f" stroke-width="1.5" stroke-dasharray="2 2"/>
+              <polygon points="33,5 41,10 41,20 33,25 25,20 25,10" fill="none" stroke="#1e6b48" stroke-width="1.5"/>
+              <path d="M44,6 Q50,15 44,24 M58,6 Q52,15 58,24" fill="none" stroke="#0f5a8a" stroke-width="1.8"/>
+            </svg>
+          </td>
+          <td><strong>Butterflies</strong></td>
+          <td>— (icosahedral <span class="orb">532</span> sits on 𝕊<sup>2</sup>)</td>
+          <td><span class="orb">632</span> (Drawing #70, 1948, p6)</td>
+          <td><span class="orb">732</span> (Dunham {7,3}, <i>χ</i>=-1/42)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="beyond-escher">
+  <h2>3. Hyperbolic extensions beyond Escher (Dunham)</h2>
+  <p class="prose">
+    Beginning in the late 1970s, Douglas Dunham used hyperbolic replication algorithms to push Escher's Euclidean motifs past the cost = 2 barrier into infinitely many hyperbolic triangle families.
+  </p>
+
+  <article class="exhibit">
+    <div class="disk-wrap">
+      <canvas class="disk-canvas" id="cv-dunham" width="400" height="400" aria-label="Poincare disk showing Dunham's hyperbolic extensions 732 and 552"></canvas>
+      <div class="controls">
+        <button class="ctrl is-on" type="button" data-dunham="732" aria-pressed="true">732 Butterflies ({7,3})</button>
+        <button class="ctrl" type="button" data-dunham="552" aria-pressed="false">552 Fish ({5,5})</button>
+      </div>
+      <p class="caption-line">Switch between the Hurwitz minimal-area group <span class="orb">732</span> and 5-colour <span class="orb">552</span>.</p>
+    </div>
+    <div class="exhibit-meta">
+      <div class="exhibit-head">
+        <h3>Chiral Hyperbolic Extensions: <span class="orb">732</span> &amp; <span class="orb">552</span></h3>
+        <span class="exhibit-year">Dunham (1986–2002)</span>
+      </div>
+      <div class="stage-notes">
+        <div class="stage-note is-active" data-dun="732">
+          <strong><span class="orb">732</span> (Hurwitz group, <i>χ</i> = -1/42, cost = 85/42)</strong>: The smallest possible positive excess among all chiral hyperbolic orbifolds. Seven butterfly copies meet around each 2<i>π</i>/7 center, three at wing-junctions, and two at body midpoints. Quotienting by its index-168 Klein-quartic kernel K tiles a genus-3 surface with 168 Escher butterflies; the 7-colouring shown uses the exact Fano-plane homomorphism 732 → PSL(2,7) ⊂ S<sub>7</sub> (index-7 stabilizer <span class="orb">2223</span>).
+        </div>
+        <div class="stage-note" data-dun="552">
+          <strong><span class="orb">552</span> ([5,5]<sup>+</sup> fish, <i>χ</i> = -1/10, cost = 21/10)</strong>: Hyperbolic analogue of Escher's 4-colour Euclidean Drawing #20 (<span class="orb">442</span>). Five fish meet at both heads and tails around 5-fold gyrations, forcing a 5-colour cyclic permutation because 5 is prime.
+        </div>
+      </div>
+      <div class="facts" style="margin-top:12px;">
+        <div class="fact"><div class="fact-k">732 Kernel</div><div class="fact-v">PSL(2,7) order 168 (genus 3)</div></div>
+        <div class="fact"><div class="fact-k">552 Colouring</div><div class="fact-v">5-colour cyclic (prime 5)</div></div>
+      </div>
+    </div>
+  </article>
+</section>
+
+<section id="euclidean-spherical">
+  <h2>4. Selected spherical &amp; Euclidean Escher reference</h2>
+  <p class="prose">
+    Every Euclidean assignment below is cross-checked against EscherMath and this project's curated catalogue; colour groups follow Schattschneider, MacGillavry, and Plachinda. Note that <em>Snakes</em> (1969) has global <span class="orb">3</span> (C<sub>3</sub>) rosette symmetry on a variable-curvature ring mesh rather than a uniform hyperbolic group.
+  </p>
+
+  <div class="table-scroll">
+    <table class="atlas">
+      <thead>
+        <tr>
+          <th class="glyph-cell">Type</th>
+          <th>Escher Work</th>
+          <th>Year</th>
+          <th>Orbifold</th>
+          <th>IUC / Coxeter</th>
+          <th class="num"><i>χ</i></th>
+          <th>Colouring / Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><circle cx="30" cy="15" r="10" fill="none" stroke="#1a1a1f" stroke-width="1.6"/><ellipse cx="30" cy="15" rx="10" ry="4" fill="none" stroke="#52514a" stroke-width="1"/></svg></td>
+          <td><strong>Beechwood Sphere with Fish</strong></td>
+          <td>1940</td>
+          <td><span class="orb">332</span></td>
+          <td>[3,3]<sup>+</sup> (tetrahedral)</td>
+          <td class="num">+1/6</td>
+          <td>Order 12 chiral sphere</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><circle cx="30" cy="15" r="10" fill="none" stroke="#1a1a1f" stroke-width="1.6"/><line x1="20" y1="15" x2="40" y2="15" stroke="#0f5a8a" stroke-width="1.3"/><line x1="30" y1="5" x2="30" y2="25" stroke="#0f5a8a" stroke-width="1.3"/></svg></td>
+          <td><strong>Maple Ball (Angels &amp; Devils)</strong></td>
+          <td>1942</td>
+          <td><span class="orb">3*2</span> / <span class="orb">*22</span></td>
+          <td>[3<sup>+</sup>,4] / D<sub>2</sub></td>
+          <td class="num">+1/12</td>
+          <td>24 domains uniform; carved depth drops to D<sub>2</sub></td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><circle cx="30" cy="15" r="10" fill="none" stroke="#9c5b10" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="30" cy="15" r="3" fill="#9c5b10"/></svg></td>
+          <td><strong>Snakes</strong> (woodcut)</td>
+          <td>1969</td>
+          <td><span class="orb">3</span> (C<sub>3</sub>)</td>
+          <td>Finite cyclic</td>
+          <td class="num">—</td>
+          <td>Non-constant curvature rings, 3-fold center</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><polygon points="18,22 25,8 42,8 35,22" fill="none" stroke="#1e6b48" stroke-width="1.5"/></svg></td>
+          <td><strong>#105 Pegasus</strong></td>
+          <td>1959</td>
+          <td><span class="orb">o</span></td>
+          <td>p1</td>
+          <td class="num">0</td>
+          <td>Pure translations, 2-colour alternating</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><line x1="12" y1="10" x2="48" y2="10" stroke="#1e6b48" stroke-width="1.5" stroke-dasharray="4 3"/><line x1="12" y1="20" x2="48" y2="20" stroke="#1e6b48" stroke-width="1.5" stroke-dasharray="4 3"/></svg></td>
+          <td><strong>#67 Horsemen</strong></td>
+          <td>1946</td>
+          <td><span class="orb">××</span></td>
+          <td>pg</td>
+          <td class="num">0</td>
+          <td>Parallel glides, 2 colours</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><line x1="14" y1="15" x2="46" y2="15" stroke="#1e6b48" stroke-width="1.4" stroke-dasharray="4 3"/><circle cx="23" cy="9" r="2.2" fill="#1e6b48"/><circle cx="37" cy="21" r="2.2" fill="#1e6b48"/></svg></td>
+          <td><strong>#124 Lizard</strong></td>
+          <td>1965</td>
+          <td><span class="orb">22×</span></td>
+          <td>pgg</td>
+          <td class="num">0</td>
+          <td>2-colour p2'g'g, kernel <span class="orb">××</span> (pg)</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><rect x="20" y="5" width="20" height="20" fill="none" stroke="#1e6b48" stroke-width="1.5"/><rect x="27" y="12" width="6" height="6" fill="#1e6b48"/></svg></td>
+          <td><strong>#20 Fish</strong></td>
+          <td>1938</td>
+          <td><span class="orb">442</span></td>
+          <td>p4</td>
+          <td class="num">0</td>
+          <td>4 colours meeting 3 at mouths</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><rect x="18" y="4" width="24" height="22" fill="none" stroke="#1e6b48" stroke-width="1.5"/><line x1="18" y1="15" x2="42" y2="15" stroke="#0f5a8a" stroke-width="1.3"/><rect x="28" y="8" width="4" height="4" fill="#1e6b48"/></svg></td>
+          <td><strong>#45 Angels &amp; Devils</strong></td>
+          <td>1941</td>
+          <td><span class="orb">4*2</span></td>
+          <td>p4g</td>
+          <td class="num">0</td>
+          <td>2 distinct motifs; trivial colour group H = Γ</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><polygon points="30,4 40,10 40,20 30,26 20,20 20,10" fill="none" stroke="#1e6b48" stroke-width="1.5"/><circle cx="30" cy="15" r="2.5" fill="#1e6b48"/></svg></td>
+          <td><strong>#70 Butterfly</strong></td>
+          <td>1948</td>
+          <td><span class="orb">632</span></td>
+          <td>p6</td>
+          <td class="num">0</td>
+          <td>3 colours (EscherMath &amp; Schattschneider)</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><polygon points="30,4 40,10 40,20 30,26 20,20 20,10" fill="none" stroke="#0f5a8a" stroke-width="1.5"/><circle cx="30" cy="15" r="2.5" fill="#0f5a8a"/></svg></td>
+          <td><strong>#57 Two Fish</strong></td>
+          <td>1942</td>
+          <td><span class="orb">632</span></td>
+          <td>p6</td>
+          <td class="num">0</td>
+          <td>2-colour kernel <span class="orb">333</span> (p3, index 2)</td>
+        </tr>
+        <tr>
+          <td class="glyph-cell"><svg class="glyph-svg" viewBox="0 0 60 30" aria-hidden="true"><polygon points="30,5 42,24 18,24" fill="none" stroke="#0f5a8a" stroke-width="1.8"/></svg></td>
+          <td><strong>#85 Lizard / Fish / Bat</strong></td>
+          <td>1952</td>
+          <td><span class="orb">*333</span></td>
+          <td>p3m1</td>
+          <td class="num">0</td>
+          <td>3 colours; 3 mirror axes at 60°</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="rights">
+  <h2>5. Rights &amp; sources</h2>
+  <p class="prose">
+    <strong>About the diagrams.</strong> M. C. Escher's works are in copyright; The M.C. Escher Company B.V. (<a href="https://mcescher.com/gallery/symmetry/" target="_blank" rel="noopener">mcescher.com</a>) reserves all rights. This page reproduces no Escher artwork: every canvas is an original mathematical diagram generated directly from the Minkowski hyperboloid, spherical, and Euclidean symmetry generators.
+  </p>
+
+  <details class="sources">
+    <summary>References &amp; mathematical attributions</summary>
+    <ul>
+      <li>J. H. Conway, H. Burgiel, C. Goodman-Strauss, <em>The Symmetries of Things</em> (A K Peters, 2008) — orbifold signature calculus, Magic Theorem, and Ch. 17 hyperbolic analysis.</li>
+      <li>H. S. M. Coxeter, "Crystal Symmetry and its Generalizations," <em>Trans. Royal Soc. Canada</em> 51 (1957), Fig. 7 — the {6,4} triangle tessellation that inspired Escher.</li>
+      <li>H. S. M. Coxeter, "The Non-Euclidean Symmetry of Escher's Picture 'Circle Limit III'," <em>Leonardo</em> 12 (1979) 19–25 — exact 79.97° backbone angle and index-12 colour-preserving subgroup.</li>
+      <li>H. S. M. Coxeter, "Angels and Devils," in <em>The Mathematical Gardner</em> (1981) 197–209.</li>
+      <li>D. Dunham, "Artistic Patterns in Hyperbolic Geometry" (<em>Bridges</em> 1999), "More 'Circle Limit III' Patterns" (<em>Bridges</em> 2006), "A 'Circle Limit III' Backbone Arc Formula" (<em>Bridges</em> 2008), "The Symmetry of 'Circle Limit IV' and Related Patterns" (<em>Bridges</em> 2009), and "Creating Repeating Patterns with Color Symmetry" (<em>ISAMA</em> 2010).</li>
+      <li>D. Schattschneider, <em>M.C. Escher: Visions of Symmetry</em> (2nd ed., Abrams, 2004); EscherMath (Saint Louis University) and C. MacGillavry, <em>Symmetry Aspects of M.C. Escher's Periodic Drawings</em>.</li>
+    </ul>
+  </details>
+</section>
+
+<footer class="page-foot">
+  <span><a href="escher.html">← 107 Escher regular divisions catalogue</a></span>
+  <span>Original interactive diagrams via Minkowski hyperboloid ℍ<sup>2</sup>, 𝕊<sup>2</sup>, and 𝔼<sup>2</sup> engines.</span>
+  <span><a href="https://github.com/yaroslavvb/animated-groups-fable">source</a> · Spacetime Groups</span>
+</footer>
+
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  // ------------------------------------------------------------------
+  // 1. Exact Minkowski Hyperboloid Geometry Engine
+  //    Signature (+, +, -): H^2 = {x^2 + y^2 - t^2 = -1, t > 0}
+  // ------------------------------------------------------------------
+  const mdot = (u, v) => u[0] * v[0] + u[1] * v[1] - u[2] * v[2];
+  const mcross = (u, v) => [
+    u[1] * v[2] - u[2] * v[1],
+    u[2] * v[0] - u[0] * v[2],
+    -(u[0] * v[1] - u[1] * v[0])
+  ];
+  const normTime = (v) => {
+    const d = mdot(v, v);
+    if (d >= -1e-15) return [0, 0, 1];
+    let s = Math.sqrt(-d);
+    if (v[2] < 0) s = -s;
+    return [v[0] / s, v[1] / s, v[2] / s];
+  };
+  const poincare = (v) => [v[0] / (1 + v[2]), v[1] / (1 + v[2])];
+  const liftDisk = (u, v) => {
+    const r2 = u * u + v * v;
+    const denom = Math.max(1e-7, 1 - r2);
+    return [(2 * u) / denom, (2 * v) / denom, (1 + r2) / denom];
+  };
+  const reflMatrix = (n) => {
+    const s = [1, 1, -1];
+    const M = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        M[i][j] = (i === j ? 1 : 0) - 2 * n[i] * n[j] * s[j];
+      }
+    }
+    return M;
+  };
+  const mul3 = (A, B) => {
+    const C = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        C[i][j] = A[i][0] * B[0][j] + A[i][1] * B[1][j] + A[i][2] * B[2][j];
+      }
+    }
+    return C;
+  };
+  const apply3 = (M, v) => [
+    M[0][0] * v[0] + M[0][1] * v[1] + M[0][2] * v[2],
+    M[1][0] * v[0] + M[1][1] * v[1] + M[1][2] * v[2],
+    M[2][0] * v[0] + M[2][1] * v[1] + M[2][2] * v[2]
+  ];
+  const ID3 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+
+  function rotMatrix(theta) {
+    const c = Math.cos(theta), s = Math.sin(theta);
+    return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+  }
+
+  function hypTriangle(p, q, r) {
+    const n0 = [0, 1, 0];
+    const n1 = [Math.sin(Math.PI / p), -Math.cos(Math.PI / p), 0];
+    const b = -Math.cos(Math.PI / r);
+    const a = (-Math.cos(Math.PI / q) - Math.cos(Math.PI / r) * Math.cos(Math.PI / p)) / Math.sin(Math.PI / p);
+    const c = Math.sqrt(Math.max(0, a * a + b * b - 1));
+    const n2 = [a, b, c];
+    const V2 = [0, 0, 1];
+    const V1 = normTime(mcross(n0, n2));
+    const V0 = normTime(mcross(n1, n2));
+    return {
+      n0, n1, n2,
+      V0, V1, V2,
+      R0: reflMatrix(n0),
+      R1: reflMatrix(n1),
+      R2: reflMatrix(n2)
+    };
+  }
+
+  function baryH(verts, weights) {
+    let x = 0, y = 0, t = 0;
+    for (let i = 0; i < verts.length; i++) {
+      x += weights[i] * verts[i][0];
+      y += weights[i] * verts[i][1];
+      t += weights[i] * verts[i][2];
+    }
+    return normTime([x, y, t]);
+  }
+
+  function geodesicSamples(u, w, steps = 5) {
+    const out = [];
+    for (let s = 0; s <= steps; s++) {
+      const f = s / steps;
+      const pt = normTime([
+        (1 - f) * u[0] + f * w[0],
+        (1 - f) * u[1] + f * w[1],
+        (1 - f) * u[2] + f * w[2]
+      ]);
+      out.push(poincare(pt));
+    }
+    return out;
+  }
+
+  function bfsTiles(gens, centH, initState, maxTiles = 1200, rMax = 0.986) {
+    const keyOf = (M) => {
+      const p = poincare(apply3(M, centH));
+      return `${Math.round(p[0] * 1800)},${Math.round(p[1] * 1800)}`;
+    };
+    const seen = new Set([keyOf(ID3)]);
+    const tiles = [];
+    // Min-heap ordered by Poincare radius so outer rings expand symmetrically to the boundary
+    const heap = [{ M: ID3, state: initState, depth: 0, r: 0 }];
+    const push = (item) => {
+      heap.push(item);
+      let i = heap.length - 1;
+      while (i > 0) {
+        const p = (i - 1) >> 1;
+        if (heap[p].r <= heap[i].r) break;
+        const tmp = heap[p]; heap[p] = heap[i]; heap[i] = tmp;
+        i = p;
+      }
+    };
+    const pop = () => {
+      const top = heap[0], last = heap.pop();
+      if (heap.length > 0) {
+        heap[0] = last;
+        let i = 0;
+        while (true) {
+          let m = i, l = 2 * i + 1, r = 2 * i + 2;
+          if (l < heap.length && heap[l].r < heap[m].r) m = l;
+          if (r < heap.length && heap[r].r < heap[m].r) m = r;
+          if (m === i) break;
+          const tmp = heap[i]; heap[i] = heap[m]; heap[m] = tmp;
+          i = m;
+        }
+      }
+      return top;
+    };
+    while (heap.length > 0 && tiles.length < maxTiles) {
+      const cur = pop();
+      tiles.push(cur);
+      for (const g of gens) {
+        const M2 = mul3(cur.M, g.M);
+        const pc = poincare(apply3(M2, centH));
+        const rad = Math.hypot(pc[0], pc[1]);
+        if (rad > rMax) continue;
+        const k = keyOf(M2);
+        if (!seen.has(k)) {
+          seen.add(k);
+          push({
+            M: M2,
+            state: g.step(cur.state),
+            depth: cur.depth + 1,
+            r: rad
+          });
+        }
+      }
+    }
+    return tiles;
+  }
+
+  // Canvas helper with crisp DPR scaling
+  function prepCanvas(canvas) {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const css = canvas.clientWidth || canvas.width;
+    const px = Math.round(css * dpr);
+    if (canvas.width !== px || canvas.height !== px) {
+      canvas.width = px;
+      canvas.height = px;
+    }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { ctx, size: css };
+  }
+
+  function setupDisk(ctx, size, bg = "#f6f5f1") {
+    const cx = size / 2, cy = size / 2, R = size * 0.48;
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = bg;
+    ctx.fill();
+    ctx.clip();
+    const toPx = (p) => [cx + p[0] * R, cy - p[1] * R];
+    const drawPoly = (ptsDisk) => {
+      ctx.beginPath();
+      for (let i = 0; i < ptsDisk.length; i++) {
+        const [x, y] = toPx(ptsDisk[i]);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    };
+    const drawChain = (ptsDisk, close = false) => {
+      ctx.beginPath();
+      for (let i = 0; i < ptsDisk.length; i++) {
+        const [x, y] = toPx(ptsDisk[i]);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      if (close) ctx.closePath();
+    };
+    return { cx, cy, R, toPx, drawPoly, drawChain, finish: () => {
+      ctx.restore();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.strokeStyle = "#1a1a1f";
+      ctx.lineWidth = 1.6;
+      ctx.stroke();
+    }};
+  }
+
+  function drawStarMarker(ctx, x, y, n, color, r = 5) {
+    ctx.save();
+    ctx.fillStyle = color;
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    if (n === 2) {
+      ctx.rect(x - r * 0.75, y - r * 0.75, r * 1.5, r * 1.5);
+    } else {
+      for (let i = 0; i < n; i++) {
+        const a = -Math.PI / 2 + (i * 2 * Math.PI) / n;
+        const px = x + r * Math.cos(a), py = y + r * Math.sin(a);
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // 2. Renderers for Exhibits 1A - 1E
+  // ------------------------------------------------------------------
+  const state = {
+    coxeter: { overlay: true, chiral: false },
+    cl1: { overlay: true },
+    cl2: { overlay: true, kernel: false },
+    cl3: { overlay: true, onecol: false, geod: false },
+    cl4: { mode: "4*3" },
+    sphere: { spin: true, carved: false, yaw: 0.45, pitch: 0.35 },
+    euclid: { overlay: true },
+    tripHyp: { overlay: true },
+    dunham: { mode: "732" }
+  };
+
+  // Precompute tile sets lazily once per group
+  const cache = {};
+
+  function getCoxeterData() {
+    if (cache.coxeter) return cache.coxeter;
+    const T = hypTriangle(6, 4, 2);
+    const cent = baryH([T.V0, T.V1, T.V2], [1, 1, 1]);
+    const tiles = bfsTiles(
+      [
+        { M: T.R0, step: (s) => s ^ 1 },
+        { M: T.R1, step: (s) => s ^ 1 },
+        { M: T.R2, step: (s) => s ^ 1 }
+      ],
+      cent, 0, 1450, 0.985
+    );
+    return (cache.coxeter = { T, tiles });
+  }
+
+  function renderCoxeter() {
+    const cv = document.getElementById("cv-coxeter");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#eef0f3");
+    const { T, tiles } = getCoxeterData();
+    const { overlay, chiral } = state.coxeter;
+
+    for (const tile of tiles) {
+      const p0 = apply3(tile.M, T.V0);
+      const p1 = apply3(tile.M, T.V1);
+      const p2 = apply3(tile.M, T.V2);
+      const pts = [
+        ...geodesicSamples(p2, p0, 3),
+        ...geodesicSamples(p0, p1, 3).slice(1),
+        ...geodesicSamples(p1, p2, 3).slice(1, -1)
+      ];
+      disk.drawPoly(pts);
+      if (chiral) {
+        ctx.fillStyle = tile.state === 0 ? "#0f5a8a" : "#eceae3";
+      } else {
+        ctx.fillStyle = tile.state === 0 ? "#243b55" : "#f5f3ec";
+      }
+      ctx.fill();
+      ctx.strokeStyle = "rgba(26,26,31,0.22)";
+      ctx.lineWidth = 0.6;
+      ctx.stroke();
+    }
+
+    if (overlay) {
+      // Draw {6,4} hexagon edges (p0-p1) prominently
+      ctx.strokeStyle = "rgba(156,91,16,0.75)";
+      ctx.lineWidth = 1.25;
+      for (const tile of tiles) {
+        if (tile.state !== 0) continue;
+        const p0 = apply3(tile.M, T.V0);
+        const p1 = apply3(tile.M, T.V1);
+        disk.drawChain(geodesicSamples(p0, p1, 4), false);
+        ctx.stroke();
+      }
+      // Highlight central fundamental triangle
+      const pts0 = [
+        ...geodesicSamples(T.V2, T.V0, 5),
+        ...geodesicSamples(T.V0, T.V1, 5).slice(1),
+        ...geodesicSamples(T.V1, T.V2, 5).slice(1, -1)
+      ];
+      disk.drawPoly(pts0);
+      ctx.fillStyle = "rgba(224, 145, 60, 0.45)";
+      ctx.fill();
+      ctx.strokeStyle = "#9c5b10";
+      ctx.lineWidth = 2.2;
+      ctx.stroke();
+
+      const c2 = disk.toPx(poincare(T.V2));
+      const c0 = disk.toPx(poincare(T.V0));
+      const c1 = disk.toPx(poincare(T.V1));
+      drawStarMarker(ctx, c2[0], c2[1], 6, "#9c5b10", 6);
+      drawStarMarker(ctx, c0[0], c0[1], 4, "#0f5a8a", 5);
+      drawStarMarker(ctx, c1[0], c1[1], 2, "#1e6b48", 5);
+    }
+    disk.finish();
+  }
+
+  // 1B. Circle Limit I (2*32)
+  function getCl1Data() {
+    if (cache.cl1) return cache.cl1;
+    const T = hypTriangle(4, 6, 2);
+    // Rotate 45 deg so orthogonal backbone mirrors at center are horizontal & vertical!
+    const Rrot = rotMatrix(Math.PI / 4);
+    const cent = baryH([T.V0, T.V1, T.V2], [1, 1, 1]);
+    // Coset flips on R0 (V2-V1) and R2 (V0-V1), preserved on R1 (V2-V0 backbone mirror)
+    const tiles = bfsTiles(
+      [
+        { M: T.R0, step: (s) => s ^ 1 },
+        { M: T.R1, step: (s) => s },
+        { M: T.R2, step: (s) => s ^ 1 }
+      ],
+      cent, 0, 1450, 0.985
+    );
+    // Interlocking half-fish curve points in H^2 on edges V2-V1 and V0-V1
+    const A1 = baryH([T.V2, T.V0, T.V1], [0.68, -0.08, 0.40]); // tail fluke notch out
+    const A2 = baryH([T.V2, T.V0, T.V1], [0.35, 0.14, 0.51]);  // narrow waist
+    const B1 = baryH([T.V2, T.V0, T.V1], [-0.05, 0.44, 0.61]); // dorsal sweep
+    const B2 = baryH([T.V2, T.V0, T.V1], [0.10, 0.72, 0.18]);  // gill / head flare
+    const eye0 = baryH([T.V2, T.V0, T.V1], [0.06, 0.80, 0.14]);
+    const eye1 = baryH([T.V2, T.V0, T.V1], [0.80, 0.08, 0.12]);
+    return (cache.cl1 = { T, Rrot, tiles, A1, A2, B1, B2, eye0, eye1 });
+  }
+
+  function renderCl1() {
+    const cv = document.getElementById("cv-cl1");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#e8e4da");
+    const { T, Rrot, tiles, A1, A2, B1, B2, eye0, eye1 } = getCl1Data();
+    const { overlay } = state.cl1;
+
+    // Pre-apply Rrot to edge points for coset 0 and coset 1
+    const edgeA0 = [T.V2, A1, A2, T.V1];
+    const edgeB0 = [T.V1, B1, B2, T.V0];
+    const edgeA1 = edgeA0.map((v) => apply3(T.R0, v));
+    const edgeB1 = edgeB0.map((v) => apply3(T.R2, v));
+
+    for (const tile of tiles) {
+      const M = mul3(Rrot, tile.M);
+      const isDark = tile.state === 0;
+      const eA = isDark ? edgeA0 : edgeA1;
+      const eB = isDark ? edgeB0 : edgeB1;
+      const chain = [
+        ...geodesicSamples(apply3(M, T.V2), apply3(M, eA[1]), 2),
+        ...geodesicSamples(apply3(M, eA[1]), apply3(M, eA[2]), 2).slice(1),
+        ...geodesicSamples(apply3(M, eA[2]), apply3(M, T.V1), 2).slice(1),
+        ...geodesicSamples(apply3(M, T.V1), apply3(M, eB[1]), 2).slice(1),
+        ...geodesicSamples(apply3(M, eB[1]), apply3(M, eB[2]), 2).slice(1),
+        ...geodesicSamples(apply3(M, eB[2]), apply3(M, T.V0), 2).slice(1),
+        ...geodesicSamples(apply3(M, T.V0), apply3(M, T.V2), 3).slice(1, -1)
+      ];
+      disk.drawPoly(chain);
+      ctx.fillStyle = isDark ? "#232a36" : "#f4f1e8";
+      ctx.fill();
+      ctx.strokeStyle = "#1a1a1f";
+      ctx.lineWidth = 0.7;
+      ctx.stroke();
+
+      // Spine line along V2-V0
+      disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, T.V0), 3), false);
+      ctx.strokeStyle = isDark ? "rgba(244,241,232,0.72)" : "rgba(35,42,54,0.45)";
+      ctx.lineWidth = 1.05;
+      ctx.stroke();
+
+      // Subtle eye
+      const ep = poincare(apply3(M, isDark ? eye0 : eye1));
+      if (Math.hypot(ep[0], ep[1]) < 0.88) {
+        const [ex, ey] = disk.toPx(ep);
+        ctx.beginPath();
+        ctx.arc(ex, ey, Math.max(1.2, size * 0.008 * (1 - Math.hypot(ep[0], ep[1]))), 0, Math.PI * 2);
+        ctx.fillStyle = isDark ? "#f4f1e8" : "#232a36";
+        ctx.fill();
+      }
+    }
+
+    if (overlay) {
+      // Draw backbone mirrors (V2-V0) in cobalt and highlight 1 domain (T U R0(T))
+      ctx.strokeStyle = "rgba(15, 90, 138, 0.78)";
+      ctx.lineWidth = 1.6;
+      for (const tile of tiles) {
+        if (tile.depth > 28) continue;
+        const M = mul3(Rrot, tile.M);
+        disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, T.V0), 3), false);
+        ctx.stroke();
+      }
+      // Markers on central tile
+      const c2 = disk.toPx(poincare(apply3(Rrot, T.V2)));
+      const c0 = disk.toPx(poincare(apply3(Rrot, T.V0)));
+      const c1 = disk.toPx(poincare(apply3(Rrot, T.V1)));
+      drawStarMarker(ctx, c2[0], c2[1], 2, "#0f5a8a", 6);
+      drawStarMarker(ctx, c0[0], c0[1], 3, "#9c5b10", 6);
+      drawStarMarker(ctx, c1[0], c1[1], 4, "#1e6b48", 5);
+    }
+    disk.finish();
+  }
+
+  // 1C. Circle Limit II (3*4 -> *444)
+  function getCl2Data() {
+    if (cache.cl2) return cache.cl2;
+    const T = hypTriangle(8, 3, 2);
+    const V1p = apply3(T.R1, T.V1);
+    const cent = baryH([T.V2, T.V1, T.V0, V1p], [1, 1, 1, 1]);
+    const m0 = T.R0;
+    const m1 = mul3(T.R1, mul3(T.R0, T.R1));
+    const R3 = mul3(T.R1, T.R2);
+    const R3i = mul3(T.R2, T.R1);
+    const tiles = bfsTiles(
+      [
+        { M: m0, step: (s) => s },
+        { M: m1, step: (s) => s },
+        { M: R3, step: (s) => (s + 1) % 3 },
+        { M: R3i, step: (s) => (s + 2) % 3 }
+      ],
+      cent, 0, 1200, 0.985
+    );
+    // Stylized cross half-sector inside quad (V2, V1, V0, V1p):
+    // Thick cross arm runs along V2-V1 (mirror m0), flaring into a diamond/beak at V1 and tapering along V0-V1p
+    const armTip = baryH([T.V2, T.V1, T.V0, V1p], [0.04, 0.90, 0.06, 0.0]);
+    const armShoulder = baryH([T.V2, T.V1, T.V0, V1p], [0.22, 0.56, 0.22, 0.0]);
+    const waist = baryH([T.V2, T.V1, T.V0, V1p], [0.46, 0.24, 0.16, 0.14]);
+    const armpit = baryH([T.V2, T.V1, T.V0, V1p], [0.42, 0.0, 0.10, 0.48]);
+    return (cache.cl2 = { T, V1p, tiles, armTip, armShoulder, waist, armpit });
+  }
+
+  function renderCl2() {
+    const cv = document.getElementById("cv-cl2");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#e6e2d8");
+    const { T, V1p, tiles, armTip, armShoulder, waist, armpit } = getCl2Data();
+    const { overlay, kernel } = state.cl2;
+    const COLS = ["#b5352b", "#f4f0e4", "#262c36"];
+
+    for (const tile of tiles) {
+      const M = tile.M;
+      const q = [
+        ...geodesicSamples(apply3(M, T.V2), apply3(M, T.V1), 3),
+        ...geodesicSamples(apply3(M, T.V1), apply3(M, T.V0), 3).slice(1),
+        ...geodesicSamples(apply3(M, T.V0), apply3(M, V1p), 3).slice(1),
+        ...geodesicSamples(apply3(M, V1p), apply3(M, T.V2), 3).slice(1, -1)
+      ];
+      disk.drawPoly(q);
+      ctx.fillStyle = COLS[tile.state];
+      ctx.fill();
+      ctx.strokeStyle = "rgba(26,26,31,0.16)";
+      ctx.lineWidth = 0.5;
+      ctx.stroke();
+
+      // Inner stylized cross-bone chevron silhouette inside the quad
+      const bone = [
+        ...geodesicSamples(apply3(M, T.V2), apply3(M, armTip), 3),
+        ...geodesicSamples(apply3(M, armTip), apply3(M, armShoulder), 2).slice(1),
+        ...geodesicSamples(apply3(M, armShoulder), apply3(M, waist), 2).slice(1),
+        ...geodesicSamples(apply3(M, waist), apply3(M, armpit), 2).slice(1),
+        ...geodesicSamples(apply3(M, armpit), apply3(M, T.V2), 3).slice(1, -1)
+      ];
+      disk.drawPoly(bone);
+      ctx.fillStyle = tile.state === 1 ? "rgba(38,44,54,0.10)" : "rgba(255,255,255,0.14)";
+      ctx.fill();
+
+      // Stronger border on colour boundaries (V0-V1 and V0-V1p)
+      ctx.strokeStyle = "#1a1a1f";
+      ctx.lineWidth = 0.8;
+      disk.drawChain([
+        ...geodesicSamples(apply3(M, T.V1), apply3(M, T.V0), 3),
+        ...geodesicSamples(apply3(M, T.V0), apply3(M, V1p), 3).slice(1)
+      ], false);
+      ctx.stroke();
+    }
+
+    if (kernel) {
+      // Draw equilateral *444 colour-preserving mirror triangle: vertices are 3 adjacent *4 cross centers of colour 0?
+      // Actually in *444, the three mirrors are m0, m1, and R3^-1 * m0 * R3! Their corners are V2, R3(V2)? Wait:
+      // Wait: m0 passes through V2 and V1; m1 passes through V2 and V1'; and m2 = R3^-1 * m0 * R3 passes through R3^-1(V2) and V1!
+      // Check: V1 is on m0 AND on m2? Wait: R3 maps V1 -> V1', so R3^-1 maps V1' -> V1; thus m2 = R3^-1 * m1 * R3 passes through V1!
+      // Wait: R3(V2) = V2_neighbor1, R3^-1(V2) = V2_neighbor2! Let's highlight the *444 triangle bounded by the 3 *4 centers around V0?
+      // Check: around V0, three *4 centers sit at 120 deg: V2, R3(V2), R3^-1(V2)!
+      // Their edges V2-R3(V2), R3(V2)-R3^-1(V2), R3^-1(V2)-V2 are mirror lines of *444 meeting at 45 deg at each *4 center!!
+      // Wait: verify V2 - R3(V2) lies on mirror m1 (V2-V1')! YES: V1' is midpoint between V2 and R3(V2), and V2-V1' IS mirror m1!!
+      const A = T.V2;
+      const B = apply3(mul3(T.R1, T.R2), T.V2);
+      const C = apply3(mul3(T.R2, T.R1), T.V2);
+      const tri444 = [
+        ...geodesicSamples(A, B, 5),
+        ...geodesicSamples(B, C, 5).slice(1),
+        ...geodesicSamples(C, A, 5).slice(1, -1)
+      ];
+      disk.drawPoly(tri444);
+      ctx.fillStyle = "rgba(255, 220, 90, 0.34)";
+      ctx.fill();
+      ctx.strokeStyle = "#9c5b10";
+      ctx.lineWidth = 2.4;
+      ctx.stroke();
+    }
+
+    if (overlay) {
+      ctx.strokeStyle = "rgba(15, 90, 138, 0.72)";
+      ctx.lineWidth = 1.2;
+      for (const tile of tiles) {
+        if (tile.depth > 18) continue;
+        const M = tile.M;
+        disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, T.V1), 3), false);
+        ctx.stroke();
+        disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, V1p), 3), false);
+        ctx.stroke();
+      }
+      const c2 = disk.toPx(poincare(T.V2));
+      const c0 = disk.toPx(poincare(T.V0));
+      drawStarMarker(ctx, c2[0], c2[1], 4, "#0f5a8a", 6);
+      drawStarMarker(ctx, c0[0], c0[1], 3, "#9c5b10", 6);
+    }
+    disk.finish();
+  }
+
+  // 1D. Circle Limit III (433 -> A_4 -> 3322 -> 222222)
+  function getCl3Data() {
+    if (cache.cl3) return cache.cl3;
+    const T = hypTriangle(4, 3, 3);
+    const tail = apply3(T.R0, T.V0);
+    const R_fin = T.V2, N = T.V0, L_fin = T.V1;
+    const cent = baryH([R_fin, N, L_fin, tail], [1, 1, 1, 1]);
+    const ga = mul3(T.R1, T.R0);
+    const gai = mul3(T.R0, T.R1);
+    const gb = mul3(T.R0, T.R2);
+    const gbi = mul3(T.R2, T.R0);
+    const pa = [1, 0, 3, 2];
+    const pb = [0, 2, 3, 1];
+    const pbi = [0, 3, 1, 2];
+    const tiles = bfsTiles(
+      [
+        { M: ga, step: (c) => pa[c] },
+        { M: gai, step: (c) => pa[c] },
+        { M: gb, step: (c) => pb[c] },
+        { M: gbi, step: (c) => pbi[c] }
+      ],
+      cent, 1, 1150, 0.985
+    );
+
+    // Compute exact white hypercycle backbone arc in kite K=(R_fin, N, L_fin, tail):
+    // In Poincare disk, R_fin=(0,0), N=(pNx, pNy), L_fin=(pLx, 0), tail=(pNx, -pNy).
+    const pN = poincare(N), pL = poincare(L_fin);
+    const C2 = [T.n2[0] / T.n2[2], T.n2[1] / T.n2[2]];
+    const r2 = 1.0 / T.n2[2];
+    const tRN = [-pN[0] / Math.hypot(pN[0], pN[1]), -pN[1] / Math.hypot(pN[0], pN[1])];
+    const radN = [(pN[0] - C2[0]) / r2, (pN[1] - C2[1]) / r2];
+    const t1 = [-radN[1], radN[0]], t2 = [radN[1], -radN[0]];
+    const dNL = [pL[0] - pN[0], pL[1] - pN[1]];
+    const tNL = (t1[0] * dNL[0] + t1[1] * dNL[1] > 0) ? t1 : t2;
+    const bisX = tRN[0] + tNL[0], bisY = tRN[1] + tNL[1];
+    const xc = pN[0] + (pN[1] * bisY) / bisX;
+    const rb = Math.hypot(pN[0] - xc, pN[1]);
+    const angN = Math.atan2(pN[1], pN[0] - xc);
+    const angT = Math.atan2(-pN[1], pN[0] - xc);
+
+    // Sample hypercycle backbone arc from tail to nose N in H^2
+    const backboneH = [];
+    for (let i = 0; i <= 8; i++) {
+      const th = angT + (angN - angT) * (i / 8);
+      backboneH.push(liftDisk(xc + rb * Math.cos(th), rb * Math.sin(th)));
+    }
+    // Also define smooth fish contour inside kite K in H^2
+    const rShoulder = baryH([R_fin, N, L_fin, tail], [0.30, 0.56, 0.14, 0]);
+    const rFlank = baryH([R_fin, N, L_fin, tail], [0.44, 0.10, 0.16, 0.30]);
+    const lBelly = baryH([R_fin, N, L_fin, tail], [0.05, 0.15, 0.50, 0.30]);
+    const lNeck = baryH([R_fin, N, L_fin, tail], [0.04, 0.42, 0.54, 0.0]);
+    const eyeH = baryH([R_fin, N, L_fin, tail], [0.10, 0.72, 0.18, 0.0]);
+    return (cache.cl3 = {
+      T, R_fin, N, L_fin, tail, tiles, backboneH,
+      rShoulder, rFlank, lBelly, lNeck, eyeH
+    });
+  }
+
+  function renderCl3() {
+    const cv = document.getElementById("cv-cl3");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#1d222b");
+    const { R_fin, N, L_fin, tail, tiles, backboneH, rShoulder, rFlank, lBelly, lNeck, eyeH } = getCl3Data();
+    const { overlay, onecol, geod } = state.cl3;
+    // Colourblind-friendly warm Escher palette (Ochre, Blue, Green, Terracotta)
+    const COLS = ["#d89d2b", "#2a699a", "#2b825b", "#c04938"];
+
+    for (const tile of tiles) {
+      const M = tile.M;
+      const pts = [
+        ...geodesicSamples(apply3(M, tail), apply3(M, rFlank), 2),
+        ...geodesicSamples(apply3(M, rFlank), apply3(M, R_fin), 2).slice(1),
+        ...geodesicSamples(apply3(M, R_fin), apply3(M, rShoulder), 2).slice(1),
+        ...geodesicSamples(apply3(M, rShoulder), apply3(M, N), 2).slice(1),
+        ...geodesicSamples(apply3(M, N), apply3(M, lNeck), 2).slice(1),
+        ...geodesicSamples(apply3(M, lNeck), apply3(M, L_fin), 2).slice(1),
+        ...geodesicSamples(apply3(M, L_fin), apply3(M, lBelly), 2).slice(1),
+        ...geodesicSamples(apply3(M, lBelly), apply3(M, tail), 2).slice(1, -1)
+      ];
+      disk.drawPoly(pts);
+      const active = !onecol || tile.state === 1;
+      ctx.fillStyle = active ? COLS[tile.state] : "#d9d8d3";
+      ctx.fill();
+      ctx.strokeStyle = "#181c22";
+      ctx.lineWidth = active ? 0.9 : 0.45;
+      ctx.stroke();
+
+      // White hypercycle backbone curve
+      const bPts = backboneH.map((p) => poincare(apply3(M, p)));
+      disk.drawChain(bPts, false);
+      ctx.strokeStyle = active ? "#ffffff" : "rgba(255,255,255,0.55)";
+      ctx.lineWidth = active ? 1.8 : 0.9;
+      ctx.stroke();
+
+      if (geod) {
+        disk.drawChain(geodesicSamples(apply3(M, tail), apply3(M, N), 4), false);
+        ctx.strokeStyle = "rgba(15, 90, 138, 0.72)";
+        ctx.lineWidth = 1.0;
+        ctx.stroke();
+      }
+
+      const ep = poincare(apply3(M, eyeH));
+      if (Math.hypot(ep[0], ep[1]) < 0.87) {
+        const [ex, ey] = disk.toPx(ep);
+        ctx.beginPath();
+        ctx.arc(ex, ey, Math.max(1.0, size * 0.007 * (1 - Math.hypot(ep[0], ep[1]))), 0, Math.PI * 2);
+        ctx.fillStyle = "#181c22";
+        ctx.fill();
+      }
+    }
+
+    if (overlay) {
+      const cR = disk.toPx(poincare(R_fin));
+      const cN = disk.toPx(poincare(N));
+      const cL = disk.toPx(poincare(L_fin));
+      drawStarMarker(ctx, cR[0], cR[1], 4, "#0f5a8a", 6.5);
+      drawStarMarker(ctx, cN[0], cN[1], 3, "#9c5b10", 6);
+      drawStarMarker(ctx, cL[0], cL[1], 3, "#1e6b48", 6);
+    }
+    disk.finish();
+  }
+
+  // 1E. Circle Limit IV (4*3 / 2*33 / *3333 / *3) & Triptych 4*3
+  function getCl4Data() {
+    if (cache.cl4) return cache.cl4;
+    const T = hypTriangle(6, 4, 2);
+    const Rrot = rotMatrix(Math.PI / 2); // Align one mirror axis vertically so top=devil, bottom=angel
+    const V2b = apply3(T.R2, T.V2);
+    const cent = baryH([T.V0, T.V2, V2b], [1, 1, 1]);
+    const R4 = mul3(T.R1, T.R2);
+    const R4i = mul3(T.R2, T.R1);
+    const tiles = bfsTiles(
+      [
+        { M: T.R0, step: (s) => s },
+        { M: R4, step: (s) => (s + 1) % 4 },
+        { M: R4i, step: (s) => (s + 3) % 4 }
+      ],
+      cent, 0, 1150, 0.985
+    );
+
+    // Angel half occupies T = (V0, V2, V1): halo near V2, wing reaching toward V0
+    // Devil half occupies R2(T) = (V0, V1, V2b): horn near V2b, wing reaching toward V0
+    const aWing = baryH([T.V0, T.V2, T.V1], [0.76, 0.14, 0.10]);
+    const aWaist = baryH([T.V0, T.V2, T.V1], [0.22, 0.30, 0.48]);
+    const aHead = baryH([T.V0, T.V2, T.V1], [0.10, 0.72, 0.18]);
+    const dWing = apply3(T.R2, aWing);
+    const dWaist = apply3(T.R2, aWaist);
+    const dHead = apply3(T.R2, aHead);
+    return (cache.cl4 = { T, Rrot, V2b, tiles, aWing, aWaist, aHead, dWing, dWaist, dHead });
+  }
+
+  function drawCl4OnCanvas(canvasId, mode, showSquareMirrors = false) {
+    const cv = document.getElementById(canvasId);
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#d9d8d2");
+    const { T, Rrot, V2b, tiles, aWing, aWaist, aHead, dWing, dWaist, dHead } = getCl4Data();
+
+    for (const tile of tiles) {
+      const M = mul3(Rrot, tile.M);
+      // Determine visual dominance regime
+      let dom = "balanced"; // "angel" | "devil" | "balanced"
+      if (mode === "2*33") {
+        dom = (tile.state % 2 === 0) ? "angel" : "devil";
+      } else if (mode === "*3333") {
+        dom = tile.state === 0 ? "angel" : (tile.state === 2 ? "devil" : "balanced");
+      } else if (mode === "*3") {
+        const pc = poincare(apply3(M, baryH([T.V0, T.V2, V2b], [1, 1, 1])));
+        // 6 angular wedges aligned with the 3 mirror rays at 90°, 210°, 330°
+        const ang = (Math.atan2(pc[1], pc[0]) + Math.PI * 2 + Math.PI / 6) % (Math.PI * 2);
+        const wedge = Math.floor(ang / (Math.PI / 3));
+        dom = (wedge % 2 === 1) ? "angel" : "devil";
+      }
+
+      // Draw angel triangle (T) and devil triangle (R2(T)) cleanly
+      const angelPts = [
+        ...geodesicSamples(apply3(M, T.V2), apply3(M, T.V1), 3),
+        ...geodesicSamples(apply3(M, T.V1), apply3(M, T.V0), 3).slice(1),
+        ...geodesicSamples(apply3(M, T.V0), apply3(M, T.V2), 3).slice(1, -1)
+      ];
+      const devilPts = [
+        ...geodesicSamples(apply3(M, V2b), apply3(M, T.V1), 3),
+        ...geodesicSamples(apply3(M, T.V1), apply3(M, T.V0), 3).slice(1),
+        ...geodesicSamples(apply3(M, T.V0), apply3(M, V2b), 3).slice(1, -1)
+      ];
+
+      // Background wash per dominance
+      disk.drawPoly(angelPts);
+      ctx.fillStyle = dom === "angel" ? "#fbfaf6" : (dom === "devil" ? "#454a54" : "#f4f1e8");
+      ctx.fill();
+
+      disk.drawPoly(devilPts);
+      ctx.fillStyle = dom === "devil" ? "#1b2029" : (dom === "angel" ? "#d6d4cc" : "#242a35");
+      ctx.fill();
+
+      // Stylized Angel wing/robe accent inside angel half
+      const aMotif = [
+        ...geodesicSamples(apply3(M, T.V2), apply3(M, aHead), 2),
+        ...geodesicSamples(apply3(M, aHead), apply3(M, aWing), 2).slice(1),
+        ...geodesicSamples(apply3(M, aWing), apply3(M, aWaist), 2).slice(1),
+        ...geodesicSamples(apply3(M, aWaist), apply3(M, T.V2), 2).slice(1, -1)
+      ];
+      disk.drawPoly(aMotif);
+      ctx.fillStyle = dom === "devil" ? "rgba(255,255,255,0.10)" : "#ffffff";
+      ctx.fill();
+      ctx.strokeStyle = dom === "devil" ? "rgba(20,24,30,0.4)" : "#262b35";
+      ctx.lineWidth = 0.65;
+      ctx.stroke();
+
+      // Stylized Devil wing/horn accent inside devil half
+      const dMotif = [
+        ...geodesicSamples(apply3(M, V2b), apply3(M, dHead), 2),
+        ...geodesicSamples(apply3(M, dHead), apply3(M, dWing), 2).slice(1),
+        ...geodesicSamples(apply3(M, dWing), apply3(M, dWaist), 2).slice(1),
+        ...geodesicSamples(apply3(M, dWaist), apply3(M, V2b), 2).slice(1, -1)
+      ];
+      disk.drawPoly(dMotif);
+      ctx.fillStyle = dom === "angel" ? "rgba(30,36,46,0.16)" : "#141820";
+      ctx.fill();
+      ctx.strokeStyle = dom === "angel" ? "rgba(30,36,46,0.3)" : "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 0.65;
+      ctx.stroke();
+
+      if (showSquareMirrors) {
+        disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, V2b), 3), false);
+        ctx.strokeStyle = "rgba(15, 90, 138, 0.72)";
+        ctx.lineWidth = 1.15;
+        ctx.stroke();
+      }
+    }
+
+    if (showSquareMirrors || mode === "4*3") {
+      const c0 = disk.toPx(poincare(apply3(Rrot, T.V0)));
+      const c2 = disk.toPx(poincare(apply3(Rrot, T.V2)));
+      if (mode === "4*3") drawStarMarker(ctx, c0[0], c0[1], 4, "#0f5a8a", 5.5);
+      drawStarMarker(ctx, c2[0], c2[1], 3, "#9c5b10", 5.5);
+    }
+    disk.finish();
+  }
+
+  // ------------------------------------------------------------------
+  // 3. Triptych: Spherical 3*2 (Maple Ball) + Euclidean 4*2 (Drawing #45)
+  // ------------------------------------------------------------------
+  function getSphereMats() {
+    if (cache.sphMats) return cache.sphMats;
+    const perms = [[0,1,2],[1,2,0],[2,0,1]];
+    const mats = [];
+    for (const sx of [1, -1]) {
+      for (const sy of [1, -1]) {
+        for (const sz of [1, -1]) {
+          for (const p of perms) {
+            const M = [[0,0,0],[0,0,0],[0,0,0]];
+            const sg = [sx, sy, sz];
+            for (let i = 0; i < 3; i++) M[i][p[i]] = sg[i];
+            mats.push(M);
+          }
+        }
+      }
+    }
+    const n3 = (v) => {
+      const l = Math.hypot(v[0], v[1], v[2]);
+      return [v[0]/l, v[1]/l, v[2]/l];
+    };
+    const V0 = [0, 0, 1];
+    const E1 = n3([0, 1, 1]);
+    const C  = n3([1, 1, 1]);
+    const E2 = n3([1, 0, 1]);
+    const mid = (a, b, t = 0.5) => n3([a[0]*(1-t)+b[0]*t, a[1]*(1-t)+b[1]*t, a[2]*(1-t)+b[2]*t]);
+    const arcPts = (a, b, steps = 4) => {
+      const out = [];
+      for (let i = 0; i <= steps; i++) out.push(mid(a, b, i / steps));
+      return out;
+    };
+    return (cache.sphMats = { mats, V0, E1, C, E2, mid, arcPts, n3 });
+  }
+
+  function renderSphere() {
+    const cv = document.getElementById("cv-sphere");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const { mats, V0, E1, C, E2, mid, arcPts } = getSphereMats();
+    const { yaw, pitch, carved } = state.sphere;
+    const cx = size / 2, cy = size / 2, R = size * 0.45;
+
+    ctx.clearRect(0, 0, size, size);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.fillStyle = "#e6e8ec";
+    ctx.fill();
+    ctx.clip();
+
+    const cyw = Math.cos(yaw), syw = Math.sin(yaw);
+    const cph = Math.cos(pitch), sph = Math.sin(pitch);
+    const rot = (v) => {
+      const x1 = v[0] * cyw + v[2] * syw;
+      const y1 = v[1];
+      const z1 = -v[0] * syw + v[2] * cyw;
+      const y2 = y1 * cph - z1 * sph;
+      const z2 = y1 * sph + z1 * cph;
+      return [x1, y2, z2];
+    };
+    const proj = (v) => [cx + v[0] * R, cy - v[1] * R];
+
+    const items = [];
+    for (const M of mats) {
+      const mV0 = rot(apply3(M, V0));
+      const mE1 = rot(apply3(M, E1));
+      const mC  = rot(apply3(M, C));
+      const mE2 = rot(apply3(M, E2));
+      const zAvg = (mV0[2] + mE1[2] + mC[2] + mE2[2]) * 0.25;
+      if (zAvg < -0.15) continue;
+
+      // Determine carved relief shading (poles +z = heaven/white dominant, -z = hell/black dominant)
+      const worldC = apply3(M, C);
+      const poleBias = carved ? worldC[2] : 0; // >0 heaven, <0 hell
+      items.push({ M, mV0, mE1, mC, mE2, zAvg, poleBias });
+    }
+    items.sort((a, b) => a.zAvg - b.zAvg);
+
+    const drawSphPoly = (pts3) => {
+      ctx.beginPath();
+      for (let i = 0; i < pts3.length; i++) {
+        const [x, y] = proj(pts3[i]);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+    };
+
+    for (const it of items) {
+      const { M, poleBias } = it;
+      const shade = 0.82 + 0.18 * Math.max(0, it.zAvg);
+      const rArc = (a, b) => arcPts(a, b, 3).map((p) => rot(apply3(M, p)));
+
+      // Split kite into Angel half (V0-E1-C) and Devil half (V0-C-E2)
+      const angelPts = [...rArc(V0, E1), ...rArc(E1, C).slice(1), ...rArc(C, V0).slice(1, -1)];
+      const devilPts = [...rArc(V0, C), ...rArc(C, E2).slice(1), ...rArc(E2, V0).slice(1, -1)];
+
+      drawSphPoly(angelPts);
+      const aLight = poleBias > 0.2 ? 250 : (poleBias < -0.2 ? 120 : 244);
+      const av = Math.round(aLight * shade);
+      ctx.fillStyle = `rgb(${av},${av - 2},${av - 8})`;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(26,26,31,0.35)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      drawSphPoly(devilPts);
+      const dBase = poleBias < -0.2 ? 24 : (poleBias > 0.2 ? 185 : 36);
+      const dv = Math.round(dBase * shade);
+      ctx.fillStyle = `rgb(${dv},${dv + 4},${dv + 12})`;
+      ctx.fill();
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+
+      // Mirror edges (V0-E1 and V0-E2)
+      const mirPts = [...rArc(E1, V0), ...rArc(V0, E2).slice(1)];
+      ctx.beginPath();
+      mirPts.forEach((p, i) => {
+        const [x, y] = proj(p);
+        if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = "rgba(15, 90, 138, 0.72)";
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      // Center 3-fold dot
+      if (it.mC[2] > 0.1) {
+        const [cx3, cy3] = proj(it.mC);
+        ctx.beginPath();
+        ctx.arc(cx3, cy3, 2.8, 0, Math.PI * 2);
+        ctx.fillStyle = "#9c5b10";
+        ctx.fill();
+      }
+    }
+
+    // Spherical vignette
+    const grad = ctx.createRadialGradient(cx - R * 0.28, cy - R * 0.28, R * 0.1, cx, cy, R);
+    grad.addColorStop(0, "rgba(255,255,255,0.14)");
+    grad.addColorStop(0.75, "rgba(0,0,0,0)");
+    grad.addColorStop(1, "rgba(18,22,30,0.26)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, Math.PI * 2);
+    ctx.strokeStyle = "#1a1a1f";
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  function renderEuclidean() {
+    const cv = document.getElementById("cv-euclid");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const { overlay } = state.euclid;
+    ctx.clearRect(0, 0, size, size);
+    const N = 4;
+    const cell = size / N;
+    for (let gy = 0; gy < N; gy++) {
+      for (let gx = 0; gx < N; gx++) {
+        const x0 = gx * cell, y0 = gy * cell, cx = x0 + cell / 2, cy = y0 + cell / 2;
+        const parity = (gx + gy) % 2;
+        const hs = cell / 2;
+        for (let k = 0; k < 4; k++) {
+          ctx.save();
+          ctx.translate(cx, cy);
+          if (parity) ctx.scale(-1, 1);
+          ctx.rotate((k * Math.PI) / 2);
+
+          // Left half of quadrant (top-left corner = Angel, swirling into center 4-fold wingtip)
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-hs, -hs);
+          ctx.lineTo(0, -hs);
+          ctx.closePath();
+          ctx.fillStyle = "#f4f1e8";
+          ctx.fill();
+          ctx.strokeStyle = "#1a1a1f";
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+
+          // Stylized Angel wing highlight
+          ctx.beginPath();
+          ctx.moveTo(-hs * 0.85, -hs * 0.85);
+          ctx.quadraticCurveTo(-hs * 0.15, -hs * 0.82, -hs * 0.12, -hs * 0.14);
+          ctx.quadraticCurveTo(-hs * 0.55, -hs * 0.42, -hs * 0.85, -hs * 0.85);
+          ctx.fillStyle = "#ffffff";
+          ctx.fill();
+          ctx.strokeStyle = "#262b35";
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+
+          // Right half of quadrant (top-right corner = Devil, swirling into center)
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(0, -hs);
+          ctx.lineTo(hs, -hs);
+          ctx.closePath();
+          ctx.fillStyle = "#242a35";
+          ctx.fill();
+          ctx.strokeStyle = "#1a1a1f";
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+
+          // Stylized Devil wing highlight
+          ctx.beginPath();
+          ctx.moveTo(hs * 0.85, -hs * 0.85);
+          ctx.quadraticCurveTo(hs * 0.52, -hs * 0.40, hs * 0.14, -hs * 0.14);
+          ctx.quadraticCurveTo(hs * 0.18, -hs * 0.82, hs * 0.85, -hs * 0.85);
+          ctx.fillStyle = "#141820";
+          ctx.fill();
+          ctx.strokeStyle = "rgba(255,255,255,0.22)";
+          ctx.lineWidth = 0.65;
+          ctx.stroke();
+
+          ctx.restore();
+        }
+        if (overlay) {
+          ctx.strokeStyle = "rgba(15, 90, 138, 0.72)";
+          ctx.lineWidth = 1.4;
+          ctx.strokeRect(x0, y0, cell, cell);
+          drawStarMarker(ctx, cx, cy, 4, "#0f5a8a", 4.5);
+          drawStarMarker(ctx, x0, y0, 2, "#9c5b10", 4);
+        }
+      }
+    }
+    ctx.strokeStyle = "#1a1a1f";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(0.75, 0.75, size - 1.5, size - 1.5);
+  }
+
+  // ------------------------------------------------------------------
+  // 4. Dunham Extensions (732 Butterflies & 552 Fish)
+  // ------------------------------------------------------------------
+  function getDunham732() {
+    if (cache.d732) return cache.d732;
+    const T = hypTriangle(7, 3, 2);
+    const cent = baryH([T.V0, T.V1, T.V2], [1, 1, 1]);
+    const g7 = mul3(T.R0, T.R1);
+    const g7i = mul3(T.R1, T.R0);
+    const g3 = mul3(T.R1, T.R2);
+    const g3i = mul3(T.R2, T.R1);
+    const g2 = mul3(T.R0, T.R2);
+    // Double triangle T U R0(T) is one chiral butterfly domain!
+    const V0b = apply3(T.R0, T.V0);
+    const domCent = baryH([T.V2, T.V0, T.V1, V0b], [1, 1, 1, 1]);
+    const p7  = [1, 2, 3, 4, 5, 6, 0];
+    const p7i = [6, 0, 1, 2, 3, 4, 5];
+    const p3  = [6, 4, 2, 1, 3, 0, 5];
+    const p3i = [5, 3, 2, 4, 1, 6, 0];
+    const p2  = [4, 2, 1, 3, 0, 5, 6];
+    const tiles = bfsTiles(
+      [
+        { M: g7, step: (s) => p7[s] },
+        { M: g7i, step: (s) => p7i[s] },
+        { M: g3, step: (s) => p3[s] },
+        { M: g3i, step: (s) => p3i[s] },
+        { M: g2, step: (s) => p2[s] }
+      ],
+      domCent, 0, 1400, 0.985
+    );
+    const tip1 = baryH([T.V2, T.V0, T.V1, V0b], [0.16, 0.72, 0.12, 0.0]);
+    const tip2 = baryH([T.V2, T.V0, T.V1, V0b], [0.16, 0.0, 0.12, 0.72]);
+    return (cache.d732 = { T, V0b, tiles, tip1, tip2 });
+  }
+
+  function getDunham552() {
+    if (cache.d552) return cache.d552;
+    const T = hypTriangle(5, 5, 2);
+    const V0b = apply3(T.R0, T.V0);
+    const domCent = baryH([T.V2, T.V0, T.V1, V0b], [1, 1, 1, 1]);
+    const g5a = mul3(T.R0, T.R1);
+    const g5ai = mul3(T.R1, T.R0);
+    const g5b = mul3(T.R1, T.R2);
+    const g5bi = mul3(T.R2, T.R1);
+    const g2 = mul3(T.R0, T.R2);
+    // Exact 5-colouring homomorphism 552 -> Z_5 (g5a*g5b*g2 = I, g2^2 = I)
+    const tiles = bfsTiles(
+      [
+        { M: g5a, step: (s) => (s + 1) % 5 },
+        { M: g5ai, step: (s) => (s + 4) % 5 },
+        { M: g5b, step: (s) => (s + 4) % 5 },
+        { M: g5bi, step: (s) => (s + 1) % 5 },
+        { M: g2, step: (s) => s }
+      ],
+      domCent, 0, 1150, 0.985
+    );
+    return (cache.d552 = { T, V0b, tiles });
+  }
+
+  function renderDunham() {
+    const cv = document.getElementById("cv-dunham");
+    if (!cv) return;
+    const { ctx, size } = prepCanvas(cv);
+    const disk = setupDisk(ctx, size, "#f4f2ec");
+    const mode = state.dunham.mode;
+    if (mode === "732") {
+      const { T, V0b, tiles, tip1, tip2 } = getDunham732();
+      const PAL7 = ["#245b84", "#d4982a", "#2b7e5c", "#b54234", "#5b6472", "#755299", "#3d869c"];
+      for (const tile of tiles) {
+        const M = tile.M;
+        const wing = [
+          ...geodesicSamples(apply3(M, T.V2), apply3(M, tip1), 2),
+          ...geodesicSamples(apply3(M, tip1), apply3(M, T.V0), 2).slice(1),
+          ...geodesicSamples(apply3(M, T.V0), apply3(M, T.V1), 2).slice(1),
+          ...geodesicSamples(apply3(M, T.V1), apply3(M, V0b), 2).slice(1),
+          ...geodesicSamples(apply3(M, V0b), apply3(M, tip2), 2).slice(1),
+          ...geodesicSamples(apply3(M, tip2), apply3(M, T.V2), 2).slice(1, -1)
+        ];
+        disk.drawPoly(wing);
+        ctx.fillStyle = PAL7[tile.state];
+        ctx.fill();
+        ctx.strokeStyle = "#181c22";
+        ctx.lineWidth = 0.65;
+        ctx.stroke();
+      }
+      const c2 = disk.toPx(poincare(T.V2));
+      const c0 = disk.toPx(poincare(T.V0));
+      const c1 = disk.toPx(poincare(T.V1));
+      drawStarMarker(ctx, c2[0], c2[1], 7, "#0f5a8a", 6);
+      drawStarMarker(ctx, c0[0], c0[1], 3, "#9c5b10", 5.5);
+      drawStarMarker(ctx, c1[0], c1[1], 2, "#1e6b48", 5);
+    } else {
+      const { T, V0b, tiles } = getDunham552();
+      const PAL5 = ["#d89d2b", "#2a699a", "#2b825b", "#b54234", "#eae6dc"];
+      for (const tile of tiles) {
+        const M = tile.M;
+        const pts = [
+          ...geodesicSamples(apply3(M, T.V2), apply3(M, T.V0), 3),
+          ...geodesicSamples(apply3(M, T.V0), apply3(M, T.V1), 3).slice(1),
+          ...geodesicSamples(apply3(M, T.V1), apply3(M, V0b), 3).slice(1),
+          ...geodesicSamples(apply3(M, V0b), apply3(M, T.V2), 3).slice(1, -1)
+        ];
+        disk.drawPoly(pts);
+        ctx.fillStyle = PAL5[tile.state];
+        ctx.fill();
+        ctx.strokeStyle = "#181c22";
+        ctx.lineWidth = 0.7;
+        ctx.stroke();
+        disk.drawChain(geodesicSamples(apply3(M, T.V2), apply3(M, T.V1), 3), false);
+        ctx.strokeStyle = tile.state === 4 ? "rgba(26,26,31,0.38)" : "rgba(255,255,255,0.62)";
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+      const c2 = disk.toPx(poincare(T.V2));
+      const c0 = disk.toPx(poincare(T.V0));
+      const c1 = disk.toPx(poincare(T.V1));
+      drawStarMarker(ctx, c2[0], c2[1], 5, "#0f5a8a", 6);
+      drawStarMarker(ctx, c0[0], c0[1], 5, "#9c5b10", 5.5);
+      drawStarMarker(ctx, c1[0], c1[1], 2, "#1e6b48", 5);
+    }
+    disk.finish();
+  }
+
+  // ------------------------------------------------------------------
+  // 5. Wire Interactive Controls & Animation
+  // ------------------------------------------------------------------
+  function renderAll() {
+    renderCoxeter();
+    renderCl1();
+    renderCl2();
+    renderCl3();
+    drawCl4OnCanvas("cv-cl4", state.cl4.mode, state.cl4.mode !== "*3");
+    renderSphere();
+    renderEuclidean();
+    drawCl4OnCanvas("cv-trip-hyp", "4*3", state.tripHyp.overlay);
+    renderDunham();
+  }
+
+  document.querySelectorAll("button[data-target]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const t = btn.dataset.target, a = btn.dataset.action;
+      state[t][a] = !state[t][a];
+      btn.setAttribute("aria-pressed", String(state[t][a]));
+      if (t === "coxeter") renderCoxeter();
+      else if (t === "cl1") renderCl1();
+      else if (t === "cl2") renderCl2();
+      else if (t === "cl3") renderCl3();
+    });
+  });
+
+  document.querySelectorAll("button[data-cl4]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const m = btn.dataset.cl4;
+      state.cl4.mode = m;
+      document.querySelectorAll("button[data-cl4]").forEach((b) => {
+        const on = b.dataset.cl4 === m;
+        b.classList.toggle("is-on", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      document.querySelectorAll(".stage-note[data-stage]").forEach((n) => {
+        n.classList.toggle("is-active", n.dataset.stage === m);
+      });
+      drawCl4OnCanvas("cv-cl4", m, m !== "*3");
+    });
+  });
+
+  document.querySelectorAll("button[data-dunham]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const m = btn.dataset.dunham;
+      state.dunham.mode = m;
+      document.querySelectorAll("button[data-dunham]").forEach((b) => {
+        const on = b.dataset.dunham === m;
+        b.classList.toggle("is-on", on);
+        b.setAttribute("aria-pressed", String(on));
+      });
+      document.querySelectorAll(".stage-note[data-dun]").forEach((n) => {
+        n.classList.toggle("is-active", n.dataset.dun === m);
+      });
+      renderDunham();
+    });
+  });
+
+  const btnSpin = document.getElementById("btn-sphere-spin");
+  const btnCarved = document.getElementById("btn-sphere-carved");
+  const btnEuclid = document.getElementById("btn-euclid-ov");
+  const btnTripHyp = document.getElementById("btn-triphyp-ov");
+
+  btnSpin?.addEventListener("click", () => {
+    state.sphere.spin = !state.sphere.spin;
+    btnSpin.setAttribute("aria-pressed", String(state.sphere.spin));
+    btnSpin.textContent = state.sphere.spin ? "Pause spin" : "Resume spin";
+  });
+  btnCarved?.addEventListener("click", () => {
+    state.sphere.carved = !state.sphere.carved;
+    btnCarved.setAttribute("aria-pressed", String(state.sphere.carved));
+    btnCarved.classList.toggle("is-on", state.sphere.carved);
+    renderSphere();
+  });
+  btnEuclid?.addEventListener("click", () => {
+    state.euclid.overlay = !state.euclid.overlay;
+    btnEuclid.setAttribute("aria-pressed", String(state.euclid.overlay));
+    renderEuclidean();
+  });
+  btnTripHyp?.addEventListener("click", () => {
+    state.tripHyp.overlay = !state.tripHyp.overlay;
+    btnTripHyp.setAttribute("aria-pressed", String(state.tripHyp.overlay));
+    drawCl4OnCanvas("cv-trip-hyp", "4*3", state.tripHyp.overlay);
+  });
+
+  // Sphere pointer drag
+  const sphCv = document.getElementById("cv-sphere");
+  let dragging = false, lastX = 0, lastY = 0;
+  sphCv?.addEventListener("pointerdown", (e) => {
+    dragging = true; lastX = e.clientX; lastY = e.clientY;
+    sphCv.setPointerCapture(e.pointerId);
+  });
+  sphCv?.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+    state.sphere.yaw += (e.clientX - lastX) * 0.012;
+    state.sphere.pitch = Math.max(-1.2, Math.min(1.2, state.sphere.pitch + (e.clientY - lastY) * 0.012));
+    lastX = e.clientX; lastY = e.clientY;
+    renderSphere();
+  });
+  sphCv?.addEventListener("pointerup", () => { dragging = false; });
+  sphCv?.addEventListener("pointercancel", () => { dragging = false; });
+
+  // Gentle animation loop for sphere only (halts when paused or hidden)
+  let lastTs = 0;
+  function tick(ts) {
+    if (lastTs && state.sphere.spin && !dragging && !document.hidden) {
+      state.sphere.yaw += (ts - lastTs) * 0.00045;
+      renderSphere();
+    }
+    lastTs = ts;
+    requestAnimationFrame(tick);
+  }
+
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(renderAll, 80);
+  });
+
+  renderAll();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
