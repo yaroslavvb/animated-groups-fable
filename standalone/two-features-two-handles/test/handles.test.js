@@ -1726,3 +1726,49 @@ test('smoothClosedPath emits finite corner-preserving Catmull-Rom cubics for com
   smoothClosedPath(sqPath, [0, 100, 100, 0], [0, 0, 100, 100], 4);
   assert.deepEqual(sqPath.ops.map((o) => o[0]), ['M', 'L', 'L', 'L', 'L', 'Z']);
 });
+
+test('333x crosscap len sweep (b = 1.16, 0.95, 0.86) misses zero visible rim commas with comma-aware tilesPSU and culling', () => {
+  const def = defaultCommas('333x');
+  const pr = { k: '333x', perm: [1, 2, 0, 3], twBase: 0, fit: 1, specs: def };
+  const H_CULL_Z = Math.cosh(5.8);
+  const R = 300;
+  for (const b of [1.16, 0.95, 0.86]) {
+    const st = { k: '333x', perm: [1, 2, 0, 3], orders: [0, 3, 3, 3], L: 4.78, tw: 0.121, b, tau: 0, thetas: [0, 0, 0, 0], print: pr };
+    const m = buildPatternModel(st);
+    const { D, A } = m;
+    const des = m.design(D);
+    const desAt = des.map((sh) => GH.norm(sh.pts.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1], acc[2] + p[2]], [0, 0, 0])));
+    const desRad = des.map((sh, i) => Math.max(...sh.pts.map((p) => GH.dist(desAt[i], p))));
+    const desExpNeg = desRad.map((r) => Math.exp(-r));
+    const extraSamples = [];
+    for (let si = 0; si < des.length; si++) {
+      const pts = des[si].pts;
+      extraSamples.push(desAt[si]);
+      for (let k = 0; k < 6; k++) extraSamples.push(pts[Math.floor((k * pts.length) / 6)]);
+    }
+    const V = GH.translate(m.home[3], GH.origin);
+    const vPsu = so21ToPSU(V, false);
+    const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
+    const tsPSU = tilesPSU(D, A, { focus, radius: 6.5, max: 4200, extraSamples });
+    const tsBig = tiles(D, A, { radius: 9.5, max: 25000, ms: 5000 });
+
+    const info = (ts) => ts.map((t) => {
+      const M = t.g ? psuToSO21(psuMul(vPsu, t.g)) : mul(V, t.M);
+      const da = apply(M, desAt[0]);
+      const x = da[0] / (1 + da[2]), y = da[1] / (1 + da[2]);
+      let minZ = apply(M, D.at)[2];
+      for (const v of D.verts) minZ = Math.min(minZ, apply(M, v)[2]);
+      const cz = Math.max(1, da[2] * desExpNeg[0]);
+      if (cz < minZ) minZ = cz;
+      let minCommaZ = da[2];
+      for (const p of des[0].pts) minCommaZ = Math.min(minCommaZ, apply(M, p)[2]);
+      const rNear = (desRad[0] * R) / (1 + cz);
+      return { dCMin: Math.acosh(Math.max(1, minCommaZ)), minZ, rNear, x, y };
+    });
+
+    const drawn = info(tsPSU).filter((c) => c.minZ <= H_CULL_Z && c.rNear >= 1.2);
+    const visRef = info(tsBig).filter((c) => c.dCMin <= 5.5);
+    const missing = visRef.filter((w) => !drawn.some((g) => Math.hypot(g.x - w.x, g.y - w.y) < 0.005));
+    assert.equal(missing.length, 0, `b=${b} missing ${missing.length} visible rim commas`);
+  }
+});

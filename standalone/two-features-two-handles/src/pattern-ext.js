@@ -230,7 +230,7 @@ export function locateTilePSU(D, A, targetDisc, maxSteps = 400) {
 }
 
 /** Exact PSU(1,1) x Z2 hyperbolic tile enumerator centered at `focus` (in Poincare disc). */
-export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 1500 } = {}) {
+export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 1500, extraSamples = null } = {}) {
   const G = D.G, n = D.n;
   if (!n) return [{ g: psuI(), M: I3.slice(), flip: false, d: 0 }];
   const [fx, fy] = clampDisc(focus);
@@ -245,6 +245,9 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
       const k = Math.ceil(len / 2.0);
       for (let s = 1; s < k; s++) samplesD.push(toDisc(hypLerp(G, a, b, s / k)));
     }
+  }
+  if (extraSamples && extraSamples.length) {
+    for (let i = 0; i < extraSamples.length; i++) samplesD.push(toDisc(extraSamples[i]));
   }
   const ns = samplesD.length, sX = new Float64Array(ns), sY = new Float64Array(ns);
   for (let i = 0; i < ns; i++) { sX[i] = samplesD[i][0]; sY[i] = samplesD[i][1]; }
@@ -322,14 +325,14 @@ export function createPattern(canvas, opts = {}) {
   // Does V turn the plane over? Does base? Kept as facts (each flips when the middle of the view crosses onto a
   // mirror-image neighbour; base's is set when the outline moves), never read back off a determinant: a long way
   // out on the hyperbolic plane a determinant is rounding. fix() is told them.
-  const H_CACHE_RADIUS = 5.9, H_REBUILD_DRIFT = 0.65, H_CULL_Z = Math.cosh(5.2), H_FULL_MAX = 4200;
+  const H_CACHE_RADIUS = 6.5, H_REBUILD_DRIFT = 0.65, H_CULL_Z = Math.cosh(5.8), H_FULL_MAX = 4200;
   const isIdentityPsu = (g) => Math.abs(g[0] - 1) < 1e-12 && !g[4] && Math.hypot(g[1], g[2], g[3]) < 1e-12;
   let vRev = false, bRev = false;
   let vPsu = psuI(), bPsu = psuI();
   const vHand = () => (vRev ? -1 : 1), bHand = () => (bRev ? -1 : 1);
   let pulse = -1e9;                 // when the outline last moved to another tile (performance.now()): it glows for a moment
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], desRad = [], desExpNeg = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
+  let budget = H_FULL_MAX, emaMs = 8, cache = new Map(), hCache = null, hMidSamples = [], des = [], desAt = [], desRad = [], desExpNeg = [], desSamples = [], reach = 1, area = 1, stats = { tiles: 0, drawn: 0 };
   const smBuf = { cap: 0, ptCap: 0, sx: null, sy: null, dx: null, dy: null, len: null, rt: null, tx: null, ty: null, sharp: null };
   let raf = 0;
   let hots = [], hot = null, home = null;      // the outlined tile's glued edges on the screen, the pair a pointer is on (a, b, ...), the tile's middle
@@ -441,7 +444,7 @@ export function createPattern(canvas, opts = {}) {
       }
       if (need) {
         const focus = psuApplyDisc(psuInv(vPsu), [0, 0]);
-        hCache = { focus, shift: psuI(), max: wantMax, list: tilesPSU(D, A, { focus, radius: H_CACHE_RADIUS, max: wantMax }) };
+        hCache = { focus, shift: psuI(), max: wantMax, list: tilesPSU(D, A, { focus, radius: H_CACHE_RADIUS, max: wantMax, extraSamples: desSamples }) };
       }
       return quick && hCache.list.length > budget ? hCache.list.slice(0, budget) : hCache.list;
     }
@@ -696,6 +699,11 @@ export function createPattern(canvas, opts = {}) {
           const s = hMidSamples[i], sz = m6 * s[0] + m7 * s[1] + m8 * s[2];
           if (sz < minZ) minZ = sz;
         }
+        for (let si = 0; si < desAt.length; si++) {
+          const da = desAt[si];
+          const cz = Math.max(1, (m6 * da[0] + m7 * da[1] + m8 * da[2]) * desExpNeg[si]);
+          if (cz < minZ) minZ = cz;
+        }
         if (minZ > H_CULL_Z) continue;
         drawn++;
         effPx = (hScale * R) / (1 + minZ);
@@ -753,11 +761,11 @@ export function createPattern(canvas, opts = {}) {
       if (kind === 'H') {
         // an outline is drawn by its own size on the screen (its near-edge reach from its middle, at the disc's scale
         // there, so a large comma extending inward from the rim still renders smoothly): all points + splines from
-        // 9 px (smooth >= 10 px), every third from 4 px, every fifth below, and not at all under 2.3 px.
+        // 9 px (smooth >= 10 px), every third from 4 px, every fifth below, and not at all under 1.2 px.
         for (let si = 0; si < des.length; si++) {
           const sh = des[si], q = apply(M, desAt[si] || D.at);
           const rNear = (desRad[si] * R) / (1 + Math.max(1, q[2] * desExpNeg[si]));
-          if (rNear >= 2.3) print(ink, sh, M, rNear >= 9 ? 0 : rNear >= 4 ? 1 : 2, rNear);
+          if (rNear >= 1.2) print(ink, sh, M, rNear >= 9 ? 0 : rNear >= 4 ? 1 : 2, rNear);
         }
       } else if (kind === 'E') {
         for (let si = 0; si < des.length; si++) { const rPx = desRad[si] * R; if (rPx >= 2.3) print(ink, des[si], M, rPx >= 9 ? 0 : rPx >= 4 ? 1 : 2, rPx); }
@@ -939,8 +947,8 @@ export function createPattern(canvas, opts = {}) {
     if (quick && kind === 'H') {
       const ms = performance.now() - t0;
       emaMs = 0.75 * emaMs + 0.25 * ms;
-      if (emaMs > 14) budget = Math.max(600, Math.round(budget * 0.85));
-      else if (emaMs < 8 && budget < H_FULL_MAX) budget = Math.min(H_FULL_MAX, Math.round(budget * 1.15));
+      if (emaMs > 18) budget = Math.max(1600, Math.round(budget * 0.88));
+      else if (emaMs < 11 && budget < H_FULL_MAX) budget = Math.min(H_FULL_MAX, Math.round(budget * 1.15));
     }
   }
   const schedule = () => { if (!raf) raf = requestAnimationFrame(draw); };
@@ -1156,7 +1164,7 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; desSamples = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (!keep) sel = null; quick = false;
       cache = new Map();
@@ -1184,6 +1192,15 @@ export function createPattern(canvas, opts = {}) {
       // each outline's own reach from its middle: how large it comes out on the screen decides how finely it is drawn
       desRad = des.map((sh, i) => (sh.pts && sh.pts.length ? Math.max(...sh.pts.map((p) => G.dist(desAt[i], p))) : 0));
       desExpNeg = desRad.map((r) => Math.exp(-r));
+      desSamples = [];
+      if (G.kind === 'H') {
+        for (let si = 0; si < des.length; si++) {
+          const pts = des[si].pts;
+          if (!pts || !pts.length) continue;
+          desSamples.push(desAt[si]);
+          for (let k = 0; k < 6; k++) desSamples.push(pts[Math.floor((k * pts.length) / 6)]);
+        }
+      }
       size();
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else {

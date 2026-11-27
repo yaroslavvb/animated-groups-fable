@@ -91,11 +91,19 @@ try {
     for (const k of chips) {
       await T.click(`[data-fam="${k}"]`);
       await page.waitForTimeout(350);
-      const s = await S(T), mine = engine.paisleyInfo(k);
-      ok(s.k === k && s.classified.at && s.classified.exact && offClassified(s) < 1e-6, `${k}: opens on the Classification page's pattern, lying as it lies there`, JSON.stringify([s.classified.at, s.classified.exact, offClassified(s)]));
-      ok(s.pat.shapes === mine.tied.length && s.classified.tied.join() === mine.tied.join() && s.classified.shapes === mine.shapes, `${k}: the same commas on the same cone points here as in node`, JSON.stringify([s.pat.shapes, s.classified.tied, mine.tied]));
-      ok(s.pat.shapes === s.classified.shapes && s.classified.joint.clear && s.print.scale === 1 && Math.abs(s.classified.joint.delta - mine.joint.delta) < 1e-6, `${k}: every comma whole, at that page's size, and a joint that runs through none`, JSON.stringify([s.pat.shapes, s.classified.shapes, s.classified.joint, s.print]));
-      await shot(page, 'p-' + k.replace('*', 's'));
+      const s = await S(T), u = await ui(T);
+      ok(!u.on && u.pressed.join() === k, `${k}: chip lights itself, not the custom field`, JSON.stringify([u.on, u.pressed]));
+      if (s.mode === 'pairs') {
+        const mine = engine.paisleyInfo(engine.normalizeFamilyKey(k) || k);
+        ok(s.k === k && s.classified.at && s.classified.exact && offClassified(s) < 1e-6, `${k}: opens on the Classification page's pattern, lying as it lies there`, JSON.stringify([s.classified.at, s.classified.exact, offClassified(s)]));
+        ok(s.pat.shapes === mine.tied.length && s.classified.tied.join() === mine.tied.join() && s.classified.shapes === mine.shapes, `${k}: the same commas on the same cone points here as in node`, JSON.stringify([s.pat.shapes, s.classified.tied, mine.tied]));
+        ok(s.pat.shapes === s.classified.shapes && s.classified.joint.clear && s.print.scale === 1 && Math.abs(s.classified.joint.delta - mine.joint.delta) < 1e-6, `${k}: every comma whole, at that page's size, and a joint that runs through none`, JSON.stringify([s.pat.shapes, s.classified.shapes, s.classified.joint, s.print]));
+      } else if (s.mode === 'multi') {
+        ok(s.k === k && s.multi.atDefaults && offClassified(s) < 1e-6 && s.pat.shapes === s.multi.commas && s.multi.joints.every((j) => j.clear) && s.pat.tiles > 3, `${k}: opens on the Classification page's pattern at defaults`, JSON.stringify([s.k, s.multi.atDefaults, offClassified(s), s.pat.shapes, s.pat.tiles]));
+      } else {
+        ok(s.k === k && s.controls.off && s.pat.tiles >= 1, `${k}: shown still as classified with pair controls off`, JSON.stringify([s.k, s.mode, s.controls.off, s.pat.tiles]));
+      }
+      await shot(page, 'p-' + k.replaceAll('*', 's'));
     }
     // a slider moves: the pattern holds its place (the view is not touched), and Reset then centres on the pair
     await T.click('[data-fam="3333"]');
@@ -182,9 +190,16 @@ try {
       const hash = (await S(fresh.T)).hash;
       await fresh.ctx.close();
       if (hash === '#') continue;
-      const linked = await newPage({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }, hash.replace('*', '%2A'));
-      const sl = await S(linked.T);
-      ok(sl.k === k && sl.classified.at && offClassified(sl) < 1e-6 && sl.hash === hash, `a link copied at ${k}'s defaults (${hash}) opens as classified`, JSON.stringify([sl.k, sl.classified.at, offClassified(sl), sl.hash]));
+      const linked = await newPage({ viewport: { width: 1100, height: 800 }, deviceScaleFactor: 1 }, hash.replaceAll('*', '%2A'));
+      const sl = await S(linked.T), ul = await ui(linked.T);
+      ok(!ul.on && ul.pressed.join() === k, `a link copied at ${k}'s defaults (${hash}) lights the chip, not the custom field`, JSON.stringify([ul.on, ul.pressed]));
+      if (sl.mode === 'pairs') {
+        ok(sl.k === k && sl.classified.at && offClassified(sl) < 1e-6 && sl.hash === hash, `a link copied at ${k}'s defaults (${hash}) opens as classified`, JSON.stringify([sl.k, sl.classified.at, offClassified(sl), sl.hash]));
+      } else if (sl.mode === 'multi') {
+        ok(sl.k === k && sl.multi.atDefaults && offClassified(sl) < 1e-6 && sl.hash === hash, `a link copied at ${k}'s defaults (${hash}) opens as classified`, JSON.stringify([sl.k, sl.multi.atDefaults, offClassified(sl), sl.hash]));
+      } else {
+        ok(sl.k === k && sl.controls.off && sl.pat.tiles >= 1 && sl.hash === hash, `a link copied at ${k}'s defaults (${hash}) opens still`, JSON.stringify([sl.k, sl.controls.off, sl.pat.tiles, sl.hash]));
+      }
       await linked.ctx.close();
     }
   }

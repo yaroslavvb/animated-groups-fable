@@ -445,7 +445,7 @@ function fmtSigned(v, dec) {
 
 function syncUI() {
   const fam = FAMILIES[state.k], still = isStill(), many = isMulti();
-  for (const b of famBtns) b.setAttribute('aria-pressed', String(b.dataset.fam === state.k));
+  for (const b of famBtns) b.setAttribute('aria-pressed', String((b.dataset.k || b.dataset.fam) === state.k));
   custom.sync();          // the text field after the chips: lit while the orbifold shown is the one typed there
   const picked = still ? new Set() : new Set([state.perm[0], state.perm[1]]);
   sigBtns.forEach((b, idx) => {
@@ -783,7 +783,7 @@ const custom = createCustomField({
   resolve: normalizeFamilyKey,
   show: showCustom,
   shown: () => state.k,
-  isCustom: (k) => !!FAMILIES[k].custom,
+  isCustom: (k) => !!FAMILIES[k].custom && !famBtns.some((b) => (b.dataset.k || b.dataset.fam) === k),
   labelOf: (k) => FAMILIES[k].label,
 });
 
@@ -880,6 +880,8 @@ for (const b of tabBtns) {
 if (backPlayBtn) backPlayBtn.addEventListener('click', () => showTab('play'));
 
 for (const b of famBtns) {
+  const k = normalizeFamilyKey(b.dataset.fam);
+  if (k) b.dataset.k = k;
   b.addEventListener('click', () => setFamily(b.dataset.fam));
 }
 
