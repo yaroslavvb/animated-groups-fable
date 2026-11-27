@@ -1,22 +1,14 @@
 /* page.css — styling for "The real 2222", layered over classification-of-surfaces/src/styles.css */
 
 :root {
-  --p-ab: #0072B2;
-  --p-ab-soft: rgba(0, 114, 178, 0.11);
-  --p-ac: #D58800;
-  --p-ac-soft: rgba(213, 136, 0, 0.12);
-  --p-ad: #7A5CC7;
-  --p-ad-soft: rgba(122, 92, 199, 0.11);
+  --side1: #0072B2;
+  --side2: #D55E00;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --p-ab: #56B4E9;
-    --p-ab-soft: rgba(86, 180, 233, 0.16);
-    --p-ac: #F0AE1E;
-    --p-ac-soft: rgba(240, 174, 30, 0.16);
-    --p-ad: #AE96EC;
-    --p-ad-soft: rgba(174, 150, 236, 0.16);
+    --side1: #56B4E9;
+    --side2: #FF8A3D;
   }
 }
 
@@ -97,8 +89,14 @@ html, body {
 }
 
 .stage-card .labels {
-  font-size: 13.5px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.stage-card .labels .r3d-label {
+  font-size: 14px;
+  font-weight: 750;
+  text-shadow: 0 0 3px var(--ground), 0 0 3px var(--ground), 0 0 5px var(--ground);
 }
 
 .stage-card .hint {
@@ -175,8 +173,8 @@ html, body {
 }
 
 .partition-card {
-  --part-col: var(--p-ab);
-  --part-soft: var(--p-ab-soft);
+  --part-col: var(--muted);
+  --part-soft: var(--accent-soft);
   border: 1.5px solid var(--hairline);
   border-radius: 12px;
   background: var(--card);
@@ -184,23 +182,9 @@ html, body {
   transition: border-color 0.14s ease, background-color 0.14s ease;
 }
 
-.partition-card[data-color="ab"] {
-  --part-col: var(--p-ab);
-  --part-soft: var(--p-ab-soft);
-}
-
-.partition-card[data-color="ac"] {
-  --part-col: var(--p-ac);
-  --part-soft: var(--p-ac-soft);
-}
-
-.partition-card[data-color="ad"] {
-  --part-col: var(--p-ad);
-  --part-soft: var(--p-ad-soft);
-}
-
 .partition-card.is-active {
-  border-color: var(--part-col);
+  --part-col: var(--accent);
+  border-color: var(--accent);
   background: var(--ground);
   box-shadow: 0 0 0 3px var(--part-soft);
 }
@@ -221,23 +205,47 @@ html, body {
 .part-id {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 0;
-}
-
-.part-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--part-col);
-  flex: none;
-}
-
-.part-title {
   font-size: 14.5px;
   font-weight: 650;
   letter-spacing: -0.01em;
   color: var(--ink);
+}
+
+.pair-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pair-dot {
+  display: inline-block;
+  border-radius: 50%;
+  flex: none;
+  opacity: 0.5;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.pair-chip.s1 .pair-dot {
+  width: 11px;
+  height: 11px;
+  background: var(--side1);
+}
+
+.pair-chip.s2 .pair-dot {
+  width: 8.5px;
+  height: 8.5px;
+  background: var(--side2);
+}
+
+.partition-card.is-active .pair-dot {
+  opacity: 1;
+}
+
+.pair-sep {
+  color: var(--faint);
+  font-weight: 500;
 }
 
 .part-badge {
@@ -246,7 +254,7 @@ html, body {
   padding: 2px 7px;
   border-radius: 999px;
   background: var(--part-soft);
-  color: var(--part-col);
+  color: var(--accent);
   opacity: 0;
   transition: opacity 0.12s ease;
 }
@@ -371,23 +379,25 @@ html, body {
   font-size: 12.5px;
 }
 
-.sw-cut {
-  height: 3px;
+.sw-s1, .sw-s2 {
+  border-radius: 50%;
+}
+
+.sw-s1 {
+  width: 12px;
+  height: 12px;
+  background: var(--side1);
+}
+
+.sw-s2 {
+  width: 9.5px;
+  height: 9.5px;
+  background: var(--side2);
+}
+
+.sw-crease {
+  height: 2px;
   width: 16px;
-  border-radius: 2px;
-  background: var(--ink);
+  border-radius: 1px;
+  background: var(--faint);
 }
-
-.sw-band-shade {
-  background: color-mix(in srgb, var(--front) 78%, var(--ink));
-}
-
-.sw-ab, .sw-ac, .sw-ad {
-  height: 4px;
-  width: 16px;
-  border-radius: 2px;
-}
-
-.sw-ab { background: var(--p-ab); }
-.sw-ac { background: var(--p-ac); }
-.sw-ad { background: var(--p-ad); }

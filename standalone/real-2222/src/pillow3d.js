@@ -10,16 +10,14 @@ const SURFACE_RADIUS = 0.86;
 const PRINT_SIZE = 256;
 const VIEW = { az: -24, el: 18, zoom: 1 };
 
-export const PAIR_RGB = {
+export const SIDE_COLORS = {
   light: {
-    ab: [0, 0.447, 0.698],
-    ac: [0.835, 0.533, 0],
-    ad: [0.478, 0.361, 0.78],
+    side1: { rgb: [0, 0.447, 0.698], css: '#0072B2' },     // vivid cobalt blue
+    side2: { rgb: [0.835, 0.369, 0], css: '#D55E00' },     // vivid vermilion orange
   },
   dark: {
-    ab: [0.337, 0.706, 0.914],
-    ac: [0.941, 0.682, 0.118],
-    ad: [0.682, 0.588, 0.925],
+    side1: { rgb: [0.337, 0.706, 0.914], css: '#56B4E9' }, // vivid sky blue
+    side2: { rgb: [1.0, 0.541, 0.239], css: '#FF8A3D' },   // vivid warm coral-orange
   },
 };
 
@@ -143,71 +141,76 @@ export function createPillowStage(canvas, labelLayer, scrollHost) {
     });
   }
 
+  function sidePalette() {
+    return THEME.dark ? SIDE_COLORS.dark : SIDE_COLORS.light;
+  }
+
+  function buildMarkerList() {
+    if (!mesh || !curState) return [];
+    const S = sidePalette();
+    const part = PARTITIONS[curState.activeIdx];
+    const side1Set = new Set(part.pairs[0]);
+
+    return ['A', 'B', 'C', 'D'].map((name) => {
+      const isSide1 = side1Set.has(name);
+      const spec = isSide1 ? S.side1 : S.side2;
+      return {
+        name,
+        side: isSide1 ? 1 : 2,
+        p: mesh.corners[name],
+        color: spec.rgb,
+        size: isSide1 ? 15 : 9.5,
+        alpha: 1,
+        shape: 'dot',
+        xray: 0.5,
+        label: name,
+        labelColor: spec.css,
+      };
+    });
+  }
+
   function lines() {
     if (!mesh || !curState) return [];
     const out = [];
-    const C = THEME.dark ? PAIR_RGB.dark : PAIR_RGB.light;
+    const S = sidePalette();
 
     for (const ep of mesh.edgePairs) {
-      const col = C[ep.colorKey];
       const active = ep.idx === curState.activeIdx;
       const folded = ep.bend >= 0.08;
       if (active) {
-        for (const [a, b] of ep.segs) {
+        // Highlight the two separated edge pairs in Side 1 vs Side 2 colors
+        const sideSpecs = [S.side1, S.side2];
+        ep.segs.forEach(([a, b], pairIndex) => {
+          const spec = sideSpecs[pairIndex];
           out.push({
             points: flat2(a, b),
-            color: col,
-            width: folded ? 3.5 : 2.3,
-            alpha: folded ? 1 : 0.9,
-            xray: folded ? 0.32 : 0.24,
+            color: spec.rgb,
+            width: folded ? (pairIndex === 0 ? 4.2 : 3.2) : (pairIndex === 0 ? 2.8 : 2.1),
+            alpha: folded ? 1 : 0.92,
+            xray: folded ? 0.34 : 0.26,
             dashed: !folded,
           });
-        }
+        });
       } else {
+        // Non-active creases stay subtle neutral lines so separated pairs stand out clearly
         for (const [a, b] of ep.segs) {
           out.push({
             points: flat2(a, b),
-            color: col,
-            width: folded ? 2.1 : 1.2,
-            alpha: folded ? 0.85 : 0.38,
-            xray: folded ? 0.24 : 0.14,
+            color: THEME.soft,
+            width: folded ? 1.5 : 1.0,
+            alpha: folded ? 0.58 : 0.24,
+            xray: folded ? 0.18 : 0.1,
             dashed: !folded,
           });
         }
       }
     }
 
-    for (const [a, b] of mesh.cutSegments) {
-      out.push({
-        points: flat2(a, b),
-        color: THEME.ink,
-        width: 2.8,
-        alpha: 1,
-        xray: 0.24,
-      });
-    }
-
     return out;
   }
 
   function markers() {
-    if (!mesh || !curState) return [];
-    const C = THEME.dark ? PAIR_RGB.dark : PAIR_RGB.light;
-    const part = PARTITIONS[curState.activeIdx];
-    const col = C[part.colorKey];
-    const primarySet = new Set(part.pairs[0]);
-    const labelColor = THEME.dark ? '#f2f2f5' : '#141418';
-
-    return ['A', 'B', 'C', 'D'].map((name) => ({
-      p: mesh.corners[name],
-      color: col,
-      size: primarySet.has(name) ? 9.5 : 7.5,
-      alpha: 1,
-      shape: 'dot',
-      xray: 0.45,
-      label: name,
-      labelColor,
-    }));
+    return buildMarkerList();
   }
 
   const scene = {
@@ -238,7 +241,6 @@ export function createPillowStage(canvas, labelLayer, scrollHost) {
       positions: mesh.positions,
       indices: mesh.indices,
       uv: mesh.uv,
-      tint: mesh.tint,
     });
 
     const key = [
@@ -281,6 +283,12 @@ export function createPillowStage(canvas, labelLayer, scrollHost) {
       }
     },
     info() {
+      const markerStyles = buildMarkerList().map((m) => ({
+        name: m.name,
+        side: m.side,
+        size: m.size,
+        color: m.labelColor,
+      }));
       return {
         activeIdx: curState ? curState.activeIdx : 0,
         kind: mesh ? mesh.S.kind : '',
@@ -289,6 +297,8 @@ export function createPillowStage(canvas, labelLayer, scrollHost) {
         corners: mesh ? { ...mesh.corners } : {},
         triangles: mesh ? mesh.triangles : 0,
         cutLength: mesh ? mesh.cutLength : 0,
+        cutLinesDrawn: 0,
+        markerStyles,
         view: R.getView(),
         printUploads: R.stats ? R.stats.printUploads : 0,
       };

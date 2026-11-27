@@ -118,7 +118,7 @@ function renderAll() {
   if (info.edges.length === 3) {
     edgesReadoutEl.textContent = 'edges ' + info.edges.map((e) => e.toFixed(2)).join(', ');
   }
-  cutReadoutEl.textContent = model.cFrac.toFixed(3).replace(/\.?0+$/, '');
+  if (cutReadoutEl) cutReadoutEl.textContent = model.cFrac.toFixed(3).replace(/\.?0+$/, '');
 }
 
 for (let i = 0; i < 3; i++) {

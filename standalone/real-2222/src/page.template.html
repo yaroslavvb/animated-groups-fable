@@ -44,12 +44,9 @@
       </div>
 
       <div class="legend" aria-label="Legend">
-        <span class="lg"><i class="sw sw-cut"></i><span>isolating cut (c = <span id="cut-readout">0.296</span>)</span></span>
-        <span class="lg"><i class="sw sw-front"></i>plain band</span>
-        <span class="lg"><i class="sw sw-band-shade"></i>shaded band</span>
-        <span class="lg"><i class="sw sw-ab"></i>{A, B} | {C, D}</span>
-        <span class="lg"><i class="sw sw-ac"></i>{A, C} | {B, D}</span>
-        <span class="lg"><i class="sw sw-ad"></i>{A, D} | {B, C}</span>
+        <span class="lg"><i class="sw sw-s1"></i><span>side 1 pair</span></span>
+        <span class="lg"><i class="sw sw-s2"></i><span>side 2 pair</span></span>
+        <span class="lg"><i class="sw sw-crease"></i><span>other creases</span></span>
       </div>
     </div>
 
@@ -57,10 +54,11 @@
       <article class="partition-card is-active" data-part="0" data-color="ab">
         <button type="button" class="part-head" data-select="0" aria-pressed="true">
           <span class="part-id">
-            <i class="part-dot"></i>
-            <span class="part-title">{A, B} | {C, D}</span>
+            <span class="pair-chip s1"><i class="pair-dot"></i>{A, B}</span>
+            <span class="pair-sep">|</span>
+            <span class="pair-chip s2"><i class="pair-dot"></i>{C, D}</span>
           </span>
-          <span class="part-badge">active cut</span>
+          <span class="part-badge">highlighted</span>
         </button>
         <div class="slider-group">
           <label class="srow" for="len-0">
@@ -95,10 +93,11 @@
       <article class="partition-card" data-part="1" data-color="ac">
         <button type="button" class="part-head" data-select="1" aria-pressed="false">
           <span class="part-id">
-            <i class="part-dot"></i>
-            <span class="part-title">{A, C} | {B, D}</span>
+            <span class="pair-chip s1"><i class="pair-dot"></i>{A, C}</span>
+            <span class="pair-sep">|</span>
+            <span class="pair-chip s2"><i class="pair-dot"></i>{B, D}</span>
           </span>
-          <span class="part-badge">active cut</span>
+          <span class="part-badge">highlighted</span>
         </button>
         <div class="slider-group">
           <label class="srow" for="len-1">
@@ -133,10 +132,11 @@
       <article class="partition-card" data-part="2" data-color="ad">
         <button type="button" class="part-head" data-select="2" aria-pressed="false">
           <span class="part-id">
-            <i class="part-dot"></i>
-            <span class="part-title">{A, D} | {B, C}</span>
+            <span class="pair-chip s1"><i class="pair-dot"></i>{A, D}</span>
+            <span class="pair-sep">|</span>
+            <span class="pair-chip s2"><i class="pair-dot"></i>{B, C}</span>
           </span>
-          <span class="part-badge">active cut</span>
+          <span class="part-badge">highlighted</span>
         </button>
         <div class="slider-group">
           <label class="srow" for="len-2">
