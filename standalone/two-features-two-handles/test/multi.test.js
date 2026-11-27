@@ -221,15 +221,20 @@ test('the pattern model: every shown pair\'s tree and cut, the picked pair\'s co
     assert.deepEqual(fam.pairs, m === 3 ? [[0, 1], [2, 3], [4, 5]] : [[0, 1], [2, 3]]);
     assert.equal(surfacePartsFor(k).length, fam.orders.length);
     buildSurface(surfacePartsFor(k));
+    const pairLines = (i) => (fam.orders[2 * i] === 2 && fam.orders[2 * i + 1] === 2 ? 1 : 2);
     const st = multiState(k), model = buildPatternModel(st), c = multiCentred(st);
-    assert.ok(model.classified && model.lines.length === 2 && model.marks.length === 2 && model.design().length === multiPrint(k).count);
+    assert.ok(model.classified && model.lines.length === pairLines(0) && model.marks.length === 2 && model.design().length === multiPrint(k).count);
     assert.deepEqual(model.firstV, c.view, `${text}: opens as the Classification page lies`);
     assert.deepEqual(st.perm, [0, 1]);
     // the marks are the corner classes of the picked pair's two cone points, of the right orders
     model.marks.forEach((cls, q) => assert.equal(model.A.classes[cls].n, fam.orders[q], `${text}: mark ${q}`));
     // any other pair picked, or a number moved: it opens by its pose (the picked pair level in the middle)
     const all = buildPatternModel(multiState(k, { shown: m, active: m - 1 }));
-    assert.ok(all.lines.length === 2 * m && !all.classified, `${text}: ${m} pairs shown, the last picked`);
+    const allExpectedLines = fam.pairs.reduce((s, _, i) => s + pairLines(i), 0);
+    assert.ok(all.lines.length === allExpectedLines && !all.classified, `${text}: ${m} pairs shown, the last picked`);
+    if (fam.orders.every((o) => o === 2)) {
+      assert.ok(all.lines.every((ln) => !!ln.dash), `${text}: (2,2) pairs omit redundant black tree on cut`);
+    }
     assert.deepEqual(all.firstV, all.pose);
     const moved = buildPatternModel(multiState(k, { tws: fam.defaults.tw.map(() => 0.1) }));
     assert.ok(!moved.classified && moved.firstV === moved.pose);
@@ -301,8 +306,10 @@ test('(2, 2) pairs single-cover their cut geodesic at length L/2 with zero doubl
       active: 2, shown: 3, L: 2.634, tw: tw2, b: 0, tau: 0,
     };
     const m = buildPatternModel(st);
+    assert.equal(m.lines.length, 3, `222222 tw2=${tw2}: expected 3 cut lines only`);
+    assert.ok(m.lines.every((ln) => !!ln.dash), `222222 tw2=${tw2}: no overlapping black tree on cut`);
     for (let pair = 0; pair < 3; pair++) {
-      assertDisjointCutCopies(m, m.lines[2 * pair + 1], 2.634 / 2, `222222 tw2=${tw2} pair=${pair}`);
+      assertDisjointCutCopies(m, m.lines[pair], 2.634 / 2, `222222 tw2=${tw2} pair=${pair}`);
     }
   }
 

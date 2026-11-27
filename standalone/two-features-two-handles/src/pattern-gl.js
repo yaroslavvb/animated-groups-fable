@@ -632,7 +632,6 @@ const discToKlein = (w) => {
   const s = 2 / (1 + w[0] * w[0] + w[1] * w[1]);
   return [w[0] * s, w[1] * s];
 };
-const isIdPsu = (g) => Math.abs(g[0] - 1) < 1e-12 && !g[4] && Math.hypot(g[1], g[2], g[3]) < 1e-12;
 
 function pushDirDisc(g, p0, dir0) {
   const u = p0[0], v = g[4] ? -p0[1] : p0[1];
@@ -691,7 +690,8 @@ function segDistHypCPU(wD, S, lenH) {
   const r2 = u[0] * u[0] + u[1] * u[1];
   const uxK = (2 * u[0]) / (1 + r2);
   if (uxK <= 0) return 2 * Math.atanh(Math.min(1 - 1e-12, Math.hypot(u[0], u[1])));
-  if (uxK >= Math.tanh(lenH)) return discDist(u, [Math.tanh(0.5 * lenH), 0]);
+  const tb = Math.tanh(0.5 * lenH);
+  if ((1 + tb * tb) * u[0] >= tb * (1 + r2)) return discDist(u, [tb, 0]);
   return Math.asinh((2 * Math.abs(u[1])) / Math.max(1e-12, 1 - r2));
 }
 
@@ -731,6 +731,139 @@ function segDistToD(aD, bD, S_ab, len_ab, D, norms, S_edges, edgeLens, vDiscs, v
     best = Math.min(best, segDistHypCPU(aD, S_edges[i], edgeLens[i]), segDistHypCPU(bD, S_edges[i], edgeLens[i]), segDistHypCPU(vDiscs[i], S_ab, len_ab));
   }
   return best;
+}
+
+/** Enumerate face-adjacent covering tiles intersecting a convex feature neighborhood via BFS. */
+export function bfsFeatureTiles(seeds, maps2, atD, acceptAndExpand, maxVisited = 1024) {
+  const queue = [];
+  const visited = [];
+  let truncated = false;
+  const enqueue = (h) => {
+    if (!h) return;
+    const flip = h[4] ? 1 : 0;
+    const w = psuApplyDisc(h, atD);
+    for (let i = 0; i < visited.length; i++) {
+      if (visited[i].flip === flip && discDist(visited[i].w, w) < 1e-4) return;
+    }
+    if (visited.length >= maxVisited) { truncated = true; return; }
+    visited.push({ flip, w });
+    queue.push(h);
+  };
+  for (const s of seeds) enqueue(s);
+  let qi = 0;
+  while (qi < queue.length) {
+    const h = queue[qi++];
+    const g = psuInv(h);
+    if (!acceptAndExpand(g, h)) continue;
+    for (let e = 0; e < maps2.length; e++) enqueue(psuMul(h, maps2[e]));
+  }
+  return { visited: visited.length, truncated };
+}
+
+/** Collect exact tiles intersecting each comma, segment, and vertex mark near fundamental domain D. */
+export function collectFeatureTiles(D, A, {
+  commaSamples = [], repSegs = [], marked = [], area = 1, locateTile,
+  norms: normsIn, S_edges: sEdgesIn, edgeLens: edgeLensIn, vDiscs: vDiscsIn, vKleins: vKleinsIn,
+} = {}) {
+  const G = D.G;
+  const n = D.n;
+  const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
+  const atD = toDisc(D.at);
+  const norms = normsIn || buildKleinNorms(D);
+  const vDiscs = vDiscsIn || D.verts.map(toDisc);
+  const vKleins = vKleinsIn || vDiscs.map(discToKlein);
+  let S_edges = sEdgesIn;
+  let edgeLens = edgeLensIn;
+  if (!S_edges || !edgeLens) {
+    S_edges = [];
+    edgeLens = [];
+    for (let i = 0; i < n; i++) {
+      const a = D.verts[i], b = D.verts[(i + 1) % n];
+      S_edges.push(psuInv(so21ToPSU(G.frame(a, b), false)));
+      edgeLens.push(G.dist(a, b));
+    }
+  }
+
+  let truncated = false;
+  const gI = psuI();
+
+  const commaTiles = commaSamples.map((cs) => {
+    const out = [];
+    if (!cs || !cs.pts || cs.pts.length < 3) return out;
+    const rLim = cs.rad + 0.08;
+    const res = locateTile(D, A, cs.atD);
+    const seeds = [res && res.g ? res.g : gI];
+    if (!res || !res.inside) {
+      seeds.push(gI);
+      const r0 = locateTile(D, A, toDisc(cs.pts[0]));
+      if (r0 && r0.g) seeds.push(r0.g);
+    }
+    const bfs = bfsFeatureTiles(seeds, maps2, atD, (g, h) => {
+      const centerG = psuApplyDisc(g, cs.atD);
+      if (pointDistToD(centerG, D, norms, S_edges, edgeLens) > rLim) return false;
+      out.push({ g, h, centerG });
+      return true;
+    });
+    if (bfs.truncated) truncated = true;
+    return out;
+  });
+
+  const segTiles = repSegs.map((seg) => {
+    const out = [];
+    const a0 = toDisc(seg.a), b0 = toDisc(seg.b);
+    const lenH = G.dist(seg.a, seg.b);
+    if (lenH < 1e-7) return out;
+    const segMargin = (seg.kind === 0 || seg.kind === 2) ? 0.14 : 0.09;
+    const tb = Math.tanh(0.5 * lenH);
+    const rA = locateTile(D, A, a0);
+    const rM = locateTile(D, A, toDisc(G.mix(seg.a, seg.b, 0.5)));
+    const rB = locateTile(D, A, b0);
+    const seeds = [rA && rA.g, rM && rM.g, rB && rB.g].filter(Boolean);
+    if (!seeds.length || !rA?.inside || !rM?.inside || !rB?.inside) seeds.push(gI);
+    const sSeen = [];
+    const bfs = bfsFeatureTiles(seeds, maps2, atD, (g) => {
+      const M = psuToSO21(g);
+      const gaH = apply(M, seg.a), gbH = apply(M, seg.b);
+      const ga = psuApplyDisc(g, a0), gb = psuApplyDisc(g, b0);
+      const S_ab = psuInv(so21ToPSU(G.frame(gaH, gbH), false));
+      if (segDistToD(ga, gb, S_ab, lenH, D, norms, S_edges, edgeLens, vDiscs, vKleins) > segMargin) return false;
+      let dup = false;
+      for (const p of sSeen) {
+        if ((discDist(p.a, ga) < 1e-3 && discDist(p.b, gb) < 1e-3) ||
+            (discDist(p.a, gb) < 1e-3 && discDist(p.b, ga) < 1e-3)) { dup = true; break; }
+      }
+      if (!dup) {
+        sSeen.push({ a: ga, b: gb });
+        out.push({ g, gaH, gbH, S_ab, lenH, tb });
+      }
+      return true;
+    });
+    if (bfs.truncated) truncated = true;
+    return out;
+  });
+
+  const hScale = Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area)));
+  const markMargin = Math.max(0.45, 0.72 * hScale);
+  const markTiles = marked.map((mk) => {
+    const out = [];
+    const p0 = toDisc(D.verts[mk.v]);
+    const mSeen = [];
+    const bfs = bfsFeatureTiles([gI], maps2, atD, (g) => {
+      const pg = psuApplyDisc(g, p0);
+      if (pointDistToD(pg, D, norms, S_edges, edgeLens) > markMargin) return false;
+      let dup = false;
+      for (const prev of mSeen) { if (discDist(prev, pg) < 1e-3) { dup = true; break; } }
+      if (!dup) {
+        mSeen.push(pg);
+        out.push({ g, pg, p0 });
+      }
+      return true;
+    });
+    if (bfs.truncated) truncated = true;
+    return out;
+  });
+
+  return { commaTiles, segTiles, markTiles, truncated };
 }
 
 function sampleSmoothCommaDisc(pts0, L_si, smoothClosedPath) {
@@ -1028,119 +1161,6 @@ export function createHyperbolicGL(canvas2d) {
     arr[off] = x; arr[off + 1] = y; arr[off + 2] = z; arr[off + 3] = w;
   }
 
-  function buildCandidateTiles(D, A, { repSegs, commaSamples, locateTile, norms, S_edges, edgeLens }) {
-    const maps2 = A.maps2 || A.maps.map((M, i) => so21ToPSU(M, !!(D.edges[i].mirror || D.edges[i].rev)));
-    const atD = toDisc(D.at);
-    const n = D.n;
-    const vDiscs = D.verts.map(toDisc);
-
-    const needVertex = new Uint8Array(n);
-    for (const c of A.classes) {
-      if (c.n > 1) for (const vi of c.verts) needVertex[vi] = 1;
-    }
-    const commaMargin = 0.08;
-    const commaBoundary = new Uint8Array(commaSamples.length);
-    let anyCommaNearBoundary = false;
-    for (let si = 0; si < commaSamples.length; si++) {
-      const cs = commaSamples[si];
-      let minE = Infinity;
-      for (let ei = 0; ei < n; ei++) minE = Math.min(minE, segDistHypCPU(cs.atD, S_edges[ei], edgeLens[ei]));
-      if (minE <= cs.rad + commaMargin) {
-        commaBoundary[si] = 1;
-        anyCommaNearBoundary = true;
-        for (let vi = 0; vi < n; vi++) {
-          if (discDist(vDiscs[vi], cs.atD) <= cs.rad + 0.35) needVertex[vi] = 1;
-        }
-      }
-    }
-    const fastOnlyEdges = repSegs.length === 0 && !anyCommaNearBoundary;
-
-    const tiles = [];
-    const seen = [];
-    const addTile = (g) => {
-      const flip = g[4] ? 1 : 0;
-      const w = psuApplyDisc(g, atD);
-      for (let i = 0; i < seen.length; i++) {
-        if (seen[i].flip === flip && discDist(seen[i].w, w) < 1e-4) return false;
-      }
-      seen.push({ flip, w });
-      tiles.push(g);
-      return true;
-    };
-
-    const gI = psuI();
-    addTile(gI);
-
-    if (fastOnlyEdges) {
-      for (let e = 0; e < n; e++) addTile(maps2[e]);
-      let qi = 0;
-      while (qi < tiles.length && tiles.length < 96) {
-        const g = tiles[qi++];
-        const gv = vDiscs.map((v) => psuApplyDisc(g, v));
-        let touchesNeeded = isIdPsu(g);
-        if (!touchesNeeded) {
-          for (let i = 0; i < n && !touchesNeeded; i++) {
-            if (!needVertex[i]) continue;
-            for (let j = 0; j < n; j++) {
-              if (discDist(vDiscs[i], gv[j]) < 1e-3) { touchesNeeded = true; break; }
-            }
-          }
-        }
-        if (!touchesNeeded) continue;
-        for (let i = 0; i < n; i++) {
-          const gn = psuMul(g, maps2[i]);
-          let shared = false;
-          for (let a = 0; a < n && !shared; a++) {
-            if (!needVertex[a]) continue;
-            const dA = vDiscs[a];
-            for (let b = 0; b < n; b++) {
-              if (discDist(dA, psuApplyDisc(gn, vDiscs[b])) < 1e-3) { shared = true; break; }
-            }
-          }
-          if (shared) addTile(gn);
-        }
-      }
-      return tiles;
-    }
-
-    let qi = 0;
-    while (qi < tiles.length && tiles.length < 96) {
-      const g = tiles[qi++];
-      for (let i = 0; i < n; i++) {
-        const gn = psuMul(g, maps2[i]);
-        let shared = isIdPsu(g);
-        for (let a = 0; a < n && !shared; a++) {
-          const dA = vDiscs[a];
-          for (let b = 0; b < n; b++) {
-            if (discDist(dA, psuApplyDisc(gn, vDiscs[b])) < 1e-3) { shared = true; break; }
-          }
-        }
-        if (shared) addTile(gn);
-      }
-    }
-
-    const probePoint = (ptH) => {
-      const res = locateTile(D, A, toDisc(ptH));
-      if (!res || !res.g) return;
-      const gBase = psuInv(res.g);
-      addTile(gBase);
-      for (let e = 0; e < n && tiles.length < 112; e++) addTile(psuMul(gBase, maps2[e]));
-    };
-    const G = D.G;
-    for (const seg of repSegs) {
-      for (let k = 0; k <= 4; k++) probePoint(k === 0 ? seg.a : k === 4 ? seg.b : G.mix(seg.a, seg.b, k / 4));
-    }
-    for (let si = 0; si < commaSamples.length; si++) {
-      if (commaSamples[si].pts && commaSamples[si].pts.length) {
-        const pts = commaSamples[si].pts;
-        probePoint(commaSamples[si].atH);
-        for (let k = 0; k < 4; k++) probePoint(pts[Math.floor((k * pts.length) / 4)]);
-      }
-    }
-    void norms;
-    return tiles;
-  }
-
   return {
     isReady: () => !lost && !!mainProg,
 
@@ -1242,68 +1262,6 @@ export function createHyperbolicGL(canvas2d) {
         });
       });
 
-      const candTiles = buildCandidateTiles(D, A, { repSegs, commaSamples, locateTile, norms, S_edges, edgeLens });
-
-      const commaInst = [];
-      for (let si = 0; si < des.length; si++) {
-        const info = bakedInfos[si], L_si = localFrames[si], cs = commaSamples[si];
-        if (!info || !L_si) continue;
-        const cSeen = [];
-        const rCorner = Math.SQRT2 * info.rBox;
-        const coshBound = rCorner < 0.995
-          ? ((1 + rCorner * rCorner) / (1 - rCorner * rCorner)) * 1.005 + 1e-3
-          : 1e9;
-        for (const g of candTiles) {
-          const centerG = psuApplyDisc(g, cs.atD);
-          if (pointDistToD(centerG, D, norms, S_edges, edgeLens) > cs.rad + 0.06) continue;
-          const flip = g[4] ? 1 : 0;
-          let dup = false;
-          for (const prev of cSeen) {
-            if (prev.flip === flip && discDist(prev.c, centerG) < 1e-4) { dup = true; break; }
-          }
-          if (dup) continue;
-          cSeen.push({ flip, c: centerG });
-          if (commaInst.length >= MAX_ITEMS) return false;
-          const M_c = psuMul(L_si, psuInv(g));
-          const cH = discToH(centerG);
-          commaInst.push({ M: M_c, flip: M_c[4] ? 1 : 0, layer: si, rBox: info.rBox, cH, coshBound });
-        }
-      }
-
-      const segInst = [];
-      let maxSegHalfW = 2.0;
-      for (const seg of repSegs) {
-        const a0 = toDisc(seg.a), b0 = toDisc(seg.b), sSeen = [];
-        const lenH = G.dist(seg.a, seg.b);
-        if (lenH < 1e-7) continue;
-        const segMargin = (seg.kind === 0 || seg.kind === 2) ? 0.14 : 0.075;
-        const tb = Math.tanh(0.5 * lenH);
-        for (const g of candTiles) {
-          const M = psuToSO21(g);
-          const gaH = apply(M, seg.a), gbH = apply(M, seg.b);
-          const ga = psuApplyDisc(g, a0), gb = psuApplyDisc(g, b0);
-          let dup = false;
-          for (const p of sSeen) {
-            if ((discDist(p.a, ga) < 1e-3 && discDist(p.b, gb) < 1e-3) ||
-                (discDist(p.a, gb) < 1e-3 && discDist(p.b, ga) < 1e-3)) { dup = true; break; }
-          }
-          if (dup) continue;
-          const S_ab = psuInv(so21ToPSU(G.frame(gaH, gbH), false));
-          if (segDistToD(ga, gb, S_ab, lenH, D, norms, S_edges, edgeLens, vDiscs, vKleins) > segMargin) continue;
-          sSeen.push({ a: ga, b: gb });
-          if (segInst.length >= MAX_ITEMS) return false;
-          const sN = segMinkNorm(gaH, gbH);
-          const peakHalfW = 0.5 * seg.width * (seg.kind === 1 ? 1.0 : 1.85);
-          if (peakHalfW > maxSegHalfW) maxSegHalfW = peakHalfW;
-          segInst.push({
-            N: sN, S: S_ab, lenH, tb,
-            color: seg.color, alpha: seg.alpha, width: seg.width,
-            dashOn: seg.dash ? seg.dash[0] : 0, dashOff: seg.dash ? seg.dash[1] : 0,
-            kind: seg.kind, grpIdx: seg.grpIdx, scaleMode: seg.scaleMode, groupId: seg.groupId,
-          });
-        }
-      }
-
       const alsoSet = model.marks ? new Set(model.marks) : null;
       const marked = A.classes.filter((c) => c.n > 1).map((c) => {
         const ref = model.markRefs && model.markRefs[c.id];
@@ -1315,11 +1273,51 @@ export function createHyperbolicGL(canvas2d) {
         }
         return { c, v, toward, dir: ref ? ref.dir : null };
       });
+
+      const { commaTiles, segTiles, markTiles, truncated } = collectFeatureTiles(D, A, {
+        commaSamples, repSegs, marked, area, locateTile, norms, S_edges, edgeLens, vDiscs, vKleins,
+      });
+      if (truncated) return false;
+
+      const commaInst = [];
+      for (let si = 0; si < des.length; si++) {
+        const info = bakedInfos[si], L_si = localFrames[si];
+        if (!info || !L_si) continue;
+        const rCorner = Math.SQRT2 * info.rBox;
+        const coshBound = rCorner < 0.995
+          ? ((1 + rCorner * rCorner) / (1 - rCorner * rCorner)) * 1.005 + 1e-3
+          : 1e9;
+        for (const hit of commaTiles[si]) {
+          if (commaInst.length >= MAX_ITEMS) return false;
+          const M_c = psuMul(L_si, hit.h);
+          const cH = discToH(hit.centerG);
+          commaInst.push({ M: M_c, flip: M_c[4] ? 1 : 0, layer: si, rBox: info.rBox, cH, coshBound });
+        }
+      }
+
+      const segInst = [];
+      let maxSegHalfW = 2.0;
+      for (let ri = 0; ri < repSegs.length; ri++) {
+        const seg = repSegs[ri];
+        for (const hit of segTiles[ri]) {
+          if (segInst.length >= MAX_ITEMS) return false;
+          const sN = segMinkNorm(hit.gaH, hit.gbH);
+          const peakHalfW = 0.5 * seg.width * (seg.kind === 1 ? 1.0 : 1.85);
+          if (peakHalfW > maxSegHalfW) maxSegHalfW = peakHalfW;
+          segInst.push({
+            N: sN, S: hit.S_ab, lenH: hit.lenH, tb: hit.tb,
+            color: seg.color, alpha: seg.alpha, width: seg.width,
+            dashOn: seg.dash ? seg.dash[0] : 0, dashOff: seg.dash ? seg.dash[1] : 0,
+            kind: seg.kind, grpIdx: seg.grpIdx, scaleMode: seg.scaleMode, groupId: seg.groupId,
+          });
+        }
+      }
+
       const markInst = [];
       const hScale = Math.min(0.75, Math.max(0.45, 0.30 * Math.sqrt(area)));
       const markScale = Math.min(0.75, Math.max(0.20, 0.30 * Math.sqrt(area)));
-      const markMargin = Math.max(0.45, 0.72 * hScale);
-      for (const mk of marked) {
+      for (let mi = 0; mi < marked.length; mi++) {
+        const mk = marked[mi];
         const pH = D.verts[mk.v], p0 = toDisc(pH);
         let dir0;
         if (mk.dir) {
@@ -1337,18 +1335,11 @@ export function createHyperbolicGL(canvas2d) {
           const dx = qD[0] - p0[0], dy = qD[1] - p0[1], l = Math.hypot(dx, dy) || 1;
           dir0 = [dx / l, dy / l];
         }
-        const mSeen = [];
-        for (const g of candTiles) {
-          const pg = psuApplyDisc(g, p0);
-          if (pointDistToD(pg, D, norms, S_edges, edgeLens) > markMargin) continue;
-          let dup = false;
-          for (const prev of mSeen) { if (discDist(prev, pg) < 1e-3) { dup = true; break; } }
-          if (dup) continue;
-          mSeen.push(pg);
+        for (const hit of markTiles[mi]) {
           if (markInst.length >= MAX_ITEMS) return false;
-          const ug = pushDirDisc(g, p0, dir0);
-          const F = markLocalFrame(pg, ug);
-          const mH = discToH(pg);
+          const ug = pushDirDisc(hit.g, hit.p0, dir0);
+          const F = markLocalFrame(hit.pg, ug);
+          const mH = discToH(hit.pg);
           markInst.push({
             F, mH, order: mk.c.n,
             isCone: mk.c.kind === 'cone' ? 1 : 0,

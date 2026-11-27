@@ -58,6 +58,7 @@ const tauLabel = $('#tau-label');
 const extraSliders = $('#extra-sliders');
 const bRow = $('#b-row');
 const tauRow = $('#tau-row');
+const keyTree = $('#key-tree');
 const keyFault = $('#key-fault');
 const keyMirror = $('#key-mirror');
 const keyGlide = $('#key-glide');
@@ -517,6 +518,7 @@ function syncUI() {
     tauLabel.textContent = fam.tauLabel;
     tauRange.setAttribute('aria-label', fam.tauLabel);
   }
+  keyTree.hidden = many && fam.pairs.every(([a, b], i) => (i !== state.active && i >= state.shown) || (state.orders[a] === 2 && state.orders[b] === 2));
   keyFault.hidden = fam.mode !== 'handle';
   keyMirror.hidden = fam.mode !== 'cone-star' && fam.mode !== 'cone-star3';
   keyGlide.hidden = fam.mode !== 'cone-x';

@@ -9,7 +9,7 @@ import {
   fourConeCentered, coneFeatCentered, o33Centered, recut, recutH, pillowCentered, recut2222,
   followTreeData, interpolateView, stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
-  defaultCommas, buildPatternModel, pairMetricsFor, multiState,
+  defaultCommas, buildPatternModel, centredFor, pairMetricsFor, multiState,
 } from '../src/handles.js';
 import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath, psuPow } from '../src/pattern-ext.js';
 import { design } from '../../classification-of-surfaces/src/sym/motifs.js';
@@ -802,36 +802,43 @@ test('Complementary pair tree (farTreeSeg) renders symmetrically and matches swa
     const L = k === '2222' ? 1.1 : 2.2;
     const b = fam.defaultB ?? 0, tau = fam.defaultTau ?? 0;
     const thetas = defaultCommas(k).map((s) => (s ? s.theta : 0));
+    const orders = perm.map((c) => fam.baseOrders[c]);
+    const cutOnPicked = k !== '2222' && orders[0] === 2 && orders[1] === 2;
+    const cutOnFar = k !== '2222' && orders[2] === 2 && orders[3] === 2;
+    const expectedLineCount = 1 + (cutOnPicked ? 0 : 1) + (cutOnFar ? 0 : 1);
 
     let refLen = null;
     for (const tw of [-0.5, -0.25, 0, 0.25, 0.5]) {
-      const st = { k, perm, orders: perm.map((c) => fam.baseOrders[c]), L, tw, b, tau, thetas };
+      const st = { k, perm, orders, L, tw, b, tau, thetas };
+      const c = centredFor(st);
       const m = buildPatternModel(st);
-      const nonOnce = m.lines.filter((ln) => !ln.once);
+      const nonOnce = m.lines.filter((ln) => !ln.once && !ln.role);
+      assert.equal(nonOnce.length, expectedLineCount, `${k} perm=${perm} line count`);
       const cutLn = nonOnce[nonOnce.length - 1];
-      const treeLn = nonOnce[nonOnce.length - 2];
-      const farLn = nonOnce[nonOnce.length - 3];
       assert.ok(cutLn && cutLn.dash, `${k} missing cutSeg`);
-      assert.equal(treeLn.alpha, 0.9, `${k} picked tree alpha`);
-      assert.equal(farLn.alpha, 0.5, `${k} farTree alpha`);
-      const len = G.dist(farLn.a, farLn.b);
+      const treeEmitted = nonOnce.find((ln) => !ln.dash && Math.abs(ln.alpha - 0.9) < 1e-9);
+      const farEmitted = nonOnce.find((ln) => !ln.dash && Math.abs(ln.alpha - 0.5) < 1e-9);
+      assert.equal(!!treeEmitted, !cutOnPicked, `${k} perm=${perm} picked tree emission`);
+      assert.equal(!!farEmitted, !cutOnFar, `${k} perm=${perm} far tree emission`);
+      const len = G.dist(c.farTreeSeg[0], c.farTreeSeg[1]);
       if (refLen === null) refLen = len;
       assert.ok(near(len, refLen, 1e-7), `${k} tw=${tw} farTree len varied: ${len} vs ${refLen}`);
     }
 
-    const st = { k, perm, orders: perm.map((c) => fam.baseOrders[c]), L, tw: 0.23, b, tau, thetas };
+    const st = { k, perm, orders, L, tw: 0.23, b, tau, thetas };
+    const c1 = centredFor(st);
     const m1 = buildPatternModel(st);
     const nonOnce = m1.lines.filter((ln) => !ln.once);
     const cutLn = nonOnce[nonOnce.length - 1];
-    const treeLn = nonOnce[nonOnce.length - 2];
-    const farLn = nonOnce[nonOnce.length - 3];
+    const [t0, t1] = c1.treeSeg;
+    const [f0, f1] = c1.farTreeSeg;
 
     const side = (pt) => {
       if (fam.kind === 'E') return pt[1] - cutLn.a[1];
       const F = GH.frame(cutLn.a, cutLn.b), n = [F[1], F[4], F[7]];
       return pt[0] * n[0] + pt[1] * n[1] - pt[2] * n[2];
     };
-    const st0 = side(treeLn.a), st1 = side(treeLn.b), sf0 = side(farLn.a), sf1 = side(farLn.b);
+    const st0 = side(t0), st1 = side(t1), sf0 = side(f0), sf1 = side(f1);
     if (Math.abs(sf0) < 1e-9 && Math.abs(sf1) < 1e-9) {
       assert.ok(Math.abs(st0) > 0.1 && st0 * st1 > 0, `${k} expected cut through (2,2) far pair`);
     } else if (Math.abs(st0) < 1e-9 && Math.abs(st1) < 1e-9) {
@@ -842,18 +849,17 @@ test('Complementary pair tree (farTreeSeg) renders symmetrically and matches swa
 
     const r = recut(st, perm[2], perm[3]);
     const st2 = { k: r.k, perm: r.perm, orders: r.orders, L: r.L, tw: r.tw, b: r.b ?? st.b, tau: r.tau ?? st.tau, thetas: r.thetas };
-    const m2 = buildPatternModel(st2);
-    const nonOnce2 = m2.lines.filter((ln) => !ln.once);
-    const tree2 = nonOnce2[nonOnce2.length - 2];
+    const c2 = centredFor(st2);
+    const [u0, u1] = c2.treeSeg;
     if (fam.kind === 'E') {
-      const p0 = apply(r.invQ, tree2.a), p1 = apply(r.invQ, tree2.b);
-      assert.ok(near(p0[1], farLn.a[1], 1e-8) && near(p1[1], farLn.a[1], 1e-8), `2222 swapped y mismatch`);
-      assert.ok(near(GE.dist(tree2.a, tree2.b), GE.dist(farLn.a, farLn.b), 1e-8), `2222 swapped len mismatch`);
+      const p0 = apply(r.invQ, u0), p1 = apply(r.invQ, u1);
+      assert.ok(near(p0[1], f0[1], 1e-8) && near(p1[1], f0[1], 1e-8), `2222 swapped y mismatch`);
+      assert.ok(near(GE.dist(u0, u1), GE.dist(f0, f1), 1e-8), `2222 swapped len mismatch`);
     } else {
-      const p0 = GH.norm(apply(r.invQ, tree2.a)), p1 = GH.norm(apply(r.invQ, tree2.b));
+      const p0 = GH.norm(apply(r.invQ, u0)), p1 = GH.norm(apply(r.invQ, u1));
       const dMatch = Math.min(
-        Math.max(GH.dist(p0, farLn.a), GH.dist(p1, farLn.b)),
-        Math.max(GH.dist(p0, farLn.b), GH.dist(p1, farLn.a)),
+        Math.max(GH.dist(p0, f0), GH.dist(p1, f1)),
+        Math.max(GH.dist(p0, f1), GH.dist(p1, f0)),
       );
       assert.ok(dMatch < 1e-8, `${k} perm=${perm} swapped treeSeg vs farTreeSeg mismatch: ${dMatch}`);
     }
