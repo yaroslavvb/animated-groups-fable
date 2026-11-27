@@ -30,8 +30,10 @@ const base = opt.live || B.url('site/index.html');
 let failed = 0, errors = 0;
 const ok = (c, what, extra = '') => { if (!c) failed++; console.log(`${c ? 'ok  ' : 'FAIL'} ${what}${c ? '' : '  ' + extra}`); };
 try {
-  const ctx = await B.browser.newContext({ viewport: { width: 1400, height: 1000 }, deviceScaleFactor: 2 });
+  // A browser session of its own for every page, as tools/custom-check.mjs has: in the spacesheep viewer a second
+  // tab of one session opens on the page's plain address, the state in its link dropped.
   const open = async (tc, m = '0123') => {
+    const ctx = await B.browser.newContext({ viewport: { width: 1400, height: 1000 }, deviceScaleFactor: 2 });
     const page = await ctx.newPage();
     const mine = (url) => !opt.live || /spacesheep\.app/.test(url || '');
     page.on('console', (msg) => { if (msg.type() === 'error' && mine(msg.location().url)) { errors++; console.log('CONSOLE ERROR', msg.text().slice(0, 200)); } });
@@ -41,7 +43,7 @@ try {
     if (opt.live) { for (let i = 0; i < 150 && T === page; i++) { const f = page.frames().find((fr) => /spacesheep\.app/.test(fr.url())); if (f) T = f; else await page.waitForTimeout(200); } }
     await T.waitForFunction(() => window.__handles && window.__handles.state().pattern);
     await page.waitForTimeout(900);
-    return { page, T };
+    return { page, T, close: () => ctx.close() };
   };
   const shot = async (page, T, name) => { if (!shots) return; const box = await (await T.$('#pattern')).boundingBox(); const fr = opt.live ? await (await T.frameElement()).boundingBox() : { x: 0, y: 0 }; await page.screenshot({ path: path.join(shots, name + '.png'), clip: { x: fr.x + box.x, y: fr.y + box.y, width: box.width, height: box.height } }); };
   /** How dark the canvas is at a point of the pattern (the darkest of the pixels round it): 0 black .. 255 white. */
@@ -64,7 +66,7 @@ try {
       const c = at(tc, perm), f = H.cornerFade(tc), far = c.treeFade.far;
       const main = far ? [c.home[2], c.home[3]] : [c.home[0], c.home[1]];
       const pm = G.mix(main[0], main[1], 0.35), pa = G.mix(c.treeFade.seg[0], c.treeFade.seg[1], 0.35);
-      const { page, T } = await open(tc, m);
+      const { page, T, close } = await open(tc, m);
       const s = await T.evaluate(() => { const st = window.__handles.state(); return { tau: st.tau, m: st.m, tiles: st.pattern.tiles }; });
       const ref = tc > 0 ? refs.minus : refs.plus;
       const [gm, ga, dm, da] = [await dark(ref.T, pm), await dark(ref.T, pa), await dark(T, pm), await dark(T, pa)];
@@ -72,16 +74,16 @@ try {
       rows.push({ tc, am, aa });
       ok(s.m === m && Math.abs(s.tau - tc) < 1e-9 && s.tiles > 3 && Math.abs(am - full * f.main) < 0.12 && Math.abs(aa - full * f.alt) < 0.12, `${what} at Corner shift ${tc}: the shortest arc drawn at ${am.toFixed(2)} (meant ${(full * f.main).toFixed(2)}), the second at ${aa.toFixed(2)} (meant ${(full * f.alt).toFixed(2)})`, JSON.stringify([s, am, aa]));
       await shot(page, T, `${m}-tc_${String(tc).replace('-', 'm')}`);
-      await page.close();
+      await close();
     }
     const near = rows.filter((r) => Math.abs(r.tc) < 0.005);
     ok(near.length === 3 && near.every((r) => Math.abs(r.am - r.aa) < 0.1 && r.am > 0.3 * full), `${what}: within 0.005 of Corner shift 0 the two arcs are equally dark, so there is nothing to jump`, JSON.stringify(near));
-    await refs.plus.page.close(); await refs.minus.page.close();
+    await refs.plus.close(); await refs.minus.close();
   }
 
   // ---- the slider itself, and Follow the tree
   {
-    const { page, T } = await open(-0.0008);
+    const { page, T, close } = await open(-0.0008);
     const before = await T.evaluate(() => window.__handles.state().tau);
     // one step of the slider across 0, as he did it
     await T.evaluate(() => { const r = document.getElementById('tau-range'); r.value = String(0.5 + 0.002); r.dispatchEvent(new Event('input', { bubbles: true })); r.dispatchEvent(new Event('change', { bubbles: true })); });
@@ -92,13 +94,13 @@ try {
     const [gm, ga, dm, da] = [await dark(ref.T, pm), await dark(ref.T, pa), await dark(T, pm), await dark(T, pa)];
     const am = (gm - dm) / (gm - ink), aa = (ga - da) / (ga - ink);
     ok(before < 0 && after > 0 && Math.abs(am - aa) < 0.1 && am > 0.3, `the Corner shift slider moved from ${before} to ${after.toFixed(4)}: both arcs still there, equally dark (${am.toFixed(2)}, ${aa.toFixed(2)})`, JSON.stringify([before, after, am, aa]));
-    await ref.page.close();
+    await ref.close();
     await T.evaluate(() => window.__handles.moment('follow'));
     await page.waitForTimeout(2600);
     const s = await T.evaluate(() => { const st = window.__handles.state(); return { moment: st.moment, tiles: st.pattern.tiles }; });
     ok(s.moment === 'follow' && s.tiles > 3, 'Follow the tree runs there, the pattern drawn', JSON.stringify(s));
     await shot(page, T, 'follow-near-0');
-    await page.close();
+    await close();
   }
 } finally { await B.close(); }
 console.log(`${failed ? 'FAILED ' + failed : 'all ok'}; page errors ${errors}`);
