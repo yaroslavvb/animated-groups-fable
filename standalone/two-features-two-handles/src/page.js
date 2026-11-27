@@ -65,7 +65,9 @@ const outTw = $('#out-tw');
 const outGeo = $('#out-geo');
 const momentBtns = [...document.querySelectorAll('[data-moment]')];
 const momentNote = $('#moment-note');
+const pane2El = $('#pane2');
 const reset2Btn = $('#reset2');
+const fs2Btn = $('#fs2');
 const reset3Btn = $('#reset3');
 const backPlayBtn = $('#back-play');
 
@@ -895,6 +897,57 @@ reset2Btn.addEventListener('click', () => {
   cancelGlide();
   pattern.resetView();
 });
+
+const nativeFsEl = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+let fallbackFs = false;
+const isPatternFs = () => nativeFsEl() === pane2El || fallbackFs;
+
+function syncFsUI() {
+  const on = isPatternFs();
+  if (pane2El) pane2El.classList.toggle('pane-fs', on);
+  document.documentElement.style.overflow = fallbackFs ? 'hidden' : '';
+  if (fs2Btn) {
+    fs2Btn.setAttribute('aria-pressed', String(on));
+    fs2Btn.setAttribute('aria-label', on ? 'Exit full screen pattern' : 'Full screen pattern');
+    fs2Btn.title = on ? 'Exit full screen (Esc)' : 'Full screen';
+  }
+  requestAnimationFrame(() => pattern.draw());
+}
+
+async function togglePatternFs() {
+  if (!pane2El) return;
+  if (isPatternFs()) {
+    fallbackFs = false;
+    if (nativeFsEl() === pane2El) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) { try { const r = exit.call(document); if (r && typeof r.then === 'function') await r; } catch {} }
+    }
+    syncFsUI();
+    return;
+  }
+  const req = pane2El.requestFullscreen || pane2El.webkitRequestFullscreen;
+  if (req && (document.fullscreenEnabled || document.webkitFullscreenEnabled)) {
+    try {
+      const r = req.call(pane2El);
+      if (r && typeof r.then === 'function') await r;
+      fallbackFs = false;
+      syncFsUI();
+      return;
+    } catch {
+      // Fall through to full-viewport overlay if blocked or unsupported
+    }
+  }
+  fallbackFs = true;
+  syncFsUI();
+}
+
+if (fs2Btn) fs2Btn.addEventListener('click', () => { togglePatternFs(); });
+document.addEventListener('fullscreenchange', () => { if (nativeFsEl() !== pane2El) fallbackFs = false; syncFsUI(); });
+document.addEventListener('webkitfullscreenchange', () => { if (nativeFsEl() !== pane2El) fallbackFs = false; syncFsUI(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && fallbackFs) { fallbackFs = false; syncFsUI(); }
+});
+
 reset3Btn.addEventListener('click', () => {
   stage.R.resetView();
   stage.R.render();
@@ -1012,6 +1065,7 @@ function stateSummary() {
     classified: { at: atDefaults(state), view: paisleyView(state.k), ...paisleyInfo(state.k) },
     print: { scale: printScale(state), fit: state.print ? state.print.fit : paisleyInfo(state.k).fit, own: !!state.print, joint: state.print && state.print.joint ? { delta: state.print.joint.delta, clear: state.print.joint.clear, seal: !!state.print.joint.seal, fitted: !!state.print.joint.fitted } : paisleyInfo(state.k).joint },
     autoCenter,
+    fullscreen: isPatternFs(),
     moment: activeMoment,
     follow: !!(followState && followState.active),
     hash: computeHash(),
@@ -1040,6 +1094,7 @@ function otherSummary() {
     still: many ? null : { rigid: !!fam.rigid, moves: fam.moves, kind: fam.kind },
     controls: { off: sliderBox.hasAttribute('inert'), add: !pairAdd.hidden, note: stillNote.hidden ? '' : stillNote.textContent },
     custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
+    fullscreen: isPatternFs(),
     moment: null, follow: false, hash: computeHash(), locationHash: window.location.hash || '#',
     readout: `${valLen.textContent} | ${valTw.textContent} | ${outGeo.textContent}`,
     surface: !!built, pattern: pattern.state(),
