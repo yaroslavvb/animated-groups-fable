@@ -570,9 +570,10 @@ export function createPattern(canvas, opts = {}) {
     };
 
     // which corner class, star, glide the selected character stands for
-    const pick = sel !== null && binding[sel] ? binding[sel] : null;
-    const also = model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
-    const dim = pick || also ? 0.38 : 1;
+    const pick = sel !== null && binding && binding[sel] ? binding[sel] : null;
+    const also = !pick && model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
+    const dim = pick ? 0.32 : also ? 0.38 : 1;
+    const pickHalo = pick && pick.t === 'd' ? new Path2D() : null;
     const needFill = kind !== 'H' || A.stars.length > 0;
     const showEdges = model.tileEdges !== false;
     const fill = new Path2D(), edge = [0, 1, 2].map(() => new Path2D());
@@ -773,9 +774,10 @@ export function createPattern(canvas, opts = {}) {
         for (let si = 0; si < des.length; si++) { const sh = des[si]; if (px >= sh.min) print(ink, sh, M, b, desRad[si] * R); }
       }
       for (const mk of marked) {
+        const picked = !!(pick && pick.t === 'd' && pick.cls === mk.c.id);
         const p = P[mk.v];
         const mpx = kind === 'H' ? (hScale * R) / (1 + p[2]) : px;
-        if (mpx < 4.5) continue;
+        if (mpx < (picked ? 3.0 : 4.5)) continue;
         if (kind === 'S' && p[2] < 0.05) continue;
         let ang;
         if (mk.dir) {
@@ -787,9 +789,14 @@ export function createPattern(canvas, opts = {}) {
           const q = lerpEdge(p, mk.toward === null ? c : P[mk.toward], 0.06);
           ang = Math.atan2(Y(q) - Y(p), X(q) - X(p));
         }
-        const on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id));
-        const r = Math.min(on ? 9.5 : 6.5, (on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
+        const on = picked || !!(also && also.has(mk.c.id));
+        const r = Math.min(picked ? 10 : on ? 9.5 : 6.5, (picked ? 0.36 : on ? 0.34 : 0.24) * mpx), x = X(p), y = Y(p), path = marks[mk.c.id];
         if (r < 1.1) continue;
+        if (picked && pickHalo && r >= 2.2) {
+          const hr = r * 1.85;
+          pickHalo.moveTo(x + hr, y);
+          pickHalo.arc(x, y, hr, 0, TAU);
+        }
         if (mk.c.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); }
         else { const m = mk.c.n, rr = r * (m === 3 ? 1.25 : 1.08), x0 = x + rr * Math.cos(ang), y0 = y + rr * Math.sin(ang); path.moveTo(x0, y0); for (let k = 1; k < m; k++) { const a = ang + (TAU * k) / m; path.lineTo(x + rr * Math.cos(a), y + rr * Math.sin(a)); } path.lineTo(x0, y0); }
       }
@@ -800,38 +807,62 @@ export function createPattern(canvas, opts = {}) {
     ctx.fillStyle = css(FRONT_INK); ctx.fill(ink);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     if (showEdges) [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
+    const hasHandleLines = (model.lines || []).some((ln) => ln.role === 'o');
     // mirrors and glide axes: red
     const widths = [2.1, 1.4, 0.8];
     A.stars.forEach((s, k) => {
       // chosen: bold. One of its corners chosen: left at full strength, since that corner is where these mirrors cross
       const on = pick && pick.t === '*' && pick.star === k, near = pick && pick.t === 'd' && pick.role === 'corner' && pick.star === k;
+      if (on) {
+        ctx.strokeStyle = css(RED, 0.25);
+        mirrors[k].forEach((p, b) => { ctx.lineWidth = widths[b] * 3.6; ctx.stroke(p); });
+      }
       ctx.strokeStyle = css(RED, on || near || !pick ? 1 : dim);
-      mirrors[k].forEach((p, b) => { ctx.lineWidth = widths[b] * (on ? 1.7 : 1); ctx.stroke(p); });
+      mirrors[k].forEach((p, b) => { ctx.lineWidth = widths[b] * (on ? 1.85 : 1); ctx.stroke(p); });
     });
     A.glides.forEach((g, k) => {
       const on = pick && pick.t === 'x' && pick.k % A.glides.length === k;
       const a0 = on || !pick ? 1 : dim;
-      glides[k].forEach((p, b) => { ctx.strokeStyle = css(RED, b === 2 ? a0 * 0.78 : a0); ctx.lineWidth = widths[b] * (on ? 1.7 : 1); ctx.setLineDash(b === 2 ? [] : [widths[b] * 3.2, widths[b] * 3]); ctx.stroke(p); });
+      if (on) {
+        ctx.setLineDash([]);
+        ctx.strokeStyle = css(RED, 0.24);
+        glides[k].forEach((p, b) => { ctx.lineWidth = widths[b] * 3.6; ctx.stroke(p); });
+      }
+      glides[k].forEach((p, b) => { ctx.strokeStyle = css(RED, b === 2 ? a0 * 0.78 : a0); ctx.lineWidth = widths[b] * (on ? 1.85 : 1); ctx.setLineDash(b === 2 ? [] : [widths[b] * 3.2, widths[b] * 3]); ctx.stroke(p); });
       ctx.setLineDash([]);
     });
     // the caller's lines, in their own colour (never the mirrors' red or the gyration points' blue), thinner on small tiles
     (model.lines || []).forEach((ln, k) => {
       if (ln.once) return;
-      const a0 = ln.alpha === undefined ? 1 : ln.alpha;
-      extras[k].forEach((p, b) => { const f = [1, 0.7, 0.4][b]; ctx.strokeStyle = css(ln.color || DARK, b === 2 && ln.dash ? a0 * 0.78 : a0); ctx.lineWidth = (ln.width || 2) * f; ctx.setLineDash(b === 2 || !ln.dash ? [] : ln.dash.map((x) => x * f)); ctx.stroke(p); });
+      const on = !!(pick && pick.t === 'o' && ln.role === 'o');
+      const a0 = on ? 1 : (ln.alpha === undefined ? 1 : ln.alpha) * (pick ? 0.38 : 1);
+      if (on) {
+        ctx.setLineDash([]);
+        extras[k].forEach((p, b) => { const f = [1, 0.7, 0.4][b]; ctx.strokeStyle = css(ln.color || BLUE, 0.26); ctx.lineWidth = (ln.width || 2) * 3.2 * f; ctx.stroke(p); });
+      }
+      extras[k].forEach((p, b) => { const f = [1, 0.7, 0.4][b]; ctx.strokeStyle = css(ln.color || DARK, b === 2 && ln.dash ? a0 * 0.78 : a0); ctx.lineWidth = (ln.width || 2) * (on ? 1.8 : 1) * f; ctx.setLineDash(b === 2 || !ln.dash ? [] : ln.dash.map((x) => x * f)); ctx.stroke(p); });
       ctx.setLineDash([]);
     });
     // the marked points: blue inside the surface (gyrations), red on a mirror. Drawn last, over the outlined tile,
     // whose coloured edges would otherwise cover the marks at its corners
     const drawMarks = () => {
+      if (pickHalo && A.classes[pick.cls]) {
+        const col = A.classes[pick.cls].kind === 'cone' ? BLUE : RED;
+        ctx.fillStyle = css(col, 0.22);
+        ctx.fill(pickHalo);
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = css(col, 0.78);
+        ctx.stroke(pickHalo);
+      }
       for (const mk of marked) {
-        const on = (pick && pick.t === 'd' && pick.cls === mk.c.id) || (also && also.has(mk.c.id)), col = mk.c.kind === 'cone' ? BLUE : RED;
+        const picked = !!(pick && pick.t === 'd' && pick.cls === mk.c.id);
+        const on = picked || !!(also && also.has(mk.c.id)), col = mk.c.kind === 'cone' ? BLUE : RED;
         // model.dimMarks === false: every mark in its full colour, as on the Classification of Surfaces page with
         // nothing chosen; the marks brought out together are told by their size alone
         const full = on || !(pick || also) || (!pick && model.dimMarks === false);
         ctx.fillStyle = css(col, full ? 1 : dim);
         ctx.fill(marks[mk.c.id]);
-        ctx.lineWidth = on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${full ? 0.95 : 0.5})`;
+        ctx.lineWidth = picked ? 2 : on ? 1.6 : 1; ctx.strokeStyle = `rgba(255,255,255,${full ? 0.95 : 0.5})`;
         ctx.stroke(marks[mk.c.id]);
       }
     };
@@ -906,18 +937,20 @@ export function createPattern(canvas, opts = {}) {
           if (kind === 'S' && q[2] < 0) continue;
           const item = { x: X(q), y: Y(q), dt };
           if (dt.after) { afterDots.push(item); continue; }
+          const da = (dt.alpha === undefined ? 1 : dt.alpha) * (pick && !(pick.t === 'o' && hasHandleLines) ? 0.38 : 1);
           ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 5, 0, TAU);
-          ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
-          if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, dt.alpha === undefined ? 1 : dt.alpha); ctx.stroke(); }          // (a faint dot has a faint ring)
+          ctx.fillStyle = css(dt.color || DARK, da); ctx.fill();
+          if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, da); ctx.stroke(); }          // (a faint dot has a faint ring)
         }
         // a wonder-ring chosen: its two wanderings, out of the tile across one glued edge and across the other
-        if (pick && pick.t === 'o') {
+        if (pick && pick.t === 'o' && !hasHandleLines) {
           const turns = A.pairs.filter((p) => !p.rev).slice(2 * pick.k, 2 * pick.k + 2);
-          ctx.strokeStyle = css(BLUE, 1); ctx.lineWidth = 2.6; ctx.setLineDash([2, 6]);
           for (const pr of turns) for (const i of [pr.i, pr.j]) {
             const mid = lerp(Q[i], Q[(i + 1) % n], 0.5), far = apply(mul(M, A.maps[i]), D.at), p = new Path2D();
             line(p, c, mid, Math.max(2, stepsFor(c, mid))); line(p, mid, far, Math.max(2, stepsFor(mid, far)));
-            ctx.stroke(p);
+            ctx.setLineDash([]);
+            ctx.strokeStyle = 'rgba(255,255,255,0.88)'; ctx.lineWidth = 5.4; ctx.stroke(p);
+            ctx.strokeStyle = css(BLUE, 1); ctx.lineWidth = 3.2; ctx.setLineDash([3, 7]); ctx.stroke(p);
           }
           ctx.setLineDash([]);
         }
@@ -1166,7 +1199,7 @@ export function createPattern(canvas, opts = {}) {
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
       if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; desSamples = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
-      model = m; G = m.D.G; if (!keep) sel = null; quick = false;
+      model = m; G = m.D.G; if (o.sel !== undefined) sel = o.sel; else if (!keep) sel = null; quick = false;
       cache = new Map();
       hCache = null;
       hMidSamples = [];
@@ -1230,7 +1263,7 @@ export function createPattern(canvas, opts = {}) {
       }
       draw();
     },
-    select(i) { sel = i; schedule(); },
+    select(i) { const next = i === undefined ? null : i; if (next === sel) return; sel = next; if (model) schedule(); },
     resetView() { stopCoast(); if (!model) return; hCache = null; emaMs = 8; budget = H_FULL_MAX; firstView(); quick = false; schedule(); },
     /** Where the pattern and its outlined tile are on the screen, to hand to another screen: { V, base, turned } (turned: base turns the plane over; null: no pattern). */
     getView() { return model ? { V: V.slice(), base: base.slice(), turned: bRev } : null; },

@@ -24,7 +24,7 @@
 // The signature's grammar is the Classification of Surfaces page's (catalog.js parse); readSignature() takes it as
 // people type it.
 
-import { parse, textOf, domainOf, whyNot as noPattern } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse, textOf, tokensOf, tokenAt, domainOf, whyNot as noPattern } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 import { multiSpec } from './multi.js';
 
 /**
@@ -143,4 +143,71 @@ export function whyNot(sig) {
   try { w = noPattern(sig); } catch (err) { w = null; }
   if (!w) return { kind: 'none', tries: [] };
   return { kind: w.kind, m: w.m, n: w.n, tries: w.tries.map((t) => t.text).filter((t) => shows(parse(t))).slice(0, 4) };
+}
+
+/**
+ * Index in catalog.js `tokensOf(readSignature(text))` of the orbifold feature at the user's cursor `[selStart, selEnd]`
+ * inside the loose text `text`, or `null` when empty, invalid, or spanning multiple features.
+ */
+export function cursorTokenIndex(text, selStart = null, selEnd = null) {
+  const raw = String(text == null ? '' : text);
+  if (!raw.trim()) return null;
+  const sig = readSignature(raw);
+  if (!sig) return null;
+  const tokens = tokensOf(sig);
+  if (!tokens.length) return null;
+
+  const rawRefs = new Array(raw.length).fill(null);
+  let oCount = 0, xCount = 0, coneIdx = 0, curStar = -1, cornerIdx = 0;
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (/[\s,;·]/.test(ch)) continue;
+    if (/[○◦∘◯oO0]/.test(ch)) rawRefs[i] = { kind: 'o', i: oCount++ };
+    else if (/[×✕✖xX]/.test(ch)) rawRefs[i] = { kind: 'x', i: xCount++ };
+    else if (/[∗＊⋆✱*]/.test(ch)) {
+      rawRefs[i] = { kind: 'star', s: ++curStar };
+      cornerIdx = 0;
+    } else if (/[2-9]/.test(ch)) {
+      rawRefs[i] = curStar < 0
+        ? { kind: 'cone', i: coneIdx++ }
+        : { kind: 'corner', s: curStar, i: cornerIdx++ };
+    } else {
+      return null;
+    }
+  }
+
+  let s0 = typeof selStart === 'number' && Number.isFinite(selStart) ? Math.max(0, Math.min(raw.length, selStart)) : raw.length;
+  let s1 = typeof selEnd === 'number' && Number.isFinite(selEnd) ? Math.max(0, Math.min(raw.length, selEnd)) : s0;
+  if (s1 < s0) [s0, s1] = [s1, s0];
+
+  let rawIdx = -1;
+  if (s1 > s0) {
+    const inside = [];
+    for (let i = s0; i < s1; i++) if (rawRefs[i]) inside.push(i);
+    if (inside.length > 1) return null;
+    if (inside.length === 1) rawIdx = inside[0];
+  }
+  if (rawIdx < 0) {
+    if (s0 > 0 && rawRefs[s0 - 1]) rawIdx = s0 - 1;
+    else if (s0 < raw.length && rawRefs[s0]) rawIdx = s0;
+    else {
+      for (let i = s0 - 1; i >= 0; i--) {
+        if (rawRefs[i]) { rawIdx = i; break; }
+      }
+      if (rawIdx < 0) {
+        for (let i = s0; i < raw.length; i++) {
+          if (rawRefs[i]) { rawIdx = i; break; }
+        }
+      }
+    }
+  }
+  if (rawIdx < 0 || !rawRefs[rawIdx]) return null;
+
+  let ref = rawRefs[rawIdx];
+  if (oCount > 0 && xCount > 0) {
+    if (ref.kind === 'o') ref = { kind: 'x', i: Math.min(sig.x - 1, 2 * ref.i) };
+    else if (ref.kind === 'x') ref = { kind: 'x', i: Math.min(sig.x - 1, 2 * oCount + ref.i) };
+  }
+  const idx = tokenAt(tokens, ref);
+  return idx >= 0 ? idx : null;
 }

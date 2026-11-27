@@ -380,7 +380,7 @@ function drawPattern({ keepView = false, moving = false, still = false } = {}) {
   currentModel = model;
   let carry = null;
   if (keepView && !still && model.pose && last && last.pose) carry = psuMul(psuInv(so21ToPSU(last.pose, false)), so21ToPSU(model.pose, false));
-  pattern.set(model, { keepView, moving, carry });
+  pattern.set(model, { keepView, moving, carry, sel: custom.cursor() });
 }
 
 function renderAll({ keepView = false, moving = false } = {}) {
@@ -785,6 +785,7 @@ const custom = createCustomField({
   shown: () => state.k,
   isCustom: (k) => !!FAMILIES[k].custom && !famBtns.some((b) => (b.dataset.k || b.dataset.fam) === k),
   labelOf: (k) => FAMILIES[k].label,
+  onCursor: (idx) => pattern.select(idx),
 });
 
 function showTab(nextTab, { writeHash = true } = {}) {
@@ -1060,7 +1061,7 @@ function stateSummary() {
     d,
     mDist,
     promoted,
-    custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
+    custom: { text: custom.text(), on: custom.on(), cursor: custom.cursor(), why: custom.why(), said: custom.said() },
     classified: { at: atDefaults(state), view: paisleyView(state.k), ...paisleyInfo(state.k) },
     print: { scale: printScale(state), fit: state.print ? state.print.fit : paisleyInfo(state.k).fit, own: !!state.print, joint: state.print && state.print.joint ? { delta: state.print.joint.delta, clear: state.print.joint.clear, seal: !!state.print.joint.seal, fitted: !!state.print.joint.fitted } : paisleyInfo(state.k).joint },
     autoCenter,
@@ -1092,7 +1093,7 @@ function otherSummary() {
     multi: many ? { Ls: state.Ls.slice(), tws: state.tws.slice(), active: state.active, shown: state.shown, pairs: fam.pairs.length, atDefaults: multiAtDefaults(state), fit: pr.fit, commas: pr.count, joints: pr.joints, view: currentModel && currentModel.classified ? currentModel.firstV : null, pose: currentModel && currentModel.pose } : null,
     still: many ? null : { rigid: !!fam.rigid, moves: fam.moves, kind: fam.kind },
     controls: { off: sliderBox.hasAttribute('inert'), add: !pairAdd.hidden, note: stillNote.hidden ? '' : stillNote.textContent },
-    custom: { text: custom.text(), on: custom.on(), why: custom.why(), said: custom.said() },
+    custom: { text: custom.text(), on: custom.on(), cursor: custom.cursor(), why: custom.why(), said: custom.said() },
     fullscreen: isPatternFs(),
     moment: null, follow: false, hash: computeHash(), locationHash: window.location.hash || '#',
     readout: `${valLen.textContent} | ${valTw.textContent} | ${outGeo.textContent}`,

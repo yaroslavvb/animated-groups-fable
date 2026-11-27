@@ -15,7 +15,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel, pairMetricsFor,
 } from '../src/handles.js';
-import { customSpec, specOf, whyNot, shows, featuresOf, featureLabel, prettyOf, readSignature, canonText } from '../src/custom.js';
+import { customSpec, specOf, whyNot, shows, featuresOf, featureLabel, prettyOf, readSignature, canonText, cursorTokenIndex } from '../src/custom.js';
 import { tilesPSU, locateTilePSU } from '../src/pattern-ext.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles, fval } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
@@ -282,4 +282,38 @@ test('a custom pattern tiles the disc from any focus the view can reach', () => 
       }
     }
   }
+});
+
+test('cursorTokenIndex maps cursor position in custom input across canonical, loose, selection, and trade forms', () => {
+  // Standard 234*5 at every caret position 0..5
+  assert.deepEqual([0, 1, 2, 3, 4, 5].map((p) => cursorTokenIndex('234*5', p, p)), [0, 0, 1, 2, 3, 4]);
+  assert.equal(cursorTokenIndex('234*5'), 4);
+
+  // Loose notation: spaces, commas, unicode symbols, and reordered rings/crosses
+  assert.equal(cursorTokenIndex('2 3 4 ∗ 5', 1, 1), 0); // '2| 3...' -> '2'
+  assert.equal(cursorTokenIndex('2 3 4 ∗ 5', 2, 2), 1); // '2 |3...' -> '3'
+  assert.equal(cursorTokenIndex('2 3 4 ∗ 5', 7, 7), 3); // '2 3 4 ∗| 5' -> '∗'
+  assert.equal(cursorTokenIndex('2 3 4 ∗ 5', 9, 9), 4); // '2 3 4 ∗ 5|' -> '5'
+  assert.deepEqual([1, 3, 5, 7].map((p) => cursorTokenIndex('x 2 3 4', p, p)), [3, 0, 1, 2]);
+  assert.deepEqual([1, 2, 3].map((p) => cursorTokenIndex('27o', p, p)), [1, 2, 0]);
+  assert.equal(cursorTokenIndex('2,3,4,×', 7, 7), 3);
+
+  // Selections: single token -> index; multiple tokens / Select All -> null; separator-only -> fallback
+  assert.equal(cursorTokenIndex('234*5', 1, 2), 1);
+  assert.equal(cursorTokenIndex('2 34', 1, 3), 1); // spans ' 3', only one token inside
+  assert.equal(cursorTokenIndex('234*5', 0, 5), null);
+  assert.equal(cursorTokenIndex('234*5', 0, 2), null);
+  assert.equal(cursorTokenIndex('2 34', 1, 2), 0); // whitespace only, falls back to char before selection
+
+  // Invalid or empty signatures -> null
+  for (const bad of ['', '   ', '1', '2y4', '(2345)']) {
+    assert.equal(cursorTokenIndex(bad, 1, 1), null, `"${bad}"`);
+  }
+
+  // Handle + crosscap trade rule (ox -> xxx, o23x -> 23xxx)
+  assert.equal(cursorTokenIndex('ox', 1, 1), 0);
+  assert.equal(cursorTokenIndex('ox', 2, 2), 2);
+  assert.equal(cursorTokenIndex('o23x', 1, 1), 2);
+  assert.equal(cursorTokenIndex('o23x', 2, 2), 0);
+  assert.equal(cursorTokenIndex('o23x', 4, 4), 4);
 });

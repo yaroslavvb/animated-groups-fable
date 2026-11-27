@@ -9,7 +9,7 @@ import { commaAt, moved } from './rigid-print.js';
 import { customSpec, canonText, readSignature, stillSpec } from './custom.js';
 import { createPaisley } from './paisley.js';
 import { createMulti, multiSpec } from './multi.js';
-import { parse as parseSignature, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse as parseSignature, tokensOf, bind, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 
 const TAU = 2 * Math.PI;
 const PI = Math.PI;
@@ -1307,9 +1307,9 @@ export function o33Centered(L, tw, bo, tauO = 0, { commas = null, thetas = null,
   const marks = [clsOfFeat[perm[0]], clsOfFeat[perm[1]]].filter((c) => c >= 0);
   const x0_sym = axisCoords(I3, midH(pL_sym, pR_sym)).u;
   const extraLines = [
-    { a: toPairFromSym(handleLinesSym[0][0]), b: toPairFromSym(handleLinesSym[0][1]), color: BLUE, width: 2.3, alpha: 0.9, steps: 6 },
-    { a: toPairFromSym(handleLinesSym[1][0]), b: toPairFromSym(handleLinesSym[1][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
-    { a: toPairFromSym(handleLinesSym[2][0]), b: toPairFromSym(handleLinesSym[2][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3 },
+    { a: toPairFromSym(handleLinesSym[0][0]), b: toPairFromSym(handleLinesSym[0][1]), color: BLUE, width: 2.3, alpha: 0.9, steps: 6, role: 'o' },
+    { a: toPairFromSym(handleLinesSym[1][0]), b: toPairFromSym(handleLinesSym[1][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3, role: 'o' },
+    { a: toPairFromSym(handleLinesSym[2][0]), b: toPairFromSym(handleLinesSym[2][1]), color: BLUE, width: 2.2, alpha: 0.9, steps: 3, role: 'o' },
   ];
 
   return {
@@ -2084,9 +2084,40 @@ export const multiBuild = (state) => multi.build(state.orders, state.Ls, state.t
 
 /** The pattern of an orbifold shown still: the Classification of Surfaces page's own tile and print, its tile lines and all. */
 function stillModel(fam) {
-  const D = domainOf(parseSignature(fam.k));
-  return { D, A: analyse(D), home: [], outline: false, lines: [], dots: [], marks: null };
+  const sig = parseSignature(fam.k);
+  const D = domainOf(sig), A = analyse(D), tokens = tokensOf(sig);
+  let binding = [];
+  try { binding = bind(tokens, A); } catch {}
+  return { D, A, tokens, binding, home: [], outline: false, lines: [], dots: [], marks: null };
 }
+
+/** Map each signature token of a 4-feature `pairs` orbifold (in `tokensOf` order) to its pattern feature descriptor. */
+function pairsBinding(fam, state, D, A, home) {
+  const G = fam.kind === 'E' ? GE : GH;
+  const clsForFeat = (feat) => {
+    const slot = state.perm.indexOf(feat);
+    const p = slot >= 0 && home[slot] ? home[slot] : null;
+    if (!p) return -1;
+    let bestV = -1, bestD = Infinity;
+    for (let vi = 0; vi < D.verts.length; vi++) {
+      const dd = G.dist(D.verts[vi], p);
+      if (dd < bestD) { bestD = dd; bestV = vi; }
+    }
+    return bestV >= 0 ? A.cls[bestV] : -1;
+  };
+  if (fam.mode === 'cones' || fam.mode === 'pillow') {
+    return [0, 1, 2, 3].map((f) => ({ t: 'd', role: 'cone', cls: clsForFeat(f) }));
+  }
+  if (fam.mode === 'handle') {
+    return [{ t: 'o', k: 0 }, { t: 'd', role: 'cone', cls: clsForFeat(2) }, { t: 'd', role: 'cone', cls: clsForFeat(3) }];
+  }
+  const cones = [0, 2, 3].map((f) => ({ t: 'd', role: 'cone', cls: clsForFeat(f) }));
+  if (fam.mode === 'cone-x') return cones.concat([{ t: 'x', k: 0 }]);
+  if (fam.mode === 'cone-star') return cones.concat([{ t: '*', star: 0 }]);
+  const cornerCls = A.stars[0] && A.stars[0].corners.length ? A.stars[0].corners[0] : A.cls[0];
+  return cones.concat([{ t: '*', star: 0 }, { t: 'd', role: 'corner', cls: cornerCls, star: 0 }]);
+}
+
 /** The pattern of five or six cone points (multi.js): every pair's tree and cut, the picked pair's the heavier. */
 const lastGood = new Map();
 function multiModel(state, dark) {
@@ -2111,6 +2142,7 @@ function multiModel(state, dark) {
     D: c.D, A: c.A, home: c.home, outline: false, tileEdges: false, center: GH.mix(c.home[c.marks[0]], c.home[c.marks[1]], 0.5),
     firstV: classified ? c.view : c.pose, classified, pose: c.pose,
     design: () => c.shapes, lines, dots: [], marks: c.marks, dimMarks: false,
+    binding: state.orders.map((_, f) => ({ t: 'd', role: 'cone', cls: f })),
   };
 }
 
@@ -2208,6 +2240,7 @@ export function buildPatternModel(state, { dark = false, follow = null } = {}) {
   return {
     D,
     A,
+    binding: pairsBinding(fam, state, D, A, home),
     home,
     outline: false,
     tileEdges: false,

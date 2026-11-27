@@ -17,7 +17,7 @@
 //     labelOf(key)    how the page writes it (234∗5)
 
 import { textOf, parse } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
-import { readSignature, whyNot, prettyOf } from './custom.js';
+import { readSignature, whyNot, prettyOf, cursorTokenIndex } from './custom.js';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 /** Why the text of the field is not on the page: { kind, html, tries } or null (nothing typed, or it is shown). */
@@ -37,12 +37,23 @@ export function noteFor(text) {
   return { kind: w.kind, tries: w.tries, html };
 }
 
-export function createCustomField({ resolve, show, shown, isCustom, labelOf }) {
+export function createCustomField({ resolve, show, shown, isCustom, labelOf, onCursor }) {
   const field = document.getElementById('custom-in'), pop = document.getElementById('custom-pop'), bar = field.closest('.ctrl-bar');
   let sticky = false;          // the note is up without the keyboard being in the field (a link named a signature the page cannot show)
+  let lastCursor = null;
 
   const keyOf = () => { const sig = readSignature(field.value); return sig && field.value.trim() ? resolve(textOf(sig)) : null; };
   const focused = () => document.activeElement === field;
+  const cursorIdx = () => {
+    const k = focused() ? keyOf() : null;
+    return k && k === shown() ? cursorTokenIndex(field.value, field.selectionStart, field.selectionEnd) : null;
+  };
+  function emitCursor({ force = false } = {}) {
+    const next = cursorIdx();
+    if (!force && next === lastCursor) return;
+    lastCursor = next;
+    if (onCursor) onCursor(next);
+  }
 
   /** The note goes right under the field, inside the row of chips, wherever the row has wrapped the field to. */
   function place() {
@@ -58,11 +69,16 @@ export function createCustomField({ resolve, show, shown, isCustom, labelOf }) {
     const key = keyOf();
     field.dataset.on = key && key === shown() && isCustom(key) ? '1' : '0';
     const note = focused() || sticky ? noteFor(field.value) : null;
-    if (!note) { pop.hidden = true; pop.textContent = ''; return; }
-    const tries = note.tries.length ? ` <span class="tries">Try ${note.tries.map((t) => `<button type="button" class="trylink" data-k="${esc(t)}">${esc(prettyOf(parse(t)))}</button>`).join(' ')}</span>` : '';
-    pop.innerHTML = note.html + tries;
-    pop.hidden = false;
-    place();
+    if (!note) {
+      pop.hidden = true;
+      pop.textContent = '';
+    } else {
+      const tries = note.tries.length ? ` <span class="tries">Try ${note.tries.map((t) => `<button type="button" class="trylink" data-k="${esc(t)}">${esc(prettyOf(parse(t)))}</button>`).join(' ')}</span>` : '';
+      pop.innerHTML = note.html + tries;
+      pop.hidden = false;
+      place();
+    }
+    emitCursor();
   }
 
   /** Read the field; what it holds goes onto the page as soon as the page can show it. */
@@ -78,10 +94,14 @@ export function createCustomField({ resolve, show, shown, isCustom, labelOf }) {
     if (e.key === 'Enter') { e.preventDefault(); take(); if (!keyOf()) nope(); }
     else if (e.key === 'Escape') { sticky = false; field.blur(); }
   });
+  field.addEventListener('keyup', emitCursor);
+  field.addEventListener('mouseup', emitCursor);
+  field.addEventListener('select', emitCursor);
   field.addEventListener('focus', paint);
   field.addEventListener('blur', () => { sticky = false; paint(); });
   // a tap on the field is a tap on an eighth chip: what it holds comes back onto the page
-  field.addEventListener('click', take);
+  field.addEventListener('click', () => { take(); emitCursor(); });
+  document.addEventListener('selectionchange', () => { if (focused()) emitCursor(); });
   // an offer in the note: it goes into the field and onto the page; the field keeps the keyboard (no blur on the way)
   pop.addEventListener('pointerdown', (e) => { if (e.target.closest && e.target.closest('.trylink')) e.preventDefault(); });
   pop.addEventListener('click', (e) => {
@@ -110,6 +130,7 @@ export function createCustomField({ resolve, show, shown, isCustom, labelOf }) {
     // for the checks
     type(text) { field.value = text; field.dispatchEvent(new Event('input', { bubbles: true })); },
     text: () => field.value,
+    cursor: cursorIdx,
     on: () => field.dataset.on === '1',
     why: () => { const n = noteFor(field.value); return n ? { kind: n.kind, tries: n.tries } : null; },
     said: () => (pop.hidden ? '' : pop.textContent),

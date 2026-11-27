@@ -9,13 +9,13 @@ import {
   fourConeCentered, coneFeatCentered, o33Centered, recut, recutH, pillowCentered, recut2222,
   followTreeData, interpolateView, stadium, handleBeltLoop, beadOnLoop, sitesForBall,
   surfacePartsFor, featureAnchorsForBall,
-  defaultCommas, buildPatternModel, pairMetricsFor,
+  defaultCommas, buildPatternModel, pairMetricsFor, multiState,
 } from '../src/handles.js';
 import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath } from '../src/pattern-ext.js';
 import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles, analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
-import { parse, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
+import { parse, tokensOf, domainOf } from '../../2026-11-15-classification-of-surfaces/src/sym/catalog.js';
 import { buildSurface } from '../../2026-11-15-classification-of-surfaces/src/sym/surface.js';
 
 const TAU = 2 * Math.PI;
@@ -1770,5 +1770,68 @@ test('333x crosscap len sweep (b = 1.16, 0.95, 0.86) misses zero visible rim com
     const visRef = info(tsBig).filter((c) => c.dCMin <= 5.5);
     const missing = visRef.filter((w) => !drawn.some((g) => Math.hypot(g.x - w.x, g.y - w.y) < 0.005));
     assert.equal(missing.length, 0, `b=${b} missing ${missing.length} visible rim commas`);
+  }
+});
+
+test('buildPatternModel provides exact feature bindings across pairs, multi, and still orbifold modes', () => {
+  const perms = [[0, 1, 2, 3], [1, 2, 0, 3], [2, 3, 0, 1]];
+  for (const raw of ['3333', '2223', '2345', '2222', '234*', '234*5', '234x', 'o33', 'o27']) {
+    const k = normalizeFamilyKey(raw);
+    const fam = FAMILIES[k];
+    const toks = tokensOf(parse(k));
+    for (const perm of perms) {
+      const st = {
+        k,
+        perm,
+        orders: perm.map((c) => fam.baseOrders[c]),
+        L: fam.defaultL,
+        tw: fam.mode === 'pillow' ? 0.15 : 0.12,
+        b: fam.defaultB ?? 0,
+        tau: fam.defaultTau ?? 0,
+        thetas: defaultCommas(k).map((sp) => (sp ? sp.theta : 0)),
+      };
+      const m = buildPatternModel(st, { dark: false });
+      assert.equal(m.binding.length, toks.length, `${k} m=${perm.join('')}: binding length`);
+      const usedCls = new Set();
+      m.binding.forEach((b, idx) => {
+        const tk = toks[idx];
+        assert.equal(b.t, tk.t, `${k}[${idx}] token type mismatch`);
+        if (b.t === 'd') {
+          const c = m.A.classes[b.cls];
+          assert.ok(c && c.kind === b.role && c.n === tk.v, `${k}[${idx}] bad class ${JSON.stringify(b)} vs ${JSON.stringify(tk)}`);
+          assert.ok(!usedCls.has(b.cls), `${k}[${idx}] duplicate class ${b.cls}`);
+          usedCls.add(b.cls);
+        } else if (b.t === '*') {
+          assert.ok(b.star >= 0 && b.star < m.A.stars.length, `${k} invalid star index`);
+        } else if (b.t === 'x') {
+          assert.ok(m.A.glides.length > 0, `${k} missing glides`);
+        }
+      });
+      if (fam.mode === 'handle') {
+        assert.ok(m.lines.some((ln) => ln.role === 'o'), `${k} handle missing role:'o' lines`);
+      }
+    }
+  }
+
+  // multi mode (5 or 6 cone points)
+  for (const raw of ['22233', '223344']) {
+    const k = normalizeFamilyKey(raw);
+    const toks = tokensOf(parse(k));
+    const m = buildPatternModel(multiState(k, { active: 1, shown: 2 }));
+    assert.equal(m.binding.length, toks.length);
+    m.binding.forEach((b, i) => {
+      assert.equal(b.t, 'd');
+      assert.equal(b.role, 'cone');
+      assert.equal(m.A.classes[b.cls].n, toks[i].v);
+    });
+  }
+
+  // still mode across hyperbolic, Euclidean, and spherical signatures
+  for (const raw of ['*642', '237', '234*56', 'oo', '632', '532']) {
+    const k = normalizeFamilyKey(raw);
+    const toks = tokensOf(parse(k));
+    const m = buildPatternModel({ k, mode: 'still' });
+    assert.equal(m.binding.length, toks.length, `${k} still binding length`);
+    m.binding.forEach((b, i) => assert.equal(b.t, toks[i].t, `${k}[${i}] still token type`));
   }
 });
