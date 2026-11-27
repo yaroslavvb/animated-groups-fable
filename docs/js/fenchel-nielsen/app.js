@@ -8,7 +8,7 @@ import {
   getCutOptions,
   getCutMarkerSides,
   formatFrac
-} from "./orbifold.js?v=fn-v8";
+} from "./orbifold.js?v=fn-v9";
 
 import {
   ID3,
@@ -29,7 +29,7 @@ import {
   buildRealization,
   generateTiling,
   recutHyperbolic
-} from "./hyperbolic.js?v=fn-v8";
+} from "./hyperbolic.js?v=fn-v9";
 
 import {
   EID3,
@@ -42,7 +42,7 @@ import {
   wrapEuclideanCameraWithColor,
   wrapPointIntoEucFD,
   recutEuclidean
-} from "./euclidean.js?v=fn-v8";
+} from "./euclidean.js?v=fn-v9";
 
 const EUC_VIEW_R = 2.6;
 
@@ -76,6 +76,7 @@ const state = {
   cameraColor: 0,
   parityFlip: 0,
   hoveredCutId: null,
+  selectedCutId: null,
   refineTimer: null,
   rafId: null
 };
@@ -358,6 +359,19 @@ function dedupScreenMarker(buckets, px, py, kind, order, featureId = null) {
   return true;
 }
 
+function pickDefaultSelectedCutId(orb, carving) {
+  if (!orb || !carving?.cuts?.length) return null;
+  for (const cut of carving.cuts) {
+    const sides = getCutMarkerSides(orb, carving, cut.id);
+    if (sides && sides.sideA.size > 0 && sides.sideB.size > 0) return cut.id;
+  }
+  return null;
+}
+
+function getActiveHighlightCutId() {
+  return state.hoveredCutId ?? state.selectedCutId;
+}
+
 function getHoverMarkerContext(hoveredCutId) {
   const hoverSides =
     hoveredCutId && state.orb && state.carving
@@ -427,7 +441,8 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
   const scalePx = size / (2 * EUC_VIEW_R);
   const toPx = ([x, y]) => [cx + x * scalePx, cy - y * scalePx];
   const { hoveredCutId, coloring } = state;
-  const { hoverSides, hasTwoSidedMarkers } = getHoverMarkerContext(hoveredCutId);
+  const { hoverSides } = getHoverMarkerContext(getActiveHighlightCutId());
+  const { hasTwoSidedMarkers: hoveredHasTwoSided } = getHoverMarkerContext(hoveredCutId);
 
   ctx.save();
   ctx.fillStyle = "#f2f1ec";
@@ -616,7 +631,7 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
 
     drawFdHighlight(ctx, real, state.cameraM, toPx, true);
 
-    if (hoveredCutId && !hasTwoSidedMarkers && real.cutSegments.length > 0) {
+    if (hoveredCutId && !hoveredHasTwoSided && real.cutSegments.length > 0) {
       for (let ti = 0; ti < tiles.length; ti++) {
         const t = tiles[ti];
         const CM = t.CM || emul3(state.cameraM, t.M);
@@ -700,7 +715,8 @@ function renderDisk(maxPolys = 2200) {
   }
 
   const { hoveredCutId, coloring } = state;
-  const { hoverSides, hasTwoSidedMarkers } = getHoverMarkerContext(hoveredCutId);
+  const { hoverSides } = getHoverMarkerContext(getActiveHighlightCutId());
+  const { hasTwoSidedMarkers: hoveredHasTwoSided } = getHoverMarkerContext(hoveredCutId);
   const tiles = generateTiling(real, state.cameraM, {
     maxPolys,
     rMax: 0.985,
@@ -886,7 +902,7 @@ function renderDisk(maxPolys = 2200) {
     drawFdHighlight(ctx, real, state.cameraM, toPx, false);
 
     // Subtle dashed hairline on hover only when the cut lacks special points on both sides
-    if (hoveredCutId && !hasTwoSidedMarkers && real.cutSegments.length > 0) {
+    if (hoveredCutId && !hoveredHasTwoSided && real.cutSegments.length > 0) {
       for (let ti = 0; ti < tiles.length; ti++) {
         const t = tiles[ti];
         if (t.r > 0.94) continue;
@@ -1115,7 +1131,7 @@ function renderSliders() {
   carving.cuts.forEach((cut, idx) => {
     const opts = getCutOptions(orb, carving, idx);
     const group = document.createElement("div");
-    group.className = `cut-group ${state.hoveredCutId === cut.id ? "is-hovered" : ""}`;
+    group.className = `cut-group ${getActiveHighlightCutId() === cut.id ? "is-hovered" : ""}`;
     group.dataset.cutId = cut.id;
     group.style.borderLeftColor = cut.color;
 
@@ -1137,6 +1153,13 @@ function renderSliders() {
     group.addEventListener("mouseleave", () => {
       pointerHovered = false;
       syncHoverForGroup();
+    });
+    group.addEventListener("click", () => {
+      if (state.selectedCutId !== cut.id) {
+        state.selectedCutId = cut.id;
+        syncHoverVisuals();
+        scheduleDiskRender(false);
+      }
     });
 
     const head = document.createElement("div");
@@ -1186,18 +1209,26 @@ function renderSliders() {
     lenInput.setAttribute("aria-label", `${cut.name} ${lenSymText}`);
 
     const bindRangeEvents = (inputEl, onInputVal) => {
+      const pinSelection = () => {
+        if (state.selectedCutId !== cut.id) {
+          state.selectedCutId = cut.id;
+          syncHoverVisuals();
+        }
+      };
       const endDrag = () => {
         activeDrag = false;
         syncHoverForGroup();
       };
       inputEl.addEventListener("pointerdown", () => {
         activeDrag = true;
+        pinSelection();
         syncHoverForGroup();
       });
       inputEl.addEventListener("pointerup", endDrag);
       inputEl.addEventListener("pointercancel", endDrag);
       inputEl.addEventListener("blur", endDrag);
       inputEl.addEventListener("input", () => {
+        pinSelection();
         onInputVal(parseFloat(inputEl.value));
         rebuildOnSliderChange();
         scheduleDiskRender(true);
@@ -1257,8 +1288,9 @@ function renderSliders() {
 }
 
 function syncHoverVisuals() {
+  const activeCutId = getActiveHighlightCutId();
   for (const el of els.slidersHost.querySelectorAll(".cut-group")) {
-    el.classList.toggle("is-hovered", el.dataset.cutId === state.hoveredCutId);
+    el.classList.toggle("is-hovered", el.dataset.cutId === activeCutId);
   }
 }
 
@@ -1315,6 +1347,7 @@ function loadSignature(rawSig, pushUrl = true) {
     state.carving = null;
     state.realization = null;
   }
+  state.selectedCutId = pickDefaultSelectedCutId(parsed, state.carving);
 
   renderAllViews(true);
 }
@@ -1368,6 +1401,13 @@ els.btnReshuffle?.addEventListener("click", () => {
   state.hoveredCutId = null;
   state.carving = res.carving;
   state.realization = res.realization;
+  const canKeepSelected =
+    state.selectedCutId &&
+    res.carving.cuts.some((c) => c.id === state.selectedCutId) &&
+    getHoverMarkerContext(state.selectedCutId).hasTwoSidedMarkers;
+  state.selectedCutId = canKeepSelected
+    ? state.selectedCutId
+    : pickDefaultSelectedCutId(orb, res.carving);
   state.cameraColor = (state.cameraColor ^ (res.colorXor || 0)) & 3;
   state.parityFlip ^= res.detFlip || 0;
   state.cameraWrapped = true;

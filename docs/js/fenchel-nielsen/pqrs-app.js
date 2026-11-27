@@ -9,7 +9,7 @@ import {
   computeDragAlign,
   deformPqrsPartition,
   recenterPqrsState
-} from "./pqrs.js?v=fn-v8";
+} from "./pqrs.js?v=fn-v9";
 
 import {
   ID3,
@@ -26,7 +26,7 @@ import {
   panCameraByDiskDelta,
   wrapCameraInGroupWithColor,
   generateTiling
-} from "./hyperbolic.js?v=fn-v8";
+} from "./hyperbolic.js?v=fn-v9";
 
 import {
   EID3,
@@ -37,7 +37,7 @@ import {
   generateEuclideanTiling,
   panEuclideanCamera,
   wrapEuclideanCameraWithColor
-} from "./euclidean.js?v=fn-v8";
+} from "./euclidean.js?v=fn-v9";
 
 const EUC_VIEW_R = 2.6;
 
@@ -60,12 +60,17 @@ const state = {
   cameraWrapped: false,
   cameraColor: 0,
   hoveredPartIdx: null,
+  selectedPartIdx: 0,
   cards: [],
   activeDragPart: null,
   activeAlign: null,
   refineTimer: null,
   rafId: null
 };
+
+function getActivePartIdx() {
+  return state.hoveredPartIdx !== null ? state.hoveredPartIdx : state.selectedPartIdx;
+}
 
 const els = {
   sigForm: document.getElementById("sig-form"),
@@ -222,7 +227,8 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
   const cy = size / 2;
   const scalePx = size / (2 * EUC_VIEW_R);
   const toPx = ([x, y]) => [cx + x * scalePx, cy - y * scalePx];
-  const { hoveredPartIdx, coloring } = state;
+  const { coloring } = state;
+  const activePartIdx = getActivePartIdx();
 
   ctx.save();
   ctx.fillStyle = "#f2f1ec";
@@ -287,7 +293,7 @@ function renderEuclideanCanvas(ctx, size, real, maxPolys) {
         const [px, py] = toPx(eapply(CM, mk.P));
         if (px < -16 || px > size + 16 || py < -16 || py > size + 16) continue;
         if (!dedupScreenMarker(buckets, px, py, mk.kind, mk.order, mk.featureId)) continue;
-        drawMarker(ctx, px, py, mk, 1.0, coneSideForPartition(hoveredPartIdx, mk.featureId));
+        drawMarker(ctx, px, py, mk, 1.0, coneSideForPartition(activePartIdx, mk.featureId));
       }
     }
   }
@@ -332,7 +338,8 @@ function renderDisk(maxPolys = 2200) {
     return;
   }
 
-  const { hoveredPartIdx, coloring } = state;
+  const { coloring } = state;
+  const activePartIdx = getActivePartIdx();
   const tiles = generateTiling(real, state.cameraM, {
     maxPolys,
     rMax: 0.985,
@@ -387,7 +394,7 @@ function renderDisk(maxPolys = 2200) {
         const [px, py] = toPx(dp);
         if (!dedupScreenMarker(buckets, px, py, mk.kind, mk.order, mk.featureId)) continue;
         const scale = Math.max(0.55, 1.0 - 0.45 * rDisk);
-        drawMarker(ctx, px, py, mk, scale, coneSideForPartition(hoveredPartIdx, mk.featureId));
+        drawMarker(ctx, px, py, mk, scale, coneSideForPartition(activePartIdx, mk.featureId));
       }
     }
   }
@@ -458,8 +465,9 @@ function updateColorSelectLabels() {
 }
 
 function syncHoverVisuals() {
+  const activePartIdx = getActivePartIdx();
   for (const card of state.cards) {
-    card.group.classList.toggle("is-hovered", card.partIdx === state.hoveredPartIdx);
+    card.group.classList.toggle("is-hovered", card.partIdx === activePartIdx);
   }
 }
 
@@ -525,7 +533,7 @@ function renderPartitionCards() {
 
   PQRS_PARTITIONS.forEach((part, k) => {
     const group = document.createElement("div");
-    group.className = `cut-group ${state.hoveredPartIdx === k ? "is-hovered" : ""}`;
+    group.className = `cut-group ${getActivePartIdx() === k ? "is-hovered" : ""}`;
     group.dataset.partIndex = String(k);
     group.style.borderLeftColor = part.color;
 
@@ -552,6 +560,13 @@ function renderPartitionCards() {
     group.addEventListener("mouseleave", () => {
       pointerHovered = false;
       syncHoverForCard();
+    });
+    group.addEventListener("click", () => {
+      if (state.selectedPartIdx !== k) {
+        state.selectedPartIdx = k;
+        syncHoverVisuals();
+        scheduleDiskRender(false);
+      }
     });
 
     const head = document.createElement("div");
@@ -603,8 +618,15 @@ function renderPartitionCards() {
       valEl.className = "param-val";
       valEl.textContent = isTwist ? formatTwist(initVal) : initVal.toFixed(2);
 
+      const pinPartition = () => {
+        if (state.selectedPartIdx !== k) {
+          state.selectedPartIdx = k;
+          syncHoverVisuals();
+        }
+      };
       const beginDrag = () => {
         activeDrag = true;
+        pinPartition();
         if (state.activeDragPart !== k || !state.activeAlign) {
           state.activeDragPart = k;
           state.activeAlign = computeDragAlign(state.pqrs, k);
@@ -622,6 +644,7 @@ function renderPartitionCards() {
       input.addEventListener("pointercancel", endDrag);
       input.addEventListener("blur", endDrag);
       input.addEventListener("input", () => {
+        pinPartition();
         if (state.activeDragPart !== k || !state.activeAlign) {
           state.activeDragPart = k;
           state.activeAlign = computeDragAlign(state.pqrs, k);
@@ -685,6 +708,7 @@ function loadSignature(rawSig, pushUrl = true) {
   const parsed = parsePqrs(rawSig);
   state.orb = parsed;
   state.hoveredPartIdx = null;
+  state.selectedPartIdx = 0;
   state.activeDragPart = null;
   state.activeAlign = null;
 

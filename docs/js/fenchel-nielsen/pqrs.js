@@ -1,6 +1,6 @@
 // Exact 3-partition coupled Fenchel-Nielsen geometry for 4-cone sphere orbifolds (P Q R S).
 
-import { frac, addFrac, subFrac, formatFrac } from "./orbifold.js?v=fn-v8";
+import { frac, addFrac, subFrac, formatFrac } from "./orbifold.js?v=fn-v9";
 import {
   ID3,
   mul3,
@@ -26,7 +26,7 @@ import {
   hypDist,
   mobiusTranslateToOrigin,
   buildHyperbolicDirichlet
-} from "./hyperbolic.js?v=fn-v8";
+} from "./hyperbolic.js?v=fn-v9";
 import {
   EID3,
   emul3,
@@ -36,7 +36,7 @@ import {
   erotAt,
   reduceSuperbase,
   buildEuclideanDirichlet
-} from "./euclidean.js?v=fn-v8";
+} from "./euclidean.js?v=fn-v9";
 
 export const PQRS_LETTERS = ["P", "Q", "R", "S"];
 
