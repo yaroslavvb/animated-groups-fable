@@ -12,6 +12,7 @@ import {
 } from './handles.js';
 import { createPattern, locateTilePSU } from './pattern-ext.js';
 import { createCustomField } from './custom-ui.js';
+import { SyncJitterMonitor, drawJitterGraph } from './perf-monitor.js';
 import { mul, apply, det, I3 } from '../../classification-of-surfaces/src/sym/geom.js';
 import { buildSurface } from '../../classification-of-surfaces/src/sym/surface.js';
 import { createStage } from '../../classification-of-surfaces/src/stage.js';
@@ -69,6 +70,28 @@ const pane2El = $('#pane2');
 const fs2Btn = $('#fs2');
 const reset3Btn = $('#reset3');
 const backPlayBtn = $('#back-play');
+const debugPanel = $('#debug-panel');
+const dbgStatusEl = $('#dbg-status');
+const dbgMsgEl = $('#dbg-msg');
+const dbgToggleBtn = $('#dbg-toggle');
+const dbgResyncBtn = $('#dbg-resync');
+const dbgMotionBtns = [...document.querySelectorAll('[data-dbg-motion]')];
+const dbgSpeedBtns = [...document.querySelectorAll('[data-dbg-speed]')];
+const dbgScaleBtns = [...document.querySelectorAll('[data-dbg-scale]')];
+const dbgHzEl = $('#dbg-hz');
+const dbgDriftEl = $('#dbg-drift');
+const dbgFpsEl = $('#dbg-fps');
+const dbgIdealEl = $('#dbg-ideal');
+const dbgJitterEl = $('#dbg-jitter');
+const dbgStuttersEl = $('#dbg-stutters');
+const dbgLatEl = $('#dbg-lat');
+const dbgGpuEl = $('#dbg-gpu');
+const dbgGraph = $('#dbg-graph');
+const dbgFsHud = $('#debug-fs-hud');
+const dbgHudStatus = $('#dbg-hud-status');
+const dbgHudText = $('#dbg-hud-text');
+const dbgHudToggle = $('#dbg-hud-toggle');
+const dbgHudScale = $('#dbg-hud-scale');
 
 const MOMENT_COPY = {
   length: 'At Length = 0.80, the two 3-cones sit 1.18 apart (above the ln 3 ≈ 1.10 floor) with tree-to-cut distance 1.64. Slide Length up to draw them further apart.',
@@ -257,7 +280,7 @@ tauScrub.setStops(HALF_TURN_STOPS);
 
 function scheduleSettle(dragging) {
   clearTimeout(moveTimer);
-  if (dragging) {
+  if (dragging && !(tab === 'debug' && debugRunning)) {
     moveTimer = setTimeout(() => {
       drawPattern({ keepView: true, moving: false });
     }, 150);
@@ -543,8 +566,7 @@ const fmtHashNum = (x, dec) => {
 
 function isDefaultState() {
   const fam = FAMILIES['3333'];
-  return tab === 'play'
-    && state.k === '3333'
+  return state.k === '3333'
     && state.perm.join('') === fam.defaultM
     && Math.abs(state.L - fam.defaultL) < 1e-4
     && Math.abs(state.tw - fam.defaultTw) < 1e-4;
@@ -552,15 +574,16 @@ function isDefaultState() {
 
 function computeHash() {
   if (tab === 'tutorial') return '#tutorial';
-  if (isDefaultState()) return '#';
+  if (isDefaultState()) return tab === 'debug' ? '#debug' : '#';
   const fam = FAMILIES[state.k];
-  if (isStill()) return `#k=${state.k}`;
-  if (isMulti()) return `#k=${state.k}&p=${state.active + 1}&n=${state.shown}&l=${state.Ls.map((x) => fmtHashNum(x, 3)).join(',')}&tw=${state.tws.map((x) => fmtHashNum(x, 4)).join(',')}`;
+  const suffix = tab === 'debug' ? '&debug=1' : '';
+  if (isStill()) return `#k=${state.k}${suffix}`;
+  if (isMulti()) return `#k=${state.k}&p=${state.active + 1}&n=${state.shown}&l=${state.Ls.map((x) => fmtHashNum(x, 3)).join(',')}&tw=${state.tws.map((x) => fmtHashNum(x, 4)).join(',')}${suffix}`;
   let h = `#k=${state.k}&m=${state.perm.join('')}&l=${fmtHashNum(state.L, 3)}&tw=${fmtHashNum(state.tw, 4)}`;
   if (fam.bRange) h += `&b=${fmtHashNum(state.b, 3)}`;
   if (fam.mode === 'handle') h += `&to=${fmtHashNum(state.tau, 4)}`;
   else if (fam.mode === 'cone-star3') h += `&tc=${fmtHashNum(state.tau, 4)}`;
-  return h;
+  return h + suffix;
 }
 
 let hashTimer = 0;
@@ -789,15 +812,166 @@ const custom = createCustomField({
   onCursor: (idx) => pattern.select(idx),
 });
 
+const DEBUG_SPEEDS = { slow: 0.35, med: 0.85, fast: 1.75 };
+const debugMonitor = new SyncJitterMonitor();
+let debugRaf = 0;
+let debugRunning = true;
+let debugMode = 'pan';
+let debugSpeed = 'med';
+let debugUseScale = true;
+let debugPrevTs = 0;
+let lastDbgUiTs = 0;
+let lastDbgStatusCode = '';
+let lastTwistSyncTs = 0;
+
+function syncDebugControls() {
+  if (dbgToggleBtn) {
+    dbgToggleBtn.setAttribute('aria-pressed', String(debugRunning));
+    dbgToggleBtn.textContent = debugRunning ? 'Pause' : 'Resume';
+  }
+  if (dbgHudToggle) {
+    dbgHudToggle.setAttribute('aria-pressed', String(debugRunning));
+    dbgHudToggle.textContent = debugRunning ? 'Pause' : 'Resume';
+  }
+  for (const b of dbgMotionBtns) b.setAttribute('aria-pressed', String(b.dataset.dbgMotion === debugMode));
+  for (const b of dbgSpeedBtns) b.setAttribute('aria-pressed', String(b.dataset.dbgSpeed === debugSpeed));
+  for (const b of dbgScaleBtns) b.setAttribute('aria-pressed', String((b.dataset.dbgScale === 'auto') === debugUseScale));
+  if (dbgHudScale) {
+    dbgHudScale.setAttribute('aria-pressed', String(debugUseScale));
+    dbgHudScale.textContent = debugUseScale ? 'Auto' : '1×';
+  }
+  if (dbgFsHud) dbgFsHud.hidden = tab !== 'debug' || !isPatternFs();
+}
+
+function renderDebugDOM(snap) {
+  if (!snap || !dbgStatusEl) return;
+  const st = snap.status;
+  dbgStatusEl.dataset.cat = st.category;
+  dbgStatusEl.textContent = st.label;
+  if (dbgMsgEl) dbgMsgEl.textContent = snap.message;
+
+  if (dbgHzEl) dbgHzEl.textContent = snap.hzDisplay;
+  if (dbgDriftEl) {
+    dbgDriftEl.textContent = snap.drift
+      ? `drift ${snap.drift.min.toFixed(1)}..+${snap.drift.max.toFixed(1)} ms · ${snap.samples}s`
+      : `est ~${snap.unverifiedHz ? snap.unverifiedHz.toFixed(1) : '—'} Hz · ${snap.samples}s`;
+  }
+  if (dbgFpsEl) dbgFpsEl.textContent = `${snap.fps > 0 ? snap.fps : '—'} FPS · ${snap.dtMs > 0 ? snap.dtMs.toFixed(2) : '—'} ms`;
+  if (dbgIdealEl) dbgIdealEl.textContent = `target ${snap.idealMs.toFixed(2)} ms · lock ${snap.goodSeconds}s`;
+  if (dbgJitterEl) dbgJitterEl.textContent = `±${Math.abs(snap.jitterMs).toFixed(2)} ms · p95 ${snap.jitterP95Ms.toFixed(1)}`;
+  if (dbgStuttersEl) dbgStuttersEl.textContent = `${snap.stutters} stutters · ${snap.droppedFrames} drops`;
+  if (dbgLatEl) {
+    dbgLatEl.textContent = snap.inputLatencyP95Ms !== null
+      ? `in ${snap.inputLatencyMs.toFixed(1)} · JS ${snap.renderP50Ms.toFixed(2)} ms`
+      : `rAF ${snap.rafLatencyP50Ms.toFixed(1)} · JS ${snap.renderP50Ms.toFixed(2)} ms`;
+  }
+  if (dbgGpuEl) {
+    const scPct = `${Math.round(snap.glScale * 100)}%`;
+    dbgGpuEl.textContent = snap.gpuP50Ms !== null
+      ? `GPU ${snap.gpuP50Ms.toFixed(2)}/${snap.gpuP95Ms.toFixed(2)} ms · ${scPct}`
+      : `GPU ${pattern.gpuTimerSupported() ? 'warming' : 'n/a'} · ${scPct}`;
+  }
+  if (dbgFsHud && !dbgFsHud.hidden) {
+    if (dbgHudStatus) {
+      dbgHudStatus.dataset.cat = st.category;
+      dbgHudStatus.textContent = st.label;
+    }
+    if (dbgHudText) {
+      const hzTxt = snap.hz > 0 ? `${snap.hz.toFixed(2)} Hz` : '… Hz';
+      const gpuTxt = snap.gpuP50Ms !== null ? ` · GPU ${snap.gpuP50Ms.toFixed(1)}ms` : '';
+      dbgHudText.textContent = `${hzTxt} · ${snap.fps || '—'} FPS · ±${Math.abs(snap.jitterMs).toFixed(1)}ms · ${snap.stutters} stut${gpuTxt} · ${Math.round(snap.glScale * 100)}%`;
+    }
+  }
+}
+
+function debugTick(rafTs) {
+  debugRaf = 0;
+  if (tab !== 'debug') return;
+  const nowStart = performance.now();
+  debugMonitor.beginFrame(nowStart, rafTs);
+  if (debugRunning && !pattern.isUserInteracting() && !glideState && !(followState && followState.active)) {
+    const dt = debugPrevTs > 0 ? clamp(nowStart - debugPrevTs, 1, 50) : 16.6667;
+    debugPrevTs = nowStart;
+    if (debugMode === 'twist' && !isStill()) {
+      const twRate = 0.16 * (DEBUG_SPEEDS[debugSpeed] / DEBUG_SPEEDS.med);
+      let nextTw = state.tw + twRate * (dt / 1000);
+      if (nextTw >= 0.5) nextTw -= 1.0;
+      state.tw = nextTw;
+      if (isMulti()) state.tws[state.active] = state.tw;
+      drawPattern({ keepView: true, moving: debugUseScale });
+      stage.decorate();
+      stage.R.render();
+      if (nowStart - lastTwistSyncTs >= 120) {
+        lastTwistSyncTs = nowStart;
+        suppressSlider = true;
+        twScrub.set(twToU(state.tw));
+        suppressSlider = false;
+        valTw.textContent = fmtSigned(state.tw, 3);
+        outTw.textContent = fmtSigned(state.tw, 3);
+      }
+    } else {
+      pattern.stepAuto(dt, { speed: DEBUG_SPEEDS[debugSpeed], angle: 0, useScale: debugUseScale });
+    }
+  } else {
+    debugPrevTs = 0;
+  }
+  const gpuSamples = pattern.consumeGpuSamples();
+  debugMonitor.endFrame(performance.now(), { gpuSamples, glScale: pattern.state().glScale });
+  drawJitterGraph(dbgGraph, debugMonitor, isDark());
+  const snap = debugMonitor.snapshot();
+  if (snap.status.code !== lastDbgStatusCode || nowStart - lastDbgUiTs >= 180) {
+    lastDbgStatusCode = snap.status.code;
+    lastDbgUiTs = nowStart;
+    renderDebugDOM(snap);
+  }
+  debugRaf = requestAnimationFrame(debugTick);
+}
+
+function startDebugLoop() {
+  if (debugRaf) return;
+  debugPrevTs = 0;
+  lastDbgUiTs = 0;
+  lastDbgStatusCode = '';
+  debugRaf = requestAnimationFrame(debugTick);
+}
+
+function stopDebugLoop() {
+  if (debugRaf) {
+    cancelAnimationFrame(debugRaf);
+    debugRaf = 0;
+  }
+  debugPrevTs = 0;
+}
+
 function showTab(nextTab, { writeHash = true } = {}) {
-  tab = nextTab === 'tutorial' ? 'tutorial' : 'play';
+  const prevTab = tab;
+  tab = nextTab === 'tutorial' ? 'tutorial' : nextTab === 'debug' ? 'debug' : 'play';
   for (const b of tabBtns) b.setAttribute('aria-selected', String(b.dataset.tab === tab));
-  playSec.hidden = tab !== 'play';
+  playSec.hidden = tab === 'tutorial';
   tutSec.hidden = tab !== 'tutorial';
-  if (tab === 'play') {
+  if (debugPanel) debugPanel.hidden = tab !== 'debug';
+  if (tab === 'debug') {
+    if (prevTab !== 'debug') {
+      debugRunning = true;
+      debugMonitor.reset('Measuring refresh rate...', true);
+    }
+    pattern.setGpuTiming(true);
+    syncDebugControls();
+    renderDebugDOM(debugMonitor.snapshot());
     stage.R.resize();
     stage.R.render();
     pattern.draw();
+    startDebugLoop();
+  } else {
+    stopDebugLoop();
+    pattern.setGpuTiming(false);
+    if (prevTab === 'debug') pattern.setInteractiveScale(false);
+    syncDebugControls();
+    if (tab === 'play') {
+      stage.R.resize();
+      stage.R.render();
+      pattern.draw();
+    }
   }
   if (writeHash) writeHashNow();
 }
@@ -810,7 +984,7 @@ function applyMoment(id) {
   }
   cancelGlide();
   cancelFollow();
-  showTab('play', { writeHash: false });
+  showTab(tab === 'debug' ? 'debug' : 'play', { writeHash: false });
   if (id === 'follow') {
     activeMoment = 'follow';
     syncUI();
@@ -841,6 +1015,7 @@ function applyHash(raw, { initial = false } = {}) {
     return;
   }
   const params = new URLSearchParams(h);
+  const targetTab = h === 'debug' || params.get('debug') === '1' ? 'debug' : 'play';
   const k = normalizeFamilyKey(params.get('k')) || '3333';
   const fam = FAMILIES[k];
   const typed = params.get('k') && !normalizeFamilyKey(params.get('k')) ? params.get('k') : null;          // not a family: it goes into the text field as written, which says why
@@ -849,7 +1024,7 @@ function applyHash(raw, { initial = false } = {}) {
     const d = fam.defaults, list = (name, def, dec) => (params.get(name) || '').split(',').map((t, i) => { const v = parseFloat(t); return Number.isFinite(v) && def[i] !== undefined && fmtHashNum(v, dec) === fmtHashNum(def[i], dec) ? def[i] : v; });
     setFamily(k, fam.mode === 'multi' ? { multi: { Ls: list('l', d.L, 3), tws: list('tw', d.tw, 4), active: (parseInt(params.get('p'), 10) || 1) - 1, shown: parseInt(params.get('n'), 10) || 1 } } : {});
     if (typed) custom.fill(typed);
-    showTab('play', { writeHash: !initial });
+    showTab(targetTab, { writeHash: !initial });
     if (initial) writeHashNow();
     return;
   }
@@ -871,7 +1046,7 @@ function applyHash(raw, { initial = false } = {}) {
   const tau = fam.tauLabel && Number.isFinite(tauRaw) ? snap(clamp(tauRaw, -0.5, 0.5), fam.defaultTau ?? 0, 4) : (fam.defaultTau ?? 0);
   setFamily(k, { perm, L, tw, b, tau });
   if (typed) custom.fill(typed);
-  showTab('play', { writeHash: !initial });
+  showTab(targetTab, { writeHash: !initial });
   if (initial) writeHashNow();
 }
 
@@ -906,6 +1081,61 @@ const nativeFsEl = () => document.fullscreenElement || document.webkitFullscreen
 let fallbackFs = false;
 const isPatternFs = () => nativeFsEl() === pane2El || fallbackFs;
 
+function toggleDebugRunning() {
+  debugRunning = !debugRunning;
+  debugPrevTs = 0;
+  if (!debugRunning) pattern.setInteractiveScale(false);
+  else pattern.setInteractiveScale(debugUseScale);
+  syncDebugControls();
+}
+
+function setDebugScale(useAuto) {
+  debugUseScale = !!useAuto;
+  if (tab === 'debug') pattern.setInteractiveScale(debugRunning && debugUseScale);
+  syncDebugControls();
+  renderDebugDOM(debugMonitor.snapshot());
+}
+
+if (dbgToggleBtn) dbgToggleBtn.addEventListener('click', toggleDebugRunning);
+if (dbgHudToggle) dbgHudToggle.addEventListener('click', toggleDebugRunning);
+if (dbgHudScale) dbgHudScale.addEventListener('click', () => setDebugScale(!debugUseScale));
+if (dbgResyncBtn) {
+  dbgResyncBtn.addEventListener('click', () => {
+    debugMonitor.resync('Manual resync...', true);
+    lastDbgStatusCode = '';
+    renderDebugDOM(debugMonitor.snapshot());
+  });
+}
+for (const b of dbgMotionBtns) {
+  b.addEventListener('click', () => {
+    debugMode = b.dataset.dbgMotion === 'twist' ? 'twist' : 'pan';
+    syncDebugControls();
+  });
+}
+for (const b of dbgSpeedBtns) {
+  b.addEventListener('click', () => {
+    debugSpeed = DEBUG_SPEEDS[b.dataset.dbgSpeed] ? b.dataset.dbgSpeed : 'med';
+    syncDebugControls();
+  });
+}
+for (const b of dbgScaleBtns) {
+  b.addEventListener('click', () => setDebugScale(b.dataset.dbgScale === 'auto'));
+}
+
+const recordDbgInput = (e) => {
+  if (tab === 'debug') debugMonitor.recordInput(e.timeStamp, performance.now());
+};
+patCanvas.addEventListener('pointerdown', recordDbgInput, { passive: true });
+patCanvas.addEventListener('pointermove', recordDbgInput, { passive: true });
+patCanvas.addEventListener('wheel', recordDbgInput, { passive: true });
+
+document.addEventListener('visibilitychange', () => {
+  if (tab === 'debug') debugMonitor.onVisibilityChange(document.hidden);
+});
+window.addEventListener('resize', () => {
+  if (tab === 'debug') debugMonitor.onResize();
+});
+
 function syncFsUI() {
   const on = isPatternFs();
   if (pane2El) pane2El.classList.toggle('pane-fs', on);
@@ -915,7 +1145,9 @@ function syncFsUI() {
     fs2Btn.setAttribute('aria-label', on ? 'Exit full screen pattern' : 'Full screen pattern');
     fs2Btn.title = on ? 'Exit full screen (Esc)' : 'Full screen';
   }
-  requestAnimationFrame(() => pattern.draw());
+  syncDebugControls();
+  if (tab === 'debug') renderDebugDOM(debugMonitor.snapshot());
+  else requestAnimationFrame(() => pattern.draw());
 }
 
 async function togglePatternFs() {
@@ -1024,7 +1256,7 @@ viewCanvas.addEventListener('pointerleave', () => viewCanvas.classList.remove('c
 
 if (typeof ResizeObserver === 'function') {
   new ResizeObserver(() => {
-    if (tab === 'play' && built) {
+    if (tab !== 'tutorial' && built) {
       stage.R.resize();
       stage.R.render();
     }
@@ -1032,9 +1264,22 @@ if (typeof ResizeObserver === 'function') {
 }
 
 if (mqDark && typeof mqDark.addEventListener === 'function') {
-  mqDark.addEventListener('change', () => renderAll({ keepView: true, moving: false }));
+  mqDark.addEventListener('change', () => {
+    renderAll({ keepView: true, moving: false });
+    if (tab === 'debug') drawJitterGraph(dbgGraph, debugMonitor, isDark());
+  });
 }
 window.addEventListener('hashchange', () => applyHash(window.location.hash, { initial: false }));
+
+function debugSummary() {
+  return {
+    running: debugRunning,
+    mode: debugMode,
+    speed: debugSpeed,
+    useScale: debugUseScale,
+    ...debugMonitor.snapshot(),
+  };
+}
 
 // ---- Verification / inspection API
 function stateSummary() {
@@ -1075,6 +1320,7 @@ function stateSummary() {
     coneScreen: coneScreenInfo(),
     tileScreens,
     pattern: pattern.state(),
+    debug: tab === 'debug' ? debugSummary() : null,
   };
 }
 
@@ -1098,7 +1344,7 @@ function otherSummary() {
     fullscreen: isPatternFs(),
     moment: null, follow: false, hash: computeHash(), locationHash: window.location.hash || '#',
     readout: `${valLen.textContent} | ${valTw.textContent} | ${outGeo.textContent}`,
-    surface: !!built, pattern: pattern.state(),
+    surface: !!built, pattern: pattern.state(), debug: tab === 'debug' ? debugSummary() : null,
   };
 }
 
@@ -1137,10 +1383,11 @@ window.__handles = {
   pick(i, j, opts) { return pickPair(i, j, opts); },
   tapCone(i) { return handleConeSelect(i); },
   show(v) {
-    if (v === 'play' || v === 'tutorial') { showTab(v); return stateSummary(); }
+    if (v === 'play' || v === 'debug' || v === 'tutorial') { showTab(v); return stateSummary(); }
     if (v && typeof v === 'object') { stage.R.setView(v); stage.R.render(); }
     return stateSummary();
   },
+  debug() { return debugSummary(); },
   moment(id) { applyMoment(id); return stateSummary(); },
   reset() { resetAll(); return stateSummary(); },
   custom,

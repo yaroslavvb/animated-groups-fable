@@ -842,8 +842,21 @@ export function createHyperbolicGL(canvas2d) {
   if (!gl) { glCanvas.remove(); return null; }
 
   let lost = false;
-  glCanvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); lost = true; });
-  glCanvas.addEventListener('webglcontextrestored', () => { lost = false; initResources(); });
+  let gpuTiming = false;
+  let tqExt = null;
+  const gpuQueries = [];
+  const gpuSamples = [];
+
+  const clearGpuQueries = () => {
+    while (gpuQueries.length) {
+      const q = gpuQueries.pop();
+      if (gl && !lost && q) try { gl.deleteQuery(q); } catch {}
+    }
+    gpuSamples.length = 0;
+  };
+
+  glCanvas.addEventListener('webglcontextlost', (e) => { e.preventDefault(); lost = true; clearGpuQueries(); });
+  glCanvas.addEventListener('webglcontextrestored', () => { lost = false; tqExt = gpuTiming ? gl.getExtension('EXT_disjoint_timer_query_webgl2') : null; initResources(); });
 
   let bakeProg = null, mainProg = null, emptyVao = null;
   let polyTex = null, commaTex = null, bakeFbo = null;
@@ -1123,6 +1136,23 @@ export function createHyperbolicGL(canvas2d) {
     isReady: () => !lost && !!mainProg,
 
     lastScale: () => lastRenderScale,
+
+    setGpuTiming(on) {
+      gpuTiming = !!on;
+      if (gpuTiming) {
+        if (!tqExt && gl && !lost) tqExt = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+      } else {
+        clearGpuQueries();
+      }
+    },
+
+    gpuTimerSupported: () => {
+      if (!gl || lost) return false;
+      if (!tqExt) tqExt = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+      return !!tqExt;
+    },
+
+    consumeGpuSamples: () => gpuSamples.splice(0),
 
     setVisible(vis) {
       glCanvas.style.display = vis ? 'block' : 'none';
@@ -1479,6 +1509,12 @@ export function createHyperbolicGL(canvas2d) {
       gl.uniform4f(mainLocs.uPick, pickType, pickId, pickExtra, dimAlpha);
       gl.uniform3f(mainLocs.uRimColor, modelInfo.rimColor[0], modelInfo.rimColor[1], modelInfo.rimColor[2]);
 
+      let timingQ = null;
+      if (gpuTiming && tqExt) {
+        timingQ = gl.createQuery();
+        gl.beginQuery(tqExt.TIME_ELAPSED_EXT, timingQ);
+      }
+
       gl.drawArrays(gl.TRIANGLES, 0, 96);
 
       if (scaled) {
@@ -1486,6 +1522,22 @@ export function createHyperbolicGL(canvas2d) {
         gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
         gl.blitFramebuffer(0, 0, targetW, targetH, 0, 0, wPx, hPx, gl.COLOR_BUFFER_BIT, gl.LINEAR);
         gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+      }
+
+      if (timingQ) {
+        gl.endQuery(tqExt.TIME_ELAPSED_EXT);
+        gpuQueries.push(timingQ);
+        while (gpuQueries.length > 3 && gl.getQueryParameter(gpuQueries[0], gl.QUERY_RESULT_AVAILABLE)) {
+          const q = gpuQueries.shift();
+          if (!gl.getParameter(tqExt.GPU_DISJOINT_EXT)) {
+            const ms = gl.getQueryParameter(q, gl.QUERY_RESULT) / 1e6;
+            if (Number.isFinite(ms) && ms > 0) {
+              gpuSamples.push(ms);
+              if (gpuSamples.length > 64) gpuSamples.shift();
+            }
+          }
+          gl.deleteQuery(q);
+        }
       }
     },
 

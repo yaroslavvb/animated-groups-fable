@@ -625,3 +625,210 @@
   .sig-digits[data-many="1"] .sig-btn { min-width: 38px; padding: 0 6px; }
   .sig-digits[data-many="1"] .sig-btn[data-gap="1"] { margin-right: 6px; }
 }
+
+/* ---- Debug telemetry & VSYNC/jitter monitor ---- */
+.debug-panel {
+  contain: layout style;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--ground);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.debug-panel[hidden],
+.debug-fs-hud[hidden] {
+  display: none;
+}
+.dbg-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+.dbg-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.dbg-badge[data-cat="good"] { background: #146c3a; color: #ffffff; }
+.dbg-badge[data-cat="syncing"] { background: #1d4ed8; color: #ffffff; }
+.dbg-badge[data-cat="warning"] { background: #b45309; color: #ffffff; }
+.dbg-badge[data-cat="error"] { background: #b91c1c; color: #ffffff; }
+.dbg-msg {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-right: auto;
+  min-width: 0;
+}
+.dbg-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.dbg-seg {
+  display: inline-flex;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.dbg-seg .dbg-btn {
+  border: 0;
+  border-radius: 0;
+}
+.dbg-seg .dbg-btn + .dbg-btn {
+  border-left: 1px solid var(--hairline);
+}
+.dbg-btn {
+  appearance: none;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.dbg-btn:hover { color: var(--ink); }
+.dbg-btn[aria-pressed="true"] {
+  background: var(--blue-bg);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.dbg-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.dbg-card {
+  min-width: 0;
+  padding: 6px 9px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--card);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.dbg-k {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.dbg-v {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dbg-s {
+  font-size: 0.74rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dbg-graph-wrap {
+  position: relative;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--card);
+  padding: 4px 6px 6px;
+}
+#dbg-graph {
+  display: block;
+  width: 100%;
+  height: 68px;
+}
+.dbg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: 3px;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.dbg-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.dbg-sw {
+  display: inline-block;
+  width: 10px;
+  height: 3px;
+  border-radius: 2px;
+}
+.dbg-sw-ok { background: #168a4c; }
+.dbg-sw-warn { border-top: 2px dashed var(--amber); height: 0; }
+.dbg-sw-gpu { background: #0072b2; }
+.dbg-sw-js { background: #7c3aed; }
+
+.debug-fs-hud {
+  display: none;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 4;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  max-width: calc(100% - 20px);
+  padding: 6px 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(8px);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+#pane2.pane-fs .debug-fs-hud:not([hidden]),
+#pane2:fullscreen .debug-fs-hud:not([hidden]),
+#pane2:-webkit-full-screen .debug-fs-hud:not([hidden]) {
+  display: flex;
+}
+@media (prefers-color-scheme: dark) {
+  .dbg-badge[data-cat="good"] { background: #15803d; }
+  .dbg-badge[data-cat="syncing"] { background: #2563eb; }
+  .dbg-badge[data-cat="warning"] { background: #d97706; color: #111; }
+  .dbg-badge[data-cat="error"] { background: #dc2626; }
+  .dbg-sw-ok { background: #52d287; }
+  .dbg-sw-gpu { background: #56b4e9; }
+  .dbg-sw-js { background: #c084fc; }
+  .debug-fs-hud { background: rgba(18, 20, 26, 0.86); }
+}
+@media (max-width: 720px) {
+  .dbg-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dbg-card {
+    padding: 6px 8px;
+  }
+  .dbg-v {
+    font-size: 0.84rem;
+  }
+  .dbg-s {
+    font-size: 0.7rem;
+  }
+  .dbg-btn {
+    min-height: 40px;
+  }
+}

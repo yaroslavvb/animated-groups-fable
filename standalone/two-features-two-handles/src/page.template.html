@@ -16,6 +16,7 @@
     </div>
     <nav class="tabs2" role="tablist" aria-label="Mode">
       <button class="tab2" type="button" role="tab" data-tab="play" aria-selected="true">Play</button>
+      <button class="tab2" type="button" role="tab" data-tab="debug" aria-selected="false">Debug</button>
       <button class="tab2" type="button" role="tab" data-tab="tutorial" aria-selected="false">Tutorial</button>
     </nav>
   </header>
@@ -53,6 +54,61 @@
       </div>
     </div>
 
+    <div class="debug-panel" id="debug-panel" hidden>
+      <div class="dbg-head">
+        <span class="dbg-badge" id="dbg-status" data-cat="syncing">SYNCING</span>
+        <span class="dbg-msg" id="dbg-msg">Measuring refresh rate…</span>
+        <div class="dbg-controls">
+          <button class="dbg-btn" type="button" id="dbg-toggle" aria-pressed="true">Pause</button>
+          <span class="dbg-seg" role="group" aria-label="Animation mode">
+            <button class="dbg-btn" type="button" data-dbg-motion="pan" aria-pressed="true">Pan</button>
+            <button class="dbg-btn" type="button" data-dbg-motion="twist" aria-pressed="false">Twist</button>
+          </span>
+          <span class="dbg-seg" role="group" aria-label="Animation speed">
+            <button class="dbg-btn" type="button" data-dbg-speed="slow" aria-pressed="false">Slow</button>
+            <button class="dbg-btn" type="button" data-dbg-speed="med" aria-pressed="true">Med</button>
+            <button class="dbg-btn" type="button" data-dbg-speed="fast" aria-pressed="false">Fast</button>
+          </span>
+          <span class="dbg-seg" role="group" aria-label="Motion resolution scaling">
+            <button class="dbg-btn" type="button" data-dbg-scale="auto" aria-pressed="true">Auto</button>
+            <button class="dbg-btn" type="button" data-dbg-scale="native" aria-pressed="false">1×</button>
+          </span>
+          <button class="dbg-btn" type="button" id="dbg-resync">Resync</button>
+        </div>
+      </div>
+      <div class="dbg-metrics">
+        <div class="dbg-card">
+          <span class="dbg-k">Refresh Rate</span>
+          <strong class="dbg-v" id="dbg-hz">Calculating…</strong>
+          <span class="dbg-s" id="dbg-drift">locking VSYNC</span>
+        </div>
+        <div class="dbg-card">
+          <span class="dbg-k">Frame Rate</span>
+          <strong class="dbg-v" id="dbg-fps">—</strong>
+          <span class="dbg-s" id="dbg-ideal">ideal — ms</span>
+        </div>
+        <div class="dbg-card">
+          <span class="dbg-k">Jitter &amp; Stutters</span>
+          <strong class="dbg-v" id="dbg-jitter">—</strong>
+          <span class="dbg-s" id="dbg-stutters">0 stutters · 0 drops</span>
+        </div>
+        <div class="dbg-card">
+          <span class="dbg-k">Latency &amp; GPU</span>
+          <strong class="dbg-v" id="dbg-lat">—</strong>
+          <span class="dbg-s" id="dbg-gpu">GPU — · scale 1×</span>
+        </div>
+      </div>
+      <div class="dbg-graph-wrap">
+        <canvas id="dbg-graph" height="68" aria-label="Frame time and jitter graph"></canvas>
+        <div class="dbg-legend">
+          <span><i class="dbg-sw dbg-sw-ok"></i>Frame dt</span>
+          <span><i class="dbg-sw dbg-sw-warn"></i>±½T stutter</span>
+          <span><i class="dbg-sw dbg-sw-gpu"></i>GPU ms</span>
+          <span><i class="dbg-sw dbg-sw-js"></i>JS ms</span>
+        </div>
+      </div>
+    </div>
+
     <div class="panes play-panes">
       <div class="pane" id="pane2">
         <div class="pane-head">
@@ -69,6 +125,12 @@
         </div>
         <div class="canvas-wrap ratio-pat">
           <canvas id="pattern" tabindex="0" aria-label="Repeating pattern in pair-centred frame"></canvas>
+          <div class="debug-fs-hud" id="debug-fs-hud" hidden>
+            <span class="dbg-badge" id="dbg-hud-status" data-cat="syncing">SYNCING</span>
+            <span class="dbg-hud-stat" id="dbg-hud-text">— Hz · — FPS · 0 stutters</span>
+            <button class="dbg-btn" type="button" id="dbg-hud-toggle" aria-pressed="true">Pause</button>
+            <button class="dbg-btn" type="button" id="dbg-hud-scale" aria-pressed="true">Auto</button>
+          </div>
           <div class="tip" id="tip" hidden></div>
           <span class="hint" id="pat-hint">Drag to slide</span>
         </div>

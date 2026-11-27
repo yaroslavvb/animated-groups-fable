@@ -1469,6 +1469,50 @@ export function createPattern(canvas, opts = {}) {
       return ctx.getImageData(cxPx - rPx, cyPx - rPx, 2 * rPx + 1, 2 * rPx + 1).data;
     },
     draw, redraw: schedule,
+    /** Advance continuous Debug-mode pan by `dtMs` inside the master rAF loop (zero secondary rAF scheduling). */
+    stepAuto(dtMs, { speed = 0.75, angle = 0, useScale = true } = {}) {
+      if (!model || !G || drag || coast || wheelRaf) return false;
+      const dtSec = Math.min(0.05, Math.max(0.001, dtMs / 1000));
+      const stepDist = speed * dtSec;
+      if (G.kind === 'H') {
+        const T = G.translate(G.origin, G.polar(stepDist, angle));
+        const tPsu = so21ToPSU(T, false);
+        panDist += psuStepDist(tPsu);
+        vPsu = psuMul(tPsu, vPsu);
+        V = psuToSO21(vPsu); vRev = !!vPsu[4];
+        recentre(null);
+        if (usingGL) settle();
+      } else if (G.kind === 'E') {
+        const dE = stepDist * Math.sqrt(area || 1);
+        const T = G.translate(G.origin, G.polar(dE, angle));
+        panDist += dE;
+        V = G.fix(mul(T, V), vHand());
+        recentre(null);
+        settle();
+      } else {
+        const dS = stepDist * 0.6;
+        const T = G.translate(G.origin, G.polar(dS, angle));
+        panDist += dS;
+        V = G.fix(mul(T, V), vHand());
+      }
+      glInteractive = usingGL && !!useScale;
+      quick = !usingGL && !!useScale;
+      clearTimeout(glRefine); clearTimeout(still);
+      glRefine = 0; still = 0;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      draw();
+      return true;
+    },
+    setInteractiveScale(on) {
+      glInteractive = usingGL && !!on;
+      quick = !usingGL && !!on;
+      clearTimeout(glRefine); glRefine = 0;
+      if (model) draw();
+    },
+    isUserInteracting: () => !!(drag || coast || wheelRaf),
+    setGpuTiming(on) { if (gl && gl.setGpuTiming) gl.setGpuTiming(on); },
+    gpuTimerSupported: () => !!(usingGL && gl && gl.gpuTimerSupported && gl.gpuTimerSupported()),
+    consumeGpuSamples: () => (usingGL && gl && gl.consumeGpuSamples ? gl.consumeGpuSamples() : []),
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
     state: () => ({ kind: G && G.kind, gl: usingGL, glScale: usingGL && gl ? gl.lastScale() : 1, panDist, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
