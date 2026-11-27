@@ -1927,3 +1927,116 @@ export function createRandomCarving(orb, prevCarving = null, rng = Math.random) 
 
   return firstDiffPart || base;
 }
+
+/**
+ * Return `{ sideA, sideB }` sets of canonical special-point IDs (`"cone:..."` / `"corner:..."`)
+ * separated onto the two sides of `cutId` in `carving`. Returns empty sets for non-separating
+ * cuts (handles, crosscaps, smooth mirrors) or unsupported/rigid orbifolds.
+ */
+export function getCutMarkerSides(orb, carving, cutId) {
+  const empty = () => ({ sideA: new Set(), sideB: new Set() });
+  if (!orb?.ok || !carving || !cutId) return empty();
+
+  if (orb.mode === "euc-1d") {
+    if (orb.k === 0 && orb.b === 1 && orb.m === 1) {
+      return {
+        sideA: new Set([orb.mirrorLoops[0].corners[0].id, orb.mirrorLoops[0].corners[1].id]),
+        sideB: new Set([orb.coneItems[0].id])
+      };
+    }
+    if ((orb.k === 0 && orb.b === 1 && orb.m === 2) || (orb.k === 1 && orb.m === 2)) {
+      return {
+        sideA: new Set(orb.coneItems.map((c) => c.id)),
+        sideB: new Set()
+      };
+    }
+    return empty();
+  }
+
+  if (orb.mode === "euc-rigid" || orb.mode === "rigid" || orb.mode === "euc-torus") {
+    return empty();
+  }
+
+  const pieces = carving.pieces || [];
+  if (pieces.length === 0) return empty();
+
+  const collarCutByLoop = new Map();
+  for (const p of pieces) {
+    if ((p.kind === "corner-cap" || p.kind === "cuff-mirror-bridge") && p.cuffCutId) {
+      collarCutByLoop.set(p.loopIndex, p.cuffCutId);
+    }
+  }
+
+  const cutNeighbors = new Map();
+  const pieceCuts = new Map();
+  const linkPieceCut = (p, cId) => {
+    if (!cId) return;
+    let pSet = pieceCuts.get(p.id);
+    if (!pSet) {
+      pSet = new Set();
+      pieceCuts.set(p.id, pSet);
+    }
+    pSet.add(cId);
+
+    let list = cutNeighbors.get(cId);
+    if (!list) {
+      list = [];
+      cutNeighbors.set(cId, list);
+    }
+    if (!list.includes(p)) list.push(p);
+  };
+
+  for (const p of pieces) {
+    for (const f of p.features || []) {
+      if (f.kind === "cut") linkPieceCut(p, f.cutId);
+      else if (f.kind === "collar-end") linkPieceCut(p, collarCutByLoop.get(f.loopIndex));
+    }
+    if (p.cutId) linkPieceCut(p, p.cutId);
+    if (p.cuffCutId) linkPieceCut(p, p.cuffCutId);
+    if (p.bridgeCutId) linkPieceCut(p, p.bridgeCutId);
+  }
+
+  const touching = cutNeighbors.get(cutId) || [];
+  if (touching.length < 2) return empty();
+
+  const ownedSpecialIds = (p) => {
+    const ids = [];
+    for (const f of p.features || []) {
+      if (f.kind === "cone" || f.kind === "corner") ids.push(f.id);
+    }
+    if (p.kind === "cone-mirror-cap" && p.cone?.id) ids.push(p.cone.id);
+    if (p.kind === "corner-cap" && p.corner?.id) ids.push(p.corner.id);
+    return ids;
+  };
+
+  const pA = touching.find((p) => p.boundaryCutId === cutId) || touching[0];
+  const pB = touching.find((p) => p.id !== pA.id);
+  if (!pA || !pB) return empty();
+
+  const collectSide = (startPiece) => {
+    const ids = new Set();
+    const visited = new Set([startPiece.id]);
+    const queue = [startPiece];
+    for (let qi = 0; qi < queue.length; qi++) {
+      const cur = queue[qi];
+      for (const id of ownedSpecialIds(cur)) ids.add(id);
+      const edges = pieceCuts.get(cur.id);
+      if (!edges) continue;
+      for (const cId of edges) {
+        if (cId === cutId) continue;
+        for (const nbr of cutNeighbors.get(cId) || []) {
+          if (!visited.has(nbr.id)) {
+            visited.add(nbr.id);
+            queue.push(nbr);
+          }
+        }
+      }
+    }
+    return ids;
+  };
+
+  return {
+    sideA: collectSide(pA),
+    sideB: collectSide(pB)
+  };
+}

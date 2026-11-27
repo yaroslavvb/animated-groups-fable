@@ -451,25 +451,26 @@ function transformPoly(M, poly) {
 // 3. Complete Orbifold Realization Assembly
 // ---------------------------------------------------------------------------
 
-function makeDegenerateBarSegments(F, length, twistTurns, cut, markersOut, gensOut) {
+function makeDegenerateBarSegments(F, length, twistTurns, cut, gensOut) {
   const mod0 = (((twistTurns % 1) + 1) % 1) * length;
-  const mod1 = ((((twistTurns + 0.5) % 1) + 1) % 1) * length;
+  const mod1 = mod0 + 0.5 * length;
+  const mod1Bar = mod1 >= length ? mod1 - length : mod1;
   const Q1 = slideFrame(F, mod0).P;
   const Q2 = slideFrame(F, mod1).P;
+  const Q2Bar = slideFrame(F, mod1Bar).P;
   const P0 = F.P;
   const P1 = slideFrame(F, length).P;
   const samples = geodesicSamples(P0, P1, 10);
   const rot1 = rotMatrixAt(Q1, Math.PI);
   const rot2 = rotMatrixAt(Q2, Math.PI);
+  const rot2Bar = rotMatrixAt(Q2Bar, Math.PI);
   gensOut.push({ label: `${cut.name}:2A`, M: rot1, role: "cone2", point: Q1 });
-  gensOut.push({ label: `${cut.name}:2B`, M: rot2, role: "cone2", point: Q2 });
-  markersOut.push({ kind: "cone", order: 2, label: "2", P: Q1 });
-  markersOut.push({ kind: "cone", order: 2, label: "2", P: Q2 });
+  gensOut.push({ label: `${cut.name}:2B`, M: rot2Bar, role: "cone2", point: Q2Bar });
   return {
     segments: [{ cutId: cut.id, color: cut.color, name: cut.name, A: P0, B: P1, samples, isFoldedBar: true }],
     cones: [
-      { P: Q1, G: rot1 },
-      { P: Q2, G: rot2 }
+      { P: Q1, visP: Q1, G: rot1 },
+      { P: Q2, visP: Q2Bar, G: rot2 }
     ]
   };
 }
@@ -555,9 +556,9 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
       pushGenPair(`r_${a}`, `r_${a}^-1`, g1, "rot");
       seamSegments.push(geodesicSamples(H.features[0].V, H.features[1].V, 8));
       markers.push(
-        { kind: "cone", order: a, label: orb.coneItems[0].shortLabel, P: H.features[0].V },
-        { kind: "cone", order: b, label: orb.coneItems[1].shortLabel, P: H.features[1].V },
-        { kind: "cone", order: c, label: orb.coneItems[2].shortLabel, P: H.features[2].V }
+        { kind: "cone", order: a, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: H.features[0].V },
+        { kind: "cone", order: b, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: H.features[1].V },
+        { kind: "cone", order: c, label: orb.coneItems[2].shortLabel, featureId: orb.coneItems[2].id, P: H.features[2].V }
       );
     } else if (p0.kind === "rigid-mirror-tri") {
       const [a, b, c] = orb.mirrors[0];
@@ -568,9 +569,9 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
       pushGen(`m_${orb.mirrorLoops[0].corners[1].letter}`, reflMatrix(H.S[1]), "mirror", { normal: H.S[1] });
       pushGen(`m_${orb.mirrorLoops[0].corners[2].letter}`, reflMatrix(H.S[2]), "mirror", { normal: H.S[2] });
       markers.push(
-        { kind: "corner", order: a, label: orb.mirrorLoops[0].corners[0].shortLabel, P: H.features[0].V },
-        { kind: "corner", order: b, label: orb.mirrorLoops[0].corners[1].shortLabel, P: H.features[1].V },
-        { kind: "corner", order: c, label: orb.mirrorLoops[0].corners[2].shortLabel, P: H.features[2].V }
+        { kind: "corner", order: a, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: H.features[0].V },
+        { kind: "corner", order: b, label: orb.mirrorLoops[0].corners[1].shortLabel, featureId: orb.mirrorLoops[0].corners[1].id, P: H.features[1].V },
+        { kind: "corner", order: c, label: orb.mirrorLoops[0].corners[2].shortLabel, featureId: orb.mirrorLoops[0].corners[2].id, P: H.features[2].V }
       );
     } else {
       const p = orb.cones[0];
@@ -589,8 +590,8 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
       pushGen("m_-", rm1, "mirror", { normal: normSpace(apply3(R2, H.S[0])) });
       seamSegments.push(geodesicSamples(H.features[0].V, H.features[1].V, 8));
       markers.push(
-        { kind: "cone", order: p, label: orb.coneItems[0].shortLabel, P: H.features[0].V },
-        { kind: "corner", order: q, label: orb.mirrorLoops[0].corners[0].shortLabel, P: H.features[1].V }
+        { kind: "cone", order: p, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: H.features[0].V },
+        { kind: "corner", order: q, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: H.features[1].V }
       );
     }
     return finalizeRealization(orb, carving, fdPolygons, rawGens, cutSegments, seamSegments, markers, totalArea, null, dirichletBase, skipDirichletBuild);
@@ -722,11 +723,12 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
       visitedPieces.add(childPiece.id);
       if (childPiece.kind === "pant") {
         // Degenerate (2, 2) cone leaf
-        const barRes = makeDegenerateBarSegments(parentFrame, cutLength, twistTurns, cut, markers, rawGens);
+        const barRes = makeDegenerateBarSegments(parentFrame, cutLength, twistTurns, cut, rawGens);
         cutSegments.push(...barRes.segments);
         const coneFeats = childPiece.features.filter((f) => f.kind === "cone");
+        const [c0, c1] = barRes.cones;
+        let orderedCones = [c0, c1];
         if (coneFeats.length === 2 && slotG) {
-          const [c0, c1] = barRes.cones;
           const prod01 = mul3(c0.G, c1.G);
           const prod10 = mul3(c1.G, c0.G);
           let err01 = 0;
@@ -737,7 +739,25 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
               err10 += Math.abs(prod10[i][j] - slotG[i][j]);
             }
           }
-          const orderedCones = err01 <= err10 ? [c0, c1] : [c1, c0];
+          orderedCones = err01 <= err10 ? [c0, c1] : [c1, c0];
+        }
+        markers.push(
+          {
+            kind: "cone",
+            order: 2,
+            label: coneFeats[0]?.label || "2",
+            featureId: coneFeats[0]?.id || null,
+            P: orderedCones[0].visP || orderedCones[0].P
+          },
+          {
+            kind: "cone",
+            order: 2,
+            label: coneFeats[1]?.label || "2",
+            featureId: coneFeats[1]?.id || null,
+            P: orderedCones[1].visP || orderedCones[1].P
+          }
+        );
+        if (coneFeats.length === 2 && slotG) {
           return [
             { id: coneFeats[0].id, kind: "cone", order: 2, P: orderedCones[0].P, G: orderedCones[0].G },
             { id: coneFeats[1].id, kind: "cone", order: 2, P: orderedCones[1].P, G: orderedCones[1].G }
@@ -749,7 +769,10 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
         pushGen(`m_${cut.name}`, reflMatrix(parentFrame.N), "mirror", { cutId: cut.id, normal: parentFrame.N });
         const P0 = parentFrame.P;
         const P1 = slideFrame(parentFrame, cutLength).P;
-        const corners = childPiece.features.filter((f) => f.kind === "corner");
+        const cFeats = childPiece.features;
+        const cCutIdx = cFeats.findIndex((f) => f.kind === "cut" && f.cutId === cut.id);
+        const rotFeats = cCutIdx >= 0 ? [...cFeats.slice(cCutIdx + 1), ...cFeats.slice(0, cCutIdx)] : cFeats;
+        const corners = rotFeats.filter((f) => f.kind === "corner");
         const li = childPiece.loopIndex ?? 0;
         const mlMeta = topoMeta.mirrorLoops[li];
         if (mlMeta && corners.length === 2) {
@@ -765,8 +788,8 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
             mlMeta.walls[wallIdx] = outwardN;
           }
         }
-        markers.push({ kind: "corner", order: 2, label: corners[0]?.label || "*2", P: P0 });
-        markers.push({ kind: "corner", order: 2, label: corners[1]?.label || "*2", P: P1 });
+        markers.push({ kind: "corner", order: 2, label: corners[0]?.label || "*2", featureId: corners[0]?.id || null, P: P0 });
+        markers.push({ kind: "corner", order: 2, label: corners[1]?.label || "*2", featureId: corners[1]?.id || null, P: P1 });
         cutSegments.push({
           cutId: cut.id,
           color: cut.color,
@@ -781,7 +804,7 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
         const Qmid = slideFrame(parentFrame, cutLength / 2).P;
         const rot2 = rotMatrixAt(Qmid, Math.PI);
         pushGen(`${cut.name}:2`, rot2, "cone2", { cutId: cut.id, point: Qmid });
-        markers.push({ kind: "cone", order: 2, label: childPiece.cone.label, P: Qmid });
+        markers.push({ kind: "cone", order: 2, label: childPiece.cone.label, featureId: childPiece.cone.id, P: Qmid });
         const P0 = parentFrame.P;
         const P1 = slideFrame(parentFrame, cutLength).P;
         cutSegments.push({
@@ -951,6 +974,7 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
             kind: "cone",
             order: f.order,
             label: f.label,
+            featureId: f.id,
             P
           });
           slotLeaves[slot].push({ id: f.id, kind: "cone", order: f.order, P, G: Gslots[slot] });
@@ -1095,6 +1119,7 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
             kind: "corner",
             order: f.order,
             label: f.label,
+            featureId: f.id,
             P: normTime(apply3(M, H.features[slot].V))
           });
         } else {
@@ -1157,6 +1182,7 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
         kind: "cone",
         order: p,
         label: piece.cone.label,
+        featureId: piece.cone.id,
         P: wV0
       });
 
@@ -1234,6 +1260,7 @@ export function buildRealization(orb, carving, { dirichletBase = null, skipDiric
         kind: "corner",
         order: q,
         label: piece.corner.shortLabel,
+        featureId: piece.corner.id,
         P: normTime(apply3(M, H.features[0].V))
       });
 
@@ -4028,12 +4055,10 @@ export function recutHyperbolic(orb, oldCarving, oldReal, newCarvingTemplate) {
       const ell = cut.length;
       if (node.piece.degenerate) {
         const cFeats = node.ordered.filter((f) => f.kind === "cone");
-        const q0 = bestCand.leafById.get(cFeats[0].id);
         const q1 = bestCand.leafById.get(cFeats[1].id);
-        // Degenerate cones lie at mod0 = tw*ell and mod1 = (tw+0.5)*ell; both yield tw mod 0.5, pick best matching q0
-        const s0 = signedFrameParamOfPoint(parentF, q0.P);
-        cut.twistTurns = wrapHalfTurns(s0 / ell);
-        // Check whether mod1 vs mod0 agrees with leaf order if needed; wrapHalfTurns covers [-0.5, 0.5]
+        // orderedCones[1] (c0) lies at tw * ell and orderedCones[0] (c1) at (tw + 0.5) * ell
+        const s1 = signedFrameParamOfPoint(parentF, q1.P);
+        cut.twistTurns = wrapHalfTurns(s1 / ell);
       } else {
         const childSlot0 = bestCand.pantFrames.get(node.piece.id).frames[0];
         const s = signedFrameParamOfPoint(parentF, childSlot0.P);

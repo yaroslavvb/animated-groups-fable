@@ -766,7 +766,7 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       const idx = perm[slot];
       const P = rawPts[slot];
       pushGen(`R_${names[idx].letter}`, erotAt(P[0], P[1], Math.PI), "cone2");
-      markers.push({ kind: "cone", order: 2, label: names[idx].shortLabel, P, coneIndex: idx });
+      markers.push({ kind: "cone", order: 2, label: names[idx].shortLabel, featureId: names[idx].id, P, coneIndex: idx });
     }
 
     cutSegments.push({
@@ -855,7 +855,7 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
 
     for (let k = 0; k < 4; k++) {
       const cItem = cList[perm[k]];
-      markers.push({ kind: "corner", order: 2, label: cItem.shortLabel, P: cornerPts[k], cornerIndex: perm[k] });
+      markers.push({ kind: "corner", order: 2, label: cItem.shortLabel, featureId: cItem.id, P: cornerPts[k], cornerIndex: perm[k] });
     }
 
     cutSegments.push({
@@ -881,9 +881,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("m_B", ereflLine([0, 0], [a, 0]), "mirror");
       pushGen("R_2", erotAt(a * 0.5, h, Math.PI), "cone2");
       markers.push(
-        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [0, 0] },
-        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[1].shortLabel, P: [a, 0] },
-        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, P: [a * 0.5, h] }
+        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [0, 0] },
+        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[1].shortLabel, featureId: orb.mirrorLoops[0].corners[1].id, P: [a, 0] },
+        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [a * 0.5, h] }
       );
       cutSegments.push({ cutId: cut.id, color: cut.color, name: cut.name, A: [0, h * 0.5], B: [a, h * 0.5], samples: [[0, h * 0.5], [a, h * 0.5]] });
       defaultBase = [0.37 * a, 0.43 * h];
@@ -895,8 +895,8 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("R_B", erotAt(a * 0.75, h, Math.PI), "cone2");
       pushGenPair("T_x", "T_x^-1", etrans(a, 0), "translation");
       markers.push(
-        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, P: [a * 0.25, h] },
-        { kind: "cone", order: 2, label: orb.coneItems[1].shortLabel, P: [a * 0.75, h] }
+        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [a * 0.25, h] },
+        { kind: "cone", order: 2, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: [a * 0.75, h] }
       );
       cutSegments.push({ cutId: cut.id, color: cut.color, name: cut.name, A: [0, 0], B: [a, 0], samples: [[0, 0], [a, 0]], isMirrorWall: true });
       defaultBase = [0.39 * a, 0.43 * h];
@@ -906,8 +906,8 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGenPair("g_h", "g_h^-1", eglideLine([0, h * 0.5], [a, h * 0.5], a), "glide");
       pushGenPair("g_v", "g_v^-1", eglideLine([a * 0.5, 0], [a * 0.5, h], h), "glide");
       markers.push(
-        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, P: [0, 0] },
-        { kind: "cone", order: 2, label: orb.coneItems[1].shortLabel, P: [a, 0] }
+        { kind: "cone", order: 2, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [0, 0] },
+        { kind: "cone", order: 2, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: [a, 0] }
       );
       cutSegments.push({ cutId: cut.id, color: cut.color, name: cut.name, A: [0, h * 0.5], B: [a, h * 0.5], samples: [[0, h * 0.5], [a, h * 0.5]] });
       defaultBase = [0.38 * a, 0.31 * h];
@@ -944,9 +944,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("m_h", ereflLine([s, 0], [0, s]), "mirror");
       pushGen("m_x", ereflLine([0, s], [0, 0]), "mirror");
       markers.push(
-        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[2].shortLabel, P: [0, 0] },
-        { kind: "corner", order: 4, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [s, 0] },
-        { kind: "corner", order: 4, label: orb.mirrorLoops[0].corners[1].shortLabel, P: [0, s] }
+        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[2].shortLabel, featureId: orb.mirrorLoops[0].corners[2].id, P: [0, 0] },
+        { kind: "corner", order: 4, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [s, 0] },
+        { kind: "corner", order: 4, label: orb.mirrorLoops[0].corners[1].shortLabel, featureId: orb.mirrorLoops[0].corners[1].id, P: [0, s] }
       );
       defaultBase = [0.39 * s, 0.27 * s];
     } else if (sig === "442") {
@@ -955,9 +955,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGenPair("r_4B", "r_4B^-1", erotAt(1, 1, Math.PI / 2), "rot");
       pushGen("r_2", erotAt(1, 0, Math.PI), "cone2");
       markers.push(
-        { kind: "cone", order: 4, label: orb.coneItems[0].shortLabel, P: [0, 0] },
-        { kind: "cone", order: 4, label: orb.coneItems[1].shortLabel, P: [1, 1] },
-        { kind: "cone", order: 2, label: orb.coneItems[2].shortLabel, P: [1, 0] }
+        { kind: "cone", order: 4, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [0, 0] },
+        { kind: "cone", order: 4, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: [1, 1] },
+        { kind: "cone", order: 2, label: orb.coneItems[2].shortLabel, featureId: orb.coneItems[2].id, P: [1, 0] }
       );
       defaultBase = [0.43, 0.37];
     } else if (sig === "4*2") {
@@ -966,8 +966,8 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGenPair("r_4", "r_4^-1", erotAt(0, 0, Math.PI / 2), "rot");
       pushGen("m_h", ereflLine([s, 0], [0, s]), "mirror");
       markers.push(
-        { kind: "cone", order: 4, label: orb.coneItems[0].shortLabel, P: [0, 0] },
-        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [s, 0] }
+        { kind: "cone", order: 4, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [0, 0] },
+        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [s, 0] }
       );
       defaultBase = [0.41, 0.27];
     } else if (sig === "*632") {
@@ -978,9 +978,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("m_h", ereflLine([L, 0], [0, H]), "mirror");
       pushGen("m_x", ereflLine([0, H], [0, 0]), "mirror");
       markers.push(
-        { kind: "corner", order: 6, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [L, 0] },
-        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[1].shortLabel, P: [0, H] },
-        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[2].shortLabel, P: [0, 0] }
+        { kind: "corner", order: 6, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [L, 0] },
+        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[1].shortLabel, featureId: orb.mirrorLoops[0].corners[1].id, P: [0, H] },
+        { kind: "corner", order: 2, label: orb.mirrorLoops[0].corners[2].shortLabel, featureId: orb.mirrorLoops[0].corners[2].id, P: [0, 0] }
       );
       defaultBase = [0.41 * L, 0.29 * H];
     } else if (sig === "632") {
@@ -992,9 +992,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGenPair("r_3", "r_3^-1", erotAt(r, 0, (2 * Math.PI) / 3), "rot");
       pushGen("r_2", erotAt(bx, by, Math.PI), "cone2");
       markers.push(
-        { kind: "cone", order: 6, label: orb.coneItems[0].shortLabel, P: [0, 0] },
-        { kind: "cone", order: 3, label: orb.coneItems[1].shortLabel, P: [r, 0] },
-        { kind: "cone", order: 2, label: orb.coneItems[2].shortLabel, P: [bx, by] }
+        { kind: "cone", order: 6, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [0, 0] },
+        { kind: "cone", order: 3, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: [r, 0] },
+        { kind: "cone", order: 2, label: orb.coneItems[2].shortLabel, featureId: orb.coneItems[2].id, P: [bx, by] }
       );
       defaultBase = [0.53 * r, 0.29 * by];
     } else if (sig === "*333") {
@@ -1005,9 +1005,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("m_1", ereflLine([L, 0], [L * 0.5, H]), "mirror");
       pushGen("m_2", ereflLine([L * 0.5, H], [0, 0]), "mirror");
       markers.push(
-        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [0, 0] },
-        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[1].shortLabel, P: [L, 0] },
-        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[2].shortLabel, P: [L * 0.5, H] }
+        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [0, 0] },
+        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[1].shortLabel, featureId: orb.mirrorLoops[0].corners[1].id, P: [L, 0] },
+        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[2].shortLabel, featureId: orb.mirrorLoops[0].corners[2].id, P: [L * 0.5, H] }
       );
       defaultBase = [0.47 * L, 0.31 * H];
     } else if (sig === "3*3") {
@@ -1017,8 +1017,8 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGen("m_*", ereflLine([0, 0], [L, 0]), "mirror");
       pushGenPair("r_3", "r_3^-1", erotAt(L * 0.5, H, (2 * Math.PI) / 3), "rot");
       markers.push(
-        { kind: "cone", order: 3, label: orb.coneItems[0].shortLabel, P: [L * 0.5, H] },
-        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[0].shortLabel, P: [0, 0] }
+        { kind: "cone", order: 3, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [L * 0.5, H] },
+        { kind: "corner", order: 3, label: orb.mirrorLoops[0].corners[0].shortLabel, featureId: orb.mirrorLoops[0].corners[0].id, P: [0, 0] }
       );
       defaultBase = [0.43 * L, 0.31 * H];
     } else {
@@ -1031,9 +1031,9 @@ export function buildEuclideanRealization(orb, carving, { dirichletBase = null, 
       pushGenPair("r_3A", "r_3A^-1", erotAt(0, 0, (2 * Math.PI) / 3), "rot");
       pushGenPair("r_3B", "r_3B^-1", erotAt(top[0], top[1], (2 * Math.PI) / 3), "rot");
       markers.push(
-        { kind: "cone", order: 3, label: orb.coneItems[0].shortLabel, P: [0, 0] },
-        { kind: "cone", order: 3, label: orb.coneItems[1].shortLabel, P: top },
-        { kind: "cone", order: 3, label: orb.coneItems[2].shortLabel, P: vr }
+        { kind: "cone", order: 3, label: orb.coneItems[0].shortLabel, featureId: orb.coneItems[0].id, P: [0, 0] },
+        { kind: "cone", order: 3, label: orb.coneItems[1].shortLabel, featureId: orb.coneItems[1].id, P: top },
+        { kind: "cone", order: 3, label: orb.coneItems[2].shortLabel, featureId: orb.coneItems[2].id, P: vr }
       );
       defaultBase = [0.33 * r, 0.37 * top[1]];
     }
