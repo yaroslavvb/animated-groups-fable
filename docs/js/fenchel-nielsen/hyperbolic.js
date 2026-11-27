@@ -1196,7 +1196,7 @@ export { reorthonormalizeLorentz };
 
 export function panCameraByDiskDelta(cameraM, du, dv, realization = null) {
   const rad = Math.hypot(du, dv);
-  if (rad < 1e-12) return { cameraM, wrapped: false };
+  if (rad < 1e-12) return { cameraM, wrapped: false, colorXor: 0 };
   let sx = du;
   let sy = dv;
   if (rad > 0.55) {
@@ -1209,19 +1209,25 @@ export function panCameraByDiskDelta(cameraM, du, dv, realization = null) {
     next = reorthonormalizeLorentz(next);
   }
   if (realization && next[2][2] > 120) {
-    return { cameraM: wrapCameraInGroup(next, realization), wrapped: true };
+    const wrappedRes = wrapCameraInGroupWithColor(next, realization);
+    return { cameraM: wrappedRes.cameraM, wrapped: true, colorXor: wrappedRes.colorXor };
   }
-  return { cameraM: next, wrapped: false };
+  return { cameraM: next, wrapped: false, colorXor: 0 };
 }
 
-export function wrapCameraInGroup(cameraM, realization) {
-  const { fdPolygons, gens } = realization;
-  if (!fdPolygons || fdPolygons.length === 0 || !gens || gens.length === 0) return cameraM;
+export function wrapCameraInGroupWithColor(cameraM, realization) {
+  const { fdPolygons, gens, quotient } = realization || {};
+  if (!fdPolygons || fdPolygons.length === 0 || !gens || gens.length === 0) {
+    return { cameraM, colorXor: 0 };
+  }
+  const masks = quotient?.genColorMasks;
   const pt = fdPolygons[0].centroid;
   let cur = cameraM;
   let curT = normTime(apply3(cur, pt))[2];
+  let colorXor = 0;
   for (let step = 0; step < 64; step++) {
     let best = null;
+    let bestGi = -1;
     let bestT = curT;
     for (let gi = 0; gi < gens.length; gi++) {
       let cand = mul3(cur, gens[gi].M);
@@ -1230,13 +1236,362 @@ export function wrapCameraInGroup(cameraM, realization) {
       if (t < bestT - 1e-6) {
         bestT = t;
         best = cand;
+        bestGi = gi;
       }
     }
     if (!best) break;
     cur = best;
     curT = bestT;
+    if (masks) colorXor ^= masks[bestGi];
   }
-  return cur[2][2] <= 5000 ? reorthonormalizeLorentz(cur) : cur;
+  return {
+    cameraM: cur[2][2] <= 5000 ? reorthonormalizeLorentz(cur) : cur,
+    colorXor
+  };
+}
+
+export function wrapCameraInGroup(cameraM, realization) {
+  return wrapCameraInGroupWithColor(cameraM, realization).cameraM;
+}
+
+function popcountBig(x) {
+  let c = 0;
+  let v = x;
+  while (v !== 0n) {
+    v &= v - 1n;
+    c++;
+  }
+  return c;
+}
+
+/**
+ * Solve for an exact group homomorphism Gamma -> Z_2^2 (or Z_2 / trivial if forced
+ * by odd relations or commutator loops) via F_2 RREF over local algebraic relations
+ * and Cayley-graph BFS cycle relations.
+ */
+function computeZ2Quotient(fdPolygons, gens) {
+  const k = gens ? gens.length : 0;
+  if (!fdPolygons || fdPolygons.length === 0 || k === 0) {
+    return { genColorMasks: new Array(k).fill(0), quotientSize: 1 };
+  }
+
+  const poly0 = fdPolygons[0];
+  const testPt1 = poly0.centroid;
+  const testPt2 = baryH([poly0.centroid, poly0.vertsH[0], poly0.vertsH[1]], [0.55, 0.27, 0.18]);
+  const fixesTestPts = (M) =>
+    det3(M) >= 0 &&
+    -mdot(normTime(apply3(M, testPt1)), testPt1) < 1 + 1e-5 &&
+    -mdot(normTime(apply3(M, testPt2)), testPt2) < 1 + 1e-5;
+
+  const relations = [];
+  const evenCornerPairs = [];
+
+  // Step A: Local algebraic relations (inverses & finite-order rotations/pairwise products)
+  for (let i = 0; i < k; i++) {
+    const M = gens[i].M;
+    if (det3(M) > 0) {
+      const tr = M[0][0] + M[1][1] + M[2][2];
+      if (tr < 3 - 1e-4) {
+        let Q = M;
+        for (let q = 2; q <= 30; q++) {
+          Q = mul3(Q, M);
+          if (Q[2][2] <= 5000) Q = reorthonormalizeLorentz(Q);
+          if (fixesTestPts(Q)) {
+            if (q % 2 === 1) relations.push(1n << BigInt(i));
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  for (let i = 0; i < k; i++) {
+    for (let j = i + 1; j < k; j++) {
+      let P = mul3(gens[i].M, gens[j].M);
+      if (P[2][2] <= 5000) P = reorthonormalizeLorentz(P);
+      if (fixesTestPts(P)) {
+        relations.push((1n << BigInt(i)) | (1n << BigInt(j)));
+        continue;
+      }
+      if (det3(P) > 0) {
+        const tr = P[0][0] + P[1][1] + P[2][2];
+        if (tr < 3 - 1e-4) {
+          let Q = P;
+          for (let q = 2; q <= 30; q++) {
+            Q = mul3(Q, P);
+            if (Q[2][2] <= 5000) Q = reorthonormalizeLorentz(Q);
+            if (fixesTestPts(Q)) {
+              if (q % 2 === 1) relations.push((1n << BigInt(i)) | (1n << BigInt(j)));
+              else evenCornerPairs.push([i, j]);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Step B: Cayley-graph BFS cycle relations
+  const probePts = [];
+  for (let pi = 0; pi < fdPolygons.length; pi++) {
+    probePts.push(fdPolygons[pi].centroid, ...fdPolygons[pi].vertsH);
+  }
+  const minDiskR = (M) => {
+    let minR = 2;
+    for (let i = 0; i < probePts.length; i++) {
+      const pc = poincare(normTime(apply3(M, probePts[i])));
+      const r = Math.hypot(pc[0], pc[1]);
+      if (r < minR) minR = r;
+    }
+    return minR;
+  };
+
+  const buckets = new Map();
+  const scale = 60;
+  const findSeen = (M, p1, p2, detPos) => {
+    const d1 = poincare(p1);
+    const bx = Math.round(d1[0] * scale);
+    const by = Math.round(d1[1] * scale);
+    for (let dx = -1; dx <= 1; dx++) {
+      for (let dy = -1; dy <= 1; dy++) {
+        const list = buckets.get(`${bx + dx},${by + dy}`);
+        if (!list) continue;
+        for (const item of list) {
+          if (item.detPos !== detPos) continue;
+          if (-mdot(p1, item.p1) < 1 + 1e-5 && -mdot(p2, item.p2) < 1 + 1e-5) {
+            return item;
+          }
+        }
+      }
+    }
+    return null;
+  };
+  const markSeen = (M, p1, p2, detPos, vec) => {
+    const d1 = poincare(p1);
+    const home = `${Math.round(d1[0] * scale)},${Math.round(d1[1] * scale)}`;
+    if (!buckets.has(home)) buckets.set(home, []);
+    buckets.get(home).push({ detPos, p1, p2, vec });
+  };
+
+  const heap = [];
+  const pushH = (node) => {
+    heap.push(node);
+    let i = heap.length - 1;
+    while (i > 0) {
+      const p = (i - 1) >> 1;
+      if (heap[p].r <= heap[i].r) break;
+      const tmp = heap[p];
+      heap[p] = heap[i];
+      heap[i] = tmp;
+      i = p;
+    }
+  };
+  const popH = () => {
+    const top = heap[0];
+    const last = heap.pop();
+    if (heap.length > 0) {
+      heap[0] = last;
+      let i = 0;
+      while (true) {
+        let m = i;
+        const l = 2 * i + 1;
+        const r = 2 * i + 2;
+        if (l < heap.length && heap[l].r < heap[m].r) m = l;
+        if (r < heap.length && heap[r].r < heap[m].r) m = r;
+        if (m === i) break;
+        const tmp = heap[i];
+        heap[i] = heap[m];
+        heap[m] = tmp;
+        i = m;
+      }
+    }
+    return top;
+  };
+
+  const p1Root = normTime(apply3(ID3, testPt1));
+  const p2Root = normTime(apply3(ID3, testPt2));
+  markSeen(ID3, p1Root, p2Root, true, 0n);
+  pushH({ M: ID3, r: minDiskR(ID3), vec: 0n });
+
+  let visitedCount = 0;
+  const maxRelTiles = 450;
+  while (heap.length > 0 && visitedCount < maxRelTiles) {
+    const cur = popH();
+    visitedCount++;
+    for (let gi = 0; gi < k; gi++) {
+      let M2 = mul3(cur.M, gens[gi].M);
+      if (M2[2][2] > 600) continue;
+      if (M2[2][2] > 20) M2 = reorthonormalizeLorentz(M2);
+      const rad = minDiskR(M2);
+      if (rad > 0.96) continue;
+      const p1 = normTime(apply3(M2, testPt1));
+      const p2 = normTime(apply3(M2, testPt2));
+      const detPos = det3(M2) >= 0;
+      const edgeVec = cur.vec ^ (1n << BigInt(gi));
+      const hit = findSeen(M2, p1, p2, detPos);
+      if (hit) {
+        const cyc = edgeVec ^ hit.vec;
+        if (cyc !== 0n) relations.push(cyc);
+      } else {
+        markSeen(M2, p1, p2, detPos, edgeVec);
+        pushH({ M: M2, r: rad, vec: edgeVec });
+      }
+    }
+  }
+
+  // Step C: Exact RREF over F_2 and nullspace basis
+  const pivots = new Map();
+  for (let i = 0; i < relations.length; i++) {
+    let x = relations[i];
+    for (let c = 0; c < k && x !== 0n; c++) {
+      if ((x >> BigInt(c)) & 1n) {
+        const piv = pivots.get(c);
+        if (piv !== undefined) {
+          x ^= piv;
+        } else {
+          pivots.set(c, x);
+          break;
+        }
+      }
+    }
+  }
+
+  const pivotColsDesc = [...pivots.keys()].sort((a, b) => b - a);
+  for (const cHigh of pivotColsDesc) {
+    const pivHigh = pivots.get(cHigh);
+    const maskHigh = 1n << BigInt(cHigh);
+    for (const cLow of pivotColsDesc) {
+      if (cLow < cHigh) {
+        const pivLow = pivots.get(cLow);
+        if (pivLow & maskHigh) {
+          pivots.set(cLow, pivLow ^ pivHigh);
+        }
+      }
+    }
+  }
+
+  const basis = [];
+  for (let f = 0; f < k; f++) {
+    if (pivots.has(f)) continue;
+    let b = 1n << BigInt(f);
+    const maskF = 1n << BigInt(f);
+    for (const [c, piv] of pivots.entries()) {
+      if (piv & maskF) b |= 1n << BigInt(c);
+    }
+    basis.push(b);
+  }
+
+  if (basis.length === 0) {
+    return { genColorMasks: new Array(k).fill(0), quotientSize: 1 };
+  }
+
+  const masksFromVecs = (v0, v1 = 0n) => {
+    const out = new Array(k);
+    for (let i = 0; i < k; i++) {
+      const bit0 = Number((v0 >> BigInt(i)) & 1n);
+      const bit1 = Number((v1 >> BigInt(i)) & 1n);
+      out[i] = bit0 | (bit1 << 1);
+    }
+    return out;
+  };
+
+  if (basis.length === 1) {
+    return { genColorMasks: masksFromVecs(basis[0]), quotientSize: 2 };
+  }
+
+  // Basis dimension >= 2: select 2 independent characters for Z_2^2 (4 colors)
+  const poolSet = new Set();
+  const dim = basis.length;
+  if (dim <= 6) {
+    for (let mask = 1; mask < 1 << dim; mask++) {
+      let v = 0n;
+      for (let b = 0; b < dim; b++) {
+        if ((mask >> b) & 1) v ^= basis[b];
+      }
+      if (v !== 0n) poolSet.add(v);
+    }
+  } else {
+    let allXor = 0n;
+    let evenXor = 0n;
+    let oddXor = 0n;
+    for (let i = 0; i < dim; i++) {
+      if (basis[i] !== 0n) poolSet.add(basis[i]);
+      allXor ^= basis[i];
+      if (i % 2 === 0) evenXor ^= basis[i];
+      else oddXor ^= basis[i];
+      for (let j = i + 1; j < dim; j++) {
+        const pairXor = basis[i] ^ basis[j];
+        if (pairXor !== 0n) poolSet.add(pairXor);
+      }
+    }
+    if (allXor !== 0n) poolSet.add(allXor);
+    if (evenXor !== 0n) poolSet.add(evenXor);
+    if (oddXor !== 0n) poolSet.add(oddXor);
+  }
+  const candidates = [...poolSet];
+
+  let detVec = 0n;
+  for (let i = 0; i < k; i++) {
+    if (det3(gens[i].M) < 0) detVec |= 1n << BigInt(i);
+  }
+  const detValid =
+    detVec !== 0n && [...pivots.values()].every((piv) => (popcountBig(piv & detVec) & 1) === 0);
+
+  const scorePair = (v0, v1) => {
+    const masks = masksFromVecs(v0, v1);
+    const counts = [0, 0, 0, 0];
+    for (let i = 0; i < k; i++) counts[masks[i]]++;
+    const dNZ = (counts[1] > 0 ? 1 : 0) + (counts[2] > 0 ? 1 : 0) + (counts[3] > 0 ? 1 : 0);
+    let evenDiff = 0;
+    for (let p = 0; p < evenCornerPairs.length; p++) {
+      const [i, j] = evenCornerPairs[p];
+      if (masks[i] !== masks[j]) evenDiff++;
+    }
+    const balance =
+      Math.abs(counts[1] - counts[3]) +
+      (!detValid ? Math.abs(counts[1] - counts[2]) + Math.abs(counts[2] - counts[3]) : 0);
+    return -10 * counts[0] + 12 * evenDiff + 6 * dNZ - balance;
+  };
+
+  let bestV0 = basis[0];
+  let bestV1 = basis[1];
+
+  if (detValid) {
+    bestV0 = detVec;
+    let bestScore = -Infinity;
+    for (const v1 of candidates) {
+      if (v1 === bestV0) continue;
+      const sc = scorePair(bestV0, v1);
+      if (sc > bestScore) {
+        bestScore = sc;
+        bestV1 = v1;
+      }
+    }
+  } else {
+    const targetHalf = k / 2;
+    let bestHalfErr = Infinity;
+    for (const v0 of candidates) {
+      const err = Math.abs(popcountBig(v0) - targetHalf);
+      if (err < bestHalfErr) {
+        bestHalfErr = err;
+        bestV0 = v0;
+      }
+    }
+    let bestScore = -Infinity;
+    for (const v1 of candidates) {
+      if (v1 === bestV0) continue;
+      const sc = scorePair(bestV0, v1);
+      if (sc > bestScore) {
+        bestScore = sc;
+        bestV1 = v1;
+      }
+    }
+  }
+
+  return {
+    genColorMasks: masksFromVecs(bestV0, bestV1),
+    quotientSize: 4
+  };
 }
 
 function finalizeRealization(orb, carving, fdPolygons, rawGens, cutSegments, seamSegments, markers, totalArea) {
@@ -1292,12 +1647,17 @@ function finalizeRealization(orb, carving, fdPolygons, rawGens, cutSegments, sea
     if (err > maxLorentzError) maxLorentzError = err;
   }
   const areaError = Math.abs(totalArea - orb.areaNum);
+  const quotient = computeZ2Quotient(centeredPolys, centeredGens);
+  const fdHasBothParities =
+    centeredPolys.some((p) => p.parity === 0) && centeredPolys.some((p) => p.parity === 1);
 
   return {
     orb,
     carving,
     fdPolygons: centeredPolys,
     gens: centeredGens,
+    quotient,
+    fdHasBothParities,
     cutSegments: centeredCuts,
     seamSegments: centeredSeams,
     markers: centeredMarkers,
@@ -1325,9 +1685,10 @@ export function pointInPolyH(poly, P, margin = 0) {
 /**
  * Generate group transforms tiling the Poincare disk via camera-centered min-heap BFS.
  */
-export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rMax = 0.985 } = {}) {
-  const { fdPolygons, gens } = realization;
+export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rMax = 0.985, cameraColor = 0 } = {}) {
+  const { fdPolygons, gens, quotient } = realization;
   if (!fdPolygons || fdPolygons.length === 0) return [];
+  const masks = quotient?.genColorMasks;
 
   const poly0 = fdPolygons[0];
   const testPt1 = poly0.centroid;
@@ -1426,10 +1787,12 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
 
   // Greedily walk from cameraM back toward the camera center (0,0,1) so far-panned views stay centered
   let seedCM = cameraM;
+  let seedColor = cameraColor;
   if (!isCamId) {
     let curT = normTime(apply3(seedCM, testPt1))[2];
     for (let step = 0; step < 64; step++) {
       let bestCM = null;
+      let bestGi = -1;
       let bestT = curT;
       for (let gi = 0; gi < gens.length; gi++) {
         let cand = mul3(seedCM, gens[gi].M);
@@ -1438,11 +1801,13 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
         if (t < bestT - 1e-6) {
           bestT = t;
           bestCM = cand;
+          bestGi = gi;
         }
       }
       if (!bestCM) break;
       seedCM = bestCM;
       curT = bestT;
+      if (masks) seedColor ^= masks[bestGi];
     }
   }
 
@@ -1454,7 +1819,8 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
     r: camRadiusOfCM(seedCM),
     depth: 0,
     detPos: seedDetPos,
-    isFD: isCamId ? true : checkIsFD(seedCM, seedDetPos)
+    isFD: isCamId ? true : checkIsFD(seedCM, seedDetPos),
+    color: seedColor
   });
 
   if (!isCamId) {
@@ -1466,7 +1832,8 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
         r: fdRad,
         depth: 0,
         detPos: true,
-        isFD: true
+        isFD: true,
+        color: cameraColor
       });
     }
   }
@@ -1489,7 +1856,8 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
           r: rad,
           depth: cur.depth + 1,
           detPos,
-          isFD: isCamId ? false : checkIsFD(CM2, detPos)
+          isFD: isCamId ? false : checkIsFD(CM2, detPos),
+          color: cur.color ^ (masks ? masks[gi] : 0)
         });
       }
     }

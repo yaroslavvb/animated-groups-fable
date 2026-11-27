@@ -72,6 +72,28 @@ body.fn-page {
   outline-offset: 1px;
 }
 
+.color-control {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.fn-select {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  padding: 6px 8px;
+  border: 1px solid var(--fn-line-strong);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--fn-ink);
+  cursor: pointer;
+}
+.fn-select:focus {
+  outline: 2px solid var(--fn-accent);
+  outline-offset: 1px;
+}
+
 .btn {
   appearance: none;
   border: 1px solid var(--fn-line-strong);

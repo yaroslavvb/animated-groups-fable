@@ -6,7 +6,7 @@ import {
   hasMultipleCarvings,
   getCutOptions,
   formatFrac
-} from "./orbifold.js?v=fn-v3";
+} from "./orbifold.js?v=fn-v4";
 
 import {
   ID3,
@@ -21,17 +21,35 @@ import {
   mobiusTranslateToOrigin,
   reorthonormalizeLorentz,
   panCameraByDiskDelta,
-  wrapCameraInGroup,
+  wrapCameraInGroupWithColor,
   buildRealization,
   generateTiling
-} from "./hyperbolic.js?v=fn-v3";
+} from "./hyperbolic.js?v=fn-v4";
+
+const QUOTIENT_COLORS = [
+  ["#dce8f5", "#ebf2fa"], // sky slate
+  ["#f7e4cd", "#fbf0e2"], // warm apricot
+  ["#dceee2", "#ebf6ee"], // soft sage
+  ["#eadff2", "#f4eef9"]  // soft lavender
+];
+
+const PIECE_COLORS = [
+  ["#cfe0f2", "#eaf2fa"],
+  ["#f2d8b6", "#fbf0e1"],
+  ["#cde6d5", "#eaf6ee"],
+  ["#e0d0ee", "#f3ecf9"],
+  ["#f2cfd4", "#faeaec"],
+  ["#cbe6ea", "#e8f5f7"]
+];
 
 const state = {
   orb: null,
   carving: null,
   realization: null,
+  coloring: "parity",
   cameraM: ID3,
   cameraWrapped: false,
+  cameraColor: 0,
   hoveredCutId: null,
   refineTimer: null,
   rafId: null
@@ -40,6 +58,7 @@ const state = {
 const els = {
   sigForm: document.getElementById("sig-form"),
   sigInput: document.getElementById("sig-input"),
+  colorSelect: document.getElementById("color-select"),
   orbMeta: document.getElementById("orb-meta"),
   statusBanner: document.getElementById("status-banner"),
   canvas: document.getElementById("disk-canvas"),
@@ -205,10 +224,22 @@ function renderDisk(maxPolys = 2200) {
     return;
   }
 
-  const tiles = generateTiling(real, state.cameraM, { maxPolys, rMax: 0.985 });
-  const { hoveredCutId } = state;
+  const tiles = generateTiling(real, state.cameraM, {
+    maxPolys,
+    rMax: 0.985,
+    cameraColor: state.cameraColor
+  });
+  const { hoveredCutId, coloring } = state;
 
-  // 1. Tile polygons with orientation parity shading
+  const pieceIndexById = new Map();
+  if (coloring === "pieces") {
+    for (let pi = 0; pi < real.fdPolygons.length; pi++) {
+      const pid = real.fdPolygons[pi].pieceId;
+      if (!pieceIndexById.has(pid)) pieceIndexById.set(pid, pieceIndexById.size);
+    }
+  }
+
+  // 1. Tile polygons shaded according to selected coloring mode
   for (let ti = 0; ti < tiles.length; ti++) {
     const t = tiles[ti];
     const CM = t.CM || mul3(state.cameraM, t.M);
@@ -217,8 +248,19 @@ function renderDisk(maxPolys = 2200) {
       const poly = real.fdPolygons[pi];
       const worldVerts = poly.vertsH.map((v) => normTime(apply3(CM, v)));
       drawPolygonPath(ctx, toPx, worldVerts);
-      const p = poly.parity ^ tileDetFlip;
-      ctx.fillStyle = p === 0 ? "#e2e7ee" : "#f9f8f4";
+      if (coloring === "quotient") {
+        const pair = QUOTIENT_COLORS[(t.color ?? 0) & 3];
+        ctx.fillStyle = real.fdHasBothParities && poly.parity === 1 ? pair[1] : pair[0];
+      } else if (coloring === "pieces") {
+        const pIdx = pieceIndexById.get(poly.pieceId) ?? 0;
+        const pair = PIECE_COLORS[pIdx % PIECE_COLORS.length];
+        ctx.fillStyle = pair[poly.parity ^ tileDetFlip];
+      } else if (coloring === "none") {
+        ctx.fillStyle = "#f7f6f1";
+      } else {
+        const p = poly.parity ^ tileDetFlip;
+        ctx.fillStyle = p === 0 ? "#e2e7ee" : "#f9f8f4";
+      }
       ctx.fill();
       ctx.strokeStyle = "rgba(26, 26, 31, 0.20)";
       ctx.lineWidth = 0.7;
@@ -228,14 +270,20 @@ function renderDisk(maxPolys = 2200) {
 
   // 2. Highlight assembled fundamental domain
   if (!state.cameraWrapped) {
+    const showFdFill = coloring === "parity" || coloring === "none";
     for (let pi = 0; pi < real.fdPolygons.length; pi++) {
       const poly = real.fdPolygons[pi];
       const worldVerts = poly.vertsH.map((v) => normTime(apply3(state.cameraM, v)));
       drawPolygonPath(ctx, toPx, worldVerts);
-      ctx.fillStyle = "rgba(15, 90, 138, 0.14)";
-      ctx.fill();
-      ctx.strokeStyle = "rgba(15, 90, 138, 0.58)";
-      ctx.lineWidth = 1.5;
+      if (showFdFill) {
+        ctx.fillStyle = "rgba(15, 90, 138, 0.14)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(15, 90, 138, 0.58)";
+        ctx.lineWidth = 1.5;
+      } else {
+        ctx.strokeStyle = "rgba(26, 26, 31, 0.55)";
+        ctx.lineWidth = 1.6;
+      }
       ctx.stroke();
     }
   }
@@ -565,12 +613,30 @@ function syncHoverVisuals() {
   }
 }
 
+function updateColorSelectLabels() {
+  if (!els.colorSelect) return;
+  const qOpt = els.colorSelect.querySelector('option[value="quotient"]');
+  if (qOpt) {
+    const qSize = state.realization?.quotient?.quotientSize;
+    qOpt.textContent = qSize ? `Quotient (${qSize}-color)` : "Quotient (4-color)";
+  }
+  const pOpt = els.colorSelect.querySelector('option[value="pieces"]');
+  if (pOpt) {
+    const pieceCount = state.realization
+      ? new Set(state.realization.fdPolygons.map((p) => p.pieceId)).size
+      : 0;
+    pOpt.textContent = pieceCount > 0 ? `Carved pieces (${pieceCount})` : "Carved pieces";
+  }
+}
+
 function renderAllViews(resetCamera = false) {
   if (resetCamera) {
     state.cameraM = ID3;
     state.cameraWrapped = false;
+    state.cameraColor = 0;
   }
   renderStatusAndMeta();
+  updateColorSelectLabels();
   renderSliders();
   scheduleDiskRender(false);
 }
@@ -609,6 +675,11 @@ els.sigForm?.addEventListener("submit", (e) => {
   loadSignature(els.sigInput.value);
 });
 
+els.colorSelect?.addEventListener("change", () => {
+  state.coloring = els.colorSelect.value;
+  scheduleDiskRender(false);
+});
+
 els.btnReshuffle?.addEventListener("click", () => {
   if (!state.orb?.ok || state.orb.geometry !== "hyperbolic") return;
   state.hoveredCutId = null;
@@ -616,6 +687,8 @@ els.btnReshuffle?.addEventListener("click", () => {
   state.realization = buildRealization(state.orb, state.carving);
   state.cameraM = ID3;
   state.cameraWrapped = false;
+  state.cameraColor = 0;
+  updateColorSelectLabels();
   renderSliders();
   scheduleDiskRender(false);
 });
@@ -679,8 +752,10 @@ if (els.canvas) {
     const M2 = invLorentz(mobiusTranslateToOrigin(Pcur));
     let nextCam = reorthonormalizeLorentz(mul3(mul3(M2, M1), dragStartCamera));
     if (nextCam[2][2] > 120 && state.realization) {
-      nextCam = wrapCameraInGroup(nextCam, state.realization);
+      const wrappedRes = wrapCameraInGroupWithColor(nextCam, state.realization);
+      nextCam = wrappedRes.cameraM;
       state.cameraWrapped = true;
+      state.cameraColor ^= wrappedRes.colorXor;
       dragStartPt = curPt;
       dragStartCamera = nextCam;
     }
@@ -725,7 +800,10 @@ if (els.canvas) {
       if (Math.hypot(du, dv) < 1e-6) return;
       const res = panCameraByDiskDelta(state.cameraM, du, dv, state.realization);
       state.cameraM = res.cameraM;
-      if (res.wrapped) state.cameraWrapped = true;
+      if (res.wrapped) {
+        state.cameraWrapped = true;
+        state.cameraColor ^= res.colorXor;
+      }
       scheduleDiskRender(true);
     },
     { passive: false }
@@ -734,6 +812,7 @@ if (els.canvas) {
   els.canvas.addEventListener("dblclick", () => {
     state.cameraM = ID3;
     state.cameraWrapped = false;
+    state.cameraColor = 0;
     scheduleDiskRender(false);
   });
 }

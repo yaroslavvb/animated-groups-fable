@@ -21,6 +21,7 @@ import {
   mcross,
   add3,
   scale3,
+  baryH,
   normTime,
   normSpace,
   apply3,
@@ -29,6 +30,8 @@ import {
   frameMap,
   hypDist,
   lorentzError,
+  panCameraByDiskDelta,
+  wrapCameraInGroupWithColor,
   buildRealization,
   generateTiling
 } from "../docs/js/fenchel-nielsen/hyperbolic.js";
@@ -332,6 +335,122 @@ console.log("6. Checking random carvings, hasMultipleCarvings, and Reshuffle inv
       checkTilingCoverage(`${sig}#reshuffle${step}`, r, 150, 0.55);
       cur = next;
     }
+  }
+}
+
+console.log("7. Checking Z_2^2 quotient coloring solver, zero homomorphism contradictions, and pan-wrap invariance...");
+{
+  const expectedQuotientSizes = [
+    ["*22222", 4],
+    ["*222222", 4],
+    ["*642", 4],
+    ["*2223", 4],
+    ["222222", 4],
+    ["2223", 4],
+    ["2*32", 4],
+    ["4*3", 4],
+    ["23*", 4],
+    ["o2", 4],
+    ["oo", 4],
+    ["xxx", 4],
+    ["2*222", 4],
+    ["*22*22", 4],
+    ["*3333", 2],
+    ["3*5", 2],
+    ["3322", 2],
+    ["2345", 2],
+    ["23x", 2],
+    ["237", 1]
+  ];
+  for (const [sig, expSize] of expectedQuotientSizes) {
+    const o = parseOrbifold(sig);
+    const r = buildRealization(o, createDefaultCarving(o));
+    assert.equal(r.quotient.quotientSize, expSize, `${sig}: expected quotientSize=${expSize}, got ${r.quotient.quotientSize}`);
+  }
+
+  const verifyTilingHomomorphism = (label, r, tiles, camColor = 0) => {
+    const masks = r.quotient.genColorMasks;
+    const poly0 = r.fdPolygons[0];
+    const testPt1 = poly0.centroid;
+    const testPt2 = baryH([poly0.centroid, poly0.vertsH[0], poly0.vertsH[1]], [0.55, 0.27, 0.18]);
+    const scale = 60;
+    const buckets = new Map();
+    for (const t of tiles) {
+      const p1 = normTime(apply3(t.M, testPt1));
+      const p2 = normTime(apply3(t.M, testPt2));
+      const d1 = poincare(p1);
+      const detPos = det3(t.M) >= 0;
+      const home = `${Math.round(d1[0] * scale)},${Math.round(d1[1] * scale)}`;
+      if (!buckets.has(home)) buckets.set(home, []);
+      buckets.get(home).push({ detPos, p1, p2, color: t.color, M: t.M });
+    }
+    const fdMatches = buckets.get(`${Math.round(poincare(testPt1)[0] * scale)},${Math.round(poincare(testPt1)[1] * scale)}`) || [];
+    for (const item of fdMatches) {
+      if (item.detPos && -mdot(item.p1, testPt1) < 1 + 1e-5 && -mdot(item.p2, testPt2) < 1 + 1e-5) {
+        assert.equal(item.color, camColor, `${label}: FD color mismatch`);
+      }
+    }
+    let edgesChecked = 0;
+    for (const t of tiles) {
+      for (let gi = 0; gi < r.gens.length; gi++) {
+        const M2 = mul3(t.M, r.gens[gi].M);
+        const p1 = normTime(apply3(M2, testPt1));
+        const p2 = normTime(apply3(M2, testPt2));
+        const d1 = poincare(p1);
+        const detPos = det3(M2) >= 0;
+        const bx = Math.round(d1[0] * scale);
+        const by = Math.round(d1[1] * scale);
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            const list = buckets.get(`${bx + dx},${by + dy}`);
+            if (!list) continue;
+            for (const t2 of list) {
+              if (t2.detPos !== detPos) continue;
+              if (-mdot(p1, t2.p1) < 1 + 1e-5 && -mdot(p2, t2.p2) < 1 + 1e-5) {
+                edgesChecked++;
+                assert.equal(
+                  t.color ^ masks[gi],
+                  t2.color,
+                  `${label}: homomorphism contradiction at gen ${gi}`
+                );
+              }
+            }
+          }
+        }
+      }
+    }
+    assert(edgesChecked > 0, `${label}: no Cayley edges verified`);
+  };
+
+  for (const grp of PRESETS) {
+    for (const item of grp.items) {
+      const o = parseOrbifold(item.sig);
+      const r = buildRealization(o, createDefaultCarving(o));
+      const tiles = generateTiling(r, ID3, { maxPolys: 900, rMax: 0.94 });
+      verifyTilingHomomorphism(item.sig, r, tiles, 0);
+    }
+  }
+
+  for (const sig of ["*22222", "2*32"]) {
+    const o = parseOrbifold(sig);
+    const r = buildRealization(o, createDefaultCarving(o));
+    let cameraM = ID3;
+    let cameraColor = 0;
+    let wrapCount = 0;
+    for (let step = 0; step < 80; step++) {
+      const res = panCameraByDiskDelta(cameraM, 0.22, 0.13, r);
+      cameraM = res.cameraM;
+      if (res.wrapped) {
+        wrapCount++;
+        cameraColor ^= res.colorXor;
+      }
+    }
+    assert(wrapCount > 0, `${sig}: expected camera wrapping during 80-step pan`);
+    assert(cameraM[2][2] <= 200, `${sig}: cameraM did not wrap cleanly (${cameraM[2][2]})`);
+    const pannedTiles = generateTiling(r, cameraM, { maxPolys: 700, rMax: 0.94, cameraColor });
+    verifyTilingHomomorphism(`${sig}#panned`, r, pannedTiles, cameraColor);
+    const wrappedRes = wrapCameraInGroupWithColor(cameraM, r);
+    assert(typeof wrappedRes.colorXor === "number");
   }
 }
 
