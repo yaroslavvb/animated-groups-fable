@@ -16,7 +16,7 @@
 }
 
 .handles-app {
-  max-width: 1120px;
+  max-width: 1220px;
   margin: 0 auto;
   padding: 16px 18px 28px;
 }
@@ -281,6 +281,12 @@
   padding: 10px 12px 12px;
   overflow: visible;
 }
+.play-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
 
 .pane-head {
   display: flex;
@@ -331,7 +337,8 @@
   aspect-ratio: 1 / 1;
 }
 .ratio-surf {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
+  max-height: 190px;
 }
 .canvas-wrap canvas {
   display: block;
@@ -520,22 +527,38 @@
   color: var(--ink);
 }
 
-@media (min-width: 860px) {
+@media (min-width: 900px) {
   .play-panes {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 2.2fr) minmax(300px, 1fr);
+    align-items: start;
     gap: 16px;
   }
-  .ratio-pat,
+  .ratio-pat {
+    aspect-ratio: 1 / 1;
+    max-height: min(74vh, 720px);
+  }
   .ratio-surf {
     aspect-ratio: 4 / 3;
+    max-height: 250px;
   }
   .sliders,
   .extra-sliders {
-    grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .slider-row {
+    grid-template-columns: 88px minmax(0, 1fr) 52px;
+    gap: 8px;
+  }
+  .s-label,
+  .s-val {
+    font-size: 0.86rem;
   }
   .readout {
     min-height: 1.6em;
+  }
+  .controls .note {
+    min-height: 3.2em;
   }
 }
 

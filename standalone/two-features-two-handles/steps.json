@@ -3,7 +3,7 @@
     "w": 1280,
     "h": 800,
     "wait": 500,
-    "eval": "(() => { const H = window.__handles.state(); const sw = document.documentElement.scrollWidth; const iw = window.innerWidth; const p2 = document.getElementById('pane2').getBoundingClientRect(); const p3 = document.getElementById('pane').getBoundingClientRect(); const ex = document.getElementById('extra-sliders'); return { k: H.k, m: H.m, L: H.L, tw: H.tw, extraHidden: ex.hidden && getComputedStyle(ex).display === 'none', hash: H.hash, locHash: H.locationHash, overflowX: sw > iw, paneRowOk: Math.abs(p2.top - p3.top) < 6 && p2.left < p3.left && Math.abs(p2.height - p3.height) < 4, frontCones: H.coneScreen.filter(c => c.front).map(c => c.cone) }; })()",
+    "eval": "(() => { const H = window.__handles.state(); const sw = document.documentElement.scrollWidth; const iw = window.innerWidth; const p2 = document.getElementById('pane2').getBoundingClientRect(); const p3 = document.getElementById('pane').getBoundingClientRect(); const ex = document.getElementById('extra-sliders'); return { k: H.k, m: H.m, L: H.L, tw: H.tw, extraHidden: ex.hidden && getComputedStyle(ex).display === 'none', hash: H.hash, locHash: H.locationHash, overflowX: sw > iw, patW: Math.round(p2.width), patH: Math.round(p2.height), surfW: Math.round(p3.width), surfH: Math.round(p3.height), paneRowOk: Math.abs(p2.top - p3.top) < 6 && p2.left < p3.left && p2.width >= p3.width * 2 && (p2.width * p2.height) >= 2 * (p3.width * p3.height), frontCones: H.coneScreen.filter(c => c.front).map(c => c.cone) }; })()",
     "out": "shots/h-1280-open.png"
   },
   {

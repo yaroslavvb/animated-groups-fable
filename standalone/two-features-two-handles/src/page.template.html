@@ -65,21 +65,21 @@
         </div>
       </div>
 
-      <div class="pane" id="pane">
-        <div class="pane-head">
-          <span class="pane-title">Surface</span>
-          <span class="pane-sub" id="surf-sub">Tap two features</span>
-          <button class="reset" type="button" id="reset3" aria-label="Reset surface orientation">Reset</button>
+      <div class="play-side">
+        <div class="pane" id="pane">
+          <div class="pane-head">
+            <span class="pane-title">Surface</span>
+            <span class="pane-sub" id="surf-sub">Tap two features</span>
+            <button class="reset" type="button" id="reset3" aria-label="Reset surface orientation">Reset</button>
+          </div>
+          <div class="canvas-wrap ratio-surf">
+            <canvas id="view" tabindex="0" aria-label="3D orbifold surface with tappable features"></canvas>
+            <div class="labels" id="labels"></div>
+            <span class="hint" id="view-hint">Drag to turn · tap features</span>
+          </div>
         </div>
-        <div class="canvas-wrap ratio-surf">
-          <canvas id="view" tabindex="0" aria-label="3D orbifold surface with tappable features"></canvas>
-          <div class="labels" id="labels"></div>
-          <span class="hint" id="view-hint">Drag to turn · tap features</span>
-        </div>
-      </div>
-    </div>
 
-    <div class="controls">
+        <div class="controls">
       <div class="sliders">
         <div class="slider-row">
           <label class="s-label" for="len-range" id="len-label">Length</label>
@@ -151,7 +151,9 @@
         <button class="chip" type="button" data-moment="half" aria-pressed="false">Half a turn</button>
         <button class="chip" type="button" data-moment="fault" aria-pressed="false">Handle fault</button>
       </div>
-      <p class="note" id="moment-note" aria-live="polite"></p>
+        <p class="note" id="moment-note" aria-live="polite"></p>
+      </div>
+      </div>
     </div>
   </section>
 
