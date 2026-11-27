@@ -10,7 +10,7 @@ import {
   totalSliderCount,
   formatFrac,
   formatAreaPi
-} from "./orbifold.js?v=fn-v1";
+} from "./orbifold.js?v=fn-v2";
 
 import {
   ID3,
@@ -23,18 +23,22 @@ import {
   geodesicSamples,
   slideFrame,
   mobiusTranslateToOrigin,
+  reorthonormalizeLorentz,
+  panCameraByDiskDelta,
+  wrapCameraInGroup,
   det3,
   buildRealization,
   generateTiling
-} from "./hyperbolic.js?v=fn-v1";
+} from "./hyperbolic.js?v=fn-v2";
 
-import { renderSchematic } from "./schematic.js?v=fn-v1";
+import { renderSchematic } from "./schematic.js?v=fn-v2";
 
 const state = {
   orb: null,
   carving: null,
   realization: null,
   cameraM: ID3,
+  cameraWrapped: false,
   activePickCutIndex: null,
   pendingNodeId: null,
   hoveredCutId: null,
@@ -237,7 +241,7 @@ function renderDisk(maxPolys = 2200) {
   // 1. Draw all tile polygons
   for (let ti = 0; ti < tiles.length; ti++) {
     const t = tiles[ti];
-    const CM = mul3(state.cameraM, t.M);
+    const CM = t.CM || mul3(state.cameraM, t.M);
     const tileDetFlip = t.detPos ? 0 : 1;
     for (let pi = 0; pi < real.fdPolygons.length; pi++) {
       const poly = real.fdPolygons[pi];
@@ -257,7 +261,7 @@ function renderDisk(maxPolys = 2200) {
   }
 
   // 2. Highlight assembled fundamental domain
-  if (overlays.fd) {
+  if (overlays.fd && !state.cameraWrapped) {
     for (let pi = 0; pi < real.fdPolygons.length; pi++) {
       const poly = real.fdPolygons[pi];
       const worldVerts = poly.vertsH.map((v) => normTime(apply3(state.cameraM, v)));
@@ -294,8 +298,8 @@ function renderDisk(maxPolys = 2200) {
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
       if (t.r > 0.94) continue;
-      const CM = mul3(state.cameraM, t.M);
-      const isFD = ti === 0;
+      const CM = t.CM || mul3(state.cameraM, t.M);
+      const isFD = Boolean(t.isFD) && !state.cameraWrapped;
       for (const seg of real.cutSegments) {
         const pA = normTime(apply3(CM, seg.A));
         const pB = normTime(apply3(CM, seg.B));
@@ -324,7 +328,7 @@ function renderDisk(maxPolys = 2200) {
     }
 
     // Draw twist footpoint ticks along FD cut geodesics
-    if (overlays.fd) {
+    if (overlays.fd && !state.cameraWrapped) {
       for (const seg of real.cutSegments) {
         if (!seg.twistTicks || !seg.frame) continue;
         const wf = {
@@ -362,9 +366,9 @@ function renderDisk(maxPolys = 2200) {
   if (overlays.markers && real.markers.length > 0) {
     for (let ti = 0; ti < tiles.length; ti++) {
       const t = tiles[ti];
-      if (t.r > 0.72 && ti > 0) continue;
-      const CM = mul3(state.cameraM, t.M);
-      const isFD = ti === 0;
+      const isFD = Boolean(t.isFD) && !state.cameraWrapped;
+      if (t.r > 0.72 && !isFD) continue;
+      const CM = t.CM || mul3(state.cameraM, t.M);
       for (const mk of real.markers) {
         const dp = poincare(normTime(apply3(CM, mk.P)));
         if (Math.hypot(dp[0], dp[1]) > 0.94) continue;
@@ -842,7 +846,10 @@ function updateCarvingActionButtons() {
 }
 
 function renderAllViews(resetCamera = false) {
-  if (resetCamera) state.cameraM = ID3;
+  if (resetCamera) {
+    state.cameraM = ID3;
+    state.cameraWrapped = false;
+  }
   renderPresets();
   renderStatusAndKPIs();
   renderSchematicView();
@@ -908,6 +915,7 @@ els.btnCancelPick?.addEventListener("click", () => {
 
 els.btnRecenter?.addEventListener("click", () => {
   state.cameraM = ID3;
+  state.cameraWrapped = false;
   scheduleDiskRender(false);
 });
 
@@ -915,6 +923,7 @@ els.btnResetParams?.addEventListener("click", () => {
   if (!state.orb || state.orb.geometry !== "hyperbolic") return;
   stopActiveAnimation();
   state.cameraM = ID3;
+  state.cameraWrapped = false;
   state.carving = createDefaultCarving(state.orb);
   state.realization = buildRealization(state.orb, state.carving);
   renderAllViews(true);
@@ -950,18 +959,19 @@ for (const key of Object.keys(state.overlays)) {
   });
 }
 
-// Mouse / touch Mobius pan on canvas
+// Mouse / touch Mobius pan and two-finger trackpad scroll on canvas
 if (els.canvas) {
+  const activePointers = new Map();
   let dragStartPt = null;
   let dragStartCamera = null;
 
-  const clientToDisk = (e) => {
+  const clientCoordsToDisk = (clientX, clientY) => {
     const rect = els.canvas.getBoundingClientRect();
     const R = rect.width * 0.48;
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
-    let u = (e.clientX - cx) / R;
-    let v = -(e.clientY - cy) / R;
+    let u = (clientX - cx) / R;
+    let v = -(clientY - cy) / R;
     const rad = Math.hypot(u, v);
     if (rad > 0.92) {
       u = (u / rad) * 0.92;
@@ -970,34 +980,100 @@ if (els.canvas) {
     return [u, v];
   };
 
+  const resetDragAnchor = () => {
+    if (activePointers.size === 0) {
+      dragStartPt = null;
+      dragStartCamera = null;
+      return;
+    }
+    let sx = 0;
+    let sy = 0;
+    for (const p of activePointers.values()) {
+      sx += p.clientX;
+      sy += p.clientY;
+    }
+    dragStartPt = clientCoordsToDisk(sx / activePointers.size, sy / activePointers.size);
+    dragStartCamera = state.cameraM;
+  };
+
   els.canvas.addEventListener("pointerdown", (e) => {
     if (!state.realization) return;
     els.canvas.setPointerCapture(e.pointerId);
-    dragStartPt = clientToDisk(e);
-    dragStartCamera = state.cameraM;
+    activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+    resetDragAnchor();
   });
 
   els.canvas.addEventListener("pointermove", (e) => {
-    if (!dragStartPt) return;
-    const curPt = clientToDisk(e);
+    if (!dragStartPt || !activePointers.has(e.pointerId)) return;
+    activePointers.set(e.pointerId, { clientX: e.clientX, clientY: e.clientY });
+    let sx = 0;
+    let sy = 0;
+    for (const p of activePointers.values()) {
+      sx += p.clientX;
+      sy += p.clientY;
+    }
+    const curPt = clientCoordsToDisk(sx / activePointers.size, sy / activePointers.size);
     const Pstart = liftDisk(dragStartPt[0], dragStartPt[1]);
     const Pcur = liftDisk(curPt[0], curPt[1]);
     const M1 = mobiusTranslateToOrigin(Pstart);
     const M2 = invLorentz(mobiusTranslateToOrigin(Pcur));
-    state.cameraM = mul3(mul3(M2, M1), dragStartCamera);
+    let nextCam = reorthonormalizeLorentz(mul3(mul3(M2, M1), dragStartCamera));
+    if (nextCam[2][2] > 120 && state.realization) {
+      nextCam = wrapCameraInGroup(nextCam, state.realization);
+      state.cameraWrapped = true;
+      dragStartPt = curPt;
+      dragStartCamera = nextCam;
+    }
+    state.cameraM = nextCam;
     scheduleDiskRender(true);
   });
 
-  const endDrag = () => {
-    if (!dragStartPt) return;
-    dragStartPt = null;
-    dragStartCamera = null;
-    scheduleDiskRender(false);
+  const endDrag = (e) => {
+    if (!activePointers.has(e.pointerId)) return;
+    activePointers.delete(e.pointerId);
+    resetDragAnchor();
+    if (activePointers.size === 0) {
+      scheduleDiskRender(false);
+    }
   };
   els.canvas.addEventListener("pointerup", endDrag);
   els.canvas.addEventListener("pointercancel", endDrag);
+
+  els.canvas.addEventListener(
+    "wheel",
+    (e) => {
+      if (!state.realization || e.ctrlKey) return;
+      const rect = els.canvas.getBoundingClientRect();
+      const R = rect.width * 0.48;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      if (Math.hypot(e.clientX - cx, e.clientY - cy) > R + 4) return;
+
+      e.preventDefault();
+      let dx = e.deltaX;
+      let dy = e.deltaY;
+      if (e.deltaMode === 1) {
+        dx *= 16;
+        dy *= 16;
+      } else if (e.deltaMode === 2) {
+        dx *= rect.height * 0.5;
+        dy *= rect.height * 0.5;
+      }
+      const scale = Math.max(120, R * 1.15);
+      const du = -dx / scale;
+      const dv = dy / scale;
+      if (Math.hypot(du, dv) < 1e-6) return;
+      const res = panCameraByDiskDelta(state.cameraM, du, dv, state.realization);
+      state.cameraM = res.cameraM;
+      if (res.wrapped) state.cameraWrapped = true;
+      scheduleDiskRender(true);
+    },
+    { passive: false }
+  );
+
   els.canvas.addEventListener("dblclick", () => {
     state.cameraM = ID3;
+    state.cameraWrapped = false;
     scheduleDiskRender(false);
   });
 }

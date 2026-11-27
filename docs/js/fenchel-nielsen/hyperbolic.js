@@ -1192,6 +1192,53 @@ function reorthonormalizeLorentz(M) {
   return X;
 }
 
+export { reorthonormalizeLorentz };
+
+export function panCameraByDiskDelta(cameraM, du, dv, realization = null) {
+  const rad = Math.hypot(du, dv);
+  if (rad < 1e-12) return { cameraM, wrapped: false };
+  let sx = du;
+  let sy = dv;
+  if (rad > 0.55) {
+    sx = (du / rad) * 0.55;
+    sy = (dv / rad) * 0.55;
+  }
+  const T = invLorentz(mobiusTranslateToOrigin(liftDisk(sx, sy)));
+  let next = mul3(T, cameraM);
+  if (next[2][2] <= 5000) {
+    next = reorthonormalizeLorentz(next);
+  }
+  if (realization && next[2][2] > 120) {
+    return { cameraM: wrapCameraInGroup(next, realization), wrapped: true };
+  }
+  return { cameraM: next, wrapped: false };
+}
+
+export function wrapCameraInGroup(cameraM, realization) {
+  const { fdPolygons, gens } = realization;
+  if (!fdPolygons || fdPolygons.length === 0 || !gens || gens.length === 0) return cameraM;
+  const pt = fdPolygons[0].centroid;
+  let cur = cameraM;
+  let curT = normTime(apply3(cur, pt))[2];
+  for (let step = 0; step < 64; step++) {
+    let best = null;
+    let bestT = curT;
+    for (let gi = 0; gi < gens.length; gi++) {
+      let cand = mul3(cur, gens[gi].M);
+      if (cand[2][2] > 20 && cand[2][2] <= 5000) cand = reorthonormalizeLorentz(cand);
+      const t = normTime(apply3(cand, pt))[2];
+      if (t < bestT - 1e-6) {
+        bestT = t;
+        best = cand;
+      }
+    }
+    if (!best) break;
+    cur = best;
+    curT = bestT;
+  }
+  return cur[2][2] <= 5000 ? reorthonormalizeLorentz(cur) : cur;
+}
+
 function finalizeRealization(orb, carving, fdPolygons, rawGens, cutSegments, seamSegments, markers, totalArea) {
   // Center the whole FD when compact; anchor to the root piece if a long twisted branch pulls the barycenter far out
   const allVerts = [];
@@ -1276,7 +1323,7 @@ export function pointInPolyH(poly, P, margin = 0) {
 }
 
 /**
- * Generate group transforms tiling the Poincare disk via min-heap BFS.
+ * Generate group transforms tiling the Poincare disk via camera-centered min-heap BFS.
  */
 export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rMax = 0.985 } = {}) {
   const { fdPolygons, gens } = realization;
@@ -1285,16 +1332,20 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
   const poly0 = fdPolygons[0];
   const testPt1 = poly0.centroid;
   const testPt2 = baryH([poly0.centroid, poly0.vertsH[0], poly0.vertsH[1]], [0.55, 0.27, 0.18]);
+  const fdCamP1 = normTime(apply3(cameraM, testPt1));
+  const fdCamP2 = normTime(apply3(cameraM, testPt2));
+  const isCamId = cameraM === ID3;
+  const camInv = isCamId ? ID3 : invLorentz(cameraM);
 
   const maxTiles = Math.max(1, Math.ceil(maxPolys / fdPolygons.length));
   const buckets = new Map();
   const scale = 60;
 
-  const isSeenAndMark = (M) => {
-    const p1 = normTime(apply3(M, testPt1));
-    const p2 = normTime(apply3(M, testPt2));
+  const isSeenAndMark = (CM) => {
+    const p1 = normTime(apply3(CM, testPt1));
+    const p2 = normTime(apply3(CM, testPt2));
     const d1 = poincare(p1);
-    const detPos = det3(M) >= 0;
+    const detPos = det3(CM) >= 0;
     const bx = Math.round(d1[0] * scale);
     const by = Math.round(d1[1] * scale);
 
@@ -1322,8 +1373,7 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
   for (let pi = 0; pi < fdPolygons.length; pi++) {
     probePts.push(fdPolygons[pi].centroid, ...fdPolygons[pi].vertsH);
   }
-  const camRadiusOf = (M) => {
-    const CM = mul3(cameraM, M);
+  const camRadiusOfCM = (CM) => {
     let minR = 2;
     for (let i = 0; i < probePts.length; i++) {
       const pc = poincare(normTime(apply3(CM, probePts[i])));
@@ -1369,21 +1419,78 @@ export function generateTiling(realization, cameraM = ID3, { maxPolys = 2000, rM
     return top;
   };
 
-  isSeenAndMark(ID3);
-  pushHeap({ M: ID3, r: camRadiusOf(ID3), depth: 0, detPos: true });
+  const checkIsFD = (CM, detPos) =>
+    detPos &&
+    -mdot(normTime(apply3(CM, testPt1)), fdCamP1) < 1 + 1e-6 &&
+    -mdot(normTime(apply3(CM, testPt2)), fdCamP2) < 1 + 1e-6;
+
+  // Greedily walk from cameraM back toward the camera center (0,0,1) so far-panned views stay centered
+  let seedCM = cameraM;
+  if (!isCamId) {
+    let curT = normTime(apply3(seedCM, testPt1))[2];
+    for (let step = 0; step < 64; step++) {
+      let bestCM = null;
+      let bestT = curT;
+      for (let gi = 0; gi < gens.length; gi++) {
+        let cand = mul3(seedCM, gens[gi].M);
+        if (cand[2][2] > 20) cand = reorthonormalizeLorentz(cand);
+        const t = normTime(apply3(cand, testPt1))[2];
+        if (t < bestT - 1e-6) {
+          bestT = t;
+          bestCM = cand;
+        }
+      }
+      if (!bestCM) break;
+      seedCM = bestCM;
+      curT = bestT;
+    }
+  }
+
+  const seedDetPos = det3(seedCM) >= 0;
+  isSeenAndMark(seedCM);
+  pushHeap({
+    M: isCamId ? ID3 : mul3(camInv, seedCM),
+    CM: seedCM,
+    r: camRadiusOfCM(seedCM),
+    depth: 0,
+    detPos: seedDetPos,
+    isFD: isCamId ? true : checkIsFD(seedCM, seedDetPos)
+  });
+
+  if (!isCamId) {
+    const fdRad = camRadiusOfCM(cameraM);
+    if (fdRad <= rMax && !isSeenAndMark(cameraM)) {
+      pushHeap({
+        M: ID3,
+        CM: cameraM,
+        r: fdRad,
+        depth: 0,
+        detPos: true,
+        isFD: true
+      });
+    }
+  }
 
   const tiles = [];
   while (heap.length > 0 && tiles.length < maxTiles) {
     const cur = popHeap();
     tiles.push(cur);
     for (let gi = 0; gi < gens.length; gi++) {
-      let M2 = mul3(cur.M, gens[gi].M);
-      if (M2[2][2] > 1500) continue;
-      if (M2[2][2] > 20) M2 = reorthonormalizeLorentz(M2);
-      const rad = camRadiusOf(M2);
+      let CM2 = mul3(cur.CM, gens[gi].M);
+      if (CM2[2][2] > 1500) continue;
+      if (CM2[2][2] > 20) CM2 = reorthonormalizeLorentz(CM2);
+      const rad = camRadiusOfCM(CM2);
       if (rad > rMax) continue;
-      if (!isSeenAndMark(M2)) {
-        pushHeap({ M: M2, r: rad, depth: cur.depth + 1, detPos: det3(M2) >= 0 });
+      if (!isSeenAndMark(CM2)) {
+        const detPos = det3(CM2) >= 0;
+        pushHeap({
+          M: isCamId ? CM2 : mul3(camInv, CM2),
+          CM: CM2,
+          r: rad,
+          depth: cur.depth + 1,
+          detPos,
+          isFD: isCamId ? false : checkIsFD(CM2, detPos)
+        });
       }
     }
   }

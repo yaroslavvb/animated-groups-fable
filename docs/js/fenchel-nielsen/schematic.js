@@ -2,7 +2,7 @@
 // Visualizes how the Conway orbifold is cut into rigid pieces and lets users
 // select pairs / edge slots directly on the diagram.
 
-import { formatAreaPi } from "./orbifold.js?v=fn-v1";
+import { formatAreaPi } from "./orbifold.js?v=fn-v2";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
