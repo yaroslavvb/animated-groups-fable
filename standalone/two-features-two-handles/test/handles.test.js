@@ -11,7 +11,7 @@ import {
   surfacePartsFor, featureAnchorsForBall,
   defaultCommas, buildPatternModel, pairMetricsFor, multiState,
 } from '../src/handles.js';
-import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath } from '../src/pattern-ext.js';
+import { locateTilePSU, tilesPSU, poincareArc, createPattern, smoothClosedPath, psuPow } from '../src/pattern-ext.js';
 import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/motifs.js';
 import { mul, apply, inv, I3 } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { signatureOf, tiles, analyse } from '../../2026-11-15-classification-of-surfaces/src/sym/orbifold.js';
@@ -1836,4 +1836,60 @@ test('buildPatternModel provides exact feature bindings across pairs, multi, and
     assert.equal(m.binding.length, toks.length, `${k} still binding length`);
     m.binding.forEach((b, i) => assert.equal(b.t, toks[i].t, `${k}[${i}] still token type`));
   }
+});
+
+test('psuPow exact splitting & 2-stage left-residual wheel smoother eliminate [2x, 0x] beats', () => {
+  const parabolic = [1, 0.25, 0.25, 0, 0];
+  const hyp = psuMul(psuRotate(GH.origin, 0.35), psuBoostX(0.42));
+  const ell = so21ToPSU(GH.rotate([0.3, -0.2, Math.hypot(1, 0.3, 0.2)], 0.7), false);
+  const negSign = hyp.map((v, i) => (i < 4 ? -v : v));
+  const smallHyp = psuBoostX(1e-6);
+
+  for (const [name, g] of [['hyp', hyp], ['ell', ell], ['parabolic', parabolic], ['negSign', negSign], ['smallHyp', smallHyp]]) {
+    const split = psuMul(psuPow(g, 0.37), psuPow(g, 0.63));
+    const mA = psuToSO21(g), mB = psuToSO21(split);
+    const maxDiff = Math.max(...mA.map((v, i) => Math.abs(v - mB[i])));
+    assert.ok(maxDiff < 1e-10, `${name} psuPow split mismatch ${maxDiff}`);
+  }
+
+  // Simulate [5, 5, 10, 0] px beat wheel arrival at 60 Hz with 2-stage left-residual PSU smoother (tau = 22 ms)
+  const dt = 1000 / 60, a = 1 - Math.exp(-dt / 22);
+  let wRem = psuI(), wLead = psuI(), vPsu = psuI(), vExact = psuI();
+  const unitPx = so21ToPSU(GH.translate(GH.origin, GH.polar(0.015, 0.4)), false);
+  const steps = [];
+  for (let f = 0; f < 64; f++) {
+    const mult = [1, 1, 2, 0][f % 4];
+    for (let k = 0; k < mult; k++) {
+      wRem = psuMul(unitPx, wRem);
+      vExact = psuMul(unitPx, vExact);
+    }
+    const prevPos = psuApplyDisc(vPsu, [0, 0]);
+    const stepMid = psuPow(wRem, a);
+    wRem = psuMul(wRem, psuInv(stepMid));
+    wLead = psuMul(stepMid, wLead);
+    const stepV = psuPow(wLead, a);
+    wLead = psuMul(wLead, psuInv(stepV));
+    vPsu = psuMul(stepV, vPsu);
+    const curPos = psuApplyDisc(vPsu, [0, 0]);
+    steps.push(discDist(prevPos, curPos));
+  }
+  const steady = steps.slice(16);
+  const mean = steady.reduce((s, v) => s + v, 0) / steady.length;
+  const sd = Math.sqrt(steady.reduce((s, v) => s + (v - mean) ** 2, 0) / steady.length);
+  const cv = sd / mean;
+  assert.equal(steady.filter((v) => v < 0.05 * mean).length, 0, 'zero duplicate 0x frames expected');
+  assert.ok(cv < 0.15, `expected steady CV < 0.15 under [1x,1x,2x,0x] beat, got ${cv.toFixed(3)}`);
+
+  // Drain tail and check exact conservation of total displacement
+  for (let f = 0; f < 40; f++) {
+    const stepMid = psuPow(wRem, a);
+    wRem = psuMul(wRem, psuInv(stepMid));
+    wLead = psuMul(stepMid, wLead);
+    const stepV = psuPow(wLead, a);
+    wLead = psuMul(wLead, psuInv(stepV));
+    vPsu = psuMul(stepV, vPsu);
+  }
+  vPsu = psuMul(psuMul(wRem, wLead), vPsu);
+  const posSmooth = psuApplyDisc(vPsu, [0, 0]), posExact = psuApplyDisc(vExact, [0, 0]);
+  assert.ok(discDist(posSmooth, posExact) < 1e-10, 'total displacement conserved after draining');
 });

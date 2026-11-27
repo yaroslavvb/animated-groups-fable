@@ -51,6 +51,31 @@ import { createHyperbolicGL } from './pattern-gl.js';
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
 
+/** Exact fractional exponential power g^alpha in PSU(1,1) (orientation-preserving) for sub-frame motion smoothing. */
+export function psuPow(g, alpha) {
+  if (!(alpha > 0) || !g || g[4]) return psuI();
+  if (alpha >= 1) return g[0] < 0 ? [-g[0], -g[1], -g[2], -g[3], 0] : g.slice();
+  const s = g[0] < 0 ? -1 : 1;
+  const c = s * g[0], ai = s * g[1], br = s * g[2], bi = s * g[3];
+  const e = c - 1;
+  let ca, sa;
+  if (Math.abs(e) <= 1e-11) {
+    ca = 1 + alpha * alpha * e;
+    sa = alpha * (1 + ((alpha * alpha - 1) / 3) * e);
+  } else if (e > 0) {
+    const phi = Math.acosh(c);
+    const sh = Math.sqrt(Math.max(1e-24, c * c - 1));
+    ca = Math.cosh(alpha * phi);
+    sa = Math.sinh(alpha * phi) / sh;
+  } else {
+    const phi = Math.acos(Math.max(-1, c));
+    const sn = Math.sqrt(Math.max(1e-24, 1 - c * c));
+    ca = Math.cos(alpha * phi);
+    sa = Math.sin(alpha * phi) / sn;
+  }
+  return psuNorm([ca, ai * sa, br * sa, bi * sa, 0]);
+}
+
 /**
  * Emit a smooth closed centripetal Catmull-Rom spline (alpha = 0.5) as cubic Bezier segments
  * on `path` for deduplicated screen-space vertices `(xs[0..count-1], ys[0..count-1])`,
@@ -608,7 +633,7 @@ export function createPattern(canvas, opts = {}) {
     };
 
     if (usingGL && gl && gl.isReady()) {
-      gl.render({ W, H, dpr, cx, cy, R, vPsu, pick, also });
+      gl.render({ W, H, dpr, cx, cy, R, vPsu, pick, also, interactive: glInteractive });
       const M = psuToSO21(psuMul(vPsu, bPsu)), c = apply(M, D.at), ppu = R / (1 + c[2]), px = D.clear * ppu;
       home = (n && px > 3) ? [X(c), Y(c), px] : null;
       hots = [];
@@ -1072,9 +1097,74 @@ export function createPattern(canvas, opts = {}) {
   // below 0.12 px per ms or once the hand rested 70 ms before letting go, at most 2.5 px per ms, and it falls to a third
   // in about a fifth of a second. Each frame moves the point under the place the hand let go, as one more step of the
   // drag would. A new touch, a wheel, a key, a reset or a pattern from another screen stops it; reduced motion has none.
-  let coast = 0;
+  const WHEEL_TAU = 22;
+  let coast = 0, wheelRaf = 0, wPrev = 0, wRem = psuI(), wLead = psuI(), panDist = 0;
+  let glInteractive = false, glRefine = 0;
   const FADE = 200, MIN_SPEED = 0.12, MAX_SPEED = 2.5;      // ms; px per ms
-  const stopCoast = () => { if (coast) { cancelAnimationFrame(coast); coast = 0; } };
+  const isSmallPsu = (g) => Math.abs(Math.abs(g[0]) - 1) < 1e-8 && Math.hypot(g[1], g[2], g[3]) < 4e-5;
+  const psuStepDist = (g) => 2 * Math.asinh(Math.hypot(g[2], g[3]));
+  const markGlInteractive = (ms = 140) => {
+    glInteractive = true;
+    clearTimeout(glRefine);
+    glRefine = setTimeout(() => {
+      glRefine = 0;
+      if (!drag && !coast && !wheelRaf && glInteractive) {
+        glInteractive = false;
+        if (model) schedule();
+      }
+    }, ms);
+  };
+  const stopMotion = (commit = false) => {
+    if (coast) { cancelAnimationFrame(coast); coast = 0; }
+    if (wheelRaf) { cancelAnimationFrame(wheelRaf); wheelRaf = 0; }
+    if (commit && model && G && G.kind === 'H' && (!isIdentityPsu(wRem) || !isIdentityPsu(wLead))) {
+      const remAll = psuMul(wRem, wLead);
+      panDist += psuStepDist(remAll);
+      vPsu = psuMul(remAll, vPsu);
+      V = psuToSO21(vPsu); vRev = !!vPsu[4];
+      recentre(null);
+    }
+    wRem = psuI(); wLead = psuI();
+    clearTimeout(glRefine); glRefine = 0;
+    glInteractive = false;
+  };
+  function stepWheel(now) {
+    wheelRaf = 0;
+    if (!model || G.kind !== 'H') return;
+    const dt = Math.min(40, Math.max(4, now - wPrev));
+    wPrev = now;
+    const a = 1 - Math.exp(-dt / WHEEL_TAU);
+    const stepMid = psuPow(wRem, a);
+    wRem = psuMul(wRem, psuInv(stepMid));
+    wLead = psuMul(stepMid, wLead);
+    const stepV = psuPow(wLead, a);
+    wLead = psuMul(wLead, psuInv(stepV));
+    panDist += psuStepDist(stepV);
+    vPsu = psuMul(stepV, vPsu);
+    V = psuToSO21(vPsu); vRev = !!vPsu[4];
+    recentre(null);
+    if (usingGL) settle();
+    if (!isSmallPsu(wRem) || !isSmallPsu(wLead)) {
+      glInteractive = true;
+      quick = !usingGL;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      draw();
+      wheelRaf = requestAnimationFrame(stepWheel);
+    } else {
+      const remAll = psuMul(wRem, wLead);
+      if (!isIdentityPsu(remAll)) {
+        panDist += psuStepDist(remAll);
+        vPsu = psuMul(remAll, vPsu);
+        V = psuToSO21(vPsu); vRev = !!vPsu[4];
+        recentre(null);
+        if (usingGL) settle();
+      }
+      wRem = psuI(); wLead = psuI();
+      glInteractive = false; quick = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      draw();
+    }
+  }
   function release(was, t) {
     const pts = was.trail;
     if (calm || !pts || pts.length < 2 || typeof requestAnimationFrame !== 'function') return false;
@@ -1109,21 +1199,24 @@ export function createPattern(canvas, opts = {}) {
       }
       if (Math.hypot(vx, vy) > 0.02) {
         quick = !usingGL;
+        glInteractive = usingGL;
+        clearTimeout(glRefine); glRefine = 0;
         if (raf) { cancelAnimationFrame(raf); raf = 0; }
         draw();
         coast = requestAnimationFrame(step);
         return;
       }
       const moved = settle();                                                 // the outlined tile went out of sight: it comes back
-      clearTimeout(still); quick = false;
+      clearTimeout(still); clearTimeout(glRefine); glRefine = 0;
+      quick = false; glInteractive = false;
       if (raf) { cancelAnimationFrame(raf); raf = 0; }
-      if (moved || model.outline !== false || (!usingGL && G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max)))) draw();
+      if (usingGL || moved || model.outline !== false || (!usingGL && G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max)))) draw();
     };
     coast = requestAnimationFrame(step);
     return true;
   }
   canvas.addEventListener('pointerdown', (e) => {
-    stopCoast();
+    stopMotion(true);
     if (!model || (e.pointerType === 'mouse' && e.button !== 0)) return;
     const [x, y] = local(e);
     drag = { id: e.pointerId, p0: unproject(x, y), V0: V.slice(), v0Psu: G.kind === 'H' ? vPsu.slice() : null, x, y, moved: false, trail: [{ x, y, t: performance.now() }] };
@@ -1156,6 +1249,7 @@ export function createPattern(canvas, opts = {}) {
       drag.V0 = recentre(drag.V0);
     }
     quick = !usingGL; clearTimeout(still);
+    if (usingGL) markGlInteractive(140);
     schedule();
   });
   const up = (e) => {
@@ -1172,8 +1266,14 @@ export function createPattern(canvas, opts = {}) {
     }
     if (e.type === 'pointerup' && release(was, performance.now())) return;     // it coasts, and settles when it stops
     const moved = settle();
+    if (usingGL) {
+      clearTimeout(glRefine); glRefine = 0;
+      const wasScaled = glInteractive;
+      glInteractive = false; quick = false;
+      if (moved || wasScaled) schedule();
+      return;
+    }
     if (moved) schedule();                                           // the outlined tile was dragged out of sight: it comes back
-    if (usingGL) { quick = false; return; }
     still = setTimeout(() => {
       const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
       quick = false;
@@ -1189,7 +1289,7 @@ export function createPattern(canvas, opts = {}) {
   canvas.addEventListener('wheel', (e) => {
     if (!model || e.ctrlKey) return;
     e.preventDefault();
-    stopCoast();
+    if (coast) { cancelAnimationFrame(coast); coast = 0; }
     let dx = e.deltaX, dy = e.deltaY;
     if (e.deltaMode === 1) { dx *= 30; dy *= 30; } else if (e.deltaMode === 2) { dx *= 300; dy *= 300; }
     dx = Math.max(-240, Math.min(240, dx)); dy = Math.max(-240, Math.min(240, dy));
@@ -1197,6 +1297,16 @@ export function createPattern(canvas, opts = {}) {
     const [x, y] = local(e);
     setHot(null);
     const T = G.translate(unproject(x, y), unproject(x - dx, y - dy));
+    if (G.kind === 'H' && !calm && typeof requestAnimationFrame === 'function') {
+      wRem = psuMul(so21ToPSU(T, false), wRem);
+      clearTimeout(glRefine); glRefine = 0;
+      glInteractive = true;
+      if (!wheelRaf) {
+        wPrev = performance.now();
+        wheelRaf = requestAnimationFrame(stepWheel);
+      }
+      return;
+    }
     if (G.kind === 'H') {
       vPsu = psuMul(so21ToPSU(T, false), vPsu);
       V = psuToSO21(vPsu); vRev = !!vPsu[4];
@@ -1224,7 +1334,7 @@ export function createPattern(canvas, opts = {}) {
     if (e.key === '0' || e.key === 'Home') { api.resetView(); e.preventDefault(); return; }
     if (!d) return;
     e.preventDefault();
-    stopCoast();
+    stopMotion(true);
     const step = G.kind === 'E' ? 0.5 * Math.sqrt(area) : G.kind === 'S' ? 0.2 : 0.35;
     const T = G.translate(G.origin, G.polar(step, Math.atan2(d[1], d[0])));
     if (G.kind === 'H') {
@@ -1248,7 +1358,7 @@ export function createPattern(canvas, opts = {}) {
      * the view goes with it, so that what the page holds still (a picked pair) stays where it is on the screen.
      */
     set(m, o = {}) {
-      stopCoast();
+      stopMotion(!!o.keepView);
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
       if (!m) { usingGL = false; if (gl) gl.setVisible(false); overlayDirty = false; model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; desSamples = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
@@ -1315,25 +1425,31 @@ export function createPattern(canvas, opts = {}) {
           if (drag && drag.V0) drag.V0 = recentre(drag.V0);
           else recentre(null);
         }
-        if (o.moving && !usingGL) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
+        if (o.moving) {
+          if (usingGL) markGlInteractive(140);
+          else { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
+        } else if (usingGL) {
+          clearTimeout(glRefine); glRefine = 0; glInteractive = false;
+        }
       }
       draw();
     },
     select(i) { const next = i === undefined ? null : i; if (next === sel) return; sel = next; if (model) schedule(); },
-    resetView() { stopCoast(); if (!model) return; hCache = null; emaMs = 8; budget = H_FULL_MAX; firstView(); quick = false; schedule(); },
+    resetView() { stopMotion(false); if (!model) return; hCache = null; emaMs = 8; budget = H_FULL_MAX; firstView(); quick = false; schedule(); },
     /** Where the pattern and its outlined tile are on the screen, to hand to another screen: { V, base, turned } (turned: base turns the plane over; null: no pattern). */
     getView() { return model ? { V: V.slice(), base: base.slice(), turned: bRev } : null; },
     /** Put the pattern where another screen has it (what its getView() gave). Anything else is left alone. */
     setView(v, o = {}) {
       const nine = (m) => Array.isArray(m) && m.length === 9 && m.every(Number.isFinite);
       if (!model || !v || !nine(v.V) || !nine(v.base)) return false;
-      stopCoast();
+      stopMotion(false);
       vRev = det(v.V) < 0; bRev = !!v.turned;              // V is always near the middle of the view: its determinant can be trusted
       V = G.fix(v.V, vHand()); base = G.fix(v.base, bHand());
       vPsu = G.kind === 'H' ? so21ToPSU(V, vRev) : psuI();
       bPsu = G.kind === 'H' ? so21ToPSU(base, bRev) : psuI();
       if (hCache && !isIdentityPsu(hCache.shift)) hCache = null;
-      quick = !!o.moving;
+      quick = !usingGL && !!o.moving;
+      if (usingGL && o.moving) markGlInteractive(140);
       if (o.sync) draw(); else schedule();
       return true;
     },
@@ -1355,7 +1471,7 @@ export function createPattern(canvas, opts = {}) {
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, gl: usingGL, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
+    state: () => ({ kind: G && G.kind, gl: usingGL, glScale: usingGL && gl ? gl.lastScale() : 1, panDist, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }

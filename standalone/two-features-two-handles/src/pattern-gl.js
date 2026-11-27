@@ -1,8 +1,8 @@
 // pattern-gl.js — WebGL2 Poincaré disc fragment renderer for hyperbolic orbifolds (60 FPS, zero edge pop-in).
-// Stacks an interactive <canvas class="pat-gl"> behind the transparent 2D overlay canvas (#pattern), folding each
-// screen pixel into the fundamental domain D via exact Cyrus-Beck Klein geodesic ray-marching + PSU(1,1) x Z2
-// side-pairings and evaluating smooth commas (per-comma local-frame GPU SDF + mipmapped textureGrad), tile edges,
-// mirrors, glide axes, repeating handle/tree lines, and vertex marks in a single fullscreen draw call.
+// Stacks an interactive tight disc-bound <canvas class="pat-gl"> behind the transparent 2D overlay canvas (#pattern),
+// folding each pixel inside a 32-gon disc proxy into the fundamental domain D via spill-free Cyrus-Beck Klein
+// geodesic ray-marching + PSU(1,1) x Z2 side-pairings. Reads geometry from std140 UBOs, culls commas/edges/segments/
+// marks in 1 Minkowski dot product, renders rigid hyperbolic-arc dashes, and uses a reusable offscreen FBO during scroll.
 
 import { apply } from '../../2026-11-15-classification-of-surfaces/src/sym/geom.js';
 import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
@@ -15,11 +15,14 @@ const RED = [0.835, 0.369, 0];
 const BLUE = [0, 0.447, 0.698];
 
 const COMMA_TEX_SIZE = 256;
-const SCENE_TEX_COLS = 128;
-const SCENE_TEX_ROWS = 16;
 const MAX_ITEMS = 128;
 const MAX_EDGES = 32;
 const MAX_POLY_VERTS = 256;
+
+const FOLD_UBO_FLOATS = MAX_EDGES * 4 * 4;
+const COMMA_UBO_FLOATS = MAX_ITEMS * 3 * 4;
+const SEG_UBO_FLOATS = MAX_ITEMS * 5 * 4;
+const MARK_UBO_FLOATS = MAX_ITEMS * 3 * 4;
 
 const FULLSCREEN_VS = `#version 300 es
 precision highp float;
@@ -29,6 +32,20 @@ void main() {
   float y = float((gl_VertexID & 2) << 1) - 1.0;
   vUv = 0.5 * vec2(x, y) + 0.5;
   gl_Position = vec4(x, y, 0.0, 1.0);
+}`;
+
+const DISC_VS = `#version 300 es
+precision highp float;
+uniform vec4 uDiscClip; // (cxNdc, cyNdc, rxNdc, ryNdc)
+void main() {
+  int tri = gl_VertexID / 3;
+  int corner = gl_VertexID % 3;
+  if (corner == 0) {
+    gl_Position = vec4(uDiscClip.xy, 0.0, 1.0);
+  } else {
+    float ang = float(tri + corner - 1) * 0.19634954084936207; // 2*PI / 32
+    gl_Position = vec4(uDiscClip.xy + vec2(cos(ang), sin(ang)) * uDiscClip.zw, 0.0, 1.0);
+  }
 }`;
 
 const SDF_BAKE_FS = `#version 300 es
@@ -72,17 +89,44 @@ precision highp float;
 precision highp int;
 precision highp sampler2DArray;
 
-uniform vec4 uGeom;       // (cxCss, cyCss, RCss, dpr)
-uniform float uViewportH; // H in CSS px
+uniform vec4 uGeom;       // (cxLocalCss, cyLocalCss, RCss, effDpr)
+uniform vec2 uInvPxScale; // (gW / fboW, gH / fboH)
+uniform float uViewportH; // gH in CSS px
 uniform vec4 uInvView;    // psuInv(vPsu) = (ar, ai, br, bi)
 uniform float uInvViewFlip;
 uniform vec2 uAtD;        // D.at in Poincare disc
-uniform vec4 uParams;     // (hScale, showEdges, dimMarksFlag, nGlides)
+uniform vec4 uParams;     // (hScale, showEdges, dimMarksFlag, maxSegHalfW)
 uniform ivec4 uCounts;    // (nEdges, nCommas, nSegs, nMarks)
 uniform vec4 uPick;       // (pickType, pickId, pickExtra, dimAlpha)
 uniform vec3 uRimColor;   // fallback rim color when folding reaches max steps
 
-uniform sampler2D uSceneTex;      // 128 x 16 RGBA32F
+layout(std140) uniform FoldBlock {
+  vec4 eNorm[32];  // Euclidean-unit (Nx, Ny, Pz) + starPlus1
+  vec4 eInvM[32];  // (ar, ai, br, bi)
+  vec4 eMeta[32];  // (invFlip, nextLast, lenH, eucToMink)
+  vec4 eS[32];     // (ar, ai, br, bi)
+};
+
+layout(std140) uniform CommaBlock {
+  vec4 cM[128];     // (ar, ai, br, bi)
+  vec4 cMeta[128];  // (flip, layer, rBox, inv2rBox)
+  vec4 cBound[128]; // (-Cx, -Cy, +Cz, coshBoundRad)
+};
+
+layout(std140) uniform SegBlock {
+  vec4 sNorm[128]; // (Nx, Ny, Pz, grpId)
+  vec4 sS[128];    // (ar, ai, br, bi)
+  vec4 sCol[128];  // (r, g, b, alpha)
+  vec4 sWd[128];   // (width, lenH, dashOn, dashOff)
+  vec4 sMeta[128]; // (kind, grpIdx, scaleMode, tanhHalfLen)
+};
+
+layout(std140) uniform MarkBlock {
+  vec4 mPos[128];   // (px, py, ux, uy)
+  vec4 mMeta[128];  // (order, isCone, clsId, isAlso)
+  vec4 mBound[128]; // (-Mx, -My, +Mz, 0.0)
+};
+
 uniform sampler2DArray uCommaTex; // 256 x 256 x N RGBA8
 
 out vec4 fragColor;
@@ -126,9 +170,7 @@ vec2 psuPushDir(vec4 g, float flip, vec2 p0, vec2 dir0) {
   float dr = g.z * u + g.w * v + g.x;
   float di = g.z * v - g.w * u - g.y;
   vec2 ds = vec2(dir0.x, flip > 0.5 ? -dir0.y : dir0.y);
-  // den^2
   vec2 den2 = vec2(dr * dr - di * di, 2.0 * dr * di);
-  // ds * conj(den2)
   vec2 dw = vec2(ds.x * den2.x + ds.y * den2.y, ds.y * den2.x - ds.x * den2.y);
   float l2 = dot(dw, dw);
   return l2 > 1e-24 ? dw * inversesqrt(l2) : dir0;
@@ -152,7 +194,6 @@ vec4 psuMul(vec4 g1, float f1, vec4 g2, float f2, out float fout) {
   return r * inversesqrt(n2);
 }
 
-// Hyperbolic distance from point q (in D disc) to geodesic segment mapped by S (flip=0) to [0, (+tanh(L/2), 0)].
 float segDistHyp(vec2 q, vec4 S, float lenH) {
   vec2 u = psuApply(S, 0.0, q);
   float r2 = dot(u, u);
@@ -161,8 +202,8 @@ float segDistHyp(vec2 q, vec4 S, float lenH) {
   if (uxK <= 0.0) {
     return 2.0 * atanh(min(0.99999, length(u)));
   }
-  if (uxK >= tanh(lenH)) {
-    float tb = tanh(0.5 * lenH);
+  float tb = tanh(0.5 * lenH);
+  if ((1.0 + tb * tb) * u.x >= tb * (1.0 + r2)) {
     vec2 db = u - vec2(tb, 0.0);
     vec2 den = vec2(1.0 - tb * u.x, -tb * u.y);
     float arg = min(0.99999, sqrt(dot(db, db) / max(1e-12, dot(den, den))));
@@ -171,58 +212,37 @@ float segDistHyp(vec2 q, vec4 S, float lenH) {
   return asinh(2.0 * abs(u.y) / oneMinusR2);
 }
 
-// Box-filtered 1D coverage for CSS line width wCss (half-width = 0.5 * wCss) over physical pixel size 1/dpr.
+float segDistAndSymH(vec2 q, vec4 S, float lenH, float tb, out float sSym) {
+  vec2 u = psuApply(S, 0.0, q);
+  float r2 = dot(u, u);
+  if (u.x <= 0.0) {
+    sSym = 0.5 * lenH;
+    return 2.0 * atanh(min(0.99999, length(u)));
+  }
+  if ((1.0 + tb * tb) * u.x >= tb * (1.0 + r2)) {
+    sSym = 0.5 * lenH;
+    vec2 db = u - vec2(tb, 0.0);
+    vec2 den = vec2(1.0 - tb * u.x, -tb * u.y);
+    float arg = min(0.99999, sqrt(dot(db, db) / max(1e-12, dot(den, den))));
+    return 2.0 * atanh(arg);
+  }
+  float yy = u.y * u.y;
+  float num = (1.0 + u.x) * (1.0 + u.x) + yy;
+  float den = max(1e-12, (1.0 - u.x) * (1.0 - u.x) + yy);
+  float sH = 0.5 * log(num / den);
+  sSym = abs(sH - 0.5 * lenH);
+  return asinh(2.0 * abs(u.y) / max(1e-6, 1.0 - r2));
+}
+
 float lineCov(float distCss, float halfW, float dpr) {
   float hp = 0.5 / dpr;
   return clamp((min(halfW, distCss + hp) - max(-halfW, distCss - hp)) * dpr, 0.0, 1.0);
 }
 
-// Smooth transition matching Canvas2D width/alpha buckets [0, 1, 2] at sPx = 20 and 7.
 float bucket3(float sPx, float v0, float v1, float v2) {
   float t1 = smoothstep(5.5, 8.5, sPx);
   float t2 = smoothstep(18.0, 22.0, sPx);
   return mix(v2, mix(v1, v0, t2), t1);
-}
-
-// Screen-space arc distance sArcPx from a_s along Poincaré geodesic a_s -> b_s, plus total arc length.
-void poincareArcDistPx(vec2 a, vec2 b, vec2 w, float R, out float sArcPx, out float totalPx) {
-  vec2 chord = b - a;
-  float chordLen = length(chord);
-  float chPx = chordLen * R;
-  float det2 = 2.0 * (a.x * b.y - a.y * b.x);
-  if (chPx < 1.5 || abs(det2) < 1e-5) {
-    vec2 dir = chordLen > 1e-9 ? chord / chordLen : vec2(1.0, 0.0);
-    sArcPx = dot(w - a, dir) * R;
-    totalPx = chPx;
-    return;
-  }
-  float r1 = 1.0 + dot(a, a);
-  float r2 = 1.0 + dot(b, b);
-  vec2 uc = vec2(r1 * b.y - r2 * a.y, a.x * r2 - b.x * r1) / det2;
-  float rc2 = dot(uc, uc) - 1.0;
-  if (rc2 <= 0.0) {
-    vec2 dir = chord / chordLen;
-    sArcPx = dot(w - a, dir) * R;
-    totalPx = chPx;
-    return;
-  }
-  float sr = R * sqrt(rc2);
-  if (sr > 2e5 || (sr > 4.0 && chPx * chPx < 1.6 * sr)) {
-    vec2 dir = chord / chordLen;
-    sArcPx = dot(w - a, dir) * R;
-    totalPx = chPx;
-    return;
-  }
-  vec2 va = normalize(a - uc);
-  vec2 vb = normalize(b - uc);
-  vec2 vw = normalize(w - uc);
-  float sgn = (va.x * vb.y - va.y * vb.x) >= 0.0 ? 1.0 : -1.0;
-  float da = atan(sgn * (va.x * vb.y - va.y * vb.x), dot(va, vb));
-  if (da < 0.0) da += 2.0 * PI;
-  float dw = atan(sgn * (va.x * vw.y - va.y * vw.x), dot(va, vw));
-  if (dw < -PI + 0.5 * da) dw += 2.0 * PI;
-  totalPx = sr * da;
-  sArcPx = sr * dw;
 }
 
 float vesicaSDF(vec2 p, float r) {
@@ -248,8 +268,8 @@ float regularPolySDF(vec2 p, int m, float rr) {
 
 void main() {
   float cx = uGeom.x, cy = uGeom.y, R = uGeom.z, dpr = uGeom.w;
-  float xCss = gl_FragCoord.x / dpr;
-  float yCss = uViewportH - gl_FragCoord.y / dpr;
+  float xCss = gl_FragCoord.x * uInvPxScale.x;
+  float yCss = uViewportH - gl_FragCoord.y * uInvPxScale.y;
   vec2 ws = vec2(xCss - cx, -(yCss - cy)) / R;
   float r2s = dot(ws, ws);
   float rs = sqrt(r2s);
@@ -260,114 +280,121 @@ void main() {
   }
 
   vec2 wClamped = r2s >= 0.9990 ? ws * (0.999499 / rs) : ws;
-  float pxPerHyp = 0.5 * R * max(1e-5, 1.0 - dot(wClamped, wClamped));
+  float oneMinusWs2 = max(1e-5, 1.0 - dot(wClamped, wClamped));
+  float pxPerHyp = 0.5 * R * oneMinusWs2;
   float hScale = uParams.x;
   float sPx = hScale * pxPerHyp;
 
-  // ---- Exact Cyrus-Beck Klein + PSU(1,1) folding into D
   vec4 T = uInvView;
   float Tflip = uInvViewFlip;
   vec2 qD = clampDisc(psuApply(T, Tflip, wClamped));
-  vec2 pD = uAtD;
   int nEdges = uCounts.x;
-  int lastEdge = -1;
-  int zeroRun = 0;
   bool converged = false;
 
-  for (int step = 0; step < 80; step++) {
-    vec2 qK = discToKlein(qD);
-    float sqArr[32];
-    float minSq = 1e9;
-    for (int i = 0; i < 32; i++) {
-      if (i >= nEdges) break;
-      vec3 N = texelFetch(uSceneTex, ivec2(i, 0), 0).xyz;
-      float s = N.x * qK.x + N.y * qK.y + N.z;
-      sqArr[i] = s;
-      minSq = min(minSq, s);
-    }
-    if (minSq >= -1e-6) {
-      converged = true;
-      break;
-    }
-    vec2 pK = discToKlein(pD);
-    int bestEdge = -1;
-    float bestT = 1e9;
-    for (int i = 0; i < 32; i++) {
-      if (i >= nEdges) break;
-      if (i == lastEdge) continue;
-      float sq = sqArr[i];
-      if (sq >= -1e-7) continue;
-      vec3 N = texelFetch(uSceneTex, ivec2(i, 0), 0).xyz;
-      float sp = max(0.0, N.x * pK.x + N.y * pK.y + N.z);
-      float t = sp / (sp - sq);
-      if (t < bestT) { bestT = t; bestEdge = i; }
-    }
-    if (bestEdge < 0) {
+  if (rs < 0.996) {
+    vec2 pD = uAtD;
+    int lastEdge = -1;
+    int zeroRun = 0;
+
+    for (int step = 0; step < 56; step++) {
+      vec2 qK = discToKlein(qD);
+      vec2 pK = discToKlein(pD);
+      float minSq = 1e9;
+      int bestEdge = -1;
+      float bestT = 1e9;
+      int fbEdge = -1;
+      float fbT = 1e9;
       for (int i = 0; i < 32; i++) {
         if (i >= nEdges) break;
-        float sq = sqArr[i];
-        if (sq >= -1e-7) continue;
-        vec3 N = texelFetch(uSceneTex, ivec2(i, 0), 0).xyz;
-        float sp = max(0.0, N.x * pK.x + N.y * pK.y + N.z);
-        float t = sp / (sp - sq);
-        if (t < bestT) { bestT = t; bestEdge = i; }
+        vec3 N = eNorm[i].xyz;
+        float sq = N.x * qK.x + N.y * qK.y + N.z;
+        minSq = min(minSq, sq);
+        if (sq < -1e-7) {
+          float sp = max(0.0, N.x * pK.x + N.y * pK.y + N.z);
+          float t = sp / (sp - sq);
+          if (i == lastEdge) {
+            if (t < fbT) { fbT = t; fbEdge = i; }
+          } else {
+            if (t < bestT) { bestT = t; bestEdge = i; }
+          }
+        }
       }
-      if (bestEdge < 0) break;
-    }
-    if (bestT < 1e-6) {
-      zeroRun++;
-      if (zeroRun > 10) {
-        pD = mix(pD, uAtD, 1e-4);
+      if (minSq >= -1e-6) {
+        converged = true;
+        break;
+      }
+      if (bestEdge < 0) {
+        if (fbEdge < 0) break;
+        bestEdge = fbEdge;
+        bestT = fbT;
+      }
+      if (bestT < 1e-6) {
+        zeroRun++;
+        if (zeroRun > 10) {
+          pD = mix(pD, uAtD, 1e-4);
+          zeroRun = 0;
+          lastEdge = -1;
+          continue;
+        }
+      } else {
         zeroRun = 0;
-        lastEdge = -1;
-        continue;
       }
-    } else {
-      zeroRun = 0;
+      vec4 invM = eInvM[bestEdge];
+      vec4 meta = eMeta[bestEdge];
+      float invFlip = meta.x;
+      qD = clampDisc(psuApply(invM, invFlip, qD));
+      float nextFlip;
+      T = psuMul(invM, invFlip, T, Tflip, nextFlip);
+      Tflip = nextFlip;
+      vec2 wK = mix(pK, qK, bestT);
+      pD = clampDisc(psuApply(invM, invFlip, kleinToDisc(wK)));
+      lastEdge = int(meta.y + 0.5);
     }
-    vec4 invM = texelFetch(uSceneTex, ivec2(bestEdge, 1), 0);
-    vec4 eMeta = texelFetch(uSceneTex, ivec2(bestEdge, 2), 0);
-    float invFlip = eMeta.x;
-    qD = clampDisc(psuApply(invM, invFlip, qD));
-    float nextFlip;
-    T = psuMul(invM, invFlip, T, Tflip, nextFlip);
-    Tflip = nextFlip;
-    vec2 wK = mix(pK, qK, bestT);
-    pD = clampDisc(psuApply(invM, invFlip, kleinToDisc(wK)));
-    lastEdge = int(eMeta.y + 0.5);
   }
 
   vec3 col = C_FRONT;
   if (!converged) {
     col = uRimColor;
   } else {
-    float oneMinusWs2 = max(1e-5, 1.0 - dot(wClamped, wClamped));
+    float q2 = dot(qD, qD);
+    float inv1m = 1.0 / max(1e-6, 1.0 - q2);
+    vec3 Q = vec3(2.0 * qD.x * inv1m, 2.0 * qD.y * inv1m, (1.0 + q2) * inv1m);
 
-    // ---- 1. Smooth Commas (per-comma local-frame SDF + mipmapped textureGrad)
+    // ---- 1. Smooth Commas (1-dot Minkowski cull + coherent SDF/mip branch)
     int nCommas = uCounts.y;
     float commaCov = 0.0;
     for (int i = 0; i < 128; i++) {
       if (i >= nCommas) break;
-      vec4 Mc = texelFetch(uSceneTex, ivec2(i, 4), 0);
-      vec4 cMeta = texelFetch(uSceneTex, ivec2(i, 5), 0);
-      vec2 qc = psuApply(Mc, cMeta.x, qD);
-      float rBox = cMeta.z;
+      vec4 bnd = cBound[i];
+      if (dot(Q, bnd.xyz) > bnd.w) continue;
+      vec4 cMetaV = cMeta[i];
+      vec2 qc = psuApply(cM[i], cMetaV.x, qD);
+      float rBox = cMetaV.z;
       if (abs(qc.x) > rBox || abs(qc.y) > rBox) continue;
-      float inv2rBox = cMeta.w;
+      float inv2rBox = cMetaV.w;
       vec2 uv = 0.5 + qc * inv2rBox;
       float duv = ((1.0 - dot(qc, qc)) / oneMinusWs2) * inv2rBox / (R * dpr);
-      float layer = cMeta.y;
-      float sdfR = textureLod(uCommaTex, vec3(uv, layer), 0.0).r;
-      float covMip = textureGrad(uCommaTex, vec3(uv, layer), vec2(duv, 0.0), vec2(0.0, duv)).g;
-      float sdPx = (sdfR - 0.5) * 0.22 / max(duv, 1e-6);
-      float covSdf = smoothstep(0.65, -0.65, sdPx);
+      float layer = cMetaV.y;
       float tpp = duv * ${COMMA_TEX_SIZE}.0;
-      float cov = mix(covSdf, covMip, smoothstep(0.75, 2.2, tpp));
+      float cov;
+      if (tpp <= 0.75) {
+        float sdfR = textureLod(uCommaTex, vec3(uv, layer), 0.0).r;
+        float sdPx = (sdfR - 0.5) * 0.22 / max(duv, 1e-6);
+        cov = smoothstep(0.65, -0.65, sdPx);
+      } else if (tpp >= 2.2) {
+        cov = textureGrad(uCommaTex, vec3(uv, layer), vec2(duv, 0.0), vec2(0.0, duv)).g;
+      } else {
+        float sdfR = textureLod(uCommaTex, vec3(uv, layer), 0.0).r;
+        float covMip = textureGrad(uCommaTex, vec3(uv, layer), vec2(duv, 0.0), vec2(0.0, duv)).g;
+        float sdPx = (sdfR - 0.5) * 0.22 / max(duv, 1e-6);
+        float covSdf = smoothstep(0.65, -0.65, sdPx);
+        cov = mix(covSdf, covMip, smoothstep(0.75, 2.2, tpp));
+      }
       commaCov = max(commaCov, cov);
     }
     col = mix(col, C_INK, commaCov);
 
-    // ---- 2. Tile Edges & Mirrors (A.stars)
+    // ---- 2. Tile Edges & Mirrors (1-dot Minkowski cull)
     bool showEdges = uParams.y > 0.5;
     float edgeFade = showEdges ? smoothstep(1.5, 2.5, sPx) : 0.0;
     float edgeW = bucket3(sPx, 0.9, 0.7, 0.5);
@@ -384,14 +411,16 @@ void main() {
     float pickExtra = uPick.z;
     float dimA = uPick.w;
 
+    float maxEdgeW = (pickType > 0.5 && pickType < 1.5) ? 1.8 * mirWBase : 0.5 * mirWBase;
+    float maxEdgeSinh = sinh(min(4.0, (max(0.5 * edgeW, maxEdgeW) + 1.5) / pxPerHyp)) * 1.05 + 2e-3;
+
     for (int i = 0; i < 32; i++) {
       if (i >= nEdges) break;
-      float starPlus1 = texelFetch(uSceneTex, ivec2(i, 0), 0).w;
-      float starIdx = starPlus1 - 1.0;
+      vec4 en = eNorm[i];
+      float starIdx = en.w - 1.0;
       if (edgeFade <= 0.0 && starIdx < -0.5) continue;
-      vec4 S = texelFetch(uSceneTex, ivec2(i, 3), 0);
-      float lenH = texelFetch(uSceneTex, ivec2(i, 2), 0).z;
-      float dCss = segDistHyp(qD, S, lenH) * pxPerHyp;
+      if (abs(dot(Q, en.xyz)) * eMeta[i].w > maxEdgeSinh) continue;
+      float dCss = segDistHyp(qD, eS[i], eMeta[i].z) * pxPerHyp;
       if (edgeFade > 0.0) minEdgeD = min(minEdgeD, dCss);
       if (starIdx >= -0.5) {
         bool isOn = (pickType > 0.5 && pickType < 1.5 && abs(starIdx - pickId) < 0.25);
@@ -417,31 +446,36 @@ void main() {
       col = mix(col, C_RED, lineCov(minMirPickD, 0.925 * mirWBase, dpr));
     }
 
-    // ---- 3. Repeating Segments (glides then model.lines, grouped by groupId)
-    vec4 Tinv = psuInv(T, Tflip);
-    float TinvFlip = Tflip;
+    // ---- 3. Repeating Segments (1-dot Minkowski cull + rigid intrinsic hyperbolic dashing)
     int nSegs = uCounts.z;
+    float maxSegHalfW = uParams.w;
+    float maxSegSinh = sinh(min(4.0, (maxSegHalfW + 1.5) / pxPerHyp)) * 1.05 + 2e-3;
+    float scaleM0 = bucket3(sPx, 2.1, 1.4, 0.8) / 2.1;
+    float scaleM1 = bucket3(sPx, 1.0, 0.7, 0.4);
+    float invRef = 2.0 / R;
 
-    if (pickType > 1.5 && pickType < 3.5) {
+    if (pickType > 1.5 && pickType < 3.5 && nSegs > 0) {
+      float glowMaxSinh = sinh(min(4.0, (maxSegHalfW * 3.8 + 1.5) / pxPerHyp)) * 1.05 + 2e-3;
       float glowCov = 0.0;
       vec3 glowCol = vec3(0.0);
       float glowAlpha = 0.0;
       for (int i = 0; i < 128; i++) {
         if (i >= nSegs) break;
-        vec4 sMeta = texelFetch(uSceneTex, ivec2(i, 10), 0);
-        float kind = sMeta.x;
-        float grpIdx = sMeta.y;
+        vec4 sn = sNorm[i];
+        if (abs(dot(Q, sn.xyz)) > glowMaxSinh) continue;
+        vec4 sMetaV = sMeta[i];
+        float kind = sMetaV.x;
+        float grpIdx = sMetaV.y;
         bool isOn = (pickType < 2.5 && kind < 0.5 && abs(grpIdx - pickId) < 0.25) ||
                     (pickType > 2.5 && kind > 1.5);
         if (!isOn) continue;
-        vec4 S = texelFetch(uSceneTex, ivec2(i, 6), 0);
-        vec4 wd = texelFetch(uSceneTex, ivec2(i, 9), 0);
-        float dCss = segDistHyp(qD, S, wd.y) * pxPerHyp;
-        float scaleF = sMeta.z < 0.5 ? bucket3(sPx, 2.1, 1.4, 0.8) / 2.1 : bucket3(sPx, 1.0, 0.7, 0.4);
+        vec4 wd = sWd[i];
+        float dCss = segDistHyp(qD, sS[i], wd.y) * pxPerHyp;
+        float scaleF = sMetaV.z < 0.5 ? scaleM0 : scaleM1;
         float halfGW = kind < 0.5 ? 1.8 * 2.1 * scaleF : 1.6 * wd.x * scaleF;
         if (dCss < halfGW + 1.5) {
           float cov = lineCov(dCss, halfGW, dpr);
-          vec3 gCol = kind < 0.5 ? C_RED : texelFetch(uSceneTex, ivec2(i, 8), 0).rgb;
+          vec3 gCol = kind < 0.5 ? C_RED : sCol[i].rgb;
           float gA = kind < 0.5 ? 0.24 : 0.26;
           if (cov > glowCov) { glowCov = cov; glowCol = gCol; glowAlpha = gA; }
         }
@@ -453,56 +487,53 @@ void main() {
     float grpCov = 0.0;
     vec3 grpCol = vec3(0.0);
     float grpAlpha = 0.0;
-    float dashBlend = smoothstep(5.5, 8.5, sPx);
 
     for (int i = 0; i < 128; i++) {
       if (i >= nSegs) break;
-      vec4 S = texelFetch(uSceneTex, ivec2(i, 6), 0);
-      vec4 endpts = texelFetch(uSceneTex, ivec2(i, 7), 0);
-      vec4 ca = texelFetch(uSceneTex, ivec2(i, 8), 0);
-      vec4 wd = texelFetch(uSceneTex, ivec2(i, 9), 0);
-      vec4 sMeta = texelFetch(uSceneTex, ivec2(i, 10), 0);
-      float kind = sMeta.x;
-      float grpIdx = sMeta.y;
-      float grpId = sMeta.w;
+      vec4 sn = sNorm[i];
+      if (abs(dot(Q, sn.xyz)) > maxSegSinh) continue;
+
+      vec4 wd = sWd[i];
+      vec4 sMetaV = sMeta[i];
+      float grpId = sn.w;
+      float kind = sMetaV.x;
+      float grpIdx = sMetaV.y;
+      float scaleF = sMetaV.z < 0.5 ? scaleM0 : scaleM1;
+      bool isOn = (pickType > 1.5 && pickType < 2.5 && kind < 0.5 && abs(grpIdx - pickId) < 0.25) ||
+                  (pickType > 2.5 && pickType < 3.5 && kind > 1.5);
+      float halfW = 0.5 * wd.x * (isOn ? (kind < 0.5 ? 1.85 : 1.8) : 1.0) * scaleF;
+
+      float sSym;
+      float dCss = segDistAndSymH(qD, sS[i], wd.y, sMetaV.w, sSym) * pxPerHyp;
+      if (dCss >= halfW + 1.5) continue;
 
       if (curGroup > -0.5 && abs(grpId - curGroup) > 0.25) {
         if (grpCov > 0.0) col = mix(col, grpCol, grpCov * grpAlpha);
         grpCov = 0.0;
       }
 
-      bool isOn = (pickType > 1.5 && pickType < 2.5 && kind < 0.5 && abs(grpIdx - pickId) < 0.25) ||
-                  (pickType > 2.5 && pickType < 3.5 && kind > 1.5);
+      vec4 ca = sCol[i];
       float alpha = isOn ? 1.0 : ca.a * (kind < 0.5 ? (pickType > 0.5 ? dimA : 1.0) : (pickType > 0.5 ? 0.38 : 1.0));
-      float scaleF = sMeta.z < 0.5 ? bucket3(sPx, 2.1, 1.4, 0.8) / 2.1 : bucket3(sPx, 1.0, 0.7, 0.4);
-      float halfW = 0.5 * wd.x * (isOn ? (kind < 0.5 ? 1.85 : 1.8) : 1.0) * scaleF;
-      bool hasDash = wd.z > 0.0 && wd.w > 0.0;
-      if (hasDash) alpha *= mix(0.78, 1.0, dashBlend);
-
-      float dCss = segDistHyp(qD, S, wd.y) * pxPerHyp;
-      if (dCss < halfW + 1.5) {
-        float distUsed = dCss;
-        if (hasDash && dashBlend > 0.01) {
-          vec2 as = psuApply(Tinv, TinvFlip, endpts.xy);
-          vec2 bs = psuApply(Tinv, TinvFlip, endpts.zw);
-          float sArcPx, totPx;
-          poincareArcDistPx(as, bs, wClamped, R, sArcPx, totPx);
-          float dOn = wd.z * scaleF;
-          float dOff = wd.w * scaleF;
-          float per = dOn + dOff;
-          float sC = clamp(sArcPx, 0.0, max(0.0, totPx));
-          float sSym = abs(sC - 0.5 * max(0.0, totPx));
-          float ph = mod(sSym + 0.5 * dOn, per);
-          float dAlong = ph <= dOn ? 0.0 : min(ph - dOn, per - ph);
-          float dDashed = length(vec2(dCss, dAlong));
-          distUsed = mix(dCss, dDashed, dashBlend);
+      float cov = lineCov(dCss, halfW, dpr);
+      if (wd.z > 0.0 && wd.w > 0.0) {
+        float dOnH = wd.z * invRef;
+        float dOffH = wd.w * invRef;
+        float perH = dOnH + dOffH;
+        float perPx = perH * pxPerHyp;
+        float dBlend = smoothstep(2.2, 4.8, perPx);
+        alpha *= mix(0.78, 1.0, dBlend);
+        if (dBlend > 0.01) {
+          float phH = mod(sSym + 0.5 * dOnH, perH);
+          float sdAlongH = phH <= dOnH ? -min(phH, dOnH - phH) : min(phH - dOnH, perH - phH);
+          float aa = 0.6 / dpr;
+          float dashCov = 1.0 - smoothstep(-aa, aa, sdAlongH * pxPerHyp);
+          cov *= mix(1.0, dashCov, dBlend);
         }
-        float cov = lineCov(distUsed, halfW, dpr);
-        if (cov > grpCov) {
-          grpCov = cov;
-          grpCol = ca.rgb;
-          grpAlpha = alpha;
-        }
+      }
+      if (cov > grpCov) {
+        grpCov = cov;
+        grpCol = ca.rgb;
+        grpAlpha = alpha;
       }
       curGroup = grpId;
     }
@@ -510,26 +541,30 @@ void main() {
       col = mix(col, grpCol, grpCov * grpAlpha);
     }
 
-    // ---- 4. Marked Vertices (gyration cone points & mirror corners)
+    // ---- 4. Marked Vertices (1-dot Minkowski cull before psuApply)
     int nMarks = uCounts.w;
     bool dimMarks = uParams.z > 0.5;
-    if (pickType > 3.5) {
+    vec4 Tinv = psuInv(T, Tflip);
+    float TinvFlip = Tflip;
+
+    if (pickType > 3.5 && nMarks > 0) {
+      float haloMaxCosh = cosh(min(5.0, (24.0 / pxPerHyp) * 1.05 + 0.02));
       float haloFillCov = 0.0;
       float haloRingCov = 0.0;
       vec3 haloCol = C_BLUE;
       for (int i = 0; i < 128; i++) {
         if (i >= nMarks) break;
-        vec4 mMeta = texelFetch(uSceneTex, ivec2(i, 12), 0);
-        if (abs(mMeta.z - pickId) > 0.25) continue;
-        vec4 mPos = texelFetch(uSceneTex, ivec2(i, 11), 0);
-        vec2 ps = psuApply(Tinv, TinvFlip, mPos.xy);
+        if (dot(Q, mBound[i].xyz) > haloMaxCosh) continue;
+        vec4 mMetaV = mMeta[i];
+        if (abs(mMetaV.z - pickId) > 0.25) continue;
+        vec2 ps = psuApply(Tinv, TinvFlip, mPos[i].xy);
         float mpx = hScale * R * 0.5 * max(1e-5, 1.0 - dot(ps, ps));
         float r = min(10.0, 0.36 * mpx);
         if (mpx < 3.0 || r < 2.2) continue;
         float hr = 1.85 * r;
         float d = length((wClamped - ps) * R);
         if (d > hr + 2.0) continue;
-        haloCol = mMeta.y > 0.5 ? C_BLUE : C_RED;
+        haloCol = mMetaV.y > 0.5 ? C_BLUE : C_RED;
         float fCov = clamp((hr + 0.5 / dpr - d) * dpr, 0.0, 1.0);
         float rCov = lineCov(abs(d - hr), 0.8, dpr);
         haloFillCov = max(haloFillCov, fCov);
@@ -539,41 +574,49 @@ void main() {
       if (haloRingCov > 0.0) col = mix(col, haloCol, haloRingCov * 0.78);
     }
 
-    for (int i = 0; i < 128; i++) {
-      if (i >= nMarks) break;
-      vec4 mPos = texelFetch(uSceneTex, ivec2(i, 11), 0);
-      vec2 ps = psuApply(Tinv, TinvFlip, mPos.xy);
-      vec2 dDisc = (wClamped - ps) * R;
-      if (dot(dDisc, dDisc) > 324.0) continue; // > 18 px away (max radius 12.5 + 2px stroke)
-      float mpx = hScale * R * 0.5 * max(1e-5, 1.0 - dot(ps, ps));
-      vec4 mMeta = texelFetch(uSceneTex, ivec2(i, 12), 0);
-      int order = int(mMeta.x + 0.5);
-      bool isCone = mMeta.y > 0.5;
-      bool picked = (pickType > 3.5 && abs(mMeta.z - pickId) < 0.25);
-      bool on = picked || (pickType < 0.5 && mMeta.w > 0.5);
-      if (mpx < (picked ? 3.0 : 4.5)) continue;
-      float r = min(picked ? 10.0 : (on ? 9.5 : 6.5), (picked ? 0.36 : (on ? 0.34 : 0.24)) * mpx);
-      if (r < 1.1) continue;
-      float boundR = (order == 2 || order == 3 ? 1.25 : 1.08) * r + 2.5;
-      if (dot(dDisc, dDisc) > boundR * boundR) continue;
+    if (nMarks > 0) {
+      float markMaxCosh = cosh(min(5.0, (18.0 / pxPerHyp) * 1.05 + 0.02));
+      for (int i = 0; i < 128; i++) {
+        if (i >= nMarks) break;
+        if (dot(Q, mBound[i].xyz) > markMaxCosh) continue;
+        vec4 mPosV = mPos[i];
+        vec2 ps = psuApply(Tinv, TinvFlip, mPosV.xy);
+        vec2 dDisc = (wClamped - ps) * R;
+        if (dot(dDisc, dDisc) > 324.0) continue;
+        float mpx = hScale * R * 0.5 * max(1e-5, 1.0 - dot(ps, ps));
+        vec4 mMetaV = mMeta[i];
+        int order = int(mMetaV.x + 0.5);
+        bool isCone = mMetaV.y > 0.5;
+        bool picked = (pickType > 3.5 && abs(mMetaV.z - pickId) < 0.25);
+        bool on = picked || (pickType < 0.5 && mMetaV.w > 0.5);
+        if (mpx < (picked ? 3.0 : 4.5)) continue;
+        float r = min(picked ? 10.0 : (on ? 9.5 : 6.5), (picked ? 0.36 : (on ? 0.34 : 0.24)) * mpx);
+        if (r < 1.1) continue;
+        float boundR = (order == 2 || order == 3 ? 1.25 : 1.08) * r + 2.5;
+        if (dot(dDisc, dDisc) > boundR * boundR) continue;
 
-      vec2 us = psuPushDir(Tinv, TinvFlip, mPos.xy, mPos.zw);
-      vec2 localPx = vec2(dDisc.x * us.x + dDisc.y * us.y, dDisc.y * us.x - dDisc.x * us.y);
-      float sd = order == 2
-        ? vesicaSDF(localPx, r)
-        : regularPolySDF(localPx, order, r * (order == 3 ? 1.25 : 1.08));
+        vec2 us = psuPushDir(Tinv, TinvFlip, mPosV.xy, mPosV.zw);
+        vec2 localPx = vec2(dDisc.x * us.x + dDisc.y * us.y, dDisc.y * us.x - dDisc.x * us.y);
+        float sd = order == 2
+          ? vesicaSDF(localPx, r)
+          : regularPolySDF(localPx, order, r * (order == 3 ? 1.25 : 1.08));
 
-      bool hasAnySel = (pickType > 0.5) || (uPick.w < 0.99);
-      bool full = on || !hasAnySel || (pickType < 0.5 && !dimMarks);
-      float fAlpha = full ? 1.0 : dimA;
-      float sWidth = picked ? 2.0 : (on ? 1.6 : 1.0);
-      float sAlpha = full ? 0.95 : 0.5;
-      float hp = 0.5 / dpr;
-      float fillCov = clamp((hp - sd) * dpr, 0.0, 1.0);
-      float strokeCov = lineCov(abs(sd), 0.5 * sWidth, dpr);
-      vec3 mCol = isCone ? C_BLUE : C_RED;
-      col = mix(col, mCol, fillCov * fAlpha);
-      col = mix(col, vec3(1.0), strokeCov * sAlpha);
+        bool hasAnySel = (pickType > 0.5) || (uPick.w < 0.99);
+        bool full = on || !hasAnySel || (pickType < 0.5 && !dimMarks);
+        float fAlpha = full ? 1.0 : dimA;
+        float sWidth = picked ? 2.0 : (on ? 1.6 : 1.0);
+        float sAlpha = full ? 0.95 : 0.5;
+        float hp = 0.5 / dpr;
+        float fillCov = clamp((hp - sd) * dpr, 0.0, 1.0);
+        float strokeCov = lineCov(abs(sd), 0.5 * sWidth, dpr);
+        vec3 mCol = isCone ? C_BLUE : C_RED;
+        col = mix(col, mCol, fillCov * fAlpha);
+        col = mix(col, vec3(1.0), strokeCov * sAlpha);
+      }
+    }
+
+    if (rs > 0.992) {
+      col = mix(col, uRimColor, smoothstep(0.992, 0.996, rs));
     }
   }
 
@@ -587,9 +630,10 @@ void main() {
 }`;
 
 const toDisc = (p) => [p[0] / (1 + p[2]), p[1] / (1 + p[2])];
-const clampDisc = (w) => {
-  const r = Math.hypot(w[0], w[1]);
-  return r >= 1 - 1e-12 ? [(w[0] * (1 - 1e-12)) / r, (w[1] * (1 - 1e-12)) / r] : w;
+const discToH = (w) => {
+  const r2 = w[0] * w[0] + w[1] * w[1];
+  const inv = 1 / Math.max(1e-12, 1 - r2);
+  return [2 * w[0] * inv, 2 * w[1] * inv, (1 + r2) * inv];
 };
 const discToKlein = (w) => {
   const s = 2 / (1 + w[0] * w[0] + w[1] * w[1]);
@@ -609,28 +653,37 @@ function pushDirDisc(g, p0, dir0) {
 }
 
 function buildKleinNorms(D) {
-  if (D._kleinNorms) return D._kleinNorms;
+  if (D._minkNorms) return D._minkNorms;
   const norms = [];
   for (let i = 0; i < D.n; i++) {
     const a = D.verts[i], b = D.verts[(i + 1) % D.n];
+    // Store Euclidean-unit inward normal (Nx, Ny, Pz) for zero-sqrt folding + eucToMink factor for exact sinh distance
     const N = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
-    const l = Math.hypot(N[0], N[1], N[2]) || 1;
-    const u = [N[0] / l, N[1] / l, N[2] / l];
-    if (u[0] * D.at[0] + u[1] * D.at[1] + u[2] * D.at[2] < 0) { u[0] = -u[0]; u[1] = -u[1]; u[2] = -u[2]; }
+    const el = Math.hypot(N[0], N[1], N[2]) || 1;
+    const ml = Math.sqrt(Math.max(1e-18, N[0] * N[0] + N[1] * N[1] - N[2] * N[2]));
+    const u = [N[0] / el, N[1] / el, N[2] / el, el / ml];
+    if (u[0] * D.at[0] + u[1] * D.at[1] + u[2] * D.at[2] < 0) {
+      u[0] = -u[0]; u[1] = -u[1]; u[2] = -u[2];
+    }
     norms.push(u);
   }
-  D._kleinNorms = norms;
+  D._minkNorms = norms;
   return norms;
 }
 
-function segDistHypCPU(wD, S, lenH, endBDisc) {
+function segMinkNorm(aH, bH) {
+  const N = [aH[1] * bH[2] - aH[2] * bH[1], aH[2] * bH[0] - aH[0] * bH[2], aH[0] * bH[1] - aH[1] * bH[0]];
+  const ml = Math.sqrt(Math.max(1e-18, N[0] * N[0] + N[1] * N[1] - N[2] * N[2]));
+  return [N[0] / ml, N[1] / ml, N[2] / ml];
+}
+
+function segDistHypCPU(wD, S, lenH) {
   const u = psuApplyDisc(S, wD);
   const r2 = u[0] * u[0] + u[1] * u[1];
   const uxK = (2 * u[0]) / (1 + r2);
   if (uxK <= 0) return 2 * Math.atanh(Math.min(1 - 1e-12, Math.hypot(u[0], u[1])));
   if (uxK >= Math.tanh(lenH)) return discDist(u, [Math.tanh(0.5 * lenH), 0]);
   return Math.asinh((2 * Math.abs(u[1])) / Math.max(1e-12, 1 - r2));
-  void endBDisc;
 }
 
 function pointDistToD(wD, D, norms, S_edges, edgeLens) {
@@ -722,7 +775,6 @@ function sampleSmoothCommaDisc(pts0, L_si, smoothClosedPath) {
         area2 += x * vy[j] - vx[j] * y;
       }
       const rBox = Math.max(0.05, rMax * 1.25);
-      // Approximate hyperbolic area of local comma (~ 4 * discArea since ds = 2|dz|/(1-|z|^2))
       const hypArea = 2 * Math.abs(area2);
       const hashParts = [count, Math.round(rBox * 1e4)];
       for (let i = 0; i < count; i++) hashParts.push(Math.round(verts[2 * i] * 1e4), Math.round(verts[2 * i + 1] * 1e4));
@@ -770,7 +822,7 @@ export function createHyperbolicGL(canvas2d) {
   const wrap = canvas2d.parentElement;
   const glCanvas = document.createElement('canvas');
   glCanvas.className = 'pat-gl';
-  glCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;display:none;';
+  glCanvas.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;z-index:0;display:none;';
   wrap.insertBefore(glCanvas, canvas2d);
   canvas2d.style.position = 'relative';
   canvas2d.style.zIndex = '1';
@@ -794,17 +846,32 @@ export function createHyperbolicGL(canvas2d) {
   glCanvas.addEventListener('webglcontextrestored', () => { lost = false; initResources(); });
 
   let bakeProg = null, mainProg = null, emptyVao = null;
-  let sceneTex = null, polyTex = null, commaTex = null, bakeFbo = null;
+  let polyTex = null, commaTex = null, bakeFbo = null;
+  let foldUbo = null, commaUbo = null, segUbo = null, markUbo = null;
+  let interactFbo = null, interactTex = null, interactW = 0, interactH = 0;
   let commaLayers = 0, cachedSigs = [];
   let bakeLocs = null, mainLocs = null;
-  const sceneData = new Float32Array(SCENE_TEX_COLS * SCENE_TEX_ROWS * 4);
+
+  const foldData = new Float32Array(FOLD_UBO_FLOATS);
+  const commaData = new Float32Array(COMMA_UBO_FLOATS);
+  const segData = new Float32Array(SEG_UBO_FLOATS);
+  const markData = new Float32Array(MARK_UBO_FLOATS);
   const polyData = new Float32Array(MAX_POLY_VERTS * 2);
 
-  let modelInfo = null; // { atD, hScale, showEdges, dimMarks, nEdges, nCommas, nSegs, nMarks, nGlides, rimColor }
+  let modelInfo = null;
+  let lastBox = { left: 0, top: 0, w: 0, h: 0 };
+  let lastRenderScale = 1;
+
+  function makeUbo(floatLen) {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.UNIFORM_BUFFER, buf);
+    gl.bufferData(gl.UNIFORM_BUFFER, floatLen * 4, gl.DYNAMIC_DRAW);
+    return buf;
+  }
 
   function initResources() {
     bakeProg = createProgram(gl, FULLSCREEN_VS, SDF_BAKE_FS);
-    mainProg = createProgram(gl, FULLSCREEN_VS, MAIN_FS);
+    mainProg = createProgram(gl, DISC_VS, MAIN_FS);
     emptyVao = gl.createVertexArray();
 
     bakeLocs = {
@@ -813,7 +880,9 @@ export function createHyperbolicGL(canvas2d) {
       uRBox: gl.getUniformLocation(bakeProg, 'uRBox'),
     };
     mainLocs = {
+      uDiscClip: gl.getUniformLocation(mainProg, 'uDiscClip'),
       uGeom: gl.getUniformLocation(mainProg, 'uGeom'),
+      uInvPxScale: gl.getUniformLocation(mainProg, 'uInvPxScale'),
       uViewportH: gl.getUniformLocation(mainProg, 'uViewportH'),
       uInvView: gl.getUniformLocation(mainProg, 'uInvView'),
       uInvViewFlip: gl.getUniformLocation(mainProg, 'uInvViewFlip'),
@@ -822,17 +891,25 @@ export function createHyperbolicGL(canvas2d) {
       uCounts: gl.getUniformLocation(mainProg, 'uCounts'),
       uPick: gl.getUniformLocation(mainProg, 'uPick'),
       uRimColor: gl.getUniformLocation(mainProg, 'uRimColor'),
-      uSceneTex: gl.getUniformLocation(mainProg, 'uSceneTex'),
       uCommaTex: gl.getUniformLocation(mainProg, 'uCommaTex'),
     };
 
-    sceneTex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, sceneTex);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, SCENE_TEX_COLS, SCENE_TEX_ROWS, 0, gl.RGBA, gl.FLOAT, null);
+    foldUbo = makeUbo(FOLD_UBO_FLOATS);
+    commaUbo = makeUbo(COMMA_UBO_FLOATS);
+    segUbo = makeUbo(SEG_UBO_FLOATS);
+    markUbo = makeUbo(MARK_UBO_FLOATS);
+    const bindBlock = (name, slot, buf) => {
+      const idx = gl.getUniformBlockIndex(mainProg, name);
+      if (idx !== 0xffffffff && idx >= 0) {
+        gl.uniformBlockBinding(mainProg, idx, slot);
+        gl.bindBufferBase(gl.UNIFORM_BUFFER, slot, buf);
+      }
+    };
+    bindBlock('FoldBlock', 0, foldUbo);
+    bindBlock('CommaBlock', 1, commaUbo);
+    bindBlock('SegBlock', 2, segUbo);
+    bindBlock('MarkBlock', 3, markUbo);
+    gl.bindBuffer(gl.UNIFORM_BUFFER, null);
 
     polyTex = gl.createTexture();
     gl.bindTexture(gl.TEXTURE_2D, polyTex);
@@ -843,6 +920,10 @@ export function createHyperbolicGL(canvas2d) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG32F, MAX_POLY_VERTS, 1, 0, gl.RG, gl.FLOAT, null);
 
     bakeFbo = gl.createFramebuffer();
+    interactFbo = gl.createFramebuffer();
+    interactTex = null;
+    interactW = 0;
+    interactH = 0;
     commaLayers = 0;
     commaTex = null;
     cachedSigs = [];
@@ -868,6 +949,23 @@ export function createHyperbolicGL(canvas2d) {
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D_ARRAY, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     cachedSigs = [];
+  }
+
+  function ensureInteractTarget(w, h) {
+    if (interactTex && interactW === w && interactH === h) return;
+    if (interactTex) gl.deleteTexture(interactTex);
+    interactW = w;
+    interactH = h;
+    interactTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, interactTex);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, interactFbo);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, interactTex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   }
 
   function bakeCommas(shapes) {
@@ -903,12 +1001,9 @@ export function createHyperbolicGL(canvas2d) {
     }
   }
 
-  function setRow(row, col, x, y, z, w) {
-    const idx = (row * SCENE_TEX_COLS + col) * 4;
-    sceneData[idx] = x;
-    sceneData[idx + 1] = y;
-    sceneData[idx + 2] = z;
-    sceneData[idx + 3] = w;
+  function putVec4(arr, blockBase, index, x, y, z, w) {
+    const off = (blockBase + index) * 4;
+    arr[off] = x; arr[off + 1] = y; arr[off + 2] = z; arr[off + 3] = w;
   }
 
   function buildCandidateTiles(D, A, { repSegs, commaSamples, locateTile, norms, S_edges, edgeLens }) {
@@ -917,7 +1012,6 @@ export function createHyperbolicGL(canvas2d) {
     const n = D.n;
     const vDiscs = D.verts.map(toDisc);
 
-    // Check which vertices of D need a vertex-star (any marked vertex, any vertex close to a comma, or any repSeg)
     const needVertex = new Uint8Array(n);
     for (const c of A.classes) {
       if (c.n > 1) for (const vi of c.verts) needVertex[vi] = 1;
@@ -956,13 +1050,11 @@ export function createHyperbolicGL(canvas2d) {
     addTile(gI);
 
     if (fastOnlyEdges) {
-      // Expand only tiles touching marked vertices (and 1-ring edge neighbors for tiny near-edge marks)
       for (let e = 0; e < n; e++) addTile(maps2[e]);
       let qi = 0;
       while (qi < tiles.length && tiles.length < 96) {
         const g = tiles[qi++];
         const gv = vDiscs.map((v) => psuApplyDisc(g, v));
-        // Only expand across edges touching a needed vertex of D
         let touchesNeeded = isIdPsu(g);
         if (!touchesNeeded) {
           for (let i = 0; i < n && !touchesNeeded; i++) {
@@ -989,7 +1081,6 @@ export function createHyperbolicGL(canvas2d) {
       return tiles;
     }
 
-    // General starRing BFS around D
     let qi = 0;
     while (qi < tiles.length && tiles.length < 96) {
       const g = tiles[qi++];
@@ -1006,7 +1097,6 @@ export function createHyperbolicGL(canvas2d) {
       }
     }
 
-    // Overflow safety: add locateTilePSU inverse hits for long segments or far commas (e.g. extreme o33)
     const probePoint = (ptH) => {
       const res = locateTile(D, A, toDisc(ptH));
       if (!res || !res.g) return;
@@ -1032,17 +1122,14 @@ export function createHyperbolicGL(canvas2d) {
   return {
     isReady: () => !lost && !!mainProg,
 
+    lastScale: () => lastRenderScale,
+
     setVisible(vis) {
       glCanvas.style.display = vis ? 'block' : 'none';
     },
 
-    resize(wPx, hPx) {
-      if (!gl || lost) return;
-      const w = Math.max(1, Math.round(wPx)), h = Math.max(1, Math.round(hPx));
-      if (glCanvas.width !== w || glCanvas.height !== h) {
-        glCanvas.width = w;
-        glCanvas.height = h;
-      }
+    resize() {
+      // Sizing is driven directly from disc layout inside render() to avoid blank/oversized allocations.
     },
 
     setModel(model, opts) {
@@ -1066,7 +1153,6 @@ export function createHyperbolicGL(canvas2d) {
         edgeLens.push(G.dist(a, b));
       }
 
-      // Per-comma local frames & smooth contour samples
       const localFrames = [];
       const bakedInfos = [];
       const commaSamples = [];
@@ -1095,7 +1181,6 @@ export function createHyperbolicGL(canvas2d) {
         commaSamples.push({ atH, atD: toDisc(atH), rad: desRad[si] || 0, pts });
       }
 
-      // Build canonical repeating segments list (glides first, then non-once lines)
       const repSegs = [];
       A.glides.forEach((g, k) => {
         if (g.seg) repSegs.push({
@@ -1120,12 +1205,15 @@ export function createHyperbolicGL(canvas2d) {
 
       const candTiles = buildCandidateTiles(D, A, { repSegs, commaSamples, locateTile, norms, S_edges, edgeLens });
 
-      // 1. Collect comma instances overlapping D
       const commaInst = [];
       for (let si = 0; si < des.length; si++) {
         const info = bakedInfos[si], L_si = localFrames[si], cs = commaSamples[si];
         if (!info || !L_si) continue;
         const cSeen = [];
+        const rCorner = Math.SQRT2 * info.rBox;
+        const coshBound = rCorner < 0.995
+          ? ((1 + rCorner * rCorner) / (1 - rCorner * rCorner)) * 1.005 + 1e-3
+          : 1e9;
         for (const g of candTiles) {
           const centerG = psuApplyDisc(g, cs.atD);
           if (pointDistToD(centerG, D, norms, S_edges, edgeLens) > cs.rad + 0.06) continue;
@@ -1138,16 +1226,19 @@ export function createHyperbolicGL(canvas2d) {
           cSeen.push({ flip, c: centerG });
           if (commaInst.length >= MAX_ITEMS) return false;
           const M_c = psuMul(L_si, psuInv(g));
-          commaInst.push({ M: M_c, flip: M_c[4] ? 1 : 0, layer: si, rBox: info.rBox });
+          const cH = discToH(centerG);
+          commaInst.push({ M: M_c, flip: M_c[4] ? 1 : 0, layer: si, rBox: info.rBox, cH, coshBound });
         }
       }
 
-      // 2. Collect repeating segments intersecting/near D
       const segInst = [];
+      let maxSegHalfW = 2.0;
       for (const seg of repSegs) {
         const a0 = toDisc(seg.a), b0 = toDisc(seg.b), sSeen = [];
         const lenH = G.dist(seg.a, seg.b);
         if (lenH < 1e-7) continue;
+        const segMargin = (seg.kind === 0 || seg.kind === 2) ? 0.14 : 0.075;
+        const tb = Math.tanh(0.5 * lenH);
         for (const g of candTiles) {
           const M = psuToSO21(g);
           const gaH = apply(M, seg.a), gbH = apply(M, seg.b);
@@ -1159,11 +1250,14 @@ export function createHyperbolicGL(canvas2d) {
           }
           if (dup) continue;
           const S_ab = psuInv(so21ToPSU(G.frame(gaH, gbH), false));
-          if (segDistToD(ga, gb, S_ab, lenH, D, norms, S_edges, edgeLens, vDiscs, vKleins) > 0.22) continue;
+          if (segDistToD(ga, gb, S_ab, lenH, D, norms, S_edges, edgeLens, vDiscs, vKleins) > segMargin) continue;
           sSeen.push({ a: ga, b: gb });
           if (segInst.length >= MAX_ITEMS) return false;
+          const sN = segMinkNorm(gaH, gbH);
+          const peakHalfW = 0.5 * seg.width * (seg.kind === 1 ? 1.0 : 1.85);
+          if (peakHalfW > maxSegHalfW) maxSegHalfW = peakHalfW;
           segInst.push({
-            S: S_ab, a: ga, b: gb, lenH,
+            N: sN, S: S_ab, lenH, tb,
             color: seg.color, alpha: seg.alpha, width: seg.width,
             dashOn: seg.dash ? seg.dash[0] : 0, dashOff: seg.dash ? seg.dash[1] : 0,
             kind: seg.kind, grpIdx: seg.grpIdx, scaleMode: seg.scaleMode, groupId: seg.groupId,
@@ -1171,7 +1265,6 @@ export function createHyperbolicGL(canvas2d) {
         }
       }
 
-      // 3. Collect marked vertices near/on D
       const alsoSet = model.marks ? new Set(model.marks) : null;
       const marked = A.classes.filter((c) => c.n > 1).map((c) => {
         const ref = model.markRefs && model.markRefs[c.id];
@@ -1213,8 +1306,9 @@ export function createHyperbolicGL(canvas2d) {
           mSeen.push(pg);
           if (markInst.length >= MAX_ITEMS) return false;
           const ug = pushDirDisc(g, p0, dir0);
+          const mH = discToH(pg);
           markInst.push({
-            p: pg, u: ug, order: mk.c.n,
+            p: pg, u: ug, mH, order: mk.c.n,
             isCone: mk.c.kind === 'cone' ? 1 : 0,
             clsId: mk.c.id,
             isAlso: alsoSet && alsoSet.has(mk.c.id) ? 1 : 0,
@@ -1222,37 +1316,52 @@ export function createHyperbolicGL(canvas2d) {
         }
       }
 
-      // Pack sceneData (RGBA32F 128 x 16)
-      sceneData.fill(0);
+      // Pack and upload 4 std140 UBOs once per model change
+      foldData.fill(0);
       for (let i = 0; i < n; i++) {
         const N = norms[i], im = invMaps2[i], Se = S_edges[i];
         const e = D.edges[i], nextLast = e.mirror ? i : e.to;
-        setRow(0, i, N[0], N[1], N[2], starOf[i] + 1);
-        setRow(1, i, im[0], im[1], im[2], im[3]);
-        setRow(2, i, im[4] ? 1 : 0, nextLast, edgeLens[i], 0);
-        setRow(3, i, Se[0], Se[1], Se[2], Se[3]);
+        putVec4(foldData, 0 * MAX_EDGES, i, N[0], N[1], N[2], starOf[i] + 1);
+        putVec4(foldData, 1 * MAX_EDGES, i, im[0], im[1], im[2], im[3]);
+        putVec4(foldData, 2 * MAX_EDGES, i, im[4] ? 1 : 0, nextLast, edgeLens[i], N[3]);
+        putVec4(foldData, 3 * MAX_EDGES, i, Se[0], Se[1], Se[2], Se[3]);
       }
+      gl.bindBuffer(gl.UNIFORM_BUFFER, foldUbo);
+      gl.bufferSubData(gl.UNIFORM_BUFFER, 0, foldData);
+
+      commaData.fill(0);
       for (let i = 0; i < commaInst.length; i++) {
         const c = commaInst[i];
-        setRow(4, i, c.M[0], c.M[1], c.M[2], c.M[3]);
-        setRow(5, i, c.flip, c.layer, c.rBox, 1 / (2 * c.rBox));
+        putVec4(commaData, 0 * MAX_ITEMS, i, c.M[0], c.M[1], c.M[2], c.M[3]);
+        putVec4(commaData, 1 * MAX_ITEMS, i, c.flip, c.layer, c.rBox, 1 / (2 * c.rBox));
+        putVec4(commaData, 2 * MAX_ITEMS, i, -c.cH[0], -c.cH[1], c.cH[2], c.coshBound);
       }
+      gl.bindBuffer(gl.UNIFORM_BUFFER, commaUbo);
+      gl.bufferSubData(gl.UNIFORM_BUFFER, 0, commaData);
+
+      segData.fill(0);
       for (let i = 0; i < segInst.length; i++) {
         const s = segInst[i];
-        setRow(6, i, s.S[0], s.S[1], s.S[2], s.S[3]);
-        setRow(7, i, s.a[0], s.a[1], s.b[0], s.b[1]);
-        setRow(8, i, s.color[0], s.color[1], s.color[2], s.alpha);
-        setRow(9, i, s.width, s.lenH, s.dashOn, s.dashOff);
-        setRow(10, i, s.kind, s.grpIdx, s.scaleMode, s.groupId);
+        putVec4(segData, 0 * MAX_ITEMS, i, s.N[0], s.N[1], s.N[2], s.groupId);
+        putVec4(segData, 1 * MAX_ITEMS, i, s.S[0], s.S[1], s.S[2], s.S[3]);
+        putVec4(segData, 2 * MAX_ITEMS, i, s.color[0], s.color[1], s.color[2], s.alpha);
+        putVec4(segData, 3 * MAX_ITEMS, i, s.width, s.lenH, s.dashOn, s.dashOff);
+        putVec4(segData, 4 * MAX_ITEMS, i, s.kind, s.grpIdx, s.scaleMode, s.tb);
       }
+      gl.bindBuffer(gl.UNIFORM_BUFFER, segUbo);
+      gl.bufferSubData(gl.UNIFORM_BUFFER, 0, segData);
+
+      markData.fill(0);
       for (let i = 0; i < markInst.length; i++) {
         const mk = markInst[i];
-        setRow(11, i, mk.p[0], mk.p[1], mk.u[0], mk.u[1]);
-        setRow(12, i, mk.order, mk.isCone, mk.clsId, mk.isAlso);
+        putVec4(markData, 0 * MAX_ITEMS, i, mk.p[0], mk.p[1], mk.u[0], mk.u[1]);
+        putVec4(markData, 1 * MAX_ITEMS, i, mk.order, mk.isCone, mk.clsId, mk.isAlso);
+        putVec4(markData, 2 * MAX_ITEMS, i, -mk.mH[0], -mk.mH[1], mk.mH[2], 0);
       }
+      gl.bindBuffer(gl.UNIFORM_BUFFER, markUbo);
+      gl.bufferSubData(gl.UNIFORM_BUFFER, 0, markData);
+      gl.bindBuffer(gl.UNIFORM_BUFFER, null);
 
-      gl.bindTexture(gl.TEXTURE_2D, sceneTex);
-      gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, SCENE_TEX_COLS, SCENE_TEX_ROWS, gl.RGBA, gl.FLOAT, sceneData);
       bakeCommas(bakedInfos);
 
       const inkFrac = Math.min(0.42, Math.max(0.10, totalCommaArea / Math.max(0.05, area)));
@@ -1273,6 +1382,7 @@ export function createHyperbolicGL(canvas2d) {
         hScale,
         showEdges: model.tileEdges !== false ? 1 : 0,
         dimMarks: model.dimMarks === false ? 0 : 1,
+        maxSegHalfW,
         nEdges: n,
         nCommas: commaInst.length,
         nSegs: segInst.length,
@@ -1283,16 +1393,60 @@ export function createHyperbolicGL(canvas2d) {
       return true;
     },
 
-    render({ W, H, dpr, cx, cy, R, vPsu, pick, also }) {
+    render({ W, H, dpr, cx, cy, R, vPsu, pick, also, interactive = false }) {
       if (!gl || lost || !modelInfo || !W || !H) return;
-      const wPx = Math.max(1, Math.round(W * dpr)), hPx = Math.max(1, Math.round(H * dpr));
-      if (glCanvas.width !== wPx || glCanvas.height !== hPx) {
-        glCanvas.width = wPx; glCanvas.height = hPx;
+      const pad = 4;
+      const gLeft = Math.max(0, Math.floor(cx - R - pad));
+      const gTop = Math.max(0, Math.floor(cy - R - pad));
+      const gRight = Math.min(W, Math.ceil(cx + R + pad));
+      const gBot = Math.min(H, Math.ceil(cy + R + pad));
+      const gW = Math.max(1, gRight - gLeft);
+      const gH = Math.max(1, gBot - gTop);
+      if (lastBox.left !== gLeft || lastBox.top !== gTop || lastBox.w !== gW || lastBox.h !== gH) {
+        glCanvas.style.left = `${gLeft}px`;
+        glCanvas.style.top = `${gTop}px`;
+        glCanvas.style.width = `${gW}px`;
+        glCanvas.style.height = `${gH}px`;
+        lastBox = { left: gLeft, top: gTop, w: gW, h: gH };
       }
-      gl.viewport(0, 0, wPx, hPx);
+      const wPx = Math.max(1, Math.round(gW * dpr));
+      const hPx = Math.max(1, Math.round(gH * dpr));
+      if (glCanvas.width !== wPx || glCanvas.height !== hPx) {
+        glCanvas.width = wPx;
+        glCanvas.height = hPx;
+      }
+
+      const scale = interactive && (dpr > 1.25 || wPx * hPx > 1_600_000)
+        ? Math.min(0.75, Math.max(0.40, Math.sqrt(1_250_000 / Math.max(1, wPx * hPx))))
+        : 1.0;
+      lastRenderScale = scale;
+
+      const scaled = scale < 0.95;
+      const targetW = scaled ? Math.max(64, Math.round(wPx * scale)) : wPx;
+      const targetH = scaled ? Math.max(64, Math.round(hPx * scale)) : hPx;
+      const effDpr = dpr * scale;
+
+      if (scaled) {
+        ensureInteractTarget(targetW, targetH);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, interactFbo);
+        gl.enable(gl.SCISSOR_TEST);
+        gl.scissor(0, 0, targetW, targetH);
+      } else {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.disable(gl.SCISSOR_TEST);
+      }
+      gl.viewport(0, 0, targetW, targetH);
       gl.disable(gl.BLEND);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
+      if (scaled) gl.disable(gl.SCISSOR_TEST);
+
+      const cxL = cx - gLeft, cyL = cy - gTop;
+      const cxNdc = (2 * cxL) / gW - 1;
+      const cyNdc = 1 - (2 * cyL) / gH;
+      const radCss = (R + 3.5) * 1.006;
+      const rxNdc = (2 * radCss) / gW;
+      const ryNdc = (2 * radCss) / gH;
 
       const invV = psuInv(vPsu);
       let pickType = 0, pickId = 0, pickExtra = -1;
@@ -1310,37 +1464,46 @@ export function createHyperbolicGL(canvas2d) {
       gl.useProgram(mainProg);
       gl.bindVertexArray(emptyVao);
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, sceneTex);
-      gl.uniform1i(mainLocs.uSceneTex, 0);
-      gl.activeTexture(gl.TEXTURE1);
       gl.bindTexture(gl.TEXTURE_2D_ARRAY, commaTex);
-      gl.uniform1i(mainLocs.uCommaTex, 1);
+      gl.uniform1i(mainLocs.uCommaTex, 0);
 
-      gl.uniform4f(mainLocs.uGeom, cx, cy, R, dpr);
-      gl.uniform1f(mainLocs.uViewportH, H);
+      gl.uniform4f(mainLocs.uDiscClip, cxNdc, cyNdc, rxNdc, ryNdc);
+      gl.uniform4f(mainLocs.uGeom, cxL, cyL, R, effDpr);
+      gl.uniform2f(mainLocs.uInvPxScale, gW / targetW, gH / targetH);
+      gl.uniform1f(mainLocs.uViewportH, gH);
       gl.uniform4f(mainLocs.uInvView, invV[0], invV[1], invV[2], invV[3]);
       gl.uniform1f(mainLocs.uInvViewFlip, invV[4] ? 1 : 0);
       gl.uniform2f(mainLocs.uAtD, modelInfo.atD[0], modelInfo.atD[1]);
-      gl.uniform4f(mainLocs.uParams, modelInfo.hScale, modelInfo.showEdges, modelInfo.dimMarks, modelInfo.nGlides);
+      gl.uniform4f(mainLocs.uParams, modelInfo.hScale, modelInfo.showEdges, modelInfo.dimMarks, modelInfo.maxSegHalfW);
       gl.uniform4i(mainLocs.uCounts, modelInfo.nEdges, modelInfo.nCommas, modelInfo.nSegs, modelInfo.nMarks);
       gl.uniform4f(mainLocs.uPick, pickType, pickId, pickExtra, dimAlpha);
       gl.uniform3f(mainLocs.uRimColor, modelInfo.rimColor[0], modelInfo.rimColor[1], modelInfo.rimColor[2]);
 
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      gl.drawArrays(gl.TRIANGLES, 0, 96);
+
+      if (scaled) {
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, interactFbo);
+        gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
+        gl.blitFramebuffer(0, 0, targetW, targetH, 0, 0, wPx, hPx, gl.COLOR_BUFFER_BIT, gl.LINEAR);
+        gl.bindFramebuffer(gl.READ_FRAMEBUFFER, null);
+      }
     },
 
-    /** Render current frame and return top-down RGBA Uint8ClampedArray patch (composited over white + 2D overlay). */
+    /** Render current native-resolution frame and return top-down RGBA Uint8ClampedArray patch (composited over white + 2D overlay). */
     readPatch(xCss, yCss, rPx, overlayCanvas, frame) {
-      this.render(frame);
+      this.render({ ...frame, interactive: false });
       const dpr = frame.dpr;
       const wPx = glCanvas.width, hPx = glCanvas.height;
-      const cxPx = Math.round(xCss * dpr), cyCssPx = Math.round(yCss * dpr);
+      const glCxPx = Math.round((xCss - lastBox.left) * dpr);
+      const glCyCssPx = Math.round((yCss - lastBox.top) * dpr);
+      const ovCxPx = Math.round(xCss * dpr);
+      const ovCyCssPx = Math.round(yCss * dpr);
       const side = 2 * rPx + 1;
       const out = new Uint8ClampedArray(side * side * 4);
       out.fill(255);
 
-      const x0 = Math.max(0, cxPx - rPx), x1 = Math.min(wPx, cxPx + rPx + 1);
-      const yTop0 = Math.max(0, cyCssPx - rPx), yTop1 = Math.min(hPx, cyCssPx + rPx + 1);
+      const x0 = Math.max(0, glCxPx - rPx), x1 = Math.min(wPx, glCxPx + rPx + 1);
+      const yTop0 = Math.max(0, glCyCssPx - rPx), yTop1 = Math.min(hPx, glCyCssPx + rPx + 1);
       const rw = x1 - x0, rh = yTop1 - yTop0;
       if (rw > 0 && rh > 0) {
         const yBot0 = hPx - yTop1;
@@ -1348,29 +1511,34 @@ export function createHyperbolicGL(canvas2d) {
         gl.readPixels(x0, yBot0, rw, rh, gl.RGBA, gl.UNSIGNED_BYTE, buf);
         for (let row = 0; row < rh; row++) {
           const glRow = rh - 1 - row;
-          const outY = yTop0 + row - (cyCssPx - rPx);
+          const outY = yTop0 + row - (glCyCssPx - rPx);
           for (let col = 0; col < rw; col++) {
             const gi = (glRow * rw + col) * 4;
-            const outX = x0 + col - (cxPx - rPx);
+            const outX = x0 + col - (glCxPx - rPx);
             const oi = (outY * side + outX) * 4;
             const a = buf[gi + 3] / 255;
-            // glCanvas uses premultipliedAlpha over white page ground
             out[oi] = Math.round(buf[gi] + 255 * (1 - a));
             out[oi + 1] = Math.round(buf[gi + 1] + 255 * (1 - a));
             out[oi + 2] = Math.round(buf[gi + 2] + 255 * (1 - a));
             out[oi + 3] = 255;
           }
         }
-        if (overlayCanvas) {
+      }
+      if (overlayCanvas) {
+        const owPx = overlayCanvas.width, ohPx = overlayCanvas.height;
+        const ox0 = Math.max(0, ovCxPx - rPx), ox1 = Math.min(owPx, ovCxPx + rPx + 1);
+        const oy0 = Math.max(0, ovCyCssPx - rPx), oy1 = Math.min(ohPx, ovCyCssPx + rPx + 1);
+        const orw = ox1 - ox0, orh = oy1 - oy0;
+        if (orw > 0 && orh > 0) {
           const octx = overlayCanvas.getContext('2d');
-          const ov = octx.getImageData(x0, yTop0, rw, rh).data;
-          for (let row = 0; row < rh; row++) {
-            const outY = yTop0 + row - (cyCssPx - rPx);
-            for (let col = 0; col < rw; col++) {
-              const vi = (row * rw + col) * 4;
+          const ov = octx.getImageData(ox0, oy0, orw, orh).data;
+          for (let row = 0; row < orh; row++) {
+            const outY = oy0 + row - (ovCyCssPx - rPx);
+            for (let col = 0; col < orw; col++) {
+              const vi = (row * orw + col) * 4;
               const va = ov[vi + 3] / 255;
               if (va > 0) {
-                const outX = x0 + col - (cxPx - rPx);
+                const outX = ox0 + col - (ovCxPx - rPx);
                 const oi = (outY * side + outX) * 4;
                 out[oi] = Math.round(ov[vi] * va + out[oi] * (1 - va));
                 out[oi + 1] = Math.round(ov[vi + 1] * va + out[oi + 1] * (1 - va));

@@ -378,6 +378,10 @@
 .ratio-pat {
   aspect-ratio: 1 / 1;
 }
+.canvas-wrap.ratio-pat {
+  border-radius: 0;
+  overflow: visible;
+}
 .ratio-surf {
   aspect-ratio: 16 / 9;
   max-height: 190px;
