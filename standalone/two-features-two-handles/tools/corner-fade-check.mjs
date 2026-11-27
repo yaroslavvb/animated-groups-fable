@@ -48,8 +48,13 @@ try {
   const shot = async (page, T, name) => { if (!shots) return; const box = await (await T.$('#pattern')).boundingBox(); const fr = opt.live ? await (await T.frameElement()).boundingBox() : { x: 0, y: 0 }; await page.screenshot({ path: path.join(shots, name + '.png'), clip: { x: fr.x + box.x, y: fr.y + box.y, width: box.width, height: box.height } }); };
   /** How dark the canvas is at a point of the pattern (the darkest of the pixels round it): 0 black .. 255 white. */
   const dark = (T, p) => T.evaluate((pt) => {
-    const c = document.getElementById('pattern'), xy = window.__handles.pattern.projectTile(pt), s = c.width / c.clientWidth;
-    const d = c.getContext('2d').getImageData(Math.round(xy[0] * s) - 3, Math.round(xy[1] * s) - 3, 7, 7).data;
+    const pat = window.__handles.pattern, xy = pat.projectTile(pt);
+    let d;
+    if (typeof pat.readPatch === 'function') d = pat.readPatch(xy[0], xy[1], 3);
+    else {
+      const c = document.getElementById('pattern'), s = c.width / c.clientWidth;
+      d = c.getContext('2d').getImageData(Math.round(xy[0] * s) - 3, Math.round(xy[1] * s) - 3, 7, 7).data;
+    }
     let best = 255;
     for (let i = 0; i < d.length; i += 4) best = Math.min(best, 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
     return best;

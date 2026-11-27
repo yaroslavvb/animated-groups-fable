@@ -46,6 +46,7 @@ import { design } from '../../2026-11-15-classification-of-surfaces/src/sym/moti
 import { PRINT_FRONT, hexToRgb } from '../../2026-11-15-classification-of-surfaces/src/vendor/the-folding/palette.js';
 import { pairStyle } from '../../2026-11-15-classification-of-surfaces/src/sym/pairs.js';
 import { invH, psuI, psuNorm, psuInv, psuMul, psuApplyDisc, psuToSO21, so21ToPSU, discDist } from './handles.js';
+import { createHyperbolicGL } from './pattern-gl.js';
 
 const TAU = 2 * Math.PI;
 export const BLUE = [0, 0.447, 0.698], RED = [0.835, 0.369, 0];
@@ -320,7 +321,9 @@ export function tilesPSU(D, A, { focus = [0, 0], radius = 5.6, max = 4200, ms = 
 
 export function createPattern(canvas, opts = {}) {
   const ctx = canvas.getContext('2d'), tipEl = opts.tip || null;
+  const gl = createHyperbolicGL(canvas);
   let W = 0, H = 0, dpr = 1;
+  let usingGL = false, overlayDirty = true;
   let model = null, G = null, V = I3.slice(), base = I3.slice(), sel = null, quick = false;
   // Does V turn the plane over? Does base? Kept as facts (each flips when the middle of the view crosses onto a
   // mirror-image neighbour; base's is set when the outline moves), never read back off a determinant: a long way
@@ -343,6 +346,8 @@ export function createPattern(canvas, opts = {}) {
     if (w === W && h === H && d === dpr) return;
     W = w; H = h; dpr = d;
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    if (gl) gl.resize(canvas.width, canvas.height);
+    overlayDirty = true;
   }
   // what a unit of the geometry is on the screen, and where its origin goes
   const lay = () => {
@@ -460,18 +465,10 @@ export function createPattern(canvas, opts = {}) {
     const t0 = performance.now();
     size();
     const { D, A, binding } = model, kind = G.kind, L = lay(), { cx, cy, R } = L;
-    const n = D.n, list = tileList();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    ctx.save();
-    if (kind !== 'E') { ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip(); }
-    if (kind === 'H') {
-      // the hyperbolic disc has infinitely many tiles toward its rim and only some thousands are drawn: what is left
-      // of the rim gets the colour the tiles there would blur to, not the page's white
-      const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
-      const bg = A.stars.length ? mixc(FRONT, RED, 0.35) : FRONT;
-      ctx.fillStyle = css(bg); ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
-    }
+    const n = D.n;
+    const pick = sel !== null && binding && binding[sel] ? binding[sel] : null;
+    const also = !pick && model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
+    const hasHandleLines = (model.lines || []).some((ln) => ln.role === 'o');
 
     const X = (p) => (kind === 'H' ? cx + (R * p[0]) / (1 + p[2]) : cx + R * p[0]);
     const Y = (p) => (kind === 'H' ? cy - (R * p[1]) / (1 + p[2]) : cy - R * p[1]);
@@ -569,9 +566,94 @@ export function createPattern(canvas, opts = {}) {
       return Math.max(minSteps, Math.min(36, Math.ceil(Math.max(pxLen / 9, d * 3))));
     };
 
+    const drawTileAnnotations = (M, Q, c) => {
+      const foundAfter = [];
+      for (const ln of model.lines || []) {
+        if (!ln.once) continue;
+        const a = apply(M, ln.a), q = apply(M, ln.b), p = new Path2D();
+        line(p, a, q, kind === 'E' ? 1 : stepsFor(a, q, ln.steps || 2));
+        ctx.strokeStyle = css(ln.color || DARK, ln.alpha === undefined ? 1 : ln.alpha); ctx.lineWidth = ln.width || 2.4; ctx.setLineDash(ln.dash || []); ctx.stroke(p);
+        ctx.setLineDash([]);
+      }
+      for (const dt of model.dots || []) {
+        const q = apply(M, dt.p);
+        if (kind === 'S' && q[2] < 0) continue;
+        const item = { x: X(q), y: Y(q), dt };
+        if (dt.after) { foundAfter.push(item); continue; }
+        const da = (dt.alpha === undefined ? 1 : dt.alpha) * (pick && !(pick.t === 'o' && hasHandleLines) ? 0.38 : 1);
+        ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 5, 0, TAU);
+        ctx.fillStyle = css(dt.color || DARK, da); ctx.fill();
+        if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, da); ctx.stroke(); }          // (a faint dot has a faint ring)
+      }
+      if (pick && pick.t === 'o' && !hasHandleLines) {
+        const turns = A.pairs.filter((p) => !p.rev).slice(2 * pick.k, 2 * pick.k + 2);
+        for (const pr of turns) for (const i of [pr.i, pr.j]) {
+          const mid = lerp(Q[i], Q[(i + 1) % n], 0.5), far = apply(mul(M, A.maps[i]), D.at), p = new Path2D();
+          line(p, c, mid, Math.max(2, stepsFor(c, mid))); line(p, mid, far, Math.max(2, stepsFor(mid, far)));
+          ctx.setLineDash([]);
+          ctx.strokeStyle = 'rgba(255,255,255,0.88)'; ctx.lineWidth = 5.4; ctx.stroke(p);
+          ctx.strokeStyle = css(BLUE, 1); ctx.lineWidth = 3.2; ctx.setLineDash([3, 7]); ctx.stroke(p);
+        }
+        ctx.setLineDash([]);
+      }
+      return foundAfter;
+    };
+    const drawAfterDots = (items) => {
+      for (const item of items) {
+        const dt = item.dt;
+        ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 6, 0, TAU);
+        ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
+        if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, dt.alpha === undefined ? 1 : dt.alpha); ctx.stroke(); }
+      }
+    };
+
+    if (usingGL && gl && gl.isReady()) {
+      gl.render({ W, H, dpr, cx, cy, R, vPsu, pick, also });
+      const M = psuToSO21(psuMul(vPsu, bPsu)), c = apply(M, D.at), ppu = R / (1 + c[2]), px = D.clear * ppu;
+      home = (n && px > 3) ? [X(c), Y(c), px] : null;
+      hots = [];
+      placeTip();
+      const est = Math.min(2900, Math.max(16, Math.round((2 * Math.PI * (Math.cosh(7.9) - 1)) / Math.max(0.05, area))));
+      stats = { tiles: est, drawn: est };
+      const hasOnce = (model.lines || []).some((ln) => ln.once);
+      const hasDots = !!(model.dots && model.dots.length);
+      const hasStillO = !!(pick && pick.t === 'o' && !hasHandleLines && n);
+      if (!hasOnce && !hasDots && !hasStillO) {
+        if (overlayDirty) {
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          ctx.clearRect(0, 0, W, H);
+          overlayDirty = false;
+        }
+        return;
+      }
+      overlayDirty = true;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip();
+      ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      const Q = n && px > 3 && hasStillO ? D.verts.map((v) => apply(M, v)) : null;
+      const glAfterDots = (px > 3 || model.outline === false) && n ? drawTileAnnotations(M, Q, c) : [];
+      ctx.restore();
+      drawAfterDots(glAfterDots);
+      return;
+    }
+
+    const list = tileList();
+    overlayDirty = true;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    ctx.save();
+    if (kind !== 'E') { ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.clip(); }
+    if (kind === 'H') {
+      // the hyperbolic disc has infinitely many tiles toward its rim and only some thousands are drawn: what is left
+      // of the rim gets the colour the tiles there would blur to, not the page's white
+      const mixc = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+      const bg = A.stars.length ? mixc(FRONT, RED, 0.35) : FRONT;
+      ctx.fillStyle = css(bg); ctx.fillRect(cx - R, cy - R, 2 * R, 2 * R);
+    }
+
     // which corner class, star, glide the selected character stands for
-    const pick = sel !== null && binding && binding[sel] ? binding[sel] : null;
-    const also = !pick && model.marks ? new Set(model.marks) : null;          // corner classes brought out together (a pair of features)
     const dim = pick ? 0.32 : also ? 0.38 : 1;
     const pickHalo = pick && pick.t === 'd' ? new Path2D() : null;
     const needFill = kind !== 'H' || A.stars.length > 0;
@@ -807,7 +889,6 @@ export function createPattern(canvas, opts = {}) {
     ctx.fillStyle = css(FRONT_INK); ctx.fill(ink);
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     if (showEdges) [[0.9, 0.2], [0.7, 0.16], [0.5, 0.12]].forEach(([w, a], b) => { ctx.lineWidth = w; ctx.strokeStyle = css(DARK, a); ctx.stroke(edge[b]); });
-    const hasHandleLines = (model.lines || []).some((ln) => ln.role === 'o');
     // mirrors and glide axes: red
     const widths = [2.1, 1.4, 0.8];
     A.stars.forEach((s, k) => {
@@ -868,7 +949,8 @@ export function createPattern(canvas, opts = {}) {
     };
 
     // ---- the tile the surface is folded from
-    const found = [], afterDots = [];
+    const found = [];
+    let afterDots = [];
     home = null;
     {
       const M = kind === 'H' ? psuToSO21(psuMul(vPsu, bPsu)) : mul(V, base), Q = D.verts.map((v) => apply(M, v)), c = apply(M, D.at);
@@ -924,36 +1006,7 @@ export function createPattern(canvas, opts = {}) {
           for (const g of glued) g.heads.forEach(chevron);
           for (const g of glued) { ctx.strokeStyle = css(g.color, 1); ctx.lineWidth = g.on ? 5.8 : 3.4; ctx.stroke(g.path); ctx.lineWidth = 2.6; g.heads.forEach(chevron); }
         }
-        // the caller's lines that are drawn once, in the outlined tile's own frame (one lift of a loop, a tree): annotations
-        for (const ln of model.lines || []) {
-          if (!ln.once) continue;
-          const a = apply(M, ln.a), q = apply(M, ln.b), p = new Path2D();
-          line(p, a, q, kind === 'E' ? 1 : stepsFor(a, q, ln.steps || 2));
-          ctx.strokeStyle = css(ln.color || DARK, ln.alpha === undefined ? 1 : ln.alpha); ctx.lineWidth = ln.width || 2.4; ctx.setLineDash(ln.dash || []); ctx.stroke(p);
-          ctx.setLineDash([]);
-        }
-        for (const dt of model.dots || []) {
-          const q = apply(M, dt.p);
-          if (kind === 'S' && q[2] < 0) continue;
-          const item = { x: X(q), y: Y(q), dt };
-          if (dt.after) { afterDots.push(item); continue; }
-          const da = (dt.alpha === undefined ? 1 : dt.alpha) * (pick && !(pick.t === 'o' && hasHandleLines) ? 0.38 : 1);
-          ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 5, 0, TAU);
-          ctx.fillStyle = css(dt.color || DARK, da); ctx.fill();
-          if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, da); ctx.stroke(); }          // (a faint dot has a faint ring)
-        }
-        // a wonder-ring chosen: its two wanderings, out of the tile across one glued edge and across the other
-        if (pick && pick.t === 'o' && !hasHandleLines) {
-          const turns = A.pairs.filter((p) => !p.rev).slice(2 * pick.k, 2 * pick.k + 2);
-          for (const pr of turns) for (const i of [pr.i, pr.j]) {
-            const mid = lerp(Q[i], Q[(i + 1) % n], 0.5), far = apply(mul(M, A.maps[i]), D.at), p = new Path2D();
-            line(p, c, mid, Math.max(2, stepsFor(c, mid))); line(p, mid, far, Math.max(2, stepsFor(mid, far)));
-            ctx.setLineDash([]);
-            ctx.strokeStyle = 'rgba(255,255,255,0.88)'; ctx.lineWidth = 5.4; ctx.stroke(p);
-            ctx.strokeStyle = css(BLUE, 1); ctx.lineWidth = 3.2; ctx.setLineDash([3, 7]); ctx.stroke(p);
-          }
-          ctx.setLineDash([]);
-        }
+        afterDots = drawTileAnnotations(M, Q, c);
       }
     }
     drawMarks();
@@ -970,12 +1023,7 @@ export function createPattern(canvas, opts = {}) {
       }
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.lineWidth = 1.2; ctx.strokeStyle = css(DARK, 0.55); ctx.stroke();
     }
-    for (const item of afterDots) {
-      const dt = item.dt;
-      ctx.beginPath(); ctx.arc(item.x, item.y, dt.r || 6, 0, TAU);
-      ctx.fillStyle = css(dt.color || DARK, dt.alpha === undefined ? 1 : dt.alpha); ctx.fill();
-      if (dt.stroke) { ctx.lineWidth = dt.strokeWidth || 1.2; ctx.strokeStyle = css(dt.stroke, dt.alpha === undefined ? 1 : dt.alpha); ctx.stroke(); }
-    }
+    drawAfterDots(afterDots);
     // Keep 60+ fps smooth with EMA hysteresis and zero frame-to-frame budget oscillation
     if (quick && kind === 'H') {
       const ms = performance.now() - t0;
@@ -1060,7 +1108,7 @@ export function createPattern(canvas, opts = {}) {
         recentre(null);
       }
       if (Math.hypot(vx, vy) > 0.02) {
-        quick = true;
+        quick = !usingGL;
         if (raf) { cancelAnimationFrame(raf); raf = 0; }
         draw();
         coast = requestAnimationFrame(step);
@@ -1069,7 +1117,7 @@ export function createPattern(canvas, opts = {}) {
       const moved = settle();                                                 // the outlined tile went out of sight: it comes back
       clearTimeout(still); quick = false;
       if (raf) { cancelAnimationFrame(raf); raf = 0; }
-      if (moved || model.outline !== false || (G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max)))) draw();
+      if (moved || model.outline !== false || (!usingGL && G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max)))) draw();
     };
     coast = requestAnimationFrame(step);
     return true;
@@ -1107,7 +1155,7 @@ export function createPattern(canvas, opts = {}) {
       V = G.fix(mul(T, drag.V0), vHand());
       drag.V0 = recentre(drag.V0);
     }
-    quick = true; clearTimeout(still);
+    quick = !usingGL; clearTimeout(still);
     schedule();
   });
   const up = (e) => {
@@ -1125,6 +1173,7 @@ export function createPattern(canvas, opts = {}) {
     if (e.type === 'pointerup' && release(was, performance.now())) return;     // it coasts, and settles when it stops
     const moved = settle();
     if (moved) schedule();                                           // the outlined tile was dragged out of sight: it comes back
+    if (usingGL) { quick = false; return; }
     still = setTimeout(() => {
       const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
       quick = false;
@@ -1155,13 +1204,17 @@ export function createPattern(canvas, opts = {}) {
       V = G.fix(mul(T, V), vHand());
     }
     recentre(null);
-    quick = true; clearTimeout(still);
-    still = setTimeout(() => {
-      const moved = settle();
-      const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
-      quick = false;
-      if (moved || model.outline !== false || wasTruncated) schedule();
-    }, 180);     // the outline comes back once it rests
+    quick = !usingGL; clearTimeout(still);
+    if (usingGL) {
+      settle();
+    } else {
+      still = setTimeout(() => {
+        const moved = settle();
+        const wasTruncated = G.kind === 'H' && (!hCache || (hCache.max < H_FULL_MAX && hCache.list.length >= hCache.max));
+        quick = false;
+        if (moved || model.outline !== false || wasTruncated) schedule();
+      }, 180);     // the outline comes back once it rests
+    }
     schedule();
   }, { passive: false });
   canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag) setHot(null); });
@@ -1197,7 +1250,7 @@ export function createPattern(canvas, opts = {}) {
     set(m, o = {}) {
       stopCoast();
       hot = null; hots = []; home = null; if (tipEl) tipEl.hidden = true;
-      if (!m) { model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; desSamples = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
+      if (!m) { usingGL = false; if (gl) gl.setVisible(false); overlayDirty = false; model = null; G = null; sel = null; hCache = null; hMidSamples = []; des = []; desAt = []; desRad = []; desExpNeg = []; desSamples = []; stats = { tiles: 0, drawn: 0 }; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); return; }      // a signature no pattern has
       const keep = !!(o.keepView && model && G && G.kind === m.D.G.kind);
       model = m; G = m.D.G; if (o.sel !== undefined) sel = o.sel; else if (!keep) sel = null; quick = false;
       cache = new Map();
@@ -1235,6 +1288,9 @@ export function createPattern(canvas, opts = {}) {
         }
       }
       size();
+      const wantGL = !!(gl && gl.isReady() && G.kind === 'H' && m.D.n > 0 && m.D.n <= 32 && m.outline === false);
+      usingGL = wantGL ? gl.setModel(m, { des, desAt, desRad, area, smoothClosedPath, locateTile: locateTilePSU }) : false;
+      if (gl) gl.setVisible(usingGL);
       if (!keep) { emaMs = 8; budget = H_FULL_MAX; firstView(); }
       else {
         if (G.kind === 'H') {
@@ -1259,7 +1315,7 @@ export function createPattern(canvas, opts = {}) {
           if (drag && drag.V0) drag.V0 = recentre(drag.V0);
           else recentre(null);
         }
-        if (o.moving) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
+        if (o.moving && !usingGL) { quick = true; clearTimeout(still); still = setTimeout(() => { quick = false; schedule(); }, 180); }
       }
       draw();
     },
@@ -1283,10 +1339,23 @@ export function createPattern(canvas, opts = {}) {
     },
     /** Where a point of the outlined tile (in the tile's own coordinates) is on the canvas, in css px: [x, y]; null with no pattern. */
     projectTile(p) { if (!model) return null; const L = lay(), q = apply(G.kind === 'H' ? psuToSO21(psuMul(vPsu, bPsu)) : mul(V, base), p), k = G.kind === 'H' ? 1 / (1 + q[2]) : 1; return [L.cx + L.R * q[0] * k, L.cy - L.R * q[1] * k]; },
+    /** Read composited RGBA pixel patch around CSS pixel `(xCss, yCss)` (for pixel verification across WebGL2 and 2D). */
+    readPatch(xCss, yCss, rPx = 3) {
+      if (!model) return null;
+      size();
+      if (usingGL && gl && gl.isReady()) {
+        const L = lay();
+        const pick = sel !== null && model.binding && model.binding[sel] ? model.binding[sel] : null;
+        const also = !pick && model.marks ? model.marks : null;
+        return gl.readPatch(xCss, yCss, rPx, canvas, { W, H, dpr, cx: L.cx, cy: L.cy, R: L.R, vPsu, pick, also });
+      }
+      const cxPx = Math.round(xCss * dpr), cyPx = Math.round(yCss * dpr);
+      return ctx.getImageData(cxPx - rPx, cyPx - rPx, 2 * rPx + 1, 2 * rPx + 1).data;
+    },
     draw, redraw: schedule,
     /** For the tests: bring out a glued pair as a pointer on it does. Pairs are named a, b, ... in the order they are met going round the tile (null: none). */
     point(letter) { setHot(letter); if (model) draw(); },
-    state: () => ({ kind: G && G.kind, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
+    state: () => ({ kind: G && G.kind, gl: usingGL, ...stats, V: V.slice(), base: base.slice(), sel, turned: bRev, shapes: des.length, home: home && home.slice(), hot, edges: hots.map((h) => ({ letter: h.letter, x: Math.round(h.x), y: Math.round(h.y), color: css(h.color), heads: h.heads })) }),
   };
   return api;
 }
