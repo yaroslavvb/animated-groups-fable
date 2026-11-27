@@ -513,7 +513,7 @@ export function wrapPointIntoEucFD(point, fdPolygons, gens, genColorMasks) {
  * Compute convex Dirichlet fundamental domain around `p0` under `gens` in E^2,
  * tracking exact generator side-pairings and Z_2^2 quotient color masks.
  */
-function buildEuclideanDirichlet(p0, gens, expectedArea, genColorMasks = null, markers = null) {
+export function buildEuclideanDirichlet(p0, gens, expectedArea, genColorMasks = null, markers = null) {
   if (!gens || gens.length === 0 || !expectedArea || expectedArea <= 0) return null;
   const ptTest = [p0[0], p0[1]];
   const sortedCands = [];

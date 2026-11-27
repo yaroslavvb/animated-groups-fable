@@ -8,7 +8,7 @@ import {
   getCutOptions,
   getCutMarkerSides,
   formatFrac
-} from "./orbifold.js?v=fn-v6";
+} from "./orbifold.js?v=fn-v7";
 
 import {
   ID3,
@@ -29,7 +29,7 @@ import {
   buildRealization,
   generateTiling,
   recutHyperbolic
-} from "./hyperbolic.js?v=fn-v6";
+} from "./hyperbolic.js?v=fn-v7";
 
 import {
   EID3,
@@ -42,7 +42,7 @@ import {
   wrapEuclideanCameraWithColor,
   wrapPointIntoEucFD,
   recutEuclidean
-} from "./euclidean.js?v=fn-v6";
+} from "./euclidean.js?v=fn-v7";
 
 const EUC_VIEW_R = 2.6;
 

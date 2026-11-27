@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PQRS 4-Cone Orbifolds — Spacetime Groups</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎞️</text></svg>">
+<link rel="stylesheet" href="css/style.css?v=collapsible-header-v1">
+<link rel="stylesheet" href="css/fenchel-nielsen.css?v=fn-v7">
+<script defer src="js/site-header.js?v=collapsible-header-v1"></script>
+</head>
+<body class="fn-page">
+<header class="site">
+  <div class="inner">
+    <a class="title" href="index.html">Spacetime Groups</a>
+    <nav>
+      <span class="navgroup">
+        <span class="navgroup-label">Background</span>
+        <a href="index.html">Tutorial</a>
+        <a href="notation.html">Notation</a>
+        <a href="colourings-tutorial.html">Colourings</a>
+        <a href="subgroups-vs-colourings.html">Subgroups</a>
+        <a href="torus-cayley.html">Torus Cayley graphs</a>
+        <a href="hierarchy.html">Hierarchy</a>
+        <a href="history.html">History</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Catalogues</span>
+        <a href="showcase/">Showcase</a>
+        <a href="catalog.html">275 spacetime</a>
+        <a href="wallpaper.html">275 spacetime (grouped)</a>
+        <a href="correspondence.html">68 colored&lt;&gt;polar crystals</a>
+        <a href="patterns.html">609 patterns</a>
+        <a href="escher.html">107 Escher</a>
+        <a href="escher-orbifolds.html">Escher orbifolds</a>
+        <a href="fenchel-nielsen.html">Fenchel–Nielsen</a>
+        <a href="pqrs.html" class="here">PQRS (4-cone)</a>
+        <a href="gallery.html">Gallery</a>
+        <a href="scott-gray-groups.html">Reaction–diffusion</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Colourings</span>
+        <a href="colour/">Entangled colourings</a>
+        <a href="colour/gyre/">Gyre</a>
+        <a href="colour/trefoil/">Trefoil</a>
+        <a href="monochrome/">Monochrome</a>
+        <a href="shubnikov/">Shubnikov</a>
+      </span>
+      <span class="navgroup">
+        <span class="navgroup-label">Developer</span>
+        <a href="reports/">Reports</a>
+        <a href="motifs.html">Motifs</a>
+        <a href="designer.html">Designer</a>
+        <a href="shubnikov/studio/">Studio</a>
+        <a href="billiards.html">Billiards</a>
+      </span>
+      <span class="navgroup navgroup-superseded">
+        <span class="navgroup-label">Superseded</span>
+        <a href="crystals-colored.html">269 coloured crystals</a>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<main class="fn-shell">
+  <div class="fn-topbar">
+    <form class="sig-form" id="sig-form">
+      <label class="sig-label" for="sig-input">Orbifold</label>
+      <input class="sig-input" id="sig-input" type="text" value="3322" spellcheck="false" autocomplete="off" placeholder="e.g. 3322, 2222, 4322, 3333">
+      <button class="btn btn-primary" type="submit">Apply</button>
+    </form>
+    <div class="color-control">
+      <label class="sig-label" for="color-select">Coloring</label>
+      <select class="fn-select" id="color-select">
+        <option value="parity">Parity (2-color)</option>
+        <option value="quotient">Quotient (4-color)</option>
+        <option value="none">None</option>
+      </select>
+    </div>
+    <a class="fn-page-link" href="fenchel-nielsen.html">← All orbifolds</a>
+    <span class="orb-meta" id="orb-meta" aria-live="polite"></span>
+  </div>
+
+  <div class="status-banner" id="status-banner" hidden role="status"></div>
+
+  <div class="fn-stage" id="fn-stage">
+    <div class="disk-col">
+      <canvas id="disk-canvas" width="560" height="560" aria-label="Interactive PQRS 4-cone orbifold tiling"></canvas>
+      <p class="disk-hint">Drag or two-finger scroll to pan · double-click to recenter</p>
+    </div>
+
+    <aside class="controls-col" id="controls-col" aria-label="Simultaneous PQRS partition coordinates">
+      <div class="controls-head">
+        <span class="controls-title">Partitions</span>
+        <button class="btn btn-sm" id="btn-reset" type="button">Reset</button>
+      </div>
+      <div class="sliders-stack" id="sliders-host"></div>
+    </aside>
+  </div>
+</main>
+
+<script type="module" src="js/fenchel-nielsen/pqrs-app.js?v=fn-v7"></script>
+</body>
+</html>
