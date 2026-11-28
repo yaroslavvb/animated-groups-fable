@@ -2,14 +2,10 @@
    (the look is theirs: header, tabs, chips, the quiet field, panes, hints). Only what this page adds or changes. */
 
 :root {
-  --pair1: #0072B2;            /* the active partition's first pair: blue, larger */
-  --pair2: #D55E00;            /* its second pair: orange, smaller */
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --pair1: #56B4E9;
-    --pair2: #FF8A3D;
-  }
+  /* the three partitions, each its own colour for good (colors.js holds the same three values) */
+  --pq-part-1: #0072B2;        /* PQ | RS */
+  --pq-part-2: #D55E00;        /* PR | QS */
+  --pq-part-3: #882E72;        /* PS | QR */
 }
 
 /* ---- header: the title and the two tabs on one line ---- */
@@ -129,27 +125,20 @@
   gap: 5px;
   white-space: nowrap;
 }
-.pq-kdot {
-  display: inline-block;
-  border-radius: 50%;
-  flex: none;
-}
-.pq-k1 { width: 11px; height: 11px; background: var(--pair1); }
-.pq-k2 { width: 8px; height: 8px; background: var(--pair2); }
 .pq-kline {
   display: inline-block;
-  width: 14px;
-  height: 2px;
-  border-radius: 1px;
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
   flex: none;
+  background: var(--ink);
 }
-.pq-kseal1 { background: var(--pair1); }
-.pq-kseal2 { background: var(--pair2); margin-left: -2px; }
-.pq-kloop { height: 1.5px; background: var(--ink); opacity: 0.6; }
-/* the two pillows in 3D: the first pair's pillow in the paper's front tone, the second's in its back tone */
-.pq-kpillow { display: inline-block; width: 12px; height: 12px; border-radius: 2px; flex: none; border: 1px solid rgba(26, 26, 31, 0.18); }
-.pq-kp1 { background: #9ad5cc; }
-.pq-kp2 { background: #f5e6c6; margin-left: -3px; }
+.pq-kline[data-part="1"] { background: var(--pq-part-1); }
+.pq-kline[data-part="2"] { background: var(--pq-part-2); }
+.pq-kline[data-part="3"] { background: var(--pq-part-3); }
+.pq-key-how { color: var(--faint); }
+.pq-kbold { height: 3px; opacity: 0.55; }
+.pq-kthin { height: 1.3px; opacity: 0.55; }
 
 .pq-journey {
   display: flex;
@@ -201,31 +190,21 @@
   min-width: 0;
   border: 1.5px solid var(--hairline);
   border-radius: 12px;
-  background: var(--card);
-  padding: 2px 12px 6px;
-  transition: border-color 0.14s ease, background-color 0.14s ease, box-shadow 0.14s ease;
-}
-.pq-card[data-active="true"] {
-  --part-col: var(--accent);
-  border-color: var(--accent);
   background: var(--ground);
-  box-shadow: 0 0 0 3px var(--accent-soft);
+  padding: 2px 12px 6px;
 }
+/* a card wears its partition's colour for good; no card is dressed as "active" */
+.pq-card[data-part="1"] { --part-col: var(--pq-part-1); }
+.pq-card[data-part="2"] { --part-col: var(--pq-part-2); }
+.pq-card[data-part="3"] { --part-col: var(--pq-part-3); }
 .pq-card-head {
-  appearance: none;
   width: 100%;
   min-height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 0;
-  border: 0;
-  background: transparent;
   color: var(--ink);
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 .pq-card-id {
   display: inline-flex;
@@ -238,36 +217,18 @@
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.pq-pair {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.pq-dot {
+.pq-swatch {
   display: inline-block;
-  border-radius: 50%;
+  width: 22px;
+  height: 4px;
+  border-radius: 2px;
   flex: none;
-  opacity: 0.42;
-  transition: opacity 0.14s ease;
+  background: var(--part-col);
 }
-.pq-pair-1 .pq-dot { width: 11px; height: 11px; background: var(--pair1); }
-.pq-pair-2 .pq-dot { width: 8px; height: 8px; background: var(--pair2); }
-.pq-card[data-active="true"] .pq-dot { opacity: 1; }
 .pq-sep {
   color: var(--faint);
   font-weight: 500;
 }
-.pq-tag {
-  flex: none;
-  font-size: 11.5px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 999px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  visibility: hidden;
-}
-.pq-card[data-active="true"] .pq-tag { visibility: visible; }
 
 .pq-srow {
   display: grid;
@@ -281,7 +242,7 @@
   font-size: 13.5px;
   font-weight: 600;
   line-height: 1.15;
-  color: var(--muted);
+  color: var(--ink);
 }
 .pq-slabel small {
   display: block;
@@ -290,7 +251,6 @@
   color: var(--faint);
   white-space: nowrap;
 }
-.pq-card[data-active="true"] .pq-slabel { color: var(--ink); }
 .pq-swrap {
   position: relative;
   display: flex;
@@ -316,10 +276,7 @@
 .pq-swrap input[type="range"]::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
-  background: var(--hairline);
-}
-.pq-card[data-active="true"] .pq-swrap input[type="range"]::-webkit-slider-runnable-track {
-  background: color-mix(in srgb, var(--accent) 28%, var(--hairline));
+  background: color-mix(in srgb, var(--part-col) 26%, var(--hairline));
 }
 .pq-swrap input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -336,7 +293,7 @@
   height: 4px;
   border: 0;
   border-radius: 2px;
-  background: var(--hairline);
+  background: color-mix(in srgb, var(--part-col) 26%, var(--hairline));
 }
 .pq-swrap input[type="range"]::-moz-range-thumb {
   box-sizing: border-box;
@@ -347,8 +304,8 @@
   background: var(--part-col);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
 }
-.pq-swrap input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
-.pq-swrap input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pq-swrap input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--part-col); outline-offset: 2px; }
+.pq-swrap input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--part-col); outline-offset: 2px; }
 .pq-sticks {
   position: absolute;
   left: 11px;
@@ -414,14 +371,20 @@
 .pq-table td:first-child {
   font-weight: 650;
 }
-.pq-table .pq-tdot {
+.pq-table .pq-tline {
   display: inline-block;
-  border-radius: 50%;
-  margin-right: 6px;
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  margin-right: 7px;
   vertical-align: middle;
 }
-.pq-table tr[data-pair="0"] .pq-tdot { width: 11px; height: 11px; background: var(--pair1); }
-.pq-table tr[data-pair="1"] .pq-tdot { width: 8px; height: 8px; background: var(--pair2); margin-left: 1.5px; margin-right: 7.5px; }
+.pq-table .pq-tline[data-part="1"] { background: var(--pq-part-1); }
+.pq-table .pq-tline[data-part="2"] { background: var(--pq-part-2); }
+.pq-table .pq-tline[data-part="3"] { background: var(--pq-part-3); }
+/* a partition's two pillows read as one group */
+.pq-table tr[data-pair="0"] td { border-bottom-color: transparent; padding-bottom: 1px; }
+.pq-table tr[data-pair="1"] td { padding-top: 1px; }
 .pq-note {
   margin: 6px 0 0;
   color: var(--muted);
@@ -484,7 +447,6 @@
 }
 @media (max-width: 900px) {
   .pq-cards { gap: 8px; }
-  .pq-tag { display: none; }
 }
 
 /* ---- a phone: the two panes stay side by side at half width, then the journey, the cards stacked, the table ---- */
@@ -514,7 +476,6 @@
   #surf-wrap .labels { font-size: 12px; }
   .pq-key { min-height: 0; font-size: 12px; gap: 2px 10px; }
   .pq-cards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
-  .pq-tag { display: inline-block; }
   .pq-srow { grid-template-columns: 54px minmax(0, 1fr) 86px; gap: 8px; }
   .pq-card { padding: 0 12px 4px; }
   .pq-table { font-size: 13px; }

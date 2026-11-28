@@ -35,7 +35,7 @@ test('the template has the build\'s three slots once each, and the tutorial\'s t
 test('the shell: title, the one sentence, the presets in order, the quiet field, two tabs, the journey\'s words', () => {
   assert.match(template, /<title>PQRS pillows<\/title>/);
   assert.match(template, /<h1>PQRS pillows<\/h1>/);
-  assert.ok(template.includes('The orbifold PQRS is two pillows joined along a loop. Each of the three ways to pair its four cone points has its own Length and Twist: move any of them.'));
+  assert.ok(template.includes('The orbifold PQRS is two pillows joined along a loop, in three ways: each way to pair its four cone points has its own colour, Length and Twist. Move any of them.'));
   const chips = [...template.matchAll(/class="chip"[^>]*data-sig="(\d{4})"/g)].map((m) => m[1]);
   assert.deepEqual(chips, PRESETS);
   assert.ok(template.includes('placeholder="or type four orders: 2346"'));

@@ -1,5 +1,6 @@
 // cards.test.js — the three partition cards (src/cards.js), on a small stand-in DOM: what they show, and what they
-// tell the page when a header is clicked, a slider is grabbed, dragged or moved with the keys.
+// tell the page when a slider is grabbed, dragged or moved with the keys. The cards are equals: each wears its
+// partition's colour for good, and none is dressed as the active one.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createCards, twistText, lengthText } from '../src/cards.js';
@@ -44,7 +45,8 @@ test('three cards in the fixed order, named by pairing, the pair with P written 
   assert.deepEqual(host.children.map((c) => c.dataset.key), ['01|23', '02|13', '03|12']);
   assert.deepEqual(ui.read().map((c) => c.label), ['P3 Q3 | R3 S3', 'P3 R3 | Q3 S3', 'P3 S3 | Q3 R3']);
   assert.deepEqual(host.children.map((c) => c.dataset.active), ['true', 'false', 'false']);
-  assert.deepEqual(host.children.map((c) => headOf(c).attrs['aria-pressed']), ['true', 'false', 'false']);
+  // each card wears its partition's colour, by its place in the fixed order, for good
+  assert.deepEqual(host.children.map((c) => c.dataset.part), ['1', '2', '3']);
   // the numbers: the engine's default 3333 (L = 2.634, no twist), and the third loop a quarter turn off
   assert.deepEqual(ui.read().map((c) => c.LText), ['2.634', '2.634', '3.850']);
   assert.deepEqual(ui.read().map((c) => c.twText), ['+0.000', '+0.000', '+0.250']);
@@ -52,22 +54,32 @@ test('three cards in the fixed order, named by pairing, the pair with P written 
   assert.equal(text(outputsOf(host.children[0])[1]), '+0.000 turn');
 });
 
-test('the dots say which pair is blue (first) and which orange, whatever side it is written on', () => {
-  const { host, state } = mount('2345');
-  const cards = cardsOf(state);
-  host.children.forEach((card, i) => {
-    const id = headOf(card).children[0], left = id.children[0], right = id.children[2];
-    const lead = cards[i].pairs[0].includes(0) ? 0 : 1;
-    assert.equal(left.className, `pq-pair pq-pair-${lead + 1}`);
-    assert.equal(right.className, `pq-pair pq-pair-${2 - lead}`);
-    assert.ok(text(left).startsWith('P'), 'the pair with P is on the left');
+test('a card is named by its partition, the pair with P first, behind a swatch of its colour; nothing says "active"', () => {
+  const { host, ui, state } = mount('2345');
+  const look = () => host.children.map((card) => {
+    const id = headOf(card).children[0];
+    return { part: card.dataset.part, swatch: id.children[0].className, left: text(id.children[1]), right: text(id.children[3]), cls: card.className, head: headOf(card).tagName };
   });
+  const before = look();
+  before.forEach((c, i) => {
+    assert.equal(c.swatch, 'pq-swatch');
+    assert.equal(c.part, String(i + 1));
+    assert.ok(c.left.startsWith('P'), 'the pair with P is on the left');
+    assert.equal(c.head, 'DIV', 'the head is a name, not a control');
+  });
+  // make another partition the cut: the cards look exactly as before (data-active alone says which is the cut)
+  for (const key of ['02|13', '03|12', '01|23']) {
+    const flipped = activate(state, key).state;
+    ui.update(cardsOf(flipped), flipped);
+    assert.deepEqual(look(), before, `after ${key} became the cut`);
+    assert.equal(host.children.filter((c) => c.dataset.active === 'true').length, 1);
+  }
 });
 
-test('a header click asks for the activation; nothing else is sent', () => {
+test('the head of a card is not a control: a click on it sends nothing', () => {
   const { host, calls } = mount();
   headOf(host.children[2]).fire('click');
-  assert.deepEqual(calls, [['activate', '03|12']]);
+  assert.deepEqual(calls, []);
 });
 
 test('a slider of an inactive card is grabbed at once: activation first, then the drag', () => {

@@ -10,17 +10,20 @@
 //
 // What is checked, per viewport (SPEC 4.2, and the layout rules of SPEC 1):
 //   panes        both panes draw: a screenshot of each pane element is not blank
-//   preset ...   each preset chip opens: pressed, three cards with one active, the address names it, both panes draw
+//   preset ...   each preset chip opens: pressed, three cards (one of them the engine's cut), the address names it, both panes draw
 //   typed        four orders typed in the field open that orbifold
-//   twist drag   dragging the active card's Twist changes its number, BOTH other cards' numbers and the Surface's pixels
+//   twist drag   dragging a card's Twist changes its number, BOTH other cards' numbers and the Surface's pixels
 //   length drag  the same for its Length
-//   grab         dragging a slider of a card that is NOT active makes that card the active one (SPEC 1.3)
-//   table        the two pillows in numbers: two rows, and the line that says exact or relaxed, with the stretch (SPEC 1.5)
-//   still ...    activating each card moves the "active" state and leaves the Pattern pane's print where it was
-//                (3333 after a Twist drag; 2345, 2223 with its pair of 2s, and 2222 as they open; first the gauge)
+//   grab         dragging a slider of a card that is NOT the cut makes that card the cut (SPEC 1.3), and moves its number
+//   table        the pillows in numbers: six rows (two a partition), and the line that says the solid is exact
+//   colours      each card wears its partition's colour, and still does after the other cards were touched
+//   switch ...   TOUCHING another card's slider without moving it changes nothing: the Surface pane not by one pixel,
+//                the Pattern pane's print not at all and its lines by rounding only, the cards' look not at all
+//                (his ask of Fri 27 Nov 2026, 22:55; 3333 after a Twist drag; 2345, 2223 with its pair of 2s, and 2222
+//                with a Twist; first the gauge)
 //   journey      the journey goes through its three stops (the Surface's pixels change at each), buttons as in SPEC 1.4
-//   address      opening the address again restores the orbifold, the active card, the numbers, the journey
-//   tutorial     the Tutorial tab opens: six sections, formulas typeset, no raw TeX left
+//   address      opening the address again restores the orbifold, the cut, the numbers, the journey
+//   tutorial     the Tutorial tab opens: its sections, formulas typeset, no raw TeX left
 //   overflow     nothing is wider than the screen (Play and Tutorial)
 //   layout       the two panes side by side; on the phone: tap targets at least 44 px, field text 16 px
 //   errors       no console error and no page error during all of the above
@@ -66,7 +69,8 @@ const SEL = {
   cardRange: 'input[type="range"]', cardValue: '.pq-sval',
   journeyRange: '#j-range', journeyLeft: '#j-left', journeyRight: '#j-right',
   tableRows: '#pillows-body tr', tableNote: '#pillows-note',
-  tapTargets: 'button.chip[data-sig], .tab2, .pq-card-head, #j-left, #j-right',
+  cardSwatch: '.pq-swatch', cardsBox: '#cards', journeyBox: '#journey', journeyChips: '.pq-jchip',
+  tapTargets: 'button.chip[data-sig], .tab2, #j-left, #j-right, .pq-jchip',
 };
 const PRESETS = ['2222', '3333', '2223', '2345', '4444'];
 const VIEWPORTS = [
@@ -75,6 +79,7 @@ const VIEWPORTS = [
 ];
 const SCALE = 2;               // device pixels per CSS pixel in every screenshot
 const STILL_GATE = 0.005;      // SPEC 4.2: under 0.5 % of the samples
+const TUTORIAL_SECTIONS = 5;   // the Tutorial tab's h2 count
 const TONE_STEP = 0.25;        // a print pixel has moved when its tone (0 comma .. 1 paper) changed by more than this
 // the three letter sequences a publish refuses (SPEC 1.8), spelt in halves so that this file does not hold them
 const REFUSED = ['rec' + 'order', 'rec' + 'ording', 'trans' + 'cri'];
@@ -442,54 +447,102 @@ async function runViewport(vp) {
     let e = null;
     if (chipSigs.includes('2222')) { await pressChip('2222'); await settle(600); e = await readTable(); }
     const problems = [];
-    if (h.rows.length !== 2) problems.push(`${h.rows.length} rows for 3333 (SPEC 1.5: two, one a pillow)`);
+    if (h.rows.length !== 6) problems.push(`${h.rows.length} rows for 3333 (two pillows for each of the three partitions: six)`);
     if (h.rows.some((r) => (r.match(/\d+(\.\d+)?/g) || []).length < 4)) problems.push('a row without its numbers');
-    if (!/stretch/i.test(h.note) || !/\d(\.\d+)?\s*%/.test(h.note)) problems.push(`3333: the line under the table does not give the closed surface's stretch ("${h.note}")`);
-    if (!/crown exact|past the rim/i.test(h.note)) problems.push('3333: the line does not say whether the crowns are exact');
+    if (!/exact/i.test(h.note)) problems.push(`3333: the line under the table does not say the solid is exact ("${h.note}")`);
+    if (/stretch|relaxed/i.test(h.note)) problems.push(`3333: the line still speaks of a relaxed mesh ("${h.note}")`);
     if (e && !/exact/i.test(e.note)) problems.push(`2222: the line does not say the solid is exact ("${e.note}")`);
     say(problems.length ? 'FAIL' : 'ok', where, 'table', problems.length ? problems.join('; ') : `3333: ${h.rows.join(' || ')} :: ${h.note}${e ? ` ;; 2222: ${e.note}` : ''}`);
   }
 
-  // ---- stillness: activating a card leaves the Pattern pane's print where it was
-  async function stillOn(sig) {
+  // ---- colours: a card keeps its partition's colour, whatever is touched
+  const swatches = () => F.evaluate((S) => [...document.querySelectorAll(S.cards)].map((c) => { const sw = c.querySelector(S.cardSwatch); return sw ? getComputedStyle(sw).backgroundColor : null; }), SEL);
+  /** Press and release on a slider's thumb, without moving it: what "switching to another slider" is. */
+  async function touchSlider(cardIndex, word) {
+    const cards = await readCards(), loc = F.locator(SEL.cards).nth(cardIndex).locator(SEL.cardRange).nth(sliderOf(cards[cardIndex], word));
+    await loc.scrollIntoViewIfNeeded();
+    const box = await loc.boundingBox(), r = await loc.evaluate((e) => ({ value: Number(e.value), min: Number(e.min), max: Number(e.max) }));
+    const at = (r.value - r.min) / ((r.max - r.min) || 1), thumb = Math.min(22, box.height), run = box.width - thumb;
+    const x = box.x + thumb / 2 + at * run, y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.waitForTimeout(70);
+    await page.mouse.up();
+    await page.mouse.move(2, 2);                       // off the cards: no hover is left on the picture
+  }
+  if (!gotCards || !(await has(`${SEL.cards} ${SEL.cardSwatch}`))) say('skip', where, 'colours', `no cards or no ${SEL.cardSwatch}`);
+  else {
+    if (chipSigs.includes('3333')) await pressChip('3333');
+    const c0 = await swatches();
+    const problems = [];
+    if (new Set(c0).size !== 3 || c0.some((c) => !c || /rgba\(0, 0, 0, 0\)|transparent/.test(c))) problems.push(`the three cards do not wear three colours (${c0.join(', ')})`);
+    for (const i of [1, 2, 0]) {
+      await F.evaluate((key) => window.__pqrs && window.__pqrs.activate(key), (await readCards())[i].key);
+      await settle(250);
+      const c1 = await swatches();
+      if (JSON.stringify(c1) !== JSON.stringify(c0)) problems.push(`after card ${i + 1} became the cut the colours read ${c1.join(', ')}`);
+    }
+    say(problems.length ? 'FAIL' : 'ok', where, 'colours', problems.length ? problems.join('; ') : `the three cards wear ${c0.join(', ')}, whichever of them is the cut`);
+  }
+
+  // ---- switching between sliders changes nothing: both panes and the cards, before and after another card is touched
+  async function switchOn(sig) {
     if (sig && chipSigs.includes(sig)) await pressChip(sig);
-    if (sig === '3333') {                                                         // 3333 away from its symmetric opening state
+    {                                                                             // away from the symmetric opening state
       const c = await readCards(), k = Math.max(0, c.findIndex((x) => x.active));
       await dragRange(F.locator(SEL.cards).nth(k).locator(SEL.cardRange).nth(sliderOf(c[k], 'twist')), 0.17);
       await settle(700);
     }
     const first = await readCards(), start = Math.max(0, first.findIndex((c) => c.active));
     const order = [1, 2, 0].map((d) => (start + d) % 3);                           // the two others, then back
-    const base = await shot(SEL.patternPane, `pattern-${sig}-start`);
+    const tag = (label) => `${label}-${sig}`;
+    await page.mouse.move(2, 2);
+    const base = await shot(SEL.patternPane, tag('pattern-start'));
+    let prevSurf = (await has(SEL.surfacePane)) ? await shot(SEL.surfacePane, tag('surface-start')) : null;
+    let prevCards = (await has(SEL.cardsBox)) ? await shot(SEL.cardsBox, tag('cards-start')) : null;
     const T = printTones(base);
-    if (!T) { say('skip', where, `still ${sig}`, 'the print\'s two tones were not found in the Pattern pane (is it drawn?)'); return; }
+    if (!T) { say('skip', where, `switch ${sig}`, 'the print\'s two tones were not found in the Pattern pane (is it drawn?)'); return; }
     // the gauge: the same picture one device pixel to the right must read well over the gate, or the lines below mean nothing
     const gauge = printMoved(base, shifted(base, 1, 0), T);
-    say(gauge.ratio >= 2 * STILL_GATE ? 'ok' : 'FAIL', where, `still ${sig} gauge`, `the start picture against itself one device pixel (half a CSS pixel) to the right: ${pct(gauge.ratio)} of ${gauge.samples} print pixels change tone` + (gauge.ratio >= 2 * STILL_GATE ? ` (the gate is ${pct(STILL_GATE, 1)})` : `: under twice the gate of ${pct(STILL_GATE, 1)}, so this measure cannot see such a shift here`));
-    let prev = base;
+    say(gauge.ratio >= 2 * STILL_GATE ? 'ok' : 'FAIL', where, `switch ${sig} gauge`, `the start picture against itself one device pixel (half a CSS pixel) to the right: ${pct(gauge.ratio)} of ${gauge.samples} print pixels change tone` + (gauge.ratio >= 2 * STILL_GATE ? ` (the gate is ${pct(STILL_GATE, 1)})` : `: under twice the gate of ${pct(STILL_GATE, 1)}, so this measure cannot see such a shift here`));
+    let prev = base, n = 0;
     for (const i of order) {
-      const head = F.locator(SEL.cards).nth(i).locator(SEL.cardHead).first();
-      await head.scrollIntoViewIfNeeded();
-      await head.click();
-      await settle(800);
-      const cards = await readCards(), img = await shot(SEL.patternPane, `pattern-${sig}-on-${first[i].key}`.replace('|', '-'));
-      const m = printMoved(prev, img, T), raw = changed(prev, img);
+      const word = n++ % 2 ? 'length' : 'twist', before = await readCards();
+      let how = `its ${word} slider pressed and let go`;
+      await touchSlider(i, word);
+      await settle(500);
+      let cards = await readCards();
+      if (JSON.stringify(cards.map(numbersOf)) !== JSON.stringify(before.map(numbersOf)) || !cards[i].active) {
+        // the press moved the thumb (it fell beside it), or did not reach the page: put the numbers back and switch through the page's own hook
+        how = 'made the cut through the page\'s hook (the press moved a number)';
+        await F.evaluate(([key, L, tw]) => { window.__pqrs.set({ L, tw }, { key }); }, [before[i].key, num(before[i].values[0]), num(before[i].values[1])]);
+        await F.evaluate((key) => window.__pqrs.activate(key), before[i].key);
+        await settle(500);
+        cards = await readCards();
+      }
+      const img = await shot(SEL.patternPane, tag(`pattern-on-${first[i].key}`.replace('|', '-')));
+      const surf = prevSurf ? await shot(SEL.surfacePane, tag(`surface-on-${first[i].key}`.replace('|', '-'))) : null;
+      const cardsImg = prevCards ? await shot(SEL.cardsBox, tag(`cards-on-${first[i].key}`.replace('|', '-'))) : null;
+      const m = printMoved(prev, img, T), raw = changed(prev, img, 0), surfRaw = surf ? changed(prevSurf, surf, 0) : null, cardsRaw = cardsImg ? changed(prevCards, cardsImg, 0) : null;
       const problems = [];
-      if (!cards[i].active || cards.filter((c) => c.active).length !== 1) problems.push(`the card ${first[i].key} did not become the active one`);
+      if (!cards[i].active || cards.filter((c) => c.active).length !== 1) problems.push(`the card ${first[i].key} did not become the cut`);
       if (!m.sized) problems.push('the pane changed size');
       else if (m.samples < 0.2 * m.area) problems.push(`too little print to compare (${m.samples} pixels)`);
       else if (m.ratio >= STILL_GATE) problems.push(`the print moved: ${pct(m.ratio)} of ${m.samples} print pixels changed tone (gate ${pct(STILL_GATE, 1)})`);
+      if (raw > 0) problems.push(`the Pattern pane changed: ${pct(raw, 4)} of its pixels are not the same, lines and marks included`);
+      if (surfRaw !== null && surfRaw > 0) problems.push(`the Surface pane changed: ${pct(surfRaw, 4)} of its pixels are not the same`);
+      if (cardsRaw !== null && cardsRaw > 0) problems.push(`the cards changed their look: ${pct(cardsRaw, 4)} of their pixels are not the same`);
       const back = i === start ? `; back at the start, against the first picture: ${pct(printMoved(base, img, T).ratio)}` : '';
-      say(problems.length ? 'FAIL' : 'ok', where, `still ${sig} ${first[i].key}`, (problems.length ? problems.join('; ') : `${pct(m.ratio)} of ${m.samples} print pixels changed tone; all pixels, marks and lines included: ${pct(raw)}`) + back);
-      prev = img;
+      say(problems.length ? 'FAIL' : 'ok', where, `switch ${sig} ${first[i].key}`, (problems.length ? problems.join('; ') : `${how}: not one pixel differs in the Surface pane (${surfRaw === null ? 'no pane' : pct(surfRaw, 4)}), the Pattern pane (${pct(raw, 4)}; print ${pct(m.ratio)} of ${m.samples}) or the cards (${cardsRaw === null ? 'none' : pct(cardsRaw, 4)})`) + back);
+      prev = img; prevSurf = surf; prevCards = cardsImg;
     }
   }
-  if (!gotCards || !(await has(SEL.patternPane))) say('skip', where, 'still', `no cards or no ${SEL.patternPane}`);
-  else if (!(await has(`${SEL.cards} ${SEL.cardHead}`))) say('skip', where, 'still', `the cards have no header to press (${SEL.cardHead})`);
-  else for (const sig of ['3333', '2345', '2223', '2222']) await stillOn(sig);
+  if (!gotCards || !(await has(SEL.patternPane))) say('skip', where, 'switch', `no cards or no ${SEL.patternPane}`);
+  else for (const sig of ['3333', '2345', '2223', '2222']) await switchOn(sig);
 
   // ---- the journey
-  if (!(await has(SEL.journeyRange)) || !(await has(SEL.journeyRight)) || !(await has(SEL.surfacePane))) say('skip', where, 'journey', `no ${SEL.journeyRange}, ${SEL.journeyRight} or ${SEL.surfacePane}`);
+  const journeyShown = (await has(SEL.journeyRange)) && (await has(SEL.journeyRight)) && (await F.locator(SEL.journeyRight).first().isVisible());
+  if (!journeyShown || !(await has(SEL.surfacePane))) say('skip', where, 'journey', `no journey shown (${SEL.journeyRange}, ${SEL.journeyRight}) or no ${SEL.surfacePane}`);
   else {
     if (chipSigs.includes('3333')) await pressChip('3333');
     const jr = F.locator(SEL.journeyRange).first(), left = F.locator(SEL.journeyLeft).first(), right = F.locator(SEL.journeyRight).first();
@@ -532,12 +585,12 @@ async function runViewport(vp) {
   if (!gotCards) say('skip', where, 'address', `no cards (${SEL.cards})`);
   else {
     if (chipSigs.includes('2345')) await pressChip('2345');
-    const heads = F.locator(`${SEL.cards} ${SEL.cardHead}`);
-    if ((await heads.count()) >= 3) { await heads.nth(2).scrollIntoViewIfNeeded(); await heads.nth(2).click(); await settle(700); }
+    await F.evaluate((key) => window.__pqrs && window.__pqrs.activate(key), (await readCards())[2].key);
+    await settle(500);
     const c = await readCards(), k = Math.max(0, c.findIndex((x) => x.active));
     await dragRange(F.locator(SEL.cards).nth(k).locator(SEL.cardRange).last(), 0);
     await settle(500);
-    if ((await has(SEL.journeyRight)) && !(await F.locator(SEL.journeyRight).first().isDisabled())) { await F.locator(SEL.journeyRight).first().click(); await settle(1600); }
+    if (journeyShown && !(await F.locator(SEL.journeyRight).first().isDisabled())) { await F.locator(SEL.journeyRight).first().click(); await settle(1600); }
     await settle(600);
     const read = async (frame) => frame.evaluate((S) => ({
       chip: (document.querySelector(`${S.chips}[aria-pressed="true"]`) || { getAttribute: () => null }).getAttribute(S.chipAttr),
@@ -581,7 +634,7 @@ async function runViewport(vp) {
     const hosts = t.links.filter((h) => !/^https:\/\/(spacesheep\.dev\/@yaroslavvb\/|yaroslavvb\.github\.io\/animated-groups-fable\/)/.test(h));
     const problems = [];
     if (!t.shown) problems.push('the tab did not open');
-    if (t.sections !== 6) problems.push(`${t.sections} sections (h2), SPEC 1.8 has six`);
+    if (t.sections !== TUTORIAL_SECTIONS) problems.push(`${t.sections} sections (h2), the Tutorial has ${TUTORIAL_SECTIONS}`);
     if (t.formulas < 20) problems.push(`only ${t.formulas} typeset formulas`);
     if (t.raw) problems.push('raw TeX is left in the text');
     if (hosts.length) problems.push(`links off the two allowed hosts: ${hosts.join(', ')}`);

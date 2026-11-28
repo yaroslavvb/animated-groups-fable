@@ -62,13 +62,19 @@
 // In the page this file sits at standalone/pqrs-pillows/src/, so the import below is the real one.
 
 import { createRenderer } from '../../the-folding/src/render3d.js';
+import { PART_RGB, INK_RGB } from './colors.js';
 
-const INK = [26 / 255, 26 / 255, 31 / 255], BLUE = [0, 0.447, 0.698], ORANGE = [0.835, 0.369, 0];
-/** The page's look (SPEC 1.1, 1.4): the first pair blue #0072B2 and larger, the second orange #D55E00 and smaller. */
+const INK = INK_RGB;
+/**
+ * The page's look. A curve takes the colour of its PARTITION (colors.js: PQ|RS blue, PR|QS vermillion, PS|QR purple),
+ * whichever card is active; a seal is drawn bold, a loop thin. The four cone points are ink dots of one size: a pair
+ * is shown by the seal that joins it.
+ */
 export const LOOK = {
-  loop: { color: INK, width: 1.8, xray: 0.3 },
-  seals: [{ color: BLUE, width: 3, xray: 0.3 }, { color: ORANGE, width: 3, xray: 0.3 }],
-  marks: [{ color: BLUE, size: 13, labelColor: '#0072b2' }, { color: ORANGE, size: 9.5, labelColor: '#b04d00' }],   // (the orange label a shade darker: 5:1 on white)
+  parts: PART_RGB,
+  seal: { width: 3, xray: 0.3 },
+  loop: { width: 1.3, alpha: 0.75, xray: 0.1 },
+  mark: { color: INK, size: 9, labelColor: '' },
 };
 
 const DEFAULTS = {
@@ -290,15 +296,14 @@ export function createSurfacePane(canvas, opts = {}) {
       else setPositions(f.positions);
       shown.version = f.version; shown.cornersVersion = f.cornersVersion; shown.uv = uv ? (fresh ? Float32Array.from(uv) : shown.uv) : null;
       curves = (f.curves || []).filter((c) => c && (c.chain || c.points)).map((c) => {
-        const st = c.id === 'seal0' ? look.seals[0] : c.id === 'seal1' ? look.seals[1] : c.id === 'loop' ? look.loop : (c.pillow === 1 ? look.seals[1] : look.loop);
-        return { ...st, ...c };
+        const color = look.parts[c.part] || INK, st = c.id === 'loop' ? look.loop : look.seal;
+        return { color, ...st, ...c };
       });
       const labels = o.labels, orders = o.orders || f.orders;
       marks = (f.marks || []).filter(Boolean).map((k) => {
-        const st = look.marks[k.pair === 1 ? 1 : 0];
         let label = k.label;
         if (label == null) label = typeof labels === 'function' ? labels(k) : labels && labels[k.id] != null ? labels[k.id] : orders && orders[k.feature] != null ? String(k.id) + orders[k.feature] : k.id;
-        return { ...st, ...k, label };
+        return { ...look.mark, ...k, label };
       });
     } finally { hold = false; }
     place();

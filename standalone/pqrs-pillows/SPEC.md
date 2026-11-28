@@ -1,5 +1,26 @@
 # PQRS pillows: the binding spec (v1, Fri 27 Nov 2026, 16:15)
 
+## v2: what replaced what (Fri 27 Nov 2026, 23:00 on; his asks of 22:55)
+
+His words about v1: *"I don't want to switch colors, so the lines between different edges should keep their colors.
+I should be able to adjust different sliders, and when I switch between sliders, there shouldn't be any change. The
+only change will be when I'm actually moving the slider, so maybe the image can always be painted there
+correspondingly. The surface currently looks quite wobbly maybe find a better surface parameterization."*
+
+Where the text below and this section disagree, this section wins. `README.md` describes the page as it is.
+
+| v1, below | v2 |
+|---|---|
+| § 1.1: the ACTIVE partition's first pair blue and larger, its second pair orange and smaller, everywhere | a partition owns a colour for good: PQ\|RS blue `#0072B2`, PR\|QS vermillion `#D55E00`, PS\|QR purple `#882E72` (its two seals, its loop, its card, its rows). Cone points are marked alike. No card looks active |
+| § 1.2: the active partition's seals and loop on the pattern | every partition's two seals (bold) and loop (thin), always |
+| § 1.2, § 1.4: on activation the pattern is redrawn where it was and the surface is carried to the new cut's mesh | a flip redraws NOTHING in either pane; the next slider move lays the new cut where the picture is. Gate: not one pixel differs (tools/check.mjs "switch") |
+| § 1.3: touching a card that is not active "first makes it active" (visibly) | the same bookkeeping, with nothing to see; a card's head is a name, not a control |
+| § 1.4: the closed surface is `orbifoldMesh` relaxed by `solver.js`; pose: the active loop level; the second pillow shaded | the surface is the exact solid of `solid.js` (a tetrahedron of hyperbolic space with the six seals as edges, shown in the Poincaré ball; 2222 in ordinary space), the same for every cut; one paper tone; the pose is carried by the four named cone points |
+| § 1.4: the journey parts the active partition's pillows | the journey is hidden until it is rebuilt on the solid with its own choice of loop |
+| § 1.5: a table of the active partition's two pillows; the closed surface's stretch | six rows, two for each partition; the line says the solid is exact |
+| § 3.2 `solver.js`; § 3.3 `sm.flip`, the frame's pillows and chains | no solver; `sm.set`, `sm.update(state, { hold })`, `sm.frame()`, `sm.relevel()`: curves and marks come as points |
+
+
 Read `BRIEF.md` first. This file says WHAT is built and where each piece lives. Where it and an older note
 disagree, this file wins. Change it only by telling the orchestrator.
 

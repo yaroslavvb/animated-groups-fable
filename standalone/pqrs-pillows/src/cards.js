@@ -3,17 +3,24 @@
 // pairing) after every change, and is told what the reader did:
 //
 //   const ui = createCards(host, { onActivate(key), onInput(key, { L } | { tw }, { dragging, range }), format? });
-//   ui.update(cards, state)         every card refreshed: header, dots, the "active" tag, both sliders and numbers
+//   ui.update(cards, state)         every card refreshed: its name, both sliders and numbers
 //                                   (state: the engine's, read only for the features' orders: "P3 Q3 | R3 S3")
+//
+// THE THREE CARDS ARE EQUALS (his ask, Fri 27 Nov 2026, 22:55: "when I switch between sliders, there shouldn't be
+// any change. The only change will be when I'm actually moving the slider"). Each wears its partition's own colour
+// (colors.js, page.css --pq-part-1 … 3: the colour of its seals and its loop in both panes), always. No card looks
+// "active": which loop is the engine's cut is bookkeeping (data-active says it, for the checks; nothing is styled by
+// it), and grabbing another card's slider changes nothing until the slider moves.
 //
 // `range` is the slider's own [lo, hi] at the moment of the grab: a Length slider's range follows its number, and
 // is held still while a finger is on it. `format` = { length(L), twist(tw) } -> text (the default: three decimals).
 //
-// A slider of a card that is not active can be grabbed at once: its pointerdown first calls onActivate(key) (the
-// page makes that partition the cut: a flip, nothing of the geometry changes), and the drag goes on in the same
+// A slider of a card that is not the cut can be grabbed at once: its pointerdown first calls onActivate(key) (the
+// page makes that partition the cut: a flip, nothing on the page changes), and the drag goes on in the same
 // gesture. Under a finger the activation waits for the slider's first movement (onInput for a card that is not
-// active: the page activates it first), so that scrolling the page across the cards flips nothing. The sliders are native ranges (as on The real 2222), 44 px tall; the arrow keys move a focused slider
-// (Shift: a fine step), Page Up / Down ten steps, Home / End the ends.
+// the cut: the page activates it first), so that scrolling the page across the cards flips nothing. The sliders are
+// native ranges (as on The real 2222), 44 px tall; the arrow keys move a focused slider (Shift: a fine step), Page
+// Up / Down ten steps, Home / End the ends.
 
 const clamp = (x, lo, hi) => Math.max(lo, Math.min(hi, x));
 const TW_TICKS = [-0.5, -0.25, 0, 0.25, 0.5];
@@ -87,24 +94,23 @@ export function createCards(host, opts = {}) {
     return S;
   }
 
-  function build(card) {
+  function build(card, index) {
     const slot = { key: card.key, active: false };
     const root = el('article', 'pq-card');
     root.dataset.key = card.key;
-    const head = el('button', 'pq-card-head');
-    head.type = 'button';
+    root.dataset.part = String(index + 1);           // the partition's colour (page.css), fixed for good
+    const head = el('div', 'pq-card-head');
     const id = el('span', 'pq-card-id');
-    // the pair with P is always written first, so a card's name stays put; the dots say which pair is which
-    const pair = () => { const p = el('span', 'pq-pair'), dot = el('i', 'pq-dot'), t = el('span', '', ''); p.append(dot, t); return { p, t }; };
-    const p1 = pair(), p2 = pair();
-    id.append(p1.p, el('span', 'pq-sep', '|'), p2.p);
-    const tag = el('span', 'pq-tag', 'active');
-    head.append(id, tag);
-    head.addEventListener('click', () => onActivate(slot.key));
+    // a short piece of the partition's line, then its two pairs; the pair with P is always written first
+    const swatch = el('i', 'pq-swatch');
+    swatch.setAttribute('aria-hidden', 'true');
+    const t1 = el('span', 'pq-pair', ''), t2 = el('span', 'pq-pair', '');
+    id.append(swatch, t1, el('span', 'pq-sep', '|'), t2);
+    head.append(id);
     const len = sliderRow(slot, 'L'), tw = sliderRow(slot, 'tw');
     root.append(head, len.row, tw.row);
     host.appendChild(root);
-    Object.assign(slot, { root, head, e1: p1.p, e2: p2.p, t1: p1.t, t2: p2.t, len, tw });
+    Object.assign(slot, { root, head, t1, t2, len, tw });
     return slot;
   }
 
@@ -131,22 +137,17 @@ export function createCards(host, opts = {}) {
     }
     current = cards;
     cards.forEach((card, i) => {
-      const slot = slots[i] || (slots[i] = build(card));
+      const slot = slots[i] || (slots[i] = build(card, i));
       slot.key = card.key;
       slot.active = !!card.active;
       slot.root.dataset.key = card.key;
-      slot.root.dataset.active = String(!!card.active);
-      slot.head.setAttribute('aria-pressed', String(!!card.active));
-      // card.pairs[0] is the pair that is blue and larger once the card is active, pairs[1] the orange one
+      slot.root.dataset.active = String(!!card.active);          // for the checks; nothing is styled by it
       const name = (pr) => pr.slice().sort((x, y) => x - y).map((f) => labelOf(f)).join(' ');
       const lead = card.pairs[0].includes(0) ? 0 : 1;
       const a = name(card.pairs[lead]), b = name(card.pairs[1 - lead]);
       if (slot.t1.textContent !== a) slot.t1.textContent = a;
       if (slot.t2.textContent !== b) slot.t2.textContent = b;
-      const c1 = `pq-pair pq-pair-${lead + 1}`, c2 = `pq-pair pq-pair-${2 - lead}`;
-      if (slot.e1.className !== c1) slot.e1.className = c1;
-      if (slot.e2.className !== c2) slot.e2.className = c2;
-      slot.head.setAttribute('aria-label', `Partition ${a} | ${b}${card.active ? ', active' : ': make it the active one'}`);
+      slot.root.setAttribute('aria-label', `Partition ${a} | ${b}`);
       if (slot.len.sub) { slot.len.sub.hidden = !flat; if (flat && slot.len.sub.textContent !== 'pair spacing') slot.len.sub.textContent = 'pair spacing'; }
       setSlider(slot.len, card.L, card.lRange || [0.4, 7], fmtL(card.L), `Length of the loop ${a} | ${b}${flat ? ' (pair spacing)' : ''}`);
       setSlider(slot.tw, card.tw, card.twRange || [-0.5, 0.5], fmtTw(card.tw), `Twist of the loop ${a} | ${b}, in turns`);

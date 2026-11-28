@@ -51,7 +51,7 @@ export const CARD_KEYS = ['01|23', '02|13', '03|12'];
  * seal, so at -20 the doubled square of 3333 and the flat envelope of 2222 stood edge-on. 70 = 90 - 20: the seal
  * across the screen, P to the left, turned by the spec's 20 degrees (the view of Twist of 2222's solid).
  */
-export const DEFAULT_UI = Object.freeze({ j: 0, az: 70, el: 14 });
+export const DEFAULT_UI = Object.freeze({ j: 0, az: 55, el: 16 });
 
 // The Length slider's own range, and how far a Length may go at all. A flip can lead outside the slider's range
 // (seen: 0.11 to 11.4 from 0.4 .. 7), so a card's range follows its number by 8 %, up to the outer limits.
@@ -381,3 +381,16 @@ export function pillowsOf(state) {
 export const lengthText = (L) => Number(L).toFixed(3);
 /** A Twist in turns, signed, three decimals, with a true minus and never a "-0.000": "+0.250", "−0.125", "+0.000". */
 export const twistText = (tw) => { const t = Number(Number(tw).toFixed(3)); return `${t < 0 ? '−' : '+'}${Math.abs(t).toFixed(3)}`; };
+
+/**
+ * The pillows of all three partitions, in the cards' fixed order: [{ key, rows: [pillow, pillow] }], each partition's
+ * pillow that holds the lowest feature first. Nothing here depends on which partition is the cut.
+ */
+export function pillowsByPartition(state) {
+  const own = keyOf(state);
+  return CARD_KEYS.map((key) => {
+    const st = key === own ? state : flip(state, key).state;
+    const rows = pillowsOf(st).slice().sort((a, b) => Math.min(...a.features) - Math.min(...b.features));
+    return { key, rows };
+  });
+}

@@ -12,8 +12,8 @@
 // signature and a link are drawn at once, in the task that asked.
 
 import {
-  PRESETS, DEFAULT_UI, stateFor, kindOf, keyOf, featureLabel, cardsOf, activate, withNumbers, toHash, fromHash, pillowsOf,
-  lengthText, twistText,
+  PRESETS, DEFAULT_UI, CARD_KEYS, stateFor, kindOf, keyOf, featureLabel, cardsOf, activate, withNumbers, toHash, fromHash, pillowsOf,
+  pillowsByPartition, lengthText, twistText,
 } from './state.js';
 import { createPatternGlue } from './pattern-glue.js';
 import { createCards } from './cards.js';
@@ -34,7 +34,7 @@ const now = () => (window.performance ? window.performance.now() : Date.now());
 
 // ---- the one state, the one ui -------------------------------------------------------------------------------------
 let state = null;
-const ui = { j: DEFAULT_UI.j, az: DEFAULT_UI.az, el: DEFAULT_UI.el };
+const ui = { j: DEFAULT_UI.j, jp: 0, az: DEFAULT_UI.az, el: DEFAULT_UI.el };      // jp: the partition the journey parts along (0..2)
 let tab = 'play';
 
 const glue = createPatternGlue($('pattern'), { tip: $('tip') });
@@ -45,11 +45,13 @@ const cards = createCards($('cards'), {
 });
 
 // ---- the Surface pane: mountSurface(host) once, showSurface(state, { flip, dragging }) on every change ---------------
-const PAIR_BLUE = [0, 0.447, 0.698], PAIR_ORANGE = [0.835, 0.369, 0], INK = [0.102, 0.102, 0.122];
+// The surface is the solid of solid.js: exact, and the same whichever card is active. So an activation (a flip) does
+// NOT come here at all: the picture stays as it is, pixel for pixel (his ask, Fri 27 Nov 2026, 22:55). Everything
+// drawn is made for surface.sm.state, the state the picture was last made for; its pair frame is the print's chart.
 const surface = {
   on: false, sm: null, pane: null, print: null,
-  started: false, version: null, stats: null, exact: null, fails: 0, error: null,
-  lastBake: -1e9, bakeMs: 0, bakeTimer: 0, baked: '', bakedFor: null, charted: false, settle: 0, settleLeft: 0, userView: false,
+  started: false, version: null, exact: null, info: null, fails: 0, error: null,
+  lastBake: -1e9, bakeMs: 0, bakeTimer: 0, baked: '', bakedFor: null, charted: false, userView: false,
   ms: { model: 0, bake: 0, baked: false, chart: 0, pane: 0 },      // the last frame's script time, part by part (for the checks)
 };
 
@@ -71,8 +73,8 @@ function surfaceFailed(err) {
 function mountSurface(host) {
   if (!SURFACE || typeof createSurfaceModel !== 'function' || typeof createSurfacePane !== 'function') return false;
   try {
-    surface.sm = createSurfaceModel({ nVertices: 2600 });
-    surface.pane = createSurfacePane(host.canvas, { labelLayer: host.labels, view: { az: ui.az, el: ui.el, zoom: 1 }, sides: 'paper' });
+    surface.sm = createSurfaceModel({ levels: 5 });
+    surface.pane = createSurfacePane(host.canvas, { labelLayer: host.labels, view: { az: ui.az, el: ui.el, zoom: 1 } });
     if (surface.pane && surface.pane.ok === false) throw new Error('no WebGL2 for the surface');
     try { surface.print = typeof createPrint3d === 'function' ? createPrint3d() : null; } catch (err) { surface.print = null; }
     if (typeof surface.pane.onView === 'function') {
@@ -98,12 +100,12 @@ function mountSurface(host) {
 }
 
 /**
- * The print on the surface: the pattern's own commas, baked for this state (print3d.js). Returns true when the
- * texture now shown is this state's. A failure leaves the surface in its plain tones for good.
+ * The print on the surface: the pattern's own commas, baked for the state the picture is made for (print3d.js).
+ * Returns true when the texture now shown is that state's. A failure leaves the surface in its plain tone for good.
  */
-function bakePrint(st, size) {
-  const S = surface;
-  if (!S.on || !S.print || typeof S.print.bake !== 'function') return false;
+function bakePrint(size) {
+  const S = surface, st = S.sm.state;
+  if (!S.on || !S.print || typeof S.print.bake !== 'function' || !st) return false;
   try {
     const t0 = now(), pr = S.print.bake(st, { size });
     S.bakeMs = now() - t0; S.lastBake = now();
@@ -112,44 +114,43 @@ function bakePrint(st, size) {
     S.bakedFor = pr ? st : null;                  // print3d's chartOf folds with THIS state's motions from here on
     return !!pr;
   } catch (err) {
-    S.print = null;                               // plain tones from here on
+    S.print = null;                               // the plain tone from here on
     try { S.pane.setPrint(null); } catch (e) { /* nothing to undo */ }
-    if (typeof console !== 'undefined') console.warn('PQRS pillows: the print could not be baked; the surface keeps its plain tones:', err);
+    if (typeof console !== 'undefined') console.warn('PQRS pillows: the print could not be baked; the surface keeps its plain tone:', err);
     return false;
   }
 }
 
 /**
  * One frame of the surface: the model's frame at the journey's place, handed to the pane.
- *   bake   'auto': the state changed (a full print at once; while a slider is dragged a small one, every frame
- *          where a bake is quick, else at most every 90 ms, and the full one 200 ms after the last change);
- *          'full': that late full print; null: the state is the one drawn last (the journey moved, the solver
- *          settled).
+ *   bake   'auto': the picture's state changed (a full print at once; while a slider is dragged a small one, every
+ *          frame where a bake is quick, else at most every 90 ms, and the full one 200 ms after the last change);
+ *          'full': that late full print; null: the state is the one drawn last (the journey moved).
  * The chart points go with the bake: print3d folds with the motions of the state baked last, so they are taken anew
  * only when a bake was made, or when the mesh itself is another.
  */
-function drawSurfaceFrame(st, { dragging = false, bake = null } = {}) {
-  const S = surface, tA = now(), fr = S.sm.frame(clamp(ui.j, 0, 2));
-  const labelOf = (m) => featureLabel(st, m.feature);
+function drawSurfaceFrame({ dragging = false, bake = null } = {}) {
+  const S = surface, st = S.sm.state, tA = now(), fr = S.sm.frame(clamp(ui.j, 0, 2), ui.jp);
   let baked = false;
   if (S.print && bake) {
     // a bake is a few ms here: under a drag every frame gets a small one; where a bake is slow they are spaced out
     const slow = S.bakeMs > 90, quick = S.bakeMs < 12;
-    if (bake === 'full') baked = bakePrint(st, 1024);
-    else if (!dragging && !slow) baked = bakePrint(st, 1024);
-    else if (quick || now() - S.lastBake >= (slow ? 240 : 90)) baked = bakePrint(st, 512);
+    if (bake === 'full') baked = bakePrint(1024);
+    else if (!dragging && !slow) baked = bakePrint(1024);
+    else if (quick || now() - S.lastBake >= (slow ? 240 : 90)) baked = bakePrint(512);
     clearTimeout(S.bakeTimer);
     if (bake === 'auto' && (dragging || slow)) {
       S.bakeTimer = setTimeout(() => {
-        if (!S.on || !S.started || !S.print || S.baked === `${toHash(state, {})}@1024`) return;
-        try { drawSurfaceFrame(state, { bake: 'full' }); } catch (err) { surfaceFailed(err); }
+        const at = S.sm.state;
+        if (!S.on || !S.started || !S.print || !at || S.baked === `${toHash(at, {})}@1024`) return;
+        try { drawSurfaceFrame({ bake: 'full' }); } catch (err) { surfaceFailed(err); }
       }, 200);
     }
   }
-  // A new mesh needs a new chart, and a chart is only right beside the texture of ITS state (the pane owner's note 2):
-  // where this frame's bake was skipped (a slow bake under a drag) and the triangles changed, bake after all.
-  const needChart = fr.version !== S.version || !S.charted;
-  if (S.print && !baked && needChart && S.bakedFor !== st) baked = bakePrint(st, dragging ? 512 : 1024);
+  // A new mesh needs a new chart, and a chart is only right beside the texture of ITS state: where this frame's bake
+  // was skipped (a slow bake under a drag) and the corners changed, bake after all.
+  const needChart = fr.version !== S.version || fr.cornersVersion !== S.cornersVersion || !S.charted;
+  if (S.print && !baked && needChart && S.bakedFor !== st) baked = bakePrint(dragging ? 512 : 1024);
   // uv: undefined keeps the chart shown (the pane's rule), null is no print, an array is this state's chart
   const tB = now();
   let uv;
@@ -161,89 +162,39 @@ function drawSurfaceFrame(st, { dragging = false, bake = null } = {}) {
     } catch (err) { uv = null; }
   }
   const tC = now();
-  if (typeof S.pane.showFrame === 'function') {
-    const o = { labels: labelOf, render: false };
-    if (uv !== undefined) o.uv = uv;
-    S.pane.showFrame(fr, o);
-  } else {
-    // the prototype pane (no showFrame): the same through its setters
-    if (fr.version !== S.version || uv) S.pane.setMesh({ positions: fr.positions, triangles: fr.triangles, pillow: fr.pillow, uv: uv || null });
-    else S.pane.setPositions(fr.positions);
-    S.pane.setCurves((fr.curves || []).map((c) => ({
-      id: c.id, chain: c.chain, pillow: c.pillow, closed: !!c.closed,
-      color: c.id === 'loop' ? INK : c.id === 'seal0' ? PAIR_BLUE : PAIR_ORANGE, width: c.id === 'loop' ? 1.8 : 3, xray: 0.3,
-    })));
-    S.pane.setMarks((fr.marks || []).map((m) => ({
-      id: m.id, vertex: m.vertex, pillow: m.pillow, label: labelOf(m),
-      color: m.pair ? PAIR_ORANGE : PAIR_BLUE, labelColor: m.pair ? '#b04d00' : '#0072b2', size: m.pair ? 9.5 : 13,
-    })));
-    if (fr.frame) S.pane.setFrame(fr.frame);
-  }
-  S.version = fr.version;
-  S.stats = fr.stats || null;
+  const o = { render: false };
+  if (uv !== undefined) o.uv = uv;
+  S.pane.showFrame(fr, o);
+  S.version = fr.version; S.cornersVersion = fr.cornersVersion;
   S.exact = fr.exact;
+  S.info = { kind: fr.kind, flat: fr.flat, thick: fr.thick, swaps: fr.swaps, edges: fr.edges };
   S.pane.render();
   S.ms.bake = baked ? tB - tA : 0; S.ms.baked = baked; S.ms.chart = tC - tB; S.ms.pane = now() - tC;
   return fr;
 }
 
-/** After a change the solver may still be settling: a few more frames of it, while nothing else is asked. */
-function settleSurface() {
-  const S = surface;
-  cancelAnimationFrame(S.settle);
-  // A solver that says whether it is settling (solver.js) is followed until it rests: a cold start that begins from
-  // the flattened tetrahedron takes about half a second. Otherwise a few frames, until the stretch stops changing.
-  S.settleLeft = S.sm.settling === undefined ? 30 : 400;
-  const step = () => {
-    S.settle = 0;
-    if (!S.on || !S.started || S.settleLeft <= 0 || tab !== 'play') return;
-    S.settleLeft -= 1;
-    try {
-      const before = S.stats ? S.stats.strainMean : null;
-      if (S.sm.settling === false) { fillNote(); return; }                                       // it rests
-      if (typeof S.sm.settle === 'function') S.sm.settle(8); else S.sm.update(state, 6);
-      drawSurfaceFrame(state, {});
-      const after = S.stats ? S.stats.strainMean : null;
-      fillNote();
-      if (S.sm.settling === false) return;
-      if (S.sm.settling === undefined && before !== null && after !== null && Math.abs(after - before) < 2e-5) return;
-    } catch (err) { surfaceFailed(err); return; }
-    S.settle = requestAnimationFrame(step);
-  };
-  S.settle = requestAnimationFrame(step);
-}
-
 /**
- * The surface for a state. flip: { invQ, before } of an activation (the SAME surface on the new partition's mesh,
- * turned over to its new pose); dragging: a slider is moving (a short solver step, a small print); cold: a new
- * signature or a link; journey: only the journey moved.
+ * The surface for a state. flip: an activation, which moves nothing: the picture is left as it is (and the model
+ * keeps the state it was made for). dragging: a slider is moving (a small print); cold: a new signature or a link;
+ * journey: only the journey moved.
  */
-function showSurface(st, { flip = null, dragging = false, cold = false, journey = false } = {}) {
+function showSurface(st, { flip = null, dragging = false, cold = false, journey = false, moved = null } = {}) {
   const S = surface;
   if (!S.on) return;
+  if (flip && S.started && !cold) { S.ms.model = 0; S.ms.bake = 0; S.ms.baked = false; S.ms.chart = 0; S.ms.pane = 0; return; }
   try {
-    let turn = null, shift = null;
     const tM = now();
     if (!journey || !S.started) {
-      if (cold || !S.started) {
-        S.sm.set(st);
-        S.started = true;
-      } else if (flip) {
-        // new pose = turn · old pose + shift (each pose has its own loop's middle at the origin)
-        const r = S.sm.flip(st, { invQ: flip.invQ, before: flip.before });
-        if (r && r.turn && !r.cold) { turn = r.turn; shift = r.shift || null; }
-      } else {
-        S.sm.update(st, dragging ? 4 : 10);
+      if (cold || !S.started) { S.sm.set(st); S.started = true; } else {
+        // the card whose slider moved: its pair that holds P stays put, the other pair moves against it
+        const pairs = moved ? moved.split('|').map((pr) => pr.split('').map(Number)) : null;
+        S.sm.update(st, { hold: pairs ? pairs.find((pr) => pr.includes(0)) || pairs[0] : null });
       }
     }
     S.ms.model = now() - tM;
-    drawSurfaceFrame(st, { dragging, bake: journey && S.started ? null : 'auto' });
-    // the model is in its new pose already: the pane shows it turned back onto the old one and eases to the new
-    // (0.5 s; at once under reduced motion: the pane's own rule)
-    if (turn && typeof S.pane.turn === 'function') S.pane.turn(turn, reducedMotion() ? 0 : 0.5, shift ? { inverse: true, shift } : { inverse: true });
+    drawSurfaceFrame({ dragging, bake: journey && S.started ? null : 'auto' });
     S.fails = 0;
     surfaceNote('');
-    if (!dragging && !journey) settleSurface();
   } catch (err) {
     surfaceFailed(err);
   }
@@ -260,40 +211,49 @@ function areaText(row) {
   if (a === 0) return '0';
   return `${a === 1 ? '' : a}π${b === 1 ? '' : `/${b}`}`;
 }
+/** A partition as the page writes it: the pair with P first, "P3 Q3 | R3 S3". */
+function partitionName(card) {
+  const name = (pr) => pr.slice().sort((x, y) => x - y).map((f) => featureLabel(state, f)).join(' ');
+  const lead = card.pairs[0].includes(0) ? 0 : 1;
+  return [name(card.pairs[lead]), name(card.pairs[1 - lead])];
+}
+/**
+ * The table: for each of the three partitions, in the cards' fixed order, its two pillows (the pillow with P first).
+ * It does not depend on which card is active, like everything else on the page.
+ */
 function fillTable() {
-  const rows = pillowsOf(state), body = $('pillows-body');
-  // a pillow's two cone points are written in the order P, Q, R, S (state.js lists them in the cut's slot order)
+  const groups = pillowsByPartition(state), body = $('pillows-body');
+  // a pillow's two cone points are written in the order P, Q, R, S
   const inOrder = (r) => (r.features[0] <= r.features[1] ? [0, 1] : [1, 0]);
   const nameOf = (r) => inOrder(r).map((i) => featureLabel(state, r.features[i])).join(' ');
-  const html = rows.map((r, i) => {
+  const html = groups.map((g, gi) => g.rows.map((r, i) => {
     const o = inOrder(r);
     const cells = [
-      `<span class="pq-tdot"></span>${nameOf(r)}`,
+      `<span class="pq-tline" data-part="${gi + 1}"></span>${nameOf(r)}`,
       o.map((k) => cornerText(r.orders[k])).join(', '),
-      r.loop.toFixed(3),
+      i === 0 ? r.loop.toFixed(3) : '',
       r.seal.toFixed(3),
       o.map((k) => r.heights[k].toFixed(3)).join(', '),
       areaText(r),
     ];
-    return `<tr data-pair="${i}">${cells.map((c) => `<td>${c}</td>`).join('')}</tr>`;
-  }).join('');
+    return `<tr data-part="${gi + 1}" data-pair="${i}"${i === 0 ? ' class="pq-tfirst"' : ''}>${cells.map((c) => `<td>${c}</td>`).join('')}</tr>`;
+  }).join('')).join('');
   if (body.innerHTML !== html) body.innerHTML = html;
-  $('key-pair-1').textContent = nameOf(rows[0]);
-  $('key-pair-2').textContent = nameOf(rows[1]);
-  fillNote(rows);
+  const cards = cardsOf(state);
+  cards.forEach((c, i) => {
+    const el = $(`key-part-${i + 1}`), [x, y] = partitionName(c), text = `${x} | ${y}`;
+    if (el && el.textContent !== text) el.textContent = text;
+  });
+  fillNote();
 }
-/** The one line under the table: is the crown exact, and how far the closed mesh is from its exact lengths. */
-function fillNote(rows = null) {
-  const rs = rows || pillowsOf(state), kind = kindOf(state), parts = [];
-  if (kind === 'E') parts.push('Flat: the closed solid is exact, no relaxation.');
-  else {
-    const past = rs.filter((r) => !r.degenerate && !r.exact);
-    parts.push(past.length ? 'Open crowns: peaks past the rim: flange.' : 'Open crowns: crown exact.');
-    if (rs.some((r) => r.degenerate)) parts.push('A pair of 2s has no area: its pillow is its seal, lying on the loop.');
-    const s = surface.on ? surface.stats : null;
-    if (s && Number.isFinite(s.strainMean) && Number.isFinite(s.strainMax)) parts.push(`Closed surface: relaxed mesh, mean stretch ${(100 * s.strainMean).toFixed(1)} %, worst ${(100 * s.strainMax).toFixed(1)} %.`);
-    else parts.push('Closed surface: a mesh relaxed toward the exact lengths.');
-  }
+/** The one line under the table: what the solid is, and what it is doing now (flat; a loop that left its edges). */
+function fillNote() {
+  const kind = kindOf(state), parts = [], info = surface.on ? surface.info : null;
+  parts.push(kind === 'E'
+    ? 'The solid is exact: the tetrahedron whose surface is this flat orbifold. Its six edges are the six seals.'
+    : 'The solid is exact: the convex solid of hyperbolic space whose surface is this orbifold, shown in the Poincaré ball. Its six edges are the six seals.');
+  if (info && info.flat) parts.push('Here it is flat: a doubled quadrilateral.');
+  if (info && info.swaps > 0) parts.push('A loop here is longer than its twin: its seals no longer run along edges, they cross the faces.');
   const text = parts.join(' '), el = $('pillows-note');
   if (el.textContent !== text) el.textContent = text;
 }
@@ -322,15 +282,17 @@ let pending = null, frame = 0;
 const perf = { last: null, drag: null };
 function perfReset() { perf.drag = { n: 0, pattern: 0, cards: 0, surface: 0, model: 0, bake: 0, bakes: 0, chart: 0, pane: 0, rest: 0, total: 0, worst: 0 }; }
 perfReset();
-function draw(next, { flip = null, cold = false, dragging = false } = {}) {
+function draw(next, { flip = null, cold = false, dragging = false, moved = null } = {}) {
   const t0 = now();
   state = next;
-  if (flip) glue.still(flip.invQ);
-  glue.show(state, { keepView: !cold });
+  // a flip moves nothing: the Pattern pane is left exactly as it is (the motion is remembered for the next slider
+  // move); so is the Surface pane (showSurface). Only what a slider changes is redrawn.
+  if (flip && !cold) glue.still(flip.invQ);
+  else glue.show(state, { keepView: !cold });
   const t1 = now();
   cards.update(cardsOf(state), state);
   const t2 = now();
-  showSurface(state, { flip, cold, dragging });
+  showSurface(state, { flip, cold, dragging, moved });
   const t3 = now();
   fillTable();
   syncShell();
@@ -362,11 +324,11 @@ function apply(next, opts = {}) {
     // (last drawn in a hurry) is let settle, and the address is written
     if (opts.dragging) return;
     if (pending) pending.opts.dragging = false;
-    else { if (surface.on && surface.started) settleSurface(); writeHash(); }
+    else writeHash();
     return;
   }
   if (opts.flip || opts.cold || opts.now) { flush(); draw(next, opts); return; }
-  pending = { state: next, opts: { dragging: !!opts.dragging } };
+  pending = { state: next, opts: { dragging: !!opts.dragging, moved: opts.moved || null } };
   state = next;                                   // what the next input builds on
   if (!frame) frame = requestAnimationFrame(() => { frame = 0; const p = pending; pending = null; if (p) draw(p.state, p.opts); });
 }
@@ -382,7 +344,7 @@ function inputCard(key, numbers, meta = {}) {
   if (key !== keyOf(state)) activateCard(key);                      // a slider of another card: that card first
   const next = withNumbers(state, numbers, meta.range && Number.isFinite(numbers.L) ? { lRange: meta.range } : {});
   if (next !== state) dropHint('view-hint');
-  apply(next, { dragging: !!meta.dragging });
+  apply(next, { dragging: !!meta.dragging, moved: key });
 }
 
 // ---- presets, the typed orders ---------------------------------------------------------------------------------------
@@ -423,6 +385,7 @@ function syncShell() {
   if (!preset && document.activeElement !== sigIn && sigIn.value.replace(/[\s,;·]+/g, '') !== k) sigIn.value = k;
   sigIn.dataset.on = !preset && sigIn.value.replace(/[\s,;·]+/g, '') === k ? '1' : '0';
   $('pat-sub').textContent = kindOf(state) === 'E' ? 'Euclidean plane' : 'Poincaré disc';
+  $('surf-sub').textContent = kindOf(state) === 'E' ? 'the exact solid' : 'the exact solid, in the Poincaré ball';
 }
 
 // ---- the journey: surface -> two pillows -> open crowns --------------------------------------------------------------
@@ -482,17 +445,15 @@ for (const [wrapId, hintId] of [['pat-wrap', 'pat-hint'], ['surf-wrap', 'view-hi
 $('reset-view').addEventListener('click', () => {
   if (!surface.on) return;
   try { surface.pane.setView({ az: DEFAULT_UI.az, el: DEFAULT_UI.el, zoom: 1 }); surface.pane.render(); } catch (err) { /* the view stays */ }
-  // An activation leaves the solid where it was (his ask, 27 Nov 22:30), so after a few the active loop may stand
-  // tilted. The reset lays it level again (loop level, the active first pair below), turning the solid there over half
-  // a second: the one place where the solid turns. The pane shows Q (x - Qs) and eases Q to none: Q = hold.R and
-  // Qs = -hold.Rᵀ hold.t start it exactly where it was held.
+  // The solid is turned as little as can be while the sliders move, so after a while it may stand any way up. The
+  // reset lays it level again (the first pair below, its seal across), turning it there over half a second: the one
+  // place where the solid turns by itself. relevel() hands the rotation that carries the new pose onto the old one;
+  // the pane shows the solid turned by it and eases the turn to none.
   try {
-    const h = surface.started && typeof surface.sm.relevel === 'function' ? surface.sm.relevel() : null;
-    if (h) {
-      drawSurfaceFrame(state, {});
-      const R = h.R, t = h.t, Rt = [R[0], R[3], R[6], R[1], R[4], R[7], R[2], R[5], R[8]];
-      const sh = [0, 1, 2].map((r) => -(Rt[3 * r] * t[0] + Rt[3 * r + 1] * t[1] + Rt[3 * r + 2] * t[2]));
-      if (typeof surface.pane.turn === 'function') surface.pane.turn(Rt, reducedMotion() ? 0 : 0.5, { inverse: true, shift: sh });
+    const turn = surface.started && typeof surface.sm.relevel === 'function' ? surface.sm.relevel() : null;
+    if (turn) {
+      drawSurfaceFrame({});
+      if (typeof surface.pane.turn === 'function') surface.pane.turn(turn, reducedMotion() ? 0 : 0.5);
     }
   } catch (err) { surfaceFailed(err); }
   ui.az = DEFAULT_UI.az; ui.el = DEFAULT_UI.el; surface.userView = false;
@@ -579,7 +540,7 @@ window.__pqrs = {
   pattern: glue.pattern,
   patternGrid,
   patternPixels,
-  surface: () => ({ on: surface.on, started: surface.started, error: surface.error, fails: surface.fails, stats: surface.stats, exact: surface.exact, version: surface.version, bakeMs: surface.bakeMs, print: !!surface.print, view: surface.on && surface.pane.getView ? surface.pane.getView() : null }),
+  surface: () => ({ on: surface.on, started: surface.started, error: surface.error, fails: surface.fails, info: surface.info, exact: surface.exact, version: surface.version, bakeMs: surface.bakeMs, print: !!surface.print, view: surface.on && surface.pane.getView ? surface.pane.getView() : null, shown: surface.sm && surface.sm.shown }),
   pane: () => surface.pane,
   model: () => surface.sm,
 };
