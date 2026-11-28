@@ -229,8 +229,9 @@ line a check, `ok …`, `FAIL …` or `skip …` (a part of the page that is not
 - the table has its six rows and the line that says the solid is exact;
 - **colours**: the three cards wear three colours, the same after each of them was made the cut;
 - **switch**: on 3333, 2345, 2223 and 2222, each after a Twist drag: press and release on another card's slider
-  (Twist, then Length, then back). Gate: not one pixel differs in the Surface pane, in the Pattern pane or in the
-  cards, read off screenshots of the three elements. Each run prints a gauge first, for the reader (what a shift of
+  (Twist, then Length, then back). Gate: no pixel differs by more than 1 of 255 in the Surface pane, in the Pattern
+  pane or in the cards, read off screenshots of the three elements; on the built file none differs at all (inside
+  the spacesheep viewer on a phone-size screen the browser's compositing moves about 2 % of the pixels by exactly 1). Each run prints a gauge first, for the reader (what a shift of
   the Pattern picture by one device pixel would read);
 - **journey**: the three stops change the Surface's pixels, the buttons read Join / Part / Zip / Unzip; parted,
   pressing another card's slider changes not one pixel; choosing another loop does, and back on the first loop the
