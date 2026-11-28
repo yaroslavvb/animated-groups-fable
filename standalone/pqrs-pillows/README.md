@@ -97,6 +97,23 @@ faint jagged line where the grid crosses it.
 - **The default view is az 70, el 14** (`state.js` `DEFAULT_UI`): the first seal lies along y, so az 0 looks along
   it; az 70 shows it across the screen, as Twist of 2222's view shows its solid.
 
+### Activating another card turns nothing (his ask, Fri 27 Nov 2026, 22:30)
+
+*"Don't rotate the three-dimensional shape when switching between different sliders. Keep orientation the same."*
+The first version turned the solid over half a second so that the new loop stood level with its first pair below.
+Now the surface stays where it is on the screen and only what is drawn on it changes: the loop (another closed
+curve of the same surface, generally tilted), the two pillows' tones, the seals and the pairs' colours.
+
+- `surface-model.js` keeps a **hold** (world = R x + t for a point x of the model's own frame): a flip moves the
+  model's frame to the new cut and the hold takes that move up, so `frame()` hands out the same surface in the same
+  place. The camera's frames are kept in world coordinates and are kept through a flip while every point of the solid
+  still lies inside them. A failed carry (a cold start) lays the four cone points where they were.
+- Measured in Chrome (`dev/final/hold-check.mjs`): on activation the four cone points move on the screen by at most
+  2.6 px (3333), 5.8 px (2345: the surface relaxes a little on its new mesh) and 0.1 px (2222), against 115 to 303 px
+  before; three activations round return them to within 1.4 px.
+- **The reset button (↺) lays the active cut level again** (`sm.relevel()`): the one place where the solid turns, over
+  half a second (at once under reduced motion). A new orbifold or a link opens in the cut's own pose.
+
 ## Files and owners
 
 Built by five owners working side by side; each file has one.
@@ -110,7 +127,7 @@ Built by five owners working side by side; each file has one.
 | `src/solver.js` | the closed-surface solver | surface |
 | `src/flat2222.js`, `test/flat2222.test.js` | the exact flat solid | surface |
 | `src/surface-model.js`, `test/surface-model.test.js` | mesh + solver + flip carry + pose + journey + curves + marks | surface |
-| `src/surface-pane.js` | the renderer's glue, picking, the turn after a flip | pane |
+| `src/surface-pane.js` | the renderer's glue, picking, the turn of a reset (re-level) | pane |
 | `src/print3d.js`, `test/print3d.test.js` | comma outlines baked into a signed-distance texture; chart points | pane |
 | `src/page.js`, `src/page.template.html`, `src/page.css`, `test/page.test.js` | the page | shell |
 | `src/cards.js`, `src/pattern-glue.js`, `test/cards.test.js`, `test/pattern-glue.test.js` | the three cards; the Pattern pane with pair colours, held still on a flip | shell |

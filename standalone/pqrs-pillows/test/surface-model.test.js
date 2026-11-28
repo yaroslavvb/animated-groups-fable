@@ -106,6 +106,33 @@ for (const id of ['3333', '2345', '2223', '2222']) {
   });
 }
 
+test('activating another partition turns nothing on the screen; flipping back holds it there; relevel() lays the cut level', () => {
+  for (const id of ['3333', '2345', '2222']) {
+    const sm = createSurfaceModel({ nVertices: N }), st = STATES[id], flat = id === '2222', tol = (c) => (flat ? 1e-6 : c);
+    sm.set(st); rest(sm);
+    assert.equal(sm.hold, null, 'a cold start holds nothing');
+    const f0 = sm.frame(0), old = markPoints(f0);
+    const r = flip(st, '02|13');
+    sm.flip(r.state, { invQ: r.invQ, before: st }); rest(sm);
+    const f1 = sm.frame(0), now = markPoints(f1), cell = cellOf(sm.mesh);
+    for (let f = 0; f < 4; f++) assert.ok(dist(now[f], old[f]) < tol(cell), `${id}: feature ${f} moved on the screen by ${dist(now[f], old[f]).toExponential(2)}`);
+    assert.ok(sm.hold !== null, 'held');
+    assert.ok(dist(f1.frame.center, f0.frame.center) < 0.3 * f0.frame.radius, `${id}: the camera keeps its frame (moved ${dist(f1.frame.center, f0.frame.center).toFixed(3)})`);
+    // and back to the first partition: still where it was
+    const b = flip(r.state, '01|23');
+    sm.flip(b.state, { invQ: b.invQ, before: r.state }); rest(sm);
+    const again = markPoints(sm.frame(0));
+    for (let f = 0; f < 4; f++) assert.ok(dist(again[f], old[f]) < tol(2 * cell), `${id}: after flipping back feature ${f} stands ${dist(again[f], old[f]).toExponential(2)} off`);
+    // relevel: the cut's own pose again, the hold handed back
+    const h = sm.relevel();
+    assert.ok(h && h.R.length === 9 && h.t.length === 3);
+    assert.equal(sm.hold, null);
+    const lv = markPoints(sm.frame(0)), p = sm.state.perm, d = [lv[p[1]][0] - lv[p[0]][0], lv[p[1]][1] - lv[p[0]][1]];
+    assert.ok(d[1] / Math.hypot(...d) > 0.995, `${id}: level again, the first seal along y`);
+    assert.equal(sm.relevel(), null, 'nothing more to drop');
+  }
+});
+
 test('the world frame: loop level about the z axis, first pair below, its seal along y from -y', () => {
   for (const id of ['3333', '2345', '2223', '2222']) {
     const sm = modelOf(id), fr = sm.frame(0), mk = markPoints(fr), st = STATES[id];
@@ -352,7 +379,10 @@ for (const id of ['3333', '2345', '2223', '2222']) {
       const vol0 = volumeOf(f0), vol1 = volumeOf(f1);
       if (flat) assert.ok(vol0 > -1e-9 && vol1 > -1e-9 && Math.abs(vol1 - vol0) < 1e-6, `volumes ${vol0}, ${vol1}`);
       else assert.ok(vol0 > 0 && vol1 > 0 && Math.abs(vol1 / vol0 - 1) < 0.15, `${id} ${key}: the volume went from ${vol0.toFixed(4)} to ${vol1.toFixed(4)}`);
-      // where each feature stood before the turn: undo the turn on its new place
+      // nothing turns on the screen (his ask, 27 Nov 22:30): the flip hands out no turn, the hold takes the move up
+      assert.ok(T.every((v, i) => Math.abs(v - (i % 4 === 0 ? 1 : 0)) < 1e-12) && sh.every((v) => v === 0), `${id} ${key}: no turn`);
+      assert.ok(res.moved && res.moved.turn.length === 9, 'the move of the model\'s own frame is reported');
+      // so each feature stays where it stood (undoing the identity turn: as the test read before the hold)
       let worst = 0;
       for (let f = 0; f < 4; f++) {
         const q = [now[f][0] - sh[0], now[f][1] - sh[1], now[f][2] - sh[2]];
@@ -365,12 +395,18 @@ for (const id of ['3333', '2345', '2223', '2222']) {
         const d0 = dist(old[a], old[b]), d1 = dist(now[a], now[b]);
         assert.ok(Math.abs(d1 / d0 - 1) < (flat ? 1e-6 : 0.05), `${id} ${key}: the chord between features ${a} and ${b} went from ${d0.toFixed(4)} to ${d1.toFixed(4)}`);
       }
-      // the new pose: the new cut's first pair below, along y
-      const p = r.state.perm, d = [now[p[1]][0] - now[p[0]][0], now[p[1]][1] - now[p[0]][1]];
+      // the new pose IN THE MODEL'S FRAME (the screen keeps the old one through the hold): first pair below, along y
+      const hd = sm.hold, inModel = (w) => {
+        if (!hd) return w;
+        const a = w[0] - hd.t[0], b = w[1] - hd.t[1], c = w[2] - hd.t[2], R = hd.R;
+        return [R[0] * a + R[3] * b + R[6] * c, R[1] * a + R[4] * b + R[7] * c, R[2] * a + R[5] * b + R[8] * c];
+      };
+      const nm = now.map(inModel);
+      const p = r.state.perm, d = [nm[p[1]][0] - nm[p[0]][0], nm[p[1]][1] - nm[p[0]][1]];
       assert.ok(d[1] / Math.hypot(...d) > 0.995, 'the new first seal lies along y, seen from above');
       // the new first pair is below the new far pair (where the four tips lie in one plane, as after 3333's flip to
       // the diagonal pairing at Twist 0, they are all level with the loop: not above is all that can be asked)
-      assert.ok(now[p[0]][2] + now[p[1]][2] <= now[p[2]][2] + now[p[3]][2] + 0.1 * f1.frame.radius, 'the new first pair is not above the far pair');
+      assert.ok(nm[p[0]][2] + nm[p[1]][2] <= nm[p[2]][2] + nm[p[3]][2] + 0.1 * f1.frame.radius, 'the new first pair is not above the far pair');
       if (!flat) assert.ok(f1.stats.strainMean < 0.012, `${id} ${key}: mean stretch after the flip ${(100 * f1.stats.strainMean).toFixed(3)} %`);
       // marks follow the features, colours follow the pairs of the new cut
       for (const m of f1.marks) { assert.equal(m.feature, p[m.slot]); assert.equal(m.id, 'PQRS'[m.feature]); }

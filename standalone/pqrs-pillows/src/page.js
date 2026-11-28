@@ -482,6 +482,19 @@ for (const [wrapId, hintId] of [['pat-wrap', 'pat-hint'], ['surf-wrap', 'view-hi
 $('reset-view').addEventListener('click', () => {
   if (!surface.on) return;
   try { surface.pane.setView({ az: DEFAULT_UI.az, el: DEFAULT_UI.el, zoom: 1 }); surface.pane.render(); } catch (err) { /* the view stays */ }
+  // An activation leaves the solid where it was (his ask, 27 Nov 22:30), so after a few the active loop may stand
+  // tilted. The reset lays it level again (loop level, the active first pair below), turning the solid there over half
+  // a second: the one place where the solid turns. The pane shows Q (x - Qs) and eases Q to none: Q = hold.R and
+  // Qs = -hold.Rᵀ hold.t start it exactly where it was held.
+  try {
+    const h = surface.started && typeof surface.sm.relevel === 'function' ? surface.sm.relevel() : null;
+    if (h) {
+      drawSurfaceFrame(state, {});
+      const R = h.R, t = h.t, Rt = [R[0], R[3], R[6], R[1], R[4], R[7], R[2], R[5], R[8]];
+      const sh = [0, 1, 2].map((r) => -(Rt[3 * r] * t[0] + Rt[3 * r + 1] * t[1] + Rt[3 * r + 2] * t[2]));
+      if (typeof surface.pane.turn === 'function') surface.pane.turn(Rt, reducedMotion() ? 0 : 0.5, { inverse: true, shift: sh });
+    }
+  } catch (err) { surfaceFailed(err); }
   ui.az = DEFAULT_UI.az; ui.el = DEFAULT_UI.el; surface.userView = false;
   scheduleHash();
 });

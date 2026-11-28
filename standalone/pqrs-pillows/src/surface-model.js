@@ -9,9 +9,14 @@
 //   sm.set(state);                         cold start (a new signature, a link); deterministic
 //   sm.update(state, budgetMs = 4);        the same cut, new L / tw: a slider frame. Called again with the same
 //                                          numbers it goes on relaxing (an idle frame); sm.settle(ms) does the same
-//   sm.flip(newState, { invQ, before })    the same surface on the new cut's mesh
-//        -> { turn, shift, cold }          turn: 3 x 3 rotation, row-major; new pose = turn * old pose + shift for every
-//                                          point of the surface (identity and zeros after a cold start: cold = true)
+//   sm.flip(newState, { invQ, before })    the same surface on the new cut's mesh, KEPT WHERE IT IS on the screen
+//        -> { turn, shift, cold, moved }   turn = identity, shift = 0 (since 27 Nov, 22:30: his ask, no turn on a flip);
+//                                          moved: { turn, shift } by which the model's own frame moved, which the hold
+//                                          (below) takes up. A failed carry starts cold (cold = true) and lays the four
+//                                          cone points where they were.
+//   sm.relevel() -> { R, t } | null        drop the hold: the next frame shows the cut in its own pose (loop level, first
+//                                          pair below); returns the hold that was shown, for the pane's turn
+//   sm.hold -> { R, t } | null             world = R x + t for a point x of the model's frame (null: the identity)
 //   sm.frame(j) -> {                       j in [0, 2]: 0 surface, 1 two pillows, 2 open crowns
 //     version,                             changes when triangles / pillow / the vertex set change (the pane then needs setMesh)
 //     cornersVersion,                      changes when `corners` change (every change of L, tw, cut)
@@ -35,6 +40,9 @@
 // (the best rigid motion of the loop's ring and the four cone points onto their crown places; then a turn about z
 // that lays the first seal along +y seen from above, and the ring's middle on the origin), so the solver may drift
 // freely and a Twist turns the other pillow only. 2222: the exact solid in the same pose (flat2222.js).
+// That is the MODEL's frame. frame() hands positions and the camera's frame out through the hold (world = R x + t),
+// the identity after a cold start; a flip moves the model's frame to the new cut and the hold takes the move up, so
+// the solid does not turn on the screen when another partition is made active.
 //
 // 2222. Exact: every vertex is the image of its chart point on the solid of Twist of 2222. The grid does not know
 // where the solid folds, so (followCreases) each edge that crosses a crease has its nearer end moved to the
@@ -158,7 +166,31 @@ export function createSurfaceModel(opts = {}) {
   let cornersCache = null, cornersAt = -1;
   let pillowFit = null, pillowFitAt = -1;
   let stats = { strainMean: 0, strainMax: 0 };
+  // The camera's two frames; their centres are in the WORLD frame (what the pane draws), radii are lengths.
   const view = { center: [0, 0, 0], radius: 1, gap: 0.5, extent: 1, center0: [0, 0, 0], radius0: 1, extent0: 1 };
+  // THE HOLD (his ask, Fri 27 Nov 2026, 22:30: "Don't rotate the three-dimensional shape when switching between
+  // different sliders. Keep orientation the same"). The model lays every cut in its own frame (loop level, first pair
+  // below); a flip would turn the solid to that pose. Instead the turn is absorbed here: what frame() hands out is
+  // world = hold.R · x + hold.t for a point x of the model's frame, and a flip composes the hold with the inverse of the
+  // flip's turn, so the same surface stays where it was on the screen. null: the identity (a cold start, relevel()).
+  let hold = null;
+  const toWorld = (p) => (hold ? [
+    hold.R[0] * p[0] + hold.R[1] * p[1] + hold.R[2] * p[2] + hold.t[0],
+    hold.R[3] * p[0] + hold.R[4] * p[1] + hold.R[5] * p[2] + hold.t[1],
+    hold.R[6] * p[0] + hold.R[7] * p[1] + hold.R[8] * p[2] + hold.t[2]] : [p[0], p[1], p[2]]);
+  const toModel = (q) => {
+    if (!hold) return [q[0], q[1], q[2]];
+    const a = q[0] - hold.t[0], b = q[1] - hold.t[1], c = q[2] - hold.t[2], R = hold.R;
+    return [R[0] * a + R[3] * b + R[6] * c, R[1] * a + R[4] * b + R[7] * c, R[2] * a + R[5] * b + R[8] * c];
+  };
+  /** The model's frame was moved by T (x -> turn x + shift) for the same surface: keep the world picture, hold ∘ T⁻¹. */
+  function holdThrough(turn, shift) {
+    const R0 = hold ? hold.R : I3(), t0 = hold ? hold.t : [0, 0, 0], R = new Array(9);
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 3; k++) R[3 * r + k] = R0[3 * r] * turn[3 * k] + R0[3 * r + 1] * turn[3 * k + 1] + R0[3 * r + 2] * turn[3 * k + 2];   // R0 · turnᵀ
+    const t = [0, 1, 2].map((r) => t0[r] - (R[3 * r] * shift[0] + R[3 * r + 1] * shift[1] + R[3 * r + 2] * shift[2]));
+    if (R.some((v) => !Number.isFinite(v)) || t.some((v) => !Number.isFinite(v))) return;
+    hold = { R, t };
+  }
 
   const read = (state) => {
     const orders = Array.from(state.orders, Number);
@@ -319,6 +351,25 @@ export function createSurfaceModel(opts = {}) {
    * every stop the closed solid filled 58 % of the pane's height on 3333; frame(j) now goes from the one to the other
    * as the pillows part).
    */
+  /**
+   * The farthest the closed solid reaches from c (a point of the model's frame); with `journey`, the farthest of the
+   * parted pillows and of the open crowns too (every point moved by half the gap either way along the axis).
+   */
+  function reachFrom(c, journey) {
+    const half = journey ? 0.5 * view.gap : 0;
+    let m = 0;
+    const eat = (A) => {
+      for (let i = 0; i + 2 < A.length; i += 3) {
+        const dx = A[i] - c[0], dy = A[i + 1] - c[1], dz = A[i + 2] - c[2], r2 = dx * dx + dy * dy;
+        const lo = r2 + (dz - half) * (dz - half), hi = r2 + (dz + half) * (dz + half);
+        if (lo > m) m = lo; if (hi > m) m = hi;
+      }
+    };
+    eat(X);
+    if (journey && crown) eat(crown);
+    return Math.sqrt(m);
+  }
+
   function fitView(fresh) {
     const O = crown, cuff = mesh.cuff, rho = cuff / (2 * Math.PI);
     let rC = rho, zLoC = 0, zHiC = 0;
@@ -326,19 +377,27 @@ export function createSurfaceModel(opts = {}) {
     let rMax = rC, zLo = zLoC, zHi = zHiC;
     for (let i = 0; i < O.length; i += 3) { const r = Math.hypot(O[i], O[i + 1]); if (r > rMax) rMax = r; if (O[i + 2] < zLo) zLo = O[i + 2]; if (O[i + 2] > zHi) zHi = O[i + 2]; }
     view.gap = 0.8 * rho + 0.15 * Math.max(rMax, (zHi - zLo) / 2);
-    const half = (zHi - zLo + view.gap) / 2, extent = Math.hypot(rMax, half);
+    const half = (zHi - zLo + view.gap) / 2, extent = Math.hypot(rMax, half), mid = (zHi + zLo) / 2;
     view.extent = extent;
-    if (fresh || extent > view.radius / 1.03 || extent < 0.55 * view.radius) { view.radius = 1.1 * extent; view.center = [0, 0, (zHi + zLo) / 2]; }
+    // how far a kept centre (world) stands from the point [0, 0, m] of the model's frame
+    const offset = (c, m) => { const p = toModel(c); return Math.hypot(p[0], p[1], p[2] - m); };
+    // Held (after a flip) the kept frames stand off the new loop's axis: they are kept while every point of the solid
+    // (and, for the journey's frame, of the parted pillows and the open crowns) still lies inside, measured exactly,
+    // so an activation does not move the camera. Not held: the bound of the axis-centred frames, as before.
+    const fitsJ = hold ? reachFrom(toModel(view.center), true) <= view.radius / 1.03 : extent <= view.radius / 1.03;
+    if (fresh || !fitsJ || extent < 0.55 * view.radius) { view.radius = 1.1 * extent; view.center = toWorld([0, 0, mid]); }
     const mid0 = (zHiC + zLoC) / 2, extent0 = Math.hypot(rC, (zHiC - zLoC) / 2);
     view.extent0 = extent0;
     // (the closed frame is re-centred when the solid's middle has left it by more than the margin, too)
-    if (fresh || extent0 + Math.abs(mid0 - view.center0[2]) > view.radius0 || extent0 < 0.55 * view.radius0) { view.radius0 = 1.04 * extent0; view.center0 = [0, 0, mid0]; }
-    if (view.radius0 > view.radius) { view.radius0 = Math.max(1.04 * extent0, view.radius); view.center0 = [0, 0, mid0]; }   // never wider than the journey's
+    const fits0 = hold ? reachFrom(toModel(view.center0), false) <= view.radius0 : extent0 + offset(view.center0, mid0) <= view.radius0;
+    if (fresh || !fits0 || extent0 < 0.55 * view.radius0) { view.radius0 = 1.04 * extent0; view.center0 = toWorld([0, 0, mid0]); }
+    if (view.radius0 > view.radius) { view.radius0 = Math.max(1.04 * extent0, view.radius); view.center0 = toWorld([0, 0, mid0]); }   // never wider than the journey's
   }
 
   // ---- the three calls -----------------------------------------------------------------------------------------------
   function set(state) {
     st = read(state);
+    hold = null;                                       // a cold start shows the cut in its own pose
     if (st.kind === 'E') setFlat(true);
     else {
       useSolver(P.suggestGrid(st.orders, st.L, nVertices)).set(st.orders, st.L, st.tw);
@@ -391,7 +450,41 @@ export function createSurfaceModel(opts = {}) {
     return api;
   }
 
-  const coldFlip = (state) => { set(state); return { turn: I3(), shift: [0, 0, 0], cold: true }; };
+  /** The four cone points by feature, in the model's frame (world: through the hold). */
+  function conesByFeature(world) {
+    if (!st || !top || !mesh) return null;
+    const out = [], o = mesh.open;
+    for (let slot = 0; slot < 4; slot++) {
+      const c = 3 * o.closedOf[top.vOpen[top.cones[slot]]], p = [X[c], X[c + 1], X[c + 2]];
+      if (!p.every(Number.isFinite)) return null;
+      out[st.perm[slot]] = world ? toWorld(p) : p;
+    }
+    return out;
+  }
+  /** No carry (it failed): start cold, but keep the solid's orientation by laying the four cone points where they were. */
+  const coldFlip = (state) => {
+    const was = conesByFeature(true);
+    set(state);
+    const now = conesByFeature(false);
+    if (was && now) {
+      const A = new Float64Array(12), B = new Float64Array(12);
+      for (let f = 0; f < 4; f++) { A.set(now[f], 3 * f); B.set(was[f], 3 * f); }
+      const fit = fitRigid(4, A, B, null);
+      if (fit.R.every(Number.isFinite) && fit.t.every(Number.isFinite)) { hold = { R: fit.R, t: fit.t }; fitView(true); }
+    }
+    return { turn: I3(), shift: [0, 0, 0], cold: true };
+  };
+
+  /**
+   * Back to the cut's own pose (loop level, first pair below): the hold is dropped. Returns the hold that was shown
+   * ({ R, t }: world = R x + t) so the pane can turn the solid from there, or null if there was none.
+   */
+  function relevel() {
+    const h = hold;
+    hold = null;
+    if (st && top) fitView(true);
+    return h ? { R: h.R.slice(), t: h.t.slice() } : null;
+  }
 
   function flip(newState, { invQ = null, before = null } = {}) {
     if (!st || !mesh || !invQ) return coldFlip(newState);
@@ -406,17 +499,20 @@ export function createSurfaceModel(opts = {}) {
     const prev = st;
     const feature = (s, f) => s.perm.indexOf(f);
     if (next.kind === 'E') {
-      // both solids are exact: the turn is the rotation between them, cone point onto the same cone point
+      // both solids are exact: the turn is the rotation between them, cone point onto the same cone point; the hold
+      // takes it up, so nothing turns on the screen
       const oldC = flat.corners, names = ['P', 'Q', 'R', 'S'];
-      st = next; setFlat(true); cornersVersion++; fitView(false);
+      st = next; setFlat(true); cornersVersion++;
       const A = new Float64Array(12), B = new Float64Array(12);
       for (let f = 0; f < 4; f++) {
         const a = oldC[names[feature(prev, f)]], b = flat.corners[names[feature(next, f)]];
-        if (!a || !b) return { turn: I3(), shift: [0, 0, 0], cold: true };
+        if (!a || !b) { fitView(true); return { turn: I3(), shift: [0, 0, 0], cold: true }; }
         A.set(a, 3 * f); B.set(b, 3 * f);
       }
       const fit = fitRigid(4, A, B, null);
-      return { turn: fit.R, shift: fit.t, cold: false };
+      holdThrough(fit.R, fit.t);
+      fitView(false);
+      return { turn: I3(), shift: [0, 0, 0], cold: false, moved: { turn: fit.R, shift: fit.t } };
     }
     try {
       const g = P.suggestGrid(next.orders, next.L, nVertices);
@@ -440,9 +536,12 @@ export function createSurfaceModel(opts = {}) {
       st = next;
       const pose = afterSolve();
       cornersVersion++;
-      fitView(false);
       for (let i = 0; i < X.length; i++) if (!Number.isFinite(X[i])) return coldFlip(newState);
-      return { turn: pose.R, shift: pose.t, cold: false };
+      // the model's frame moved with the new cut (new = pose.R · old + pose.t); the hold takes it up, so the same
+      // surface stays where it was on the screen and nothing turns
+      holdThrough(pose.R, pose.t);
+      fitView(false);
+      return { turn: I3(), shift: [0, 0, 0], cold: false, moved: { turn: pose.R, shift: pose.t } };
     } catch (err) {
       return coldFlip(newState);
     }
@@ -525,6 +624,13 @@ export function createSurfaceModel(opts = {}) {
         positions[3 * v + 2] = M[6] * sx + M[7] * sy + M[8] * sz + (1 - f) * t[2] + dz;
       }
     }
+    if (hold) {                                        // into the world: the solid keeps its place through flips
+      const R = hold.R, t = hold.t;
+      for (let i = 0; i < positions.length; i += 3) {
+        const a = positions[i], b = positions[i + 1], c = positions[i + 2];
+        positions[i] = R[0] * a + R[1] * b + R[2] * c + t[0]; positions[i + 1] = R[3] * a + R[4] * b + R[5] * c + t[1]; positions[i + 2] = R[6] * a + R[7] * b + R[8] * c + t[2];
+      }
+    }
     const deg = top.degenerate, curves = [];
     // the loop: on the rim of each pillow that has an inside; joined (j = 0) the two rims are one curve
     const first = deg[0] ? 1 : 0;
@@ -549,7 +655,9 @@ export function createSurfaceModel(opts = {}) {
   }
 
   const api = {
-    set, update, settle, flip, frame,
+    set, update, settle, flip, frame, relevel,
+    /** The hold { R, t } (world = R x + t for a point x of the model's frame) since the last flip, or null. */
+    get hold() { return hold ? { R: hold.R.slice(), t: hold.t.slice() } : null; },
     /** For tests and tools: the mesh (pillow.js), the closed positions in the world frame (3 per closed vertex), the state. */
     get mesh() { return mesh; },
     get closed() { return X; },
