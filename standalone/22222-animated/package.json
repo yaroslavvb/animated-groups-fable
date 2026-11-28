@@ -4,6 +4,6 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "build": "cd ../classification-of-surfaces && node build.mjs --template ../22222-animated/src/page.template.html --entry ../22222-animated/src/page.js --css src/styles.css,../22222-animated/src/page.css --out ../22222-animated/site/index.html && cp ../22222-animated/site/index.html ../../docs/22222-animated.html"
+    "build": "cd ../classification-of-surfaces && node build.mjs --template ../22222-animated/src/page.template.html --entry ../22222-animated/src/page.js --css src/styles.css,../22222-animated/src/page.css --out ../22222-animated/site/index.html && cp ../22222-animated/site/index.html ../../docs/hyperbolic-22222-animation.html && cp ../22222-animated/site/index.html ../../docs/22222-animated.html"
   }
 }
