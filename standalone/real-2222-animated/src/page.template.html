@@ -13,7 +13,7 @@
 <main class="app">
   <header class="hdr">
     <h1 class="title">The real 2222 animated</h1>
-    <p class="sub">Fixed size and aspect ratio — choose one of the three corner pairings to hold the first pair fixed while twisting the other in 3D and rigid 2D unfolding.</p>
+    <p class="sub">Fixed area — choose one of the three corner pairings to hold the first pair fixed while twisting the other in 3D and rigid 2D unfolding.</p>
   </header>
 
   <section class="pair-picker" role="radiogroup" aria-label="Choose twist pairing">
@@ -93,7 +93,10 @@
       </div>
 
       <div class="play-foot">
-        <button type="button" class="btn-primary play-btn" id="btn-play" aria-pressed="true">Pause</button>
+        <div class="play-actions">
+          <button type="button" class="btn-primary play-btn" id="btn-play" aria-pressed="true">Pause</button>
+          <button type="button" class="reset-btn" id="btn-reset" title="Reset to regular tetrahedron and default view">Reset</button>
+        </div>
         <div class="scrub-wrap">
           <label class="scrub-label" for="twist-scrub">Twist</label>
           <div class="swrap">
@@ -109,6 +112,7 @@
           <output class="sval" id="twist-val" for="twist-scrub">0.250</output>
         </div>
         <div class="meta-right">
+          <span class="ell-chip" id="ell-val" title="Active pair edge length">ℓ = 1.075</span>
           <span class="shape-chip" id="shape-kind">regular tetrahedron</span>
           <div class="speed-pills" role="group" aria-label="Animation speed">
             <button type="button" class="speed-btn" data-speed="0.5">0.5×</button>

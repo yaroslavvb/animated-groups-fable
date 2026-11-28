@@ -269,11 +269,36 @@ html, body {
   background: var(--card);
 }
 
+.play-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .play-btn {
   height: 36px;
   min-width: 78px;
   font-size: 14.5px;
   border-radius: 8px;
+}
+
+.reset-btn {
+  height: 36px;
+  padding: 0 11px;
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--ground);
+  color: var(--ink);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.14s ease, background-color 0.14s ease;
+}
+
+@media (hover: hover) {
+  .reset-btn:hover {
+    border-color: var(--accent);
+  }
 }
 
 .scrub-wrap {
@@ -376,9 +401,19 @@ html, body {
 
 .meta-right {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  justify-content: flex-end;
+  gap: 8px 10px;
   margin-left: auto;
+}
+
+.ell-chip {
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .shape-chip {

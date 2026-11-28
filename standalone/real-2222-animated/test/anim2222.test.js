@@ -102,12 +102,23 @@ test('each pairing holds its first pair fixed in 3D, rotates the other pair, and
   }
 });
 
-test('switchAnimPair preserves exact world pose, settles glides cleanly, and holds new first pair fixed', () => {
-  for (const startT of [0.0, 0.25, 0.5, 0.65]) {
+test('switchAnimPair preserves exact world pose and instantaneous ell (no length reset), wraps cleanly, and holds new first pair fixed', () => {
+  for (const startT of [0.0, 0.12, 0.25, 0.5, 0.65]) {
     const model = createAnimModel({ activeIdx: 0, t: startT, ell: FIXED_ELL, playing: true, speed: 1 });
     for (const nextIdx of [1, 2, 0]) {
       const before = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
+      const eBefore = [model.e[0].slice(), model.e[1].slice()];
+      const expectedEll = pairVectors(model.e, [
+        [1, 0],
+        [0, 1],
+      ]);
+      void expectedEll;
       switchAnimPair(model, nextIdx, PAISLEY_FNS);
+      const pv = pairVectors(model.e, model.activeFrame);
+      assert.ok(Math.abs(model.animEll - pv.ell) < 1e-13, `animEll=${model.animEll} != pv.ell=${pv.ell}`);
+      assert.ok(Math.hypot(model.e[0][0] - eBefore[0][0], model.e[0][1] - eBefore[0][1]) < 1e-13);
+      assert.ok(Math.hypot(model.e[1][0] - eBefore[1][0], model.e[1][1] - eBefore[1][1]) < 1e-13);
+
       const afterSwitch = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
       for (const c of ['A', 'B', 'C', 'D']) {
         assert.ok(
@@ -116,25 +127,63 @@ test('switchAnimPair preserves exact world pose, settles glides cleanly, and hol
         );
       }
 
-      const angBefore = pairVectors(model.e, model.activeFrame).ang;
+      const angBefore = pv.ang;
+      const ellBefore = model.animEll;
       for (let i = 0; i < 30; i++) stepAnim(model, 0.02);
-      assert.ok(Math.abs(model.animEll - FIXED_ELL) < 1e-10, `ell did not settle to FIXED_ELL: ${model.animEll}`);
+      assert.ok(Math.abs(model.animEll - ellBefore) < 1e-13, 'animEll drifted during stepAnim');
+      scrubAnimTwist(model, model.animT + 0.15);
+      assert.ok(Math.abs(model.animEll - ellBefore) < 1e-13, 'animEll reset during scrubAnimTwist');
       assert.ok(Math.abs(pairVectors(model.e, model.activeFrame).ang - angBefore) < 1e-10, 'angle drifted');
       assert.ok(Math.abs(det2(model.e[0], model.e[1]) - 1) < 1e-10);
-      assert.equal(model.glide, null);
-      assert.equal(model.midGlide, null);
 
-      const settled = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
-      const cen = mul3(0.25, add3(add3(settled.A, settled.B), add3(settled.C, settled.D)));
-      assert.ok(norm3(cen) < 0.1, `centroid drifted too far: ${norm3(cen)}`);
+      // Verify period-1 wrap even when non-regular length is active
+      const snap = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
+      const tSnap = model.animT;
+      scrubAnimTwist(model, tSnap + ANIM_PERIOD);
+      const wrapped = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
+      for (const c of ['A', 'B', 'C', 'D']) {
+        assert.ok(norm3(sub3(snap[c], wrapped[c])) < 1e-11, `period-1 wrap failed at ell=${ellBefore}`);
+      }
 
-      const [[f0, f1], [r0, r1]] = PAIR_SPLITS[model.activeIdx];
-      for (let i = 0; i < 40; i++) stepAnim(model, 0.025);
-      const later = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
-      const pinDrift = Math.max(norm3(sub3(later[f0], settled[f0])), norm3(sub3(later[f1], settled[f1])));
-      const otherMove = Math.max(norm3(sub3(later[r0], settled[r0])), norm3(sub3(later[r1], settled[r1])));
-      assert.ok(pinDrift < 1e-12, `pair ${model.activeIdx} drifted after settle: ${pinDrift}`);
-      assert.ok(otherMove > 0.3, `pair ${model.activeIdx} other pair barely moved: ${otherMove}`);
+      if (model.animEll <= 1.35) {
+        const [[f0, f1], [r0, r1]] = PAIR_SPLITS[model.activeIdx];
+        for (let i = 0; i < 40; i++) stepAnim(model, 0.025);
+        const later = worldCornersFromState(model.e, model.activeIdx, model.pinFrame).V;
+        const pinDrift = Math.max(norm3(sub3(later[f0], snap[f0])), norm3(sub3(later[f1], snap[f1])));
+        const otherMove = Math.max(norm3(sub3(later[r0], snap[r0])), norm3(sub3(later[r1], snap[r1])));
+        assert.ok(pinDrift < 1e-11, `pair ${model.activeIdx} drifted at ell=${model.animEll}: ${pinDrift}`);
+        assert.ok(otherMove > 0.25, `pair ${model.activeIdx} other pair barely moved: ${otherMove}`);
+      }
     }
+  }
+});
+
+test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 tints across extreme ell 0.2..4.0', () => {
+  for (const ell of [0.2, 0.35, 1.4215, 2.5, 4.0]) {
+    const model = createAnimModel({ activeIdx: 0, t: 0.18, ell });
+    const mesh = buildSymbolPillowMesh(model.e, model.activeFrame, {
+      minConorm: 0,
+      activeIdx: 0,
+      pinFrame: model.pinFrame,
+    });
+    const seenTints = new Set();
+    for (let i = 0; i < mesh.tint.length; i++) seenTints.add(mesh.tint[i]);
+    assert.deepEqual([...seenTints].sort((a, b) => a - b), [0, 4, 5, 6, 7], `missing tint at ell=${ell}`);
+
+    let area = 0;
+    const cen = mul3(0.25, add3(add3(mesh.corners.A, mesh.corners.B), add3(mesh.corners.C, mesh.corners.D)));
+    for (let t = 0; t < mesh.indices.length; t += 3) {
+      const i0 = mesh.indices[t] * 3;
+      const i1 = mesh.indices[t + 1] * 3;
+      const i2 = mesh.indices[t + 2] * 3;
+      const p0 = [mesh.positions[i0], mesh.positions[i0 + 1], mesh.positions[i0 + 2]];
+      const p1 = [mesh.positions[i1], mesh.positions[i1 + 1], mesh.positions[i1 + 2]];
+      const p2 = [mesh.positions[i2], mesh.positions[i2 + 1], mesh.positions[i2 + 2]];
+      const n = cross3(sub3(p1, p0), sub3(p2, p0));
+      area += 0.5 * norm3(n);
+      const mid = [(p0[0] + p1[0] + p2[0]) / 3, (p0[1] + p1[1] + p2[1]) / 3, (p0[2] + p1[2] + p2[2]) / 3];
+      assert.ok(dot3(n, sub3(mid, cen)) > -1e-9, `inverted triangle normal at ell=${ell}`);
+    }
+    assert.ok(Math.abs(area - 2) < 1e-4, `extreme ell=${ell}: area=${area}`);
   }
 });

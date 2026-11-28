@@ -28,12 +28,12 @@ import {
 export const FIXED_ELL = REG_ELL; // (4/3)^(1/4) = 1.07456993...
 export const ANIM_PERIOD = 1.0;   // one full 360-deg rotation of the second pair returns all corners identically
 export const BASE_TURNS_PER_SEC = 0.22;
-export const REG_HALF_AXIS = Math.sqrt(1 / Math.sqrt(3)) / 2;
 export const PAIR_SPLITS = [
   [['A', 'B'], ['C', 'D']],
   [['A', 'C'], ['B', 'D']],
   [['A', 'D'], ['B', 'C']],
 ];
+const MAX_SYMBOL_RADIUS = 0.27;
 
 export const FEATURES = {
   A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, light: '#0072B2', dark: '#4DB6F5' },
@@ -165,16 +165,26 @@ export function earClip(pts) {
 
 /**
  * Intrinsic rigid frame attached to the active pairing's first (pinned) pair in stage coords.
- * Axis w uses S.ex/S.ey/S.ez directly so it stays unit-length even at flat degenerate states.
+ * Uses the fixed unsigned stage axis w so there are no 180-deg flips when X/Y/Z cross 0 (ell >= sqrt(2)).
  */
 export function intrinsicPairFrame(S, activeIdx) {
   const [[p0, p1]] = PAIR_SPLITS[activeIdx];
   const V = S.stage;
   const mid = mul3(0.5, add3(V[p0], V[p1]));
   const u = unit3(sub3(V[p1], V[p0]));
-  const w = activeIdx === 0 ? [0, 0, S.ex] : activeIdx === 1 ? [S.ey, 0, 0] : [0, S.ez, 0];
+  const w = activeIdx === 0 ? [0, 0, 1] : activeIdx === 1 ? [1, 0, 0] : [0, 1, 0];
   const v = cross3(w, u);
   return { mid, u, v, w };
+}
+
+export function symbolScaleFor(S) {
+  const minEdge = Math.min(S.edges[0], S.edges[1], S.edges[2]);
+  const maxEdge = Math.max(S.edges[0], S.edges[1], S.edges[2]);
+  if (!(minEdge > 0) || !(maxEdge > 0)) return 1;
+  return Math.max(
+    1e-3,
+    Math.min(1, (0.82 * minEdge) / (2 * MAX_SYMBOL_RADIUS), 0.72 / (MAX_SYMBOL_RADIUS * maxEdge))
+  );
 }
 
 function mapPointBetweenFrames(q, src, dst) {
@@ -242,6 +252,7 @@ export function buildSymbolPillowMesh(
     indices.push(base, base + 1, base + 2);
   };
 
+  const symScale = symbolScaleFor(S);
   for (const tr of S.tris) {
     // Work in global plane coordinates tr.pts so corner emblems never jump/spin on active pair switch
     const V2 = tr.pts;
@@ -269,7 +280,7 @@ export function buildSymbolPillowMesh(
       while (th1 <= th0) th1 += 2 * Math.PI;
 
       const rimRel = wedgeRim(SYMBOL_POLYS[name], th0, th1);
-      const rimAbs = rimRel.map((p) => [vk[0] + p[0], vk[1] + p[1]]);
+      const rimAbs = rimRel.map((p) => [vk[0] + symScale * p[0], vk[1] + symScale * p[1]]);
       const tintVal = FEATURES[name].tint;
       const vk3 = V3[k];
       const vkUv = toPair(vk);
@@ -316,24 +327,54 @@ export function buildSymbolPillowMesh(
 
 // ---- Animation State Machine ----
 
+export function computeOrbitFrame(state) {
+  const angDeg = pairVectors(state.e, state.activeFrame).ang;
+  let minX = Infinity, maxX = -Infinity;
+  let minY = Infinity, maxY = -Infinity;
+  let minZ = Infinity, maxZ = -Infinity;
+  const pts = [];
+  for (let k = 0; k < 16; k++) {
+    const e = basisFromPair(state.animEll, k / 16, state.activeFrame, angDeg);
+    const { V } = worldCornersFromState(e, state.activeIdx, state.pinFrame, { minConorm: 4e-4 });
+    for (const name of ['A', 'B', 'C', 'D']) {
+      const p = V[name];
+      pts.push(p);
+      if (p[0] < minX) minX = p[0];
+      if (p[0] > maxX) maxX = p[0];
+      if (p[1] < minY) minY = p[1];
+      if (p[1] > maxY) maxY = p[1];
+      if (p[2] < minZ) minZ = p[2];
+      if (p[2] > maxZ) maxZ = p[2];
+    }
+  }
+  const center = [(minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2];
+  let r = 0;
+  for (const p of pts) {
+    const d = norm3(sub3(p, center));
+    if (d > r) r = d;
+  }
+  return { center, radius: Math.max(0.86, r * 1.15) };
+}
+
 export function createAnimModel({ activeIdx = 0, t = 0.25, ell = FIXED_ELL, playing = true, speed = 1 } = {}) {
-  const safeEll = clamp(Number.isFinite(ell) ? ell : FIXED_ELL, 0.5, 2.0);
+  const safeEll = clamp(Number.isFinite(ell) ? ell : FIXED_ELL, 0.2, 5.0);
   const safeT = mod(Number.isFinite(t) ? t : 0.25, ANIM_PERIOD);
   const base = createModel({ ell: safeEll, t: 0, activeIdx: 0 });
   if (activeIdx === 1 || activeIdx === 2) activatePartition(base, activeIdx, null);
   const angDeg = pairVectors(base.e, base.activeFrame).ang;
   base.e = basisFromPair(safeEll, safeT, base.activeFrame, angDeg);
   const S0 = solidFromBasis(base.e, { minConorm: 4e-4 });
-  return {
+  const state = {
     ...base,
     animEll: safeEll,
     animT: safeT,
     playing: !!playing,
     speed: Number.isFinite(speed) && speed > 0 ? speed : 1,
-    glide: null,
     pinFrame: intrinsicPairFrame(S0, base.activeIdx),
-    midGlide: null,
+    orbitFrame: null,
   };
+  state.orbitFrame = computeOrbitFrame(state);
+  return state;
 }
 
 export function switchAnimPair(state, nextIdx, paisleyFns = null) {
@@ -355,53 +396,16 @@ export function switchAnimPair(state, nextIdx, paisleyFns = null) {
   const newV = cross3(newW, newU);
   state.pinFrame = { mid: newMid, u: newU, v: newV, w: newW };
 
-  const idealMid = mul3(-REG_HALF_AXIS, newW);
-  state.midGlide = norm3(sub3(newMid, idealMid)) > 1e-4
-    ? { from: newMid.slice(), to: idealMid, elapsed: 0, dur: 0.35 }
-    : null;
-
   activatePartition(state, nextIdx, paisleyFns);
   const pv = pairVectors(state.e, state.activeFrame);
   state.animEll = pv.ell;
   state.animT = mod(pv.t, ANIM_PERIOD);
-  state.glide = Math.abs(pv.ell - FIXED_ELL) > 1e-4
-    ? { fromEll: pv.ell, toEll: FIXED_ELL, elapsed: 0, dur: 0.35 }
-    : null;
-  if (!state.glide) {
-    state.animEll = FIXED_ELL;
-    state.e = basisFromPair(FIXED_ELL, state.animT, state.activeFrame, pv.ang);
-  }
+  state.orbitFrame = computeOrbitFrame(state);
   return state;
 }
 
 export function stepAnim(state, dtSec) {
   const dt = clamp(Number.isFinite(dtSec) ? dtSec : 0, 0, 0.1);
-  if (state.glide) {
-    const g = state.glide;
-    g.elapsed += dt;
-    const u = clamp(g.elapsed / g.dur, 0, 1);
-    const ease = u * u * (3 - 2 * u);
-    state.animEll = g.fromEll + (g.toEll - g.fromEll) * ease;
-    if (u >= 1) {
-      state.animEll = g.toEll;
-      state.glide = null;
-    }
-  }
-  if (state.midGlide && state.pinFrame) {
-    const g = state.midGlide;
-    g.elapsed += dt;
-    const u = clamp(g.elapsed / g.dur, 0, 1);
-    const ease = u * u * (3 - 2 * u);
-    state.pinFrame.mid = [
-      g.from[0] + (g.to[0] - g.from[0]) * ease,
-      g.from[1] + (g.to[1] - g.from[1]) * ease,
-      g.from[2] + (g.to[2] - g.from[2]) * ease,
-    ];
-    if (u >= 1) {
-      state.pinFrame.mid = g.to.slice();
-      state.midGlide = null;
-    }
-  }
   if (state.playing) {
     state.animT = mod(state.animT + dt * BASE_TURNS_PER_SEC * state.speed, ANIM_PERIOD);
   }
@@ -412,7 +416,6 @@ export function stepAnim(state, dtSec) {
 
 export function scrubAnimTwist(state, newT) {
   state.animT = mod(Number.isFinite(newT) ? newT : 0, ANIM_PERIOD);
-  state.animEll = state.glide ? state.animEll : FIXED_ELL;
   const angDeg = pairVectors(state.e, state.activeFrame).ang;
   state.e = basisFromPair(state.animEll, state.animT, state.activeFrame, angDeg);
   return state;

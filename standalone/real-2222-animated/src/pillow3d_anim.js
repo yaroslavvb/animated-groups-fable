@@ -41,6 +41,7 @@ export function createAnimPillowStage(canvas, labelLayer, scrollHost) {
   let curState = null;
   let mesh = null;
   let framed = false;
+  let lastOrbitFrame = null;
 
   // Allow two-finger trackpad scroll / wheel to scroll the page natively.
   const host = scrollHost || canvas.parentElement?.parentElement;
@@ -206,7 +207,7 @@ export function createAnimPillowStage(canvas, labelLayer, scrollHost) {
     else if (mq.addListener) mq.addListener(onTheme);
   }
 
-  function set(nextState) {
+  function set(nextState, { immediateFrame = false } = {}) {
     curState = nextState;
     mesh = buildSymbolPillowMesh(nextState.e, nextState.activeFrame, {
       activeIdx: nextState.activeIdx,
@@ -239,8 +240,12 @@ export function createAnimPillowStage(canvas, labelLayer, scrollHost) {
       });
     }
 
-    R.setFrame({ center: [0, 0, 0], radius: SURFACE_RADIUS }, !framed);
-    framed = true;
+    const frame = nextState.orbitFrame || { center: [0, 0, 0], radius: SURFACE_RADIUS };
+    if (!framed || immediateFrame || frame !== lastOrbitFrame) {
+      R.setFrame(frame, !framed || immediateFrame);
+      lastOrbitFrame = frame;
+      framed = true;
+    }
     stage.decorate();
     R.render();
   }

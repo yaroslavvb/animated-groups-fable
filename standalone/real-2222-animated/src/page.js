@@ -1,9 +1,10 @@
 // page.js — controller for "The real 2222 animated":
-// fixed aspect ratio/size, three twist-pair selector buttons, continuous animation in 3D and 2D rigid unfolding.
+// continuous twist animations where each pairing holds its first pair fixed in 3D while twisting the other,
+// preserving instantaneous length when switching pairs, with a Reset button back to the regular tetrahedron.
 
 import { shareHash } from '../../classification-of-surfaces/src/sharehash.js';
 import { placedInPane, samePrint } from '../../real-2222/src/paisley.js';
-import { mod } from '../../real-2222/src/real2222.js';
+import { mod, clamp } from '../../real-2222/src/real2222.js';
 import {
   FIXED_ELL,
   ANIM_PERIOD,
@@ -20,7 +21,7 @@ const PAISLEY_FNS = { placedInPane, samePrint };
 
 function parseHash() {
   const raw = (typeof window !== 'undefined' ? window.location.hash : '').replace(/^#/, '');
-  const out = { activeIdx: 0, t: 0.25 };
+  const out = { activeIdx: 0, t: 0.25, ell: FIXED_ELL };
   if (!raw) return out;
   for (const part of raw.split('&')) {
     const eq = part.indexOf('=');
@@ -33,6 +34,8 @@ function parseHash() {
       if (idx >= 0 && idx <= 2) out.activeIdx = idx;
     } else if (k === 't') {
       out.t = mod(v, ANIM_PERIOD);
+    } else if (k === 'l') {
+      out.ell = clamp(v, 0.2, 5.0);
     }
   }
   return out;
@@ -47,7 +50,7 @@ const initial = parseHash();
 let model = createAnimModel({
   activeIdx: initial.activeIdx,
   t: initial.t,
-  ell: FIXED_ELL,
+  ell: initial.ell,
   playing: !reducedMotion,
   speed: 1,
 });
@@ -58,8 +61,10 @@ const unfold = createAnimUnfoldPane($('unfold'));
 const pairBtns = [0, 1, 2].map((i) => document.querySelector(`[data-pair="${i}"]`));
 const speedBtns = [...document.querySelectorAll('[data-speed]')];
 const playBtn = $('btn-play');
+const resetBtn = $('btn-reset');
 const scrubEl = $('twist-scrub');
 const twistValEl = $('twist-val');
+const ellValEl = $('ell-val');
 const shapeKindEl = $('shape-kind');
 
 let lastHash = '';
@@ -69,6 +74,9 @@ let lastFrameMs = 0;
 function writeHash() {
   const parts = [];
   if (model.activeIdx !== 0) parts.push(`p=${model.activeIdx}`);
+  if (Math.abs(model.animEll - FIXED_ELL) > 1e-3) {
+    parts.push(`l=${model.animEll.toFixed(3).replace(/\.?0+$/, '')}`);
+  }
   if (!model.playing) parts.push(`t=${model.animT.toFixed(3).replace(/\.?0+$/, '')}`);
   const h = parts.length ? '#' + parts.join('&') : '#';
   if (h === lastHash) return;
@@ -89,6 +97,7 @@ function syncUI() {
   playBtn.setAttribute('aria-pressed', String(model.playing));
   scrubEl.value = model.animT.toFixed(4);
   twistValEl.textContent = model.animT.toFixed(3);
+  ellValEl.textContent = `ℓ = ${model.animEll.toFixed(3)}`;
   const info = pillow.info();
   if (info.kind) shapeKindEl.textContent = info.kind;
   for (const btn of speedBtns) {
@@ -96,29 +105,43 @@ function syncUI() {
   }
 }
 
-function renderAll() {
-  pillow.set(model);
+function renderAll(opts) {
+  pillow.set(model, opts);
   unfold.set(model);
   syncUI();
 }
 
 function tick(now) {
   rafId = 0;
-  if (!model.playing && !model.glide && !model.midGlide) return;
+  if (!model.playing) return;
   const dt = lastFrameMs ? Math.min(0.05, Math.max(0, (now - lastFrameMs) / 1000)) : 0;
   lastFrameMs = now;
   stepAnim(model, dt);
   renderAll();
-  if (model.playing || model.glide || model.midGlide) {
+  if (model.playing) {
     rafId = requestAnimationFrame(tick);
   }
 }
 
 function ensureLoop() {
-  if (!rafId && (model.playing || model.glide || model.midGlide)) {
+  if (!rafId && model.playing) {
     lastFrameMs = performance.now();
     rafId = requestAnimationFrame(tick);
   }
+}
+
+function resetAll() {
+  model = createAnimModel({
+    activeIdx: 0,
+    t: 0.25,
+    ell: FIXED_ELL,
+    playing: model.playing,
+    speed: model.speed,
+  });
+  pillow.resetView();
+  renderAll({ immediateFrame: true });
+  writeHash();
+  ensureLoop();
 }
 
 for (let i = 0; i < 3; i++) {
@@ -136,6 +159,8 @@ playBtn.addEventListener('click', () => {
   writeHash();
   ensureLoop();
 });
+
+resetBtn.addEventListener('click', resetAll);
 
 for (const btn of speedBtns) {
   btn.addEventListener('click', () => {
@@ -187,12 +212,12 @@ window.addEventListener('hashchange', () => {
   model = createAnimModel({
     activeIdx: p.activeIdx,
     t: p.t,
-    ell: FIXED_ELL,
+    ell: p.ell,
     playing: model.playing,
     speed: model.speed,
   });
   lastHash = h;
-  renderAll();
+  renderAll({ immediateFrame: true });
   ensureLoop();
 });
 
@@ -219,7 +244,6 @@ window.__real2222Anim = {
     animT: model.animT,
     playing: model.playing,
     speed: model.speed,
-    gliding: !!(model.glide || model.midGlide),
   }),
   info: () => pillow.info(),
   unfoldInfo: () => unfold.info(),
@@ -241,5 +265,6 @@ window.__real2222Anim = {
     model.speed = speed;
     syncUI();
   },
+  reset: resetAll,
   resetView: () => pillow.resetView(),
 };

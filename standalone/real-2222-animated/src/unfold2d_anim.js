@@ -10,7 +10,7 @@ import {
   unfoldedNet,
 } from '../../real-2222/src/real2222.js';
 import { placedInPane, outline, sizeOf } from '../../real-2222/src/paisley.js';
-import { FEATURES, SYMBOL_POLYS } from './symbols.js';
+import { FEATURES, SYMBOL_POLYS, symbolScaleFor } from './symbols.js';
 
 const VIEW_SPAN = 4.2;
 const CAM_X = 0;
@@ -171,6 +171,7 @@ export function createAnimUnfoldPane(canvas) {
     const net = unfoldedNet(S, [CAM_X, CAM_Y]);
 
     // 5. Four unique 180-deg symmetric colored emblems centered at every visible half-turn point
+    const symScale = symbolScaleFor(S);
     let symbolsDrawn = 0;
 
     for (let jb = jb0; jb <= jb1; jb++) {
@@ -181,10 +182,10 @@ export function createAnimUnfoldPane(canvas) {
         const poly = SYMBOL_POLYS[name];
 
         ctx.beginPath();
-        const s0 = toScreen([pt[0] + poly[0][0], pt[1] + poly[0][1]]);
+        const s0 = toScreen([pt[0] + symScale * poly[0][0], pt[1] + symScale * poly[0][1]]);
         ctx.moveTo(s0[0], s0[1]);
         for (let k = 1; k < poly.length; k++) {
-          const sk = toScreen([pt[0] + poly[k][0], pt[1] + poly[k][1]]);
+          const sk = toScreen([pt[0] + symScale * poly[k][0], pt[1] + symScale * poly[k][1]]);
           ctx.lineTo(sk[0], sk[1]);
         }
         ctx.closePath();
