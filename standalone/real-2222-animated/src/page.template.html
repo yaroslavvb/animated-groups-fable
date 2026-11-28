@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The real 2222 animated</title>
+<style>
+/*__INLINE_CSS__*/
+</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<main class="app">
+  <header class="hdr">
+    <h1 class="title">The real 2222 animated</h1>
+    <p class="sub">Fixed size and aspect ratio — choose one of the three corner pairings to animate its continuous twist in 3D and rigid 2D unfolding.</p>
+  </header>
+
+  <section class="pair-picker" role="radiogroup" aria-label="Choose twist pairing">
+    <button type="button" class="pair-btn is-selected" data-pair="0" role="radio" aria-checked="true">
+      <span class="pair-badge">Twisting pair 1</span>
+      <span class="pair-visual">
+        <span class="pair-side">
+          <svg class="sym-ico sym-a" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.5 12.1,7.9 18.5,10 12.1,12.1 10,18.5 7.9,12.1 1.5,10 7.9,7.9"/></svg>
+          <svg class="sym-ico sym-b" viewBox="0 0 20 20" aria-hidden="true"><polygon points="18.5,10 10,15 1.5,10 10,5"/></svg>
+        </span>
+        <span class="pair-bar" aria-hidden="true">|</span>
+        <span class="pair-side">
+          <svg class="sym-ico sym-c" viewBox="0 0 20 20" aria-hidden="true"><polygon points="17.5,7.5 17.5,12.5 12.5,12.5 12.5,17.5 7.5,17.5 7.5,12.5 2.5,12.5 2.5,7.5 7.5,7.5 7.5,2.5 12.5,2.5 12.5,7.5"/></svg>
+          <svg class="sym-ico sym-d" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg>
+        </span>
+      </span>
+      <span class="pair-names">{A, B} | {C, D}</span>
+    </button>
+
+    <button type="button" class="pair-btn" data-pair="1" role="radio" aria-checked="false">
+      <span class="pair-badge">Twisting pair 2</span>
+      <span class="pair-visual">
+        <span class="pair-side">
+          <svg class="sym-ico sym-a" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.5 12.1,7.9 18.5,10 12.1,12.1 10,18.5 7.9,12.1 1.5,10 7.9,7.9"/></svg>
+          <svg class="sym-ico sym-c" viewBox="0 0 20 20" aria-hidden="true"><polygon points="17.5,7.5 17.5,12.5 12.5,12.5 12.5,17.5 7.5,17.5 7.5,12.5 2.5,12.5 2.5,7.5 7.5,7.5 7.5,2.5 12.5,2.5 12.5,7.5"/></svg>
+        </span>
+        <span class="pair-bar" aria-hidden="true">|</span>
+        <span class="pair-side">
+          <svg class="sym-ico sym-b" viewBox="0 0 20 20" aria-hidden="true"><polygon points="18.5,10 10,15 1.5,10 10,5"/></svg>
+          <svg class="sym-ico sym-d" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg>
+        </span>
+      </span>
+      <span class="pair-names">{A, C} | {B, D}</span>
+    </button>
+
+    <button type="button" class="pair-btn" data-pair="2" role="radio" aria-checked="false">
+      <span class="pair-badge">Twisting pair 3</span>
+      <span class="pair-visual">
+        <span class="pair-side">
+          <svg class="sym-ico sym-a" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.5 12.1,7.9 18.5,10 12.1,12.1 10,18.5 7.9,12.1 1.5,10 7.9,7.9"/></svg>
+          <svg class="sym-ico sym-d" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg>
+        </span>
+        <span class="pair-bar" aria-hidden="true">|</span>
+        <span class="pair-side">
+          <svg class="sym-ico sym-b" viewBox="0 0 20 20" aria-hidden="true"><polygon points="18.5,10 10,15 1.5,10 10,5"/></svg>
+          <svg class="sym-ico sym-c" viewBox="0 0 20 20" aria-hidden="true"><polygon points="17.5,7.5 17.5,12.5 12.5,12.5 12.5,17.5 7.5,17.5 7.5,12.5 2.5,12.5 2.5,7.5 7.5,7.5 7.5,2.5 12.5,2.5 12.5,7.5"/></svg>
+        </span>
+      </span>
+      <span class="pair-names">{A, D} | {B, C}</span>
+    </button>
+  </section>
+
+  <section class="stage-wrap" id="stage-wrap" aria-label="3D pillow and rigid unfolding animations">
+    <div class="stage-card">
+      <div class="viz-grid">
+        <div class="viz-cell">
+          <div class="pane" id="pane">
+            <canvas id="view" tabindex="0" aria-label="Animated 3D 2222 orbifold pillow"></canvas>
+            <div class="labels" id="labels" aria-hidden="true"></div>
+            <span class="viz-tag">3D surface</span>
+            <button type="button" class="btn-quiet pane-reset" id="reset-view" aria-label="Reset 3D camera" title="Reset camera view">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7"/>
+                <path d="M4 4v4.7h4.7"/>
+              </svg>
+            </button>
+            <p class="hint">Drag to turn · pinch to zoom</p>
+          </div>
+        </div>
+
+        <div class="viz-cell">
+          <div class="pane unfold-pane" id="unfold-pane">
+            <canvas id="unfold" aria-label="Rigidly unfolded animated 2222 wallpaper"></canvas>
+            <span class="viz-tag">Rigid unfolding</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="play-foot">
+        <button type="button" class="btn-primary play-btn" id="btn-play" aria-pressed="true">Pause</button>
+        <div class="scrub-wrap">
+          <label class="scrub-label" for="twist-scrub">Twist</label>
+          <div class="swrap">
+            <input id="twist-scrub" type="range" min="0" max="2" step="0.002" value="0.25">
+            <div class="sticks" aria-hidden="true">
+              <i style="left:0%"></i>
+              <i style="left:12.5%"></i>
+              <i style="left:25%"></i>
+              <i style="left:37.5%"></i>
+              <i style="left:50%"></i>
+              <i style="left:62.5%"></i>
+              <i style="left:75%"></i>
+              <i style="left:87.5%"></i>
+              <i style="left:100%"></i>
+            </div>
+          </div>
+          <output class="sval" id="twist-val" for="twist-scrub">0.250</output>
+        </div>
+        <div class="meta-right">
+          <span class="shape-chip" id="shape-kind">regular tetrahedron</span>
+          <div class="speed-pills" role="group" aria-label="Animation speed">
+            <button type="button" class="speed-btn" data-speed="0.5">0.5×</button>
+            <button type="button" class="speed-btn is-selected" data-speed="1">1×</button>
+            <button type="button" class="speed-btn" data-speed="2">2×</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="legend" aria-label="Feature emblems legend">
+      <span class="lg"><svg class="sym-ico sym-a" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.5 12.1,7.9 18.5,10 12.1,12.1 10,18.5 7.9,12.1 1.5,10 7.9,7.9"/></svg><span>A (Star)</span></span>
+      <span class="lg"><svg class="sym-ico sym-b" viewBox="0 0 20 20" aria-hidden="true"><polygon points="18.5,10 10,15 1.5,10 10,5"/></svg><span>B (Diamond)</span></span>
+      <span class="lg"><svg class="sym-ico sym-c" viewBox="0 0 20 20" aria-hidden="true"><polygon points="17.5,7.5 17.5,12.5 12.5,12.5 12.5,17.5 7.5,17.5 7.5,12.5 2.5,12.5 2.5,7.5 7.5,7.5 7.5,2.5 12.5,2.5 12.5,7.5"/></svg><span>C (Cross)</span></span>
+      <span class="lg"><svg class="sym-ico sym-d" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5"/></svg><span>D (Circle)</span></span>
+      <span class="lg"><i class="sw sw-edge"></i><span>active twist pair</span></span>
+      <span class="lg"><i class="sw sw-net"></i><span>unfolded pillow net</span></span>
+    </div>
+  </section>
+</main>
+<script>
+/*__INLINE_JS__*/
+</script>
+</body>
+</html>

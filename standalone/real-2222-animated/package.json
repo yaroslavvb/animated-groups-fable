@@ -1,0 +1,9 @@
+{
+  "name": "real-2222-animated",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "cd ../classification-of-surfaces && node build.mjs --template ../real-2222-animated/src/page.template.html --entry ../real-2222-animated/src/page.js --css src/styles.css,../real-2222-animated/src/page.css --out ../real-2222-animated/site/index.html && cp ../real-2222-animated/site/index.html ../../docs/real-2222-animated.html"
+  }
+}
