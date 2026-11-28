@@ -1,6 +1,6 @@
 // symbols.js — pure geometry for "The real 2222 animated":
 // large overlapping 180-deg symmetric colored motifs carved cleanly via exact convex BSP partitioning
-// with 15-color stained-glass overlap blending, and three twist animations holding each first pair fixed in 3D.
+// with fixed painter's depth order (D < B < C < A), and three twist animations holding each first pair fixed in 3D.
 
 import {
   REG_ELL,
@@ -33,14 +33,16 @@ export const PAIR_SPLITS = [
   [['A', 'D'], ['B', 'C']],
 ];
 export const MAX_SYMBOL_RADIUS = 0.69;
-export const OVERLAP_ALPHA_LIGHT = 0.76;
-export const OVERLAP_ALPHA_DARK = 0.78;
+export const DEPTH_ORDER = ['D', 'B', 'C', 'A']; // bottom -> top painter's order (Circle < Diamond < Cross < Star)
+const DEPTH_RANK = Object.fromEntries(
+  DEPTH_ORDER.map((name, i) => [name, DEPTH_ORDER.length - 1 - i])
+);
 
 export const FEATURES = {
-  A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, maskBit: 1, light: '#0072B2', dark: '#4DB6F5' },
-  B: { name: 'B', label: 'Diamond', tint: 5, palIdx: 1, maskBit: 2, light: '#D55E00', dark: '#FF7B54' },
-  C: { name: 'C', label: 'Cross', tint: 7, palIdx: 3, maskBit: 4, light: '#009E73', dark: '#2DD49F' },
-  D: { name: 'D', label: 'Circle', tint: 11, palIdx: 7, maskBit: 8, light: '#8841B8', dark: '#C084FC' },
+  A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, light: '#0072B2', dark: '#4DB6F5' },
+  B: { name: 'B', label: 'Diamond', tint: 5, palIdx: 1, light: '#D55E00', dark: '#FF7B54' },
+  C: { name: 'C', label: 'Cross', tint: 6, palIdx: 2, light: '#009E73', dark: '#2DD49F' },
+  D: { name: 'D', label: 'Circle', tint: 7, palIdx: 3, light: '#8841B8', dark: '#C084FC' },
 };
 
 export const FEATURE_LIST = [FEATURES.A, FEATURES.B, FEATURES.C, FEATURES.D];
@@ -107,43 +109,6 @@ function makeSymbolData() {
 const SYMBOL_DATA = makeSymbolData();
 export const SYMBOL_POLYS = SYMBOL_DATA.polys;
 export const SYMBOL_CONVEX_PARTS = SYMBOL_DATA.parts;
-
-function hexToRgb(hex) {
-  return [
-    parseInt(hex.slice(1, 3), 16) / 255,
-    parseInt(hex.slice(3, 5), 16) / 255,
-    parseInt(hex.slice(5, 7), 16) / 255,
-  ];
-}
-
-function rgbToHex([r, g, b]) {
-  return '#' + [r, g, b]
-    .map((x) => Math.round(clamp(x, 0, 1) * 255).toString(16).padStart(2, '0'))
-    .join('');
-}
-
-export function buildOverlapPalette(dark) {
-  const groundHex = dark ? '#1f3532' : '#dceee9';
-  const G = hexToRgb(groundHex);
-  const alpha = dark ? OVERLAP_ALPHA_DARK : OVERLAP_ALPHA_LIGHT;
-  const cols = FEATURE_LIST.map((f) => hexToRgb(dark ? f.dark : f.light));
-  const palette = [];
-  for (let mask = 1; mask <= 15; mask++) {
-    const cur = G.slice();
-    for (let i = 0; i < 4; i++) {
-      if (!(mask & (1 << i))) continue;
-      const M = cols[i];
-      for (let c = 0; c < 3; c++) {
-        cur[c] = dark
-          ? 1 - (1 - cur[c]) * (1 - alpha * M[c])
-          : cur[c] * ((1 - alpha) + alpha * M[c]);
-      }
-    }
-    const hex = rgbToHex(cur);
-    palette.push({ front: hex, back: hex });
-  }
-  return palette;
-}
 
 /** Unique point where ray from origin at angle `th` exits star-shaped CCW polygon `poly`. */
 export function rayPolyPoint(poly, th) {
@@ -250,23 +215,24 @@ function partitionTriangleByMotifs(V2, S) {
       }
       const idx = (ia & 1) + 2 * (jb & 1);
       const name = 'ABCD'[idx];
-      const bit = 1 << idx;
+      const tint = FEATURES[name].tint;
+      const rank = DEPTH_RANK[name];
       for (const basePoly of SYMBOL_CONVEX_PARTS[name]) {
         const poly = basePoly.map((p) => [cx + p[0], cy + p[1]]);
         const bb = polyBBox(poly);
         if (bb[2] < tb[0] || bb[0] > tb[2] || bb[3] < tb[1] || bb[1] > tb[3]) continue;
-        shapes.push({ poly, bb, bit, order: poly.length });
+        shapes.push({ poly, bb, tint, rank });
       }
     }
   }
-  shapes.sort((u, v) => u.order - v.order);
+  shapes.sort((u, v) => (u.rank !== v.rank ? u.rank - v.rank : u.poly.length - v.poly.length));
 
-  let pieces = [{ poly: V2, bb: tb, mask: 0 }];
+  let pieces = [{ poly: V2, bb: tb, tint: 0 }];
   for (const sh of shapes) {
     const next = [];
     const sb = sh.bb;
     for (const pc of pieces) {
-      if ((pc.mask & sh.bit) !== 0 || pc.bb[2] < sb[0] || pc.bb[0] > sb[2] || pc.bb[3] < sb[1] || pc.bb[1] > sb[3]) {
+      if (pc.tint !== 0 || pc.bb[2] < sb[0] || pc.bb[0] > sb[2] || pc.bb[3] < sb[1] || pc.bb[1] > sb[3]) {
         next.push(pc);
         continue;
       }
@@ -275,14 +241,14 @@ function partitionTriangleByMotifs(V2, S) {
         const a = sh.poly[i];
         const b = sh.poly[(i + 1) % sh.poly.length];
         const [inP, outP] = splitConvexByLine(inside, a[0], a[1], b[0], b[1]);
-        if (outP) next.push({ poly: outP, bb: polyBBox(outP), mask: pc.mask });
+        if (outP) next.push({ poly: outP, bb: polyBBox(outP), tint: 0 });
         if (!inP) {
           inside = null;
           break;
         }
         inside = inP;
       }
-      if (inside) next.push({ poly: inside, bb: polyBBox(inside), mask: pc.mask | sh.bit });
+      if (inside) next.push({ poly: inside, bb: polyBBox(inside), tint: sh.tint });
     }
     pieces = next;
   }
@@ -338,9 +304,9 @@ export function worldCornersFromState(e, activeIdx, pinFrame, { minConorm = 4e-4
 }
 
 /**
- * Exact non-overlapping carved disphenoid mesh with multi-motif overlap regions:
- * partitions each face by all overlapping 180-deg symmetric corner motifs via exact convex BSP,
- * assigning tint = 0 (Paisley ground) or 3 + mask (1..15 stained-glass overlap palette).
+ * Exact non-overlapping carved disphenoid mesh with fixed-depth motif occlusion:
+ * partitions each face top-down in DEPTH_ORDER (A Star > C Cross > B Diamond > D Circle)
+ * via exact convex BSP, assigning tint = 0 (Paisley ground) or 4..7 for A..D.
  */
 export function buildSymbolPillowMesh(
   e,
@@ -387,7 +353,7 @@ export function buildSymbolPillowMesh(
     const pieces = partitionTriangleByMotifs(V2, S);
     for (const pc of pieces) {
       const poly = pc.poly;
-      const tintVal = pc.mask === 0 ? 0 : 3 + pc.mask;
+      const tintVal = pc.tint;
       const p03 = to3d(poly[0]);
       const p0uv = toPair(poly[0]);
       for (let k = 1; k < poly.length - 1; k++) {

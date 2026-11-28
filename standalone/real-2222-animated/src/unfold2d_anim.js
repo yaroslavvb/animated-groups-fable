@@ -13,9 +13,8 @@ import { placedInPane, outline, sizeOf } from '../../real-2222/src/paisley.js';
 import {
   FEATURES,
   SYMBOL_POLYS,
+  DEPTH_ORDER,
   MAX_SYMBOL_RADIUS,
-  OVERLAP_ALPHA_LIGHT,
-  OVERLAP_ALPHA_DARK,
 } from './symbols.js';
 
 const VIEW_SPAN = 4.2;
@@ -176,7 +175,7 @@ export function createAnimUnfoldPane(canvas) {
     // 4. Canonical label anchors (zero tetrahedron outline lines drawn)
     const net = unfoldedNet(S, [CAM_X, CAM_Y]);
 
-    // 5. Four large 180-deg symmetric colored motifs with order-independent stained-glass overlaps
+    // 5. Four large 180-deg symmetric colored motifs painted in fixed depth order (D < B < C < A)
     const paths = { A: new Path2D(), B: new Path2D(), C: new Path2D(), D: new Path2D() };
     const symBox = {
       x0: planeBox.x0 - MAX_SYMBOL_RADIUS,
@@ -219,18 +218,15 @@ export function createAnimUnfoldPane(canvas) {
     }
 
     ctx.save();
-    ctx.globalCompositeOperation = dark ? 'screen' : 'multiply';
-    ctx.globalAlpha = dark ? OVERLAP_ALPHA_DARK : OVERLAP_ALPHA_LIGHT;
-    for (const name of ['A', 'B', 'C', 'D']) {
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1.0;
+    ctx.lineJoin = 'round';
+    ctx.lineWidth = 2.2;
+    ctx.strokeStyle = col.ground;
+    for (const name of DEPTH_ORDER) {
+      ctx.stroke(paths[name]);
       ctx.fillStyle = col.sym[name];
       ctx.fill(paths[name]);
-    }
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = dark ? 0.55 : 0.45;
-    ctx.lineWidth = 1.15;
-    for (const name of ['A', 'B', 'C', 'D']) {
-      ctx.strokeStyle = col.sym[name];
-      ctx.stroke(paths[name]);
     }
     ctx.restore();
 

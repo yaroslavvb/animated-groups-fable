@@ -30,16 +30,27 @@ test('all four corner symbols are strictly 180-degree rotationally symmetric', (
   }
 });
 
-const popcount = (x) => {
-  let n = 0;
-  for (let v = x; v; v &= v - 1) n++;
-  return n;
+const polyArea = (pts) => {
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    const q = pts[(i + 1) % pts.length];
+    a += p[0] * q[1] - p[1] * q[0];
+  }
+  return 0.5 * a;
 };
+const SUM_MOTIF_AREA =
+  0.5 *
+  (polyArea(SYMBOL_POLYS.A) +
+    polyArea(SYMBOL_POLYS.B) +
+    polyArea(SYMBOL_POLYS.C) +
+    polyArea(SYMBOL_POLYS.D));
 
-test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 single + 6 pairwise overlap tints across all 3 pairs', () => {
+test('buildSymbolPillowMesh preserves area=2, outward normals, fixed depth order [0,4,5,6,7], and genuine motif overlap', () => {
   for (let activeIdx = 0; activeIdx < 3; activeIdx++) {
     const model = createAnimModel({ activeIdx, t: 0.25, ell: FIXED_ELL });
-    const cycleTints = new Set();
+    let minOverlapArea = Infinity;
+    let maxOverlapArea = 0;
     for (let s = 0; s <= 24; s++) {
       const tw = (s / 24) * ANIM_PERIOD;
       scrubAnimTwist(model, tw);
@@ -49,15 +60,10 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 single 
         pinFrame: model.pinFrame,
       });
       let area = 0;
+      let bgArea = 0;
       const seenTints = new Set();
-      for (let i = 0; i < meshExact.tint.length; i++) {
-        seenTints.add(meshExact.tint[i]);
-        cycleTints.add(meshExact.tint[i]);
-      }
-      assert.ok(seenTints.has(0), `missing ground tint 0 at pair ${activeIdx} t=${tw}`);
-      for (const tSingle of [4, 5, 7, 11]) {
-        assert.ok(seenTints.has(tSingle), `missing single tint ${tSingle} at pair ${activeIdx} t=${tw}`);
-      }
+      for (let i = 0; i < meshExact.tint.length; i++) seenTints.add(meshExact.tint[i]);
+      assert.deepEqual([...seenTints].sort((a, b) => a - b), [0, 4, 5, 6, 7], `pair ${activeIdx} t=${tw}`);
 
       for (let t = 0; t < meshExact.indices.length; t += 3) {
         const i0 = meshExact.indices[t] * 3;
@@ -66,9 +72,14 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 single 
         const p0 = [meshExact.positions[i0], meshExact.positions[i0 + 1], meshExact.positions[i0 + 2]];
         const p1 = [meshExact.positions[i1], meshExact.positions[i1 + 1], meshExact.positions[i1 + 2]];
         const p2 = [meshExact.positions[i2], meshExact.positions[i2 + 1], meshExact.positions[i2 + 2]];
-        area += 0.5 * norm3(cross3(sub3(p1, p0), sub3(p2, p0)));
+        const ta = 0.5 * norm3(cross3(sub3(p1, p0), sub3(p2, p0)));
+        area += ta;
+        if (meshExact.tint[meshExact.indices[t]] === 0) bgArea += ta;
       }
       assert.ok(Math.abs(area - 2) < 1e-5, `pair ${activeIdx} t=${tw}: area=${area}`);
+      const overlap = SUM_MOTIF_AREA - (2 - bgArea);
+      minOverlapArea = Math.min(minOverlapArea, overlap);
+      maxOverlapArea = Math.max(maxOverlapArea, overlap);
 
       const meshViz = buildSymbolPillowMesh(model.e, model.activeFrame, {
         minConorm: 4e-4,
@@ -88,14 +99,8 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 single 
         assert.ok(dot3(n, sub3(mid, cen)) > 0, `pair ${activeIdx} t=${tw}: inverted triangle normal`);
       }
     }
-    if (activeIdx < 2) {
-      for (const tPair of [6, 8, 9, 12, 13, 15]) {
-        assert.ok(cycleTints.has(tPair), `pair ${activeIdx} missing pairwise overlap tint ${tPair} across cycle`);
-      }
-    } else {
-      const pairwiseCount = [6, 8, 9, 12, 13, 15].filter((tPair) => cycleTints.has(tPair)).length;
-      assert.ok(pairwiseCount >= 3, `pair ${activeIdx} expected >= 3 pairwise overlap tints, got ${pairwiseCount}`);
-    }
+    assert.ok(minOverlapArea > 0.001, `pair ${activeIdx} expected > 0.001 overlap area, got ${minOverlapArea}`);
+    assert.ok(maxOverlapArea > 0.02, `pair ${activeIdx} expected > 0.02 max overlap area, got ${maxOverlapArea}`);
   }
 });
 
@@ -179,7 +184,7 @@ test('switchAnimPair preserves exact world pose and instantaneous ell (no length
   }
 });
 
-test('buildSymbolPillowMesh preserves area=2, outward normals, and overlap tints across extreme ell 0.2..4.0', () => {
+test('buildSymbolPillowMesh preserves area=2, outward normals, and depth-ordered overlap across extreme ell 0.2..4.0', () => {
   for (const ell of [0.2, 0.35, 1.4215, 2.5, 4.0]) {
     const model = createAnimModel({ activeIdx: 0, t: 0.18, ell });
     const mesh = buildSymbolPillowMesh(model.e, model.activeFrame, {
@@ -188,21 +193,13 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and overlap tints
       pinFrame: model.pinFrame,
     });
     const seenTints = new Set();
-    let combinedMask = 0;
-    let hasOverlap = false;
-    for (let i = 0; i < mesh.tint.length; i++) {
-      const tv = mesh.tint[i];
-      seenTints.add(tv);
-      if (tv >= 4) {
-        const mask = tv - 3;
-        combinedMask |= mask;
-        if (popcount(mask) >= 2) hasOverlap = true;
-      }
+    for (let i = 0; i < mesh.tint.length; i++) seenTints.add(mesh.tint[i]);
+    for (const tv of seenTints) {
+      assert.ok([0, 4, 5, 6, 7].includes(tv), `unexpected tint ${tv} at ell=${ell}`);
     }
-    assert.equal(combinedMask, 15, `expected all 4 motifs represented at ell=${ell}, mask=${combinedMask}`);
-    assert.ok(hasOverlap, `expected overlapping motifs at extreme ell=${ell}, tints=${[...seenTints]}`);
 
     let area = 0;
+    let bgArea = 0;
     const cen = mul3(0.25, add3(add3(mesh.corners.A, mesh.corners.B), add3(mesh.corners.C, mesh.corners.D)));
     for (let t = 0; t < mesh.indices.length; t += 3) {
       const i0 = mesh.indices[t] * 3;
@@ -212,10 +209,14 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and overlap tints
       const p1 = [mesh.positions[i1], mesh.positions[i1 + 1], mesh.positions[i1 + 2]];
       const p2 = [mesh.positions[i2], mesh.positions[i2 + 1], mesh.positions[i2 + 2]];
       const n = cross3(sub3(p1, p0), sub3(p2, p0));
-      area += 0.5 * norm3(n);
+      const ta = 0.5 * norm3(n);
+      area += ta;
+      if (mesh.tint[mesh.indices[t]] === 0) bgArea += ta;
       const mid = [(p0[0] + p1[0] + p2[0]) / 3, (p0[1] + p1[1] + p2[1]) / 3, (p0[2] + p1[2] + p2[2]) / 3];
       assert.ok(dot3(n, sub3(mid, cen)) > -1e-9, `inverted triangle normal at ell=${ell}`);
     }
+    const overlapArea = SUM_MOTIF_AREA - (2 - bgArea);
+    assert.ok(overlapArea > 0.02, `expected > 0.02 overlap area at ell=${ell}, got ${overlapArea}`);
     assert.ok(Math.abs(area - 2) < 1e-4, `extreme ell=${ell}: area=${area}`);
   }
 });
