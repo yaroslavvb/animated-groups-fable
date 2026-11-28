@@ -2,7 +2,8 @@
 // address that brings a state back, and the way back from a flip.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { openOrbifold, spell, withParam, withMove, cutsOf, linkOf, readLink, rangeOf, LIMIT } from '../src/model.js';
+import { openOrbifold, spell, withParam, withMove, relaid, cutsOf, sidesOf, crowdOf, linkOf, readLink, rangeOf, LIMIT, CROWD_MAX } from '../src/model.js';
+import { crowding } from '../src/print.js';
 import { mul, apply, invOf } from '../src/h2.js';
 import { printKept, rng } from './support.js';
 
@@ -38,15 +39,18 @@ for (const text of WITH_CUTS) {
     for (const c of cutsOf(s)) for (const m of c.moves) {
       const r = withMove(s, c.id, m.kind), kept = printKept(s, r.state, r.carry);
       assert.equal(kept.missing, 0, `${c.id} ${m.kind}: ${kept.missing} of ${kept.n} commas moved`);
-      assert.ok(r.state.tied && !r.state.reinked);
       assert.ok(r.made.length > 0 && r.gone.length > 0);
+      assert.equal(r.state.shapes.flat().length, s.shapes.flat().length, `${c.id} ${m.kind}: a comma came or went`);
       // the state after the flip has an address of its own, and comes back from it
       const l2 = readLink('#' + linkOf(r.state)), s2 = openOrbifold(l2.k, l2.saved);
       assert.equal(linkOf(s2), linkOf(r.state), `${c.id} ${m.kind}: the flipped state reads back`);
-      // the first number moved after a flip inks the print afresh, and says so once
-      const c2 = cutsOf(r.state)[0], s3 = withParam(r.state, c2.id, 'len', c2.len * 1.05), s4 = withParam(s3, c2.id, 'len', c2.len * 1.1);
-      assert.ok(s3.reinked && !s3.tied && !s4.reinked);
-      assert.ok(s3.shapes.flat().length > 0);
+      // a number moved after a flip moves the commas a little, and changes none of them: nothing is laid afresh
+      // (the first step after the flip is a step like the next one: no comma jumps to a new place)
+      const c2 = cutsOf(r.state)[0], s3 = withParam(r.state, c2.id, 'len', c2.len * 1.01), s4 = withParam(s3, c2.id, 'len', c2.len * 1.02);
+      assert.equal(s3.motifs.length, r.state.motifs.length);
+      const G = s3.atlas.G, step = (p, q) => { let top = 0; q.shapes.forEach((list, a) => list.forEach((sh, j) => { assert.equal(sh.size, p.shapes[a][j].size, `${c.id} ${m.kind}: a comma changed its size`); top = Math.max(top, G.dist(sh.c, p.shapes[a][j].c)); })); return top; };
+      const d1 = step(r.state, s3), d2 = step(s3, s4);
+      assert.ok(d1 < 2.5 * d2 + 2e-3, `${c.id} ${m.kind}: the first 1 % step after the flip moved a comma by ${d1}, the next by ${d2}`);
     }
   });
 }
@@ -136,14 +140,109 @@ test('a slider moved in small steps moves every comma in small steps', () => {
   }
 });
 
+/** The shape of a comma as distances between some of its points: the same for two commas exactly when one is the other moved. */
+const shapeOf = (G, sh) => { const k = [0, 7, 15, 23, 31, 40], out = []; for (let i = 0; i < k.length; i++) for (let j = i + 1; j < k.length; j++) out.push(G.dist(sh.pts[k[i] % sh.pts.length], sh.pts[k[j] % sh.pts.length])); return out; };
+
+test('a comma is only ever moved: no number and no flip changes its shape or its size, and none comes or goes', () => {
+  const rnd = rng(8);
+  for (const text of ['3333', '2223', '333*2x', 'o33', '33*2', '32*54', '***', '*22222', '2222', 'o', '**', '*x']) {
+    let s = openOrbifold(text);
+    const first = s.shapes.flat().map((sh) => shapeOf(s.atlas.G, sh)).sort((a, b) => a[0] - b[0] || a[1] - b[1]), count = first.length;
+    assert.ok(count > 0, text);
+    for (let i = 0; i < 14; i++) {
+      const cuts = cutsOf(s), c = cuts[Math.floor(rnd() * cuts.length)], pick = rnd();
+      if (pick < 0.35) s = withParam(s, c.id, 'len', c.len * (0.8 + 0.5 * rnd()));
+      else if (pick < 0.6 && c.twist) s = withParam(s, c.id, 'tw', rnd() - 0.5);
+      else if (c.moves.length) { try { s = withMove(s, c.id, c.moves[Math.floor(rnd() * c.moves.length)].kind).state; } catch (err) { assert.ok(err.refused, `${text}: ${err.message}`); } }
+      const now = s.shapes.flat().map((sh) => shapeOf(s.atlas.G, sh)).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+      assert.equal(now.length, count, `${text}, step ${i + 1}: there were ${count} commas and there are ${now.length}`);
+      now.forEach((d, k) => d.forEach((x, j) => assert.ok(Math.abs(x - first[k][j]) < 1e-7, `${text}, step ${i + 1}: a comma has changed its shape (${x} for ${first[k][j]})`)));
+    }
+  }
+});
+
+test('the print is laid so that no two commas touch, a flip leaves it as crowded as it was, and a Length stops before they run into each other', () => {
+  for (const text of ['3333', '2223', '22222', '333*2x', 'o33', 'oo', '33*2', '***', '*22222', '32*54', '2222', 'o', '*2222', '**', '22*', '*x']) {
+    const s = openOrbifold(text);
+    assert.equal(crowdOf(s), 0, `${text}: commas touch as the print is laid`);
+    for (const c of cutsOf(s)) {
+      // a Length taken as far as its slider goes, both ways
+      for (const end of rangeOf(s, c.id, 'len')) {
+        const t = withParam(s, c.id, 'len', end);
+        assert.ok(crowdOf(t) <= CROWD_MAX + 1e-6, `${text} ${c.id}: at ${t.params[c.id].len} the commas run ${crowdOf(t)} into each other`);
+        if (t.limited) assert.ok(Math.abs(t.params[c.id].len - end) > 1e-3 && crowdOf(t) > CROWD_MAX - 0.05, `${text} ${c.id}: stopped at ${t.params[c.id].len} with the commas ${crowdOf(t)} into each other`);
+        else assert.ok(Math.abs(t.params[c.id].len - end) < 1e-9);
+      }
+      for (const m of c.moves) {
+        let r;
+        try { r = withMove(s, c.id, m.kind); } catch (err) { assert.ok(err.refused); continue; }
+        assert.ok(Math.abs(crowding(r.state.atlas, r.state.shapes).worst - crowdOf(s)) < 1e-6, `${text} ${c.id} ${m.kind}: the flip changed how crowded the print is`);
+      }
+    }
+  }
+});
+
+test('a Twist is never stopped, and a state more crowded than the limit may still move the way that is no worse', () => {
+  let s = openOrbifold('3333');
+  const c = cutsOf(s)[0];
+  s = withMove(s, c.id, 'A').state;
+  for (const tw of [-0.5, -0.2, 0.3, 0.5]) { const t = withParam(s, c.id, 'tw', tw); assert.equal(t.params[c.id].tw, tw); assert.ok(!t.limited); }
+  // crowded on purpose: a twist after a flip carries commas over each other
+  const crowded = withParam(s, c.id, 'tw', 0.31), before = crowdOf(crowded);
+  const moved = withParam(crowded, c.id, 'len', crowded.params[c.id].len * 1.02);
+  assert.ok(crowdOf(moved) <= Math.max(CROWD_MAX, before) + 1e-6);
+});
+
+test('the print laid afresh, when asked for, has no two commas touching', () => {
+  let s = openOrbifold('333*2x');
+  s = withMove(s, cutsOf(s)[0].id, 'pop').state;
+  s = withParam(s, cutsOf(s)[2].id, 'tw', 0.37);
+  const fresh = relaid(s);
+  assert.equal(crowdOf(fresh), 0);
+  assert.ok(fresh.shapes.flat().length > 0);
+  assert.equal(linkOf(fresh), linkOf(s));
+  assert.equal(relaid(openOrbifold('*532')).mode, 'rigid');
+});
+
+test('what a cut parts: the special points on its two sides', () => {
+  const s = openOrbifold('333*2x'), cuts = cutsOf(s);
+  assert.deepEqual(cuts.map((c) => c.parts && c.parts.join(' | ')), ['∗2 | 333×', null, '∗2× | 333', '3∗2× | 33']);
+  const sides = sidesOf(s, cuts[3].id);
+  assert.equal(Object.values(sides.marks).filter((x) => x === 1).length, 2);            // the two cone points 3 3
+  assert.equal(Object.values(sides.marks).filter((x) => x === 0).length, 2);            // the third, and the mirror's corner
+  // every mark of the atlas is on one side or the other
+  for (const atom of s.atlas.atoms) for (const mk of atom.marks) assert.ok(sides.marks[mk.which === undefined ? `${mk.part}:${mk.end}` : `${mk.part}:${mk.end}:${mk.which}`] !== undefined);
+  assert.equal(sidesOf(s, cuts[1].id), null);                                           // a crosscap parts nothing
+  for (const text of ['oo', '***', 'o', '**', '*x']) for (const c of cutsOf(openOrbifold(text))) assert.equal(c.parts, null, `${text} ${c.id}`);
+  assert.deepEqual(cutsOf(openOrbifold('3333'))[0].parts, ['33', '33']);
+  assert.deepEqual(cutsOf(openOrbifold('2223'))[0].parts.slice().sort(), ['22', '32']);
+  assert.deepEqual(cutsOf(openOrbifold('2222'))[0].parts, ['22', '22']);
+  assert.deepEqual(cutsOf(openOrbifold('*2222'))[0].parts, ['∗22', '∗22']);
+  // after a flip the same special points are parted another way
+  const flipped = withMove(openOrbifold('3333'), 'c0', 'A').state;
+  assert.deepEqual(cutsOf(flipped)[0].parts, ['33', '33']);
+});
+
+test('a link opens the same orbifold cut the same way, with the print laid as that decomposition first has it and moved to the numbers', () => {
+  const a = withParam(withParam(openOrbifold('3333'), 'c0', 'len', 3.1), 'c0', 'tw', 0.2);
+  const link = readLink('#' + linkOf(a)), b = openOrbifold(link.k, link.saved);
+  assert.equal(linkOf(b), linkOf(a));
+  const G = a.atlas.G;
+  a.shapes.forEach((list, atom) => list.forEach((sh, j) => assert.ok(G.dist(sh.c, b.shapes[atom][j].c) < 1e-3 && sh.size === b.shapes[atom][j].size, 'the print of the link is the print of the page')));
+});
+
 test('a number is kept inside what can be drawn', () => {
   const s = openOrbifold('3333'), c = cutsOf(s)[0], r = rangeOf(s, c.id, 'len');
   assert.equal(withParam(s, c.id, 'len', 1e-9).params[c.id].len, r[0]);
-  assert.equal(withParam(s, c.id, 'len', 99).params[c.id].len, r[1]);
+  const long = withParam(s, c.id, 'len', 99);
+  assert.ok(long.limited && long.params[c.id].len > c.len * 1.3 && long.params[c.id].len < r[1], `stopped at ${long.params[c.id].len}`);
   assert.equal(withParam(s, c.id, 'tw', 3).params[c.id].tw, 0.5);
   assert.equal(withParam(s, 'nope', 'len', 2), s);
   const flat = openOrbifold('**'), f = cutsOf(flat)[0], fr = rangeOf(flat, f.id, 'len');
   assert.ok(fr[0] < f.len && f.len < fr[1]);
+  // a cut a flip has made shorter than a slider goes keeps its place, and the slider reaches to it
+  const far = withMove(openOrbifold('2223'), 'c0', 'A').state, made = cutsOf(far)[0];
+  assert.ok(made.len < 0.6 && rangeOf(far, made.id, 'len')[0] === made.len, `the flip made ${made.len}`);
 });
 
 test('a flip that cannot be drawn is refused with the length it would make and the limit', () => {

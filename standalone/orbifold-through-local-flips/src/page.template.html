@@ -14,7 +14,7 @@
     <h1 data-ss-id="title">Orbifold through local flips</h1>
   </header>
 
-  <p class="lede" data-ss-id="lede">Type an orbifold. Its pattern is cut into rigid pieces, and every cut has a Length, and a Twist where it can turn. Click a cut, in the diagram or on the pattern, to cut another way: the pattern stays exactly where it is, and only the cuts and their numbers change.</p>
+  <p class="lede" data-ss-id="lede">Type an orbifold. A cut parts its special points into two groups, and its two numbers move one group against the other: a Length, and a Twist where it can turn. Click a cut in the diagram to group them another way: the pattern stays exactly where it is, and only the numbers change.</p>
 
   <div class="ctrl-bar" data-ss-react="off">
     <div class="presets" id="presets">
@@ -69,7 +69,8 @@
       <div class="pane-head">
         <span class="pane-title">Pattern</span>
         <span class="pane-sub" id="pat-sub">Poincaré disc</span>
-        <label class="seams-toggle"><input type="checkbox" id="seams" checked> seams</label>
+        <label class="seams-toggle" title="Draw the cuts and the seams of the pieces as lines"><input type="checkbox" id="cuts-on"> cuts</label>
+        <button class="reset" type="button" id="fresh" title="Lay the commas afresh on the pieces as they are now">Fresh print</button>
         <button class="reset" type="button" id="reset-view">Centre</button>
       </div>
       <div class="canvas-wrap">
@@ -91,9 +92,10 @@
       </div>
       <div class="cuts" id="cuts"></div>
       <p class="legend" id="legend">
-        <span><i class="lg lg-cuff"></i>cuff: Length and Twist</span>
-        <span><i class="lg lg-arc"></i>arc: Length</span>
-        <span><i class="lg lg-seam"></i>seams of the pieces</span>
+        <span data-without-cuts><i class="lg-dot lg-dot-a"></i><i class="lg-dot lg-dot-b"></i>the special points on the two sides of the cut pointed at</span>
+        <span data-with-cuts hidden><i class="lg lg-cuff"></i>cuff: Length and Twist</span>
+        <span data-with-cuts hidden><i class="lg lg-arc"></i>arc: Length</span>
+        <span data-with-cuts hidden><i class="lg lg-seam"></i>seams of the pieces</span>
         <span><i class="lg lg-mirror"></i>mirror</span>
         <span><i class="lg lg-cone"></i>cone point</span>
       </p>
@@ -110,6 +112,7 @@
         <li data-ss-id="move-slide"><b>Slide.</b> An arc that runs from a mirror round a cone point or a cuff, next to a mirror polygon, moves to the polygon's third mirror.</li>
       </ul>
       <p data-ss-id="note-same">A move changes coordinates, not the pattern: the group \(\Gamma\) stays as it is, the new Length is read off the trace of the new curve's motion, and each Twist changes by the step the foot of a seam takes along its cuff.</p>
+      <p data-ss-id="note-corners">The cuts are not drawn: a cut is shown by the special points it parts, one side filled in its colour and the other ringed in it, while it is pointed at. A cut that parts no special points (a handle's loop, a crosscap, a mirror) is drawn as its line. Tick <i>cuts</i> to see every cut and the seams of the pieces, and to flip a cut by a click on the pattern.</p>
       <p data-ss-id="note-undo">Undo steps back through flips and slider moves (also ⌘Z or Ctrl+Z). The address of the page holds the cut and its numbers, so a link brings a state back.</p>
     </details>
     <details data-ss-id="note-count">
@@ -123,7 +126,8 @@
         <li data-ss-id="limit-crosscap">Two crosscaps cannot yet be traded for a one-sided handle (a fourth move); every crosscap stays cut along its own core.</li>
         <li data-ss-id="limit-crown">A cuff between two mirrors with corners, or between such a mirror and a crosscap, offers no pop.</li>
         <li data-ss-id="limit-long">A move that would make a cuff longer than 9.5 or an arc longer than 6 is turned down: such a piece is a sliver on the screen.</li>
-        <li data-ss-id="limit-print">After a flip the commas lie as they did, some across the new cuts; the first slider you move inks them afresh inside the new pieces.</li>
+        <li data-ss-id="limit-thin">A Length stops when a piece would get thinner than 0.6 of what it starts as (the distance from its middle to its nearest side, at the numbers its decomposition has at first: every cuff \(2\operatorname{acosh}2\), every arc \(\operatorname{acosh}2\)): past that the commas, which keep their size, run into each other.</li>
+        <li data-ss-id="limit-print">A comma is never changed, only moved: each is tied to a corner or to the middle of a piece, a Twist carries whole pieces past each other, and a flip leaves every comma where it is. So commas of different pieces can come to lie over each other after a flip or when a piece gets small. A link opens the same orbifold cut the same way with the same numbers, with the print laid afresh.</li>
       </ul>
     </details>
   </section>

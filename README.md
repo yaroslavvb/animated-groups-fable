@@ -80,11 +80,12 @@ loop with ← → (shift for finer steps).
 
 - **Orbifold through local flips** ([docs/orbifold-through-local-flips.html](docs/orbifold-through-local-flips.html),
   source in [standalone/orbifold-through-local-flips/](standalone/orbifold-through-local-flips/)) —
-  type any orbifold; its pattern is cut into rigid pieces with a Length and a
-  Twist for every cut, and a click on a cut (edge flip, handle swap, mirror
-  pop and merge, arc flip, slide) cuts it another way while the pattern stays
-  exactly where it is. Hyperbolic, plane and sphere; Undo; the state travels
-  in the link. See its
+  type any orbifold; cuts part its special points into groups, each cut with
+  a Length and a Twist that move one group against the other, and a click on
+  a cut (edge flip, handle swap, mirror pop and merge, arc flip, slide)
+  groups them another way while the pattern stays exactly where it is. The
+  print's commas are only ever moved, never changed. Hyperbolic, plane and
+  sphere; Undo; the state travels in the link. See its
   [README](standalone/orbifold-through-local-flips/README.md).
 
 ## The computation (`enumerate/`)

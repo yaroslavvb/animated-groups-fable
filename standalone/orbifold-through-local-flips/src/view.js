@@ -7,16 +7,24 @@
 //   hyperbolic plane  the Poincare disc; a drag slides the pattern along a hyperbolic line
 //
 // What is drawn: the ground in one tone; the print (print.js) in a darker one; mirrors red, glide axes dashed red;
-// the seams of the pieces as thin dark lines; each CUT in its own colour (a cuff solid, an arc dashed), the one
-// pointed at heavier; cone points blue and corners red, as crystallographers draw them.
+// cone points blue and corners red, as crystallographers draw them.
+//
+// The cuts are NOT drawn (his rule, Fri 27 Nov 2026: "instead of cutting on the geodesic, you're just rearranging
+// the corners ... I don't think we need the actual cut"; and on The real 2222 the same day: "Instead of drawing the
+// isolated cut ... highlight the pairs of vertices which are being separated. So use different colors and
+// different sizes"). A cut is shown by what it parts: while it is pointed at, the special points on one side of it
+// are drawn larger and filled in its colour, those on the other side larger and ringed in it. Only a cut that parts
+// no special points (a handle's loop, a crosscap, a mirror) is drawn as its line, since it has nothing else to show.
+// setCuts(true) draws every cut and the seams of the pieces as the first version of the page did (a cuff solid, an
+// arc dashed, the one pointed at heavier), and then a click on a cut flips it.
 //
 //   const V = createView(canvas, { onHover(cutId | null), onPick(cutId) });
 //   V.show(scene)                    a new pattern; the view starts over
 //   V.update(scene, { cut })         the same decomposition with other numbers: what is in the middle stays put,
 //                                    and the cut being moved keeps its line when it is the middle piece's own
-//   V.replace(scene, carry, ghost)   another decomposition of the SAME pattern (a flip): nothing moves; the cuts
-//                                    that went fade out as the new ones fade in
-//   scene = { atlas, shapes, cuts: { id: { color, type } }, area }
+//   V.replace(scene, carry, ghost)   another decomposition of the SAME pattern (a flip): nothing moves; with the cuts
+//                                    drawn, those that went fade out as the new ones fade in
+//   scene = { atlas, shapes, cuts: { id: { color, type } }, sides: { id: { markKey: 0 | 1 } | null }, area }
 
 import { mul, apply, I3, invOf, geomOf } from './h2.js';
 import { walk } from './atlas.js';
@@ -33,9 +41,8 @@ export function createView(canvas, opts = {}) {
   const ctx = canvas.getContext('2d');
   let W = 0, H = 0, dpr = 1, raf = 0;
   let scene = null, G = null, kind = 'H', V = I3.slice(), home = 0, vRev = false;
-  let tiles = null, tilesKey = '', quick = false, budget = 1500, hover = null, seams = true, bare = false, stats = { tiles: 0, drawn: 0 };
+  let tiles = null, tilesKey = '', quick = false, budget = 1500, hover = null, showCuts = false, bare = false, stats = { tiles: 0, drawn: 0 };
   let ghost = null;              // { scene, V, home, cuts: [ids], t0 }: the overlay of the decomposition before a flip
-  let oldInk = null;             // { scene, V, home, t0 }: the print before it was inked afresh, fading out
   let fresh = null;              // { cuts: Set, t0 }: the cuts a flip made, fading in
   let hits = [];                 // the cuts on the screen: [cutId, x0, y0, x1, y1]
   const calm = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -71,9 +78,10 @@ export function createView(canvas, opts = {}) {
       V = mul(mul(Rx, Ry), G.translate(A.face || A.atoms[0].at, G.origin));
       return;
     }
-    // the middle of the decomposition in the middle of the pane: the atom whose piece has the most cuts
+    // the middle of the decomposition in the middle of the pane: the atom with the most cuts round it, one that has
+    // a special point of its own before one that has none (the special points are what the cuts move about)
     let best = 0, bn = -1;
-    A.atoms.forEach((a, i) => { const n = a.sides.filter((s) => s.cut != null).length + (a.twin ? 0 : 0.5); if (n > bn) { bn = n; best = i; } });
+    A.atoms.forEach((a, i) => { const n = a.sides.filter((s) => s.cut != null).length + (a.marks && a.marks.some((m) => m.which === undefined) ? 1.2 : 0) + (a.twin ? 0 : 0.5); if (n > bn) { bn = n; best = i; } });
     home = best;
     V = G.translate(A.atoms[home].at, G.origin);
     recentre();
@@ -147,6 +155,8 @@ export function createView(canvas, opts = {}) {
     const paint = (sc, Vm, list, what) => {
       const At = sc.atlas, ink = new Path2D(), seamP = [new Path2D(), new Path2D()], mirrors = [0, 1, 2].map(() => new Path2D()), glides = [0, 1, 2].map(() => new Path2D());
       const cutP = new Map(), marks = new Map(), seen = new Set();
+      // what the cut pointed at parts, if it parts anything: the marks of its two sides are drawn apart
+      const parted = !what.cutsOnly && hover != null && sc.sides ? sc.sides[hover] || null : null;
       const cutPath = (id, b) => { if (!cutP.has(id)) cutP.set(id, [new Path2D(), new Path2D(), new Path2D()]); return cutP.get(id)[b]; };
       let drawn = 0;
       for (const t of list) {
@@ -176,9 +186,11 @@ export function createView(canvas, opts = {}) {
         for (let i = 0; i < n; i++) {
           const s = atom.sides[i];
           if (s.mirror && !what.cutsOnly) line(mirrors[b], P[i], P[(i + 1) % n]);
-          if (s.cut != null && s.primary && (!what.cutsOnly || what.cutsOnly.has(s.cut))) line(cutPath(s.cut, b), P[i], P[(i + 1) % n], what.hit && px >= 5 ? s.cut : null);
+          // a cut's line: all of them when the cuts are shown; else only the one pointed at, and only if it parts nothing
+          const drawn = what.cutsOnly ? what.cutsOnly.has(s.cut) : showCuts || (s.cut === hover && !parted);
+          if (s.cut != null && s.primary && drawn) line(cutPath(s.cut, b), P[i], P[(i + 1) % n], what.hit && showCuts && px >= 5 ? s.cut : null);
         }
-        if (seams && px >= 3) for (const sm of atom.seams) line(seamP[px >= 12 ? 0 : 1], apply(M, sm[0]), apply(M, sm[1]));
+        if (showCuts && px >= 3) for (const sm of atom.seams) line(seamP[px >= 12 ? 0 : 1], apply(M, sm[0]), apply(M, sm[1]));
         if (atom.glides && !what.cutsOnly) for (const g of atom.glides) line(glides[b], apply(M, g[0]), apply(M, g[1]));
         if (px >= 4.5 && !what.cutsOnly) for (const mk of atom.marks) {
           const p = apply(M, mk.pt);
@@ -187,9 +199,10 @@ export function createView(canvas, opts = {}) {
           if (seen.has(key)) continue;
           seen.add(key);
           const q = lerp(p, apply(M, mk.dir), 0.06), ang = Math.atan2(Y(q) - y, X(q) - x), mpx = kind === 'H' ? Math.min(px, 2.4 * (R / (1 + p[2])) * At.clear) : px;
-          const r = Math.min(6.5, 0.24 * Math.max(mpx, px * 0.6));
+          const side = parted ? parted[mk.which === undefined ? mk.part + ':' + mk.end : mk.part + ':' + mk.end + ':' + mk.which] : undefined;
+          const r = Math.min(6.5, 0.24 * Math.max(mpx, px * 0.6)) * (side === undefined ? 1 : 1.7);
           if (r < 1.1) continue;
-          const id = (mk.kind === 'cone' ? 'c' : 'k') + (r >= 4 ? 0 : 1);
+          const id = (mk.kind === 'cone' ? 'c' : 'k') + (r >= 4 ? 0 : 1) + (side === undefined ? '' : side ? 'B' : 'A');
           if (!marks.has(id)) marks.set(id, new Path2D());
           const path = marks.get(id);
           if (mk.n === 2) { const ux = Math.cos(ang), uy = Math.sin(ang), a1 = 1.25 * r, w = 0.95 * r; path.moveTo(x + a1 * ux, y + a1 * uy); path.quadraticCurveTo(x - w * uy, y + w * ux, x - a1 * ux, y - a1 * uy); path.quadraticCurveTo(x + w * uy, y - w * ux, x + a1 * ux, y + a1 * uy); path.closePath(); }
@@ -200,7 +213,7 @@ export function createView(canvas, opts = {}) {
       if (what.print) { ctx.globalAlpha = what.inkAlpha == null ? 1 : what.inkAlpha; ctx.fillStyle = css(INK); ctx.fill(ink); ctx.globalAlpha = 1; }
       if (!what.overlay) return drawn;
       ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      if (seams) { const sa = what.seamAlpha == null ? alpha : what.seamAlpha; ctx.strokeStyle = css(DARK, 0.5 * sa); ctx.lineWidth = 1.1; ctx.stroke(seamP[0]); ctx.strokeStyle = css(DARK, 0.3 * sa); ctx.lineWidth = 0.7; ctx.stroke(seamP[1]); }
+      if (showCuts) { const sa = what.seamAlpha == null ? alpha : what.seamAlpha; ctx.strokeStyle = css(DARK, 0.5 * sa); ctx.lineWidth = 1.1; ctx.stroke(seamP[0]); ctx.strokeStyle = css(DARK, 0.3 * sa); ctx.lineWidth = 0.7; ctx.stroke(seamP[1]); }
       const widths = [2.1, 1.4, 0.8];
       if (!what.cutsOnly) {
         ctx.strokeStyle = css(RED, 1);
@@ -219,7 +232,13 @@ export function createView(canvas, opts = {}) {
         paths.forEach((p, b) => { ctx.setLineDash(st.type === 'arc' ? [cw[b] * 2.2 * k, cw[b] * 2.4 * k] : []); ctx.lineCap = st.type === 'arc' ? 'butt' : 'round'; ctx.strokeStyle = st.color; ctx.lineWidth = cw[b] * k; ctx.stroke(p); });
         ctx.setLineDash([]); ctx.lineCap = 'round'; ctx.globalAlpha = 1;
       }
-      for (const [id, path] of marks) {
+      // the special points: as crystallographers draw them, or, for the two sides of the cut pointed at, one side
+      // filled in the cut's colour and the other ringed in it
+      const tint = parted && sc.cuts && sc.cuts[hover] ? sc.cuts[hover].color : null;
+      for (const [id, path] of [...marks].sort((a, b) => a[0].length - b[0].length)) {
+        const side = id[2];
+        if (side === 'A' && tint) { ctx.fillStyle = tint; ctx.fill(path); ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = 1.4; ctx.stroke(path); continue; }
+        if (side === 'B' && tint) { ctx.fillStyle = 'rgba(255,255,255,0.97)'; ctx.fill(path); ctx.strokeStyle = tint; ctx.lineWidth = id[1] === '0' ? 2.6 : 1.6; ctx.stroke(path); continue; }
         ctx.fillStyle = css(id[0] === 'c' ? BLUE : RED, 1); ctx.fill(path);
         ctx.strokeStyle = 'rgba(255,255,255,0.95)'; ctx.lineWidth = id[1] === '0' ? 1 : 0.5; ctx.stroke(path);
       }
@@ -231,16 +250,7 @@ export function createView(canvas, opts = {}) {
     let fadeIn = 1;
     if (fresh) { fadeIn = calm ? 1 : Math.min(1, (tnow - fresh.t0) / FADE_MS); if (fadeIn >= 1) fresh = null; }
     if (ghost) { const k = calm ? 1 : Math.min(1, (tnow - ghost.t0) / FADE_MS); if (k >= 1) ghost = null; else ghost.k = k; }
-    let inkIn = 1;
-    if (oldInk) {
-      inkIn = calm ? 1 : Math.min(1, (tnow - oldInk.t0) / FADE_MS);
-      if (inkIn >= 1) oldInk = null;
-      else {
-        const ol = oldInk.tiles || (oldInk.tiles = walk(oldInk.scene.atlas, oldInk.home, { radius: kind === 'H' ? 5 + 2 * oldInk.scene.atlas.reach : kind === 'E' ? Math.hypot(W, H) / 2 / R + 2 * oldInk.scene.atlas.reach : Infinity, max: 2500, ms: 200 }));
-        paint(oldInk.scene, oldInk.V, ol, { print: true, overlay: false, inkAlpha: 1 - inkIn });
-      }
-    }
-    const drawn = paint(scene, V, list, { print: true, inkAlpha: inkIn, overlay: !bare, hit: true, seamAlpha: ghost ? fadeIn : 1, cutAlpha: fresh ? (id) => (fresh.cuts.has(id) ? fadeIn : 1) : null });
+    const drawn = paint(scene, V, list, { print: true, overlay: !bare, hit: true, seamAlpha: ghost ? fadeIn : 1, cutAlpha: fresh ? (id) => (fresh.cuts.has(id) ? fadeIn : 1) : null });
     if (ghost && !bare) {
       const gl = ghost.tiles || (ghost.tiles = walk(ghost.scene.atlas, ghost.home, { radius: kind === 'H' ? 5 + 2 * ghost.scene.atlas.reach : kind === 'E' ? Math.hypot(W, H) / 2 / R + 2 * ghost.scene.atlas.reach : Infinity, max: 2500, ms: 200 }));
       paint(ghost.scene, ghost.V, gl, { print: false, overlay: true, cutsOnly: ghost.cuts, alpha: 1 - ghost.k });
@@ -256,7 +266,7 @@ export function createView(canvas, opts = {}) {
       ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.lineWidth = 1.2; ctx.strokeStyle = css(DARK, 0.55); ctx.stroke();
     }
     if (quick && kind === 'H') { const ms = now() - t0; budget = Math.round(Math.max(300, Math.min(2400, budget * Math.max(0.6, Math.min(1.3, 30 / Math.max(1, ms)))))); }
-    if (ghost || fresh || oldInk) schedule();
+    if (ghost || fresh) schedule();
   }
   const schedule = () => { if (!raf && typeof requestAnimationFrame === 'function') raf = requestAnimationFrame(draw); };
 
@@ -315,7 +325,7 @@ export function createView(canvas, opts = {}) {
   });
   canvas.addEventListener('pointermove', (e) => {
     const [x, y] = local(e);
-    if (!drag) { if (scene && e.pointerType === 'mouse') { const c = cutAt(x, y, 8); if (c !== hover) { hover = c; canvas.style.cursor = c ? 'pointer' : ''; if (opts.onHover) opts.onHover(c); schedule(); } } return; }
+    if (!drag) { if (scene && showCuts && e.pointerType === 'mouse') { const c = cutAt(x, y, 8); if (c !== hover) { hover = c; canvas.style.cursor = c ? 'pointer' : ''; if (opts.onHover) opts.onHover(c); schedule(); } } return; }
     if (drag.id !== e.pointerId) return;
     const t = now();
     drag.trail.push({ x, y, t });
@@ -335,7 +345,7 @@ export function createView(canvas, opts = {}) {
     const was = drag;
     drag = null;
     if (!was.moved) {
-      const mouse = e.pointerType === 'mouse', c = cutAt(was.x, was.y, mouse ? 8 : 18), t = now();
+      const mouse = e.pointerType === 'mouse', c = showCuts ? cutAt(was.x, was.y, mouse ? 8 : 18) : null, t = now();
       if (c) {
         // a mouse has pointed at the cut already (it is drawn heavier); a finger points with one tap and flips with
         // the next, so that a touch meant to slide the pattern never cuts it another way
@@ -343,7 +353,7 @@ export function createView(canvas, opts = {}) {
         lastTap = 0;
         return;
       }
-      if (!mouse && hover) { hover = null; if (opts.onHover) opts.onHover(null); schedule(); }
+      if (!mouse && hover && showCuts) { hover = null; if (opts.onHover) opts.onHover(null); schedule(); }
       if (t - lastTap < 320) { api.resetView(); lastTap = 0; } else lastTap = t;
       return;
     }
@@ -352,7 +362,7 @@ export function createView(canvas, opts = {}) {
   };
   canvas.addEventListener('pointerup', up);
   canvas.addEventListener('pointercancel', up);
-  canvas.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse' && !drag && hover) { hover = null; canvas.style.cursor = ''; if (opts.onHover) opts.onHover(null); schedule(); } });
+  canvas.addEventListener('pointerleave', (e) => { if (showCuts && e.pointerType === 'mouse' && !drag && hover) { hover = null; canvas.style.cursor = ''; if (opts.onHover) opts.onHover(null); schedule(); } });
   canvas.addEventListener('wheel', (e) => {
     if (!scene || e.ctrlKey) return;
     e.preventDefault();
@@ -386,18 +396,17 @@ export function createView(canvas, opts = {}) {
   const adopt = (sc) => { scene = sc; scene.stamp = ++stampN; G = geomOf(sc.atlas.kind); kind = sc.atlas.kind; tilesKey = ''; };
   const api = {
     /** A new pattern: the view starts over. */
-    show(sc) { stopCoast(); ghost = null; fresh = null; oldInk = null; hover = null; adopt(sc); size(); firstView(); quick = false; draw(); },
-    clear() { stopCoast(); scene = null; ghost = null; fresh = null; oldInk = null; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); },
+    show(sc) { stopCoast(); ghost = null; fresh = null; hover = null; adopt(sc); size(); firstView(); quick = false; draw(); },
+    clear() { stopCoast(); scene = null; ghost = null; fresh = null; size(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); },
     /**
      * The same decomposition with other numbers. The atom in the middle of the view keeps its place: if `cut` is one
      * of its piece's own, that cut's reference frame stays where it is (so a twist slides the far side past, and a
      * length keeps the cut's line); otherwise the atom's own middle and the way to its first corner.
      */
-    update(sc, { cut = null, fast = false, reink = false } = {}) {
+    update(sc, { cut = null, fast = false } = {}) {
       if (!scene) return api.show(sc);
       const old = scene.atlas, inv = invOf(old.kind), oa = old.atoms[home], na = sc.atlas.atoms[home];
       if (!oa || !na || sc.atlas.kind !== old.kind || oa.verts.length !== na.verts.length) return api.show(sc);
-      if (reink && !calm) oldInk = { scene, V: V.slice(), home, t0: now() };
       let Fo = null, Fn = null;
       if (cut != null) { const i = oa.sides.findIndex((sd) => sd.cut === cut && sd.axis); if (i >= 0 && na.sides[i] && na.sides[i].axis) { Fo = oa.sides[i].axis; Fn = na.sides[i].axis; } }
       if (!Fo) { Fo = G.frame(oa.at, oa.verts[0]); Fn = G.frame(na.at, na.verts[0]); }
@@ -420,23 +429,23 @@ export function createView(canvas, opts = {}) {
       if (det(c.M) < 0) vRev = !vRev;
       adopt(sc);
       recentre();
-      ghost = gone.length ? before : null;
-      fresh = made.length ? { cuts: new Set(made), t0: now() } : null;
+      ghost = showCuts && gone.length ? before : null;
+      fresh = showCuts && made.length ? { cuts: new Set(made), t0: now() } : null;
       quick = false;
       schedule();
     },
     setHover(id) { if (hover !== id) { hover = id; schedule(); } },
-    setSeams(on) { seams = !!on; schedule(); },
+    /** The cuts and the seams of the pieces drawn as lines (and a cut on the pattern then takes a click), or not. */
+    setCuts(on) { showCuts = !!on; if (!showCuts) { ghost = null; fresh = null; canvas.style.cursor = ''; } schedule(); },
     /** The print alone, without the cuts, the seams and the marks: what a flip must leave exactly as it was (the checks compare it). */
     setBare(on) { bare = !!on; schedule(); },
     resetView() { stopCoast(); if (!scene) return; firstView(); panned++; quick = false; schedule(); },
     /** The view as it is, to come back to (Undo of a slider): where the tiles are counted from and how, and how often the person has moved the view. */
     snap: () => ({ V: V.slice(), home, vRev, panned }),
     /** A scene shown exactly as a snap of it had it. */
-    restore(sc, snap, { reink = false } = {}) {
+    restore(sc, snap) {
       if (!scene || !snap || !sc.atlas.atoms[snap.home] || sc.atlas.kind !== kind) return api.show(sc);
       stopCoast();
-      if (reink && !calm) oldInk = { scene, V: V.slice(), home, t0: now() };
       V = snap.V.slice(); home = snap.home; vRev = snap.vRev;
       adopt(sc);
       quick = false;
@@ -445,7 +454,7 @@ export function createView(canvas, opts = {}) {
     draw, redraw: schedule,
     /** Where a point of the home atom's chart is on the screen (for the tests), and the view itself. */
     project(p) { const L = lay(), q = apply(V, p); return kind === 'H' ? [L.cx + (L.R * q[0]) / (1 + q[2]), L.cy - (L.R * q[1]) / (1 + q[2])] : [L.cx + L.R * q[0], L.cy - L.R * q[1]]; },
-    state: () => ({ kind, home, V: V.slice(), ...stats, hits: hits.length, hover, fading: !!(ghost || fresh || oldInk) }),
+    state: () => ({ kind, home, V: V.slice(), ...stats, hits: hits.length, hover, cuts: showCuts, fading: !!(ghost || fresh) }),
     cutAt,
   };
   return api;

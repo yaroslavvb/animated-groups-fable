@@ -9,7 +9,7 @@
 
 import { createView } from './view.js';
 import { createSchematic } from './schematic.js';
-import { openOrbifold, spell, withParam, withMove, cutsOf, linkOf, readLink, rangeOf, GEOMETRY, LIMIT } from './model.js';
+import { openOrbifold, spell, withParam, withMove, relaid, cutsOf, sidesOf, crowdOf, linkOf, readLink, rangeOf, GEOMETRY, LIMIT } from './model.js';
 
 const $ = (id) => document.getElementById(id);
 // the page's own icon, set from here because the one-file build keeps the page free of <link>s; without one a
@@ -36,10 +36,12 @@ const keep = (entry) => { past.push({ state: cur, colors: { ...colors }, ...entr
 const view = createView($('pattern'), { onHover: setHover, onPick: (id) => flip(id) });
 const schematic = createSchematic($('schematic'), { onHover: setHover, onPick: (id) => flip(id) });
 
+// what each cut parts: the special points on its two sides (null for a cut that parts none)
+const partsOf = (s) => { const out = {}; for (const c of cutsOf(s)) out[c.id] = sidesOf(s, c.id); return out; };
 const sceneOf = (s) => {
-  const cuts = {};
-  for (const c of cutsOf(s)) cuts[c.id] = { color: colors[c.id], type: c.type };
-  return { atlas: s.atlas, shapes: s.shapes, cuts, area: s.atlas.area };
+  const cuts = {}, sides = {}, parts = partsOf(s);
+  for (const c of cutsOf(s)) { cuts[c.id] = { color: colors[c.id], type: c.type }; sides[c.id] = parts[c.id] ? parts[c.id].marks : null; }
+  return { atlas: s.atlas, shapes: s.shapes, cuts, sides, area: s.atlas.area };
 };
 function colourCuts(s, fresh) {
   if (fresh) colors = {};
@@ -89,7 +91,14 @@ function drawCuts() {
     head.className = 'cut-head';
     const sw = document.createElement('span'); sw.className = 'cut-sw';
     const num = document.createElement('span'); num.className = 'cut-n'; num.textContent = String(i + 1);
-    const what = document.createElement('span'); what.className = 'cut-what'; what.textContent = c.what;
+    const what = document.createElement('span'); what.className = 'cut-what';
+    if (c.parts) {
+      // the special points it parts, side by side: the first side as the pattern fills it, the other as it rings it
+      const a = document.createElement('b'), b = document.createElement('b'), bar = document.createElement('i');
+      a.className = 'pt-a'; a.textContent = pretty(c.parts[0]); b.className = 'pt-b'; b.textContent = pretty(c.parts[1]); bar.textContent = ' | ';
+      what.append('parts ', a, bar, b);
+      what.title = c.what;
+    } else what.textContent = c.what;
     head.append(sw, num, what);
     if (c.moves.length) {
       // the moves stay together: beside the name where there is room, under it where there is not
@@ -134,8 +143,13 @@ function slide(id, key, value, out) {
   const c = cutsOf(next).find((x) => x.id === id);
   cur = next;
   out.textContent = key === 'len' ? fmt(c.half ? c.len / 2 : c.len) : fmt(c.tw, 3);
-  view.update(sceneOf(cur), { cut: id, fast: true, reink: !!cur.reinked });
-  if (cur.reinked) say('The print is inked afresh inside the new pieces.', '');
+  if (cur.limited) {
+    // the Length has stopped short of where the slider was taken: the slider goes back to it
+    const el = document.getElementById(`s-${id}-len`);
+    if (el) el.value = String(toSlider(c.len, rangeOf(cur, id, 'len')));
+    say(`Length ${cutsOf(cur).findIndex((x) => x.id === id) + 1} stops here: past it the commas, which keep their size, would run into each other.`, 'no');
+  } else if ($('say').dataset.kind === 'no') say('', '');
+  view.update(sceneOf(cur), { cut: id, fast: true });
   setHover(id);
   noteLink();
 }
@@ -163,7 +177,7 @@ function flip(id, kind) {
   view.replace(sceneOf(cur), res.carry, { gone: res.gone, made: res.made });
   const after = cutsOf(cur);
   drawCuts();
-  schematic.show(cur, after, colors);
+  schematic.show(cur, after, colors, { parts: partsOf(cur) });
   const told = res.made.map((m) => { const x = after.find((y) => y.id === m); return x ? `${after.indexOf(x) + 1}: Length ${fmt(x.half ? x.len / 2 : x.len)}${x.twist ? ', Twist ' + fmt(x.tw, 3) : ''}` : ''; }).filter(Boolean).join('; ');
   const verb = { A: 're-paired', F: 'flipped', S: 'swapped', pop: 'opened', merge: 'closed', slide: 'moved' }[res.info.kind] || 'flipped';
   const skip = res.info.skipped ? ` (the next pairing round would make a cuff ${fmt(res.info.skipped, 1)} long: this is the one after)` : '';
@@ -177,18 +191,15 @@ function undo() {
   const was = past.pop();
   $('undo').disabled = !past.length;
   if (!was) return;
-  const from = cur;
   cur = was.state; colors = { ...was.colors }; sliding = '';
-  if (was.how === 'flip') view.replace(sceneOf(cur), was.back, { gone: was.gone, made: was.made });
-  else {
-    // exactly as it was, if the pattern has not been slid about since; otherwise what is in the middle stays put
-    const reink = from.tied !== cur.tied;
-    if (was.snap && view.snap().panned === was.snap.panned) view.restore(sceneOf(cur), was.snap, { reink }); else view.update(sceneOf(cur), { cut: was.cut, reink });
-  }
+  if (was.how === 'print') view.update(sceneOf(cur), {});
+  else if (was.how === 'flip') view.replace(sceneOf(cur), was.back, { gone: was.gone, made: was.made });
+  else if (was.snap && view.snap().panned === was.snap.panned) view.restore(sceneOf(cur), was.snap);      // exactly as it was, if the pattern has not been slid about since
+  else view.update(sceneOf(cur), { cut: was.cut });                                                        // otherwise what is in the middle stays put
   drawCuts();
-  schematic.show(cur, cutsOf(cur), colors);
+  schematic.show(cur, cutsOf(cur), colors, { parts: partsOf(cur) });
   sayOrbifold(cur);
-  say(was.how === 'flip' ? 'The flip is undone. The pattern has not moved.' : 'The slider is back where it was.', 'ok');
+  say(was.how === 'flip' ? 'The flip is undone. The pattern has not moved.' : was.how === 'print' ? 'The print is as it was.' : 'The slider is back where it was.', 'ok');
   noteLink(true);
 }
 
@@ -199,10 +210,11 @@ function show(state, { fresh = true } = {}) {
   colourCuts(cur, fresh);
   sayOrbifold(cur);
   drawCuts();
-  schematic.show(cur, cutsOf(cur), colors, { keep: false });
+  schematic.show(cur, cutsOf(cur), colors, { keep: false, parts: partsOf(cur) });
   $('pat-sub').textContent = { S: 'the sphere, seen from outside', E: 'the plane', H: 'Poincaré disc' }[cur.cls.geometry];
   $('pat-hint').textContent = cur.cls.geometry === 'S' ? 'Drag to turn' : 'Drag to slide';
   $('cut-sub').textContent = cutsOf(cur).some((c) => c.moves.length) ? 'click a numbered cut to flip it' : cutsOf(cur).length ? 'no move for this cut' : 'nothing to cut';
+  $('fresh').disabled = cur.mode === 'rigid';
   view.show(sceneOf(cur));
   say('', '');
   markChips();
@@ -305,9 +317,17 @@ input.addEventListener('keydown', (e) => {
 input.addEventListener('blur', () => { const sp = spell(plain(input.value)); if (cur && sp && sp.text === cur.text) remember(cur.text); popNote(null); markChips(); });
 $('reset').addEventListener('click', () => { if (cur) show(openOrbifold(cur.text)); });
 $('undo').addEventListener('click', undo);
+// the print laid afresh on the pieces as they are: the only thing that changes the commas, and only when asked
+$('fresh').addEventListener('click', () => {
+  if (!cur || cur.mode === 'rigid') return;
+  keep({ how: 'print' }); sliding = '';
+  cur = relaid(cur);
+  view.update(sceneOf(cur), {});
+  say('The print is laid afresh on the pieces as they are now.', 'ok');
+});
 window.addEventListener('keydown', (e) => { if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key.toLowerCase() === 'z' && document.activeElement !== input && past.length) { e.preventDefault(); undo(); } });
 $('reset-view').addEventListener('click', () => view.resetView());
-$('seams').addEventListener('change', (e) => view.setSeams(e.target.checked));
+$('cuts-on').addEventListener('change', (e) => { view.setCuts(e.target.checked); for (const el of document.querySelectorAll('#legend [data-with-cuts]')) el.hidden = !e.target.checked; for (const el of document.querySelectorAll('#legend [data-without-cuts]')) el.hidden = e.target.checked; });
 $('pattern').addEventListener('pointerdown', () => { $('pat-hint').hidden = true; }, { once: true });
 window.addEventListener('hashchange', () => { if (location.hash !== lastHash) openFromHash(); });
 
@@ -317,5 +337,6 @@ if (!openFromHash()) tryOpen('333*2x');
 // for the checks: what is on show, and the levers
 window.__flips = {
   state: () => cur, cuts: () => (cur ? cutsOf(cur) : []), view, schematic, colors: () => ({ ...colors }), link: () => (cur ? linkOf(cur) : ''),
-  open: (t) => tryOpen(t), flip: (id, kind) => flip(id, kind), undo, past: () => past.length, set: (id, key, value) => { const row = document.getElementById(`s-${id}-${key}`); cur = withParam(cur, id, key, value); view.update(sceneOf(cur), { cut: id, reink: !!cur.reinked }); drawCuts(); schematic.refresh(cutsOf(cur)); noteLink(true); return !!row; },
+  open: (t) => tryOpen(t), flip: (id, kind) => flip(id, kind), undo, past: () => past.length, set: (id, key, value) => { const row = document.getElementById(`s-${id}-${key}`); cur = withParam(cur, id, key, value); view.update(sceneOf(cur), { cut: id }); drawCuts(); schematic.refresh(cutsOf(cur)); noteLink(true); return !!row; },
+  hover: (id) => setHover(id), crowd: () => (cur ? crowdOf(cur) : 0), showCuts: (on) => { $('cuts-on').checked = !!on; $('cuts-on').dispatchEvent(new Event('change')); },
 };

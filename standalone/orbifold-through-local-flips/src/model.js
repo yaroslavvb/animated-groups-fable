@@ -7,6 +7,8 @@
 //   cutsOf(state)               what the page lists: every cut with its numbers and the moves it offers
 //   linkOf(state) / openOrbifold(text, readLink(hash))
 //
+//   sidesOf(state, cut)         the special points a cut parts, side by side
+//
 // A state is immutable: every change makes a new one, so the page can keep the one before for Undo.
 
 import { classify, parse, textOf, canon, spelled, defaultDecomp, defaultParams, resolve, cutList, hasTwist, encode, decode, refs, isCap, countParams } from './decomp.js';
@@ -14,14 +16,18 @@ import { movesOf, applyMove, LIMIT } from './moves.js';
 import { flatDecomp, flatDefaults, flatParts, flatMoves, flatMove, flatTwist, FAMILIES } from './flat.js';
 import { rigidAtlas } from './rigid.js';
 import { buildAtlas } from './atlas.js';
-import { design, place, retie } from './print.js';
+import { design, place, retie, crowding } from './print.js';
 import { mul, I3, invOf, wrapHalf } from './h2.js';
 import { whyNot } from '../../classification-of-surfaces/src/sym/catalog.js';
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 export const GEOMETRY = { S: 'sphere', E: 'plane', H: 'hyperbolic plane' };
-/** How far a slider goes. A hyperbolic length: from a short cuff to the longest a move may make. */
-export const RANGE = { len: [0.35, 7.5], tw: [-0.5, 0.5] };
+/**
+ * How far a slider goes. A hyperbolic Length: from where the collar round a short cut is as wide as a piece (the
+ * commas do not stretch, so it is bare ground) to the longest a slider may make it; in between a Length stops where
+ * the commas run into each other (CROWD_MAX). A cut a flip has made shorter or longer than this keeps its place.
+ */
+export const RANGE = { len: [1.0, 7.5], arc: [0.5, 5], tw: [-0.5, 0.5] };
 
 function atlasOf(mode, D, params, sig) {
   if (mode === 'rigid') return rigidAtlas(sig);
@@ -29,15 +35,38 @@ function atlasOf(mode, D, params, sig) {
   return buildAtlas('H', resolve(D, params));
 }
 /**
- * The atlas and the print of a state. The print: design() of the atlas, laid afresh whenever a number changes; or,
- * right after a flip (state.tied), the commas of the decomposition before it, left exactly where they were.
+ * How far the commas may run into each other before a Length stops (crowdOf): the print is never changed, only
+ * moved, so when the special points come together the commas they carry meet. His words (Fri 27 Nov 2026): "This
+ * may require some limits on the length to avoid things getting too skewed."
+ */
+export const CROWD_MAX = 0.12;
+
+/**
+ * How crowded the print of a state is (print.js crowding): 0 when no two commas touch, as the print is laid. A
+ * matter of the pattern alone: a flip, which moves nothing, leaves it as it was.
+ */
+export function crowdOf(state) {
+  if (state.crowd === undefined) state.crowd = state.shapes ? crowding(state.atlas, state.shapes).worst : 0;
+  return state.crowd;
+}
+
+/** The atlas of a decomposition at the numbers it starts from (every cuff 2 acosh 2, every arc acosh 2, every Twist 0; the plane's own). */
+function firstAtlas(state) {
+  const base = state.mode === 'flat' ? flatDefaults(state.D) : defaultParams(state.D);
+  if (JSON.stringify(base) === JSON.stringify(state.params) && state.atlas) return state.atlas;
+  try { return atlasOf(state.mode, state.D, base, state.sig); } catch (err) { return state.atlas; }
+}
+/**
+ * The atlas and the print of a state. The print is laid ONCE, on the decomposition an orbifold opens with at the
+ * numbers that decomposition starts from, and from then on its commas are only moved (print.js): by the corners and
+ * middles of the pieces they are tied to when a number changes, not at all by a flip.
  */
 function finish(state) {
   state.atlas = atlasOf(state.mode, state.D, state.params, state.sig);
-  if (state.mode !== 'rigid') {
-    if (!state.tied) state.motifs = design(state.atlas);
-    state.shapes = place(state.atlas, state.motifs);
-  } else state.shapes = null;
+  state.crowd = undefined;
+  if (state.mode === 'rigid') { state.shapes = null; return state; }
+  if (!state.motifs) state.motifs = design(firstAtlas(state));
+  state.shapes = place(state.atlas, state.motifs);
   return state;
 }
 
@@ -56,7 +85,7 @@ export function openOrbifold(text, saved = null) {
   if (!sig) return { mode: 'none', text: String(text || ''), why: { kind: 'text' } };
   const cls = classify(sig), shown = spelled(sig);
   if (cls.mode === 'none') return { mode: 'none', text: shown, sig, why: whyNot(sig) || { kind: 'none' } };
-  const state = { mode: cls.mode, text: shown, sig, cls, D: null, params: {}, motifs: null, tied: false };
+  const state = { mode: cls.mode, text: shown, sig, cls, D: null, params: {}, motifs: null };
   if (cls.mode === 'flat') {
     state.D = flatDecomp(cls.text, saved && saved.v);
     state.params = flatDefaults(state.D);
@@ -81,7 +110,7 @@ export function openOrbifold(text, saved = null) {
   }
   try { return finish(state); } catch (err) {
     // numbers from a link that the pieces cannot be built from: the canonical ones
-    if (cls.mode === 'pieces') { state.D = defaultDecomp(sig); state.params = defaultParams(state.D); return finish(state); }
+    if (cls.mode === 'pieces') { state.D = defaultDecomp(sig); state.params = defaultParams(state.D); state.motifs = null; state.atlas = null; return finish(state); }
     throw err;
   }
 }
@@ -100,20 +129,46 @@ const flatRange = (D) => { const F = FAMILIES[D.family], both = F.views.length =
 export function rangeOf(state, cutId, key) {
   if (key === 'tw') return RANGE.tw;
   if (state.mode === 'flat') return flatRange(state.D);
-  return [RANGE.len[0], Math.max(RANGE.len[1], state.params[cutId].len)];
+  const r = state.D.cuts[cutId] && state.D.cuts[cutId].type === 'arc' ? RANGE.arc : RANGE.len, len = state.params[cutId].len;
+  return [Math.min(r[0], len), Math.max(r[1], len)];
 }
 
 /**
- * The same decomposition with one number changed (clamped to what can be drawn). After a flip the first such change
- * inks the print afresh for the new pieces: the result then says `reinked`, for the page to cross-fade the two.
+ * The same decomposition with one number changed. Nothing is laid afresh: every comma goes where its anchor goes.
+ * A Length is kept inside what can be drawn, and stops before the commas run into each other more than CROWD_MAX
+ * (the result then says `limited`); where they do so already (after a flip they may) it can still go any way that
+ * makes it no worse. A Twist is never stopped: it only carries pieces past each other.
  */
 export function withParam(state, cutId, key, value) {
-  const next = { ...state, params: clone(state.params), reinked: !!state.tied, tied: false };
-  const p = next.params[cutId];
-  if (!p) return state;
-  if (key === 'len') { const r = rangeOf(state, cutId, 'len'); p.len = Math.max(r[0], Math.min(r[1], value)); }
-  else if (key === 'tw' && p.tw !== undefined) p.tw = Math.max(-0.5, Math.min(0.5, value));
-  return finish(next);
+  const p0 = state.params[cutId];
+  if (!p0 || (key === 'tw' && p0.tw === undefined)) return state;
+  const at = (v) => { const next = { ...state, params: clone(state.params), limited: false }; next.params[cutId][key] = v; return finish(next); };
+  if (key === 'tw') return at(Math.max(-0.5, Math.min(0.5, value)));
+  if (key !== 'len') return state;
+  const r = rangeOf(state, cutId, 'len'), want = Math.max(r[0], Math.min(r[1], value)), most = Math.max(CROWD_MAX, crowdOf(state)) + 1e-9;
+  // the way there is gone in steps of a twentieth at most: two commas that would pass through each other on the way
+  // must not be stepped over
+  const steps = Math.max(1, Math.min(60, Math.ceil(Math.abs(Math.log(want / p0.len)) / 0.05)));
+  let lo = p0.len, hi = null, reached = null;
+  for (let k = 1; k <= steps; k++) {
+    const v = k === steps ? want : p0.len * Math.pow(want / p0.len, k / steps), s = at(v);
+    if (crowdOf(s) <= most) { lo = v; reached = s; } else { hi = v; break; }
+  }
+  if (hi === null) return reached;
+  for (let i = 0; i < 12; i++) { const mid = (lo + hi) / 2; if (crowdOf(at(mid)) <= most) lo = mid; else hi = mid; }
+  const next = at(lo);
+  next.limited = true;
+  return next;
+}
+/**
+ * The print laid afresh on the pieces as they are now: the one thing that changes the pattern's commas, and only
+ * when asked for (after flips and long slides the commas the pieces carry can lie over each other).
+ */
+export function relaid(state) {
+  if (state.mode === 'rigid' || state.mode === 'none') return state;
+  const next = { ...state, motifs: design(state.atlas), limited: false, crowd: undefined };
+  next.shapes = place(next.atlas, next.motifs);
+  return next;
 }
 /** The canonical decomposition and numbers again. */
 export const reopened = (state) => openOrbifold(state.text);
@@ -123,7 +178,8 @@ export function cutsOf(state) {
   if (state.mode === 'rigid' || state.mode === 'none') return [];
   if (state.mode === 'flat') {
     const D = state.D, cut = D.cuts.c0, p = state.params.c0;
-    return [{ id: 'c0', type: cut.type, len: p.len, tw: p.tw, twist: p.tw !== undefined, moves: flatMoves(D), what: flatWhat(D), half: false }];
+    const sides = sidesOf(state, 'c0');
+    return [{ id: 'c0', type: cut.type, len: p.len, tw: p.tw, twist: p.tw !== undefined, moves: flatMoves(D), what: flatWhat(D), half: false, parts: sides ? sides.parts : null }];
   }
   const D = state.D;
   return cutList(D).map((id) => {
@@ -133,8 +189,73 @@ export function cutsOf(state) {
     else if (cut.cap === '*') what = 'mirror';
     else if (r.length === 2 && r[0].piece === r[1].piece) what = 'handle loop';
     else if (r.some((x) => isCap(x.piece))) { const c = r.find((x) => isCap(x.piece)).piece; what = c.kind === 'P' ? 'cuff folded onto 2 2' : c.kind === 'M' ? 'arc along the mirror between two corners 2' : 'arc folded about a 2'; }
-    return { id, type: cut.type, cap: cut.cap || null, len: p.len, tw: p.tw, twist: hasTwist(D, id), moves: movesOf(D, id), what, half: cut.cap === 'x' };
+    const sides = sidesOf(state, id);
+    return { id, type: cut.type, cap: cut.cap || null, len: p.len, tw: p.tw, twist: hasTwist(D, id), moves: movesOf(D, id), what, half: cut.cap === 'x', parts: sides ? sides.parts : null };
   });
+}
+
+/**
+ * What a cut parts. A cut that separates the orbifold puts every special point on one side of it or the other:
+ * { marks: { key: 0 | 1 } (key 'part:end' or 'part:end:which', as the atlas names its marks), pieces: { pieceId: 0 | 1 },
+ * parts: [text, text] (each side's features, spelled as in a signature) }. null for a cut that parts no special
+ * points from others: a handle's loop, a crosscap, a smooth mirror, a cuff with special points on one side only.
+ */
+export function sidesOf(state, cutId) {
+  if (state.mode === 'flat') {
+    // one flat piece: the cut is its waist, and what closes each end is on that end's side
+    const glue = state.atlas.parts[0].glue, at = (g) => (g.type === 'fold' ? ['2', '2'] : g.type === 'half' ? ['2'] : g.type === 'mirror' ? ['2', '2'] : []);
+    const a = at(glue[0]), b = at(glue[1]);
+    if (!a.length || !b.length) return null;
+    const marks = {};
+    a.forEach((_, w) => { marks[`0:0:${w}`] = 0; });
+    b.forEach((_, w) => { marks[`0:1:${w}`] = 1; });
+    const star = (g, list) => (g.type === 'mirror' ? '∗' : '') + list.join('');
+    return { marks, pieces: { e0: 0, e1: 1 }, parts: [star(glue[0], a), star(glue[1], b)] };
+  }
+  if (state.mode !== 'pieces') return null;
+  const D = state.D, r = refs(D, cutId);
+  if (r.length !== 2 || r[0].piece === r[1].piece) return null;
+  // the pieces reached from one side of the cut without crossing it
+  const side = { [r[0].piece.id]: 0 }, queue = [r[0].piece];
+  while (queue.length) {
+    const p = queue.shift();
+    for (const e of p.ends) {
+      if ((e.t !== 'cuff' && e.t !== 'arc') || e.cut === cutId) continue;
+      for (const x of refs(D, e.cut)) if (side[x.piece.id] === undefined) { side[x.piece.id] = 0; queue.push(x.piece); }
+    }
+  }
+  if (side[r[1].piece.id] === 0) return null;                    // the cut does not separate
+  for (const p of D.pieces) if (side[p.id] === undefined) side[p.id] = 1;
+  // each side's features, as a signature would spell them
+  const text = [0, 1].map((k) => {
+    const mine = D.pieces.filter((p) => side[p.id] === k), cones = [], corners = [];
+    let mirror = false, x = 0, inner = 0;
+    for (const p of mine) {
+      if (p.kind === 'M' || p.kind === 'S') mirror = true;
+      for (const e of p.ends) { if (e.t === 'cone') cones.push(e.n); if (e.t === 'corner') corners.push(e.n); }
+    }
+    for (const id of cutList(D)) {
+      const rr = refs(D, id);
+      if (id === cutId || !rr.length || side[rr[0].piece.id] !== k) continue;
+      if (D.cuts[id].cap === 'x') x++;
+      if (D.cuts[id].cap === '*') mirror = true;
+      if (rr.length === 2) inner++;
+    }
+    const handles = Math.max(0, inner - mine.length + 1);
+    return { points: cones.length + corners.length, text: 'o'.repeat(handles) + cones.sort((a, b) => b - a).join('') + (mirror ? '∗' + corners.sort((a, b) => b - a).join('') : '') + '×'.repeat(x) };
+  });
+  if (!text[0].points || !text[1].points) return null;           // special points on one side only: nothing is parted from anything
+  const marks = {};
+  state.atlas.parts.forEach((part, i) => {
+    const piece = D.pieces.find((p) => p.id === part.id);
+    if (!piece) return;
+    piece.ends.forEach((e, k) => {
+      if (e.t === 'cone' || e.t === 'corner') { marks[`${i}:${k}`] = side[piece.id]; return; }
+      const cap = refs(D, e.cut).find((x) => x.piece !== piece && isCap(x.piece));
+      if (cap) { marks[`${i}:${k}:0`] = side[cap.piece.id]; marks[`${i}:${k}:1`] = side[cap.piece.id]; }
+    });
+  });
+  return { marks, pieces: side, parts: [text[0].text, text[1].text] };
 }
 function flatWhat(D) {
   if (D.view === 'arc') return D.family === '*2222' ? 'arc between two opposite mirrors' : 'arc from mirror to mirror';
@@ -174,8 +295,9 @@ export function withMove(state, cutId, kind) {
   const atlas = next.atlas0;
   delete next.atlas0;
   next.motifs = retie(old, state.motifs, atlas, carry);
-  next.tied = true; next.reinked = false;
+  next.limited = false;
   next.atlas = atlas; next.shapes = place(atlas, next.motifs);
+  next.crowd = state.crowd;                                    // the pattern has not changed, and neither has how crowded it is
   const before = new Set(Object.keys(state.params)), after = new Set(Object.keys(next.params)), made = info.cuts || [];
   const gone = [...new Set([...made.filter((id) => before.has(id)), ...[...before].filter((id) => !after.has(id))])];
   return { state: next, carry, back: carryBack(old, atlas, carry), gone, made, info };

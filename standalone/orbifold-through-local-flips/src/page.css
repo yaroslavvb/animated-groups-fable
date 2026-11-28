@@ -42,6 +42,11 @@
   .box-row .preset-lab { flex-basis: 5.6em; }
   .custom-field { flex: 1 1 0; }
   .box-hint { flex: 1 1 100%; }
+  /* the pattern's own line: its name, the tick and the two buttons, and no more */
+  .pane-pattern .pane-sub { display: none; }
+  .pane-pattern .pane-title { flex: 1 1 auto; }
+  .pane-pattern .pane-head { gap: 6px; }
+  .pane-pattern .reset { padding: 0 9px; white-space: nowrap; }
 }
 .custom-in {
   appearance: none; width: 100%; min-width: 0; min-height: 44px; margin: 0; padding: 0 11px;
@@ -121,6 +126,9 @@
 .sch-piece.cap { fill: var(--ground); stroke: var(--muted); stroke-width: 1.3; }
 .sch-leaf { font: 600 14px var(--font); text-anchor: middle; fill: var(--ink); paint-order: stroke; stroke: var(--ground); stroke-width: 3.5px; }
 .sch-leaf.sym { font-size: 18px; }
+/* the two sides of the cut pointed at: one filled in its colour, the other ringed in it */
+.sch-leaf.side-a { font-size: 17px; font-weight: 800; }
+.sch-leaf.side-b { font-size: 17px; font-weight: 800; fill: var(--ground) !important; stroke-width: 3.2px; }
 .sch-leaf.cone { fill: var(--blue); }
 .sch-leaf.mirror { fill: var(--red); }
 .sch-tap { fill: transparent; }
@@ -140,6 +148,10 @@
 .cut[data-type="arc"] .cut-sw { border-top-style: dashed; }
 .cut-n { font-weight: 700; font-variant-numeric: tabular-nums; }
 .cut-what { flex: 1 1 7.5em; min-width: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.3; }
+.cut-what b { font-weight: 700; letter-spacing: 0.04em; font-size: 0.95rem; }
+.cut-what .pt-a { color: var(--c, var(--ink)); }
+.cut-what .pt-b { color: var(--ink); text-decoration: underline; text-decoration-color: var(--c, var(--muted)); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.cut-what i { font-style: normal; color: var(--faint); }
 .cut-moves { display: flex; flex: 0 1 auto; gap: 6px; margin-left: auto; }
 .cut-flip {
   appearance: none; flex: 0 0 auto; min-height: 44px; padding: 0 11px; border: 1px solid var(--hairline); border-radius: 8px; background: var(--ground);
@@ -159,6 +171,10 @@
 .lg-seam { border-top: 1.4px solid var(--muted); }
 .lg-mirror { border-top-color: #d55e00; }
 .lg-cone { width: 0; height: 0; border-top: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-bottom: 10px solid #0072b2; }
+.lg-dot { display: inline-block; width: 11px; height: 11px; border-radius: 50%; box-sizing: border-box; }
+.lg-dot-a { background: var(--amber); }
+.lg-dot-b { border: 2.5px solid var(--amber); background: var(--ground); margin-left: -2px; }
+.legend span[data-without-cuts] { white-space: normal; }
 
 /* ---- the notes */
 .notes { margin-top: 18px; max-width: 80ch; }

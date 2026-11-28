@@ -8,9 +8,12 @@
 //   2. A FLIP MOVES NOTHING: the print drawn alone (no cuts, seams or marks) is the same picture before and after
 //      every first flip and along a chain of six, pixel for pixel inside 0.8 of the pane;
 //   3. Undo brings each earlier picture back exactly, flips and slider moves alike;
-//   4. a slider moved in small steps changes the picture in small steps (the view does not jump);
-//   5. the mouse: a handle of the diagram lights its cut everywhere and a click on it flips; a click on a cut drawn on
-//      the pattern flips; typing a signature opens it and keeps it under "yours"; a signature with no pattern says why;
+//   4. a slider moved in small steps changes the picture in small steps (the view does not jump), also right after
+//      a flip (nothing is laid afresh); a Length stops before the commas run into each other, and says so; Fresh
+//      print lays the commas afresh only when asked, and Undo takes it back;
+//   5. the mouse: the cuts are not drawn; a handle of the diagram lights its cut in its row and marks the special
+//      points it parts, and a click on it flips; with "cuts" ticked a click on a cut drawn on the pattern flips;
+//      typing a signature opens it and keeps it under "yours"; a signature with no pattern says why;
 //   6. at 390 px nothing is wider than the screen, and the pattern stays in sight while the sliders pass under it.
 //
 // Needs Playwright and a Chrome: PLAYWRIGHT=<path to playwright/index.mjs> and CHROME=<binary>, or the defaults below.
@@ -132,6 +135,47 @@ async function open(width, height, opts = {}) {
     for (const o of r) { if (o.mean > 0.002) { moved++; jump = Math.max(jump, o.top / o.mean); } }
   }
   ok(moved > 6 && jump < 2.5, `${moved} sliders moved in 12 small steps: no step changes the picture more than ${jump.toFixed(1)} times the usual`);
+  // right after a flip: the first step of a slider is a step like the next (nothing is inked afresh)
+  let afterFlip = 0, tried = 0;
+  for (const k of withCuts.slice(0, 10)) {
+    const r = await page.evaluate(async (k) => {
+      const F = window.__flips; F.open(k); F.view.setBare(true);
+      const able = F.cuts().find((c) => c.moves.length);
+      if (!able) { F.view.setBare(false); return null; }
+      const n = F.past(); F.flip(able.id, able.moves[0].kind);
+      if (F.past() === n) { F.view.setBare(false); return null; }
+      await window.__settle();
+      const c = F.cuts()[0], shots = [window.__grab()];
+      let stopped = false;
+      for (let i = 1; i <= 3; i++) { F.set(c.id, 'len', c.len * (1 + 0.01 * i)); stopped = stopped || !!F.state().limited; F.view.draw(); shots.push(window.__grab()); }
+      F.view.setBare(false);
+      return stopped ? null : [1, 2, 3].map((i) => window.__diff(shots[i - 1], shots[i], 0.7, 2));
+    }, k);
+    if (!r || !(r[1] > 1e-4)) continue;
+    tried++; afterFlip = Math.max(afterFlip, r[0] / ((r[1] + r[2]) / 2));
+  }
+  ok(tried > 5 && afterFlip < 2, `${tried} flips, each followed by a Length moved in three small steps: the first step changes the picture at most ${afterFlip.toFixed(1)} times what the next two do`);
+  // a Length taken to the end of its slider stops where the commas would run into each other
+  const stop = await page.evaluate(() => {
+    const F = window.__flips; F.open('3333');
+    const el = document.querySelector('#cuts .cut input[data-key="len"]');
+    el.value = el.max; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true }));
+    return { limited: !!F.state().limited, crowd: F.crowd(), len: F.cuts()[0].len, back: Number(el.value) < Number(el.max), say: document.getElementById('say').textContent };
+  });
+  ok(stop.limited && stop.back && stop.crowd < 0.2 && /stops here/.test(stop.say), `a Length dragged to the end of its slider stops at ${stop.len.toFixed(2)}, the slider goes back to it, and the page says why`);
+  const fresh = await page.evaluate(async () => {
+    const F = window.__flips; F.open('333*2x'); F.view.setBare(true);
+    F.flip('c0', 'pop'); await window.__settle();
+    F.set(F.cuts()[2].id, 'tw', 0.37); F.view.draw();
+    const before = window.__grab(), n = F.past(), crowded = F.crowd();
+    document.getElementById('fresh').click(); F.view.draw();
+    const after = window.__grab(), laid = { past: F.past() - n, crowd: F.crowd(), changed: window.__diff(before, after) };
+    F.undo(); await window.__settle();
+    laid.undone = window.__diff(before, window.__grab()); laid.was = crowded;
+    F.view.setBare(false);
+    return laid;
+  });
+  ok(fresh.past === 1 && fresh.crowd === 0 && fresh.changed > 0.001 && fresh.undone < 0.002, `Fresh print lays the commas afresh (they ran ${fresh.was.toFixed(2)} into each other, then not at all), and Undo puts them back exactly`);
   ok(errors.length === 0, 'no error on the console' + (errors.length ? ': ' + errors.slice(0, 3).join(' | ') : ''));
   await ctx.close();
 }
@@ -144,8 +188,10 @@ async function open(width, height, opts = {}) {
   const h = page.locator('#schematic .sch-handle.can').first();
   await h.hover();
   await page.waitForTimeout(150);
-  const lit = await page.evaluate(() => ({ view: window.__flips.view.state().hover, rows: [...document.querySelectorAll('#cuts .cut.on')].map((e) => e.dataset.cut), sch: document.querySelectorAll('#schematic .on').length }));
-  ok(lit.view && lit.rows.length === 1 && lit.rows[0] === lit.view && lit.sch >= 2, 'pointing at a handle of the diagram lights the cut on the pattern, in the diagram and in its row');
+  const lit = await page.evaluate(() => ({ view: window.__flips.view.state().hover, drawn: window.__flips.view.state().cuts, hits: window.__flips.view.state().hits, rows: [...document.querySelectorAll('#cuts .cut.on')].map((e) => e.dataset.cut), sch: document.querySelectorAll('#schematic .on').length, a: document.querySelectorAll('#schematic .sch-leaf.side-a').length, b: document.querySelectorAll('#schematic .sch-leaf.side-b').length, parts: [...document.querySelectorAll('#cuts .cut.on .cut-what b')].map((e) => e.textContent) }));
+  ok(lit.drawn === false && lit.hits === 0, 'the cuts are not drawn on the pattern');
+  ok(lit.view && lit.rows.length === 1 && lit.rows[0] === lit.view && lit.sch >= 2, 'pointing at a handle of the diagram lights the cut in the diagram and in its row');
+  ok(lit.a > 0 && lit.b > 0 && lit.parts.length === 2, `and marks the special points it parts, side by side (${lit.parts.join(' | ')})`);
   await h.click();
   await page.waitForTimeout(600);
   const after = await page.evaluate(() => ({ say: document.getElementById('say').textContent, cuts: window.__flips.cuts().map((c) => c.type), undo: !document.getElementById('undo').disabled, hash: location.hash }));
@@ -155,10 +201,13 @@ async function open(width, height, opts = {}) {
   await page.waitForTimeout(500);
   ok(await page.evaluate(() => window.__flips.cuts().every((c) => c.type === 'cuff') && document.getElementById('undo').disabled), 'Undo from the keyboard closes them again');
   await page.evaluate(() => window.__flips.open('o33'));
+  await page.locator('#cuts-on').check();
+  await page.waitForTimeout(150);
   const pt = await page.evaluate(() => { const v = window.__flips.view; v.draw(); const r = document.getElementById('pattern').getBoundingClientRect(); for (let y = 80; y < r.height - 80; y += 6) for (let x = 80; x < r.width - 80; x += 6) { const id = v.cutAt(x, y, 3); if (id) return { x: r.left + x, y: r.top + y, id }; } return null; });
   await page.mouse.move(pt.x, pt.y); await page.waitForTimeout(120);
   await page.mouse.down(); await page.mouse.up(); await page.waitForTimeout(600);
-  ok(await page.evaluate(() => /The pattern has not moved/.test(document.getElementById('say').textContent) && window.__flips.past() === 1), 'a click on a cut where it is drawn on the pattern flips it');
+  ok(!!pt && await page.evaluate(() => /The pattern has not moved/.test(document.getElementById('say').textContent) && window.__flips.past() === 1), 'with "cuts" ticked the cuts are drawn, and a click on one where it is drawn on the pattern flips it');
+  await page.locator('#cuts-on').uncheck();
   const box = page.locator('#custom-in');
   await box.click(); await page.keyboard.type('2345'); await page.keyboard.press('Enter'); await page.waitForTimeout(250);
   const typed = await page.evaluate(() => ({ text: window.__flips.state().text, box: document.getElementById('custom-in').value, yours: [...document.querySelectorAll('#recent-row .chip')].map((e) => e.dataset.k) }));

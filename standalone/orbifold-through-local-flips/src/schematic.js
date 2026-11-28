@@ -137,7 +137,7 @@ export function createSchematic(svg, opts = {}) {
   const W = 320;
   let H = 190;
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  let raw = {}, shown = {}, graph = null, cuts = [], colors = {}, hover = null, anim = 0, from = {}, to = {}, t0 = 0;
+  let raw = {}, shown = {}, graph = null, cuts = [], colors = {}, sides = {}, hover = null, anim = 0, from = {}, to = {}, t0 = 0;
   const el = (name, attrs = {}, parent = null) => { const e = document.createElementNS(NS, name); for (const k of Object.keys(attrs)) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
   const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -192,10 +192,12 @@ export function createSchematic(svg, opts = {}) {
       }
       h.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); if (opts.onPick) opts.onPick(e.cut); } });
     }
+    const owner = {};
+    for (const e of graph.edges) if (!e.cut) owner[e.b] = e.a;                     // a feature hangs on its piece by a twig
     for (const nd of graph.nodes) {
       const p = pos[nd.id];
       if (!p) continue;
-      if (nd.kind === 'leaf') { const t = el('text', { x: p[0], y: p[1] + 4.6, class: 'sch-leaf ' + nd.tone + (/^[∗×○]$/.test(nd.text) ? ' sym' : '') }, gN); t.textContent = nd.text; continue; }
+      if (nd.kind === 'leaf') { const t = el('text', { x: p[0], y: p[1] + 4.6, class: 'sch-leaf ' + nd.tone + (/^[∗×○]$/.test(nd.text) ? ' sym' : ''), 'data-owner': owner[nd.id] || '' }, gN); t.textContent = nd.text; continue; }
       let dot;
       if (nd.shape === 'M') dot = el('rect', { x: p[0] - 5.5, y: p[1] - 5.5, width: 11, height: 11, class: 'sch-piece mirror' }, gN);
       else if (nd.shape === 'cap') dot = el('circle', { cx: p[0], cy: p[1], r: 3, class: 'sch-piece cap' }, gN);
@@ -203,17 +205,26 @@ export function createSchematic(svg, opts = {}) {
       el('title', {}, dot).textContent = WHAT[nd.shape] || WHAT.P;
     }
   }
+  /** The features on the two sides of the cut pointed at: one side in the cut's colour, the other ringed in it (as on the pattern). */
+  function tint() {
+    const part = hover != null && sides[hover] ? sides[hover].pieces : null, color = hover != null ? colors[hover] : null;
+    for (const t of svg.querySelectorAll('.sch-leaf')) {
+      const side = part ? part[t.getAttribute('data-owner')] : undefined;
+      t.classList.toggle('side-a', side === 0); t.classList.toggle('side-b', side === 1);
+      if (side === 0) { t.style.fill = color; t.style.stroke = ''; } else if (side === 1) { t.style.fill = ''; t.style.stroke = color; } else { t.style.fill = ''; t.style.stroke = ''; }
+    }
+  }
   function step(now) {
     anim = 0;
     const t = Math.min(1, (now - t0) / 260), k = t * t * (3 - 2 * t), pos = {};
     for (const id of Object.keys(to)) { const a = from[id] || to[id], b = to[id]; pos[id] = [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; }
     shown = pos;
-    paint(pos);
+    paint(pos); tint();
     if (t < 1) anim = requestAnimationFrame(step);
   }
   return {
-    show(state, cutInfo, cutColors, { keep = true } = {}) {
-      graph = state ? graphOf(state) : null; cuts = cutInfo || []; colors = cutColors || {};
+    show(state, cutInfo, cutColors, { keep = true, parts = {} } = {}) {
+      graph = state ? graphOf(state) : null; cuts = cutInfo || []; colors = cutColors || {}; sides = parts || {};
       if (!graph) { raw = {}; shown = {}; paint({}); return; }
       if (!keep) { H = heightFor(graph); svg.setAttribute('viewBox', `0 0 ${W} ${H}`); }
       const box = { w: W, h: H, pad: H < 100 ? 18 : 26 };
@@ -223,12 +234,12 @@ export function createSchematic(svg, opts = {}) {
       raw = L.raw; delete L.raw;
       from = keep ? shown : {}; to = L; t0 = performance.now();
       if (anim) cancelAnimationFrame(anim);
-      if (calm || !keep || !Object.keys(from).length) { shown = L; paint(L); } else anim = requestAnimationFrame(step);
+      if (calm || !keep || !Object.keys(from).length) { shown = L; paint(L); tint(); } else anim = requestAnimationFrame(step);
     },
     /** The numbers changed and nothing else: the same picture, with what a cut says about itself brought up to date. */
-    refresh(cutInfo) { cuts = cutInfo || cuts; if (!anim) paint(shown); },
+    refresh(cutInfo) { cuts = cutInfo || cuts; if (!anim) { paint(shown); tint(); } },
     // only the class changes: a repaint would take away the very element the pointer is over
-    setHover(id) { if (hover === id) return; hover = id; for (const e of svg.querySelectorAll('[data-cut]')) e.classList.toggle('on', e.getAttribute('data-cut') === id); },
+    setHover(id) { if (hover === id) return; hover = id; for (const e of svg.querySelectorAll('[data-cut]')) e.classList.toggle('on', e.getAttribute('data-cut') === id); tint(); },
     state: () => ({ nodes: graph ? graph.nodes.length : 0, edges: graph ? graph.edges.length : 0, hover }),
   };
 }
