@@ -25,7 +25,7 @@
   .preset-row.row-wide { flex: 1 1 100%; }
 }
 .preset-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-.preset-lab { flex: 0 0 5.4em; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); }
+.preset-lab { flex: 0 0 6.1em; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.02em; color: var(--muted); }
 .flips-app .chip { flex: 0 0 auto; text-align: center; padding: 0 11px; letter-spacing: 0.02em; }
 .box-row { position: relative; }
 .box-row .preset-lab { color: var(--ink); }
@@ -38,8 +38,8 @@
     -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent); mask-image: linear-gradient(to right, #000 calc(100% - 34px), transparent);
   }
   .preset-row:not(.box-row)::-webkit-scrollbar { display: none; }
-  .preset-row:not(.box-row) .preset-lab { position: sticky; left: 0; z-index: 1; align-self: stretch; display: flex; align-items: center; flex-basis: 4.9em; background: var(--ground); box-shadow: 8px 0 6px -2px var(--ground); }
-  .box-row .preset-lab { flex-basis: 4.9em; }
+  .preset-row:not(.box-row) .preset-lab { position: sticky; left: 0; z-index: 1; align-self: stretch; display: flex; align-items: center; flex-basis: 5.6em; background: var(--ground); box-shadow: 8px 0 6px -2px var(--ground); }
+  .box-row .preset-lab { flex-basis: 5.6em; }
   .custom-field { flex: 1 1 0; }
   .box-hint { flex: 1 1 100%; }
 }

@@ -12,6 +12,14 @@ import { createSchematic } from './schematic.js';
 import { openOrbifold, spell, withParam, withMove, cutsOf, linkOf, readLink, rangeOf, GEOMETRY, LIMIT } from './model.js';
 
 const $ = (id) => document.getElementById(id);
+// the page's own icon, set from here because the one-file build keeps the page free of <link>s; without one a
+// browser asks the site for favicon.ico, which it does not have
+try {
+  const icon = document.createElement('link');
+  icon.rel = 'icon';
+  icon.href = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#9ad5cc"/><path d="M10 64 Q50 26 90 64" fill="none" stroke="#e69f00" stroke-width="10" stroke-linecap="round"/><circle cx="50" cy="70" r="9" fill="#4fa397"/></svg>');
+  document.head.append(icon);
+} catch (err) { /* a page without a head to add to still works */ }
 // the cuts' colours: clear of the teal ground, the red mirrors and the blue cone points, and readable in the diagram
 // on a light page and on a dark one
 const PALETTE = ['#E69F00', '#7A5CC7', '#C2409F', '#8C6D1F', '#4660C4', '#5C8A12', '#56B4E9', '#A0522D', '#77778A'];
