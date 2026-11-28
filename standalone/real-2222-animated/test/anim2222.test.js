@@ -30,9 +30,16 @@ test('all four corner symbols are strictly 180-degree rotationally symmetric', (
   }
 });
 
-test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 corner tints across all 3 pairs', () => {
+const popcount = (x) => {
+  let n = 0;
+  for (let v = x; v; v &= v - 1) n++;
+  return n;
+};
+
+test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 single + 6 pairwise overlap tints across all 3 pairs', () => {
   for (let activeIdx = 0; activeIdx < 3; activeIdx++) {
     const model = createAnimModel({ activeIdx, t: 0.25, ell: FIXED_ELL });
+    const cycleTints = new Set();
     for (let s = 0; s <= 24; s++) {
       const tw = (s / 24) * ANIM_PERIOD;
       scrubAnimTwist(model, tw);
@@ -43,8 +50,14 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 corner 
       });
       let area = 0;
       const seenTints = new Set();
-      for (let i = 0; i < meshExact.tint.length; i++) seenTints.add(meshExact.tint[i]);
-      assert.deepEqual([...seenTints].sort((a, b) => a - b), [0, 4, 5, 6, 7]);
+      for (let i = 0; i < meshExact.tint.length; i++) {
+        seenTints.add(meshExact.tint[i]);
+        cycleTints.add(meshExact.tint[i]);
+      }
+      assert.ok(seenTints.has(0), `missing ground tint 0 at pair ${activeIdx} t=${tw}`);
+      for (const tSingle of [4, 5, 7, 11]) {
+        assert.ok(seenTints.has(tSingle), `missing single tint ${tSingle} at pair ${activeIdx} t=${tw}`);
+      }
 
       for (let t = 0; t < meshExact.indices.length; t += 3) {
         const i0 = meshExact.indices[t] * 3;
@@ -74,6 +87,14 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 corner 
         const mid = [(p0[0] + p1[0] + p2[0]) / 3, (p0[1] + p1[1] + p2[1]) / 3, (p0[2] + p1[2] + p2[2]) / 3];
         assert.ok(dot3(n, sub3(mid, cen)) > 0, `pair ${activeIdx} t=${tw}: inverted triangle normal`);
       }
+    }
+    if (activeIdx < 2) {
+      for (const tPair of [6, 8, 9, 12, 13, 15]) {
+        assert.ok(cycleTints.has(tPair), `pair ${activeIdx} missing pairwise overlap tint ${tPair} across cycle`);
+      }
+    } else {
+      const pairwiseCount = [6, 8, 9, 12, 13, 15].filter((tPair) => cycleTints.has(tPair)).length;
+      assert.ok(pairwiseCount >= 3, `pair ${activeIdx} expected >= 3 pairwise overlap tints, got ${pairwiseCount}`);
     }
   }
 });
@@ -158,7 +179,7 @@ test('switchAnimPair preserves exact world pose and instantaneous ell (no length
   }
 });
 
-test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 tints across extreme ell 0.2..4.0', () => {
+test('buildSymbolPillowMesh preserves area=2, outward normals, and overlap tints across extreme ell 0.2..4.0', () => {
   for (const ell of [0.2, 0.35, 1.4215, 2.5, 4.0]) {
     const model = createAnimModel({ activeIdx: 0, t: 0.18, ell });
     const mesh = buildSymbolPillowMesh(model.e, model.activeFrame, {
@@ -167,8 +188,19 @@ test('buildSymbolPillowMesh preserves area=2, outward normals, and all 4 tints a
       pinFrame: model.pinFrame,
     });
     const seenTints = new Set();
-    for (let i = 0; i < mesh.tint.length; i++) seenTints.add(mesh.tint[i]);
-    assert.deepEqual([...seenTints].sort((a, b) => a - b), [0, 4, 5, 6, 7], `missing tint at ell=${ell}`);
+    let combinedMask = 0;
+    let hasOverlap = false;
+    for (let i = 0; i < mesh.tint.length; i++) {
+      const tv = mesh.tint[i];
+      seenTints.add(tv);
+      if (tv >= 4) {
+        const mask = tv - 3;
+        combinedMask |= mask;
+        if (popcount(mask) >= 2) hasOverlap = true;
+      }
+    }
+    assert.equal(combinedMask, 15, `expected all 4 motifs represented at ell=${ell}, mask=${combinedMask}`);
+    assert.ok(hasOverlap, `expected overlapping motifs at extreme ell=${ell}, tints=${[...seenTints]}`);
 
     let area = 0;
     const cen = mul3(0.25, add3(add3(mesh.corners.A, mesh.corners.B), add3(mesh.corners.C, mesh.corners.D)));

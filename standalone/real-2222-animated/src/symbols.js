@@ -1,13 +1,12 @@
 // symbols.js — pure geometry for "The real 2222 animated":
-// fixed aspect ratio/size (FIXED_ELL = REG_ELL), four unique 180-deg symmetric colored emblems
-// carved seamlessly into the four faces (zero z-fighting), and three continuous twist animations
-// where each pairing holds its first pair fixed in 3D while rotating only the other pair.
+// large overlapping 180-deg symmetric colored motifs carved cleanly via exact convex BSP partitioning
+// with 15-color stained-glass overlap blending, and three twist animations holding each first pair fixed in 3D.
 
 import {
   REG_ELL,
   clamp,
   mod,
-  sub2,
+  coords2,
   det2,
   dot2,
   mul2,
@@ -33,35 +32,46 @@ export const PAIR_SPLITS = [
   [['A', 'C'], ['B', 'D']],
   [['A', 'D'], ['B', 'C']],
 ];
-const MAX_SYMBOL_RADIUS = 0.27;
+export const MAX_SYMBOL_RADIUS = 0.69;
+export const OVERLAP_ALPHA_LIGHT = 0.76;
+export const OVERLAP_ALPHA_DARK = 0.78;
 
 export const FEATURES = {
-  A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, light: '#0072B2', dark: '#4DB6F5' },
-  B: { name: 'B', label: 'Diamond', tint: 5, palIdx: 1, light: '#D55E00', dark: '#FF7B54' },
-  C: { name: 'C', label: 'Cross', tint: 6, palIdx: 2, light: '#009E73', dark: '#2DD49F' },
-  D: { name: 'D', label: 'Circle', tint: 7, palIdx: 3, light: '#8841B8', dark: '#C084FC' },
+  A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, maskBit: 1, light: '#0072B2', dark: '#4DB6F5' },
+  B: { name: 'B', label: 'Diamond', tint: 5, palIdx: 1, maskBit: 2, light: '#D55E00', dark: '#FF7B54' },
+  C: { name: 'C', label: 'Cross', tint: 7, palIdx: 3, maskBit: 4, light: '#009E73', dark: '#2DD49F' },
+  D: { name: 'D', label: 'Circle', tint: 11, palIdx: 7, maskBit: 8, light: '#8841B8', dark: '#C084FC' },
 };
 
 export const FEATURE_LIST = [FEATURES.A, FEATURES.B, FEATURES.C, FEATURES.D];
 
-function makeSymbolPolys() {
-  // A: 4-pointed star (8 vertices, strictly C4 / 180-deg symmetric)
+function makeSymbolData() {
+  // A: Large 4-pointed star (R=0.64, inner corner (0.15, 0.15)) as union of 2 stretched diamonds
+  const R = 0.64;
+  const c = 0.15;
+  const h = (R * c) / (R - c);
   const star = [];
   for (let i = 0; i < 8; i++) {
     const a = (i * Math.PI) / 4;
-    const r = i % 2 === 0 ? 0.27 : 0.102;
+    const r = i % 2 === 0 ? R : c * Math.SQRT2;
     star.push([r * Math.cos(a), r * Math.sin(a)]);
   }
-  // B: Elongated diamond (4 vertices, strictly C2 / 180-deg symmetric)
-  const diamond = [
-    [0.27, 0],
-    [0, 0.16],
-    [-0.27, 0],
-    [0, -0.16],
+  const starParts = [
+    [[R, 0], [0, h], [-R, 0], [0, -h]],
+    [[h, 0], [0, R], [-h, 0], [0, -R]],
   ];
-  // C: Swiss cross (12 vertices, strictly C4 / 180-deg symmetric)
-  const L = 0.23;
-  const W = 0.076;
+
+  // B: Large diamond (0.68 x 0.56 half-axes so adjacent overlaps happen in both horizontal and vertical pairings)
+  const diamond = [
+    [0.68, 0],
+    [0, 0.56],
+    [-0.68, 0],
+    [0, -0.56],
+  ];
+
+  // C: Large Swiss cross (arm L=0.60, half-width W=0.14) as union of 2 bars
+  const L = 0.60;
+  const W = 0.14;
   const cross = [
     [L, -W],
     [L, W],
@@ -76,16 +86,64 @@ function makeSymbolPolys() {
     [W, -L],
     [W, -W],
   ];
-  // D: Smooth circle (24-gon, strictly circular / 180-deg symmetric)
+  const crossParts = [
+    [[L, -W], [L, W], [-L, W], [-L, -W]],
+    [[W, -L], [W, L], [-W, L], [-W, -L]],
+  ];
+
+  // D: Large smooth circle (20-gon of radius 0.54)
   const circle = [];
-  for (let i = 0; i < 24; i++) {
-    const a = (i * 2 * Math.PI) / 24;
-    circle.push([0.195 * Math.cos(a), 0.195 * Math.sin(a)]);
+  for (let i = 0; i < 20; i++) {
+    const a = (i * 2 * Math.PI) / 20;
+    circle.push([0.54 * Math.cos(a), 0.54 * Math.sin(a)]);
   }
-  return { A: star, B: diamond, C: cross, D: circle };
+
+  return {
+    polys: { A: star, B: diamond, C: cross, D: circle },
+    parts: { A: starParts, B: [diamond], C: crossParts, D: [circle] },
+  };
 }
 
-export const SYMBOL_POLYS = makeSymbolPolys();
+const SYMBOL_DATA = makeSymbolData();
+export const SYMBOL_POLYS = SYMBOL_DATA.polys;
+export const SYMBOL_CONVEX_PARTS = SYMBOL_DATA.parts;
+
+function hexToRgb(hex) {
+  return [
+    parseInt(hex.slice(1, 3), 16) / 255,
+    parseInt(hex.slice(3, 5), 16) / 255,
+    parseInt(hex.slice(5, 7), 16) / 255,
+  ];
+}
+
+function rgbToHex([r, g, b]) {
+  return '#' + [r, g, b]
+    .map((x) => Math.round(clamp(x, 0, 1) * 255).toString(16).padStart(2, '0'))
+    .join('');
+}
+
+export function buildOverlapPalette(dark) {
+  const groundHex = dark ? '#1f3532' : '#dceee9';
+  const G = hexToRgb(groundHex);
+  const alpha = dark ? OVERLAP_ALPHA_DARK : OVERLAP_ALPHA_LIGHT;
+  const cols = FEATURE_LIST.map((f) => hexToRgb(dark ? f.dark : f.light));
+  const palette = [];
+  for (let mask = 1; mask <= 15; mask++) {
+    const cur = G.slice();
+    for (let i = 0; i < 4; i++) {
+      if (!(mask & (1 << i))) continue;
+      const M = cols[i];
+      for (let c = 0; c < 3; c++) {
+        cur[c] = dark
+          ? 1 - (1 - cur[c]) * (1 - alpha * M[c])
+          : cur[c] * ((1 - alpha) + alpha * M[c]);
+      }
+    }
+    const hex = rgbToHex(cur);
+    palette.push({ front: hex, back: hex });
+  }
+  return palette;
+}
 
 /** Unique point where ray from origin at angle `th` exits star-shaped CCW polygon `poly`. */
 export function rayPolyPoint(poly, th) {
@@ -106,61 +164,129 @@ export function rayPolyPoint(poly, th) {
   return [bestT * dx, bestT * dy];
 }
 
-/** Ordered CCW boundary points along `poly` across angular wedge [th0, th1]. */
-export function wedgeRim(poly, th0, th1) {
-  const span = th1 - th0;
-  const pStart = rayPolyPoint(poly, th0);
-  const pEnd = rayPolyPoint(poly, th1);
-  const inside = [];
-  for (const v of poly) {
-    const rel = mod(Math.atan2(v[1], v[0]) - th0, 2 * Math.PI);
-    if (rel > 1e-7 && rel < span - 1e-7) inside.push({ rel, p: v });
+function polyArea2(pts) {
+  let a = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    const q = pts[(i + 1) % pts.length];
+    a += p[0] * q[1] - p[1] * q[0];
   }
-  inside.sort((u, v) => u.rel - v.rel);
-  return [pStart, ...inside.map((x) => x.p), pEnd];
+  return 0.5 * a;
 }
 
-/** Ear-clipping triangulation of a simple CCW 2D polygon; returns index triples. */
-export function earClip(pts) {
-  const idx = pts.map((_, i) => i);
-  const tris = [];
-  const inTri = (p, a, b, c) => {
-    const d1 = det2(sub2(b, a), sub2(p, a));
-    const d2 = det2(sub2(c, b), sub2(p, b));
-    const d3 = det2(sub2(a, c), sub2(p, c));
-    return d1 >= -1e-12 && d2 >= -1e-12 && d3 >= -1e-12;
-  };
-  let guard = idx.length * idx.length + 10;
-  while (idx.length > 3 && guard-- > 0) {
-    let cut = false;
-    for (let i = 0; i < idx.length; i++) {
-      const ia = idx[(i + idx.length - 1) % idx.length];
-      const ib = idx[i];
-      const ic = idx[(i + 1) % idx.length];
-      const a = pts[ia];
-      const b = pts[ib];
-      const c = pts[ic];
-      if (det2(sub2(b, a), sub2(c, a)) <= 1e-12) continue;
-      let hasInside = false;
-      for (let j = 0; j < idx.length; j++) {
-        const k = idx[j];
-        if (k === ia || k === ib || k === ic) continue;
-        if (inTri(pts[k], a, b, c)) {
-          hasInside = true;
-          break;
-        }
+function polyBBox(pts) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const p of pts) {
+    if (p[0] < x0) x0 = p[0];
+    if (p[0] > x1) x1 = p[0];
+    if (p[1] < y0) y0 = p[1];
+    if (p[1] > y1) y1 = p[1];
+  }
+  return [x0, y0, x1, y1];
+}
+
+function splitConvexByLine(poly, ax, ay, bx, by) {
+  const ex = bx - ax;
+  const ey = by - ay;
+  const n = poly.length;
+  const side = new Array(n);
+  let anyIn = false;
+  let anyOut = false;
+  for (let i = 0; i < n; i++) {
+    const s = ex * (poly[i][1] - ay) - ey * (poly[i][0] - ax);
+    side[i] = s;
+    if (s > 1e-11) anyIn = true;
+    else if (s < -1e-11) anyOut = true;
+  }
+  if (!anyOut) return [poly, null];
+  if (!anyIn) return [null, poly];
+  const inP = [];
+  const outP = [];
+  for (let i = 0; i < n; i++) {
+    const p = poly[i];
+    const q = poly[(i + 1) % n];
+    const sp = side[i];
+    const sq = side[(i + 1) % n];
+    if (sp >= -1e-11) inP.push(p);
+    if (sp <= 1e-11) outP.push(p);
+    if ((sp > 1e-11 && sq < -1e-11) || (sp < -1e-11 && sq > 1e-11)) {
+      const f = sp / (sp - sq);
+      const mid = [p[0] + f * (q[0] - p[0]), p[1] + f * (q[1] - p[1])];
+      inP.push(mid);
+      outP.push(mid);
+    }
+  }
+  return [
+    inP.length >= 3 && polyArea2(inP) > 1e-10 ? inP : null,
+    outP.length >= 3 && polyArea2(outP) > 1e-10 ? outP : null,
+  ];
+}
+
+function partitionTriangleByMotifs(V2, S) {
+  const tb = polyBBox(V2);
+  const pad = MAX_SYMBOL_RADIUS + 0.05;
+  const boxCorners = [
+    [tb[0] - pad, tb[1] - pad],
+    [tb[2] + pad, tb[1] - pad],
+    [tb[2] + pad, tb[3] + pad],
+    [tb[0] - pad, tb[3] + pad],
+  ];
+  let aMin = Infinity, aMax = -Infinity, bMin = Infinity, bMax = -Infinity;
+  for (const pt of boxCorners) {
+    const [a, b] = coords2(pt, S.va, S.vb);
+    if (a < aMin) aMin = a;
+    if (a > aMax) aMax = a;
+    if (b < bMin) bMin = b;
+    if (b > bMax) bMax = b;
+  }
+
+  const shapes = [];
+  for (let jb = Math.floor(bMin); jb <= Math.ceil(bMax); jb++) {
+    for (let ia = Math.floor(aMin); ia <= Math.ceil(aMax); ia++) {
+      const cx = ia * S.va[0] + jb * S.vb[0];
+      const cy = ia * S.va[1] + jb * S.vb[1];
+      if (cx + MAX_SYMBOL_RADIUS < tb[0] || cx - MAX_SYMBOL_RADIUS > tb[2] || cy + MAX_SYMBOL_RADIUS < tb[1] || cy - MAX_SYMBOL_RADIUS > tb[3]) {
+        continue;
       }
-      if (!hasInside) {
-        tris.push([ia, ib, ic]);
-        idx.splice(i, 1);
-        cut = true;
-        break;
+      const idx = (ia & 1) + 2 * (jb & 1);
+      const name = 'ABCD'[idx];
+      const bit = 1 << idx;
+      for (const basePoly of SYMBOL_CONVEX_PARTS[name]) {
+        const poly = basePoly.map((p) => [cx + p[0], cy + p[1]]);
+        const bb = polyBBox(poly);
+        if (bb[2] < tb[0] || bb[0] > tb[2] || bb[3] < tb[1] || bb[1] > tb[3]) continue;
+        shapes.push({ poly, bb, bit, order: poly.length });
       }
     }
-    if (!cut) throw new Error(`earClip stalled with ${idx.length} vertices`);
   }
-  if (idx.length === 3) tris.push([idx[0], idx[1], idx[2]]);
-  return tris;
+  shapes.sort((u, v) => u.order - v.order);
+
+  let pieces = [{ poly: V2, bb: tb, mask: 0 }];
+  for (const sh of shapes) {
+    const next = [];
+    const sb = sh.bb;
+    for (const pc of pieces) {
+      if ((pc.mask & sh.bit) !== 0 || pc.bb[2] < sb[0] || pc.bb[0] > sb[2] || pc.bb[3] < sb[1] || pc.bb[1] > sb[3]) {
+        next.push(pc);
+        continue;
+      }
+      let inside = pc.poly;
+      for (let i = 0; i < sh.poly.length; i++) {
+        const a = sh.poly[i];
+        const b = sh.poly[(i + 1) % sh.poly.length];
+        const [inP, outP] = splitConvexByLine(inside, a[0], a[1], b[0], b[1]);
+        if (outP) next.push({ poly: outP, bb: polyBBox(outP), mask: pc.mask });
+        if (!inP) {
+          inside = null;
+          break;
+        }
+        inside = inP;
+      }
+      if (inside) next.push({ poly: inside, bb: polyBBox(inside), mask: pc.mask | sh.bit });
+    }
+    pieces = next;
+  }
+  return pieces;
 }
 
 /**
@@ -175,16 +301,6 @@ export function intrinsicPairFrame(S, activeIdx) {
   const w = activeIdx === 0 ? [0, 0, 1] : activeIdx === 1 ? [1, 0, 0] : [0, 1, 0];
   const v = cross3(w, u);
   return { mid, u, v, w };
-}
-
-export function symbolScaleFor(S) {
-  const minEdge = Math.min(S.edges[0], S.edges[1], S.edges[2]);
-  const maxEdge = Math.max(S.edges[0], S.edges[1], S.edges[2]);
-  if (!(minEdge > 0) || !(maxEdge > 0)) return 1;
-  return Math.max(
-    1e-3,
-    Math.min(1, (0.82 * minEdge) / (2 * MAX_SYMBOL_RADIUS), 0.72 / (MAX_SYMBOL_RADIUS * maxEdge))
-  );
 }
 
 function mapPointBetweenFrames(q, src, dst) {
@@ -222,9 +338,9 @@ export function worldCornersFromState(e, activeIdx, pinFrame, { minConorm = 4e-4
 }
 
 /**
- * Exact non-overlapping carved disphenoid mesh for "The real 2222 animated":
- * each corner feature carves its 180-deg symmetric emblem out of each incident triangle face
- * (tint = 4..7) while the remaining background interior stays tint = 0 (Paisley print).
+ * Exact non-overlapping carved disphenoid mesh with multi-motif overlap regions:
+ * partitions each face by all overlapping 180-deg symmetric corner motifs via exact convex BSP,
+ * assigning tint = 0 (Paisley ground) or 3 + mask (1..15 stained-glass overlap palette).
  */
 export function buildSymbolPillowMesh(
   e,
@@ -252,15 +368,14 @@ export function buildSymbolPillowMesh(
     indices.push(base, base + 1, base + 2);
   };
 
-  const symScale = symbolScaleFor(S);
   for (const tr of S.tris) {
-    // Work in global plane coordinates tr.pts so corner emblems never jump/spin on active pair switch
+    // Work in global plane coordinates tr.pts so motifs never jump/spin on active pair switch
     const V2 = tr.pts;
     const V3 = tr.names.map((n) => V[n]);
-    const d2 = det2(sub2(V2[1], V2[0]), sub2(V2[2], V2[0]));
+    const d2 = det2([V2[1][0] - V2[0][0], V2[1][1] - V2[0][1]], [V2[2][0] - V2[0][0], V2[2][1] - V2[0][1]]);
     const to3d = (q) => {
-      const w0 = det2(sub2(V2[1], q), sub2(V2[2], q)) / d2;
-      const w1 = det2(sub2(V2[2], q), sub2(V2[0], q)) / d2;
+      const w0 = det2([V2[1][0] - q[0], V2[1][1] - q[1]], [V2[2][0] - q[0], V2[2][1] - q[1]]) / d2;
+      const w1 = det2([V2[2][0] - q[0], V2[2][1] - q[1]], [V2[0][0] - q[0], V2[0][1] - q[1]]) / d2;
       const w2 = 1 - w0 - w1;
       return [
         w0 * V3[0][0] + w1 * V3[1][0] + w2 * V3[2][0],
@@ -269,38 +384,19 @@ export function buildSymbolPillowMesh(
       ];
     };
 
-    const bgBoundary = [];
-    for (let k = 0; k < 3; k++) {
-      const name = tr.names[k];
-      const vk = V2[k];
-      const vNext = V2[(k + 1) % 3];
-      const vPrev = V2[(k + 2) % 3];
-      const th0 = Math.atan2(vNext[1] - vk[1], vNext[0] - vk[0]);
-      let th1 = Math.atan2(vPrev[1] - vk[1], vPrev[0] - vk[0]);
-      while (th1 <= th0) th1 += 2 * Math.PI;
-
-      const rimRel = wedgeRim(SYMBOL_POLYS[name], th0, th1);
-      const rimAbs = rimRel.map((p) => [vk[0] + symScale * p[0], vk[1] + symScale * p[1]]);
-      const tintVal = FEATURES[name].tint;
-      const vk3 = V3[k];
-      const vkUv = toPair(vk);
-
-      for (let j = 0; j < rimAbs.length - 1; j++) {
-        const pA = rimAbs[j];
-        const pB = rimAbs[j + 1];
-        pushTri([vk3, to3d(pA), to3d(pB)], [vkUv, toPair(pA), toPair(pB)], tintVal);
+    const pieces = partitionTriangleByMotifs(V2, S);
+    for (const pc of pieces) {
+      const poly = pc.poly;
+      const tintVal = pc.mask === 0 ? 0 : 3 + pc.mask;
+      const p03 = to3d(poly[0]);
+      const p0uv = toPair(poly[0]);
+      for (let k = 1; k < poly.length - 1; k++) {
+        pushTri(
+          [p03, to3d(poly[k]), to3d(poly[k + 1])],
+          [p0uv, toPair(poly[k]), toPair(poly[k + 1])],
+          tintVal
+        );
       }
-
-      // Walk corner rim in reverse around interior cavity so overall background polygon is CCW
-      for (let j = rimAbs.length - 1; j >= 0; j--) bgBoundary.push(rimAbs[j]);
-    }
-
-    const bgTris = earClip(bgBoundary);
-    for (const [ia, ib, ic] of bgTris) {
-      const p0 = bgBoundary[ia];
-      const p1 = bgBoundary[ib];
-      const p2 = bgBoundary[ic];
-      pushTri([to3d(p0), to3d(p1), to3d(p2)], [toPair(p0), toPair(p1), toPair(p2)], 0);
     }
   }
 

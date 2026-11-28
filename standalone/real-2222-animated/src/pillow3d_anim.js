@@ -6,7 +6,7 @@ import { createStage } from '../../classification-of-surfaces/src/stage.js';
 import { THEME } from '../../classification-of-surfaces/src/theme.js';
 import { unitFields, printOf, printTexture, cellBox } from '../../real-2222/src/paisley.js';
 import { pairPrintParams } from '../../real-2222/src/real2222.js';
-import { FEATURES, FEATURE_LIST, buildSymbolPillowMesh } from './symbols.js';
+import { FEATURES, buildOverlapPalette, buildSymbolPillowMesh } from './symbols.js';
 
 const SURFACE_RADIUS = 0.86;
 const PRINT_SIZE = 256;
@@ -121,10 +121,7 @@ export function createAnimPillowStage(canvas, labelLayer, scrollHost) {
 
   function applyStyle() {
     const P = THEME.dark ? BG_PRINT.dark : BG_PRINT.light;
-    const palette = FEATURE_LIST.map((f) => {
-      const hex = THEME.dark ? f.dark : f.light;
-      return { front: hex, back: hex };
-    });
+    const palette = buildOverlapPalette(THEME.dark);
     R.setStyle({
       printFront: P.front,
       printBack: P.back,

@@ -10,7 +10,13 @@ import {
   unfoldedNet,
 } from '../../real-2222/src/real2222.js';
 import { placedInPane, outline, sizeOf } from '../../real-2222/src/paisley.js';
-import { FEATURES, SYMBOL_POLYS, symbolScaleFor } from './symbols.js';
+import {
+  FEATURES,
+  SYMBOL_POLYS,
+  MAX_SYMBOL_RADIUS,
+  OVERLAP_ALPHA_LIGHT,
+  OVERLAP_ALPHA_DARK,
+} from './symbols.js';
 
 const VIEW_SPAN = 4.2;
 const CAM_X = 0;
@@ -170,59 +176,80 @@ export function createAnimUnfoldPane(canvas) {
     // 4. Canonical label anchors (zero tetrahedron outline lines drawn)
     const net = unfoldedNet(S, [CAM_X, CAM_Y]);
 
-    // 5. Four unique 180-deg symmetric colored emblems centered at every visible half-turn point
-    const symScale = symbolScaleFor(S);
-    let symbolsDrawn = 0;
+    // 5. Four large 180-deg symmetric colored motifs with order-independent stained-glass overlaps
+    const paths = { A: new Path2D(), B: new Path2D(), C: new Path2D(), D: new Path2D() };
+    const symBox = {
+      x0: planeBox.x0 - MAX_SYMBOL_RADIUS,
+      x1: planeBox.x1 + MAX_SYMBOL_RADIUS,
+      y0: planeBox.y0 - MAX_SYMBOL_RADIUS,
+      y1: planeBox.y1 + MAX_SYMBOL_RADIUS,
+    };
+    const sbCorners = [
+      [symBox.x0, symBox.y0],
+      [symBox.x1, symBox.y0],
+      [symBox.x1, symBox.y1],
+      [symBox.x0, symBox.y1],
+    ];
+    let sa0 = Infinity, sa1 = -Infinity, sb0 = Infinity, sb1 = -Infinity;
+    for (const pt of sbCorners) {
+      const [a, b] = coords2(pt, va, vb);
+      if (a < sa0) sa0 = a;
+      if (a > sa1) sa1 = a;
+      if (b < sb0) sb0 = b;
+      if (b > sb1) sb1 = b;
+    }
 
-    for (let jb = jb0; jb <= jb1; jb++) {
-      for (let ia = ia0; ia <= ia1; ia++) {
+    let symbolsDrawn = 0;
+    for (let jb = Math.floor(sb0) - 1; jb <= Math.ceil(sb1) + 1; jb++) {
+      for (let ia = Math.floor(sa0) - 1; ia <= Math.ceil(sa1) + 1; ia++) {
         const pt = latPt(ia, jb);
-        if (pt[0] < planeBox.x0 || pt[0] > planeBox.x1 || pt[1] < planeBox.y0 || pt[1] > planeBox.y1) continue;
+        if (pt[0] < symBox.x0 || pt[0] > symBox.x1 || pt[1] < symBox.y0 || pt[1] > symBox.y1) continue;
         const name = 'ABCD'[(ia & 1) + 2 * (jb & 1)];
         const poly = SYMBOL_POLYS[name];
-
-        ctx.beginPath();
-        const s0 = toScreen([pt[0] + symScale * poly[0][0], pt[1] + symScale * poly[0][1]]);
-        ctx.moveTo(s0[0], s0[1]);
+        const path = paths[name];
+        const s0 = toScreen([pt[0] + poly[0][0], pt[1] + poly[0][1]]);
+        path.moveTo(s0[0], s0[1]);
         for (let k = 1; k < poly.length; k++) {
-          const sk = toScreen([pt[0] + symScale * poly[k][0], pt[1] + symScale * poly[k][1]]);
-          ctx.lineTo(sk[0], sk[1]);
+          const sk = toScreen([pt[0] + poly[k][0], pt[1] + poly[k][1]]);
+          path.lineTo(sk[0], sk[1]);
         }
-        ctx.closePath();
-
-        ctx.globalAlpha = 1.0;
-        ctx.fillStyle = col.sym[name];
-        ctx.fill();
-        ctx.lineWidth = 1.0;
-        ctx.strokeStyle = col.ground;
-        ctx.stroke();
+        path.closePath();
         symbolsDrawn++;
       }
     }
 
-    // 6. Crisp A, B, C, D corner labels beside the 4 canonical corners of the central net
-    const cenScreen = toScreen(net.centroid);
+    ctx.save();
+    ctx.globalCompositeOperation = dark ? 'screen' : 'multiply';
+    ctx.globalAlpha = dark ? OVERLAP_ALPHA_DARK : OVERLAP_ALPHA_LIGHT;
+    for (const name of ['A', 'B', 'C', 'D']) {
+      ctx.fillStyle = col.sym[name];
+      ctx.fill(paths[name]);
+    }
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = dark ? 0.55 : 0.45;
+    ctx.lineWidth = 1.15;
+    for (const name of ['A', 'B', 'C', 'D']) {
+      ctx.strokeStyle = col.sym[name];
+      ctx.stroke(paths[name]);
+    }
+    ctx.restore();
+
+    // 6. Crisp A, B, C, D cone labels anchored at the centers of the four central motifs
     ctx.font = '700 13px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.lineJoin = 'round';
     ctx.lineWidth = 3.5;
-    ctx.strokeStyle = col.ground;
+    ctx.strokeStyle = dark ? 'rgba(255, 255, 255, 0.72)' : 'rgba(16, 22, 26, 0.65)';
+    ctx.fillStyle = dark ? '#101418' : '#ffffff';
 
     for (const name of ['A', 'B', 'C', 'D']) {
       const c = net.labelCorners[name];
       if (!c) continue;
       const [sx, sy] = toScreen(c.pt);
-      let dx = sx - cenScreen[0];
-      let dy = sy - cenScreen[1];
-      const d = Math.hypot(dx, dy) || 1;
-      dx /= d;
-      dy /= d;
-      const dist = Math.max(17, 0.28 * ppuX);
-      const lx = Math.max(12, Math.min(W - 12, sx + dx * dist));
-      const ly = Math.max(12, Math.min(H - 12, sy + dy * dist));
+      const lx = Math.max(12, Math.min(W - 12, sx));
+      const ly = Math.max(12, Math.min(H - 12, sy));
       ctx.strokeText(name, lx, ly);
-      ctx.fillStyle = col.sym[name];
       ctx.fillText(name, lx, ly);
     }
 
