@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>22222 animated — hyperbolic center-sliding &amp; local flips</title>
+<style>
+/*__INLINE_CSS__*/
+</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<main class="app">
+  <header class="hdr">
+    <h1 class="title">22222 animated</h1>
+    <p class="sub">Closed-form hyperbolic two-pair coordinates for the five order-2 centers of 22222 — pick any of the 15 groupings via geometry-preserving local flips and watch its rail twist loop cleanly at balanced golden lengths.</p>
+  </header>
+
+  <div class="workspace">
+    <section class="stage-col" aria-label="Poincaré disk hyperbolic pattern">
+      <div class="stage-card">
+        <div class="pane disk-pane" id="disk-pane">
+          <canvas id="disk" tabindex="0" aria-label="Animated hyperbolic 22222 orbifold pattern in the Poincaré disk"></canvas>
+          <span class="viz-tag" id="active-tag">{A, B} | E | {C, D}</span>
+          <button type="button" class="btn-quiet pane-reset" id="reset-view" aria-label="Recenter Poincaré disk" title="Recenter view (or double-click)">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12a8 8 0 1 0 2.3-5.6L4 8.7"/>
+              <path d="M4 4v4.7h4.7"/>
+            </svg>
+          </button>
+          <p class="hint">Drag to slide · scroll to zoom</p>
+        </div>
+
+        <div class="play-foot">
+          <div class="play-actions">
+            <button type="button" class="btn-primary play-btn" id="btn-play" aria-pressed="true">Pause</button>
+            <button type="button" class="reset-btn" id="btn-reset" title="Reset to 5-fold balanced 22222 and default view">Reset</button>
+          </div>
+          <div class="scrub-wrap">
+            <label class="scrub-label" for="twist-scrub">Twist</label>
+            <div class="swrap">
+              <input id="twist-scrub" type="range" min="0" max="1" step="0.001" value="0">
+              <div class="sticks" aria-hidden="true">
+                <i style="left:0%"></i>
+                <i style="left:25%"></i>
+                <i style="left:50%"></i>
+                <i style="left:75%"></i>
+                <i style="left:100%"></i>
+              </div>
+            </div>
+            <output class="sval" id="twist-val" for="twist-scrub">0.000</output>
+          </div>
+          <div class="speed-pills" role="group" aria-label="Animation speed">
+            <button type="button" class="speed-btn" data-speed="0.5">0.5×</button>
+            <button type="button" class="speed-btn is-selected" data-speed="1">1×</button>
+            <button type="button" class="speed-btn" data-speed="2">2×</button>
+          </div>
+        </div>
+
+        <div class="opts-foot">
+          <div class="opts-left">
+            <label class="chk">
+              <input type="checkbox" id="chk-rails">
+              <span>Show rails</span>
+            </label>
+            <label class="chk" title="Gently ease rail lengths back to the balanced golden spacing arccosh(φ) after flips">
+              <input type="checkbox" id="chk-balance" checked>
+              <span>Auto-balance lengths</span>
+            </label>
+          </div>
+          <div class="opts-right">
+            <span class="len-readout" id="len-readout">d₁ = 1.061 · d₂ = 1.061 · δ = 1.061</span>
+            <button type="button" class="mini-btn" id="btn-balance" title="Set both pair lengths to balanced golden arccosh(φ)">Balance</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="legend" aria-label="Five center motifs in fixed overlap order">
+        <span class="lg"><svg class="sym-ico sym-a" viewBox="0 0 20 20" aria-hidden="true"><polygon points="10,1.2 12.2,7.8 18.8,10 12.2,12.2 10,18.8 7.8,12.2 1.2,10 7.8,7.8"/></svg><span>A Star</span></span>
+        <span class="lg"><svg class="sym-ico sym-c" viewBox="0 0 20 20" aria-hidden="true"><polygon points="17.8,7.4 17.8,12.6 12.6,12.6 12.6,17.8 7.4,17.8 7.4,12.6 2.2,12.6 2.2,7.4 7.4,7.4 7.4,2.2 12.6,2.2 12.6,7.4"/></svg><span>C Cross</span></span>
+        <span class="lg"><svg class="sym-ico sym-e" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10,2.2 A7.8,7.8 0 1,0 10,17.8 A7.8,7.8 0 1,0 10,2.2 Z M10,6.2 A3.8,3.8 0 1,1 10,13.8 A3.8,3.8 0 1,1 10,6.2 Z"/></svg><span>E Ring</span></span>
+        <span class="lg"><svg class="sym-ico sym-b" viewBox="0 0 20 20" aria-hidden="true"><polygon points="18.6,10 10,15.6 1.4,10 10,4.4"/></svg><span>B Diamond</span></span>
+        <span class="lg"><svg class="sym-ico sym-d" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.8"/></svg><span>D Circle</span></span>
+      </div>
+    </section>
+
+    <aside class="panel-col" aria-label="Local flips and 15 groupings">
+      <section class="panel-card" aria-label="Active grouping and local flips">
+        <div class="panel-head">
+          <h2 class="panel-title">Active grouping &amp; local flips</h2>
+          <span class="panel-note">Zero-jump flips</span>
+        </div>
+
+        <div class="rail-diagram" id="rail-diagram" aria-live="polite"></div>
+
+        <div class="twist-rail-row" role="radiogroup" aria-label="Select animated twist rail">
+          <button type="button" class="rail-pill is-selected" data-rail="0" role="radio" aria-checked="true" id="pill-r1">Twist Rail 1</button>
+          <button type="button" class="rail-pill" data-rail="1" role="radio" aria-checked="false" id="pill-r2">Twist Rail 2</button>
+          <button type="button" class="rail-pill" data-rail="2" role="radio" aria-checked="false" id="pill-both">Both</button>
+        </div>
+
+        <div class="flips-wrap">
+          <div class="flips-label">Local flips from this grouping <span class="flips-sub">(each keeps one pair fixed)</span></div>
+          <div class="flips-grid" id="flips-grid"></div>
+        </div>
+      </section>
+
+      <section class="panel-card" aria-label="All 15 groupings">
+        <div class="panel-head">
+          <h2 class="panel-title">All 15 groupings</h2>
+          <span class="panel-note"><i class="nbr-dot"></i> 1 local flip away</span>
+        </div>
+        <div class="groups-matrix" id="groups-matrix" role="radiogroup" aria-label="Select one of the 15 groupings via local flips"></div>
+        <div class="flip-trail" id="flip-trail" aria-live="polite">Balanced 5-fold start · {A, B} | E | {C, D}</div>
+      </section>
+    </aside>
+  </div>
+</main>
+<script>
+/*__INLINE_JS__*/
+</script>
+</body>
+</html>
