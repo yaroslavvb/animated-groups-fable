@@ -206,6 +206,7 @@ function undo() {
 // ---- opening an orbifold
 function show(state, { fresh = true } = {}) {
   past = []; sliding = ''; $('undo').disabled = true;
+  hover = null; schematic.setHover(null);            // another orbifold: no cut of the one before is pointed at any more
   cur = state;
   colourCuts(cur, fresh);
   sayOrbifold(cur);
