@@ -1,0 +1,9 @@
+{
+  "name": "pqrs-pillows",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "build": "cd ../classification-of-surfaces && node build.mjs --template ../pqrs-pillows/src/page.template.html --entry ../pqrs-pillows/src/page.js --css src/styles.css,../two-features-two-handles/src/page.css,../pqrs-pillows/src/page.css --out ../pqrs-pillows/site/index.html && cp ../pqrs-pillows/site/index.html ../../docs/pqrs-pillows.html"
+  }
+}

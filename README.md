@@ -78,6 +78,14 @@ loop with ← → (shift for finer steps).
   custom orbifold typing, multi-pair chains, WebGL2 rendering, and smooth
   60 FPS interactive panning.
 
+- **PQRS pillows** ([docs/pqrs-pillows.html](docs/pqrs-pillows.html),
+  source in [standalone/pqrs-pillows/](standalone/pqrs-pillows/), live at
+  https://spacesheep.dev/@yaroslavvb/pqrs-pillows) — the sphere with four cone
+  points as two pillows joined along a loop, in 3D beside its pattern: three
+  coupled partition cards (Length and Twist of each way to pair the cone
+  points; activating another leaves the pattern in place), the journey
+  surface → two pillows → open crowns, the pattern's commas on the surface.
+
 - **Orbifold through local flips** ([docs/orbifold-through-local-flips.html](docs/orbifold-through-local-flips.html),
   source in [standalone/orbifold-through-local-flips/](standalone/orbifold-through-local-flips/)) —
   type any orbifold; cuts part its special points into groups, each cut with

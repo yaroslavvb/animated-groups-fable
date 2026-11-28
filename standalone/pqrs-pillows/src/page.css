@@ -1,0 +1,522 @@
+/* page.css — PQRS pillows, over classification-of-surfaces/src/styles.css and two-features-two-handles/src/page.css
+   (the look is theirs: header, tabs, chips, the quiet field, panes, hints). Only what this page adds or changes. */
+
+:root {
+  --pair1: #0072B2;            /* the active partition's first pair: blue, larger */
+  --pair2: #D55E00;            /* its second pair: orange, smaller */
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --pair1: #56B4E9;
+    --pair2: #FF8A3D;
+  }
+}
+
+/* ---- header: the title and the two tabs on one line ---- */
+.pq-app .pq-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0 16px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--hairline);
+}
+.pq-app .pq-top .title-row {
+  padding-bottom: 8px;
+}
+.pq-app .pq-top .tabs2 {
+  margin-top: 0;
+  border-bottom: 0;
+}
+.pq-app .lede {
+  margin: 8px 0 10px;
+  max-width: none;
+}
+.pq-app .ctrl-bar {
+  margin-bottom: 10px;
+  justify-content: flex-start;
+}
+.pq-app .chip[data-sig] {
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.pq-app .custom-field {
+  max-width: 250px;
+}
+
+/* ---- the two panes, equal, side by side at every width ---- */
+.play-panes.pq-panes {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-areas: "pat surf" "key journey";
+  align-items: start;
+  gap: 8px 16px;
+  margin-bottom: 12px;
+}
+.pq-panes .pq-pane-pat { grid-area: pat; }
+.pq-panes .pq-pane-surf { grid-area: surf; }
+.pq-panes .pq-key { grid-area: key; }
+.pq-panes .pq-journey { grid-area: journey; }
+.play-panes.pq-panes .pane {
+  padding: 6px 10px 10px;
+}
+.pq-panes .pane-head {
+  min-height: 30px;
+  margin-bottom: 4px;
+}
+.canvas-wrap.ratio-pq {
+  aspect-ratio: 1 / 1;
+  max-height: clamp(240px, calc(100vh - 456px), 640px);
+  border-radius: 0;
+  overflow: visible;
+}
+#surf-wrap.ratio-pq {
+  overflow: hidden;
+  border-radius: 8px;
+}
+#surf-wrap canvas {
+  cursor: grab;
+}
+#surf-wrap canvas:active {
+  cursor: grabbing;
+}
+#surf-wrap .labels {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+#surf-wrap #view-hint {
+  left: 8px;                    /* in the corner: the solid stands in the middle and may reach the pane's foot */
+  transform: none;
+}
+.pq-pane-surf > .pane-reset {
+  top: 0;
+  right: 0;
+  z-index: 3;
+}
+.pq-pane-surf .pane-head {
+  padding-right: 40px;          /* the reset button's corner */
+}
+.pq-wait {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: calc(100% - 16px);
+  margin: 0;
+  color: var(--faint);
+  font-size: 14px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* ---- under the Pattern pane: the key; under the Surface pane: the journey ---- */
+.pq-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 14px;
+  min-height: 44px;
+  padding: 0 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.pq-key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.pq-kdot {
+  display: inline-block;
+  border-radius: 50%;
+  flex: none;
+}
+.pq-k1 { width: 11px; height: 11px; background: var(--pair1); }
+.pq-k2 { width: 8px; height: 8px; background: var(--pair2); }
+.pq-kline {
+  display: inline-block;
+  width: 14px;
+  height: 2px;
+  border-radius: 1px;
+  flex: none;
+}
+.pq-kseal1 { background: var(--pair1); }
+.pq-kseal2 { background: var(--pair2); margin-left: -2px; }
+.pq-kloop { height: 1.5px; background: var(--ink); opacity: 0.6; }
+/* the two pillows in 3D: the first pair's pillow in the paper's front tone, the second's in its back tone */
+.pq-kpillow { display: inline-block; width: 12px; height: 12px; border-radius: 2px; flex: none; border: 1px solid rgba(26, 26, 31, 0.18); }
+.pq-kp1 { background: #9ad5cc; }
+.pq-kp2 { background: #f5e6c6; margin-left: -3px; }
+
+.pq-journey {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+.pq-jbtn {
+  min-width: 64px;
+  justify-content: center;
+  padding: 0 10px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.pq-jbtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pq-jmid {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.pq-jmid .scrub {
+  width: 100%;
+}
+.pq-jstops {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: -3px 2px 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.pq-jstops > span:nth-child(2) { text-align: center; }
+.pq-jstops > span:nth-child(3) { text-align: right; }
+.pq-jstops > span[data-at="1"] { color: var(--ink); font-weight: 600; }
+
+/* ---- the three partition cards (the feel of The real 2222) ---- */
+.pq-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pq-card {
+  --part-col: #6b6a63;
+  min-width: 0;
+  border: 1.5px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 2px 12px 6px;
+  transition: border-color 0.14s ease, background-color 0.14s ease, box-shadow 0.14s ease;
+}
+.pq-card[data-active="true"] {
+  --part-col: var(--accent);
+  border-color: var(--accent);
+  background: var(--ground);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+.pq-card-head {
+  appearance: none;
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pq-card-id {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.pq-pair {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pq-dot {
+  display: inline-block;
+  border-radius: 50%;
+  flex: none;
+  opacity: 0.42;
+  transition: opacity 0.14s ease;
+}
+.pq-pair-1 .pq-dot { width: 11px; height: 11px; background: var(--pair1); }
+.pq-pair-2 .pq-dot { width: 8px; height: 8px; background: var(--pair2); }
+.pq-card[data-active="true"] .pq-dot { opacity: 1; }
+.pq-sep {
+  color: var(--faint);
+  font-weight: 500;
+}
+.pq-tag {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  visibility: hidden;
+}
+.pq-card[data-active="true"] .pq-tag { visibility: visible; }
+
+.pq-srow {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) 86px;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin: 0;
+}
+.pq-slabel {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--muted);
+}
+.pq-slabel small {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--faint);
+  white-space: nowrap;
+}
+.pq-card[data-active="true"] .pq-slabel { color: var(--ink); }
+.pq-swrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 44px;
+  min-width: 0;
+}
+.pq-swrap input[type="range"] {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+  touch-action: pan-y;
+  font-size: 16px;
+}
+.pq-swrap input[type="range"]:focus { outline: none; }
+.pq-swrap input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hairline);
+}
+.pq-card[data-active="true"] .pq-swrap input[type="range"]::-webkit-slider-runnable-track {
+  background: color-mix(in srgb, var(--accent) 28%, var(--hairline));
+}
+.pq-swrap input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -9px;
+  border: 2px solid var(--ground);
+  border-radius: 50%;
+  background: var(--part-col);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.pq-swrap input[type="range"]::-moz-range-track {
+  height: 4px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--hairline);
+}
+.pq-swrap input[type="range"]::-moz-range-thumb {
+  box-sizing: border-box;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--ground);
+  border-radius: 50%;
+  background: var(--part-col);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.pq-swrap input[type="range"]:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pq-swrap input[type="range"]:focus-visible::-moz-range-thumb { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pq-sticks {
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  bottom: 5px;
+  height: 5px;
+  pointer-events: none;
+}
+.pq-sticks > i {
+  position: absolute;
+  top: 0;
+  width: 1.5px;
+  height: 5px;
+  margin-left: -0.75px;
+  border-radius: 1px;
+  background: var(--faint);
+  opacity: 0.65;
+}
+.pq-sval {
+  text-align: right;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.pq-sval small {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+/* ---- the two pillows, in numbers ---- */
+.pq-pillows {
+  max-width: 100%;
+}
+.pq-h2 {
+  margin: 0 0 4px;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+.pq-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+.pq-table {
+  border-collapse: collapse;
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+.pq-table th,
+.pq-table td {
+  padding: 5px 14px 5px 0;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--hairline);
+}
+.pq-table th {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.pq-table td:first-child {
+  font-weight: 650;
+}
+.pq-table .pq-tdot {
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.pq-table tr[data-pair="0"] .pq-tdot { width: 11px; height: 11px; background: var(--pair1); }
+.pq-table tr[data-pair="1"] .pq-tdot { width: 8px; height: 8px; background: var(--pair2); margin-left: 1.5px; margin-right: 7.5px; }
+.pq-note {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.45;
+  max-width: 78ch;
+}
+
+/* ---- the Tutorial tab (src/tutorial.html, pasted between the template's markers) ---- */
+.pq-app .tut {
+  padding-top: 4px;
+}
+.pq-app .tut .lede {
+  max-width: 74ch;
+}
+.tut .tut-sec {
+  margin: 0;
+}
+.tut h2 {
+  margin: 1.6em 0 0.5em;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+.tut p {
+  margin: 0.6em 0;
+  line-height: 1.55;
+}
+.tut-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  margin: 0.8em 0;
+}
+.tut-table {
+  border-collapse: collapse;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+.tut-table th,
+.tut-table td {
+  padding: 6px 14px 6px 0;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--hairline);
+}
+.tut-table th {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+.tut-ref {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ---- a narrower desk ---- */
+@media (max-width: 1100px) {
+  .pq-srow { grid-template-columns: 50px minmax(0, 1fr) 82px; gap: 6px; }
+  .pq-card { padding: 2px 10px 6px; }
+  .pq-card-id { font-size: 14px; gap: 6px; }
+}
+@media (max-width: 900px) {
+  .pq-cards { gap: 8px; }
+  .pq-tag { display: none; }
+}
+
+/* ---- a phone: the two panes stay side by side at half width, then the journey, the cards stacked, the table ---- */
+@media (max-width: 640px) {
+  .pq-app .pq-top .title-row { padding-bottom: 4px; }
+  .pq-app .lede { font-size: 0.9rem; line-height: 1.4; margin: 6px 0 8px; }
+  .pq-app .ctrl-bar { margin-bottom: 8px; }
+  .pq-app .seg { gap: 4px; }
+  .pq-app .chip[data-sig] { padding: 0 9px; }
+  .pq-app .custom-field { flex: 1 1 100%; max-width: none; }
+  .play-panes.pq-panes {
+    grid-template-areas: "pat surf" "journey journey" "key key";
+    gap: 6px 6px;
+    margin-bottom: 8px;
+  }
+  .play-panes.pq-panes .pane {
+    padding: 2px 4px 4px;
+    border-radius: 10px;
+  }
+  .pq-panes .pane-head { min-height: 26px; margin-bottom: 2px; padding: 0 2px; }
+  .pq-panes .pane-title { font-size: 0.86rem; }
+  .pq-panes .pane-sub { display: none; }
+  .canvas-wrap.ratio-pq { max-height: none; }
+  .pq-panes .canvas-wrap .hint { font-size: 11.5px; padding: 2px 7px 3px; bottom: 4px; }
+  #view-hint { display: none; }          /* the small solid reaches the pane's foot: nothing is laid over it */
+  .pq-jstops { font-size: 11.5px; }
+  #surf-wrap .labels { font-size: 12px; }
+  .pq-key { min-height: 0; font-size: 12px; gap: 2px 10px; }
+  .pq-cards { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .pq-tag { display: inline-block; }
+  .pq-srow { grid-template-columns: 54px minmax(0, 1fr) 86px; gap: 8px; }
+  .pq-card { padding: 0 12px 4px; }
+  .pq-table { font-size: 13px; }
+  .pq-table th, .pq-table td { padding-right: 10px; }
+}

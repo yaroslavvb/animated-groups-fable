@@ -1,0 +1,121 @@
+--- desk 1280x900
+{"sw":1280,"iw":1280,"sh":1105,"pane2":[48,154,584,496],"pane":[648,154,584,496],"pattern":[59,195,562,444],"view":[659,195,562,444],"journey":[648,658,584,55],"cards":[48,726,1184,142],"pillows":[48,907,405,92],"cardRects":[[48,726,387,142],[447,726,387,142],[845,726,387,142]],"fieldFont":"16px","small":[],"wide":[],"gl":true,"surf":{"on":true,"started":true,"error":null,"fails":0,"stats":{"strainMean":0.0024388403083502323,"strainMax":0.02822103883657401,"sweeps":1920,"ms":8.100000381469727,"vertices":2738,"method":"baseline: position-based, seals closed by a homotopy of the rest lengths"},"exact":true,"version":1,"bakeMs":9.5,"print":true,"view":{"q":[-0.6063081941316425,0.10690849325003436,0.13683663134575172,0.7760390996088925],"zoom":1,"az":-20,"el":14}}}
+ok   nothing wider than the screen  scrollWidth 1280 of 1280; beyond: 
+ok   the two panes side by side  48,154,584,496 | 648,154,584,496
+ok   the two panes equally wide
+ok   tap targets 44 px
+ok   field text 16 px  16px
+ok   3333 on WebGL
+ok   preset 2222: plane, 2D  #k=2222&m=0123&l=1&tw=0  P2 Q2 | R2 S2 1.000 +0.000* ; P2 R2 | Q2 S2 1.000 +0.000 ; P2 S2 | Q2 R2 1.414 +0.250
+ok     2222 activate 02|13: print still  0 of 1833 nodes changed tone
+ok     2222 activate 03|12: print still  0 of 1779 nodes changed tone
+ok     2222 activate 01|23: print still  0 of 1803 nodes changed tone
+ok   preset 3333: WebGL  #  P3 Q3 | R3 S3 2.634 +0.000* ; P3 R3 | Q3 S3 2.634 +0.000 ; P3 S3 | Q3 R3 3.850 +0.250
+ok     3333 activate 02|13: print still  0 of 2078 nodes changed tone
+ok     3333 activate 03|12: print still  0 of 1991 nodes changed tone
+ok     3333 activate 01|23: print still  0 of 1995 nodes changed tone
+ok   preset 2223: WebGL  #k=2223&m=3012&l=1.317&tw=0  P2 Q2 | R2 S3 1.925 +0.250 ; P2 R2 | Q2 S3 1.317 +0.000 ; P2 S3 | Q2 R2 1.317 +0.000*
+ok     2223 activate 02|13: print still  0 of 1903 nodes changed tone
+ok     2223 activate 03|12: print still  0 of 1903 nodes changed tone
+ok     2223 activate 01|23: print still  0 of 1865 nodes changed tone
+ok   preset 2345: WebGL  #k=2345&m=0132&l=2.536&tw=0  P2 Q3 | R4 S5 2.536 +0.000* ; P2 R4 | Q3 S5 3.797 +0.248 ; P2 S5 | Q3 R4 2.623 +0.000
+ok     2345 activate 02|13: print still  0 of 1977 nodes changed tone
+ok     2345 activate 03|12: print still  0 of 1972 nodes changed tone
+ok     2345 activate 01|23: print still  0 of 1997 nodes changed tone
+ok   preset 4444: WebGL  #k=4444&m=0132&l=3.057&tw=0  P4 Q4 | R4 S4 3.057 +0.000* ; P4 R4 | Q4 S4 4.514 +0.250 ; P4 S4 | Q4 R4 3.057 +0.000
+ok     4444 activate 02|13: print still  0 of 1975 nodes changed tone
+ok     4444 activate 03|12: print still  0 of 1974 nodes changed tone
+ok     4444 activate 01|23: print still  0 of 2040 nodes changed tone
+ok   typed 2346 is shown  {"k":"2346","on":"1","gl":true,"labels":["P2 Q3 | R4 S6","P2 R4 | Q3 S6","P2 S6 | Q3 R4"]}
+ok   a refusal is one line and moves nothing  {"k":"2346","pop":true,"text":"Four cone points only: four orders, each from 2 to 9, such as 2346.","top":154.265625}
+ok   five orders are refused
+     the pattern was slid: V = [2.265,-2.13,2.944,1.034,0.417,0.494,2.28,-1.927,3.149]
+     away from lines and marks (3 px): 0 of 56638 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 3468 changed; all pixels: 0 of 103841 print pixels changed tone, 1508 changed value at all (415 by more than 8 of 255, worst 19); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 55101 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 3408 changed; all pixels: 0 of 101067 print pixels changed tone, 1620 changed value at all (405 by more than 8 of 255, worst 18); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 53338 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 3385 changed; all pixels: 0 of 100518 print pixels changed tone, 1596 changed value at all (367 by more than 8 of 255, worst 17); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+     away from lines and marks (3 px): 0 of 53338 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 3385 changed; all pixels: 0 of 100518 print pixels changed tone, 1596 changed value at all (367 by more than 8 of 255, worst 17); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 55101 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 3408 changed; all pixels: 0 of 101067 print pixels changed tone, 1620 changed value at all (405 by more than 8 of 255, worst 18); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 56638 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 3468 changed; all pixels: 0 of 103841 print pixels changed tone, 1508 changed value at all (415 by more than 8 of 255, worst 19); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+ok   a Twist drag moves all three cards  01|23: L 2.634→2.634 tw 0.000→0.134 ; 02|13: L 2.634→2.740 tw -0.000→-0.125 ; 03|12: L 3.850→3.342 tw 0.250→0.238
+ok   pointerdown on an inactive slider activates its card, the print still  0 of 2024
+ok   and the same gesture drags it  tw -0.125 → 0.039
+ok   ArrowRight moves the Twist by 0.01  0.039 → 0.049
+     cost: a slider step 8.1 ms (median of 12, worst 9.1), an activation 30.9 ms and back 29.9 ms; surface on true, fails 0, stretch 0.52 %, bake 4.3 ms
+ok   Part goes to "two pillows"  {"j":1,"l":"Join","r":"Unzip","hash":"#k=3333&m=2031&l=2.74&tw=0.049&j=1"}
+ok   Unzip goes to "open crowns"  {"j":2,"l":"Zip","r":"Unzip","dis":true,"hash":"#k=3333&m=2031&l=2.74&tw=0.049&j=2"}
+ok   Zip, Join return to the surface
+ok   Tutorial tab shows, nothing wider than the screen
+ok   back on Play the pattern is drawn
+ok   the address restores the state and all three cards  #k=3333&m=2031&l=2.74&tw=0.049
+ok   no console or page error
+--- small 1024x700
+{"sw":1024,"iw":1024,"sh":928,"pane2":[18,177,486,296],"pane":[520,177,486,296],"pattern":[29,218,464,244],"view":[531,218,464,244],"journey":[520,481,486,55],"cards":[18,548,988,142],"pillows":[18,730,405,92],"cardRects":[[18,548,321,142],[351,548,321,142],[685,548,321,142]],"fieldFont":"16px","small":[],"wide":[],"gl":true,"surf":{"on":true,"started":true,"error":null,"fails":0,"stats":{"strainMean":0.0024368411390513593,"strainMax":0.028217719645156514,"sweeps":1930,"ms":8,"vertices":2738,"method":"baseline: position-based, seals closed by a homotopy of the rest lengths"},"exact":true,"version":1,"bakeMs":8.699999809265137,"print":true,"view":{"q":[-0.6063081941316425,0.10690849325003436,0.13683663134575172,0.7760390996088925],"zoom":1,"az":-20,"el":14}}}
+ok   nothing wider than the screen  scrollWidth 1024 of 1024; beyond: 
+ok   the two panes side by side  18,177,486,296 | 520,177,486,296
+ok   the two panes equally wide
+ok   tap targets 44 px
+ok   field text 16 px  16px
+ok   3333 on WebGL
+     the pattern was slid: V = [1.194,-0.047,0.654,-0.298,1.142,-0.627,0.717,-0.553,1.349]
+     away from lines and marks (3 px): 0 of 9488 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 3083 changed; all pixels: 0 of 26816 print pixels changed tone, 620 changed value at all (184 by more than 8 of 255, worst 18); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 9354 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 2971 changed; all pixels: 0 of 25883 print pixels changed tone, 683 changed value at all (174 by more than 8 of 255, worst 17); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 8822 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 2967 changed; all pixels: 0 of 25574 print pixels changed tone, 669 changed value at all (179 by more than 8 of 255, worst 16); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+     away from lines and marks (3 px): 0 of 8822 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 2967 changed; all pixels: 0 of 25574 print pixels changed tone, 669 changed value at all (179 by more than 8 of 255, worst 16); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 9354 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 2971 changed; all pixels: 0 of 25883 print pixels changed tone, 683 changed value at all (174 by more than 8 of 255, worst 17); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 9488 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 3083 changed; all pixels: 0 of 26816 print pixels changed tone, 620 changed value at all (184 by more than 8 of 255, worst 18); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+ok   a Twist drag moves all three cards  01|23: L 2.634→2.634 tw 0.000→0.140 ; 02|13: L 2.634→2.749 tw -0.000→-0.130 ; 03|12: L 3.850→3.321 tw 0.250→0.237
+ok   pointerdown on an inactive slider activates its card, the print still  0 of 1829
+ok   and the same gesture drags it  tw -0.130 → 0.095
+ok   ArrowRight moves the Twist by 0.01  0.095 → 0.105
+     cost: a slider step 7.8 ms (median of 12, worst 8.8), an activation 36.7 ms and back 30.6 ms; surface on true, fails 0, stretch 0.52 %, bake 4.1 ms
+ok   Part goes to "two pillows"  {"j":1,"l":"Join","r":"Unzip","hash":"#k=3333&m=2031&l=2.749&tw=0.105&j=1"}
+ok   Unzip goes to "open crowns"  {"j":2,"l":"Zip","r":"Unzip","dis":true,"hash":"#k=3333&m=2031&l=2.749&tw=0.105&j=2"}
+ok   Zip, Join return to the surface
+ok   Tutorial tab shows, nothing wider than the screen
+ok   back on Play the pattern is drawn
+ok   the address restores the state and all three cards  #k=3333&m=2031&l=2.749&tw=0.105
+ok   no console or page error
+--- phone 390x844
+{"sw":390,"iw":390,"sh":1234,"pane2":[12,230,180,206],"pane":[198,230,180,206],"pattern":[17,261,170,170],"view":[203,261,170,170],"journey":[12,442,366,55],"cards":[12,529,366,430],"pillows":[12,998,362,89],"cardRects":[[12,529,366,138],[12,675,366,138],[12,821,366,138]],"fieldFont":"16px","small":[],"wide":[],"gl":true,"surf":{"on":true,"started":true,"error":null,"fails":0,"stats":{"strainMean":0.0024405280907992093,"strainMax":0.028223643269553733,"sweeps":1912,"ms":8,"vertices":2738,"method":"baseline: position-based, seals closed by a homotopy of the rest lengths"},"exact":true,"version":1,"bakeMs":9.700000286102295,"print":true,"view":{"q":[-0.6063081941316425,0.10690849325003436,0.13683663134575172,0.7760390996088925],"zoom":1,"az":-20,"el":14}}}
+ok   nothing wider than the screen  scrollWidth 390 of 390; beyond: 
+ok   the two panes side by side  12,230,180,206 | 198,230,180,206
+ok   the two panes equally wide
+ok   tap targets 44 px
+ok   field text 16 px  16px
+ok   3333 on WebGL
+     the pattern was slid: V = [1.006,-1.431,1.436,1.246,0.12,0.753,1.251,-1.031,1.905]
+     away from lines and marks (3 px): 0 of 2611 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 2850 changed; all pixels: 0 of 11787 print pixels changed tone, 696 changed value at all (170 by more than 8 of 255, worst 18); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 2829 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 2772 changed; all pixels: 0 of 11197 print pixels changed tone, 721 changed value at all (161 by more than 8 of 255, worst 18); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 2593 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 2730 changed; all pixels: 0 of 11042 print pixels changed tone, 672 changed value at all (136 by more than 8 of 255, worst 18); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+     away from lines and marks (3 px): 0 of 2593 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 03|12: print still  grid 0 of 2730 changed; all pixels: 0 of 11042 print pixels changed tone, 672 changed value at all (136 by more than 8 of 255, worst 18); surface fails 0; active false,false,true; L 3.8497 tw 0.2500
+     away from lines and marks (3 px): 0 of 2829 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 02|13: print still  grid 0 of 2772 changed; all pixels: 0 of 11197 print pixels changed tone, 721 changed value at all (161 by more than 8 of 255, worst 18); surface fails 0; active false,true,false; L 2.6339 tw -0.0000
+     away from lines and marks (3 px): 0 of 2611 print pixels changed tone, 0 changed value at all (0 by more than 8 of 255, worst 0)
+ok   3333 click card 01|23: print still  grid 0 of 2850 changed; all pixels: 0 of 11787 print pixels changed tone, 696 changed value at all (170 by more than 8 of 255, worst 18); surface fails 0; active true,false,false; L 2.6339 tw 0.0000
+ok   a Twist drag moves all three cards  01|23: L 2.634→2.634 tw 0.000→0.100 ; 02|13: L 2.634→2.693 tw -0.000→-0.096 ; 03|12: L 3.850→3.463 tw 0.250→0.244
+ok   ArrowRight moves the Twist by 0.01  0.100 → 0.110
+     cost: a slider step 8.0 ms (median of 12, worst 9.6), an activation 29.5 ms and back 30.0 ms; surface on true, fails 0, stretch 0.47 %, bake 3.4 ms
+ok   Part goes to "two pillows"  {"j":1,"l":"Join","r":"Unzip","hash":"#k=3333&m=0123&l=2.634&tw=0.11&j=1"}
+ok   Unzip goes to "open crowns"  {"j":2,"l":"Zip","r":"Unzip","dis":true,"hash":"#k=3333&m=0123&l=2.634&tw=0.11&j=2"}
+ok   Zip, Join return to the surface
+ok   Tutorial tab shows, nothing wider than the screen
+ok   back on Play the pattern is drawn
+ok   the address restores the state and all three cards  #k=3333&m=0123&l=2.634&tw=0.11
+ok   no console or page error
+all ok

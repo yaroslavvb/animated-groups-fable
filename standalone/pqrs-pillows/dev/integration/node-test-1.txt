@@ -1,0 +1,279 @@
+✔ three cards in the fixed order, named by pairing, the pair with P written first (77.115458ms)
+✔ the dots say which pair is blue (first) and which orange, whatever side it is written on (110.458208ms)
+✔ a header click asks for the activation; nothing else is sent (0.32775ms)
+✔ a slider of an inactive card is grabbed at once: activation first, then the drag (17.214208ms)
+✔ the arrow keys move a focused slider: Twist by 0.01, Length by 0.02, Shift a fine 0.001 (0.281291ms)
+✔ a held Length slider keeps the range it was grabbed with; released, it takes the new one (0.564083ms)
+✔ all three cards are refreshed by one update (a Twist of the active card moves the other two) (0.292167ms)
+✔ 2222: the Length is the pair spacing, and says so (9.748208ms)
+✔ the numbers as text: three decimals, a sign on the Twist, never a negative zero (0.079709ms)
+✔ SPEC 2.1: every name of the import block is exported, and is of its kind (1.664458ms)
+✔ every name a file of src/ imports from outside this folder is still exported there (18.532833ms)
+ℹ 45 imported names in 11 files of src/ (cards.js, flat2222.js, flips.js, page.js, pattern-glue.js, pillow.js, print3d.js, solver.js, state.js, surface-model.js, surface-pane.js)
+✔ the methods of GH and GE that the page calls are there (1.001458ms)
+✔ the engine opens 3333, 2345, 2223, 2222 (and 4444) on the numbers the notes record (383.6005ms)
+✔ the pillow's numbers: hgt, pairDistance, treeToCut (0.140292ms)
+✔ buildPatternModel(state): the keys the Pattern pane and the page read (0.983833ms)
+✔ centredFor(state): Pmat, shapes with pts, home, treeSeg, farTreeSeg, cutSeg (0.658417ms)
+✔ the pair frame: home = Pmat X(s, theta), with pillow.js's chart (the print on the surface stands on this) (2.511959ms)
+ℹ worst distance over 28 hyperbolic cone points: 3.4e-14
+✔ recut(state, i, j): the new state with Q and invQ on it; retiePrint gives the print to carry (279.215375ms)
+✔ beyond the block: fourConeCentered (surface-model.js) and linkedPrint (state.js) give what those files read (81.126541ms)
+✔ pattern-ext.js: the tile motions, and createPattern's methods by name (5.338417ms)
+✔ the-folding: bakeSDF bakes a cell, createRenderer has the methods the Surface pane calls (2.260791ms)
+✔ the two copies of every seal vertex are one point, and every open copy sits on its closed vertex (52.587792ms)
+✔ the four cone vertices are the corners of the solid; the first pair lies below, its seal along y, P at -y (14.183791ms)
+✔ L = 1, tw = 1/4: the seals are square to each other; L = (4/3)^(1/4), tw = 1/4: the regular tetrahedron (0.492542ms)
+✔ the mesh on the solid: the surface closes, faces outward, and every edge that stays in one face has its exact length (107.542042ms)
+✔ L = 1, tw = 0 is the doubled square with every edge exact; the copied solid() has the lattice numbers (2.908083ms)
+    720 flips, 647 in range (flat ones count as in range); kinds: a 2 on each side, after flips 3; a 2 on each side, one swap on 4; a 2 on each side 19; equal orders, after flips 2; equal orders, one swap on 1; equal orders 21; flat 2222, after flips 7; flat 2222, one swap on 1; flat 2222 39; generic, after flips 23; generic, one swap on 18; generic 170; pair of 2s far, after flips 3; pair of 2s far, one swap on 1; pair of 2s far 21; pair of 2s picked, after flips 2; pair of 2s picked 25; walks into the tile that did not end: 0
+      flat a comma's points off the old comma's: 9.7e-16 over 94
+      flat a new cone point off the old ones, engine's picture: 9.0e-16 over 94
+      flat a new cone point off the old ones, exact picture: 9.0e-16 over 94
+      flat a new turn moves an old cone point off the old ones: 1.5e-15 over 94
+      flat an old cone point off the new pattern: 6.3e-16 over 94
+      flat this layer's cone points against the engine's: 2.2e-16 over 47
+      flat tw outside [-1/2, 1/2] by: 0.0e+0 over 94
+      (for scale) hyperbolic a comma's points off the old comma's [far]: 1.4e-9 over 73
+      hyperbolic a comma's points off the old comma's [in range]: 2.6e-11 over 553
+      (for scale) hyperbolic a new cone point off the old ones, engine's picture [far]: 3.2e-11 over 73
+      hyperbolic a new cone point off the old ones, engine's picture [in range]: 2.3e-11 over 553
+      (for scale) hyperbolic a new cone point off the old ones, exact picture [far]: 1.3e-10 over 73
+      hyperbolic a new cone point off the old ones, exact picture [in range]: 2.3e-11 over 553
+      (for scale) hyperbolic a new turn moves an old cone point off the old ones [far]: 6.7e-9 over 73
+      hyperbolic a new turn moves an old cone point off the old ones [in range]: 1.3e-10 over 553
+      (for scale) hyperbolic an old cone point off the new pattern [far]: 2.1e-8 over 73
+      hyperbolic an old cone point off the new pattern [in range]: 1.1e-11 over 553
+      (for scale) hyperbolic the check's own tile: a side pairing off its side by [far]: 9.2e-10 over 18
+      hyperbolic the check's own tile: a side pairing off its side by: 1.4e-10 over 295
+      (for scale) hyperbolic the check's own tile: its six corners against the engine's tile [far]: 3.6e-11 over 18
+      hyperbolic the check's own tile: its six corners against the engine's tile: 1.1e-11 over 295
+      (for scale) hyperbolic this layer's cone points against the engine's [far]: 3.2e-11 over 18
+      hyperbolic this layer's cone points against the engine's: 7.0e-12 over 295
+      hyperbolic tw outside [-1/2, 1/2] by: 0.0e+0 over 626
+    largest value of each line
+      flat a flip named by features, by number or by key differs (0 or 1): 0.0e+0 over 94
+      flat flip and back: L: 4.4e-16 over 94
+      flat flip and back: comma angles: 8.9e-16 over 94
+      flat flip and back: perm, orders or tri differ (0 or 1): 0.0e+0 over 94
+      flat flip and back: pose (a cone point moved by): 1.4e-15 over 94
+      flat flip and back: tw: 8.9e-16 over 94
+      flat the flip's numbers against the triangle's listing: 0.0e+0 over 94
+      flat the triangle after a flip: its other two lengths changed by: 6.7e-16 over 94
+      flat three round: L: 6.7e-16 over 94
+      flat three round: comma angles: 1.6e-15 over 94
+      flat three round: perm or tri differ (0 or 1): 0.0e+0 over 94
+      flat three round: pose (a cone point moved by): 2.3e-15 over 94
+      flat three round: tw: 2.1e-15 over 94
+      hyperbolic a flip named by features, by number or by key differs (0 or 1): 0.0e+0 over 626
+      hyperbolic flip and back: L: 2.3e-14 over 626
+      (for scale) hyperbolic flip and back: comma angles [far]: 7.9e-11 over 71
+      hyperbolic flip and back: comma angles: 1.5e-11 over 555
+      hyperbolic flip and back: perm, orders or tri differ (0 or 1): 0.0e+0 over 626
+      (for scale) hyperbolic flip and back: pose (a cone point moved by) [far]: 7.5e-12 over 71
+      hyperbolic flip and back: pose (a cone point moved by): 6.4e-13 over 555
+      hyperbolic flip and back: tw: 2.9e-14 over 626
+      hyperbolic the flip's numbers against the triangle's listing: 0.0e+0 over 626
+      hyperbolic the triangle after a flip: its other two lengths changed by: 2.3e-14 over 626
+      hyperbolic three round: L: 2.4e-14 over 626
+      (for scale) hyperbolic three round: comma angles [far]: 2.9e-9 over 82
+      hyperbolic three round: comma angles: 1.1e-11 over 544
+      hyperbolic three round: perm or tri differ (0 or 1): 0.0e+0 over 626
+      (for scale) hyperbolic three round: pose (a cone point moved by) [far]: 8.9e-12 over 82
+      hyperbolic three round: pose (a cone point moved by): 1.2e-12 over 544
+      hyperbolic three round: tw: 3.8e-14 over 626
+    160 chains, 142 in range
+      flat chain of six: a comma's points off the old comma's: 1.4e-15 over 23
+      flat chain of six: a new cone point off the old ones, engine's picture: 1.5e-15 over 23
+      flat chain of six: a new cone point off the old ones, exact picture: 1.5e-15 over 23
+      flat chain of six: a new turn moves an old cone point off the old ones: 3.6e-15 over 23
+      flat chain of six: an old cone point off the new pattern: 1.8e-15 over 23
+      flat chain of six: tw outside [-1/2, 1/2] at some step by: 0.0e+0 over 23
+      flat chain of six: tw outside [-1/2, 1/2] by: 0.0e+0 over 23
+      (for scale) hyperbolic chain of six: a comma's points off the old comma's [far]: 3.5e-9 over 18
+      hyperbolic chain of six: a comma's points off the old comma's [in range]: 3.3e-11 over 119
+      (for scale) hyperbolic chain of six: a new cone point off the old ones, engine's picture [far]: 1.1e-11 over 18
+      hyperbolic chain of six: a new cone point off the old ones, engine's picture [in range]: 1.8e-11 over 119
+      (for scale) hyperbolic chain of six: a new cone point off the old ones, exact picture [far]: 6.4e-12 over 18
+      hyperbolic chain of six: a new cone point off the old ones, exact picture [in range]: 1.8e-11 over 119
+      (for scale) hyperbolic chain of six: a new turn moves an old cone point off the old ones [far]: 1.6e-9 over 18
+      hyperbolic chain of six: a new turn moves an old cone point off the old ones [in range]: 1.1e-10 over 119
+      (for scale) hyperbolic chain of six: an old cone point off the new pattern [far]: 7.5e-10 over 18
+      hyperbolic chain of six: an old cone point off the new pattern [in range]: 1.8e-12 over 119
+      hyperbolic chain of six: tw outside [-1/2, 1/2] at some step by: 0.0e+0 over 137
+      hyperbolic chain of six: tw outside [-1/2, 1/2] by: 0.0e+0 over 137
+    360 triangles: 325 natural, 238 reduced, the cut longer than its twin in 90
+      flat Heron: 2 (a2 b2 + b2 c2 + c2 a2) - (a4 + b4 + c4) = 4 (relative): 4.0e-16 over 47
+      flat a twin's length: closed form against the relation's other root: 4.3e-16 over 47
+      flat closed forms: the apex's two distances agree on where it stands: 2.2e-16 over 47
+      flat drawn: a loop's motion T against the product of its pair's two turns: 1.4e-15 over 282
+      flat drawn: a loop's two arcs give its Length (F1): 2.2e-16 over 141
+      flat loop length: the flip's against the one-line closed form: 4.4e-16 over 94
+      flat natural triangle: one of the two other loops is longer than its twin (0 or 1): 0.0e+0 over 45
+      flat swap of the cut: Length against the relation's other root: 2.2e-16 over 6
+      flat swap of the cut: the other two loops' lengths changed by: 4.4e-16 over 6
+      flat trace relation residual: 5.3e-16 over 47
+      hyperbolic a twin's length: closed form against the relation's other root: 1.5e-14 over 313
+      hyperbolic closed forms: the apex's two distances agree on where it stands: 1.1e-14 over 313
+      hyperbolic cubic, written out from the three Lengths (relative): 1.1e-15 over 313
+      (for scale) hyperbolic drawn: a loop's motion T against the product of its pair's two turns [far]: 1.5e-8 over 433
+      hyperbolic drawn: a loop's motion T against the product of its pair's two turns: 7.4e-12 over 1445
+      (for scale) hyperbolic drawn: a loop's two arcs give its Length (F1) [far]: 2.3e-11 over 57
+      hyperbolic drawn: a loop's two arcs give its Length (F1): 3.2e-13 over 882
+      (for scale) hyperbolic drawn: a loop's two ends, moved by T or off the circle by [far]: 5.9e-14 over 57
+      hyperbolic drawn: a loop's two ends, moved by T or off the circle by: 9.0e-13 over 882
+      hyperbolic loop length: the flip's against the one-line closed form: 3.9e-15 over 626
+      hyperbolic natural triangle: one of the two other loops is longer than its twin (0 or 1): 0.0e+0 over 280
+      hyperbolic swap of the cut: Length against the relation's other root: 2.9e-14 over 54
+      hyperbolic swap of the cut: the other two loops' lengths changed by: 6.4e-15 over 54
+      hyperbolic trace relation residual: 1.1e-15 over 313
+    the engine's pick gives the flip's Length in 650 of 650; then the same Twist up to the far pair's naming: 1.0e-13 (2 ties with a twin); pick and pick back fails in 180 of 650: the cut longer than its twin in 180 of them, not in 0; returned although longer: 0
+    2222, 40 shapes: the face's area off 1/2 by 4.4e-16; a cone point after a flip off the old lattice by 8.9e-16
+    80 states
+      R(A) R(B) R(Y_{j+1}) R(Y_j) off the identity by: 1.7e-12 over 400
+      T = R(A) R(B) takes Y_j to Y_{j-2}: 2.0e-13 over 400
+      X_{j-1} against R(X_j)(X_{j+1}): 3.4e-12 over 400
+      Y_{j+1} against R(Y_j)(Y_{j-1}): 5.6e-11 over 400
+      layout().T against R(A) R(B): 1.8e-13 over 400
+      loop j as R(B) R(Y_{j+1}): its length against the closed form: 8.4e-13 over 400
+    12 flips of six states re-tied (and flipped back, re-tied again): a comma displaced by at most 3.5e-13; re-ties that parted commas: 0
+✔ a flip keeps the cone points, the group and the commas (360 seeded states, both flips of each) (230.118375ms)
+✔ flip and flip back, and three flips round the face, return the numbers, the slots, the commas and the pose (149.783ms)
+✔ a chain of six flips keeps the pattern; the Twist never leaves [-1/2, 1/2] (94.332542ms)
+✔ the trace relation (Fricke's cubic; Heron on the plane), its other root is the twin, and the closed forms (38.04775ms)
+✔ the engine's own re-cut takes the same loops from a natural triangle (and does not always come back) (38.11825ms)
+✔ named cases: the numbers of the notes (0.766708ms)
+✔ 2222: the flat family (1.040708ms)
+✔ a pair of 2s: the loop is that pair's seal run twice (0.182958ms)
+✔ the words: the four turns as a tuple, the chains by turns (7.3405ms)
+✔ the carried triangle: stamped, lapses when a number moves; tri as text; anchor; the cut names itself (1.676875ms)
+✔ the page's own print after a flip and the engine's re-tie: every comma an image of an old one (569.08975ms)
+✔ every element page.js looks up by id is in the template, once (1.145916ms)
+✔ the template has the build's three slots once each, and the tutorial's two markers in order (0.2185ms)
+✔ the shell: title, the one sentence, the presets in order, the quiet field, two tabs, the journey's words (0.8995ms)
+✔ what page.js imports is there (0.400084ms)
+✔ nothing a build or a publish refuses (1.166875ms)
+✔ phones: the panes stay side by side, fields are 16 px, sliders 44 px tall (0.379875ms)
+✔ the two colours are the page's: blue #0072B2, orange #D55E00 (0.746917ms)
+✔ 2222: marks by pair, three thin lines, nothing of the engine's changed (53.844792ms)
+✔ 3333: marks by pair, three thin lines, nothing of the engine's changed (189.842042ms)
+✔ 2223: marks by pair, three thin lines, nothing of the engine's changed (238.982083ms)
+✔ 2345: marks by pair, three thin lines, nothing of the engine's changed (217.655792ms)
+✔ 4444: marks by pair, three thin lines, nothing of the engine's changed (221.125167ms)
+✔ 2346: marks by pair, three thin lines, nothing of the engine's changed (104.844167ms)
+    832 pillows (orders 2..9, L 0.35..9.5): heights against hgt 7.0e-16; seal against pairDistance (rel) 9.6e-16; least distance against treeToCut 2.1e-14, its feet 0; dP + dQ - d 1.4e-12; uP + uQ - L/2 8.9e-16; least value of the roof 4.5e-7; the seven relations 2.2e-14
+    20 triples x 150 half-pillows: the original returned to 3.0e-13; two solutions only for a,d,hP; a,d,hQ; al,hP,hQ; be,hP,hQ
+    378 pillows x 21 theta: roof against the plane through P, Q 1.3e-13; on the segment PQ 1.8e-15; through the common perpendicular 5.9e-14; slope 5.0e-10 (difference), 4.8e-14 (closed form); corner angles 5.4e-14; area against Gauss–Bonnet 4.0e-14; areaUnder 6.0e-15; dFermi against GH.dist (rel) 2.0e-12
+    48 heights against quadrature (rel) 1.6e-15; first fundamental form off (1, 0, cosh^2 s) by 1.1e-8 (central differences); r'(rim) - 1: 2.2e-16
+    630 states (9 signatures x 7 L x 10 tw from -1.3 to 1.2): home = Pmat * fermiToHyperboloid(s, theta) to 1.4e-12 (rel) over the 381 states below z = 30, within 64 eps z^2 everywhere; six distances 4.4e-13 (1.7e-7 over all); shortest over the lifts 3.3e-11; the turn 2 pi tw 1.8e-15
+    V/E/T at 16 x 4, 32 x 8, 64 x 16: 3333 L=2 tw=0: 130/384/256, 514/1536/1024, 2050/6144/4096; 3333 L=2 tw=0.25: 130/384/256, 514/1536/1024, 2050/6144/4096; 3333 L=2 tw=0.1337: 130/384/256, 514/1536/1024, 2050/6144/4096; 3333 default: 130/384/256, 514/1536/1024, 2050/6144/4096; 2345 default: 130/384/256, 514/1536/1024, 2050/6144/4096; 2223 default: 66/192/128, 258/768/512, 1026/3072/2048; 2223 tw=0.3: 66/192/128, 258/768/512, 1026/3072/2048; 2233 (2,2|3,3) tw=0.2: 66/192/128, 258/768/512, 1026/3072/2048; 2222 default: 130/384/256, 514/1536/1024, 2050/6144/4096; 2222 L=1.0746 tw=0.25: 130/384/256, 514/1536/1024, 2050/6144/4096; 6666 L=3 tw=0.1 (fallback): 130/384/256, 514/1536/1024, 2050/6144/4096 (past the rim: fallback)
+    worst over all: area against Gauss–Bonnet 2.0e-14, cone angle 1.1e-14, regular vertex 4.7e-14
+    161 twists from -1.2 to 1.2: the stitch changed 77 times; area against Gauss–Bonnet 1.2e-14, regular vertex 1.2e-14, the turn of the upper crown 8.8e-16
+    edge paths from P in the 48 x 12 mesh of 3333, L = 2, tw = 0.1: Q 1.5178 (true 1.5178), R 2.1388 (true 2.1072), S 2.3157 (true 2.2896)
+    300 meshes (orders 2..12, a pair of 2s on either side, 2222; L 0.3..10; tw -2..2; six grids): area 3.2e-14 (rel), regular vertex 1.8e-12, cone 3.9e-13
+    4837 points at 40 twists, five signatures: weights off by 1.1e-16, parameters by 8.9e-16; pointOn against the exact crown point: 3333: 2.2e-3; 3222: 1.4e-3; 2233: 1.6e-3; 2354: 2.1e-2; 2222: 7.5e-4
+    4271 points moved by random words: 1649 carried no farther than z = 50, worst 5.1e-11; 1022 to z <= 2000, worst 3.3e-7; flat 1600, worst 1.1e-14; most turns needed 10
+    8 flips of four states: the new loop closes on the old pillows to 6.3e-13; crossings of the old loop: 2, 2, 2, 2, 2, 2; 32 new cone points on the old ones to 2.3e-14; 70 seal points, their two chart points apart by 1.9e-9 on the old pillows; points not found: 0
+✔ closed forms of the half-pillow: heights, seal, least distance; the engine's hgt, pairDistance, treeToCut (115.587417ms)
+✔ any three of the six data fix the half-pillow (acute corners: exactly one) (22.270292ms)
+✔ the roof: the seal in Fermi coordinates, its slope, the corner angles, the area (Gauss–Bonnet) (82.31475ms)
+✔ the crown is an isometry onto a surface of revolution, up to the rim (6.580459ms)
+✔ two pillows on one surface: the cone points are the engine's home points (173.204584ms)
+✔ the flat 2222, and a pair of 2s in a hyperbolic orbifold (95.9575ms)
+✔ meshes: closed surfaces of Euler characteristic 2; areas and cone angles from the rest lengths alone (139.259125ms)
+✔ one pillow is a disc bounded by its loop (9.031958ms)
+✔ the zipper strip follows the twist; nothing else of the mesh changes; on the crowns the upper pillow turns by 2 pi tw (108.039792ms)
+✔ the mesh's cone points against the engine; edge paths never undercut the true distance (15.490541ms)
+✔ robustness: random states on random grids are closed surfaces with finite numbers (172.097ms)
+✔ locate and pointOn: a pillow-chart point in the mesh, through the strip at any twist (6.882291ms)
+✔ toPillow: a point of the pattern on the pillows (the charts' inverse) (11.320542ms)
+✔ a flip seen from the pillows: the new loop closes on the old pillows and crosses the old loop twice; the carry keeps the cone points and the seals (4.246875ms)
+  3333 defaults (size 1024): bake 45.3 ms, 30 outlines / 2370 edges, 180 tiles walked, fold reach 1.32, baked to 2.02, chart radius up to 0.546; 966 of 1000 read (34 within two texels of an outline), 140 dark / 826 light, 0 wrong; group: 39 motions for the direct test, 75 for the images
+  3333 Twist 0.2 (size 512): bake 11.8 ms, 30 outlines / 2370 edges, 172 tiles walked, fold reach 1.35, baked to 2.05, chart radius up to 0.579; 942 of 1000 read (58 within two texels of an outline), 144 dark / 798 light, 0 wrong; group: 29 motions for the direct test, 65 for the images
+  2345 defaults (size 1024): bake 21.2 ms, 102 outlines / 5882 edges, 186 tiles walked, fold reach 1.38, baked to 2.08, chart radius up to 0.578; 944 of 1000 read (56 within two texels of an outline), 292 dark / 652 light, 0 wrong; group: 84 motions for the direct test, 64 for the images
+  2345 Twist 0.2 (size 512): bake 10.6 ms, 114 outlines / 6574 edges, 183 tiles walked, fold reach 1.38, baked to 2.08, chart radius up to 0.597; 934 of 1000 read (66 within two texels of an outline), 204 dark / 730 light, 0 wrong; group: 80 motions for the direct test, 68 for the images
+  2222 defaults (size 1024): bake 3.3 ms, 6 outlines / 474 edges; 980 of 1000 read (20 within two texels of an outline), 246 dark / 734 light, 0 wrong; group: 11 motions for the direct test, 77 for the images
+  2222 Twist 0.2 (size 512): bake 4.4 ms, 9 outlines / 711 edges; 940 of 1000 read (60 within two texels of an outline), 198 dark / 742 light, 0 wrong; group: 17 motions for the direct test, 81 for the images
+  2222 Length 1.6, Twist -0.37 (size 512): bake 2.7 ms, 9 outlines / 711 edges; 954 of 1000 read (46 within two texels of an outline), 190 dark / 764 light, 0 wrong; group: 19 motions for the direct test, 79 for the images
+  2223 defaults (size 512): bake 27.5 ms, 76 outlines / 4788 edges, 399 tiles walked, fold reach 0.67, baked to 1.37, chart radius up to 0.312; 454 of 500 read (46 within two texels of an outline), 72 dark / 382 light, 0 wrong; group: 14 motions for the direct test, 265 for the images
+  3333 Length 5.5, Twist -0.31 (size 512): bake 17.2 ms, 38 outlines / 3002 edges, 222 tiles walked, fold reach 1.22, baked to 1.92, chart radius up to 0.503; 484 of 500 read (16 within two texels of an outline), 32 dark / 452 light, 0 wrong; group: 235 motions for the direct test, 69 for the images
+  2345 Length 1.8, Twist 0.45 (size 512): bake 19.4 ms, 126 outlines / 7266 edges, 195 tiles walked, fold reach 1.42, baked to 2.12, chart radius up to 0.559; 486 of 500 read (14 within two texels of an outline), 56 dark / 430 light, 0 wrong; group: 141 motions for the direct test, 49 for the images
+  3333 Length 0.8 (two pillows on a long neck) (size 512): bake 11.1 ms, 74 outlines / 5846 edges, 187 tiles walked, fold reach 1.82, baked to 2.52, chart radius up to 0.710; 436 of 500 read (64 within two texels of an outline), 208 dark / 228 light, 0 wrong; group: 127 motions for the direct test, 85 for the images
+  3333 Length 7, Twist -0.5 (size 512): bake 10.9 ms, 130 outlines / 10270 edges, 247 tiles walked, fold reach 1.92, baked to 2.62, chart radius up to 0.760; 390 of 400 read (10 within two texels of an outline), 34 dark / 356 light, 0 wrong; group: 687 motions for the direct test, 32 for the images
+  3333 defaults, the pair frame's own disc (size 512): bake 2.8 ms, 46 outlines / 3634 edges, 183 tiles walked, fold reach 1.70, baked to 2.40, chart radius up to 0.679; 370 of 400 read (30 within two texels of an outline), 74 dark / 296 light, 0 wrong; group: 39 motions for the direct test, 75 for the images
+  3333 Length 0.7: 2 layers; 6 outline points lie 0.1 or more inside another comma (the deepest 0.14): 0 of them read as an outline (the lightest value 1; 128 = an outline, 86 = two texels inside)
+  3333 flipped to the pair (0, 2): L 2.634, tw -0.000 (size 512): bake 8.3 ms, 24 outlines / 1896 edges, 158 tiles walked, fold reach 1.32, baked to 2.02, chart radius up to 0.537; 552 of 600 read (48 within two texels of an outline), 94 dark / 458 light, 0 wrong; group: 39 motions for the direct test, 75 for the images
+  3333 Twist 0.2 flipped to the pair (0, 3): L 3.128, tw 0.221 (size 512): bake 6.1 ms, 36 outlines / 2844 edges, 185 tiles walked, fold reach 1.46, baked to 2.16, chart radius up to 0.616; 556 of 600 read (44 within two texels of an outline), 80 dark / 476 light, 0 wrong; group: 29 motions for the direct test, 65 for the images
+  2345 flipped to the pair (0, 2): L 3.797, tw 0.248 (size 512): bake 6.0 ms, 192 outlines / 11072 edges, 200 tiles walked, fold reach 1.62, baked to 2.32, chart radius up to 0.647; 552 of 600 read (48 within two texels of an outline), 140 dark / 412 light, 0 wrong; group: 84 motions for the direct test, 64 for the images
+  2222 Twist 0.2 flipped to the pair (0, 2): L 1.077, tw 0.328 (size 512): bake 0.8 ms, 9 outlines / 711 edges; 572 of 600 read (28 within two texels of an outline), 144 dark / 428 light, 0 wrong; group: 17 motions for the direct test, 81 for the images
+  3333: 482 pairs of chart points of one surface point, 460 counted (the rest within two texels of an outline), 67 dark, 0 differ
+  3333 Twist 0.2: 482 pairs of chart points of one surface point, 457 counted (the rest within two texels of an outline), 57 dark, 0 differ
+  2345: 482 pairs of chart points of one surface point, 453 counted (the rest within two texels of an outline), 64 dark, 0 differ
+  2345 Twist 0.2: 482 pairs of chart points of one surface point, 453 counted (the rest within two texels of an outline), 60 dark, 0 differ
+  2223: 311 pairs of chart points of one surface point, 287 counted (the rest within two texels of an outline), 33 dark, 0 differ
+  2222: 482 pairs of chart points of one surface point, 472 counted (the rest within two texels of an outline), 78 dark, 0 differ
+  2222 Twist 0.2: 482 pairs of chart points of one surface point, 467 counted (the rest within two texels of an outline), 75 dark, 0 differ
+  200 triangles carried up to 5.42 from the middle: after the fold at most 1.49; side lengths kept to 3.4e-6
+  bake, median of 6 states each: 3333 512: 1.9 ms (best 1.9, worst 2.0); 3333 1024: 3.5 ms (best 3.4, worst 5.6); 2345 512: 3.0 ms (best 2.9, worst 4.9); 2345 1024: 4.8 ms (best 4.6, worst 9.8); 2222 512: 1.2 ms (best 1.2, worst 1.3); 2222 1024: 2.2 ms (best 2.1, worst 6.5)
+  chartOf, 5200 triangles: 0.41 ms (best 0.38, worst 2.75)
+✔ 3333: the texture at chartOf(point) is the pattern (defaults, Twist 0.2) (198.969583ms)
+✔ 2345 (cut P2 Q3 | S5 R4, the engine's default pairing: orders [2, 3, 5, 4]): the same (91.856542ms)
+✔ 2222: one lattice cell of the plane, chart point = plane point (defaults, Twist 0.2) (20.920875ms)
+✔ other states: 2223 (a (2,2) pair on the loop), a long loop, a short loop with a large Twist (228.530458ms)
+✔ overlapping commas are baked as their union: no outline of one comma shows inside another (26.605292ms)
+✔ after a flip the surface carries the SAME commas: the new state's print, read in the new frame, is the old pattern (183.722041ms)
+✔ on pillow.js's mesh: the two sides of a seal read the same print, and so do the two ends of a turn round the loop (63.691167ms)
+✔ a triangle moves as one: the fold is a motion, and brings a far triangle near (11.104959ms)
+✔ the same state and size give the same print; another state another data array (the renderer uploads by identity) (7.908792ms)
+✔ no DOM is touched, and the times are those of a frame (138.872042ms)
+    activate: 16 states; flip and back off by 3.1e-15, three round 2.2e-15, a card's numbers across a flip 3.1e-15, the face 2.3e-14
+    coupling: 90 moved states x 3 cards; a card against the flip to it: 0.0e+0
+    3333 L 2.634: largest step 4.08e-3 (at Twist 0: 4.08e-3), 1 change(s) of a loop for its twin
+    2345 L 2.536: largest step 3.99e-3 (at Twist 0: 3.99e-3), 1 change(s) of a loop for its twin
+    2223 L 1.317: largest step 2.04e-3 (at Twist 0: 2.04e-3), 1 change(s) of a loop for its twin
+    2222 L 1.000: largest step 1.41e-3 (at Twist 0: 1.41e-3), 1 change(s) of a loop for its twin
+    3333 L 4.100: largest step 7.82e-3 (at Twist 0: 7.82e-3), 1 change(s) of a loop for its twin
+    2346 L 1.100: largest step 7.17e-4 (at Twist 0: 7.17e-4), 1 change(s) of a loop for its twin
+    2222 L 1.700: largest step 3.21e-3 (at Twist 0: 3.21e-3), 1 change(s) of a loop for its twin
+    42 drags of 1000 steps: no jump by half a turn; 26 of them wrap by a whole turn somewhere
+    flipped states: 21 addresses carry tri, 11 need none
+✔ presets and typed orders: four cone points at the engine's defaults (455.007917ms)
+✔ cardsOf: three cards in the fixed order 01|23, 02|13, 03|12, each with its loop's numbers (161.150625ms)
+✔ cardsOf: pairs[0] is the picked pair once the card is active; a pair of 2s is said (243.232208ms)
+✔ activate: a flip that changes the cut and nothing else; flip back and three round return home (2814.843375ms)
+✔ activate: any listing of a partition names it; what is none throws (156.822167ms)
+✔ withNumbers: the cut's Length and Twist, clamped; the three loops go on (50.6585ms)
+✔ the coupling: after a move of the active card the other two cards are the triangle's, and true (374.81225ms)
+✔ a drag of Twist through 0 (and across the whole range) keeps every card's Length continuous (251.125667ms)
+✔ under a real drag (each step from the state before) an inactive card's Twist is continuous: whole-turn wraps and the twin change only (1284.027709ms)
+✔ the address: grammar, the allowed characters, defaults (599.350334ms)
+✔ the address: round trips (the five presets, a typed signature, a flipped state, a state with tri) (1514.455416ms)
+✔ the address: clamps, parts that cannot be read, a whole URL (0.301917ms)
+✔ pillowsOf: the two pillows in numbers (SPEC 1.5), from pillow.js (27.6265ms)
+✔ numbers as the cards write them (0.08125ms)
+✔ 3333: after set() the surface is closed (Euler 2), finite, near isometric; the three stops share one vertex set (422.53275ms)
+✔ 2345: after set() the surface is closed (Euler 2), finite, near isometric; the three stops share one vertex set (196.113958ms)
+✔ 2223: after set() the surface is closed (Euler 2), finite, near isometric; the three stops share one vertex set (153.215666ms)
+✔ 2222: after set() the surface is closed (Euler 2), finite, near isometric; the three stops share one vertex set (10.44025ms)
+✔ the world frame: loop level about the z axis, first pair below, its seal along y from -y (0.277416ms)
+✔ the journey: the pillows part along the axis by the gap, then each seal opens onto the exact crown (8.279208ms)
+✔ corners: each triangle is small in the engine's pair frame, and the marks sit on the engine's cone points (7.573ms)
+✔ 2222 with a Twist: the mesh follows the solid's creases; every side that stays in one face has its exact length (54.37075ms)
+✔ two cold starts give identical positions (489.913083ms)
+✔ update(): a small Twist step moves no vertex more than a few mesh cells, and the upper pillow turns against the lower (399.598459ms)
+✔ a drag that loses the shape is caught: a jump of Length starts again cold, an idle settle() re-grids (258.542625ms)
+✔ 3333: a flip keeps the surface: each cone point stays within a mesh cell, the six tip distances within 5 % (253.276583ms)
+✔ 2345: a flip keeps the surface: each cone point stays within a mesh cell, the six tip distances within 5 % (259.993375ms)
+✔ 2223: a flip keeps the surface: each cone point stays within a mesh cell, the six tip distances within 5 % (245.529833ms)
+✔ 2222: a flip keeps the surface: each cone point stays within a mesh cell, the six tip distances within 5 % (6.97825ms)
+✔ flip and flip back returns the shape (cone points within two cells); a flip without its frames falls back to a cold start (497.321417ms)
+✔ fitRigid finds any rotation, large ones too, and never a reflection (0.187167ms)
+✔ the baseline solver behind the PROTO-SPEC interface: set, update, positions, mesh, adoptPositions, stats (156.29325ms)
+ℹ tests 106
+ℹ suites 0
+ℹ pass 106
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8104.926833

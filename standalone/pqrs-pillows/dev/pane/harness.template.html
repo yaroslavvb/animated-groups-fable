@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" data-page="pane-harness">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>pane harness: the print on the pillows</title>
+<style>/*__INLINE_CSS__*/</style>
+</head>
+<body>
+<!--__MATH_CACHE__-->
+<main class="app handles-app">
+  <header class="top"><div class="title-row"><h1>Pane harness</h1></div></header>
+  <p class="lede">The Pattern pane beside the Surface pane with the same commas baked on (print3d). Stand-in frames from pillow.js.</p>
+  <div class="hbar">
+    <button type="button" data-go="k=3333&mode=open">3333 open</button>
+    <button type="button" data-go="k=3333&mode=solved">3333 closed</button>
+    <button type="button" data-go="k=2345&mode=open">2345 open</button>
+    <button type="button" data-go="k=2345&mode=solved">2345 closed</button>
+    <button type="button" data-go="k=2222&mode=open">2222 tube</button>
+    <button type="button" data-go="k=2222&mode=solved">2222 solid</button>
+    <button type="button" data-go="k=2223&mode=solved">2223 closed</button>
+  </div>
+  <div class="hpanes">
+    <div class="hp">
+      <div class="hp-title">Pattern</div>
+      <div class="canvas-wrap ratio-pat"><canvas id="pattern" tabindex="0" aria-label="Repeating pattern"></canvas></div>
+    </div>
+    <div class="hp">
+      <div class="hp-title">Surface</div>
+      <div class="surf-box"><canvas id="view" tabindex="0" aria-label="The two pillows in space"></canvas><div class="labels" id="labels" aria-hidden="true"></div></div>
+    </div>
+  </div>
+  <pre id="log"></pre>
+  <div style="height: 60vh" aria-hidden="true"></div>
+</main>
+<script>/*__INLINE_JS__*/</script>
+</body>
+</html>

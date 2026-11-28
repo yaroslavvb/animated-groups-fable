@@ -1,0 +1,11 @@
+/* harness.css — the pane owner's test page */
+.hbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.hbar button { min-height: 32px; padding: 0 10px; font: inherit; }
+.hpanes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; }
+.hpanes .hp { min-width: 0; border: 1px solid #e5e5ea; border-radius: 10px; padding: 8px; }
+.hp-title { font-weight: 650; margin-bottom: 4px; }
+.surf-box { position: relative; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; }
+.surf-box > canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+.surf-box > .labels { position: absolute; inset: 0; overflow: hidden; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.surf-box > .labels > .r3d-label { font: 650 14px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+#log { font-size: 11px; white-space: pre-wrap; word-break: break-all; color: #52514a; }

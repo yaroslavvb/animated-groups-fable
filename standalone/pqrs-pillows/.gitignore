@@ -1,0 +1,10 @@
+# scratch of the build round: pictures and dev builds stay on disk, not in the repository
+dev/**/*.png
+dev/**/index*.html
+dev/**/*.json
+dev/**/shots/
+dev/words/
+dev/pane/print3d.v3.js
+dev/**/site-*.html
+dev/core/patch*.py
+dev/core/*.before-*.js

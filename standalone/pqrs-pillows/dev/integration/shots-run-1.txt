@@ -1,0 +1,46 @@
+== 3333  #k=3333
+eval: {"hash":"#","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.26,"worst":2.88},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333.png
+eval: {"hash":"#","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.24,"worst":2.82},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333.png
+== 2345  #k=2345
+eval: {"hash":"#k=2345&m=0132&l=2.536&tw=0","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.29,"worst":6.95},"shown":"2.5357058149971943 @ 0 | 3.79681404907996 @ 0.24757754143180827 | 2.6232762574154167 @ -1.3877787807814457e-16"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-2345.png
+eval: {"hash":"#k=2345&m=0132&l=2.536&tw=0","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.29,"worst":6.91},"shown":"2.5357058149971943 @ 0 | 3.79681404907996 @ 0.24757754143180827 | 2.6232762574154167 @ -1.3877787807814457e-16"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-2345.png
+== 2223  #k=2223
+eval: {"hash":"#k=2223&m=3012&l=1.317&tw=0","key":"03|12","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.3,"worst":7.33},"shown":"1.924847300238414 @ 0.24999999999999967 | 1.3169578969248177 @ -1.6653345369377348e-16 | 1.3169578969248166 @ 0"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-2223.png
+eval: {"hash":"#k=2223&m=3012&l=1.317&tw=0","key":"03|12","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.28,"worst":5.82},"shown":"1.924847300238414 @ 0.24999999999999967 | 1.3169578969248177 @ -1.6653345369377348e-16 | 1.3169578969248166 @ 0"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-2223.png
+== 2222  #k=2222
+eval: {"hash":"#k=2222&m=0123&l=1&tw=0","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0,"worst":0},"shown":"1 @ 0 | 1 @ 0 | 1.4142135623730951 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-2222.png
+eval: {"hash":"#k=2222&m=0123&l=1&tw=0","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0,"worst":0},"shown":"1 @ 0 | 1 @ 0 | 1.4142135623730951 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-2222.png
+== 3333-tw02  #k=3333
+eval: {"hash":"#k=3333&m=0123&l=2.634&tw=0.2","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.26,"worst":3.6},"shown":"2.633915793849633 @ 0.2 | 2.8640356134343463 @ -0.17235818862508676 | 3.127618489171016 @ 0.22052104499815217"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333-tw02.png
+eval: {"hash":"#k=3333&m=0123&l=2.634&tw=0.2","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.24,"worst":3.59},"shown":"2.633915793849633 @ 0.2 | 2.8640356134343463 @ -0.17235818862508676 | 3.127618489171016 @ 0.22052104499815217"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333-tw02.png
+== 3333-j1  #k=3333&j=1
+eval: {"hash":"#j=1","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.26,"worst":2.88},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333-j1.png
+eval: {"hash":"#j=1","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.24,"worst":2.82},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333-j1.png
+== 3333-j2  #k=3333&j=2
+eval: {"hash":"#j=2","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.26,"worst":2.88},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333-j2.png
+eval: {"hash":"#j=2","key":"01|23","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.24,"worst":2.82},"shown":"2.633915793849633 @ 0 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333-j2.png
+== 3333-card2  #k=3333
+eval: {"hash":"#k=3333&m=2031&l=2.634&tw=0&tri=0.-1.-1","key":"02|13","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.31,"worst":4.91},"shown":"2.6339157938496327 @ 2.220446049250313e-16 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768264 @ 0.2499999999999999"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333-card2.png
+eval: {"hash":"#k=3333&m=2031&l=2.634&tw=0&tri=0.-1.-1","key":"02|13","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.24,"worst":5.85},"shown":"2.6339157938496327 @ 2.220446049250313e-16 | 2.633915793849634 @ -1.3877787807814457e-16 | 3.8496946004768264 @ 0.2499999999999999"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333-card2.png
+== 3333-card3  #k=3333
+eval: {"hash":"#k=3333&m=1203&l=3.85&tw=0.25","key":"03|12","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.47,"worst":6.15},"shown":"2.6339157938496327 @ 0 | 2.6339157938496327 @ 5.551115123125783e-17 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/desk-3333-card3.png
+eval: {"hash":"#k=3333&m=1203&l=3.85&tw=0.25","key":"03|12","on":true,"started":true,"error":null,"fails":0,"stats":{"mean":0.25,"worst":4.81},"shown":"2.6339157938496327 @ 0 | 2.6339157938496327 @ 5.551115123125783e-17 | 3.8496946004768273 @ 0.25"}
+wrote /Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/dev/integration/shots/phone-3333-card3.png
+done

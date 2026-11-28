@@ -1,0 +1,69 @@
+ok file words: none of the three letter sequences a publish refuses in 560 kB
+ok desktop panes: pattern 55 % drawn in 214 colours, surface 8 % in 257
+ok desktop preset 2222: active 01|23, 1.000 / +0.000 turn | 1.000 / +0.000 turn | 1.414 / +0.250 turn, #k=2222&m=0123&l=1&tw=0; pattern 33 % drawn in 90 colours, surface 7 % in 186
+ok desktop preset 3333: active 01|23, 2.634 / +0.000 turn | 2.634 / +0.000 turn | 3.850 / +0.250 turn, ; pattern 55 % drawn in 214 colours, surface 8 % in 257
+ok desktop preset 2223: active 03|12, 1.925 / +0.250 turn | 1.317 / +0.000 turn | 1.317 / +0.000 turn, #k=2223&m=3012&l=1.317&tw=0; pattern 55 % drawn in 233 colours, surface 8 % in 256
+ok desktop preset 2345: active 01|23, 2.536 / +0.000 turn | 3.797 / +0.248 turn | 2.623 / +0.000 turn, #k=2345&m=0132&l=2.536&tw=0; pattern 55 % drawn in 245 colours, surface 5 % in 279
+ok desktop preset 4444: active 01|23, 3.057 / +0.000 turn | 4.514 / +0.250 turn | 3.057 / +0.000 turn, #k=4444&m=0132&l=3.057&tw=0; pattern 55 % drawn in 214 colours, surface 7 % in 269
+ok desktop typed: 2346 opens: #k=2346&m=0132&l=2.559&tw=0
+ok desktop twist drag: by a mouse drag; Surface pixels changed 3.78 %; 2.634 / +0.000 turn | 2.634 / +0.000 turn | 3.850 / +0.250 turn  ->  2.634 / −0.213 turn | 2.894 / +0.180 turn | 3.089 / −0.216 turn
+ok desktop length drag: Surface pixels changed 7.15 %; 2.634 / −0.213 turn | 2.894 / +0.180 turn | 3.089 / −0.216 turn  ->  4.073 / −0.213 turn | 2.406 / −0.444 turn | 2.893 / +0.460 turn
+ok desktop grab: the Twist of 02|13, not active, was dragged: it is the active card now, 2.406 / −0.444 turn -> 2.406 / −0.217 turn
+ok desktop table: 3333: P3 Q3 2π/3, 2π/3 2.634 1.763 0.881, 0.881 2π/3 || R3 S3 2π/3, 2π/3 2.634 1.763 0.881, 0.881 2π/3 :: Open crowns: crown exact. Closed surface: relaxed mesh, mean stretch 0.3 %, worst 2.9 %. ;; 2222: Flat: the closed solid is exact, no relaxation.
+ok desktop still 3333 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 1.73 % of 392840 print pixels change tone (the gate is 0.5 %)
+ok desktop still 3333 02|13: 0.00 % of 348120 print pixels changed tone; all pixels, marks and lines included: 7.38 %
+ok desktop still 3333 03|12: 0.00 % of 338334 print pixels changed tone; all pixels, marks and lines included: 8.00 %
+ok desktop still 3333 01|23: 0.00 % of 341308 print pixels changed tone; all pixels, marks and lines included: 7.78 %; back at the start, against the first picture: 0.00 %
+ok desktop still 2345 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 2.58 % of 393602 print pixels change tone (the gate is 0.5 %)
+ok desktop still 2345 02|13: 0.00 % of 336386 print pixels changed tone; all pixels, marks and lines included: 8.23 %
+ok desktop still 2345 03|12: 0.00 % of 335583 print pixels changed tone; all pixels, marks and lines included: 8.26 %
+ok desktop still 2345 01|23: 0.00 % of 351424 print pixels changed tone; all pixels, marks and lines included: 7.27 %; back at the start, against the first picture: 0.00 %
+ok desktop still 2223 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 4.68 % of 389890 print pixels change tone (the gate is 0.5 %)
+ok desktop still 2223 01|23: 0.00 % of 327206 print pixels changed tone; all pixels, marks and lines included: 8.95 %
+ok desktop still 2223 02|13: 0.00 % of 326773 print pixels changed tone; all pixels, marks and lines included: 8.99 %
+ok desktop still 2223 03|12: 0.00 % of 345827 print pixels changed tone; all pixels, marks and lines included: 7.76 %; back at the start, against the first picture: 0.00 %
+ok desktop still 2222 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 2.36 % of 382847 print pixels change tone (the gate is 0.5 %)
+ok desktop still 2222 02|13: 0.00 % of 338620 print pixels changed tone; all pixels, marks and lines included: 12.34 %
+ok desktop still 2222 03|12: 0.00 % of 299537 print pixels changed tone; all pixels, marks and lines included: 15.72 %
+ok desktop still 2222 01|23: 0.00 % of 305393 print pixels changed tone; all pixels, marks and lines included: 15.11 %; back at the start, against the first picture: 0.00 %
+ok desktop journey: stops at 0.00, 0.50, 1.00 of the scrubber; pixels changed 7.8 %, 6.7 %, back 12.0 % (against the first picture 0.2 %); buttons Join / Part, Join / Unzip, Zip / Unzip; #j=2
+ok desktop address: #k=2345&m=3021&l=2.623&tw=-0.213&tri=0.-1.-1&j=1 opens again on 2345, active 03|12, numbers within 0.0000, journey 0.5; its own address then reads #k=2345&m=3021&l=2.623&tw=-0.213&tri=0.-1.-1&j=1
+ok desktop tutorial: 6 sections, 99 formulas typeset, none wider than the screen, 5 links, about 957 words and formula marks
+ok desktop overflow: Play 1280 of 1280 px, Tutorial 1280 of 1280 px
+ok desktop layout: panes side by side, 584 + 584 of 1280 px
+ok desktop errors: no console error, no page error
+ok phone panes: pattern 60 % drawn in 249 colours, surface 12 % in 216
+ok phone preset 2222: active 01|23, 1.000 / +0.000 turn | 1.000 / +0.000 turn | 1.414 / +0.250 turn, #k=2222&m=0123&l=1&tw=0; pattern 41 % drawn in 88 colours, surface 10 % in 159
+ok phone preset 3333: active 01|23, 2.634 / +0.000 turn | 2.634 / +0.000 turn | 3.850 / +0.250 turn, ; pattern 60 % drawn in 249 colours, surface 12 % in 215
+ok phone preset 2223: active 03|12, 1.925 / +0.250 turn | 1.317 / +0.000 turn | 1.317 / +0.000 turn, #k=2223&m=3012&l=1.317&tw=0; pattern 65 % drawn in 228 colours, surface 11 % in 196
+ok phone preset 2345: active 01|23, 2.536 / +0.000 turn | 3.797 / +0.248 turn | 2.623 / +0.000 turn, #k=2345&m=0132&l=2.536&tw=0; pattern 62 % drawn in 265 colours, surface 8 % in 243
+ok phone preset 4444: active 01|23, 3.057 / +0.000 turn | 4.514 / +0.250 turn | 3.057 / +0.000 turn, #k=4444&m=0132&l=3.057&tw=0; pattern 62 % drawn in 247 colours, surface 11 % in 223
+ok phone typed: 2346 opens: #k=2346&m=0132&l=2.559&tw=0
+ok phone twist drag: by a mouse drag; Surface pixels changed 8.15 %; 2.634 / +0.000 turn | 2.634 / +0.000 turn | 3.850 / +0.250 turn  ->  2.634 / −0.212 turn | 2.891 / +0.180 turn | 3.092 / −0.216 turn
+ok phone length drag: Surface pixels changed 14.19 %; 2.634 / −0.212 turn | 2.891 / +0.180 turn | 3.092 / −0.216 turn  ->  4.071 / −0.212 turn | 2.399 / −0.445 turn | 2.900 / +0.461 turn
+ok phone grab: the Twist of 02|13, not active, was dragged: it is the active card now, 2.399 / −0.445 turn -> 2.399 / −0.217 turn
+ok phone table: 3333: P3 Q3 2π/3, 2π/3 2.634 1.763 0.881, 0.881 2π/3 || R3 S3 2π/3, 2π/3 2.634 1.763 0.881, 0.881 2π/3 :: Open crowns: crown exact. Closed surface: relaxed mesh, mean stretch 0.3 %, worst 2.9 %. ;; 2222: Flat: the closed solid is exact, no relaxation.
+ok phone still 3333 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 4.54 % of 44564 print pixels change tone (the gate is 0.5 %)
+ok phone still 3333 02|13: 0.00 % of 33456 print pixels changed tone; all pixels, marks and lines included: 15.41 %
+ok phone still 3333 03|12: 0.00 % of 31106 print pixels changed tone; all pixels, marks and lines included: 16.46 %
+ok phone still 3333 01|23: 0.00 % of 31840 print pixels changed tone; all pixels, marks and lines included: 16.11 %; back at the start, against the first picture: 0.00 %
+ok phone still 2345 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 6.35 % of 44845 print pixels change tone (the gate is 0.5 %)
+ok phone still 2345 02|13: 0.00 % of 30723 print pixels changed tone; all pixels, marks and lines included: 17.01 %
+ok phone still 2345 03|12: 0.00 % of 30533 print pixels changed tone; all pixels, marks and lines included: 17.03 %
+ok phone still 2345 01|23: 0.00 % of 34294 print pixels changed tone; all pixels, marks and lines included: 15.28 %; back at the start, against the first picture: 0.00 %
+ok phone still 2223 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 10.56 % of 43826 print pixels change tone (the gate is 0.5 %)
+ok phone still 2223 01|23: 0.00 % of 29074 print pixels changed tone; all pixels, marks and lines included: 17.86 %
+ok phone still 2223 02|13: 0.00 % of 29110 print pixels changed tone; all pixels, marks and lines included: 17.83 %
+ok phone still 2223 03|12: 0.00 % of 33497 print pixels changed tone; all pixels, marks and lines included: 15.67 %; back at the start, against the first picture: 0.00 %
+ok phone still 2222 gauge: the start picture against itself one device pixel (half a CSS pixel) to the right: 5.69 % of 45477 print pixels change tone (the gate is 0.5 %)
+ok phone still 2222 02|13: 0.00 % of 35788 print pixels changed tone; all pixels, marks and lines included: 16.22 %
+ok phone still 2222 03|12: 0.00 % of 25787 print pixels changed tone; all pixels, marks and lines included: 21.92 %
+ok phone still 2222 01|23: 0.00 % of 27178 print pixels changed tone; all pixels, marks and lines included: 21.34 %; back at the start, against the first picture: 0.00 %
+ok phone journey: stops at 0.00, 0.50, 1.00 of the scrubber; pixels changed 13.7 %, 11.4 %, back 18.3 % (against the first picture 1.9 %); buttons Join / Part, Join / Unzip, Zip / Unzip; #j=2
+ok phone address: #k=2345&m=3021&l=2.623&tw=-0.212&tri=0.-1.-1&j=1 opens again on 2345, active 03|12, numbers within 0.0010, journey 0.5; its own address then reads #k=2345&m=3021&l=2.623&tw=-0.212&tri=0.-1.-1&j=1
+ok phone tutorial: 6 sections, 99 formulas typeset, none wider than the screen, 5 links, about 957 words and formula marks
+ok phone overflow: Play 390 of 390 px, Tutorial 390 of 390 px
+ok phone layout: panes side by side, 180 + 180 of 390 px; tap targets at least 44 px, sliders 44 px, field text 16 px
+ok phone errors: no console error, no page error
+check.mjs: 67 ok, 0 FAIL, 0 skip in 108 s on file:///Users/solid/git/agf-pqrs-pillows/standalone/pqrs-pillows/site/index.html
+exit 0

@@ -1,0 +1,92 @@
+    <p class="lede">\(PQRS\) is the sphere with four cone points of orders \(p, q, r, s\): flat for \(2222\), hyperbolic otherwise. Below: what the Play tab draws, and how much of it is exact.</p>
+
+    <section class="tut-sec" id="tut-pillows">
+      <h2>1. Two pillows</h2>
+      <p>A <strong>pillow</strong> \(\{p, q, L\}\) is a disc of curvature \(-1\) with two cone points \(P\), \(Q\), bounded by a geodesic <strong>loop</strong> of length \(L\). It is the double of a quadrilateral \(c_1 P Q c_2\): right angles at \(c_1, c_2\) on the loop, \(\alpha = \pi/p\) at \(P\), \(\beta = \pi/q\) at \(Q\). Its six data are the corners \(\alpha\), \(\beta\), \(a = L/2\), the <strong>seal</strong> \(d = |PQ|\) and the heights \(h_P = |c_1P|\), \(h_Q = |c_2Q|\):</p>
+      \[
+        \begin{aligned}
+        \sinh h_P &= \frac{\cos\beta + \cos\alpha\,\cosh a}{\sin\alpha\,\sinh a},\\[6pt]
+        \sinh^2\frac{d}{2} &= \frac{\sinh^2\frac{a}{2} + \cos^2\frac{\alpha+\beta}{2}}{\sin\alpha\,\sin\beta},
+        \end{aligned}
+      \]
+      <p>with \(h_Q\) by exchanging \(\alpha\) and \(\beta\); the area is \(2\pi(1 - 1/p - 1/q)\). For cone orders at least 2, any three of the six data had exactly one pillow in a numerical search of all twenty triples (not proved here). \(\{2, 2, L\}\) has no area: its seal lies on the loop.</p>
+      <p>The orbifold is \(\{p, q, L\}\) and \(\{r, s, L\}\) joined along the loop with a <strong>Twist</strong> \(\mathrm{tw}\), in turns: one turn is once round the loop.</p>
+    </section>
+
+    <section class="tut-sec" id="tut-crown">
+      <h2>2. The crown is exact</h2>
+      <p>In Fermi coordinates about the loop (\(\theta\) along it, \(s\) the distance from it) the metric is \(ds^2 + \cosh^2 s\,d\theta^2\). The surface of revolution</p>
+      \[
+        \begin{aligned}
+        r(s) &= \frac{L}{2\pi}\cosh s, \qquad \varphi = \frac{2\pi\,\theta}{L},\\[6pt]
+        z'(s) &= \sqrt{1 - \Bigl(\frac{L}{2\pi}\Bigr)^{2}\sinh^2 s}
+        \end{aligned}
+      \]
+      <p>carries it exactly up to the rim \(s_{\max} = \operatorname{arsinh}(2\pi/L)\), where the meridian turns level. A pillow cut open along its seal is the part \(0 \le s \le h(|\theta|)\), \(|\theta| \le a\), under the roof \(h\):</p>
+      \[
+        \begin{aligned}
+        \sinh a\,\tanh h(\theta) ={} & \tanh h_P\,\sinh(a - \theta)\\
+        & {}+ \tanh h_Q\,\sinh\theta .
+        \end{aligned}
+      \]
+      <p>On the surface of revolution this is a <strong>crown</strong> with a peak at each cone point, isometric while \(\sinh h \le 2\pi/L\) at both peaks: for \(\{3, 3, L\}\) when \(L \lt 10.784\), for \(\{4, 4, L\}\) when \(L \lt 5.543\), for \(\{p, p, L\}\) with \(p \ge 6\) never. Past the rim the page runs the meridian on level, a flange: parallels come out short.</p>
+      <p>On the crowns the Twist is a rigid turn of the upper crown by exactly \(2\pi\,\mathrm{tw}\). Adding 1 to \(\mathrm{tw}\) gives the same orbifold.</p>
+    </section>
+
+    <section class="tut-sec" id="tut-zip">
+      <h2>3. Zipping: exact and relaxed</h2>
+      <p>Zipping identifies the roof points \((h(\theta), \pm\theta)\): the roof becomes the seal. The closed shape has no formula. If two smooth faces meet at an angle strictly between \(0\) and \(\pi\) along a curve \(\gamma\) that is a geodesic of both, then \(\gamma''\) is parallel to both normals, so \(\gamma'' = 0\): the crease is straight. A tetrahedron with faces of curvature \(-1\) creased along geodesics would have straight edges, hence faces with the Euclidean angle sum \(\pi\), against Gauss–Bonnet: in \(\mathbb{R}^3\) it exists only when flat.</p>
+      <p>So the closed surface is a triangle mesh: each edge's rest length is the exact geodesic distance, and the positions are relaxed toward those lengths from the exact crowns. What remains is the <strong>stretch</strong> \(|\text{chord}/\text{rest} - 1|\); the page prints its mean and worst values.</p>
+      <div class="tut-table-scroll">
+        <table class="tut-table">
+          <thead><tr><th scope="col">Drawn</th><th scope="col">Status</th></tr></thead>
+          <tbody>
+            <tr><td>open crowns inside the rim; their turn \(2\pi\,\mathrm{tw}\)</td><td>exact</td></tr>
+            <tr><td>the three Lengths and Twists; the pattern across a flip; the solid of \(2222\)</td><td>exact</td></tr>
+            <tr><td>the closed hyperbolic surface</td><td>relaxed; stretch printed</td></tr>
+            <tr><td>peaks past the rim</td><td>flange; parallels short</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="tut-sec" id="tut-partitions">
+      <h2>4. Three partitions, one orbifold</h2>
+      <p>A <strong>partition</strong> pairs the cone points two and two; its loops are the simple closed geodesics that part the pairs, infinitely many. Call the active one the cut. The loops that meet it twice are numbered by the integers: loop \(j\) runs round a seal that crosses the cut and joins cone points of orders \(n, n'\) at heights \(h, h'\), their feet \((\mathrm{tw} + j/2)\,L\) apart:</p>
+      \[
+        \begin{aligned}
+        \cosh d_j ={} & \cosh h\,\cosh h'\,\cosh\bigl((\mathrm{tw} + \tfrac{j}{2})\,L\bigr)\\
+        & {}+ \sinh h\,\sinh h',\\[6pt]
+        \cosh\frac{L_j}{2} ={} & \sin\frac{\pi}{n}\,\sin\frac{\pi}{n'}\,\cosh d_j\\
+        & {}- \cos\frac{\pi}{n}\,\cos\frac{\pi}{n'}.
+        \end{aligned}
+      \]
+      <p>The cut with loops \(k\), \(k + 1\) is a <strong>triangle</strong>: one loop for each partition, any two meeting twice. After a slider moves, the cards show \(k = -1\) for \(\mathrm{tw} \ge 0\) and \(k = 0\) for \(\mathrm{tw} \lt 0\), where each other loop is the shortest of its partition among those meeting the cut twice. One seal of each loop is a side of one geodesic triangle of cone points; activating a card keeps the three loops and takes another side as the base. Cone points and group stay; only which product of two turns is "once round the loop" changes. So the pattern does not move, and the new Length and Twist are closed forms in the old (a flip and back returns them to \(5.2 \times 10^{-14}\)).</p>
+      <p>With \(X, Y, Z = \cosh(\text{length}/2)\), \(c_i = \cos(\pi/n_i)\), and \(\kappa = c_i c_j + c_k c_l\) for the loop parting \(\{i, j\}\) from \(\{k, l\}\):</p>
+      \[
+        \begin{aligned}
+        & X^2 + Y^2 + Z^2 - 2XYZ\\
+        & {}+ 2\,(\kappa_X X + \kappa_Y Y + \kappa_Z Z)\\
+        & {}+ c_1^2 + c_2^2 + c_3^2 + c_4^2 + 4\,c_1 c_2 c_3 c_4 - 1 = 0 .
+        \end{aligned}
+      \]
+      <p>(Fricke's trace identity for four turns with product 1; residual below \(1.3 \times 10^{-15}\) on 2,083 triangles.) \(3333\) opens at \((X, Y, Z) = (2, 2, \tfrac72)\). The other root in one letter, \(X' = 2YZ - 2\kappa_X - X\), is the loop's <strong>twin</strong>: the other loop of that partition meeting the remaining two twice. When the active Twist crosses \(0\) or \(\pm\tfrac12\), a card's loop gives way to its twin: its Length continues, its Twist changes sign.</p>
+      <p>Hatcher and Thurston are cited for this only: pants decompositions are joined by elementary moves; on a sphere with four cone points the move is to a loop meeting the old one twice. The triangle and the cubic are this page's own statements.</p>
+    </section>
+
+    <section class="tut-sec" id="tut-2222">
+      <h2>5. 2222</h2>
+      <p>\(2222\) is flat. The loop slides: every parallel loop has the same length, and the cut is drawn halfway by convention. Length is the pair's spacing \(\ell\), half the loop; the area is 2, so the pairs are \(1/\ell\) apart, the second slid by \(2\ell\,\mathrm{tw}\). The closed surface is exact: a tetrahedron with four congruent faces, its edges the three distances between cone points, each twice.</p>
+      <p>On the open crown, a cylinder, the Twist is again the turn \(2\pi\,\mathrm{tw}\). On the closed solid, for \(\ell^2 \le 2\) and \(0 \le \mathrm{tw} \le \tfrac12\), the second seal is turned against the first by</p>
+      \[
+        \varphi = \arccos(1 - 4\,\mathrm{tw}),
+      \]
+      <p>\(53.1^\circ\) at \(\mathrm{tw} = 0.1\), where \(2\pi\,\mathrm{tw}\) is \(36^\circ\). The Lengths \(a, b, c\) are the sides of a triangle of area \(\tfrac12\): the cubic becomes Heron's \(2\,(a^2b^2 + b^2c^2 + c^2a^2) - (a^4 + b^4 + c^4) = 4\), and the twin the parallelogram law \(a'^2 = 2b^2 + 2c^2 - a^2\).</p>
+    </section>
+
+    <section class="tut-sec" id="tut-credits">
+      <h2>6. Credits and siblings</h2>
+      <p>Built from Chaim Goodman-Strauss's reply to Two features, two handles as Yaroslav Bulatov understood it; Chaim has not seen this build. From the reply: "the PQRS orbifold is made of two of these pillows, each with two regular corners and with one joining loop."</p>
+      <p>Pattern pane and engine: <a href="https://spacesheep.dev/@yaroslavvb/two-features-two-handles">Two features, two handles</a>. Flat solid: <a href="https://spacesheep.dev/@yaroslavvb/twist-of-2222">Twist of 2222</a>. Print: the Paisley of <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a>. The three coupled partitions without the pillows: <a href="https://yaroslavvb.github.io/animated-groups-fable/real-2222.html" target="_blank" rel="noopener">The real 2222</a> and <a href="https://yaroslavvb.github.io/animated-groups-fable/pqrs.html" target="_blank" rel="noopener">PQRS 4-cone orbifolds</a>.</p>
+      <p class="tut-ref">A. Hatcher and W. Thurston, "A presentation for the mapping class group of a closed orientable surface", <em>Topology</em> 19 (1980).</p>
+    </section>
