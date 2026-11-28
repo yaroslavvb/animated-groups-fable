@@ -79,7 +79,7 @@ const VIEWPORTS = [
 ];
 const SCALE = 2;               // device pixels per CSS pixel in every screenshot
 const STILL_GATE = 0.005;      // SPEC 4.2: under 0.5 % of the samples
-const TUTORIAL_SECTIONS = 5;   // the Tutorial tab's h2 count
+const TUTORIAL_SECTIONS = 6;   // the Tutorial tab's h2 count
 const TONE_STEP = 0.25;        // a print pixel has moved when its tone (0 comma .. 1 paper) changed by more than this
 // the three letter sequences a publish refuses (SPEC 1.8), spelt in halves so that this file does not hold them
 const REFUSED = ['rec' + 'order', 'rec' + 'ording', 'trans' + 'cri'];
@@ -561,7 +561,19 @@ async function runViewport(vp) {
     const at = [], pics = [], labels = [];
     at.push(await stop()); labels.push(await texts()); pics.push(await shot(SEL.surfacePane, 'journey-0-surface'));
     await right.scrollIntoViewIfNeeded(); await right.click(); await settle(300);
-    at.push(await stop()); await settle(500); labels.push(await texts()); pics.push(await shot(SEL.surfacePane, 'journey-1-pillows'));
+    at.push(await stop()); await settle(1800); labels.push(await texts()); pics.push(await shot(SEL.surfacePane, 'journey-1-pillows'));      // (the camera's frame eases in: 0.16 s to 1/e)
+    // the loop it parts along is the journey's own choice: another card's slider, pressed, changes nothing; another chip does
+    let own = null;
+    if (await has(SEL.journeyChips)) {
+      await touchSlider(2, 'twist');
+      await settle(400);
+      const afterTouch = await shot(SEL.surfacePane, 'journey-1-after-touch'), chips = F.locator(SEL.journeyChips);
+      await chips.nth(2).scrollIntoViewIfNeeded(); await chips.nth(2).click(); await settle(1800);
+      const otherLoop = await shot(SEL.surfacePane, 'journey-1-other-loop'), hashChip = await hashNow();
+      await chips.nth(0).click(); await settle(1800);
+      const backLoop = await shot(SEL.surfacePane, 'journey-1-first-loop');
+      own = { touch: changed(pics[1], afterTouch, 0), chip: changed(pics[1], otherLoop), back: changed(pics[1], backLoop), hash: hashChip };
+    }
     await right.click(); await settle(300);
     at.push(await stop()); await settle(500); labels.push(await texts()); pics.push(await shot(SEL.surfacePane, 'journey-2-crowns'));
     const hash2 = await hashNow();
@@ -578,7 +590,15 @@ async function runViewport(vp) {
     else if (d20 < 0.01) problems.push('dragging the scrubber back did not change the picture');
     if (!/^part$/i.test(labels[0][1]) || !/^join$/i.test(labels[1][0]) || !/^unzip$/i.test(labels[1][1]) || !/^zip$/i.test(labels[2][0])) problems.push(`button words (left / right at the three stops): ${labels.map((l) => l.join(' / ')).join(', ')}; SPEC 1.4: Join / Part, Join / Unzip, Zip / ...`);
     if (!/(^|[#&])j=/.test(hash2)) problems.push(`the address carries no j at the last stop (${hash2 || 'empty'})`);
-    say(problems.length ? 'FAIL' : 'ok', where, 'journey', problems.length ? problems.join('; ') : `stops at ${pos.map((v) => v.toFixed(2)).join(', ')} of the scrubber; pixels changed ${pct(d01, 1)}, ${pct(d12, 1)}, back ${pct(d20, 1)} (against the first picture ${pct(d00, 1)}); buttons ${labels.map((l) => l.join(' / ')).join(', ')}; ${hash2}`);
+    if (own) {
+      if (own.touch > 0) problems.push(`parted, pressing another card's slider changed ${pct(own.touch, 4)} of the Surface's pixels (the journey's loop must not follow the cards)`);
+      if (own.chip < 0.01) problems.push(`choosing another loop to part along changed only ${pct(own.chip)} of the Surface's pixels`);
+      // (back on the first loop the solid is the same; a label may sit on another side of its cone point, by the
+      // renderer's own rule that a label keeps a spot until another is clearly better: hence a share, not zero)
+      if (own.back > 0.02) problems.push(`back on the first loop the picture is another one (${pct(own.back, 2)} of its pixels)`);
+      if (!/(^|[#&])jp=2(&|$)/.test(own.hash)) problems.push(`the address does not name the loop chosen (${own.hash})`);
+    }
+    say(problems.length ? 'FAIL' : 'ok', where, 'journey', problems.length ? problems.join('; ') : `stops at ${pos.map((v) => v.toFixed(2)).join(', ')} of the scrubber; pixels changed ${pct(d01, 1)}, ${pct(d12, 1)}, back ${pct(d20, 1)} (against the first picture ${pct(d00, 1)}); buttons ${labels.map((l) => l.join(' / ')).join(', ')}; ${hash2}${own ? `; parted, another card's slider pressed: ${pct(own.touch, 4)} of pixels differ; another loop chosen: ${pct(own.chip, 1)}; back on the first: ${pct(own.back, 2)} (labels may sit elsewhere)` : ''}`);
   }
 
   // ---- the address restores the state

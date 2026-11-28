@@ -402,7 +402,7 @@ test('the address: grammar, the allowed characters, defaults', () => {
   assert.equal(S.toHash(S.stateFor('3333'), { j: 7, az: 350.04, el: 123 }), '#j=2&v=-10%2C90');
   assert.equal(S.toHash(S.stateFor('3333'), { az: 12.345, el: -3.21 }), '#v=12.3%2C-3.2');
   // "#" alone, nothing, or parts that cannot be read: 3333 at the engine's defaults
-  for (const t of ['#', '', null, undefined, '#tutorial', '#m=zzzz&l=abc&tw=', '#k=']) assert.deepEqual(S.fromHash(t), { state: S.stateFor('3333'), ui: { j: 0, az: 55, el: 16 } }, String(t));
+  for (const t of ['#', '', null, undefined, '#tutorial', '#m=zzzz&l=abc&tw=', '#k=']) assert.deepEqual(S.fromHash(t), { state: S.stateFor('3333'), ui: { j: 0, jp: 0, az: 55, el: 16 } }, String(t));
   // not four cone points: null
   for (const t of ['#k=333*', '#k=22222', '#k=o33', '#k=33', '#k=hello', '#k=2341&m=0123']) assert.equal(S.fromHash(t), null, t);
   // only the allowed characters, for every state this file makes
@@ -420,7 +420,7 @@ test('the address: round trips (the five presets, a typed signature, a flipped s
   for (const sig of SIGS) {
     const st = S.stateFor(sig), back = S.fromHash(S.toHash(st, { j: 2, az: 40, el: -10 }));
     assert.deepEqual(back.state, st, sig);
-    assert.deepEqual(back.ui, { j: 2, az: 40, el: -10 });
+    assert.deepEqual(back.ui, { j: 2, jp: 0, az: 40, el: -10 });
     assert.equal(S.fromHash(`#k=${sig}`).state.L, FAMILIES[sig].defaultL);
   }
   assert.equal(S.fromHash('#k=3333&m=0123&l=2.634&tw=0').state.L, 2 * Math.acosh(2));
@@ -492,9 +492,9 @@ test('the address: clamps, parts that cannot be read, a whole URL', () => {
   assert.deepEqual(S.fromHash('#k=3333&m=2031&l=2.634&tw=0&tri=0._._').state.tri, { k: 0, lo: null, hi: null, L: 2 * Math.acosh(2), tw: 0 });
   const u = S.fromHash('https://spacesheep.dev/@yaroslavvb/pqrs-pillows#k=2222&m=0123&l=1.2&tw=0.1&j=0.5&v=30,20');
   assert.equal(u.state.k, '2222'); assert.equal(u.state.L, 1.2); assert.equal(u.state.tw, 0.1);
-  assert.deepEqual(u.ui, { j: 0.5, az: 30, el: 20 }, 'a plain comma in v is read too');
-  assert.deepEqual(S.fromHash('k=2346&j=9&v=400%2C-200').ui, { j: 2, az: 40, el: -90 });
-  assert.deepEqual(S.fromHash('#k=2346&j=x&v=1').ui, { j: 0, az: 55, el: 16 });
+  assert.deepEqual(u.ui, { j: 0.5, jp: 0, az: 30, el: 20 }, 'a plain comma in v is read too');
+  assert.deepEqual(S.fromHash('k=2346&j=9&v=400%2C-200').ui, { j: 2, jp: 0, az: 40, el: -90 });
+  assert.deepEqual(S.fromHash('#k=2346&j=x&v=1').ui, { j: 0, jp: 0, az: 55, el: 16 });
   // a link to another pair than the family's own opens with a print and four comma angles
   const st = S.fromHash('#k=3333&m=1203&l=3.85&tw=0.25').state;
   assert.equal(st.thetas.length, 4); assert.ok(st.thetas.every(Number.isFinite));

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // shot.mjs — pictures of the built page for a list of steps, in ONE headless Chrome.
-//   node dev/solid/shot.mjs <steps.json | inline JSON> [--file site/index.html] [--out dev/solid/shots] [--width 1280] [--height 900] [--scale 1]
+//   node dev/solid/shot.mjs <steps.json | inline JSON> [--file site/index.html] [--out dev/solid/shots] [--width 1280] [--height 900] [--scale 1] [--dark]
 // A step: { hash, do: [ ['set', { tw: 0.2 }, '02|13'] | ['activate', '03|12'] | ['journey', 1] | ['view', az, el] | ['wait', ms] | ['click', selector] ],
 //           shot: 'name', of: 'page' | 'surface' | 'pattern' | 'panes' | 'cards' }   (the same page is kept while `hash` is absent)
 // Prints one line a step, with the page's errors if any.
@@ -21,7 +21,7 @@ fs.mkdirSync(out, { recursive: true });
 const SEL = { surface: '#surf-wrap', pattern: '#pat-wrap', panes: '.pq-panes', cards: '#cards', table: '.pq-pillows' };
 const { chromium } = await import(pathToFileURL(PW).href);
 const browser = await chromium.launch({ executablePath: CHROME, headless: true, args: ['--ignore-gpu-blocklist', '--enable-webgl'] });
-const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE });
+const ctx = await browser.newContext({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE, colorScheme: argv.includes('--dark') ? 'dark' : 'light' });
 let page = null;
 const errors = [];
 try {
@@ -37,7 +37,7 @@ try {
     for (const a of st.do || []) {
       if (a[0] === 'set') await page.evaluate(([n, k]) => window.__pqrs.set(n, k ? { key: k } : {}), [a[1], a[2] || null]);
       else if (a[0] === 'activate') await page.evaluate((k) => window.__pqrs.activate(k), a[1]);
-      else if (a[0] === 'journey') await page.evaluate((j) => window.__pqrs.journey(j), a[1]);
+      else if (a[0] === 'journey') await page.evaluate(([j, part]) => window.__pqrs.journey(j, part), [a[1], a[2] === undefined ? null : a[2]]);
       else if (a[0] === 'view') await page.evaluate(([az, el, zoom]) => { const p = window.__pqrs.pane(); p.setView({ az, el, zoom: zoom || 1 }); p.render(); }, [a[1], a[2], a[3]]);
       else if (a[0] === 'wait') await page.waitForTimeout(a[1]);
       else if (a[0] === 'click') await page.click(a[1]);

@@ -11,7 +11,8 @@
 //   sm.set(state);                 a new orbifold, a link: the solid in its level pose (below)
 //   sm.update(state, { hold });    new numbers: the solid as it now is, turned as little as can be from where it was shown
 //                                  (hold: [f, g], two cone points to keep in place: the moved card's pair that holds P)
-//   sm.frame() -> {
+//   sm.frame(j = 0, part = 0) -> {       j in [0, 2]: the journey (0 surface, 1 two pillows, 2 open crowns), along the loop
+//                                  of partition `part` (0, 1, 2: PQ|RS, PR|QS, PS|QR). At j = 0 `part` plays no role
 //     version,                     changes when the triangles change (never, for one `levels`): the pane then needs setMesh
 //     cornersVersion,              changes with every set / update (the print's chart follows the corners)
 //     nVertices, positions,        Float32Array, 3 per vertex
@@ -21,6 +22,9 @@
 //     curves: [{ id: 'seal' | 'loop', part: 0 | 1 | 2, key: '01|23' …, points: Float32Array(3 n), closed }],
 //     marks:  [{ id: 'P' …, feature, order, label: 'P3', p: [x, y, z] }],
 //     frame: { center, radius }, kind, exact: true, flat, thick, swaps, edges: { '01': length, … } }
+//   At j > 0 the mesh is the journey's (journey.js: the solid's faces cut along that loop and its seals), with its
+//   own version; the loop is drawn on both rims, that partition's seals on their pillows (both sides of each once it
+//   opens), and the other partitions' lines fade out in the first quarter of the way.
 //   sm.relevel() -> turn | null    back to the level pose; `turn` (row-major 9) carries the new pose onto the old one,
 //                                  for the pane's eased turn
 //   sm.state                       the state the picture was made for (its pair frame is the chart's)
@@ -35,6 +39,7 @@
 // (Twist 0) then stands in the y-z plane, which the default view (az 70) sees nearly face on.
 
 import { solidOf } from './solid.js';
+import { journeyOf } from './journey.js';
 import { cardsOf, CARD_KEYS } from './state.js';
 
 const I3 = () => [1, 0, 0, 0, 1, 0, 0, 0, 1];
@@ -130,7 +135,8 @@ export function createSurfaceModel(opts = {}) {
   let st = null, S = null, mesh = null;
   let version = 1, cornersVersion = 0;
   let shown = null;                                  // the four cone points as last shown, by feature
-  let curves = null, marks = null, positions32 = null;
+  let curves = null, marks = null, positions32 = null, cards = [];
+  let jm = null, jmKey = '', jVersion = 1000;         // the journey's mesh for (the state shown, a partition), made when first asked for
   const view = { center: [0, 0, 0], radius: 1 };
 
   const sameOrders = (a, b) => a && b && a.k === b.k && a.orders.length === b.orders.length && [0, 1, 2, 3].every((f) => a.orders[a.perm.indexOf(f)] === b.orders[b.perm.indexOf(f)]);
@@ -165,7 +171,6 @@ export function createSurfaceModel(opts = {}) {
     cornersVersion++;
     // every card's seals and loop, on the solid
     curves = [];
-    let cards = [];
     try { cards = cardsOf(st); } catch (err) { cards = []; }
     for (const card of cards) {
       const part = CARD_KEYS.indexOf(card.key);
@@ -199,8 +204,127 @@ export function createSurfaceModel(opts = {}) {
     return moved ? turn : null;
   }
 
-  function frame() {
+  // ---- the journey: surface -> two pillows -> open crowns, along one partition's loop -------------------------------
+  const ease = (u) => (u <= 0 ? 0 : u >= 1 ? 1 : u * u * (3 - 2 * u));
+  const rot3 = (R, p) => [R[0] * p[0] + R[1] * p[1] + R[2] * p[2], R[3] * p[0] + R[4] * p[1] + R[5] * p[2], R[6] * p[0] + R[7] * p[1] + R[8] * p[2]];
+  /** A rotation matrix as a unit axis and an angle in [0, pi]. */
+  function axisAngle(R) {
+    const c = Math.max(-1, Math.min(1, (R[0] + R[4] + R[8] - 1) / 2)), angle = Math.acos(c);
+    if (angle < 1e-9) return { axis: [0, 0, 1], angle: 0 };
+    let ax = [R[7] - R[5], R[2] - R[6], R[3] - R[1]], n = len(ax);
+    if (n < 1e-6) {                                   // near a half turn: the largest column of R + 1
+      const cols = [[R[0] + 1, R[3], R[6]], [R[1], R[4] + 1, R[7]], [R[2], R[5], R[8] + 1]];
+      ax = cols.reduce((u, v) => (len(v) > len(u) ? v : u));
+      n = len(ax) || 1;
+    }
+    return { axis: [ax[0] / n, ax[1] / n, ax[2] / n], angle };
+  }
+  function rotation(axis, angle) {
+    const [x, y, z] = axis, c = Math.cos(angle), s = Math.sin(angle), k = 1 - c;
+    return [c + x * x * k, x * y * k - z * s, x * z * k + y * s, y * x * k + z * s, c + y * y * k, y * z * k - x * s, z * x * k - y * s, z * y * k + x * s, c + z * z * k];
+  }
+
+  /**
+   * The journey's mesh for the state shown and a partition, with what its frames need: the crowns laid on the solid
+   * as one rigid body (so that they stand where the pillows are), each pillow's own rigid fit of its crown onto its
+   * closed shape, the axis the pillows part along, the gap, and the camera's reach.
+   */
+  function journeyMesh(part) {
+    const key = `${cornersVersion}/${part}`;
+    if (jm && jmKey === key) return jm;
+    const card = cards[part];
+    if (!card) return null;
+    const J = journeyOf(S, st, card), nV = J.nVertices;
+    // the crowns as one body, laid on the solid: the best rigid motion of every vertex's crown point onto its closed point
+    const W = nV ? fitRigid(nV, J.crown, J.closed) : { R: I3(), t: [0, 0, 0] };
+    const lay = (A) => { const out = new Float64Array(A.length); for (let i = 0; i < A.length; i += 3) { const q = rot3(W.R, [A[i], A[i + 1], A[i + 2]]); out[i] = q[0] + W.t[0]; out[i + 1] = q[1] + W.t[1]; out[i + 2] = q[2] + W.t[2]; } return out; };
+    const crown = lay(J.crown);
+    // each pillow's own fit: its crown (laid) onto its closed shape
+    const fits = [0, 1].map((k) => {
+      const A = [], B = [];
+      for (let v = 0; v < nV; v++) if (J.pillow[v] === k) { A.push(crown[3 * v], crown[3 * v + 1], crown[3 * v + 2]); B.push(J.closed[3 * v], J.closed[3 * v + 1], J.closed[3 * v + 2]); }
+      const fit = A.length >= 9 ? fitRigid(A.length / 3, A, B) : { R: I3(), t: [0, 0, 0] };
+      return { ...fit, ...axisAngle(fit.R) };
+    });
+    // the axis the pillows part along: on the solid, from the first pair's seal to the second's; on the crowns, their own axis
+    const mid = (A) => { const i = 3 * Math.floor(A.length / 6); return [A[i], A[i + 1], A[i + 2]]; };
+    const axisW = unit(rot3(W.R, [0, 0, 1])) || [0, 0, 1];
+    let axisC = unit(sub(mid(J.seals[1].closed), mid(J.seals[0].closed)));
+    if (!axisC || dot(axisC, axisW) < 0.2) axisC = axisW;           // (seals that cross: the crowns' axis will do)
+    let extent = 0;
+    for (const p of shown) extent = Math.max(extent, len(p));
+    const gap = 0.8 * J.rho + 0.15 * extent;
+    let reach = extent + 0.5 * gap;
+    for (let i = 0; i < crown.length; i += 3) reach = Math.max(reach, Math.hypot(crown[i], crown[i + 1], crown[i + 2]) + 0.5 * gap);
+    jm = {
+      J, crown, fits, axisC, axisW, gap, reach, version: ++jVersion, part,
+      loopCrown: lay(J.loop.crown), sealCrown: J.seals.map((sl) => [lay(sl.crownA), lay(sl.crownB)]), coneCrown: J.cones.map((c) => rot3(W.R, c.crown).map((x, i) => x + W.t[i])),
+    };
+    jmKey = key;
+    return jm;
+  }
+
+  /** Where a point of pillow k stands at the journey's place j: C its place on the solid, O on the crowns (laid). */
+  function placer(m, j) {
+    const e1 = ease(Math.min(1, j)), f = ease(Math.max(0, j - 1));
+    const n = unit([(1 - f) * m.axisC[0] + f * m.axisW[0], (1 - f) * m.axisC[1] + f * m.axisW[1], (1 - f) * m.axisC[2] + f * m.axisW[2]]) || m.axisW;
+    const half = 0.5 * m.gap * e1, off = [[-half * n[0], -half * n[1], -half * n[2]], [half * n[0], half * n[1], half * n[2]]];
+    const turn = m.fits.map((ft) => (f > 0 ? rotation(ft.axis, (1 - f) * ft.angle) : null));
+    return (k, C, ci, O, oi, out, o) => {
+      const d = off[k];
+      if (f <= 0) { out[o] = C[ci] + d[0]; out[o + 1] = C[ci + 1] + d[1]; out[o + 2] = C[ci + 2] + d[2]; return; }
+      // the closed point seen from the crown's own place, mixed with the crown point, then put back part of the way
+      const R = m.fits[k].R, t = m.fits[k].t, M = turn[k];
+      const a = C[ci] - t[0], b = C[ci + 1] - t[1], c = C[ci + 2] - t[2];
+      const sx = (1 - f) * (R[0] * a + R[3] * b + R[6] * c) + f * O[oi], sy = (1 - f) * (R[1] * a + R[4] * b + R[7] * c) + f * O[oi + 1], sz = (1 - f) * (R[2] * a + R[5] * b + R[8] * c) + f * O[oi + 2];
+      out[o] = M[0] * sx + M[1] * sy + M[2] * sz + (1 - f) * t[0] + d[0];
+      out[o + 1] = M[3] * sx + M[4] * sy + M[5] * sz + (1 - f) * t[1] + d[1];
+      out[o + 2] = M[6] * sx + M[7] * sy + M[8] * sz + (1 - f) * t[2] + d[2];
+    };
+  }
+
+  function journeyFrame(j, part) {
+    const m = journeyMesh(part);
+    if (!m) return null;
+    const J = m.J, nV = J.nVertices, put = placer(m, j), f = Math.max(0, j - 1);
+    const positions = new Float32Array(3 * nV), tmp = [0, 0, 0];
+    for (let v = 0; v < nV; v++) put(J.pillow[v], J.closed, 3 * v, m.crown, 3 * v, positions, 3 * v);
+    const key = CARD_KEYS[part], out = [];
+    const lineOf = (k, closedPts, crownPts) => { const pts = new Float32Array(closedPts.length); for (let i = 0; i < closedPts.length; i += 3) put(k, closedPts, i, crownPts, i, pts, i); return pts; };
+    // the loop on the rim of each pillow that has an inside
+    for (let k = 0; k < 2; k++) if (!J.degenerate[k]) out.push({ id: 'loop', part, key, pillow: k, points: lineOf(k, J.loop.closed, m.loopCrown), closed: true });
+    // that partition's two seals; once a pillow opens, both sides of its seal
+    for (let k = 0; k < 2; k++) {
+      out.push({ id: 'seal', part, key, pillow: k, points: lineOf(k, J.seals[k].closed, m.sealCrown[k][0]), closed: false });
+      if (f > 0) out.push({ id: 'seal', part, key, pillow: k, points: lineOf(k, J.seals[k].closed, m.sealCrown[k][1]), closed: false });
+    }
+    // the other partitions' lines stay on the solid and fade out in the first quarter of the way
+    const fade = Math.max(0, 1 - 4 * j);
+    if (fade > 0) for (const c of curves) if (c.part !== part) out.push({ ...c, fade });
+    const jMarks = J.cones.map((cn, i) => {
+      put(cn.pillow, cn.closed, 0, m.coneCrown[i], 0, tmp, 0);
+      return { id: 'PQRS'[cn.feature], feature: cn.feature, order: S.orders[cn.feature], label: `${'PQRS'[cn.feature]}${S.orders[cn.feature]}`, p: tmp.slice(), pillow: cn.pillow };
+    }).sort((a, b) => a.feature - b.feature);
+    const u = ease(Math.min(1, j)), radius = view.radius + u * Math.max(0, 1.08 * m.reach - view.radius);
+    return {
+      version: m.version, cornersVersion, nVertices: nV, positions, triangles: J.triangles, pillow: new Uint8Array(J.triangles.length / 3), corners: J.corners,
+      curves: out, marks: jMarks, frame: { center: view.center.slice(), radius },
+      journey: { j, part, key, cells: J.cells, gap: m.gap, crownsExact: J.exact, degenerate: J.degenerate.slice(), vertexPillow: J.pillow },
+    };
+  }
+
+  function frame(j = 0, part = 0) {
     if (!st) throw new Error('surface-model: frame() before set()');
+    j = Math.min(2, Math.max(0, Number(j) || 0));
+    part = [0, 1, 2].includes(part) ? part : 0;
+    const base = baseFrame();
+    if (j <= 0) return base;
+    let jf = null;
+    try { jf = journeyFrame(j, part); } catch (err) { jf = null; }
+    return jf ? { ...base, ...jf } : base;
+  }
+
+  function baseFrame() {
     const nT = mesh.triangles.length / 3, edges = {};
     for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++) edges[`${a}${b}`] = S.dist[a][b];
     return {

@@ -48,8 +48,9 @@ loop."* The page is built from that reply as Yaroslav Bulatov understood it; Cha
 | Surface pane | the solid, a turntable; the pattern's own commas printed on it; the same six seals and three loops; the cone points labelled `P3` … |
 | Three cards `PQ\|RS` blue, `PR\|QS` vermillion, `PS\|QR` purple | Length and Twist of each partition's loop; all three are equals, none is shown as "active" |
 | The pillows of each partition, a table | for each partition its two pillows: corners, loop, seal, heights, area; a line that says the solid is exact, when it is flat, and when a loop has left the edges |
-| Tutorial tab | five short sections with the formulas (`src/tutorial.html`) |
-| Address | `#k=<orders>&m=<marking>&l=<Length>&tw=<Twist>[&tri=…][&v=<az>,<el>]` |
+| Journey scrubber, with three chips | `surface` → `two pillows` → `open crowns` (Join / Part, Zip / Unzip), along the loop of the partition its chips choose |
+| Tutorial tab | six short sections with the formulas (`src/tutorial.html`) |
+| Address | `#k=<orders>&m=<marking>&l=<Length>&tw=<Twist>[&tri=…][&j=<journey>[&jp=<loop>]][&v=<az>,<el>]` |
 
 ## What changed on 27 November, late (his three asks, 22:55)
 
@@ -114,9 +115,34 @@ Why not ordinary space: two smooth faces that meet at an angle along a curve tha
 curve to be straight, so a surface of curvature −1 with the faces of a tetrahedron, creased along geodesics, would
 have faces with the Euclidean angle sum (the Tutorial, § 2).
 
-**Not back yet: the journey** (surface → two pillows → open crowns). It parted the pillows of "the active
-partition", which no longer exists as a thing to see; it is hidden in the template (`#journey hidden`) until it is
-rebuilt on the solid with its own choice of loop.
+## The journey (`src/journey.js`)
+
+`surface` → `two pillows` → `open crowns`: the solid is parted along ONE partition's loop, then each pillow opens
+along its seal onto its crown. **Which loop is the journey's own choice** (the three chips "part along", `ui.jp`,
+`&jp=` in the address): no slider changes it, and pressing a card's slider while the solid is parted changes not
+one pixel (`tools/check.mjs` "journey").
+
+- **Cells.** In the loop's own chart (Fermi coordinates about it) a pillow is the strip between the loop and its
+  roof, the seal's copies laid end to end: a convex strip. Every face of the solid, a triangle of the pattern's
+  plane, is cut into cells that each lie in one copy of one pillow's strip: a polygon is moved by the group until its
+  middle lies in a strip (`fold`: turns about the copies of a pillow's first cone point, as `pillow.js toPillow`
+  walks), cut by the strip's lines, and what sticks out goes round again. Eight cells when the loop runs round two
+  edges, more when it has left them, four when one pair is a pair of 2s.
+- **Two places a point.** A cell's point has true Fermi coordinates, hence its place on the crown
+  `r = (L / 2π) cosh s` (exact in ordinary space up to the rim `arsinh(2π / L)`; a flange past it; a tube for 2222),
+  and, as a point of its face, its place on the solid. The two sides of a seal are different cells, so the seal can
+  open; the two sides of the loop are different cells, so the pillows can part. Checked in `test/journey.test.js`:
+  the crowns' area is the orbifold's (within 1.2 %, the triangles' chords), and a side's length on the crown is its
+  length in the pattern's plane (within 2 %).
+- **The frames** (`surface-model.js frame(j, part)`): 0 → 1 the pillows part by a gap along the line through the
+  two seals' middles; 1 → 2 each pillow goes from its closed shape to its crown, laid on the solid by the best rigid
+  motion (so the crowns stand where the pillows stood) and turned back gradually, so the shape opens instead of
+  cross-fading. One mesh for the whole way; the other partitions' lines fade out in the first quarter.
+- A pair of 2s in a hyperbolic orbifold has no pillow of its own: its pillow is its seal, lying on the loop, and
+  the other pillow is the whole surface. The line under the table says so.
+
+Cost: the journey's mesh is made anew for every slider frame while the solid is parted, about 10 ms in headless
+Chrome on the Intel (`node dev/solid/perf-journey.mjs`: 17 to 34 ms a frame in all, against 12 to 16 closed).
 
 ## Files
 
@@ -124,10 +150,11 @@ rebuilt on the solid with its own choice of loop.
 |---|---|
 | `src/solid.js`, `test/solid.test.js` | the solid: reduced triangle, the tetrahedron, the developed walk, mesh, traces |
 | `src/surface-model.js`, `test/surface-model.test.js` | what the Surface pane is handed: the solid's mesh, every partition's curves, marks, the pose |
+| `src/journey.js`, `test/journey.test.js` | the journey: the solid cut along one loop into cells, each point's place on the crowns |
 | `src/colors.js`, `test/colors.test.js` | the three partitions' colours (and that `page.css` has the same) |
 | `src/flips.js`, `test/flips.test.js` | the three loops, their numbers, a flip and its motion |
 | `src/state.js`, `test/state.test.js` | presets, typed orders, cards, activation, numbers, address, the pillows in numbers |
-| `src/pillow.js`, `test/pillow.test.js` | one pillow {p, q, L}: its six data, Fermi charts, the crown (used by the table now, by the journey later) |
+| `src/pillow.js`, `test/pillow.test.js` | one pillow {p, q, L}: its six data, Fermi charts, the crown (the table and the journey read them; its meshes are no longer drawn) |
 | `src/surface-pane.js` | the renderer's glue (The Folding's `render3d.js`), the look by partition, the turn of a reset |
 | `src/print3d.js`, `test/print3d.test.js` | comma outlines baked into a signed-distance texture; chart points |
 | `src/cards.js`, `src/pattern-glue.js`, `test/cards.test.js`, `test/pattern-glue.test.js` | the three cards; the Pattern pane with all three partitions' lines, left alone on a flip |
@@ -137,7 +164,7 @@ rebuilt on the solid with its own choice of loop.
 | `test/contract.test.js` | pins what the page leans on in files it does not own |
 | `tools/check.mjs` | the built page in headless Chrome |
 | `site/index.html` | the build |
-| `dev/solid/` | this round's tools: `probe.mjs` (the solid in numbers), `shot.mjs` (pictures of states), `perf.mjs`, `pixdiff.mjs`, `diffmap.mjs` |
+| `dev/solid/` | this round's tools: `probe.mjs`, `probe-journey.mjs` (the solid and the journey in numbers), `shot.mjs` (pictures of states), `perf.mjs`, `perf-journey.mjs`, `pixdiff.mjs`, `diffmap.mjs`, `sheet.mjs`, `crop.mjs` |
 | `dev/core`, `dev/pane`, `dev/shell`, `dev/surface`, `dev/final`, `dev/integration` | the first build's scratch (27 Nov, afternoon). What imports the solver or the old surface model there no longer runs |
 
 Nothing is copied from the sibling pages except `flat2222.js`; the rest is imported by relative path (`SPEC.md` § 2.1):
@@ -150,7 +177,7 @@ the engine and the Pattern pane from `../two-features-two-handles/src/`, the 3D 
 
 ```sh
 cd standalone/pqrs-pillows
-node --test                              # every module's tests (no browser; 111 passed in 20 s on the Intel, 27 Nov, 23:50)
+node --test                              # every module's tests (no browser; 119 passed in 25 s on the Intel, 28 Nov, 01:30)
 node --test test/contract.test.js        # under a second: run it after every fast-forward of the branch
 ```
 
@@ -204,11 +231,15 @@ line a check, `ok …`, `FAIL …` or `skip …` (a part of the page that is not
   (Twist, then Length, then back). Gate: not one pixel differs in the Surface pane, in the Pattern pane or in the
   cards, read off screenshots of the three elements. Each run prints its gauge first (the Pattern picture against
   itself shifted by one device pixel must read at least 1 % by the print measure);
+- **journey**: the three stops change the Surface's pixels, the buttons read Join / Part / Zip / Unzip; parted,
+  pressing another card's slider changes not one pixel; choosing another loop does, and back on the first loop the
+  solid is the same (under 2 % of pixels: a label may sit on another side of its cone point, by the renderer's rule
+  that a label keeps its spot until another is clearly better);
 - nothing is wider than the screen; the panes stay side by side; on the phone, tap targets of 44 px and 16 px field text;
 - opening the address again restores the state; the Tutorial tab has its sections, typeset;
 - the built file holds none of the three refused letter sequences.
 
-On the build of 27 Nov, 23:50: 67 ok, 0 FAIL, 2 skip (the journey, hidden) in 117 s.
+On the build of 28 Nov, 01:30: 69 ok, 0 FAIL, 0 skip in 150 s.
 
 `node dev/solid/perf.mjs`: script time of a slider frame in headless Chrome on the Intel, at device scale 2: 12 to
 16 ms, of which the solid 1.4 ms, the print's bake 3 to 9 ms, the Pattern pane 2 to 6 ms.
@@ -225,7 +256,7 @@ On the build of 27 Nov, 23:50: 67 ok, 0 FAIL, 2 skip (the journey, hidden) in 11
 
 Mirrors, crosscaps, handles, more than four cone points, cusps; dragging on the pattern to change Length or Twist;
 a paper net; sound; saving pictures; the twin move as a control (the triangle follows the sliders); a pick on the 3D
-marks; the journey on the new solid (above). Safari / WebKit and a real phone have not been looked at.
+marks. Safari / WebKit and a real phone have not been looked at.
 
 ## Where the mathematics is written down
 

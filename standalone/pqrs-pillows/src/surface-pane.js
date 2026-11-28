@@ -297,7 +297,8 @@ export function createSurfacePane(canvas, opts = {}) {
       shown.version = f.version; shown.cornersVersion = f.cornersVersion; shown.uv = uv ? (fresh ? Float32Array.from(uv) : shown.uv) : null;
       curves = (f.curves || []).filter((c) => c && (c.chain || c.points)).map((c) => {
         const color = look.parts[c.part] || INK, st = c.id === 'loop' ? look.loop : look.seal;
-        return { color, ...st, ...c };
+        // fade: a share of the line's own strength (the journey lets the other partitions' lines go)
+        return { color, ...st, ...c, alpha: (c.alpha ?? st.alpha ?? 1) * (c.fade ?? 1) };
       });
       const labels = o.labels, orders = o.orders || f.orders;
       marks = (f.marks || []).filter(Boolean).map((k) => {

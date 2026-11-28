@@ -42,6 +42,8 @@ test('the shell: title, the one sentence, the presets in order, the quiet field,
   assert.deepEqual([...template.matchAll(/data-tab="(\w+)"/g)].map((m) => m[1]), ['play', 'tutorial']);
   assert.ok(template.includes('<span>surface</span><span>two pillows</span><span>open crowns</span>'));
   for (const word of ['Join', 'Zip', 'Part', 'Unzip']) assert.ok(page.includes(`'${word}'`), word);
+  // the journey's own choice of loop: three chips, in the cards' order
+  assert.deepEqual([...template.matchAll(/class="pq-jchip"[^>]*data-part="(\d)"/g)].map((m) => m[1]), ['1', '2', '3']);
 });
 
 test('what page.js imports is there', () => {

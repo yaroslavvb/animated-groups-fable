@@ -10,25 +10,45 @@
         \end{aligned}
       \]
       <p>with \(h_Q\) by exchanging \(\alpha\) and \(\beta\); the area is \(2\pi(1 - 1/p - 1/q)\). For cone orders at least 2, any three of the six data had exactly one pillow in a numerical search of all twenty triples (not proved here). \(\{2, 2, L\}\) has no area: its seal lies on the loop.</p>
-      <p>The orbifold is \(\{p, q, L\}\) and \(\{r, s, L\}\) joined along the loop with a <strong>Twist</strong> \(\mathrm{tw}\), in turns: one turn is once round the loop. It is so in three ways at once, one for each way to pair the four cone points (§3). The page draws all three at all times, each in its own colour: a pair's seal bold, the loop that parts the pairs thin.</p>
+      <p>The orbifold is \(\{p, q, L\}\) and \(\{r, s, L\}\) joined along the loop with a <strong>Twist</strong> \(\mathrm{tw}\), in turns: one turn is once round the loop. It is so in three ways at once, one for each way to pair the four cone points (§4). The page draws all three at all times, each in its own colour: a pair's seal bold, the loop that parts the pairs thin.</p>
     </section>
 
     <section class="tut-sec" id="tut-solid">
       <h2>2. The solid</h2>
-      <p>Take three loops, one for each pairing, any two meeting twice (§3). Their six seals do not cross: they cut the orbifold into four geodesic triangles with the cone points as corners, glued along their sides as the faces of a tetrahedron. A hyperbolic triangle is fixed by its three sides. So a tetrahedron of hyperbolic 3-space with the same six edge lengths \(d_{ij}\) has that very surface: the orbifold, creased along the six seals, with nothing stretched.</p>
+      <p>Take three loops, one for each pairing, any two meeting twice (§4). Their six seals do not cross: they cut the orbifold into four geodesic triangles with the cone points as corners, glued along their sides as the faces of a tetrahedron. A hyperbolic triangle is fixed by its three sides. So a tetrahedron of hyperbolic 3-space with the same six edge lengths \(d_{ij}\) has that very surface: the orbifold, creased along the six seals, with nothing stretched.</p>
       <p>Its vertices are points \(v_i\) of the hyperboloid \(\langle v, v\rangle = -1\) of \(\mathbb{R}^{3,1}\) with</p>
       \[
         \langle v_i, v_j\rangle = -\cosh d_{ij} .
       \]
       <p>They exist when this \(4 \times 4\) matrix has three positive eigenvalues and one negative, or two positive and a zero: then the solid is flat, a doubled quadrilateral. Alexandrov's theorem says every metric of curvature \(-1\) on the sphere with cone angles under \(2\pi\) is the surface of exactly one convex polyhedron of hyperbolic space, flat ones included. So the solid belongs to the orbifold, not to a choice of loops, and it is the same whichever card is touched.</p>
-      <p>Only one triangle of loops has its seals along the edges: the one in which no loop is longer than its <strong>twin</strong> (§3), because an edge is the shortest way between its ends. The page reaches it from the cards' three loops by exchanging a loop for its twin while the twin is shorter; in 360 random states the tetrahedron existed every time.</p>
+      <p>Only one triangle of loops has its seals along the edges: the one in which no loop is longer than its <strong>twin</strong> (§4), because an edge is the shortest way between its ends. The page reaches it from the cards' three loops by exchanging a loop for its twin while the twin is shorter; in 360 random states the tetrahedron existed every time.</p>
       <p>It is shown in the Poincaré ball, the vertices' middle at the centre, at twice the ball's scale so that lengths near the middle are true: \(x_i = 2\,\vec v_i / (1 + t_i)\) for \(v_i = (\vec v_i, t_i)\). Planes are spheres there: the faces are caps, the edges arcs of circles, and the corner at \(P\) is as sharp as its cone angle \(2\pi/p\). For \(2222\) the same construction in ordinary space gives the tetrahedron of Twist of 2222.</p>
       <p>The solid is flat exactly when the orbifold has a mirror through its four cone points: at Twist \(0\) and \(\pm\tfrac12\) of a loop that runs round two of its edges. Every preset opens there. Away from the mirror the thickness grows like \(\sqrt{|\mathrm{tw}|}\), so a small Twist already makes a full tetrahedron.</p>
       <p>Ordinary space has no such surface. If two smooth faces meet at an angle strictly between \(0\) and \(\pi\) along a curve \(\gamma\) that is a geodesic of both, then \(\gamma''\) is parallel to both normals, so \(\gamma'' = 0\): the crease is straight. A tetrahedron with faces of curvature \(-1\) creased along geodesics would have straight edges, hence faces with the Euclidean angle sum \(\pi\), against Gauss–Bonnet. (Until 27 November 2026 this page drew a mesh relaxed toward the right lengths in ordinary space; it was off by about 1 % and looked uneven.)</p>
     </section>
 
+    <section class="tut-sec" id="tut-crown">
+      <h2>3. A pillow alone: the crown</h2>
+      <p>The journey under the Surface pane parts the solid along one loop (the chips choose which; a slider never does) and then opens each pillow along its seal. An open pillow needs no hyperbolic space. In Fermi coordinates about the loop (\(\theta\) along it, \(s\) the distance from it) the metric is \(ds^2 + \cosh^2 s\,d\theta^2\), and the surface of revolution</p>
+      \[
+        \begin{aligned}
+        r(s) &= \frac{L}{2\pi}\cosh s, \qquad \varphi = \frac{2\pi\,\theta}{L},\\[6pt]
+        z'(s) &= \sqrt{1 - \Bigl(\frac{L}{2\pi}\Bigr)^{2}\sinh^2 s}
+        \end{aligned}
+      \]
+      <p>of ordinary space carries it exactly up to the rim \(s_{\max} = \operatorname{arsinh}(2\pi/L)\), where the meridian turns level. A pillow cut open along its seal is the part \(0 \le s \le h(|\theta|)\), \(|\theta| \le a\), under the roof \(h\):</p>
+      \[
+        \begin{aligned}
+        \sinh a\,\tanh h(\theta) ={} & \tanh h_P\,\sinh(a - \theta)\\
+        & {}+ \tanh h_Q\,\sinh\theta .
+        \end{aligned}
+      \]
+      <p>On the surface of revolution this is a <strong>crown</strong> with a peak at each cone point, isometric while \(\sinh h \le 2\pi/L\) at both peaks: for \(\{3, 3, L\}\) when \(L \lt 10.784\), for \(\{4, 4, L\}\) when \(L \lt 5.543\), for \(\{p, p, L\}\) with \(p \ge 6\) never. Past the rim the page runs the meridian on level, a flange: parallels come out short, and the line under the table says so.</p>
+      <p>On the crowns the Twist is a rigid turn of one crown against the other by exactly \(2\pi\,\mathrm{tw}\). Adding 1 to \(\mathrm{tw}\) gives the same orbifold. The solid's faces are cut along the loop and the seals for this, each piece inside one copy of one pillow, so every point of the solid has its own place on a crown: the journey moves points, it redraws nothing.</p>
+    </section>
+
     <section class="tut-sec" id="tut-partitions">
-      <h2>3. Three partitions, one orbifold</h2>
+      <h2>4. Three partitions, one orbifold</h2>
       <p>A <strong>partition</strong> pairs the cone points two and two; its loops are the simple closed geodesics that part the pairs, infinitely many. Take one of them as the cut. The loops that meet it twice are numbered by the integers: loop \(j\) runs round a seal that crosses the cut and joins cone points of orders \(n, n'\) at heights \(h, h'\), their feet \((\mathrm{tw} + j/2)\,L\) apart:</p>
       \[
         \begin{aligned}
@@ -53,8 +73,8 @@
     </section>
 
     <section class="tut-sec" id="tut-2222">
-      <h2>4. 2222</h2>
-      <p>\(2222\) is flat. A loop slides: every parallel loop has the same length, and each is drawn halfway by convention. Length is the pair's spacing \(\ell\), half the loop; the area is 2, so the pairs are \(1/\ell\) apart, the second slid by \(2\ell\,\mathrm{tw}\). The solid is a tetrahedron with four congruent faces, its edges the three distances between cone points, each twice.</p>
+      <h2>5. 2222</h2>
+      <p>\(2222\) is flat. A loop slides: every parallel loop has the same length, and each is drawn halfway by convention. Length is the pair's spacing \(\ell\), half the loop; the area is 2, so the pairs are \(1/\ell\) apart, the second slid by \(2\ell\,\mathrm{tw}\). The solid is a tetrahedron with four congruent faces, its edges the three distances between cone points, each twice. An open pillow is a tube, and the Twist turns one tube against the other by \(2\pi\,\mathrm{tw}\).</p>
       <p>For \(\ell^2 \le 2\) and \(0 \le \mathrm{tw} \le \tfrac12\), the second seal is turned against the first by</p>
       \[
         \varphi = \arccos(1 - 4\,\mathrm{tw}),
@@ -63,7 +83,7 @@
     </section>
 
     <section class="tut-sec" id="tut-credits">
-      <h2>5. Credits and siblings</h2>
+      <h2>6. Credits and siblings</h2>
       <p>Built from Chaim Goodman-Strauss's reply to Two features, two handles as Yaroslav Bulatov understood it; Chaim has not seen this build. From the reply: "there is a realization of the PQRS orbifold with const curvature faces, with breaks along geodesics: a pointy tetrahedron", and "the PQRS orbifold is made of two of these pillows, each with two regular corners and with one joining loop." The solid of §2 is this page's reading of the first sentence, in hyperbolic space, where it exists.</p>
       <p>Pattern pane and engine: <a href="https://spacesheep.dev/@yaroslavvb/two-features-two-handles">Two features, two handles</a>. Flat solid: <a href="https://spacesheep.dev/@yaroslavvb/twist-of-2222">Twist of 2222</a>. Print: the Paisley of <a href="https://spacesheep.dev/@yaroslavvb/classification-of-surfaces">Classification of Surfaces</a>. The three coupled partitions without the solid: <a href="https://yaroslavvb.github.io/animated-groups-fable/real-2222.html" target="_blank" rel="noopener">The real 2222</a> and <a href="https://yaroslavvb.github.io/animated-groups-fable/pqrs.html" target="_blank" rel="noopener">PQRS 4-cone orbifolds</a>.</p>
       <p class="tut-ref">A. D. Alexandrov, <em>Convex Polyhedra</em> (1950; English edition, Springer, 2005): a convex polyhedron with a given metric exists and is unique, in spaces of constant curvature too.</p>

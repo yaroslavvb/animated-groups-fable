@@ -51,7 +51,7 @@ export const CARD_KEYS = ['01|23', '02|13', '03|12'];
  * seal, so at -20 the doubled square of 3333 and the flat envelope of 2222 stood edge-on. 70 = 90 - 20: the seal
  * across the screen, P to the left, turned by the spec's 20 degrees (the view of Twist of 2222's solid).
  */
-export const DEFAULT_UI = Object.freeze({ j: 0, az: 55, el: 16 });
+export const DEFAULT_UI = Object.freeze({ j: 0, jp: 0, az: 55, el: 16 });
 
 // The Length slider's own range, and how far a Length may go at all. A flip can lead outside the slider's range
 // (seen: 0.11 to 11.4 from 0.4 .. 7), so a card's range follows its number by 8 %, up to the outer limits.
@@ -249,7 +249,7 @@ export function withNumbers(state, { L, tw } = {}, { lRange = null } = {}) {
 }
 
 // ---- the address ----------------------------------------------------------------------------------------------------
-// #k=<sig>&m=<perm>&l=<L, 3 dec>&tw=<4 dec>[&tri=k.lo.hi][&j=<journey 0..2, 2 dec>][&v=<az>%2C<el>]
+// #k=<sig>&m=<perm>&l=<L, 3 dec>&tw=<4 dec>[&tri=k.lo.hi][&j=<journey 0..2, 2 dec>[&jp=<1 | 2: the loop it parts along>]][&v=<az>%2C<el>]
 // "#" alone is 3333 at the engine's defaults. Only the characters [A-Za-z0-9_.=%&/-] are written.
 
 /** A number as the address writes it: `dec` decimals at most, no trailing zeros, never "-0". */
@@ -286,8 +286,9 @@ function triForAddress(state, L, tw) {
 
 /**
  * The address of a state and of what the page shows of it.
- *   ui   { j: the journey 0..2 (0 surface, 1 two pillows, 2 open crowns), az, el: the turntable's view in degrees }
- *        j = 0 and the view of DEFAULT_UI (or none) are left out.
+ *   ui   { j: the journey 0..2 (0 surface, 1 two pillows, 2 open crowns), jp: the partition it parts along (0, 1, 2),
+ *          az, el: the turntable's view in degrees }
+ *        j = 0 (and then jp), jp = 0 and the view of DEFAULT_UI (or none) are left out.
  */
 export function toHash(state, ui = {}) {
   const fam = FAMILIES[state.k] || { defaultM: '', defaultL: NaN, defaultTw: NaN, kind: kindOf(state) };
@@ -299,6 +300,8 @@ export function toHash(state, ui = {}) {
   if (tri) parts.push(`tri=${tri}`);
   const j = Number.isFinite(ui && ui.j) ? num(clamp(ui.j, 0, 2), 2) : '0';
   if (j !== '0') parts.push(`j=${j}`);
+  // the loop the journey parts along (1, 2: the second or third partition), said only where the journey is under way
+  if (j !== '0' && ui && (ui.jp === 1 || ui.jp === 2)) parts.push(`jp=${ui.jp}`);
   if (ui && Number.isFinite(ui.az) && Number.isFinite(ui.el)) {
     const az = num(wrapDeg(ui.az), 1), el = num(clamp(ui.el, -90, 90), 1);
     if (az !== num(DEFAULT_UI.az, 1) || el !== num(DEFAULT_UI.el, 1)) parts.push(`v=${az}%2C${el}`);
@@ -344,6 +347,8 @@ export function fromHash(text) {
   }
   const ui = { ...DEFAULT_UI }, jv = parseFloat(params.get('j')), v = (params.get('v') || '').split(',').map(parseFloat);
   if (Number.isFinite(jv)) ui.j = clamp(jv, 0, 2);
+  const jp = params.get('jp');
+  if (jp === '1' || jp === '2') ui.jp = Number(jp);
   if (v.length === 2 && v.every(Number.isFinite)) { ui.az = wrapDeg(v[0]); ui.el = clamp(v[1], -90, 90); }
   return { state: st, ui };
 }

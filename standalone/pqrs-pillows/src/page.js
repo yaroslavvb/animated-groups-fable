@@ -167,7 +167,7 @@ function drawSurfaceFrame({ dragging = false, bake = null } = {}) {
   S.pane.showFrame(fr, o);
   S.version = fr.version; S.cornersVersion = fr.cornersVersion;
   S.exact = fr.exact;
-  S.info = { kind: fr.kind, flat: fr.flat, thick: fr.thick, swaps: fr.swaps, edges: fr.edges };
+  S.info = { kind: fr.kind, flat: fr.flat, thick: fr.thick, swaps: fr.swaps, edges: fr.edges, journey: fr.journey || null };
   S.pane.render();
   S.ms.bake = baked ? tB - tA : 0; S.ms.baked = baked; S.ms.chart = tC - tB; S.ms.pane = now() - tC;
   return fr;
@@ -254,13 +254,18 @@ function fillNote() {
     : 'The solid is exact: the convex solid of hyperbolic space whose surface is this orbifold, shown in the Poincaré ball. Its six edges are the six seals.');
   if (info && info.flat) parts.push('Here it is flat: a doubled quadrilateral.');
   if (info && info.swaps > 0) parts.push('A loop here is longer than its twin: its seals no longer run along edges, they cross the faces.');
+  const jn = info && ui.j > 0.004 ? info.journey : null;
+  if (jn && jn.degenerate.some(Boolean)) parts.push('A pair of 2s has no pillow of its own: its pillow is its seal, lying on the loop.');
+  if (jn && ui.j > 1.004) parts.push(kind === 'E'
+    ? 'The open pillows are exact too: each lies on a tube.'
+    : jn.crownsExact ? 'The open crowns are exact too, in ordinary space: each lies on the surface of revolution r = (L / 2π) cosh s.' : 'The open crowns: a peak stands past the rim of the surface of revolution r = (L / 2π) cosh s; a level flange stands in for it there (parallels come out short).');
   const text = parts.join(' '), el = $('pillows-note');
   if (el.textContent !== text) el.textContent = text;
 }
 
 // ---- the address ---------------------------------------------------------------------------------------------------
 let hashTimer = 0, lastHash = null;
-const hashNow = () => toHash(state, surface.userView ? ui : { j: ui.j });
+const hashNow = () => toHash(state, surface.userView ? ui : { j: ui.j, jp: ui.jp });
 function writeHash() {
   clearTimeout(hashTimer);
   hashTimer = 0;
@@ -385,11 +390,14 @@ function syncShell() {
   if (!preset && document.activeElement !== sigIn && sigIn.value.replace(/[\s,;·]+/g, '') !== k) sigIn.value = k;
   sigIn.dataset.on = !preset && sigIn.value.replace(/[\s,;·]+/g, '') === k ? '1' : '0';
   $('pat-sub').textContent = kindOf(state) === 'E' ? 'Euclidean plane' : 'Poincaré disc';
-  $('surf-sub').textContent = kindOf(state) === 'E' ? 'the exact solid' : 'the exact solid, in the Poincaré ball';
+  syncJourney();
 }
 
 // ---- the journey: surface -> two pillows -> open crowns --------------------------------------------------------------
+// It parts the solid along the loop of the partition chosen HERE (three chips, ui.jp), never along "the card touched
+// last": a slider changes the numbers and nothing else.
 const jLeft = $('j-left'), jRight = $('j-right'), jStops = Array.from(document.querySelectorAll('.pq-jstops > span'));
+const jChips = Array.from(document.querySelectorAll('.pq-jchip'));
 function syncJourney() {
   const j = ui.j, e = 0.004;
   jLeft.textContent = j > 1 + e ? 'Zip' : 'Join';
@@ -397,6 +405,11 @@ function syncJourney() {
   jRight.textContent = j >= 1 - e ? 'Unzip' : 'Part';
   jRight.disabled = j >= 2 - e;
   jStops.forEach((s, i) => { s.dataset.at = Math.abs(j - i) <= e ? '1' : '0'; });
+  jChips.forEach((b, i) => b.setAttribute('aria-checked', String(i === ui.jp)));
+  if (state) {
+    const flat = kindOf(state) === 'E';
+    $('surf-sub').textContent = j <= e ? (flat ? 'the exact solid' : 'the exact solid, in the Poincaré ball') : j <= 1 + e ? 'two pillows, joined at the loop' : flat ? 'each pillow opened along its seal: a tube' : 'each pillow opened along its seal: a crown';
+  }
 }
 function setJourney(j, { fromScrub = false } = {}) {
   const v = clamp(j, 0, 2);
@@ -405,7 +418,7 @@ function setJourney(j, { fromScrub = false } = {}) {
   if (v > 0) dropHint('view-hint');
   if (!fromScrub) journey.set(v / 2);
   syncJourney();
-  if (surface.on && state) showSurface(state, { journey: true });
+  if (surface.on && state) { showSurface(state, { journey: true }); fillNote(); }
   scheduleHash();
 }
 const journey = createTimeline({ slider: $('j-range'), keyTarget: null, onChange: (t) => setJourney(2 * t, { fromScrub: true }) });
@@ -417,6 +430,14 @@ function journeyTo(target) {
 }
 jLeft.addEventListener('click', () => journeyTo(ui.j > 1.004 ? 1 : 0));
 jRight.addEventListener('click', () => journeyTo(ui.j >= 0.996 ? 2 : 1));
+jChips.forEach((b, i) => b.addEventListener('click', () => {
+  if (ui.jp === i) return;
+  ui.jp = i;
+  syncJourney();
+  // on the closed surface the choice shows nothing yet; under way, the solid is parted along the new loop at once
+  if (ui.j > 0 && surface.on && state) { showSurface(state, { journey: true }); fillNote(); }
+  scheduleHash();
+}));
 
 // ---- tabs ----------------------------------------------------------------------------------------------------------
 function showTab(next) {
@@ -470,6 +491,7 @@ function openAddress(raw, { initial = false } = {}) {
   const got = fromHash(text) || fromHash('#');
   const u = got.ui || DEFAULT_UI;
   ui.j = Number.isFinite(u.j) ? u.j : 0;
+  ui.jp = u.jp === 1 || u.jp === 2 ? u.jp : 0;
   const viewed = Number.isFinite(u.az) && Number.isFinite(u.el) && (u.az !== DEFAULT_UI.az || u.el !== DEFAULT_UI.el);
   ui.az = Number.isFinite(u.az) ? u.az : DEFAULT_UI.az;
   ui.el = Number.isFinite(u.el) ? u.el : DEFAULT_UI.el;
@@ -532,7 +554,7 @@ window.__pqrs = {
   open: (text) => openSignature(String(text)),
   activate: (key) => { const done = activateCard(key); flush(); return done; },
   set: (numbers = {}, { key = null, dragging = false } = {}) => { inputCard(key || keyOf(state), numbers, { dragging }); flush(); return window.__pqrs.state(); },
-  journey: (j) => { setJourney(j); return ui.j; },
+  journey: (j, part) => { if (part === 0 || part === 1 || part === 2) { ui.jp = part; syncJourney(); } setJourney(j); if (surface.on && state) showSurface(state, { journey: true }); return ui.j; },
   tab: (t) => { showTab(t); return tab; },
   flush,
   perf: () => ({ last: perf.last && { ...perf.last }, drag: { ...perf.drag } }),

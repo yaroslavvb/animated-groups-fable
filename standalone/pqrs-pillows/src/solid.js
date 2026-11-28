@@ -36,6 +36,7 @@
 //   S.mesh(levels)         { positions: Float64Array(3 n), triangles: Uint32Array(3 m), corners: Float64Array(9 m),
 //                            face: Uint8Array(m) }: each face cut into 4^levels triangles by halving (so the
 //                            triangles are of even hyperbolic size); vertices are not shared between faces
+//   S.place(fi, y, out)    a point y of face number fi (on that face's own developed triangle), as drawn
 //   S.rotate(R)            turn the solid as drawn by the rotation R (row-major 9): vertex, point, trace, mesh follow
 //
 // The pair frame is the engine's frame of `state` (handles.js fourConeCentered / pillowCentered): the print's chart
@@ -378,6 +379,8 @@ export function solidOf(state, opts = {}) {
     rotate(M) { R = mul9(Array.from(M), R); return api; },
     setRotation(M) { R = Array.from(M); return api; },
     locate, point, trace, mesh,
+    /** A point y of the pair frame that lies in face number `fi` (as that face's own developed triangle has it), as drawn. */
+    place(fi, y, out = [0, 0, 0]) { return show(lift(faces[fi], y), out); },
     /** the geometry's helpers, for callers that sample curves: mix(u, v, t), q(u, v), norm(v) */
     G,
   };
