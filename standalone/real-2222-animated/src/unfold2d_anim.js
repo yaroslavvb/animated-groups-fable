@@ -1,5 +1,5 @@
 // unfold2d_anim.js — rigid 2D unfolded wallpaper visualizer for "The real 2222 animated":
-// draws the isotropic flat development with subtle rigid Paisley commas, the 4-triangle pillow net,
+// draws the isotropic flat development with subtle rigid Paisley commas, faint triangulation hairlines,
 // and exact 180-deg symmetric colored emblems matching the 3D corners 1-to-1.
 
 import {
@@ -22,9 +22,6 @@ function paletteFor(dark) {
       ground: '#1f3532',
       comma: '#2c4a45',
       grid: 'rgba(236, 236, 240, 0.13)',
-      crease: 'rgba(236, 236, 240, 0.48)',
-      activeEdge: '#ececf0',
-      casing: 'rgba(19, 19, 23, 0.78)',
       sym: {
         A: FEATURES.A.dark,
         B: FEATURES.B.dark,
@@ -37,9 +34,6 @@ function paletteFor(dark) {
     ground: '#dceee9',
     comma: '#b9d9d1',
     grid: 'rgba(20, 23, 31, 0.14)',
-    crease: 'rgba(20, 23, 31, 0.48)',
-    activeEdge: '#1a1a1f',
-    casing: 'rgba(255, 255, 255, 0.86)',
     sym: {
       A: FEATURES.A.light,
       B: FEATURES.B.light,
@@ -59,7 +53,7 @@ export function createAnimUnfoldPane(canvas) {
   let H = 0;
   let dpr = 1;
   let curState = null;
-  let stats = { commasDrawn: 0, symbolsDrawn: 0, netArea: 0, ppuX: 0, ppuY: 0, isRigid: true };
+  let stats = { commasDrawn: 0, symbolsDrawn: 0, netLinesDrawn: 0, netArea: 0, ppuX: 0, ppuY: 0, isRigid: true };
 
   function measure() {
     const rect = canvas.getBoundingClientRect();
@@ -173,52 +167,10 @@ export function createAnimUnfoldPane(canvas) {
     ctx.strokeStyle = col.grid;
     ctx.stroke(gridPath);
 
-    // 4. Central rigidly-unfolded 4-triangle pillow net
+    // 4. Canonical label anchors (zero tetrahedron outline lines drawn)
     const net = unfoldedNet(S, [CAM_X, CAM_Y]);
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.beginPath();
-    const o0 = toScreen(net.outline[0]);
-    ctx.moveTo(o0[0], o0[1]);
-    for (let k = 1; k < net.outline.length; k++) {
-      const ok = toScreen(net.outline[k]);
-      ctx.lineTo(ok[0], ok[1]);
-    }
-    ctx.closePath();
-    ctx.strokeStyle = col.casing;
-    ctx.lineWidth = 5.5;
-    ctx.stroke();
-
-    const orderedEdges = [...net.edges].sort((u, v) => {
-      const au = u.partIdx === curState.activeIdx ? 1 : 0;
-      const av = v.partIdx === curState.activeIdx ? 1 : 0;
-      return au - av;
-    });
-
-    for (const ed of orderedEdges) {
-      const sa = toScreen(ed.a);
-      const sb = toScreen(ed.b);
-      const active = ed.partIdx === curState.activeIdx;
-      const folded = ed.bend >= 0.08;
-      ctx.beginPath();
-      ctx.moveTo(sa[0], sa[1]);
-      ctx.lineTo(sb[0], sb[1]);
-      ctx.setLineDash(!folded ? [5, 4] : []);
-      if (active) {
-        ctx.strokeStyle = col.activeEdge;
-        ctx.lineWidth = folded ? 3.2 : 2.1;
-      } else {
-        ctx.strokeStyle = col.crease;
-        ctx.lineWidth = folded ? 1.45 : 1.05;
-      }
-      ctx.stroke();
-    }
-    ctx.setLineDash([]);
-    ctx.restore();
 
     // 5. Four unique 180-deg symmetric colored emblems centered at every visible half-turn point
-    const netCornerKeys = new Set(net.corners.map((c) => `${c.i},${c.j}`));
     let symbolsDrawn = 0;
 
     for (let jb = jb0; jb <= jb1; jb++) {
@@ -227,7 +179,6 @@ export function createAnimUnfoldPane(canvas) {
         if (pt[0] < planeBox.x0 || pt[0] > planeBox.x1 || pt[1] < planeBox.y0 || pt[1] > planeBox.y1) continue;
         const name = 'ABCD'[(ia & 1) + 2 * (jb & 1)];
         const poly = SYMBOL_POLYS[name];
-        const onNet = netCornerKeys.has(`${ia},${jb}`);
 
         ctx.beginPath();
         const s0 = toScreen([pt[0] + poly[0][0], pt[1] + poly[0][1]]);
@@ -238,15 +189,12 @@ export function createAnimUnfoldPane(canvas) {
         }
         ctx.closePath();
 
-        ctx.globalAlpha = onNet ? 1.0 : 0.78;
+        ctx.globalAlpha = 1.0;
         ctx.fillStyle = col.sym[name];
         ctx.fill();
-        if (onNet) {
-          ctx.lineWidth = 1.2;
-          ctx.strokeStyle = col.ground;
-          ctx.stroke();
-        }
-        ctx.globalAlpha = 1.0;
+        ctx.lineWidth = 1.0;
+        ctx.strokeStyle = col.ground;
+        ctx.stroke();
         symbolsDrawn++;
       }
     }
@@ -280,6 +228,7 @@ export function createAnimUnfoldPane(canvas) {
     stats = {
       commasDrawn,
       symbolsDrawn,
+      netLinesDrawn: 0,
       netArea: net.area,
       ppuX,
       ppuY,

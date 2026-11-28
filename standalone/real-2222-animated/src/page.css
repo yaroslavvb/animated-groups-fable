@@ -425,11 +425,3 @@ html, body {
   border-radius: 2px;
   background: var(--ink);
 }
-
-.sw-net {
-  width: 16px;
-  height: 11px;
-  border-radius: 2px;
-  border: 1.5px solid var(--ink);
-  background: transparent;
-}
