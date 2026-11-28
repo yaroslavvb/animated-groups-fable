@@ -10,7 +10,8 @@
 //   const sm = createSurfaceModel({ levels: 5 });
 //   sm.set(state);                 a new orbifold, a link: the solid in its level pose (below)
 //   sm.update(state, { hold });    new numbers: the solid as it now is, turned as little as can be from where it was shown
-//                                  (hold: [f, g], two cone points to keep in place: the moved card's pair that holds P)
+//                                  (hold: [f, g], two cone points to keep in place: the moved card's first pair, the
+//                                  one the Pattern pane keeps in place)
 //   sm.frame(j = 0, part = 0) -> {       j in [0, 2]: the journey (0 surface, 1 two pillows, 2 open crowns), along the loop
 //                                  of partition `part` (0, 1, 2: PQ|RS, PR|QS, PS|QR). At j = 0 `part` plays no role
 //     version,                     changes when the triangles change (never, for one `levels`): the pane then needs setMesh
@@ -155,8 +156,9 @@ export function createSurfaceModel(opts = {}) {
     if (fresh || !shown) R = levelPose(V0, st.perm[0], st.perm[1], st.perm[2], st.perm[3]);
     else {
       // as little turned from the last picture as can be: the best rotation of the four named cone points. While a
-      // card's slider moves, the pair of that card that holds P is HELD (it weighs 30 times the other pair), so a
-      // Twist is seen as the other pair turning against it (as on The real 2222 animated: "hold first pair fixed").
+      // card's slider moves, that card's first pair is HELD (it weighs 30 times the other pair: the page hands over the
+      // pair the Pattern pane keeps in place), so a Twist is seen as the other pair turning against it (as on The real
+      // 2222 animated: "hold first pair fixed").
       const A = new Float64Array(12), B = new Float64Array(12), W = new Float64Array(4).fill(1);
       for (let f = 0; f < 4; f++) { A.set(V0[f], 3 * f); B.set(shown[f], 3 * f); }
       if (hold && hold.length === 2) { W.fill(1 / 30); W[hold[0]] = 1; W[hold[1]] = 1; }
@@ -187,7 +189,7 @@ export function createSurfaceModel(opts = {}) {
   }
 
   function set(state) { st = state; build(true); return api; }
-  /** opts.hold: two features [f, g] to hold in place as far as can be (the moved card's pair that holds P). */
+  /** opts.hold: two features [f, g] to hold in place as far as can be (the moved card's first pair). */
   function update(state, { hold = null } = {}) {
     const fresh = !st || !sameOrders(state, st);
     st = state;

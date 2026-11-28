@@ -108,8 +108,9 @@ depend on any choice of loops.
   the edges themselves; a loop dragged longer than its twin has seals that cross the faces (the table's line says so).
 - **The pose** (`src/surface-model.js`). A cold start lays the first pair below, its seal along y, the other pair
   above. While a slider moves the solid is turned as little as can be from the last picture (the best rotation of
-  the four named cone points), and the moved card's pair that holds P is held still (weight 30 to 1), so a Twist
-  shows as the other pair turning against it. The reset button lays it level again.
+  the four named cone points), and the moved card's first pair is held still (weight 30 to 1): the same pair the
+  Pattern pane keeps in place (the engine's picked pair of that cut), so in both panes a Twist shows as the other
+  pair moving against it. The reset button lays it level again.
 
 Why not ordinary space: two smooth faces that meet at an angle along a curve that is a geodesic of both force that
 curve to be straight, so a surface of curvature −1 with the faces of a tetrahedron, creased along geodesics, would
@@ -229,8 +230,8 @@ line a check, `ok …`, `FAIL …` or `skip …` (a part of the page that is not
 - **colours**: the three cards wear three colours, the same after each of them was made the cut;
 - **switch**: on 3333, 2345, 2223 and 2222, each after a Twist drag: press and release on another card's slider
   (Twist, then Length, then back). Gate: not one pixel differs in the Surface pane, in the Pattern pane or in the
-  cards, read off screenshots of the three elements. Each run prints its gauge first (the Pattern picture against
-  itself shifted by one device pixel must read at least 1 % by the print measure);
+  cards, read off screenshots of the three elements. Each run prints a gauge first, for the reader (what a shift of
+  the Pattern picture by one device pixel would read);
 - **journey**: the three stops change the Surface's pixels, the buttons read Join / Part / Zip / Unzip; parted,
   pressing another card's slider changes not one pixel; choosing another loop does, and back on the first loop the
   solid is the same (under 2 % of pixels: a label may sit on another side of its cone point, by the renderer's rule

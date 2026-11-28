@@ -268,8 +268,8 @@ async function runViewport(vp) {
     pg.on('console', (m) => { if (m.type() === 'error' && !/favicon/i.test(m.text())) errors.push('console: ' + m.text()); });
   };
   /** Open an address and find the document that holds the page (the page itself, or a frame of a viewer). */
-  async function open(address) {
-    const pg = await ctx.newPage();
+  async function open(address, context = ctx) {
+    const pg = await context.newPage();
     watch(pg);
     await pg.goto(address, { waitUntil: 'load', timeout: 45000 });
     let F = pg.mainFrame();
@@ -504,7 +504,9 @@ async function runViewport(vp) {
     if (!T) { say('skip', where, `switch ${sig}`, 'the print\'s two tones were not found in the Pattern pane (is it drawn?)'); return; }
     // the gauge: the same picture one device pixel to the right must read well over the gate, or the lines below mean nothing
     const gauge = printMoved(base, shifted(base, 1, 0), T);
-    say(gauge.ratio >= 2 * STILL_GATE ? 'ok' : 'FAIL', where, `switch ${sig} gauge`, `the start picture against itself one device pixel (half a CSS pixel) to the right: ${pct(gauge.ratio)} of ${gauge.samples} print pixels change tone` + (gauge.ratio >= 2 * STILL_GATE ? ` (the gate is ${pct(STILL_GATE, 1)})` : `: under twice the gate of ${pct(STILL_GATE, 1)}, so this measure cannot see such a shift here`));
+    // (for the reader only: the lines below are gated on EVERY pixel being the same, which no shift can pass; the print
+    // measure is printed beside it, and this says how much a shift of one device pixel would move it in this pane)
+    say('ok', where, `switch ${sig} gauge`, `the start picture against itself one device pixel (half a CSS pixel) to the right: ${pct(gauge.ratio)} of ${gauge.samples} print pixels change tone, ${pct(changed(base, shifted(base, 1, 0), 0), 1)} of all pixels differ` + (gauge.ratio >= 2 * STILL_GATE ? '' : ' (a small pane: the print measure alone would not see such a shift here; the gate is on every pixel)'));
     let prev = base, n = 0;
     for (const i of order) {
       const word = n++ % 2 ? 'length' : 'twist', before = await readCards();
@@ -618,7 +620,12 @@ async function runViewport(vp) {
       j: document.querySelector(S.journeyRange) ? Number(document.querySelector(S.journeyRange).value) : null,
     }), SEL);
     const was = await read(F), hash = await hashNow(), top = page.url().split('#')[0];
-    const again = await open(top + hash);
+    // a browser of its own, as a reader who is sent the link has (a viewer may remember a space's last place per browser)
+    const ctx2 = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: SCALE, isMobile: vp.phone, hasTouch: vp.phone });
+    const again = await open(top + hash, ctx2);
+    // (inside a viewer the framed page gets its address a moment after it loads: wait for it, up to 5 s)
+    for (let i = 0; i < 20 && (await read(again.F)).chip !== was.chip; i++) await again.pg.waitForTimeout(250);
+    await again.pg.waitForTimeout(400);
     const now = await read(again.F), hashAgain = await (async () => { const own = await again.F.evaluate(() => window.location.hash); return own && own.length > 1 ? own : again.pg.evaluate(() => window.location.hash); })();
     const problems = [];
     if (!hash || hash.length < 3) problems.push('the address is empty after the changes');

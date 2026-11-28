@@ -101,7 +101,7 @@ test('a slider moves the solid steadily: small steps, small moves, through the f
   }
 });
 
-test('while a card\'s slider moves, its pair that holds P stays put and the other pair turns against it', () => {
+test('while a card\'s slider moves, the pair handed over as its first stays put and the other pair turns against it', () => {
   const base = stateFor('3333'), sm = createSurfaceModel({ levels: 2 }).set(withNumbers(base, { tw: 0.1 })), start = sm.shown;
   for (let i = 1; i <= 15; i++) sm.update(withNumbers(base, { tw: 0.1 + 0.01 * i }), { hold: [0, 1] });
   const end = sm.shown, moved = end.map((p, f) => dist3(p, start[f]));

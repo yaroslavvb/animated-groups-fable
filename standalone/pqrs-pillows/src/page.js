@@ -186,9 +186,10 @@ function showSurface(st, { flip = null, dragging = false, cold = false, journey 
     const tM = now();
     if (!journey || !S.started) {
       if (cold || !S.started) { S.sm.set(st); S.started = true; } else {
-        // the card whose slider moved: its pair that holds P stays put, the other pair moves against it
-        const pairs = moved ? moved.split('|').map((pr) => pr.split('').map(Number)) : null;
-        S.sm.update(st, { hold: pairs ? pairs.find((pr) => pr.includes(0)) || pairs[0] : null });
+        // The card whose slider moved is the cut now: its first pair (the engine's picked pair, state.perm[0], [1]) is
+        // the one the Pattern pane keeps in place while the numbers move. The solid holds the SAME pair still, so in
+        // both panes a Twist shows as the other pair moving against it.
+        S.sm.update(st, { hold: moved && moved === keyOf(st) ? [st.perm[0], st.perm[1]] : null });
       }
     }
     S.ms.model = now() - tM;
