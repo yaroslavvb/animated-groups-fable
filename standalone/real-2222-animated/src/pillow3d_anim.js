@@ -208,7 +208,10 @@ export function createAnimPillowStage(canvas, labelLayer, scrollHost) {
 
   function set(nextState) {
     curState = nextState;
-    mesh = buildSymbolPillowMesh(nextState.e, nextState.activeFrame);
+    mesh = buildSymbolPillowMesh(nextState.e, nextState.activeFrame, {
+      activeIdx: nextState.activeIdx,
+      pinFrame: nextState.pinFrame,
+    });
     R.setSurface({
       positions: mesh.positions,
       indices: mesh.indices,

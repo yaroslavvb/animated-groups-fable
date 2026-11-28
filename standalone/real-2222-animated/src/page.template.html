@@ -13,7 +13,7 @@
 <main class="app">
   <header class="hdr">
     <h1 class="title">The real 2222 animated</h1>
-    <p class="sub">Fixed size and aspect ratio — choose one of the three corner pairings to animate its continuous twist in 3D and rigid 2D unfolding.</p>
+    <p class="sub">Fixed size and aspect ratio — choose one of the three corner pairings to hold the first pair fixed while twisting the other in 3D and rigid 2D unfolding.</p>
   </header>
 
   <section class="pair-picker" role="radiogroup" aria-label="Choose twist pairing">
@@ -97,16 +97,12 @@
         <div class="scrub-wrap">
           <label class="scrub-label" for="twist-scrub">Twist</label>
           <div class="swrap">
-            <input id="twist-scrub" type="range" min="0" max="2" step="0.002" value="0.25">
+            <input id="twist-scrub" type="range" min="0" max="1" step="0.001" value="0.25">
             <div class="sticks" aria-hidden="true">
               <i style="left:0%"></i>
-              <i style="left:12.5%"></i>
               <i style="left:25%"></i>
-              <i style="left:37.5%"></i>
               <i style="left:50%"></i>
-              <i style="left:62.5%"></i>
               <i style="left:75%"></i>
-              <i style="left:87.5%"></i>
               <i style="left:100%"></i>
             </div>
           </div>

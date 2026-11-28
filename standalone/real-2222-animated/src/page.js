@@ -104,18 +104,18 @@ function renderAll() {
 
 function tick(now) {
   rafId = 0;
-  if (!model.playing && !model.glide) return;
+  if (!model.playing && !model.glide && !model.midGlide) return;
   const dt = lastFrameMs ? Math.min(0.05, Math.max(0, (now - lastFrameMs) / 1000)) : 0;
   lastFrameMs = now;
   stepAnim(model, dt);
   renderAll();
-  if (model.playing || model.glide) {
+  if (model.playing || model.glide || model.midGlide) {
     rafId = requestAnimationFrame(tick);
   }
 }
 
 function ensureLoop() {
-  if (!rafId && (model.playing || model.glide)) {
+  if (!rafId && (model.playing || model.glide || model.midGlide)) {
     lastFrameMs = performance.now();
     rafId = requestAnimationFrame(tick);
   }
@@ -219,7 +219,7 @@ window.__real2222Anim = {
     animT: model.animT,
     playing: model.playing,
     speed: model.speed,
-    gliding: !!model.glide,
+    gliding: !!(model.glide || model.midGlide),
   }),
   info: () => pillow.info(),
   unfoldInfo: () => unfold.info(),

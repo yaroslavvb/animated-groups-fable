@@ -1,6 +1,7 @@
 // symbols.js — pure geometry for "The real 2222 animated":
 // fixed aspect ratio/size (FIXED_ELL = REG_ELL), four unique 180-deg symmetric colored emblems
-// carved seamlessly into the four faces (zero z-fighting), and three continuous twist animations.
+// carved seamlessly into the four faces (zero z-fighting), and three continuous twist animations
+// where each pairing holds its first pair fixed in 3D while rotating only the other pair.
 
 import {
   REG_ELL,
@@ -10,6 +11,13 @@ import {
   det2,
   dot2,
   mul2,
+  add3,
+  sub3,
+  mul3,
+  dot3,
+  cross3,
+  norm3,
+  unit3,
   basisFromPair,
   pairVectors,
   solidFromBasis,
@@ -18,8 +26,14 @@ import {
 } from '../../real-2222/src/real2222.js';
 
 export const FIXED_ELL = REG_ELL; // (4/3)^(1/4) = 1.07456993...
-export const ANIM_PERIOD = 2.0;   // two full Dehn twists return every labeled corner A..D seamlessly
+export const ANIM_PERIOD = 1.0;   // one full 360-deg rotation of the second pair returns all corners identically
 export const BASE_TURNS_PER_SEC = 0.22;
+export const REG_HALF_AXIS = Math.sqrt(1 / Math.sqrt(3)) / 2;
+export const PAIR_SPLITS = [
+  [['A', 'B'], ['C', 'D']],
+  [['A', 'C'], ['B', 'D']],
+  [['A', 'D'], ['B', 'C']],
+];
 
 export const FEATURES = {
   A: { name: 'A', label: 'Star', tint: 4, palIdx: 0, light: '#0072B2', dark: '#4DB6F5' },
@@ -150,12 +164,64 @@ export function earClip(pts) {
 }
 
 /**
+ * Intrinsic rigid frame attached to the active pairing's first (pinned) pair in stage coords.
+ * Axis w uses S.ex/S.ey/S.ez directly so it stays unit-length even at flat degenerate states.
+ */
+export function intrinsicPairFrame(S, activeIdx) {
+  const [[p0, p1]] = PAIR_SPLITS[activeIdx];
+  const V = S.stage;
+  const mid = mul3(0.5, add3(V[p0], V[p1]));
+  const u = unit3(sub3(V[p1], V[p0]));
+  const w = activeIdx === 0 ? [0, 0, S.ex] : activeIdx === 1 ? [S.ey, 0, 0] : [0, S.ez, 0];
+  const v = cross3(w, u);
+  return { mid, u, v, w };
+}
+
+function mapPointBetweenFrames(q, src, dst) {
+  const d = sub3(q, src.mid);
+  const cu = dot3(d, src.u);
+  const cv = dot3(d, src.v);
+  const cw = dot3(d, src.w);
+  return [
+    dst.mid[0] + cu * dst.u[0] + cv * dst.v[0] + cw * dst.w[0],
+    dst.mid[1] + cu * dst.u[1] + cv * dst.v[1] + cw * dst.w[1],
+    dst.mid[2] + cu * dst.u[2] + cv * dst.v[2] + cw * dst.w[2],
+  ];
+}
+
+function mapDirBetweenFrames(dir, src, dst) {
+  const cu = dot3(dir, src.u);
+  const cv = dot3(dir, src.v);
+  const cw = dot3(dir, src.w);
+  return [
+    cu * dst.u[0] + cv * dst.v[0] + cw * dst.w[0],
+    cu * dst.u[1] + cv * dst.v[1] + cw * dst.w[1],
+    cu * dst.u[2] + cv * dst.v[2] + cw * dst.w[2],
+  ];
+}
+
+export function worldCornersFromState(e, activeIdx, pinFrame, { minConorm = 4e-4 } = {}) {
+  const S = solidFromBasis(e, { minConorm });
+  if (!pinFrame) return { S, V: S.stage };
+  const src = intrinsicPairFrame(S, activeIdx);
+  const V = {};
+  for (const name of ['A', 'B', 'C', 'D']) {
+    V[name] = mapPointBetweenFrames(S.stage[name], src, pinFrame);
+  }
+  return { S, V };
+}
+
+/**
  * Exact non-overlapping carved disphenoid mesh for "The real 2222 animated":
  * each corner feature carves its 180-deg symmetric emblem out of each incident triangle face
  * (tint = 4..7) while the remaining background interior stays tint = 0 (Paisley print).
  */
-export function buildSymbolPillowMesh(e, activeFrame, { minConorm = 4e-4 } = {}) {
-  const S = solidFromBasis(e, { minConorm });
+export function buildSymbolPillowMesh(
+  e,
+  activeFrame,
+  { minConorm = 4e-4, activeIdx = 0, pinFrame = null } = {}
+) {
+  const { S, V } = worldCornersFromState(e, activeIdx, pinFrame, { minConorm });
   const pv = pairVectors(e, activeFrame);
   const toPair = (p) => [dot2(p, pv.vh), dot2(p, pv.nh)];
 
@@ -179,7 +245,7 @@ export function buildSymbolPillowMesh(e, activeFrame, { minConorm = 4e-4 } = {})
   for (const tr of S.tris) {
     // Work in global plane coordinates tr.pts so corner emblems never jump/spin on active pair switch
     const V2 = tr.pts;
-    const V3 = tr.names.map((n) => S.stage[n]);
+    const V3 = tr.names.map((n) => V[n]);
     const d2 = det2(sub2(V2[1], V2[0]), sub2(V2[2], V2[0]));
     const to3d = (q) => {
       const w0 = det2(sub2(V2[1], q), sub2(V2[2], q)) / d2;
@@ -227,7 +293,6 @@ export function buildSymbolPillowMesh(e, activeFrame, { minConorm = 4e-4 } = {})
     }
   }
 
-  const V = S.stage;
   const edgePairs = [
     { idx: 0, segs: [[V.A, V.B], [V.C, V.D]], bend: S.bends[0] },
     { idx: 1, segs: [[V.A, V.C], [V.B, V.D]], bend: S.bends[1] },
@@ -258,6 +323,7 @@ export function createAnimModel({ activeIdx = 0, t = 0.25, ell = FIXED_ELL, play
   if (activeIdx === 1 || activeIdx === 2) activatePartition(base, activeIdx, null);
   const angDeg = pairVectors(base.e, base.activeFrame).ang;
   base.e = basisFromPair(safeEll, safeT, base.activeFrame, angDeg);
+  const S0 = solidFromBasis(base.e, { minConorm: 4e-4 });
   return {
     ...base,
     animEll: safeEll,
@@ -265,11 +331,35 @@ export function createAnimModel({ activeIdx = 0, t = 0.25, ell = FIXED_ELL, play
     playing: !!playing,
     speed: Number.isFinite(speed) && speed > 0 ? speed : 1,
     glide: null,
+    pinFrame: intrinsicPairFrame(S0, base.activeIdx),
+    midGlide: null,
   };
 }
 
 export function switchAnimPair(state, nextIdx, paisleyFns = null) {
   if (nextIdx < 0 || nextIdx > 2 || nextIdx === state.activeIdx) return state;
+
+  // Snapshot exact current 3D world pose and new pair's perpendicular axis before switching frames
+  const S = solidFromBasis(state.e, { minConorm: 4e-4 });
+  const srcOld = intrinsicPairFrame(S, state.activeIdx);
+  const dstOld = state.pinFrame || srcOld;
+  const W = {};
+  for (const name of ['A', 'B', 'C', 'D']) {
+    W[name] = mapPointBetweenFrames(S.stage[name], srcOld, dstOld);
+  }
+  const rawW = mapDirBetweenFrames(intrinsicPairFrame(S, nextIdx).w, srcOld, dstOld);
+  const [[p0, p1]] = PAIR_SPLITS[nextIdx];
+  const newMid = mul3(0.5, add3(W[p0], W[p1]));
+  const newU = unit3(sub3(W[p1], W[p0]));
+  const newW = unit3(sub3(rawW, mul3(dot3(rawW, newU), newU)));
+  const newV = cross3(newW, newU);
+  state.pinFrame = { mid: newMid, u: newU, v: newV, w: newW };
+
+  const idealMid = mul3(-REG_HALF_AXIS, newW);
+  state.midGlide = norm3(sub3(newMid, idealMid)) > 1e-4
+    ? { from: newMid.slice(), to: idealMid, elapsed: 0, dur: 0.35 }
+    : null;
+
   activatePartition(state, nextIdx, paisleyFns);
   const pv = pairVectors(state.e, state.activeFrame);
   state.animEll = pv.ell;
@@ -290,11 +380,26 @@ export function stepAnim(state, dtSec) {
     const g = state.glide;
     g.elapsed += dt;
     const u = clamp(g.elapsed / g.dur, 0, 1);
-    const ease = 1 - Math.pow(1 - u, 3);
+    const ease = u * u * (3 - 2 * u);
     state.animEll = g.fromEll + (g.toEll - g.fromEll) * ease;
     if (u >= 1) {
       state.animEll = g.toEll;
       state.glide = null;
+    }
+  }
+  if (state.midGlide && state.pinFrame) {
+    const g = state.midGlide;
+    g.elapsed += dt;
+    const u = clamp(g.elapsed / g.dur, 0, 1);
+    const ease = u * u * (3 - 2 * u);
+    state.pinFrame.mid = [
+      g.from[0] + (g.to[0] - g.from[0]) * ease,
+      g.from[1] + (g.to[1] - g.from[1]) * ease,
+      g.from[2] + (g.to[2] - g.from[2]) * ease,
+    ];
+    if (u >= 1) {
+      state.pinFrame.mid = g.to.slice();
+      state.midGlide = null;
     }
   }
   if (state.playing) {
