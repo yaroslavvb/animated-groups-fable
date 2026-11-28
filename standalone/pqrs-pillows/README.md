@@ -28,7 +28,9 @@ should be able to adjust the twist between two pairs and simultaneously see the 
 of pants"*; *"use two different colors to mark special points on two different sides of the twist"*; *"I want to
 have some kind of pattern which covers the entire pillow"*.
 
-And on Fri 27 Nov 2026, 22:55, about the first version (this file's § "What changed on 27 November, late"):
+And on Fri 27 Nov 2026, 22:55, about the first version (this file's § "What changed on 27 November, late"; the
+message is the first of https://spacesheep.dev/sessions/claude-code/94cfed98-d56b-5611-97e6-34341fb98c60, and the
+fixes are the commits `a2de3b78`, `7238d8f1`, `60ed340f`, `25456d34`):
 
 > I don't want to switch colors, so the lines between different edges should keep their colors. I should be able to
 > adjust different sliders, and when I switch between sliders, there shouldn't be any change. The only change will be
